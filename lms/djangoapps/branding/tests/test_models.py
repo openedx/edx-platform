@@ -1,6 +1,8 @@
 """
 Tests for the Video Branding configuration.
 """
+from __future__ import absolute_import
+
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
@@ -11,7 +13,6 @@ class BrandingInfoConfigTest(TestCase):
     """
     Test the BrandingInfoConfig model.
     """
-    shard = 1
 
     def setUp(self):
         super(BrandingInfoConfigTest, self).setUp()

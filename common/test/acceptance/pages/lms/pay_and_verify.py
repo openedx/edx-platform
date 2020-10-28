@@ -1,5 +1,7 @@
 """Payment and verification pages"""
 
+from __future__ import absolute_import
+
 import re
 
 from bok_choy.page_object import PageObject
@@ -153,8 +155,11 @@ class FakePaymentPage(PageObject):
 
     def is_browser_on_page(self):
         """Check if a step in the payment and verification flow has loaded."""
-        message = self.q(css='BODY').text[0]
-        match = re.search('Payment page', message)
+        message = self.q(css='BODY').text
+        if not message:
+            return False
+
+        match = re.search('Payment page', message[0])
         return True if match else False
 
     def submit_payment(self):
@@ -174,8 +179,11 @@ class FakeSoftwareSecureVerificationPage(PageObject):
 
     def is_browser_on_page(self):
         """ Determine if browser is on the page. """
-        message = self.q(css='BODY').text[0]
-        match = re.search('Fake Software Secure page', message)
+        message = self.q(css='BODY').text
+        if not message:
+            return False
+
+        match = re.search('Fake Software Secure page', message[0])
         return True if match else False
 
     def mark_approved(self):

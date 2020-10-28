@@ -6,7 +6,8 @@ Runs tasks on answers to course problems to validate that code
 paths actually work.
 
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
 import json
 from itertools import chain, cycle, repeat
 from smtplib import SMTPAuthenticationError, SMTPConnectError, SMTPDataError, SMTPServerDisconnected
@@ -29,6 +30,7 @@ from django.conf import settings
 from django.core.management import call_command
 from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
+from six.moves import range
 
 from bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail, Optout
 from bulk_email.tasks import _get_course_email_context
@@ -76,7 +78,6 @@ def my_update_subtask_status(entry_id, current_task_id, new_subtask_status):
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
     """Tests instructor task that send bulk email."""
-    shard = 5
 
     def setUp(self):
         super(TestBulkEmailInstructorTask, self).setUp()
@@ -138,7 +139,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
     def _create_students(self, num_students):
         """Create students for testing"""
-        return [self.create_student('robot%d' % i) for i in xrange(num_students)]
+        return [self.create_student('robot%d' % i) for i in range(num_students)]
 
     def _assert_single_subtask_status(self, entry, succeeded, failed=0, skipped=0, retried_nomax=0, retried_withmax=0):
         """Compare counts with 'subtasks' entry in InstructorTask table."""
@@ -149,11 +150,11 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         self.assertEquals(subtask_info.get('failed'), 0 if succeeded > 0 else 1)
         # verify individual subtask status:
         subtask_status_info = subtask_info.get('status')
-        task_id_list = subtask_status_info.keys()
+        task_id_list = list(subtask_status_info.keys())
         self.assertEquals(len(task_id_list), 1)
         task_id = task_id_list[0]
         subtask_status = subtask_status_info.get(task_id)
-        print("Testing subtask status: {}".format(subtask_status))
+        print(u"Testing subtask status: {}".format(subtask_status))
         self.assertEquals(subtask_status.get('task_id'), task_id)
         self.assertEquals(subtask_status.get('attempted'), succeeded + failed)
         self.assertEquals(subtask_status.get('succeeded'), succeeded)

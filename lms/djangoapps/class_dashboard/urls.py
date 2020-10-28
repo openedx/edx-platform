@@ -1,11 +1,13 @@
 """
 Class Dashboard API endpoint urls.
 """
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.conf.urls import url
 
-import class_dashboard.views
 import class_dashboard.dashboard_data
+import class_dashboard.views
 
 COURSE_ID_PATTERN = settings.COURSE_ID_PATTERN
 

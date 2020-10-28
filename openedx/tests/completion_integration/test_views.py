@@ -2,16 +2,18 @@
 """
 Test models, managers, and validators.
 """
+from __future__ import absolute_import
+
+import ddt
 from completion import waffle
 from completion.test_utils import CompletionWaffleTestMixin
-import ddt
 from django.urls import reverse
 from rest_framework.test import APIClient
 
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 @ddt.ddt
@@ -31,7 +33,7 @@ class CompletionBatchTestCase(CompletionWaffleTestMixin, ModuleStoreTestCase):
         Create the test data.
         """
         super(CompletionBatchTestCase, self).setUp()
-        self.url = reverse('completion_api:v1:completion-batch')
+        self.url = reverse('completion:v1:completion-batch')
 
         # Enable the waffle flag for all tests
         self.override_waffle_switch(True)
@@ -118,7 +120,7 @@ class CompletionBatchTestCase(CompletionWaffleTestMixin, ModuleStoreTestCase):
             },
             400,
             {
-                "detail": "Block with key: 'i4x://some/other_course/problem/Test_Problem' is not in course {}".format(
+                "detail": u"Block with key: 'i4x://some/other_course/problem/Test_Problem' is not in course {}".format(
                     COURSE_KEY,
                 )
             }

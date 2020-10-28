@@ -61,5 +61,5 @@ class Command(BaseCommand):
             library_keys = map(self._parse_library_key, options['library_ids'])
 
         for library_key in library_keys:
-            print("Indexing library {}".format(library_key))
+            print(u"Indexing library {}".format(library_key))
             LibrarySearchIndexer.do_library_reindex(store, library_key)

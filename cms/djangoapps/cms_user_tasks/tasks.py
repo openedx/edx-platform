@@ -42,10 +42,10 @@ def send_task_complete_email(self, task_name, task_state_text, dest_addr, detail
 
     try:
         mail.send_mail(subject, message, from_address, [dest_addr], fail_silently=False)
-        LOGGER.info("Task complete email has been sent to User %s", dest_addr)
+        LOGGER.info(u"Task complete email has been sent to User %s", dest_addr)
     except NoAuthHandlerFound:
         LOGGER.info(
-            'Retrying sending email to user %s, attempt # %s of %s',
+            u'Retrying sending email to user %s, attempt # %s of %s',
             dest_addr,
             retries,
             TASK_COMPLETE_EMAIL_MAX_RETRIES
@@ -54,14 +54,14 @@ def send_task_complete_email(self, task_name, task_state_text, dest_addr, detail
             self.retry(countdown=TASK_COMPLETE_EMAIL_TIMEOUT, max_retries=TASK_COMPLETE_EMAIL_MAX_RETRIES)
         except MaxRetriesExceededError:
             LOGGER.error(
-                'Unable to send task completion email to user from "%s" to "%s"',
+                u'Unable to send task completion email to user from "%s" to "%s"',
                 from_address,
                 dest_addr,
                 exc_info=True
             )
     except Exception:  # pylint: disable=broad-except
         LOGGER.exception(
-            'Unable to send task completion email to user from "%s" to "%s"',
+            u'Unable to send task completion email to user from "%s" to "%s"',
             from_address,
             dest_addr,
             exc_info=True

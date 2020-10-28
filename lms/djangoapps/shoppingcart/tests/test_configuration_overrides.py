@@ -2,6 +2,8 @@
 """
 Dashboard with Shopping Cart History tests with configuration overrides.
 """
+from __future__ import absolute_import
+
 from django.urls import reverse
 from mock import patch
 
@@ -18,7 +20,6 @@ class TestOrderHistoryOnSiteDashboard(SiteMixin, ModuleStoreTestCase):
     """
     Test for dashboard order history site configuration overrides.
     """
-    shard = 4
 
     def setUp(self):
         super(TestOrderHistoryOnSiteDashboard, self).setUp()

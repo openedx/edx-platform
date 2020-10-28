@@ -2,6 +2,8 @@
 Script for importing courseware from git/xml into a mongo modulestore
 """
 
+from __future__ import absolute_import
+
 import logging
 
 from django.core.management.base import BaseCommand, CommandError

@@ -1,21 +1,21 @@
 """ Test Student helpers """
 
+from __future__ import absolute_import
+
 import logging
 
 import ddt
 import unittest
 from django.conf import settings
 from django.contrib.sessions.middleware import SessionMiddleware
-from django.urls import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch
 from mock import Mock
 from testfixtures import LogCapture
 
-from openedx.core.djangoapps.oauth_dispatch.api import destroy_oauth_tokens
-from student.helpers import get_next_url_for_login_page
 from student.tests.factories import UserFactory
 from edx_oauth2_provider.models import TrustedClient
 from edx_oauth2_provider.tests.factories import (
@@ -26,8 +26,10 @@ from edx_oauth2_provider.tests.factories import (
 )
 from provider.constants import CONFIDENTIAL, PUBLIC
 from provider.oauth2.models import AccessToken, RefreshToken
+from openedx.core.djangoapps.oauth_dispatch.api import destroy_oauth_tokens
 
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
+from student.helpers import get_next_url_for_login_page
 
 LOGGER_NAME = "student.helpers"
 

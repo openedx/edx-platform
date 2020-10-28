@@ -26,10 +26,11 @@ from web_fragments.fragment import Fragment
 
 from edxmako.shortcuts import render_to_response, render_to_string
 
+from lms.djangoapps.courseware.courses import allow_public_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.gating.api import get_entrance_exam_score_ratio, get_entrance_exam_usage_key
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
@@ -157,7 +158,7 @@ class CoursewareIndex(View):
 
                 return self.render(request)
         except Exception as exception:  # pylint: disable=broad-except
-            return CourseTabView.handle_exceptions(request, self.course, exception)
+            return CourseTabView.handle_exceptions(request, self.course_key, self.course, exception)
 
     @beeline.traced(name="CoursewareIndex._setup_masquerade_for_effective_user")
     def _setup_masquerade_for_effective_user(self):
@@ -203,20 +204,23 @@ class CoursewareIndex(View):
                 'email_opt_in': False,
             })
 
-            PageLevelMessages.register_warning_message(
-                request,
-                Text(_("You are not signed in. To see additional course content, {sign_in_link} or "
-                       "{register_link}, and enroll in this course.")).format(
-                    sign_in_link=HTML('<a href="{url}">{sign_in_label}</a>').format(
-                        sign_in_label=_('sign in'),
-                        url='{}?{}'.format(reverse('signin_user'), qs),
-                    ),
-                    register_link=HTML('<a href="/{url}">{register_label}</a>').format(
-                        register_label=_('register'),
-                        url='{}?{}'.format(reverse('register_user'), qs),
-                    ),
+            allow_anonymous = allow_public_access(self.course, [COURSE_VISIBILITY_PUBLIC])
+
+            if not allow_anonymous:
+                PageLevelMessages.register_warning_message(
+                    request,
+                    Text(_(u"You are not signed in. To see additional course content, {sign_in_link} or "
+                           u"{register_link}, and enroll in this course.")).format(
+                        sign_in_link=HTML(u'<a href="{url}">{sign_in_label}</a>').format(
+                            sign_in_label=_('sign in'),
+                            url='{}?{}'.format(reverse('signin_user'), qs),
+                        ),
+                        register_link=HTML(u'<a href="/{url}">{register_label}</a>').format(
+                            register_label=_('register'),
+                            url=u'{}?{}'.format(reverse('register_user'), qs),
+                        ),
+                    )
                 )
-            )
 
         return render_to_response('courseware/courseware.html', self._create_courseware_context(request))
 
@@ -331,7 +335,7 @@ class CoursewareIndex(View):
             if not child:
                 # User may be trying to access a child that isn't live yet
                 if not self._is_masquerading_as_student():
-                    raise Http404('No {block_type} found with name {url_name}'.format(
+                    raise Http404(u'No {block_type} found with name {url_name}'.format(
                         block_type=block_type,
                         url_name=url_name,
                     ))
@@ -377,6 +381,7 @@ class CoursewareIndex(View):
             self.field_data_cache,
             self.course_key,
             course=self.course,
+            will_recheck_access=True,
         )
 
     @beeline.traced(name="CoursewareIndex._prefetch_and_bind_section")
@@ -398,6 +403,7 @@ class CoursewareIndex(View):
             self.course_key,
             self.position,
             course=self.course,
+            will_recheck_access=True,
         )
 
     @beeline.traced(name="CoursewareIndex._save_positions")

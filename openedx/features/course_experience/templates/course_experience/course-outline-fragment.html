@@ -14,6 +14,7 @@ from openedx.core.djangolib.markup import HTML, Text
 
 <%
 course_sections = blocks.get('children')
+self_paced = context.get('self_paced', False)
 %>
 <main role="main" class="course-outline" id="main" tabindex="-1">
     % if course_sections is not None:
@@ -91,14 +92,16 @@ course_sections = blocks.get('children')
                 ##
                 ## Exam subsections expose exam status message field as well as a status icon
                 <%
-                if subsection.get('due') is None:
+                if subsection.get('due') is None or self_paced:
                     # examples: Homework, Lab, etc.
                     data_string = subsection.get('format')
+                    data_datetime = ""
                 else:
                     if 'special_exam_info' in subsection:
                         data_string = _('due {date}')
                     else:
                         data_string = _("{subsection_format} due {{date}}").format(subsection_format=subsection.get('format'))
+                    data_datetime = subsection.get('due')
                 %>
                 % if subsection.get('format') or 'special_exam_info' in subsection:
                                             <span class="subtitle">
@@ -117,7 +120,7 @@ course_sections = blocks.get('children')
                         % if not subsection['special_exam_info'].get('in_completed_state', False):
                                                         <span
                                                             class="localized-datetime subtitle-name"
-                                                            data-datetime="${subsection.get('due')}"
+                                                            data-datetime="${data_datetime}"
                                                             data-string="${data_string}"
                                                             data-timezone="${user_timezone}"
                                                             data-language="${user_language}"
@@ -128,7 +131,7 @@ course_sections = blocks.get('children')
                                                     ## this is the standard case in edx-platform
                                                     <span
                                                         class="localized-datetime subtitle-name"
-                                                        data-datetime="${subsection.get('due')}"
+                                                        data-datetime="${data_datetime}"
                                                         data-string="${data_string}"
                                                         data-timezone="${user_timezone}"
                                                         data-language="${user_language}"
@@ -151,6 +154,11 @@ course_sections = blocks.get('children')
                                     aria-labelledby="${ subsection['id'] }"
                                 >
                     % for vertical in subsection.get('children', []):
+                        <%
+                        vertical_is_access_denied = vertical.get('authorization_denial_reason')
+                        if vertical_is_access_denied:
+                            continue
+                        %>
                                     <li class="vertical outline-item focusable">
                                         <a class="outline-item focusable"
                                             % if enable_links:

@@ -2,18 +2,19 @@
 Tests for wiki middleware.
 """
 
+from __future__ import absolute_import
+
 from django.test.client import Client
-from wiki.models import URLPath
 
 from course_wiki.views import get_or_create_root
 from courseware.tests.factories import InstructorFactory
+from wiki.models import URLPath
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class TestWikiAccessMiddleware(ModuleStoreTestCase):
     """Tests for WikiAccessMiddleware."""
-    shard = 1
 
     def setUp(self):
         """Test setup."""

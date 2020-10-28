@@ -1,17 +1,19 @@
 """
 Test UserPreferenceModel and UserPreference events
 """
+from __future__ import absolute_import
+
 from django.db import IntegrityError
 from django.test import TestCase
 
 from student.tests.factories import UserFactory
 from student.tests.tests import UserSettingsEventTestMixin
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..tests.factories import UserPreferenceFactory, UserCourseTagFactory, UserOrgTagFactory
-from ..models import UserPreference, UserOrgTag
+from ..models import UserOrgTag, UserPreference
 from ..preferences.api import set_user_preference
+from ..tests.factories import UserCourseTagFactory, UserOrgTagFactory, UserPreferenceFactory
 
 
 class UserPreferenceModelTest(ModuleStoreTestCase):
@@ -33,7 +35,7 @@ class UserPreferenceModelTest(ModuleStoreTestCase):
         user = UserFactory.create()
         self._create_and_assert(user=user, key="testkey0", value="")
         self._create_and_assert(user=user, key="testkey1", value="This is some English text!")
-        self._create_and_assert(user=user, key="testkey2", value="{'some': 'json'}")
+        self._create_and_assert(user=user, key="testkey2", value='{"some": "json"}')
         self._create_and_assert(
             user=user,
             key="testkey3",

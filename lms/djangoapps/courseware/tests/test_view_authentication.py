@@ -1,9 +1,16 @@
+"""
+Check that view authentication works properly.
+"""
+
+from __future__ import absolute_import
+
 import datetime
 
 import pytz
 from django.urls import reverse
 from mock import patch
 from six import text_type
+from six.moves import range
 
 from courseware.access import has_access
 from courseware.tests.factories import (
@@ -29,7 +36,6 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
 
     ACCOUNT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
     ENABLED_SIGNALS = ['course_published']
-    shard = 1
 
     @staticmethod
     def _reverse_urls(names, course):
@@ -85,7 +91,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         urls.extend([
             reverse('book', kwargs={'course_id': text_type(course.id),
                                     'book_index': index})
-            for index in xrange(len(course.textbooks))
+            for index in range(len(course.textbooks))
         ])
         for url in urls:
             self.assert_request_status_code(200, url)
@@ -413,7 +419,6 @@ class TestBetatesterAccess(ModuleStoreTestCase, CourseAccessTestMixin):
     """
     Tests for the beta tester feature
     """
-    shard = 1
 
     def setUp(self):
         super(TestBetatesterAccess, self).setUp()

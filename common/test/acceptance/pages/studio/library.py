@@ -82,7 +82,7 @@ class LibraryEditPage(LibraryPage, PaginatedMixin, UsersPageMixin):
         self.q(css='.toggle-preview-button').click()
         EmptyPromise(
             lambda: self.are_previews_showing() == toggle,
-            'Preview is visible: %s' % toggle,
+            u'Preview is visible: %s' % toggle,
             timeout=30
         ).fulfill()
         self.wait_until_ready()
@@ -129,7 +129,7 @@ class LibraryEditPage(LibraryPage, PaginatedMixin, UsersPageMixin):
         action is 'edit', 'duplicate', or 'delete'
         """
         return self._div_for_xblock_id(xblock_id)[0].find_element_by_css_selector(
-            '.header-actions .{action}-button.action-button'.format(action=action)
+            u'.header-actions .{action}-button.action-button'.format(action=action)
         )
 
 

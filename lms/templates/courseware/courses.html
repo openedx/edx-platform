@@ -1,7 +1,8 @@
+<%page expression_filter="h"/>
 <%!
   import json
   from django.utils.translation import ugettext as _
-  from openedx.core.djangolib.js_utils import dump_js_escaped_json
+  from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_json
 %>
 <%inherit file="../main.html" />
 <%
@@ -21,8 +22,8 @@
     DiscoveryFactory(
       ${course_discovery_meanings | n, dump_js_escaped_json},
       getParameterByName('search_query'),
-      "${user_language}",
-      "${user_timezone}"
+      "${user_language | n, js_escaped_string}",
+      "${user_timezone | n, js_escaped_string}"
     );
   </%static:require_module>
 </%block>
@@ -56,14 +57,14 @@
         % endif
 
         <div class="courses${'' if course_discovery_enabled else ' no-course-discovery'}" role="region" aria-label="${_('List of Courses')}">
-          <ul class="courses-listing journal-list">
+          <ul class="journal-list">
             % for bundle in journal_info.get('journal_bundles'):
             <li class="courses-listing-item">
               <%include file="../journals/bundle_card.html" args="bundle=bundle" />
             </li>
             % endfor
           </ul>
-          <ul class="courses-listing journal-list">
+          <ul class="journal-list">
             %for journal in journal_info.get('journals'):
             <li class="courses-listing-item">
               <%include file="../journals/journal_card.html" args="journal=journal" />

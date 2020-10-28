@@ -1,10 +1,17 @@
-import urllib
+"""
+Tests for experimentation views
+"""
+from __future__ import absolute_import
+
 import unittest
 
+import six.moves.urllib.error  # pylint: disable=import-error
+import six.moves.urllib.parse  # pylint: disable=import-error
+import six.moves.urllib.request  # pylint: disable=import-error
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
-from django.urls import reverse
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch
 from rest_framework.test import APITestCase
 
@@ -13,12 +20,10 @@ from experiments.models import ExperimentData, ExperimentKeyValue
 from experiments.serializers import ExperimentDataSerializer
 from student.tests.factories import UserFactory
 
-
 CROSS_DOMAIN_REFERER = 'https://ecommerce.edx.org'
 
 
 class ExperimentDataViewSetTests(APITestCase):
-    shard = 4
 
     def assert_data_created_for_user(self, user, method='post', status=201):
         url = reverse('api_experiments:v0:data-list')
@@ -64,18 +69,18 @@ class ExperimentDataViewSetTests(APITestCase):
         ExperimentDataFactory(user=user)
         data = ExperimentDataFactory.create_batch(3, user=user, experiment_id=experiment_id)
 
-        qs = urllib.urlencode({'experiment_id': experiment_id})
+        qs = six.moves.urllib.parse.urlencode({'experiment_id': experiment_id})
         response = self.client.get('{url}?{qs}'.format(url=url, qs=qs))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['results'], ExperimentDataSerializer(data, many=True).data)
 
         datum = data[0]
-        qs = urllib.urlencode({'key': datum.key})
+        qs = six.moves.urllib.parse.urlencode({'key': datum.key})
         response = self.client.get('{url}?{qs}'.format(url=url, qs=qs))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['results'], ExperimentDataSerializer([datum], many=True).data)
 
-        qs = urllib.urlencode({'experiment_id': experiment_id, 'key': datum.key})
+        qs = six.moves.urllib.parse.urlencode({'experiment_id': experiment_id, 'key': datum.key})
         response = self.client.get('{url}?{qs}'.format(url=url, qs=qs))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['results'], ExperimentDataSerializer([datum], many=True).data)
@@ -314,7 +319,6 @@ class ExperimentCrossDomainTests(APITestCase):
 
 
 class ExperimentKeyValueViewSetTests(APITestCase):
-    shard = 4
 
     def test_permissions(self):
         """ Staff access is required for write operations. """

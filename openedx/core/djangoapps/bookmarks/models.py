@@ -1,8 +1,11 @@
 """
 Models for Bookmarks.
 """
+from __future__ import absolute_import
+
 import logging
 
+import six
 from django.contrib.auth.models import User
 from django.db import models
 from jsonfield.fields import JSONField
@@ -23,7 +26,7 @@ def prepare_path_for_serialization(path):
     """
     Return the data from a list of PathItems ready for serialization to json.
     """
-    return [(unicode(path_item.usage_key), path_item.display_name) for path_item in path]
+    return [(six.text_type(path_item.usage_key), path_item.display_name) for path_item in path]
 
 
 def parse_path_data(path_data):
@@ -41,6 +44,8 @@ def parse_path_data(path_data):
 class Bookmark(TimeStampedModel):
     """
     Bookmarks model.
+
+    .. no_pii:
     """
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     course_key = CourseKeyField(max_length=255, db_index=True)
@@ -190,6 +195,8 @@ class Bookmark(TimeStampedModel):
 class XBlockCache(TimeStampedModel):
     """
     XBlockCache model to store info about xblocks.
+
+    .. no_pii:
     """
 
     course_key = CourseKeyField(max_length=255, db_index=True)
@@ -207,7 +214,7 @@ class XBlockCache(TimeStampedModel):
         app_label = 'bookmarks'
 
     def __unicode__(self):
-        return unicode(self.usage_key)
+        return six.text_type(self.usage_key)
 
     @property
     def paths(self):

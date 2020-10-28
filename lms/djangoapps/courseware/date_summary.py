@@ -163,9 +163,9 @@ class DateSummary(object):
         locale = to_locale(get_language())
         user_timezone = user_timezone_locale_prefs(crum.get_current_request())['user_timezone']
         return HTML(
-            '<span class="date localized-datetime" data-format="{date_format}" data-datetime="{date_time}"'
-            ' data-timezone="{user_timezone}" data-language="{user_language}">'
-            '</span>'
+            u'<span class="date localized-datetime" data-format="{date_format}" data-datetime="{date_time}"'
+            u' data-timezone="{user_timezone}" data-language="{user_language}">'
+            u'</span>'
         ).format(
             date_format=date_format,
             date_time=self.date,
@@ -247,7 +247,7 @@ class CourseStartDate(DateSummary):
                     Text(_(
                         "Don't forget to add a calendar reminder!"
                     )),
-                    title=Text(_("Course starts in {time_remaining_string} on {course_start_date}.")).format(
+                    title=Text(_(u"Course starts in {time_remaining_string} on {course_start_date}.")).format(
                         time_remaining_string=self.time_remaining_string,
                         course_start_date=self.long_date_html,
                     )
@@ -255,7 +255,7 @@ class CourseStartDate(DateSummary):
             else:
                 CourseHomeMessages.register_info_message(
                     request,
-                    Text(_("Course starts in {time_remaining_string} at {course_start_time}.")).format(
+                    Text(_(u"Course starts in {time_remaining_string} at {course_start_time}.")).format(
                         time_remaining_string=self.time_remaining_string,
                         course_start_time=self.short_time_html,
                     )
@@ -300,7 +300,7 @@ class CourseEndDate(DateSummary):
                 CourseHomeMessages.register_info_message(
                     request,
                     Text(self.description),
-                    title=Text(_('This course is ending in {time_remaining_string} on {course_end_date}.')).format(
+                    title=Text(_(u'This course is ending in {time_remaining_string} on {course_end_date}.')).format(
                         time_remaining_string=self.time_remaining_string,
                         course_end_date=self.long_date_html,
                     )
@@ -309,7 +309,7 @@ class CourseEndDate(DateSummary):
                 CourseHomeMessages.register_info_message(
                     request,
                     Text(self.description),
-                    title=Text(_('This course is ending in {time_remaining_string} at {course_end_time}.')).format(
+                    title=Text(_(u'This course is ending in {time_remaining_string} at {course_end_time}.')).format(
                         time_remaining_string=self.time_remaining_string,
                         course_end_time=self.short_time_html,
                     )
@@ -367,12 +367,12 @@ class CertificateAvailableDate(DateSummary):
             CourseHomeMessages.register_info_message(
                 request,
                 Text(_(
-                    'If you have earned a certificate, you will be able to access it {time_remaining_string}'
-                    ' from now. You will also be able to view your certificates on your {learner_profile_link}.'
+                    u'If you have earned a certificate, you will be able to access it {time_remaining_string}'
+                    u' from now. You will also be able to view your certificates on your {learner_profile_link}.'
                 )).format(
                     time_remaining_string=self.time_remaining_string,
                     learner_profile_link=HTML(
-                        '<a href="{learner_profile_url}">{learner_profile_name}</a>'
+                        u'<a href="{learner_profile_url}">{learner_profile_name}</a>'
                     ).format(
                         learner_profile_url=reverse('learner_profile', kwargs={'username': request.user.username}),
                         learner_profile_name=_('Learner Profile'),
@@ -515,18 +515,18 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
         days_left_to_upgrade = (self.date - self.current_time).days
         if self.date > self.current_time and days_left_to_upgrade <= settings.COURSE_MESSAGE_ALERT_DURATION_IN_DAYS:
             upgrade_message = _(
-                "Don't forget, you have {time_remaining_string} left to upgrade to a Verified Certificate."
+                u"Don't forget, you have {time_remaining_string} left to upgrade to a Verified Certificate."
             ).format(time_remaining_string=self.time_remaining_string)
             if self._dynamic_deadline() is not None:
                 upgrade_message = _(
-                    "Don't forget to upgrade to a verified certificate by {localized_date}."
+                    u"Don't forget to upgrade to a verified certificate by {localized_date}."
                 ).format(localized_date=date_format(self.date))
             CourseHomeMessages.register_info_message(
                 request,
                 Text(_(
                     'In order to qualify for a certificate, you must meet all course grading '
                     'requirements, upgrade before the course deadline, and successfully verify '
-                    'your identity on {platform_name} if you have not done so already.{button_panel}'
+                    u'your identity on {platform_name} if you have not done so already.{button_panel}'
                 )).format(
                     platform_name=settings.PLATFORM_NAME,
                     button_panel=HTML(
@@ -537,7 +537,7 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
                         '</div>'
                     ).format(
                         upgrade_url=self.link,
-                        upgrade_label=Text(_('Upgrade ({upgrade_price})')).format(upgrade_price=upgrade_price),
+                        upgrade_label=Text(_(u'Upgrade ({upgrade_price})')).format(upgrade_price=upgrade_price),
                     )
                 ),
                 title=Text(upgrade_message)

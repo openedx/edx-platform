@@ -10,7 +10,6 @@ class ResourceTemplatesTests(unittest.TestCase):
     """
     Tests for xmodule.x_module.ResourceTemplates
     """
-    shard = 1
 
     def test_templates(self):
         expected = set([

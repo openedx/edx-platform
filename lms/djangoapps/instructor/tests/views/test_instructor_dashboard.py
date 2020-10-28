@@ -1,17 +1,22 @@
 """
 Unit tests for instructor_dashboard.py.
 """
+from __future__ import absolute_import
+
 import datetime
 
 import ddt
+import six
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.urls import reverse
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch
+from pyquery import PyQuery as pq
 from pytz import UTC
 from six import text_type
+from six.moves import range
 import unittest
 
 from common.test.utils import XssTestMixin
@@ -20,11 +25,10 @@ from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import StaffFactory, StudentModuleFactory, UserFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from edxmako.shortcuts import render_to_response
-from lms.djangoapps.grades.config.waffle import waffle_flags, WRITABLE_GRADEBOOK
+from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
 from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from pyquery import PyQuery as pq
 from shoppingcart.models import CourseRegCodeItem, Order, PaidCourseRegistration
 from student.models import CourseEnrollment
 from student.roles import CourseFinanceAdminRole
@@ -53,7 +57,6 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
     """
     Tests for the instructor dashboard (not legacy).
     """
-    shard = 3
 
     def setUp(self):
         """
@@ -89,14 +92,14 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         Returns expected dashboard enrollment message with link to Insights.
         """
-        return 'Enrollment data is now available in <a href="http://example.com/courses/{}" ' \
+        return u'Enrollment data is now available in <a href="http://example.com/courses/{}" ' \
                'target="_blank">Example</a>.'.format(text_type(self.course.id))
 
     def get_dashboard_analytics_message(self):
         """
         Returns expected dashboard demographic message with link to Insights.
         """
-        return 'For analytics about your course, go to <a href="http://example.com/courses/{}" ' \
+        return u'For analytics about your course, go to <a href="http://example.com/courses/{}" ' \
                'target="_blank">Example</a>.'.format(text_type(self.course.id))
 
     def test_instructor_tab(self):
@@ -129,7 +132,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         url = reverse(
             'instructor_dashboard',
             kwargs={
-                'course_id': unicode(self.course_info.id)
+                'course_id': six.text_type(self.course_info.id)
             }
         )
 
@@ -175,7 +178,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         url = reverse(
             'instructor_dashboard',
             kwargs={
-                'course_id': unicode(self.course_info.id)
+                'course_id': six.text_type(self.course_info.id)
             }
         )
 
@@ -192,7 +195,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         url = reverse(
             'instructor_dashboard',
             kwargs={
-                'course_id': unicode(self.course_info.id)
+                'course_id': six.text_type(self.course_info.id)
             }
         )
 
@@ -232,6 +235,43 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
         expected_gradebook_url = 'http://gradebook.local.edx.org/{}'.format(self.course.id)
         self.assertIn(expected_gradebook_url, response.content)
+        self.assertIn('View Gradebook', response.content)
+
+    GRADEBOOK_LEARNER_COUNT_MESSAGE = (
+        'Note: This feature is available only to courses with a small number ' +
+        'of enrolled learners.'
+    )
+
+    def test_gradebook_learner_count_message(self):
+        """
+        Test that, when the writable gradebook featue is NOT enabled, there IS
+        a message that the feature is only available for courses with small
+        numbers of learners.
+        """
+        response = self.client.get(self.url)
+        self.assertIn(
+            self.GRADEBOOK_LEARNER_COUNT_MESSAGE,
+            response.content
+        )
+        self.assertIn('View Gradebook', response.content)
+
+    @patch(
+        'lms.djangoapps.instructor.views.instructor_dashboard.settings.WRITABLE_GRADEBOOK_URL',
+        'http://gradebook.local.edx.org'
+    )
+    def test_no_gradebook_learner_count_message(self):
+        """
+        Test that, when the writable gradebook featue IS enabled, there is NOT
+        a message that the feature is only available for courses with small
+        numbers of learners.
+        """
+        waffle_flag = waffle_flags()[WRITABLE_GRADEBOOK]
+        with override_waffle_flag(waffle_flag, active=True):
+            response = self.client.get(self.url)
+        self.assertNotIn(
+            TestInstructorDashboard.GRADEBOOK_LEARNER_COUNT_MESSAGE,
+            response.content
+        )
         self.assertIn('View Gradebook', response.content)
 
     def test_default_currency_in_the_html_response(self):
@@ -286,7 +326,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         self.assertIn('<th scope="row">Professional</th>', response.content)
 
         # dashboard link hidden
-        self.assertNotIn(self.get_dashboard_enrollment_message(), response.content)
+        self.assertNotIn(self.get_dashboard_enrollment_message(), response.content.decode(response.charset))
 
     @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_ENROLLMENTS': True})
     @override_settings(ANALYTICS_DASHBOARD_URL='')
@@ -319,7 +359,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
         # link to dashboard shown
         expected_message = self.get_dashboard_enrollment_message()
-        self.assertIn(expected_message, response.content)
+        self.assertIn(expected_message, response.content.decode(response.charset))
 
     @override_settings(ANALYTICS_DASHBOARD_URL='')
     @override_settings(ANALYTICS_DASHBOARD_NAME='')
@@ -343,7 +383,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
         # link to dashboard shown
         expected_message = self.get_dashboard_analytics_message()
-        self.assertIn(expected_message, response.content)
+        self.assertIn(expected_message, response.content.decode(response.charset))
 
     def add_course_to_user_cart(self, cart, course_key):
         """
@@ -416,7 +456,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
     @patch('lms.djangoapps.instructor.views.gradebook_api.render_to_response', intercept_renderer)
     @patch('lms.djangoapps.instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
     def test_spoc_gradebook_pages(self):
-        for i in xrange(2):
+        for i in range(2):
             username = "user_%d" % i
             student = UserFactory.create(username=username)
             CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
@@ -508,7 +548,7 @@ class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTes
         )
 
         students = []
-        for i in xrange(20):
+        for i in range(20):
             username = "user_%d" % i
             student = UserFactory.create(username=username)
             CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
@@ -536,11 +576,11 @@ class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTes
             publish_item=True,
             start=datetime.datetime(2015, 4, 1, tzinfo=UTC),
         )
-        for i in xrange(10):
+        for i in range(10):
             problem = ItemFactory.create(
                 category="problem",
                 parent=vertical,
-                display_name="A Problem Block %d" % i,
+                display_name=u"A Problem Block %d" % i,
                 weight=1,
                 publish_item=False,
                 metadata={'rerandomize': 'always'},

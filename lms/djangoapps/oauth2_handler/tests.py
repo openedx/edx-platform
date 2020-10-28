@@ -1,5 +1,8 @@
 # pylint: disable=missing-docstring
+from __future__ import absolute_import
+
 import mock
+import six
 from django.core.cache import cache
 from django.test.utils import override_settings
 # Will also run default tests for IDTokens and UserInfo
@@ -15,14 +18,13 @@ from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 
 
 class BaseTestMixin(ModuleStoreTestCase):
-    shard = 6
     profile = None
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
         super(BaseTestMixin, self).setUp()
         self.course_key = CourseFactory.create(emit_signals=True).id
-        self.course_id = unicode(self.course_key)
+        self.course_id = six.text_type(self.course_key)
         self.user_factory = UserFactory
         self.set_user(self.make_user())
 
@@ -32,7 +34,6 @@ class BaseTestMixin(ModuleStoreTestCase):
 
 
 class IDTokenTest(BaseTestMixin, IDTokenTestCase):
-    shard = 6
 
     def setUp(self):
         super(IDTokenTest, self).setUp()
@@ -108,7 +109,7 @@ class IDTokenTest(BaseTestMixin, IDTokenTestCase):
     def test_course_staff_courses_with_claims(self):
         CourseStaffRole(self.course_key).add_users(self.user)
 
-        course_id = unicode(self.course_key)
+        course_id = six.text_type(self.course_key)
 
         nonexistent_course_id = 'some/other/course'
 
@@ -147,7 +148,6 @@ class IDTokenTest(BaseTestMixin, IDTokenTestCase):
 
 
 class UserInfoTest(BaseTestMixin, UserInfoTestCase):
-    shard = 6
 
     def setUp(self):
         super(UserInfoTest, self).setUp()

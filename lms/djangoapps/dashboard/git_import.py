@@ -3,6 +3,8 @@ Provides a function for importing a git repository into the lms
 instance when using a mongo modulestore
 """
 
+from __future__ import absolute_import
+
 import logging
 import os
 import re
@@ -15,10 +17,10 @@ from django.core import management
 from django.core.management.base import CommandError
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from xmodule.util.sandboxing import DEFAULT_PYTHON_LIB_FILENAME
 from opaque_keys.edx.locator import CourseLocator
 
 from dashboard.models import CourseImportLog
+from xmodule.util.sandboxing import DEFAULT_PYTHON_LIB_FILENAME
 
 log = logging.getLogger(__name__)
 
@@ -44,9 +46,9 @@ class GitImportErrorNoDir(GitImportError):
     def __init__(self, repo_dir):
         super(GitImportErrorNoDir, self).__init__(
             _(
-                "Path {0} doesn't exist, please create it, "
-                "or configure a different path with "
-                "GIT_REPO_DIR"
+                u"Path {0} doesn't exist, please create it, "
+                u"or configure a different path with "
+                u"GIT_REPO_DIR"
             ).format(repo_dir)
         )
 
@@ -57,7 +59,7 @@ class GitImportErrorUrlBad(GitImportError):
     """
     MESSAGE = _(
         'Non usable git url provided. Expecting something like:'
-        ' git@github.com:mitocw/edx4edx_lite.git'
+        ' git@github.com:edx/edx4edx_lite.git'
     )
 
 
@@ -134,7 +136,7 @@ def switch_branch(branch, rdir):
     try:
         cmd_log(['git', 'fetch', ], rdir)
     except subprocess.CalledProcessError as ex:
-        log.exception('Unable to fetch remote: %r', ex.output)
+        log.exception(u'Unable to fetch remote: %r', ex.output)
         raise GitImportErrorCannotBranch()
 
     # Check if the branch is available from the remote.
@@ -142,7 +144,7 @@ def switch_branch(branch, rdir):
     try:
         output = cmd_log(cmd, rdir)
     except subprocess.CalledProcessError as ex:
-        log.exception('Getting a list of remote branches failed: %r', ex.output)
+        log.exception(u'Getting a list of remote branches failed: %r', ex.output)
         raise GitImportErrorCannotBranch()
     if branch not in output:
         raise GitImportErrorRemoteBranchMissing()
@@ -151,7 +153,7 @@ def switch_branch(branch, rdir):
     try:
         output = cmd_log(cmd, rdir)
     except subprocess.CalledProcessError as ex:
-        log.exception('Getting a list of local branches failed: %r', ex.output)
+        log.exception(u'Getting a list of local branches failed: %r', ex.output)
         raise GitImportErrorCannotBranch()
     branches = []
     for line in output.split('\n'):
@@ -164,14 +166,14 @@ def switch_branch(branch, rdir):
         try:
             cmd_log(cmd, rdir)
         except subprocess.CalledProcessError as ex:
-            log.exception('Unable to checkout remote branch: %r', ex.output)
+            log.exception(u'Unable to checkout remote branch: %r', ex.output)
             raise GitImportErrorCannotBranch()
     # Go ahead and reset hard to the newest version of the branch now that we know
     # it is local.
     try:
         cmd_log(['git', 'reset', '--hard', 'origin/{0}'.format(branch), ], rdir)
     except subprocess.CalledProcessError as ex:
-        log.exception('Unable to reset to branch: %r', ex.output)
+        log.exception(u'Unable to reset to branch: %r', ex.output)
         raise GitImportErrorCannotBranch()
 
 
@@ -214,7 +216,7 @@ def add_repo(repo, rdir_in, branch=None):
         rdir = os.path.basename(rdir_in)
     else:
         rdir = repo.rsplit('/', 1)[-1].rsplit('.git', 1)[0]
-    log.debug('rdir = %s', rdir)
+    log.debug(u'rdir = %s', rdir)
 
     rdirp = '{0}/{1}'.format(git_repo_dir, rdir)
     if os.path.exists(rdirp):
@@ -230,7 +232,7 @@ def add_repo(repo, rdir_in, branch=None):
     try:
         ret_git = cmd_log(cmd, cwd=cwd)
     except subprocess.CalledProcessError as ex:
-        log.exception('Error running git pull: %r', ex.output)
+        log.exception(u'Error running git pull: %r', ex.output)
         raise GitImportErrorCannotPull()
 
     if branch:
@@ -241,10 +243,10 @@ def add_repo(repo, rdir_in, branch=None):
     try:
         commit_id = cmd_log(cmd, cwd=rdirp)
     except subprocess.CalledProcessError as ex:
-        log.exception('Unable to get git log: %r', ex.output)
+        log.exception(u'Unable to get git log: %r', ex.output)
         raise GitImportErrorBadRepo()
 
-    ret_git += '\nCommit ID: {0}'.format(commit_id)
+    ret_git += u'\nCommit ID: {0}'.format(commit_id)
 
     # get branch
     cmd = ['git', 'symbolic-ref', '--short', 'HEAD', ]
@@ -253,10 +255,10 @@ def add_repo(repo, rdir_in, branch=None):
     except subprocess.CalledProcessError as ex:
         # I can't discover a way to excercise this, but git is complex
         # so still logging and raising here in case.
-        log.exception('Unable to determine branch: %r', ex.output)
+        log.exception(u'Unable to determine branch: %r', ex.output)
         raise GitImportErrorBadRepo()
 
-    ret_git += '{0}Branch: {1}'.format('   \n', branch)
+    ret_git += u'{0}Branch: {1}'.format('   \n', branch)
 
     # Get XML logging logger and capture debug to parse results
     output = StringIO.StringIO()
@@ -306,7 +308,7 @@ def add_repo(repo, rdir_in, branch=None):
         # environment course id remain consistent as CourseLocator instance.
         course_key = CourseLocator(*course_id)
         cdir = '{0}/{1}'.format(git_repo_dir, course_key.course)
-        log.debug('Studio course dir = %s', cdir)
+        log.debug(u'Studio course dir = %s', cdir)
 
         if os.path.exists(cdir) and not os.path.islink(cdir):
             log.debug('   -> exists, but is not symlink')
@@ -318,7 +320,7 @@ def add_repo(repo, rdir_in, branch=None):
                 log.exception('Failed to remove course directory')
 
         if not os.path.exists(cdir):
-            log.debug('   -> creating symlink between %s and %s', rdirp, cdir)
+            log.debug(u'   -> creating symlink between %s and %s', rdirp, cdir)
             try:
                 os.symlink(os.path.abspath(rdirp), os.path.abspath(cdir))
             except OSError:

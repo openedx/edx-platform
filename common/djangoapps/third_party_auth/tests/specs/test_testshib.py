@@ -1,6 +1,8 @@
 """
 Third_party_auth integration tests using a mock version of the TestShib provider
 """
+from __future__ import absolute_import
+
 import datetime
 import json
 import logging
@@ -290,13 +292,13 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
             self.assertEqual(mock_log.call_count, 4)
 
             (msg, action_type, idp_name, xml), _kwargs = mock_log.call_args_list[0]
-            self.assertTrue(msg.startswith("SAML login %s"))
+            self.assertTrue(msg.startswith(u"SAML login %s"))
             self.assertEqual(action_type, "request")
             self.assertEqual(idp_name, self.PROVIDER_IDP_SLUG)
             self.assertIn('<samlp:AuthnRequest', xml)
 
             (msg, action_type, idp_name, xml), _kwargs = mock_log.call_args_list[1]
-            self.assertTrue(msg.startswith("SAML login %s"))
+            self.assertTrue(msg.startswith(u"SAML login %s"))
             self.assertEqual(action_type, "response")
             self.assertEqual(idp_name, self.PROVIDER_IDP_SLUG)
             self.assertIn('<saml2p:Response', xml)

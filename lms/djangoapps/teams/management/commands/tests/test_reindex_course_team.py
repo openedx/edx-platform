@@ -2,6 +2,8 @@
 Tests for course_team reindex command
 """
 
+from __future__ import absolute_import
+
 import ddt
 from django.core.management import CommandError, call_command
 from mock import patch
@@ -21,7 +23,6 @@ class ReindexCourseTeamTest(SharedModuleStoreTestCase):
     """
     Tests for the ReindexCourseTeam command
     """
-    shard = 4
 
     def setUp(self):
         """
@@ -62,7 +63,7 @@ class ReindexCourseTeamTest(SharedModuleStoreTestCase):
         Test that raises CommandError for invalid team id.
         """
         team_id = u'team4'
-        error_str = 'Argument {} is not a course_team team_id'.format(team_id)
+        error_str = u'Argument {} is not a course_team team_id'.format(team_id)
         with self.assertRaisesRegexp(CommandError, error_str):
             call_command('reindex_course_team', team_id)
 

@@ -1,28 +1,28 @@
+from __future__ import absolute_import
+
 import json
 import logging
 import unittest
 import uuid
 from datetime import datetime, timedelta
 
-from courseware.models import (
-    DynamicUpgradeDeadlineConfiguration
-)
 from django.conf import settings
 from django.urls import reverse
 from django.utils.timezone import now
 from mock import patch
 from opaque_keys.edx.locator import CourseKey
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.models import UserOrgTag
 from student.models import CourseEnrollment
-from student.tests.factories import (TEST_PASSWORD, CourseEnrollmentFactory, UserFactory)
+from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 log = logging.getLogger(__name__)
 

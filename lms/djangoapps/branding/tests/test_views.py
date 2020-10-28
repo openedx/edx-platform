@@ -1,14 +1,16 @@
 # encoding: utf-8
 """Tests of Branding API views. """
+from __future__ import absolute_import
+
 import json
-import urllib
 
 import ddt
 import mock
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.test import TestCase
+from django.urls import reverse
 
 from branding.models import BrandingApiConfig
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
@@ -22,7 +24,6 @@ from student.tests.factories import UserFactory
 @ddt.ddt
 class TestFooter(CacheIsolationTestCase):
     """Test API end-point for retrieving the footer. """
-    shard = 4
 
     @ddt.data("*/*", "text/html", "application/json")
     def test_feature_flag(self, accepts):
@@ -236,7 +237,7 @@ class TestFooter(CacheIsolationTestCase):
 
         if include_language_selector:
             selected_language = language if language else 'en'
-            self._verify_language_selector(resp.content, selected_language)
+            self._verify_language_selector(resp, selected_language)
         else:
             self.assertNotIn('footer-language-selector', resp.content)
 
@@ -257,29 +258,29 @@ class TestFooter(CacheIsolationTestCase):
         if params is not None:
             url = u"{url}?{params}".format(
                 url=url,
-                params=urllib.urlencode(params)
+                params=six.moves.urllib.parse.urlencode(params)
             )
 
         return self.client.get(url, HTTP_ACCEPT=accepts)
 
-    def _verify_language_selector(self, content, selected_language):
+    def _verify_language_selector(self, response, selected_language):
         """ Verify that the language selector is present and correctly configured."""
         # Verify the selector is included
+        content = response.content.decode(response.charset)
         self.assertIn('footer-language-selector', content)
 
         # Verify the correct language is selected
-        self.assertIn('<option value="{}" selected="selected">'.format(selected_language), content)
+        self.assertIn(u'<option value="{}" selected="selected">'.format(selected_language), content)
 
         # Verify the language choices
         for language in released_languages():
             if language.code == selected_language:
                 continue
-            self.assertIn('<option value="{}">'.format(language.code), content)
+            self.assertIn(u'<option value="{}">'.format(language.code), content)
 
 
 class TestIndex(SiteMixin, TestCase):
     """ Test the index view """
-    shard = 4
 
     def setUp(self):
         """ Set up a user """

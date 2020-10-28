@@ -126,7 +126,7 @@ def _course_team_user(request, course_key, email):
     except Exception:
         log.exception('Failed finding user by email (%s) for course (%s) team invite.', email, course_key)
         msg = {
-            "error": _("Could not find user by email address '{email}'.").format(email=email),
+            "error": _(u"Could not find user by email address '{email}'.").format(email=email),
         }
         return JsonResponse(msg, 404)
 
@@ -170,7 +170,7 @@ def _course_team_user(request, course_key, email):
     # can't modify an inactive user but can remove it
     if not (user.is_active or new_role is None):
         msg = {
-            "error": _('User {email} has registered but has not yet activated his/her account.').format(email=email),
+            "error": _(u'User {email} has registered but has not yet activated his/her account.').format(email=email),
         }
         return JsonResponse(msg, 400)
 

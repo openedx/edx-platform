@@ -27,9 +27,7 @@ _SETTINGS_MAP['DEFAULT_TEMPLATE_ENGINE'] = _SETTINGS_MAP['TEMPLATES'][0]
 class SettingsUnitTest(testutil.TestCase):
     """Unit tests for settings management code."""
 
-    # Allow access to protected methods (or module-protected methods) under test.
-    # pylint: disable=protected-access
-    # Suppress sprurious no-member warning on fakes.
+    # Suppress spurious no-member warning on fakes.
     # pylint: disable=no-member
 
     def setUp(self):

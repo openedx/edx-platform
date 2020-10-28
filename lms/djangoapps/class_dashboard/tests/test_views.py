@@ -1,6 +1,8 @@
 """
 Tests for class dashboard (Metrics tab in instructor dashboard)
 """
+from __future__ import absolute_import
+
 import json
 
 from django.test.client import RequestFactory
@@ -17,7 +19,6 @@ class TestViews(ModuleStoreTestCase):
     """
     Tests related to class_dashboard/views.py
     """
-    shard = 1
 
     def setUp(self):
         super(TestViews, self).setUp()

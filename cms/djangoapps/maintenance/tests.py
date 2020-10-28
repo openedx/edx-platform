@@ -14,6 +14,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
+from openedx.features.announcements.models import Announcement
+
 from .views import COURSE_KEY_ERROR_MESSAGES, MAINTENANCE_VIEWS
 
 # This list contains URLs of all maintenance app views.
@@ -77,8 +79,7 @@ class MaintenanceViewAccessTests(MaintenanceViewTestCase):
     """
     Tests for access control of maintenance views.
     """
-    @ddt.data(MAINTENANCE_URLS)
-    @ddt.unpack
+    @ddt.data(*MAINTENANCE_URLS)
     def test_require_login(self, url):
         """
         Test that maintenance app requires user login.
@@ -95,8 +96,7 @@ class MaintenanceViewAccessTests(MaintenanceViewTestCase):
 
         self.assertRedirects(response, redirect_url)
 
-    @ddt.data(MAINTENANCE_URLS)
-    @ddt.unpack
+    @ddt.data(*MAINTENANCE_URLS)
     def test_global_staff_access(self, url):
         """
         Test that all maintenance app views are accessible to global staff user.
@@ -104,8 +104,7 @@ class MaintenanceViewAccessTests(MaintenanceViewTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-    @ddt.data(MAINTENANCE_URLS)
-    @ddt.unpack
+    @ddt.data(*MAINTENANCE_URLS)
     def test_non_global_staff_access(self, url):
         """
         Test that all maintenance app views are not accessible to non-global-staff user.
@@ -260,3 +259,80 @@ class TestForcePublish(MaintenanceViewTestCase):
 
         # verify that both branch versions are still different
         self.verify_versions_are_different(course)
+
+
+@ddt.ddt
+class TestAnnouncementsViews(MaintenanceViewTestCase):
+    """
+    Tests for the announcements edit view.
+    """
+
+    def setUp(self):
+        super(TestAnnouncementsViews, self).setUp()
+        self.admin = AdminFactory.create(
+            email='staff@edx.org',
+            username='admin',
+            password='pass'
+        )
+        self.client.login(username=self.admin.username, password='pass')
+        self.non_staff_user = UserFactory.create(
+            email='test@edx.org',
+            username='test',
+            password='pass'
+        )
+
+    def test_index(self):
+        """
+        Test create announcement view
+        """
+        url = reverse("maintenance:announcement_index")
+        response = self.client.get(url)
+        self.assertIn('<div class="announcement-container">', response.content)
+
+    def test_create(self):
+        """
+        Test create announcement view
+        """
+        url = reverse("maintenance:announcement_create")
+        self.client.post(url, {"content": "Test Create Announcement", "active": True})
+        result = Announcement.objects.filter(content="Test Create Announcement").exists()
+        self.assertTrue(result)
+
+    def test_edit(self):
+        """
+        Test edit announcement view
+        """
+        announcement = Announcement.objects.create(content="test")
+        announcement.save()
+        url = reverse("maintenance:announcement_edit", kwargs={"pk": announcement.pk})
+        response = self.client.get(url)
+        self.assertIn('<div class="wrapper-form announcement-container">', response.content)
+        self.client.post(url, {"content": "Test Edit Announcement", "active": True})
+        announcement = Announcement.objects.get(pk=announcement.pk)
+        self.assertEquals(announcement.content, "Test Edit Announcement")
+
+    def test_delete(self):
+        """
+        Test delete announcement view
+        """
+        announcement = Announcement.objects.create(content="Test Delete")
+        announcement.save()
+        url = reverse("maintenance:announcement_delete", kwargs={"pk": announcement.pk})
+        self.client.post(url)
+        result = Announcement.objects.filter(content="Test Edit Announcement").exists()
+        self.assertFalse(result)
+
+    def _test_403(self, viewname, kwargs=None):
+        url = reverse("maintenance:%s" % viewname, kwargs=kwargs)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_authorization(self):
+        self.client.login(username=self.non_staff_user, password='pass')
+        announcement = Announcement.objects.create(content="Test Delete")
+        announcement.save()
+
+        self._test_403("announcement_index")
+        self._test_403("announcement_create")
+        self._test_403("announcement_edit", {"pk": announcement.pk})
+        self._test_403("announcement_delete", {"pk": announcement.pk})

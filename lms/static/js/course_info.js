@@ -8,4 +8,8 @@ $(document).ready(function() {
         $('.tab').slideUp();
         $(data_class + ':hidden').slideDown();
     });
+    var isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
+    if (isSafari) {
+        $('.main-cta').addClass('safari-wrapper');
+    }
 });

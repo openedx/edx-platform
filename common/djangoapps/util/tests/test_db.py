@@ -1,5 +1,7 @@
 """Tests for util.db module."""
 
+from __future__ import absolute_import
+
 import threading
 import time
 import unittest
@@ -12,6 +14,7 @@ from django.db.transaction import TransactionManagementError, atomic
 from django.test import TestCase, TransactionTestCase
 from django.test.utils import override_settings
 from django.utils.six import StringIO
+from six.moves import range
 
 from util.db import commit_on_success, enable_named_outer_atomic, generate_int_id, outer_atomic
 
@@ -199,7 +202,7 @@ class GenerateIntIdTestCase(TestCase):
         minimum = 1
         maximum = times
         for __ in range(times):
-            self.assertIn(generate_int_id(minimum, maximum), range(minimum, maximum + 1))
+            self.assertIn(generate_int_id(minimum, maximum), list(range(minimum, maximum + 1)))
 
     @ddt.data(10)
     def test_used_ids(self, times):

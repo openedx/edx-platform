@@ -155,8 +155,8 @@ class Command(BaseCommand):
             max(len(text_type(result[col])) for result in results + [headers])
             for col in range(len(results[0]))
         ]
-        id_format = "{{:>{}}} |".format(len(text_type(len(results))))
-        col_format = "| {{:>{}}} |"
+        id_format = u"{{:>{}}} |".format(len(text_type(len(results))))
+        col_format = u"| {{:>{}}} |"
 
         self.stdout.write(id_format.format(""), ending='')
         for header, width in zip(headers, col_widths):

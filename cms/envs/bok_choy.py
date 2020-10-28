@@ -25,6 +25,9 @@ from openedx.core.release import RELEASE_LINE
 # and (b) that the files are the same in Jenkins as in local dev.
 os.environ['SERVICE_VARIANT'] = 'bok_choy_docker' if 'BOK_CHOY_HOSTNAME' in os.environ else 'bok_choy'
 os.environ['CONFIG_ROOT'] = path(__file__).abspath().dirname()
+os.environ['STUDIO_CFG'] = str.format("{config_root}/{service_variant}.yml",
+                                      config_root=os.environ['CONFIG_ROOT'],
+                                      service_variant=os.environ['SERVICE_VARIANT'])
 
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-position
 

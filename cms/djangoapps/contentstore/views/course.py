@@ -854,7 +854,7 @@ def _create_or_rerun_course(request):
         })
     except InvalidKeyError as error:
         return JsonResponse({
-            "ErrMsg": _("Unable to create course '{name}'.\n\n{err}").format(name=display_name, err=text_type(error))}
+            "ErrMsg": _(u"Unable to create course '{name}'.\n\n{err}").format(name=display_name, err=text_type(error))}
         )
 
 
@@ -1518,8 +1518,7 @@ def textbooks_detail_handler(request, course_key_string, textbook_id):
             if not textbook:
                 return JsonResponse(status=404)
             return JsonResponse(textbook)
-        elif request.method in ('POST', 'PUT'):  # can be either and sometimes
-                                            # django is rewriting one to the other
+        elif request.method in ('POST', 'PUT'):  # can be either and sometimes django is rewriting one to the other
             try:
                 new_textbook = validate_textbook_json(request.body)
             except TextbookValidationError as err:
@@ -1703,8 +1702,7 @@ def group_configurations_detail_handler(request, course_key_string, group_config
         else:
             configuration = None
 
-        if request.method in ('POST', 'PUT'):  # can be either and sometimes
-                                            # django is rewriting one to the other
+        if request.method in ('POST', 'PUT'):  # can be either and sometimes django is rewriting one to the other
             try:
                 new_configuration = GroupConfiguration(request.body, course, group_configuration_id).get_user_partition()
             except GroupConfigurationsValidationError as err:

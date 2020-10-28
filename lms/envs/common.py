@@ -35,6 +35,13 @@ import os
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from path import Path as path
 from django.utils.translation import ugettext_lazy as _
+from enterprise.constants import (
+    ENTERPRISE_ADMIN_ROLE,
+    ENTERPRISE_OPERATOR_ROLE,
+    ENTERPRISE_DASHBOARD_ADMIN_ROLE,
+    ENTERPRISE_CATALOG_ADMIN_ROLE,
+    ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE
+)
 
 from openedx.core.constants import COURSE_KEY_REGEX, COURSE_KEY_PATTERN, COURSE_ID_PATTERN
 from openedx.core.djangoapps.theming.helpers_dirs import (
@@ -66,6 +73,10 @@ LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
 # This setting is used when a site does not define its own choices via site configuration
 MANUAL_ENROLLMENT_ROLE_CHOICES = ['Learner', 'Support', 'Partner']
 
+# List of logout URIs for each IDA that the learner should be logged out of when they logout of the LMS. Only applies to
+# IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
+IDA_LOGOUT_URI_LIST = []
+
 # Features
 FEATURES = {
     'DISPLAY_DEBUG_INFO_TO_STAFF': True,
@@ -81,7 +92,19 @@ FEATURES = {
     # in sync with the corresponding ones in cms/envs/common.py
     'ENABLE_DISCUSSION_SERVICE': True,
     'ENABLE_TEXTBOOK': True,
-    'ENABLE_STUDENT_NOTES': True,  # enables the student notes API and UI.
+
+    # .. toggle_name: ENABLE_STUDENT_NOTES
+    # .. toggle_type: feature_flag
+    # .. toggle_default: True
+    # .. toggle_description: Enables the Student Notes API and UI.
+    # .. toggle_category: ????
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2014-11-13
+    # .. toggle_expiration_date: None
+    # .. toggle_warnings: None
+    # .. toggle_tickets: TNL-659
+    # .. toggle_status: supported
+    'ENABLE_STUDENT_NOTES': True,
 
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
     # this should remain off in production until digest notifications are online.
@@ -100,22 +123,20 @@ FEATURES = {
 
     'ENABLE_MASQUERADE': True,  # allow course staff to change to student view of courseware
 
+    # .. toggle_name: ENABLE_SYSADMIN_DASHBOARD
+    # .. toggle_type: feature_flag
+    # .. toggle_default: False
+    # .. toggle_description: enables dashboard at /syadmin/ for django staff, for seeing overview of system status, for deleting and loading courses, for seeing log of git imports of courseware.
+    # .. toggle_category: admin
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2013-12-12
+    # .. toggle_expiration_date: None
+    # .. toggle_warnings: some views are not performant when there are more than 100 courses
+    # .. toggle_tickets: None
+    # .. toggle_status: unsupported
     'ENABLE_SYSADMIN_DASHBOARD': False,  # sysadmin dashboard, to see what courses are loaded, to delete & load courses
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
-
-    # extrernal access methods
-    'AUTH_USE_OPENID': False,
-    'AUTH_USE_CERTIFICATES': False,
-    'AUTH_USE_OPENID_PROVIDER': False,
-    # Even though external_auth is in common, shib assumes the LMS views / urls, so it should only be enabled
-    # in LMS
-    'AUTH_USE_SHIB': False,
-    'AUTH_USE_CAS': False,
-
-    # This flag disables the requirement of having to agree to the TOS for users registering
-    # with Shib.  Feature was requested by Stanford's office of general counsel
-    'SHIB_DISABLE_TOS': False,
 
     # Toggles OAuth2 authentication provider
     'ENABLE_OAUTH2_PROVIDER': False,
@@ -132,9 +153,6 @@ FEATURES = {
 
     # Set to hide the courses list on the Learner Dashboard if they are not enrolled in any courses yet.
     'HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED': False,
-
-    # Enables ability to restrict enrollment in specific courses by the user account login method
-    'RESTRICT_ENROLL_BY_REG_METHOD': False,
 
     # enable analytics server.
     # WARNING: THIS SHOULD ALWAYS BE SET TO FALSE UNDER NORMAL
@@ -178,6 +196,18 @@ FEATURES = {
 
     # Toggle to enable certificates of courses on dashboard
     'ENABLE_VERIFIED_CERTIFICATES': False,
+
+    # .. toggle_name: DISABLE_HONOR_CERTIFICATES
+    # .. toggle_type: feature_flag
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to disable honor certificates. Typically used when your installation only allows verified certificates, like courses.edx.org.
+    # .. toggle_category: certificates
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2019-05-14
+    # .. toggle_expiration_date: None
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/PROD-269
+    # .. toggle_status: supported
+    'DISABLE_HONOR_CERTIFICATES': False,  # Toggle to disable honor certificates
 
     # for acceptance and load testing
     'AUTOMATIC_AUTH_FOR_TESTING': False,
@@ -446,9 +476,7 @@ node_paths = [
 NODE_PATH = ':'.join(node_paths)
 
 # For geolocation ip database
-GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoIP.dat"
-GEOIPV6_PATH = REPO_ROOT / "common/static/data/geoip/GeoIPv6.dat"
-
+GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoLite2-Country.mmdb"
 # Where to look for a status message
 STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"
 
@@ -491,6 +519,7 @@ OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 # Scope description strings are presented to the user
 # on the application authorization page. See
 # lms/templates/oauth2_provider/authorize.html for details.
+# Non-default scopes should be added directly to OAUTH2_PROVIDER['SCOPES'] below.
 OAUTH2_DEFAULT_SCOPES = {
     'read': _('Read access'),
     'write': _('Write access'),
@@ -504,6 +533,7 @@ OAUTH2_PROVIDER = {
     'REFRESH_TOKEN_EXPIRE_SECONDS': 7776000,
     'SCOPES_BACKEND_CLASS': 'openedx.core.djangoapps.oauth_dispatch.scopes.ApplicationModelScopes',
     'SCOPES': dict(OAUTH2_DEFAULT_SCOPES, **{
+        'user_id': _('Retrieve your user identifier'),
         'grades:read': _('Retrieve your grades for your enrolled courses'),
         'certificates:read': _('Retrieve your course certificates'),
     }),
@@ -556,7 +586,6 @@ def _make_mako_template_dirs(settings):
 CONTEXT_PROCESSORS = [
     'django.template.context_processors.request',
     'django.template.context_processors.static',
-    'django.contrib.messages.context_processors.messages',
     'django.template.context_processors.i18n',
     'django.contrib.auth.context_processors.auth',  # this is required for admin
     'django.template.context_processors.csrf',
@@ -651,8 +680,10 @@ derived_collection_entry('DEFAULT_TEMPLATE_ENGINE', 'DIRS')
 ###############################################################################################
 
 AUTHENTICATION_BACKENDS = [
+    'rules.permissions.ObjectPermissionBackend',
     'openedx.core.djangoapps.oauth_dispatch.dot_overrides.backends.EdxRateLimitedAllowAllUsersModelBackend'
 ]
+
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
 
@@ -971,6 +1002,7 @@ MEDIA_ROOT = '/edx/var/edxapp/media/'
 MEDIA_URL = '/media/'
 
 # Locale/Internationalization
+CELERY_TIMEZONE = 'UTC'
 TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 # these languages display right to left
@@ -1225,10 +1257,13 @@ MIDDLEWARE_CLASSES = [
     'edx_django_utils.cache.middleware.RequestCacheMiddleware',
     'edx_django_utils.monitoring.middleware.MonitoringCustomMetricsMiddleware',
 
+    # Cookie monitoring
+    'openedx.core.lib.request_utils.CookieMetricsMiddleware',
+
     'mobile_api.middleware.AppVersionUpgrade',
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'microsite_configuration.middleware.MicrositeMiddleware',
-    'django_comment_client.middleware.AjaxExceptionMiddleware',
+    'lms.djangoapps.discussion.django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
     'edx_rest_framework_extensions.auth.jwt.middleware.JwtAuthCookieMiddleware',
@@ -1278,7 +1313,7 @@ MIDDLEWARE_CLASSES = [
     # Must be after DarkLangMiddleware.
     'django.middleware.locale.LocaleMiddleware',
 
-    'django_comment_client.utils.ViewNameMiddleware',
+    'lms.djangoapps.discussion.django_comment_client.utils.ViewNameMiddleware',
     'codejail.django_integration.ConfigureCodeJailMiddleware',
 
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
@@ -1311,6 +1346,9 @@ MIDDLEWARE_CLASSES = [
 
     'edx_rest_framework_extensions.auth.jwt.middleware.EnsureJWTAuthSettingsMiddleware',
 
+    # Handles automatically storing user ids in django-simple-history tables when possible.
+    'simple_history.middleware.HistoryRequestMiddleware',
+
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 ]
@@ -1323,7 +1361,15 @@ P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
 
 ############################### PIPELINE #######################################
 
-PIPELINE_ENABLED = True
+PIPELINE = {
+    'PIPELINE_ENABLED': True,
+    'CSS_COMPRESSOR': None,
+    'JS_COMPRESSOR': 'pipeline.compressors.uglifyjs.UglifyJSCompressor',
+    # Don't wrap JavaScript as there is code that depends upon updating the global namespace
+    'DISABLE_WRAPPER': True,
+    # Specify the UglifyJS binary to use
+    'UGLIFYJS_BINARY': 'node_modules/.bin/uglifyjs',
+}
 
 STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 
@@ -1336,15 +1382,6 @@ STATICFILES_FINDERS = [
     'openedx.core.lib.xblock_pipeline.finder.XBlockPipelineFinder',
     'pipeline.finders.PipelineFinder',
 ]
-
-PIPELINE_CSS_COMPRESSOR = None
-PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.uglifyjs.UglifyJSCompressor'
-
-# Don't wrap JavaScript as there is code that depends upon updating the global namespace
-PIPELINE_DISABLE_WRAPPER = True
-
-# Specify the UglifyJS binary to use
-PIPELINE_UGLIFYJS_BINARY = 'node_modules/.bin/uglifyjs'
 
 from openedx.core.lib.rooted_paths import rooted_glob
 
@@ -1491,7 +1528,7 @@ credit_web_view_js = [
     'js/src/logger.js',
 ]
 
-PIPELINE_CSS = {
+PIPELINE['STYLESHEETS'] = {
     'style-vendor': {
         'source_filenames': [
             'css/vendor/font-awesome.css',
@@ -1665,7 +1702,7 @@ lms_application_js = [
     'js/main.js',
 ]
 
-PIPELINE_JS = {
+PIPELINE['JAVASCRIPT'] = {
     'base_application': {
         'source_filenames': base_application_js,
         'output_filename': 'js/lms-base-application.js',
@@ -2071,10 +2108,6 @@ INSTALLED_APPS = [
     # Student support tools
     'support',
 
-    # External auth (OpenID, shib)
-    'openedx.core.djangoapps.external_auth',
-    'django_openid_auth',
-
     # django-oauth2-provider (deprecated)
     'provider',
     'provider.oauth2',
@@ -2114,9 +2147,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.util.apps.UtilConfig',
 
     # Discussion forums
-    'django_comment_client',
-    'django_comment_common',
-    'discussion_api',
+    'openedx.core.djangoapps.django_comment_common',
 
     # Notes
     'notes',
@@ -2133,16 +2164,11 @@ INSTALLED_APPS = [
     # Shopping cart
     'shoppingcart',
 
-    # Notification preferences setting
-    'notification_prefs',
-
-    'notifier_api',
-
     # Different Course Modes
     'course_modes.apps.CourseModesConfig',
 
     # Enrollment API
-    'enrollment',
+    'openedx.core.djangoapps.enrollments',
 
     # Entitlement API
     'entitlements.apps.EntitlementsConfig',
@@ -2250,6 +2276,9 @@ INSTALLED_APPS = [
     # additional release utilities to ease automation
     'release_util',
 
+    # rule-based authorization
+    'rules.apps.AutodiscoverRulesConfig',
+
     # Customized celery tasks, including persisting failed tasks so they can
     # be retried
     'celery_utils',
@@ -2263,7 +2292,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.waffle_utils',
 
     # Course Goals
-    'lms.djangoapps.course_goals',
+    'lms.djangoapps.course_goals.apps.CourseGoalsConfig',
 
     # Features
     'openedx.features.course_bookmarks',
@@ -2271,10 +2300,9 @@ INSTALLED_APPS = [
     'openedx.features.course_search',
     'openedx.features.enterprise_support.apps.EnterpriseSupportConfig',
     'openedx.features.learner_profile',
-    'openedx.features.learner_analytics',
-    'openedx.features.portfolio_project',
     'openedx.features.course_duration_limits',
     'openedx.features.content_type_gating',
+    'openedx.features.discounts',
 
     'experiments',
 
@@ -2387,28 +2415,28 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # translate this the way that Facebook advertises in your language.
         "title": _("Facebook"),
         "icon": "fa-facebook-square",
-        "action": _("Like {platform_name} on Facebook")
+        "action": _(u"Like {platform_name} on Facebook")
     },
     "twitter": {
         # Translators: This is the website name of www.twitter.com.  Please
         # translate this the way that Twitter advertises in your language.
         "title": _("Twitter"),
         "icon": "fa-twitter-square",
-        "action": _("Follow {platform_name} on Twitter")
+        "action": _(u"Follow {platform_name} on Twitter")
     },
     "linkedin": {
         # Translators: This is the website name of www.linkedin.com.  Please
         # translate this the way that LinkedIn advertises in your language.
         "title": _("LinkedIn"),
         "icon": "fa-linkedin-square",
-        "action": _("Follow {platform_name} on LinkedIn")
+        "action": _(u"Follow {platform_name} on LinkedIn")
     },
     "google_plus": {
         # Translators: This is the website name of plus.google.com.  Please
         # translate this the way that Google+ advertises in your language.
         "title": _("Google+"),
         "icon": "fa-google-plus-square",
-        "action": _("Follow {platform_name} on Google+")
+        "action": _(u"Follow {platform_name} on Google+")
     },
     "tumblr": {
         # Translators: This is the website name of www.tumblr.com.  Please
@@ -2427,7 +2455,7 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # translate this the way that Reddit advertises in your language.
         "title": _("Reddit"),
         "icon": "fa-reddit-square",
-        "action": _("Subscribe to the {platform_name} subreddit"),
+        "action": _(u"Subscribe to the {platform_name} subreddit"),
     },
     "vk": {
         # Translators: This is the website name of https://vk.com.  Please
@@ -2446,7 +2474,7 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # translate this the way that YouTube advertises in your language.
         "title": _("Youtube"),
         "icon": "fa-youtube-square",
-        "action": _("Subscribe to the {platform_name} YouTube channel")
+        "action": _(u"Subscribe to the {platform_name} YouTube channel")
     }
 }
 
@@ -2464,6 +2492,14 @@ VERIFY_STUDENT = {
     # The variable represents the window within which a verification is considered to be "expiring soon."
     "EXPIRING_SOON_WINDOW": 28,
 }
+
+################# Student Verification Expiry Email #################
+VERIFICATION_EXPIRY_EMAIL = {
+    "RESEND_DAYS": 15,
+    "DAYS_RANGE": 1,
+    "DEFAULT_EMAILS": 2,
+}
+
 DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH = "verify_student_disable_account_activation_requirement"
 
 ### This enables the Metrics tab for the Instructor dashboard ###########
@@ -2474,19 +2510,6 @@ if FEATURES.get('CLASS_DASHBOARD'):
 ################ Enable credit eligibility feature ####################
 ENABLE_CREDIT_ELIGIBILITY = True
 FEATURES['ENABLE_CREDIT_ELIGIBILITY'] = ENABLE_CREDIT_ELIGIBILITY
-
-######################## CAS authentication ###########################
-
-if FEATURES.get('AUTH_USE_CAS'):
-    CAS_SERVER_URL = 'https://provide_your_cas_url_here'
-    AUTHENTICATION_BACKENDS = [
-        'django.contrib.auth.backends.ModelBackend',
-        'django_cas.backends.CASBackend',
-    ]
-
-    INSTALLED_APPS.append('django_cas')
-
-    MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
 
 ############# Cross-domain requests #################
 
@@ -2877,6 +2900,7 @@ OPTIONAL_APPS = [
     ('integrated_channels.integrated_channel', None),
     ('integrated_channels.degreed', None),
     ('integrated_channels.sap_success_factors', None),
+    ('integrated_channels.cornerstone', None),
     ('integrated_channels.xapi', None),
 
     # Required by the Enterprise App
@@ -2968,52 +2992,52 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
     # The value is one of: 'all_users', 'private'
     "default_visibility": "all_users",
 
-    # The list of all fields that can be shared with other users
-    "shareable_fields": [
-        'username',
-        'profile_image',
-        'country',
-        'time_zone',
-        'date_joined',
-        'language_proficiencies',
-        'bio',
-        'social_links',
-        'account_privacy',
-        # Not an actual field, but used to signal whether badges should be public.
-        'accomplishments_shared',
-    ],
-
     # The list of account fields that are always public
     "public_fields": [
-        'username',
-        'profile_image',
         'account_privacy',
+        'profile_image',
+        'username',
     ],
+}
 
-    # The list of account fields that are visible only to staff and users viewing their own profiles
-    "admin_fields": [
-        "username",
-        "email",
-        "is_active",
-        "bio",
-        "country",
-        "date_joined",
-        "profile_image",
-        "language_proficiencies",
-        "social_links",
+# The list of all fields that are shared with other users using the bulk 'all_users' privacy setting
+ACCOUNT_VISIBILITY_CONFIGURATION["bulk_shareable_fields"] = (
+    ACCOUNT_VISIBILITY_CONFIGURATION["public_fields"] + [
+        'bio',
+        'course_certificates',
+        'country',
+        'date_joined',
+        'language_proficiencies',
+        "level_of_education",
+        'social_links',
+        'time_zone',
+
+        # Not an actual field, but used to signal whether badges should be public.
+        'accomplishments_shared',
+    ]
+)
+
+# The list of all fields that can be shared selectively with other users using the 'custom' privacy setting
+ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] = (
+    ACCOUNT_VISIBILITY_CONFIGURATION["bulk_shareable_fields"] + [
         "name",
+    ]
+)
+
+# The list of account fields that are visible only to staff and users viewing their own profiles
+ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
+    ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] + [
+        "email",
+        "extended_profile",
         "gender",
         "goals",
-        "year_of_birth",
-        "level_of_education",
+        "is_active",
         "mailing_address",
         "requires_parental_consent",
-        "account_privacy",
-        "accomplishments_shared",
-        "extended_profile",
         "secondary_email",
+        "year_of_birth",
     ]
-}
+)
 
 # The current list of social platforms to be shown to the user.
 #
@@ -3168,7 +3192,7 @@ JWT_AUTH = {
     'JWT_LOGIN_CLIENT_ID': 'login-service-client-id',
     'JWT_LOGIN_SERVICE_USERNAME': 'login_service_user',
 
-    'JWT_SUPPORTED_VERSION': '1.1.0',
+    'JWT_SUPPORTED_VERSION': '1.2.0',
 
     'JWT_ALGORITHM': 'HS256',
     'JWT_SECRET_KEY': SECRET_KEY,
@@ -3179,6 +3203,12 @@ JWT_AUTH = {
 
     'JWT_ISSUER': 'change-me',
     'JWT_AUDIENCE': 'change-me',
+}
+
+EDX_DRF_EXTENSIONS = {
+    # Set this value to an empty dict in order to prevent automatically updating
+    # user data from values in (possibly stale) JWTs.
+    'JWT_PAYLOAD_USER_ATTRIBUTE_MAPPING': {},
 }
 
 ################################ Settings for Microsites ################################
@@ -3248,6 +3278,9 @@ AUDIT_CERT_CUTOFF_DATE = None
 CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'
 CREDENTIALS_GENERATION_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
+# Queue to use for award program certificates
+PROGRAM_CERTIFICATES_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
+
 # Settings for Comprehensive Theming app
 
 # See https://github.com/edx/edx-django-sites-extensions for more info
@@ -3312,7 +3345,7 @@ ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = {}
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
 # The LMS communicates with the Enterprise service via the EdxRestApiClient class
 # These default settings are utilized by the LMS when interacting with the service,
-# and are overridden by the configuration parameter accessors defined in aws.py
+# and are overridden by the configuration parameter accessors defined in production.py
 
 ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
 ENTERPRISE_CONSENT_API_URL = LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
@@ -3327,11 +3360,11 @@ ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE = 512   # Enterprise logo image size limit i
 
 ENTERPRISE_PLATFORM_WELCOME_TEMPLATE = _(u'Welcome to {platform_name}.')
 ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE = _(
-    'You have left the {start_bold}{enterprise_name}{end_bold} website and are now on the {platform_name} site. '
-    '{enterprise_name} has partnered with {platform_name} to offer you high-quality, always available learning '
-    'programs to help you advance your knowledge and career. '
-    '{line_break}Please note that {platform_name} has a different {privacy_policy_link_start}Privacy Policy'
-    '{privacy_policy_link_end} from {enterprise_name}.'
+    u'You have left the {start_bold}{enterprise_name}{end_bold} website and are now on the {platform_name} site. '
+    u'{enterprise_name} has partnered with {platform_name} to offer you high-quality, always available learning '
+    u'programs to help you advance your knowledge and career. '
+    u'{line_break}Please note that {platform_name} has a different {privacy_policy_link_start}Privacy Policy'
+    u'{privacy_policy_link_end} from {enterprise_name}.'
 )
 ENTERPRISE_TAGLINE = ''
 ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS = {
@@ -3350,44 +3383,66 @@ ENTERPRISE_READONLY_ACCOUNT_FIELDS = [
 ]
 ENTERPRISE_CUSTOMER_COOKIE_NAME = 'enterprise_customer_uuid'
 BASE_COOKIE_DOMAIN = 'localhost'
+SYSTEM_TO_FEATURE_ROLE_MAPPING = {
+    ENTERPRISE_ADMIN_ROLE: [ENTERPRISE_DASHBOARD_ADMIN_ROLE],
+    ENTERPRISE_OPERATOR_ROLE: [
+        ENTERPRISE_DASHBOARD_ADMIN_ROLE,
+        ENTERPRISE_CATALOG_ADMIN_ROLE,
+        ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE
+    ],
+}
+
+DATA_CONSENT_SHARE_CACHE_TIMEOUT = 8 * 60 * 60  # 8 hours
+
+ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
 
 ############## Settings for Course Enrollment Modes ######################
+# The min_price key refers to the minimum price allowed for an instance
+# of a particular type of course enrollment mode. This is not to be confused
+# with the min_price field of the CourseMode model, which refers to the actual
+# price of the CourseMode.
 COURSE_ENROLLMENT_MODES = {
     "audit": {
         "id": 1,
         "slug": "audit",
         "display_name": _("Audit"),
-        "min_price": 0
+        "min_price": 0,
     },
     "verified": {
         "id": 2,
         "slug": "verified",
         "display_name": _("Verified"),
-        "min_price": 0
+        "min_price": 1,
     },
     "professional": {
         "id": 3,
         "slug": "professional",
         "display_name": _("Professional"),
-        "min_price": 0
+        "min_price": 1,
     },
     "no-id-professional": {
         "id": 4,
         "slug": "no-id-professional",
         "display_name": _("No-Id-Professional"),
-        "min_price": 0
+        "min_price": 0,
     },
     "credit": {
         "id": 5,
         "slug": "credit",
         "display_name": _("Credit"),
-        "min_price": 0
+        "min_price": 0,
     },
     "honor": {
         "id": 6,
         "slug": "honor",
         "display_name": _("Honor"),
-        "min_price": 0
+        "min_price": 0,
+    },
+    "masters": {
+        "id": 7,
+        "slug": "masters",
+        "display_name": _("Master's"),
+        "min_price": 0,
     },
 }
 
@@ -3404,7 +3459,7 @@ COURSES_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 COURSEGRAPH_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
 
 
-# Initialize to 'unknown', but read from JSON in aws.py
+# Initialize to 'unknown', but read from JSON in production.py
 EDX_PLATFORM_REVISION = 'unknown'
 
 ############## Settings for Completion API #########################
@@ -3458,10 +3513,16 @@ RETIREMENT_STATES = [
     'COMPLETE',
 ]
 
-############## Settings for Writable Gradebook  #########################
+USERNAME_REPLACEMENT_WORKER = "REPLACE WITH VALID USERNAME"
+
+############## Settings for Microfrontends  #########################
 # If running a Gradebook container locally,
 # modify lms/envs/private.py to give it a non-null value
 WRITABLE_GRADEBOOK_URL = None
+
+PROFILE_MICROFRONTEND_URL = "http://profile-mfe/abc/"
+ORDER_HISTORY_MICROFRONTEND_URL = "http://order-history-mfe/"
+ACCOUNT_MICROFRONTEND_URL = "http://account-mfe/"
 
 ############### Settings for django-fernet-fields ##################
 FERNET_KEYS = [
@@ -3471,6 +3532,9 @@ FERNET_KEYS = [
 ############### Settings for user-state-client ##################
 # Maximum number of rows to fetch in XBlockUserStateClient calls. Adjust for performance
 USER_STATE_BATCH_SIZE = 5000
+
+############### Settings for edx-rbac  ###############
+SYSTEM_WIDE_ROLE_CLASSES = []
 
 ############## Plugin Django Apps #########################
 

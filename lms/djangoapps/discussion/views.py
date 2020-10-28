@@ -23,16 +23,14 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from web_fragments.fragment import Fragment
 
-import django_comment_client.utils as utils
-from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
-import lms.lib.comment_client as cc
 from courseware.access import has_access
 from courseware.courses import get_course_with_access
 from courseware.views.views import CourseTabView
-from django_comment_client.base.views import track_thread_viewed_event
-from django_comment_client.constants import TYPE_ENTRY
-from django_comment_client.permissions import get_team, has_permission
-from django_comment_client.utils import (
+import lms.djangoapps.discussion.django_comment_client.utils as utils
+from lms.djangoapps.discussion.django_comment_client.base.views import track_thread_viewed_event
+from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY
+from lms.djangoapps.discussion.django_comment_client.permissions import get_team, has_permission
+from lms.djangoapps.discussion.django_comment_client.utils import (
     add_courseware_context,
     available_division_schemes,
     course_discussion_division_enabled,
@@ -43,8 +41,12 @@ from django_comment_client.utils import (
     is_commentable_divided,
     strip_none
 )
-from django_comment_common.models import CourseDiscussionSettings
-from django_comment_common.utils import ThreadContext, get_course_discussion_settings, set_course_discussion_settings
+from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
+import openedx.core.djangoapps.django_comment_common.comment_client as cc
+from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
+from openedx.core.djangoapps.django_comment_common.utils import (
+    ThreadContext, get_course_discussion_settings, set_course_discussion_settings,
+)
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from student.models import CourseEnrollment
@@ -351,10 +353,16 @@ def _find_thread(request, course, discussion_id, thread_id):
             response_limit=request.GET.get("resp_limit")
         )
     except cc.utils.CommentClientRequestError:
+        log.info(u"Discussion Error: Thread ID:{thread_id} not found for Discussion: {discussion_id}".format(
+            thread_id=thread_id, discussion_id=discussion_id)
+        )
         return None
     # Verify that the student has access to this thread if belongs to a course discussion module
     thread_context = getattr(thread, "context", "course")
     if thread_context == "course" and not utils.discussion_category_id_access(course, request.user, discussion_id):
+        log.info(u'Discussion Error: Thread Context:{context} for thread: {thread}'.format(
+            context=thread_context, thread=thread.__dict__)
+        )
         return None
 
     # verify that the thread belongs to the requesting student's group
@@ -363,6 +371,9 @@ def _find_thread(request, course, discussion_id, thread_id):
     if is_commentable_divided(course.id, discussion_id, course_discussion_settings) and not is_moderator:
         user_group_id = get_group_id_for_user(request.user, course_discussion_settings)
         if getattr(thread, "group_id", None) is not None and user_group_id != thread.group_id:
+            log.info(u"Discussion Error: user_group:{user_group} is not equal to thread_group:{thread_group}".format(
+                user_group=user_group_id, thread_group=thread.group_id
+            ))
             return None
 
     return thread
@@ -739,11 +750,13 @@ class DiscussionBoardFragmentView(EdxFragmentView):
             return fragment
         except cc.utils.CommentClientMaintenanceError:
             log.warning('Forum is in maintenance mode')
-            html = render_to_response('discussion/maintenance_fragment.html', {
+            html = render_to_string('discussion/maintenance_fragment.html', {
                 'disable_courseware_js': True,
                 'uses_pattern_library': True,
             })
-            return Fragment(html)
+            fragment = Fragment(html)
+            self.add_fragment_resource_urls(fragment)
+            return fragment
 
     def vendor_js_dependencies(self):
         """

@@ -3,10 +3,13 @@ Classes used to model the roles used in the courseware. Each role is responsible
 adding users, removing users, and listing members
 """
 
+from __future__ import absolute_import
+
 import logging
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 
+import six
 from django.contrib.auth.models import User
 from opaque_keys.edx.django.models import CourseKeyField
 
@@ -47,7 +50,7 @@ class BulkRoleCache(object):
         for role in CourseAccessRole.objects.filter(user__in=users).select_related('user'):
             roles_by_user[role.user.id].add(role)
 
-        users_without_roles = filter(lambda u: u.id not in roles_by_user, users)
+        users_without_roles = [u for u in users if u.id not in roles_by_user]
         for user in users_without_roles:
             roles_by_user[user.id] = set()
 
@@ -80,11 +83,10 @@ class RoleCache(object):
         )
 
 
-class AccessRole(object):
+class AccessRole(six.with_metaclass(ABCMeta, object)):
     """
     Object representing a role with particular access to a resource
     """
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def has_user(self, user):

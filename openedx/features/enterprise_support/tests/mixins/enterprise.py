@@ -1,15 +1,17 @@
 """
 Mixins for the EnterpriseApiClient.
 """
+from __future__ import absolute_import
+
 import json
+
 import mock
 
 import httpretty
 from django.conf import settings
 from django.core.cache import cache
-from django.urls import reverse
 from django.test import SimpleTestCase
-
+from django.urls import reverse
 from openedx.features.enterprise_support.tests import FAKE_ENTERPRISE_CUSTOMER
 
 

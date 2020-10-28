@@ -2,10 +2,12 @@
 Test entitlements tasks
 """
 
+from __future__ import absolute_import
+
 from datetime import datetime, timedelta
+
 import mock
 import pytz
-
 from django.test import TestCase
 
 from entitlements import tasks

@@ -46,7 +46,6 @@ class CourseSettingsEncoderTest(CourseTestCase):
     """
     Tests for CourseSettingsEncoder.
     """
-    shard = 1
 
     def test_encoder(self):
         details = CourseDetails.fetch(self.course.id)
@@ -94,7 +93,6 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
     """
     Tests for modifying content on the first course settings page (course dates, overview, etc.).
     """
-    shard = 1
 
     def alter_field(self, url, details, field, val):
         """
@@ -173,7 +171,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
                 dt1 = date.from_json(encoded[field])
                 dt2 = details[field]
 
-                self.assertEqual(dt1, dt2, msg="{} != {} at {}".format(dt1, dt2, context))
+                self.assertEqual(dt1, dt2, msg=u"{} != {} at {}".format(dt1, dt2, context))
             else:
                 self.fail(field + " missing from encoded but in details at " + context)
         elif field in encoded and encoded[field] is not None:
@@ -521,7 +519,6 @@ class CourseGradingTest(CourseTestCase):
     """
     Tests for the course settings grading page.
     """
-    shard = 1
 
     def test_initial_grader(self):
         test_grader = CourseGradingModel(self.course)
@@ -865,7 +862,6 @@ class CourseMetadataEditingTest(CourseTestCase):
     """
     Tests for CourseMetadata.
     """
-    shard = 1
 
     def setUp(self):
         super(CourseMetadataEditingTest, self).setUp()
@@ -1465,7 +1461,6 @@ class CourseGraderUpdatesTest(CourseTestCase):
     """
     Test getting, deleting, adding, & updating graders
     """
-    shard = 1
 
     def setUp(self):
         """Compute the url to use in tests"""
@@ -1532,7 +1527,6 @@ class CourseEnrollmentEndFieldTest(CourseTestCase):
     Base class to test the enrollment end fields in the course settings details view in Studio
     when using marketing site flag and global vs non-global staff to access the page.
     """
-    shard = 1
 
     NOT_EDITABLE_HELPER_MESSAGE = "Contact your edX partner manager to update these settings."
     NOT_EDITABLE_DATE_WRAPPER = "<div class=\"field date is-not-editable\" id=\"field-enrollment-end-date\">"

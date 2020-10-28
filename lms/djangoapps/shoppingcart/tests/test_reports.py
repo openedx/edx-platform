@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-
 """
 Tests for the Shopping Cart Models
 """
+from __future__ import absolute_import
+
 import datetime
 import StringIO
 from textwrap import dedent
@@ -31,7 +32,6 @@ class ReportTypeTests(ModuleStoreTestCase):
     """
     Tests for the models used to generate certificate status reports
     """
-    shard = 4
     FIVE_MINS = datetime.timedelta(minutes=5)
 
     @patch('student.models.CourseEnrollment.refund_cutoff_date')
@@ -108,7 +108,7 @@ class ReportTypeTests(ModuleStoreTestCase):
         second_refund.refund_requested_time = self.test_time
         second_refund.save()
 
-        self.CORRECT_REFUND_REPORT_CSV = dedent("""
+        self.CORRECT_REFUND_REPORT_CSV = dedent(b"""
             Order Number,Customer Name,Date of Original Transaction,Date of Refund,Amount of Refund,Service Fees (if any)
             3,King Bowsér,{time_str},{time_str},40.00,0.00
             4,Súsan Smith,{time_str},{time_str},40.00,0.00
@@ -165,7 +165,6 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
     """
     Tests for the models used to generate itemized purchase reports
     """
-    shard = 4
     FIVE_MINS = datetime.timedelta(minutes=5)
     TEST_ANNOTATION = u'Ba\xfc\u5305'
 
@@ -206,7 +205,7 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
         cert.refund_requested_time = self.now
         cert.save()
 
-        self.CORRECT_CSV = dedent("""
+        self.CORRECT_CSV = dedent(b"""
             Purchase Time,Order ID,Status,Quantity,Unit Cost,Total Cost,Currency,Description,Comments
             {time_str},1,purchased,1,40.00,40.00,usd,Registration for Course: Robot Super Course,Ba\xc3\xbc\xe5\x8c\x85
             {time_str},1,purchased,1,40.00,40.00,usd,verified cert for course Robot Super Course,
@@ -242,7 +241,7 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
         """
         # delete the matching annotation
         self.annotation.delete()
-        self.assertEqual(u"", self.reg.csv_report_comments)
+        self.assertEqual("", self.reg.csv_report_comments)
 
     def test_paidcourseregistrationannotation_unicode(self):
         """

@@ -121,7 +121,7 @@ def prereq_cache(cache_name, paths, install_func):
             post_install_hash = compute_fingerprint(paths)
             cache_file.write(post_install_hash)
     else:
-        print('{cache} unchanged, skipping...'.format(cache=cache_name))
+        print(u'{cache} unchanged, skipping...'.format(cache=cache_name))
 
 
 def node_prereqs_installation():
@@ -150,14 +150,14 @@ def node_prereqs_installation():
         # the forked process has returned
         proc = subprocess.Popen(npm_command, stderr=npm_log_file)
         proc.wait()
-    except BuildFailure, error_text:
+    except BuildFailure as error_text:
         if cb_error_text in error_text:
             print("npm install error detected. Retrying...")
             proc = subprocess.Popen(npm_command, stderr=npm_log_file)
             proc.wait()
         else:
             raise BuildFailure(error_text)
-    print("Successfully installed NPM packages. Log found at {}".format(
+    print(u"Successfully installed NPM packages. Log found at {}".format(
         npm_log_file_path
     ))
 
@@ -173,7 +173,7 @@ def python_prereqs_installation():
 def pip_install_req_file(req_file):
     """Pip install the requirements file."""
     pip_cmd = 'pip install --disable-pip-version-check --exists-action w'
-    sh("{pip_cmd} -r {req_file}".format(pip_cmd=pip_cmd, req_file=req_file))
+    sh(u"{pip_cmd} -r {req_file}".format(pip_cmd=pip_cmd, req_file=req_file))
 
 
 @task
@@ -192,12 +192,15 @@ def install_node_prereqs():
 # To add a package to the uninstall list, just add it to this list! No need
 # to touch any other part of this file.
 PACKAGES_TO_UNINSTALL = [
+    "MySQL-python",                 # Because mysqlclient shares the same directory name
     "South",                        # Because it interferes with Django 1.8 migrations.
     "edxval",                       # Because it was bork-installed somehow.
     "django-storages",
     "django-oauth2-provider",       # Because now it's called edx-django-oauth2-provider.
     "edx-oauth2-provider",          # Because it moved from github to pypi
     "i18n-tools",                   # Because now it's called edx-i18n-tools
+    "python-saml",                  # Because python3-saml shares the same directory name
+    "pdfminer",                     # Replaced by pdfminer.six, which shares the same directory name
 ]
 
 
@@ -242,7 +245,7 @@ def uninstall_python_packages():
         for package_name in PACKAGES_TO_UNINSTALL:
             if package_in_frozen(package_name, frozen):
                 # Uninstall the pacakge
-                sh("pip uninstall --disable-pip-version-check -y {}".format(package_name))
+                sh(u"pip uninstall --disable-pip-version-check -y {}".format(package_name))
                 uninstalled = True
         if not uninstalled:
             break
@@ -336,7 +339,7 @@ def install_prereqs():
 
 def log_installed_python_prereqs():
     """  Logs output of pip freeze for debugging. """
-    sh("pip freeze > {}".format(Env.GEN_LOG_DIR + "/pip_freeze.log"))
+    sh(u"pip freeze > {}".format(Env.GEN_LOG_DIR + "/pip_freeze.log"))
     return
 
 

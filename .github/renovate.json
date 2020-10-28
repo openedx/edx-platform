@@ -1,0 +1,10 @@
+{
+  "extends": [
+    "config:base",
+    "schedule:weekdays"
+  ],
+  "prConcurrentLimit": 2,
+  "includePaths": [
+    "package.json"
+  ]
+}

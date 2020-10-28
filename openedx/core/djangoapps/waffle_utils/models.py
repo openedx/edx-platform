@@ -1,6 +1,7 @@
 """
 Models for configuring waffle utils.
 """
+from __future__ import absolute_import
 from django.db.models import CharField
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
@@ -14,6 +15,8 @@ from openedx.core.lib.cache_utils import request_cached
 class WaffleFlagCourseOverrideModel(ConfigurationModel):
     """
     Used to force a waffle flag on or off for a course.
+
+    .. no_pii:
     """
     OVERRIDE_CHOICES = Choices(('on', _('Force On')), ('off', _('Force Off')))
     ALL_CHOICES = OVERRIDE_CHOICES + Choices('unset')

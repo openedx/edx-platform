@@ -1,12 +1,20 @@
 """
 Common utilities for the course experience, including course outline.
 """
+from __future__ import absolute_import
+
 from completion.models import BlockCompletion
+from django.utils.translation import ugettext as _
+from opaque_keys.edx.keys import CourseKey
+from six.moves import range
+from web_fragments.fragment import Fragment
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
-from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.cache_utils import request_cached
+from openedx.features.course_experience import FIRST_PURCHASE_OFFER_BANNER_DISPLAY
+from openedx.features.discounts.applicability import can_receive_discount, discount_percentage
 from xmodule.modulestore.django import modulestore
 
 
@@ -90,13 +98,12 @@ def get_course_outline_block_tree(request, course_id, user=None):
                     latest_completion,
                     block=block['children'][idx]
                 )
-                if block['children'][idx]['resume_block'] is True:
+                if block['children'][idx].get('resume_block') is True:
                     block['resume_block'] = True
 
             completable_blocks = [child for child in block['children']
-                                  if child['type'] != 'discussion']
-            if len([child['complete'] for child in block['children']
-                    if child['complete']]) == len(completable_blocks):
+                                  if child.get('type') != 'discussion']
+            if all(child.get('complete') for child in completable_blocks):
                 block['complete'] = True
 
     def mark_last_accessed(user, course_key, block):
@@ -183,7 +190,7 @@ def get_resume_block(block):
     Gets the deepest block marked as 'resume_block'.
 
     """
-    if not block['resume_block']:
+    if block.get('authorization_denial_reason') or not block['resume_block']:
         return None
     if not block.get('children'):
         return block
@@ -193,3 +200,21 @@ def get_resume_block(block):
         if resume_block:
             return resume_block
     return block
+
+
+def get_first_purchase_offer_banner_fragment(user, course):
+    if (FIRST_PURCHASE_OFFER_BANNER_DISPLAY.is_enabled() and
+            user and
+            course and
+            can_receive_discount(user=user, course=course)):
+        # Translator: xgettext:no-python-format
+        offer_message = _(u'{banner_open}{percentage}% off your first upgrade.{span_close}'
+                          u' Discount automatically applied.{div_close}')
+        return Fragment(HTML(offer_message).format(
+            banner_open=HTML(
+                '<div class="first-purchase-offer-banner"><span class="first-purchase-offer-banner-bold">'
+            ),
+            percentage=discount_percentage(),
+            span_close=HTML('</span>'),
+            div_close=HTML('</div>')
+        ))

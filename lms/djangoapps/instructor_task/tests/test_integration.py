@@ -5,22 +5,26 @@ Runs tasks on answers to course problems to validate that code
 paths actually work.
 
 """
+from __future__ import absolute_import
+
 import json
 import logging
 import textwrap
 from collections import namedtuple
 
 import ddt
+import six
 from celery.states import FAILURE, SUCCESS
 from django.contrib.auth.models import User
 from django.urls import reverse
 from mock import patch
 from six import text_type
+from six.moves import range
 
 from capa.responsetypes import StudentInputError
 from capa.tests.response_xml_factory import CodeResponseXMLFactory, CustomResponseXMLFactory
 from courseware.model_data import StudentModule
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.instructor_task.api import (
     submit_delete_problem_state_for_all_students,
     submit_rescore_problem_for_all_students,
@@ -72,7 +76,6 @@ class TestRescoringTask(TestIntegrationTask):
 
     Exercises real problems with a minimum of patching.
     """
-    shard = 3
 
     def setUp(self):
         super(TestRescoringTask, self).setUp()
@@ -354,7 +357,7 @@ class TestRescoringTask(TestIntegrationTask):
         to not-equals).
         """
         factory = CustomResponseXMLFactory()
-        script = textwrap.dedent("""
+        script = textwrap.dedent(u"""
                 def check_func(expect, answer_given):
                     expected = str(random.randint(0, 100))
                     return {'ok': answer_given %s expected, 'msg': expected}
@@ -400,9 +403,9 @@ class TestRescoringTask(TestIntegrationTask):
             module = self.get_student_module(user.username, descriptor)
             state = json.loads(module.state)
             correct_map = state['correct_map']
-            log.info("Correct Map: %s", correct_map)
+            log.info(u"Correct Map: %s", correct_map)
             # only one response, so pull it out:
-            answer = correct_map.values()[0]['msg']
+            answer = list(correct_map.values())[0]['msg']
             self.submit_student_answer(user.username, problem_url_name, [answer, answer])
             # we should now get the problem right, with a second attempt:
             self.check_state(user, descriptor, 1, 1, expected_attempts=2)
@@ -596,7 +599,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
 
         def user_partition_group(user):
             """Return a dict having single key with value equals to students group in partition"""
-            group_config_hdr_tpl = 'Experiment Group ({})'
+            group_config_hdr_tpl = u'Experiment Group ({})'
             return {
                 group_config_hdr_tpl.format(self.partition.name): self.partition.scheme.get_group_for_user(
                     self.course.id, user, self.partition
@@ -610,7 +613,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
                     grades,
                     user_partition_group(student)
                 )
-                for student_grades in students_grades for student, grades in student_grades.iteritems()
+                for student_grades in students_grades for student, grades in six.iteritems(student_grades)
             ],
             ignore_other_columns=ignore_other_columns,
         )

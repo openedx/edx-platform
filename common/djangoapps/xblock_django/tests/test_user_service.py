@@ -1,6 +1,8 @@
 """
 Tests for the DjangoXBlockUserService.
 """
+from __future__ import absolute_import
+
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 

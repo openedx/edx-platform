@@ -1,6 +1,8 @@
 """
 Test the various password reset flows
 """
+from __future__ import absolute_import
+
 import json
 import re
 import unicodedata
@@ -11,21 +13,22 @@ from django.conf import settings
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX, make_password
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
-from django.core.cache import cache
 from django.core import mail
-from django.urls import reverse
+from django.core.cache import cache
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils.http import int_to_base36
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory, RefreshTokenFactory
 from mock import Mock, patch
 from oauth2_provider import models as dot_models
 from provider.oauth2 import models as dop_models
+from six.moves import range
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
+from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 from student.tests.test_email import mock_render_to_string
@@ -106,7 +109,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         """
         cache.clear()
 
-        for i in xrange(30):
+        for i in range(30):
             good_req = self.request_factory.post('/password_reset/', {
                 'email': 'thisdoesnotexist{0}@foo.com'.format(i)
             })

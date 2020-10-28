@@ -1,11 +1,14 @@
 """Tests for per-course verification status on the dashboard. """
+from __future__ import absolute_import
+
 import unittest
 from datetime import datetime, timedelta
 
 import ddt
+import six
 from django.conf import settings
-from django.urls import reverse
 from django.test import override_settings
+from django.urls import reverse
 from mock import patch
 from pytz import UTC
 
@@ -31,7 +34,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
     """Tests for per-course verification status on the dashboard. """
 
-    shard = 3
     PAST = 'past'
     FUTURE = 'future'
     DATES = {
@@ -360,7 +362,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         response = self.client.get(self.dashboard_url)
 
         # Sanity check: verify that the course is on the page
-        self.assertContains(response, unicode(self.course.id))
+        self.assertContains(response, six.text_type(self.course.id))
 
         # Verify that the correct banner is rendered on the dashboard
         alt_text = self.BANNER_ALT_MESSAGES.get(status)

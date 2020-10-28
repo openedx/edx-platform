@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Tests for util.password_policy_validators module."""
 
+from __future__ import absolute_import
+
 import unittest
 
 from ddt import data, ddt, unpack
@@ -9,7 +11,9 @@ from django.core.exceptions import ValidationError
 from django.test.utils import override_settings
 
 from util.password_policy_validators import (
-    create_validator_config, validate_password, password_validators_instruction_texts,
+    create_validator_config,
+    password_validators_instruction_texts,
+    validate_password
 )
 
 

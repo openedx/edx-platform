@@ -1,6 +1,8 @@
 """
 Test grading with access changes.
 """
+from __future__ import absolute_import
+
 from crum import set_current_request
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
@@ -21,7 +23,6 @@ class GradesAccessIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreT
     """
     Tests integration between grading and block access.
     """
-    shard = 4
     ENABLED_SIGNALS = ['course_published']
 
     @classmethod

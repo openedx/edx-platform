@@ -3,15 +3,15 @@ Unittests for importing a course via management command
 """
 
 import os
-from path import Path as path
 import shutil
 import tempfile
 
 from django.core.management import call_command
+from path import Path as path
 
-from django_comment_common.utils import are_permissions_roles_seeded
-from xmodule.modulestore.django import modulestore
+from openedx.core.djangoapps.django_comment_common.utils import are_permissions_roles_seeded
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
@@ -24,8 +24,7 @@ class TestImport(ModuleStoreTestCase):
         directory = tempfile.mkdtemp(dir=content_dir)
         os.makedirs(os.path.join(directory, "course"))
         with open(os.path.join(directory, "course.xml"), "w+") as f:
-            f.write('<course url_name="{0.run}" org="{0.org}" '
-                    'course="{0.course}"/>'.format(course_id))
+            f.write(u'<course url_name="{0.run}" org="{0.org}" course="{0.course}"/>'.format(course_id))
 
         with open(os.path.join(directory, "course", "{0.run}.xml".format(course_id)), "w+") as f:
             f.write('<course><chapter name="Test Chapter"></chapter></course>')

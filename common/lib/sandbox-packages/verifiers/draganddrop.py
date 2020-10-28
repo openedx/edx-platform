@@ -23,8 +23,11 @@ or:
 }
 values are (x, y) coordinates of centers of dragged images.
 """
+from __future__ import absolute_import
 
 import json
+import six
+from six.moves import zip
 
 
 def flat_user_answer(user_answer):
@@ -39,8 +42,8 @@ def flat_user_answer(user_answer):
     """
 
     def parse_user_answer(answer):
-        key = answer.keys()[0]
-        value = answer.values()[0]
+        key = list(answer.keys())[0]
+        value = list(answer.values())[0]
         if isinstance(value, dict):
 
             # Make complex value:
@@ -49,8 +52,8 @@ def flat_user_answer(user_answer):
             complex_value_list = []
             v_value = value
             while isinstance(v_value, dict):
-                v_key = v_value.keys()[0]
-                v_value = v_value.values()[0]
+                v_key = list(v_value.keys())[0]
+                v_value = list(v_value.values())[0]
                 complex_value_list.append(v_key)
 
             complex_value = '{0}'.format(v_value)
@@ -101,8 +104,8 @@ class PositionsCompare(list):
                 isinstance(other[0], (list, int, float))):
             return self.coordinate_positions_compare(other)
 
-        elif (isinstance(self[0], (unicode, str)) and
-              isinstance(other[0], (unicode, str))):
+        elif (isinstance(self[0], (six.text_type, str)) and
+              isinstance(other[0], (six.text_type, str))):
             return ''.join(self) == ''.join(other)
         else:  # improper argument types: no (float / int or lists of list
             #and float / int pair) or two string / unicode lists pair
@@ -165,7 +168,7 @@ class DragAndDrop(object):
             # {'1': [u'2', u'2', u'2'], '0': [u'1', u'1'], '2': [u'3']}
             # if '+number' is in rule - do not remove duplicates and strip
             # '+number' from rule
-            current_rule = self.correct_positions[index].keys()[0]
+            current_rule = list(self.correct_positions[index].keys())[0]
             if 'number' in current_rule:
                 rule_values = self.correct_positions[index][current_rule]
                 # clean rule, do not do clean duplicate items
@@ -353,7 +356,7 @@ class DragAndDrop(object):
         # correct_answer entry, the value is False.
         # default to consider every user answer excess until proven otherwise.
         self.excess_draggables = dict(
-            (users_draggable.keys()[0], True)
+            (list(users_draggable.keys())[0], True)
             for users_draggable in user_answer
         )
 
@@ -366,7 +369,7 @@ class DragAndDrop(object):
             user_positions_data = []
             for draggable_dict in user_answer:
                 # Draggable_dict is 1-to-1 {draggable_name: position}.
-                draggable_name = draggable_dict.keys()[0]
+                draggable_name = list(draggable_dict.keys())[0]
                 if draggable_name in answer['draggables']:
                     user_groups_data.append(draggable_name)
                     user_positions_data.append(

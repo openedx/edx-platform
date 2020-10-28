@@ -1,15 +1,17 @@
 """
 Integration tests for gated content.
 """
+from __future__ import absolute_import
+
 import ddt
-from crum import set_current_request
 from completion import waffle as completion_waffle
+from crum import set_current_request
 from edx_django_utils.cache import RequestCache
 from milestones import api as milestones_api
 from milestones.tests.utils import MilestonesTestCaseMixin
 
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import answer_problem
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
@@ -25,7 +27,6 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
     Base TestCase class for setting up a basic course structure
     and testing the gating feature
     """
-    shard = 3
 
     @classmethod
     def setUpClass(cls):

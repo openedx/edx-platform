@@ -29,6 +29,9 @@ TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
 # and (b) that the files are the same in Jenkins as in local dev.
 os.environ['SERVICE_VARIANT'] = 'bok_choy_docker' if 'BOK_CHOY_HOSTNAME' in os.environ else 'bok_choy'
 os.environ['CONFIG_ROOT'] = CONFIG_ROOT
+os.environ['LMS_CFG'] = str.format("{config_root}/{service_variant}.yml",
+                                   config_root=os.environ['CONFIG_ROOT'], service_variant=os.environ['SERVICE_VARIANT'])
+
 
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-position
 
@@ -77,7 +80,7 @@ MEDIA_ROOT = TEST_ROOT / "uploads"
 WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = TEST_ROOT / "staticfiles" / "lms" / "webpack-stats.json"
 
 # Don't use compression during tests
-PIPELINE_JS_COMPRESSOR = None
+PIPELINE['JS_COMPRESSOR'] = None
 
 ################################# CELERY ######################################
 
@@ -199,6 +202,22 @@ FEATURES['ENABLE_DISCUSSION_HOME_PANEL'] = True
 
 # Enable support for OpenBadges accomplishments
 FEATURES['ENABLE_OPENBADGES'] = True
+
+FEATURES['ENABLE_LTI_PROVIDER'] = True
+INSTALLED_APPS.append('lti_provider.apps.LtiProviderConfig')
+AUTHENTICATION_BACKENDS.append('lti_provider.users.LtiBackend')
+
+FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True
+THIRD_PARTY_AUTH = {
+    "Google": {
+        "SOCIAL_AUTH_GOOGLE_OAUTH2_KEY": "test",
+        "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET": "test"
+    },
+    "Facebook": {
+        "SOCIAL_AUTH_FACEBOOK_KEY": "test",
+        "SOCIAL_AUTH_FACEBOOK_SECRET": "test"
+    }
+}
 
 # Use MockSearchEngine as the search engine for test scenario
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"

@@ -13,10 +13,9 @@ import json
 import logging
 import os.path
 import uuid
-from datetime import datetime, timedelta
+from datetime import timedelta
 from email.utils import formatdate
 
-import pytz
 import requests
 import six
 from django.conf import settings
@@ -27,6 +26,7 @@ from django.urls import reverse
 from django.db import models
 from django.dispatch import receiver
 from django.utils.functional import cached_property
+from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy
 from model_utils import Choices
 from model_utils.models import StatusModel, TimeStampedModel
@@ -93,6 +93,10 @@ class IDVerificationAttempt(StatusModel):
     Each IDVerificationAttempt represents a Student's attempt to establish
     their identity through one of several methods that inherit from this Model,
     including PhotoVerification and SSOVerification.
+
+    .. pii: The User's name is stored in this and sub-models
+    .. pii_types: name
+    .. pii_retirement: retained
     """
     STATUS = Choices('created', 'ready', 'submitted', 'must_retry', 'approved', 'denied')
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
@@ -134,7 +138,7 @@ class IDVerificationAttempt(StatusModel):
         """
         return (
             self.created_at < deadline and
-            self.expiration_datetime > datetime.now(pytz.UTC)
+            self.expiration_datetime > now()
         )
 
 
@@ -142,6 +146,10 @@ class ManualVerification(IDVerificationAttempt):
     """
     Each ManualVerification represents a user's verification that bypasses the need for
     any other verification.
+
+    .. pii: The User's name is stored in the parent model
+    .. pii_types: name
+    .. pii_retirement: retained
     """
 
     reason = models.CharField(
@@ -173,6 +181,8 @@ class SSOVerification(IDVerificationAttempt):
     Each SSOVerification represents a Student's attempt to establish their identity
     by signing in with SSO. ID verification through SSO bypasses the need for
     photo verification.
+
+    .. no_pii:
     """
 
     OAUTH2 = 'third_party_auth.models.OAuth2ProviderConfig'
@@ -254,6 +264,10 @@ class PhotoVerification(IDVerificationAttempt):
         attempt.status == PhotoVerification.STATUS.created
         attempt.status == "created"
         pending_requests = PhotoVerification.submitted.all()
+
+    .. pii: The User's name is stored in the parent model, this one stores links to face and photo ID images
+    .. pii_types: name, image
+    .. pii_retirement: retained
     """
     ######################## Fields Set During Creation ########################
     # See class docstring for description of status states
@@ -526,6 +540,10 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
     Note: this model handles *inital* verifications (which you must perform
     at the time you register for a verified cert).
+
+    .. pii: The User's name is stored in the parent model, this one stores links to face and photo ID images
+    .. pii_types: name, image
+    .. pii_retirement: retained
     """
     # This is a base64.urlsafe_encode(rsa_encrypt(photo_id_aes_key), ss_pub_key)
     # So first we generate a random AES-256 key to encrypt our photo ID with.
@@ -542,6 +560,23 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
     # to notify for expired verification is already sent.
     expiry_date = models.DateTimeField(null=True, blank=True, db_index=True)
     expiry_email_date = models.DateTimeField(null=True, blank=True, db_index=True)
+
+    @status_before_must_be("must_retry", "submitted", "approved", "denied")
+    def approve(self, user_id=None, service=""):
+        """
+        Approve the verification attempt for user
+
+        Valid attempt statuses when calling this method:
+            `submitted`, `approved`, `denied`
+
+        After method completes:
+            status is set to `approved`
+            expiry_date is set to one year from now
+        """
+        self.expiry_date = now() + timedelta(
+            days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+        )
+        super(SoftwareSecurePhotoVerification, self).approve(user_id, service)
 
     @classmethod
     def get_initial_verification(cls, user, earliest_allowed_date=None):
@@ -640,7 +675,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         try:
             response = self.send_request(copy_id_photo_from=copy_id_photo_from)
             if response.ok:
-                self.submitted_at = datetime.now(pytz.UTC)
+                self.submitted_at = now()
                 self.status = "submitted"
                 self.save()
             else:
@@ -649,7 +684,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
                 self.save()
         except Exception:       # pylint: disable=broad-except
             log.exception(
-                'Software Secure submission failed for user %s, setting status to must_retry',
+                u'Software Secure submission failed for user %s, setting status to must_retry',
                 self.user.username
             )
             self.status = "must_retry"
@@ -695,9 +730,9 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
                 if parsed_error:
                     parsed_errors.append(parsed_error)
                 else:
-                    log.debug('Ignoring photo verification error message: %s', message)
+                    log.debug(u'Ignoring photo verification error message: %s', message)
         except Exception:   # pylint: disable=broad-except
-            log.exception('Failed to parse error message for SoftwareSecurePhotoVerification %d', self.pk)
+            log.exception(u'Failed to parse error message for SoftwareSecurePhotoVerification %d', self.pk)
 
         return parsed_errors
 
@@ -836,7 +871,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         headers, body = self.create_request()
 
         header_txt = "\n".join(
-            "{}: {}".format(h, v) for h, v in sorted(headers.items())
+            u"{}: {}".format(h, v) for h, v in sorted(headers.items())
         )
         body_txt = json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8')
 
@@ -873,20 +908,20 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
             verify=False
         )
 
-        log.info("Sent request to Software Secure for receipt ID %s.", self.receipt_id)
+        log.info(u"Sent request to Software Secure for receipt ID %s.", self.receipt_id)
         if copy_id_photo_from is not None:
             log.info(
                 (
-                    "Software Secure attempt with receipt ID %s used the same photo ID "
-                    "data as the receipt with ID %s"
+                    u"Software Secure attempt with receipt ID %s used the same photo ID "
+                    u"data as the receipt with ID %s"
                 ),
                 self.receipt_id, copy_id_photo_from.receipt_id
             )
 
         log.debug("Headers:\n{}\n\n".format(headers))
         log.debug("Body:\n{}\n\n".format(body))
-        log.debug("Return code: {}".format(response.status_code))
-        log.debug("Return message:\n\n{}\n\n".format(response.text))
+        log.debug(u"Return code: {}".format(response.status_code))
+        log.debug(u"Return message:\n\n{}\n\n".format(response.text))
 
         return response
 
@@ -909,6 +944,8 @@ class VerificationDeadline(TimeStampedModel):
     If no verification deadline record exists for a course,
     then that course does not have a deadline.  This means that users
     can submit photos at any time.
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "verify_student"
@@ -923,7 +960,7 @@ class VerificationDeadline(TimeStampedModel):
     deadline = models.DateTimeField(
         help_text=ugettext_lazy(
             u"The datetime after which users are no longer allowed "
-            u"to submit photos for verification."
+            "to submit photos for verification."
         )
     )
 

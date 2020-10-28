@@ -3,6 +3,8 @@ This module defines tests for courseware.access that are specific to group
 access control rules.
 """
 
+from __future__ import absolute_import
+
 import ddt
 from stevedore.extension import Extension, ExtensionManager
 
@@ -55,7 +57,6 @@ class GroupAccessTestCase(ModuleStoreTestCase):
     Tests to ensure that has_access() correctly enforces the visibility
     restrictions specified in the `group_access` field of XBlocks.
     """
-    shard = 7
 
     def set_user_group(self, user, partition, group):
         """

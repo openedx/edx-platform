@@ -1,49 +1,56 @@
+"""
+Tests the forum notification views.
+"""
+from __future__ import absolute_import
+
 import json
 import logging
 from datetime import datetime
 
 import ddt
-from django.urls import reverse
+import pytest
+import six
 from django.http import Http404
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils import translation
 from edx_django_utils.cache import RequestCache
 from mock import ANY, Mock, call, patch
 from six import text_type
+from six.moves import range
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
-from django_comment_client.permissions import get_team
-from django_comment_client.tests.group_id import (
+from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from lms.djangoapps.discussion import views
+from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
+from lms.djangoapps.discussion.django_comment_client.permissions import get_team
+from lms.djangoapps.discussion.django_comment_client.tests.group_id import (
     CohortedTopicGroupIdTestMixin,
     GroupIdAssertionMixin,
     NonCohortedTopicGroupIdTestMixin
 )
-from django_comment_client.tests.unicode import UnicodeTestMixin
-from django_comment_client.tests.utils import (
+from lms.djangoapps.discussion.django_comment_client.tests.unicode import UnicodeTestMixin
+from lms.djangoapps.discussion.django_comment_client.tests.utils import (
     CohortedTestCase,
     ForumsEnableMixin,
     config_course_discussions,
     topic_name_to_id
 )
-from django_comment_client.utils import strip_none
-from django_comment_common.models import (
-    CourseDiscussionSettings,
-    ForumsConfig,
-    FORUM_ROLE_STUDENT,
-)
-from django_comment_common.utils import ThreadContext, seed_permissions_roles
-from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
-from lms.djangoapps.discussion import views
-from lms.djangoapps.discussion.views import _get_discussion_default_topic_id
-from lms.djangoapps.discussion.views import course_discussions_settings_handler
+from lms.djangoapps.discussion.django_comment_client.utils import strip_none
+from lms.djangoapps.discussion.views import _get_discussion_default_topic_id, course_discussions_settings_handler
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
-from lms.lib.comment_client.utils import CommentClientPaginatedResult
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
 from openedx.core.djangoapps.course_groups.tests.test_views import CohortViewsTestCase
+from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientPaginatedResult
+from openedx.core.djangoapps.django_comment_common.models import (
+    FORUM_ROLE_STUDENT,
+    CourseDiscussionSettings,
+    ForumsConfig
+)
+from openedx.core.djangoapps.django_comment_common.utils import ThreadContext, seed_permissions_roles
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
@@ -68,7 +75,6 @@ QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
 
 class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
-    shard = 4
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -117,8 +123,8 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
 
         url = reverse('user_profile',
                       kwargs={'course_id': text_type(self.course.id), 'user_id': '12345'})  # There is no user 12345
-        self.response = self.client.get(url)
-        self.assertEqual(self.response.status_code, 404)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
 
     @patch('student.models.cc.User.from_django_user')
     @patch('student.models.cc.User.subscribed_threads')
@@ -134,8 +140,8 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
 
         url = reverse('followed_threads',
                       kwargs={'course_id': text_type(self.course.id), 'user_id': '12345'})  # There is no user 12345
-        self.response = self.client.get(url)
-        self.assertEqual(self.response.status_code, 404)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
 
 
 def make_mock_thread_data(
@@ -293,13 +299,12 @@ class PartialDictMatcher(object):
     def __eq__(self, other):
         return all([
             key in other and other[key] == value
-            for key, value in self.expected_values.iteritems()
+            for key, value in six.iteritems(self.expected_values)
         ])
 
 
 @patch('requests.request', autospec=True)
 class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
-    shard = 4
 
     CREATE_USER = False
 
@@ -386,7 +391,7 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             timeout=ANY
         )
 
-    def test_post(self, mock_request):
+    def test_post(self, _mock_request):
         request = RequestFactory().post("dummy_url")
         response = views.single_thread(
             request,
@@ -418,11 +423,7 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
     Ensures the number of modulestore queries and number of sql queries are
     independent of the number of responses retrieved for a given discussion thread.
     """
-    shard = 4
     MODULESTORE = TEST_DATA_MONGO_MODULESTORE
-
-    def setUp(self):
-        super(SingleThreadQueryCountTestCase, self).setUp()
 
     @ddt.data(
         # Old mongo with cache. There is an additional SQL query for old mongo
@@ -500,20 +501,20 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
 
 @patch('requests.request', autospec=True)
 class SingleCohortedThreadTestCase(CohortedTestCase):
-    shard = 4
 
     def _create_mock_cohorted_thread(self, mock_request):
-        self.mock_text = "dummy content"
-        self.mock_thread_id = "test_thread_id"
+        mock_text = "dummy content"
+        mock_thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(
-            course=self.course, text=self.mock_text,
-            thread_id=self.mock_thread_id,
+            course=self.course, text=mock_text,
+            thread_id=mock_thread_id,
             group_id=self.student_cohort.id,
             commentable_id="cohorted_topic",
         )
+        return mock_text, mock_thread_id
 
     def test_ajax(self, mock_request):
-        self._create_mock_cohorted_thread(mock_request)
+        mock_text, mock_thread_id = self._create_mock_cohorted_thread(mock_request)
 
         request = RequestFactory().get(
             "dummy_url",
@@ -524,7 +525,7 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
             request,
             text_type(self.course.id),
             "cohorted_topic",
-            self.mock_thread_id
+            mock_thread_id
         )
 
         self.assertEquals(response.status_code, 200)
@@ -534,8 +535,8 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
             make_mock_thread_data(
                 course=self.course,
                 commentable_id="cohorted_topic",
-                text=self.mock_text,
-                thread_id=self.mock_thread_id,
+                text=mock_text,
+                thread_id=mock_thread_id,
                 num_children=1,
                 group_id=self.student_cohort.id,
                 group_name=self.student_cohort.name,
@@ -544,14 +545,14 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
         )
 
     def test_html(self, mock_request):
-        self._create_mock_cohorted_thread(mock_request)
+        _mock_text, mock_thread_id = self._create_mock_cohorted_thread(mock_request)
 
         self.client.login(username=self.student.username, password='test')
         response = self.client.get(
             reverse('single_thread', kwargs={
-                'course_id': unicode(self.course.id),
+                'course_id': six.text_type(self.course.id),
                 'discussion_id': "cohorted_topic",
-                'thread_id': self.mock_thread_id,
+                'thread_id': mock_thread_id,
             })
         )
 
@@ -563,9 +564,8 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
         self.assertRegexpMatches(html, r'"group_name": "student_cohort"')
 
 
-@patch('lms.lib.comment_client.utils.requests.request', autospec=True)
+@patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
 class SingleThreadAccessTestCase(CohortedTestCase):
-    shard = 4
 
     def call_view(self, mock_request, commentable_id, user, group_id, thread_group_id=None, pass_group_id=True):
         thread_id = "test_thread_id"
@@ -652,9 +652,8 @@ class SingleThreadAccessTestCase(CohortedTestCase):
         self.assertEqual(resp.status_code, 200)
 
 
-@patch('lms.lib.comment_client.utils.requests.request', autospec=True)
+@patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
 class SingleThreadGroupIdTestCase(CohortedTestCase, GroupIdAssertionMixin):
-    shard = 4
     cs_endpoint = "/threads/dummy_thread_id"
 
     def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True, is_ajax=False):
@@ -672,7 +671,7 @@ class SingleThreadGroupIdTestCase(CohortedTestCase, GroupIdAssertionMixin):
         self.client.login(username=user.username, password='test')
 
         return self.client.get(
-            reverse('single_thread', args=[unicode(self.course.id), commentable_id, "dummy_thread_id"]),
+            reverse('single_thread', args=[six.text_type(self.course.id), commentable_id, "dummy_thread_id"]),
             data=request_data,
             **headers
         )
@@ -708,7 +707,6 @@ class ForumFormDiscussionContentGroupTestCase(ForumsEnableMixin, ContentGroupTes
     alpha_module => alpha_group_discussion => alpha_cohort => alpha_user/community_ta
     beta_module => beta_group_discussion => beta_cohort => beta_user
     """
-    shard = 4
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -736,7 +734,7 @@ class ForumFormDiscussionContentGroupTestCase(ForumsEnableMixin, ContentGroupTes
         )
         self.client.login(username=user.username, password='test')
         return self.client.get(
-            reverse("forum_form_discussion", args=[unicode(self.course.id)]),
+            reverse("forum_form_discussion", args=[six.text_type(self.course.id)]),
             HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
 
@@ -787,7 +785,6 @@ class ForumFormDiscussionContentGroupTestCase(ForumsEnableMixin, ContentGroupTes
 
 @patch('requests.request', autospec=True)
 class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, ContentGroupTestCase):
-    shard = 4
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -802,7 +799,7 @@ class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, Content
         def call_single_thread():
             self.client.login(username=user.username, password='test')
             return self.client.get(
-                reverse('single_thread', args=[unicode(self.course.id), discussion_id, thread_id])
+                reverse('single_thread', args=[six.text_type(self.course.id), discussion_id, thread_id])
             )
 
         if should_have_access:
@@ -896,9 +893,8 @@ class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, Content
         self.assert_can_access(self.beta_user, self.alpha_module.discussion_id, thread_id, True)
 
 
-@patch('lms.lib.comment_client.utils.requests.request', autospec=True)
+@patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
 class InlineDiscussionContextTestCase(ForumsEnableMixin, ModuleStoreTestCase):
-    shard = 4
 
     def setUp(self):
         super(InlineDiscussionContextTestCase, self).setUp()
@@ -926,7 +922,7 @@ class InlineDiscussionContextTestCase(ForumsEnableMixin, ModuleStoreTestCase):
 
         response = views.inline_discussion(
             request,
-            unicode(self.course.id),
+            six.text_type(self.course.id),
             self.discussion_topic_id,
         )
 
@@ -934,13 +930,12 @@ class InlineDiscussionContextTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         self.assertEqual(json_response['discussion_data'][0]['context'], ThreadContext.STANDALONE)
 
 
-@patch('lms.lib.comment_client.utils.requests.request', autospec=True)
+@patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
 class InlineDiscussionGroupIdTestCase(
         CohortedTestCase,
         CohortedTopicGroupIdTestMixin,
         NonCohortedTopicGroupIdTestMixin
 ):
-    shard = 4
     cs_endpoint = "/threads"
 
     def setUp(self):
@@ -986,12 +981,11 @@ class InlineDiscussionGroupIdTestCase(
         )
 
 
-@patch('lms.lib.comment_client.utils.requests.request', autospec=True)
+@patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
 class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):
-    shard = 4
     cs_endpoint = "/threads"
 
-    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True, is_ajax=False):
+    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True, is_ajax=False):  # pylint: disable=arguments-differ
         kwargs = {}
         if group_id:
             kwargs['group_id'] = group_id
@@ -1006,7 +1000,7 @@ class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdT
 
         self.client.login(username=user.username, password='test')
         return self.client.get(
-            reverse("forum_form_discussion", args=[unicode(self.course.id)]),
+            reverse("forum_form_discussion", args=[six.text_type(self.course.id)]),
             data=request_data,
             **headers
         )
@@ -1033,9 +1027,8 @@ class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdT
         )
 
 
-@patch('lms.lib.comment_client.utils.requests.request', autospec=True)
+@patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
 class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):
-    shard = 4
     cs_endpoint = "/active_threads"
 
     def call_view_for_profiled_user(
@@ -1059,12 +1052,12 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
 
         self.client.login(username=requesting_user.username, password='test')
         return self.client.get(
-            reverse('user_profile', args=[unicode(self.course.id), profiled_user.id]),
+            reverse('user_profile', args=[six.text_type(self.course.id), profiled_user.id]),
             data=request_data,
             **headers
         )
 
-    def call_view(self, mock_request, _commentable_id, user, group_id, pass_group_id=True, is_ajax=False):
+    def call_view(self, mock_request, _commentable_id, user, group_id, pass_group_id=True, is_ajax=False):  # pylint: disable=arguments-differ
         return self.call_view_for_profiled_user(
             mock_request, user, user, group_id, pass_group_id=pass_group_id, is_ajax=is_ajax
         )
@@ -1113,10 +1106,7 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
                     has_course_id = "course_id" in params
                     if (for_specific_course and has_course_id) or (not for_specific_course and not has_course_id):
                         return params
-            self.assertTrue(
-                False,
-                "Did not find appropriate user_profile call for 'for_specific_course'=" + for_specific_course
-            )
+            pytest.fail("Did not find appropriate user_profile call for 'for_specific_course'=" + for_specific_course)
 
         mock_request.reset_mock()
         self.call_view_for_profiled_user(
@@ -1195,9 +1185,8 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
         verify_group_id_not_present(profiled_user=self.moderator, pass_group_id=False)
 
 
-@patch('lms.lib.comment_client.utils.requests.request', autospec=True)
+@patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
 class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):
-    shard = 4
     cs_endpoint = "/subscribed_threads"
 
     def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
@@ -1233,9 +1222,8 @@ class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGr
         )
 
 
-@patch('lms.lib.comment_client.utils.requests.request', autospec=True)
+@patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
 class InlineDiscussionTestCase(ForumsEnableMixin, ModuleStoreTestCase):
-    shard = 4
 
     def setUp(self):
         super(InlineDiscussionTestCase, self).setUp()
@@ -1276,13 +1264,12 @@ class InlineDiscussionTestCase(ForumsEnableMixin, ModuleStoreTestCase):
 
         team.add_user(self.student)
 
-        response = self.send_request(mock_request)
+        self.send_request(mock_request)
         self.assertEqual(mock_request.call_args[1]['params']['context'], ThreadContext.STANDALONE)
 
 
 @patch('requests.request', autospec=True)
 class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
-    shard = 4
 
     TEST_THREAD_TEXT = 'userprofile-test-text'
     TEST_THREAD_ID = 'userprofile-test-thread-id'
@@ -1305,7 +1292,7 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
 
         response = self.client.get(
             reverse('user_profile', kwargs={
-                'course_id': unicode(self.course.id),
+                'course_id': six.text_type(self.course.id),
                 'user_id': self.profiled_user.id,
             }),
             data=params,
@@ -1334,10 +1321,10 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
         self.assertRegexpMatches(html, r'data-num-pages="1"')
         self.assertRegexpMatches(html, r'<span class="discussion-count">1</span> discussion started')
         self.assertRegexpMatches(html, r'<span class="discussion-count">2</span> comments')
-        self.assertRegexpMatches(html, r'&#39;id&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_ID))
-        self.assertRegexpMatches(html, r'&#39;title&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_TEXT))
-        self.assertRegexpMatches(html, r'&#39;body&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_TEXT))
-        self.assertRegexpMatches(html, r'&#39;username&#39;: u&#39;{}&#39;'.format(self.student.username))
+        self.assertRegexpMatches(html, ur'&#39;id&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_ID))
+        self.assertRegexpMatches(html, ur'&#39;title&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_TEXT))
+        self.assertRegexpMatches(html, ur'&#39;body&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_TEXT))
+        self.assertRegexpMatches(html, ur'&#39;username&#39;: u&#39;{}&#39;'.format(self.student.username))
 
     def check_ajax(self, mock_request, **params):
         response = self.get_response(mock_request, params, HTTP_X_REQUESTED_WITH="XMLHttpRequest")
@@ -1376,7 +1363,7 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
                 unenrolled_user.id
             )
 
-    def test_404_profiled_user(self, mock_request):
+    def test_404_profiled_user(self, _mock_request):
         request = RequestFactory().get("dummy_url")
         request.user = self.student
         with self.assertRaises(Http404):
@@ -1386,7 +1373,7 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
                 -999
             )
 
-    def test_404_course(self, mock_request):
+    def test_404_course(self, _mock_request):
         request = RequestFactory().get("dummy_url")
         request.user = self.student
         with self.assertRaises(Http404):
@@ -1412,7 +1399,6 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
 
 @patch('requests.request', autospec=True)
 class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
-    shard = 4
 
     CREATE_USER = False
 
@@ -1479,7 +1465,6 @@ class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, Mo
 
 
 class InlineDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):
-    shard = 4
 
     @classmethod
     def setUpClass(cls):
@@ -1494,10 +1479,7 @@ class InlineDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCa
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
-    def setUp(self):
-        super(InlineDiscussionUnicodeTestCase, self).setUp()
-
-    @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
+    @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
         mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
         request = RequestFactory().get("dummy_url")
@@ -1513,7 +1495,6 @@ class InlineDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCa
 
 
 class ForumFormDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):
-    shard = 4
 
     @classmethod
     def setUpClass(cls):
@@ -1528,10 +1509,7 @@ class ForumFormDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTes
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
-    def setUp(self):
-        super(ForumFormDiscussionUnicodeTestCase, self).setUp()
-
-    @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
+    @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
         mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
         request = RequestFactory().get("dummy_url")
@@ -1546,9 +1524,8 @@ class ForumFormDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTes
 
 
 @ddt.ddt
-@patch('lms.lib.comment_client.utils.requests.request', autospec=True)
+@patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
 class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
-    shard = 4
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -1571,7 +1548,7 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         mock_user.return_value.to_dict.return_value = {}
         reverse_url = "%s%s" % (reverse(
             "forum_form_discussion",
-            kwargs={"course_id": unicode(self.course.id)}), '/forum_form_discussion')
+            kwargs={"course_id": six.text_type(self.course.id)}), '/forum_form_discussion')
         # Test that malicious code does not appear in html
         url = "%s?%s=%s" % (reverse_url, 'sort_key', malicious_code)
         resp = self.client.get(url)
@@ -1594,7 +1571,7 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy')
 
         url = reverse('user_profile',
-                      kwargs={'course_id': unicode(self.course.id), 'user_id': str(self.student.id)})
+                      kwargs={'course_id': six.text_type(self.course.id), 'user_id': str(self.student.id)})
         # Test that malicious code does not appear in html
         url_string = "%s?%s=%s" % (url, 'page', malicious_code)
         resp = self.client.get(url_string)
@@ -1603,7 +1580,6 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
 
 
 class ForumDiscussionSearchUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):
-    shard = 4
 
     @classmethod
     def setUpClass(cls):
@@ -1618,10 +1594,7 @@ class ForumDiscussionSearchUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreT
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
-    def setUp(self):
-        super(ForumDiscussionSearchUnicodeTestCase, self).setUp()
-
-    @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
+    @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
         mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
         data = {
@@ -1640,7 +1613,6 @@ class ForumDiscussionSearchUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreT
 
 
 class SingleThreadUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):
-    shard = 4
 
     @classmethod
     def setUpClass(cls):
@@ -1655,10 +1627,7 @@ class SingleThreadUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, 
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
-    def setUp(self):
-        super(SingleThreadUnicodeTestCase, self).setUp()
-
-    @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
+    @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
         thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(course=self.course, text=text, thread_id=thread_id)
@@ -1674,7 +1643,6 @@ class SingleThreadUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, 
 
 
 class UserProfileUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):
-    shard = 4
 
     @classmethod
     def setUpClass(cls):
@@ -1689,10 +1657,7 @@ class UserProfileUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, U
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
-    def setUp(self):
-        super(UserProfileUnicodeTestCase, self).setUp()
-
-    @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
+    @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
         mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
         request = RequestFactory().get("dummy_url")
@@ -1707,7 +1672,6 @@ class UserProfileUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, U
 
 
 class FollowedThreadsUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):
-    shard = 4
 
     @classmethod
     def setUpClass(cls):
@@ -1722,10 +1686,7 @@ class FollowedThreadsUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCas
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
-    def setUp(self):
-        super(FollowedThreadsUnicodeTestCase, self).setUp()
-
-    @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
+    @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
         mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
         request = RequestFactory().get("dummy_url")
@@ -1744,7 +1705,6 @@ class EnrollmentTestCase(ForumsEnableMixin, ModuleStoreTestCase):
     Tests for the behavior of views depending on if the student is enrolled
     in the course
     """
-    shard = 4
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -1753,13 +1713,13 @@ class EnrollmentTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         self.student = UserFactory.create()
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-    @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
+    @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
     def test_unenrolled(self, mock_request):
         mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy')
         request = RequestFactory().get('dummy_url')
         request.user = self.student
         with self.assertRaises(CourseAccessRedirect):
-            views.forum_form_discussion(request, course_id=text_type(self.course.id))
+            views.forum_form_discussion(request, course_id=text_type(self.course.id))  # pylint: disable=no-value-for-parameter, unexpected-keyword-arg
 
 
 @patch('requests.request', autospec=True)
@@ -1767,7 +1727,6 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ForumsEnableMixin
     """
     Ensure that the Enterprise Data Consent redirects are in place only when consent is required.
     """
-    shard = 4
     CREATE_USER = False
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -1797,7 +1756,7 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ForumsEnableMixin
         mock_enterprise_customer_for_request.return_value = None
 
         thread_id = 'dummy'
-        course_id = unicode(self.course.id)
+        course_id = six.text_type(self.course.id)
         mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy', thread_id=thread_id)
 
         for url in (
@@ -1806,11 +1765,10 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ForumsEnableMixin
                 reverse('single_thread',
                         kwargs=dict(course_id=course_id, discussion_id=self.discussion_id, thread_id=thread_id)),
         ):
-            self.verify_consent_required(self.client, url)
+            self.verify_consent_required(self.client, url)  # pylint: disable=no-value-for-parameter
 
 
 class DividedDiscussionsTestCase(CohortViewsTestCase):
-    shard = 4
 
     def create_divided_discussions(self):
         """
@@ -1851,13 +1809,12 @@ class CourseDiscussionTopicsTestCase(DividedDiscussionsTestCase):
     """
     Tests the `divide_discussion_topics` view.
     """
-    shard = 4
 
     def test_non_staff(self):
         """
         Verify that we cannot access divide_discussion_topics if we're a non-staff user.
         """
-        self._verify_non_staff_cannot_access(views.discussion_topics, "GET", [unicode(self.course.id)])
+        self._verify_non_staff_cannot_access(views.discussion_topics, "GET", [six.text_type(self.course.id)])
 
     def test_get_discussion_topics(self):
         """
@@ -1907,7 +1864,6 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
     """
     Tests the course_discussion_settings_handler
     """
-    shard = 4
 
     def get_expected_response(self):
         """
@@ -1927,10 +1883,10 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
         Verify that we cannot access course_discussions_settings_handler if we're a non-staff user.
         """
         self._verify_non_staff_cannot_access(
-            course_discussions_settings_handler, "GET", [unicode(self.course.id)]
+            course_discussions_settings_handler, "GET", [six.text_type(self.course.id)]
         )
         self._verify_non_staff_cannot_access(
-            course_discussions_settings_handler, "PATCH", [unicode(self.course.id)]
+            course_discussions_settings_handler, "PATCH", [six.text_type(self.course.id)]
         )
 
     def test_update_always_divide_inline_discussion_settings(self):
@@ -2035,7 +1991,8 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
             handler=views.course_discussions_settings_handler
         )
         self.assertEqual(
-            "Incorrect field type for `{}`. Type must be `{}`".format('always_divide_inline_discussions', bool.__name__),
+            u"Incorrect field type for `{}`. Type must be `{}`".format('always_divide_inline_discussions',
+                                                                       bool.__name__),
             response.get("error")
         )
 
@@ -2067,7 +2024,6 @@ class DefaultTopicIdGetterTestCase(ModuleStoreTestCase):
     """
     Tests the `_get_discussion_default_topic_id` helper.
     """
-    shard = 4
 
     def test_no_default_topic(self):
         discussion_topics = {
@@ -2100,7 +2056,6 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
     """
     Forum thread views are expected to launch analytics events. Test these here.
     """
-    shard = 4
 
     CATEGORY_ID = 'i4x-edx-discussion-id'
     CATEGORY_NAME = 'Discussion 1'
@@ -2111,7 +2066,7 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
     DUMMY_URL = 'https://example.com/dummy/url/'
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-    def setUp(self):
+    def setUp(self):  # pylint: disable=arguments-differ
         super(ThreadViewedEventTestCase, self).setUp('eventtracking.tracker')
 
         self.course = CourseFactory.create()
@@ -2141,7 +2096,7 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
         self.client.login(username=self.student.username, password=PASSWORD)
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-    @patch('lms.lib.comment_client.utils.perform_request')
+    @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.perform_request')
     def test_thread_viewed_event(self, mock_perform_request):
         mock_perform_request.side_effect = make_mock_perform_request_impl(
             course=self.course,
@@ -2150,7 +2105,7 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
             commentable_id=self.category.discussion_id,
         )
         url = '/courses/{0}/discussion/forum/{1}/threads/{2}'.format(
-            unicode(self.course.id),
+            six.text_type(self.course.id),
             self.category.discussion_id,
             self.DUMMY_THREAD_ID
         )
@@ -2168,9 +2123,9 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
             'team_id': self.team.id,
             'url': self.DUMMY_URL,
         }
-        expected_event_items = expected_event.items()
+        expected_event_items = list(expected_event.items())
 
         self.assert_event_emission_count('edx.forum.thread.viewed', 1)
         _, event = self.get_latest_call_args()
-        event_items = event.items()
+        event_items = list(event.items())
         self.assertTrue(kv_pair in event_items for kv_pair in expected_event_items)

@@ -18,6 +18,9 @@ def get_student_module_as_dict(user, course_key, block_key):
     Returns:
         StudentModule as a (possibly empty) dict.
     """
+    if not user.is_authenticated():
+        return {}
+
     try:
         student_module = StudentModule.objects.get(
             student=user,

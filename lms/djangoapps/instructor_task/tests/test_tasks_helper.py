@@ -7,52 +7,33 @@ Unit tests for LMS instructor-initiated background tasks helper functions.
 - Tests all of the existing reports.
 
 """
+from __future__ import absolute_import, unicode_literals
 
 import os
 import shutil
 import tempfile
-import urllib
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 
 import ddt
+from six import text_type
+from six.moves.urllib.parse import quote  # pylint: disable=import-error
+from six.moves import range, zip
 import unicodecsv
+from django.conf import settings
+from django.test.utils import override_settings
+from django.urls import reverse
+from edx_django_utils.cache import RequestCache
+from freezegun import freeze_time
+from mock import ANY, MagicMock, Mock, patch
+from pytz import UTC
+
+import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import InstructorFactory
-from django.conf import settings
-from django.urls import reverse
-from django.test.utils import override_settings
-from edx_django_utils.cache import RequestCache
-from freezegun import freeze_time
 from instructor_analytics.basic import UNAVAILABLE, list_problem_responses
-from mock import MagicMock, Mock, patch, ANY
-from pytz import UTC
-from shoppingcart.models import (
-    Coupon,
-    CourseRegistrationCode,
-    CourseRegistrationCodeInvoiceItem,
-    Invoice,
-    InvoiceTransaction,
-    Order,
-    PaidCourseRegistration,
-)
-from six import text_type
-from student.models import (
-    ALLOWEDTOENROLL_TO_ENROLLED,
-    CourseEnrollment,
-    CourseEnrollmentAllowed,
-    ManualEnrollmentAudit,
-)
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from survey.models import SurveyAnswer, SurveyForm
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
-from xmodule.partitions.partitions import Group, UserPartition
-
-import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
 from lms.djangoapps.grades.models import PersistentCourseGrade
@@ -62,24 +43,24 @@ from lms.djangoapps.instructor_task.tasks_helper.enrollments import (
     upload_enrollment_report,
     upload_exec_summary_report,
     upload_may_enroll_csv,
-    upload_students_csv,
+    upload_students_csv
 )
 from lms.djangoapps.instructor_task.tasks_helper.grades import (
     ENROLLED_IN_COURSE,
     NOT_ENROLLED_IN_COURSE,
     CourseGradeReport,
     ProblemGradeReport,
-    ProblemResponses,
+    ProblemResponses
 )
 from lms.djangoapps.instructor_task.tasks_helper.misc import (
     cohort_students_and_upload,
     upload_course_survey_report,
-    upload_ora2_data,
+    upload_ora2_data
 )
 from lms.djangoapps.instructor_task.tests.test_base import (
     InstructorTaskCourseTestCase,
     InstructorTaskModuleTestCase,
-    TestReportMixin,
+    TestReportMixin
 )
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
@@ -88,6 +69,23 @@ from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.credit.tests.factories import CreditCourseFactory
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
+from shoppingcart.models import (
+    Coupon,
+    CourseRegistrationCode,
+    CourseRegistrationCodeInvoiceItem,
+    Invoice,
+    InvoiceTransaction,
+    Order,
+    PaidCourseRegistration
+)
+from student.models import ALLOWEDTOENROLL_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from survey.models import SurveyAnswer, SurveyForm
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.partitions.partitions import Group, UserPartition
+
 from ..models import ReportStore
 from ..tasks_helper.utils import UPDATE_STATUS_FAILED, UPDATE_STATUS_SUCCEEDED
 
@@ -413,7 +411,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
 
         RequestCache.clear_all_namespaces()
 
-        expected_query_count = 50
+        expected_query_count = 49
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             with check_mongo_calls(mongo_count):
                 with self.assertNumQueries(expected_query_count):
@@ -498,11 +496,13 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         Temporarily removes the generate_report_data method so we can test
         report generation when it's absent.
         """
-        from xmodule.capa_module import CapaDescriptor
-        generate_report_data = CapaDescriptor.generate_report_data
-        del CapaDescriptor.generate_report_data
-        yield
-        CapaDescriptor.generate_report_data = generate_report_data
+        from xmodule.capa_module import ProblemBlock
+        generate_report_data = ProblemBlock.generate_report_data
+        del ProblemBlock.generate_report_data
+        try:
+            yield
+        finally:
+            ProblemBlock.generate_report_data = generate_report_data
 
     @patch.dict('django.conf.settings.FEATURES', {'MAX_PROBLEM_RESPONSES_COUNT': 4})
     def test_build_student_data_limit(self):
@@ -550,7 +550,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.assertIn('state', student_data[0])
         mock_list_problem_responses.assert_called_with(self.course.id, ANY, ANY)
 
-    @patch('xmodule.capa_module.CapaDescriptor.generate_report_data', create=True)
+    @patch('xmodule.capa_module.ProblemBlock.generate_report_data', create=True)
     def test_build_student_data_for_block_with_mock_generate_report_data(self, mock_generate_report_data):
         """
         Ensure that building student data for a block that supports the
@@ -558,24 +558,35 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         """
         self.define_option_problem(u'Problem1')
         self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
-        state = {'some': 'state', 'more': 'state!'}
+        state1 = {'some': 'state1', 'more': 'state1!'}
+        state2 = {'some': 'state2', 'more': 'state2!'}
         mock_generate_report_data.return_value = iter([
-            ('student', state),
+            ('student', state1),
+            ('student', state2),
         ])
         student_data, _ = ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
             usage_key_str=str(self.course.location),
         )
-        self.assertEquals(len(student_data), 1)
+        self.assertEquals(len(student_data), 2)
         self.assertDictContainsSubset({
             'username': 'student',
             'location': 'test_course > Section > Subsection > Problem1',
             'block_key': 'i4x://edx/1.23x/problem/Problem1',
             'title': 'Problem1',
-            'some': 'state',
-            'more': 'state!',
+            'some': 'state1',
+            'more': 'state1!',
         }, student_data[0])
+        self.assertDictContainsSubset({
+            'username': 'student',
+            'location': 'test_course > Section > Subsection > Problem1',
+            'block_key': 'i4x://edx/1.23x/problem/Problem1',
+            'title': 'Problem1',
+            'some': 'state2',
+            'more': 'state2!',
+        }, student_data[1])
+        self.assertEquals(student_data[0]['state'], student_data[1]['state'])
 
     def test_build_student_data_for_block_with_real_generate_report_data(self):
         """
@@ -603,7 +614,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.assertIn('state', student_data[0])
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.grades.list_problem_responses')
-    @patch('xmodule.capa_module.CapaDescriptor.generate_report_data', create=True)
+    @patch('xmodule.capa_module.ProblemBlock.generate_report_data', create=True)
     def test_build_student_data_for_block_with_generate_report_data_not_implemented(
             self,
             mock_generate_report_data,
@@ -752,7 +763,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content)
+        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -786,7 +797,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content)
+        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -827,7 +838,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content)
+        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -876,14 +887,14 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         result = ProblemGradeReport.generate(None, None, self.course.id, None, 'graded')
         self.assertDictContainsSubset({'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv([
-            dict(zip(
+            dict(list(zip(
                 self.csv_header_row,
-                [unicode(self.student_1.id), self.student_1.email, self.student_1.username, ENROLLED_IN_COURSE, '0.0']
-            )),
-            dict(zip(
+                [text_type(self.student_1.id), self.student_1.email, self.student_1.username, ENROLLED_IN_COURSE, '0.0']
+            ))),
+            dict(list(zip(
                 self.csv_header_row,
-                [unicode(self.student_2.id), self.student_2.email, self.student_2.username, ENROLLED_IN_COURSE, '0.0']
-            ))
+                [text_type(self.student_2.id), self.student_2.email, self.student_2.username, ENROLLED_IN_COURSE, '0.0']
+            )))
         ])
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
@@ -902,26 +913,26 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         problem_name = u'Homework 1: Subsection - Problem1'
         header_row = self.csv_header_row + [problem_name + ' (Earned)', problem_name + ' (Possible)']
         self.verify_rows_in_csv([
-            dict(zip(
+            dict(list(zip(
                 header_row,
                 [
-                    unicode(self.student_1.id),
+                    text_type(self.student_1.id),
                     self.student_1.email,
                     self.student_1.username,
                     ENROLLED_IN_COURSE,
                     '0.01', '1.0', '2.0',
                 ]
-            )),
-            dict(zip(
+            ))),
+            dict(list(zip(
                 header_row,
                 [
-                    unicode(self.student_2.id),
+                    text_type(self.student_2.id),
                     self.student_2.email,
                     self.student_2.username,
                     ENROLLED_IN_COURSE,
                     '0.0', u'Not Attempted', '2.0',
                 ]
-            ))
+            )))
         ])
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
@@ -943,7 +954,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.assertTrue(any('grade_report_err' in item[0] for item in report_store.links_for(self.course.id)))
         self.verify_rows_in_csv([
             {
-                u'Student ID': unicode(student.id),
+                u'Student ID': text_type(student.id),
                 u'Email': student.email,
                 u'Username': student.username,
                 u'error_msg': error_message if error_message else "Unknown error"
@@ -970,36 +981,36 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         problem_name = u'Homework 1: Subsection - Problem1'
         header_row = self.csv_header_row + [problem_name + ' (Earned)', problem_name + ' (Possible)']
         self.verify_rows_in_csv([
-            dict(zip(
+            dict(list(zip(
                 header_row,
                 [
-                    unicode(self.student_1.id),
+                    text_type(self.student_1.id),
                     self.student_1.email,
                     self.student_1.username,
                     ENROLLED_IN_COURSE,
                     '0.01', '1.0', '2.0',
                 ]
-            )),
-            dict(zip(
+            ))),
+            dict(list(zip(
                 header_row,
                 [
-                    unicode(self.student_2.id),
+                    text_type(self.student_2.id),
                     self.student_2.email,
                     self.student_2.username,
                     ENROLLED_IN_COURSE,
                     '0.0', u'Not Attempted', '2.0',
                 ]
-            )),
-            dict(zip(
+            ))),
+            dict(list(zip(
                 header_row,
                 [
-                    unicode(inactive_student.id),
+                    text_type(inactive_student.id),
                     inactive_student.email,
                     inactive_student.username,
                     NOT_ENROLLED_IN_COURSE,
                     '0.0', u'Not Attempted', '2.0',
                 ]
-            ))
+            )))
         ])
 
 
@@ -1007,7 +1018,6 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
     """
     Test the problem report on a course that has split tests.
     """
-    shard = 3
     OPTION_1 = 'Option 1'
     OPTION_2 = 'Option 2'
 
@@ -1048,26 +1058,26 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
             header_row += [problem + ' (Earned)', problem + ' (Possible)']
 
         self.verify_rows_in_csv([
-            dict(zip(
+            dict(list(zip(
                 header_row,
                 [
-                    unicode(self.student_a.id),
+                    text_type(self.student_a.id),
                     self.student_a.email,
                     self.student_a.username,
                     ENROLLED_IN_COURSE,
                     u'1.0', u'2.0', u'2.0', u'Not Available', u'Not Available'
                 ]
-            )),
-            dict(zip(
+            ))),
+            dict(list(zip(
                 header_row,
                 [
-                    unicode(self.student_b.id),
+                    text_type(self.student_b.id),
                     self.student_b.email,
                     self.student_b.username,
                     ENROLLED_IN_COURSE,
                     u'0.5', u'Not Available', u'Not Available', u'1.0', u'2.0'
                 ]
-            ))
+            )))
         ])
 
     def test_problem_grade_report_valid_columns_order(self):
@@ -1079,12 +1089,12 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
         self.course = CourseFactory.create(
             grading_policy={
                 "GRADER": [{
-                    "type": "Homework %d" % i,
+                    "type": u"Homework %d" % i,
                     "min_count": 1,
                     "drop_count": 0,
-                    "short_label": "HW %d" % i,
+                    "short_label": u"HW %d" % i,
                     "weight": 1.0
-                } for i in xrange(1, grader_num)]
+                } for i in range(1, grader_num)]
             }
         )
 
@@ -1096,11 +1106,11 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
 
         problem_vertical_list = []
 
-        for i in xrange(1, grader_num):
-            chapter_name = 'Chapter %d' % i
-            problem_section_name = 'Problem section %d' % i
-            problem_section_format = 'Homework %d' % i
-            problem_vertical_name = 'Problem Unit %d' % i
+        for i in range(1, grader_num):
+            chapter_name = u'Chapter %d' % i
+            problem_section_name = u'Problem section %d' % i
+            problem_section_format = u'Homework %d' % i
+            problem_vertical_name = u'Problem Unit %d' % i
 
             chapter = ItemFactory.create(parent_location=self.course.location,
                                          display_name=chapter_name)
@@ -1121,10 +1131,10 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
             problem_vertical_list.append(problem_vertical)
 
         problem_names = []
-        for i in xrange(1, grader_num):
+        for i in range(1, grader_num):
             problem_url = 'test_problem_%d' % i
             self.define_option_problem(problem_url, parent=problem_vertical_list[i - 1])
-            title = 'Homework %d 1: Problem section %d - %s' % (i, i, problem_url)
+            title = u'Homework %d 1: Problem section %d - %s' % (i, i, problem_url)
             problem_names.append(title)
 
         header_row = [u'Student ID', u'Email', u'Username', u'Enrollment Status', u'Grade']
@@ -1169,15 +1179,15 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
             user(object): Django user object
             grade(list): Users' grade list
         """
-        return dict(zip(
+        return dict(list(zip(
             header_row,
             [
-                unicode(user.id),
+                text_type(user.id),
                 user.email,
                 user.username,
                 enrollment_status,
             ] + grade
-        ))
+        )))
 
     def test_cohort_content(self):
         self.submit_student_answer(self.alpha_user.username, u'Problem0', ['Option 1', 'Option 1'])
@@ -1313,7 +1323,7 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content)
+        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -1658,8 +1668,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', ''])),
+                dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', '']))),
+                dict(list(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', '']))),
             ],
             verify_order=False
         )
@@ -1673,8 +1683,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', ''])),
+                dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', '']))),
+                dict(list(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', '']))),
             ],
             verify_order=False
         )
@@ -1688,8 +1698,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', ''])),
+                dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', '']))),
+                dict(list(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', '']))),
             ],
             verify_order=False
         )
@@ -1709,8 +1719,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', ''])),
+                dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', '']))),
+                dict(list(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', '']))),
             ],
             verify_order=False
         )
@@ -1723,7 +1733,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 1, 'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '0', 'Invalid', '', ''])),
+                dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '0', 'Invalid', '', '']))),
             ],
             verify_order=False
         )
@@ -1737,8 +1747,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 1, 'failed': 1}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Does Not Exist', 'False', '0', '', '', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', ''])),
+                dict(list(zip(self.csv_header_row, ['Does Not Exist', 'False', '0', '', '', '']))),
+                dict(list(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', '']))),
             ],
             verify_order=False
         )
@@ -1752,7 +1762,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
                                       result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '0', '', '', 'example_email@example.com'])),
+                dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '0', '', '', 'example_email@example.com']))),
             ],
             verify_order=False
         )
@@ -1765,7 +1775,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 1, 'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '0', '', 'student_1@', ''])),
+                dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '0', '', 'student_1@', '']))),
             ],
             verify_order=False
         )
@@ -1790,7 +1800,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 0, 'failed': 2}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['', 'False', '0', '', '', ''])),
+                dict(list(zip(self.csv_header_row, ['', 'False', '0', '', '', '']))),
             ],
             verify_order=False
         )
@@ -1814,8 +1824,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', ''])),
+                dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', '']))),
+                dict(list(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', '']))),
             ],
             verify_order=False
         )
@@ -1832,8 +1842,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', ''])),
+                dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', '']))),
+                dict(list(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', '']))),
             ],
             verify_order=False
         )
@@ -1852,8 +1862,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', ''])),
+                dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', '']))),
+                dict(list(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', '']))),
             ],
             verify_order=False
         )
@@ -1872,8 +1882,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'skipped': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '0', '', '', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '0', '', '', ''])),
+                dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '0', '', '', '']))),
+                dict(list(zip(self.csv_header_row, ['Cohort 2', 'True', '0', '', '', '']))),
             ],
             verify_order=False
         )
@@ -1942,7 +1952,6 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
-
             self.assertDictContainsSubset(
                 {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0},
                 result,
@@ -1950,15 +1959,14 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
             self.verify_rows_in_csv(
                 [
                     {
-                        u'Student ID': unicode(self.student.id),
+                        u'Student ID': text_type(self.student.id),
                         u'Email': self.student.email,
                         u'Username': self.student.username,
                         u'Grade': '0.13',
                         u'Homework 1: Subsection': '0.5',
-                        u'Homework 2: Hidden': u'Not Attempted',
-                        u'Homework 3: Unattempted': u'Not Attempted',
-                        u'Homework 4: Empty': u'Not Attempted',
-                        u'Homework (Avg)': '0.125',
+                        u'Homework 2: Unattempted': 'Not Attempted',
+                        u'Homework 3: Empty': 'Not Attempted',
+                        u'Homework (Avg)': text_type(1.0 / 6.0),
                     },
                 ],
                 ignore_other_columns=True,
@@ -2131,7 +2139,6 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
     """
     Test certificate generation task works.
     """
-    shard = 3
 
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
@@ -2681,7 +2688,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
                 username='student_{}'.format(index),
                 email='student_{}@example.com'.format(index)
             )
-            for index in xrange(number_of_students)
+            for index in range(number_of_students)
         ]
 
 
@@ -2735,7 +2742,7 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
                     return_val = upload_ora2_data(None, None, self.course.id, None, 'generated')
 
                     timestamp_str = datetime.now(UTC).strftime('%Y-%m-%d-%H%M')
-                    course_id_string = urllib.quote(text_type(self.course.id).replace('/', '_'))
+                    course_id_string = quote(text_type(self.course.id).replace('/', '_'))
                     filename = u'{}_ORA_data_{}.csv'.format(course_id_string, timestamp_str)
 
                     self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)

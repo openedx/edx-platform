@@ -14,14 +14,10 @@ function show_help {
 function clean_file {
     FILE_PATH=$1
     TEMP_FILE=${FILE_PATH}.tmp
-    # If an editable VCS URL has a version number suffix, it was only editable for pip-compile's benefit;
-    # this is a workaround for https://github.com/jazzband/pip-tools/issues/355
-    sed 's/-e \(.*==.*\)/\1/' ${FILE_PATH} > ${TEMP_FILE}
-    mv ${TEMP_FILE} ${FILE_PATH}
     # Workaround for https://github.com/jazzband/pip-tools/issues/204 -
     # change absolute paths for local editable packages back to relative ones
     FILE_CONTENT=$(<${FILE_PATH})
-    FILE_URL_REGEX="-e (file:///[^'$'\n'']*)/common/lib/symmath"
+    FILE_URL_REGEX="-e (file:///[^"$'\n'"]*)/common/lib/symmath"
     if [[ "${FILE_CONTENT}" =~ ${FILE_URL_REGEX} ]]; then
         BASE_FILE_URL=${BASH_REMATCH[1]}
         sed "s|$BASE_FILE_URL/||" ${FILE_PATH} > ${TEMP_FILE}

@@ -1,15 +1,28 @@
+"""
+Notes models
+"""
+from __future__ import absolute_import
+
 import json
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.urls import reverse
 from django.db import models
+from django.urls import reverse
 from django.utils.html import strip_tags
 from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
 
 
 class Note(models.Model):
+    """
+    Stores user Notes for the LMS local Notes service.
+
+    .. pii: Legacy model for an app that edx.org hasn't used since 2013
+    .. pii_types: other
+    .. pii_retirement: retained
+    """
+
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     course_id = CourseKeyField(max_length=255, db_index=True)
     uri = models.CharField(max_length=255, db_index=True)

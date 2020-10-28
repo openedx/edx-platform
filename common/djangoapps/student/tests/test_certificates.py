@@ -1,27 +1,28 @@
 """Tests for display of certificates on the student dashboard. """
 
-import unittest
+from __future__ import absolute_import
 
 import datetime
+import unittest
+
 import ddt
 import mock
 from django.conf import settings
-from django.urls import reverse
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch
 from pytz import UTC
 from unittest import skip
 
+from course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import get_certificate_url  # pylint: disable=import-error
 from lms.djangoapps.certificates.models import CertificateStatuses  # pylint: disable=import-error
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
-from course_modes.models import CourseMode
 from student.models import LinkedInAddToProfileConfiguration
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
 
 # pylint: disable=no-member
 

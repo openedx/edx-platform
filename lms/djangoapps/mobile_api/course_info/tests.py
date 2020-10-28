@@ -21,7 +21,6 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTest
     Tests for /api/mobile/{api_version}/course_info/{course_id}/updates
     """
     REVERSE_INFO = {'name': 'course-updates-list', 'params': ['course_id', 'api_version']}
-    shard = 3
 
     def verify_success(self, response):
         super(TestUpdates, self).verify_success(response)
@@ -95,7 +94,6 @@ class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTes
     Tests for /api/mobile/{api_version}/course_info/{course_id}/handouts
     """
     REVERSE_INFO = {'name': 'course-handouts-list', 'params': ['course_id', 'api_version']}
-    shard = 3
 
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, API_V05),

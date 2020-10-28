@@ -1,21 +1,23 @@
+# pylint: disable=unicode-format-string
 # -*- coding: utf-8 -*-
 """
 Tests for js_utils.py
 """
-import HTMLParser
+from __future__ import absolute_import
+import six.moves.html_parser  # pylint: disable=import-error
 import json
 from unittest import TestCase
 
 from mako.template import Template
 
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
+import six  # pylint: disable=ungrouped-imports
 
 
 class TestJSUtils(TestCase):
     """
     Test JS utils
     """
-    shard = 2
 
     class NoDefaultEncoding(object):
         """
@@ -71,7 +73,7 @@ class TestJSUtils(TestCase):
         """
         malicious_js_string = "</script><script>alert('hello, ');</script>"
 
-        expected_escaped_string_for_js = unicode(
+        expected_escaped_string_for_js = six.text_type(
             r"\u003C/script\u003E\u003Cscript\u003Ealert(\u0027hello, \u0027)\u003B\u003C/script\u003E"
         )
         escaped_string_for_js = js_escaped_string(malicious_js_string)
@@ -179,7 +181,7 @@ class TestJSUtils(TestCase):
                 should be parseable into a near equivalent to test_dict.
 
         """
-        html_parser = HTMLParser.HTMLParser()
+        html_parser = six.moves.html_parser.HTMLParser()
 
         expected_json = html_parser.unescape(expected_json_for_html_string)
         parsed_expected_dict = json.loads(expected_json)

@@ -1,5 +1,7 @@
 # Factories are self documenting
 # pylint: disable=missing-docstring
+from __future__ import absolute_import
+
 import json
 from functools import partial
 
@@ -23,9 +25,9 @@ from student.roles import (
     OrgInstructorRole,
     OrgStaffRole
 )
-from student.tests.factories import UserProfileFactory as StudentUserProfileFactory
 # Imported to re-export
 from student.tests.factories import UserFactory  # Imported to re-export
+from student.tests.factories import UserProfileFactory as StudentUserProfileFactory
 
 # TODO fix this (course_id and location are invalid names as constants, and course_id should really be COURSE_KEY)
 # pylint: disable=invalid-name

@@ -3,7 +3,7 @@ Views that dispatch processing of OAuth requests to django-oauth2-provider or
 django-oauth-toolkit as appropriate.
 """
 
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import json
 

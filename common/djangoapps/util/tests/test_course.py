@@ -1,6 +1,8 @@
 """
 Tests for course utils.
 """
+from __future__ import absolute_import
+
 import ddt
 import mock
 from django.conf import settings

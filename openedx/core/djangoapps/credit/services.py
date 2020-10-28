@@ -2,8 +2,11 @@
 Implementation of "credit" XBlock service
 """
 
+from __future__ import absolute_import
+
 import logging
 
+import six
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from opaque_keys.edx.keys import CourseKey
@@ -21,7 +24,7 @@ def _get_course_key(course_key_or_id):
     """
     return (
         CourseKey.from_string(course_key_or_id)
-        if isinstance(course_key_or_id, basestring)
+        if isinstance(course_key_or_id, six.string_types)
         else course_key_or_id
     )
 
@@ -133,10 +136,10 @@ class CreditService(object):
         # table. This will be to help debug any issues that might
         # arise in production
         log_msg = (
-            'set_credit_requirement_status was called with '
-            'user_id={user_id}, course_key_or_id={course_key_or_id} '
-            'req_namespace={req_namespace}, req_name={req_name}, '
-            'status={status}, reason={reason}'.format(
+            u'set_credit_requirement_status was called with '
+            u'user_id={user_id}, course_key_or_id={course_key_or_id} '
+            u'req_namespace={req_namespace}, req_name={req_name}, '
+            u'status={status}, reason={reason}'.format(
                 user_id=user_id,
                 course_key_or_id=course_key_or_id,
                 req_namespace=req_namespace,
@@ -189,9 +192,9 @@ class CreditService(object):
         # table. This will be to help debug any issues that might
         # arise in production
         log_msg = (
-            'remove_credit_requirement_status was called with '
-            'user_id={user_id}, course_key_or_id={course_key_or_id} '
-            'req_namespace={req_namespace}, req_name={req_name}, '.format(
+            u'remove_credit_requirement_status was called with '
+            u'user_id={user_id}, course_key_or_id={course_key_or_id} '
+            u'req_namespace={req_namespace}, req_name={req_name}, '.format(
                 user_id=user_id,
                 course_key_or_id=course_key_or_id,
                 req_namespace=req_namespace,

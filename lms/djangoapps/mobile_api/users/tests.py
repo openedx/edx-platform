@@ -27,7 +27,6 @@ from mobile_api.testutils import (
 )
 from mobile_api.utils import API_V05, API_V1
 from openedx.core.lib.courses import course_image_url
-from openedx.core.lib.tests import attr
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
@@ -42,7 +41,6 @@ from .. import errors
 from .serializers import CourseEnrollmentSerializer, CourseEnrollmentSerializerv05
 
 
-@attr(shard=9)
 @ddt.ddt
 class TestUserDetailApi(MobileAPITestCase, MobileAuthUserTestMixin):
     """
@@ -59,7 +57,6 @@ class TestUserDetailApi(MobileAPITestCase, MobileAuthUserTestMixin):
         self.assertEqual(response.data['email'], self.user.email)
 
 
-@attr(shard=9)
 @ddt.ddt
 class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
     """
@@ -76,7 +73,6 @@ class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
         self.assertIn(self.username, response['location'])
 
 
-@attr(shard=9)
 @ddt.ddt
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
 class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTestMixin,
@@ -115,7 +111,6 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertIn('courses/{}/about'.format(self.course.id), found_course['course_about'])
         self.assertIn('course_info/{}/updates'.format(self.course.id), found_course['course_updates'])
         self.assertIn('course_info/{}/handouts'.format(self.course.id), found_course['course_handouts'])
-        self.assertIn('video_outlines/courses/{}'.format(self.course.id), found_course['video_outline'])
         self.assertEqual(found_course['id'], unicode(self.course.id))
         self.assertEqual(courses[0]['mode'], CourseMode.DEFAULT_MODE_SLUG)
         self.assertEqual(courses[0]['course']['subscription_id'], self.course.clean_id(padding_char='_'))
@@ -265,7 +260,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
                 user=self.user,
                 course_id=course.id
             )
-            ScheduleFactory(start=self.THREE_YEARS_AGO, enrollment=enrollment)
+            ScheduleFactory(start=self.THREE_YEARS_AGO + datetime.timedelta(days=1), enrollment=enrollment)
         else:
             course = CourseFactory.create(start=self.LAST_WEEK, mobile_available=True)
             self.enroll(course.id)
@@ -321,7 +316,6 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self._assert_enrollment_results(api_version, courses, num_courses_returned, False)
 
 
-@attr(shard=9)
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
 class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, MilestonesTestCaseMixin):
     """
@@ -397,7 +391,6 @@ class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, Milestone
         )
 
 
-@attr(shard=9)
 class CourseStatusAPITestCase(MobileAPITestCase):
     """
     Base test class for /api/mobile/{api_version}/users/<user_name>/course_status_info/{course_id}
@@ -432,7 +425,6 @@ class CourseStatusAPITestCase(MobileAPITestCase):
         )
 
 
-@attr(shard=9)
 class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
                           MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
@@ -452,7 +444,6 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         )
 
 
-@attr(shard=9)
 class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
                             MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
@@ -556,7 +547,6 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         )
 
 
-@attr(shard=9)
 @ddt.ddt
 @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})

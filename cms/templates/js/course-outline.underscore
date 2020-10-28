@@ -84,15 +84,19 @@ if (xblockInfo.get('graded')) {
 
 var is_proctored_exam = xblockInfo.get('is_proctored_exam');
 var is_practice_exam = xblockInfo.get('is_practice_exam');
+var is_onboarding_exam = xblockInfo.get('is_onboarding_exam');
+var exam_value;
 if (is_proctored_exam) {
-    if (is_practice_exam) {
-        var exam_value = gettext('Practice proctored Exam');
+    if (is_onboarding_exam) {
+        exam_value = gettext('Onboarding Exam');
+    } else if (is_practice_exam) {
+        exam_value = gettext('Practice proctored Exam');
     } else {
-        var exam_value = gettext('Proctored Exam');
+        exam_value = gettext('Proctored Exam');
     }
 
 } else {
-    var exam_value = gettext('Timed Exam');
+    exam_value = gettext('Timed Exam');
 }
 %>
 <% if (parentInfo) { %>
@@ -126,7 +130,7 @@ if (is_proctored_exam) {
             <ul class="actions-list">
                 <% if (xblockInfo.isSequential() && xblockInfo.get('proctoring_exam_configuration_link')) { %>
                 <li class="action-item">
-                    <a href="<%- xblockInfo.get('proctoring_exam_configuration_link') %>" data-tooltip="<%- gettext('Proctoring Settings') %>" class="proctoring-configuration-button" target="_blank">
+                    <a href="<%- xblockInfo.get('proctoring_exam_configuration_link') %>" data-tooltip="<%- gettext('Proctoring Settings') %>" class="proctoring-configuration-button" rel="noopener" target="_blank">
                         <span class="action-button-text"><%- gettext('Proctoring Settings') %></span>
                     </a>
                 </li>

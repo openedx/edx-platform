@@ -2,9 +2,12 @@
 Unit tests for getting the list of courses for a user through iterating all courses and
 by reversing group name formats.
 """
+from __future__ import absolute_import
+
 import unittest
 
 import mock
+import six
 from django.conf import settings
 from django.test.client import Client
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -133,8 +136,8 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         self._create_course_with_access_groups(pre_requisite_course_location2)
         # create a course with pre_requisite_courses
         pre_requisite_courses = [
-            unicode(pre_requisite_course_location),
-            unicode(pre_requisite_course_location2),
+            six.text_type(pre_requisite_course_location),
+            six.text_type(pre_requisite_course_location2),
         ]
         course_location = self.store.make_course_key('Org1', 'Course1', 'Run1')
         self._create_course_with_access_groups(course_location, {

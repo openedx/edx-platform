@@ -1,14 +1,19 @@
-from __future__ import print_function
+"""
+Contains functions that handle XML course data
+"""
+
+from __future__ import absolute_import, print_function
 
 import os
 import sys
 import traceback
 
 import lxml.etree
-
 from django.core.management.base import BaseCommand
 from fs.osfs import OSFS
 from path import Path as path
+from six.moves import map
+
 from xmodule.modulestore.xml import XMLModuleStore
 
 
@@ -31,7 +36,7 @@ def export(course, export_dir):
     """
     fs = OSFS(export_dir, create=True)
     if not fs.isdirempty('.'):
-        print('WARNING: Directory {dir} not-empty.  May clobber/confuse things'.format(dir=export_dir))
+        print(u'WARNING: Directory {dir} not-empty.  May clobber/confuse things'.format(dir=export_dir))
 
     try:
         course.runtime.export_fs = fs
@@ -51,7 +56,7 @@ def export(course, export_dir):
 def import_with_checks(course_dir):
     all_ok = True
 
-    print('Attempting to load "{}"'.format(course_dir))
+    print(u'Attempting to load "{}"'.format(course_dir))
 
     course_dir = path(course_dir)
     data_dir = course_dir.dirname()
@@ -73,7 +78,7 @@ def import_with_checks(course_dir):
 
     n = len(courses)
     if n != 1:
-        print('ERROR: Expect exactly 1 course.  Loaded {n}: {lst}'.format(n=n, lst=courses))
+        print(u'ERROR: Expect exactly 1 course.  Loaded {n}: {lst}'.format(n=n, lst=courses))
         return (False, None)
 
     course = courses[0]
@@ -98,7 +103,7 @@ def import_with_checks(course_dir):
     print('Running validators...')
 
     for validate in validators:
-        print('Running {}'.format(validate.__name__))
+        print(u'Running {}'.format(validate.__name__))
         all_ok = validate(course) and all_ok
 
     if all_ok:
@@ -126,7 +131,7 @@ def check_roundtrip(course_dir):
     # diff = dircmp(course_dir, export_dir, ignore=[], hide=[])
     print('======== Roundtrip diff: =========')
     sys.stdout.flush()  # needed to make diff appear in the right place
-    os.system('diff -r {} {}'.format(course_dir, export_dir))
+    os.system(u'diff -r {} {}'.format(course_dir, export_dir))
     print('======== ideally there is no diff above this =======')
 
 

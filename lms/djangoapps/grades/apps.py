@@ -20,13 +20,13 @@ class GradesConfig(AppConfig):
         PluginURLs.CONFIG: {
             ProjectType.LMS: {
                 PluginURLs.NAMESPACE: u'grades_api',
-                PluginURLs.REGEX: u'api/grades/',
-                PluginURLs.RELATIVE_PATH: u'api.urls',
+                PluginURLs.REGEX: u'^api/grades/',
+                PluginURLs.RELATIVE_PATH: u'rest_api.urls',
             }
         },
         PluginSettings.CONFIG: {
             ProjectType.LMS: {
-                SettingsType.AWS: {PluginSettings.RELATIVE_PATH: u'settings.aws'},
+                SettingsType.PRODUCTION: {PluginSettings.RELATIVE_PATH: u'settings.production'},
                 SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: u'settings.common'},
                 SettingsType.TEST: {PluginSettings.RELATIVE_PATH: u'settings.test'},
             }

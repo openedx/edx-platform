@@ -1,16 +1,17 @@
 """ Test the behavior of split_mongo/MongoConnection """
-import unittest
-from mock import patch
-from pymongo.errors import ConnectionFailure
+from __future__ import absolute_import
 
+import unittest
+
+from mock import patch
+
+from pymongo.errors import ConnectionFailure
 from xmodule.exceptions import HeartbeatFailure
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
-from xmodule.exceptions import HeartbeatFailure
 
 
 class TestHeartbeatFailureException(unittest.TestCase):
     """ Test that a heartbeat failure is thrown at the appropriate times """
-    shard = 2
 
     @patch('pymongo.MongoClient')
     @patch('pymongo.database.Database')

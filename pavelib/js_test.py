@@ -48,7 +48,7 @@ def test_js(options):
 
     if (suite != 'all') and (suite not in Env.JS_TEST_ID_KEYS):
         sys.stderr.write(
-            "Unknown test suite. Please choose from ({suites})\n".format(
+            u"Unknown test suite. Please choose from ({suites})\n".format(
                 suites=", ".join(Env.JS_TEST_ID_KEYS)
             )
         )

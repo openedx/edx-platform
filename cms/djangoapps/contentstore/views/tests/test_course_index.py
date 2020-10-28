@@ -42,7 +42,6 @@ class TestCourseIndex(CourseTestCase):
     """
     Unit tests for getting the list of courses and the course outline.
     """
-    shard = 1
 
     def setUp(self):
         """
@@ -317,8 +316,6 @@ class TestCourseIndexArchived(CourseTestCase):
     """
     Unit tests for testing the course index list when there are archived courses.
     """
-    shard = 1
-
     NOW = datetime.datetime.now(pytz.utc)
     DAY = datetime.timedelta(days=1)
     YESTERDAY = NOW - DAY
@@ -434,7 +431,6 @@ class TestCourseOutline(CourseTestCase):
     """
     Unit tests for the course outline.
     """
-    shard = 1
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
@@ -531,7 +527,7 @@ class TestCourseOutline(CourseTestCase):
                 ItemFactory.create(
                     parent_location=self.vertical.location,
                     category=block_type,
-                    display_name='{} Problem'.format(block_type)
+                    display_name=u'{} Problem'.format(block_type)
                 )
 
             if not publish:
@@ -548,7 +544,7 @@ class TestCourseOutline(CourseTestCase):
             expected_blocks.append(
                 [
                     reverse_usage_url('container_handler', self.vertical.location),
-                    '{} Problem'.format(block_type)
+                    u'{} Problem'.format(block_type)
                 ]
             )
 
@@ -610,7 +606,6 @@ class TestCourseReIndex(CourseTestCase):
     """
     Unit tests for the course outline.
     """
-    shard = 1
     SUCCESSFUL_RESPONSE = _("Course has been successfully reindexed.")
 
     ENABLED_SIGNALS = ['course_published']

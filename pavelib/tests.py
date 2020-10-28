@@ -71,6 +71,19 @@ __test__ = False  # do not collect
         help="Create tables by applying migrations."
     ),
     make_option(
+        '--disable_courseenrollment_history',
+        action='store_true',
+        dest='disable_courseenrollment_history',
+        help="Disable history on student.CourseEnrollent. Can also be used by exporting"
+             "DISABLE_COURSEENROLLMENT_HISTORY=1."
+    ),
+    make_option(
+        '--enable_courseenrollment_history',
+        action='store_false',
+        dest='disable_courseenrollment_history',
+        help="Enable django-simple-history on student.CourseEnrollment."
+    ),
+    make_option(
         '--xdist_ip_addresses',
         dest='xdist_ip_addresses',
         help="Comma separated string of ip addresses to shard tests to via xdist."
@@ -230,6 +243,19 @@ def test_lib(options, passthrough_options):
         dest='disable_migrations',
         help="Create tables directly from apps' models. Can also be used by exporting DISABLE_MIGRATIONS=1."
     ),
+    make_option(
+        '--disable_courseenrollment_history',
+        action='store_true',
+        dest='disable_courseenrollment_history',
+        help="Disable history on student.CourseEnrollent. Can also be used by exporting"
+             "DISABLE_COURSEENROLLMENT_HISTORY=1."
+    ),
+    make_option(
+        '--enable_courseenrollment_history',
+        action='store_false',
+        dest='disable_courseenrollment_history',
+        help="Enable django-simple-history on student.CourseEnrollment."
+    ),
 ])
 @PassthroughTask
 @timed
@@ -294,7 +320,7 @@ def coverage():
     if not (report_dir / '.coverage').isfile():
         # This may be that the coverage files were generated using -p,
         # try to combine them to the one file that we need.
-        sh("coverage combine --rcfile={}".format(rcfile))
+        sh(u"coverage combine --rcfile={}".format(rcfile))
 
     if not os.path.getsize(report_dir / '.coverage') > 50:
         # Check if the .coverage data file is larger than the base file,
@@ -309,9 +335,9 @@ def coverage():
         return
 
     # Generate the coverage.py XML report
-    sh("coverage xml --rcfile={}".format(rcfile))
+    sh(u"coverage xml --rcfile={}".format(rcfile))
     # Generate the coverage.py HTML report
-    sh("coverage html --rcfile={}".format(rcfile))
+    sh(u"coverage html --rcfile={}".format(rcfile))
     diff_coverage()  # pylint: disable=no-value-for-parameter
 
 
@@ -347,8 +373,8 @@ def diff_coverage(options):
 
         # Generate the diff coverage reports (HTML and console)
         sh(
-            "diff-cover {xml_report_str} --compare-branch={compare_branch} "
-            "--html-report {diff_html_path}".format(
+            u"diff-cover {xml_report_str} --compare-branch={compare_branch} "
+            u"--html-report {diff_html_path}".format(
                 xml_report_str=xml_report_str,
                 compare_branch=compare_branch,
                 diff_html_path=diff_html_path,

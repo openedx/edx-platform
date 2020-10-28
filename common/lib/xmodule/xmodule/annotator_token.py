@@ -5,6 +5,8 @@ without having to create a view, but just returning a string instead.
 It can be called from other files by using the following:
 from xmodule.annotator_token import retrieve_token
 """
+from __future__ import absolute_import
+
 import datetime
 
 from firebase_token_generator import create_token

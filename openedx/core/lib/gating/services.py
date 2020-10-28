@@ -1,6 +1,7 @@
 """
 A wrapper class to communicate with Gating api
 """
+from __future__ import absolute_import
 from . import api as gating_api
 
 

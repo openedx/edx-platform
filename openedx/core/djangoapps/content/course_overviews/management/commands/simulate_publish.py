@@ -11,21 +11,22 @@ This management command will emit the SignalHandler.course_published signal for
 some subset of courses and signal listeners, and then rely on existing listener
 behavior to trigger the necessary data updates.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
 import copy
 import logging
 import os
+import sys
 import textwrap
 import time
-import sys
 
+import six
 from django.core.management.base import BaseCommand
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.ccx.tasks import course_published_handler as ccx_receiver_fn
-from xmodule.modulestore.django import modulestore, SignalHandler
-
+from xmodule.modulestore.django import SignalHandler, modulestore
 
 log = logging.getLogger('simulate_publish')
 
@@ -162,7 +163,7 @@ class Command(BaseCommand):
             return self.print_show_receivers()
 
         log.info(
-            "simulate_publish starting, dry-run=%s, delay=%d seconds",
+            u"simulate_publish starting, dry-run=%s, delay=%d seconds",
             options['dry_run'],
             options['delay']
         )
@@ -172,8 +173,8 @@ class Command(BaseCommand):
                 log.info("Forcing simulate_publish to run in LMS process.")
             else:
                 log.fatal(
-                    "simulate_publish should be run as a CMS (Studio) " +
-                    "command, not %s (override with --force-lms).",
+                    u"simulate_publish should be run as a CMS (Studio) " +
+                    u"command, not %s (override with --force-lms).",
                     os.environ.get('SERVICE_VARIANT')
                 )
                 sys.exit(1)
@@ -193,7 +194,7 @@ class Command(BaseCommand):
         # actual work of emitting signals.
         for i, course_key in enumerate(course_keys, start=1):
             log.info(
-                "Emitting course_published signal (%d of %d) for course %s",
+                u"Emitting course_published signal (%d of %d) for course %s",
                 i, len(course_keys), course_key
             )
             if options['delay']:
@@ -214,19 +215,19 @@ class Command(BaseCommand):
         unknown_receiver_names = set(receiver_names) - all_receiver_names
         if unknown_receiver_names:
             log.fatal(
-                "The following receivers were specified but not recognized: %s",
-                ", ".join(sorted(unknown_receiver_names))
+                u"The following receivers were specified but not recognized: %s",
+                u", ".join(sorted(unknown_receiver_names))
             )
-            log.fatal("Known receivers: %s", ", ".join(sorted(all_receiver_names)))
+            log.fatal(u"Known receivers: %s", ", ".join(sorted(all_receiver_names)))
             sys.exit(1)
-        log.info("%d receivers specified: %s", len(receiver_names), ", ".join(receiver_names))
+        log.info(u"%d receivers specified: %s", len(receiver_names), ", ".join(receiver_names))
         receiver_names_set = set(receiver_names)
         for receiver_fn in get_receiver_fns():
             if receiver_fn == ccx_receiver_fn and not skip_ccx:
                 continue
             fn_name = name_from_fn(receiver_fn)
             if fn_name not in receiver_names_set:
-                log.info("Disconnecting %s", fn_name)
+                log.info(u"Disconnecting %s", fn_name)
                 self.course_published_signal.disconnect(receiver_fn)
 
     def get_course_keys(self, courses):
@@ -242,20 +243,20 @@ class Command(BaseCommand):
         # Use specific courses if specified, but fall back to all courses.
         course_keys = []
         if courses:
-            log.info("%d courses specified: %s", len(courses), ", ".join(courses))
+            log.info(u"%d courses specified: %s", len(courses), ", ".join(courses))
             for course_id in courses:
                 try:
                     course_keys.append(CourseKey.from_string(course_id))
                 except InvalidKeyError:
-                    log.fatal("%s is not a parseable CourseKey", course_id)
+                    log.fatal(u"%s is not a parseable CourseKey", course_id)
                     sys.exit(1)
         else:
             log.info("No courses specified, reading all courses from modulestore...")
             course_keys = sorted(
                 (course.id for course in modulestore().get_course_summaries()),
-                key=unicode  # Different types of CourseKeys can't be compared without this.
+                key=six.text_type  # Different types of CourseKeys can't be compared without this.
             )
-            log.info("%d courses read from modulestore.", len(course_keys))
+            log.info(u"%d courses read from modulestore.", len(course_keys))
 
         return course_keys
 
@@ -284,7 +285,7 @@ class Command(BaseCommand):
         for course_key in course_keys[:COURSES_TO_SHOW]:
             print("   ", course_key)
         if len(course_keys) > COURSES_TO_SHOW:
-            print("    (+ {} more)".format(len(course_keys) - COURSES_TO_SHOW))
+            print(u"    (+ {} more)".format(len(course_keys) - COURSES_TO_SHOW))
 
 
 def get_receiver_names():

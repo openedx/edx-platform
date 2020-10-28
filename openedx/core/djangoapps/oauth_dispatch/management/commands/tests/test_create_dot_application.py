@@ -4,15 +4,14 @@ Tests the ``create_dot_application`` management command.
 from __future__ import absolute_import, unicode_literals
 
 import ddt
-
 from django.core.management import call_command
 from django.test import TestCase
 from oauth2_provider.models import get_application_model
 
+from openedx.core.djangoapps.oauth_dispatch.models import ApplicationAccess
 from student.tests.factories import UserFactory
 
 from ..create_dot_application import Command
-
 
 Application = get_application_model()
 
@@ -31,13 +30,13 @@ class TestCreateDotApplication(TestCase):
         Application.objects.filter(user=self.user).delete()
 
     @ddt.data(
-        (None, None, None, None),
-        (None, None, 'client-abc', None),
-        (None, None, None, 'great-big-secret'),
-        ('password', True, 'client-dce', 'has-a-great-big-secret'),
+        (None, None, None, None, False, None),
+        (None, None, 'client-abc', None, False, None),
+        (None, None, None, 'great-big-secret', False, 'email,profile,user_id'),
+        ('password', True, 'client-dce', 'has-a-great-big-secret', True, None),
     )
     @ddt.unpack
-    def test_create_dot_application(self, grant_type, public, client_id, client_secret):
+    def test_create_dot_application(self, grant_type, public, client_id, client_secret, skip_auth, scopes):
         # Add optional arguments if provided
         call_args = ['testing_application', self.user.username]
         if grant_type:
@@ -58,6 +57,11 @@ class TestCreateDotApplication(TestCase):
         if client_secret:
             call_args.append('--client-secret')
             call_args.append(client_secret)
+        if skip_auth:
+            call_args.append('--skip-authorization')
+        if scopes:
+            call_args.append('--scopes')
+            call_args.append(scopes)
 
         call_command(Command(), *call_args)
 
@@ -69,14 +73,24 @@ class TestCreateDotApplication(TestCase):
         self.assertEqual(grant_type, application.authorization_grant_type)
         self.assertEqual(client_type, application.client_type)
         self.assertEqual('', application.redirect_uris)
+        self.assertEqual(skip_auth, application.skip_authorization)
 
         if client_id:
             self.assertEqual(client_id, application.client_id)
         if client_secret:
             self.assertEqual(client_secret, application.client_secret)
 
+        if scopes:
+            app_access_list = ApplicationAccess.objects.filter(application_id=application.id)
+            self.assertEqual(1, len(app_access_list))
+            app_access = app_access_list[0]
+            self.assertEqual(scopes.split(','), app_access.scopes)
+
         # When called a second time with the same arguments, the command should
         # exit gracefully without creating a second application.
         call_command(Command(), *call_args)
         apps = Application.objects.filter(name='testing_application')
         self.assertEqual(1, len(apps))
+        if scopes:
+            app_access_list = ApplicationAccess.objects.filter(application_id=application.id)
+            self.assertEqual(1, len(app_access_list))

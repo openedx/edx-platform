@@ -2,18 +2,17 @@
 """
 End-to-end tests for Student's Profile Page.
 """
+from __future__ import absolute_import
 from contextlib import contextmanager
 from datetime import datetime
 from unittest import skip
 
-import pytest
-
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
-from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
 from common.test.acceptance.tests.helpers import AcceptanceTest, EventsTestMixin
+import six
 
 
 class LearnerProfileTestMixin(EventsTestMixin):
@@ -133,7 +132,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
                     'event': {
                         'user_id': int(profile_user_id),
                         'page': 'profile',
-                        'visibility': unicode(visibility)
+                        'visibility': six.text_type(visibility)
                     }
                 }
             ],
@@ -270,25 +269,6 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTest):
         profile_page.wait_for_page()
         self.verify_profile_page_is_private(profile_page)
 
-    def test_dashboard_learner_profile_link(self):
-        """
-        Scenario: Verify that my profile link is present on dashboard page and we can navigate to correct page.
-
-        Given that I am a registered user.
-        When I go to Dashboard page.
-        And I click on username dropdown.
-        Then I see Profile link in the dropdown menu.
-        When I click on Profile link.
-        Then I will be navigated to Profile page.
-        """
-        username, __ = self.log_in_as_unique_user()
-        dashboard_page = DashboardPage(self.browser)
-        dashboard_page.visit()
-        self.assertIn('Profile', dashboard_page.tabs_link_text)
-        dashboard_page.click_my_profile_link()
-        my_profile_page = LearnerProfilePage(self.browser, username)
-        my_profile_page.wait_for_page()
-
     def test_fields_on_my_private_profile(self):
         """
         Scenario: Verify that desired fields are shown when looking at her own private profile.
@@ -350,20 +330,6 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTest):
 
         self.assertEqual(profile_page.get_non_editable_mode_value(field_id), displayed_value)
         self.assertTrue(profile_page.mode_for_field(field_id), mode)
-
-    def test_birth_year_not_set(self):
-        """
-        Verify message if birth year is not set.
-
-        Given that I am a registered user.
-        And birth year is not set for the user.
-        And I visit my profile page.
-        Then I should see a message that the profile is private until the year of birth is set.
-        """
-        username, user_id = self.log_in_as_unique_user()
-        message = "You must specify your birth year before you can share your full profile."
-        self.verify_profile_forced_private_message(username, birth_year=None, message=message)
-        self.verify_profile_page_view_event(username, user_id, visibility=self.PRIVACY_PRIVATE)
 
     def test_user_is_under_age(self):
         """
@@ -679,11 +645,11 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTes
         badge.close_modal()
 
 
-@pytest.mark.a11y
 class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
     """
     Class to test learner profile accessibility.
     """
+    a11y = True
 
     def test_editable_learner_profile_a11y(self):
         """
@@ -696,6 +662,7 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         profile_page.a11y_audit.check_for_accessibility_errors()
@@ -722,6 +689,7 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         profile_page.a11y_audit.check_for_accessibility_errors()
@@ -737,6 +705,8 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
+                'color-contrast'  # AC-938
             ]
         })
         profile_page.display_accomplishments()

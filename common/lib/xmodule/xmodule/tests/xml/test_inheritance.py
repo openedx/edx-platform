@@ -8,9 +8,7 @@ from xmodule.tests.xml.factories import CourseFactory, SequenceFactory, ProblemF
 class TestInheritedFieldParsing(XModuleXmlImportTest):
     """
     Test that inherited fields work correctly when parsing XML
-
     """
-    shard = 2
 
     def test_null_string(self):
         # Test that the string inherited fields are passed through 'deserialize_field',

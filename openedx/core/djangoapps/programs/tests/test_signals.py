@@ -2,16 +2,17 @@
 This module contains tests for programs-related signals and signal handlers.
 """
 
-from django.test import TestCase
+from __future__ import absolute_import
+
 import mock
-
+from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
-from student.tests.factories import UserFactory
 
-from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED, COURSE_CERT_CHANGED
 from openedx.core.djangoapps.programs.signals import handle_course_cert_awarded, handle_course_cert_changed
+from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED, COURSE_CERT_CHANGED
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from student.tests.factories import UserFactory
 
 TEST_USERNAME = 'test-user'
 TEST_COURSE_KEY = CourseKey.from_string('course-v1:edX+test_course+1')
@@ -29,7 +30,6 @@ class CertAwardedReceiverTest(TestCase):
     """
     Tests for the `handle_course_cert_awarded` signal handler function.
     """
-    shard = 2
 
     @property
     def signal_kwargs(self):
@@ -91,7 +91,6 @@ class CertChangedReceiverTest(TestCase):
     """
     Tests for the `handle_course_cert_changed` signal handler function.
     """
-    shard = 2
 
     def setUp(self):
         super(CertChangedReceiverTest, self).setUp()

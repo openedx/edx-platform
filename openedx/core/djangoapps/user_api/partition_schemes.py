@@ -64,7 +64,7 @@ class RandomUserPartitionScheme(object):
             except NoSuchUserPartitionGroupError:
                 # jsa: we can turn off warnings here if this is an expected case.
                 log.warn(
-                    "group not found in RandomUserPartitionScheme: %r",
+                    u"group not found in RandomUserPartitionScheme: %r",
                     {
                         "requested_partition_id": user_partition.id,
                         "requested_group_id": group_id,

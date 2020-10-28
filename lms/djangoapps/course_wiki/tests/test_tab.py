@@ -2,6 +2,8 @@
 Tests for wiki views.
 """
 
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.test.client import RequestFactory
 
@@ -13,7 +15,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 class WikiTabTestCase(ModuleStoreTestCase):
     """Test cases for Wiki Tab."""
-    shard = 4
 
     def setUp(self):
         super(WikiTabTestCase, self).setUp()

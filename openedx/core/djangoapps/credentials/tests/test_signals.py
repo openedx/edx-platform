@@ -1,4 +1,6 @@
 """Tests covering Credentials signals."""
+from __future__ import absolute_import
+
 import ddt
 import mock
 from django.conf import settings
@@ -15,7 +17,6 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as XModuleCourseFactory
-
 
 SIGNALS_MODULE = 'openedx.core.djangoapps.credentials.signals'
 
@@ -43,6 +44,8 @@ class TestCredentialsSignalsSendGrade(TestCase):
         [True, 'no-id-professional', 'downloadable'],
         [True, 'credit', 'downloadable'],
         [True, 'verified', 'notpassing'],
+        [True, 'masters', 'downloadable'],
+        [True, 'masters', 'notpassing'],
         [False, 'audit', 'downloadable'],
         [False, 'professional', 'generating'],
         [False, 'no-id-professional', 'generating'],

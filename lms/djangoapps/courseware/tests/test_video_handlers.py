@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Video xmodule tests in mongo."""
 
+from __future__ import absolute_import
+
 import json
 import os
 import tempfile
@@ -9,31 +11,25 @@ from datetime import timedelta
 
 import ddt
 import freezegun
+import six
 from django.core.files.base import ContentFile
 from django.utils.timezone import now
+from edxval import api
 from mock import MagicMock, Mock, patch
 from webob import Request, Response
 
 from common.test.utils import normalize_repr
 from openedx.core.djangoapps.contentserver.caching import del_cached_content
-from openedx.core.lib.tests import attr
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.video_module.transcripts_utils import (
-    Transcript,
-    edxval_api,
-    subs_filename,
-)
+from xmodule.video_module.transcripts_utils import Transcript, edxval_api, subs_filename
 from xmodule.x_module import STUDENT_VIEW
-
-from edxval import api
 
 from .helpers import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
-
 
 TRANSCRIPT = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
 BUMPER_TRANSCRIPT = {"start": [1], "end": [10], "text": ["A bumper"]}
@@ -131,7 +127,6 @@ def attach_bumper_transcript(item, filename, lang="en"):
     item.video_bumper["transcripts"][lang] = filename
 
 
-@attr(shard=1)
 class TestVideo(BaseTestXmodule):
     """Integration tests: web client + mongo."""
     CATEGORY = "video"
@@ -205,7 +200,6 @@ class TestVideo(BaseTestXmodule):
         super(TestVideo, self).tearDown()
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestTranscriptAvailableTranslationsDispatch(TestVideo):
     """
@@ -214,7 +208,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
     Tests for `available_translations` dispatch.
     """
     srt_file = _create_srt_file()
-    DATA = """
+    DATA = u"""
         <video show_captions="true"
         display_name="A Name"
         >
@@ -324,7 +318,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
         Tests available translations with video component's and val's transcript languages
         while the feature is enabled.
         """
-        for lang_code, in_content_store in dict(transcripts).iteritems():
+        for lang_code, in_content_store in six.iteritems(dict(transcripts)):
             if in_content_store:
                 file_name, __ = os.path.split(self.srt_file.name)
                 _upload_file(self.srt_file, self.item_descriptor.location, file_name)
@@ -364,7 +358,6 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
         self.assertEqual(response.status_code, 404)
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):
     """
@@ -373,7 +366,7 @@ class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):
     Tests for `available_translations_bumper` dispatch.
     """
     srt_file = _create_srt_file()
-    DATA = """
+    DATA = u"""
         <video show_captions="true"
         display_name="A Name"
         >
@@ -535,11 +528,10 @@ class TestTranscriptDownloadDispatch(TestVideo):
         # Assert the actual response
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.text, expected_content)
-        for attribute, value in expected_headers.iteritems():
+        for attribute, value in six.iteritems(expected_headers):
             self.assertEqual(response.headers[attribute], value)
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestTranscriptTranslationGetDispatch(TestVideo):
     """
@@ -549,7 +541,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
     """
 
     srt_file = _create_srt_file()
-    DATA = """
+    DATA = u"""
         <video
             show_captions="true"
             display_name="A Name"
@@ -806,7 +798,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         # Assert the actual response
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.text, transcript['content'])
-        for attribute, value in expected_headers.iteritems():
+        for attribute, value in six.iteritems(expected_headers):
             self.assertEqual(response.headers[attribute], value)
 
     @patch('xmodule.video_module.VideoModule.translation', Mock(side_effect=NotFoundError))
@@ -821,7 +813,6 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         self.assertEqual(response.status_code, 404)
 
 
-@attr(shard=1)
 class TestStudioTranscriptTranslationGetDispatch(TestVideo):
     """
     Test Studio video handler that provide translation transcripts.
@@ -829,7 +820,7 @@ class TestStudioTranscriptTranslationGetDispatch(TestVideo):
     Tests for `translation` dispatch GET HTTP method.
     """
     srt_file = _create_srt_file()
-    DATA = """
+    DATA = u"""
         <video show_captions="true"
         display_name="A Name"
         >
@@ -838,7 +829,7 @@ class TestStudioTranscriptTranslationGetDispatch(TestVideo):
             <transcript language="uk" src="{}"/>
             <transcript language="zh" src="{}"/>
         </video>
-    """.format(os.path.split(srt_file.name)[1], u"塞.srt".encode('utf8'))
+    """.format(os.path.split(srt_file.name)[1], u"塞.srt")
 
     MODEL_DATA = {'data': DATA}
 
@@ -864,7 +855,7 @@ class TestStudioTranscriptTranslationGetDispatch(TestVideo):
         self.assertEqual(response.headers["Content-Type"], "application/x-subrip; charset=utf-8")
         self.assertEqual(
             response.headers["Content-Disposition"],
-            'attachment; filename="uk_{}"'.format(filename)
+            u'attachment; filename="uk_{}"'.format(filename)
         )
         self.assertEqual(response.headers["Content-Language"], "uk")
 
@@ -880,7 +871,6 @@ class TestStudioTranscriptTranslationGetDispatch(TestVideo):
         self.assertEqual(response.headers["Content-Language"], "zh")
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestStudioTranscriptTranslationPostDispatch(TestVideo):
     """
@@ -987,7 +977,6 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):
         )
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
     """
@@ -1030,7 +1019,7 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
             'client_video_id': 'awesome.mp4',
             'duration': 0,
             'encoded_videos': [],
-            'courses': [unicode(self.course.id)]
+            'courses': [six.text_type(self.course.id)]
         })
         api.create_video_transcript(
             video_id=self.EDX_VIDEO_ID,
@@ -1119,13 +1108,12 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
         self.assertFalse(_check_asset(self.item_descriptor.location, sub_file_name))
 
 
-@attr(shard=1)
 class TestGetTranscript(TestVideo):
     """
     Make sure that `get_transcript` method works correctly
     """
     srt_file = _create_srt_file()
-    DATA = """
+    DATA = u"""
         <video show_captions="true"
         display_name="A Name"
         >
@@ -1134,7 +1122,7 @@ class TestGetTranscript(TestVideo):
             <transcript language="uk" src="{}"/>
             <transcript language="zh" src="{}"/>
         </video>
-    """.format(os.path.split(srt_file.name)[1], u"塞.srt".encode('utf8'))
+    """.format(os.path.split(srt_file.name)[1], u"塞.srt")
 
     MODEL_DATA = {
         'data': DATA

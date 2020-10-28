@@ -1,10 +1,12 @@
 """Tests for account activation"""
+from __future__ import absolute_import
+
 import unittest
 from uuid import uuid4
 
 from django.conf import settings
-from django.urls import reverse
 from django.test import TestCase, override_settings
+from django.urls import reverse
 from mock import patch
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers

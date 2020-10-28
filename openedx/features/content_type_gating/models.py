@@ -3,28 +3,24 @@ Content Type Gating Configuration Models
 """
 
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
-from django.utils import timezone
 
 from course_modes.models import CourseMode
 from lms.djangoapps.courseware.masquerade import (
     get_course_masquerade,
     get_masquerading_user_group,
-    is_masquerading_as_specific_student,
+    is_masquerading_as_specific_student
 )
 from openedx.core.djangoapps.config_model_utils.models import StackedConfigurationModel
 from openedx.core.djangoapps.config_model_utils.utils import is_in_holdback
-from openedx.features.content_type_gating.helpers import FULL_ACCESS, LIMITED_ACCESS
-from openedx.features.course_duration_limits.config import (
-    CONTENT_TYPE_GATING_FLAG,
-    FEATURE_BASED_ENROLLMENT_GLOBAL_KILL_FLAG,
-)
+from openedx.features.content_type_gating.helpers import FULL_ACCESS, LIMITED_ACCESS, correct_modes_for_fbe
 from student.models import CourseEnrollment
 from student.role_helpers import has_staff_roles
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
@@ -34,6 +30,8 @@ from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 class ContentTypeGatingConfig(StackedConfigurationModel):
     """
     A ConfigurationModel used to manage configuration for Content Type Gating (Feature Based Enrollments).
+
+    .. no_pii:
     """
 
     STACKABLE_FIELDS = ('enabled', 'enabled_as_of', 'studio_override_enabled')
@@ -45,7 +43,7 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
         blank=True,
         help_text=_(
             'If the configuration is Enabled, then all enrollments '
-            'created after this date and time (UTC) will be affected.'
+            'created after this date and time (user local time) will be affected.'
         )
     )
     studio_override_enabled = models.NullBooleanField(
@@ -104,12 +102,6 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
             user: The user being queried.
             course_key: The CourseKey of the course being queried.
         """
-        if FEATURE_BASED_ENROLLMENT_GLOBAL_KILL_FLAG.is_enabled():
-            return False
-
-        if CONTENT_TYPE_GATING_FLAG.is_enabled():
-            return True
-
         if enrollment is not None and (user is not None or course_key is not None):
             raise ValueError('Specify enrollment or user/course_key, but not both')
 
@@ -145,14 +137,18 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
         if user_variable_represents_correct_user and is_in_holdback(user):
             return False
 
+        if not correct_modes_for_fbe(course_key, enrollment, user):
+            return False
+
         # enrollment might be None if the user isn't enrolled. In that case,
         # return enablement as if the user enrolled today
         # Also, ignore enrollment creation date if the user is masquerading.
         if enrollment is None or course_masquerade:
-            return cls.enabled_for_course(course_key=course_key, target_datetime=timezone.now())
+            target_datetime = timezone.now()
         else:
-            current_config = cls.current(course_key=enrollment.course_id)
-            return current_config.enabled_as_of_datetime(target_datetime=enrollment.created)
+            target_datetime = enrollment.created
+        current_config = cls.current(course_key=course_key)
+        return current_config.enabled_as_of_datetime(target_datetime=target_datetime)
 
     @classmethod
     def enabled_for_course(cls, course_key, target_datetime=None):
@@ -169,12 +165,8 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
             course_key: The CourseKey of the course being queried.
             target_datetime: The datetime to checked enablement as of. Defaults to the current date and time.
         """
-
-        if FEATURE_BASED_ENROLLMENT_GLOBAL_KILL_FLAG.is_enabled():
+        if not correct_modes_for_fbe(course_key):
             return False
-
-        if CONTENT_TYPE_GATING_FLAG.is_enabled():
-            return True
 
         if target_datetime is None:
             target_datetime = timezone.now()
@@ -193,12 +185,6 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
         Arguments:
             target_datetime (:class:`datetime.datetime`): The datetime that ``enabled_as_of`` must be equal to or before
         """
-
-        if FEATURE_BASED_ENROLLMENT_GLOBAL_KILL_FLAG.is_enabled():
-            return False
-
-        if CONTENT_TYPE_GATING_FLAG.is_enabled():
-            return True
 
         # Explicitly cast this to bool, so that when self.enabled is None the method doesn't return None
         return bool(self.enabled and self.enabled_as_of <= target_datetime)

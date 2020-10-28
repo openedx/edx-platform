@@ -1,6 +1,8 @@
 """
 Common MongoDB connection functions.
 """
+from __future__ import absolute_import
+
 import ssl
 import logging
 

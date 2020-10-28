@@ -1,20 +1,21 @@
 """
 Utility methods for the account settings.
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import random
 import re
 import string
-from urlparse import urlparse
 
 import waffle
+from completion import waffle as completion_waffle
+from completion.models import BlockCompletion
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from six import text_type
+from six.moves import range
+from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
-from completion import waffle as completion_waffle
-from completion.models import BlockCompletion
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings, get_current_site
 from xmodule.modulestore.django import modulestore
@@ -37,10 +38,9 @@ def validate_social_link(platform_name, new_social_link):
     # Ensure that the new link is valid.
     if formatted_social_link is None:
         required_url_stub = settings.SOCIAL_PLATFORMS[platform_name]['url_stub']
-        raise ValueError(_(
-            ' Make sure that you are providing a valid username or a URL that contains "' +
-            required_url_stub + '". To remove the link from your profile, leave this field blank.'
-        ))
+        raise ValueError(_('Make sure that you are providing a valid username or a URL that contains "{url_stub}". '
+                           'To remove the link from your profile, '
+                           'leave this field blank.').format(url_stub=required_url_stub))
 
 
 def format_social_link(platform_name, new_social_link):
@@ -189,7 +189,7 @@ def generate_password(length=12, chars=string.letters + string.digits):
     password = ''
     password += choice(string.digits)
     password += choice(string.letters)
-    password += ''.join([choice(chars) for _i in xrange(length - 2)])
+    password += ''.join([choice(chars) for _i in range(length - 2)])
     return password
 
 

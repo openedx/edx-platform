@@ -1,19 +1,25 @@
 """ Tests for auto auth. """
+from __future__ import absolute_import
+
 import json
 
 import ddt
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.client import Client
-from mock import patch, Mock
+from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
 
-from django_comment_common.models import (
-    Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_STUDENT
+from openedx.core.djangoapps.django_comment_common.models import (
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_MODERATOR,
+    FORUM_ROLE_STUDENT,
+    Role
 )
-from django_comment_common.utils import seed_permissions_roles
-from student.models import anonymous_id_for_user, CourseAccessRole, CourseEnrollment, UserProfile
+from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
+from student.models import CourseAccessRole, CourseEnrollment, UserProfile, anonymous_id_for_user
 from util.testing import UrlResetMixin
 
 
@@ -207,7 +213,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
         if settings.ROOT_URLCONF == 'lms.urls':
             url_pattern = '/course/'
         else:
-            url_pattern = '/course/{}'.format(unicode(course_key))
+            url_pattern = '/course/{}'.format(six.text_type(course_key))
 
         self.assertTrue(response.url.endswith(url_pattern))
 

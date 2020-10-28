@@ -8,12 +8,8 @@ from uuid import UUID
 import factory
 from faker import Factory as FakerFactory
 
+from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomer, EnterpriseCustomerUser
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-
-from enterprise.models import (
-    EnterpriseCustomer,
-    EnterpriseCustomerUser,
-)
 
 FAKER = FakerFactory.create()
 
@@ -59,3 +55,22 @@ class EnterpriseCustomerUserFactory(factory.django.DjangoModelFactory):
 
     enterprise_customer = factory.SubFactory(EnterpriseCustomerFactory)
     user_id = factory.LazyAttribute(lambda x: FAKER.pyint())  # pylint: disable=no-member
+
+
+class EnterpriseCourseEnrollmentFactory(factory.django.DjangoModelFactory):
+    """
+    EnterpriseCourseEnrollment factory.
+
+    Creates an instance of EnterpriseCourseEnrollment with minimal boilerplate.
+    """
+
+    class Meta(object):
+        """
+        Meta for EnterpriseCourseEnrollmentFactory.
+        """
+
+        model = EnterpriseCourseEnrollment
+
+    id = factory.LazyAttribute(lambda x: FAKER.random_int(min=1))  # pylint: disable=no-member
+    course_id = factory.LazyAttribute(lambda x: FAKER.slug())  # pylint: disable=no-member
+    enterprise_customer_user = factory.SubFactory(EnterpriseCustomerUserFactory)

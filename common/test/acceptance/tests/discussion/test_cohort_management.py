@@ -3,6 +3,8 @@
 End-to-end tests related to the cohort management on the LMS Instructor Dashboard
 """
 
+from __future__ import absolute_import
+
 import os
 import uuid
 from datetime import datetime
@@ -578,7 +580,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         start_time = datetime.now(UTC)
         self.cohort_management_page.upload_cohort_file(filename)
         self._verify_cohort_by_csv_notification(
-            "Your file '{}' has been uploaded. Allow a few minutes for processing.".format(filename)
+            u"Your file '{}' has been uploaded. Allow a few minutes for processing.".format(filename)
         )
 
         if not skip_events:
@@ -693,6 +695,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         self.cohort_management_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         self.cohort_management_page.a11y_audit.check_for_accessibility_errors()

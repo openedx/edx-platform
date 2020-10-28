@@ -3,14 +3,19 @@ xModule implementation of a learning sequence
 """
 
 # pylint: disable=abstract-method
+from __future__ import absolute_import
+
 import collections
 import json
 import logging
 from datetime import datetime
+from functools import reduce
 
+from pkg_resources import resource_string
+
+import six
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
-from pkg_resources import resource_string
 from pytz import UTC
 from six import text_type
 from web_fragments.fragment import Fragment
@@ -22,7 +27,7 @@ from .exceptions import NotFoundError
 from .fields import Date
 from .mako_module import MakoModuleDescriptor
 from .progress import Progress
-from .x_module import STUDENT_VIEW, PUBLIC_VIEW, XModule
+from .x_module import PUBLIC_VIEW, STUDENT_VIEW, XModule
 from .xml_module import XmlDescriptor
 
 log = logging.getLogger(__name__)
@@ -120,6 +125,15 @@ class ProctoringFields(object):
         display_name=_("Is Practice Exam"),
         help=_(
             "This setting indicates whether this exam is for testing purposes only. Practice exams are not verified."
+        ),
+        default=False,
+        scope=Scope.settings,
+    )
+
+    is_onboarding_exam = Boolean(
+        display_name=_("Is Onboarding Exam"),
+        help=_(
+            "This setting indicates whether this exam is an onboarding exam."
         ),
         default=False,
         scope=Scope.settings,
@@ -527,7 +541,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         """
         if not newrelic:
             return
-        newrelic.agent.add_custom_parameter('seq.block_id', unicode(self.location))
+        newrelic.agent.add_custom_parameter('seq.block_id', six.text_type(self.location))
         newrelic.agent.add_custom_parameter('seq.display_name', self.display_name or '')
         newrelic.agent.add_custom_parameter('seq.position', self.position)
         newrelic.agent.add_custom_parameter('seq.is_time_limited', self.is_time_limited)
@@ -566,7 +580,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         if 1 <= self.position <= len(display_items):
             # Basic info about the Unit...
             current = display_items[self.position - 1]
-            newrelic.agent.add_custom_parameter('seq.current.block_id', unicode(current.location))
+            newrelic.agent.add_custom_parameter('seq.current.block_id', six.text_type(current.location))
             newrelic.agent.add_custom_parameter('seq.current.display_name', current.display_name or '')
 
             # Examining all items inside the Unit (or split_test, conditional, etc.)

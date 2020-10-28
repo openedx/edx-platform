@@ -1,11 +1,16 @@
 """
 Test capa problem.
 """
-import ddt
+from __future__ import absolute_import
+
 import textwrap
-from lxml import etree
-from mock import patch
 import unittest
+
+import ddt
+import six
+from lxml import etree
+from markupsafe import Markup
+from mock import patch
 
 from capa.tests.helpers import new_loncapa_problem
 from openedx.core.djangolib.markup import HTML
@@ -145,7 +150,6 @@ class CAPAProblemTest(unittest.TestCase):
                     'descriptions': {}
                 }
             }
-
         )
         for question in (question1, question2):
             self.assertEqual(
@@ -484,16 +488,21 @@ class CAPAMultiInputProblemTest(unittest.TestCase):
         """
         return new_loncapa_problem(xml, use_capa_render_template=True)
 
-    def assert_problem_html(self, problme_html, group_label, *input_labels):
+    def assert_problem_data(self, problem_data):
+        """Verify problem data is in expected state"""
+        for problem_value in six.viewvalues(problem_data):
+            self.assertIsInstance(problem_value['label'], Markup)
+
+    def assert_problem_html(self, problem_html, group_label, *input_labels):
         """
         Verify that correct html is rendered for multiple inputtypes.
 
         Arguments:
-            problme_html (str): problem HTML
+            problem_html (str): problem HTML
             group_label (str or None): multi input group label or None if label is not present
             input_labels (tuple): individual input labels
         """
-        html = etree.XML(problme_html)
+        html = etree.XML(problem_html)
 
         # verify that only one multi input group div is present at correct path
         multi_inputs_group = html.xpath(
@@ -540,6 +549,7 @@ class CAPAMultiInputProblemTest(unittest.TestCase):
         """.format(label_html=label_html, input1_label=input1_label, input2_label=input2_label)
         problem = self.capa_problem(xml)
         self.assert_problem_html(problem.get_html(), group_label, input1_label, input2_label)
+        self.assert_problem_data(problem.problem_data)
 
     @ddt.unpack
     @ddt.data(
@@ -569,6 +579,7 @@ class CAPAMultiInputProblemTest(unittest.TestCase):
         """.format(group_label, input1_label, input2_label, inputtype=inputtype))
         problem = self.capa_problem(xml)
         self.assert_problem_html(problem.get_html(), group_label, input1_label, input2_label)
+        self.assert_problem_data(problem.problem_data)
 
     @ddt.unpack
     @ddt.data(

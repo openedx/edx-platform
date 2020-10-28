@@ -36,13 +36,13 @@ def get_email_cookies_via_sailthru(self, user_email, post_parms):
     try:
         sailthru_client = SailthruClient(email_config.sailthru_key, email_config.sailthru_secret)
         log.info(
-            'Sending to Sailthru the user interest cookie [%s] for user [%s]',
+            u'Sending to Sailthru the user interest cookie [%s] for user [%s]',
             post_parms.get('cookies', ''),
             user_email
         )
         sailthru_response = sailthru_client.api_post("user", post_parms)
     except SailthruClientError as exc:
-        log.error("Exception attempting to obtain cookie from Sailthru: %s", unicode(exc))
+        log.error(u"Exception attempting to obtain cookie from Sailthru: %s", unicode(exc))
         raise SailthruClientError
 
     if sailthru_response.is_ok():
@@ -50,11 +50,11 @@ def get_email_cookies_via_sailthru(self, user_email, post_parms):
             cookie = sailthru_response.json['keys']['cookie']
             return cookie
         else:
-            log.error("No cookie returned attempting to obtain cookie from Sailthru for %s", user_email)
+            log.error(u"No cookie returned attempting to obtain cookie from Sailthru for %s", user_email)
     else:
         error = sailthru_response.get_error()
         # generally invalid email address
-        log.info("Error attempting to obtain cookie from Sailthru: %s", error.get_message())
+        log.info(u"Error attempting to obtain cookie from Sailthru: %s", error.get_message())
 
     return None
 
@@ -87,14 +87,14 @@ def update_user(self, sailthru_vars, email, site=None, new_user=False, activatio
                                                                               site=site))
 
     except SailthruClientError as exc:
-        log.error("Exception attempting to add/update user %s in Sailthru - %s", email, unicode(exc))
+        log.error(u"Exception attempting to add/update user %s in Sailthru - %s", email, unicode(exc))
         raise self.retry(exc=exc,
                          countdown=email_config.sailthru_retry_interval,
                          max_retries=email_config.sailthru_max_retries)
 
     if not sailthru_response.is_ok():
         error = sailthru_response.get_error()
-        log.error("Error attempting to add/update user in Sailthru: %s", error.get_message())
+        log.error(u"Error attempting to add/update user in Sailthru: %s", error.get_message())
         if _retryable_sailthru_error(error):
             raise self.retry(countdown=email_config.sailthru_retry_interval,
                              max_retries=email_config.sailthru_max_retries)
@@ -113,14 +113,14 @@ def update_user(self, sailthru_vars, email, site=None, new_user=False, activatio
                 }
             )
         except SailthruClientError as exc:
-            log.error("Exception attempting to send welcome email to user %s in Sailthru - %s", email, unicode(exc))
+            log.error(u"Exception attempting to send welcome email to user %s in Sailthru - %s", email, unicode(exc))
             raise self.retry(exc=exc,
                              countdown=email_config.sailthru_retry_interval,
                              max_retries=email_config.sailthru_max_retries)
 
         if not sailthru_response.is_ok():
             error = sailthru_response.get_error()
-            log.error("Error attempting to send welcome email to user in Sailthru: %s", error.get_message())
+            log.error(u"Error attempting to send welcome email to user in Sailthru: %s", error.get_message())
             if _retryable_sailthru_error(error):
                 raise self.retry(countdown=email_config.sailthru_retry_interval,
                                  max_retries=email_config.sailthru_max_retries)
@@ -161,14 +161,14 @@ def update_user_email(self, new_email, old_email):
         sailthru_client = SailthruClient(email_config.sailthru_key, email_config.sailthru_secret)
         sailthru_response = sailthru_client.api_post("user", sailthru_parms)
     except SailthruClientError as exc:
-        log.error("Exception attempting to update email for %s in Sailthru - %s", old_email, unicode(exc))
+        log.error(u"Exception attempting to update email for %s in Sailthru - %s", old_email, unicode(exc))
         raise self.retry(exc=exc,
                          countdown=email_config.sailthru_retry_interval,
                          max_retries=email_config.sailthru_max_retries)
 
     if not sailthru_response.is_ok():
         error = sailthru_response.get_error()
-        log.error("Error attempting to update user email address in Sailthru: %s", error.get_message())
+        log.error(u"Error attempting to update user email address in Sailthru: %s", error.get_message())
         if _retryable_sailthru_error(error):
             raise self.retry(countdown=email_config.sailthru_retry_interval,
                              max_retries=email_config.sailthru_max_retries)
@@ -247,12 +247,12 @@ def _get_list_from_email_marketing_provider(sailthru_client):
     try:
         sailthru_get_response = sailthru_client.api_get("list", {})
     except SailthruClientError as exc:
-        log.error("Exception attempting to get list from Sailthru - %s", unicode(exc))
+        log.error(u"Exception attempting to get list from Sailthru - %s", unicode(exc))
         return {}
 
     if not sailthru_get_response.is_ok():
         error = sailthru_get_response.get_error()
-        log.info("Error attempting to read list record from Sailthru: %s", error.get_message())
+        log.info(u"Error attempting to read list record from Sailthru: %s", error.get_message())
         return {}
 
     list_map = dict()
@@ -273,12 +273,12 @@ def _create_user_list(sailthru_client, list_name):
     try:
         sailthru_response = sailthru_client.api_post("list", list_params)
     except SailthruClientError as exc:
-        log.error("Exception attempting to list record for key %s in Sailthru - %s", list_name, unicode(exc))
+        log.error(u"Exception attempting to list record for key %s in Sailthru - %s", list_name, unicode(exc))
         return False
 
     if not sailthru_response.is_ok():
         error = sailthru_response.get_error()
-        log.error("Error attempting to create list in Sailthru: %s", error.get_message())
+        log.error(u"Error attempting to create list in Sailthru: %s", error.get_message())
         return False
 
     return True
@@ -365,7 +365,7 @@ def update_unenrolled_list(sailthru_client, email, course_url, unenroll):
         sailthru_response = sailthru_client.api_get("user", {"id": email, "fields": {"vars": 1}})
         if not sailthru_response.is_ok():
             error = sailthru_response.get_error()
-            log.error("Error attempting to read user record from Sailthru: %s", error.get_message())
+            log.error(u"Error attempting to read user record from Sailthru: %s", error.get_message())
             return not _retryable_sailthru_error(error)
 
         response_json = sailthru_response.json
@@ -394,13 +394,13 @@ def update_unenrolled_list(sailthru_client, email, course_url, unenroll):
 
             if not sailthru_response.is_ok():
                 error = sailthru_response.get_error()
-                log.error("Error attempting to update user record in Sailthru: %s", error.get_message())
+                log.error(u"Error attempting to update user record in Sailthru: %s", error.get_message())
                 return not _retryable_sailthru_error(error)
 
         return True
 
     except SailthruClientError as exc:
-        log.exception("Exception attempting to update user record for %s in Sailthru - %s", email, unicode(exc))
+        log.exception(u"Exception attempting to update user record for %s in Sailthru - %s", email, unicode(exc))
         return False
 
 
@@ -457,7 +457,7 @@ def _build_purchase_item(course_id, course_url, cost_in_cents, mode, course_data
         item['title'] = course_data['title']
     else:
         # can't find, just invent title
-        item['title'] = 'Course {} mode: {}'.format(course_id, mode)
+        item['title'] = u'Course {} mode: {}'.format(course_id, mode)
 
     if 'tags' in course_data:
         item['tags'] = course_data['tags']
@@ -485,10 +485,10 @@ def _record_purchase(sailthru_client, email, item, options):
 
         if not sailthru_response.is_ok():
             error = sailthru_response.get_error()
-            log.error("Error attempting to record purchase in Sailthru: %s", error.get_message())
+            log.error(u"Error attempting to record purchase in Sailthru: %s", error.get_message())
             return not _retryable_sailthru_error(error)
 
     except SailthruClientError as exc:
-        log.exception("Exception attempting to record purchase for %s in Sailthru - %s", email, unicode(exc))
+        log.exception(u"Exception attempting to record purchase for %s in Sailthru - %s", email, unicode(exc))
         return False
     return True

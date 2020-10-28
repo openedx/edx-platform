@@ -12,7 +12,6 @@ class HelperFunctionTest(unittest.TestCase):
     """
     Tests to ensure that the following helper functions work for the annotation tool
     """
-    shard = 1
     sample_xml = '''
         <annotatable>
             <instructions><p>Helper Test Instructions.</p></instructions>

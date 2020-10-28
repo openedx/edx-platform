@@ -573,7 +573,8 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
               color: rgb(231, 236, 238); // UXPL grayscale-cool x-light
 
               @media (max-width: 1120px) {
-                display: none;
+                  position: absolute;
+                  clip: rect(1px, 1px, 1px, 1px);
               }
             }
 

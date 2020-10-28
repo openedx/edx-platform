@@ -25,7 +25,6 @@ class TestIDVerificationService(ModuleStoreTestCase, MockS3Mixin):
     """
     Tests for IDVerificationService.
     """
-    shard = 4
 
     def test_user_is_verified(self):
         """

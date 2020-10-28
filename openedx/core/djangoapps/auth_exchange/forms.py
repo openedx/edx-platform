@@ -1,6 +1,8 @@
 """
 Forms to support third-party to first-party OAuth 2.0 access token exchange
 """
+from __future__ import absolute_import
+
 import provider.constants
 from django.contrib.auth.models import User
 from django.forms import CharField
@@ -36,7 +38,7 @@ class AccessTokenExchangeForm(ScopeMixin, OAuthForm):
             raise OAuthValidationError(
                 {
                     "error": "invalid_request",
-                    "error_description": "{} is required".format(field_name),
+                    "error_description": u"{} is required".format(field_name),
                 }
             )
         return field_val
@@ -62,7 +64,7 @@ class AccessTokenExchangeForm(ScopeMixin, OAuthForm):
             raise OAuthValidationError(
                 {
                     "error": "invalid_request",
-                    "error_description": "{} is not a supported provider".format(backend.name),
+                    "error_description": u"{} is not a supported provider".format(backend.name),
                 }
             )
 
@@ -75,7 +77,7 @@ class AccessTokenExchangeForm(ScopeMixin, OAuthForm):
             raise OAuthValidationError(
                 {
                     "error": "invalid_client",
-                    "error_description": "{} is not a valid client_id".format(client_id),
+                    "error_description": u"{} is not a valid client_id".format(client_id),
                 }
             )
         if client.client_type not in [provider.constants.PUBLIC, Application.CLIENT_PUBLIC]:
@@ -84,7 +86,7 @@ class AccessTokenExchangeForm(ScopeMixin, OAuthForm):
                     # invalid_client isn't really the right code, but this mirrors
                     # https://github.com/edx/django-oauth2-provider/blob/edx/provider/oauth2/forms.py#L331
                     "error": "invalid_client",
-                    "error_description": "{} is not a public client".format(client_id),
+                    "error_description": u"{} is not a public client".format(client_id),
                 }
             )
         self.cleaned_data["client"] = client

@@ -2,6 +2,9 @@
 """
 Utility library for working with the edx-milestones app
 """
+from __future__ import absolute_import
+
+import six
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from milestones import api as milestones_api
@@ -54,12 +57,12 @@ def add_prerequisite_course(course_key, prerequisite_course_key):
     if not is_prerequisite_courses_enabled():
         return None
     milestone_name = _('Course {course_id} requires {prerequisite_course_id}').format(
-        course_id=unicode(course_key),
-        prerequisite_course_id=unicode(prerequisite_course_key)
+        course_id=six.text_type(course_key),
+        prerequisite_course_id=six.text_type(prerequisite_course_key)
     )
     milestone = milestones_api.add_milestone({
         'name': milestone_name,
-        'namespace': unicode(prerequisite_course_key),
+        'namespace': six.text_type(prerequisite_course_key),
         'description': _('System defined milestone'),
     })
     # add requirement course milestone
@@ -213,7 +216,7 @@ def get_required_content(course_key, user):
     """
     required_content = []
     if settings.FEATURES.get('MILESTONES_APP'):
-        course_run_id = unicode(course_key)
+        course_run_id = six.text_type(course_key)
 
         if user.is_authenticated:
             # Get all of the outstanding milestones for this course, for this user
@@ -276,9 +279,9 @@ def generate_milestone_namespace(namespace, course_key=None):
     """
     Returns a specifically-formatted namespace string for the specified type
     """
-    if namespace in NAMESPACE_CHOICES.values():
+    if namespace in list(NAMESPACE_CHOICES.values()):
         if namespace == 'entrance_exams':
-            return '{}.{}'.format(unicode(course_key), NAMESPACE_CHOICES['ENTRANCE_EXAM'])
+            return '{}.{}'.format(six.text_type(course_key), NAMESPACE_CHOICES['ENTRANCE_EXAM'])
 
 
 def serialize_user(user):
@@ -373,7 +376,7 @@ def get_course_content_milestones(course_id, content_id=None, relationship='requ
     if content_id is None:
         return request_cache_dict[user_id][relationship]
 
-    return [m for m in request_cache_dict[user_id][relationship] if m['content_id'] == unicode(content_id)]
+    return [m for m in request_cache_dict[user_id][relationship] if m['content_id'] == six.text_type(content_id)]
 
 
 def remove_course_content_user_milestones(course_key, content_key, user, relationship):

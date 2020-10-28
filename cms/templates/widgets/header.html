@@ -231,7 +231,6 @@
 
     % else:
       <%
-        login_url = settings.LMS_ROOT_URL + '/login'
         register_url = settings.LMS_ROOT_URL + '/register'
       %>
       <nav class="nav-not-signedin nav-pitch" aria-label="${_('Account')}">
@@ -246,7 +245,7 @@
               </li>
           % endif
           <li class="nav-item nav-not-signedin-signin">
-            <a class="action action-signin" href="${login_url}?next=${current_url}">${_("Sign In")}</a>
+            <a class="action action-signin" href="${settings.FRONTEND_LOGIN_URL}?next=${current_url}">${_("Sign In")}</a>
           </li>
         </ol>
       </nav>

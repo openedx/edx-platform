@@ -1,18 +1,22 @@
 """ Tests for journals marketing views. """
 
-import uuid
-import mock
+from __future__ import absolute_import
 
+import uuid
+
+import mock
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
-from openedx.features.journals.tests.utils import (get_mocked_journals,
-                                                   get_mocked_journal_bundles,
-                                                   get_mocked_pricing_data,
-                                                   override_switch)
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.journals.api import JOURNAL_INTEGRATION
+from openedx.features.journals.tests.utils import (
+    get_mocked_journal_bundles,
+    get_mocked_journals,
+    get_mocked_pricing_data,
+    override_switch
+)
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
@@ -64,7 +68,6 @@ class JournalIndexViewTest(SiteMixin, ModuleStoreTestCase):
     """
     Tests for Journals Listing in Marketing Pages.
     """
-    shard = 1
 
     def setUp(self):
         super(JournalIndexViewTest, self).setUp()

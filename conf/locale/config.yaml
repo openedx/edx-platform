@@ -50,11 +50,13 @@ locales:
     # - id  # Indonesian
     # - it_IT  # Italian (Italy)
     - ja_JP  # Japanese (Japan)
+    # - ka  # Georgian
     # - kk_KZ  # Kazakh (Kazakhstan)
     # - km_KH  # Khmer (Cambodia)
     # - kn  # Kannada
     # - ko_KR  # Korean (Korea)
     # - lt_LT  # Lithuanian (Lithuania)
+    # - lv  # Latvian
     # - ml  # Malayalam
     # - mn  # Mongolian
     # - mr  # Marathi
@@ -75,6 +77,8 @@ locales:
     # - sr  # Serbian
     # - sv  # Swedish
     # - sw  # Swahili
+    # - sw_KE  # Swahili (Kenya)
+
     # - ta  # Tamil
     # - te  # Telugu
     # - th  # Thai
@@ -129,7 +133,7 @@ ignore_dirs:
     - src/done-xblock
     - src/edx-jsme
     - src/parse-rest
-    - src/pygeoip
+    - src/geoip2
     - src/pystache-custom
     - src/rate-xblock
     - src/xblock-google-drive
@@ -158,6 +162,10 @@ segment:
     djangojs-partial.po:
         djangojs-studio.po:
             - cms/*
+        djangojs-account-settings-view.po:
+            - lms/static/js/student_account/views/account_settings_view.js
+        # Segregating student account settings view strings, so that beta language message
+        # can be translated for wide set of partially supported languages.
     mako.po:
         mako-studio.po:
             - cms/*
@@ -173,8 +181,10 @@ generate_merge:
         - mako.po
         - mako-studio.po
         - wiki.po
+        - edx_proctoring_proctortrack.po
     djangojs.po:
         - djangojs-partial.po
         - djangojs-studio.po
+        - djangojs-account-settings-view.po
         - underscore.po
         - underscore-studio.po

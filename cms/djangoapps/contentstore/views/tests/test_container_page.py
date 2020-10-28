@@ -56,13 +56,13 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         self._test_html_content(
             self.child_container,
             expected_section_tag=(
-                '<section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" '
-                'data-locator="{0}" data-course-key="{0.course_key}">'.format(self.child_container.location)
+                u'<section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" '
+                u'data-locator="{0}" data-course-key="{0.course_key}">'.format(self.child_container.location)
             ),
             expected_breadcrumbs=(
-                r'<a href="/course/{course}{section_parameters}" class="{classes}">\s*Week 1\s*</a>\s*'
-                r'<a href="/course/{course}{subsection_parameters}" class="{classes}">\s*Lesson 1\s*</a>\s*'
-                r'<a href="/container/{unit}" class="{classes}">\s*Unit\s*</a>'
+                ur'<a href="/course/{course}{section_parameters}" class="{classes}">\s*Week 1\s*</a>\s*'
+                ur'<a href="/course/{course}{subsection_parameters}" class="{classes}">\s*Lesson 1\s*</a>\s*'
+                ur'<a href="/container/{unit}" class="{classes}">\s*Unit\s*</a>'
             ).format(
                 course=re.escape(unicode(self.course.id)),
                 unit=re.escape(unicode(self.vertical.location)),
@@ -84,19 +84,19 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
             self._test_html_content(
                 xblock,
                 expected_section_tag=(
-                    '<section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" '
-                    'data-locator="{0}" data-course-key="{0.course_key}">'.format(draft_container.location)
+                    u'<section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" '
+                    u'data-locator="{0}" data-course-key="{0.course_key}">'.format(draft_container.location)
                 ),
                 expected_breadcrumbs=(
-                    r'<a href="/course/{course}{section_parameters}" class="{classes}">\s*Week 1\s*</a>\s*'
-                    r'<a href="/course/{course}{subsection_parameters}" class="{classes}">\s*Lesson 1\s*</a>\s*'
-                    r'<a href="/container/{unit}" class="{classes}">\s*Unit\s*</a>\s*'
-                    r'<a href="/container/{split_test}" class="{classes}">\s*Split Test\s*</a>'
+                    ur'<a href="/course/{course}{section_parameters}" class="{classes}">\s*Week 1\s*</a>\s*'
+                    ur'<a href="/course/{course}{subsection_parameters}" class="{classes}">\s*Lesson 1\s*</a>\s*'
+                    ur'<a href="/container/{unit}" class="{classes}">\s*Unit\s*</a>\s*'
+                    ur'<a href="/container/{split_test}" class="{classes}">\s*Split Test\s*</a>'
                 ).format(
                     course=re.escape(unicode(self.course.id)),
                     unit=re.escape(unicode(self.vertical.location)),
                     split_test=re.escape(unicode(self.child_container.location)),
-                    classes='navigation-item navigation-link navigation-parent',
+                    classes=u'navigation-item navigation-link navigation-parent',
                     section_parameters=re.escape(u'?show={}'.format(http.urlquote(self.chapter.location))),
                     subsection_parameters=re.escape(u'?show={}'.format(http.urlquote(self.sequential.location))),
                 ),

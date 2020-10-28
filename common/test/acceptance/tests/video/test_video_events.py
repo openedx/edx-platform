@@ -1,10 +1,13 @@
 """Ensure videos emit proper events"""
 
+from __future__ import absolute_import
+
 import datetime
 import json
 from unittest import skip
 
 import ddt
+import six
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from common.test.acceptance.pages.lms.video.video import _parse_time_str
@@ -46,10 +49,10 @@ class VideoEventsTestMixin(EventsTestMixin, VideoBaseTest):
 
     def assert_field_type(self, event_dict, field, field_type):
         """Assert that a particular `field` in the `event_dict` has a particular type"""
-        self.assertIn(field, event_dict, '{0} not found in the root of the event'.format(field))
+        self.assertIn(field, event_dict, u'{0} not found in the root of the event'.format(field))
         self.assertTrue(
             isinstance(event_dict[field], field_type),
-            'Expected "{key}" to be a "{field_type}", but it has the value "{value}" of type "{t}"'.format(
+            u'Expected "{key}" to be a "{field_type}", but it has the value "{value}" of type "{t}"'.format(
                 key=field,
                 value=event_dict[field],
                 t=type(event_dict[field]),
@@ -122,8 +125,8 @@ class VideoEventsTest(VideoEventsTestMixin):
             'session'
         )
         for field in dynamic_string_fields:
-            self.assert_field_type(load_video_event, field, basestring)
-            self.assertIn(field, load_video_event, '{0} not found in the root of the event'.format(field))
+            self.assert_field_type(load_video_event, field, six.string_types)
+            self.assertIn(field, load_video_event, u'{0} not found in the root of the event'.format(field))
             del load_video_event[field]
 
         # A weak assertion for the timestamp as well
@@ -135,7 +138,7 @@ class VideoEventsTest(VideoEventsTestMixin):
         course_key = CourseKey.from_string(self.course_id)
         static_fields_pattern = {
             'context': {
-                'course_id': unicode(course_key),
+                'course_id': six.text_type(course_key),
                 'org_id': course_key.org,
                 'path': '/event',
                 'user_id': self.user_info['user_id']
@@ -154,6 +157,7 @@ class VideoHLSEventsTest(VideoEventsTestMixin):
     """
     Test video player event emission for HLS video
     """
+    shard = 16
 
     def test_event_data_for_hls(self):
         """
@@ -358,8 +362,8 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
             'session'
         )
         for field in dynamic_string_fields:
-            self.assert_field_type(load_video_event, field, basestring)
-            self.assertIn(field, load_video_event, '{0} not found in the root of the event'.format(field))
+            self.assert_field_type(load_video_event, field, six.string_types)
+            self.assertIn(field, load_video_event, u'{0} not found in the root of the event'.format(field))
             del load_video_event[field]
 
         # A weak assertion for the timestamp as well
@@ -371,7 +375,7 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
         course_key = CourseKey.from_string(self.course_id)
         static_fields_pattern = {
             'context': {
-                'course_id': unicode(course_key),
+                'course_id': six.text_type(course_key),
                 'org_id': course_key.org,
                 'path': '/event',
                 'user_id': self.user_info['user_id']

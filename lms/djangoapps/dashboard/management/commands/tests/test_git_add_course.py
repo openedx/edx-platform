@@ -1,6 +1,8 @@
 """
 Provide tests for git_add_course management command.
 """
+from __future__ import absolute_import
+
 import logging
 import os
 import shutil
@@ -37,9 +39,6 @@ TEST_MONGODB_LOG = {
     'db': 'test_xlog',
 }
 
-FEATURES_WITH_SSL_AUTH = settings.FEATURES.copy()
-FEATURES_WITH_SSL_AUTH['AUTH_USE_CERTIFICATES'] = True
-
 
 @override_settings(
     MONGODB_LOG=TEST_MONGODB_LOG,
@@ -51,8 +50,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
     """
     Tests the git_add_course management command for proper functions.
     """
-    shard = 3
-    TEST_REPO = 'https://github.com/mitocw/edx4edx_lite.git'
+    TEST_REPO = 'https://github.com/edx/edx4edx_lite.git'
     TEST_COURSE = 'MITx/edx4edx/edx4edx'
     TEST_BRANCH = 'testing_do_not_delete'
     TEST_BRANCH_COURSE = CourseKey.from_string('MITx/edx4edx_branch/edx4edx')
@@ -82,7 +80,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
             'blah', 'blah', 'blah', 'blah')
         # Not a valid path.
         self.assertCommandFailureRegexp(
-            'Path {0} doesn\'t exist, please create it,'.format(self.git_repo_dir),
+            u'Path {0} doesn\'t exist, please create it,'.format(self.git_repo_dir),
             'blah')
         # Test successful import from command
         if not os.path.isdir(self.git_repo_dir):

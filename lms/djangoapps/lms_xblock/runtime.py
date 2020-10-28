@@ -35,7 +35,7 @@ def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
         # to ask for handler URLs without a student context.
         func = getattr(block.__class__, handler_name, None)
         if not func:
-            raise ValueError("{!r} is not a function name".format(handler_name))
+            raise ValueError(u"{!r} is not a function name".format(handler_name))
 
         # Is the following necessary? ProxyAttribute causes an UndefinedContext error
         # if trying this without the module system.
@@ -104,7 +104,7 @@ class UserTagsService(object):
             key: the key for the value we want
         """
         if scope != user_course_tag_api.COURSE_SCOPE:
-            raise ValueError("unexpected scope {0}".format(scope))
+            raise ValueError(u"unexpected scope {0}".format(scope))
 
         return user_course_tag_api.get_course_tag(
             self._get_current_user(),
@@ -120,7 +120,7 @@ class UserTagsService(object):
             value: the value to set
         """
         if scope != user_course_tag_api.COURSE_SCOPE:
-            raise ValueError("unexpected scope {0}".format(scope))
+            raise ValueError(u"unexpected scope {0}".format(scope))
 
         return user_course_tag_api.set_course_tag(
             self._get_current_user(),

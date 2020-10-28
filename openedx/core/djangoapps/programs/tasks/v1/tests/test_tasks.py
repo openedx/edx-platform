@@ -1,20 +1,23 @@
 """
 Tests for programs celery tasks.
 """
+from __future__ import absolute_import
+
 import json
 import logging
 from datetime import datetime, timedelta
+
 import ddt
 import httpretty
 import mock
 import pytz
-from waffle.testutils import override_switch
 from celery.exceptions import MaxRetriesExceededError
 from django.conf import settings
-from django.test import override_settings, TestCase
+from django.test import TestCase, override_settings
 from edx_oauth2_provider.tests.factories import ClientFactory
 from edx_rest_api_client import exceptions
 from edx_rest_api_client.client import EdxRestApiClient
+from waffle.testutils import override_switch
 
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
@@ -22,7 +25,7 @@ from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 from openedx.core.djangoapps.programs.tasks.v1 import tasks
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory, SiteConfigurationFactory
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 
@@ -319,7 +322,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
 
         self.assertEqual(mock_award_program_certificate.call_count, 3)
         mock_warning.assert_called_once_with(
-            'Failed to award certificate for program {uuid} to user {username}.'.format(
+            u'Failed to award certificate for program {uuid} to user {username}.'.format(
                 uuid=1,
                 username=self.student.username)
         )

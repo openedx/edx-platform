@@ -1,37 +1,41 @@
 # -*- coding: utf-8 -*-
 """Tests for account creation"""
+from __future__ import absolute_import
+
 import json
+import unicodedata
 import unittest
 from datetime import datetime
-from importlib import import_module
-import unicodedata
 
 import ddt
 import mock
 import pytz
 from django.conf import settings
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AnonymousUser, User
-from django.urls import reverse
 from django.test import TestCase, TransactionTestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from django.contrib.auth.hashers import make_password
+from django.urls import reverse
 
-from django_comment_common.models import ForumsConfig
-from notification_prefs import NOTIFICATION_PREF_KEY
-from openedx.core.djangoapps.user_authn.views.deprecated import create_account
-from openedx.core.djangoapps.user_authn.views.register import (
-    REGISTRATION_AFFILIATE_ID, REGISTRATION_UTM_CREATED_AT, REGISTRATION_UTM_PARAMETERS,
-    _skip_activation_email,
-)
-from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
+from lms.djangoapps.discussion.notification_prefs import NOTIFICATION_PREF_KEY
+from openedx.core.djangoapps.django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangoapps.user_api.accounts import (
-    USERNAME_BAD_LENGTH_MSG, USERNAME_INVALID_CHARS_ASCII, USERNAME_INVALID_CHARS_UNICODE
+    USERNAME_BAD_LENGTH_MSG,
+    USERNAME_INVALID_CHARS_ASCII,
+    USERNAME_INVALID_CHARS_UNICODE
 )
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, waffle
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
+from openedx.core.djangoapps.user_authn.views.register import (
+    REGISTRATION_AFFILIATE_ID,
+    REGISTRATION_UTM_CREATED_AT,
+    REGISTRATION_UTM_PARAMETERS,
+    _skip_activation_email
+)
 from student.models import UserAttribute
 from student.tests.factories import UserFactory
 from third_party_auth.tests import factories as third_party_auth_factory
@@ -75,14 +79,10 @@ def get_mock_pipeline_data(username=TEST_USERNAME, email=TEST_EMAIL):
 
 
 @ddt.ddt
+@with_site_configuration(
+    configuration={"extended_profile_fields": ["extra1", "extra2"]}
+)
 @override_settings(
-    DEFAULT_SITE_THEME='edx-theme-codebase',
-    MICROSITE_CONFIGURATION={
-        "microsite": {
-            "domain_prefix": "microsite",
-            "extended_profile_fields": ["extra1", "extra2"],
-        }
-    },
     REGISTRATION_EXTRA_FIELDS={
         key: "optional"
         for key in [
@@ -123,7 +123,7 @@ class TestCreateAccount(SiteMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(get_user_preference(user, LANGUAGE_KEY), lang)
 
-    def create_account_and_fetch_profile(self, host='microsite.example.com'):
+    def create_account_and_fetch_profile(self, host='test.localhost'):
         """
         Create an account with self.params, assert that the response indicates
         success, and return the UserProfile object for the newly created user
@@ -155,10 +155,6 @@ class TestCreateAccount(SiteMixin, TestCase):
         self.assertIn(settings.EDXMKTG_LOGGED_IN_COOKIE_NAME, self.client.cookies)
         self.assertIn(settings.EDXMKTG_USER_INFO_COOKIE_NAME, self.client.cookies)
 
-    @unittest.skipUnless(
-        "microsite_configuration.middleware.MicrositeMiddleware" in settings.MIDDLEWARE_CLASSES,
-        "Microsites not implemented in this environment"
-    )
     def test_profile_saved_no_optional_fields(self):
         profile = self.create_account_and_fetch_profile()
         self.assertEqual(profile.name, self.params["name"])
@@ -177,10 +173,6 @@ class TestCreateAccount(SiteMixin, TestCase):
         )
         self.assertIsNone(profile.year_of_birth)
 
-    @unittest.skipUnless(
-        "microsite_configuration.middleware.MicrositeMiddleware" in settings.MIDDLEWARE_CLASSES,
-        "Microsites not implemented in this environment"
-    )
     @override_settings(LMS_SEGMENT_KEY="testkey")
     @mock.patch('openedx.core.djangoapps.user_authn.views.register.segment.track')
     @mock.patch('openedx.core.djangoapps.user_authn.views.register.segment.identify')
@@ -215,10 +207,6 @@ class TestCreateAccount(SiteMixin, TestCase):
 
         mock_segment_identify.assert_called_with(profile.user.id, expected_payload)
 
-    @unittest.skipUnless(
-        "microsite_configuration.middleware.MicrositeMiddleware" in settings.MIDDLEWARE_CLASSES,
-        "Microsites not implemented in this environment"
-    )
     def test_profile_saved_all_optional_fields(self):
         self.params.update({
             "level_of_education": "a",
@@ -247,10 +235,6 @@ class TestCreateAccount(SiteMixin, TestCase):
         )
         self.assertEqual(profile.year_of_birth, 2015)
 
-    @unittest.skipUnless(
-        "microsite_configuration.middleware.MicrositeMiddleware" in settings.MIDDLEWARE_CLASSES,
-        "Microsites not implemented in this environment"
-    )
     def test_profile_saved_empty_optional_fields(self):
         self.params.update({
             "level_of_education": "",
@@ -280,63 +264,6 @@ class TestCreateAccount(SiteMixin, TestCase):
         self.params["year_of_birth"] = "not_an_integer"
         profile = self.create_account_and_fetch_profile()
         self.assertIsNone(profile.year_of_birth)
-
-    def base_extauth_bypass_sending_activation_email(self, bypass_activation_email):
-        """
-        Tests user creation without sending activation email when
-        doing external auth
-        """
-
-        request = self.request_factory.post(self.url, self.params)
-        request.site = self.site
-        # now indicate we are doing ext_auth by setting 'ExternalAuthMap' in the session.
-        request.session = import_module(settings.SESSION_ENGINE).SessionStore()  # empty session
-        extauth = ExternalAuthMap(external_id='withmap@stanford.edu',
-                                  external_email='withmap@stanford.edu',
-                                  internal_password=self.params['password'],
-                                  external_domain='shib:https://idp.stanford.edu/')
-        request.session['ExternalAuthMap'] = extauth
-        request.user = AnonymousUser()
-
-        with mock.patch('edxmako.request_context.get_current_request', return_value=request):
-            with mock.patch('django.core.mail.send_mail') as mock_send_mail:
-                create_account(request)
-
-        # check that send_mail is called
-        if bypass_activation_email:
-            self.assertFalse(mock_send_mail.called)
-        else:
-            self.assertTrue(mock_send_mail.called)
-
-    @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
-    @mock.patch.dict(settings.FEATURES,
-                     {'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': True, 'AUTOMATIC_AUTH_FOR_TESTING': False})
-    def test_extauth_bypass_sending_activation_email_with_bypass(self):
-        """
-        Tests user creation without sending activation email when
-        settings.FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH']=True and doing external auth
-        """
-        self.base_extauth_bypass_sending_activation_email(True)
-
-    @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
-    @mock.patch.dict(settings.FEATURES,
-                     {'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False, 'AUTOMATIC_AUTH_FOR_TESTING': False})
-    def test_extauth_bypass_sending_activation_email_without_bypass_1(self):
-        """
-        Tests user creation without sending activation email when
-        settings.FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH']=False and doing external auth
-        """
-        self.base_extauth_bypass_sending_activation_email(False)
-
-    @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
-    @mock.patch.dict(settings.FEATURES, {'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False,
-                                         'AUTOMATIC_AUTH_FOR_TESTING': False, 'SKIP_EMAIL_VALIDATION': True})
-    def test_extauth_bypass_sending_activation_email_without_bypass_2(self):
-        """
-        Tests user creation without sending activation email when
-        settings.FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH']=False and doing external auth
-        """
-        self.base_extauth_bypass_sending_activation_email(True)
 
     @ddt.data(True, False)
     def test_discussions_email_digest_pref(self, digest_enabled):
@@ -492,59 +419,37 @@ class TestCreateAccount(SiteMixin, TestCase):
 
     @ddt.data(
         (
-            False, False, get_mock_pipeline_data(),
+            False, get_mock_pipeline_data(),
             {
                 'SKIP_EMAIL_VALIDATION': False, 'AUTOMATIC_AUTH_FOR_TESTING': False,
-                'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False,
             },
             False  # Do not skip activation email for normal scenario.
         ),
         (
-            False, False, get_mock_pipeline_data(),
+            False, get_mock_pipeline_data(),
             {
                 'SKIP_EMAIL_VALIDATION': True, 'AUTOMATIC_AUTH_FOR_TESTING': False,
-                'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False,
             },
             True  # Skip activation email when `SKIP_EMAIL_VALIDATION` FEATURE flag is active.
         ),
         (
-            False, False, get_mock_pipeline_data(),
+            False, get_mock_pipeline_data(),
             {
                 'SKIP_EMAIL_VALIDATION': False, 'AUTOMATIC_AUTH_FOR_TESTING': True,
-                'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False,
             },
             True  # Skip activation email when `AUTOMATIC_AUTH_FOR_TESTING` FEATURE flag is active.
         ),
         (
-            True, False, get_mock_pipeline_data(),
+            True, get_mock_pipeline_data(),
             {
                 'SKIP_EMAIL_VALIDATION': False, 'AUTOMATIC_AUTH_FOR_TESTING': False,
-                'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': True,
-            },
-            True  # Skip activation email for external auth scenario.
-        ),
-        (
-            False, False, get_mock_pipeline_data(),
-            {
-                'SKIP_EMAIL_VALIDATION': False, 'AUTOMATIC_AUTH_FOR_TESTING': False,
-                'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': True,
-            },
-            False  # Do not skip activation email when `BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH` feature flag is set
-                   # but it is not external auth scenario.
-        ),
-        (
-            False, True, get_mock_pipeline_data(),
-            {
-                'SKIP_EMAIL_VALIDATION': False, 'AUTOMATIC_AUTH_FOR_TESTING': False,
-                'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False,
             },
             True  # Skip activation email if `skip_email_verification` is set for third party authentication.
         ),
         (
-            False, False, get_mock_pipeline_data(email='invalid@yopmail.com'),
+            False, get_mock_pipeline_data(email='invalid@yopmail.com'),
             {
                 'SKIP_EMAIL_VALIDATION': False, 'AUTOMATIC_AUTH_FOR_TESTING': False,
-                'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False,
             },
             False  # Send activation email when `skip_email_verification` is not set.
         )
@@ -552,7 +457,7 @@ class TestCreateAccount(SiteMixin, TestCase):
     @ddt.unpack
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_should_skip_activation_email(
-            self, do_external_auth, skip_email_verification, running_pipeline, feature_overrides, expected,
+            self, skip_email_verification, running_pipeline, feature_overrides, expected,
     ):
         """
         Test `skip_activation_email` works as expected.
@@ -565,7 +470,6 @@ class TestCreateAccount(SiteMixin, TestCase):
         with override_settings(FEATURES=dict(settings.FEATURES, **feature_overrides)):
             result = _skip_activation_email(
                 user=user,
-                do_external_auth=do_external_auth,
                 running_pipeline=running_pipeline,
                 third_party_provider=third_party_provider
             )
@@ -852,8 +756,11 @@ class TestCreateAccountValidation(TestCase):
 
 
 @mock.patch.dict("student.models.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-@mock.patch("lms.lib.comment_client.User.base_url", TEST_CS_URL)
-@mock.patch("lms.lib.comment_client.utils.requests.request", return_value=mock.Mock(status_code=200, text='{}'))
+@mock.patch("openedx.core.djangoapps.django_comment_common.comment_client.User.base_url", TEST_CS_URL)
+@mock.patch(
+    "openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request",
+    return_value=mock.Mock(status_code=200, text='{}')
+)
 class TestCreateCommentsServiceUser(TransactionTestCase):
     """ Tests for creating comments service user. """
 

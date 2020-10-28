@@ -1,14 +1,17 @@
 """Management command for backpopulating missing program credentials."""
+from __future__ import absolute_import
+
 import logging
 from collections import namedtuple
+from functools import reduce  # pylint: disable=redefined-builtin
 
 from django.contrib.sites.models import Site
 from django.core.management import BaseCommand
 from django.db.models import Q
 from opaque_keys.edx.keys import CourseKey
 
-from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from course_modes.models import CourseMode
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.programs.tasks.v1.tasks import award_program_certificates
 
@@ -44,10 +47,10 @@ class Command(BaseCommand):
         self._load_usernames()
 
         if options.get('commit'):
-            logger.info('Enqueuing program certification tasks for %d candidates.', len(self.usernames))
+            logger.info(u'Enqueuing program certification tasks for %d candidates.', len(self.usernames))
         else:
             logger.info(
-                'Found %d candidates. To enqueue program certification tasks, pass the -c or --commit flags.',
+                u'Found %d candidates. To enqueue program certification tasks, pass the -c or --commit flags.',
                 len(self.usernames)
             )
             return
@@ -58,14 +61,14 @@ class Command(BaseCommand):
                 award_program_certificates.delay(username)
             except:  # pylint: disable=bare-except
                 failed += 1
-                logger.exception('Failed to enqueue task for user [%s]', username)
+                logger.exception(u'Failed to enqueue task for user [%s]', username)
             else:
                 succeeded += 1
-                logger.debug('Successfully enqueued task for user [%s]', username)
+                logger.debug(u'Successfully enqueued task for user [%s]', username)
 
         logger.info(
-            'Done. Successfully enqueued tasks for %d candidates. '
-            'Failed to enqueue tasks for %d candidates.',
+            u'Done. Successfully enqueued tasks for %d candidates. '
+            u'Failed to enqueue tasks for %d candidates.',
             succeeded,
             failed
         )
@@ -74,7 +77,7 @@ class Command(BaseCommand):
         """Find all course runs which are part of a program."""
         programs = []
         for site in Site.objects.all():
-            logger.info('Loading programs from the catalog for site %s.', site.domain)
+            logger.info(u'Loading programs from the catalog for site %s.', site.domain)
             programs.extend(get_programs(site))
 
         self.course_runs = self._flatten(programs)
@@ -111,5 +114,7 @@ class Command(BaseCommand):
 
         query = status_query & course_run_query
 
-        username_dicts = GeneratedCertificate.eligible_certificates.filter(query).values('user__username').distinct()
+        username_dicts = GeneratedCertificate.eligible_available_certificates.filter(
+            query
+        ).values('user__username').distinct()
         self.usernames = [d['user__username'] for d in username_dicts]

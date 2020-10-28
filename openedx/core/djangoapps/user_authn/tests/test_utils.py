@@ -1,8 +1,10 @@
 """ Test User Authentication utilities """
 
-from collections import namedtuple
-import ddt
+from __future__ import absolute_import
 
+from collections import namedtuple
+
+import ddt
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings

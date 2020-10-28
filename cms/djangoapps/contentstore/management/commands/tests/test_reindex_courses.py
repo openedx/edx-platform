@@ -54,7 +54,7 @@ class TestReindexCourse(ModuleStoreTestCase):
     @ddt.data('qwerty', 'invalid_key', 'xblockv1:qwerty')
     def test_given_invalid_course_key_raises_not_found(self, invalid_key):
         """ Test that raises InvalidKeyError for invalid keys """
-        err_string = "Invalid course_key: '{0}'".format(invalid_key)
+        err_string = u"Invalid course_key: '{0}'".format(invalid_key)
         with self.assertRaisesRegexp(CommandError, err_string):
             call_command('reindex_course', invalid_key)
 

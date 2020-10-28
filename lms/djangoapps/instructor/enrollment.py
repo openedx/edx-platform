@@ -22,10 +22,12 @@ from six import text_type
 from course_modes.models import CourseMode
 from courseware.models import StudentModule
 from eventtracking import tracker
-from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
-from lms.djangoapps.grades.events import STATE_DELETED_EVENT_TYPE
-from lms.djangoapps.grades.signals.handlers import disconnect_submissions_signal_receiver
-from lms.djangoapps.grades.signals.signals import PROBLEM_RAW_SCORE_CHANGED
+from lms.djangoapps.grades.api import (
+    constants as grades_constants,
+    events as grades_events,
+    signals as grades_signals,
+    disconnect_submissions_signal_receiver,
+)
 from lms.djangoapps.instructor.message_types import (
     AccountCreationAndEnrollment,
     AddBetaTester,
@@ -50,6 +52,7 @@ from student.models import (
     anonymous_id_for_user,
     is_email_retired,
 )
+from openedx.core.djangolib.markup import Text
 from submissions import api as sub_api  # installed from the edx-submissions repository
 from submissions.models import score_set
 from track.event_transaction_utils import (
@@ -239,7 +242,7 @@ def send_beta_role_email(action, user, email_params):
         email_params['email_address'] = user.email
         email_params['full_name'] = user.profile.name
     else:
-        raise ValueError("Unexpected action received '{}' - expected 'add' or 'remove'".format(action))
+        raise ValueError(u"Unexpected action received '{}' - expected 'add' or 'remove'".format(action))
     trying_to_add_inactive_user = not user.is_active and action == 'add'
     if not trying_to_add_inactive_user:
         send_mail_to_student(user.email, email_params, language=get_user_email_language(user))
@@ -290,7 +293,7 @@ def reset_student_attempts(course_id, student, module_state_key, requesting_user
                 submission_cleared = True
     except ItemNotFoundError:
         block = None
-        log.warning("Could not find %s in modulestore when attempting to reset attempts.", module_state_key)
+        log.warning(u"Could not find %s in modulestore when attempting to reset attempts.", module_state_key)
 
     # Reset the student's score in the submissions API, if xblock.clear_student_state has not done so already.
     # We need to do this before retrieving the `StudentModule` model, because a score may exist with no student module.
@@ -313,16 +316,16 @@ def reset_student_attempts(course_id, student, module_state_key, requesting_user
     if delete_module:
         module_to_reset.delete()
         create_new_event_transaction_id()
-        set_event_transaction_type(STATE_DELETED_EVENT_TYPE)
+        set_event_transaction_type(grades_events.STATE_DELETED_EVENT_TYPE)
         tracker.emit(
-            unicode(STATE_DELETED_EVENT_TYPE),
+            unicode(grades_events.STATE_DELETED_EVENT_TYPE),
             {
                 'user_id': unicode(student.id),
                 'course_id': unicode(course_id),
                 'problem_id': unicode(module_state_key),
                 'instructor_id': unicode(requesting_user.id),
                 'event_transaction_id': unicode(get_event_transaction_id()),
-                'event_transaction_type': unicode(STATE_DELETED_EVENT_TYPE),
+                'event_transaction_type': unicode(grades_events.STATE_DELETED_EVENT_TYPE),
             }
         )
         if not submission_cleared:
@@ -366,7 +369,7 @@ def _fire_score_changed_for_block(
     if block and block.has_score:
         max_score = block.max_score()
         if max_score is not None:
-            PROBLEM_RAW_SCORE_CHANGED.send(
+            grades_signals.PROBLEM_RAW_SCORE_CHANGED.send(
                 sender=None,
                 raw_earned=0,
                 raw_possible=max_score,
@@ -377,7 +380,7 @@ def _fire_score_changed_for_block(
                 score_deleted=True,
                 only_if_higher=False,
                 modified=datetime.now().replace(tzinfo=pytz.UTC),
-                score_db_table=ScoreDatabaseTableEnum.courseware_student_module,
+                score_db_table=grades_constants.ScoreDatabaseTableEnum.courseware_student_module,
             )
 
 
@@ -391,7 +394,7 @@ def get_email_params(course, auto_enroll, secure=True, course_key=None, display_
 
     protocol = 'https' if secure else 'http'
     course_key = course_key or text_type(course.id)
-    display_name = display_name or course.display_name_with_default_escaped
+    display_name = display_name or Text(course.display_name_with_default)
 
     stripped_site_name = configuration_helpers.get_value(
         'SITE_NAME',
@@ -465,7 +468,7 @@ def send_mail_to_student(student, param_dict, language=None):
     if 'display_name' in param_dict:
         param_dict['course_name'] = param_dict['display_name']
     elif 'course' in param_dict:
-        param_dict['course_name'] = param_dict['course'].display_name_with_default
+        param_dict['course_name'] = Text(param_dict['course'].display_name_with_default)
 
     param_dict['site_name'] = configuration_helpers.get_value(
         'SITE_NAME',

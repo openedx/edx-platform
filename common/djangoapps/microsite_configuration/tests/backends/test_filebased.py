@@ -1,6 +1,9 @@
 """
 Test Microsite filebased backends.
 """
+from __future__ import absolute_import
+
+import six
 import unittest
 from mock import patch
 
@@ -111,7 +114,7 @@ class FilebasedMicrositeBackendTests(TestCase):
         """
         microsite.set_by_domain(self.microsite_subdomain)
         configs = microsite.get_all_config()
-        self.assertEqual(len(configs.keys()), 3)
+        self.assertEqual(len(list(configs.keys())), 3)
 
     def test_set_config_by_domain(self):
         """
@@ -161,7 +164,7 @@ class FilebasedMicrositeTemplateBackendTests(ModuleStoreTestCase):
         )
 
         response = self.client.get(
-            reverse('syllabus', args=[unicode(self.course.id)]),
+            reverse('syllabus', args=[six.text_type(self.course.id)]),
             HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME,
         )
 

@@ -5,7 +5,9 @@ import copy
 import json
 import logging
 import os
+import re
 import shutil
+import StringIO
 import tarfile
 import tempfile
 from uuid import uuid4
@@ -554,6 +556,8 @@ class ExportTestCase(CourseTestCase):
     def test_export_async(self):
         """
         Get tar.gz file, using asynchronous background task
+
+        Return a TarFile of the successful export.
         """
         resp = self.client.post(self.url)
         self.assertEquals(resp.status_code, 200)
@@ -566,30 +570,98 @@ class ExportTestCase(CourseTestCase):
         resp = self.client.get(output_url)
         self._verify_export_succeeded(resp)
 
+        buff = StringIO.StringIO(b"".join(resp.streaming_content))
+        return tarfile.open(fileobj=buff)
+
     def _verify_export_succeeded(self, resp):
         """ Export success helper method. """
         self.assertEquals(resp.status_code, 200)
         self.assertTrue(resp.get('Content-Disposition').startswith('attachment'))
 
-    def test_export_failure_top_level(self):
+    def test_unknown_xblock_top_level(self):
         """
-        Export failure.
+        Export unknown XBlock type (i.e. we uninstalled the XBlock), top level.
         """
-        fake_xblock = ItemFactory.create(parent_location=self.course.location, category='aawefawef')
+        fake_xblock = ItemFactory.create(
+            parent_location=self.course.location,
+            category='not_a_real_block_type'
+        )
         self.store.publish(fake_xblock.location, self.user.id)
-        self._verify_export_failure(u'/container/{}'.format(self.course.location))
 
-    def test_export_failure_subsection_level(self):
-        """
-        Slightly different export failure.
-        """
-        vertical = ItemFactory.create(parent_location=self.course.location, category='vertical', display_name='foo')
-        ItemFactory.create(
-            parent_location=vertical.location,
-            category='aawefawef'
+        # Now check the resulting export
+        tar_ball = self.test_export_async()
+        course_file_path = next(
+            path for path in tar_ball.getnames()
+            if re.match(r'\w+/course/\w+.xml', path)
+        )
+        course_file = tar_ball.extractfile(course_file_path)
+        course_xml = lxml.etree.parse(course_file)
+        course_elem = course_xml.getroot()
+
+        # The course run file still has a child pointer to the unknown type and
+        # creates the <not_a_real_block_type url="..."> pointer tag...
+        self.assertEqual(course_elem.tag, 'course')
+        unknown_elem = course_elem[0]
+        self.assertEqual(unknown_elem.tag, 'not_a_real_block_type')
+        # Non empty url_name attribute (the generated ID)
+        self.assertTrue(unknown_elem.attrib['url_name'])
+
+        # But there should be no file exported for our fake block type. Without
+        # the XBlock installed, we don't know how to serialize it properly.
+        assert not any(
+            '/not_a_real_block_type/' in path
+            for path in tar_ball.getnames()
         )
 
-        self._verify_export_failure(u'/container/{}'.format(vertical.location))
+    def test_unknown_xblock_subsection_level(self):
+        """
+        Export unknown XBlock type deeper in the course.
+        """
+        vertical = ItemFactory.create(
+            parent_location=self.course.location,
+            category='vertical',
+            display_name='sample_vertical',
+        )
+        fake_xblock = ItemFactory.create(
+            parent_location=vertical.location,
+            category='not_a_real_block_type',
+        )
+        self.store.publish(fake_xblock.location, self.user.id)
+
+        # Now check the resulting export
+        tar_ball = self.test_export_async()
+        course_file_path = next(
+            path for path in tar_ball.getnames()
+            if re.match(r'\w+/course/\w+.xml', path)
+        )
+        course_file = tar_ball.extractfile(course_file_path)
+        course_xml = lxml.etree.parse(course_file)
+        course_elem = course_xml.getroot()
+
+        # The course run file should have a vertical that points to the
+        # non-existant block.
+        self.assertEqual(course_elem.tag, 'course')
+        self.assertEqual(course_elem[0].tag, 'vertical')  # This is just a reference
+
+        vert_file_path = next(
+            path for path in tar_ball.getnames()
+            if re.match(r'\w+/vertical/\w+.xml', path)
+        )
+        vert_file = tar_ball.extractfile(vert_file_path)
+        vert_xml = lxml.etree.parse(vert_file)
+        vert_elem = vert_xml.getroot()
+        self.assertEqual(vert_elem.tag, 'vertical')
+        self.assertEqual(len(vert_elem), 1)
+        unknown_elem = vert_elem[0]
+        self.assertEqual(unknown_elem.tag, 'not_a_real_block_type')
+        # Non empty url_name attribute (the generated ID)
+        self.assertTrue(unknown_elem.attrib['url_name'])
+
+        # There should be no file exported for our fake block type
+        assert not any(
+            '/not_a_real_block_type/' in path
+            for path in tar_ball.getnames()
+        )
 
     def _verify_export_failure(self, expected_text):
         """ Export failure helper method. """

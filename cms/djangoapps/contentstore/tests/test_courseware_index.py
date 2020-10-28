@@ -186,7 +186,6 @@ class MixedWithOptionsTestCase(MixedSplitTestCase):
 @ddt.ddt
 class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
     """ Tests the operation of the CoursewareSearchIndexer """
-    shard = 1
 
     WORKS_WITH_STORES = (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
 
@@ -607,7 +606,6 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
 @ddt.ddt
 class TestLargeCourseDeletions(MixedWithOptionsTestCase):
     """ Tests to excerise deleting items from a course """
-    shard = 1
 
     WORKS_WITH_STORES = (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
 
@@ -675,7 +673,7 @@ class TestLargeCourseDeletions(MixedWithOptionsTestCase):
             self._do_test_large_course_deletion(store, load_factor)
         except:  # pylint: disable=bare-except
             # Catch any exception here to see when we fail
-            print("Failed with load_factor of {}".format(load_factor))
+            print(u"Failed with load_factor of {}".format(load_factor))
 
     @skip(("This test is to see how we handle very large courses, to ensure that the delete"
            "procedure works smoothly - too long to run during the normal course of things"))
@@ -691,7 +689,6 @@ class TestTaskExecution(SharedModuleStoreTestCase):
     being present, which allows us to ensure that when the listener is
     executed, it is done as expected.
     """
-    shard = 1
 
     @classmethod
     def setUpClass(cls):
@@ -786,7 +783,6 @@ class TestTaskExecution(SharedModuleStoreTestCase):
 @ddt.ddt
 class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
     """ Tests the operation of the CoursewareSearchIndexer """
-    shard = 1
 
     # libraries work only with split, so do library indexer
     WORKS_WITH_STORES = (ModuleStoreEnum.Type.split, )
@@ -960,7 +956,6 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
     """
     Tests indexing of content groups on course modules using mongo modulestore.
     """
-    shard = 1
 
     MODULESTORE = TEST_DATA_MONGO_MODULESTORE
     INDEX_NAME = CoursewareSearchIndexer.INDEX_NAME

@@ -3,6 +3,8 @@
 Tests for credit course models.
 """
 
+from __future__ import absolute_import
+
 import ddt
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
@@ -38,7 +40,6 @@ class CreditEligibilityModelTests(TestCase):
     """
     Tests for credit models used to track credit eligibility.
     """
-    shard = 2
 
     def setUp(self):
         super(CreditEligibilityModelTests, self).setUp()

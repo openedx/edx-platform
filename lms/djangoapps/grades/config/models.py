@@ -2,6 +2,8 @@
 Models for configuration of the feature flags
 controlling persistent grades.
 """
+from __future__ import absolute_import
+
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.db.models import BooleanField, IntegerField, TextField
@@ -17,6 +19,8 @@ class PersistentGradesEnabledFlag(ConfigurationModel):
     When this feature flag is set to true, individual courses
     must also have persistent grades enabled for the
     feature to take effect.
+
+    .. no_pii:
     """
     # this field overrides course-specific settings to enable the feature for all courses
     enabled_for_all_courses = BooleanField(default=False)
@@ -58,6 +62,8 @@ class CoursePersistentGradesFlag(ConfigurationModel):
     Enables persistent grades for a specific
     course. Only has an effect if the general
     flag above is set to True.
+
+    .. no_pii:
     """
     KEY_FIELDS = ('course_id',)
 
@@ -76,7 +82,7 @@ class CoursePersistentGradesFlag(ConfigurationModel):
 
 class ComputeGradesSetting(ConfigurationModel):
     """
-    ...
+    .. no_pii:
     """
     class Meta(object):
         app_label = "grades"

@@ -12,25 +12,29 @@ Examples of html5 videos for manual testing:
     https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.webm
     https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.ogv
 """
+from __future__ import absolute_import
+
 import copy
 import json
 import logging
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
 from operator import itemgetter
 
-from pkg_resources import resource_string
-
+import six
 from django.conf import settings
 from lxml import etree
 from opaque_keys.edx.locator import AssetLocator
-from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag
-from openedx.core.djangoapps.video_pipeline.config.waffle import waffle_flags, DEPRECATE_YOUTUBE
-from openedx.core.lib.cache_utils import request_cached
-from openedx.core.lib.license import LicenseMixin
+from pkg_resources import resource_string
+from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
+
+from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag
+from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE, waffle_flags
+from openedx.core.lib.cache_utils import request_cached
+from openedx.core.lib.license import LicenseMixin
 from xmodule.contentstore.content import StaticContent
 from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.exceptions import NotFoundError
@@ -38,23 +42,21 @@ from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metada
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.video_module import manage_video_subtitles_save
-from xmodule.x_module import XModule, module_attr, PUBLIC_VIEW, STUDENT_VIEW
+from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW, XModule, module_attr
 from xmodule.xml_module import deserialize_field, is_pointer_tag, name_to_pathname
 
 from .bumper_utils import bumperize
 from .transcripts_utils import (
-    get_html5_ids,
     Transcript,
     VideoTranscriptsMixin,
     clean_video_id,
-    subs_filename,
-    get_transcript_for_video
+    get_html5_ids,
+    get_transcript_for_video,
+    subs_filename
 )
-
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 from .video_utils import create_youtube_string, format_xml_exception_message, get_poster, rewrite_video_url
 from .video_xfields import VideoFields
-from web_fragments.fragment import Fragment
 
 # The following import/except block for edxval is temporary measure until
 # edxval is a proper XBlock Runtime Service.
@@ -176,7 +178,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             languages['en'] = 'English'
 
         # OrderedDict for easy testing of rendered context in tests
-        sorted_languages = sorted(languages.items(), key=itemgetter(1))
+        sorted_languages = sorted(list(languages.items()), key=itemgetter(1))
 
         sorted_languages = OrderedDict(sorted_languages)
         return track_url, transcript_language, sorted_languages
@@ -219,12 +221,13 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
 
         track_status = (self.download_track and self.track)
         transcript_download_format = self.transcript_download_format if not track_status else None
-        sources = filter(None, self.html5_sources)
+        sources = [source for source in self.html5_sources if source]
 
         download_video_link = None
         branding_info = None
         youtube_streams = ""
         video_duration = None
+        video_status = None
 
         # Determine if there is an alternative source for this video
         # based on user locale.  This exists to support cases where
@@ -271,6 +274,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
                 # get video duration
                 video_data = edxval_api.get_video_info(self.edx_video_id.strip())
                 video_duration = video_data.get('duration')
+                video_status = video_data.get('status')
 
             except (edxval_api.ValInternalError, edxval_api.ValVideoNotFoundError):
                 # VAL raises this exception if it can't find data for the edx video ID. This can happen if the
@@ -285,10 +289,11 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         if getattr(self, 'video_speed_optimizations', True) and cdn_url:
             branding_info = BrandingInfoConfig.get_config().get(self.system.user_location)
 
-            for index, source_url in enumerate(sources):
-                new_url = rewrite_video_url(cdn_url, source_url)
-                if new_url:
-                    sources[index] = new_url
+            if self.edx_video_id and edxval_api and video_status != u'external':
+                for index, source_url in enumerate(sources):
+                    new_url = rewrite_video_url(cdn_url, source_url)
+                    if new_url:
+                        sources[index] = new_url
 
         # If there was no edx_video_id, or if there was no download specified
         # for it, we fall back on whatever we find in the VideoDescriptor
@@ -684,7 +689,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         # Mild workaround to ensure that tests pass -- if a field
         # is set to its default value, we don't need to write it out.
         if youtube_string and youtube_string != '1.00:3_yD_cEKoCk':
-            xml.set('youtube', unicode(youtube_string))
+            xml.set('youtube', six.text_type(youtube_string))
         xml.set('url_name', self.url_name)
         attrs = {
             'display_name': self.display_name,
@@ -701,13 +706,13 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             if value:
                 if key in self.fields and self.fields[key].is_set_on(self):
                     try:
-                        xml.set(key, unicode(value))
+                        xml.set(key, six.text_type(value))
                     except UnicodeDecodeError:
                         exception_message = format_xml_exception_message(self.location, key, value)
                         log.exception(exception_message)
                         # If exception is UnicodeDecodeError set value using unicode 'utf-8' scheme.
                         log.info("Setting xml value using 'utf-8' scheme.")
-                        xml.set(key, unicode(value, 'utf-8'))
+                        xml.set(key, six.text_type(value, 'utf-8'))
                     except ValueError:
                         exception_message = format_xml_exception_message(self.location, key, value)
                         log.exception(exception_message)
@@ -749,7 +754,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                     video_id=edx_video_id,
                     resource_fs=resource_fs,
                     static_dir=EXPORT_IMPORT_STATIC_DIR,
-                    course_id=unicode(self.runtime.course_id.for_branch(None))
+                    course_id=six.text_type(self.runtime.course_id.for_branch(None))
                 )
                 # Update xml with edxval metadata
                 xml.append(exported_metadata['xml'])
@@ -954,7 +959,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         course_id = getattr(id_generator, 'target_course_id', None)
         # Update the handout location with current course_id
-        if 'handout' in field_data.keys() and course_id:
+        if 'handout' in list(field_data.keys()) and course_id:
             handout_location = StaticContent.get_location_from_path(field_data['handout'])
             if isinstance(handout_location, AssetLocator):
                 handout_new_location = StaticContent.compute_location(course_id, handout_location.path)
@@ -1069,7 +1074,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         """
         Returns the VAL data for the requested video profiles for the given course.
         """
-        return edxval_api.get_video_info_for_course_and_profiles(unicode(course_id), video_profile_names)
+        return edxval_api.get_video_info_for_course_and_profiles(six.text_type(course_id), video_profile_names)
 
     def student_view_data(self, context=None):
         """

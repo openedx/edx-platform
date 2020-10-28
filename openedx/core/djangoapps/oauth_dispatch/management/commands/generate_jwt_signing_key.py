@@ -2,20 +2,19 @@
 Management command for generating an asymmetric keypair to sign JSON Web Tokens.
 """
 # pylint: disable=missing-docstring
-from __future__ import print_function, unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 
-import logging
 import json
+import logging
 import random
 import string
-
 from argparse import RawTextHelpFormatter
-from django.conf import settings
-from django.core.management.base import BaseCommand
 
 from Cryptodome.PublicKey import RSA
+from django.conf import settings
+from django.core.management.base import BaseCommand
 from jwkest import jwk
-
+from six.moves import range
 
 log = logging.getLogger(__name__)
 

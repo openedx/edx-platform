@@ -1,6 +1,8 @@
 """
 URL definitions for api access request API.
 """
+from __future__ import absolute_import
+
 from django.conf.urls import include, url
 
 app_name = 'api_admin'

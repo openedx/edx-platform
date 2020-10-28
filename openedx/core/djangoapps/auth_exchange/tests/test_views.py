@@ -4,17 +4,19 @@ Tests for OAuth token exchange views
 
 # pylint: disable=no-member
 
-from datetime import timedelta
+from __future__ import absolute_import
+
 import json
-import mock
 import unittest
+from datetime import timedelta
 
 import ddt
-from django.conf import settings
-from django.urls import reverse
-from django.test import TestCase
 import httpretty
+import mock
 import provider.constants
+from django.conf import settings
+from django.test import TestCase
+from django.urls import reverse
 from provider.oauth2.models import AccessToken, Client
 from rest_framework.test import APIClient
 from social_django.models import Partial
@@ -22,8 +24,9 @@ from social_django.models import Partial
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from student.tests.factories import UserFactory
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
+
 from .mixins import DOPAdapterMixin, DOTAdapterMixin
-from .utils import AccessTokenExchangeTestMixin, TPA_FEATURE_ENABLED, TPA_FEATURES_KEY
+from .utils import TPA_FEATURE_ENABLED, TPA_FEATURES_KEY, AccessTokenExchangeTestMixin
 
 
 @ddt.ddt
@@ -181,7 +184,7 @@ class TestLoginWithAccessTokenView(TestCase):
         Calls the login_with_access_token endpoint and verifies the response given the expected values.
         """
         url = reverse("login_with_access_token")
-        response = self.client.post(url, HTTP_AUTHORIZATION="Bearer {0}".format(access_token))
+        response = self.client.post(url, HTTP_AUTHORIZATION=b"Bearer {0}".format(access_token))
         self.assertEqual(response.status_code, expected_status_code)
         if expected_cookie_name:
             self.assertIn(expected_cookie_name, response.cookies)

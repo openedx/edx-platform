@@ -2,24 +2,24 @@
 Tests of modulestore semantics: How do the interfaces methods of ModuleStore relate to each other?
 """
 
-import ddt
+from __future__ import absolute_import
+
 import itertools
 from collections import namedtuple
-from xmodule.course_module import CourseSummary
-from mock import patch
 
-from xmodule.modulestore.tests.utils import (
-    PureModulestoreTestCase, MongoModulestoreBuilder,
-    SPLIT_MODULESTORE_SETUP
-)
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
+import ddt
+from mock import patch
 from xblock.core import XBlock, XBlockAside
 from xblock.fields import Scope, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
+
+from xmodule.course_module import CourseSummary
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.utils import SPLIT_MODULESTORE_SETUP, MongoModulestoreBuilder, PureModulestoreTestCase
 
 DETACHED_BLOCK_TYPES = dict(XBlock.load_tagged_classes('detached'))
 
@@ -43,7 +43,6 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
     Verify the behavior of Direct Only items
     blocks intended to store snippets of course content.
     """
-    shard = 1
 
     __test__ = False
 
@@ -416,7 +415,6 @@ class TestSplitDirectOnlyCategorySemantics(DirectOnlyCategorySemantics):
     """
     Verify DIRECT_ONLY_CATEGORY semantics against the SplitMongoModulestore.
     """
-    shard = 1
     MODULESTORE = SPLIT_MODULESTORE_SETUP
     __test__ = True
 
@@ -451,6 +449,5 @@ class TestMongoDirectOnlyCategorySemantics(DirectOnlyCategorySemantics):
     """
     Verify DIRECT_ONLY_CATEGORY semantics against the MongoModulestore
     """
-    shard = 1
     MODULESTORE = MongoModulestoreBuilder()
     __test__ = True

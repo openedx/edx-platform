@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """ Commerce app tests package. """
 
+from __future__ import absolute_import
+
 import httpretty
 import mock
 from django.conf import settings
@@ -27,6 +29,11 @@ class EdxRestApiClientTest(TestCase):
     """ Tests to ensure the client is initialized properly. """
 
     TEST_CLIENT_ID = 'test-client-id'
+    SCOPES = [
+        'user_id',
+        'email',
+        'profile'
+    ]
 
     def setUp(self):
         super(EdxRestApiClientTest, self).setUp()
@@ -62,8 +69,8 @@ class EdxRestApiClientTest(TestCase):
                     'lms_ip': '127.0.0.1',
                 }
             }
-            expected_jwt = create_jwt_for_user(self.user, additional_claims=claims)
-            expected_header = 'JWT {}'.format(expected_jwt)
+            expected_jwt = create_jwt_for_user(self.user, additional_claims=claims, scopes=self.SCOPES)
+            expected_header = u'JWT {}'.format(expected_jwt)
             self.assertEqual(actual_header, expected_header)
 
     @httpretty.activate

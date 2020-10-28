@@ -2,16 +2,19 @@
 """
 Test the access control framework
 """
+from __future__ import absolute_import
+
 import datetime
 import itertools
 
 import ddt
 import pytz
+import six
 from ccx_keys.locator import CCXLocator
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.urls import reverse
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
@@ -30,7 +33,6 @@ from courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_grou
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
-from openedx.core.lib.tests import attr
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from student.models import CourseEnrollment
 from student.roles import CourseCcxCoachRole, CourseStaffRole
@@ -101,7 +103,7 @@ class CoachAccessTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         )
         ccx.save()
 
-        ccx_locator = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
+        ccx_locator = CCXLocator.from_course_locator(self.course.id, six.text_type(ccx.id))
         role = CourseCcxCoachRole(ccx_locator)
         role.add_users(self.coach)
         CourseEnrollment.enroll(self.coach, ccx_locator)
@@ -148,16 +150,15 @@ class CoachAccessTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         CourseEnrollment.enroll(student, ccx_locator)
 
         # Test for access of a coach
-        resp = self.client.get(reverse('student_progress', args=[unicode(ccx_locator), student.id]))
+        resp = self.client.get(reverse('student_progress', args=[six.text_type(ccx_locator), student.id]))
         self.assertEqual(resp.status_code, 200)
 
         # Assert access of a student
         self.client.login(username=student.username, password='test')
-        resp = self.client.get(reverse('student_progress', args=[unicode(ccx_locator), self.coach.id]))
+        resp = self.client.get(reverse('student_progress', args=[six.text_type(ccx_locator), self.coach.id]))
         self.assertEqual(resp.status_code, 404)
 
 
-@attr(shard=1)
 @ddt.ddt
 class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
@@ -593,7 +594,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
             org='test_org', number='788', run='test_run'
         )
 
-        pre_requisite_courses = [unicode(pre_requisite_course.id)]
+        pre_requisite_courses = [six.text_type(pre_requisite_course.id)]
         course = CourseFactory.create(
             org='test_org', number='786', run='test_run', pre_requisite_courses=pre_requisite_courses
         )
@@ -642,7 +643,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
             run='test_run',
         )
 
-        pre_requisite_courses = [unicode(pre_requisite_course.id)]
+        pre_requisite_courses = [six.text_type(pre_requisite_course.id)]
         course = CourseFactory.create(
             org='edX',
             course='1000',
@@ -658,7 +659,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         self.login(user.email, test_password)
         CourseEnrollmentFactory(user=user, course_id=course.id)
 
-        url = reverse('courseware', args=[unicode(course.id)])
+        url = reverse('courseware', args=[six.text_type(course.id)])
         response = self.client.get(url)
         self.assertRedirects(
             response,
@@ -673,7 +674,6 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         self.assertEqual(response.status_code, 200)
 
 
-@attr(shard=1)
 class UserRoleTestCase(TestCase):
     """
     Tests for user roles.
@@ -730,7 +730,6 @@ class UserRoleTestCase(TestCase):
         )
 
 
-@attr(shard=5)
 @ddt.ddt
 class CourseOverviewAccessTestCase(ModuleStoreTestCase):
     """

@@ -32,7 +32,7 @@ def export_git(request, course_key_string):
     course_module = modulestore().get_course(course_key)
     failed = False
 
-    log.debug('export_git course_module=%s', course_module)
+    log.debug(u'export_git course_module=%s', course_module)
 
     msg = ""
     if 'action' in request.GET and course_module.giturl:

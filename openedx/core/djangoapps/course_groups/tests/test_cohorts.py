@@ -2,17 +2,19 @@
 Tests for cohorts
 """
 # pylint: disable=no-member
-import ddt
-from mock import call, patch
+from __future__ import absolute_import
 
 import before_after
-from django.contrib.auth.models import User, AnonymousUser
+import ddt
+from django.contrib.auth.models import AnonymousUser, User
 from django.db import IntegrityError
 from django.http import Http404
 from django.test import TestCase
+from mock import call, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
+from six.moves import range
 
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -21,10 +23,7 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, 
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 from .. import cohorts
-from ..models import (
-    CourseCohort, CourseUserGroup, CourseUserGroupPartitionGroup,
-    UnregisteredLearnerCohortAssignments
-)
+from ..models import CourseCohort, CourseUserGroup, CourseUserGroupPartitionGroup, UnregisteredLearnerCohortAssignments
 from ..tests.helpers import CohortFactory, CourseCohortFactory, config_course_cohorts, config_course_cohorts_legacy
 
 
@@ -33,7 +32,6 @@ class TestCohortSignals(TestCase):
     """
     Test cases to validate event emissions for various cohort-related workflows
     """
-    shard = 2
 
     def setUp(self):
         super(TestCohortSignals, self).setUp()
@@ -79,7 +77,7 @@ class TestCohortSignals(TestCase):
             """
             Confirms the presence of the specifed event for each user in the specified list of cohorts
             """
-            mock_tracker.emit.assert_has_calls([
+            expected_calls = [
                 call(
                     "edx.cohort.user_" + event_name_suffix,
                     {
@@ -89,7 +87,8 @@ class TestCohortSignals(TestCase):
                     }
                 )
                 for user in user_list for cohort in cohort_list
-            ])
+            ]
+            mock_tracker.emit.assert_has_calls(expected_calls, any_order=True)
 
         # Add users to cohort
         cohort_list[0].users.add(*user_list)
@@ -140,7 +139,6 @@ class TestCohorts(ModuleStoreTestCase):
     Test the cohorts feature
     """
     MODULESTORE = TEST_DATA_MIXED_MODULESTORE
-    shard = 2
 
     def setUp(self):
         """
@@ -391,6 +389,10 @@ class TestCohorts(ModuleStoreTestCase):
         Anonymous user is not assigned to any cohort group.
         """
         course = modulestore().get_course(self.toy_course_key)
+
+        # verify cohorts is None when course is not cohorted
+        self.assertIsNone(cohorts.get_cohort(AnonymousUser(), course.id))
+
         config_course_cohorts(
             course,
             is_cohorted=True,
@@ -746,7 +748,6 @@ class TestCohortsAndPartitionGroups(ModuleStoreTestCase):
     Test Cohorts and Partitions Groups.
     """
     MODULESTORE = TEST_DATA_MIXED_MODULESTORE
-    shard = 2
 
     def setUp(self):
         """

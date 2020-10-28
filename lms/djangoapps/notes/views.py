@@ -2,6 +2,8 @@
 Views to support the edX Notes feature.
 """
 
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import Http404

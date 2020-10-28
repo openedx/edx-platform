@@ -1,6 +1,8 @@
 """
 This file will test through the LMS some of the password reset features
 """
+from __future__ import absolute_import
+
 from uuid import uuid4
 
 import ddt
@@ -18,7 +20,6 @@ class TestPasswordReset(LoginEnrollmentTestCase):
     """
     Go through some of the password reset use cases
     """
-    shard = 1
 
     def _setup_user(self, is_staff=False, password=None):
         """

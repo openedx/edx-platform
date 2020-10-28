@@ -25,7 +25,6 @@ from third_party_auth.models import (
     SAMLConfiguration,
     SAMLProviderConfig
 )
-from third_party_auth.saml import EdXSAMLIdentityProvider, get_saml_idp_class
 
 AUTH_FEATURES_KEY = 'ENABLE_THIRD_PARTY_AUTH'
 AUTH_FEATURE_ENABLED = AUTH_FEATURES_KEY in settings.FEATURES
@@ -214,16 +213,6 @@ class SAMLTestCase(TestCase):
             kwargs['public_key'] = self._get_public_key()
         kwargs.setdefault('entity_id', "https://saml.example.none")
         super(SAMLTestCase, self).enable_saml(**kwargs)
-
-    @mock.patch('third_party_auth.saml.log')
-    def test_get_saml_idp_class_with_fake_identifier(self, log_mock):
-        error_mock = log_mock.error
-        idp_class = get_saml_idp_class('fake_idp_class_option')
-        error_mock.assert_called_once_with(
-            '%s is not a valid EdXSAMLIdentityProvider subclass; using EdXSAMLIdentityProvider base class.',
-            'fake_idp_class_option'
-        )
-        self.assertIs(idp_class, EdXSAMLIdentityProvider)
 
 
 @contextmanager

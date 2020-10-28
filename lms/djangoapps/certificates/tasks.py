@@ -34,9 +34,9 @@ def generate_certificate(self, **kwargs):
         actual_verification_status = IDVerificationService.user_status(student)
         actual_verification_status = actual_verification_status['status']
         if expected_verification_status != actual_verification_status:
-            logger.warn('Expected verification status {expected} '
-                        'differs from actual verification status {actual} '
-                        'for user {user} in course {course}'.format(
+            logger.warn(u'Expected verification status {expected} '
+                        u'differs from actual verification status {actual} '
+                        u'for user {user} in course {course}'.format(
                             expected=expected_verification_status,
                             actual=actual_verification_status,
                             user=student.id,

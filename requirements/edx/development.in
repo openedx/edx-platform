@@ -18,12 +18,9 @@ django-debug-toolbar==1.8           # A set of panels that display debug informa
 edx-sphinx-theme                    # Documentation theme
 pyinotify                           # More efficient checking for runserver reload trigger events
 snakefood                           # Lists dependencies between Python modules, used in scripts/dependencies/*
-sphinx                              # Developer documentation builder
+sphinx==1.8.5                       # Pinned because 2.0.0 release requires Python '>=3.5' but current Python is 2.7.12
 vulture                             # Detects possible dead/unused code, used in scripts/find-dead-code.sh
 modernize                           # Used to make Python 2 code more modern with the intention of eventually porting it over to Python 3.
-
-# Performance timer used in modulestore/perf_tests/test_asset_import_export.py
--e git+https://github.com/doctoryes/code_block_timer.git@f3d0629f086bcc649c3c77f4bc5b9c2c8172c3bf#egg=code_block_timer
 
 # The officially released version of django-debug-toolbar-mongo doesn't support DJDT 1.x. This commit does.
 -e git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c4aee6e76b9abe61cc808#egg=django-debug-toolbar-mongo==0.1.10

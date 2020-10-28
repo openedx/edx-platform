@@ -27,10 +27,10 @@ class Command(BaseCommand):
         log.addHandler(log_handler)
         total, skipped, attempted, updated, failed, failure_messages = fetch_saml_metadata()
         self.stdout.write(
-            "\nDone."
-            "\n{total} provider(s) found in database."
-            "\n{skipped} skipped and {attempted} attempted."
-            "\n{updated} updated and {failed} failed.\n".format(
+            u"\nDone."
+            u"\n{total} provider(s) found in database."
+            u"\n{skipped} skipped and {attempted} attempted."
+            u"\n{updated} updated and {failed} failed.\n".format(
                 total=total,
                 skipped=skipped, attempted=attempted,
                 updated=updated, failed=failed,
@@ -39,7 +39,7 @@ class Command(BaseCommand):
 
         if failed > 0:
             raise CommandError(
-                "Command finished with the following exceptions:\n\n{failures}".format(
+                u"Command finished with the following exceptions:\n\n{failures}".format(
                     failures="\n\n".join(failure_messages)
                 )
             )

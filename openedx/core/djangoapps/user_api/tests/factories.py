@@ -1,8 +1,11 @@
 """Provides factories for User API models."""
-from factory.django import DjangoModelFactory
+from __future__ import absolute_import
+
 from factory import SubFactory
-from student.tests.factories import UserFactory
+from factory.django import DjangoModelFactory
 from opaque_keys.edx.locator import CourseLocator
+
+from student.tests.factories import UserFactory
 
 from ..models import UserCourseTag, UserOrgTag, UserPreference
 

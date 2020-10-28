@@ -162,7 +162,7 @@ def transcript_download_handler(request):
         )
         # Construct an HTTP response
         response = HttpResponse(transcript_content, content_type=Transcript.mime_types[Transcript.SRT])
-        response['Content-Disposition'] = 'attachment; filename="{filename}"'.format(filename=transcript_filename)
+        response['Content-Disposition'] = u'attachment; filename="{filename}"'.format(filename=transcript_filename)
     else:
         response = HttpResponseNotFound()
 

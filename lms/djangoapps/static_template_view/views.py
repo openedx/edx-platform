@@ -3,6 +3,8 @@
 # List of valid templates is explicitly managed for (short-term)
 # security reasons.
 
+from __future__ import absolute_import
+
 import mimetypes
 
 from django.conf import settings
@@ -11,8 +13,8 @@ from django.shortcuts import redirect
 from django.template import TemplateDoesNotExist
 from django.utils.safestring import mark_safe
 from django.views.decorators.csrf import ensure_csrf_cookie
-
 from mako.exceptions import TopLevelLookupException
+
 from edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from util.cache import cache_if_anonymous

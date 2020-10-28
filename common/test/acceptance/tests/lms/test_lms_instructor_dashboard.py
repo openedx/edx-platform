@@ -3,6 +3,7 @@
 End-to-end tests for the LMS Instructor Dashboard.
 """
 
+from __future__ import absolute_import
 import ddt
 from bok_choy.promise import EmptyPromise
 
@@ -31,6 +32,7 @@ from common.test.acceptance.tests.helpers import (
     get_modal_alert
 )
 from openedx.core.lib.tests import attr
+from six.moves import range
 
 
 class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
@@ -80,6 +82,7 @@ class LMSInstructorDashboardA11yTest(BaseInstructorDashboardTest):
         self.instructor_dashboard_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         self.instructor_dashboard_page.a11y_audit.check_for_accessibility_errors()
@@ -90,6 +93,8 @@ class BulkEmailTest(BaseInstructorDashboardTest):
     """
     End-to-end tests for bulk emailing from instructor dash.
     """
+    shard = 23
+
     def setUp(self):
         super(BulkEmailTest, self).setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
@@ -113,6 +118,9 @@ class BulkEmailTest(BaseInstructorDashboardTest):
         self.send_email_page.a11y_audit.config.set_rules({
             "ignore": [
                 'button-name',  # TODO: TNL-5830
+                'aria-allowed-role',  # TODO: AC-936
+                'color-contrast',  # TODO: AC-938
+                'listitem'  # TODO: AC-937
             ]
         })
         self.send_email_page.a11y_audit.check_for_accessibility_errors()
@@ -230,7 +238,7 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
         Auto-enrollment with CSV accessibility tests
         """
         self.auto_enroll_section.a11y_audit.config.set_scope([
-            '#member-list-widget-template'
+            '#membership-list-widget-tpl'
         ])
         self.auto_enroll_section.a11y_audit.check_for_accessibility_errors()
 
@@ -239,6 +247,7 @@ class BatchBetaTestersTest(BaseInstructorDashboardTest):
     """
     End-to-end tests for Batch beta testers functionality.
     """
+    shard = 23
 
     def setUp(self):
         super(BatchBetaTestersTest, self).setUp()
@@ -697,36 +706,11 @@ class DataDownloadsWithMultipleRoleTests(BaseInstructorDashboardTest):
     """
     Bok Choy tests for the "Data Downloads" tab with multiple user roles.
     """
+    shard = 23
+
     def setUp(self):
         super(DataDownloadsWithMultipleRoleTests, self).setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
-
-    @ddt.data(['staff'], ['instructor'])
-    def test_list_student_profile_information(self, role):
-        """
-        Scenario: List enrolled students' profile information
-        Given I am "<Role>" for a course
-        When I click "List enrolled students' profile information"
-            Then I see a table of student profiles
-            Examples:
-            | Role          |
-            | instructor    |
-            | staff         |
-        """
-        username, user_id, email, __ = self.log_in_as_instructor(
-            global_staff=False,
-            course_access_roles=role
-        )
-        instructor_dashboard_page = self.visit_instructor_dashboard()
-        data_download_section = instructor_dashboard_page.select_data_download()
-
-        data_download_section.enrolled_student_profile_button.click()
-        student_profile_info = data_download_section.student_profile_information
-
-        self.assertNotIn(student_profile_info, [u'', u'Loading'])
-        expected_data = [user_id, username, email]
-        for datum in expected_data:
-            self.assertIn(str(datum), student_profile_info[0].split('\n'))
 
     @ddt.data(['staff'], ['instructor'])
     def test_list_student_profile_information_for_large_course(self, role):
@@ -994,7 +978,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.add_certificate_exception(self.user_name, '')
 
         self.assertIn(
-            '{user} already in exception list.'.format(user=self.user_name),
+            u'{user} already in exception list.'.format(user=self.user_name),
             self.certificates_section.message.text
         )
 
@@ -1041,7 +1025,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.wait_for_ajax()
 
         self.assertIn(
-            "{user} does not exist in the LMS. Please check your spelling and retry.".format(user=invalid_user),
+            u"{user} does not exist in the LMS. Please check your spelling and retry.".format(user=invalid_user),
             self.certificates_section.message.text
         )
 
@@ -1074,7 +1058,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.wait_for_ajax()
 
         self.assertIn(
-            "{user} is not enrolled in this course. Please check your spelling and retry.".format(user=new_user),
+            u"{user} is not enrolled in this course. Please check your spelling and retry.".format(user=new_user),
             self.certificates_section.message.text
         )
 
@@ -1135,6 +1119,11 @@ class CertificatesTest(BaseInstructorDashboardTest):
         """
         Certificates page accessibility tests
         """
+        self.certificates_section.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-hidden-focus'  # TODO: AC-938
+            ]
+        })
         self.certificates_section.a11y_audit.config.set_scope([
             '.certificates-wrapper'
         ])
@@ -1212,7 +1201,7 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
 
         # Validate success message
         self.assertIn(
-            "Certificate has been successfully invalidated for {user}.".format(user=self.student_name),
+            u"Certificate has been successfully invalidated for {user}.".format(user=self.student_name),
             self.certificates_section.certificate_invalidation_message.text
         )
 
@@ -1344,6 +1333,11 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
         """
         Certificate invalidation accessibility tests
         """
+        self.certificates_section.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-hidden-focus'  # TODO: AC-938
+            ]
+        })
         self.certificates_section.a11y_audit.config.set_scope([
             '.certificates-wrapper'
         ])
@@ -1449,6 +1443,8 @@ class StudentAdminTest(BaseInstructorDashboardTest):
     SUBSECTION_NAME = 'Test Subsection 1'
     UNIT_NAME = 'Test Unit 1'
     PROBLEM_NAME = 'Test Problem 1'
+
+    shard = 23
 
     def setUp(self):
         super(StudentAdminTest, self).setUp()

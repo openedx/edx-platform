@@ -2,6 +2,8 @@
 Exercises tests on the base_store_provider file
 """
 
+from __future__ import absolute_import
+
 from django.test import TestCase
 
 from lms.djangoapps.instructor.enrollment_report import AbstractEnrollmentReportProvider
@@ -37,7 +39,6 @@ class TestBaseNotificationDataProvider(TestCase):
     """
     Cover the EnrollmentReportProvider class
     """
-    shard = 4
 
     def test_cannot_create_instance(self):
         """

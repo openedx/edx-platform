@@ -13,15 +13,12 @@ def runBokchoyTests() {
             doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', honorRefspec: true,
             noTags: true, shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
             refspec: git_refspec, url: "git@github.com:edx/${REPO_NAME}.git"]]]
-        console_output = sh(returnStdout: true, script: 'bash scripts/all-tests.sh').trim()
-        dir('stdout') {
-            writeFile file: "${TEST_SUITE}-${SHARD}-stdout.log", text: console_output
-        }
+        sh 'bash scripts/all-tests.sh'
     }
 }
 
 def bokchoyTestCleanup() {
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'test_root/log/**/*.log,stdout/*.log'
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'test_root/log/**/*.log,test_root/log/**/*.png'
     junit '**/reports/bok_choy/**/xunit.xml'
 }
 
@@ -47,7 +44,7 @@ pipeline {
                             string(name: 'GITHUB_REPO', value: "${REPO_NAME}"),
                             string(name: 'TARGET_URL', value: "${BUILD_URL}"),
                             string(name: 'DESCRIPTION', value: 'Pending'),
-                            string(name: 'CONTEXT', value: 'jenkins/bokchoy'),
+                            string(name: 'CONTEXT', value: "${GITHUB_CONTEXT}"),
                             string(name: 'CREATE_DEPLOYMENT', value: 'false'),
                             string(name: 'BUILD_STATUS', value: 'pending')
                         ],
@@ -59,7 +56,7 @@ pipeline {
             steps {
                 script {
                     def parallel_stages = [:]
-                    for (int i = 1; i <= 22; i++) {
+                    for (int i = 1; i <= 25; i++) {
                         int index = i
                         parallel_stages["${index}"] = {
                             node('jenkins-worker') {
@@ -85,7 +82,7 @@ pipeline {
             script{
                 if (env.ghprbPullId != null) {
                     // For PR jobs, run the edx-platform-test-notifier for PR reporting
-                    build job: 'edx-platform-test-notifier', parameters: [string(name: 'PR_NUMBER', value: "${ghprbPullId}")], wait: false
+                    build job: 'edx-platform-test-notifier', parameters: [string(name: 'REPO', value: "${REPO_NAME}"), string(name: 'PR_NUMBER', value: "${ghprbPullId}")], wait: false
                 } else {
                     // For master jobs run github-build-status and report to slack when necessary
                     if (currentBuild.currentResult == "SUCCESS") {
@@ -107,14 +104,15 @@ pipeline {
                             string(name: 'GITHUB_REPO', value: "${REPO_NAME}"),
                             string(name: 'TARGET_URL', value: "${BUILD_URL}"),
                             string(name: 'DESCRIPTION', value: build_description),
-                            string(name: 'CONTEXT', value: 'jenkins/bokchoy'),
+                            string(name: 'CONTEXT', value: "${GITHUB_CONTEXT}"),
                             string(name: 'CREATE_DEPLOYMENT', value: create_deployment),
                             string(name: 'BUILD_STATUS', value: build_status)
                         ],
                         propagate: false, wait: false
 
                     if (currentBuild.currentResult != "SUCCESS"){
-                        slackSend "`${JOB_NAME}` #${BUILD_NUMBER}: ${currentBuild.currentResult} after ${currentBuild.durationString.replace(' and counting', '')}\n${BUILD_URL}"
+                        slackSend botUser: true,
+                            message: "`${JOB_NAME}` #${BUILD_NUMBER}: ${currentBuild.currentResult} after ${currentBuild.durationString.replace(' and counting', '')}\n${BUILD_URL}"
 
                         email_body = "See: <${BUILD_URL}>\n\nChanges:\n"
                         change_sets = currentBuild.changeSets
@@ -128,7 +126,8 @@ pipeline {
                         emailext body: email_body,
                             subject: "Build failed in Jenkins: ${JOB_NAME} #${BUILD_NUMBER}", to: 'testeng@edx.org'
                     } else if (currentBuild.currentResult == "SUCCESS" && currentBuild.previousBuild.currentResult != "SUCCESS") {
-                        slackSend "`${JOB_NAME}` #${BUILD_NUMBER}: Back to normal after ${currentBuild.durationString.replace(' and counting', '')}\n${BUILD_URL}"
+                        slackSend botUser: true,
+                            message: "`${JOB_NAME}` #${BUILD_NUMBER}: Back to normal after ${currentBuild.durationString.replace(' and counting', '')}\\n${BUILD_URL}"
                         emailext body: "See <${BUILD_URL}>",
                             subject: "Jenkins Build is back to normal: ${JOB_NAME} #${BUILD_NUMBER}", to: 'testeng@edx.org'
                     }

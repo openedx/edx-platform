@@ -111,14 +111,6 @@ Alternatively, you're also free to physically mail the agreement to the street
 address on the agreement. Once we have your agreement in hand, we can begin
 reviewing and merging your work.
 
-You'll also need to add yourself to the `AUTHORS` file when you submit your
-first pull request.  You should add your full name as well as the email address
-associated with your GitHub account.  Please update `AUTHORS` in an individual
-commit, distinct from other changes in the pull request (it's OK for a pull
-request to contain multiple commits, including a commit to `AUTHORS`).
-Alternatively, you can open up a separate PR just to have your name added to
-the `AUTHORS` file, and link that PR to the PR with your changes.
-
 Step 2: Fork, Commit, and Pull Request
 ======================================
 GitHub has some great documentation on `how to fork a git repository`_. Once
@@ -224,4 +216,4 @@ Expectations You Have of Us
 3. Once we have determined through visual review that your code is not
    malicious, we will run a Jenkins build on your branch.
 
-.. _individual contributor agreement: http://open.edx.org/sites/default/files/wysiwyg/individual-contributor-agreement.pdf
+.. _individual contributor agreement: https://open.edx.org/wp-content/uploads/2019/01/individual-contributor-agreement.pdf

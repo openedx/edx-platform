@@ -1,12 +1,11 @@
 """Factories for generating fake credentials-related data."""
 # pylint: disable=missing-docstring, invalid-name
 
+from __future__ import absolute_import
+
 import factory
 
-from openedx.core.djangoapps.catalog.tests.factories import (
-    generate_course_run_key,
-    DictFactoryBase,
-)
+from openedx.core.djangoapps.catalog.tests.factories import DictFactoryBase, generate_course_run_key
 
 
 class ProgramCredential(DictFactoryBase):

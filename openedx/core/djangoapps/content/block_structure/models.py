@@ -2,21 +2,25 @@
 Models used by the block structure framework.
 """
 
+from __future__ import absolute_import
+
 from contextlib import contextmanager
 from datetime import datetime
+from logging import getLogger
+
+import six
+from six.moves import map
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.core.files.base import ContentFile
 from django.db import models, transaction
-from logging import getLogger
-
 from model_utils.models import TimeStampedModel
+
 from openedx.core.djangoapps.xmodule_django.models import UsageKeyWithRunField
 from openedx.core.storage import get_storage
 
 from . import config
 from .exceptions import BlockStructureNotFound
-
 
 log = getLogger(__name__)
 
@@ -35,7 +39,7 @@ def _directory_name(data_usage_key):
     """
     # replace any '/' in the usage key so they aren't interpreted
     # as folder separators.
-    encoded_usage_key = unicode(data_usage_key).replace('/', '_')
+    encoded_usage_key = six.text_type(data_usage_key).replace('/', '_')
     return '{}{}'.format(
         settings.BLOCK_STRUCTURES_SETTINGS.get('DIRECTORY_PREFIX', ''),
         encoded_usage_key,
@@ -124,6 +128,8 @@ def _storage_error_handling(bs_model, operation, is_read_operation=False):
 class BlockStructureModel(TimeStampedModel):
     """
     Model for storing Block Structure information.
+
+    .. no_pii:
     """
     VERSION_FIELDS = [
         u'data_version',
@@ -217,7 +223,7 @@ class BlockStructureModel(TimeStampedModel):
         Returns a string representation of this model.
         """
         return u', '.join(
-            u'{}: {}'.format(field_name, unicode(getattr(self, field_name)))
+            u'{}: {}'.format(field_name, six.text_type(getattr(self, field_name)))
             for field_name in self.UNIQUENESS_FIELDS
         )
 
@@ -253,7 +259,7 @@ class BlockStructureModel(TimeStampedModel):
         Deletes the given files from storage.
         """
         storage = _bs_model_storage()
-        map(storage.delete, files)
+        list(map(storage.delete, files))
 
     @classmethod
     def _get_all_files(cls, data_usage_key):

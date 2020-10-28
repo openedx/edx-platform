@@ -8,7 +8,7 @@ from django.conf import settings
 from django.dispatch import receiver
 
 import lti_provider.outcomes as outcomes
-from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
+from lms.djangoapps.grades.api import signals as grades_signals
 from lti_provider.views import parse_course_and_usage_keys
 from xmodule.modulestore.django import modulestore
 from .tasks import send_composite_outcome, send_leaf_outcome
@@ -35,7 +35,7 @@ def increment_assignment_versions(course_key, usage_key, user_id):
     return assignments
 
 
-@receiver(PROBLEM_WEIGHTED_SCORE_CHANGED)
+@receiver(grades_signals.PROBLEM_WEIGHTED_SCORE_CHANGED)
 def score_changed_handler(sender, **kwargs):  # pylint: disable=unused-argument
     """
     Consume signals that indicate score changes. See the definition of
@@ -62,8 +62,8 @@ def score_changed_handler(sender, **kwargs):  # pylint: disable=unused-argument
                 )
     else:
         log.error(
-            "Outcome Service: Required signal parameter is None. "
-            "points_possible: %s, points_earned: %s, user_id: %s, "
-            "course_id: %s, usage_id: %s",
+            u"Outcome Service: Required signal parameter is None. "
+            u"points_possible: %s, points_earned: %s, user_id: %s, "
+            u"course_id: %s, usage_id: %s",
             points_possible, points_earned, user_id, course_id, usage_id
         )

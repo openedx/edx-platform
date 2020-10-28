@@ -1,7 +1,9 @@
+from __future__ import absolute_import
+
 import json
 import unittest
 
-import draganddrop
+from . import draganddrop
 
 from .draganddrop import PositionsCompare
 

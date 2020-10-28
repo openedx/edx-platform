@@ -16,21 +16,26 @@ TODO:
 - test funny xml chars -- should never get xml parse error if things are escaped properly.
 
 """
+from __future__ import absolute_import
+
 import json
 import textwrap
 import unittest
 import xml.sax.saxutils as saxutils
 from collections import OrderedDict
 
+import six
+from lxml import etree
+from lxml.html import fromstring
+from mock import ANY, patch
+from pyparsing import ParseException
+from six.moves import zip
+
 from capa import inputtypes
 from capa.checker import DemoSystem
 from capa.tests.helpers import test_capa_system
 from capa.xqueue_interface import XQUEUE_TIMEOUT
-from lxml import etree
-from lxml.html import fromstring
-from mock import ANY, patch
 from openedx.core.djangolib.markup import HTML
-from pyparsing import ParseException
 
 # just a handy shortcut
 lookup_tag = inputtypes.registry.get_class_for_tag
@@ -861,7 +866,6 @@ class MatlabTest(unittest.TestCase):
             'response_data': {},
             'describedby_html': 'aria-describedby="status_{id}"'.format(id=prob_id)
         }
-
         self.assertEqual(context, expected)
         self.the_input.capa_system.render_template = DemoSystem().render_template
         self.the_input.get_html()  # Should not raise an exception
@@ -1609,7 +1613,7 @@ class TestStatus(unittest.TestCase):
         """
         statobj = inputtypes.Status('test')
         self.assertEqual(str(statobj), 'test')
-        self.assertEqual(unicode(statobj), u'test')
+        self.assertEqual(six.text_type(statobj), u'test')
 
     def test_classes(self):
         """

@@ -2,21 +2,22 @@
 This command will be run by an ansible script.
 """
 
-import os
-import json
-import fnmatch
-import logging
+from __future__ import absolute_import
 
-from provider.oauth2.models import Client
-from provider.constants import CONFIDENTIAL
-from edx_oauth2_provider.models import TrustedClient
+import fnmatch
+import json
+import logging
+import os
+
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
-
+from edx_oauth2_provider.models import TrustedClient
 from lms.djangoapps.commerce.models import CommerceConfiguration
-from openedx.core.djangoapps.theming.models import SiteTheme
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+from openedx.core.djangoapps.theming.models import SiteTheme
+from provider.constants import CONFIDENTIAL
+from provider.oauth2.models import Client
 from student.models import UserProfile
 
 LOG = logging.getLogger(__name__)
@@ -101,7 +102,7 @@ class Command(BaseCommand):
             }
         )
         if created:
-            LOG.info("Adding {client} oauth2 client as trusted client".format(client=client.name))
+            LOG.info(u"Adding {client} oauth2 client as trusted client".format(client=client.name))
             TrustedClient.objects.get_or_create(client=client)
 
     def _create_sites(self, site_domain, theme_dir_name, site_configuration):
@@ -113,13 +114,13 @@ class Command(BaseCommand):
             defaults={"name": theme_dir_name}
         )
         if created:
-            LOG.info("Creating '{site_name}' SiteTheme".format(site_name=site_domain))
+            LOG.info(u"Creating '{site_name}' SiteTheme".format(site_name=site_domain))
             SiteTheme.objects.create(site=site, theme_dir_name=theme_dir_name)
 
-            LOG.info("Creating '{site_name}' SiteConfiguration".format(site_name=site_domain))
+            LOG.info(u"Creating '{site_name}' SiteConfiguration".format(site_name=site_domain))
             SiteConfiguration.objects.create(site=site, values=site_configuration, enabled=True)
         else:
-            LOG.info("'{site_domain}' site already exists".format(site_domain=site_domain))
+            LOG.info(u"'{site_domain}' site already exists".format(site_domain=site_domain))
 
     def find(self, pattern, path):
         """
@@ -172,7 +173,7 @@ class Command(BaseCommand):
         """
         site_data = {}
         for config_file in self.find(self.configuration_filename, self.theme_path):
-            LOG.info("Reading file from {file}".format(file=config_file))
+            LOG.info(u"Reading file from {file}".format(file=config_file))
             configuration_data = json.loads(
                 json.dumps(
                     json.load(
@@ -246,17 +247,17 @@ class Command(BaseCommand):
             ecommerce_url = self.ecommerce_base_url_fmt.format(site_domain=site_domain)
             journals_url = self.journals_base_url_fmt.format(site_domain=site_domain)
 
-            LOG.info("Creating '{site_name}' Site".format(site_name=site_name))
+            LOG.info(u"Creating '{site_name}' Site".format(site_name=site_name))
             self._create_sites(site_domain, site_data['theme_dir_name'], site_data['configuration'])
 
-            LOG.info("Creating discovery oauth2 client for '{site_name}' site".format(site_name=site_name))
+            LOG.info(u"Creating discovery oauth2 client for '{site_name}' site".format(site_name=site_name))
             self._create_oauth2_client(discovery_url, site_name, 'discovery', self.discovery_user)
 
-            LOG.info("Creating ecommerce oauth2 client for '{site_name}' site".format(site_name=site_name))
+            LOG.info(u"Creating ecommerce oauth2 client for '{site_name}' site".format(site_name=site_name))
             self._create_oauth2_client(ecommerce_url, site_name, 'ecommerce', self.ecommerce_user)
 
             if self.journals:
-                LOG.info("Creating journals oauth2 client for '{site_name}' site".format(site_name=site_name))
+                LOG.info(u"Creating journals oauth2 client for '{site_name}' site".format(site_name=site_name))
                 self._create_oauth2_client(journals_url, site_name, 'journals', self.journals_user)
 
         self._enable_commerce_configuration()

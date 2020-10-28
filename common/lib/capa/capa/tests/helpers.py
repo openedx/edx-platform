@@ -1,19 +1,20 @@
 """Tools for helping with testing capa."""
 
+from __future__ import absolute_import
+
 import gettext
-from path import Path
 import os
 import os.path
+import xml.sax.saxutils as saxutils
 
 import fs.osfs
 import six
+from mako.lookup import TemplateLookup
+from mock import MagicMock, Mock
+from path import Path
 
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
 from capa.inputtypes import Status
-from mock import Mock, MagicMock
-from mako.lookup import TemplateLookup
-
-import xml.sax.saxutils as saxutils
 
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
 

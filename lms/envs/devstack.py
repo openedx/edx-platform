@@ -24,6 +24,10 @@ HTTPS = 'off'
 LMS_ROOT_URL = "http://localhost:8000"
 LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
 ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
+IDA_LOGOUT_URI_LIST = [
+    'http://localhost:18130/logout/',  # ecommerce
+    'http://localhost:18150/logout/',  # credentials
+]
 
 ################################ LOGGERS ######################################
 
@@ -32,7 +36,7 @@ import logging
 LOG_OVERRIDES = [
     ('track.contexts', logging.CRITICAL),
     ('track.middleware', logging.CRITICAL),
-    ('django_comment_client.utils', logging.CRITICAL),
+    ('lms.djangoapps.discussion.django_comment_client.utils', logging.CRITICAL),
 ]
 for log_name, log_level in LOG_OVERRIDES:
     logging.getLogger(log_name).setLevel(log_level)
@@ -56,7 +60,7 @@ DJFS = {
 
 INSTALLED_APPS += ['debug_toolbar', 'debug_toolbar_mongo']
 MIDDLEWARE_CLASSES += [
-    'django_comment_client.utils.QueryCountDebugMiddleware',
+    'lms.djangoapps.discussion.django_comment_client.utils.QueryCountDebugMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
@@ -99,7 +103,7 @@ FEATURES['ENABLE_API_DOCS'] = True
 
 ########################### PIPELINE #################################
 
-PIPELINE_ENABLED = False
+PIPELINE['PIPELINE_ENABLED'] = False
 STATICFILES_STORAGE = 'openedx.core.storage.DevelopmentStorage'
 
 # Revert to the default set of finders as we don't want the production pipeline
@@ -110,12 +114,12 @@ STATICFILES_FINDERS = [
 ]
 
 # Disable JavaScript compression in development
-PIPELINE_JS_COMPRESSOR = None
+PIPELINE['JS_COMPRESSOR'] = None
 
 # Whether to run django-require in debug mode.
 REQUIRE_DEBUG = DEBUG
 
-PIPELINE_SASS_ARGUMENTS = '--debug-info'
+PIPELINE['SASS_ARGUMENTS'] = '--debug-info'
 
 # Load development webpack donfiguration
 WEBPACK_CONFIG_PATH = 'webpack.dev.config.js'
@@ -234,6 +238,7 @@ CORS_ALLOW_HEADERS = corsheaders_default_headers + (
 LOGIN_REDIRECT_WHITELIST = [CMS_BASE]
 
 ###################### JWTs ######################
+# pylint: disable=unicode-format-string
 JWT_AUTH.update({
     'JWT_ISSUER': OAUTH_OIDC_ISSUER,
     'JWT_AUDIENCE': 'lms-key',
@@ -259,10 +264,17 @@ JWT_AUTH.update({
         'y5ZLcTUomo4rZLjghVpq6KZxfS6I1Vz79ZsMVUWEdXOYePCKKsrQG20ogQEkmTf9FT_SouC6jPcHLXw"}]}'
     ),
 })
-
+# pylint: enable=unicode-format-string
 #####################################################################
 from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_constants.SettingsType.DEVSTACK)
+
+
+######################### Django Rest Framework ########################
+
+REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'] += (
+    'rest_framework.renderers.BrowsableAPIRenderer',
+)
 
 #####################################################################
 # See if the developer has any local overrides.

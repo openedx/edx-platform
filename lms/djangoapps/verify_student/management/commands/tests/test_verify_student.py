@@ -3,6 +3,8 @@ Tests for django admin commands in the verify_student module
 
 Lots of imports from verify_student's model tests, since they cover similar ground
 """
+from __future__ import absolute_import
+
 import boto
 from django.conf import settings
 from django.core.management import call_command
@@ -26,7 +28,6 @@ class TestVerifyStudentCommand(MockS3Mixin, TestCase):
     """
     Tests for django admin commands in the verify_student module
     """
-    shard = 4
 
     def setUp(self):
         super(TestVerifyStudentCommand, self).setUp()

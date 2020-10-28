@@ -3,11 +3,14 @@
 """
 Acceptance tests for Video.
 """
+from __future__ import absolute_import
+
 import os
 from unittest import skipIf
 
 from ddt import data, ddt, unpack
 from mock import patch
+from six.moves import range
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -128,7 +131,7 @@ class VideoBaseTest(UniqueCourseTest):
         :param vertical_index: index for the vertical display name
         :return: XBlockFixtureDesc
         """
-        xblock_course_vertical = XBlockFixtureDesc('vertical', 'Test Vertical-{0}'.format(vertical_index))
+        xblock_course_vertical = XBlockFixtureDesc('vertical', u'Test Vertical-{0}'.format(vertical_index))
 
         for video in vertical_contents:
             xblock_course_vertical.add_children(
@@ -1202,8 +1205,8 @@ class HLSVideoTest(VideoBaseTest):
 
         for line_no in range(5):
             self.video.click_transcript_line(line_no=line_no)
-            self.video.wait_for_position('0:0{}'.format(line_no))
+            self.video.wait_for_position(u'0:0{}'.format(line_no))
 
         for line_no in range(5):
-            self.video.seek('0:0{}'.format(line_no))
-            self.assertEqual(self.video.active_caption_text, 'Hi, edX welcomes you{}.'.format(line_no))
+            self.video.seek(u'0:0{}'.format(line_no))
+            self.assertEqual(self.video.active_caption_text, u'Hi, edX welcomes you{}.'.format(line_no))

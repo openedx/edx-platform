@@ -53,12 +53,12 @@ class HelperMethods(object):
         sequential = ItemFactory.create(
             category='sequential',
             parent_location=self.course.location,
-            display_name='Test Subsection {}'.format(name_suffix)
+            display_name=u'Test Subsection {}'.format(name_suffix)
         )
         vertical = ItemFactory.create(
             category='vertical',
             parent_location=sequential.location,
-            display_name='Test Unit {}'.format(name_suffix)
+            display_name=u'Test Unit {}'.format(name_suffix)
         )
         c0_url = self.course.id.make_usage_key("vertical", "split_test_cond0")
         c1_url = self.course.id.make_usage_key("vertical", "split_test_cond1")
@@ -122,14 +122,14 @@ class HelperMethods(object):
             subsection = ItemFactory.create(
                 category='sequential',
                 parent_location=self.course.location,
-                display_name="Test Subsection {}".format(name_suffix)
+                display_name=u"Test Subsection {}".format(name_suffix)
             )
             vertical_parent_location = subsection.location
 
         vertical = ItemFactory.create(
             category='vertical',
             parent_location=vertical_parent_location,
-            display_name="Test Unit {}".format(name_suffix)
+            display_name=u"Test Unit {}".format(name_suffix)
         )
 
         problem = ItemFactory.create(
@@ -171,7 +171,6 @@ class GroupConfigurationsBaseTestCase(object):
     """
     Mixin with base test cases for the group configurations.
     """
-    shard = 1
 
     def _remove_ids(self, content):
         """
@@ -226,7 +225,7 @@ class GroupConfigurationsBaseTestCase(object):
         Test invalid json handling.
         """
         # No property name.
-        invalid_json = "{u'name': 'Test Name', []}"
+        invalid_json = u"{u'name': 'Test Name', []}"
 
         response = self.client.post(
             self._url(),
@@ -246,7 +245,6 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
     """
     Test cases for group_configurations_list_handler.
     """
-    shard = 1
 
     def _url(self):
         """
@@ -353,8 +351,6 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
     """
     Test cases for group_configurations_detail_handler.
     """
-
-    shard = 1
     ID = 0
 
     def _url(self, cid=-1):
@@ -693,7 +689,6 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
     """
     Tests for usage information of configurations and content groups.
     """
-    shard = 1
 
     def _get_user_partition(self, scheme):
         """
@@ -1169,7 +1164,6 @@ class GroupConfigurationsValidationTestCase(CourseTestCase, HelperMethods):
     """
     Tests for validation in Group Configurations.
     """
-    shard = 1
 
     @patch('xmodule.split_test_module.SplitTestDescriptor.validate_split_test')
     def verify_validation_add_usage_info(self, expected_result, mocked_message, mocked_validation_messages):

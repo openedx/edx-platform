@@ -1,11 +1,12 @@
 """
 Computes the data to display on the Instructor Dashboard
 """
+from __future__ import absolute_import
+
 import json
 
 from django.db.models import Count
 from django.utils.translation import ugettext as _
-
 from opaque_keys.edx.locator import BlockUsageLocator
 from six import text_type
 
@@ -280,7 +281,7 @@ def get_d3_sequential_open_distrib(course_id):
                 'module_url': text_type(subsection.location),
             })
             subsection = {
-                'xValue': "SS {0}".format(c_subsection),
+                'xValue': u"SS {0}".format(c_subsection),
                 'stackData': stack_data,
             }
             data.append(subsection)

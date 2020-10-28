@@ -42,7 +42,7 @@ from lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
 from student.tests.factories import UserFactory
 from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
 from xblock_django.user_service import DjangoXBlockUserService
-from xmodule.capa_module import CapaDescriptor
+from xmodule.capa_module import ProblemBlock
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -127,7 +127,6 @@ class ItemTest(CourseTestCase):
 @ddt.ddt
 class GetItemTest(ItemTest):
     """Tests for '/xblock' GET url."""
-    shard = 1
 
     def _get_preview(self, usage_key, data=None):
         """ Makes a request to xblock preview handler """
@@ -250,7 +249,7 @@ class GetItemTest(ItemTest):
             html,
             # The instance of the wrapper class will have an auto-generated ID. Allow any
             # characters after wrapper.
-            r'"/container/{}" class="action-button">\s*<span class="action-button-text">View</span>'.format(
+            ur'"/container/{}" class="action-button">\s*<span class="action-button-text">View</span>'.format(
                 wrapper_usage_key
             )
         )
@@ -472,7 +471,6 @@ class GetItemTest(ItemTest):
 @ddt.ddt
 class DeleteItem(ItemTest):
     """Tests for '/xblock' DELETE url."""
-    shard = 1
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_delete_static_page(self, store):
@@ -490,7 +488,6 @@ class TestCreateItem(ItemTest):
     """
     Test the create_item handler thoroughly
     """
-    shard = 1
 
     def test_create_nicely(self):
         """
@@ -526,7 +523,7 @@ class TestCreateItem(ItemTest):
         prob_usage_key = self.response_usage_key(resp)
         problem = self.get_item_from_modulestore(prob_usage_key, verify_is_draft=True)
         # check against the template
-        template = CapaDescriptor.get_template(template_id)
+        template = ProblemBlock.get_template(template_id)
         self.assertEqual(problem.data, template['data'])
         self.assertEqual(problem.display_name, template['metadata']['display_name'])
         self.assertEqual(problem.markdown, template['metadata']['markdown'])
@@ -640,10 +637,10 @@ class DuplicateHelper(object):
                 return duplicated_item.display_name == original_item.category
             return duplicated_item.display_name == original_item.display_name
         if original_item.display_name is not None:
-            return duplicated_item.display_name == "Duplicate of '{display_name}'".format(
+            return duplicated_item.display_name == u"Duplicate of '{display_name}'".format(
                 display_name=original_item.display_name
             )
-        return duplicated_item.display_name == "Duplicate of {display_name}".format(
+        return duplicated_item.display_name == u"Duplicate of {display_name}".format(
             display_name=original_item.category
         )
 
@@ -667,7 +664,6 @@ class TestDuplicateItem(ItemTest, DuplicateHelper):
     """
     Test the duplicate method.
     """
-    shard = 1
 
     def setUp(self):
         """ Creates the test course structure and a few components to 'duplicate'. """
@@ -775,7 +771,6 @@ class TestMoveItem(ItemTest):
     """
     Tests for move item.
     """
-    shard = 1
 
     def setUp(self):
         """
@@ -983,7 +978,7 @@ class TestMoveItem(ItemTest):
         self.assertEqual(response.status_code, 400)
         response = json.loads(response.content)
 
-        expected_error = 'You can not move {usage_key} at an invalid index ({target_index}).'.format(
+        expected_error = u'You can not move {usage_key} at an invalid index ({target_index}).'.format(
             usage_key=self.html_usage_key,
             target_index=parent_children_length + 10
         )
@@ -1000,7 +995,7 @@ class TestMoveItem(ItemTest):
         self.assertEqual(response.status_code, 400)
         response = json.loads(response.content)
 
-        expected_error = 'You can not move {source_type} into {target_type}.'.format(
+        expected_error = u'You can not move {source_type} into {target_type}.'.format(
             source_type=self.html_usage_key.block_type,
             target_type=self.seq_usage_key.block_type
         )
@@ -1145,7 +1140,7 @@ class TestMoveItem(ItemTest):
         self.assertEqual(response.status_code, 400)
         response = json.loads(response.content)
 
-        error = 'You must provide target_index ({target_index}) as an integer.'.format(target_index=target_index)
+        error = u'You must provide target_index ({target_index}) as an integer.'.format(target_index=target_index)
         self.assertEqual(response['error'], error)
         new_parent_loc = self.store.get_parent_location(self.html_usage_key)
         self.assertEqual(new_parent_loc, parent_loc)
@@ -1242,7 +1237,7 @@ class TestMoveItem(ItemTest):
         insert_at = 0
         self.assert_move_item(self.html_usage_key, self.vert2_usage_key, insert_at)
         mock_logger.info.assert_called_with(
-            'MOVE: %s moved from %s to %s at %d index',
+            u'MOVE: %s moved from %s to %s at %d index',
             unicode(self.html_usage_key),
             unicode(self.vert_usage_key),
             unicode(self.vert2_usage_key),
@@ -1328,7 +1323,6 @@ class TestDuplicateItemWithAsides(ItemTest, DuplicateHelper):
     """
     Test the duplicate method for blocks with asides.
     """
-    shard = 1
 
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
@@ -1392,7 +1386,6 @@ class TestEditItemSetup(ItemTest):
     """
     Setup for xblock update tests.
     """
-    shard = 1
 
     def setUp(self):
         """ Creates the test course structure and a couple problems to 'edit'. """
@@ -1425,7 +1418,6 @@ class TestEditItem(TestEditItemSetup):
     """
     Test xblock update.
     """
-    shard = 1
 
     def test_delete_field(self):
         """
@@ -1892,7 +1884,6 @@ class TestEditItemSplitMongo(TestEditItemSetup):
     """
     Tests for EditItem running on top of the SplitMongoModuleStore.
     """
-    shard = 1
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def test_editing_view_wrappers(self):
@@ -1914,7 +1905,6 @@ class TestEditSplitModule(ItemTest):
     """
     Tests around editing instances of the split_test module.
     """
-    shard = 1
 
     def setUp(self):
         super(TestEditSplitModule, self).setUp()
@@ -2138,7 +2128,6 @@ class TestEditSplitModule(ItemTest):
 @ddt.ddt
 class TestComponentHandler(TestCase):
     """Tests for component handler api"""
-    shard = 1
 
     def setUp(self):
         super(TestComponentHandler, self).setUp()
@@ -2238,7 +2227,6 @@ class TestComponentTemplates(CourseTestCase):
     """
     Unit tests for the generation of the component templates for a course.
     """
-    shard = 1
 
     def setUp(self):
         super(TestComponentTemplates, self).setUp()
@@ -2474,7 +2462,6 @@ class TestXBlockInfo(ItemTest):
     """
     Unit tests for XBlock's outline handling.
     """
-    shard = 1
 
     def setUp(self):
         super(TestXBlockInfo, self).setUp()
@@ -2786,8 +2773,10 @@ class TestXBlockInfo(ItemTest):
             self.assertIsNone(xblock_info.get('child_info', None))
 
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
+    @patch('contentstore.views.item.does_backend_support_onboarding')
     @patch('contentstore.views.item.get_exam_configuration_dashboard_url')
-    def test_proctored_exam_xblock_info(self, get_exam_configuration_dashboard_url_patch):
+    def test_proctored_exam_xblock_info(self, get_exam_configuration_dashboard_url_patch,
+                                        does_backend_support_onboarding_patch):
         self.course.enable_proctored_exams = True
         self.course.save()
         self.store.update_item(self.course, self.user.id)
@@ -2805,11 +2794,12 @@ class TestXBlockInfo(ItemTest):
             parent_location=self.chapter.location, category='sequential',
             display_name="Test Lesson 1", user_id=self.user.id,
             is_proctored_exam=True, is_time_limited=True,
-            default_time_limit_minutes=100
+            default_time_limit_minutes=100, is_onboarding_exam=False
         )
         sequential = modulestore().get_item(sequential.location)
 
         get_exam_configuration_dashboard_url_patch.return_value = 'test_url'
+        does_backend_support_onboarding_patch.return_value = True
         xblock_info = create_xblock_info(
             sequential,
             include_child_info=True,
@@ -2820,6 +2810,8 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['is_time_limited'], True)
         self.assertEqual(xblock_info['default_time_limit_minutes'], 100)
         self.assertEqual(xblock_info['proctoring_exam_configuration_link'], 'test_url')
+        self.assertEqual(xblock_info['supports_onboarding'], True)
+        self.assertEqual(xblock_info['is_onboarding_exam'], False)
         get_exam_configuration_dashboard_url_patch.assert_called_with(self.course.id, xblock_info['id'])
 
 
@@ -2827,7 +2819,6 @@ class TestLibraryXBlockInfo(ModuleStoreTestCase):
     """
     Unit tests for XBlock Info for XBlocks in a content library
     """
-    shard = 1
 
     def setUp(self):
         super(TestLibraryXBlockInfo, self).setUp()
@@ -2878,7 +2869,6 @@ class TestLibraryXBlockCreation(ItemTest):
     """
     Tests the adding of XBlocks to Library
     """
-    shard = 1
 
     def test_add_xblock(self):
         """
@@ -2916,7 +2906,6 @@ class TestXBlockPublishingInfo(ItemTest):
     """
     Unit tests for XBlock's outline handling.
     """
-    shard = 1
     FIRST_SUBSECTION_PATH = [0]
     FIRST_UNIT_PATH = [0, 0]
     SECOND_UNIT_PATH = [0, 1]

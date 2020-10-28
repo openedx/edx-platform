@@ -1,4 +1,6 @@
 """Tests for cached authentication middleware."""
+from __future__ import absolute_import
+
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.test import TestCase

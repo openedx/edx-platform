@@ -22,7 +22,7 @@ from rest_framework.views import APIView
 from rest_framework_oauth.authentication import OAuth2Authentication
 
 from courseware.courses import get_course_with_access, has_access
-from django_comment_client.utils import has_discussion_privileges
+from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from edx_rest_framework_extensions.paginators import DefaultPagination, paginate_search_results
 from openedx.core.lib.api.parsers import MergePatchParser
@@ -372,7 +372,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 result_filter.update({'course_id': course_key})
             except InvalidKeyError:
                 error = build_api_error(
-                    ugettext_noop("The supplied course id {course_id} is not valid."),
+                    ugettext_noop(u"The supplied course id {course_id} is not valid."),
                     course_id=course_id_string,
                 )
                 return Response(error, status=status.HTTP_400_BAD_REQUEST)
@@ -399,7 +399,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         if topic_id is not None:
             if topic_id not in [topic['id'] for topic in course_module.teams_configuration['topics']]:
                 error = build_api_error(
-                    ugettext_noop('The supplied topic id {topic_id} is not valid'),
+                    ugettext_noop(u'The supplied topic id {topic_id} is not valid'),
                     topic_id=topic_id
                 )
                 return Response(error, status=status.HTTP_400_BAD_REQUEST)
@@ -448,7 +448,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 queryset = queryset.order_by('-last_activity_at', 'team_size')
             else:
                 return Response({
-                    'developer_message': "unsupported order_by value {ordering}".format(ordering=order_by_input),
+                    'developer_message': u"unsupported order_by value {ordering}".format(ordering=order_by_input),
                     # Translators: 'ordering' is a string describing a way
                     # of ordering a list. For example, {ordering} may be
                     # 'name', indicating that the user wants to sort the
@@ -477,7 +477,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 return Response(status=status.HTTP_404_NOT_FOUND)
         except InvalidKeyError:
             field_errors['course_id'] = build_api_error(
-                ugettext_noop('The supplied course_id {course_id} is not valid.'),
+                ugettext_noop(u'The supplied course_id {course_id} is not valid.'),
                 course_id=course_id
             )
             return Response({
@@ -673,7 +673,7 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
 
         # Note: also deletes all team memberships associated with this team
         team.delete()
-        log.info('user %d deleted team %s', request.user.id, team_id)
+        log.info(u'user %d deleted team %s', request.user.id, team_id)
         emit_team_event('edx.team.deleted', team.course_id, {
             'team_id': team_id,
         })
@@ -755,7 +755,7 @@ class TopicListView(GenericAPIView):
             return Response({
                 'field_errors': {
                     'course_id': build_api_error(
-                        ugettext_noop("The supplied course id {course_id} is not valid."),
+                        ugettext_noop(u"The supplied course id {course_id} is not valid."),
                         course_id=course_id_string
                     )
                 }
@@ -777,7 +777,7 @@ class TopicListView(GenericAPIView):
         ordering = request.query_params.get('order_by', 'name')
         if ordering not in ['name', 'team_count']:
             return Response({
-                'developer_message': "unsupported order_by value {ordering}".format(ordering=ordering),
+                'developer_message': u"unsupported order_by value {ordering}".format(ordering=ordering),
                 # Translators: 'ordering' is a string describing a way
                 # of ordering a list. For example, {ordering} may be
                 # 'name', indicating that the user wants to sort the
@@ -1125,7 +1125,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         except AlreadyOnTeamInCourse:
             return Response(
                 build_api_error(
-                    ugettext_noop("The user {username} is already a member of a team in this course."),
+                    ugettext_noop(u"The user {username} is already a member of a team in this course."),
                     username=username
                 ),
                 status=status.HTTP_400_BAD_REQUEST
@@ -1133,7 +1133,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         except NotEnrolledInCourseForTeam:
             return Response(
                 build_api_error(
-                    ugettext_noop("The user {username} is not enrolled in the course associated with this team."),
+                    ugettext_noop(u"The user {username} is not enrolled in the course associated with this team."),
                     username=username
                 ),
                 status=status.HTTP_400_BAD_REQUEST

@@ -9,15 +9,18 @@ from django.dispatch import receiver
 from lms.djangoapps.certificates.models import (
     CertificateGenerationCourseSetting,
     CertificateWhitelist,
-    GeneratedCertificate
+    GeneratedCertificate,
+    CertificateStatuses
 )
 from lms.djangoapps.certificates.tasks import generate_certificate
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.certificates.api import auto_certificate_generation_enabled
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.signals import COURSE_PACING_CHANGED
-from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED, LEARNER_NOW_VERIFIED
+from openedx.core.djangoapps.signals.signals import (COURSE_GRADE_NOW_PASSED,
+                                                     LEARNER_NOW_VERIFIED,
+                                                     COURSE_GRADE_NOW_FAILED)
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
 
@@ -71,6 +74,24 @@ def _listen_for_passing_grade(sender, user, course_id, **kwargs):  # pylint: dis
         ))
 
 
+@receiver(COURSE_GRADE_NOW_FAILED, dispatch_uid="new_failing_learner")
+def _listen_for_failing_grade(sender, user, course_id, grade, **kwargs):  # pylint: disable=unused-argument
+    """
+    Listen for a learner failing a course, mark the cert as notpassing
+    if it is currently passing,
+    downstream signal from COURSE_GRADE_CHANGED
+    """
+    cert = GeneratedCertificate.certificate_for_student(user, course_id)
+    if cert is not None:
+        if CertificateStatuses.is_passing_status(cert.status):
+            cert.mark_notpassing(grade.percent)
+            log.info(u'Certificate marked not passing for {user} : {course} via failing grade: {grade}'.format(
+                user=user.id,
+                course=course_id,
+                grade=grade
+            ))
+
+
 @receiver(LEARNER_NOW_VERIFIED, dispatch_uid="learner_track_changed")
 def _listen_for_id_verification_status_changed(sender, user, **kwargs):  # pylint: disable=unused-argument
     """
@@ -81,6 +102,7 @@ def _listen_for_id_verification_status_changed(sender, user, **kwargs):  # pylin
         return
 
     user_enrollments = CourseEnrollment.enrollments_for_user(user=user)
+
     grade_factory = CourseGradeFactory()
     expected_verification_status = IDVerificationService.user_status(user)
     expected_verification_status = expected_verification_status['status']
@@ -125,6 +147,7 @@ def fire_ungenerated_certificate_task(user, course_key, expected_verification_st
         CourseMode.CREDIT_MODE,
         CourseMode.PROFESSIONAL,
         CourseMode.NO_ID_PROFESSIONAL_MODE,
+        CourseMode.MASTERS,
     ]
     enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
     cert = GeneratedCertificate.certificate_for_student(user, course_key)

@@ -1,10 +1,14 @@
 """Test for async task service status"""
 
-import json
+from __future__ import absolute_import
 
-from django.urls import reverse
-from django.test.client import Client
+import json
 import unittest
+
+import six
+
+from django.test.client import Client
+from django.urls import reverse
 
 
 class CeleryConfigTest(unittest.TestCase):
@@ -44,6 +48,6 @@ class CeleryConfigTest(unittest.TestCase):
 
         # We don't know the other dict values exactly,
         # but we can assert that they take the right form
-        self.assertIsInstance(result_dict['task_id'], unicode)
+        self.assertIsInstance(result_dict['task_id'], six.text_type)
         self.assertIsInstance(result_dict['time'], float)
         self.assertGreater(result_dict['time'], 0.0)

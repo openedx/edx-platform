@@ -17,6 +17,7 @@ from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.utils.timezone import now
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from django.views.decorators.csrf import csrf_exempt
@@ -27,7 +28,6 @@ from eventtracking import tracker
 from ipware.ip import get_ip
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
 
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response, render_to_string
@@ -376,7 +376,7 @@ class PayAndVerifyView(View):
                 current_step = display_steps[current_step_idx + 1]['name']
 
         courseware_url = ""
-        if not course.start or course.start < datetime.datetime.today().replace(tzinfo=UTC):
+        if not course.start or course.start < now():
             courseware_url = reverse(
                 'course_root',
                 kwargs={'course_id': unicode(course_key)}
@@ -711,12 +711,12 @@ class PayAndVerifyView(View):
 
         """
         if deadline_name not in [self.VERIFICATION_DEADLINE, self.UPGRADE_DEADLINE]:
-            log.error("Invalid deadline name %s.  Skipping check for whether the deadline passed.", deadline_name)
+            log.error(u"Invalid deadline name %s.  Skipping check for whether the deadline passed.", deadline_name)
             return None
 
         deadline_passed = (
             deadline_datetime is not None and
-            deadline_datetime < datetime.datetime.now(UTC)
+            deadline_datetime < now()
         )
         if deadline_passed:
             context = {
@@ -743,7 +743,7 @@ def checkout_with_ecommerce_service(user, course_key, course_mode, processor):
         return result.get('payment_data')
     except SlumberBaseException:
         params = {'username': user.username, 'mode': course_mode.slug, 'course_id': course_id}
-        log.exception('Failed to create order for %(username)s %(mode)s mode of %(course_id)s', params)
+        log.exception(u'Failed to create order for %(username)s %(mode)s mode of %(course_id)s', params)
         raise
     finally:
         audit_log(
@@ -951,7 +951,7 @@ class SubmitPhotosView(View):
         if "photo_id_image" not in params and not has_initial_verification:
             log.error(
                 (
-                    "User %s does not have an initial verification attempt "
+                    u"User %s does not have an initial verification attempt "
                     "and no photo ID image data was provided. "
                     "This most likely means that the JavaScript client is not "
                     "correctly constructing the request to submit photos."
@@ -993,7 +993,7 @@ class SubmitPhotosView(View):
             return HttpResponseBadRequest(_("No profile found for user"))
         except AccountValidationError:
             msg = _(
-                "Name must be at least {min_length} characters long."
+                u"Name must be at least {min_length} characters long."
             ).format(min_length=NAME_MIN_LENGTH)
             return HttpResponseBadRequest(msg)
 
@@ -1071,7 +1071,7 @@ class SubmitPhotosView(View):
             'platform_name': configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME)
         }
 
-        subject = _("{platform_name} ID Verification Photos Received").format(platform_name=context['platform_name'])
+        subject = _(u"{platform_name} ID Verification Photos Received").format(platform_name=context['platform_name'])
         message = render_to_string('emails/photo_submission_confirmation.txt', context)
         from_address = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
         to_address = user.email
@@ -1082,7 +1082,7 @@ class SubmitPhotosView(View):
             # We catch all exceptions and log them.
             # It would be much, much worse to roll back the transaction due to an uncaught
             # exception than to skip sending the notification email.
-            log.exception("Could not send notification email for initial verification for user %s", user.id)
+            log.exception(u"Could not send notification email for initial verification for user %s", user.id)
 
     def _fire_event(self, user, event_name, parameters):
         """
@@ -1111,12 +1111,12 @@ def results_callback(request):
     try:
         body_dict = json.loads(body)
     except ValueError:
-        log.exception("Invalid JSON received from Software Secure:\n\n{}\n".format(body))
-        return HttpResponseBadRequest("Invalid JSON. Received:\n\n{}".format(body))
+        log.exception(u"Invalid JSON received from Software Secure:\n\n{}\n".format(body))
+        return HttpResponseBadRequest(u"Invalid JSON. Received:\n\n{}".format(body))
 
     if not isinstance(body_dict, dict):
-        log.error("Reply from Software Secure is not a dict:\n\n{}\n".format(body))
-        return HttpResponseBadRequest("JSON should be dict. Received:\n\n{}".format(body))
+        log.error(u"Reply from Software Secure is not a dict:\n\n{}\n".format(body))
+        return HttpResponseBadRequest(u"JSON should be dict. Received:\n\n{}".format(body))
 
     headers = {
         "Authorization": request.META.get("HTTP_AUTHORIZATION", ""),
@@ -1150,23 +1150,38 @@ def results_callback(request):
     try:
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=receipt_id)
     except SoftwareSecurePhotoVerification.DoesNotExist:
-        log.error("Software Secure posted back for receipt_id %s, but not found", receipt_id)
-        return HttpResponseBadRequest("edX ID {} not found".format(receipt_id))
+        log.error(u"Software Secure posted back for receipt_id %s, but not found", receipt_id)
+        return HttpResponseBadRequest(u"edX ID {} not found".format(receipt_id))
 
     user = attempt.user
     verification_status_email_vars = {
         'platform_name': settings.PLATFORM_NAME,
     }
     if result == "PASS":
-        log.debug("Approving verification for %s", receipt_id)
+        # If this verification is not an outdated version then make expiry date of previous approved verification NULL
+        # Setting expiry date to NULL is important so that it does not get filtered in the management command
+        # that sends email when verification expires : verify_student/send_verification_expiry_email
+        if attempt.status != 'approved':
+            verification = SoftwareSecurePhotoVerification.objects.filter(status='approved', user_id=attempt.user_id)
+            if verification:
+                log.info(u'Making expiry date of previous approved verification NULL for {}'.format(attempt.user_id))
+                # The updated_at field in sspv model has auto_now set to True, which means any time save() is called on
+                # the model instance, `updated_at` will change. Some of the existing functionality of verification
+                # (showing your verification has expired on dashboard) relies on updated_at.
+                # In case the attempt.approve() fails for some reason and to not cause any inconsistencies in existing
+                # functionality update() is called instead of save()
+                previous_verification = verification.latest('updated_at')
+                SoftwareSecurePhotoVerification.objects.filter(pk=previous_verification.pk
+                                                               ).update(expiry_date=None, expiry_email_date=None)
+        log.debug(u'Approving verification for {}'.format(receipt_id))
         attempt.approve()
-        status = "approved"
+        status = u"approved"
         expiry_date = datetime.date.today() + datetime.timedelta(
             days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
         )
         verification_status_email_vars['expiry_date'] = expiry_date.strftime("%m/%d/%Y")
         verification_status_email_vars['full_name'] = user.profile.name
-        subject = _("Your {platform_name} ID Verification Approved").format(
+        subject = _(u"Your {platform_name} ID Verification Approved").format(
             platform_name=settings.PLATFORM_NAME
         )
         context = {
@@ -1178,14 +1193,14 @@ def results_callback(request):
         send_verification_status_email.delay(context)
 
     elif result == "FAIL":
-        log.debug("Denying verification for %s", receipt_id)
+        log.debug(u"Denying verification for %s", receipt_id)
         attempt.deny(json.dumps(reason), error_code=error_code)
         status = "denied"
         reverify_url = '{}{}'.format(settings.LMS_ROOT_URL, reverse("verify_student_reverify"))
         verification_status_email_vars['reasons'] = reason
         verification_status_email_vars['reverify_url'] = reverify_url
         verification_status_email_vars['faq_url'] = settings.ID_VERIFICATION_SUPPORT_LINK
-        subject = _("Your {platform_name} Verification Has Been Denied").format(
+        subject = _(u"Your {platform_name} Verification Has Been Denied").format(
             platform_name=settings.PLATFORM_NAME
         )
         context = {
@@ -1197,14 +1212,14 @@ def results_callback(request):
         send_verification_status_email.delay(context)
 
     elif result == "SYSTEM FAIL":
-        log.debug("System failure for %s -- resetting to must_retry", receipt_id)
+        log.debug(u"System failure for %s -- resetting to must_retry", receipt_id)
         attempt.system_error(json.dumps(reason), error_code=error_code)
         status = "error"
-        log.error("Software Secure callback attempt for %s failed: %s", receipt_id, reason)
+        log.error(u"Software Secure callback attempt for %s failed: %s", receipt_id, reason)
     else:
-        log.error("Software Secure returned unknown result %s", result)
+        log.error(u"Software Secure returned unknown result %s", result)
         return HttpResponseBadRequest(
-            "Result {} not understood. Known results: PASS, FAIL, SYSTEM FAIL".format(result)
+            u"Result {} not understood. Known results: PASS, FAIL, SYSTEM FAIL".format(result)
         )
 
     return HttpResponse("OK!")

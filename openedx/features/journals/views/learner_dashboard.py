@@ -1,16 +1,14 @@
 """ Journal Tab of Learner Dashboard views """
-from datetime import datetime, time
+from __future__ import absolute_import
+
 import logging
+from datetime import datetime, time
 
 from django.http import Http404
 
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.features.journals.api import (
-    fetch_journal_access,
-    journals_enabled,
-)
-
+from openedx.features.journals.api import fetch_journal_access, journals_enabled
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +52,7 @@ def format_expiration_date(expiration_date):
         date=datetime.strptime(expiration_date, '%Y-%m-%d').date(),
         time=time.max
     )
-    return expiration_datetime.strftime("%b %d %Y")
+    return expiration_datetime.strftime(u"%b %d %Y")
 
 
 def has_access_expired(expiration_date):

@@ -1,4 +1,6 @@
 """Catalog model tests."""
+from __future__ import absolute_import
+
 import ddt
 import mock
 from django.test import TestCase, override_settings

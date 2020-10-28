@@ -5,7 +5,7 @@ Tests of verify_student views.
 
 import json
 import urllib
-from datetime import datetime, timedelta
+from datetime import timedelta
 from uuid import uuid4
 
 import boto
@@ -13,7 +13,6 @@ import ddt
 import httpretty
 import mock
 import moto
-import pytz
 import requests
 from bs4 import BeautifulSoup
 from django.conf import settings
@@ -22,6 +21,7 @@ from django.urls import reverse
 from django.test import TestCase
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
+from django.utils.timezone import now
 from django.utils.translation import ugettext as _
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
@@ -43,7 +43,6 @@ from lms.djangoapps.verify_student.views import (
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
-from openedx.core.lib.tests import attr
 from shoppingcart.models import CertificateItem, Order
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -62,7 +61,6 @@ render_mock = Mock(side_effect=mock_render_to_response)
 PAYMENT_DATA_KEYS = {'payment_processor_name', 'payment_page_url', 'payment_form_data'}
 
 
-@attr(shard=2)
 class StartView(TestCase):
     """
     This view is for the first time student is
@@ -83,7 +81,6 @@ class StartView(TestCase):
         self.assertHttpForbidden(self.client.get(self.start_url()))
 
 
-@attr(shard=2)
 @ddt.ddt
 class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     """
@@ -93,7 +90,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     USERNAME = "test_user"
     PASSWORD = "test_password"
 
-    NOW = datetime.now(pytz.UTC)
+    NOW = now()
     YESTERDAY = 'yesterday'
     TOMORROW = 'tomorrow'
     NEXT_YEAR = 'next_year'
@@ -732,7 +729,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
     @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
     def test_verification_deadline(self, payment_flow):
-        deadline = datetime.now(tz=pytz.UTC) + timedelta(days=360)
+        deadline = now() + timedelta(days=360)
         course = self._create_course("verified")
 
         # Set a deadline on the course mode AND on the verification deadline model.
@@ -748,7 +745,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self.assertEqual(data['verification_deadline'], unicode(deadline))
 
     def test_course_mode_expired(self):
-        deadline = datetime.now(tz=pytz.UTC) + timedelta(days=-360)
+        deadline = now() + timedelta(days=-360)
         course = self._create_course("verified")
 
         # Set the upgrade deadline (course mode expiration) and verification deadline
@@ -776,13 +773,13 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         # deadline in the future.
         self._set_deadlines(
             course.id,
-            upgrade_deadline=datetime.now(tz=pytz.UTC) + timedelta(days=-360),
+            upgrade_deadline=now() + timedelta(days=-360),
             verification_deadline=verification_deadline,
         )
         # Set the upgrade deadline for credit mode in future.
         self._set_deadlines(
             course.id,
-            upgrade_deadline=datetime.now(tz=pytz.UTC) + timedelta(days=360),
+            upgrade_deadline=now() + timedelta(days=360),
             verification_deadline=verification_deadline,
             mode_slug="credit"
         )
@@ -826,8 +823,8 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         # since it's a bad user experience
         # to purchase a verified track and then not be able to verify,
         # but if it happens we need to handle it gracefully.
-        upgrade_deadline_in_future = datetime.now(tz=pytz.UTC) + timedelta(days=360)
-        verification_deadline_in_past = datetime.now(tz=pytz.UTC) + timedelta(days=-360)
+        upgrade_deadline_in_future = now() + timedelta(days=360)
+        verification_deadline_in_past = now() + timedelta(days=-360)
         self._set_deadlines(
             course.id,
             upgrade_deadline=upgrade_deadline_in_future,
@@ -913,7 +910,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
         if status == "expired":
             days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
-            attempt.created_at = datetime.now(pytz.UTC) - timedelta(days=(days_good_for + 1))
+            attempt.created_at = now() - timedelta(days=(days_good_for + 1))
             attempt.save()
 
     def _set_deadlines(self, course_key, upgrade_deadline=None, verification_deadline=None, mode_slug="verified"):
@@ -983,9 +980,9 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         response_dict = self._get_page_data(response)
         for req, displayed in response_dict['requirements'].iteritems():
             if req in requirements:
-                self.assertTrue(displayed, msg="Expected '{req}' requirement to be displayed".format(req=req))
+                self.assertTrue(displayed, msg=u"Expected '{req}' requirement to be displayed".format(req=req))
             else:
-                self.assertFalse(displayed, msg="Expected '{req}' requirement to be hidden".format(req=req))
+                self.assertFalse(displayed, msg=u"Expected '{req}' requirement to be hidden".format(req=req))
 
     def _assert_course_details(self, response, course_key, display_name, url):
         """Check the course information on the page. """
@@ -1105,7 +1102,6 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self.assertNotEqual(httpretty.last_request().headers, {})
 
 
-@attr(shard=2)
 class CheckoutTestMixin(object):
     """
     Mixin implementing test methods that should behave identically regardless
@@ -1231,7 +1227,6 @@ class CheckoutTestMixin(object):
         self.assertEqual(data, {'foo': 'bar'})
 
 
-@attr(shard=2)
 @patch('lms.djangoapps.verify_student.views.checkout_with_shoppingcart', return_value=TEST_PAYMENT_DATA, autospec=True)
 class TestCreateOrderShoppingCart(CheckoutTestMixin, ModuleStoreTestCase):
     """ Test view behavior when the shoppingcart is used. """
@@ -1245,7 +1240,6 @@ class TestCreateOrderShoppingCart(CheckoutTestMixin, ModuleStoreTestCase):
         return dict(zip(('request', 'user', 'course_key', 'course_mode', 'amount'), patched_create_order.call_args[0]))
 
 
-@attr(shard=2)
 @override_settings(ECOMMERCE_API_URL=TEST_API_URL)
 @patch(
     'lms.djangoapps.verify_student.views.checkout_with_ecommerce_service',
@@ -1264,7 +1258,6 @@ class TestCreateOrderEcommerceService(CheckoutTestMixin, ModuleStoreTestCase):
         return dict(zip(('user', 'course_key', 'course_mode', 'processor'), patched_create_order.call_args[0]))
 
 
-@attr(shard=2)
 class TestCheckoutWithEcommerceService(ModuleStoreTestCase):
     """
     Ensures correct behavior in the function `checkout_with_ecommerce_service`.
@@ -1310,7 +1303,6 @@ class TestCheckoutWithEcommerceService(ModuleStoreTestCase):
         self.assertEqual(actual_payment_data, expected_payment_data)
 
 
-@attr(shard=2)
 class TestCreateOrderView(ModuleStoreTestCase):
     """
     Tests for the create_order view of verified course enrollment process.
@@ -1414,7 +1406,6 @@ class TestCreateOrderView(ModuleStoreTestCase):
         return response
 
 
-@attr(shard=2)
 @ddt.ddt
 @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
 class TestSubmitPhotosForVerification(TestCase):
@@ -1629,7 +1620,7 @@ class TestSubmitPhotosForVerification(TestCase):
         """
         if expect_email:
             # Verify that photo submission confirmation email was sent
-            subject = _("{platform_name} ID Verification Photos Received").format(
+            subject = _(u"{platform_name} ID Verification Photos Received").format(
                 platform_name=settings.PLATFORM_NAME
             )
             self.assertEqual(len(mail.outbox), 1)
@@ -1659,7 +1650,6 @@ class TestSubmitPhotosForVerification(TestCase):
         return json.loads(last_request.body)
 
 
-@attr(shard=2)
 class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
     """
     Tests for the results_callback view.
@@ -1774,6 +1764,17 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         """
         Test for verification passed.
         """
+        expiry_date = now() + timedelta(
+            days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+        )
+        verification = SoftwareSecurePhotoVerification.objects.create(user=self.user)
+        verification.mark_ready()
+        verification.submit()
+        verification.approve()
+        verification.expiry_date = now()
+        verification.expiry_email_date = now()
+        verification.save()
+
         data = {
             "EdX-ID": self.receipt_id,
             "Result": "PASS",
@@ -1788,7 +1789,45 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
             HTTP_DATE='testdate'
         )
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
+        old_verification = SoftwareSecurePhotoVerification.objects.get(pk=verification.pk)
         self.assertEqual(attempt.status, u'approved')
+        self.assertEqual(attempt.expiry_date.date(), expiry_date.date())
+        self.assertIsNone(old_verification.expiry_date)
+        self.assertIsNone(old_verification.expiry_email_date)
+        self.assertEquals(response.content, 'OK!')
+        self.assertEqual(len(mail.outbox), 1)
+
+    @patch(
+        'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
+        mock.Mock(side_effect=mocked_has_valid_signature)
+    )
+    @patch('lms.djangoapps.verify_student.views.log.error')
+    @patch('lms.djangoapps.verify_student.utils.SailthruClient.send')
+    def test_first_time_verification(self, mock_sailthru_send, mock_log_error):  # pylint: disable=unused-argument
+        """
+        Test for verification passed if the learner does not have any previous verification
+        """
+        expiry_date = now() + timedelta(
+            days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+        )
+
+        data = {
+            "EdX-ID": self.receipt_id,
+            "Result": "PASS",
+            "Reason": "",
+            "MessageType": "You have been verified."
+        }
+        json_data = json.dumps(data)
+        response = self.client.post(
+            reverse('verify_student_results_callback'), data=json_data,
+            content_type='application/json',
+            HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing',
+            HTTP_DATE='testdate'
+        )
+
+        attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
+        self.assertEqual(attempt.status, u'approved')
+        self.assertEqual(attempt.expiry_date.date(), expiry_date.date())
         self.assertEquals(response.content, 'OK!')
         self.assertEqual(len(mail.outbox), 1)
 
@@ -1874,7 +1913,6 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertIn('Result Unknown not understood', response.content)
 
 
-@attr(shard=2)
 class TestReverifyView(TestCase):
     """
     Tests for the reverification view.
@@ -1914,7 +1952,7 @@ class TestReverifyView(TestCase):
         attempt.approve()
 
         days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
-        attempt.created_at = datetime.now(pytz.UTC) - timedelta(days=(days_good_for + 1))
+        attempt.created_at = now() - timedelta(days=(days_good_for + 1))
         attempt.save()
 
         # Allow the student to reverify

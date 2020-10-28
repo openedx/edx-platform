@@ -1,11 +1,13 @@
 """Views for API management."""
+from __future__ import absolute_import
+
 import logging
 
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
-from django.urls import reverse, reverse_lazy
 from django.http.response import JsonResponse
 from django.shortcuts import redirect
+from django.urls import reverse, reverse_lazy
 from django.views.generic import View
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView

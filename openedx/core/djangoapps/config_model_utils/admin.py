@@ -2,11 +2,11 @@
 Convenience classes for defining StackedConfigModel Admin pages.
 """
 
-from django import forms
-
-from opaque_keys.edx.keys import CourseKey
+from __future__ import absolute_import
 
 from config_models.admin import ConfigurationModelAdmin
+from django import forms
+from opaque_keys.edx.keys import CourseKey
 
 
 class CourseOverviewField(forms.ModelChoiceField):

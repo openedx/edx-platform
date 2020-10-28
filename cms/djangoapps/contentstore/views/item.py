@@ -68,7 +68,8 @@ from xmodule.modulestore.inheritance import own_metadata
 from xmodule.services import ConfigurationService, SettingsService
 from xmodule.tabs import CourseTabList
 from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW
-from edx_proctoring.api import get_exam_configuration_dashboard_url
+from edx_proctoring.api import get_exam_configuration_dashboard_url, does_backend_support_onboarding
+from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 
 __all__ = [
     'orphan_handler', 'xblock_handler', 'xblock_view_handler', 'xblock_outline_handler', 'xblock_container_handler'
@@ -344,7 +345,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
             # dungeon and surface as uneditable, unsaveable, and undeletable
             # component-goblins.
             except Exception as exc:                          # pylint: disable=broad-except
-                log.debug("Unable to render %s for %r", view_name, xblock, exc_info=True)
+                log.debug(u"Unable to render %s for %r", view_name, xblock, exc_info=True)
                 fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
 
         elif view_name in PREVIEW_VIEWS + container_views:
@@ -368,8 +369,8 @@ def xblock_view_handler(request, usage_key_string, view_name):
                     }
             except ValueError:
                 return HttpResponse(
-                    content="Couldn't parse paging parameters: enable_paging: "
-                            "{0}, page_number: {1}, page_size: {2}".format(
+                    content=u"Couldn't parse paging parameters: enable_paging: "
+                            u"{0}, page_number: {1}, page_size: {2}".format(
                                 request.GET.get('enable_paging', 'false'),
                                 request.GET.get('page_number', 0),
                                 request.GET.get('page_size', 0)
@@ -587,7 +588,7 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
                         except ValueError as verr:
                             reason = _("Invalid data")
                             if text_type(verr):
-                                reason = _("Invalid data ({details})").format(details=text_type(verr))
+                                reason = _(u"Invalid data ({details})").format(details=text_type(verr))
                             return JsonResponse({"error": reason}, 400)
 
                         field.write_to(xblock, value)
@@ -679,7 +680,7 @@ def _create_item(request):
         # Only these categories are supported at this time.
         if category not in ['html', 'problem', 'video']:
             return HttpResponseBadRequest(
-                "Category '%s' not supported for Libraries" % category, content_type='text/plain'
+                u"Category '%s' not supported for Libraries" % category, content_type='text/plain'
             )
 
     created_block = create_xblock(
@@ -767,7 +768,7 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
 
         if (valid_move_type.get(target_parent_type, '') != source_type and
                 target_parent_type not in parent_component_types):
-            error = _('You can not move {source_type} into {target_parent_type}.').format(
+            error = _(u'You can not move {source_type} into {target_parent_type}.').format(
                 source_type=source_type,
                 target_parent_type=target_parent_type,
             )
@@ -780,7 +781,7 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
         elif target_parent_type == 'split_test':
             error = _('You can not move an item directly into content experiment.')
         elif source_index is None:
-            error = _('{source_usage_key} not found in {parent_usage_key}.').format(
+            error = _(u'{source_usage_key} not found in {parent_usage_key}.').format(
                 source_usage_key=unicode(source_usage_key),
                 parent_usage_key=unicode(source_parent.location)
             )
@@ -788,12 +789,12 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
             try:
                 target_index = int(target_index) if target_index is not None else None
                 if len(target_parent.children) < target_index:
-                    error = _('You can not move {source_usage_key} at an invalid index ({target_index}).').format(
+                    error = _(u'You can not move {source_usage_key} at an invalid index ({target_index}).').format(
                         source_usage_key=unicode(source_usage_key),
                         target_index=target_index
                     )
             except ValueError:
-                error = _('You must provide target_index ({target_index}) as an integer.').format(
+                error = _(u'You must provide target_index ({target_index}) as an integer.').format(
                     target_index=target_index
                 )
         if error:
@@ -811,7 +812,7 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
         )
 
         log.info(
-            'MOVE: %s moved from %s to %s at %d index',
+            u'MOVE: %s moved from %s to %s at %d index',
             unicode(source_usage_key),
             unicode(source_parent.location),
             unicode(target_parent_usage_key),
@@ -852,9 +853,9 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
             duplicate_metadata['display_name'] = display_name
         else:
             if source_item.display_name is None:
-                duplicate_metadata['display_name'] = _("Duplicate of {0}").format(source_item.category)
+                duplicate_metadata['display_name'] = _(u"Duplicate of {0}").format(source_item.category)
             else:
-                duplicate_metadata['display_name'] = _("Duplicate of '{0}'").format(source_item.display_name)
+                duplicate_metadata['display_name'] = _(u"Duplicate of '{0}'").format(source_item.display_name)
 
         asides_to_create = []
         for aside in source_item.runtime.get_asides(source_item):
@@ -1150,7 +1151,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         # Translators: The {pct_sign} here represents the percent sign, i.e., '%'
         # in many languages. This is used to avoid Transifex's misinterpreting of
         # '% o'. The percent sign is also translatable as a standalone string.
-        explanatory_message = _('Students must score {score}{pct_sign} or higher to access course materials.').format(
+        explanatory_message = _(u'Students must score {score}{pct_sign} or higher to access course materials.').format(
             score=int(parent_xblock.entrance_exam_minimum_score_pct * 100),
             # Translators: This is the percent sign. It will be used to represent
             # a percent value out of 100, e.g. "58%" means "58/100".
@@ -1218,10 +1219,11 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                 xblock_info.update({
                     'enable_proctored_exams': xblock.enable_proctored_exams,
                     'create_zendesk_tickets': xblock.create_zendesk_tickets,
-                    'enable_timed_exams': xblock.enable_timed_exams
+                    'enable_timed_exams': xblock.enable_timed_exams,
                 })
             elif xblock.category == 'sequential':
                 rules_url = settings.PROCTORING_SETTINGS.get('LINK_URLS', {}).get('online_proctoring_rules', "")
+                supports_onboarding = does_backend_support_onboarding(course.proctoring_provider)
 
                 proctoring_exam_configuration_link = None
                 if xblock.is_proctored_exam:
@@ -1232,10 +1234,13 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                     'is_proctored_exam': xblock.is_proctored_exam,
                     'online_proctoring_rules': rules_url,
                     'is_practice_exam': xblock.is_practice_exam,
+                    'is_onboarding_exam': xblock.is_onboarding_exam,
                     'is_time_limited': xblock.is_time_limited,
                     'exam_review_rules': xblock.exam_review_rules,
                     'default_time_limit_minutes': xblock.default_time_limit_minutes,
                     'proctoring_exam_configuration_link': proctoring_exam_configuration_link,
+                    'supports_onboarding': supports_onboarding,
+                    'show_review_rules': SHOW_REVIEW_RULES_FLAG.is_enabled(xblock.location.course_key),
                 })
 
         # Update with gating info
@@ -1487,6 +1492,6 @@ def _xblock_type_and_display_name(xblock):
     """
     Returns a string representation of the xblock's type and display name
     """
-    return _('{section_or_subsection} "{display_name}"').format(
+    return _(u'{section_or_subsection} "{display_name}"').format(
         section_or_subsection=xblock_type_display_name(xblock),
         display_name=xblock.display_name_with_default)

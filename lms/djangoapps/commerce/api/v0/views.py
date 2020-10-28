@@ -5,6 +5,7 @@ from django.urls import reverse
 from edx_rest_api_client import exceptions
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_409_CONFLICT
@@ -13,11 +14,11 @@ from six import text_type
 
 from course_modes.models import CourseMode
 from courseware import courses
-from enrollment.api import add_enrollment
-from enrollment.views import EnrollmentCrossDomainSessionAuth
 from entitlements.models import CourseEntitlement
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.embargo import api as embargo_api
+from openedx.core.djangoapps.enrollments.api import add_enrollment
+from openedx.core.djangoapps.enrollments.views import EnrollmentCrossDomainSessionAuth
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from student.models import CourseEnrollment
@@ -35,7 +36,9 @@ class BasketsView(APIView):
     """ Creates a basket with a course seat and enrolls users. """
 
     # LMS utilizes User.user_is_active to indicate email verification, not whether an account is active. Sigh!
-    authentication_classes = (EnrollmentCrossDomainSessionAuth, OAuth2AuthenticationAllowInactiveUser)
+    authentication_classes = (JwtAuthentication,
+                              OAuth2AuthenticationAllowInactiveUser,
+                              EnrollmentCrossDomainSessionAuth)
     permission_classes = (IsAuthenticated,)
 
     def _is_data_valid(self, request):
@@ -56,7 +59,7 @@ class BasketsView(APIView):
         try:
             course_key = CourseKey.from_string(course_id)
             courses.get_course(course_key)
-        except (InvalidKeyError, ValueError)as ex:
+        except (InvalidKeyError, ValueError) as ex:
             log.exception(u'Unable to locate course matching %s.', course_id)
             return False, None, text_type(ex)
 
@@ -79,7 +82,7 @@ class BasketsView(APIView):
             except Exception:  # pylint: disable=broad-except
                 # log the error, return silently
                 log.exception(
-                    'Failed to handle marketing opt-in flag: user="%s", course="%s"', user.username, course_key
+                    u'Failed to handle marketing opt-in flag: user="%s", course="%s"', user.username, course_key
                 )
 
     def post(self, request, *args, **kwargs):

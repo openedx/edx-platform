@@ -42,7 +42,6 @@ class APIsTestCase(SharedModuleStoreTestCase):
     Unit tests for the API module functions
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
-    shard = 1
 
     @classmethod
     def setUpClass(cls):

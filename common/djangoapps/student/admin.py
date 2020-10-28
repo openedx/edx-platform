@@ -1,12 +1,22 @@
 """ Django admin pages for student app """
+from __future__ import absolute_import
+
+from functools import wraps
+
 from config_models.admin import ConfigurationModelAdmin
 from django import forms
 from django.contrib import admin
 from django.contrib.admin.sites import NotRegistered
+from django.contrib.admin.utils import unquote
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.contrib.auth.forms import ReadOnlyPasswordHashField, UserChangeForm as BaseUserChangeForm
-from django.db import models
+from django.contrib.auth.forms import ReadOnlyPasswordHashField
+from django.contrib.auth.forms import UserChangeForm as BaseUserChangeForm
+from django.db import models, router, transaction
+from django.http import HttpResponseRedirect
+from django.http.request import QueryDict
+from django.urls import reverse
+from django.utils.translation import ngettext
 from django.utils.translation import ugettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -21,6 +31,7 @@ from student.models import (
     CourseEnrollmentAllowed,
     DashboardConfiguration,
     LinkedInAddToProfileConfiguration,
+    LoginFailures,
     PendingNameChange,
     Registration,
     RegistrationCookieConfiguration,
@@ -148,15 +159,27 @@ class LinkedInAddToProfileConfigurationAdmin(admin.ModelAdmin):
 
 
 class CourseEnrollmentForm(forms.ModelForm):
-
     def __init__(self, *args, **kwargs):
+        # If args is a QueryDict, then the ModelForm addition request came in as a POST with a course ID string.
+        # Change the course ID string to a CourseLocator object by copying the QueryDict to make it mutable.
+        if args and 'course' in args[0] and isinstance(args[0], QueryDict):
+            args_copy = args[0].copy()
+            try:
+                args_copy['course'] = CourseKey.from_string(args_copy['course'])
+            except InvalidKeyError:
+                raise forms.ValidationError("Cannot make a valid CourseKey from id {}!".format(args_copy['course']))
+            args = [args_copy]
+
         super(CourseEnrollmentForm, self).__init__(*args, **kwargs)
 
         if self.data.get('course'):
             try:
                 self.data['course'] = CourseKey.from_string(self.data['course'])
-            except InvalidKeyError:
-                raise forms.ValidationError("Cannot make a valid CourseKey from id {}!".format(self.data['course']))
+            except AttributeError:
+                # Change the course ID string to a CourseLocator.
+                # On a POST request, self.data is a QueryDict and is immutable - so this code will fail.
+                # However, the args copy above before the super() call handles this case.
+                pass
 
     def clean_course_id(self):
         course_id = self.cleaned_data['course']
@@ -170,6 +193,15 @@ class CourseEnrollmentForm(forms.ModelForm):
 
         return course_key
 
+    def save(self, *args, **kwargs):
+        course_enrollment = super(CourseEnrollmentForm, self).save(commit=False)
+        user = self.cleaned_data['user']
+        course_overview = self.cleaned_data['course']
+        enrollment = CourseEnrollment.get_or_create_enrollment(user, course_overview.id)
+        course_enrollment.id = enrollment.id
+        course_enrollment.created = enrollment.created
+        return course_enrollment
+
     class Meta:
         model = CourseEnrollment
         fields = '__all__'
@@ -180,7 +212,7 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
     """ Admin interface for the CourseEnrollment model. """
     list_display = ('id', 'course_id', 'mode', 'user', 'is_active',)
     list_filter = ('mode', 'is_active',)
-    raw_id_fields = ('user',)
+    raw_id_fields = ('user', 'course')
     search_fields = ('course__id', 'mode', 'user__username',)
     form = CourseEnrollmentForm
 
@@ -300,6 +332,112 @@ class CourseEnrollmentAllowedAdmin(admin.ModelAdmin):
 
     class Meta(object):
         model = CourseEnrollmentAllowed
+
+
+@admin.register(LoginFailures)
+class LoginFailuresAdmin(admin.ModelAdmin):
+    """Admin interface for the LoginFailures model. """
+    list_display = ('user', 'failure_count', 'lockout_until')
+    raw_id_fields = ('user',)
+    search_fields = ('user__username', 'user__email', 'user__first_name', 'user__last_name')
+    actions = ['unlock_student_accounts']
+    change_form_template = 'admin/student/loginfailures/change_form_template.html'
+
+    class _Feature(object):
+        """
+        Inner feature class to implement decorator.
+        """
+        @classmethod
+        def is_enabled(cls, func):
+            """
+            Check if feature is enabled.
+            """
+            @wraps(func)
+            def decorator(*args, **kwargs):
+                """Decorator class to return"""
+                if not LoginFailures.is_feature_enabled():
+                    return False
+                return func(*args, **kwargs)
+            return decorator
+
+    @_Feature.is_enabled
+    def has_module_permission(self, request):
+        """
+        Only enabled if feature is enabled.
+        """
+        return super(LoginFailuresAdmin, self).has_module_permission(request)
+
+    @_Feature.is_enabled
+    def has_delete_permission(self, request, obj=None):
+        """
+        Only enabled if feature is enabled.
+        """
+        return super(LoginFailuresAdmin, self).has_delete_permission(request, obj)
+
+    @_Feature.is_enabled
+    def has_change_permission(self, request, obj=None):
+        """
+        Only enabled if feature is enabled.
+        """
+        return super(LoginFailuresAdmin, self).has_change_permission(request, obj)
+
+    @_Feature.is_enabled
+    def has_add_permission(self, request):
+        """
+        Only enabled if feature is enabled.
+        """
+        return super(LoginFailuresAdmin, self).has_add_permission(request)
+
+    def unlock_student_accounts(self, request, queryset):
+        """
+        Unlock student accounts with login failures.
+        """
+        count = 0
+        with transaction.atomic(using=router.db_for_write(self.model)):
+            for obj in queryset:
+                self.unlock_student(request, obj=obj)
+                count += 1
+        self.message_user(
+            request,
+            ngettext(
+                '%(count)d student account was unlocked.',
+                '%(count)d student accounts were unlocked.',
+                count
+            ) % {
+                'count': count
+            }
+        )
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        """
+        Change View.
+
+        This is overridden so we can add a custom button to unlock an account in the record's details.
+        """
+        if '_unlock' in request.POST:
+            with transaction.atomic(using=router.db_for_write(self.model)):
+                self.unlock_student(request, object_id=object_id)
+                url = reverse('admin:student_loginfailures_changelist', current_app=self.admin_site.name)
+                return HttpResponseRedirect(url)
+        return super(LoginFailuresAdmin, self).change_view(request, object_id, form_url, extra_context)
+
+    def get_actions(self, request):
+        """
+        Get actions for model admin and remove delete action.
+        """
+        actions = super(LoginFailuresAdmin, self).get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
+    def unlock_student(self, request, object_id=None, obj=None):
+        """
+        Unlock student account.
+        """
+        if object_id:
+            obj = self.get_object(request, unquote(object_id))
+
+        self.model.clear_lockout_counter(obj.user)
 
 
 admin.site.register(UserTestGroup)

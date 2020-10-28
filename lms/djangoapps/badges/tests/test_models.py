@@ -1,7 +1,8 @@
 """
 Tests for the Badges app models.
 """
-from path import Path
+from __future__ import absolute_import
+
 from django.core.exceptions import ValidationError
 from django.core.files.images import ImageFile
 from django.core.files.storage import default_storage
@@ -9,6 +10,8 @@ from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.test.utils import override_settings
 from mock import Mock, patch
+from path import Path
+from six.moves import range
 
 from badges.models import (
     BadgeAssertion,
@@ -36,7 +39,6 @@ class BadgeImageConfigurationTest(TestCase):
     """
     Test the validation features of BadgeImageConfiguration.
     """
-    shard = 1
 
     def tearDown(self):
         tmp_path = Path(TEST_DATA_ROOT / 'course_complete_badges')

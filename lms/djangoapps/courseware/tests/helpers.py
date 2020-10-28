@@ -1,17 +1,21 @@
 """
 Helpers for courseware tests.
 """
-from datetime import timedelta
-import json
+from __future__ import absolute_import
 
+import json
+from datetime import timedelta
+
+import six
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.client import Client, RequestFactory
 from django.urls import reverse
 from django.utils.timezone import now
-from django.utils.translation import get_language
 from six import text_type
+from six.moves import range
+from xblock.field_data import DictFieldData
 
 from courseware.access import has_access
 from courseware.masquerade import handle_ajax, setup_masquerade
@@ -20,10 +24,10 @@ from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_lin
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.url_utils import quote_slashes
-from student.models import Registration, CourseEnrollment
+from openedx.features.course_duration_limits.access import EXPIRATION_DATE_FORMAT_STR
+from student.models import CourseEnrollment, Registration
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.date_utils import strftime_localized
-from xblock.field_data import DictFieldData
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -88,7 +92,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
         self.item_descriptor.xmodule_runtime = self.new_module_runtime()
 
-        self.item_url = unicode(self.item_descriptor.location)
+        self.item_url = six.text_type(self.item_descriptor.location)
 
     def setup_course(self):
         self.course = CourseFactory.create(data=self.COURSE_DATA)
@@ -134,7 +138,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
         """Return item url with dispatch."""
         return reverse(
             'xblock_handler',
-            args=(unicode(self.course.id), quote_slashes(self.item_url), 'xmodule_handler', dispatch)
+            args=(six.text_type(self.course.id), quote_slashes(self.item_url), 'xmodule_handler', dispatch)
         )
 
 
@@ -173,12 +177,16 @@ class LoginEnrollmentTestCase(TestCase):
         self.login(self.email, self.password)
 
     def assert_request_status_code(self, status_code, url, method="GET", **kwargs):
+        """
+        Make a request to the specified URL and verify that it returns the
+        expected status code.
+        """
         make_request = getattr(self.client, method.lower())
         response = make_request(url, **kwargs)
         self.assertEqual(
             response.status_code, status_code,
-            "{method} request to {url} returned status code {actual}, "
-            "expected status code {expected}".format(
+            u"{method} request to {url} returned status code {actual}, "
+            u"expected status code {expected}".format(
                 method=method, url=url,
                 actual=response.status_code, expected=status_code
             )
@@ -191,7 +199,7 @@ class LoginEnrollmentTestCase(TestCase):
         message_list = list(messages.get_messages(response.wsgi_request))
         self.assertEqual(len(message_list), 1)
         self.assertIn("success", message_list[0].tags)
-        self.assertTrue("You have activated your account." in message_list[0].message)
+        self.assertIn("You have activated your account.", message_list[0].message)
 
     # ============ User creation and login ==============
 
@@ -208,8 +216,7 @@ class LoginEnrollmentTestCase(TestCase):
         Logout; check that the HTTP response code indicates redirection
         as expected.
         """
-        # should redirect
-        self.assert_request_status_code(302, reverse('logout'))
+        self.assert_request_status_code(200, reverse('logout'))
 
     def create_account(self, username, email, password):
         """
@@ -224,7 +231,7 @@ class LoginEnrollmentTestCase(TestCase):
             'terms_of_service': 'true',
             'honor_code': 'true',
         }
-        resp = self.assert_request_status_code(200, url, method="POST", data=request_data)
+        self.assert_request_status_code(200, url, method="POST", data=request_data)
         # Check both that the user is created, and inactive
         user = User.objects.get(email=email)
         self.assertFalse(user.is_active)
@@ -339,7 +346,7 @@ def masquerade_as_group_member(user, course, partition_id, group_id):
         user,
         data={"role": "student", "user_partition_id": partition_id, "group_id": group_id}
     )
-    response = handle_ajax(request, unicode(course.id))
+    response = handle_ajax(request, six.text_type(course.id))
     setup_masquerade(request, course.id, True)
     return response.status_code
 
@@ -367,19 +374,21 @@ def get_expiration_banner_text(user, course, language='en'):
     if upgrade_deadline is None or now() < upgrade_deadline:
         upgrade_deadline = enrollment.course_upgrade_deadline
 
-    date_string = '<span class="localized-datetime" data-format="shortDate" \
-        data-datetime="{formatted_date}" data-language="{language}">{formatted_date}</span>'
+    date_string = u'<span class="localized-datetime" data-format="shortDate" \
+        data-datetime="{formatted_date}" data-language="{language}">{formatted_date_localized}</span>'
     formatted_expiration_date = date_string.format(
         language=language,
-        formatted_date=strftime_localized(expiration_date, '%b. %-d, %Y')
+        formatted_date=expiration_date.strftime("%Y-%m-%d"),
+        formatted_date_localized=strftime_localized(expiration_date, EXPIRATION_DATE_FORMAT_STR)
     )
     if upgrade_deadline:
         formatted_upgrade_deadline = date_string.format(
             language=language,
-            formatted_date=strftime_localized(upgrade_deadline, '%b. %-d, %Y')
+            formatted_date=upgrade_deadline.strftime("%Y-%m-%d"),
+            formatted_date_localized=strftime_localized(upgrade_deadline, EXPIRATION_DATE_FORMAT_STR)
         )
 
-        bannerText = '<strong>Audit Access Expires {expiration_date}</strong><br>\
+        bannerText = u'<strong>Audit Access Expires {expiration_date}</strong><br>\
                      You lose all access to this course, including your progress, on {expiration_date}.\
                      <br>Upgrade by {upgrade_deadline} to get unlimited access to the course as long as it exists\
                      on the site. <a href="{upgrade_link}">Upgrade now<span class="sr-only"> to retain access past\
@@ -389,7 +398,7 @@ def get_expiration_banner_text(user, course, language='en'):
             upgrade_deadline=formatted_upgrade_deadline
         )
     else:
-        bannerText = '<strong>Audit Access Expires {expiration_date}</strong><br>\
+        bannerText = u'<strong>Audit Access Expires {expiration_date}</strong><br>\
                      You lose all access to this course, including your progress, on {expiration_date}.\
                      '.format(
             expiration_date=formatted_expiration_date

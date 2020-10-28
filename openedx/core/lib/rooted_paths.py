@@ -1,5 +1,6 @@
 """Provides rooted_glob, for finding relative glob paths in another director."""
 
+from __future__ import absolute_import
 import glob2
 
 

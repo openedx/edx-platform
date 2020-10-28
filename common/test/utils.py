@@ -108,8 +108,10 @@ def skip_signal(signal, **kwargs):
     and then reconnecting the signal.
     """
     signal.disconnect(**kwargs)
-    yield
-    signal.connect(**kwargs)
+    try:
+        yield
+    finally:
+        signal.connect(**kwargs)
 
 
 class MockS3Mixin(object):
@@ -133,7 +135,7 @@ class reprwrapper(object):
     """
     def __init__(self, func):
         self._func = func
-        self.repr = 'Func: {}'.format(func.__name__)
+        self.repr = u'Func: {}'.format(func.__name__)
         functools.update_wrapper(self, func)
 
     def __call__(self, *args, **kw):

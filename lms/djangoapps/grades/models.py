@@ -23,7 +23,7 @@ from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from coursewarehistoryextended.fields import UnsignedBigIntAutoField, UnsignedBigIntOneToOneField
-from lms.djangoapps.grades import events
+from lms.djangoapps.grades import events, constants
 from openedx.core.lib.cache_utils import get_cache
 
 
@@ -131,6 +131,8 @@ class VisibleBlocks(models.Model):
     This state is represented using an array of BlockRecord, stored
     in the blocks_json field. A hash of this json array is used for lookup
     purposes.
+
+    .. no_pii:
     """
     blocks_json = models.TextField()
     hashed = models.CharField(max_length=100, unique=True)
@@ -259,6 +261,8 @@ class VisibleBlocks(models.Model):
 class PersistentSubsectionGrade(TimeStampedModel):
     """
     A django model tracking persistent grades at the subsection level.
+
+    .. no_pii:
     """
 
     class Meta(object):
@@ -492,6 +496,8 @@ class PersistentSubsectionGrade(TimeStampedModel):
 class PersistentCourseGrade(TimeStampedModel):
     """
     A django model tracking persistent course grades.
+
+    .. no_pii:
     """
 
     class Meta(object):
@@ -626,6 +632,8 @@ class PersistentCourseGrade(TimeStampedModel):
 class PersistentSubsectionGradeOverride(models.Model):
     """
     A django model tracking persistent grades overrides at the subsection level.
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "grades"
@@ -653,6 +661,9 @@ class PersistentSubsectionGradeOverride(models.Model):
             u"earned_graded_override: {}".format(self.earned_graded_override),
             u"possible_graded_override: {}".format(self.possible_graded_override),
         ])
+
+    def get_history(self):
+        return PersistentSubsectionGradeOverrideHistory.get_override_history(self.id)
 
     @classmethod
     def prefetch(cls, user_id, course_key):
@@ -725,16 +736,25 @@ class PersistentSubsectionGradeOverride(models.Model):
             )
         return cleaned_data
 
+    def delete(self, **kwargs):  # pylint: disable=arguments-differ
+        # TODO: a proper history table
+        PersistentSubsectionGradeOverrideHistory.objects.create(
+            override_id=self.id,
+            feature=kwargs.pop('feature', ''),
+            action=PersistentSubsectionGradeOverrideHistory.DELETE
+        )
+        super(PersistentSubsectionGradeOverride, self).delete(**kwargs)
+
 
 class PersistentSubsectionGradeOverrideHistory(models.Model):
     """
     A django model tracking persistent grades override audit records.
+
+    .. no_pii:
     """
-    PROCTORING = 'PROCTORING'
-    GRADEBOOK = 'GRADEBOOK'
     OVERRIDE_FEATURES = (
-        (PROCTORING, 'proctoring'),
-        (GRADEBOOK, 'gradebook'),
+        (constants.GradeOverrideFeatureEnum.proctoring, 'proctoring'),
+        (constants.GradeOverrideFeatureEnum.gradebook, 'gradebook'),
     )
 
     CREATE_OR_UPDATE = 'CREATEORUPDATE'
@@ -751,7 +771,7 @@ class PersistentSubsectionGradeOverrideHistory(models.Model):
     feature = models.CharField(
         max_length=32,
         choices=OVERRIDE_FEATURES,
-        default=PROCTORING
+        default=constants.GradeOverrideFeatureEnum.proctoring,
     )
     action = models.CharField(
         max_length=32,
@@ -777,7 +797,6 @@ class PersistentSubsectionGradeOverrideHistory(models.Model):
             self.created
         )
 
-
-def prefetch(user, course_key):
-    PersistentSubsectionGradeOverride.prefetch(user.id, course_key)
-    VisibleBlocks.bulk_read(user.id, course_key)
+    @classmethod
+    def get_override_history(cls, override_id):
+        return cls.objects.filter(override_id=override_id)

@@ -1,11 +1,14 @@
 """
 Support tool for changing course enrollments.
 """
+from __future__ import absolute_import
+
+import six
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponseBadRequest
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 from opaque_keys import InvalidKeyError
@@ -15,12 +18,12 @@ from six import text_type
 
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
-from enrollment.api import get_enrollments, update_enrollment
-from enrollment.errors import CourseModeNotFoundError
-from enrollment.serializers import ModeSerializer
 from lms.djangoapps.support.decorators import require_support_permission
 from lms.djangoapps.support.serializers import ManualEnrollmentSerializer
 from lms.djangoapps.verify_student.models import VerificationDeadline
+from openedx.core.djangoapps.enrollments.api import get_enrollments, update_enrollment
+from openedx.core.djangoapps.enrollments.errors import CourseModeNotFoundError
+from openedx.core.djangoapps.enrollments.serializers import ModeSerializer
 from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, ManualEnrollmentAudit
 from util.json_request import JsonResponse
 
@@ -101,7 +104,7 @@ class EnrollmentSupportListView(GenericAPIView):
             return HttpResponseBadRequest(
                 u'Could not find enrollment for user {username} in course {course}.'.format(
                     username=username_or_email,
-                    course=unicode(course_key)
+                    course=six.text_type(course_key)
                 )
             )
         try:

@@ -64,12 +64,9 @@ def format_certificate_for_user(username, cert):
             "created": cert.created_date,
             "modified": cert.modified_date,
             "is_passing": is_passing_status(cert.status),
-
-            # NOTE: the download URL is not currently being set for webview certificates.
-            # In the future, we can update this to construct a URL to the webview certificate
-            # for courses that have this feature enabled.
+            "is_pdf_certificate": bool(cert.download_url),
             "download_url": (
-                cert.download_url or get_certificate_url(cert.user.id, cert.course_id)
+                cert.download_url or get_certificate_url(cert.user.id, cert.course_id, user_certificate=cert)
                 if cert.status == CertificateStatuses.downloadable
                 else None
             ),
@@ -129,6 +126,25 @@ def get_certificate_for_user(username, course_key):
     except GeneratedCertificate.DoesNotExist:
         return None
     return format_certificate_for_user(username, cert)
+
+
+def get_recently_modified_certificates(course_keys=None, start_date=None, end_date=None):
+    """
+    Returns a QuerySet of GeneratedCertificate objects filtered by the input
+    parameters and ordered by modified_date.
+    """
+    cert_filter_args = {}
+
+    if course_keys:
+        cert_filter_args['course_id__in'] = course_keys
+
+    if start_date:
+        cert_filter_args['modified_date__gte'] = start_date
+
+    if end_date:
+        cert_filter_args['modified_date__lte'] = end_date
+
+    return GeneratedCertificate.objects.filter(**cert_filter_args).order_by('modified_date')  # pylint: disable=no-member
 
 
 def generate_user_certificates(student, course_key, course=None, insecure=False, generation_mode='batch',
@@ -215,7 +231,7 @@ def regenerate_user_certificates(student, course_key, course=None,
 
     generate_pdf = not has_html_certificates_enabled(course)
     log.info(
-        "Started regenerating certificates for user %s in course %s with generate_pdf status: %s",
+        u"Started regenerating certificates for user %s in course %s with generate_pdf status: %s",
         student.username, unicode(course_key), generate_pdf
     )
 
@@ -426,19 +442,23 @@ def _certificate_html_url(user_id, course_id, uuid):
     return ''
 
 
-def _certificate_download_url(user_id, course_id):
-    try:
-        user_certificate = GeneratedCertificate.eligible_certificates.get(
-            user=user_id,
-            course_id=_safe_course_key(course_id)
-        )
+def _certificate_download_url(user_id, course_id, user_certificate=None):
+    if not user_certificate:
+        try:
+            user_certificate = GeneratedCertificate.eligible_certificates.get(
+                user=user_id,
+                course_id=_safe_course_key(course_id)
+            )
+        except GeneratedCertificate.DoesNotExist:
+            log.critical(
+                u'Unable to lookup certificate\n'
+                u'user id: %d\n'
+                u'course: %s', user_id, unicode(course_id)
+            )
+
+    if user_certificate:
         return user_certificate.download_url
-    except GeneratedCertificate.DoesNotExist:
-        log.critical(
-            'Unable to lookup certificate\n'
-            'user id: %d\n'
-            'course: %s', user_id, unicode(course_id)
-        )
+
     return ''
 
 
@@ -448,7 +468,7 @@ def has_html_certificates_enabled(course):
     return course.cert_html_view_enabled
 
 
-def get_certificate_url(user_id=None, course_id=None, uuid=None):
+def get_certificate_url(user_id=None, course_id=None, uuid=None, user_certificate=None):
     url = ''
 
     course = _course_from_key(course_id)
@@ -458,7 +478,7 @@ def get_certificate_url(user_id=None, course_id=None, uuid=None):
     if has_html_certificates_enabled(course):
         url = _certificate_html_url(user_id, course_id, uuid)
     else:
-        url = _certificate_download_url(user_id, course_id)
+        url = _certificate_download_url(user_id, course_id, user_certificate=user_certificate)
     return url
 
 
@@ -522,8 +542,11 @@ def get_language_specific_template_or_default(language, templates):
     Returns default templates If no language matches, or language passed is None
     """
     two_letter_language = _get_two_letter_language_code(language)
-    language_or_default_templates = list(templates.filter(Q(language=two_letter_language) | Q(language=None) | Q(language='')))
-    language_specific_template = get_language_specific_template(two_letter_language, language_or_default_templates)
+
+    language_or_default_templates = list(templates.filter(Q(language=two_letter_language)
+                                                          | Q(language=None) | Q(language='')))
+    language_specific_template = get_language_specific_template(two_letter_language,
+                                                                language_or_default_templates)
     if language_specific_template:
         return language_specific_template
     else:

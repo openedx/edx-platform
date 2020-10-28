@@ -1,5 +1,7 @@
 """Defines ``Group`` and ``UserPartition`` models for partitioning"""
 
+from __future__ import absolute_import
+
 from collections import namedtuple
 
 from stevedore.extension import ExtensionManager
@@ -250,13 +252,13 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
             )
         )
 
-    def access_denied_message(self, block, user, user_group, allowed_groups):
+    def access_denied_message(self, block_key, user, user_group, allowed_groups):
         """
         Return a message that should be displayed to the user when they are not allowed to access
         content managed by this partition, or None if there is no applicable message.
 
         Arguments:
-            block (:class:`.XBlock`): The content being managed
+            block_key (:class:`.BlockUsageLocator`): The content being managed
             user (:class:`.User`): The user who was denied access
             user_group (:class:`.Group`): The current Group the user is in
             allowed_groups (list of :class:`.Group`): The groups who are allowed to see the content

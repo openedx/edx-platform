@@ -18,6 +18,8 @@ front-end validation will not pass.
                   one stored on YouTube
     t_not_exist - this file does not exist on YouTube; it exists locally
 """
+from __future__ import absolute_import
+
 from common.test.acceptance.tests.video.test_studio_video_module import CMSVideoBaseTest
 
 
@@ -72,26 +74,26 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         # Currently we are working with 2nd field. It means, that if 2nd field
         # contain incorrect value, 1st and 3rd fields should be disabled until
         # 2nd field will be filled by correct correct value
-        self.assertEqual(self.video.url_field_status(1, 3).values(), [False, False])
+        self.assertEqual(list(self.video.url_field_status(1, 3).values()), [False, False])
         self.video.clear_fields()
-        self.assertEqual(self.video.url_field_status().values(), [True, True, True])
+        self.assertEqual(list(self.video.url_field_status().values()), [True, True, True])
 
         #User input URL with incorrect format
         self.video.set_url_field('http://link.c', 1)
         self.assertEqual(self.video.message('error'), 'Incorrect url format.')
-        self.assertEqual(self.video.url_field_status(2, 3).values(), [False, False])
+        self.assertEqual(list(self.video.url_field_status(2, 3).values()), [False, False])
 
         #User input URL with incorrect format
         self.video.set_url_field('http://goo.gl/pxxZrg', 1)
         self.video.set_url_field('http://goo.gl/pxxZrg', 2)
         self.assertEqual(self.video.message('error'), 'Links should be unique.')
-        self.assertEqual(self.video.url_field_status(1, 3).values(), [False, False])
+        self.assertEqual(list(self.video.url_field_status(1, 3).values()), [False, False])
         self.video.clear_fields()
-        self.assertEqual(self.video.url_field_status().values(), [True, True, True])
+        self.assertEqual(list(self.video.url_field_status().values()), [True, True, True])
 
         self.video.set_url_field('http://youtu.be/t_not_exist', 1)
         self.assertEqual(self.video.message('error'), '')
-        self.assertEqual(self.video.url_field_status().values(), [True, True, True])
+        self.assertEqual(list(self.video.url_field_status().values()), [True, True, True])
 
     def test_youtube_server_interaction(self):
         """

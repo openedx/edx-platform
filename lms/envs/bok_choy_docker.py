@@ -10,6 +10,7 @@ CMS_BASE = '{}:{}'.format(os.environ['BOK_CHOY_HOSTNAME'], os.environ.get('BOK_C
 LMS_BASE = '{}:{}'.format(os.environ['BOK_CHOY_HOSTNAME'], os.environ.get('BOK_CHOY_LMS_PORT', 8003))
 LMS_ROOT_URL = 'http://{}'.format(LMS_BASE)
 LOGIN_REDIRECT_WHITELIST = [CMS_BASE]
+SITE_NAME = LMS_BASE
 
 COMMENTS_SERVICE_URL = 'http://{}:4567'.format(os.environ['BOK_CHOY_HOSTNAME'])
 EDXNOTES_PUBLIC_API = 'http://{}:8042/api/v1'.format(os.environ['BOK_CHOY_HOSTNAME'])

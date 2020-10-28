@@ -1,6 +1,8 @@
 """
 Tests for microsite admin
 """
+from __future__ import absolute_import
+
 from django.contrib.admin.sites import AdminSite
 from django.http import HttpRequest
 

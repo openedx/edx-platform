@@ -1,21 +1,18 @@
 """Ensure we can parse events sent to us from the Segment webhook integration"""
+from __future__ import absolute_import
+
 import json
 
 from dateutil import parser
-from ddt import ddt, data, unpack
-from mock import sentinel
-
+from ddt import data, ddt, unpack
 from django.contrib.auth.models import User
 from django.test.utils import override_settings
+from mock import sentinel
 
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from track.middleware import TrackMiddleware
 from track.views import segmentio
-from track.views.tests.base import (
-    SegmentIOTrackingTestCaseBase,
-    SEGMENTIO_TEST_ENDPOINT,
-    SEGMENTIO_TEST_USER_ID
-)
+from track.views.tests.base import SEGMENTIO_TEST_ENDPOINT, SEGMENTIO_TEST_USER_ID, SegmentIOTrackingTestCaseBase
 
 
 def expect_failure_with_message(message):
@@ -33,7 +30,6 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
     """
     Test processing of Segment events.
     """
-    shard = 3
 
     def setUp(self):
         super(SegmentIOTrackingTestCase, self).setUp()

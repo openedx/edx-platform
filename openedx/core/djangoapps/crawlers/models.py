@@ -2,13 +2,19 @@
 This module handles the detection of crawlers, so that we can handle them
 appropriately in other parts of the code.
 """
+from __future__ import absolute_import
+
 import six
 from config_models.models import ConfigurationModel
 from django.db import models
 
 
 class CrawlersConfig(ConfigurationModel):
-    """Configuration for the crawlers django app."""
+    """
+    Configuration for the crawlers django app.
+
+    .. no_pii:
+    """
     class Meta(object):
         app_label = "crawlers"
 

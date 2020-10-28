@@ -9,3 +9,6 @@ PATHWAY_CACHE_KEY_TPL = 'pathway-{id}'
 
 # Cache key used to locate an item containing a list of all credit pathway ids for a site.
 SITE_PATHWAY_IDS_CACHE_KEY_TPL = 'pathway-ids-{domain}'
+
+# Template used to create cache keys for individual courses to program uuids.
+COURSE_PROGRAMS_CACHE_KEY_TPL = 'course-programs-{course_run_id}'

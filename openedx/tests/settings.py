@@ -60,12 +60,12 @@ PROCTORING_BACKENDS = {
 FEATURES = {}
 
 INSTALLED_APPS = (
-    'django_comment_common',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
     'djcelery',
+    'openedx.core.djangoapps.django_comment_common',
     'openedx.core.djangoapps.video_config',
     'openedx.core.djangoapps.video_pipeline',
     'openedx.core.djangoapps.bookmarks.apps.BookmarksConfig',
@@ -73,6 +73,7 @@ INSTALLED_APPS = (
     'courseware',
     'student',
     'openedx.core.djangoapps.site_configuration',
+    'lms.djangoapps.grades.apps.GradesConfig',
     'lms.djangoapps.certificates.apps.CertificatesConfig',
     'openedx.core.djangoapps.user_api',
     'course_modes.apps.CourseModesConfig',
@@ -88,6 +89,7 @@ INSTALLED_APPS = (
     'milestones',
     'celery_utils',
     'waffle',
+    'edx_when',
 
     # Django 1.11 demands to have imported models supported by installed apps.
     'completion',
@@ -99,6 +101,11 @@ MEDIA_ROOT = tempfile.mkdtemp()
 
 MICROSITE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeBackend'
 MICROSITE_TEMPLATE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend'
+
+RECALCULATE_GRADES_ROUTING_KEY = 'edx.core.default'
+POLICY_CHANGE_GRADES_ROUTING_KEY = 'edx.core.default'
+POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
+
 
 SECRET_KEY = 'insecure-secret-key'
 SITE_ID = 1

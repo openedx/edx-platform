@@ -3,10 +3,12 @@
 End-to-end tests for the LMS that utilize the
 progress page.
 """
+from __future__ import absolute_import
+
 from contextlib import contextmanager
 
 import ddt
-import pytest
+from six.moves import range
 
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.common.logout import LogoutPage
@@ -114,17 +116,16 @@ class ProgressPageBaseTest(UniqueCourseTest):
     def _logged_in_session(self, staff=False):
         """
         Ensure that the user is logged in and out appropriately at the beginning
-        and end of the current test.
+        and end of the current test.  But if there's an error, don't log out
+        before capturing a screenshot.
         """
         self.logout_page.visit()
-        try:
-            if staff:
-                auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
-            else:
-                auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
-            yield
-        finally:
-            self.logout_page.visit()
+        if staff:
+            auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
+        else:
+            auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
+        yield
+        self.logout_page.visit()
 
 
 @ddt.ddt
@@ -276,15 +277,13 @@ class PersistentGradesTest(ProgressPageBaseTest):
             self.assertEqual(self._get_section_score(), (0, 2))
 
 
-class SubsectionGradingPolicyTest(ProgressPageBaseTest):
+class SubsectionGradingPolicyBase(ProgressPageBaseTest):
     """
-    Tests changing a subsection's 'graded' field
-    and the effect it has on the progress page.
+    Base class for testing a subsection and its impact to
+    the progress page
     """
-    shard = 22
-
     def setUp(self):
-        super(SubsectionGradingPolicyTest, self).setUp()
+        super(SubsectionGradingPolicyBase, self).setUp()
         self._set_policy_for_subsection("Homework", 0)
         self._set_policy_for_subsection("Lab", 1)
 
@@ -315,6 +314,13 @@ class SubsectionGradingPolicyTest(ProgressPageBaseTest):
         self.assertEqual(sr_text, self.progress_page.x_tick_sr_text(index))
         self.assertEqual([label, 'true' if label_hidden else None], self.progress_page.x_tick_label(index))
 
+
+class SubsectionGradingPolicyA11yTest(SubsectionGradingPolicyBase):
+    """
+    Class to test the accessibility of subsection grading
+    """
+    a11y = True
+
     def test_axis_a11y(self):
         """
         Tests that the progress chart axes have appropriate a11y (screenreader) markup.
@@ -326,6 +332,13 @@ class SubsectionGradingPolicyTest(ProgressPageBaseTest):
             self.courseware_page.click_next_button_on_top()
             # Answer the first Lab problem (unit only contains a single problem)
             self._answer_problem_correctly()
+
+            self.progress_page.a11y_audit.config.set_rules({
+                "ignore": [
+                    'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                    'region',  # TODO: AC-932
+                ]
+            })
             self.progress_page.visit()
 
             # Verify the basic a11y of the progress page
@@ -334,8 +347,7 @@ class SubsectionGradingPolicyTest(ProgressPageBaseTest):
             # Verify that y-Axis labels are aria-hidden
             self.assertEqual(['100%', 'true'], self.progress_page.y_tick_label(0))
             self.assertEqual(['0%', 'true'], self.progress_page.y_tick_label(1))
-            self.assertEqual(['Pass 50%', 'true'], self.progress_page.y_tick_label(2))
-
+            self.assertEqual(['Pass 50%', 'true'], self.progress_page.y_tick_label(2))  # pylint: disable=unicode-format-string
             # Verify x-Axis labels and sr-text
             self._check_tick_text(0, [u'Homework 1 - Test Subsection 1 - 50% (1/2)'], u'HW 01')
 
@@ -396,34 +408,14 @@ class SubsectionGradingPolicyTest(ProgressPageBaseTest):
 
             # Verify the overall score. The first element in the array is the sr-only text, and the
             # second is the total text (including the sr-only text).
-            self.assertEqual(['Overall Score', 'Overall Score\n2%'], self.progress_page.graph_overall_score())
-
-    def test_subsection_grading_policy_on_progress_page(self):
-        with self._logged_in_session():
-            self._check_scores_and_page_text([(0, 1), (0, 1)], (0, 2), "Homework 1 - Test Subsection 1 - 0% (0/2)")
-            self.courseware_page.visit()
-            self._answer_problem_correctly()
-            self._check_scores_and_page_text([(1, 1), (0, 1)], (1, 2), "Homework 1 - Test Subsection 1 - 50% (1/2)")
-
-        self._set_policy_for_subsection("Not Graded")
-
-        with self._logged_in_session():
-            self.progress_page.visit()
-            self.assertEqual(self._get_problem_scores(), [(1, 1), (0, 1)])
-            self.assertEqual(self._get_section_score(), (1, 2))
-            self.assertFalse(self.progress_page.text_on_page("Homework 1 - Test Subsection 1"))
-
-        self._set_policy_for_subsection("Homework")
-
-        with self._logged_in_session():
-            self._check_scores_and_page_text([(1, 1), (0, 1)], (1, 2), "Homework 1 - Test Subsection 1 - 50% (1/2)")
+            self.assertEqual(['Overall Score', 'Overall Score\n2%'], self.progress_page.graph_overall_score())  # pylint: disable=unicode-format-string
 
 
-@pytest.mark.a11y
 class ProgressPageA11yTest(ProgressPageBaseTest):
     """
     Class to test the accessibility of the progress page.
     """
+    a11y = True
 
     def test_progress_page_a11y(self):
         """
@@ -432,6 +424,7 @@ class ProgressPageA11yTest(ProgressPageBaseTest):
         self.progress_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         self.progress_page.visit()

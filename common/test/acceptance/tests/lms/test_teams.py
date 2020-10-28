@@ -1,6 +1,7 @@
 """
 Acceptance tests for the teams feature.
 """
+from __future__ import absolute_import
 import json
 import random
 import time
@@ -29,6 +30,8 @@ from common.test.acceptance.pages.lms.teams import (
 )
 from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest, get_modal_alert
 from openedx.core.lib.tests import attr
+from six.moves import map
+from six.moves import range
 
 TOPICS_PER_PAGE = 12
 
@@ -47,17 +50,17 @@ class TeamsTabBase(EventsTestMixin, ForumsConfigMixin, UniqueCourseTest):
 
     def create_topics(self, num_topics):
         """Create `num_topics` test topics."""
-        return [{u"description": i, u"name": i, u"id": i} for i in map(str, xrange(num_topics))]
+        return [{u"description": i, u"name": i, u"id": i} for i in map(str, range(num_topics))]
 
     def create_teams(self, topic, num_teams, time_between_creation=0):
         """Create `num_teams` teams belonging to `topic`."""
         teams = []
-        for i in xrange(num_teams):
+        for i in range(num_teams):
             team = {
                 'course_id': self.course_id,
                 'topic_id': topic['id'],
-                'name': 'Team {}'.format(i),
-                'description': 'Description {}'.format(i),
+                'name': u'Team {}'.format(i),
+                'description': u'Description {}'.format(i),
                 'language': 'aa',
                 'country': 'AF'
             }
@@ -83,7 +86,7 @@ class TeamsTabBase(EventsTestMixin, ForumsConfigMixin, UniqueCourseTest):
         """Create `num_memberships` users and assign them to `team_id`. The
         last user created becomes the current user."""
         memberships = []
-        for __ in xrange(num_memberships):
+        for __ in range(num_memberships):
             user_info = AutoAuthPage(self.browser, course_id=self.course_id).visit().user_info
             memberships.append(user_info)
             self.create_membership(user_info['username'], team_id)
@@ -142,7 +145,7 @@ class TeamsTabBase(EventsTestMixin, ForumsConfigMixin, UniqueCourseTest):
 
         team_card_names = page.team_names
         team_card_descriptions = page.team_descriptions
-        map(assert_team_equal, expected_teams, team_card_names, team_card_descriptions)
+        list(map(assert_team_equal, expected_teams, team_card_names, team_card_descriptions))
 
     def verify_my_team_count(self, expected_number_of_teams):
         """ Verify the number of teams shown on "My Team". """
@@ -623,7 +626,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.assertEqual(search_results_page.header_name, 'Team Search')
         self.assertEqual(
             search_results_page.header_description,
-            'Showing results for "{search_query}"'.format(search_query=search_query)
+            u'Showing results for "{search_query}"'.format(search_query=search_query)
         )
 
     def verify_on_page(self, teams_page, page_num, total_teams, pagination_header_text, footer_visible):
@@ -916,7 +919,7 @@ class TeamFormActions(TeamsTabBase):
             title='Create a New Team',
             description='Create a new team if you can\'t find an existing team to join, '
                         'or if you would like to learn with friends you know.',
-            breadcrumbs='All Topics {topic_name}'.format(topic_name=self.topic['name'])
+            breadcrumbs=u'All Topics {topic_name}'.format(topic_name=self.topic['name'])
         )
 
     def verify_and_navigate_to_edit_team_page(self):
@@ -933,7 +936,7 @@ class TeamFormActions(TeamsTabBase):
             title='Edit Team',
             description='If you make significant changes, make sure you notify '
                         'members of the team before making these changes.',
-            breadcrumbs='All Topics {topic_name} {team_name}'.format(
+            breadcrumbs=u'All Topics {topic_name} {team_name}'.format(
                 topic_name=self.topic['name'],
                 team_name=self.team['name']
             )

@@ -2,6 +2,8 @@
 API methods related to xblock state.
 """
 
+from __future__ import absolute_import
+
 from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration
 
 

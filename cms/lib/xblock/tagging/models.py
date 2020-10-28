@@ -7,6 +7,8 @@ from django.db import models
 class TagCategories(models.Model):
     """
     This model represents tag categories.
+
+    .. no_pii:
     """
     name = models.CharField(max_length=255, unique=True)
     title = models.CharField(max_length=255)
@@ -30,6 +32,8 @@ class TagCategories(models.Model):
 class TagAvailableValues(models.Model):
     """
     This model represents available values for tags.
+
+    .. no_pii:
     """
     category = models.ForeignKey(TagCategories, db_index=True, on_delete=models.CASCADE)
     value = models.CharField(max_length=255)

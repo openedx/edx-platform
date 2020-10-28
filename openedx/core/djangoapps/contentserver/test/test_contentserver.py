@@ -1,11 +1,14 @@
 """
 Tests for StaticContentServer
 """
+from __future__ import absolute_import
+
 import copy
 
 import datetime
 import ddt
 import logging
+import six
 import unittest
 from uuid import uuid4
 
@@ -89,14 +92,14 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
 
         # A locked asset
         cls.locked_asset = cls.course_key.make_asset_key('asset', 'sample_static.html')
-        cls.url_locked = unicode(cls.locked_asset)
+        cls.url_locked = six.text_type(cls.locked_asset)
         cls.url_locked_versioned = get_versioned_asset_url(cls.url_locked)
         cls.url_locked_versioned_old_style = get_old_style_versioned_asset_url(cls.url_locked)
         cls.contentstore.set_attr(cls.locked_asset, 'locked', True)
 
         # An unlocked asset
         cls.unlocked_asset = cls.course_key.make_asset_key('asset', 'another_static.txt')
-        cls.url_unlocked = unicode(cls.unlocked_asset)
+        cls.url_unlocked = six.text_type(cls.unlocked_asset)
         cls.url_unlocked_versioned = get_versioned_asset_url(cls.url_unlocked)
         cls.url_unlocked_versioned_old_style = get_old_style_versioned_asset_url(cls.url_unlocked)
         cls.length_unlocked = cls.contentstore.get_attr(cls.unlocked_asset, 'length')
@@ -217,7 +220,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         self.assertEqual(resp.status_code, 206)  # HTTP_206_PARTIAL_CONTENT
         self.assertEqual(
             resp['Content-Range'],
-            'bytes {first}-{last}/{length}'.format(
+            b'bytes {first}-{last}/{length}'.format(
                 first=0, last=self.length_unlocked - 1,
                 length=self.length_unlocked
             )
@@ -236,7 +239,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
             first=first_byte, last=last_byte))
 
         self.assertEqual(resp.status_code, 206)  # HTTP_206_PARTIAL_CONTENT
-        self.assertEqual(resp['Content-Range'], 'bytes {first}-{last}/{length}'.format(
+        self.assertEqual(resp['Content-Range'], b'bytes {first}-{last}/{length}'.format(
             first=first_byte, last=last_byte, length=self.length_unlocked))
         self.assertEqual(resp['Content-Length'], str(last_byte - first_byte + 1))
 
@@ -246,7 +249,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         """
         first_byte = self.length_unlocked / 4
         last_byte = self.length_unlocked / 2
-        resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes={first}-{last}, -100'.format(
+        resp = self.client.get(self.url_unlocked, HTTP_RANGE=b'bytes={first}-{last}, -100'.format(
             first=first_byte, last=last_byte))
 
         self.assertEqual(resp.status_code, 200)

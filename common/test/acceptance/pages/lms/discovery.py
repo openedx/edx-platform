@@ -2,6 +2,8 @@
 Course discovery page.
 """
 
+from __future__ import absolute_import
+
 from bok_choy.page_object import PageObject
 
 from common.test.acceptance.pages.lms import BASE_URL

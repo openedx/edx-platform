@@ -41,15 +41,15 @@ def validate_video_image(image_file, skip_aspect_ratio=False):
     if not all(hasattr(image_file, attr) for attr in ['name', 'content_type', 'size']):
         error = _('The image must have name, content type, and size information.')
     elif image_file.content_type not in settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS.values():
-        error = _('This image file type is not supported. Supported file types are {supported_file_formats}.').format(
+        error = _(u'This image file type is not supported. Supported file types are {supported_file_formats}.').format(
             supported_file_formats=settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS.keys()
         )
     elif image_file.size > settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MAX_BYTES']:
-        error = _('This image file must be smaller than {image_max_size}.').format(
+        error = _(u'This image file must be smaller than {image_max_size}.').format(
             image_max_size=settings.VIDEO_IMAGE_MAX_FILE_SIZE_MB
         )
     elif image_file.size < settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MIN_BYTES']:
-        error = _('This image file must be larger than {image_min_size}.').format(
+        error = _(u'This image file must be larger than {image_min_size}.').format(
             image_min_size=settings.VIDEO_IMAGE_MIN_FILE_SIZE_KB
         )
     else:
@@ -61,15 +61,15 @@ def validate_video_image(image_file, skip_aspect_ratio=False):
             return _('There is a problem with this image file. Try to upload a different file.')
         image_file_aspect_ratio = abs(image_file_width / float(image_file_height) - settings.VIDEO_IMAGE_ASPECT_RATIO)
         if image_file_width < settings.VIDEO_IMAGE_MIN_WIDTH or image_file_height < settings.VIDEO_IMAGE_MIN_HEIGHT:
-            error = _('Recommended image resolution is {image_file_max_width}x{image_file_max_height}. '
-                      'The minimum resolution is {image_file_min_width}x{image_file_min_height}.').format(
+            error = _(u'Recommended image resolution is {image_file_max_width}x{image_file_max_height}. '
+                      u'The minimum resolution is {image_file_min_width}x{image_file_min_height}.').format(
                 image_file_max_width=settings.VIDEO_IMAGE_MAX_WIDTH,
                 image_file_max_height=settings.VIDEO_IMAGE_MAX_HEIGHT,
                 image_file_min_width=settings.VIDEO_IMAGE_MIN_WIDTH,
                 image_file_min_height=settings.VIDEO_IMAGE_MIN_HEIGHT
             )
         elif not skip_aspect_ratio and image_file_aspect_ratio > settings.VIDEO_IMAGE_ASPECT_RATIO_ERROR_MARGIN:
-            error = _('This image file must have an aspect ratio of {video_image_aspect_ratio_text}.').format(
+            error = _(u'This image file must have an aspect ratio of {video_image_aspect_ratio_text}.').format(
                 video_image_aspect_ratio_text=settings.VIDEO_IMAGE_ASPECT_RATIO_TEXT
             )
         else:
@@ -106,7 +106,7 @@ def validate_and_update_video_image(course_key_string, edx_video_id, image_file,
     error = validate_video_image(image_file, skip_aspect_ratio=True)
     if error:
         LOGGER.info(
-            'VIDEOS: Scraping youtube video thumbnail failed for edx_video_id [%s] in course [%s] with error: %s',
+            u'VIDEOS: Scraping youtube video thumbnail failed for edx_video_id [%s] in course [%s] with error: %s',
             edx_video_id,
             course_key_string,
             error
@@ -115,7 +115,7 @@ def validate_and_update_video_image(course_key_string, edx_video_id, image_file,
 
     update_video_image(edx_video_id, course_key_string, image_file, image_filename)
     LOGGER.info(
-        'VIDEOS: Scraping youtube video thumbnail for edx_video_id [%s] in course [%s]', edx_video_id, course_key_string
+        u'VIDEOS: Scraping youtube video thumbnail for edx_video_id [%s] in course [%s]', edx_video_id, course_key_string
     )
 
 

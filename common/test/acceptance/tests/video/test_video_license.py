@@ -2,7 +2,7 @@
 """
 Acceptance tests for licensing of the Video module
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
@@ -78,7 +78,7 @@ class VideoLicenseTest(StudioCourseTest):
         video.open_advanced_tab()
         video.set_license('all-rights-reserved')
         video.save_settings()
-        container_page.publish_action.click()
+        container_page.publish()
 
         self.lms_courseware.visit()
         video = self.lms_courseware.q(css=".vert .xblock .video")
@@ -108,7 +108,7 @@ class VideoLicenseTest(StudioCourseTest):
         video.open_advanced_tab()
         video.set_license('creative-commons')
         video.save_settings()
-        container_page.publish_action.click()
+        container_page.publish()
 
         self.lms_courseware.visit()
         video = self.lms_courseware.q(css=".vert .xblock .video")

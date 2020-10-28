@@ -11,6 +11,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
+from testfixtures import LogCapture
 
 # It is really unfortunate that we are using the XQueue client
 # code from the capa library.  In the future, we should move this
@@ -19,7 +20,7 @@ from opaque_keys.edx.locator import CourseLocator
 # in our `XQueueCertInterface` implementation.
 from capa.xqueue_interface import XQueueInterface
 from lms.djangoapps.certificates.models import CertificateStatuses, ExampleCertificate, ExampleCertificateSet, GeneratedCertificate
-from lms.djangoapps.certificates.queue import XQueueCertInterface
+from lms.djangoapps.certificates.queue import LOGGER, XQueueCertInterface
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
 from course_modes.models import CourseMode
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
@@ -33,7 +34,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 @override_settings(CERT_QUEUE='certificates')
 class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
     """Test the "add to queue" operation of the XQueue interface. """
-    shard = 1
 
     def setUp(self):
         super(XQueueCertInterfaceAddCertificateTest, self).setUp()
@@ -277,11 +277,84 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
             expected_status
         )
 
+    def test_regen_cert_with_pdf_certificate(self):
+        """
+        Test that regenerating PDF certifcate log warning message and certificate
+        status remains unchanged.
+        """
+        download_url = 'http://www.example.com/certificate.pdf'
+        # Create an existing verifed enrollment and certificate
+        CourseEnrollmentFactory(
+            user=self.user_2,
+            course_id=self.course.id,
+            is_active=True,
+            mode=CourseMode.VERIFIED,
+        )
+        GeneratedCertificateFactory(
+            user=self.user_2,
+            course_id=self.course.id,
+            grade='1.0',
+            status=CertificateStatuses.downloadable,
+            mode=GeneratedCertificate.MODES.verified,
+            download_url=download_url
+        )
+
+        self._assert_pdf_cert_generation_dicontinued_logs(download_url)
+
+    def test_add_cert_with_existing_pdf_certificate(self):
+        """
+        Test that add certifcate for existing PDF certificate log warning
+        message and certificate status remains unchanged.
+        """
+        download_url = 'http://www.example.com/certificate.pdf'
+        # Create an existing verifed enrollment and certificate
+        CourseEnrollmentFactory(
+            user=self.user_2,
+            course_id=self.course.id,
+            is_active=True,
+            mode=CourseMode.VERIFIED,
+        )
+        GeneratedCertificateFactory(
+            user=self.user_2,
+            course_id=self.course.id,
+            grade='1.0',
+            status=CertificateStatuses.downloadable,
+            mode=GeneratedCertificate.MODES.verified,
+            download_url=download_url
+        )
+
+        self._assert_pdf_cert_generation_dicontinued_logs(download_url, add_cert=True)
+
+    def _assert_pdf_cert_generation_dicontinued_logs(self, download_url, add_cert=False):
+        """Assert PDF certificate generation discontinued logs."""
+        with LogCapture(LOGGER.name) as log:
+            if add_cert:
+                self.xqueue.add_cert(self.user_2, self.course.id)
+            else:
+                self.xqueue.regen_cert(self.user_2, self.course.id)
+            log.check_present(
+                (
+                    LOGGER.name,
+                    'WARNING',
+                    (
+                        u"PDF certificate generation discontinued, canceling "
+                        u"PDF certificate generation for student {student_id} "
+                        u"in course '{course_id}' "
+                        u"with status '{status}' "
+                        u"and download_url '{download_url}'."
+                    ).format(
+                        student_id=self.user_2.id,
+                        course_id=unicode(self.course.id),
+                        status=CertificateStatuses.downloadable,
+                        download_url=download_url
+                    )
+                )
+            )
+
 
 @override_settings(CERT_QUEUE='certificates')
 class XQueueCertInterfaceExampleCertificateTest(TestCase):
     """Tests for the XQueue interface for certificate generation. """
-    shard = 1
 
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')
 

@@ -8,7 +8,7 @@ from __future__ import print_function
 import argparse
 import logging
 import sys
-from cStringIO import StringIO
+from io import BytesIO
 
 from mako.lookup import TemplateLookup
 from path import Path as path
@@ -75,8 +75,8 @@ def command_test(problem):
     # We're going to trap stdout/stderr from the problems (yes, some print)
     old_stdout, old_stderr = sys.stdout, sys.stderr
     try:
-        sys.stdout = StringIO()
-        sys.stderr = StringIO()
+        sys.stdout = BytesIO()
+        sys.stderr = BytesIO()
 
         check_that_suggested_answers_work(problem)
         check_that_blanks_fail(problem)

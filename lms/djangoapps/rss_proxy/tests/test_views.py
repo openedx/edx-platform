@@ -1,9 +1,10 @@
 """
 Tests for the rss_proxy views
 """
-from __future__ import print_function
-from django.urls import reverse
+from __future__ import absolute_import, print_function
+
 from django.test import TestCase
+from django.urls import reverse
 from mock import Mock, patch
 
 from rss_proxy.models import WhitelistedRssUrl
@@ -11,7 +12,6 @@ from rss_proxy.models import WhitelistedRssUrl
 
 class RssProxyViewTests(TestCase):
     """ Tests for the rss_proxy views """
-    shard = 4
 
     def setUp(self):
         super(RssProxyViewTests, self).setUp()

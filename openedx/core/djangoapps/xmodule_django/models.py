@@ -1,11 +1,13 @@
 """
 Useful django models for implementing XBlock infrastructure in django.
 """
+from __future__ import absolute_import
+
 import logging
 import warnings
 
-from django.db import models
 import opaque_keys.edx.django.models
+from django.db import models
 
 from xmodule.modulestore.django import modulestore
 
