@@ -151,13 +151,13 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
         if "read_replica" in settings.DATABASES:
             schedules = schedules.using("read_replica")
 
-        LOG.info(u'Query = %r', schedules.query.sql_with_params())
+        LOG.info('Query = %r', schedules.query.sql_with_params())
 
         with function_trace('schedule_query_set_evaluation'):
             # This will run the query and cache all of the results in memory.
             num_schedules = len(schedules)
 
-        LOG.info(u'Number of schedules = %d', num_schedules)
+        LOG.info('Number of schedules = %d', num_schedules)
 
         # This should give us a sense of the volume of data being processed by each task.
         set_custom_attribute('num_schedules', num_schedules)
@@ -389,7 +389,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
                 week_highlights = get_week_highlights(user, enrollment.course_id, week_num)
             except CourseUpdateDoesNotExist:
                 LOG.warning(
-                    u'Weekly highlights for user {} in week {} of course {} does not exist or is disabled'.format(
+                    'Weekly highlights for user {} in week {} of course {} does not exist or is disabled'.format(
                         user, week_num, enrollment.course_id
                     )
                 )
@@ -446,7 +446,7 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
                 context,
             )
             LOG.info(
-                u'Sending email to user: {} for course-key: {}'.format(
+                'Sending email to user: {} for course-key: {}'.format(
                     user.username,
                     self.course_id
                 )
@@ -469,7 +469,7 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
             course = schedule.enrollment.course
             user = enrollment.user
             start_date = max(filter(None, (schedule.start_date, course.start)))
-            LOG.info(u'Received a schedule for user {} in course {} for date {}'.format(
+            LOG.info('Received a schedule for user {} in course {} for date {}'.format(
                 user.username,
                 self.course_id,
                 target_date,
@@ -477,9 +477,10 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
 
             try:
                 week_highlights, week_num = get_next_section_highlights(user, course.id, start_date, target_date)
-            except CourseUpdateDoesNotExist:
+            except CourseUpdateDoesNotExist as e:
+                LOG.warning(e.args)
                 LOG.warning(
-                    u'Weekly highlights for user {} of course {} does not exist or is disabled'.format(
+                    'Weekly highlights for user {} of course {} does not exist or is disabled'.format(
                         user, course.id
                     )
                 )
