@@ -94,6 +94,9 @@ def plugin_settings(settings):
     if settings.SENTRY_DSN:
         settings.RAVEN_CONFIG['tags']['app'] = 'lms'
 
+    settings.ACCESS_CONTROL_BACKENDS = settings.ENV_TOKENS.get('ACCESS_CONTROL_BACKENDS', {})
+    settings.LMS_SEGMENT_SITE = settings.AUTH_TOKENS.get('SEGMENT_SITE')
+
     # This is used in the appsembler_sites.middleware.RedirectMiddleware to exclude certain paths
     # from the redirect mechanics.
     settings.MAIN_SITE_REDIRECT_WHITELIST = [

@@ -80,3 +80,16 @@ def plugin_settings(settings):
     settings.TAHOE_DEFAULT_COURSE_GITHUB_ORG = settings.ENV_TOKENS.get('TAHOE_DEFAULT_COURSE_GITHUB_ORG', '')
     settings.TAHOE_DEFAULT_COURSE_GITHUB_NAME = settings.ENV_TOKENS.get('TAHOE_DEFAULT_COURSE_GITHUB_NAME', '')
     settings.TAHOE_DEFAULT_COURSE_VERSION = settings.ENV_TOKENS.get('TAHOE_DEFAULT_COURSE_VERSION', '')
+
+
+    # force S3 v4 (temporary until we can upgrade to django-storages 1.9)
+    settings.S3_USE_SIGV4 = True
+
+    # for some buckets like London ones, we need these non documented django-storages vars
+    # https://github.com/jschneier/django-storages/issues/28#issuecomment-265876674
+    settings.AWS_S3_REGION_NAME = settings.ENV_TOKENS.get('AWS_S3_REGION_NAME', '')
+    settings.AWS_S3_SIGNATURE_VERSION = 's3v4'
+
+    # Honeycomb
+    settings.HONEYCOMB_DATASET = settings.AUTH_TOKENS.get('HONEYCOMB_DATASET', None)
+    settings.HONEYCOMB_WRITEKEY = settings.AUTH_TOKENS.get('HONEYCOMB_WRITEKEY', None)
