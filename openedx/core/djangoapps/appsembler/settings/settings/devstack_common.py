@@ -9,7 +9,7 @@ def plugin_settings(settings):
     """
     Appsembler overrides devstack, both LMS and CMS.
 
-    This runs after `aws_common.py`, check that for relevant settings.
+    This runs after `production_common.py`, check that for relevant settings.
     """
     settings.OAUTH_ENFORCE_SECURE = False
     settings.SESSION_ENGINE = 'django.contrib.sessions.backends.db'

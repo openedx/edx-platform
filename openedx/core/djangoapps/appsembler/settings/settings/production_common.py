@@ -1,5 +1,5 @@
 """
-Settings for Appsembler on production (aka AWS), both LMS and CMS.
+Settings for Appsembler on production in both LMS and CMS.
 """
 
 import dj_database_url

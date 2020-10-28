@@ -1,9 +1,9 @@
 """
-Settings for Appsembler on LMS in Production (aka AWS).
+Settings for Appsembler on LMS in Production.
 """
 from os import path
 
-from openedx.core.djangoapps.appsembler.settings.settings import aws_common
+from openedx.core.djangoapps.appsembler.settings.settings import production_common
 
 
 def _add_theme_static_dirs(settings):
@@ -43,7 +43,7 @@ def plugin_settings(settings):
 
     This file, however, won't run in test environments.
     """
-    aws_common.plugin_settings(settings)
+    production_common.plugin_settings(settings)
 
     settings.LMS_BASE = settings.ENV_TOKENS.get('LMS_BASE')
 

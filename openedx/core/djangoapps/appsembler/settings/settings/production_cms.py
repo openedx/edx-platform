@@ -1,8 +1,8 @@
 """
-Settings for Appsembler on CMS in Production (aka AWS).
+Settings for Appsembler on CMS in Production.
 """
 
-from openedx.core.djangoapps.appsembler.settings.settings import aws_common
+from openedx.core.djangoapps.appsembler.settings.settings import production_common
 
 
 def plugin_settings(settings):
@@ -13,7 +13,7 @@ def plugin_settings(settings):
 
     This file, however, won't run in test environments.
     """
-    aws_common.plugin_settings(settings)
+    production_common.plugin_settings(settings)
 
     settings.APPSEMBLER_SECRET_KEY = settings.AUTH_TOKENS.get("APPSEMBLER_SECRET_KEY")
 
