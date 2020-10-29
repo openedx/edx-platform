@@ -2,7 +2,7 @@
 These are tests for disabling and enabling student accounts, and for making sure
 that students with disabled accounts are unable to access the courseware.
 """
-from __future__ import absolute_import
+
 
 import unittest
 

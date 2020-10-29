@@ -1,39 +1,39 @@
 # #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-17 13:37+0000\n"
-"PO-Revision-Date: 2019-09-17 13:37:43.609149\n"
+"POT-Creation-Date: 2020-01-19 20:51+0000\n"
+"PO-Revision-Date: 2020-01-19 20:51:39.084772\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -245,6 +245,14 @@ msgid "Your changes have been saved."
 msgstr "غخعق ذاشرلثس اشدث زثثر سشدثي."
 
 #. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: cms/static/js/views/xblock_validation.js
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Warning"
+msgstr "صشقرهرل"
+
+#. Translators: This message will be added to the front of messages of type
 #. error,
 #. e.g. "Error: required field is missing".
 #: cms/static/js/views/xblock_validation.js
@@ -410,6 +418,12 @@ msgstr "فاهس حقخزمثو اشس زثثر قثسثف."
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "unsubmitted"
 msgstr "عرسعزوهففثي"
+
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+msgid ""
+"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
+msgstr ""
+"{paragraph}=ح;{preformatted}=حقث;{heading3}=ا3;{heading4}=ا4;{heading5}=ا5;{heading6}=ا6"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -2103,16 +2117,16 @@ msgid "This post could not be reopened. Refresh the page and try again."
 msgstr "فاهس حخسف ذخعمي رخف زث قثخحثرثي. قثبقثسا فاث حشلث شري فقغ شلشهر."
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Show Discussion"
+msgstr "ساخص يهسذعسسهخر"
+
+#: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Hide Discussion"
 msgstr "اهيث يهسذعسسهخر"
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "This discussion could not be loaded. Refresh the page and try again."
 msgstr "فاهس يهسذعسسهخر ذخعمي رخف زث مخشيثي. قثبقثسا فاث حشلث شري فقغ شلشهر."
-
-#: common/static/common/js/discussion/views/discussion_inline_view.js
-msgid "Show Discussion"
-msgstr "ساخص يهسذعسسهخر"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "There are no posts in this topic yet."
@@ -2441,12 +2455,20 @@ msgid "Masters"
 msgstr "وشسفثقس"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "MicroBachelors"
+msgstr "وهذقخزشذاثمخقس"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Photo Verification"
 msgstr "حاخفخ دثقهبهذشفهخر"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Proctoring"
 msgstr "حقخذفخقهرل"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Security"
+msgstr "سثذعقهفغ"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: cms/templates/js/asset-library.underscore
@@ -2637,14 +2659,14 @@ msgstr "شر ثققخق خذذعققثي صاهمث قثوخدهرل فاث وث
 msgid "This team does not have any members."
 msgstr "فاهس فثشو يخثس رخف اشدث شرغ وثوزثقس."
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Joined %(date)s"
 msgstr "تخهرثي %(date)s"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Last Activity %(date)s"
 msgstr "مشسف شذفهدهفغ %(date)s"
@@ -2655,11 +2677,11 @@ msgstr "قثوخدث فاهس فثشو وثوزثق?"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid ""
-"This learner will be removed from the team, allowing another learner to take"
-" the available spot."
+"This learner will be removed from the team,allowing another learner to take "
+"the available spot."
 msgstr ""
-"فاهس مثشقرثق صهمم زث قثوخدثي بقخو فاث فثشو, شممخصهرل شرخفاثق مثشقرثق فخ فشنث"
-" فاث شدشهمشزمث سحخف."
+"فاهس مثشقرثق صهمم زث قثوخدثي بقخو فاث فثشو,شممخصهرل شرخفاثق مثشقرثق فخ فشنث "
+"فاث شدشهمشزمث سحخف."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Delete this team?"
@@ -2667,35 +2689,40 @@ msgstr "يثمثفث فاهس فثشو?"
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid ""
-"Deleting a team is permanent and cannot be undone. All members are removed "
+"Deleting a team is permanent and cannot be undone.All members are removed "
 "from the team, and team discussions can no longer be accessed."
 msgstr ""
-"يثمثفهرل ش فثشو هس حثقوشرثرف شري ذشررخف زث عريخرث. شمم وثوزثقس شقث قثوخدثي "
+"يثمثفهرل ش فثشو هس حثقوشرثرف شري ذشررخف زث عريخرث.شمم وثوزثقس شقث قثوخدثي "
 "بقخو فاث فثشو, شري فثشو يهسذعسسهخرس ذشر رخ مخرلثق زث شذذثسسثي."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Team \"{team}\" successfully deleted."
 msgstr "فثشو \"{team}\" سعذذثسسبعممغ يثمثفثي."
 
+#: lms/djangoapps/teams/static/teams/js/views/manage.js
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Manage"
+msgstr "وشرشلث"
+
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
 msgstr "غخع شقث رخف ذعققثرفمغ ش وثوزثق خب شرغ فثشو."
 
-#. Translators: "and others" refers to fact that additional members of a team
-#. exist that are not displayed.
+#. Translators: "and others" refers to fact that additional
+#. * members of a team exist that are not displayed.
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "and others"
 msgstr "شري خفاثقس"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. http://momentjs.com/)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: http://momentjs.com/)
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "Last activity %(date)s"
-msgstr "مشسف شذفهدهفغ %(date)s"
+msgid "Last activity {date}"
+msgstr "مشسف شذفهدهفغ {date}"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "View %(span_start)s %(team_name)s %(span_end)s"
-msgstr "دهثص %(span_start)s %(team_name)s %(span_end)s"
+msgid "View {span_start} {team_name} {span_end}"
+msgstr "دهثص {span_start} {team_name} {span_end}"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
@@ -2708,10 +2735,10 @@ msgstr "مثشدث فاهس فثشو?"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 msgid ""
-"If you leave, you can no longer post in this team's discussions. Your place "
+"If you leave, you can no longer post in this team's discussions.Your place "
 "will be available to another learner."
 msgstr ""
-"هب غخع مثشدث, غخع ذشر رخ مخرلثق حخسف هر فاهس فثشو'س يهسذعسسهخرس. غخعق حمشذث "
+"هب غخع مثشدث, غخع ذشر رخ مخرلثق حخسف هر فاهس فثشو'س يهسذعسسهخرس.غخعق حمشذث "
 "صهمم زث شدشهمشزمث فخ شرخفاثق مثشقرثق."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
@@ -2728,11 +2755,15 @@ msgstr "غخع شمقثشيغ زثمخرل فخ شرخفاثق فثشو."
 msgid "This team is full."
 msgstr "فاهس فثشو هس بعمم."
 
+#: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
+msgid "Cannot join instructor managed team"
+msgstr "ذشررخف تخهر هرسفقعذفخق وشرشلثي فثشو"
+
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
-msgid "%(memberCount)s / %(maxMemberCount)s Member"
-msgid_plural "%(memberCount)s / %(maxMemberCount)s Members"
-msgstr[0] "%(memberCount)s / %(maxMemberCount)s وثوزثق"
-msgstr[1] "%(memberCount)s / %(maxMemberCount)s وثوزثقس"
+msgid "{memberCount} / {maxMemberCount} Member"
+msgid_plural "{memberCount} / {maxMemberCount} Members"
+msgstr[0] "{memberCount} / {maxMemberCount} وثوزثق"
+msgstr[1] "{memberCount} / {maxMemberCount} وثوزثقس"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "All teams"
@@ -2747,14 +2778,6 @@ msgid "Topics"
 msgstr "فخحهذس"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid ""
-"See all teams in your course, organized by topic. Join a team to collaborate"
-" with other learners who are interested in the same topic as you are."
-msgstr ""
-"سثث شمم فثشوس هر غخعق ذخعقسث, خقلشرهظثي زغ فخحهذ. تخهر ش فثشو فخ ذخممشزخقشفث"
-" صهفا خفاثق مثشقرثقس صاخ شقث هرفثقثسفثي هر فاث سشوث فخحهذ شس غخع شقث."
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "My Team"
 msgstr "وغ فثشو"
 
@@ -2762,6 +2785,14 @@ msgstr "وغ فثشو"
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Browse"
 msgstr "زقخصسث"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"See all teams in your course, organized by topic. Join a team to collaborate"
+" with other learners who are interested in the same topic as you are."
+msgstr ""
+"سثث شمم فثشوس هر غخعق ذخعقسث, خقلشرهظثي زغ فخحهذ. تخهر ش فثشو فخ ذخممشزخقشفث"
+" صهفا خفاثق مثشقرثقس صاخ شقث هرفثقثسفثي هر فاث سشوث فخحهذ شس غخع شقث."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Your request could not be completed. Reload the page and try again."
@@ -2844,27 +2875,19 @@ msgid "The team \"{team}\" could not be found."
 msgstr "فاث فثشو \"{team}\" ذخعمي رخف زث بخعري."
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "%(team_count)s Team"
-msgid_plural "%(team_count)s Teams"
-msgstr[0] "%(team_count)s فثشو"
-msgstr[1] "%(team_count)s فثشوس"
+msgid "{team_count} Team"
+msgid_plural "{team_count} Teams"
+msgstr[0] "{team_count} فثشو"
+msgstr[1] "{team_count} فثشوس"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "Topic"
 msgstr "فخحهذ"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "View Teams in the %(topic_name)s Topic"
-msgstr "دهثص فثشوس هر فاث %(topic_name)s فخحهذ"
+msgid "View Teams in the {topic_name} Topic"
+msgstr "دهثص فثشوس هر فاث {topic_name} فخحهذ"
 
-#. Translators: this string is shown at the bottom of the teams page
-#. to find a team to join or else to create a new one. There are three
-#. links that need to be included in the message:
-#. 1. Browse teams in other topics
-#. 2. search teams
-#. 3. create a new team
-#. Be careful to start each link with the appropriate start indicator
-#. (e.g. {browse_span_start} for #1) and finish it with {span_end}.
 #: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
 msgid ""
 "{browse_span_start}Browse teams in other topics{span_end} or "
@@ -4575,40 +4598,43 @@ msgid ""
 "{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read "
 "the above carefully before proceeding. This is an irreversible action, and "
 "{strongStart}you will no longer be able to use the same email on "
-"edX.{strongEnd}"
+"{platformName}.{strongEnd}"
 msgstr ""
 "{strongStart}صشقرهرل: شذذخعرف يثمثفهخر هس حثقوشرثرف.{strongEnd} حمثشسث قثشي "
 "فاث شزخدث ذشقثبعممغ زثبخقث حقخذثثيهرل. فاهس هس شر هققثدثقسهزمث شذفهخر, شري "
 "{strongStart}غخع صهمم رخ مخرلثق زث شزمث فخ عسث فاث سشوث ثوشهم خر "
-"ثيط.{strongEnd}"
-
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "We’re sorry to see you go!"
-msgstr "صث’قث سخققغ فخ سثث غخع لخ!"
+"{platformName}.{strongEnd}"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
 "Please note: Deletion of your account and personal data is permanent and "
-"cannot be undone. EdX will not be able to recover your account or the data "
-"that is deleted."
+"cannot be undone. {platformName} will not be able to recover your account or"
+" the data that is deleted."
 msgstr ""
 "حمثشسث رخفث: يثمثفهخر خب غخعق شذذخعرف شري حثقسخرشم يشفش هس حثقوشرثرف شري "
-"ذشررخف زث عريخرث. ثيط صهمم رخف زث شزمث فخ قثذخدثق غخعق شذذخعرف خق فاث يشفش "
-"فاشف هس يثمثفثي."
+"ذشررخف زث عريخرث. {platformName} صهمم رخف زث شزمث فخ قثذخدثق غخعق شذذخعرف خق"
+" فاث يشفش فاشف هس يثمثفثي."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
-"Once your account is deleted, you cannot use it to take courses on the edX "
-"app, edx.org, or any other site hosted by edX. This includes access to "
-"edx.org from your employer’s or university’s system and access to private "
-"sites offered by MIT Open Learning, Wharton Executive Education, and Harvard"
-" Medical School."
+"Once your account is deleted, you cannot use it to take courses on the "
+"{platformName} app, {siteName}, or any other site hosted by {platformName}."
 msgstr ""
-"خرذث غخعق شذذخعرف هس يثمثفثي, غخع ذشررخف عسث هف فخ فشنث ذخعقسثس خر فاث ثيط "
-"شحح, ثيط.خقل, خق شرغ خفاثق سهفث اخسفثي زغ ثيط. فاهس هرذمعيثس شذذثسس فخ "
-"ثيط.خقل بقخو غخعق ثوحمخغثق’س خق عرهدثقسهفغ’س سغسفثو شري شذذثسس فخ حقهدشفث "
-"سهفثس خببثقثي زغ وهف خحثر مثشقرهرل, صاشقفخر ثطثذعفهدث ثيعذشفهخر, شري اشقدشقي"
-" وثيهذشم سذاخخم."
+"خرذث غخعق شذذخعرف هس يثمثفثي, غخع ذشررخف عسث هف فخ فشنث ذخعقسثس خر فاث "
+"{platformName} شحح, {siteName}, خق شرغ خفاثق سهفث اخسفثي زغ {platformName}."
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"This includes access to {siteName} from your employer’s or university’s "
+"system{additionalSiteSpecificDeletionText}."
+msgstr ""
+"فاهس هرذمعيثس شذذثسس فخ {siteName} بقخو غخعق ثوحمخغثق’س خق عرهدثقسهفغ’س "
+"سغسفثو{additionalSiteSpecificDeletionText}."
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid "We’re sorry to see you go!"
+msgstr "صث’قث سخققغ فخ سثث غخع لخ!"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -4642,26 +4668,22 @@ msgstr "ش حشسسصخقي هس قثضعهقثي"
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "You have selected “Delete my account.” Deletion of your account and personal"
-" data is permanent and cannot be undone. EdX will not be able to recover "
-"your account or the data that is deleted."
+" data is permanent and cannot be undone. {platformName} will not be able to "
+"recover your account or the data that is deleted."
 msgstr ""
 "غخع اشدث سثمثذفثي “يثمثفث وغ شذذخعرف.” يثمثفهخر خب غخعق شذذخعرف شري حثقسخرشم"
-" يشفش هس حثقوشرثرف شري ذشررخف زث عريخرث. ثيط صهمم رخف زث شزمث فخ قثذخدثق "
-"غخعق شذذخعرف خق فاث يشفش فاشف هس يثمثفثي."
+" يشفش هس حثقوشرثرف شري ذشررخف زث عريخرث. {platformName} صهمم رخف زث شزمث فخ "
+"قثذخدثق غخعق شذذخعرف خق فاث يشفش فاشف هس يثمثفثي."
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "If you proceed, you will be unable to use this account to take courses on "
-"the edX app, edx.org, or any other site hosted by edX. This includes access "
-"to edx.org from your employer’s or university’s system and access to private"
-" sites offered by MIT Open Learning, Wharton Executive Education, and "
-"Harvard Medical School."
+"the {platformName} app, {siteName}, or any other site hosted by "
+"{platformName}."
 msgstr ""
 "هب غخع حقخذثثي, غخع صهمم زث عرشزمث فخ عسث فاهس شذذخعرف فخ فشنث ذخعقسثس خر "
-"فاث ثيط شحح, ثيط.خقل, خق شرغ خفاثق سهفث اخسفثي زغ ثيط. فاهس هرذمعيثس شذذثسس "
-"فخ ثيط.خقل بقخو غخعق ثوحمخغثق’س خق عرهدثقسهفغ’س سغسفثو شري شذذثسس فخ حقهدشفث"
-" سهفثس خببثقثي زغ وهف خحثر مثشقرهرل, صاشقفخر ثطثذعفهدث ثيعذشفهخر, شري "
-"اشقدشقي وثيهذشم سذاخخم."
+"فاث {platformName} شحح, {siteName}, خق شرغ خفاثق سهفث اخسفثي زغ "
+"{platformName}."
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
@@ -4760,6 +4782,10 @@ msgid ""
 msgstr ""
 "شر ثققخق اشس خذذعققثي. فقغ قثبقثساهرل فاث حشلث, خق ذاثذن غخعق هرفثقرثف "
 "ذخررثذفهخر."
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid "An unexpected error has occurred."
+msgstr "شر عرثطحثذفثي ثققخق اشس خذذعققثي."
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -6347,8 +6373,8 @@ msgstr "يشفث شييثي"
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
-msgid "Editing access for: %(title)s"
-msgstr "ثيهفهرل شذذثسس بخق: %(title)s"
+msgid "Editing access for: {title}"
+msgstr "ثيهفهرل شذذثسس بخق: {title}"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
@@ -6915,13 +6941,6 @@ msgstr "سثففهرلس"
 msgid "New {component_type}"
 msgstr "رثص {component_type}"
 
-#. Translators: This message will be added to the front of messages of type
-#. warning,
-#. e.g. "Warning: this component has not been configured yet".
-#: cms/static/js/views/xblock_validation.js
-msgid "Warning"
-msgstr "صشقرهرل"
-
 #: cms/static/js/xblock_asides/structured_tags.js
 msgid "Updating Tags"
 msgstr "عحيشفهرل فشلس"
@@ -7288,6 +7307,22 @@ msgstr "يثمثفث فثشو"
 #: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
 msgid "Edit Membership"
 msgstr "ثيهف وثوزثقساهح"
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "View Current Team Memberships"
+msgstr "دهثص ذعققثرف فثشو وثوزثقساهحس"
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Download Memberships"
+msgstr "يخصرمخشي وثوزثقساهحس"
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Assign Team Memberships"
+msgstr "شسسهلر فثشو وثوزثقساهحس"
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Upload Memberships"
+msgstr "عحمخشي وثوزثقساهحس"
 
 #: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
 msgid "Are you having trouble finding a team to join?"
@@ -9416,6 +9451,10 @@ msgstr ""
 "فاهس سعزسثذفهخر زثذخوث شدشهمشزمث فخ مثشقرثقس عرمثسس فاثغ شقث ثطحمهذهفمغ "
 "اهييثر."
 
+#: cms/templates/js/copy-clipboard-button.underscore
+msgid "Copy Component Location"
+msgstr "ذخحغ ذخوحخرثرف مخذشفهخر"
+
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Weekly Highlight Emails"
 msgstr "صثثنمغ اهلامهلاف ثوشهمس"
@@ -9852,6 +9891,10 @@ msgstr "ذاشحفثق هربخقوشفهخر"
 msgid "Add a Chapter"
 msgstr "شيي ش ذاشحفثق"
 
+#: cms/templates/js/edit-title-button.underscore
+msgid "Edit Title"
+msgstr "ثيهف فهفمث"
+
 #: cms/templates/js/grading-editor.underscore
 msgid "Grading"
 msgstr "لقشيهرل"
@@ -10024,10 +10067,6 @@ msgstr "ذمثشق"
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear Value"
 msgstr "ذمثشق دشمعث"
-
-#: cms/templates/js/metadata-editor.underscore
-msgid "Component Location ID"
-msgstr "ذخوحخرثرف مخذشفهخر هي"
 
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video-transcripts.underscore

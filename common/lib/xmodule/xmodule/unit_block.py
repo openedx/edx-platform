@@ -4,7 +4,7 @@ An XBlock which groups related XBlocks together.
 This is like the "vertical" block, but without that block's UI code, JavaScript,
 and other legacy features.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
@@ -51,6 +51,8 @@ class UnitBlock(XBlock):
             result.add_content(frag.content)
         result.add_content('</div>')
         return result
+
+    public_view = student_view
 
     def index_dictionary(self):
         """

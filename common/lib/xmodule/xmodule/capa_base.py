@@ -1,5 +1,5 @@
 """Implements basics of Capa, including class CapaModule."""
-from __future__ import absolute_import
+
 
 import copy
 import datetime
@@ -294,7 +294,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         except Exception as err:  # pylint: disable=broad-except
             msg = u'cannot create LoncapaProblem {loc}: {err}'.format(
                 loc=text_type(self.location), err=err)
-            six.reraise(Exception(msg), None, sys.exc_info()[2])
+            six.reraise(Exception, Exception(msg), sys.exc_info()[2])
 
         if self.score is None:
             self.set_score(self.score_from_lcp(lcp))
@@ -441,6 +441,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         })
 
     def handle_fatal_lcp_error(self, error):
+        log.exception(u"LcpFatalError Encountered for {block}".format(block=str(self.location)))
         if error:
             return(
                 HTML(u'<p>Error formatting HTML for problem:</p><p><pre style="color:red">{msg}</pre></p>').format(
@@ -557,7 +558,14 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
         `err` is the Exception encountered while rendering the problem HTML.
         """
-        log.exception(text_type(err))
+        problem_display_name = self.display_name_with_default
+        problem_location = text_type(self.location)
+        log.exception(
+            u"ProblemGetHtmlError: %r, %r, %s",
+            problem_display_name,
+            problem_location,
+            text_type(err)
+        )
 
         # TODO (vshnayder): another switch on DEBUG.
         if self.runtime.DEBUG:
@@ -613,9 +621,14 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             html = warning
             try:
                 html += self.lcp.get_html()
-            except Exception:
+            except Exception as error:
                 # Couldn't do it. Give up.
-                log.exception("Unable to generate html from LoncapaProblem")
+                log.exception(
+                    u"ProblemGetHtmlError: Unable to generate html from LoncapaProblem: %r, %r, %s",
+                    problem_display_name,
+                    problem_location,
+                    text_type(error)
+                )
                 raise
 
         return html

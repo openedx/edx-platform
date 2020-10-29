@@ -1,6 +1,7 @@
-"""Factories for testing the Teams API."""
+"""
+Factories for testing the Teams API.
+"""
 
-from __future__ import absolute_import
 
 from datetime import datetime
 from uuid import uuid4
@@ -24,6 +25,7 @@ class CourseTeamFactory(DjangoModelFactory):
         django_get_or_create = ('team_id',)
 
     team_id = factory.Sequence('team-{0}'.format)
+    topic_id = factory.Sequence('topic-{0}'.format)
     discussion_topic_id = factory.LazyAttribute(lambda a: uuid4().hex)
     name = factory.Sequence(u"Awesome Team {0}".format)
     description = "A simple description"

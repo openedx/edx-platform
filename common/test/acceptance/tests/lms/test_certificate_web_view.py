@@ -1,7 +1,7 @@
 """
 Acceptance tests for the certificate web view feature.
 """
-from __future__ import absolute_import
+
 
 from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
 from common.test.acceptance.fixtures.course import CourseFixture

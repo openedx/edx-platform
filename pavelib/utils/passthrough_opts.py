@@ -8,7 +8,6 @@ Provides:
         as the `passthrough_options` argument to the decorated function
 """
 
-from __future__ import absolute_import
 
 from optparse import BadOptionError, OptionParser
 

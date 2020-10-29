@@ -10,7 +10,7 @@ with an E-Commerce service that supports automatic refunds.  Once that
 transition is complete, we can remove this view.
 
 """
-from __future__ import absolute_import
+
 
 import logging
 

@@ -1,7 +1,7 @@
 """
 Decorators that can be used to interact with third_party_auth.
 """
-from __future__ import absolute_import
+
 
 from functools import wraps
 

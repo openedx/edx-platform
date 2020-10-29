@@ -4,7 +4,7 @@ Certificate end-points used by the student support UI.
 See lms/djangoapps/support for more details.
 
 """
-from __future__ import absolute_import
+
 
 import logging
 from functools import wraps
@@ -22,9 +22,9 @@ from django.views.decorators.http import require_GET, require_POST
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from courseware.access import has_access
 from lms.djangoapps.certificates import api
 from lms.djangoapps.certificates.models import CertificateInvalidation
+from lms.djangoapps.certificates.permissions import VIEW_ALL_CERTIFICATES, GENERATE_ALL_CERTIFICATES
 from lms.djangoapps.instructor_task.api import generate_certificates_for_students
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment, User
@@ -34,22 +34,28 @@ from xmodule.modulestore.django import modulestore
 log = logging.getLogger(__name__)
 
 
-def require_certificate_permission(func):
+def require_certificate_permission(permission):
     """
     View decorator that requires permission to view and regenerate certificates.
     """
-    @wraps(func)
-    def inner(request, *args, **kwargs):
-        if has_access(request.user, "certificates", "global"):
-            return func(request, *args, **kwargs)
-        else:
+    def inner(func):
+        """
+        The outer wrapper, used to allow the decorator to take optional arguments.
+        """
+        @wraps(func)
+        def wrapper(request, *args, **kwargs):
+            """
+            The inner wrapper, which wraps the view function.
+            """
+            if request.user.has_perm(permission, 'global'):
+                return func(request, *args, **kwargs)
             return HttpResponseForbidden()
-
+        return wrapper
     return inner
 
 
 @require_GET
-@require_certificate_permission
+@require_certificate_permission(VIEW_ALL_CERTIFICATES)
 def search_certificates(request):
     """
     Search for certificates for a particular user OR along with the given course.
@@ -157,7 +163,7 @@ def _validate_post_params(params):
 # Grades can potentially be written - if so, let grading manage the transaction.
 @transaction.non_atomic_requests
 @require_POST
-@require_certificate_permission
+@require_certificate_permission(GENERATE_ALL_CERTIFICATES)
 def regenerate_certificate_for_user(request):
     """
     Regenerate certificates for a user.
@@ -224,7 +230,7 @@ def regenerate_certificate_for_user(request):
 
 @transaction.non_atomic_requests
 @require_POST
-@require_certificate_permission
+@require_certificate_permission(GENERATE_ALL_CERTIFICATES)
 def generate_certificate_for_user(request):
     """
     Generate certificates for a user.

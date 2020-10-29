@@ -1,7 +1,7 @@
 """
 Model Managers for Course Actions
 """
-from __future__ import absolute_import
+
 import six
 import traceback
 from django.db import models, transaction

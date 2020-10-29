@@ -2,7 +2,6 @@
 Configuration for self-paced courses.
 """
 
-from __future__ import absolute_import
 
 from config_models.models import ConfigurationModel
 from django.db.models import BooleanField

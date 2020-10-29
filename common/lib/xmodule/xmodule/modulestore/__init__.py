@@ -3,7 +3,6 @@ This module provides an abstraction for working with XModuleDescriptors
 that are stored in a database an accessible using their Location as an identifier
 """
 
-from __future__ import absolute_import
 
 import datetime
 import logging

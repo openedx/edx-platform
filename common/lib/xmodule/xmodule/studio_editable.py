@@ -1,7 +1,7 @@
 """
 Mixin to support editing in Studio.
 """
-from __future__ import absolute_import
+
 
 import six
 from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW, module_attr

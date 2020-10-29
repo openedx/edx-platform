@@ -2,7 +2,7 @@
 Utilities for use in Mako markup.
 """
 
-from __future__ import absolute_import
+
 import markupsafe
 import bleach
 from lxml.html.clean import Cleaner

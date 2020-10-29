@@ -2,17 +2,20 @@
 Models for configuration of the feature flags
 controlling persistent grades.
 """
-from __future__ import absolute_import
+
 
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.db.models import BooleanField, IntegerField, TextField
+from django.utils.encoding import python_2_unicode_compatible
 from opaque_keys.edx.django.models import CourseKeyField
+
 from six import text_type
 
 from openedx.core.lib.cache_utils import request_cached
 
 
+@python_2_unicode_compatible
 class PersistentGradesEnabledFlag(ConfigurationModel):
     """
     Enables persistent grades across the platform.
@@ -50,13 +53,14 @@ class PersistentGradesEnabledFlag(ConfigurationModel):
     class Meta(object):
         app_label = "grades"
 
-    def __unicode__(self):
+    def __str__(self):
         current_model = PersistentGradesEnabledFlag.current()
         return u"PersistentGradesEnabledFlag: enabled {}".format(
             current_model.is_enabled()
         )
 
 
+@python_2_unicode_compatible
 class CoursePersistentGradesFlag(ConfigurationModel):
     """
     Enables persistent grades for a specific
@@ -73,7 +77,7 @@ class CoursePersistentGradesFlag(ConfigurationModel):
     # The course that these features are attached to.
     course_id = CourseKeyField(max_length=255, db_index=True)
 
-    def __unicode__(self):
+    def __str__(self):
         not_en = "Not "
         if self.enabled:
             not_en = ""
@@ -90,5 +94,5 @@ class ComputeGradesSetting(ConfigurationModel):
     batch_size = IntegerField(default=100)
     course_ids = TextField(
         blank=False,
-        help_text="Whitespace-separated list of course keys for which to compute grades."
+        help_text=u"Whitespace-separated list of course keys for which to compute grades."
     )

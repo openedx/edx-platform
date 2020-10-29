@@ -1,7 +1,7 @@
 """
 Permissions classes for User-API aware views.
 """
-from __future__ import absolute_import
+
 
 from django.contrib.auth.models import User
 from django.http import Http404

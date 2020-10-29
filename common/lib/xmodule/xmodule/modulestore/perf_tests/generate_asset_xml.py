@@ -4,7 +4,7 @@
 """
 Generates fake XML for asset metadata.
 """
-from __future__ import absolute_import, print_function
+
 
 import random
 from datetime import datetime, timedelta

@@ -1,7 +1,7 @@
 """
 Tests for Discussion API forms
 """
-from __future__ import absolute_import
+
 
 import itertools
 from unittest import TestCase

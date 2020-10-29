@@ -2,7 +2,7 @@
 A utility class which wraps the RateLimitMixin 3rd party class to do bad request counting
 which can be used for rate limiting
 """
-from __future__ import absolute_import
+
 
 from django.conf import settings
 from ratelimitbackend.backends import RateLimitMixin

@@ -1,7 +1,10 @@
 """
-Python API for content libraries
+Python API for content libraries.
+
+Unless otherwise specified, all APIs in this file deal with the DRAFT version
+of the content library.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 from uuid import UUID
 import logging
 
@@ -31,6 +34,7 @@ from openedx.core.lib.blockstore_api import (
     commit_draft,
     delete_draft,
 )
+from openedx.core.djangolib import blockstore_cache
 from openedx.core.djangolib.blockstore_cache import BundleCache
 from .models import ContentLibrary, ContentLibraryPermission
 
@@ -54,6 +58,10 @@ class LibraryAlreadyExists(KeyError):
 
 class LibraryBlockAlreadyExists(KeyError):
     """ An XBlock with that ID already exists in the library """
+
+
+class InvalidNameError(ValueError):
+    """ The specified name/identifier is not valid """
 
 
 # Models:
@@ -83,6 +91,21 @@ class LibraryXBlockMetadata(object):
     def_key = attr.ib(type=BundleDefinitionLocator)
     display_name = attr.ib("")
     has_unpublished_changes = attr.ib(False)
+
+
+@attr.s
+class LibraryXBlockStaticFile(object):
+    """
+    Class that represents a static file in a content library, associated with
+    a particular XBlock.
+    """
+    # File path e.g. "diagram.png"
+    # In some rare cases it might contain a folder part, e.g. "en/track1.srt"
+    path = attr.ib("")
+    # Publicly accessible URL where the file can be downloaded
+    url = attr.ib("")
+    # Size in bytes
+    size = attr.ib(0)
 
 
 @attr.s
@@ -260,6 +283,21 @@ def get_library_blocks(library_key):
     return blocks
 
 
+def _lookup_usage_key(usage_key):
+    """
+    Given a LibraryUsageLocatorV2 (usage key for an XBlock in a content library)
+    return the definition key and LibraryBundle
+    or raise ContentLibraryBlockNotFound
+    """
+    assert isinstance(usage_key, LibraryUsageLocatorV2)
+    lib_context = get_learning_context_impl(usage_key)
+    def_key = lib_context.definition_for_usage(usage_key, force_draft=DRAFT_NAME)
+    if def_key is None:
+        raise ContentLibraryBlockNotFound(usage_key)
+    lib_bundle = LibraryBundle(usage_key.lib_key, def_key.bundle_uuid, draft_name=DRAFT_NAME)
+    return def_key, lib_bundle
+
+
 def get_library_block(usage_key):
     """
     Get metadata (LibraryXBlockMetadata) about one specific XBlock in a library
@@ -268,12 +306,7 @@ def get_library_block(usage_key):
         openedx.core.djangoapps.xblock.api.load_block()
     instead.
     """
-    assert isinstance(usage_key, LibraryUsageLocatorV2)
-    lib_context = get_learning_context_impl(usage_key)
-    def_key = lib_context.definition_for_usage(usage_key, force_draft=DRAFT_NAME)
-    if def_key is None:
-        raise ContentLibraryBlockNotFound(usage_key)
-    lib_bundle = LibraryBundle(usage_key.lib_key, def_key.bundle_uuid, draft_name=DRAFT_NAME)
+    def_key, lib_bundle = _lookup_usage_key(usage_key)
     return LibraryXBlockMetadata(
         usage_key=usage_key,
         def_key=def_key,
@@ -292,7 +325,7 @@ def get_library_block_olx(usage_key):
         bundle_uuid=definition_key.bundle_uuid,  # pylint: disable=no-member
         path=definition_key.olx_path,  # pylint: disable=no-member
         use_draft=DRAFT_NAME,
-    )
+    ).decode('utf-8')
     return xml_str
 
 
@@ -314,7 +347,7 @@ def set_library_block_olx(usage_key, new_olx_str):
         raise ValueError("Invalid root tag in OLX, expected {}".format(block_type))
     # Write the new XML/OLX file into the library bundle's draft
     draft = get_or_create_bundle_draft(metadata.def_key.bundle_uuid, DRAFT_NAME)
-    write_draft_file(draft.uuid, metadata.def_key.olx_path, new_olx_str)
+    write_draft_file(draft.uuid, metadata.def_key.olx_path, new_olx_str.encode('utf-8'))
     # Clear the bundle cache so everyone sees the new block immediately:
     BundleCache(metadata.def_key.bundle_uuid, draft_name=DRAFT_NAME).clear()
 
@@ -347,7 +380,7 @@ def create_library_block(library_key, block_type, definition_id):
     path = "{}/{}/definition.xml".format(block_type, definition_id)
     # Write the new XML/OLX file into the library bundle's draft
     draft = get_or_create_bundle_draft(ref.bundle_uuid, DRAFT_NAME)
-    write_draft_file(draft.uuid, path, new_definition_xml)
+    write_draft_file(draft.uuid, path, new_definition_xml.encode('utf-8'))
     # Clear the bundle cache so everyone sees the new block immediately:
     BundleCache(ref.bundle_uuid, draft_name=DRAFT_NAME).clear()
     # Now return the metadata about the new block:
@@ -371,13 +404,7 @@ def delete_library_block(usage_key, remove_from_parent=True):
         delete block. This should always be true except when this function
         calls itself recursively.
     """
-    assert isinstance(usage_key, LibraryUsageLocatorV2)
-    library_context = get_learning_context_impl(usage_key)
-    library_ref = ContentLibrary.objects.get_by_key(usage_key.context_key)
-    def_key = library_context.definition_for_usage(usage_key)
-    if def_key is None:
-        raise ContentLibraryBlockNotFound(usage_key)
-    lib_bundle = LibraryBundle(usage_key.context_key, library_ref.bundle_uuid, draft_name=DRAFT_NAME)
+    def_key, lib_bundle = _lookup_usage_key(usage_key)
     # Create a draft:
     draft_uuid = get_or_create_bundle_draft(def_key.bundle_uuid, DRAFT_NAME).uuid
     # Does this block have a parent?
@@ -395,7 +422,7 @@ def delete_library_block(usage_key, remove_from_parent=True):
             # we're going to delete this block anyways.
             delete_library_block(child_usage, remove_from_parent=False)
     # Delete the definition:
-    if def_key.bundle_uuid == library_ref.bundle_uuid:
+    if def_key.bundle_uuid == lib_bundle.bundle_uuid:
         # This definition is in the library, so delete it:
         path_prefix = lib_bundle.olx_prefix(def_key)
         for bundle_file in get_bundle_files(def_key.bundle_uuid, use_draft=DRAFT_NAME):
@@ -432,6 +459,74 @@ def create_library_block_child(parent_usage_key, block_type, definition_id):
     parent_block.runtime.add_child_include(parent_block, include_data)
     parent_block.save()
     return metadata
+
+
+def get_library_block_static_asset_files(usage_key):
+    """
+    Given an XBlock in a content library, list all the static asset files
+    associated with that XBlock.
+
+    Returns a list of LibraryXBlockStaticFile objects.
+    """
+    def_key, lib_bundle = _lookup_usage_key(usage_key)
+    result = [
+        LibraryXBlockStaticFile(path=f.path, url=f.url, size=f.size)
+        for f in lib_bundle.get_static_files_for_definition(def_key)
+    ]
+    result.sort(key=lambda f: f.path)
+    return result
+
+
+def add_library_block_static_asset_file(usage_key, file_name, file_content):
+    """
+    Upload a static asset file into the library, to be associated with the
+    specified XBlock. Will silently overwrite an existing file of the same name.
+
+    file_name should be a name like "doc.pdf". It may optionally contain slashes
+        like 'en/doc.pdf'
+    file_content should be a binary string.
+
+    Returns a LibraryXBlockStaticFile object.
+
+    Example:
+        video_block = UsageKey.from_string("lb:VideoTeam:python-intro:video:1")
+        add_library_block_static_asset_file(video_block, "subtitles-en.srt", subtitles.encode('utf-8'))
+    """
+    assert isinstance(file_content, six.binary_type)
+    def_key, lib_bundle = _lookup_usage_key(usage_key)
+    if file_name != file_name.strip().strip('/'):
+        raise InvalidNameError("file name cannot start/end with / or whitespace.")
+    if '//' in file_name or '..' in file_name:
+        raise InvalidNameError("Invalid sequence (// or ..) in filename.")
+    file_path = lib_bundle.get_static_prefix_for_definition(def_key) + file_name
+    # Write the new static file into the library bundle's draft
+    draft = get_or_create_bundle_draft(def_key.bundle_uuid, DRAFT_NAME)
+    write_draft_file(draft.uuid, file_path, file_content)
+    # Clear the bundle cache so everyone sees the new file immediately:
+    lib_bundle.cache.clear()
+    file_metadata = blockstore_cache.get_bundle_file_metadata_with_cache(
+        bundle_uuid=def_key.bundle_uuid, path=file_path, draft_name=DRAFT_NAME,
+    )
+    return LibraryXBlockStaticFile(path=file_metadata.path, url=file_metadata.url, size=file_metadata.size)
+
+
+def delete_library_block_static_asset_file(usage_key, file_name):
+    """
+    Delete a static asset file from the library.
+
+    Example:
+        video_block = UsageKey.from_string("lb:VideoTeam:python-intro:video:1")
+        delete_library_block_static_asset_file(video_block, "subtitles-en.srt")
+    """
+    def_key, lib_bundle = _lookup_usage_key(usage_key)
+    if '..' in file_name:
+        raise InvalidNameError("Invalid .. in file name.")
+    file_path = lib_bundle.get_static_prefix_for_definition(def_key) + file_name
+    # Delete the file from the library bundle's draft
+    draft = get_or_create_bundle_draft(def_key.bundle_uuid, DRAFT_NAME)
+    write_draft_file(draft.uuid, file_path, contents=None)
+    # Clear the bundle cache so everyone sees the new file immediately:
+    lib_bundle.cache.clear()
 
 
 def get_allowed_block_types(library_key):  # pylint: disable=unused-argument

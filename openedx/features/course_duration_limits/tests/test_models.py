@@ -2,7 +2,6 @@
 Tests of CourseDurationLimitConfig.
 """
 
-from __future__ import absolute_import
 
 import itertools
 from datetime import datetime, timedelta
@@ -39,18 +38,15 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         super(TestCourseDurationLimitConfig, self).setUp()
 
     @ddt.data(
-        (True, True, True),
-        (True, True, False),
-        (True, False, True),
-        (True, False, False),
-        (False, False, True),
-        (False, False, False),
+        (True, True),
+        (True, False),
+        (False, True),
+        (False, False),
     )
     @ddt.unpack
     def test_enabled_for_enrollment(
         self,
         already_enrolled,
-        pass_enrollment,
         enrolled_before_enabled,
     ):
 
@@ -75,22 +71,13 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         else:
             existing_enrollment = None
 
-        if pass_enrollment:
-            enrollment = existing_enrollment
-            user = None
-            course_key = None
-        else:
-            enrollment = None
-            user = self.user
-            course_key = self.course_overview.id
+        user = self.user
+        course_key = self.course_overview.id
 
-        query_count = 7
-        if pass_enrollment and already_enrolled:
-            query_count = 6
+        query_count = 6
 
         with self.assertNumQueries(query_count):
             enabled = CourseDurationLimitConfig.enabled_for_enrollment(
-                enrollment=enrollment,
                 user=user,
                 course_key=course_key,
             )
@@ -98,16 +85,14 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
 
     def test_enabled_for_enrollment_failure(self):
         with self.assertRaises(ValueError):
-            CourseDurationLimitConfig.enabled_for_enrollment(None, None, None)
+            CourseDurationLimitConfig.enabled_for_enrollment(None, None)
         with self.assertRaises(ValueError):
             CourseDurationLimitConfig.enabled_for_enrollment(
-                Mock(name='enrollment'),
                 Mock(name='user'),
                 None
             )
         with self.assertRaises(ValueError):
             CourseDurationLimitConfig.enabled_for_enrollment(
-                Mock(name='enrollment'),
                 None,
                 Mock(name='course_key')
             )

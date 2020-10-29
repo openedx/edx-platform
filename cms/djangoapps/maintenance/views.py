@@ -1,7 +1,7 @@
 """
 Views for the maintenance app.
 """
-from __future__ import absolute_import
+
 
 import logging
 

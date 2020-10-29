@@ -1,7 +1,9 @@
 """
 Tests for the link_program_enrollments management command.
 """
-from __future__ import absolute_import
+
+
+from uuid import UUID
 
 import mock
 from django.core.management import call_command
@@ -15,13 +17,13 @@ _COMMAND_PATH = 'lms.djangoapps.program_enrollments.management.commands.link_pro
 
 class TestLinkProgramEnrollmentManagementCommand(TestCase):
     """
-    Test that the command calls link_program_enrollments_to_lms_users
+    Test that the command calls link_program_enrollments
     correctly and handles exceptional input correctly.
     """
 
     program_uuid = 'a32c5da8-fb89-4f1e-97a7-b13de9e6dfa2'
 
-    _LINKING_FUNCTION_MOCK_PATH = _COMMAND_PATH + ".link_program_enrollments_to_lms_users"
+    _LINKING_FUNCTION_MOCK_PATH = _COMMAND_PATH + ".link_program_enrollments"
 
     @mock.patch(_LINKING_FUNCTION_MOCK_PATH, autospec=True)
     def test_good_input_calls_linking(self, mock_link):
@@ -29,7 +31,7 @@ class TestLinkProgramEnrollmentManagementCommand(TestCase):
             Command(), self.program_uuid, 'learner-01:user-01', 'learner-02:user-02'
         )
         mock_link.assert_called_once_with(
-            self.program_uuid,
+            UUID(self.program_uuid),
             {
                 'learner-01': 'user-01',
                 'learner-02': 'user-02',
@@ -45,6 +47,24 @@ class TestLinkProgramEnrollmentManagementCommand(TestCase):
                 Command(), self.program_uuid, 'learner-01:user-01', 'whoops', 'learner-03:user-03'
             )
 
+    def test_missing_external_user_key(self):
+        with self.assertRaisesRegex(
+                CommandError,
+                INCORRECT_PARAMETER_TEMPLATE.format('whoops: ')
+        ):
+            call_command(
+                Command(), self.program_uuid, 'learner-01:user-01', 'whoops: ', 'learner-03:user-03'
+            )
+
+    def test_missing_username(self):
+        with self.assertRaisesRegex(
+                CommandError,
+                INCORRECT_PARAMETER_TEMPLATE.format(' :whoops')
+        ):
+            call_command(
+                Command(), self.program_uuid, 'learner-01:user-01', ' :whoops', 'learner-03:user-03'
+            )
+
     def test_repeated_user_key_exception(self):
         with self.assertRaisesRegex(
                 CommandError,
@@ -52,4 +72,11 @@ class TestLinkProgramEnrollmentManagementCommand(TestCase):
         ):
             call_command(
                 Command(), self.program_uuid, 'learner-01:user-01', 'learner-01:user-02'
+            )
+
+    def test_invalid_uuid(self):
+        error_regex = r"supplied program_uuid '.*' is not a valid UUID"
+        with self.assertRaisesRegex(CommandError, error_regex):
+            call_command(
+                Command(), 'notauuid::thisisntauuid', 'learner-0:user-01'
             )

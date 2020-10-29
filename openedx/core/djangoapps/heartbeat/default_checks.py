@@ -3,7 +3,7 @@ A set of built-in default checks for the platform heartbeat endpoint
 
 Other checks should be included in their respective modules/djangoapps
 """
-from __future__ import absolute_import
+
 
 from datetime import datetime, timedelta
 from time import sleep, time

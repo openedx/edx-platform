@@ -1,15 +1,15 @@
 """
 Test for split test XModule
 """
-from __future__ import absolute_import
+
 
 import six
 from django.urls import reverse
 from mock import MagicMock
 from six import text_type
 
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module_for_descriptor
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.module_render import get_module_for_descriptor
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase

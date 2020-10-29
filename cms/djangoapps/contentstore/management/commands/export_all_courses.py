@@ -1,7 +1,7 @@
 """
 Script for exporting all courseware from Mongo to a directory and listing the courses which failed to export
 """
-from __future__ import absolute_import, print_function
+
 
 from django.core.management.base import BaseCommand
 from six import text_type

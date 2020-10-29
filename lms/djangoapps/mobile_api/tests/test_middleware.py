@@ -1,7 +1,7 @@
 """
 Tests for Version Based App Upgrade Middleware
 """
-from __future__ import absolute_import
+
 
 from datetime import datetime
 
@@ -85,7 +85,7 @@ class TestAppVersionUpgradeMiddleware(CacheIsolationTestCase):
         with self.assertNumQueries(0):
             request_response, processed_response = self.process_middleware(user_agent, 0)
         self.assertIsNone(request_response)
-        self.assertEquals(200, processed_response.status_code)
+        self.assertEqual(200, processed_response.status_code)
         self.assertNotIn(AppVersionUpgrade.LATEST_VERSION_HEADER, processed_response)
         self.assertNotIn(AppVersionUpgrade.LAST_SUPPORTED_DATE_HEADER, processed_response)
 
@@ -99,7 +99,7 @@ class TestAppVersionUpgradeMiddleware(CacheIsolationTestCase):
         with self.assertNumQueries(2):
             request_response, processed_response = self.process_middleware(user_agent)
         self.assertIsNone(request_response)
-        self.assertEquals(200, processed_response.status_code)
+        self.assertEqual(200, processed_response.status_code)
         self.assertNotIn(AppVersionUpgrade.LATEST_VERSION_HEADER, processed_response)
         self.assertNotIn(AppVersionUpgrade.LAST_SUPPORTED_DATE_HEADER, processed_response)
         with self.assertNumQueries(0):
@@ -116,7 +116,7 @@ class TestAppVersionUpgradeMiddleware(CacheIsolationTestCase):
         with self.assertNumQueries(2):
             request_response, processed_response = self.process_middleware(user_agent)
         self.assertIsNone(request_response)
-        self.assertEquals(200, processed_response.status_code)
+        self.assertEqual(200, processed_response.status_code)
         self.assertEqual(latest_version, processed_response[AppVersionUpgrade.LATEST_VERSION_HEADER])
         self.assertNotIn(AppVersionUpgrade.LAST_SUPPORTED_DATE_HEADER, processed_response)
         with self.assertNumQueries(0):
@@ -137,7 +137,7 @@ class TestAppVersionUpgradeMiddleware(CacheIsolationTestCase):
         with self.assertNumQueries(2):
             request_response, processed_response = self.process_middleware(user_agent)
         self.assertIsNotNone(request_response)
-        self.assertEquals(426, processed_response.status_code)
+        self.assertEqual(426, processed_response.status_code)
         self.assertEqual(latest_version, processed_response[AppVersionUpgrade.LATEST_VERSION_HEADER])
         with self.assertNumQueries(0):
             self.process_middleware(user_agent)
@@ -155,7 +155,7 @@ class TestAppVersionUpgradeMiddleware(CacheIsolationTestCase):
         with self.assertNumQueries(2):
             request_response, processed_response = self.process_middleware(user_agent)
         self.assertIsNone(request_response)
-        self.assertEquals(200, processed_response.status_code)
+        self.assertEqual(200, processed_response.status_code)
         self.assertEqual(latest_version, processed_response[AppVersionUpgrade.LATEST_VERSION_HEADER])
         self.assertEqual(upgrade_date, processed_response[AppVersionUpgrade.LAST_SUPPORTED_DATE_HEADER])
         with self.assertNumQueries(0):

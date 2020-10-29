@@ -1,7 +1,7 @@
 """
 Serializers for Course Blocks related return objects.
 """
-from __future__ import absolute_import
+
 
 import six
 from django.conf import settings
@@ -104,9 +104,11 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
         if authorization_denial_reason and authorization_denial_message:
             data['authorization_denial_reason'] = authorization_denial_reason
             data['authorization_denial_message'] = authorization_denial_message
+            cleaned_data = data.copy()
             for field in data.keys():  # pylint: disable=consider-iterating-dictionary
                 if field not in FIELDS_ALLOWED_IN_AUTH_DENIED_CONTENT:
-                    del data[field]
+                    del cleaned_data[field]
+            data = cleaned_data
 
         return data
 

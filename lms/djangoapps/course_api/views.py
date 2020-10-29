@@ -2,7 +2,6 @@
 Course API Views
 """
 
-from __future__ import absolute_import
 
 from django.core.exceptions import ValidationError
 from edx_rest_framework_extensions.paginators import NamespacedPageNumberPagination

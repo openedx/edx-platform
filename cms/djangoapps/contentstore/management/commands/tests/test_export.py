@@ -1,7 +1,7 @@
 """
 Tests for exporting courseware to the desired path
 """
-from __future__ import absolute_import
+
 
 import shutil
 import unittest
@@ -29,7 +29,7 @@ class TestArgParsingCourseExport(unittest.TestCase):
             errstring = "Error: too few arguments"
         else:
             errstring = "Error: the following arguments are required: course_id, output_path"
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('export')
 
 
@@ -62,7 +62,7 @@ class TestCourseExport(ModuleStoreTestCase):
         )
         # Test `export` management command with invalid course_id
         errstring = "Invalid course_key: 'InvalidCourseID'."
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('export', "InvalidCourseID", self.temp_dir_1)
 
         # Test `export` management command with correct course_id
@@ -74,5 +74,5 @@ class TestCourseExport(ModuleStoreTestCase):
         Test export command with a valid course key that doesn't exist
         """
         errstring = "Course with x/y/z key not found."
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('export', "x/y/z", self.temp_dir_1)

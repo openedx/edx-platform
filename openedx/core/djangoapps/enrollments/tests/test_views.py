@@ -2,7 +2,7 @@
 """
 Tests for user enrollment.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import itertools
@@ -273,7 +273,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             _assert_no_opt_in_set()
         else:
             preference = UserOrgTag.objects.get(user=self.user, org=self.course.id.org, key="email-optin")
-            self.assertEquals(preference.value, pref_value)
+            self.assertEqual(preference.value, pref_value)
 
     def test_enroll_prof_ed(self):
         # Create the prod ed mode.
@@ -547,8 +547,12 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
 
     def test_enrollment_already_enrolled(self):
         response = self.assert_enrollment_status()
+        response_json = json.loads(response.content.decode('utf-8'))
+
         repeat_response = self.assert_enrollment_status(expected_status=status.HTTP_200_OK)
-        self.assertEqual(json.loads(response.content.decode('utf-8')), json.loads(repeat_response.content))
+        repeat_json = json.loads(repeat_response.content.decode('utf-8'))
+
+        self.assertEqual(response_json, repeat_json)
 
     def test_get_enrollment_with_invalid_key(self):
         resp = self.client.post(
@@ -561,8 +565,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             },
             format='json'
         )
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("No course ", resp.content)
+        self.assertContains(resp, "No course ", status_code=status.HTTP_400_BAD_REQUEST)
 
     def test_enrollment_throttle_for_user(self):
         """Make sure a user requests do not exceed the maximum number of requests"""
@@ -655,7 +658,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             ),
             {'include_expired': True},
         )
-        v_data = json.loads(v_response.content)
+        v_data = json.loads(v_response.content.decode('utf-8'))
 
         # Ensure that both course modes are returned
         self.assertEqual(len(v_data['course_modes']), 2)
@@ -664,7 +667,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         h_response = self.client.get(
             reverse('courseenrollmentdetails', kwargs={"course_id": six.text_type(self.course.id)}),
         )
-        h_data = json.loads(h_response.content)
+        h_data = json.loads(h_response.content.decode('utf-8'))
 
         # Ensure that only one course mode is returned and that it is honor
         self.assertEqual(len(h_data['course_modes']), 1)
@@ -943,7 +946,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             self.assertEqual(is_active, old_is_active)
             self.assertEqual(course_mode, old_mode)
             # error message should contain specific text.  Otto checks for this text in the message.
-            self.assertRegexpMatches(
+            self.assertRegex(
                 json.loads(response.content.decode('utf-8'))['message'],
                 'Enrollment mode mismatch'
             )
@@ -996,6 +999,40 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
         self.assertTrue(is_active)
         self.assertEqual(course_mode, updated_mode)
+
+    @ddt.data(
+        (True, status.HTTP_200_OK),
+        (False, status.HTTP_404_NOT_FOUND)
+    )
+    @ddt.unpack
+    def test_enrollment_with_global_staff_permissions(self, using_global_staff_user, http_status):
+        """Verify no audit enrollments for user different than requesting user and without
+        API_KEY should be done by the users having global staff permissions. """
+
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug=CourseMode.VERIFIED,
+            mode_display_name=CourseMode.VERIFIED,
+        )
+
+        username = self.OTHER_USERNAME
+        if using_global_staff_user:
+            username = 'global_staff'
+            AdminFactory(username=username, email='global_staff@example.com', password=self.PASSWORD)
+        self.client.login(username=username, password=self.PASSWORD)
+
+        # Create an enrollment
+        self.assert_enrollment_status(
+            as_server=False,
+            mode=CourseMode.VERIFIED,
+            expected_status=http_status
+        )
+
+        if using_global_staff_user:
+            course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+            self.assertTrue(is_active)
+            self.assertEqual(course_mode, CourseMode.VERIFIED)
+        self.client.logout()
 
     @httpretty.activate
     @override_settings(ENTERPRISE_SERVICE_WORKER_USERNAME='enterprise_worker',

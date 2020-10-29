@@ -9,7 +9,7 @@ This management command will manually trigger the receivers we care about.
 (We don't want to trigger all receivers for these signals, since these are busy
 signals.)
 """
-from __future__ import absolute_import, division, print_function
+
 
 import logging
 import math
@@ -64,9 +64,10 @@ def paged_query(queryset, delay, page_size):
 
         if delay and page:
             time.sleep(delay)
-
-        for i, item in enumerate(subquery, start=1):
-            yield page_start + i, item
+        index = 0
+        for item in subquery.iterator():
+            index += 1
+            yield page_start + index, item
 
 
 class Command(BaseCommand):

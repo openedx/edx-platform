@@ -3,7 +3,7 @@ CCX Enrollment operations for use by Coach APIs.
 
 Does not include any access control, be sure to check access before calling.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import logging
@@ -18,7 +18,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from six.moves import map
 
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.ccx.custom_exception import CCXUserValidationException
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import get_override_for_ccx

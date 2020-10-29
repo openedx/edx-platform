@@ -1,6 +1,5 @@
 """Script to Empty the trashcan"""
 
-from __future__ import absolute_import
 
 from django.core.management.base import BaseCommand
 from opaque_keys.edx.keys import CourseKey

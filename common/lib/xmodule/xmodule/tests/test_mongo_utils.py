@@ -1,7 +1,7 @@
 """
 Tests for methods defined in mongo_utils.py
 """
-from __future__ import absolute_import
+
 
 import os
 from unittest import TestCase

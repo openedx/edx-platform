@@ -2,7 +2,7 @@
 """
 Utils related to the videos.
 """
-from __future__ import absolute_import
+
 
 import logging
 

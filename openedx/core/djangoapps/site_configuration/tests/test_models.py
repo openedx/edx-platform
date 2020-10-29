@@ -1,7 +1,7 @@
 """
 Tests for site configuration's django models.
 """
-from __future__ import absolute_import
+
 
 from mock import patch
 import six

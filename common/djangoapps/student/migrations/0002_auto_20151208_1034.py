@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+
 
 from django.db import migrations, models
 
@@ -14,11 +14,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='courseenrollment',
             name='mode',
-            field=models.CharField(default=b'audit', max_length=100),
+            field=models.CharField(default=u'audit', max_length=100),
         ),
         migrations.AlterField(
             model_name='historicalcourseenrollment',
             name='mode',
-            field=models.CharField(default=b'audit', max_length=100),
+            field=models.CharField(default=u'audit', max_length=100),
         ),
     ]

@@ -1,6 +1,5 @@
 """Tests for util.db module."""
 
-from __future__ import absolute_import
 
 import threading
 import time
@@ -113,11 +112,11 @@ class TransactionManagersTestCase(TransactionTestCase):
         with outer_atomic():
             atomic()(do_nothing)()
 
-        with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+        with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
             with atomic():
                 outer_atomic()(do_nothing)()
 
-        with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+        with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
             with outer_atomic():
                 outer_atomic()(do_nothing)()
 
@@ -134,11 +133,11 @@ class TransactionManagersTestCase(TransactionTestCase):
 
         commit_on_success(read_committed=True)(do_nothing)()
 
-        with self.assertRaisesRegexp(TransactionManagementError, 'Cannot change isolation level when nested.'):
+        with self.assertRaisesRegex(TransactionManagementError, 'Cannot change isolation level when nested.'):
             with commit_on_success():
                 commit_on_success(read_committed=True)(do_nothing)()
 
-        with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+        with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
             with atomic():
                 commit_on_success(read_committed=True)(do_nothing)()
 
@@ -162,7 +161,7 @@ class TransactionManagersTestCase(TransactionTestCase):
             with atomic():
                 outer_atomic(name='pqr')(do_nothing)()  # Not enabled.
 
-            with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+            with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with atomic():
                     outer_atomic(name='abc')(do_nothing)()
 
@@ -173,19 +172,19 @@ class TransactionManagersTestCase(TransactionTestCase):
             with atomic():
                 outer_atomic(name='pqr')(do_nothing)()  # Not enabled.
 
-            with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+            with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with atomic():
                     outer_atomic(name='def')(do_nothing)()
 
-            with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+            with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with outer_atomic():
                     outer_atomic(name='def')(do_nothing)()
 
-            with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+            with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with atomic():
                     outer_atomic(name='abc')(do_nothing)()
 
-            with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+            with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with outer_atomic():
                     outer_atomic(name='abc')(do_nothing)()
 
@@ -223,7 +222,7 @@ class MigrationTests(TestCase):
     Tests for migrations.
     """
 
-    @unittest.skip("Migration will delete the Note model. Need to ship not referencing it first. DEPR-18.")
+    @unittest.skip("Need to skip as part of renaming a field in schedules app. This will be unskipped in DE-1825")
     @override_settings(MIGRATION_MODULES={})
     def test_migrations_are_in_sync(self):
         """

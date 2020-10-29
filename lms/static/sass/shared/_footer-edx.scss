@@ -180,6 +180,9 @@ footer#footer-edx-v3 {
   .copyright {
     margin-top: 30px;
 
+    a {
+      text-decoration: underline !important;
+    }
     @include margin-left(8px);
     @include font-size(16);
     @include line-height(24px);

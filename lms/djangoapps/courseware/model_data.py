@@ -21,7 +21,6 @@ UserInfoCache: A cache for Scope.user_info
 DjangoOrmFieldCache: A base-class for single-row-per-field caches.
 """
 
-from __future__ import absolute_import
 
 import json
 import logging
@@ -39,7 +38,7 @@ from xblock.exceptions import InvalidScopeError, KeyValueMultiSaveError
 from xblock.fields import Scope, UserScope
 from xblock.runtime import KeyValueStore
 
-from courseware.user_state_client import DjangoXBlockUserStateClient
+from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from xmodule.modulestore.django import modulestore
 
 from .models import StudentModule, XModuleStudentInfoField, XModuleStudentPrefsField, XModuleUserStateSummaryField

@@ -1,6 +1,5 @@
 # Source: https://github.com/mayoff/python-markdown-mathjax
 
-from __future__ import absolute_import
 
 import markdown
 

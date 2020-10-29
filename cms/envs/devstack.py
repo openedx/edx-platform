@@ -2,7 +2,6 @@
 Specific overrides to the base prod settings to make development easier.
 """
 
-from __future__ import absolute_import
 
 import logging
 from os.path import abspath, dirname, join
@@ -127,6 +126,9 @@ FEATURES['CERTIFICATES_HTML_VIEW'] = True
 
 ########################## AUTHOR PERMISSION #######################
 FEATURES['ENABLE_CREATOR_GROUP'] = False
+
+################### FRONTEND APPLICATION PUBLISHER URL ###################
+FEATURES['FRONTEND_APP_PUBLISHER_URL'] = 'http://localhost:18400'
 
 ################################# DJANGO-REQUIRE ###############################
 

@@ -1,5 +1,5 @@
 """Django admin interface for the shopping cart models. """
-from __future__ import absolute_import
+
 
 from django.contrib import admin
 

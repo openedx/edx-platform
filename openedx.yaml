@@ -9,7 +9,9 @@ nick: edx
 openedx-release: {ref: release}
 
 oeps:
-    oep-2: True
+    oep-2: true
+    oep-18: true
+    oep-7: true
 
 tags:
     - core

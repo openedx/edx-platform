@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 import json
 import logging
@@ -14,7 +14,7 @@ from opaque_keys.edx.locator import CourseKey
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.models import DynamicUpgradeDeadlineConfiguration
+from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory

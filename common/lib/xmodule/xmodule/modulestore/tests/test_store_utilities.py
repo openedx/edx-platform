@@ -1,7 +1,7 @@
 """
 Tests for store_utilities.py
 """
-from __future__ import absolute_import
+
 
 import unittest
 

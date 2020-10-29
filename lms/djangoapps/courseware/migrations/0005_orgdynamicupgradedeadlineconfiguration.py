@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+
 
 import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
 
-import courseware.models
+import lms.djangoapps.courseware.models
 
 
 class Migration(migrations.Migration):
@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
                 'ordering': ('-change_date',),
                 'abstract': False,
             },
-            bases=(courseware.models.OptOutDynamicUpgradeDeadlineMixin, models.Model),
+            bases=(lms.djangoapps.courseware.models.OptOutDynamicUpgradeDeadlineMixin, models.Model),
         ),
         migrations.AlterModelOptions(
             name='coursedynamicupgradedeadlineconfiguration',

@@ -4,7 +4,6 @@ Unit tests for behavior that is specific to the api methods (vs. the view method
 Most of the functionality is covered in test_views.py.
 """
 
-from __future__ import absolute_import
 
 import itertools
 import re
@@ -19,17 +18,16 @@ from django.contrib.auth.models import User
 from django.core import mail
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.urls import reverse
 from mock import Mock, patch
 from six import iteritems
+from social_django.models import UserSocialAuth
 
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.accounts import PRIVATE_VISIBILITY, USERNAME_MAX_LENGTH
 from openedx.core.djangoapps.user_api.accounts.api import (
-    activate_account,
-    create_account,
     get_account_settings,
-    request_password_change,
     update_account_settings
 )
 from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (  # pylint: disable=unused-import
@@ -58,7 +56,7 @@ from openedx.core.djangoapps.user_api.errors import (
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerUserFactory
-from student.models import PendingEmailChange
+from student.models import PendingEmailChange, Registration
 from student.tests.factories import UserFactory
 from student.tests.tests import UserSettingsEventTestMixin
 
@@ -68,9 +66,23 @@ def mock_render_to_string(template_name, context):
     return str((template_name, sorted(iteritems(context))))
 
 
+class CreateAccountMixin(object):
+    def create_account(self, username, password, email):
+        # pylint: disable=missing-docstring
+        registration_url = reverse('user_api_registration')
+        resp = self.client.post(registration_url, {
+            'username': username,
+            'email': email,
+            'password': password,
+            'name': username,
+            'honor_code': 'true',
+        })
+        self.assertEqual(resp.status_code, 200)
+
+
 @skip_unless_lms
 @ddt.ddt
-class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, RetirementTestCase):
+class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAccountMixin, RetirementTestCase):
     """
     These tests specifically cover the parts of the API methods that are not covered by test_views.py.
     This includes the specific types of error raised, and default behavior when optional arguments
@@ -88,6 +100,11 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
         self.different_user = UserFactory.create(password=self.password)
         self.staff_user = UserFactory(is_staff=True, password=self.password)
         self.reset_tracker()
+
+        enterprise_patcher = patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
+        enterprise_learner_patcher = enterprise_patcher.start()
+        enterprise_learner_patcher.return_value = {}
+        self.addCleanup(enterprise_learner_patcher.stop)
 
     def test_get_username_provided(self):
         """Test the difference in behavior when a username is supplied to get_account_settings."""
@@ -230,7 +247,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
         account_settings = get_account_settings(self.default_request)[0]
         self.assertEqual(level_of_education, account_settings["level_of_education"])
 
-    @patch('openedx.features.enterprise_support.api.get_enterprise_customer_for_learner')
+    @patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
     @patch('openedx.features.enterprise_support.utils.third_party_auth.provider.Registry.get')
     @ddt.data(
         *itertools.product(
@@ -240,6 +257,8 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
             (True, False),
             # is_synch_learner_profile_data
             (True, False),
+            # has `UserSocialAuth` record
+            (True, False),
         )
     )
     @ddt.unpack
@@ -248,9 +267,11 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
         field_name_value,
         is_enterprise_user,
         is_synch_learner_profile_data,
+        has_user_social_auth_record,
         mock_auth_provider,
         mock_customer,
     ):
+        idp_backend_name = 'tpa-saml'
         mock_customer.return_value = {}
         if is_enterprise_user:
             mock_customer.return_value.update({
@@ -259,13 +280,25 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
                 'identity_provider': 'saml-ubc'
             })
         mock_auth_provider.return_value.sync_learner_profile_data = is_synch_learner_profile_data
+        mock_auth_provider.return_value.backend_name = idp_backend_name
 
         update_data = {field_name_value[0]: field_name_value[1]}
 
+        user_fullname_editable = False
+        if has_user_social_auth_record:
+            UserSocialAuth.objects.create(
+                provider=idp_backend_name,
+                user=self.user
+            )
+        else:
+            UserSocialAuth.objects.all().delete()
+            # user's fullname is editable if no `UserSocialAuth` record exists
+            user_fullname_editable = field_name_value[0] == 'name'
+
         # prevent actual email change requests
         with patch('openedx.core.djangoapps.user_api.accounts.api.student_views.do_email_change_request'):
-            # expect field un-editability only when both of the following conditions are met
-            if is_enterprise_user and is_synch_learner_profile_data:
+            # expect field un-editability only when all of the following conditions are met
+            if is_enterprise_user and is_synch_learner_profile_data and not user_fullname_editable:
                 with self.assertRaises(AccountValidationError) as validation_error:
                     update_account_settings(self.user, update_data)
                     field_errors = validation_error.exception.field_errors
@@ -333,7 +366,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
         self.assertIn("Valid e-mail address required.", field_errors["email"]["developer_message"])
         self.assertIn("Full Name cannot contain the following characters: < >", field_errors["name"]["user_message"])
 
-    @patch('django.core.mail.send_mail')
+    @patch('django.core.mail.EmailMultiAlternatives.send')
     @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_update_sending_email_fails(self, send_mail):
         """Test what happens if all validation checks pass, but sending the email for email change fails."""
@@ -432,7 +465,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
     clear=True
 )
 @skip_unless_lms
-class AccountSettingsOnCreationTest(TestCase):
+class AccountSettingsOnCreationTest(CreateAccountMixin, TestCase):
     # pylint: disable=missing-docstring
 
     USERNAME = u'frank-underwood'
@@ -441,7 +474,7 @@ class AccountSettingsOnCreationTest(TestCase):
 
     def test_create_account(self):
         # Create a new account, which should have empty account settings by default.
-        create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
+        self.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
         # Retrieve the account settings
         user = User.objects.get(username=self.USERNAME)
         request = RequestFactory().get("/api/user/v1/accounts/")
@@ -456,12 +489,12 @@ class AccountSettingsOnCreationTest(TestCase):
         self.assertEqual(account_settings, {
             'username': self.USERNAME,
             'email': self.EMAIL,
-            'name': u'',
+            'name': self.USERNAME,
             'gender': None,
-            'goals': None,
+            'goals': u'',
             'is_active': False,
             'level_of_education': None,
-            'mailing_address': None,
+            'mailing_address': u'',
             'year_of_birth': None,
             'country': None,
             'social_links': [],
@@ -487,7 +520,7 @@ class AccountSettingsOnCreationTest(TestCase):
         """
         # Set user password to NFKD format so that we can test that it is normalized to
         # NFKC format upon account creation.
-        create_account(self.USERNAME, unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), self.EMAIL)
+        self.create_account(self.USERNAME, unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), self.EMAIL)
 
         user = User.objects.get(username=self.USERNAME)
 
@@ -495,193 +528,3 @@ class AccountSettingsOnCreationTest(TestCase):
 
         expected_user_password = make_password(unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'), salt_val)
         self.assertEqual(expected_user_password, user.password)
-
-
-@pytest.mark.django_db
-def test_create_account_duplicate_email(django_db_use_migrations):
-    """
-    Test case for duplicate email constraint
-    Email uniqueness constraints were introduced in a database migration,
-    which we disable in the unit tests to improve the speed of the test suite
-
-    This test only runs if migrations have been run.
-
-    django_db_use_migrations is a pytest_django fixture which tells us whether
-    migrations are being used.
-    """
-    password = 'legit'
-    email = 'zappadappadoo@example.com'
-
-    if django_db_use_migrations:
-        create_account('zappadappadoo', password, email)
-
-        with pytest.raises(
-                AccountUserAlreadyExists,
-                message='Migrations are being used, but creating an account with duplicate email succeeded!'
-        ):
-            create_account('different_user', password, email)
-
-
-@ddt.ddt
-class AccountCreationActivationAndPasswordChangeTest(TestCase):
-    """
-    Test cases to cover the account initialization workflow
-    """
-    USERNAME = u'claire-underwood'
-    PASSWORD = u'ṕáśśẃőŕd'
-    EMAIL = u'claire+underwood@example.com'
-
-    IS_SECURE = False
-
-    @skip_unless_lms
-    def test_activate_account(self):
-        # Create the account, which is initially inactive
-        activation_key = create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-        user = User.objects.get(username=self.USERNAME)
-
-        request = RequestFactory().get("/api/user/v1/accounts/")
-        request.user = user
-        account = get_account_settings(request)[0]
-        self.assertEqual(self.USERNAME, account["username"])
-        self.assertEqual(self.EMAIL, account["email"])
-        self.assertFalse(account["is_active"])
-
-        # Activate the account and verify that it is now active
-        activate_account(activation_key)
-        account = get_account_settings(request)[0]
-        self.assertTrue(account['is_active'])
-
-    def test_create_account_duplicate_username(self):
-        create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-        with self.assertRaises(AccountUserAlreadyExists):
-            create_account(self.USERNAME, self.PASSWORD, 'different+email@example.com')
-
-    def test_username_too_long(self):
-        long_username = 'e' * (USERNAME_MAX_LENGTH + 1)
-        with self.assertRaises(AccountUsernameInvalid):
-            create_account(long_username, self.PASSWORD, self.EMAIL)
-
-    @ddt.data(*INVALID_EMAILS)
-    def test_create_account_invalid_email(self, invalid_email):
-        with pytest.raises(AccountEmailInvalid):
-            create_account(self.USERNAME, self.PASSWORD, invalid_email)
-
-    @ddt.data(*INVALID_PASSWORDS)
-    def test_create_account_invalid_password(self, invalid_password):
-        with pytest.raises(AccountPasswordInvalid):
-            create_account(self.USERNAME, invalid_password, self.EMAIL)
-
-    def test_create_account_username_password_equal(self):
-        # Username and password cannot be the same
-        with pytest.raises(AccountPasswordInvalid):
-            create_account(self.USERNAME, self.USERNAME, self.EMAIL)
-
-    @ddt.data(*INVALID_USERNAMES)
-    def test_create_account_invalid_username(self, invalid_username):
-        with pytest.raises(AccountRequestError):
-            create_account(invalid_username, self.PASSWORD, self.EMAIL)
-
-    def test_create_account_prevent_auth_user_writes(self):
-        with pytest.raises(UserAPIInternalError, message=SYSTEM_MAINTENANCE_MSG):
-            with waffle().override(PREVENT_AUTH_USER_WRITES, True):
-                create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-
-    def test_activate_account_invalid_key(self):
-        with pytest.raises(UserNotAuthorized):
-            activate_account(u'invalid')
-
-    def test_activate_account_prevent_auth_user_writes(self):
-        activation_key = create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-        with pytest.raises(UserAPIInternalError, message=SYSTEM_MAINTENANCE_MSG):
-            with waffle().override(PREVENT_AUTH_USER_WRITES, True):
-                activate_account(activation_key)
-
-    @skip_unless_lms
-    def test_request_password_change(self):
-        # Create and activate an account
-        activation_key = create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-        activate_account(activation_key)
-
-        request = RequestFactory().post('/password')
-        request.user = Mock()
-        request.site = SiteFactory()
-
-        with patch('crum.get_current_request', return_value=request):
-            # Request a password change
-            request_password_change(self.EMAIL, self.IS_SECURE)
-
-        # Verify that one email message has been sent
-        self.assertEqual(len(mail.outbox), 1)
-
-        # Verify that the body of the message contains something that looks
-        # like an activation link
-        email_body = mail.outbox[0].body
-        result = re.search(r'(?P<url>https?://[^\s]+)', email_body)
-        self.assertIsNot(result, None)
-
-    @skip_unless_lms
-    def test_request_password_change_invalid_user(self):
-        with self.assertRaises(UserNotFound):
-            request_password_change(self.EMAIL, self.IS_SECURE)
-
-        # Verify that no email messages have been sent
-        self.assertEqual(len(mail.outbox), 0)
-
-    @skip_unless_lms
-    def test_request_password_change_inactive_user(self):
-        # Create an account, but do not activate it
-        create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-
-        request = RequestFactory().post('/password')
-        request.user = Mock()
-        request.site = SiteFactory()
-
-        with patch('crum.get_current_request', return_value=request):
-            request_password_change(self.EMAIL, self.IS_SECURE)
-
-        # Verify that the activation email was still sent
-        self.assertEqual(len(mail.outbox), 1)
-
-    def _assert_is_datetime(self, timestamp):
-        """
-        Internal helper to validate the type of the provided timestamp
-        """
-        if not timestamp:
-            return False
-        try:
-            parse_datetime(timestamp)
-        except ValueError:
-            return False
-        else:
-            return True
-
-    @patch("openedx.core.djangoapps.site_configuration.helpers.get_value", Mock(return_value=False))
-    def test_create_account_not_allowed(self):
-        """
-        Test case to check user creation is forbidden when ALLOW_PUBLIC_ACCOUNT_CREATION feature flag is turned off
-        """
-        response = create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-        self.assertEqual(response.status_code, 403)
-
-
-@ddt.ddt
-class AccountCreationUnicodeUsernameTest(TestCase):
-    """
-    Test cases to cover the account initialization workflow
-    """
-    PASSWORD = u'unicode-user-password'
-    EMAIL = u'unicode-user-username@example.com'
-
-    @ddt.data(*VALID_USERNAMES_UNICODE)
-    def test_unicode_usernames(self, unicode_username):
-        with patch.dict(settings.FEATURES, {'ENABLE_UNICODE_USERNAME': False}):
-            with self.assertRaises(AccountUsernameInvalid):
-                create_account(unicode_username, self.PASSWORD, self.EMAIL)  # Feature is disabled, therefore invalid.
-
-        with patch.dict(settings.FEATURES, {'ENABLE_UNICODE_USERNAME': True}):
-            try:
-                create_account(unicode_username, self.PASSWORD, self.EMAIL)
-            except AccountUsernameInvalid:
-                self.fail(u'The API should accept Unicode username `{unicode_username}`.'.format(
-                    unicode_username=unicode_username,
-                ))

@@ -60,7 +60,7 @@ can't yet be deleted, for example if there are straggling course overrides.
     than implicit.
 
 """
-from __future__ import absolute_import
+
 import crum
 import logging
 from abc import ABCMeta

@@ -2,7 +2,6 @@
 Test for asset XML generation / parsing.
 """
 
-from __future__ import absolute_import
 
 import unittest
 
@@ -36,7 +35,7 @@ class TestAssetXml(unittest.TestCase):
 
         # Read in the XML schema definition and make a validator.
         xsd_path = path(__file__).realpath().parent / xsd_filename
-        with open(xsd_path, 'r') as f:
+        with open(xsd_path, 'rb') as f:
             schema_root = etree.XML(f.read())
         schema = etree.XMLSchema(schema_root)
         self.xmlparser = etree.XMLParser(schema=schema)

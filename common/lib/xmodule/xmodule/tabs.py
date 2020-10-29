@@ -1,7 +1,7 @@
 """
 Implement CourseTab
 """
-from __future__ import absolute_import
+
 
 import logging
 from abc import ABCMeta

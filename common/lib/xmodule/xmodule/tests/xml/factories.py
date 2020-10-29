@@ -2,7 +2,6 @@
 Factories for generating edXML for testing XModule import
 """
 
-from __future__ import absolute_import
 
 import inspect
 from tempfile import mkdtemp

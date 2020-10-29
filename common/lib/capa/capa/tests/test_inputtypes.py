@@ -16,7 +16,7 @@ TODO:
 - test funny xml chars -- should never get xml parse error if things are escaped properly.
 
 """
-from __future__ import absolute_import
+
 
 import json
 import textwrap
@@ -747,18 +747,27 @@ class MatlabTest(unittest.TestCase):
     def test_get_html(self):
         # usual output
         output = self.the_input.get_html()
-        self.assertEqual(
-            etree.tostring(output),
-            textwrap.dedent("""
-            <div>{\'status\': Status(\'queued\'), \'button_enabled\': True, \'rows\': \'10\', \'queue_len\': \'3\',
-            \'mode\': \'\', \'tabsize\': 4, \'cols\': \'80\', \'STATIC_URL\': \'/dummy-static/\', \'linenumbers\':
-            \'true\', \'queue_msg\': \'\', \'value\': \'print "good evening"\',
-            \'msg\': u\'Submitted. As soon as a response is returned, this message will be replaced by that feedback.\',
-            \'matlab_editor_js\': \'/dummy-static/js/vendor/CodeMirror/octave.js\',
-            \'hidden\': \'\', \'id\': \'prob_1_2\',
-            \'describedby_html\': Markup(u\'aria-describedby="status_prob_1_2"\'), \'response_data\': {}}</div>
-            """).replace('\n', ' ').strip()
-        )
+        output_string = etree.tostring(output).decode('utf-8')
+        assert output_string.startswith('<div>{')
+        assert output_string.endswith('}</div>')
+        output_string = output_string.replace('}</div>', '')
+        output_string = output_string.replace('<div>{', '')
+        output_list = output_string.split(',')
+        for index, value in enumerate(output_list):
+            output_list[index] = value.replace('u\'', '\'').strip()
+
+        expected_string = u"""
+        \'matlab_editor_js\': \'/dummy-static/js/vendor/CodeMirror/octave.js\',
+        \'value\': \'print "good evening"\', \'hidden\': \'\',
+        \'msg\': \'Submitted. As soon as a response is returned, this message will be replaced by that feedback.\',
+        \'status\': Status(\'queued\'), \'response_data\': {}, \'queue_msg\': \'\', \'mode\': \'\',
+        \'id\': \'prob_1_2\', \'queue_len\': \'3\', \'tabsize\': 4, \'STATIC_URL\': \'/dummy-static/\',
+        \'linenumbers\': \'true\', \'cols\': \'80\', \'button_enabled\': True, \'rows\': \'10\',
+        \'describedby_html\': Markup(\'aria-describedby="status_prob_1_2"\')"""
+        expected_list = (textwrap.dedent(expected_string).replace('\n', ' ').strip()).split(',')
+        for index, value in enumerate(expected_list):
+            expected_list[index] = value.replace('u\'', '\'').strip()
+        six.assertCountEqual(self, output_list, expected_list)
 
         # test html, that is correct HTML5 html, but is not parsable by XML parser.
         old_render_template = self.the_input.capa_system.render_template
@@ -768,16 +777,27 @@ class MatlabTest(unittest.TestCase):
                 <div>Right click <a href=https://endpoint.mss-mathworks.com/media/filename.wav>here</a> and click \"Save As\" to download the file</div></div>
                 <div style='white-space:pre' class='commandWindowOutput'></div><ul></ul></div>
             """).replace('\n', '')
+
         output = self.the_input.get_html()
-        self.assertEqual(
-            etree.tostring(output),
-            textwrap.dedent("""
-            <div class='matlabResponse'><div id='mwAudioPlaceHolder'>
-            <audio src='data:audio/wav;base64=' autobuffer="" controls="" autoplay="">Audio is not supported on this browser.</audio>
-            <div>Right click <a href="https://endpoint.mss-mathworks.com/media/filename.wav">here</a> and click \"Save As\" to download the file</div></div>
-            <div style='white-space:pre' class='commandWindowOutput'/><ul/></div>
-            """).replace('\n', '').replace('\'', '\"')
-        )
+        elements = []
+        element_tags = []
+        element_keys = []
+        for element in output.iter():
+            elements.append(element)
+            element_tags.append(element.tag)
+            element_keys.append(element.keys())
+        assert element_tags.count('div') == 4
+        assert element_tags.count('audio') == 1
+        audio_index = element_tags.index('audio')
+
+        six.assertCountEqual(self, element_keys[audio_index], ['autobuffer', 'controls', 'autoplay', 'src'])
+        self.assertEqual(elements[audio_index].get('src'), 'data:audio/wav;base64=')
+        self.assertEqual(elements[audio_index].text, 'Audio is not supported on this browser.')
+        href_index = element_keys.index(['href'])
+        self.assertEqual(elements[href_index].get('href'), 'https://endpoint.mss-mathworks.com/media/filename.wav')
+        id_index = element_keys.index(['id'])
+        self.assertEqual(elements[id_index].get('id'), 'mwAudioPlaceHolder')
+        output_string = etree.tostring(output).decode('utf-8')
 
         # check that exception is raised during parsing for html.
         self.the_input.capa_system.render_template = lambda *args: "<aaa"
@@ -1599,7 +1619,7 @@ class TestChoiceText(unittest.TestCase):
         Test to ensure having a tag other than <choice> inside of
         a checkbox or radiotextgroup problem raises an error.
         """
-        with self.assertRaisesRegexp(Exception, "Error in xml"):
+        with self.assertRaisesRegex(Exception, "Error in xml"):
             self.check_group('checkboxtextgroup', 'invalid', 'checkbox')
 
 

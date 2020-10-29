@@ -1,5 +1,5 @@
 """ API v0 views. """
-from __future__ import absolute_import
+
 
 import logging
 
@@ -16,7 +16,7 @@ from rest_framework.views import APIView
 from six import text_type
 
 from course_modes.models import CourseMode
-from courseware import courses
+from lms.djangoapps.courseware import courses
 from entitlements.models import CourseEntitlement
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.embargo import api as embargo_api

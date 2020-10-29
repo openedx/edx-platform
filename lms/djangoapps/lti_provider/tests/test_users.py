@@ -2,7 +2,6 @@
 Tests for the LTI user management functionality
 """
 
-from __future__ import absolute_import
 
 import string
 
@@ -200,9 +199,13 @@ class LtiBackendTest(TestCase):
             lti_user_id=self.lti_user_id,
             edx_user=self.edx_user
         ).save()
+        self.old_user = UserFactory.create()
+        self.request = RequestFactory().post('/')
+        self.request.user = self.old_user
 
     def test_valid_user_authenticates(self):
         user = users.LtiBackend().authenticate(
+            self.request,
             username=self.edx_user.username,
             lti_user_id=self.lti_user_id,
             lti_consumer=self.lti_consumer
@@ -211,6 +214,7 @@ class LtiBackendTest(TestCase):
 
     def test_missing_user_returns_none(self):
         user = users.LtiBackend().authenticate(
+            self.request,
             username=self.edx_user.username,
             lti_user_id='Invalid Username',
             lti_consumer=self.lti_consumer
@@ -221,12 +225,14 @@ class LtiBackendTest(TestCase):
         non_edx_user = UserFactory.create()
         non_edx_user.save()
         user = users.LtiBackend().authenticate(
+            self.request,
             username=non_edx_user.username,
         )
         self.assertIsNone(user)
 
     def test_missing_lti_id_returns_null(self):
         user = users.LtiBackend().authenticate(
+            self.request,
             username=self.edx_user.username,
             lti_consumer=self.lti_consumer
         )
@@ -234,6 +240,7 @@ class LtiBackendTest(TestCase):
 
     def test_missing_lti_consumer_returns_null(self):
         user = users.LtiBackend().authenticate(
+            self.request,
             username=self.edx_user.username,
             lti_user_id=self.lti_user_id,
         )

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Test for Word cloud Xmodule functional logic."""
 
-from __future__ import absolute_import
 
 from webob.multidict import MultiDict
 
@@ -38,15 +37,14 @@ class WordCloudModuleTest(LogicTest):
             response['student_words'],
             {'sun': 1, 'dog': 6, 'cat': 12}
         )
+
         self.assertListEqual(
             response['top_words'],
-            [{'text': 'dad', 'size': 2, 'percent': 9.0},
-             {'text': 'sun', 'size': 1, 'percent': 5.0},
+            [{'text': 'cat', 'size': 12, 'percent': 55.0},
+             {'text': 'dad', 'size': 2, 'percent': 9.0},
              {'text': 'dog', 'size': 6, 'percent': 27.0},
              {'text': 'mom', 'size': 1, 'percent': 5.0},
-             {'text': 'cat', 'size': 12, 'percent': 54.0}]
+             {'text': 'sun', 'size': 1, 'percent': 4.0}]
         )
 
-        self.assertEqual(
-            100.0,
-            sum(i['percent'] for i in response['top_words']))
+        self.assertEqual(100.0, sum(i['percent'] for i in response['top_words']))

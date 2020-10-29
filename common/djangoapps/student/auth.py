@@ -4,7 +4,7 @@ authorization has authorization to do so, which infers authorization via role hi
 (GlobalStaff is superset of auths of course instructor, ...), which consults the config
 to decide whether to check course creator role, and other such functions.
 """
-from __future__ import absolute_import
+
 
 from ccx_keys.locator import CCXBlockUsageLocator, CCXLocator
 from django.conf import settings

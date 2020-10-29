@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -29,10 +29,11 @@
 # Thắng Trần <tmt111295@gmail.com>, 2019
 # Theodora. Tôn Nữ Quý Thiện <thien.tonnu1001@gmail.com>, 2015
 # Trung V. Nguyen <trung.ngvan@gmail.com>, 2015
+# Tuan Nguyen <tuannn.bk@gmail.com>, 2019
 # Vu Bach, 2019
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -59,9 +60,9 @@
 # truong tran <tranminhtruong88@yahoo.com.vn>, 2017
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Vietnamese (https://www.transifex.com/open-edx/teams/6205/vi/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # Translators:
 # Tan Phat Trang <phattt2901@gmail.com>, 2019
@@ -70,7 +71,7 @@
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -86,7 +87,7 @@
 # Trung V. Nguyen <trung.ngvan@gmail.com>, 2015-2016
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -105,8 +106,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-15 20:42+0000\n"
-"PO-Revision-Date: 2019-07-28 20:42+0000\n"
+"POT-Creation-Date: 2020-01-19 20:42+0000\n"
+"PO-Revision-Date: 2019-09-29 20:43+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)\n"
 "Language: vi\n"
@@ -295,6 +296,14 @@ msgid "Your changes have been saved."
 msgstr "Thay đổi của bạn đã được lưu."
 
 #. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: cms/static/js/views/xblock_validation.js
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Warning"
+msgstr ""
+
+#. Translators: This message will be added to the front of messages of type
 #. error,
 #. e.g. "Error: required field is missing".
 #: cms/static/js/views/xblock_validation.js
@@ -454,6 +463,11 @@ msgstr "Câu hỏi này đã được sửa."
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "unsubmitted"
 msgstr "chưa gửi"
+
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+msgid ""
+"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -2125,16 +2139,16 @@ msgid "This post could not be reopened. Refresh the page and try again."
 msgstr "Bài này không thể mở lại. Làm mới lại trang và thử lại."
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Show Discussion"
+msgstr "Hiện thảo luận"
+
+#: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Hide Discussion"
 msgstr "Ẩn thảo luận"
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "This discussion could not be loaded. Refresh the page and try again."
 msgstr "Không mở được cuộc thảo luận này. Làm mới lại trang và thử lại."
-
-#: common/static/common/js/discussion/views/discussion_inline_view.js
-msgid "Show Discussion"
-msgstr "Hiện thảo luận"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "There are no posts in this topic yet."
@@ -2451,11 +2465,19 @@ msgid "Masters"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "MicroBachelors"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Photo Verification"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Proctoring"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Security"
 msgstr ""
 
 #: cms/templates/js/asset-library.underscore
@@ -2643,14 +2665,14 @@ msgstr "Có lỗi xảy ra trong lúc xóa thành viên khỏi nhóm. Xin thử 
 msgid "This team does not have any members."
 msgstr "Nhóm này không có bất kỳ thành viên nào."
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Joined %(date)s"
 msgstr "Tham gia ngày %(date)s"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Last Activity %(date)s"
 msgstr "Hoạt động gần nhất %(date)s"
@@ -2661,10 +2683,9 @@ msgstr "Xóa thành viên này?"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid ""
-"This learner will be removed from the team, allowing another learner to take"
-" the available spot."
+"This learner will be removed from the team,allowing another learner to take "
+"the available spot."
 msgstr ""
-"Người học này sẽ bị xóa khỏi nhóm để nhường chỗ cho một người học khác."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Delete this team?"
@@ -2672,35 +2693,38 @@ msgstr "Xóa nhóm này?"
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid ""
-"Deleting a team is permanent and cannot be undone. All members are removed "
+"Deleting a team is permanent and cannot be undone.All members are removed "
 "from the team, and team discussions can no longer be accessed."
 msgstr ""
-"Xóa một nhóm là hành động không thể thu lại được, tất cả thành viên sẽ bị "
-"xóa khỏi nhóm và các thảo luận nhóm cũng sẽ bị xóa."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Team \"{team}\" successfully deleted."
 msgstr "Nhóm \"{team}\" đã xóa thành công."
 
+#: lms/djangoapps/teams/static/teams/js/views/manage.js
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Manage"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
 msgstr "Bạn hiện không phải thành viên của bất kỳ nhóm nào."
 
-#. Translators: "and others" refers to fact that additional members of a team
-#. exist that are not displayed.
+#. Translators: "and others" refers to fact that additional
+#. * members of a team exist that are not displayed.
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "and others"
 msgstr "và các thành viên khác"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. http://momentjs.com/)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: http://momentjs.com/)
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "Last activity %(date)s"
-msgstr "Hoạt động gần nhất %(date)s"
+msgid "Last activity {date}"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "View %(span_start)s %(team_name)s %(span_end)s"
-msgstr "Xem %(span_start)s %(team_name)s %(span_end)s"
+msgid "View {span_start} {team_name} {span_end}"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
@@ -2713,11 +2737,9 @@ msgstr "Rời nhóm này?"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 msgid ""
-"If you leave, you can no longer post in this team's discussions. Your place "
+"If you leave, you can no longer post in this team's discussions.Your place "
 "will be available to another learner."
 msgstr ""
-"Nếu bạn rời nhóm, bạn sẽ không thể tham gia vào thảo luận nhóm nữa. Chỗ của "
-"bạn trong nhóm sẽ có thể được thay bằng người học khác."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/static/js/verify_student/views/reverify_view.js
@@ -2733,10 +2755,14 @@ msgstr "Bạn đã nằm trong một nhóm khác."
 msgid "This team is full."
 msgstr "Nhóm này đã đủ thành viên."
 
+#: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
+msgid "Cannot join instructor managed team"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
-msgid "%(memberCount)s / %(maxMemberCount)s Member"
-msgid_plural "%(memberCount)s / %(maxMemberCount)s Members"
-msgstr[0] "%(memberCount)s / %(maxMemberCount)s thành viên tối đa"
+msgid "{memberCount} / {maxMemberCount} Member"
+msgid_plural "{memberCount} / {maxMemberCount} Members"
+msgstr[0] ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "All teams"
@@ -2751,21 +2777,18 @@ msgid "Topics"
 msgstr "Các chủ đề"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid ""
-"See all teams in your course, organized by topic. Join a team to collaborate"
-" with other learners who are interested in the same topic as you are."
-msgstr ""
-"Xem tất cả các nhóm học trong khóa học của bạn, sắp xếp theo chủ đề. Tham "
-"gia một nhóm học để hợp tác với những người học cùng hứng thú với chủ đề mà "
-"bạn thích."
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "My Team"
 msgstr "Nhóm của tôi"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Browse"
 msgstr "Duyệt"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"See all teams in your course, organized by topic. Join a team to collaborate"
+" with other learners who are interested in the same topic as you are."
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Your request could not be completed. Reload the page and try again."
@@ -2848,26 +2871,18 @@ msgid "The team \"{team}\" could not be found."
 msgstr "Không thấy nhóm \"{team}\"."
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "%(team_count)s Team"
-msgid_plural "%(team_count)s Teams"
-msgstr[0] "%(team_count)s nhóm"
+msgid "{team_count} Team"
+msgid_plural "{team_count} Teams"
+msgstr[0] ""
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "Topic"
 msgstr "Chủ đề"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "View Teams in the %(topic_name)s Topic"
-msgstr "Xem các nhóm học trong chủ đề %(topic_name)s "
+msgid "View Teams in the {topic_name} Topic"
+msgstr ""
 
-#. Translators: this string is shown at the bottom of the teams page
-#. to find a team to join or else to create a new one. There are three
-#. links that need to be included in the message:
-#. 1. Browse teams in other topics
-#. 2. search teams
-#. 3. create a new team
-#. Be careful to start each link with the appropriate start indicator
-#. (e.g. {browse_span_start} for #1) and finish it with {span_end}.
 #: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
 msgid ""
 "{browse_span_start}Browse teams in other topics{span_end} or "
@@ -4564,37 +4579,32 @@ msgid ""
 "{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read "
 "the above carefully before proceeding. This is an irreversible action, and "
 "{strongStart}you will no longer be able to use the same email on "
-"edX.{strongEnd}"
+"{platformName}.{strongEnd}"
 msgstr ""
-"{strongStart}Cảnh Báo: Tài khoản sẽ bị xóa vĩnh viễn{strongEnd} Vui lòng đọc"
-" kỹ những điều trên trước khi tiếp tục. Đây là một hành động không thể đảo "
-"ngược và {strongStart}bạn sẽ không thể sử dụng email này trên edX "
-"nữa.{strongEnd}"
-
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "We’re sorry to see you go!"
-msgstr "Chúng tôi rất tiếc khi thấy bạn ra đi!"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
 "Please note: Deletion of your account and personal data is permanent and "
-"cannot be undone. EdX will not be able to recover your account or the data "
-"that is deleted."
+"cannot be undone. {platformName} will not be able to recover your account or"
+" the data that is deleted."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
-"Once your account is deleted, you cannot use it to take courses on the edX "
-"app, edx.org, or any other site hosted by edX. This includes access to "
-"edx.org from your employer’s or university’s system and access to private "
-"sites offered by MIT Open Learning, Wharton Executive Education, and Harvard"
-" Medical School."
+"Once your account is deleted, you cannot use it to take courses on the "
+"{platformName} app, {siteName}, or any other site hosted by {platformName}."
 msgstr ""
-"Khi tài khoản của bạn bị xóa, bạn không thể sử dụng nó để tham gia các khóa "
-"học trên ứng dụng edX, edx.org hoặc bất kỳ trang web nào khác được lưu trữ "
-"bởi edX. Điều này bao gồm quyền truy cập vào edx.org từ hệ thống hệ thống "
-"trường thành viên hoặc truy cập riêng tư bởi MIT Open Learning, Wharton "
-"Executive Education và Harvard Medical School cung cấp."
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"This includes access to {siteName} from your employer’s or university’s "
+"system{additionalSiteSpecificDeletionText}."
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid "We’re sorry to see you go!"
+msgstr "Chúng tôi rất tiếc khi thấy bạn ra đi!"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -4627,20 +4637,15 @@ msgstr "Bắt buộc phải có Mật Khẩu"
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "You have selected “Delete my account.” Deletion of your account and personal"
-" data is permanent and cannot be undone. EdX will not be able to recover "
-"your account or the data that is deleted."
+" data is permanent and cannot be undone. {platformName} will not be able to "
+"recover your account or the data that is deleted."
 msgstr ""
-"Bạn đã chọn “Xóa tài khoản của tôi”. Xóa tài khoản và dữ liệu cá nhân của "
-"bạn là vĩnh viễn và không thể hoàn tác. EdX sẽ không thể khôi phục tài khoản"
-" của bạn hoặc dữ liệu bị xóa."
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "If you proceed, you will be unable to use this account to take courses on "
-"the edX app, edx.org, or any other site hosted by edX. This includes access "
-"to edx.org from your employer’s or university’s system and access to private"
-" sites offered by MIT Open Learning, Wharton Executive Education, and "
-"Harvard Medical School."
+"the {platformName} app, {siteName}, or any other site hosted by "
+"{platformName}."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
@@ -4734,6 +4739,10 @@ msgid ""
 msgstr ""
 "Một lỗi đã xảy ra. Hãy thử làm mới trang hoặc kiểm tra kết nối Internet của "
 "bạn."
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid "An unexpected error has occurred."
+msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -6316,8 +6325,8 @@ msgstr "Ngày thêm vào"
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
-msgid "Editing access for: %(title)s"
-msgstr "Chỉnh sửa quyền truy cập: %(title)s"
+msgid "Editing access for: {title}"
+msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
@@ -6882,13 +6891,6 @@ msgstr "Thiết lập"
 msgid "New {component_type}"
 msgstr "{component_type} Mới"
 
-#. Translators: This message will be added to the front of messages of type
-#. warning,
-#. e.g. "Warning: this component has not been configured yet".
-#: cms/static/js/views/xblock_validation.js
-msgid "Warning"
-msgstr "Cảnh báo"
-
 #: cms/static/js/xblock_asides/structured_tags.js
 msgid "Updating Tags"
 msgstr "Cập nhật Các thẻ"
@@ -7251,6 +7253,22 @@ msgstr "Xóa nhóm"
 #: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
 msgid "Edit Membership"
 msgstr "chỉnh sửa thành viên"
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "View Current Team Memberships"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Download Memberships"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Assign Team Memberships"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Upload Memberships"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
 msgid "Are you having trouble finding a team to join?"
@@ -9290,6 +9308,10 @@ msgstr ""
 "bản trong phần con này sẽ suất hiện cho người học trừ khi chúng được ẩn một "
 "cách rõ ràng."
 
+#: cms/templates/js/copy-clipboard-button.underscore
+msgid "Copy Component Location"
+msgstr ""
+
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Weekly Highlight Emails"
 msgstr ""
@@ -9725,6 +9747,10 @@ msgstr "Thông tin chương"
 msgid "Add a Chapter"
 msgstr "Thêm một Chương"
 
+#: cms/templates/js/edit-title-button.underscore
+msgid "Edit Title"
+msgstr ""
+
 #: cms/templates/js/grading-editor.underscore
 msgid "Grading"
 msgstr "Đánh Giá"
@@ -9893,10 +9919,6 @@ msgstr "Xóa"
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear Value"
 msgstr "Xoá Giá trị"
-
-#: cms/templates/js/metadata-editor.underscore
-msgid "Component Location ID"
-msgstr "ID Vị trí Thành phần"
 
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video-transcripts.underscore

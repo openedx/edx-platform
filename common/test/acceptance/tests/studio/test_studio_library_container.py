@@ -1,7 +1,7 @@
 """
 Acceptance tests for Library Content in LMS
 """
-from __future__ import absolute_import
+
 
 import textwrap
 

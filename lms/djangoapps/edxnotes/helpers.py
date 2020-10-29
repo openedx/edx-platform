@@ -1,7 +1,7 @@
 """
 Helper methods related to EdxNotes.
 """
-from __future__ import absolute_import
+
 
 import json
 import logging
@@ -21,8 +21,8 @@ from oauth2_provider.models import Application
 from opaque_keys.edx.keys import UsageKey
 from requests.exceptions import RequestException
 
-from courseware.access import has_access
-from courseware.courses import get_current_child
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_current_child
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.plugins import EdxNotesTab
 from lms.lib.utils import get_parent_unit
@@ -34,8 +34,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger(__name__)
-# OAuth2 Client name for edxnotes
-CLIENT_NAME = "edx-notes"
+
 DEFAULT_PAGE = 1
 DEFAULT_PAGE_SIZE = 25
 
@@ -56,10 +55,10 @@ def get_edxnotes_id_token(user):
     Returns generated ID Token for edxnotes.
     """
     try:
-        notes_application = Application.objects.get(name=CLIENT_NAME)
+        notes_application = Application.objects.get(name=settings.EDXNOTES_CLIENT_NAME)
     except Application.DoesNotExist:
         raise ImproperlyConfigured(
-            u'OAuth2 Client with name [{}] does not exist.'.format(CLIENT_NAME)
+            u'OAuth2 Client with name [{}] does not exist.'.format(settings.EDXNOTES_CLIENT_NAME)
         )
     return create_jwt_for_user(
         user, secret=notes_application.client_secret, aud=notes_application.client_id
@@ -175,7 +174,7 @@ def preprocess_collection(user, course, collection):
 
             model.update(update)
             usage_id = model["usage_id"]
-            if usage_id in cache:
+            if usage_id in list(cache.keys()):
                 model.update(cache[usage_id])
                 filtered_collection.append(model)
                 continue
@@ -204,13 +203,13 @@ def preprocess_collection(user, course, collection):
                 if not section:
                     log.debug(u"Section not found: %s", usage_key)
                     continue
-                if section in cache:
-                    usage_context = cache[section]
+                if section.location in list(cache.keys()):
+                    usage_context = cache[section.location]
                     usage_context.update({
                         "unit": get_module_context(course, unit),
                     })
                     model.update(usage_context)
-                    cache[usage_id] = cache[unit] = usage_context
+                    cache[usage_id] = cache[unit.location] = usage_context
                     filtered_collection.append(model)
                     continue
 
@@ -218,14 +217,14 @@ def preprocess_collection(user, course, collection):
                 if not chapter:
                     log.debug(u"Chapter not found: %s", usage_key)
                     continue
-                if chapter in cache:
-                    usage_context = cache[chapter]
+                if chapter.location in list(cache.keys()):
+                    usage_context = cache[chapter.location]
                     usage_context.update({
                         "unit": get_module_context(course, unit),
                         "section": get_module_context(course, section),
                     })
                     model.update(usage_context)
-                    cache[usage_id] = cache[unit] = cache[section] = usage_context
+                    cache[usage_id] = cache[unit.location] = cache[section.location] = usage_context
                     filtered_collection.append(model)
                     continue
 
@@ -236,9 +235,9 @@ def preprocess_collection(user, course, collection):
             }
             model.update(usage_context)
             if include_path_info:
-                cache[section] = cache[chapter] = usage_context
+                cache[section.location] = cache[chapter.location] = usage_context
 
-            cache[usage_id] = cache[unit] = usage_context
+            cache[usage_id] = cache[unit.location] = usage_context
             filtered_collection.append(model)
 
     return filtered_collection
@@ -344,7 +343,7 @@ def get_notes(request, course, page=DEFAULT_PAGE, page_size=DEFAULT_PAGE_SIZE, t
     response = send_request(request.user, course.id, page, page_size, path, text)
 
     try:
-        collection = json.loads(response.content)
+        collection = json.loads(response.content.decode('utf-8'))
     except ValueError:
         log.error(u"Invalid JSON response received from notes api: response_content=%s", response.content)
         raise EdxNotesParseError(_("Invalid JSON response received from notes api."))

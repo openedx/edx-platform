@@ -3,7 +3,7 @@
 A mixin class for LTI 2.0 functionality.  This is really just done to refactor the code to
 keep the LTIModule class from getting too big
 """
-from __future__ import absolute_import
+
 
 import base64
 import hashlib
@@ -18,6 +18,7 @@ from oauthlib.oauth1 import Client
 from six import text_type
 from webob import Response
 from xblock.core import XBlock
+from openedx.core.lib.grade_utils import round_away_from_zero
 
 log = logging.getLogger(__name__)
 
@@ -174,12 +175,12 @@ class LTI20ModuleMixin(object):
         }
         self.system.rebind_noauth_module_to_user(self, real_user)
         if self.module_score is None:  # In this case, no score has been ever set
-            return Response(json.dumps(base_json_obj), content_type=LTI_2_0_JSON_CONTENT_TYPE)
+            return Response(json.dumps(base_json_obj).encode('utf-8'), content_type=LTI_2_0_JSON_CONTENT_TYPE)
 
         # Fall through to returning grade and comment
-        base_json_obj['resultScore'] = round(self.module_score, 2)
+        base_json_obj['resultScore'] = round_away_from_zero(self.module_score, 2)
         base_json_obj['comment'] = self.score_comment
-        return Response(json.dumps(base_json_obj), content_type=LTI_2_0_JSON_CONTENT_TYPE)
+        return Response(json.dumps(base_json_obj).encode('utf-8'), content_type=LTI_2_0_JSON_CONTENT_TYPE)
 
     def _lti_2_0_result_del_handler(self, request, real_user):  # pylint: disable=unused-argument
         """
@@ -211,7 +212,7 @@ class LTI20ModuleMixin(object):
             webob.response:  response to this request.  status 200 if success.  404 if body of PUT request is malformed
         """
         try:
-            (score, comment) = self.parse_lti_2_0_result_json(request.body)
+            (score, comment) = self.parse_lti_2_0_result_json(request.body.decode('utf-8'))
         except LTIError:
             return Response(status=404)  # have to do 404 due to spec, but 400 is better, with error msg in body
 

@@ -6,13 +6,12 @@ These tags do not have state, so they just get passed the system (for access to 
 and the xml element.
 """
 
-from __future__ import absolute_import
 
 import logging
 import re
 import xml.sax.saxutils as saxutils
-from cgi import escape as cgi_escape
 
+from django.utils import html
 from lxml import etree
 
 from .registry import TagRegistry
@@ -126,9 +125,10 @@ class TargetedFeedbackRenderer(object):
         Return the contents of this tag, rendered to html, as an etree element.
         """
         # xss-lint: disable=python-wrap-html
-        html = '<section class="targeted-feedback-span"><span>{}</span></section>'.format(etree.tostring(self.xml))
+        html_str = '<section class="targeted-feedback-span"><span>{}</span></section>'.format(
+            etree.tostring(self.xml, encoding='unicode'))
         try:
-            xhtml = etree.XML(html)
+            xhtml = etree.XML(html_str)
 
         except Exception as err:  # pylint: disable=broad-except
             if self.system.DEBUG:
@@ -140,7 +140,7 @@ class TargetedFeedbackRenderer(object):
                         <p>Failed to construct targeted feedback from <pre>{html}</pre></p>
                       </div>
                     </html>
-                """.format(err=cgi_escape(err), html=cgi_escape(html))
+                """.format(err=html.escape(err), html=html.escape(html_str))
                 log.error(msg)
                 return etree.XML(msg)
             else:
@@ -167,7 +167,7 @@ class ClarificationRenderer(object):
         self.system = system
         # Get any text content found inside this tag prior to the first child tag. It may be a string or None type.
         initial_text = xml.text if xml.text else ''
-        self.inner_html = initial_text + ''.join(etree.tostring(element) for element in xml)
+        self.inner_html = initial_text + u''.join(etree.tostring(element, encoding='unicode') for element in xml)
         self.tail = xml.tail
 
     def get_html(self):

@@ -28,7 +28,6 @@ Longer TODO:
 # and throws spurious errors. Therefore, we disable invalid-name checking.
 # pylint: disable=invalid-name, wrong-import-position
 
-from __future__ import absolute_import
 
 import imp
 import sys
@@ -97,19 +96,6 @@ FEATURES = {
     'ENABLE_DISCUSSION_SERVICE': True,
     'ENABLE_TEXTBOOK': True,
 
-    # .. toggle_name: ENABLE_STUDENT_NOTES
-    # .. toggle_type: waffle_flag
-    # .. toggle_default: True
-    # .. toggle_description: Enables the Student Notes API and UI.
-    # .. toggle_category: ????
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2014-11-13
-    # .. toggle_expiration_date: None
-    # .. toggle_warnings: None
-    # .. toggle_tickets: TNL-659
-    # .. toggle_status: supported
-    'ENABLE_STUDENT_NOTES': True,
-
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
     # this should remain off in production until digest notifications are online.
     'ENABLE_DISCUSSION_HOME_PANEL': False,
@@ -128,7 +114,7 @@ FEATURES = {
     'ENABLE_MASQUERADE': True,  # allow course staff to change to student view of courseware
 
     # .. toggle_name: ENABLE_SYSADMIN_DASHBOARD
-    # .. toggle_type: waffle_flag
+    # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: enables dashboard at /syadmin/ for django staff, for seeing overview of system status, for deleting and loading courses, for seeing log of git imports of courseware.
     # .. toggle_category: admin
@@ -193,7 +179,7 @@ FEATURES = {
     'ENABLE_VERIFIED_CERTIFICATES': False,
 
     # .. toggle_name: DISABLE_HONOR_CERTIFICATES
-    # .. toggle_type: waffle_flag
+    # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Set to True to disable honor certificates. Typically used when your installation only allows verified certificates, like courses.edx.org.
     # .. toggle_category: certificates
@@ -204,6 +190,8 @@ FEATURES = {
     # .. toggle_status: supported
     # .. toggle_warnings: ???
     'DISABLE_HONOR_CERTIFICATES': False,  # Toggle to disable honor certificates
+
+    'DISABLE_AUDIT_CERTIFICATES': False,  # Toggle to disable audit certificates
 
     # for acceptance and load testing
     'AUTOMATIC_AUTH_FOR_TESTING': False,
@@ -275,8 +263,6 @@ FEATURES = {
     # ENABLE_OAUTH2_PROVIDER to True
     'ENABLE_MOBILE_REST_API': False,
 
-    # Enable the combined login/registration form
-    'ENABLE_COMBINED_LOGIN_REGISTRATION': False,
     'ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER': False,
 
     # Enable organizational email opt-in
@@ -309,6 +295,7 @@ FEATURES = {
 
     # Courseware search feature
     'ENABLE_COURSEWARE_SEARCH': False,
+    'ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF': False,
 
     # Dashboard search feature
     'ENABLE_DASHBOARD_SEARCH': False,
@@ -364,7 +351,7 @@ FEATURES = {
     # This will eventually default to True and may be
     # removed since all installs should have the separate
     # extended history table.
-    'ENABLE_CSMH_EXTENDED': False,
+    'ENABLE_CSMH_EXTENDED': True,
 
     # Read from both the CSMH and CSMHE history tables.
     # This is the default, but can be disabled if all history
@@ -669,7 +656,7 @@ CONTEXT_PROCESSORS = [
     'shoppingcart.context_processor.user_has_cart_context_processor',
 
     # Timezone processor (sends language and time_zone preference)
-    'courseware.context_processor.user_timezone_locale_prefs',
+    'lms.djangoapps.courseware.context_processor.user_timezone_locale_prefs',
 
     # Online contextual help
     'help_tokens.context_processor',
@@ -770,6 +757,7 @@ STATIC_ROOT_BASE = '/edx/var/edxapp/staticfiles'
 LOGGING_ENV = 'sandbox'
 
 EDX_ROOT_URL = ''
+EDX_API_KEY = "PUT_YOUR_API_KEY_HERE"
 
 LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/login'
 LOGIN_URL = EDX_ROOT_URL + '/login'
@@ -784,7 +772,7 @@ LOCAL_LOGLEVEL = "INFO"
 
 LOG_DIR = '/edx/var/log/edx'
 
-DATA_DIR = '/edx/app/edxapp'
+DATA_DIR = '/edx/var/edxapp/data'
 
 MAINTENANCE_BANNER_TEXT = 'Sample banner message'
 
@@ -792,7 +780,7 @@ GIT_REPO_DIR = '/edx/var/edxapp/course_repos'
 
 DJFS = {
     'type': 'osfs',
-    'directory_root': '/edx/app/edxapp/django-pyfs/static/django-pyfs',
+    'directory_root': '/edx/var/edxapp/django-pyfs/static/django-pyfs',
     'url_root': '/static/django-pyfs',
 }
 
@@ -806,13 +794,13 @@ WIKI_ENABLED = True
 
 COURSE_MODE_DEFAULTS = {
     'bulk_sku': None,
-    'currency': 'usd',
+    'currency': u'usd',
     'description': None,
     'expiration_datetime': None,
     'min_price': 0,
-    'name': _('Audit'),
+    'name': _(u'Audit'),
     'sku': None,
-    'slug': 'audit',
+    'slug': u'audit',
     'suggested_prices': '',
 }
 
@@ -944,6 +932,7 @@ TRACKING_SEGMENTIO_SOURCE_MAP = {
 GOOGLE_ANALYTICS_ACCOUNT = None
 GOOGLE_SITE_VERIFICATION_ID = ''
 GOOGLE_ANALYTICS_LINKEDIN = 'GOOGLE_ANALYTICS_LINKEDIN_DUMMY'
+GOOGLE_ANALYTICS_TRACKING_ID = None
 
 ######################## BRANCH.IO ###########################
 BRANCH_IO_KEY = ''
@@ -981,12 +970,22 @@ XBLOCK_SETTINGS = {}
 MODULESTORE_BRANCH = 'published-only'
 
 DOC_STORE_CONFIG = {
+    'db': 'edxapp',
     'host': 'localhost',
-    'db': 'xmodule',
+    'replicaSet': '',
+    'password': 'password',
+    'port': 27017,
+    'user': 'edxapp',
     'collection': 'modulestore',
-    # If 'asset_collection' defined, it'll be used
-    # as the collection name for asset metadata.
-    # Otherwise, a default collection name will be used.
+    'ssl': False,
+    # https://api.mongodb.com/python/2.9.1/api/pymongo/mongo_client.html#module-pymongo.mongo_client
+    # default is never timeout while the connection is open,
+    #this means it needs to explicitly close raising pymongo.errors.NetworkTimeout
+    'socketTimeoutMS': 3000,
+    'connectTimeoutMS': 2000,  # default is 20000, I believe raises pymongo.errors.ConnectionFailure
+    # Not setting waitQueueTimeoutMS and waitQueueMultiple since pymongo defaults to nobody being allowed to wait
+    'auth_source': None,
+    'read_preference': 'SECONDARY_PREFERRED'
 }
 
 CONTENTSTORE = {
@@ -996,10 +995,11 @@ CONTENTSTORE = {
     'OPTIONS': {
         'db': 'edxapp',
         'host': 'localhost',
-        'password': 'edxapp',
+        'password': 'password',
         'port': 27017,
         'user': 'edxapp',
-        'ssl': False
+        'ssl': False,
+        'auth_source': None
     },
     'ADDITIONAL_OPTIONS': {},
     'DOC_STORE_CONFIG': DOC_STORE_CONFIG
@@ -1055,7 +1055,7 @@ DATABASES = {
         'CONN_MAX_AGE': 0,
         'ENGINE': 'django.db.backends.mysql',
         'HOST': 'localhost',
-        'NAME': 'dxapp',
+        'NAME': 'edxapp',
         'OPTIONS': {},
         'PASSWORD': 'password',
         'PORT': '3306',
@@ -1069,7 +1069,7 @@ DATABASES = {
         'OPTIONS': {},
         'PASSWORD': 'password',
         'PORT': '3306',
-        'USER': 'edxapp'
+        'USER': 'edxapp001'
     }
 }
 
@@ -1110,7 +1110,7 @@ DEBUG = False
 USE_TZ = True
 SESSION_COOKIE_SECURE = False
 SESSION_SAVE_EVERY_REQUEST = False
-SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+SESSION_SERIALIZER = 'openedx.core.lib.session_serializers.PickleV2Serializer'
 SESSION_COOKIE_DOMAIN = ""
 SESSION_COOKIE_NAME = 'sessionid'
 
@@ -1284,6 +1284,7 @@ CERTIFICATE_TEMPLATE_LANGUAGES = {
 USE_I18N = True
 USE_L10N = True
 
+STATICI18N_FILENAME_FUNCTION = 'statici18n.utils.legacy_filename'
 STATICI18N_ROOT = PROJECT_ROOT / "static"
 STATICI18N_OUTPUT_DIR = "js/i18n"
 
@@ -1314,6 +1315,11 @@ TRANSLATORS_GUIDE = 'https://edx.readthedocs.org/projects/edx-developer-guide/en
 AWS_QUERYSTRING_EXPIRE = 10 * 365 * 24 * 60 * 60  # 10 years
 AWS_SES_REGION_NAME = 'us-east-1'
 AWS_SES_REGION_ENDPOINT = 'email.us-east-1.amazonaws.com'
+AWS_ACCESS_KEY_ID = None
+AWS_SECRET_ACCESS_KEY = None
+AWS_QUERYSTRING_AUTH = False
+AWS_STORAGE_BUCKET_NAME = "SET-ME-PLEASE (ex. bucket-name)"
+AWS_S3_CUSTOM_DOMAIN = "SET-ME-PLEASE (ex. bucket-name.s3.amazonaws.com)"
 
 ################################# SIMPLEWIKI ###################################
 SIMPLE_WIKI_REQUIRE_LOGIN_EDIT = True
@@ -1374,8 +1380,9 @@ PAYMENT_REPORT_GENERATOR_GROUP = 'shoppingcart_report_access'
 ################################# EdxNotes config  #########################
 
 # Configure the LMS to use our stub EdxNotes implementation
-EDXNOTES_PUBLIC_API = 'http://localhost:8120/api/v1'
-EDXNOTES_INTERNAL_API = 'http://localhost:8120/api/v1'
+EDXNOTES_PUBLIC_API = 'http://localhost:18120/api/v1'
+EDXNOTES_INTERNAL_API = 'http://localhost:18120/api/v1'
+EDXNOTES_CLIENT_NAME = "edx-notes"
 
 EDXNOTES_CONNECT_TIMEOUT = 0.5  # time in seconds
 EDXNOTES_READ_TIMEOUT = 1.5  # time in seconds
@@ -1448,6 +1455,7 @@ MIDDLEWARE_CLASSES = [
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'lms.djangoapps.discussion.django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
+
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
     'edx_rest_framework_extensions.auth.jwt.middleware.JwtAuthCookieMiddleware',
 
@@ -1509,17 +1517,14 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     # to redirected unenrolled students to the course info page
-    'courseware.middleware.CacheCourseIdMiddleware',
-    'courseware.middleware.RedirectMiddleware',
+    'lms.djangoapps.courseware.middleware.CacheCourseIdMiddleware',
+    'lms.djangoapps.courseware.middleware.RedirectMiddleware',
 
     'course_wiki.middleware.WikiAccessMiddleware',
 
     'openedx.core.djangoapps.theming.middleware.CurrentSiteThemeMiddleware',
 
     'waffle.middleware.WaffleMiddleware',
-
-    # Inserts Enterprise content.
-    'openedx.features.enterprise_support.middleware.EnterpriseMiddleware',
 
     # Enables force_django_cache_miss functionality for TieredCache.
     'edx_django_utils.cache.middleware.TieredCacheMiddleware',
@@ -1555,6 +1560,7 @@ PIPELINE = {
 }
 
 STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
+STATICFILES_STORAGE_KWARGS = {}
 
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
@@ -1649,7 +1655,6 @@ discussion_vendor_js = [
     'js/split.js'
 ]
 
-notes_js = ['js/notes.js']
 instructor_dash_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/instructor_dashboard/**/*.js'))
 
 verify_student_js = [
@@ -1930,10 +1935,6 @@ PIPELINE['JAVASCRIPT'] = {
         'source_filenames': discussion_vendor_js,
         'output_filename': 'js/discussion_vendor.js',
     },
-    'notes': {
-        'source_filenames': notes_js,
-        'output_filename': 'js/notes.js',
-    },
     'instructor_dash': {
         'source_filenames': instructor_dash_js,
         'output_filename': 'js/instructor_dash.js',
@@ -2173,7 +2174,7 @@ BULK_EMAIL_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 
 # We also define a queue for smaller jobs so that large courses don't block
 # smaller emails (see BULK_EMAIL_JOB_SIZE_THRESHOLD setting)
-BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = DEFAULT_PRIORITY_QUEUE
+BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = 'edx.lms.core.default'
 
 # For emails with fewer than these number of recipients, send them through
 # a different queue to avoid large courses blocking emails that are meant to be
@@ -2283,7 +2284,8 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.video_pipeline',
 
     # Our courseware
-    'courseware',
+    'lms.djangoapps.courseware',
+    'coursewarehistoryextended',
     'student.apps.StudentConfig',
 
     'static_template_view',
@@ -2349,7 +2351,6 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.django_comment_common',
 
     # Notes
-    'notes',
     'edxnotes',
 
     # Splash screen
@@ -2511,7 +2512,10 @@ INSTALLED_APPS = [
 
     # edx-drf-extensions
     'csrf.apps.CsrfAppConfig',  # Enables frontend apps to retrieve CSRF tokens.
-    'xss_utils'
+    'xss_utils',
+
+    # so sample_task is available to celery workers
+    'openedx.core.djangoapps.heartbeat',
 ]
 
 ######################### CSRF #########################################
@@ -2542,7 +2546,7 @@ REST_FRAMEWORK = {
 }
 
 SWAGGER_SETTINGS = {
-    'DEFAULT_INFO': 'openedx.core.openapi.openapi_info',
+    'DEFAULT_INFO': 'openedx.core.apidocs.api_info',
 }
 
 # How long to cache OpenAPI schemas and UI, in seconds.
@@ -2604,9 +2608,9 @@ SOCIAL_SHARING_SETTINGS = {
 SOCIAL_MEDIA_FOOTER_NAMES = [
     "facebook",
     "twitter",
-    "youtube",
+    # "youtube", see PROD-816 for more details
     "linkedin",
-    "google_plus",
+    "instagram",
     "reddit",
 ]
 
@@ -2638,12 +2642,12 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         "icon": "fa-linkedin-square",
         "action": _(u"Follow {platform_name} on LinkedIn")
     },
-    "google_plus": {
-        # Translators: This is the website name of plus.google.com.  Please
-        # translate this the way that Google+ advertises in your language.
-        "title": _("Google+"),
-        "icon": "fa-google-plus-square",
-        "action": _(u"Follow {platform_name} on Google+")
+    "instagram": {
+        # Translators: This is the website name of www.instagram.com.  Please
+        # translate this the way that Instagram advertises in your language.
+        "title": _("Instagram"),
+        "icon": "fa-instagram",
+        "action": _(u"Follow {platform_name} on Instagram")
     },
     "tumblr": {
         # Translators: This is the website name of www.tumblr.com.  Please
@@ -2684,6 +2688,9 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         "action": _(u"Subscribe to the {platform_name} YouTube channel")
     }
 }
+
+#################SOCAIL AUTH OAUTH######################
+SOCIAL_AUTH_OAUTH_SECRETS = {}
 
 ################# Mobile URLS ##########################
 
@@ -3187,7 +3194,7 @@ NOTES_DISABLED_TABS = ['course_structure', 'tags']
 PDF_RECEIPT_TAX_ID = '00-0000000'
 PDF_RECEIPT_FOOTER_TEXT = 'Enter your receipt footer text here.'
 PDF_RECEIPT_DISCLAIMER_TEXT = 'ENTER YOUR RECEIPT DISCLAIMER TEXT HERE.'
-PDF_RECEIPT_BILLING_ADDRESS = 'Enter your receipt terms and conditions here.'
+PDF_RECEIPT_BILLING_ADDRESS = 'Enter your receipt billing address here.'
 PDF_RECEIPT_TERMS_AND_CONDITIONS = 'Enter your receipt terms and conditions here.'
 PDF_RECEIPT_TAX_ID_LABEL = 'fake Tax ID'
 PDF_RECEIPT_LOGO_PATH = PROJECT_ROOT + '/static/images/openedx-logo-tag.png'
@@ -3297,7 +3304,7 @@ ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 COURSE_CATALOG_API_URL = 'http://localhost:8008/api/v1'
 
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:8005'
-CREDENTIALS_PUBLIC_SERVICE_URL = None
+CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:8005'
 
 COMMENTS_SERVICE_URL = 'http://localhost:18080'
 COMMENTS_SERVICE_KEY = 'password'
@@ -3323,7 +3330,7 @@ MODULESTORE_FIELD_OVERRIDE_PROVIDERS = ('openedx.features.content_type_gating.fi
 # occurring when a user uploads a new profile image to replace an
 # earlier one (the file will temporarily be deleted).
 PROFILE_IMAGE_BACKEND = {
-    'class': 'django.core.files.storage.FileSystemStorage',
+    'class': 'openedx.core.storage.OverwriteStorage',
     'options': {
         'location': os.path.join(MEDIA_ROOT, 'profile-images/'),
         'base_url': os.path.join(MEDIA_URL, 'profile-images/'),
@@ -3375,7 +3382,7 @@ CREDIT_PROVIDER_SECRET_KEYS = {}
 CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
 
 # The Help link to the FAQ page about the credit
-CREDIT_HELP_LINK_URL = "/"
+CREDIT_HELP_LINK_URL = ""
 
 # Default domain for the e-mail address associated with users who are created
 # via the LTI Provider feature. Note that the generated e-mail addresses are
@@ -3402,6 +3409,15 @@ NOTIFICATION_EMAIL_EDX_LOGO = "templates/credit_notifications/edx-logo-header.pn
 
 ################################ Settings for JWTs ################################
 
+JWT_ISSUER = 'http://127.0.0.1:8000/oauth2'
+DEFAULT_JWT_ISSUER = {
+    'ISSUER': 'http://127.0.0.1:8000/oauth2',
+    'AUDIENCE': 'change-me',
+    'SECRET_KEY': 'SET-ME-PLEASE'
+}
+JWT_EXPIRATION = 30
+JWT_PRIVATE_SIGNING_KEY = None
+
 JWT_AUTH = {
     'JWT_VERIFY_EXPIRATION': True,
 
@@ -3427,8 +3443,17 @@ JWT_AUTH = {
     'JWT_PRIVATE_SIGNING_JWK': None,
     'JWT_PUBLIC_SIGNING_JWK_SET': None,
 
-    'JWT_ISSUER': 'change-me',
+    'JWT_ISSUER': 'http://127.0.0.1:8000/oauth2',
     'JWT_AUDIENCE': 'change-me',
+    'JWT_ISSUERS': [
+        {
+            'ISSUER': 'http://127.0.0.1:8000/oauth2',
+            'AUDIENCE': 'change-me',
+            'SECRET_KEY': SECRET_KEY
+        }
+    ],
+    'JWT_AUTH_COOKIE_HEADER_PAYLOAD': 'edx-jwt-cookie-header-payload',
+    'JWT_AUTH_COOKIE_SIGNATURE': 'edx-jwt-cookie-signature',
 }
 
 EDX_DRF_EXTENSIONS = {
@@ -3452,7 +3477,7 @@ CCX_MAX_STUDENTS_ALLOWED = 200
 
 # Maximum and minimum length of answers, in characters, for the
 # financial assistance form
-FINANCIAL_ASSISTANCE_MIN_LENGTH = 250
+FINANCIAL_ASSISTANCE_MIN_LENGTH = 1250
 FINANCIAL_ASSISTANCE_MAX_LENGTH = 2500
 
 #### Registration form extension. ####
@@ -3491,7 +3516,7 @@ CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'
 CREDENTIALS_GENERATION_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
 # Queue to use for award program certificates
-PROGRAM_CERTIFICATES_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
+PROGRAM_CERTIFICATES_ROUTING_KEY = 'edx.lms.core.default'
 
 # Settings for Comprehensive Theming app
 
@@ -3552,6 +3577,7 @@ ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES = ['audit', 'honor']
 ENTERPRISE_SUPPORT_URL = ''
 ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = {}
 ENTERPRISE_CUSTOMER_SUCCESS_EMAIL = "customersuccess@edx.org"
+ENTERPRISE_INTEGRATIONS_EMAIL = "enterprise-integrations@edx.org"
 
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
 # The LMS communicates with the Enterprise service via the EdxRestApiClient class
@@ -3563,6 +3589,7 @@ ENTERPRISE_CONSENT_API_URL = LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
 ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
 ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE = 512   # Enterprise logo image size limit in KB's
+ENTERPRISE_CATALOG_INTERNAL_ROOT_URL = 'http://enterprise.catalog.app:18160'
 
 ############## ENTERPRISE SERVICE LMS CONFIGURATION ##################################
 # The LMS has some features embedded that are related to the Enterprise service, but
@@ -3695,6 +3722,8 @@ RETIRED_EMAIL_FMT = lambda settings: settings.RETIRED_EMAIL_PREFIX + '{}@' + set
 derived('RETIRED_USERNAME_FMT', 'RETIRED_EMAIL_FMT')
 RETIRED_USER_SALTS = ['abc', '123']
 RETIREMENT_SERVICE_WORKER_USERNAME = 'RETIREMENT_SERVICE_USER'
+RETIREMENT_SERVICE_USER_EMAIL = "retirement_worker@example.com"
+RETIREMENT_SERVICE_USER_NAME = "retirement_worker"
 
 # These states are the default, but are designed to be overridden in configuration.
 RETIREMENT_STATES = [
@@ -3746,6 +3775,8 @@ ACE_CHANNEL_SAILTHRU_TEMPLATE_NAME = None
 ACE_ROUTING_KEY = 'edx.lms.core.default'
 ACE_CHANNEL_DEFAULT_EMAIL = 'django_email'
 ACE_CHANNEL_TRANSACTIONAL_EMAIL = 'django_email'
+ACE_CHANNEL_SAILTHRU_API_KEY = ""
+ACE_CHANNEL_SAILTHRU_API_SECRET = ""
 
 ############### Settings swift #####################################
 SWIFT_USERNAME = None
@@ -3807,6 +3838,27 @@ SOCIAL_AUTH_SAML_SP_PUBLIC_CERT = ""
 SOCIAL_AUTH_SAML_SP_PRIVATE_KEY_DICT = {}
 SOCIAL_AUTH_SAML_SP_PUBLIC_CERT_DICT = {}
 
-######################### rate limit for yt_video_metadata api ############
+######################### rate limit for yt_video_metadata api ##############
 
 RATE_LIMIT_FOR_VIDEO_METADATA_API = '10/minute'
+
+########################## MAILCHIMP SETTINGS #################################
+MAILCHIMP_NEW_USER_LIST_ID = ""
+
+########################## BLOCKSTORE #####################################
+BLOCKSTORE_PUBLIC_URL_ROOT = 'http://localhost:18250'
+BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
+# Which of django's caches to use for storing anonymous user state for XBlocks
+# in the blockstore-based XBlock runtime
+XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
+
+########################## LEARNER PORTAL ##############################
+LEARNER_PORTAL_URL_ROOT = 'https://learner-portal-localhost:18000'
+
+######################### MICROSITE ###############################
+MICROSITE_ROOT_DIR = '/edx/app/edxapp/edx-microsite'
+MICROSITE_CONFIGURATION = {}
+
+SYSLOG_SERVER = ''
+FEEDBACK_SUBMISSION_EMAIL = ''
+GITHUB_REPO_ROOT = '/edx/var/edxapp/data'

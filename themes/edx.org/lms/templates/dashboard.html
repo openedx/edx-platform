@@ -6,7 +6,7 @@
 import json
 import pytz
 import six
-from courseware.context_processor import user_timezone_locale_prefs
+from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from datetime import datetime, timedelta
 from django.utils import timezone
 from django.utils.translation import ugettext as _
@@ -137,6 +137,11 @@ from student.models import CourseEnrollment
       </div>
     %endif
 
+    ${static.renderReact(
+      component="EnterpriseLearnerPortalBanner",
+      id="enterprise-learner-portal-banner",
+      props={}
+    )}
 </div>
 
 <section class="dashboard" id="dashboard-main">

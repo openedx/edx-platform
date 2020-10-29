@@ -5,7 +5,7 @@ business logic that is not directly tied to the data itself.
 This API is exposed via the middleware(emabargo/middileware.py) layer but may be used directly in-process.
 
 """
-from __future__ import absolute_import
+
 import logging
 
 from django.conf import settings

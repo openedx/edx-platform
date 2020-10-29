@@ -1,6 +1,5 @@
 """Utility functions and classes for track backends"""
 
-from __future__ import absolute_import
 
 import json
 from datetime import date, datetime

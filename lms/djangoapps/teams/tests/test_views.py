@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Tests for the teams API at the HTTP request level."""
-from __future__ import absolute_import
+"""
+Tests for the teams API at the HTTP request level.
+"""
+
 
 import json
 import unittest
@@ -20,9 +22,11 @@ from search.search_engine_base import SearchEngine
 from six.moves import range
 
 from common.test.utils import skip_signal
-from courseware.tests.factories import StaffFactory
+from course_modes.models import CourseMode
+from lms.djangoapps.courseware.tests.factories import StaffFactory
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
+from openedx.core.lib.teams_config import TeamsConfig
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from util.testing import EventTestMixin
@@ -44,7 +48,7 @@ class TestDashboard(SharedModuleStoreTestCase):
     def setUpClass(cls):
         super(TestDashboard, cls).setUpClass()
         cls.course = CourseFactory.create(
-            teams_configuration={
+            teams_configuration=TeamsConfig({
                 "max_team_size": 10,
                 "topics": [
                     {
@@ -54,7 +58,7 @@ class TestDashboard(SharedModuleStoreTestCase):
                     }
                     for topic_id in range(cls.NUM_TOPICS)
                 ]
-            }
+            })
         )
 
     def setUp(self):
@@ -156,7 +160,7 @@ class TestDashboard(SharedModuleStoreTestCase):
 
         # Create a course two
         course_two = CourseFactory.create(
-            teams_configuration={
+            teams_configuration=TeamsConfig({
                 "max_team_size": 1,
                 "topics": [
                     {
@@ -165,7 +169,7 @@ class TestDashboard(SharedModuleStoreTestCase):
                         "description": "Description for test topic for course two."
                     }
                 ]
-            }
+            })
         )
 
         # Login and enroll user in both course course
@@ -180,17 +184,17 @@ class TestDashboard(SharedModuleStoreTestCase):
         # Check that initially list of user teams in course one is empty
         course_one_teams_url = reverse('teams_dashboard', args=[self.course.id])
         response = self.client.get(course_one_teams_url)
-        self.assertIn('"teams": {"count": 0', response.content)  # pylint: disable=unicode-format-string
+        self.assertContains(response, '"teams": {"count": 0')
         # Add user to a course one team
         course_one_team.add_user(self.user)
 
         # Check that list of user teams in course one is not empty, it is one now
         response = self.client.get(course_one_teams_url)
-        self.assertIn('"teams": {"count": 1', response.content)  # pylint: disable=unicode-format-string
+        self.assertContains(response, '"teams": {"count": 1')
         # Check that list of user teams in course two is still empty
         course_two_teams_url = reverse('teams_dashboard', args=[course_two.id])
         response = self.client.get(course_two_teams_url)
-        self.assertIn('"teams": {"count": 0', response.content)  # pylint: disable=unicode-format-string
+        self.assertContains(response, '"teams": {"count": 0')
 
 
 class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
@@ -202,7 +206,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
     def setUpClass(cls):
         # pylint: disable=super-method-not-called
         with super(TeamAPITestCase, cls).setUpClassAndTestData():
-            teams_configuration_1 = {
+            teams_configuration_1 = TeamsConfig({
                 'topics':
                 [
                     {
@@ -211,7 +215,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                         'description': u'Description for topic {}.'.format(i)
                     } for i, name in enumerate([u'Sólar power', 'Wind Power', 'Nuclear Power', 'Coal Power'])
                 ]
-            }
+            })
             cls.test_course_1 = CourseFactory.create(
                 org='TestX',
                 course='TS101',
@@ -219,7 +223,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                 teams_configuration=teams_configuration_1
             )
 
-            teams_configuration_2 = {
+            teams_configuration_2 = TeamsConfig({
                 'topics':
                 [
                     {
@@ -239,7 +243,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                     },
                 ],
                 'max_team_size': 1
-            }
+            })
             cls.test_course_2 = CourseFactory.create(
                 org='MIT',
                 course='6.002x',
@@ -288,6 +292,13 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             username='student_enrolled_other_course_not_on_team'
         )
 
+        # This is a Masters student who should be in the organization protected bubble
+        cls.create_and_enroll_student(
+            courses=[cls.test_course_1, cls.test_course_2],
+            username='student_masters',
+            mode=CourseMode.MASTERS
+        )
+
         with skip_signal(
             post_save,
             receiver=course_team_post_save_callback,
@@ -324,6 +335,16 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                 topic_id='topic_7'
             )
 
+            cls.masters_only_team = CourseTeamFactory.create(
+                name='masters_course_1',
+                description='masters student group',
+                country='US',
+                language='EN',
+                course_id=cls.test_course_1.id,
+                topic_id='topic_0',
+                organization_protected=True
+            )
+
         cls.test_team_name_id_map = {team.name: team for team in (
             cls.solar_team,
             cls.wind_team,
@@ -332,6 +353,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             cls.public_profile_team,
             cls.search_team,
             cls.chinese_team,
+            cls.masters_only_team,
         )}
 
         for user, course in [('staff', cls.test_course_1), ('course_staff', cls.test_course_1)]:
@@ -346,6 +368,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         cls.nuclear_team.add_user(cls.users['student_enrolled_both_courses_other_team'])
         cls.another_team.add_user(cls.users['student_enrolled_both_courses_other_team'])
         cls.public_profile_team.add_user(cls.users['student_enrolled_public_profile'])
+        cls.masters_only_team.add_user(cls.users['student_masters'])
 
     def build_membership_data_raw(self, username, team):
         """Assembles a membership creation payload based on the raw values provided."""
@@ -356,7 +379,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         return self.build_membership_data_raw(self.users[username].username, team.team_id)
 
     @classmethod
-    def create_and_enroll_student(cls, courses=None, username=None):
+    def create_and_enroll_student(cls, courses=None, username=None, mode=None):
         """ Creates a new student and enrolls that student in the course.
 
         Adds the new user to the cls.users dictionary with the username as the key.
@@ -369,7 +392,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             user = UserFactory.create(password=cls.test_password)
         courses = courses if courses is not None else [cls.test_course_1]
         for course in courses:
-            CourseEnrollment.enroll(user, course.id, check_access=True)
+            CourseEnrollment.enroll(user, course.id, mode=mode, check_access=True)
         cls.users[user.username] = user
 
         return user.username
@@ -539,6 +562,12 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         for field in ['id', 'name', 'course_id', 'topic_id', 'date_created', 'description']:
             self.assertIn(field, team)
 
+    def reset_search_index(self):
+        """Clear out the search index and reindex the teams."""
+        CourseTeamIndexer.engine().destroy()
+        for team in self.test_team_name_id_map.values():
+            CourseTeamIndexer.index(team)
+
 
 @ddt.ddt
 class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
@@ -551,16 +580,17 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         (None, 401),
         ('student_inactive', 401),
         ('student_unenrolled', 403),
-        ('student_enrolled', 200),
-        ('staff', 200),
-        ('course_staff', 200),
-        ('community_ta', 200),
+        ('student_enrolled', 200, 3),
+        ('staff', 200, 4),
+        ('course_staff', 200, 4),
+        ('community_ta', 200, 3),
+        ('student_masters', 200, 1)
     )
     @ddt.unpack
-    def test_access(self, user, status):
+    def test_access(self, user, status, expected_teams_count=0):
         teams = self.get_teams_list(user=user, expected_status=status)
         if status == 200:
-            self.assertEqual(3, teams['count'])
+            self.assertEqual(expected_teams_count, teams['count'])
 
     def test_missing_course_id(self):
         self.get_teams_list(400, no_course_id=True)
@@ -630,11 +660,11 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
 
     def test_page_size(self):
         result = self.get_teams_list(200, {'page_size': 2})
-        self.assertEquals(2, result['num_pages'])
+        self.assertEqual(2, result['num_pages'])
 
     def test_page(self):
         result = self.get_teams_list(200, {'page_size': 1, 'page': 3})
-        self.assertEquals(3, result['num_pages'])
+        self.assertEqual(3, result['num_pages'])
         self.assertIsNone(result['next'])
         self.assertIsNotNone(result['previous'])
 
@@ -666,13 +696,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
     )
     @ddt.unpack
     def test_text_search(self, text_search, expected_team_names):
-        def reset_search_index():
-            """Clear out the search index and reindex the teams."""
-            CourseTeamIndexer.engine().destroy()
-            for team in self.test_team_name_id_map.values():
-                CourseTeamIndexer.index(team)
-
-        reset_search_index()
+        self.reset_search_index()
         self.verify_names(
             {'course_id': self.test_course_2.id, 'text_search': text_search},
             200,
@@ -689,13 +713,30 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
 
         # Verify that the searches still work for a user from a different locale
         with translation.override('ar'):
-            reset_search_index()
+            self.reset_search_index()
             self.verify_names(
                 {'course_id': self.test_course_2.id, 'text_search': text_search},
                 200,
                 expected_team_names,
                 user='student_enrolled_public_profile'
             )
+
+    @ddt.data(
+        ('masters', ['masters_course_1']),
+        ('group', ['masters_course_1']),
+        ('Sólar', []),
+        ('Wind', []),
+    )
+    @ddt.unpack
+    def test_text_search_masters(self, text_search, expected_team_names):
+        # Verify that the search is working with Masters learner
+        self.reset_search_index()
+        self.verify_names(
+            {'course_id': self.test_course_1.id, 'text_search': text_search},
+            200,
+            expected_team_names,
+            user='student_masters'
+        )
 
     def test_delete_removed_from_search(self):
         team = CourseTeamFactory.create(
@@ -793,6 +834,23 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
             json.loads(response.content.decode('utf-8'))["user_message"]
         )
 
+    @patch('lms.djangoapps.teams.views.can_user_create_team_in_topic', return_value=False)
+    def test_student_create_team_instructor_managed_topic(self, *args):  # pylint: disable=unused-argument
+        response = self.post_create_team(
+            403,
+            data=self.build_team_data(
+                name="student create team in instructor managed topic",
+                course=self.test_course_1,
+                description="student cannot create team in instructor-managed topic",
+                topic_id='great-topic'
+            ),
+            user='student_enrolled_not_on_team'
+        )
+        self.assertEqual(
+            "You can't create a team in an instructor managed topic.",
+            json.loads(response.content.decode('utf-8'))["user_message"]
+        )
+
     @ddt.data('staff', 'course_staff', 'community_ta')
     def test_privileged_create_multiple_teams(self, user):
         """ Privileged users can create multiple teams, even if they are already in one. """
@@ -874,7 +932,8 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
             'country': 'CA',
             'topic_id': 'great-topic',
             'course_id': str(self.test_course_1.id),
-            'description': 'Another fantastic team'
+            'description': 'Another fantastic team',
+            'organization_protected': False,
         })
 
     @ddt.data('staff', 'course_staff', 'community_ta')
@@ -1000,7 +1059,7 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
         prev_name = self.solar_team.name
         team = self.patch_team_detail(self.solar_team.team_id, status, {'name': 'foo'}, user=user)
         if status == 200:
-            self.assertEquals(team['name'], 'foo')
+            self.assertEqual(team['name'], 'foo')
             self.assert_event_emitted(
                 'edx.team.changed',
                 team_id=self.solar_team.team_id,
@@ -1374,6 +1433,21 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
             user='staff'
         )
 
+    @patch('lms.djangoapps.teams.api.is_instructor_managed_team', return_value=True)
+    def test_staff_join_instructor_managed_team(self, *args):  # pylint: disable=unused-argument
+        self.post_create_membership(
+            200,
+            self.build_membership_data_raw(self.users['staff'].username, self.solar_team.team_id),
+            user='staff'
+        )
+
+    @patch('lms.djangoapps.teams.api.is_instructor_managed_team', return_value=True)
+    def test_student_join_instructor_managed_team(self, *args):  # pylint: disable=unused-argument
+        self.post_create_membership(
+            403,
+            self.build_membership_data_raw(self.users['student_enrolled_not_on_team'].username, self.solar_team.team_id)
+        )
+
     @ddt.data('student_enrolled', 'staff', 'course_staff')
     def test_join_twice(self, user):
         response = self.post_create_membership(
@@ -1535,6 +1609,11 @@ class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
     def test_missing_membership(self):
         self.delete_membership(self.wind_team.team_id, self.users['student_enrolled'].username, 404)
 
+    @patch('lms.djangoapps.teams.api.is_instructor_managed_team', return_value=True)
+    def test_student_leave_instructor_managed_team(self, *args):  # pylint: disable=unused-argument
+        self.delete_membership(
+            self.solar_team.team_id, self.users['student_enrolled'].username, 403, user='student_enrolled')
+
 
 class TestElasticSearchErrors(TeamAPITestCase):
     """Test that the Team API is robust to Elasticsearch connection errors."""
@@ -1580,3 +1659,52 @@ class TestElasticSearchErrors(TeamAPITestCase):
             data={'description': 'new description'},
             user='staff'
         )
+
+
+@ddt.ddt
+class TestBulkMembershipManagement(TeamAPITestCase):
+    """
+    Test that CSVs can be uploaded and downloaded to manage course membership.
+
+    This test case will be expanded when the view is fully
+    implemented (TODO MST-31).
+    """
+    good_course_id = 'TestX/TS101/Test_Course'
+    fake_course_id = 'TestX/TS101/Non_Existent_Course'
+
+    allow_username = 'course_staff'
+    deny_username = 'student_enrolled'
+
+    @ddt.data(
+        ('GET', good_course_id, deny_username, 403),
+        ('GET', fake_course_id, allow_username, 404),
+        ('GET', fake_course_id, deny_username, 404),
+        ('POST', good_course_id, allow_username, 501),  # TODO MST-31
+        ('POST', good_course_id, deny_username, 403),
+        ('POST', fake_course_id, allow_username, 404),
+        ('POST', fake_course_id, deny_username, 404),
+    )
+    @ddt.unpack
+    def test_error_statuses(self, method, course_id, username, expected_status):
+        url = self.get_url(course_id)
+        self.login(username)
+        response = self.client.generic(method, url)
+        assert response.status_code == expected_status
+
+    def test_download_csv(self):
+        url = self.get_url(self.good_course_id)
+        self.login(self.allow_username)
+        response = self.client.get(url)
+        assert response.status_code == 200
+        assert response['Content-Type'] == 'text/csv'
+        assert response['Content-Disposition'] == (
+            'attachment; filename="team-membership_TestX_TS101_Test_Course.csv"'
+        )
+        # For now, just assert that the file is non-empty.
+        # Eventually, we will test contents (TODO MST-31).
+        assert response.content
+
+    @staticmethod
+    def get_url(course_id):
+        # This strategy allows us to test with invalid course IDs
+        return reverse('team_membership_bulk_management', args=[course_id])

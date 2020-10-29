@@ -1,7 +1,7 @@
 """
 Tests for comprehensive themes.
 """
-from __future__ import absolute_import
+
 
 from django.conf import settings
 from django.contrib import staticfiles
@@ -142,32 +142,6 @@ class TestComprehensiveThemeLMS(TestCase):
         self.assertContains(resp, "This is a custom template.")
 
 
-@skip_unless_cms
-class TestComprehensiveThemeCMS(TestCase):
-    """
-    Test html, sass and static file overrides for comprehensive themes.
-    """
-
-    def setUp(self):
-        """
-        Clear static file finders cache and register cleanup methods.
-        """
-        super(TestComprehensiveThemeCMS, self).setUp()
-
-        # Clear the internal staticfiles caches, to get test isolation.
-        staticfiles.finders.get_finder.cache_clear()
-
-    @with_comprehensive_theme("test-theme")
-    def test_template_override(self):
-        """
-        Test that theme templates are used instead of default templates.
-        """
-        resp = self.client.get('/signin')
-        self.assertEqual(resp.status_code, 200)
-        # This string comes from login.html of test-theme
-        self.assertContains(resp, "Login Page override for test-theme.")
-
-
 @skip_unless_lms
 class TestComprehensiveThemeDisabledLMS(TestCase):
     """
@@ -189,30 +163,6 @@ class TestComprehensiveThemeDisabledLMS(TestCase):
         """
         result = staticfiles.finders.find('images/logo.png')
         self.assertEqual(result, settings.REPO_ROOT / 'lms/static/images/logo.png')
-
-
-@skip_unless_cms
-class TestComprehensiveThemeDisabledCMS(TestCase):
-    """
-    Test default html, sass and static file when no theme is applied.
-    """
-
-    def setUp(self):
-        """
-        Clear static file finders cache and register cleanup methods.
-        """
-        super(TestComprehensiveThemeDisabledCMS, self).setUp()
-
-        # Clear the internal staticfiles caches, to get test isolation.
-        staticfiles.finders.get_finder.cache_clear()
-
-    def test_template_override(self):
-        """
-        Test that defaults templates are used when no theme is applied.
-        """
-        resp = self.client.get('/signin')
-        self.assertEqual(resp.status_code, 200)
-        self.assertNotContains(resp, "Login Page override for test-theme.")
 
 
 @skip_unless_lms

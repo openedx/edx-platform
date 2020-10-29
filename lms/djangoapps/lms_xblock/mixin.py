@@ -3,7 +3,7 @@ Namespace that defines fields common to all blocks used in the LMS
 """
 
 #from django.utils.translation import ugettext_noop as _
-from __future__ import absolute_import
+
 
 import six
 from lazy import lazy

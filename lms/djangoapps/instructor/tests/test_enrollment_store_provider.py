@@ -2,7 +2,6 @@
 Exercises tests on the base_store_provider file
 """
 
-from __future__ import absolute_import
 
 from django.test import TestCase
 

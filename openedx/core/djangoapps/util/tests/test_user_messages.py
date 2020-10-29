@@ -2,7 +2,6 @@
 Unit tests for user messages.
 """
 
-from __future__ import absolute_import
 
 import ddt
 from django.contrib.messages.middleware import MessageMiddleware
@@ -43,7 +42,7 @@ class UserMessagesTestCase(TestCase):
         PageLevelMessages.register_user_message(self.request, UserMessageType.INFO, message)
         messages = list(PageLevelMessages.user_messages(self.request))
         self.assertEqual(len(messages), 1)
-        self.assertEquals(messages[0].message_html, expected_message_html)
+        self.assertEqual(messages[0].message_html, expected_message_html)
 
     @ddt.data(
         (UserMessageType.ERROR, 'alert-danger', 'fa fa-warning'),
@@ -59,8 +58,8 @@ class UserMessagesTestCase(TestCase):
         PageLevelMessages.register_user_message(self.request, message_type, TEST_MESSAGE)
         messages = list(PageLevelMessages.user_messages(self.request))
         self.assertEqual(len(messages), 1)
-        self.assertEquals(messages[0].css_class, expected_css_class)
-        self.assertEquals(messages[0].icon_class, expected_icon_class)
+        self.assertEqual(messages[0].css_class, expected_css_class)
+        self.assertEqual(messages[0].icon_class, expected_icon_class)
 
     @ddt.data(
         (normalize_repr(PageLevelMessages.register_error_message), UserMessageType.ERROR),
@@ -76,4 +75,4 @@ class UserMessagesTestCase(TestCase):
         register_message_function(self.request, TEST_MESSAGE)
         messages = list(PageLevelMessages.user_messages(self.request))
         self.assertEqual(len(messages), 1)
-        self.assertEquals(messages[0].type, expected_message_type)
+        self.assertEqual(messages[0].type, expected_message_type)

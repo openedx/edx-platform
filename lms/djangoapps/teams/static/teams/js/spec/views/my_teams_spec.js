@@ -6,12 +6,13 @@ define([
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
 ], function(Backbone, MyTeamsCollection, MyTeamsView, TeamSpecHelpers, AjaxHelpers) {
     'use strict';
+    var createMyTeamsView;
     describe('My Teams View', function() {
         beforeEach(function() {
             setFixtures('<div class="teams-container"></div>');
         });
 
-        var createMyTeamsView = function(myTeams) {
+        createMyTeamsView = function(myTeams) {
             return new MyTeamsView({
                 el: '.teams-container',
                 collection: myTeams,

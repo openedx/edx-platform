@@ -1,7 +1,7 @@
 """
 django admin pages for certificates models
 """
-from __future__ import absolute_import
+
 
 from operator import itemgetter
 
@@ -9,6 +9,7 @@ from config_models.admin import ConfigurationModelAdmin
 from django import forms
 from django.conf import settings
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -57,8 +58,17 @@ class CertificateTemplateAssetAdmin(admin.ModelAdmin):
     """
     Django admin customizations for CertificateTemplateAsset model
     """
+
     list_display = ('description', 'asset_slug',)
     prepopulated_fields = {"asset_slug": ("description",)}
+
+    # see PROD-1153 for the details
+    def changelist_view(self, request, extra_context=None):
+        if '.stage.edx.org' in request.get_host():
+            extra_context = {'title': mark_safe('Select Certificate Template Asset to change <br/><br/>'
+                                                '<div><strong style="color: red;"> Warning!</strong> Updating '
+                                                'stage asset would also update production asset</div>')}
+        return super(CertificateTemplateAssetAdmin, self).changelist_view(request, extra_context=extra_context)
 
 
 class GeneratedCertificateAdmin(admin.ModelAdmin):

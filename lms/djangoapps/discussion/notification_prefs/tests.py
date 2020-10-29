@@ -1,5 +1,5 @@
 # pylint: disable=missing-docstring,consider-iterating-dictionary
-from __future__ import absolute_import
+
 
 import json
 
@@ -28,7 +28,7 @@ from util.testing import UrlResetMixin
 
 @override_settings(SECRET_KEY="test secret key")
 class NotificationPrefViewTest(UrlResetMixin, TestCase):
-    INITIALIZATION_VECTOR = "\x00" * 16
+    INITIALIZATION_VECTOR = b"\x00" * 16
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -189,7 +189,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):
     def test_unsubscribe_invalid_token(self):
         def test_invalid_token(token, message):
             request = self.request_factory.get("dummy")
-            self.assertRaisesRegexp(Http404, "^{}$".format(message), set_subscription, request, token, False)
+            self.assertRaisesRegex(Http404, "^{}$".format(message), set_subscription, request, token, False)
 
         # Invalid base64 encoding
         test_invalid_token("ZOMG INVALID BASE64 CHARS!!!", "base64url")

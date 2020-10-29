@@ -1,7 +1,7 @@
 """
 Tests for the lms_filter_generator
 """
-from __future__ import absolute_import
+
 
 import six
 from mock import Mock, patch

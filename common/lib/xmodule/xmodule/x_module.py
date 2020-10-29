@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 import beeline
 import logging
@@ -13,6 +13,7 @@ from pkg_resources import resource_exists, resource_isdir, resource_listdir, res
 import six
 import yaml
 from contracts import contract, new_contract
+from django.utils.encoding import python_2_unicode_compatible
 from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.asides import AsideDefinitionKeyV2, AsideUsageKeyV2
@@ -924,6 +925,7 @@ class XModuleToXBlockMixin(object):
 
 
 @XBlock.needs("i18n")
+@python_2_unicode_compatible
 class XModule(XModuleToXBlockMixin, HTMLSnippet, XModuleMixin):
     """ Implements a generic learning module.
 
@@ -968,7 +970,7 @@ class XModule(XModuleToXBlockMixin, HTMLSnippet, XModuleMixin):
     def runtime(self, value):  # pylint: disable=arguments-differ
         self._runtime = value
 
-    def __unicode__(self):
+    def __str__(self):
         # xss-lint: disable=python-wrap-html
         return u'<x_module(id={0})>'.format(self.id)
 
@@ -1261,9 +1263,20 @@ class XModuleDescriptor(XModuleDescriptorToXBlockMixin, HTMLSnippet, ResourceTem
         """
         return (hasattr(other, 'scope_ids') and
                 self.scope_ids == other.scope_ids and
-                list(self.fields.keys()) == list(other.fields.keys()) and
+                set(self.fields.keys()) == set(other.fields.keys()) and
                 all(getattr(self, field.name) == getattr(other, field.name)
                     for field in self.fields.values()))
+
+    def __hash__(self):  # pylint: disable=useless-super-delegation
+        """
+        This isn't technically appropriate since descriptors are actually mutable,
+        but in practice we rarely modify them after creation or instantiate two
+        equivalent descriptors in the same process.  And we perform graph
+        operations on large collections of XBlocks that have simply unacceptable
+        performance if we have to rely on lists and equality rather than sets,
+        dictionaries, and identity-based hash functions.
+        """
+        return super(XModuleDescriptor, self).__hash__()
 
     def __repr__(self):
         return (

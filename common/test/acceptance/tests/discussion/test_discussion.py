@@ -2,7 +2,6 @@
 Tests for discussion pages
 """
 
-from __future__ import absolute_import
 
 import datetime
 import time
@@ -582,16 +581,6 @@ class DiscussionCommentDeletionTest(BaseDiscussionTestCase):
             ]
         )
         view.push()
-
-    def test_comment_deletion_as_student(self):
-        self.setup_user()
-        self.setup_view()
-        page = self.create_single_thread_page("comment_deletion_test_thread")
-        page.visit()
-        self.assertTrue(page.is_comment_deletable("comment_self_author"))
-        self.assertTrue(page.is_comment_visible("comment_other_author"))
-        self.assertFalse(page.is_comment_deletable("comment_other_author"))
-        page.delete_comment("comment_self_author")
 
     def test_comment_deletion_as_moderator(self):
         self.setup_user(roles=['Moderator'])

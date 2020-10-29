@@ -9,6 +9,13 @@ define([
     'teams/js/spec_helpers/team_spec_helpers'
 ], function($, _, Backbone, AjaxHelpers, PageHelpers, TeamEditView, TeamModel, TeamSpecHelpers) {
     'use strict';
+    var assertFormRendersCorrectly,
+        assertTeamCreateUpdateInfo,
+        assertValidationMessagesWhenFieldsEmpty,
+        assertValidationMessagesWhenInvalidData,
+        assertShowMessageOnError,
+        assertRedirectsToCorrectUrlOnCancel,
+        requestMethod;
 
     describe('CreateEditTeam', function() {
         var teamsUrl = '/api/team/v0/teams/',
@@ -31,17 +38,18 @@ define([
                 language: 'en'
             },
             verifyValidation = function(requests, teamEditView, fieldsData) {
+                var message = teamEditView.$('.wrapper-msg');
+                var actionMessage = (
+                    // eslint-disable-next-line no-use-before-define
+                    teamAction === 'create' ? 'Your team could not be created.' : 'Your team could not be updated.'
+                );
                 _.each(fieldsData, function(fieldData) {
                     teamEditView.$(fieldData[0]).val(fieldData[1]);
                 });
 
                 teamEditView.$('.create-team.form-actions .action-primary').click();
 
-                var message = teamEditView.$('.wrapper-msg');
                 expect(message.hasClass('is-hidden')).toBeFalsy();
-                var actionMessage = (
-                    teamAction === 'create' ? 'Your team could not be created.' : 'Your team could not be updated.'
-                );
                 expect(message.find('.title').text().trim()).toBe(actionMessage);
                 expect(message.find('.copy').text().trim()).toBe(
                     'Check the highlighted fields below and try again.'
@@ -95,7 +103,7 @@ define([
             spyOn(Backbone.history, 'navigate');
         });
 
-        var assertFormRendersCorrectly = function() {
+        assertFormRendersCorrectly = function() {
             var fieldClasses = [
                     '.u-field-name',
                     '.u-field-description',
@@ -120,11 +128,11 @@ define([
             }
         };
 
-        var requestMethod = function() {
+        requestMethod = function() {
             return teamAction === 'create' ? 'POST' : 'PATCH';
         };
 
-        var assertTeamCreateUpdateInfo = function(that, teamsData, teamsUrl, expectedUrl) {
+        assertTeamCreateUpdateInfo = function(that, teamsData, teamsUrlLink, expectedUrl) {
             var requests = AjaxHelpers.requests(that),
                 teamEditView = createEditTeamView();
 
@@ -135,14 +143,14 @@ define([
 
             teamEditView.$('.create-team.form-actions .action-primary').click();
 
-            AjaxHelpers.expectJsonRequest(requests, requestMethod(), teamsUrl, teamsData);
+            AjaxHelpers.expectJsonRequest(requests, requestMethod(), teamsUrlLink, teamsData);
             AjaxHelpers.respondWithJson(requests, _.extend({}, teamsData, teamAction === 'create' ? {id: '123'} : {}));
 
             expect(teamEditView.$('.create-team.wrapper-msg .copy').text().trim().length).toBe(0);
             expect(Backbone.history.navigate.calls.mostRecent().args[0]).toBe(expectedUrl);
         };
 
-        var assertValidationMessagesWhenFieldsEmpty = function(that) {
+        assertValidationMessagesWhenFieldsEmpty = function(that) {
             var requests = AjaxHelpers.requests(that),
                 teamEditView = createEditTeamView();
 
@@ -163,7 +171,7 @@ define([
             ]);
         };
 
-        var assertValidationMessagesWhenInvalidData = function(that) {
+        assertValidationMessagesWhenInvalidData = function(that) {
             var requests = AjaxHelpers.requests(that),
                 teamEditView = createEditTeamView(),
                 teamName = new Array(500 + 1).join('$'),
@@ -185,7 +193,7 @@ define([
             ]);
         };
 
-        var assertShowMessageOnError = function(that, teamsData, teamsUrl, errorCode) {
+        assertShowMessageOnError = function(that, teamsData, teamsUrlLink, errorCode) {
             var teamEditView = createEditTeamView(),
                 requests = AjaxHelpers.requests(that);
 
@@ -195,10 +203,10 @@ define([
             teamEditView.$('.create-team.form-actions .action-primary').click();
 
             if (teamAction === 'create') {
-                teamsData.country = '';
-                teamsData.language = '';
+                teamsData.country = ''; // eslint-disable-line no-param-reassign
+                teamsData.language = ''; // eslint-disable-line no-param-reassign
             }
-            AjaxHelpers.expectJsonRequest(requests, requestMethod(), teamsUrl, teamsData);
+            AjaxHelpers.expectJsonRequest(requests, requestMethod(), teamsUrlLink, teamsData);
 
             if (errorCode < 500) {
                 AjaxHelpers.respondWithError(
@@ -213,7 +221,7 @@ define([
             }
         };
 
-        var assertRedirectsToCorrectUrlOnCancel = function(expectedUrl) {
+        assertRedirectsToCorrectUrlOnCancel = function(expectedUrl) {
             var teamEditView = createEditTeamView();
             teamEditView.$('.create-team.form-actions .action-cancel').click();
             expect(Backbone.history.navigate.calls.mostRecent().args[0]).toBe(expectedUrl);

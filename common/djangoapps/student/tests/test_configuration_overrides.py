@@ -1,7 +1,7 @@
 """
 Test for user creation from sites with configuration overrides.
 """
-from __future__ import absolute_import
+
 
 import json
 

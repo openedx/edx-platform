@@ -2,7 +2,7 @@
 """
 Test cases to cover account retirement views
 """
-from __future__ import absolute_import, print_function
+
 
 import datetime
 import json
@@ -200,8 +200,9 @@ class TestDeactivateLogout(RetirementTestCase):
     def build_post(self, password):
         return {'password': password}
 
-    @mock.patch('openedx.core.djangolib.oauth2_retirement_utils')
-    def test_user_can_deactivate_self(self, retirement_utils_mock):
+    @mock.patch('openedx.core.djangoapps.user_api.accounts.views.retire_dot_oauth2_models')
+    @mock.patch('openedx.core.djangoapps.user_api.accounts.views.retire_dop_oauth2_models')
+    def test_user_can_deactivate_self(self, mock_retire_dop, mock_retire_dot):
         """
         Verify a user calling the deactivation endpoint logs out the user, deletes all their SSO tokens,
         and creates a user retirement row.
@@ -218,8 +219,8 @@ class TestDeactivateLogout(RetirementTestCase):
         self.assertEqual(list(Registration.objects.filter(user=self.test_user)), [])
         self.assertEqual(len(UserRetirementStatus.objects.filter(user_id=self.test_user.id)), 1)
         # these retirement utils are tested elsewhere; just make sure we called them
-        retirement_utils_mock.retire_dop_oauth2_models.assertCalledWith(self.test_user)
-        retirement_utils_mock.retire_dot_oauth2_models.assertCalledWith(self.test_user)
+        mock_retire_dop.assert_called_with(self.test_user)
+        mock_retire_dot.assert_called_with(self.test_user)
         # make sure the user cannot log in
         self.assertFalse(self.client.login(username=self.test_user.username, password=self.test_password))
         # make sure that an email has been sent

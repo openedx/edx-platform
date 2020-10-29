@@ -2,7 +2,6 @@
 Message Types for user_api emails
 """
 
-from __future__ import absolute_import
 
 from django.conf import settings
 

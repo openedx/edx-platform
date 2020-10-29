@@ -3,7 +3,6 @@ This file contains implementation override of SearchFilterGenerator which will a
     * Filter by all courses in which the user is enrolled in
 """
 
-from __future__ import absolute_import
 
 import six
 from search.filter_generator import SearchFilterGenerator

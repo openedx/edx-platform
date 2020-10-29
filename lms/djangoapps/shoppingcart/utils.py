@@ -2,7 +2,6 @@
 Utility methods for the Shopping Cart app
 """
 
-from __future__ import absolute_import
 
 from django.conf import settings
 from pdfminer.converter import PDFPageAggregator

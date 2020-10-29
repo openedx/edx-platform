@@ -1,11 +1,10 @@
 """Test safe_exec.py"""
 
-from __future__ import absolute_import
 
 import hashlib
 import os
 import os.path
-import random
+import random2 as random
 import textwrap
 import unittest
 

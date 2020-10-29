@@ -9,7 +9,6 @@ TO DO sync instructor and staff flags
         {instructor: true, staff: true}
 """
 
-from __future__ import absolute_import
 
 import logging
 

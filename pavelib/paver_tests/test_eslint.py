@@ -1,7 +1,7 @@
 """
 Tests for Paver's Stylelint tasks.
 """
-from __future__ import absolute_import
+
 
 import unittest
 

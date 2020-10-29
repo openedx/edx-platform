@@ -1,7 +1,7 @@
 """
 Command to back-populate domain of the site the user account was created on.
 """
-from __future__ import absolute_import
+
 
 import six
 from django.contrib.auth.models import User

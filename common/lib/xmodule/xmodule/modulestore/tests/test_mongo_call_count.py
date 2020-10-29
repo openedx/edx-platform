@@ -3,7 +3,6 @@ Tests to verify correct number of MongoDB calls during course import/export and 
 when using the Split modulestore.
 """
 
-from __future__ import absolute_import
 
 from shutil import rmtree
 from tempfile import mkdtemp

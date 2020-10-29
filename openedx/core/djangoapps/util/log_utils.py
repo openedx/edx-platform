@@ -3,7 +3,7 @@ Django-based logging utilities
 
 UserIdFilter: A logging.Filter that adds userid to the logging context
 """
-from __future__ import absolute_import
+
 
 from logging import Filter
 

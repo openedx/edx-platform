@@ -1,7 +1,7 @@
 """
 A management command to send Schedule upgrade reminders
 """
-from __future__ import absolute_import
+
 
 from textwrap import dedent
 

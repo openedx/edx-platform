@@ -1,7 +1,7 @@
 """
 Factories for use in tests of XBlocks.
 """
-from __future__ import absolute_import, print_function
+
 
 import datetime
 import functools

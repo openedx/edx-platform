@@ -1,16 +1,17 @@
 """
 Support tool for changing course enrollments.
 """
-from __future__ import absolute_import
+
 
 import csv
+from uuid import UUID
+
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 
 from edxmako.shortcuts import render_to_response
+from lms.djangoapps.program_enrollments.api import link_program_enrollments
 from lms.djangoapps.support.decorators import require_support_permission
-
-from lms.djangoapps.program_enrollments.api import link_program_enrollments_to_lms_users
 
 TEMPLATE_PATH = 'support/link_program_enrollments.html'
 
@@ -44,25 +45,7 @@ class LinkProgramEnrollmentSupportView(View):
         """
         program_uuid = request.POST.get('program_uuid', '').strip()
         text = request.POST.get('text', '')
-        successes = []
-        errors = []
-        if not program_uuid or not text:
-            error = 'You must provide both a program uuid and a comma separated list of external_student_key, username'
-            errors = [error]
-        else:
-            reader = csv.DictReader(text.splitlines(), fieldnames=('external_key', 'username'))
-            ext_key_to_lms_username = {
-                (item['external_key'] or '').strip(): (item['username'] or '').strip()
-                for item in reader
-            }
-            try:
-                link_errors = link_program_enrollments_to_lms_users(program_uuid, ext_key_to_lms_username)
-            except ValueError as e:
-                errors = [str(e)]
-            else:
-                successes = [str(item) for item in ext_key_to_lms_username.items() if item not in link_errors]
-                errors = [message for message in link_errors.values()]
-
+        successes, errors = self._validate_and_link(program_uuid, text)
         return render_to_response(
             TEMPLATE_PATH,
             {
@@ -72,3 +55,46 @@ class LinkProgramEnrollmentSupportView(View):
                 'text': text,
             }
         )
+
+    @staticmethod
+    def _validate_and_link(program_uuid_string, linkage_text):
+        """
+        Validate arguments, and if valid, call `link_program_enrollments`.
+
+        Returns: (successes, errors)
+            where successes and errors are both list[str]
+        """
+        if not (program_uuid_string and linkage_text):
+            error = (
+                "You must provide both a program uuid "
+                "and a series of lines with the format "
+                "'external_user_key,lms_username'."
+            )
+            return [], [error]
+        try:
+            program_uuid = UUID(program_uuid_string)
+        except ValueError:
+            return [], [
+                "Supplied program UUID '{}' is not a valid UUID.".format(program_uuid_string)
+            ]
+        reader = csv.DictReader(
+            linkage_text.splitlines(), fieldnames=('external_key', 'username')
+        )
+        ext_key_to_username = {
+            (item.get('external_key') or '').strip(): (item['username'] or '').strip()
+            for item in reader
+        }
+        if not (all(ext_key_to_username.keys()) and all(ext_key_to_username.values())):
+            return [], [
+                "All linking lines must be in the format 'external_user_key,lms_username'"
+            ]
+        link_errors = link_program_enrollments(
+            program_uuid, ext_key_to_username
+        )
+        successes = [
+            str(item)
+            for item in ext_key_to_username.items()
+            if item not in link_errors
+        ]
+        errors = [message for message in link_errors.values()]
+        return successes, errors

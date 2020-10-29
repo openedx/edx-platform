@@ -1,13 +1,16 @@
 """
 Django ORM model specifications for the User API application
 """
-from __future__ import absolute_import
+
+
+import logging
 
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
+from django.utils.encoding import python_2_unicode_compatible
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 
@@ -29,6 +32,8 @@ from student.models import (
 )
 from util.model_utils import emit_setting_changed_event, get_changed_fields_dict
 
+log = logging.getLogger(__name__)
+
 
 class RetirementStateError(Exception):
     pass
@@ -40,7 +45,7 @@ class UserPreference(models.Model):
 
     .. no_pii: Stores arbitrary key/value pairs, currently none are PII. If that changes, update this annotation.
     """
-    KEY_REGEX = r"[-_a-zA-Z0-9]+"
+    KEY_REGEX = u"[-_a-zA-Z0-9]+"
     user = models.ForeignKey(User, db_index=True, related_name="preferences", on_delete=models.CASCADE)
     key = models.CharField(max_length=255, db_index=True, validators=[RegexValidator(KEY_REGEX)])
     value = models.TextField()
@@ -95,7 +100,11 @@ def post_save_callback(sender, **kwargs):
     """
     Event changes to user preferences.
     """
+
     user_preference = kwargs["instance"]
+    if user_preference.key == u'pref-lang':
+        log.info(u"Updated the language for the user:{username} to {new}".format(
+            username=user_preference.user.username, new=user_preference.value))
     emit_setting_changed_event(
         user_preference.user, sender._meta.db_table, user_preference.key,
         user_preference._old_value, user_preference.value
@@ -149,6 +158,7 @@ class UserOrgTag(TimeStampedModel, DeletableByUserValue):  # pylint: disable=mod
         unique_together = ("user", "org", "key")
 
 
+@python_2_unicode_compatible
 class RetirementState(models.Model):
     """
     Stores the list and ordering of the steps of retirement, this should almost never change
@@ -161,8 +171,9 @@ class RetirementState(models.Model):
     is_dead_end_state = models.BooleanField(default=False, db_index=True)
     required = models.BooleanField(default=False)
 
-    def __unicode__(self):
-        return u'{} (step {})'.format(self.state_name, self.state_execution_order)
+    def __str__(self):
+        # pylint: disable=unicode-format-string
+        return '{} (step {})'.format(self.state_name, self.state_execution_order)
 
     class Meta(object):
         ordering = ('state_execution_order',)
@@ -180,6 +191,7 @@ class RetirementState(models.Model):
         return cls.objects.all().values_list('state_name', flat=True)
 
 
+@python_2_unicode_compatible
 class UserRetirementPartnerReportingStatus(TimeStampedModel):
     """
     When a user has been retired from LMS it will still need to be reported out to
@@ -192,7 +204,7 @@ class UserRetirementPartnerReportingStatus(TimeStampedModel):
     .. pii_types: name, username, email_address
     .. pii_retirement: local_api
     """
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     original_username = models.CharField(max_length=150, db_index=True)
     original_email = models.EmailField(db_index=True)
     original_name = models.CharField(max_length=255, blank=True, db_index=True)
@@ -202,13 +214,14 @@ class UserRetirementPartnerReportingStatus(TimeStampedModel):
         verbose_name = 'User Retirement Reporting Status'
         verbose_name_plural = 'User Retirement Reporting Statuses'
 
-    def __unicode__(self):
+    def __str__(self):
         return u'UserRetirementPartnerReportingStatus: {} is being processed: {}'.format(
             self.user,
             self.is_being_processed
         )
 
 
+@python_2_unicode_compatible
 class UserRetirementRequest(TimeStampedModel):
     """
     Records and perists every user retirement request.
@@ -239,10 +252,11 @@ class UserRetirementRequest(TimeStampedModel):
         """
         return cls.objects.filter(user=user).exists()
 
-    def __unicode__(self):
+    def __str__(self):
         return u'User: {} Requested: {}'.format(self.user.id, self.created)
 
 
+@python_2_unicode_compatible
 class UserRetirementStatus(TimeStampedModel):
     """
     Tracks the progress of a user's retirement request
@@ -382,7 +396,7 @@ class UserRetirementStatus(TimeStampedModel):
 
         return retirement
 
-    def __unicode__(self):
+    def __str__(self):
         return u'User: {} State: {} Last Updated: {}'.format(self.user.id, self.current_state, self.modified)
 
 

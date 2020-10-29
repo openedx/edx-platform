@@ -1,7 +1,7 @@
 """
 Unit tests for getting the list of courses and the course outline.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import json
@@ -178,7 +178,7 @@ class TestCourseIndex(CourseTestCase):
         resp = self.client.get(notification_url, HTTP_ACCEPT='application/json')
 
         # verify that we get an empty dict out
-        self.assertEquals(resp.status_code, 400)
+        self.assertEqual(resp.status_code, 400)
 
         # create a test notification
         rerun_state = CourseRerunState.objects.update_state(
@@ -200,9 +200,9 @@ class TestCourseIndex(CourseTestCase):
 
         json_response = json.loads(resp.content.decode('utf-8'))
 
-        self.assertEquals(json_response['state'], state)
-        self.assertEquals(json_response['action'], action)
-        self.assertEquals(json_response['should_display'], should_display)
+        self.assertEqual(json_response['state'], state)
+        self.assertEqual(json_response['action'], action)
+        self.assertEqual(json_response['should_display'], should_display)
 
     def test_notifications_handler_dismiss(self):
         state = CourseRerunUIStateManager.State.FAILED
@@ -230,7 +230,7 @@ class TestCourseIndex(CourseTestCase):
             'action_state_id': rerun_state.id,
         })
         resp = self.client.delete(notification_dismiss_url)
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
 
         with self.assertRaises(CourseRerunState.DoesNotExist):
             # delete nofications that are dismissed
@@ -311,7 +311,7 @@ class TestCourseIndex(CourseTestCase):
         self.assertEqual(response.status_code, 200)
 
         # Assert that 'display_course_number' is being set to "" (as display_coursenumber was None).
-        self.assertIn('display_course_number: ""', response.content)
+        self.assertContains(response, 'display_course_number: ""')
 
 
 @ddt.ddt
@@ -388,7 +388,7 @@ class TestCourseIndexArchived(CourseTestCase):
         if org is not None:
             index_params['org'] = org
         index_response = self.client.get(index_url, index_params, HTTP_ACCEPT='text/html')
-        self.assertEquals(index_response.status_code, 200)
+        self.assertEqual(index_response.status_code, 200)
 
         parsed_html = lxml.html.fromstring(index_response.content)
         course_tab = parsed_html.find_class('courses')
@@ -398,13 +398,13 @@ class TestCourseIndexArchived(CourseTestCase):
 
     @ddt.data(
         # Staff user has course staff access
-        (True, 'staff', None, 3, 18),
-        (False, 'staff', None, 3, 18),
+        (True, 'staff', None, 3, 19),
+        (False, 'staff', None, 3, 19),
         # Base user has global staff access
-        (True, 'user', ORG, 3, 18),
-        (False, 'user', ORG, 3, 18),
-        (True, 'user', None, 3, 18),
-        (False, 'user', None, 3, 18),
+        (True, 'user', ORG, 3, 19),
+        (False, 'user', ORG, 3, 19),
+        (True, 'user', None, 3, 19),
+        (False, 'user', None, 3, 19),
     )
     @ddt.unpack
     def test_separate_archived_courses(self, separate_archived_courses, username, org, mongo_queries, sql_queries):
@@ -650,11 +650,11 @@ class TestCourseReIndex(CourseTestCase):
         response = self.client.get(index_url, {}, HTTP_ACCEPT='application/json')
 
         # A course with the default release date should display as "Unscheduled"
-        self.assertIn(self.SUCCESSFUL_RESPONSE, response.content)
+        self.assertContains(response, self.SUCCESSFUL_RESPONSE)
         self.assertEqual(response.status_code, 200)
 
         response = self.client.post(index_url, {}, HTTP_ACCEPT='application/json')
-        self.assertEqual(response.content, '')
+        self.assertEqual(response.content, b'')
         self.assertEqual(response.status_code, 405)
 
         self.client.logout()
@@ -679,7 +679,7 @@ class TestCourseReIndex(CourseTestCase):
         response = self.client.get(index_url, {}, CONTENT_TYPE='')
 
         # A course with the default release date should display as "Unscheduled"
-        self.assertIn(self.SUCCESSFUL_RESPONSE, response.content)
+        self.assertContains(response, self.SUCCESSFUL_RESPONSE)
         self.assertEqual(response.status_code, 200)
 
     @mock.patch('xmodule.html_module.HtmlBlock.index_dictionary')

@@ -1250,6 +1250,18 @@
       border-bottom-color: $verified-color-lvl4;
     }
 
+    .action-reverify {
+      @extend %btn-primary-error;
+      @extend %t-weight4;
+
+      display: block;
+
+      @include font-size(14);
+    }
+
+    .btn-reverify {
+      margin-top: ($baseline/2);
+    }
     .deco-arrow {
       @include triangle(($baseline/2), $verified-color-lvl4, up);
     }

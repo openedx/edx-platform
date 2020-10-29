@@ -1,7 +1,7 @@
 """
 Tasks for bookmarks.
 """
-from __future__ import absolute_import
+
 
 import logging
 

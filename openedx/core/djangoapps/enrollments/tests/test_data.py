@@ -2,7 +2,7 @@
 Test the Data Aggregation Layer for Course Enrollments.
 
 """
-from __future__ import absolute_import
+
 
 import datetime
 import unittest

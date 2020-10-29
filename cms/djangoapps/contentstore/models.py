@@ -2,7 +2,6 @@
 Models for contentstore
 """
 
-from __future__ import absolute_import
 
 from config_models.models import ConfigurationModel
 from django.db.models.fields import TextField
@@ -16,7 +15,7 @@ class VideoUploadConfig(ConfigurationModel):
     """
     profile_whitelist = TextField(
         blank=True,
-        help_text="A comma-separated list of names of profiles to include in video encoding downloads."
+        help_text=u"A comma-separated list of names of profiles to include in video encoding downloads."
     )
 
     @classmethod

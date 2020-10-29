@@ -1,7 +1,7 @@
 """
 Tests for the maintenance app views.
 """
-from __future__ import absolute_import
+
 
 import json
 
@@ -92,11 +92,12 @@ class MaintenanceViewAccessTests(MaintenanceViewTestCase):
 
         # Expect a redirect to the login page
         redirect_url = '{login_url}?next={original_url}'.format(
-            login_url=reverse('login'),
+            login_url=settings.LOGIN_URL,
             original_url=url,
         )
 
-        self.assertRedirects(response, redirect_url)
+        # Studio login redirects to LMS login
+        self.assertRedirects(response, redirect_url, target_status_code=302)
 
     @ddt.data(*MAINTENANCE_URLS)
     def test_global_staff_access(self, url):
@@ -289,7 +290,7 @@ class TestAnnouncementsViews(MaintenanceViewTestCase):
         """
         url = reverse("maintenance:announcement_index")
         response = self.client.get(url)
-        self.assertIn('<div class="announcement-container">', response.content.decode('utf-8'))
+        self.assertContains(response, '<div class="announcement-container">')
 
     def test_create(self):
         """
@@ -308,10 +309,10 @@ class TestAnnouncementsViews(MaintenanceViewTestCase):
         announcement.save()
         url = reverse("maintenance:announcement_edit", kwargs={"pk": announcement.pk})
         response = self.client.get(url)
-        self.assertIn('<div class="wrapper-form announcement-container">', response.content.decode('utf-8'))
+        self.assertContains(response, '<div class="wrapper-form announcement-container">')
         self.client.post(url, {"content": "Test Edit Announcement", "active": True})
         announcement = Announcement.objects.get(pk=announcement.pk)
-        self.assertEquals(announcement.content, "Test Edit Announcement")
+        self.assertEqual(announcement.content, "Test Edit Announcement")
 
     def test_delete(self):
         """

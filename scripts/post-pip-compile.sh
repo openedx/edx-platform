@@ -28,7 +28,7 @@ function clean_file {
     # Code sandbox local package installs must be non-editable due to file
     # permissions issues.  edxapp ones must stay editable until assorted
     # packaging bugs are fixed.
-    if [[ "${FILE_PATH}" == "requirements/edx-sandbox/base.txt" ]]; then
+    if [[ "${FILE_PATH}" == "requirements/edx-sandbox/py35.txt" ]]; then
         sed "s|-e common/lib/|common/lib/|" ${FILE_PATH} > ${TEMP_FILE}
         mv ${TEMP_FILE} ${FILE_PATH}
     fi

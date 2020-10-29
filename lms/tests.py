@@ -1,6 +1,5 @@
 """Tests for the lms module itself."""
 
-from __future__ import absolute_import
 
 import logging
 import mimetypes

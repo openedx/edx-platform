@@ -4,20 +4,21 @@
 #
 #    make upgrade
 #
--e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
+-e git+https://github.com/edx/acid-block.git@98aecba94ecbfa934e2d00262741c0ea9f557fc9#egg=acid-xblock
 -e common/lib/capa
--e git+https://github.com/edx/codejail.git@ed3d36c27913254a23273da95ad627a1bbbffa44#egg=codejail
--e git+https://github.com/edx/django-wiki.git@v0.0.23#egg=django-wiki
--e git+https://github.com/edx/DoneXBlock.git@01a14f3bd80ae47dd08cdbbe2f88f3eb88d00fba#egg=done-xblock
+-e git+https://github.com/edx/codejail.git@4127fc4bd5775cc72aee8d7f0a70e31405e22439#egg=codejail
+-e git+https://github.com/edx/django-wiki.git@v0.0.25#egg=django-wiki
+-e git+https://github.com/edx/DoneXBlock.git@2.0.1#egg=done-xblock
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
 -e .
 -e git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
--e git+https://github.com/edx/RateXBlock.git@367e19c0f6eac8a5f002fd0f1559555f8e74bfff#egg=rate-xblock
+-e git+https://github.com/edx/RateXBlock.git@2.0#egg=rate-xblock
 -e common/lib/safe_lxml
 -e common/lib/sandbox-packages
+-e git+https://github.com/python-social-auth/social-app-django.git@c00d23c2b45c3317bd35b15ad1b959338689cef8#egg=social-auth-app-django
 -e common/lib/symmath
 -e openedx/core/lib/xblock_builtin/xblock_discussion
--e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
+-e git+https://github.com/edx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive
 -e common/lib/xmodule
 amqp==1.4.9
 analytics-python==1.2.9
@@ -26,315 +27,287 @@ anyjson==0.3.3
 apipkg==1.5               # via execnet
 appdirs==1.4.3
 argh==0.26.2
-argparse==1.4.0           # via caniusepython3
-asn1crypto==0.24.0
 astroid==1.5.3            # via pylint, pylint-celery
-atomicwrites==1.3.0       # via pytest
-attrs==17.4.0
-aws-xray-sdk==0.95        # via moto
-babel==1.3
-backports.functools-lru-cache==1.5
-backports.ssl-match-hostname==3.7.0.1  # via docker
-backports.tempfile==1.0   # via moto
-backports.weakref==1.0.post1  # via backports.tempfile
-beautifulsoup4==4.8.0
-before-after==1.0.1
+attrs==19.3.0
+babel==2.8.0
+beautifulsoup4==4.8.2
 billiard==3.3.0.23
-bleach==2.1.4
-bok-choy==1.0.0
+bleach==3.1.0
+bok-choy==1.0.1
 boto3==1.4.8
 boto==2.39.0
 botocore==1.8.17
-git+https://github.com/edx/bridgekeeper.git@4e34894e4ac5d0467ed1901811a81fd87ee01937#egg=bridgekeeper==0.0
+git+https://github.com/edx/bridgekeeper.git@2423e8d8788c2132ebeec509e1a7b17e1f5b9364#egg=bridgekeeper==0.0
 git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
-caniusepython3==7.1.0
 celery==3.1.25
-certifi==2019.9.11
-cffi==1.12.3
+certifi==2019.11.28
+cffi==1.13.2
 chardet==3.0.4
 git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
 click-log==0.3.2          # via edx-lint
 click==7.0
-code-annotations==0.3.2
-colorama==0.4.1           # via radon
-configparser==4.0.2       # via entrypoints, flake8, importlib-metadata, pylint
-contextlib2==0.5.5
-cookies==2.2.1            # via moto
+code-annotations==0.3.3
+colorama==0.4.3           # via radon
+contextlib2==0.6.0.post1
 coreapi==2.3.3
 coreschema==0.0.4
-coverage==5.0a6
+coverage==5.0.3
 git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0
 git+https://github.com/edx/crowdsourcehinter.git@a7ffc85b134b7d8909bf1fefd23dbdb8eb28e467#egg=crowdsourcehinter-xblock==0.2
-cryptography==2.7
+cryptography==2.8
 cssselect==1.1.0
 cssutils==1.0.2
-ddt==1.2.1
-decorator==4.4.0
+ddt==1.2.2
+decorator==4.4.1
 defusedxml==0.5.0
-diff-cover==0.9.8
-distlib==0.2.9.post0      # via caniusepython3
-django-appconf==1.0.3
+diff-cover==2.5.2
+git+https://github.com/django-compressor/django-appconf@1526a842ee084b791aa66c931b3822091a442853#egg=django-appconf
 django-babel-underscore==0.5.2
 django-babel==0.6.2
 git+https://github.com/edx/django-celery.git@756cb57aad765cb2b0d37372c1855b8f5f37e6b0#egg=django-celery==3.2.1+edx.2
-django-classy-tags==0.9.0
-django-config-models==1.0.1
-django-cors-headers==2.1.0
-django-countries==4.6.1
-django-crum==0.7.3
+django-classy-tags==1.0.0
+django-config-models==1.0.4
+django-cors-headers==2.5.3
+django-countries==5.5
+django-crum==0.7.5
 django-fernet-fields==0.6
-django-filter==1.0.4
+django-filter==2.2.0
 django-ipware==2.1.0
-django-method-override==0.1.0
+django-js-asset==1.2.2
+django-method-override==0.2.0
 django-model-utils==3.0.0
-django-mptt==0.8.7
+django-mptt==0.11.0
 django-multi-email-field==0.5.1
-django-mysql==2.4.1
-git+https://github.com/edx/django-oauth-plus.git@66155b545b23ebc01ec438849d303077e8198dfd#egg=django-oauth-plus==2.2.9.edx-3
-django-oauth-toolkit==1.1.3
-django-object-actions==1.1.0
-django-pipeline==1.6.14
-django-pyfs==2.0
-django-ratelimit-backend==1.1.1
+django-mysql==3.3.0
+git+https://github.com/edx/django-oauth-plus.git@b9b64a3ac24fd11f471763c88462bbf3c53e46e6#egg=django-oauth-plus==2.2.9.edx-4
+django-object-actions==2.0.0
+django-pipeline==1.7.0
+django-pyfs==2.1
+django-ratelimit-backend==2.0
 django-ratelimit==2.0.0
 django-require==1.0.11
-django-sekizai==1.0.0
-django-ses==0.8.4
-django-simple-history==2.7.3
-django-splash==0.2.2
-django-statici18n==1.4.0
-django-storages==1.6.5
-django-user-tasks==0.2.0
-django-waffle==0.12.0
+django-sekizai==1.1.0
+django-ses==0.8.14
+django-simple-history==2.8.0
+django-splash==0.2.5
+django-statici18n==1.9.0
+django-storages==1.8
+django-user-tasks==0.3.0
+django-waffle==0.18.0
 django-webpack-loader==0.6.0
 djangorestframework-jwt==1.11.0
 git+https://github.com/edx/django-rest-framework-oauth.git@0a43e8525f1e3048efe4bc70c03de308a277197c#egg=djangorestframework-oauth==1.1.1
 djangorestframework-xml==1.4.0
-djangorestframework==3.7.7
-docker==4.0.2             # via moto
+djangorestframework==3.9.4
 docopt==0.6.2
-docutils==0.15.2
-drf-yasg==1.16
-edx-ace==0.1.10
+docutils==0.16
+drf-yasg==1.17.0
+edx-ace==0.1.13
 edx-analytics-data-api-client==0.15.3
-edx-bulk-grades==0.6.0
+edx-api-doc-tools==1.0.2
+edx-bulk-grades==0.6.6
 edx-ccx-keys==1.0.0
-edx-celeryutils==0.3.0
-edx-completion==2.0.0
+edx-celeryutils==0.3.1
+edx-completion==3.0.2
 edx-django-oauth2-provider==1.3.5
-edx-django-release-util==0.3.1
-edx-django-sites-extensions==2.3.1
-edx-django-utils==2.0.0
-edx-drf-extensions==2.4.0
-edx-enterprise==1.10.2
-edx-i18n-tools==0.4.8
+edx-django-release-util==0.3.5
+edx-django-sites-extensions==2.4.3
+edx-django-utils==2.0.3
+edx-drf-extensions==2.4.5
+edx-enterprise==2.1.2
+edx-i18n-tools==0.5.0
 edx-lint==1.3.0
-edx-milestones==0.2.3
+edx-milestones==0.2.6
 edx-oauth2-provider==1.3.1
-edx-opaque-keys[django]==2.0.0
-git+https://github.com/appsembler/edx-organizations.git@omar/juniper2  # edx-organizations
+edx-opaque-keys[django]==2.0.1
+git+https://github.com/appsembler/edx-organizations.git@omar/juniper3  # edx-organizations
 edx-proctoring-proctortrack==1.0.5
-edx-proctoring==2.0.8
-edx-rbac==1.0.3
+edx-proctoring==2.2.4
+edx-rbac==1.0.5
 edx-rest-api-client==1.9.2
 edx-search==1.2.2
-git+https://github.com/mitodl/edx-sga.git@3828ba9e413080a81b907a3381e5ffa05e063f81#egg=edx-sga==0.8.3
-edx-submissions==3.0.1
+edx-sga==0.10.0
+edx-submissions==3.0.3
+edx-tincan-py35==0.0.5
 edx-user-state-client==1.1.2
-edx-when==0.4
-edxval==1.1.27
+edx-when==0.5.2
+edxval==1.2.2
 elasticsearch==1.9.0
 entrypoints==0.3          # via flake8
 enum34==1.1.6
-event-tracking==0.2.9
+event-tracking==0.3.0
 execnet==1.7.1            # via pytest-xdist
-factory_boy==2.8.1
-faker==2.0.1              # via factory-boy
-faulthandler==3.1 ; python_version == "2.7"  # via pytest-faulthandler
-feedparser==5.1.3
+factory-boy==2.8.1
+faker==4.0.0              # via factory-boy
 filelock==3.0.12          # via tox
 flake8-polyfill==1.0.2    # via radon
-flake8==3.7.8             # via flake8-polyfill
+flake8==3.7.9             # via flake8-polyfill
 freezegun==0.3.12
 fs-s3fs==0.1.8
 fs==2.0.18
-funcsigs==1.0.2           # via pytest
-functools32==3.2.3.post2 ; python_version == "2.7"  # via flake8
-future==0.17.1
-futures==3.3.0 ; python_version == "2.7"
-geoip2==2.9.0
+future==0.18.2
+geoip2==3.0.0
 glob2==0.7
-gunicorn==19.9.0
-help-tokens==1.0.4
+gunicorn==20.0.4
+help-tokens==1.0.5
 html5lib==1.0.1
-httplib2==0.13.1
-httpretty==0.9.6
+httplib2==0.16.0
+httpretty==0.9.7
 idna==2.8
-importlib-metadata==0.23  # via pluggy, tox
-inflect==2.1.0
+importlib-metadata==1.4.0
+inflect==3.0.2
 inflection==0.3.1
-ipaddress==1.0.22
+ipaddress==1.0.23
 isodate==0.6.0
 isort==4.3.21
 itypes==1.1.0
 jinja2-pluralize==0.3.0
-jinja2==2.10.1
+jinja2==2.10.3
 jmespath==0.9.4
-jsondiff==1.1.1
+jsondiff==1.2.0
 jsonfield==2.0.2
-jsonpickle==1.2           # via aws-xray-sdk
 kombu==3.0.37
 laboratory==1.0.2
-lazy-object-proxy==1.4.2  # via astroid
-lazy==1.1
+lazy-object-proxy==1.4.3  # via astroid
+lazy==1.4
 lepl==5.1.3
 libsass==0.11.1
 loremipsum==1.0.5
-git+https://github.com/edx/xblock-lti-consumer.git@v1.1.8#egg=lti_consumer-xblock==1.1.8
-lxml==3.8.0
+git+https://github.com/edx/xblock-lti-consumer.git@v1.2.3#egg=lti_consumer-xblock==1.2.3
+lxml==4.4.2
 mailsnake==1.6.4
 mako==1.0.2
 mando==0.6.4              # via radon
 markdown==2.6.11
 markey==0.8
 markupsafe==1.1.1
-maxminddb==1.4.1
+maxminddb==1.5.2
 mccabe==0.6.1             # via flake8, pylint
-mock==1.0.1
+mock==3.0.5
 git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a#egg=MongoDBProxy==0.1.0+edx.2
 mongoengine==0.10.0
-more-itertools==5.0.0     # via pytest, zipp
-moto==1.3.1
+more-itertools==8.1.0
 mpmath==1.1.0
-mysqlclient==1.4.4
-networkx==1.7
-newrelic==5.0.2.126
+mysqlclient==1.4.6
+newrelic==5.4.1.134
 nltk==3.4.5
-nodeenv==1.1.1
-numpy==1.16.5
+nodeenv==1.3.4
+numpy==1.18.1
 git+https://github.com/joestump/python-oauth2.git@b94f69b1ad195513547924e380d9265133e995fa#egg=oauth2
 oauthlib==2.1.0
-git+https://github.com/edx/edx-ora2.git@2.3.1#egg=ora2==2.3.1
-packaging==19.2           # via caniusepython3, tox
-path.py==8.2.1
-pathlib2==2.3.4           # via importlib-metadata, pytest, pytest-django
+git+https://github.com/edx/edx-ora2.git@2.6.0#egg=ora2==2.6.0
+packaging==20.0
+pandas==0.22.0
+path.py==12.4.0
+path==13.1.0
+pathlib2==2.3.5           # via pytest
 pathtools==0.1.2
 paver==1.3.4
-pbr==5.4.3
-pdfminer.six==20181108
-piexif==1.0.2
-pillow==6.1.0
+pbr==5.4.4
+pdfminer.six==20200121
+piexif==1.1.3
+pillow==7.0.0
 pkgconfig==1.5.1
-pluggy==0.13.0            # via pytest, tox
+pluggy==0.13.1
 polib==1.1.0
 psutil==1.2.1
 py2neo==3.1.2
-py==1.8.0                 # via pytest, tox
-pyaml==19.4.1             # via moto
+py==1.8.1                 # via pytest, tox
 pycodestyle==2.5.0
-pycontracts==1.7.1
+pycontracts==1.8.12
 pycountry==19.8.18
 pycparser==2.19
-pycryptodome==3.9.0
-pycryptodomex==3.4.7
+pycryptodome==3.9.4
+pycryptodomex==3.9.4
 pyflakes==2.1.1           # via flake8
-pygments==2.4.2
-pygraphviz==1.5
+pygments==2.5.2
 pyjwkest==1.3.2
 pyjwt==1.5.2
 pylint-celery==0.3        # via edx-lint
 pylint-django==0.7.2      # via edx-lint
-pylint-plugin-utils==0.3  # via pylint-celery, pylint-django
-pylint==1.7.6             # via edx-lint, pylint-celery, pylint-django
+pylint-plugin-utils==0.6  # via pylint-celery, pylint-django
+pylint==1.7.6             # via edx-lint, pylint-celery, pylint-django, pylint-plugin-utils
 pymongo==3.9.0
 pynliner==0.8.0
 pyparsing==2.2.0
-pyquery==1.4.0
-pysqlite==2.8.3 ; python_version == "2.7"
-pysrt==1.1.1
+pyquery==1.4.1
+pysrt==1.1.2
 pytest-attrib==0.1.3
-git+https://github.com/nedbat/pytest-cov.git@nedbat/cov5-combine#egg=pytest-cov==0.0
-pytest-django==3.5.1
-pytest-faulthandler==1.6.0
-pytest-forked==1.0.2      # via pytest-xdist
-pytest-randomly==1.2.3
-pytest-xdist==1.29.0
-pytest==4.5.0
+pytest-cov==2.8.1
+pytest-django==3.8.0
+pytest-forked==1.1.3      # via pytest-xdist
+pytest-json-report==1.2.1
+pytest-metadata==1.8.0    # via pytest-json-report
+pytest-randomly==3.2.1
+pytest-xdist==1.31.0
+pytest==5.3.4
 python-dateutil==2.4.0
 python-levenshtein==0.12.0
 python-memcached==1.59
-python-openid==2.2.5 ; python_version == "2.7"
-python-slugify==3.0.3
+python-slugify==4.0.0
 python-swiftclient==3.8.1
+python3-openid==3.1.0 ; python_version >= "3"
 python3-saml==1.5.0
-pytz==2019.2
-pyuca==1.1
-pyyaml==5.1.2
-radon==3.0.3
-git+https://github.com/edx/RecommenderXBlock.git@1.4.1#egg=recommender-xblock==1.4.1
+pytz==2019.3
+pyuca==1.2
+pyyaml==5.3
+radon==4.0.0
+random2==1.0.1
+recommender-xblock==1.4.5
 redis==2.10.6
-reportlab==3.5.26
 requests-oauthlib==1.1.0
 requests==2.22.0
 rest-condition==1.0.3
-rfc6266-parser==0.0.5.post2
-ruamel.ordereddict==0.4.14 ; python_version == "2.7"
-ruamel.yaml.clib==0.1.2
-ruamel.yaml==0.16.5
-rules==2.1
+rfc6266-parser==0.0.6
+ruamel.yaml.clib==0.2.0
+ruamel.yaml==0.16.6
+rules==2.2
 s3transfer==0.1.13
 sailthru-client==2.2.3
-scandir==1.10.0           # via pathlib2
-scipy==1.2.1
+scipy==1.4.1
 selenium==3.141.0
-semantic-version==2.8.2
+semantic-version==2.8.4
 shapely==1.6.4.post2
 shortuuid==0.5.0
-simplejson==3.16.0
+simplejson==3.17.0
 singledispatch==3.4.0.3
-six==1.12.0
+six==1.14.0
 slumber==0.7.1
-social-auth-app-django==2.1.0
-social-auth-core==1.7.0
-sorl-thumbnail==12.3
+social-auth-core==3.2.0
+git+https://github.com/jazzband/sorl-thumbnail.git@13bedfb7d2970809eda597e3ef79318a6fa80ac2#egg=sorl-thumbnail
 sortedcontainers==2.1.0
-soupsieve==1.9.3
+soupsieve==1.9.5
 sqlparse==0.3.0
-staff-graded-xblock==0.5
+staff-graded-xblock==0.6
 stevedore==1.31.0
-super-csv==0.9.2
-sympy==1.4
-testfixtures==6.10.0
-text-unidecode==1.2
-tincan==0.0.5
+super-csv==0.9.6
+sympy==1.5.1
+testfixtures==6.10.3
+text-unidecode==1.3
 toml==0.10.0              # via tox
 tox-battery==0.5.1
-tox==3.14.0
+tox==3.14.3
 transifex-client==0.13.4
-typing==3.7.4.1           # via flake8
 unicodecsv==0.14.1
 unidiff==0.5.5
-uritemplate==3.0.0
-urllib3==1.25.3
+uritemplate==3.0.1
+urllib3==1.25.8
 user-util==0.1.5
-virtualenv==16.7.5        # via tox
+virtualenv==16.7.9        # via tox
 voluptuous==0.11.7
 watchdog==0.9.0
-wcwidth==0.1.7            # via pytest
-web-fragments==0.3.0
+wcwidth==0.1.8            # via pytest
+web-fragments==0.3.1
 webencodings==0.5.1
-webob==1.8.5
-websocket-client==0.56.0  # via docker
-werkzeug==0.15.6          # via moto
-wrapt==1.10.5
-git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.4#egg=xblock-drag-and-drop-v2==2.2.4
-git+https://github.com/open-craft/xblock-poll@add89e14558c30f3c8dc7431e5cd6536fff6d941#egg=xblock-poll==1.5.1
-xblock-utils==1.2.2
-xblock==1.2.4
+webob==1.8.6
+wrapt==1.11.2
+git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.8#egg=xblock-drag-and-drop-v2==2.2.8
+git+https://github.com/open-craft/xblock-poll@3c7dcaf6c933d914188f0740a60711603f948d26#egg=xblock-poll==1.9.1
+xblock-utils==1.2.4
+xblock==1.2.9
 xmlsec==1.3.3
-xmltodict==0.12.0         # via moto
-xss-utils==0.1.1
-zipp==0.6.0               # via importlib-metadata
+xss-utils==0.1.2
+zipp==1.0.0
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools==41.2.0        # via caniusepython3, fs, lazy, pytest, python-levenshtein
+# setuptools

@@ -2,7 +2,6 @@
 Block Completion Transformer
 """
 
-from __future__ import absolute_import
 
 from completion.models import BlockCompletion
 from xblock.completable import XBlockCompletionMode as CompletionMode
@@ -61,7 +60,7 @@ class BlockCompletionTransformer(BlockStructureTransformer):
 
         completions = BlockCompletion.objects.filter(
             user=usage_info.user,
-            course_key=usage_info.course_key,
+            context_key=usage_info.course_key,
         ).values_list(
             'block_key',
             'completion',

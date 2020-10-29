@@ -77,6 +77,11 @@ from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_f
 <script type="text/javascript">
      window.auth = ${ auth | n, dump_js_escaped_json };
      window.isActive = ${ user.is_active | n, dump_js_escaped_json };
+     window.additionalSiteSpecificDeletionText = "${ static.get_value('SITE_SPECIFIC_DELETION_TEXT', _(' and access to private sites offered by MIT Open Learning, Wharton Executive Education, and Harvard Medical School')) | n, js_escaped_string }";
+     window.mktgRootLink = "${ static.marketing_link('ROOT') | n, js_escaped_string }";
+     window.platformName = "${ platform_name | n, js_escaped_string }";
+     window.siteName = "${ static.get_value('SITE_NAME', settings.SITE_NAME) | n, js_escaped_string }";
+
 </script>
 <%static:webpack entry="StudentAccountDeletionInitializer">
 </%static:webpack>

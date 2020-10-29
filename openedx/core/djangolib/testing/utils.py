@@ -8,7 +8,7 @@ Utility classes for testing django applications.
     A TestCase baseclass that has per-test isolated caches.
 """
 
-from __future__ import absolute_import
+
 import copy
 import re
 from unittest import skipUnless
@@ -47,6 +47,22 @@ class CacheIsolationMixin(object):
 
     __settings_overrides = []
     __old_settings = []
+
+    @classmethod
+    def setUpClass(cls):
+        super(CacheIsolationMixin, cls).setUpClass()
+        cls.start_cache_isolation()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.end_cache_isolation()
+        super(CacheIsolationMixin, cls).tearDownClass()
+
+    def setUp(self):
+        super(CacheIsolationMixin, self).setUp()
+
+        self.clear_caches()
+        self.addCleanup(self.clear_caches)
 
     @classmethod
     def start_cache_isolation(cls):
@@ -131,21 +147,6 @@ class CacheIsolationTestCase(CacheIsolationMixin, TestCase):
     :py:class:`CacheIsolationMixin`) at class setup, and flushes the cache
     between every test.
     """
-    @classmethod
-    def setUpClass(cls):
-        super(CacheIsolationTestCase, cls).setUpClass()
-        cls.start_cache_isolation()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.end_cache_isolation()
-        super(CacheIsolationTestCase, cls).tearDownClass()
-
-    def setUp(self):
-        super(CacheIsolationTestCase, self).setUp()
-
-        self.clear_caches()
-        self.addCleanup(self.clear_caches)
 
 
 class _AssertNumQueriesContext(CaptureQueriesContext):

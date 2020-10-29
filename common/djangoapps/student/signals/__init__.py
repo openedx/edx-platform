@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 from student.signals.signals import (
     ENROLL_STATUS_CHANGE,

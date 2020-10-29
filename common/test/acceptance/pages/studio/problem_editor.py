@@ -1,7 +1,7 @@
 """
 Studio Problem Editor
 """
-from __future__ import absolute_import
+
 
 from selenium.webdriver.support.ui import Select
 from six.moves import range
@@ -28,7 +28,7 @@ class ProblemXBlockEditorView(XBlockEditorView):
         """
         If editing, set the value of a field.
         """
-        selector = u'.xblock-studio_view li.field label:contains("{}") + input'.format(field_display_name)
+        selector = u'.metadata_edit li.field label:contains("{}") + input'.format(field_display_name)
         script = "$(arguments[0]).val(arguments[1]).change();"
         self.browser.execute_script(script, selector, field_value)
 

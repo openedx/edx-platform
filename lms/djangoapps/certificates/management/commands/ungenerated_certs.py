@@ -2,7 +2,7 @@
 Management command to find all students that need certificates for
 courses that have finished, and put their cert requests on the queue.
 """
-from __future__ import absolute_import, print_function
+
 
 import datetime
 import logging

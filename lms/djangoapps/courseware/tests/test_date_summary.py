@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Tests for course home page date summary blocks."""
-from __future__ import absolute_import
+
 
 from datetime import datetime, timedelta
 
@@ -15,8 +15,8 @@ from pytz import utc
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.courses import get_course_date_blocks
-from courseware.date_summary import (
+from lms.djangoapps.courseware.courses import get_course_date_blocks
+from lms.djangoapps.courseware.date_summary import (
     CertificateAvailableDate,
     CourseEndDate,
     CourseStartDate,
@@ -24,7 +24,7 @@ from courseware.date_summary import (
     VerificationDeadlineDate,
     VerifiedUpgradeDeadlineDate
 )
-from courseware.models import (
+from lms.djangoapps.courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
     DynamicUpgradeDeadlineConfiguration,
     OrgDynamicUpgradeDeadlineConfiguration
@@ -61,7 +61,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.client.login(username=user.username, password=TEST_PASSWORD)
         url = reverse('info', args=(course.id,))
         response = self.client.get(url)
-        self.assertNotIn(b'date-summary', response.content)
+        self.assertNotContains(response, 'date-summary', status_code=302)
 
     def test_course_home_logged_out(self):
         course = create_course_run()
@@ -176,12 +176,9 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             self.client.login(username=user.username, password=TEST_PASSWORD)
 
             html_elements = [
-                '<h3 class="hd hd-6 handouts-header">Important Course Dates</h3>',
+                '<h3 class="hd hd-6 handouts-header">Upcoming Dates</h3>',
                 '<div class="date-summary-container">',
-                '<div class="date-summary date-summary-todays-date">',
-                '<span class="hd hd-6 heading localized-datetime"',
-                'data-datetime="2015-01-02 00:00:00+00:00"',
-                u'data-string="Today is {date}"',
+                '<p class="hd hd-6 date localized-datetime"',
                 'data-timezone="None"'
             ]
             url = reverse(url_name, args=(course.id,))
@@ -204,12 +201,9 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             response = self.client.get(url, follow=True)
 
             html_elements = [
-                '<h3 class="hd hd-6 handouts-header">Important Course Dates</h3>',
+                '<h3 class="hd hd-6 handouts-header">Upcoming Dates</h3>',
                 '<div class="date-summary-container">',
-                '<div class="date-summary date-summary-todays-date">',
-                '<span class="hd hd-6 heading localized-datetime"',
-                'data-datetime="2015-01-02 00:00:00+00:00"',
-                u'data-string="Today is {date}"',
+                '<p class="hd hd-6 date localized-datetime"',
                 'data-timezone="America/Los_Angeles"'
             ]
             for html in html_elements:
@@ -235,7 +229,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             url = reverse(url_name, args=(course.id,))
             response = self.client.get(url, follow=True)
             html_elements = [
-                u'data-string="in 1 day - {date}"',
                 'data-datetime="2015-01-03 00:00:00+00:00"'
             ]
             for html in html_elements:
@@ -255,7 +248,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             url = reverse(url_name, args=(course.id,))
             response = self.client.get(url, follow=True)
             html_elements = [
-                u'data-string="in 1 day - {date}"',
                 'data-datetime="2015-01-03 00:00:00+00:00"',
                 'data-timezone="America/Los_Angeles"'
             ]

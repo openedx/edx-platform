@@ -1,13 +1,13 @@
 """
 Tests for the SubsectionGradeFactory class.
 """
-from __future__ import absolute_import
+
 
 import ddt
 from django.conf import settings
 from mock import patch
 
-from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
+from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 from student.tests.factories import UserFactory
 

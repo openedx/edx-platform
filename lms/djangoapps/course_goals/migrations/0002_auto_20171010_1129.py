@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 
-from __future__ import absolute_import
+
+
 from django.db import migrations, models
 
 
@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='coursegoal',
             name='goal_key',
-            field=models.CharField(default=b'unsure', max_length=100, choices=[(b'certify', 'Earn a certificate'), (b'complete', 'Complete the course'), (b'explore', 'Explore the course'), (b'unsure', 'Not sure yet')]),
+            field=models.CharField(default=u'unsure', max_length=100, choices=[(u'certify', 'Earn a certificate'), (u'complete', 'Complete the course'), (u'explore', 'Explore the course'), (u'unsure', 'Not sure yet')]),
         ),
     ]

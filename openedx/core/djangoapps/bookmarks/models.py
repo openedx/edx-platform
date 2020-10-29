@@ -1,13 +1,14 @@
 """
 Models for Bookmarks.
 """
-from __future__ import absolute_import
+
 
 import logging
 
 import six
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
@@ -41,6 +42,7 @@ def parse_path_data(path_data):
     return path
 
 
+@python_2_unicode_compatible
 class Bookmark(TimeStampedModel):
     """
     Bookmarks model.
@@ -61,7 +63,7 @@ class Bookmark(TimeStampedModel):
         app_label = 'bookmarks'
         unique_together = ('user', 'usage_key')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.resource_id
 
     @classmethod
@@ -192,6 +194,7 @@ class Bookmark(TimeStampedModel):
         return path_data
 
 
+@python_2_unicode_compatible
 class XBlockCache(TimeStampedModel):
     """
     XBlockCache model to store info about xblocks.
@@ -213,7 +216,7 @@ class XBlockCache(TimeStampedModel):
         """
         app_label = 'bookmarks'
 
-    def __unicode__(self):
+    def __str__(self):
         return six.text_type(self.usage_key)
 
     @property

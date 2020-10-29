@@ -1,7 +1,7 @@
 """
 test views
 """
-from __future__ import absolute_import
+
 
 import datetime
 import json
@@ -23,11 +23,11 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
-from courseware.courses import get_course_by_id
-from courseware.tabs import get_course_tab_list
-from courseware.tests.factories import StudentModuleFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.testutils import FieldOverrideTestMixin
+from lms.djangoapps.courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.tabs import get_course_tab_list
+from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.testutils import FieldOverrideTestMixin
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import get_override_for_ccx, override_field_for_ccx
@@ -238,7 +238,7 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
         self.assertEqual(progress_page_due_date, due)
 
     @patch('ccx.views.render_to_response', intercept_renderer)
-    @patch('courseware.views.views.render_to_response', intercept_renderer)
+    @patch('lms.djangoapps.courseware.views.views.render_to_response', intercept_renderer)
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
     def test_edit_schedule(self):
         """
@@ -346,7 +346,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(re.search(
             '<form action=".+create_ccx"',
-            response.content))
+            response.content.decode('utf-8')))
 
     def test_create_ccx_with_ccx_connector_set(self):
         """
@@ -365,7 +365,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
             "A CCX can only be created on this course through an external service."
             " Contact a course admin to give you access."
         )
-        self.assertTrue(re.search(error_message, response.content))
+        self.assertTrue(re.search(error_message, response.content.decode('utf-8')))
 
     def test_create_ccx(self, ccx_name='New CCX'):
         """
@@ -392,7 +392,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         course_key = CourseKey.from_string(ccx_key)
 
         self.assertTrue(CourseEnrollment.is_enrolled(self.coach, course_key))
-        self.assertTrue(re.search('id="ccx-schedule"', response.content))
+        self.assertTrue(re.search('id="ccx-schedule"', response.content.decode('utf-8')))
 
         # check if the max amount of student that can be enrolled has been overridden
         ccx = CustomCourseForEdX.objects.get()
@@ -1104,9 +1104,8 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
             response['content-disposition'],
             'attachment'
         )
-        rows = response.content.strip().split('\r')
+        rows = response.content.decode('utf-8').strip().split('\r')
         headers = rows[0]
-
         # picking first student records
         data = dict(list(zip(headers.strip().split(','), rows[1].strip().split(','))))
         self.assertNotIn('HW 04', data)
@@ -1115,10 +1114,10 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         self.assertEqual(data['HW 03'], '0.25')
         self.assertEqual(data['HW Avg'], '0.5')
 
-    @patch('courseware.views.views.render_to_response', intercept_renderer)
+    @patch('lms.djangoapps.courseware.views.views.render_to_response', intercept_renderer)
     def test_student_progress(self):
         self.course.enable_ccx = True
-        patch_context = patch('courseware.views.views.get_course_with_access')
+        patch_context = patch('lms.djangoapps.courseware.views.views.get_course_with_access')
         get_course = patch_context.start()
         get_course.return_value = self.course
         self.addCleanup(patch_context.stop)
@@ -1176,7 +1175,7 @@ class CCXCoachTabTestCase(CcxTestCase):
         """
         with self.settings(FEATURES={'CUSTOM_COURSES_EDX': ccx_feature_flag}):
             course = self.ccx_enabled_course if enable_ccx else self.ccx_disabled_course
-            self.assertEquals(
+            self.assertEqual(
                 expected_result,
                 self.check_ccx_tab(course, self.user)
             )
@@ -1276,7 +1275,7 @@ class TestStudentViewsWithCCX(ModuleStoreTestCase):
         self.client.login(username=self.student.username, password=self.student_password)
         response = self.client.get(reverse('dashboard'))
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(re.search('Test CCX', response.content))
+        self.assertTrue(re.search('Test CCX', response.content.decode('utf-8')))
 
     def test_load_courseware(self):
         self.client.login(username=self.student.username, password=self.student_password)

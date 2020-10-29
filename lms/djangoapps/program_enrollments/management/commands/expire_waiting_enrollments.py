@@ -1,5 +1,5 @@
 """ Management command to cleanup old waiting enrollments """
-from __future__ import absolute_import, unicode_literals
+
 
 import logging
 

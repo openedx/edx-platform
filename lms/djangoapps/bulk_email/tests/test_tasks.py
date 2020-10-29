@@ -6,7 +6,7 @@ Runs tasks on answers to course problems to validate that code
 paths actually work.
 
 """
-from __future__ import absolute_import, print_function
+
 
 import json
 from itertools import chain, cycle, repeat
@@ -145,24 +145,24 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         """Compare counts with 'subtasks' entry in InstructorTask table."""
         subtask_info = json.loads(entry.subtasks)
         # verify subtask-level counts:
-        self.assertEquals(subtask_info.get('total'), 1)
-        self.assertEquals(subtask_info.get('succeeded'), 1 if succeeded > 0 else 0)
-        self.assertEquals(subtask_info.get('failed'), 0 if succeeded > 0 else 1)
+        self.assertEqual(subtask_info.get('total'), 1)
+        self.assertEqual(subtask_info.get('succeeded'), 1 if succeeded > 0 else 0)
+        self.assertEqual(subtask_info.get('failed'), 0 if succeeded > 0 else 1)
         # verify individual subtask status:
         subtask_status_info = subtask_info.get('status')
         task_id_list = list(subtask_status_info.keys())
-        self.assertEquals(len(task_id_list), 1)
+        self.assertEqual(len(task_id_list), 1)
         task_id = task_id_list[0]
         subtask_status = subtask_status_info.get(task_id)
         print(u"Testing subtask status: {}".format(subtask_status))
-        self.assertEquals(subtask_status.get('task_id'), task_id)
-        self.assertEquals(subtask_status.get('attempted'), succeeded + failed)
-        self.assertEquals(subtask_status.get('succeeded'), succeeded)
-        self.assertEquals(subtask_status.get('skipped'), skipped)
-        self.assertEquals(subtask_status.get('failed'), failed)
-        self.assertEquals(subtask_status.get('retried_nomax'), retried_nomax)
-        self.assertEquals(subtask_status.get('retried_withmax'), retried_withmax)
-        self.assertEquals(subtask_status.get('state'), SUCCESS if succeeded > 0 else FAILURE)
+        self.assertEqual(subtask_status.get('task_id'), task_id)
+        self.assertEqual(subtask_status.get('attempted'), succeeded + failed)
+        self.assertEqual(subtask_status.get('succeeded'), succeeded)
+        self.assertEqual(subtask_status.get('skipped'), skipped)
+        self.assertEqual(subtask_status.get('failed'), failed)
+        self.assertEqual(subtask_status.get('retried_nomax'), retried_nomax)
+        self.assertEqual(subtask_status.get('retried_withmax'), retried_withmax)
+        self.assertEqual(subtask_status.get('state'), SUCCESS if succeeded > 0 else FAILURE)
 
     def _test_run_with_task(
             self, task_class, action_name, total, succeeded,
@@ -172,20 +172,20 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         parent_status = self._run_task_with_mock_celery(task_class, task_entry.id, task_entry.task_id)
 
         # check return value
-        self.assertEquals(parent_status.get('total'), total)
-        self.assertEquals(parent_status.get('action_name'), action_name)
+        self.assertEqual(parent_status.get('total'), total)
+        self.assertEqual(parent_status.get('action_name'), action_name)
 
         # compare with task_output entry in InstructorTask table:
         entry = InstructorTask.objects.get(id=task_entry.id)
         status = json.loads(entry.task_output)
-        self.assertEquals(status.get('attempted'), succeeded + failed)
-        self.assertEquals(status.get('succeeded'), succeeded)
-        self.assertEquals(status.get('skipped'), skipped)
-        self.assertEquals(status.get('failed'), failed)
-        self.assertEquals(status.get('total'), total)
-        self.assertEquals(status.get('action_name'), action_name)
+        self.assertEqual(status.get('attempted'), succeeded + failed)
+        self.assertEqual(status.get('succeeded'), succeeded)
+        self.assertEqual(status.get('skipped'), skipped)
+        self.assertEqual(status.get('failed'), failed)
+        self.assertEqual(status.get('total'), total)
+        self.assertEqual(status.get('action_name'), action_name)
         self.assertGreater(status.get('duration_ms'), 0)
-        self.assertEquals(entry.task_state, SUCCESS)
+        self.assertEqual(entry.task_state, SUCCESS)
         self._assert_single_subtask_status(entry, succeeded, failed, skipped, retried_nomax, retried_withmax)
         return entry
 
@@ -211,9 +211,9 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
             get_conn.return_value.send_messages.side_effect = cycle([Exception("This should not happen!")])
             parent_status = self._run_task_with_mock_celery(send_bulk_course_email, task_entry.id, task_entry.task_id)
-        self.assertEquals(parent_status.get('total'), num_emails)
-        self.assertEquals(parent_status.get('succeeded'), num_emails)
-        self.assertEquals(parent_status.get('failed'), 0)
+        self.assertEqual(parent_status.get('total'), num_emails)
+        self.assertEqual(parent_status.get('succeeded'), num_emails)
+        self.assertEqual(parent_status.get('failed'), 0)
 
     def test_unactivated_user(self):
         # Select number of emails to fit into a single subtask.

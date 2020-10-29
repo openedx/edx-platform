@@ -2,7 +2,6 @@
 Tests for course_modes views.
 """
 
-from __future__ import absolute_import
 
 import decimal
 import unittest
@@ -100,7 +99,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
             else:
                 self.assertRedirects(response, reverse('dashboard'))
         else:
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
 
     def test_no_id_redirect(self):
         # Create the course modes
@@ -138,7 +137,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         # Configure whether we're upgrading or not
         url = reverse('course_modes_choose', args=[six.text_type(prof_course.id)])
         response = self.client.get(url)
-        self.assertRedirects(response, 'http://testserver/test_basket/add/?sku=TEST', fetch_redirect_response=False)
+        self.assertRedirects(response, '/test_basket/add/?sku=TEST', fetch_redirect_response=False)
         ecomm_test_utils.update_commerce_config(enabled=False)
 
     @httpretty.activate
@@ -174,7 +173,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
             follow=False,
         )
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         # TODO: Fix it so that response.templates works w/ mako templates, and then assert
         # that the right template rendered
 
@@ -198,6 +197,29 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
             self.assertContains(response, "Credit")
         else:
             self.assertNotContains(response, "Credit")
+
+    @httpretty.activate
+    @ddt.data(True, False)
+    def test_congrats_on_enrollment_message(self, create_enrollment):
+        # Create the course mode
+        CourseModeFactory.create(mode_slug='verified', course_id=self.course.id)
+
+        if create_enrollment:
+            CourseEnrollmentFactory(
+                is_active=True,
+                course_id=self.course.id,
+                user=self.user
+            )
+
+        # Check whether congratulations message is shown on the page
+        # This should *only* be shown when an enrollment exists
+        url = reverse('course_modes_choose', args=[six.text_type(self.course.id)])
+        response = self.client.get(url)
+
+        if create_enrollment:
+            self.assertContains(response, "Congratulations!  You are now enrolled in")
+        else:
+            self.assertNotContains(response, "Congratulations!  You are now enrolled in")
 
     @ddt.data('professional', 'no-id-professional')
     def test_professional_enrollment(self, mode):
@@ -355,12 +377,12 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         url = reverse('create_mode', args=[six.text_type(self.course.id)])
         response = self.client.get(url)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
         expected_mode = [Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None, None, None, None)]
         course_mode = CourseMode.modes_for_course(self.course.id)
 
-        self.assertEquals(course_mode, expected_mode)
+        self.assertEqual(course_mode, expected_mode)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @ddt.data(
@@ -379,7 +401,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         url = reverse('create_mode', args=[six.text_type(self.course.id)])
         response = self.client.get(url, parameters)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
         expected_mode = [
             Mode(
@@ -396,36 +418,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         ]
         course_mode = CourseMode.modes_for_course(self.course.id)
 
-        self.assertEquals(course_mode, expected_mode)
-
-    @patch('openedx.features.course_experience.utils.can_receive_discount')
-    @patch('openedx.features.course_experience.utils.discount_percentage')
-    def test_discount_on_track_selection(self, discount_percentage_mock, can_receive_discount_mock):
-        can_receive_discount_mock.return_value = True
-        discount_percentage_mock.return_value = 15
-        parameters = {
-            'mode_slug': 'verified',
-            'mode_display_name': 'Verified Certificate',
-            'min_price': 10
-        }
-
-        url = reverse('create_mode', args=[six.text_type(self.course.id)])
-        response = self.client.get(url, parameters)
-
-        response = self.client.get(
-            reverse('course_modes_choose', args=[six.text_type(self.course.id)]),
-            follow=False,
-        )
-
-        bannerText = u'''<div class="first-purchase-offer-banner"><span class="first-purchase-offer-banner-bold">
-                     15% off your first upgrade.</span> Discount automatically applied.</div>'''
-        button = u'''<button type="submit" name="verified_mode">
-                    <span>Pursue a Verified Certificate</span>
-                    (<span class="upgrade-price-string">$8.50 USD</span>
-                    <del> <span class="upgrade-price-string">$10 USD</span></del>)
-                    </button>'''
-        self.assertContains(response, bannerText, html=True)
-        self.assertContains(response, button, html=True)
+        self.assertEqual(course_mode, expected_mode)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_multiple_mode_creation(self):
@@ -450,7 +443,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         expected_modes = [honor_mode, verified_mode]
         course_modes = CourseMode.modes_for_course(self.course.id)
 
-        self.assertEquals(course_modes, expected_modes)
+        self.assertEqual(course_modes, expected_modes)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @with_comprehensive_theme("edx.org")

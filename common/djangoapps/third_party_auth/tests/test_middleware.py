@@ -1,7 +1,7 @@
 """
 Tests for third party auth middleware
 """
-from __future__ import absolute_import
+
 
 import mock
 from django.contrib.messages.middleware import MessageMiddleware

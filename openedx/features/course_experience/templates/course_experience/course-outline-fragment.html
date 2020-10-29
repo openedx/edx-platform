@@ -5,6 +5,7 @@
 <%namespace name='static' file='../static_content.html'/>
 
 <%!
+import json
 from datetime import date
 
 from django.utils.translation import ugettext as _
@@ -31,8 +32,9 @@ self_paced = context.get('self_paced', False)
         % for section in course_sections:
             <%
             section_is_auto_opened = section.get('resume_block') is True
+            scored = 'scored' if section.get('scored', False) else ''
             %>
-                <li class="outline-item section">
+                <li class="outline-item section ${scored}">
                     <button class="section-name accordion-trigger"
                             aria-expanded="${ 'true' if section_is_auto_opened else 'false' }"
                             aria-controls="${ section['id'] }_contents"
@@ -52,8 +54,10 @@ self_paced = context.get('self_paced', False)
                 gated_subsection = subsection['id'] in gated_content
                 completed_prereqs = gated_content[subsection['id']]['completed_prereqs'] if gated_subsection else False
                 subsection_is_auto_opened = subsection.get('resume_block') is True
+                scored = 'scored' if subsection.get('scored', False) else ''
+                graded = 'graded' if subsection.get('graded') else ''
                 %>
-                      <li class="subsection accordion ${ 'current' if subsection.get('resume_block') else '' }">
+                      <li class="subsection accordion ${ 'current' if subsection.get('resume_block') else '' } ${graded} ${scored}">
                 % if gated_subsection and not completed_prereqs:
                                 <a href="${ subsection['lms_web_url'] }">
                                     <button class="subsection-text prerequisite-button"
@@ -140,7 +144,7 @@ self_paced = context.get('self_paced', False)
                                                     ></span>
 
                         % if subsection.get('graded'):
-                                                        <span class="sr">&nbsp;${_("This content is graded")}</span>
+                                                <span class="sr">&nbsp;${_("This content is graded")}</span>
                         % endif
                     % endif
                                             </span>
@@ -160,8 +164,10 @@ self_paced = context.get('self_paced', False)
                         vertical_is_access_denied = vertical.get('authorization_denial_reason')
                         if vertical_is_access_denied:
                             continue
+                        scored = 'scored' if vertical.get('scored', False) else ''
+                        access_restricted = list(vertical.get('all_denial_reasons', []))
                         %>
-                                    <li class="vertical outline-item focusable">
+                                    <li class="vertical outline-item focusable ${scored}" data-access-denied="${json.dumps(access_restricted)}">
                                         <a class="outline-item focusable"
                                             % if enable_links:
                                                 href="${ vertical['lms_web_url'] }"

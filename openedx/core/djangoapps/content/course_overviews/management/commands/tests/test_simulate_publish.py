@@ -1,7 +1,7 @@
 """
 Tests the simulate_publish management command.
 """
-from __future__ import absolute_import
+
 
 import six
 

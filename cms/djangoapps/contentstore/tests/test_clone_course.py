@@ -1,7 +1,7 @@
 """
 Unit tests for cloning a course between the same and different module stores.
 """
-from __future__ import absolute_import
+
 
 import json
 

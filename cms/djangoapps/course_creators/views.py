@@ -1,7 +1,7 @@
 """
 Methods for interacting programmatically with the user creator table.
 """
-from __future__ import absolute_import
+
 
 from course_creators.models import CourseCreator
 from student import auth

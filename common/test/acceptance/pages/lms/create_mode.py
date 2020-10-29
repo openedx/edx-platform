@@ -1,6 +1,5 @@
 """Mode creation page (used to add modes to courses during testing)."""
 
-from __future__ import absolute_import
 
 import re
 

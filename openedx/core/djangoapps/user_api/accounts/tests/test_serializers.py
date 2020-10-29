@@ -1,7 +1,7 @@
 """
 Test cases to cover Accounts-related serializers of the User API application
 """
-from __future__ import absolute_import
+
 
 import logging
 

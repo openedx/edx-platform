@@ -1,7 +1,7 @@
 """
 Simple test to ensure that modulestore base classes remain abstract
 """
-from __future__ import absolute_import
+
 
 from unittest import TestCase
 

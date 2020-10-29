@@ -10,6 +10,5 @@
 -c ../constraints.txt
 
 cryptography                        # Implementations of assorted cryptography algorithms
-lxml==3.8.0                         # XML parser
-networkx==1.7                       # Utilities for creating, manipulating, and studying network graphs
+lxml                                # XML parser
 nltk                                # Natural language processing; used by the chem package

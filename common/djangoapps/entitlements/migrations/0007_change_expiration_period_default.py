@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+
 
 import datetime
 
@@ -16,6 +16,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='courseentitlementpolicy',
             name='expiration_period',
-            field=models.DurationField(default=datetime.timedelta(730), help_text=b'Duration in days from when an entitlement is created until when it is expired.'),
+            field=models.DurationField(default=datetime.timedelta(730), help_text=u'Duration in days from when an entitlement is created until when it is expired.'),
         ),
     ]

@@ -5,7 +5,6 @@ Tests of the Capa XModule
 # pylint: disable=missing-docstring
 # pylint: disable=invalid-name
 
-from __future__ import absolute_import
 
 import datetime
 import json
@@ -1948,7 +1947,7 @@ class ProblemBlockTest(unittest.TestCase):
         Check that get_problem() returns the expected dictionary.
         """
         module = CapaFactory.create()
-        self.assertEquals(module.get_problem("data"), {'html': module.get_problem_html(encapsulate=False)})
+        self.assertEqual(module.get_problem("data"), {'html': module.get_problem_html(encapsulate=False)})
 
     # Standard question with shuffle="true" used by a few tests
     common_shuffle_xml = textwrap.dedent("""
@@ -1977,9 +1976,9 @@ class ProblemBlockTest(unittest.TestCase):
             event_info = mock_call[1][2]
             self.assertEqual(event_info['answers'][CapaFactory.answer_key()], 'choice_3')
             # 'permutation' key added to record how problem was shown
-            self.assertEquals(event_info['permutation'][CapaFactory.answer_key()],
-                              ('shuffle', ['choice_3', 'choice_1', 'choice_2', 'choice_0']))
-            self.assertEquals(event_info['success'], 'correct')
+            self.assertEqual(event_info['permutation'][CapaFactory.answer_key()],
+                             ('shuffle', ['choice_3', 'choice_1', 'choice_2', 'choice_0']))
+            self.assertEqual(event_info['success'], 'correct')
 
     @unittest.skip("masking temporarily disabled")
     def test_save_unmask(self):
@@ -1990,7 +1989,7 @@ class ProblemBlockTest(unittest.TestCase):
             module.save_problem(get_request_dict)
             mock_call = mock_track_function.mock_calls[0]
             event_info = mock_call[1][1]
-            self.assertEquals(event_info['answers'][CapaFactory.answer_key()], 'choice_2')
+            self.assertEqual(event_info['answers'][CapaFactory.answer_key()], 'choice_2')
             self.assertIsNotNone(event_info['permutation'][CapaFactory.answer_key()])
 
     @unittest.skip("masking temporarily disabled")
@@ -2004,8 +2003,8 @@ class ProblemBlockTest(unittest.TestCase):
             module.reset_problem(None)
             mock_call = mock_track_function.mock_calls[0]
             event_info = mock_call[1][1]
-            self.assertEquals(mock_call[1][0], 'reset_problem')
-            self.assertEquals(event_info['old_state']['student_answers'][CapaFactory.answer_key()], 'choice_2')
+            self.assertEqual(mock_call[1][0], 'reset_problem')
+            self.assertEqual(event_info['old_state']['student_answers'][CapaFactory.answer_key()], 'choice_2')
             self.assertIsNotNone(event_info['permutation'][CapaFactory.answer_key()])
 
     @unittest.skip("masking temporarily disabled")
@@ -2019,8 +2018,8 @@ class ProblemBlockTest(unittest.TestCase):
             module.rescore_problem(only_if_higher=False)
             mock_call = mock_track_function.mock_calls[0]
             event_info = mock_call[1][1]
-            self.assertEquals(mock_call[1][0], 'problem_rescore')
-            self.assertEquals(event_info['state']['student_answers'][CapaFactory.answer_key()], 'choice_2')
+            self.assertEqual(mock_call[1][0], 'problem_rescore')
+            self.assertEqual(event_info['state']['student_answers'][CapaFactory.answer_key()], 'choice_2')
             self.assertIsNotNone(event_info['permutation'][CapaFactory.answer_key()])
 
     def test_check_unmask_answerpool(self):
@@ -2045,9 +2044,9 @@ class ProblemBlockTest(unittest.TestCase):
             event_info = mock_call[1][2]
             self.assertEqual(event_info['answers'][CapaFactory.answer_key()], 'choice_2')
             # 'permutation' key added to record how problem was shown
-            self.assertEquals(event_info['permutation'][CapaFactory.answer_key()],
-                              ('answerpool', ['choice_1', 'choice_3', 'choice_2', 'choice_0']))
-            self.assertEquals(event_info['success'], 'incorrect')
+            self.assertEqual(event_info['permutation'][CapaFactory.answer_key()],
+                             ('answerpool', ['choice_1', 'choice_3', 'choice_2', 'choice_0']))
+            self.assertEqual(event_info['success'], 'incorrect')
 
     @ddt.unpack
     @ddt.data(
@@ -2441,14 +2440,14 @@ class ProblemBlockXMLTest(unittest.TestCase):
             descriptor.display_name = name
         return descriptor
 
-    @ddt.data(*responsetypes.registry.registered_tags())
+    @ddt.data(*sorted(responsetypes.registry.registered_tags()))
     def test_all_response_types(self, response_tag):
         """ Tests that every registered response tag is correctly returned """
         xml = "<problem><{response_tag}></{response_tag}></problem>".format(response_tag=response_tag)
         name = "Some Capa Problem"
         descriptor = self._create_descriptor(xml, name=name)
-        self.assertEquals(descriptor.problem_types, {response_tag})
-        self.assertEquals(descriptor.index_dictionary(), {
+        self.assertEqual(descriptor.problem_types, {response_tag})
+        self.assertEqual(descriptor.index_dictionary(), {
             'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
             'problem_types': [response_tag],
             'content': {
@@ -2474,8 +2473,8 @@ class ProblemBlockXMLTest(unittest.TestCase):
         """)
         name = "Test Capa Problem"
         descriptor = self._create_descriptor(xml, name=name)
-        self.assertEquals(descriptor.problem_types, {"multiplechoiceresponse"})
-        self.assertEquals(descriptor.index_dictionary(), {
+        self.assertEqual(descriptor.problem_types, {"multiplechoiceresponse"})
+        self.assertEqual(descriptor.index_dictionary(), {
             'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
             'problem_types': ["multiplechoiceresponse"],
             'content': {
@@ -2506,9 +2505,9 @@ class ProblemBlockXMLTest(unittest.TestCase):
         """)
         name = "Other Test Capa Problem"
         descriptor = self._create_descriptor(xml, name=name)
-        self.assertEquals(descriptor.problem_types, {"multiplechoiceresponse", "optionresponse"})
-        self.assertEquals(
-            descriptor.index_dictionary(), {
+        self.assertEqual(descriptor.problem_types, {"multiplechoiceresponse", "optionresponse"})
+        six.assertCountEqual(
+            self, descriptor.index_dictionary(), {
                 'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ["optionresponse", "multiplechoiceresponse"],
                 'content': {
@@ -2544,7 +2543,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
         """)
         name = "Blank Common Capa Problem"
         descriptor = self._create_descriptor(xml, name=name)
-        self.assertEquals(
+        self.assertEqual(
             descriptor.index_dictionary(), {
                 'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': [],
@@ -2570,8 +2569,8 @@ class ProblemBlockXMLTest(unittest.TestCase):
             Hungarian
             Note: Make sure you select all of the correct options—there may be more than one!
         """)
-        self.assertEquals(descriptor.problem_types, {"choiceresponse"})
-        self.assertEquals(
+        self.assertEqual(descriptor.problem_types, {"choiceresponse"})
+        self.assertEqual(
             descriptor.index_dictionary(),
             {
                 'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
@@ -2592,8 +2591,8 @@ class ProblemBlockXMLTest(unittest.TestCase):
             You can use the following example problem as a model.
             Which of the following countries celebrates its independence on August 15?
         """)
-        self.assertEquals(descriptor.problem_types, {"optionresponse"})
-        self.assertEquals(
+        self.assertEqual(descriptor.problem_types, {"optionresponse"})
+        self.assertEqual(
             descriptor.index_dictionary(), {
                 'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ["optionresponse"],
@@ -2617,8 +2616,8 @@ class ProblemBlockXMLTest(unittest.TestCase):
             Indonesia
             Russia
         """)
-        self.assertEquals(descriptor.problem_types, {"multiplechoiceresponse"})
-        self.assertEquals(
+        self.assertEqual(descriptor.problem_types, {"multiplechoiceresponse"})
+        self.assertEqual(
             descriptor.index_dictionary(), {
                 'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ["multiplechoiceresponse"],
@@ -2645,8 +2644,8 @@ class ProblemBlockXMLTest(unittest.TestCase):
             How many miles away from Earth is the sun? Use scientific notation to answer.
             The square of what number is -100?
         """)
-        self.assertEquals(descriptor.problem_types, {"numericalresponse"})
-        self.assertEquals(
+        self.assertEqual(descriptor.problem_types, {"numericalresponse"})
+        self.assertEqual(
             descriptor.index_dictionary(), {
                 'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ["numericalresponse"],
@@ -2670,8 +2669,8 @@ class ProblemBlockXMLTest(unittest.TestCase):
             You can use the following example problem as a model.
             What was the first post-secondary school in China to allow both male and female students?
         """)
-        self.assertEquals(descriptor.problem_types, {"stringresponse"})
-        self.assertEquals(
+        self.assertEqual(descriptor.problem_types, {"stringresponse"})
+        self.assertEqual(
             descriptor.index_dictionary(), {
                 'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ["stringresponse"],
@@ -2694,7 +2693,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
         capa_content = " FX1_VAL='Καλημέρα' Δοκιμή με μεταβλητές με Ελληνικούς χαρακτήρες μέσα σε python: $FX1_VAL "
 
         descriptor_dict = descriptor.index_dictionary()
-        self.assertEquals(
+        self.assertEqual(
             descriptor_dict['content']['capa_content'], smart_text(capa_content)
         )
 
@@ -2716,8 +2715,8 @@ class ProblemBlockXMLTest(unittest.TestCase):
             potato
             tomato
         """)
-        self.assertEquals(descriptor.problem_types, {"choiceresponse"})
-        self.assertEquals(
+        self.assertEqual(descriptor.problem_types, {"choiceresponse"})
+        self.assertEqual(
             descriptor.index_dictionary(), {
                 'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ["choiceresponse"],
@@ -2742,8 +2741,8 @@ class ProblemBlockXMLTest(unittest.TestCase):
             potato
             tomato
         """)
-        self.assertEquals(descriptor.problem_types, {"optionresponse"})
-        self.assertEquals(
+        self.assertEqual(descriptor.problem_types, {"optionresponse"})
+        self.assertEqual(
             descriptor.index_dictionary(), {
                 'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ["optionresponse"],
@@ -2768,8 +2767,8 @@ class ProblemBlockXMLTest(unittest.TestCase):
             potato
             tomato
         """)
-        self.assertEquals(descriptor.problem_types, {"multiplechoiceresponse"})
-        self.assertEquals(
+        self.assertEqual(descriptor.problem_types, {"multiplechoiceresponse"})
+        self.assertEqual(
             descriptor.index_dictionary(), {
                 'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ["multiplechoiceresponse"],
@@ -2792,8 +2791,8 @@ class ProblemBlockXMLTest(unittest.TestCase):
             Use the following example problem as a model.
             What is the arithmetic mean for the following set of numbers? (1, 5, 6, 3, 5)
         """)
-        self.assertEquals(descriptor.problem_types, {"numericalresponse"})
-        self.assertEquals(
+        self.assertEqual(descriptor.problem_types, {"numericalresponse"})
+        self.assertEqual(
             descriptor.index_dictionary(), {
                 'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ["numericalresponse"],
@@ -2816,8 +2815,8 @@ class ProblemBlockXMLTest(unittest.TestCase):
             Use the following example problem as a model.
             Which U.S. state has the largest land area?
         """)
-        self.assertEquals(descriptor.problem_types, {"stringresponse"})
-        self.assertEquals(
+        self.assertEqual(descriptor.problem_types, {"stringresponse"})
+        self.assertEqual(
             descriptor.index_dictionary(), {
                 'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ["stringresponse"],
@@ -2849,7 +2848,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
             This has HTML comment in it.
             HTML end.
         """)
-        self.assertEquals(
+        self.assertEqual(
             descriptor.index_dictionary(), {
                 'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': [],
@@ -2936,7 +2935,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
         }
         event = self.get_event_for_answers(module, answer_input_dict)
 
-        self.assertEquals(event['submission'], {
+        self.assertEqual(event['submission'], {
             factory.answer_key(2): {
                 'question': 'What color is the open ocean on a sunny day?',
                 'answer': 'blue',
@@ -2995,7 +2994,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
         }
 
         event = self.get_event_for_answers(module, answer_input_dict)
-        self.assertEquals(event['submission'], {
+        self.assertEqual(event['submission'], {
             factory.answer_key(2): {
                 'question': '',
                 'answer': '3.14',
@@ -3027,7 +3026,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
         }
 
         event = self.get_event_for_answers(module, answer_input_dict)
-        self.assertEquals(event['submission'], {
+        self.assertEqual(event['submission'], {
             factory.answer_key(2, 1): {
                 'group_label': group_label,
                 'question': input1_label,
@@ -3097,7 +3096,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
         }
 
         event = self.get_event_for_answers(module, answer_input_dict)
-        self.assertEquals(event['submission'], {
+        self.assertEqual(event['submission'], {
             factory.answer_key(2, 1): {
                 'group_label': group_label,
                 'question': input1_label,
@@ -3127,7 +3126,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
         }
 
         event = self.get_event_for_answers(module, answer_input_dict)
-        self.assertEquals(event['submission'], {
+        self.assertEqual(event['submission'], {
             factory.answer_key(2): {
                 'question': '',
                 'answer': '3.14',
@@ -3160,7 +3159,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
         }
 
         event = self.get_event_for_answers(module, answer_input_dict)
-        self.assertEquals(event['submission'], {
+        self.assertEqual(event['submission'], {
             factory.answer_key(2): {
                 'question': '',
                 'answer': fpaths,
@@ -3263,7 +3262,7 @@ class ProblemBlockReportGenerationTest(unittest.TestCase):
     def test_generate_report_data_limit_responses(self):
         descriptor = self._get_descriptor()
         report_data = list(descriptor.generate_report_data(self._mock_user_state_generator(), 2))
-        self.assertEquals(2, len(report_data))
+        self.assertEqual(2, len(report_data))
 
     def test_generate_report_data_dont_limit_responses(self):
         descriptor = self._get_descriptor()
@@ -3275,10 +3274,10 @@ class ProblemBlockReportGenerationTest(unittest.TestCase):
                 response_count=response_count,
             )
         ))
-        self.assertEquals(user_count * response_count, len(report_data))
+        self.assertEqual(user_count * response_count, len(report_data))
 
     def test_generate_report_data_skip_dynamath(self):
         descriptor = self._get_descriptor()
         iterator = iter([self._user_state(suffix='_dynamath')])
         report_data = list(descriptor.generate_report_data(iterator))
-        self.assertEquals(0, len(report_data))
+        self.assertEqual(0, len(report_data))

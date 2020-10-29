@@ -1,7 +1,7 @@
 """
 Tests for the Split Testing Module
 """
-from __future__ import absolute_import
+
 
 import ddt
 import lxml
@@ -141,7 +141,7 @@ class SplitTestModuleLMSTest(SplitTestModuleTest):
     @ddt.unpack
     def test_child(self, user_tag, child_url_name):
         self.user_partition.scheme.current_group = self.user_partition.groups[user_tag]
-        self.assertEquals(self.split_test_module.child_descriptor.url_name, child_url_name)
+        self.assertEqual(self.split_test_module.child_descriptor.url_name, child_url_name)
 
     @ddt.data((0, 'HTML FOR GROUP 0'), (1, 'HTML FOR GROUP 1'))
     @ddt.unpack
@@ -162,7 +162,7 @@ class SplitTestModuleLMSTest(SplitTestModuleTest):
         # If a user_tag has a missing value, a group should be saved/persisted for that user.
         # So, we check that we get the same url_name when we call on the url_name twice.
         # We run the test ten times so that, if our storage is failing, we'll be most likely to notice it.
-        self.assertEquals(
+        self.assertEqual(
             self.split_test_module.child_descriptor.url_name,
             self.split_test_module.child_descriptor.url_name
         )
@@ -181,14 +181,14 @@ class SplitTestModuleLMSTest(SplitTestModuleTest):
         # Write out the xml.
         xml_obj = self.split_test_module.definition_to_xml(MemoryFS())
 
-        self.assertEquals(xml_obj.get('user_partition_id'), '0')
+        self.assertEqual(xml_obj.get('user_partition_id'), '0')
         self.assertIsNotNone(xml_obj.get('group_id_to_child'))
 
         # Read the xml back in.
         fields, children = SplitTestDescriptor.definition_from_xml(xml_obj, self.module_system)
-        self.assertEquals(fields.get('user_partition_id'), '0')
+        self.assertEqual(fields.get('user_partition_id'), '0')
         self.assertIsNotNone(fields.get('group_id_to_child'))
-        self.assertEquals(len(children), 2)
+        self.assertEqual(len(children), 2)
 
 
 class SplitTestModuleStudioTest(SplitTestModuleTest):

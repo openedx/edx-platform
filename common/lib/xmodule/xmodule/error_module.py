@@ -3,7 +3,6 @@ Modules that get shown to the users when an error has occurred while
 loading or rendering other modules
 """
 
-from __future__ import absolute_import
 
 import hashlib
 import json

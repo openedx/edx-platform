@@ -2,7 +2,6 @@
 Command used for testing TrackedCommands
 """
 
-from __future__ import absolute_import
 
 import json
 from textwrap import dedent

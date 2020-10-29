@@ -2,7 +2,6 @@
 Helper functions and classes for discussion tests.
 """
 
-from __future__ import absolute_import
 
 import json
 from uuid import uuid4

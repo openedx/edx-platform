@@ -1,7 +1,7 @@
 """
     Test split modulestore w/o using any django stuff.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import os
@@ -977,6 +977,15 @@ class TestCourseStructureCache(SplitModuleTest):
         # now make sure that you get the same structure
         self.assertEqual(cached_structure, not_cached_structure)
 
+        # If data is corrupted, get it from mongo again.
+        cache_key = self.new_course.id.version_guid
+        self.cache.set(cache_key, b"bad_data")
+        with check_mongo_calls(1):
+            not_corrupt_structure = self._get_structure(self.new_course)
+
+        # now make sure that you get the same structure
+        self.assertEqual(not_corrupt_structure, not_cached_structure)
+
     @patch('xmodule.modulestore.split_mongo.mongo_connection.get_cache')
     def test_course_structure_cache_no_cache_configured(self, mock_get_cache):
         mock_get_cache.side_effect = InvalidCacheBackendError
@@ -1810,7 +1819,7 @@ class TestCourseCreation(SplitModuleTest):
             'best', 'leech', 'leech_run', 'leech_master', BRANCH_NAME_DRAFT,
             versions_dict=original_index['versions'])
         new_draft_locator = new_draft.location
-        self.assertRegexpMatches(new_draft_locator.org, 'best')
+        self.assertRegex(new_draft_locator.org, 'best')
         # the edited_by and other meta fields on the new course will be the original author not this one
         self.assertEqual(new_draft.edited_by, 'test@edx.org')
         self.assertEqual(new_draft_locator.version_guid, original_index['versions'][BRANCH_NAME_DRAFT])
@@ -1860,7 +1869,7 @@ class TestCourseCreation(SplitModuleTest):
             fields=fields
         )
         new_draft_locator = new_draft.location
-        self.assertRegexpMatches(new_draft_locator.org, 'counter')
+        self.assertRegex(new_draft_locator.org, 'counter')
         # the edited_by and other meta fields on the new course will be the original author not this one
         self.assertEqual(new_draft.edited_by, 'leech_master')
         self.assertNotEqual(new_draft_locator.version_guid, original_index['versions'][BRANCH_NAME_DRAFT])

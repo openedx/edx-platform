@@ -2,7 +2,6 @@
 Discussion settings and flags.
 """
 
-from __future__ import absolute_import
 
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 

@@ -1,7 +1,7 @@
 """
 Install Python and Node prerequisites.
 """
-from __future__ import absolute_import, print_function
+
 
 import hashlib
 import io
@@ -11,6 +11,7 @@ import subprocess
 import sys
 from distutils import sysconfig
 
+import six
 from paver.easy import BuildFailure, sh, task
 from six.moves import range
 
@@ -151,13 +152,13 @@ def node_prereqs_installation():
         # the forked process has returned
         proc = subprocess.Popen(npm_command, stderr=npm_log_file)
         proc.wait()
-    except BuildFailure as error_text:
-        if cb_error_text in error_text:
+    except BuildFailure as error:
+        if cb_error_text in six.text_type(error):
             print("npm install error detected. Retrying...")
             proc = subprocess.Popen(npm_command, stderr=npm_log_file)
             proc.wait()
         else:
-            raise BuildFailure(error_text)
+            raise
     print(u"Successfully installed NPM packages. Log found at {}".format(
         npm_log_file_path
     ))
@@ -200,8 +201,10 @@ PACKAGES_TO_UNINSTALL = [
     "django-oauth2-provider",       # Because now it's called edx-django-oauth2-provider.
     "edx-oauth2-provider",          # Because it moved from github to pypi
     "i18n-tools",                   # Because now it's called edx-i18n-tools
+    "moto",                         # Because we no longer use it and it conflicts with recent jsondiff versions
     "python-saml",                  # Because python3-saml shares the same directory name
     "pdfminer",                     # Replaced by pdfminer.six, which shares the same directory name
+    "pytest-faulthandler",          # Because it was bundled into pytest
 ]
 
 

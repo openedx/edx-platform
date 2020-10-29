@@ -11,7 +11,7 @@ structure:
     'definition.children': <list of all child text_type(location)s>
 }
 """
-from __future__ import absolute_import
+
 
 import beeline
 import copy

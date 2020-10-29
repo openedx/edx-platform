@@ -1,7 +1,7 @@
 """
 This module contains signals needed for email integration
 """
-from __future__ import absolute_import
+
 
 import datetime
 import logging
@@ -52,7 +52,7 @@ def update_sailthru(sender, user, mode, course_id, **kwargs):  # pylint: disable
         None
     """
     if WAFFLE_SWITCHES.is_enabled(SAILTHRU_AUDIT_PURCHASE_ENABLED) and mode in CourseMode.AUDIT_MODES:
-        email = str(user.email)
+        email = user.email.encode('utf-8')
         update_course_enrollment.delay(email, course_id, mode, site=_get_current_site())
 
 

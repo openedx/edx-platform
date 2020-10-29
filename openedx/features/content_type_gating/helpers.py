@@ -1,7 +1,7 @@
 """
 Helper functions used by both content_type_gating and course_duration_limits.
 """
-from __future__ import absolute_import
+
 
 import logging
 

@@ -1,7 +1,7 @@
 """
 MongoDB/GridFS-level code for the contentstore.
 """
-from __future__ import absolute_import
+
 
 import json
 import os
@@ -101,12 +101,19 @@ class MongoContentStore(ContentStore):
                               locked=getattr(content, 'locked', False)) as fp:
 
             # It seems that this code thought that only some specific object would have the `__iter__` attribute
-            # but the bytes object in python 3 has one and should not use the chunking logic.
-            if hasattr(content.data, '__iter__') and not isinstance(content.data, six.binary_type):
+            # but many more objects have this in python3 and shouldn't be using the chunking logic. For string and
+            # byte streams we write them directly to gridfs and convert them to byetarrys if necessary.
+            if hasattr(content.data, '__iter__') and not isinstance(content.data, (six.binary_type, six.string_types)):
                 for chunk in content.data:
                     fp.write(chunk)
             else:
-                fp.write(content.data)
+                # Ideally we could just ensure that we don't get strings in here and only byte streams
+                # but being confident of that wolud be a lot more work than we have time for so we just
+                # handle both cases here.
+                if isinstance(content.data, six.text_type):
+                    fp.write(content.data.encode('utf-8'))
+                else:
+                    fp.write(content.data)
 
         return content
 
@@ -126,6 +133,10 @@ class MongoContentStore(ContentStore):
         try:
             if as_stream:
                 fp = self.fs.get(content_id)
+                # Need to replace dict IDs with SON for chunk lookup to work under Python 3
+                # because field order can be different and mongo cares about the order
+                if isinstance(fp._id, dict):
+                    fp._file['_id'] = content_id
                 thumbnail_location = getattr(fp, 'thumbnail_location', None)
                 if thumbnail_location:
                     thumbnail_location = location.course_key.make_asset_key(
@@ -141,6 +152,10 @@ class MongoContentStore(ContentStore):
                 )
             else:
                 with self.fs.get(content_id) as fp:
+                    # Need to replace dict IDs with SON for chunk lookup to work under Python 3
+                    # because field order can be different and mongo cares about the order
+                    if isinstance(fp._id, dict):
+                        fp._file['_id'] = content_id
                     thumbnail_location = getattr(fp, 'thumbnail_location', None)
                     if thumbnail_location:
                         thumbnail_location = location.course_key.make_asset_key(
@@ -401,6 +416,10 @@ class MongoContentStore(ContentStore):
             if isinstance(asset_key, six.string_types):
                 asset_key = AssetKey.from_string(asset_key)
                 __, asset_key = self.asset_db_key(asset_key)
+            # Need to replace dict IDs with SON for chunk lookup to work under Python 3
+            # because field order can be different and mongo cares about the order
+            if isinstance(source_content._id, dict):
+                source_content._file['_id'] = asset_key.copy()
             asset_key['org'] = dest_course_key.org
             asset_key['course'] = dest_course_key.course
             if getattr(dest_course_key, 'deprecated', False):  # remove the run if exists

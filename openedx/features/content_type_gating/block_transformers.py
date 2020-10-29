@@ -2,7 +2,7 @@
 Content Type Gate Transformer implementation.
 Limits access for certain users to certain types of content.
 """
-from __future__ import absolute_import
+
 
 from django.conf import settings
 

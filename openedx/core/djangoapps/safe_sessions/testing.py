@@ -2,7 +2,6 @@
 Test overrides to support Safe Cookies with Test Clients.
 """
 
-from __future__ import absolute_import
 
 from django.test.client import Client
 

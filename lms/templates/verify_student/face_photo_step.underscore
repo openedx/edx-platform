@@ -4,7 +4,7 @@
         <h2 class="title"><%- gettext( "What You Need for Verification" ) %></h2>
         <div class="requirement">
             <h3 class="title"><%- gettext( "Webcam" ) %></h3>
-            <p class="copy"><%- gettext( "You need a computer that has a webcam. When you receive a browser prompt, make sure that you allow access to the camera." ) %></p>
+            <p class="copy"><%- gettext( "You need a computer or cell phone that has a webcam. When you receive a browser prompt, make sure that you allow access to the camera." ) %></p>
         </div>
         <div class="requirement">
             <h3 class="title"><%- gettext( "Photo Identification" ) %></h3>
@@ -16,7 +16,7 @@
   <div class="facephoto view">
     <h3 class="title"><%- gettext( "Take Your Photo" ) %></h2>
     <div class="instruction">
-      <p><%=  HtmlUtils.interpolateHtml( gettext( "When your face is in position, use the camera button {icon} below to take your photo." ), { icon: HtmlUtils.HTML('<span class="example">(<span class="icon fa fa-camera" aria-hidden="true"></span><span class="sr">icon</span>)</span>') } ) %></p>
+      <p><%=  HtmlUtils.interpolateHtml( gettext( "When your face is in position, use the Take Photo button {icon} below to take your photo." ), { icon: HtmlUtils.HTML('<span class="example">(<span class="icon fa fa-camera" aria-hidden="true"></span><span class="sr">icon</span>)</span>') } ) %></p>
     </div>
 
     <div class="wrapper-task">
@@ -31,7 +31,7 @@
               <li class="help-item"><%- gettext( "The photo of your face matches the photo on your ID." ) %></li>
             </ul>
 
-            <p class="copy-extra"><%=  HtmlUtils.interpolateHtml( gettext( "To use the current photo, select the camera button {icon}. To take another photo, select the retake button {icon}." ), { icon: HtmlUtils.HTML('<span class="example">(<span class="icon fa fa-camera" aria-hidden="true"></span><span class="sr">icon</span>)</span>') } ) %></p>
+            <p class="copy-extra"><%=  HtmlUtils.interpolateHtml( gettext( "To use the current photo, select the Take Photo button {icon}. To take another photo, select the Retake Photo button {icon}." ), { icon: HtmlUtils.HTML('<span class="example">(<span class="icon fa fa-camera" aria-hidden="true"></span><span class="sr">icon</span>)</span>') } ) %></p>
           </div>
         </div>
 
@@ -46,7 +46,22 @@
               <dt class="faq-question">
                 <%- _.sprintf( gettext( "What does %(platformName)s do with this photo?" ), { platformName: platformName } ) %>
               </dt>
-              <dd class="faq-answer"><%- _.sprintf( gettext( "We use the highest levels of security available to encrypt your photo and send it to our authorization service for review. Your photo and information are not saved or visible anywhere on %(platformName)s after the verification process is complete." ), { platformName: platformName } ) %></dd>
+              <dd class="faq-answer">
+                <%- _.sprintf( gettext( "We use the highest levels of security available to encrypt your photo and send it to our authorization service for review. Your photo and information are not saved or visible anywhere on %(platformName)s after the verification process is complete." ), { platformName: platformName } ) %>
+              </dd>
+              <dt class="faq-question">
+                <%- gettext( "What if I can't see the camera image, or if I can't see my photo do determine which side is visible?" ) %>
+              </dt>
+              <dd class="faq-answer">
+                <%- gettext( "You may be able to complete the image capture procedure without assistance, but it may take a couple of submission attempts to get the camera positioning right.  Optimal camera positioning varies with each computer, but generally the best position for a headshot is approximately 12-18 inches (30-45 centimeters) from the camera, with your head centered relative to the computer screen. " ) %>
+                <%- gettext( "If the photos you submit are rejected, try moving the computer or camera orientation to change the lighting angle.  The most common reason for rejection is inability to read the text on the ID card." ) %>
+              </dd>
+              <dt class="faq-question">
+                <%- gettext( "What if I have difficulty holding my head in position relative to the camera?" ) %>
+              </dt>
+              <dd class="faq-answer">
+                <%- _.sprintf( gettext( "If you require assistance with taking either photo for submission, contact %(platformName)s support for additional suggestions." ), { platformName: platformName } ) %>
+              </dd>
             </dl>
           </div>
         </div>

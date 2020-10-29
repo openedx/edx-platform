@@ -5,7 +5,7 @@ JSON views which the instructor dashboard requests.
 
 Many of these GETs may become PUTs in the future.
 """
-from __future__ import absolute_import
+
 
 import csv
 import decimal
@@ -50,9 +50,9 @@ import instructor_analytics.csvs
 import instructor_analytics.distributions
 from bulk_email.api import is_bulk_email_feature_enabled
 from bulk_email.models import CourseEmail
-from courseware.access import has_access
-from courseware.courses import get_course_by_id, get_course_with_access
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_by_id, get_course_with_access
+from lms.djangoapps.courseware.models import StudentModule
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
@@ -390,7 +390,7 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
         try:
             upload_file = request.FILES.get('students_list')
             if upload_file.name.endswith('.csv'):
-                students = [row for row in csv.reader(upload_file.read().splitlines())]
+                students = [row for row in csv.reader(upload_file.read().decode('utf-8').splitlines())]
                 course = get_course_by_id(course_id)
             else:
                 general_errors.append({
@@ -1318,6 +1318,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
             'id', 'username', 'name', 'email', 'language', 'location',
             'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
             'goals', 'enrollment_mode', 'verification_status',
+            'last_login', 'date_joined',
         ]
 
     # Provide human-friendly and translatable names for these features. These names
@@ -1337,6 +1338,8 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         'goals': _('Goals'),
         'enrollment_mode': _('Enrollment Mode'),
         'verification_status': _('Verification Status'),
+        'last_login': _('Last Login'),
+        'date_joined': _('Date Joined'),
     }
 
     if is_course_cohorted(course.id):
@@ -1406,7 +1409,11 @@ def _cohorts_csv_validator(file_storage, file_to_validate):
     Verifies that the expected columns are present in the CSV used to add users to cohorts.
     """
     with file_storage.open(file_to_validate) as f:
-        reader = unicodecsv.reader(UniversalNewlineIterator(f), encoding='utf-8')
+        if six.PY2:
+            reader = unicodecsv.reader(UniversalNewlineIterator(f), encoding='utf-8')
+        else:
+            reader = csv.reader(f.read().decode('utf-8').splitlines())
+
         try:
             fieldnames = next(reader)
         except StopIteration:
@@ -1806,12 +1813,6 @@ def generate_registration_codes(request, course_id):
         dashboard=reverse('dashboard')
     )
 
-    try:
-        pdf_file = sale_invoice.generate_pdf_invoice(course, course_price, int(quantity), float(sale_price))
-    except Exception:  # pylint: disable=broad-except
-        log.exception('Exception at creating pdf file.')
-        pdf_file = None
-
     from_address = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
     context = {
         'invoice': sale_invoice,
@@ -1864,11 +1865,6 @@ def generate_registration_codes(request, course_id):
         email.to = [recipient]
         email.attach(u'RegistrationCodes.csv', csv_file.getvalue(), 'text/csv')
         email.attach(u'Invoice.txt', invoice_attachment, 'text/plain')
-        if pdf_file is not None:
-            email.attach(u'Invoice.pdf', pdf_file.getvalue(), 'application/pdf')
-        else:
-            file_buffer = StringIO(_('pdf download unavailable right now, please contact support.'))
-            email.attach(u'pdf_unavailable.txt', file_buffer.getvalue(), 'text/plain')
         email.send()
 
     return registration_codes_csv("Registration_Codes.csv", registration_codes)
@@ -1951,14 +1947,16 @@ def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
     def csv_response(filename, header, rows):
         """Returns a CSV http response for the given header and rows (excel/utf-8)."""
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = u'attachment; filename={0}'.format(text_type(filename).encode('utf-8'))
+        response['Content-Disposition'] = u'attachment; filename={0}'.format(
+            text_type(filename).encode('utf-8') if six.PY2 else text_type(filename)
+        )
         writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
         # In practice, there should not be non-ascii data in this query,
         # but trying to do the right thing anyway.
-        encoded = [text_type(s).encode('utf-8') for s in header]
+        encoded = [text_type(s) for s in header]
         writer.writerow(encoded)
         for row in rows:
-            encoded = [text_type(s).encode('utf-8') for s in row]
+            encoded = [text_type(s) for s in row]
             writer.writerow(encoded)
         return response
 
@@ -3387,7 +3385,7 @@ def generate_bulk_certificate_exceptions(request, course_id):
         try:
             upload_file = request.FILES.get('students_list')
             if upload_file.name.endswith('.csv'):
-                students = [row for row in csv.reader(upload_file.read().splitlines())]
+                students = [row for row in csv.reader(upload_file.read().decode('utf-8').splitlines())]
             else:
                 general_errors.append(_('Make sure that the file you upload is in CSV format with no '
                                         'extraneous characters or rows.'))

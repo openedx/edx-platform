@@ -1,9 +1,10 @@
+# pylint: disable=missing-docstring,unused-argument
+
 # View for semi-static templatized content.
 #
 # List of valid templates is explicitly managed for (short-term)
 # security reasons.
 
-from __future__ import absolute_import
 
 import mimetypes
 
@@ -92,7 +93,7 @@ def render_press_release(request, slug):
 
 
 @fix_crum_request
-def render_404(request):
+def render_404(request, exception):
     return HttpResponseNotFound(render_to_string('static_templates/404.html', {}, request=request))
 
 

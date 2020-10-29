@@ -2,7 +2,6 @@
 This command will be run by an ansible script.
 """
 
-from __future__ import absolute_import
 
 import fnmatch
 import json

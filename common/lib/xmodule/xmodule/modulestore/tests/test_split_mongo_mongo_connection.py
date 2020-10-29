@@ -1,9 +1,10 @@
 """ Test the behavior of split_mongo/MongoConnection """
-from __future__ import absolute_import
+
 
 import unittest
 
 from mock import patch
+from pymongo.errors import ConnectionFailure
 
 from pymongo.errors import ConnectionFailure
 from xmodule.exceptions import HeartbeatFailure

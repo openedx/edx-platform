@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """ Tests for setting and displaying the site status message. """
-from __future__ import absolute_import
+
 
 import unittest
 

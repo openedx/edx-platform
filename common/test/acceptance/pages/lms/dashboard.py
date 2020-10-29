@@ -2,7 +2,7 @@
 """
 Student dashboard page.
 """
-from __future__ import absolute_import
+
 
 from bok_choy.page_object import PageObject
 from opaque_keys.edx.keys import CourseKey

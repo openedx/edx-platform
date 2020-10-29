@@ -1,7 +1,7 @@
 """
 Helper functions for configuration parsing
 """
-from __future__ import absolute_import
+
 
 import collections
 

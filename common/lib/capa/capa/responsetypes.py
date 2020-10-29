@@ -10,7 +10,7 @@ Used by capa_problem.py
 
 # pylint: disable=attribute-defined-outside-init
 # standard library imports
-from __future__ import absolute_import
+
 
 import abc
 # TODO: Refactor this code and fix this issue.
@@ -19,7 +19,7 @@ import inspect
 import json
 import logging
 import numbers
-import random
+import random2 as random
 import re
 import sys
 import textwrap
@@ -35,6 +35,7 @@ import requests
 import six
 # specific library imports
 from calc import UndefinedVariable, UnmatchedParenthesis, evaluator
+from django.utils.encoding import python_2_unicode_compatible
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs  # uses Beautiful Soup!!! FIXME?
 from pyparsing import ParseException
@@ -47,6 +48,7 @@ import capa.safe_exec as safe_exec
 import capa.xqueue_interface as xqueue_interface
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib import edx_six
+from openedx.core.lib.grade_utils import round_away_from_zero
 
 from . import correctmap
 from .registry import TagRegistry
@@ -108,6 +110,7 @@ class StudentInputError(Exception):
 # Main base class for CAPA responsetypes
 
 
+@python_2_unicode_compatible
 class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
     """
     Base class for CAPA responsetypes.  Each response type (ie a capa question,
@@ -130,7 +133,7 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
                                condition for a hint to be displayed
 
       - render_html          : render this Response as HTML (must return XHTML-compliant string)
-      - __unicode__          : unicode representation of this Response
+      - __str__              : unicode representation of this Response
 
     Each response type may also specify the following attributes:
 
@@ -574,7 +577,7 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
     def setup_response(self):
         pass
 
-    def __unicode__(self):
+    def __str__(self):
         return u'LoncapaProblem Response %s' % self.xml.tag
 
     def _render_response_msg_html(self, response_msg):
@@ -725,7 +728,7 @@ class ChoiceResponse(LoncapaResponse):
         good_non_answers = sum([1 for blank in student_non_answers if blank in self.incorrect_choices])
         edc_current_grade = good_answers + good_non_answers
 
-        return_grade = round(self.get_max_score() * float(edc_current_grade) / float(edc_max_grade), 2)
+        return_grade = round_away_from_zero(self.get_max_score() * float(edc_current_grade) / float(edc_max_grade), 2)
 
         if edc_current_grade == edc_max_grade:
             return CorrectMap(self.answer_id, correctness='correct')
@@ -762,10 +765,10 @@ class ChoiceResponse(LoncapaResponse):
             return_grade = self.get_max_score()
             return CorrectMap(self.answer_id, correctness='correct', npoints=return_grade)
         elif halves_error_count == 1 and len(all_choices) > 2:
-            return_grade = round(self.get_max_score() / 2.0, 2)
+            return_grade = round_away_from_zero(self.get_max_score() / 2.0, 2)
             return CorrectMap(self.answer_id, correctness='partially-correct', npoints=return_grade)
         elif halves_error_count == 2 and len(all_choices) > 4:
-            return_grade = round(self.get_max_score() / 4.0, 2)
+            return_grade = round_away_from_zero(self.get_max_score() / 4.0, 2)
             return CorrectMap(self.answer_id, correctness='partially-correct', npoints=return_grade)
         else:
             return CorrectMap(self.answer_id, 'incorrect')

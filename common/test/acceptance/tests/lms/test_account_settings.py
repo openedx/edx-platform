@@ -2,7 +2,7 @@
 """
 End-to-end tests for the Account Settings page.
 """
-from __future__ import absolute_import
+
 
 from datetime import datetime
 from unittest import skip
@@ -195,11 +195,11 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             },
             {
                 'title': 'Social Media Links',
-                'fields': [
+                'fields': sorted([
                     'Twitter Link',
                     'Facebook Link',
                     'LinkedIn Link',
-                ]
+                ])
             },
             {
                 'title': 'Delete My Account',
@@ -207,7 +207,9 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             },
         ]
 
-        self.assertEqual(self.account_settings_page.sections_structure(), expected_sections_structure)
+        sections_structure = self.account_settings_page.sections_structure()
+        sections_structure[2]['fields'] = sorted(sections_structure[2]['fields'])
+        self.assertEqual(sections_structure, expected_sections_structure)
 
     def _test_readonly_field(self, field_id, title, value):
         """
@@ -406,12 +408,20 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         """
         Test behaviour of one of the social media links field.
         """
+        first_social_media_link = self.account_settings_page.get_social_first_element()
+
+        valid_value = 'https://www.twitter.com/edX'
+        if 'face' in first_social_media_link.lower():
+            valid_value = 'https://www.facebook.com/edX'
+        elif 'linked' in first_social_media_link.lower():
+            valid_value = 'https://www.linkedin.com/in/edX'
+
         self._test_text_field(
-            u'social_links',
-            u'Twitter Link',
+            'social_links',
+            first_social_media_link,
             self.social_link,
-            u'www.google.com/invalidlink',
-            [u'https://www.twitter.com/edX', self.social_link],
+            'www.google.com/invalidlink)',
+            [valid_value, self.social_link],
         )
 
     def test_linked_accounts(self):

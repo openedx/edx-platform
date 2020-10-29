@@ -1,5 +1,5 @@
 """Tests for the CORS CSRF version of Django Rest Framework's SessionAuthentication."""
-from __future__ import absolute_import
+
 
 from mock import patch
 
@@ -32,7 +32,7 @@ class CrossDomainAuthTest(TestCase):
 
     def test_perform_csrf_referer_check(self):
         request = self._fake_request()
-        with self.assertRaisesRegexp(PermissionDenied, 'CSRF'):
+        with self.assertRaisesRegex(PermissionDenied, 'CSRF'):
             self.auth.enforce_csrf(request)
 
     @patch.dict(settings.FEATURES, {

@@ -2,7 +2,6 @@
 Tests for the Studio Tagging XBlockAside
 """
 
-from __future__ import absolute_import
 
 import json
 from datetime import datetime
@@ -129,7 +128,7 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
         runtime = TestRuntime(services={'field-data': field_data})
         xblock_aside = StructuredTagsAside(scope_ids=sids, runtime=runtime)
         available_tags = xblock_aside.get_available_tags()
-        self.assertEquals(len(available_tags), 2, "StructuredTagsAside should contains two tag categories")
+        self.assertEqual(len(available_tags), 2, "StructuredTagsAside should contains two tag categories")
 
     def test_preview_html(self):
         """
@@ -150,36 +149,36 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
         tree = etree.parse(StringIO(problem_html), parser)
 
         main_div_nodes = tree.xpath('/html/body/div/section/div')
-        self.assertEquals(len(main_div_nodes), 1)
+        self.assertEqual(len(main_div_nodes), 1)
 
         div_node = main_div_nodes[0]
-        self.assertEquals(div_node.get('data-init'), 'StructuredTagsInit')
-        self.assertEquals(div_node.get('data-runtime-class'), 'PreviewRuntime')
-        self.assertEquals(div_node.get('data-block-type'), 'tagging_aside')
-        self.assertEquals(div_node.get('data-runtime-version'), '1')
+        self.assertEqual(div_node.get('data-init'), 'StructuredTagsInit')
+        self.assertEqual(div_node.get('data-runtime-class'), 'PreviewRuntime')
+        self.assertEqual(div_node.get('data-block-type'), 'tagging_aside')
+        self.assertEqual(div_node.get('data-runtime-version'), '1')
         self.assertIn('xblock_asides-v1', div_node.get('class'))
 
         select_nodes = div_node.xpath("div//select[@multiple='multiple']")
-        self.assertEquals(len(select_nodes), 2)
+        self.assertEqual(len(select_nodes), 2)
 
         select_node1 = select_nodes[0]
-        self.assertEquals(select_node1.get('name'), self.aside_tag_dif)
+        self.assertEqual(select_node1.get('name'), self.aside_tag_dif)
 
         option_nodes1 = select_node1.xpath('option')
-        self.assertEquals(len(option_nodes1), 3)
+        self.assertEqual(len(option_nodes1), 3)
 
         option_values1 = [opt_elem.text for opt_elem in option_nodes1]
-        self.assertEquals(option_values1, ['Easy', 'Hard', 'Medium'])
+        self.assertEqual(option_values1, ['Easy', 'Hard', 'Medium'])
 
         select_node2 = select_nodes[1]
-        self.assertEquals(select_node2.get('name'), self.aside_tag_lo)
-        self.assertEquals(select_node2.get('multiple'), 'multiple')
+        self.assertEqual(select_node2.get('name'), self.aside_tag_lo)
+        self.assertEqual(select_node2.get('multiple'), 'multiple')
 
         option_nodes2 = select_node2.xpath('option')
-        self.assertEquals(len(option_nodes2), 3)
+        self.assertEqual(len(option_nodes2), 3)
 
         option_values2 = [opt_elem.text for opt_elem in option_nodes2 if opt_elem.text]
-        self.assertEquals(option_values2, ['Learned a few things', 'Learned everything', 'Learned nothing'])
+        self.assertEqual(option_values2, ['Learned a few things', 'Learned everything', 'Learned nothing'])
 
         # Now ensure the acid_aside is not in the result
         self.assertNotRegexpMatches(problem_html, r"data-block-type=[\"\']acid_aside[\"\']")

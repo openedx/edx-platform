@@ -1,7 +1,7 @@
 """
 Unit tests for the Mixed Modulestore, with DDT for the various stores (Split, Draft, XML)
 """
-from __future__ import absolute_import
+
 
 import datetime
 import itertools
@@ -284,7 +284,7 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         ).make_usage_key('vertical', 'fake')
         self._create_course(test_course_key)
 
-        self.assertEquals(default, self.store.get_modulestore_type(self.course.id))
+        self.assertEqual(default, self.store.get_modulestore_type(self.course.id))
 
 
 class AsideFoo(XBlockAside):
@@ -462,9 +462,9 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
         blocks = self.store.get_items(self.course.id, qualifiers={'category': 'problem'})
         blocks.append(self.store.get_item(self.problem_x1a_1))
-        self.assertEquals(len(blocks), 7)
+        self.assertEqual(len(blocks), 7)
         for block in blocks:
-            self.assertEquals(block.course_version, course_version)
+            self.assertEqual(block.course_version, course_version)
             # ensure that when the block is retrieved from the runtime cache,
             # the course version is still present
             cached_block = course.runtime.load_item(block.location)
@@ -1069,7 +1069,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             draft_courses = self.store.get_courses(remove_branch=True)
         with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
             published_courses = self.store.get_courses(remove_branch=True)
-        self.assertEquals([c.id for c in draft_courses], [c.id for c in published_courses])
+        self.assertEqual([c.id for c in draft_courses], [c.id for c in published_courses])
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_create_child_detached_tabs(self, default_ms):
@@ -1651,7 +1651,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #    8-9. get vertical, compute inheritance
     #    10-11. get other vertical_x1b (why?) and compute inheritance
     # Split: active_versions & structure
-    @ddt.data((ModuleStoreEnum.Type.mongo, [12, 3], 0), (ModuleStoreEnum.Type.split, [2, 2], 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, [12, 3], 0), (ModuleStoreEnum.Type.split, [3, 2], 0))
     @ddt.unpack
     def test_path_to_location(self, default_ms, num_finds, num_sends):
         """
@@ -2326,7 +2326,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             """
             Asserts the number of problems with the given display name is the given expected number.
             """
-            self.assertEquals(
+            self.assertEqual(
                 len(self.store.get_items(course_key.for_branch(None), settings={'display_name': display_name})),
                 expected_number
             )
@@ -2337,7 +2337,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             """
             # check the display_name of the problem
             problem = self.store.get_item(problem_location)
-            self.assertEquals(problem.display_name, expected_display_name)
+            self.assertEqual(problem.display_name, expected_display_name)
 
             # there should be only 1 problem with the expected_display_name
             assertNumProblems(expected_display_name, 1)
@@ -2392,25 +2392,25 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
         # verify branch setting is published-only in manager
         with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
-            self.assertEquals(self.store.get_branch_setting(), ModuleStoreEnum.Branch.published_only)
+            self.assertEqual(self.store.get_branch_setting(), ModuleStoreEnum.Branch.published_only)
 
         # verify branch setting is draft-preferred in manager
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
-            self.assertEquals(self.store.get_branch_setting(), ModuleStoreEnum.Branch.draft_preferred)
+            self.assertEqual(self.store.get_branch_setting(), ModuleStoreEnum.Branch.draft_preferred)
 
     def verify_default_store(self, store_type):
         """
         Verifies the default_store property
         """
-        self.assertEquals(self.store.default_modulestore.get_modulestore_type(), store_type)
+        self.assertEqual(self.store.default_modulestore.get_modulestore_type(), store_type)
 
         # verify internal helper method
         store = self.store._get_modulestore_for_courselike()  # pylint: disable=protected-access
-        self.assertEquals(store.get_modulestore_type(), store_type)
+        self.assertEqual(store.get_modulestore_type(), store_type)
 
         # verify store used for creating a course
         course = self.store.create_course("org", "course{}".format(uuid4().hex[:5]), "run", self.user_id)
-        self.assertEquals(course.system.modulestore.get_modulestore_type(), store_type)
+        self.assertEqual(course.system.modulestore.get_modulestore_type(), store_type)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_default_store(self, default_ms):
@@ -2444,7 +2444,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self._initialize_mixed(mappings={})
 
         fake_store = "fake"
-        with self.assertRaisesRegexp(Exception, "Cannot find store of type {}".format(fake_store)):
+        with self.assertRaisesRegex(Exception, "Cannot find store of type {}".format(fake_store)):
             with self.store.default_store(fake_store):
                 pass  # pragma: no cover
 
@@ -2783,12 +2783,6 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                     signal_handler.send.assert_not_called()
 
                     self.store.publish(unit.location, self.user_id)
-                    signal_handler.send.assert_not_called()
-
-                    self.store.unpublish(unit.location, self.user_id)
-                    signal_handler.send.assert_not_called()
-
-                    self.store.delete_item(unit.location, self.user_id)
                     signal_handler.send.assert_not_called()
 
                 signal_handler.send.assert_called_with('course_published', course_key=course.id)
@@ -3426,7 +3420,7 @@ class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
                     raise_on_failure=True,
                 )
 
-                self.assertEquals(1, len(courses2))
+                self.assertEqual(1, len(courses2))
 
                 # check that the imported blocks have the right asides and values
                 def check_block(block):
@@ -3524,11 +3518,11 @@ class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
                     raise_on_failure=True,
                 )
 
-                self.assertEquals(1, len(courses2))
+                self.assertEqual(1, len(courses2))
 
                 # check that aside for the new chapter was exported/imported properly
                 chapters = courses2[0].get_children()
-                self.assertEquals(2, len(chapters))
+                self.assertEqual(2, len(chapters))
                 self.assertIn(new_chapter_display_name, [item.display_name for item in chapters])
 
                 found = False
@@ -3539,14 +3533,14 @@ class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
                         self.assertEqual(len(asides), 1)
                         child_aside = asides[0]
                         self.assertIsInstance(child_aside, AsideTestType)
-                        self.assertEquals(child_aside.data_field, 'new value')
+                        self.assertEqual(child_aside.data_field, 'new value')
                         break
 
                 self.assertTrue(found, "new_chapter not found")
 
                 # check that aside for the new problem was exported/imported properly
                 sequence_children = courses2[0].get_children()[0].get_children()[0].get_children()
-                self.assertEquals(2, len(sequence_children))
+                self.assertEqual(2, len(sequence_children))
                 self.assertIn(new_problem_display_name, [item.display_name for item in sequence_children])
 
                 found = False
@@ -3557,8 +3551,8 @@ class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
                         self.assertEqual(len(asides), 1)
                         child_aside = asides[0]
                         self.assertIsInstance(child_aside, AsideTestType)
-                        self.assertEquals(child_aside.data_field, 'new problem value')
-                        self.assertEquals(child_aside.content, 'new content value')
+                        self.assertEqual(child_aside.data_field, 'new problem value')
+                        self.assertEqual(child_aside.content, 'new content value')
                         break
 
                 self.assertTrue(found, "new_chapter not found")
@@ -3722,8 +3716,8 @@ class TestAsidesWithMixedModuleStore(CommonMixedModuleStoreSetup):
         )
 
         asides = published_xblock.runtime.get_asides(published_xblock)
-        self.assertEquals(asides[0].field11, 'new_value11')
-        self.assertEquals(asides[0].field12, 'new_value12')
+        self.assertEqual(asides[0].field11, 'new_value11')
+        self.assertEqual(asides[0].field12, 'new_value12')
 
         # remove item
         self.store.delete_item(published_xblock.location, self.user_id)
@@ -3738,8 +3732,8 @@ class TestAsidesWithMixedModuleStore(CommonMixedModuleStoreSetup):
 
         # check that aside has default values
         asides2 = published_xblock2.runtime.get_asides(published_xblock2)
-        self.assertEquals(asides2[0].field11, 'aside1_default_value1')
-        self.assertEquals(asides2[0].field12, 'aside1_default_value2')
+        self.assertEqual(asides2[0].field11, 'aside1_default_value1')
+        self.assertEqual(asides2[0].field12, 'aside1_default_value2')
 
     @ddt.data((ModuleStoreEnum.Type.mongo, 1, 0), (ModuleStoreEnum.Type.split, 2, 0))
     @XBlockAside.register_temp_plugin(AsideFoo, 'test_aside1')
@@ -3766,8 +3760,8 @@ class TestAsidesWithMixedModuleStore(CommonMixedModuleStoreSetup):
         def _check_asides(item):
             """ Helper function to check asides """
             asides = item.runtime.get_asides(item)
-            self.assertEquals(asides[0].field11, 'new_value11')
-            self.assertEquals(asides[0].field12, 'new_value12')
+            self.assertEqual(asides[0].field11, 'new_value11')
+            self.assertEqual(asides[0].field12, 'new_value12')
 
         # start off as Private
         item = self.store.create_child(self.user_id, self.writable_chapter_location, 'problem',

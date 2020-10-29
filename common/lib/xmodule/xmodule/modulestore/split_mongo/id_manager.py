@@ -3,7 +3,6 @@ An implementation of IdReader and IdGenerator that manages ids for the SplitMong
 mechanism.
 """
 
-from __future__ import absolute_import
 
 from opaque_keys.edx.locator import DefinitionLocator, LocalId
 

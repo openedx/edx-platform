@@ -20,7 +20,7 @@ Modulestore virtual   |          XML physical (draft, published)
              (a, a)   |  (a, a) | (x, a) | (x, x) | (x, y) | (a, x)
              (a, b)   |  (a, b) | (x, b) | (x, x) | (x, y) | (a, x)
 """
-from __future__ import absolute_import, print_function
+
 
 import json
 import io

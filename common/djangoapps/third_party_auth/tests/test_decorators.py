@@ -1,7 +1,7 @@
 """
 Tests for third_party_auth decorators.
 """
-from __future__ import absolute_import
+
 
 import unittest
 

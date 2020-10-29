@@ -2,7 +2,6 @@
 Fixture to create a Content Library
 """
 
-from __future__ import absolute_import
 
 import six
 from opaque_keys.edx.keys import CourseKey

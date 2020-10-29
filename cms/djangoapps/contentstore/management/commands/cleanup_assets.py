@@ -2,7 +2,7 @@
 Script for removing all redundant Mac OS metadata files (with filename ".DS_Store"
 or with filename which starts with "._") for all courses
 """
-from __future__ import absolute_import
+
 
 import logging
 

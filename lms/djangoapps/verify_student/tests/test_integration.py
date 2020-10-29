@@ -2,7 +2,6 @@
 Integration tests of the payment flow, including course mode selection.
 """
 
-from __future__ import absolute_import
 
 import six
 from django.urls import reverse

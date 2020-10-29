@@ -1,15 +1,17 @@
-"""Defines serializers used by the Team API."""
-from __future__ import absolute_import
+"""
+Defines serializers used by the Team API.
+"""
+
 
 from copy import deepcopy
 
 import six
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.db.models import Count
 from django_countries import countries
 from rest_framework import serializers
 
+from lms.djangoapps.teams.api import add_team_count, get_team_count_query_set
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.djangoapps.user_api.accounts.serializers import UserReadOnlySerializer
 from openedx.core.lib.api.fields import ExpandableField
@@ -23,7 +25,7 @@ class CountryField(serializers.Field):
 
     COUNTRY_CODES = list(dict(countries).keys())
 
-    def to_representation(self, obj):
+    def to_representation(self, obj):  # pylint: disable=arguments-differ
         """
         Represent the country as a 2-character unicode identifier.
         """
@@ -89,6 +91,7 @@ class CourseTeamSerializer(serializers.ModelSerializer):
             "language",
             "last_activity_at",
             "membership",
+            "organization_protected",
         )
         read_only_fields = ("course_id", "date_created", "discussion_topic_id", "last_activity_at")
 
@@ -107,6 +110,7 @@ class CourseTeamCreationSerializer(serializers.ModelSerializer):
             "topic_id",
             "country",
             "language",
+            "organization_protected",
         )
 
     def create(self, validated_data):
@@ -117,6 +121,7 @@ class CourseTeamCreationSerializer(serializers.ModelSerializer):
             topic_id=validated_data.get("topic_id", ''),
             country=validated_data.get("country", ''),
             language=validated_data.get("language", ''),
+            organization_protected=validated_data.get("organization_protected", False)
         )
         team.save()
         return team
@@ -165,14 +170,15 @@ class MembershipSerializer(serializers.ModelSerializer):
         read_only_fields = ("date_joined", "last_activity_at")
 
 
-class BaseTopicSerializer(serializers.Serializer):
+class BaseTopicSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """Serializes a topic without team_count."""
     description = serializers.CharField()
     name = serializers.CharField()
     id = serializers.CharField()  # pylint: disable=invalid-name
+    type = serializers.CharField()
 
 
-class TopicSerializer(BaseTopicSerializer):
+class TopicSerializer(BaseTopicSerializer):  # pylint: disable=abstract-method
     """
     Adds team_count to the basic topic serializer, checking if team_count
     is already present in the topic data, and if not, querying the CourseTeam
@@ -187,7 +193,11 @@ class TopicSerializer(BaseTopicSerializer):
         if 'team_count' in topic:
             return topic['team_count']
         else:
-            return CourseTeam.objects.filter(course_id=self.context['course_id'], topic_id=topic['id']).count()
+            return get_team_count_query_set(
+                [topic['id']],
+                self.context['course_id'],
+                self.context.get('organization_protection_status')
+            ).count()
 
 
 class BulkTeamCountTopicListSerializer(serializers.ListSerializer):  # pylint: disable=abstract-method
@@ -195,10 +205,10 @@ class BulkTeamCountTopicListSerializer(serializers.ListSerializer):  # pylint: d
     List serializer for efficiently serializing a set of topics.
     """
 
-    def to_representation(self, obj):
+    def to_representation(self, obj):  # pylint: disable=arguments-differ
         """Adds team_count to each topic. """
         data = super(BulkTeamCountTopicListSerializer, self).to_representation(obj)
-        add_team_count(data, self.context["course_id"])
+        add_team_count(data, self.context['course_id'], self.context.get('organization_protection_status'))
         return data
 
 
@@ -209,19 +219,3 @@ class BulkTeamCountTopicSerializer(BaseTopicSerializer):  # pylint: disable=abst
     """
     class Meta(object):
         list_serializer_class = BulkTeamCountTopicListSerializer
-
-
-def add_team_count(topics, course_id):
-    """
-    Helper method to add team_count for a list of topics.
-    This allows for a more efficient single query.
-    """
-    topic_ids = [topic['id'] for topic in topics]
-    teams_per_topic = CourseTeam.objects.filter(
-        course_id=course_id,
-        topic_id__in=topic_ids
-    ).values('topic_id').annotate(team_count=Count('topic_id'))
-
-    topics_to_team_count = {d['topic_id']: d['team_count'] for d in teams_per_topic}
-    for topic in topics:
-        topic['team_count'] = topics_to_team_count.get(topic['id'], 0)

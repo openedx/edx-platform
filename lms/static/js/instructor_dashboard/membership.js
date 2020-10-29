@@ -603,7 +603,7 @@ such that the value can be defined later than this assignment (file load order).
             this.$request_response_error = this.$container.find('.request-response-error');
             this.$enrollment_button.click(function(event) {
                 var sendData;
-                if (!batchEnroll.$reason_field.val()) {
+                if (batchEnroll.$reason_field.length && !batchEnroll.$reason_field.val()) {
                     batchEnroll.fail_with_error(gettext('Reason field should not be left blank.'));
                     return false;
                 }

@@ -1,7 +1,7 @@
 """
 Signal handlers related to discussions.
 """
-from __future__ import absolute_import
+
 
 import logging
 

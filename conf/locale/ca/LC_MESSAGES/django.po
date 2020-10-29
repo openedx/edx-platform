@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Catalan (http://www.transifex.com/open-edx/edx-platform/language/ca/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -13,7 +13,7 @@
 # Sarina Canelake <sarina@edx.org>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Catalan (http://www.transifex.com/open-edx/edx-platform/language/ca/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -23,7 +23,7 @@
 # Xavi Armengol <xarmengol@gmail.com>, 2016
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Catalan (http://www.transifex.com/open-edx/edx-platform/language/ca/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -36,7 +36,7 @@
 # Muhammad Adeel Khan <adeel@edx.org>, 2019
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Catalan (http://www.transifex.com/open-edx/edx-platform/language/ca/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -44,7 +44,7 @@
 # Muhammad Adeel Khan <adeel@edx.org>, 2019
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Catalan (http://www.transifex.com/open-edx/edx-platform/language/ca/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -53,9 +53,9 @@
 # Miquel Oliver <miquel.oliver@upf.edu>, 2016
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Catalan (https://www.transifex.com/open-edx/teams/6205/ca/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # Translators:
 # Waheed Ahmed <waheed@edx.org>, 2019
@@ -64,7 +64,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-15 20:42+0000\n"
+"POT-Creation-Date: 2020-01-12 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Catalan (https://www.transifex.com/open-edx/teams/6205/ca/)\n"
@@ -117,7 +117,8 @@ msgstr "Subsecció"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: common/lib/xmodule/xmodule/unit_block.py
-#: lms/djangoapps/instructor/views/tools.py lms/templates/ccx/schedule.html
+#: lms/djangoapps/instructor/views/tools.py lms/templates/seq_module.html
+#: lms/templates/ccx/schedule.html
 msgid "Unit"
 msgstr "Unitat"
 
@@ -253,7 +254,7 @@ msgid "You're enrolled as an honor code student"
 msgstr "Estàs inscrit como a estudiant de codi d'honor"
 
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -383,11 +384,8 @@ msgstr "Perfil d'usuari"
 msgid "Account recovery"
 msgstr ""
 
-#: cms/templates/login.html cms/templates/register.html
-#: lms/templates/login.html lms/templates/provider_login.html
-#: lms/templates/register-form.html lms/templates/signup_modal.html
+#: lms/templates/provider_login.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
-#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "Clau de pas"
@@ -405,85 +403,20 @@ msgid_plural "%(count)d student accounts were unlocked."
 msgstr[0] ""
 msgstr[1] ""
 
-#: common/djangoapps/student/forms.py
-msgid ""
-"That e-mail address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr ""
-
-#: common/djangoapps/student/forms.py
-msgid ""
-"The user account associated with this e-mail address cannot reset the "
-"password."
-msgstr ""
-
-#: common/djangoapps/student/forms.py
-msgid "Full Name cannot contain the following characters: < >"
-msgstr ""
-
-#: common/djangoapps/student/forms.py
-msgid "A properly formatted e-mail is required"
-msgstr ""
-
-#: common/djangoapps/student/forms.py
-msgid "Your legal name must be a minimum of one character long"
-msgstr ""
-
-#: common/djangoapps/student/forms.py
-#, python-format
-msgid "Email cannot be more than %(limit_value)s characters long"
-msgstr ""
-
-#: common/djangoapps/student/forms.py
-msgid "You must accept the terms of service."
-msgstr "Has d'acceptar els termes del servei."
-
-#: common/djangoapps/student/forms.py
-msgid "A level of education is required"
-msgstr "Es requereix un nivell educatiu"
-
-#: common/djangoapps/student/forms.py
-msgid "Your gender is required"
-msgstr ""
-
-#: common/djangoapps/student/forms.py
-msgid "Your year of birth is required"
-msgstr "Es requereix el seu any de naixement"
-
-#: common/djangoapps/student/forms.py
-msgid "Your mailing address is required"
-msgstr ""
-
-#: common/djangoapps/student/forms.py
-msgid "A description of your goals is required"
-msgstr ""
-
-#: common/djangoapps/student/forms.py
-msgid "A city is required"
-msgstr ""
-
-#: common/djangoapps/student/forms.py
-msgid "A country is required"
-msgstr "Es requereix un país"
-
-#: common/djangoapps/student/forms.py
-msgid "To enroll, you must follow the honor code."
-msgstr "Per inscriure't has de seguir el codi d'honor."
-
-#: common/djangoapps/student/forms.py
-msgid "You are missing one or more required fields"
-msgstr ""
-
-#: common/djangoapps/student/forms.py
-msgid "Unauthorized email address."
-msgstr ""
-
-#: common/djangoapps/student/forms.py
-#: common/djangoapps/student/views/management.py
+#: common/djangoapps/student/admin.py
 #, python-brace-format
 msgid ""
-"It looks like {email} belongs to an existing account. Try again with a "
-"different email address."
+"Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' in"
+" SiteConfiguration model's values field."
+msgstr ""
+
+#: common/djangoapps/student/admin.py
+#, python-brace-format
+msgid "Email doesn't have {domain_name} domain name."
+msgstr ""
+
+#: common/djangoapps/student/admin.py
+msgid "User with this email doesn't exist in system."
 msgstr ""
 
 #: common/djangoapps/student/helpers.py
@@ -721,6 +654,14 @@ msgid "Name of the affiliate cookie"
 msgstr "Nom de la cookie d'afiliació"
 
 #: common/djangoapps/student/models.py
+msgid ""
+"It expect that the data will be provided in a csv file format with"
+"                     first row being the header and columns will be as "
+"follows:                     user_id, username, email, course_id, "
+"is_verified, verification_date"
+msgstr ""
+
+#: common/djangoapps/student/models.py
 msgid "Name of this user attribute."
 msgstr ""
 
@@ -734,6 +675,14 @@ msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Secondary email address to recover linked account."
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid ""
+"An employee (a user whose email has current site's domain name) whose email "
+"exists in this model, can be able to login from login screen through email "
+"and password. And if any employee's email doesn't exist in this model then "
+"that employee can login via third party authentication backend only."
 msgstr ""
 
 #: common/djangoapps/student/views/dashboard.py
@@ -802,14 +751,6 @@ msgstr "Els curs que estàs buscant no comença fins {date}."
 #, python-brace-format
 msgid "The course you are looking for is closed for enrollment as of {date}."
 msgstr "El curs que estàs buscant té tancades les incripcions des de {date}."
-
-#: common/djangoapps/student/views/management.py
-msgid "No inactive user with this e-mail exists"
-msgstr "No existeix cap usuari inactiu amb aquest email."
-
-#: common/djangoapps/student/views/management.py
-msgid "Unable to send reactivation email"
-msgstr "No s'ha pogut enviar l'email de reactivació"
 
 #: common/djangoapps/student/views/management.py
 msgid "Course id not specified"
@@ -890,38 +831,6 @@ msgid ""
 msgstr ""
 
 #: common/djangoapps/student/views/management.py
-msgid ""
-"Your previous request is in progress, please try again in a few moments."
-msgstr ""
-
-#: common/djangoapps/student/views/management.py
-msgid "Some error occured during password change. Please try again"
-msgstr ""
-
-#: common/djangoapps/student/views/management.py
-msgid "No email address provided."
-msgstr ""
-
-#: common/djangoapps/student/views/management.py
-msgid "Password reset unsuccessful"
-msgstr ""
-
-#: common/djangoapps/student/views/management.py
-msgid "Error in resetting your password."
-msgstr ""
-
-#: common/djangoapps/student/views/management.py
-msgid "Error in resetting your password. Please try again."
-msgstr ""
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid ""
-"{html_start}Password Creation Complete{html_end}Your password has been "
-"created. {bold_start}{email}{bold_end} is now your primary login email."
-msgstr ""
-
-#: common/djangoapps/student/views/management.py
 msgid "Valid e-mail address required."
 msgstr "Es requereix una adreça d'email vàlida."
 
@@ -931,6 +840,14 @@ msgstr "L'adreça d'email antiga és la mateixa que la nova."
 
 #: common/djangoapps/student/views/management.py
 msgid "Cannot be same as your sign in email address."
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid ""
+"It looks like {email} belongs to an existing account. Try again with a "
+"different email address."
 msgstr ""
 
 #: common/djangoapps/student/views/management.py
@@ -1917,8 +1834,8 @@ msgstr ""
 #. Translators: this is the last choice of a number of choices of how to log
 #. in
 #. to the site.
-#: common/lib/capa/capa/responsetypes.py lms/templates/login.html
-#: lms/templates/register-form.html lms/templates/course_modes/choose.html
+#: common/lib/capa/capa/responsetypes.py
+#: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "or"
@@ -2298,7 +2215,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
 #: cms/templates/index.html cms/templates/videos_index_pagination.html
-#: lms/templates/manage_user_standing.html lms/templates/register-shib.html
+#: lms/templates/manage_user_standing.html
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
@@ -4532,6 +4449,65 @@ msgstr ""
 msgid "Close"
 msgstr "Tancar"
 
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#, python-format
+msgid ""
+"This is a routed Account Activation email for %(routed_user)s "
+"(%(routed_user_email)s): %(routed_profile_name)s"
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+msgid "Account Activation"
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#: common/templates/student/edx_ace/accountactivation/email/body.txt
+#, python-format
+msgid ""
+"You're almost there! Use the link below to activate your account to access "
+"engaging, high-quality %(platform_name)s courses. Note that you will not be "
+"able to log back into your account until you have activated it."
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+msgid "Activate Your Account"
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#: common/templates/student/edx_ace/accountactivation/email/body.txt
+#, python-format
+msgid "Enjoy learning with %(platform_name)s."
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#, python-format, python-brace-format
+msgid ""
+"If you need help, please use our web form at "
+"{start_anchor_web}%(support_url)s{end_anchor} or email "
+"{start_anchor_email}%(support_email)s{end_anchor}."
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#: common/templates/student/edx_ace/accountactivation/email/body.txt
+#, python-format
+msgid ""
+"This email message was automatically sent by %(lms_url)s because someone "
+"attempted to create an account on %(platform_name)s using this email "
+"address."
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.txt
+#, python-format
+msgid ""
+"If you need help, please use our web form at %(support_url)s or email "
+"%(support_email)s."
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/subject.txt
+#, python-format
+msgid "Action Required: Activate your %(platform_name)s account"
+msgstr ""
+
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 msgid "Create Password"
 msgstr ""
@@ -4562,20 +4538,20 @@ msgstr ""
 
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 #: common/templates/student/edx_ace/accountrecovery/email/body.txt
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
 msgid ""
 "If you didn't request this change, you can disregard this email - we have "
 "not yet reset your password."
 msgstr ""
 
 #: common/templates/student/edx_ace/accountrecovery/email/body.txt
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
 msgid "Thanks for using our site!"
 msgstr "Gràcies per utilitzar el nostre lloc!"
 
 #: common/templates/student/edx_ace/accountrecovery/email/body.txt
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
 #, python-format
 msgid "The %(platform_name)s Team"
 msgstr "L'equip de %(platform_name)s "
@@ -4642,44 +4618,6 @@ msgstr ""
 "Mantenim un registre d'antics correus electrònics, de manera que si aquesta "
 "sol·licitud no era intencionada, podem investigar."
 
-#: lms/templates/forgot_password_modal.html
-msgid "Password Reset"
-msgstr "Restabliment de contrasenya"
-
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
-#, python-format
-msgid ""
-"You're receiving this e-mail because you requested a password reset for your"
-" user account at %(platform_name)s."
-msgstr ""
-
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
-#, python-format
-msgid ""
-"However, there is currently no user account associated with your email "
-"address: %(email_address)s."
-msgstr ""
-
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
-msgid "If you did not request this change, you can ignore this email."
-msgstr ""
-
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-msgid "Change my Password"
-msgstr ""
-
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
-msgid "Please go to the following page and choose a new password:"
-msgstr "Si us plau, vés a la pàgina següent i indica una nova contrasenya:"
-
-#: common/templates/student/edx_ace/passwordreset/email/subject.txt
-#, python-format
-msgid "Password reset on %(platform_name)s"
-msgstr ""
-
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
 msgid "Create Recovery Email"
 msgstr ""
@@ -4700,7 +4638,7 @@ msgstr ""
 #. Translators: This label appears above a field on the registration form
 #. meant to confirm the user's email address.
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Confirm Email"
 msgstr ""
 
@@ -5432,7 +5370,7 @@ msgid ""
 "this request, please visit the link(s) below."
 msgstr ""
 
-#: lms/djangoapps/commerce/views.py lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/commerce/views.py
 msgid "Receipt"
 msgstr ""
 
@@ -5912,7 +5850,7 @@ msgid "Annual Household Income"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
-msgid "Use between 250 and 500 words or so in your response."
+msgid "Use between 1250 and 2500 characters or so in your response."
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
@@ -6163,6 +6101,10 @@ msgstr ""
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/subject.txt
 #, python-format
 msgid "Response to %(thread_title)s"
+msgstr ""
+
+#: lms/djangoapps/discussion/views.py
+msgid "Access to this discussion is restricted to team members and staff."
 msgstr ""
 
 #: lms/djangoapps/edxnotes/helpers.py
@@ -6449,15 +6391,18 @@ msgid "User ID"
 msgstr ""
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a field on the password reset
-#. form meant to hold the user's email address.
 #. Translators: This label appears above a field on the login form
 #. meant to hold the user's email address.
+#. Translators: This label appears above a field on the password reset
+#. form meant to hold the user's email address.
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's email address.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: openedx/core/djangoapps/user_api/api.py lms/templates/ccx/enrollment.html
+#: openedx/core/djangoapps/user_authn/views/login_form.py
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Email"
 msgstr "Email"
@@ -6475,7 +6420,7 @@ msgstr ""
 msgid "Birth Year"
 msgstr ""
 
-#: lms/templates/register-form.html lms/templates/signup_modal.html
+#: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Gender"
 msgstr "Gènere"
@@ -6485,7 +6430,6 @@ msgstr "Gènere"
 msgid "Level of Education"
 msgstr "Nivell Educatiu"
 
-#: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Mailing Address"
 msgstr "Adreça de correu"
@@ -6504,14 +6448,22 @@ msgid "Verification Status"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Last Login"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Date Joined"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Team"
 msgstr ""
 
-#: lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -6520,7 +6472,6 @@ msgstr "Ciutat"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -6555,7 +6506,7 @@ msgstr "Identificador del Curs"
 msgid "% Discount"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/shoppingcart/reports.py
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -6612,11 +6563,6 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Unable to generate redeem codes because of course misconfiguration."
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/shoppingcart/models.py
-msgid "pdf download unavailable right now, please contact support."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -7049,8 +6995,7 @@ msgstr ""
 #. meant to hold the user's full name.
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/api.py cms/templates/register.html
-#: lms/templates/register-form.html lms/templates/register-shib.html
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -7180,7 +7125,7 @@ msgstr ""
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "First Name"
 msgstr ""
 
@@ -7188,7 +7133,7 @@ msgstr ""
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Last Name"
 msgstr ""
 
@@ -7202,12 +7147,11 @@ msgstr "Nom de la companyia"
 #. which allows the user to input the Title
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_api/api.py wiki/forms.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py wiki/forms.py
 #: wiki/templates/wiki/dir.html
 msgid "Title"
 msgstr "Títol"
 
-#: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Year of Birth"
 msgstr "Any de naixement"
@@ -7410,6 +7354,18 @@ msgstr ""
 #, python-brace-format
 msgid " (out of {total})"
 msgstr ""
+
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/learner_dashboard/programs.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Programs"
+msgstr "Programes"
+
+#: lms/templates/learner_dashboard/program_details.html
+msgid "Program Details"
+msgstr "Detalls del programa"
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
@@ -7624,75 +7580,6 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
 msgid "Donation for {platform_name}"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#, python-brace-format
-msgid "Page {page_number} of {page_count}"
-msgstr ""
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Invoice"
-msgstr "Factura"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Order"
-msgstr "Comanda"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#, python-brace-format
-msgid "{id_label} # {item_id}"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Date: {date}"
-msgstr "Data: {date}"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/djangoapps/shoppingcart/reports.py
-msgid "Quantity"
-msgstr "Quantitat"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid ""
-"List Price\n"
-"per item"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid ""
-"Discount\n"
-"per item"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Amount"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/templates/courseware/gradebook.html
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "Total"
-msgstr "Total"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Payment Received"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Balance"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Billing Address"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Disclaimer"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "TERMS AND CONDITIONS"
 msgstr ""
 
 #. Translators: this text appears when an unfamiliar error code occurs during
@@ -8069,6 +7956,10 @@ msgid "Order ID"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/reports.py
+msgid "Quantity"
+msgstr "Quantitat"
+
+#: lms/djangoapps/shoppingcart/reports.py
 msgid "Unit Cost"
 msgstr ""
 
@@ -8346,12 +8237,12 @@ msgid "Teams"
 msgstr "Equips"
 
 #: lms/djangoapps/teams/views.py
-#, python-brace-format
-msgid "The supplied course id {course_id} is not valid."
+msgid "course_id must be provided"
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
-msgid "course_id must be provided"
+#, python-brace-format
+msgid "The supplied course id {course_id} is not valid."
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
@@ -8386,6 +8277,10 @@ msgid "You are already in a team in this course."
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
+msgid "You can't create a team in an instructor managed topic."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
 msgid "username or team_id must be specified."
 msgstr ""
 
@@ -8402,6 +8297,10 @@ msgid "This team is already full."
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
+msgid "You can't join an instructor managed team."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
 #, python-brace-format
 msgid "The user {username} is already a member of a team in this course."
 msgstr ""
@@ -8410,6 +8309,10 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "The user {username} is not enrolled in the course associated with this team."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "You can't leave an instructor managed team."
 msgstr ""
 
 #: lms/djangoapps/verify_student/models.py
@@ -8848,6 +8751,17 @@ msgid "Signed Out"
 msgstr ""
 
 #: lms/templates/logout.html
+msgid "We are signing you in."
+msgstr ""
+
+#: lms/templates/logout.html
+msgid ""
+"\n"
+"              This may take a minute. If you are not redirected, go to the home page.\n"
+"            "
+msgstr ""
+
+#: lms/templates/logout.html
 msgid "You have signed out."
 msgstr ""
 
@@ -8886,9 +8800,6 @@ msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
 #: openedx/core/djangoapps/user_api/admin.py
-#: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: cms/templates/videos_index_pagination.html
 msgid "Cancel"
 msgstr "Cancel·lar"
 
@@ -9450,8 +9361,6 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: cms/templates/login.html cms/templates/widgets/header.html
-#: themes/red-theme/cms/templates/login.html
 msgid "Sign In"
 msgstr "Accedeix"
 
@@ -9500,6 +9409,10 @@ msgstr ""
 msgid "Our mailing address is"
 msgstr ""
 
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+msgid "Unsubscribe from these emails."
+msgstr ""
+
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_head.html
 msgid "edX Email"
 msgstr ""
@@ -9515,8 +9428,6 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
-#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.html
-#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.txt
 msgid "Upgrade Now"
 msgstr ""
 
@@ -10116,10 +10027,10 @@ msgid "Welcome to week %(week_num)s of %(course_name)s!"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
-#, python-format, python-brace-format
+#, python-brace-format
 msgid ""
-"We hope you're enjoying {start_strong}%(course_name)s{end_strong}! We want "
-"to let you know what you can look forward to in week %(week_num)s:"
+"We hope you're enjoying {start_strong}{course_name}{end_strong}! We want to "
+"let you know what you can look forward to in week {week_num}:"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
@@ -10170,11 +10081,11 @@ msgid "Keep up the momentum!"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
-#, python-format, python-brace-format
+#, python-brace-format
 msgid ""
-"Many %(platform_name)s learners in {start_strong}%(course_name)s{end_strong}"
-" are completing more problems every week, and participating in the "
-"discussion forums. What do you want to do to keep learning?"
+"Many {platform_name} learners in {start_strong}{course_name}{end_strong} are"
+" completing more problems every week, and participating in the discussion "
+"forums. What do you want to do to keep learning?"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
@@ -10204,19 +10115,19 @@ msgid "Keep learning today"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
-#, python-format, python-brace-format
+#, python-brace-format
 msgid ""
-"Remember when you enrolled in {start_strong}%(course_name)s{end_strong}, and"
-" other courses on %(platform_name)s? We do, and we’re glad to have you! Come"
-" see what everyone is learning."
+"Remember when you enrolled in {start_strong}{course_name}{end_strong}, and "
+"other courses on {platform_name}? We do, and we’re glad to have you! Come "
+"see what everyone is learning."
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
-#, python-format, python-brace-format
+#, python-brace-format
 msgid ""
-"Remember when you enrolled in {start_strong}%(course_name)s{end_strong} on "
-"%(platform_name)s? We do, and we’re glad to have you! Come see what everyone"
-" is learning."
+"Remember when you enrolled in {start_strong}{course_name}{end_strong} on "
+"{platform_name}? We do, and we’re glad to have you! Come see what everyone "
+"is learning."
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
@@ -10269,11 +10180,11 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
-#, python-format, python-brace-format
+#, python-brace-format
 msgid ""
 "We hope you are enjoying learning with us so far in "
-"{start_strong}%(first_course_name)s{end_strong}! A verified certificate "
-"allows you to highlight your new knowledge and skills. An %(platform_name)s "
+"{start_strong}{first_course_name}{end_strong}! A verified certificate allows"
+" you to highlight your new knowledge and skills. An {platform_name} "
 "certificate is official and easily shareable."
 msgstr ""
 
@@ -10422,32 +10333,25 @@ msgstr ""
 msgid "The '{field_name}' field cannot be edited."
 msgstr ""
 
-#: openedx/core/djangoapps/user_api/accounts/api.py
-#: openedx/core/djangoapps/user_api/views.py
-#: openedx/core/djangoapps/user_authn/views/auto_auth.py
-#: openedx/core/djangoapps/user_authn/views/deprecated.py
-msgid "Account creation not allowed."
-msgstr ""
-
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the State/Province/Region in which they
 #. live.
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "State/Province/Region"
 msgstr ""
 
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the Company
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Company"
 msgstr ""
 
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the Job Title
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Job Title"
 msgstr ""
 
@@ -10458,7 +10362,7 @@ msgstr "Adreça de correu"
 #. Translators: This phrase appears above a field on the registration form
 #. meant to hold the user's reasons for registering with edX.
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 #, python-brace-format
 msgid "Tell us why you're interested in {platform_name}"
 msgstr ""
@@ -10466,14 +10370,14 @@ msgstr ""
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's profession
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Profession"
 msgstr ""
 
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's specialty
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Specialty"
 msgstr ""
 
@@ -10517,116 +10421,6 @@ msgstr "Éxit"
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Actions"
 msgstr "Accions"
-
-#. Translators: This example email address is used as a placeholder in
-#. a field on the password reset form meant to hold the user's email address.
-#. Translators: This example email address is used as a placeholder in
-#. a field on the login form meant to hold the user's email address.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "username@domain.com"
-msgstr ""
-
-#. Translators: These instructions appear on the password reset form,
-#. immediately below a field meant to hold the user's email address.
-#. Translators: These instructions appear on the login form, immediately
-#. below a field meant to hold the user's email address.
-#: openedx/core/djangoapps/user_api/api.py
-#, python-brace-format
-msgid "The email address you used to register with {platform_name}"
-msgstr ""
-
-#. Translators: These instructions appear on the registration form,
-#. immediately
-#. below a field meant to hold the user's email address.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "This is what you will use to login."
-msgstr ""
-
-#. Translators: These instructions appear on the registration form,
-#. immediately
-#. below a field meant to hold the user's full name.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "This name will be used on any certificates that you earn."
-msgstr ""
-
-#: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Public Username"
-msgstr "Nom d'usuari públic"
-
-#. Translators: These instructions appear on the registration form,
-#. immediately
-#. below a field meant to hold the user's public username.
-#: openedx/core/djangoapps/user_api/api.py
-msgid ""
-"The name that will identify you in your courses. It cannot be changed later."
-msgstr ""
-
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's highest completed level of education.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Highest level of education completed"
-msgstr "Nivell educatiu més alt finalitzat"
-
-#: lms/templates/signup_modal.html
-msgid "Year of birth"
-msgstr "Any de naixement"
-
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the country in which the user lives.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Country or Region of Residence"
-msgstr ""
-
-#. Translators: These instructions appear on the registration form,
-#. immediately
-#. below a field meant to hold the user's country.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "The country or region where you live."
-msgstr ""
-
-#. Translators: This is a legal document users must agree to
-#. in order to register a new account.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Terms of Service and Honor Code"
-msgstr "Termes de Servei i Codi d'Honor"
-
-#: openedx/core/djangoapps/user_api/api.py
-#, python-brace-format
-msgid ""
-"I agree to the {platform_name} "
-"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
-msgstr ""
-
-#. Translators: "Terms of Service" is a legal document users must agree to
-#. in order to register a new account.
-#. Translators: "Terms of service" is a legal document users must agree to
-#. in order to register a new account.
-#: openedx/core/djangoapps/user_api/api.py
-#, python-brace-format
-msgid "You must agree to the {platform_name} {terms_of_service}"
-msgstr ""
-
-#: openedx/core/djangoapps/user_api/api.py
-#, python-brace-format
-msgid ""
-"By creating an account, you agree to the                   "
-"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
-"                   and you acknowledge that {platform_name} and each Member "
-"process your personal data in accordance                   with the "
-"{privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
-msgstr ""
-
-#. Translators: "Terms of service" is a legal document users must agree to
-#. in order to register a new account.
-#: openedx/core/djangoapps/user_api/api.py
-#, python-brace-format
-msgid ""
-"I agree to the {platform_name} "
-"{tos_link_start}{terms_of_service}{tos_link_end}"
-msgstr ""
 
 #: openedx/core/djangoapps/user_api/config/waffle.py
 msgid "System maintenance in progress. Please try again later."
@@ -10710,12 +10504,55 @@ msgstr ""
 msgid "Your Account Has Been Queued For Deletion"
 msgstr ""
 
+#: lms/templates/forgot_password_modal.html
+msgid "Password Reset"
+msgstr "Restabliment de contrasenya"
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
+#, python-format
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your"
+" user account at %(platform_name)s."
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
+#, python-format
+msgid ""
+"However, there is currently no user account associated with your email "
+"address: %(email_address)s."
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
+msgid "If you did not request this change, you can ignore this email."
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
+msgid "Change my Password"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
+msgid "Please go to the following page and choose a new password:"
+msgstr "Si us plau, vés a la pàgina següent i indica una nova contrasenya:"
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/subject.txt
+#, python-format
+msgid "Password reset on %(platform_name)s"
+msgstr ""
+
 #: openedx/core/djangoapps/user_authn/views/auto_auth.py
 msgid "Superuser creation not allowed"
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/auto_auth.py
 msgid "Account modification not allowed."
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/auto_auth.py
+#: openedx/core/djangoapps/user_authn/views/register.py
+msgid "Account creation not allowed."
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
@@ -10730,7 +10567,6 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
-#: lms/templates/register-form.html
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
@@ -10757,8 +10593,79 @@ msgstr ""
 msgid "Too many failed login attempts. Try again later."
 msgstr "Massa errors per entrar. Prova-ho de nou més tard."
 
+#: openedx/core/djangoapps/user_authn/views/login.py
+#, python-brace-format
+msgid ""
+"As an {allowed_domain} user, You must login with your {allowed_domain} "
+"{provider} account."
+msgstr ""
+
+#. Translators: This example email address is used as a placeholder in
+#. a field on the login form meant to hold the user's email address.
+#. Translators: This example email address is used as a placeholder in
+#. a field on the password reset form meant to hold the user's email address.
+#: openedx/core/djangoapps/user_authn/views/login_form.py
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "username@domain.com"
+msgstr ""
+
+#. Translators: These instructions appear on the login form, immediately
+#. below a field meant to hold the user's email address.
+#. Translators: These instructions appear on the password reset form,
+#. immediately below a field meant to hold the user's email address.
+#. pylint: disable=no-member
+#: openedx/core/djangoapps/user_authn/views/login_form.py
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+#, python-brace-format
+msgid "The email address you used to register with {platform_name}"
+msgstr ""
+
 #: openedx/core/djangoapps/user_authn/views/login_form.py
 msgid "Create Account"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"The user account associated with this e-mail address cannot reset the "
+"password."
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "Password reset unsuccessful"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "Error in resetting your password."
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "Error in resetting your password. Please try again."
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+#, python-brace-format
+msgid ""
+"{html_start}Password Creation Complete{html_end}Your password has been "
+"created. {bold_start}{email}{bold_end} is now your primary login email."
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"Your previous request is in progress, please try again in a few moments."
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "Some error occured during password change. Please try again"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "No email address provided."
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/register.py
@@ -10776,6 +10683,159 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/register.py
 msgid "The provided access_token is not valid."
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Full Name cannot contain the following characters: < >"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A properly formatted e-mail is required"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your legal name must be a minimum of one character long"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-format
+msgid "Email cannot be more than %(limit_value)s characters long"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "You must accept the terms of service."
+msgstr "Has d'acceptar els termes del servei."
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A level of education is required"
+msgstr "Es requereix un nivell educatiu"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your gender is required"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your year of birth is required"
+msgstr "Es requereix el seu any de naixement"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your mailing address is required"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A description of your goals is required"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A city is required"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A country is required"
+msgstr "Es requereix un país"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "To enroll, you must follow the honor code."
+msgstr "Per inscriure't has de seguir el codi d'honor."
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "You are missing one or more required fields"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Unauthorized email address."
+msgstr ""
+
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's email address.
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "This is what you will use to login."
+msgstr ""
+
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's full name.
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "This name will be used on any certificates that you earn."
+msgstr ""
+
+#: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Public Username"
+msgstr "Nom d'usuari públic"
+
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's public username.
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid ""
+"The name that will identify you in your courses. It cannot be changed later."
+msgstr ""
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's highest completed level of education.
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Highest level of education completed"
+msgstr "Nivell educatiu més alt finalitzat"
+
+#: lms/templates/signup_modal.html
+msgid "Year of birth"
+msgstr "Any de naixement"
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the country in which the user lives.
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Country or Region of Residence"
+msgstr ""
+
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's country.
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "The country or region where you live."
+msgstr ""
+
+#. Translators: This is a legal document users must agree to
+#. in order to register a new account.
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Terms of Service and Honor Code"
+msgstr "Termes de Servei i Codi d'Honor"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid ""
+"I agree to the {platform_name} "
+"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
+msgstr ""
+
+#. Translators: "Terms of Service" is a legal document users must agree to
+#. in order to register a new account.
+#. Translators: "Terms of service" is a legal document users must agree to
+#. in order to register a new account.
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid "You must agree to the {platform_name} {terms_of_service}"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid ""
+"By creating an account, you agree to the                   "
+"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
+"                   and you acknowledge that {platform_name} and each Member "
+"process your personal data in accordance                   with the "
+"{privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
+msgstr ""
+
+#. Translators: "Terms of service" is a legal document users must agree to
+#. in order to register a new account.
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid ""
+"I agree to the {platform_name} "
+"{tos_link_start}{terms_of_service}{tos_link_end}"
 msgstr ""
 
 #: openedx/core/djangoapps/util/user_messages.py
@@ -10817,6 +10877,16 @@ msgstr ""
 
 #: openedx/core/djangoapps/waffle_utils/models.py
 msgid "Force Off"
+msgstr ""
+
+#: openedx/core/djangoapps/xblock/runtime/mixin.py
+msgid ""
+"This content is only accessible to registered learners. Sign in or register "
+"to view it."
+msgstr ""
+
+#: openedx/core/djangoapps/xblock/runtime/mixin.py
+msgid "This content is only accessible to enrolled learners. "
 msgstr ""
 
 #: openedx/core/lib/api/view_utils.py
@@ -10927,10 +10997,6 @@ msgid "enabled_as_of must be set when enabled is True"
 msgstr ""
 
 #: openedx/features/content_type_gating/partitions.py
-msgid "Feature-based Enrollments"
-msgstr ""
-
-#: openedx/features/content_type_gating/partitions.py
 msgid "Partition for segmenting users by access to gated content types"
 msgstr ""
 
@@ -10996,45 +11062,6 @@ msgid ""
 "{expiration_date}{span_close}{a_close}"
 msgstr ""
 
-#: openedx/features/course_duration_limits/resolvers.py
-msgid "%b. %d, %Y"
-msgstr ""
-
-#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.html
-#, python-format
-msgid ""
-"We hope you have enjoyed %(first_course_name)s! You lose all access to this "
-"course in %(time_until_expiration)s."
-msgstr ""
-
-#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.html
-#, python-format
-msgid ""
-"We hope you have enjoyed %(first_course_name)s! You lose all access to this "
-"course, including your progress, on %(first_course_expiration_date)s "
-"(%(time_until_expiration)s)."
-msgstr ""
-
-#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.html
-msgid ""
-"Upgrade now to get unlimited access and for the chance to earn a verified "
-"certificate."
-msgstr ""
-
-#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.txt
-#, python-format
-msgid ""
-"We hope you have enjoyed %(first_course_name)s! You lose all access to this "
-"course, including your progress, on %(first_course_expiration_date)s "
-"(%(time_until_expiration)s). Upgrade now to get unlimited access and for the"
-" chance to earn a verified certificate."
-msgstr ""
-
-#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/subject.txt
-#, python-format
-msgid "Upgrade to keep your access to %(first_course_name)s"
-msgstr ""
-
 #: cms/templates/widgets/header.html
 #: lms/templates/api_admin/terms_of_service.html
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
@@ -11044,13 +11071,6 @@ msgstr "Actualitzacions"
 #: openedx/features/course_experience/templates/course_experience/course-reviews-fragment.html
 msgid "Reviews"
 msgstr "Revisions"
-
-#: openedx/features/course_experience/utils.py
-#, no-python-format, python-brace-format
-msgid ""
-"{banner_open}{percentage}% off your first upgrade.{span_close} Discount "
-"automatically applied.{div_close}"
-msgstr ""
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
@@ -11115,6 +11135,15 @@ msgid ""
 "then that course will be Disabled only if the org that it is in is Disabled."
 msgstr ""
 
+#: openedx/features/discounts/admin.py
+msgid ""
+"These define the context to configure the percentage for the first purchase "
+"discount.If multiple contexts apply to a course (for example, if "
+"configuration is specified for the course specifically, and for the org that"
+" the course is in, then the more specific context overrides the more general"
+" context."
+msgstr ""
+
 #: openedx/features/discounts/models.py
 msgid "Disabled"
 msgstr ""
@@ -11124,6 +11153,14 @@ msgstr ""
 msgid ""
 "{s_sr}Original price: {s_op}{original_price}{e_p}, discount price: "
 "{e_sr}{formatted_discount_price}"
+msgstr ""
+
+#: openedx/features/discounts/utils.py
+#, no-python-format, python-brace-format
+msgid ""
+"{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% "
+"[{strikeout_price}]{span_close}{br}Use code {b_open}{code}{b_close} at "
+"checkout! {a_open}Upgrade Now{a_close}{div_close}"
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py
@@ -11973,6 +12010,11 @@ msgstr "Nombre del curs"
 msgid "Course Outline"
 msgstr "Esquema del curs"
 
+#: cms/templates/course_outline.html
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Warning"
+msgstr ""
+
 #: cms/templates/html_error.html lms/templates/module-error.html
 msgid "Error:"
 msgstr "Error:"
@@ -12004,59 +12046,11 @@ msgstr "Curs d'execució:"
 msgid "Courses"
 msgstr "Cursos"
 
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Sign In to {studio_name}"
-msgstr "Accediu a {studio_name}"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr "No tens un compte {studio_name}? Registra't!"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Required Information to Sign In to {studio_name}"
-msgstr "Informació obligatòria per iniciar la sessió a {studio_name}"
-
-#: cms/templates/login.html cms/templates/register.html
-#: lms/templates/login.html lms/templates/provider_login.html
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/signup_modal.html themes/red-theme/cms/templates/login.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "E-mail"
-msgstr "Correu electrònic"
-
-#. Translators: This is the placeholder text for a field that requests an
-#. email
-#. address.
-#: cms/templates/login.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html cms/templates/register.html
-#: lms/templates/login.html lms/templates/register-form.html
-#: lms/templates/register-shib.html themes/red-theme/cms/templates/login.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr "exemple:nomusuari@domini.com"
-
-#: cms/templates/login.html lms/templates/login.html
-#: themes/red-theme/cms/templates/login.html
-msgid "Forgot password?"
-msgstr "Heu oblidat la clau de pas?"
-
-#. Translators: This is the placeholder text for a field that requests the
-#. user's full name.
-#: cms/templates/register.html lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "example: Jane Doe"
-msgstr "exemple: Joana Martí"
-
-#. Translators: This is the placeholder text for a field that asks the user to
-#. pick a username
-#: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "example: JaneDoe"
-msgstr "exemple: JoanaMarti"
 
 #: cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
@@ -12282,6 +12276,16 @@ msgstr "Nou formulari de tema"
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
 msgid "Discussion thread list"
 msgstr "Llista de fil de debat"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_private_fragment.html
+msgid "Private Discussion"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_private_fragment.html
+msgid ""
+"This is a private discussion. You do not have permissions to view this "
+"discussion"
+msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/discussion/_user_profile.html
@@ -12535,8 +12539,7 @@ msgstr ""
 "Introduïu la vostra adreça de correu electrònic a continuació i us enviarem "
 "instruccions per enviar una nova contrasenya."
 
-#: lms/templates/forgot_password_modal.html lms/templates/login.html
-#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/forgot_password_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -12551,7 +12554,7 @@ msgstr "Informació obligatòria"
 msgid "Your E-mail Address"
 msgstr "La vostra adreça de correu electrònic"
 
-#: lms/templates/forgot_password_modal.html lms/templates/login.html
+#: lms/templates/forgot_password_modal.html
 msgid "This is the e-mail address you used to register with {platform}"
 msgstr ""
 "Aquesta és l'adreça de correu electrònic que vau utilitzar per registrar-vos"
@@ -12598,7 +12601,7 @@ msgstr ""
 msgid "Search for a course"
 msgstr "Cerca un curs"
 
-#: lms/templates/index_overlay.html lms/templates/register-sidebar.html
+#: lms/templates/index_overlay.html
 msgid "Welcome to {platform_name}"
 msgstr "Benvingut a {platform_name}"
 
@@ -12651,89 +12654,6 @@ msgstr[1] ""
 "Mostrant tot el contingut coincident que es pot afegir a {display_name}. A "
 "cada estudiant se'ls assignarà {max_count} components dibuixats a l'atzar "
 "d'aquesta llista."
-
-#: lms/templates/login-sidebar.html
-msgid "Helpful Information"
-msgstr "Informació útil"
-
-#: lms/templates/login-sidebar.html
-msgid "Not Enrolled?"
-msgstr "No esteu inscrit?"
-
-#: lms/templates/login-sidebar.html
-msgid "Sign up for {platform_name} today!"
-msgstr "Subscriu-te a {platform_name} avui mateix!"
-
-#: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Need Help?"
-msgstr "Necessiteu ajuda?"
-
-#: lms/templates/login-sidebar.html
-msgid "Looking for help signing in or with your {platform_name} account?"
-msgstr ""
-"Esteu buscant ajuda per iniciar la sessió o amb el vostre compte "
-"{platform_name}?"
-
-#: lms/templates/login-sidebar.html
-msgid "View our help section for answers to commonly asked questions."
-msgstr ""
-"Consulteu la nostra secció d'ajuda per obtenir respostes a les preguntes més"
-" freqüents."
-
-#: lms/templates/login.html
-msgid "Log into your {platform_name} Account"
-msgstr "Inicieu sessió al vostre compte {platform_name}"
-
-#: lms/templates/login.html
-msgid "Log into My {platform_name} Account"
-msgstr "Inicieu sessió al compte la Meva {platform_name}"
-
-#: lms/templates/login.html
-msgid "Access My Courses"
-msgstr "Accés als meus cursos"
-
-#: lms/templates/login.html lms/templates/register-shib.html
-#: lms/templates/register.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Processing your account information"
-msgstr "Processament de la informació del vostre compte"
-
-#: lms/templates/login.html wiki/templates/wiki/accounts/login.html
-msgid "Please log in"
-msgstr "Si us plau inicieu sessió"
-
-#: lms/templates/login.html
-msgid "to access your account and courses"
-msgstr "per accedir al vostre compte i cursos"
-
-#: lms/templates/login.html
-msgid "We're Sorry, {platform_name} accounts are unavailable currently"
-msgstr ""
-"Actualment, els comptes {platform_name} no estan disponibles actualment"
-
-#: lms/templates/login.html
-msgid "We couldn't log you in."
-msgstr "No hem pogut iniciar la sessió."
-
-#: lms/templates/login.html
-msgid "Your email or password is incorrect"
-msgstr "El vostre correu electrònic o contrasenya no és correcte"
-
-#: lms/templates/login.html
-msgid "An error occurred when signing you in to {platform_name}."
-msgstr "S'ha produït un error en iniciar la sessió a {platform_name}."
-
-#: lms/templates/login.html
-msgid ""
-"Please provide the following information to log into your {platform_name} "
-"account. Required fields are noted by {strong_start}bold text and an "
-"asterisk (*){strong_end}."
-msgstr ""
-
-#: lms/templates/login.html
-msgid "Sign in with {provider_name}"
-msgstr "Inicieu sessió amb {provider_name}"
 
 #. Translators:  "External resource" means that this learning module is hosted
 #. on a platform external to the edX LMS
@@ -12931,252 +12851,16 @@ msgstr ""
 "{destination}, on la recopilació i ús d'aquesta informació es regeix pels "
 "seus termes de servei i la seva política de privadesa."
 
+#: lms/templates/provider_login.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "E-mail"
+msgstr "Correu electrònic"
+
 #: lms/templates/provider_login.html
 #, python-format
 msgid "Return To %s"
 msgstr "Torna a %s"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid ""
-"We're sorry, but this version of your browser is not supported. Try again "
-"using a different browser or a newer version of your browser."
-msgstr ""
-"Ho sentim, però aquesta versió del vostre navegador no és compatible. Torneu"
-" a provar d'utilitzar un navegador diferent o una versió més recent del "
-"vostre navegador."
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "The following errors occurred while processing your registration:"
-msgstr "S'han produït els següents errors durant el procés de registre:"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Sign up with {provider_name}"
-msgstr "Registreu-vos amb {provider_name}"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Create your own {platform_name} account below"
-msgstr "Creeu el vostre propi compte {platform_name} a continuació"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-msgid ""
-"Required fields are noted by {strong_start}bold text and an asterisk "
-"(*){strong_end}."
-msgstr ""
-
-#. Translators: selected_provider is the name of an external, third-party user
-#. authentication service (like Google or LinkedIn).
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "You've successfully signed in with {selected_provider}."
-msgstr "Heu iniciat la sessió amb {selected_provider} amb èxit."
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid ""
-"We just need a little more information before you start learning with "
-"{platform_name}."
-msgstr ""
-"Només necessitem una mica més d'informació abans de començar a aprendre amb "
-"{platform_name}."
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Please complete the following fields to register for an account. "
-msgstr "Completeu els camps següents per registrar-se en un compte."
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Your legal name, used for any certificates you earn."
-msgstr "El vostre nom legal, usat per a qualsevol certificat que guanyeu."
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Will be shown in any discussions or forums you participate in"
-msgstr "Es mostrarà en qualsevol discussió o fòrum en què participis"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "cannot be changed later"
-msgstr "no es pot canviar més tard"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Welcome {username}"
-msgstr "Benvingut {username}"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Enter a Public Display Name:"
-msgstr "Introduïu un nom per visualitzar públicament:"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Public Display Name"
-msgstr "Nom per visualitzar públicament"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Additional Personal Information"
-msgstr "Informació personal addicional"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "example: New York"
-msgstr "exemple: Nova York"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Highest Level of Education Completed"
-msgstr "Nivell d'Educació més alt Finalitzat"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Please share with us your reasons for registering with {platform_name}"
-msgstr ""
-"Compartiu amb nosaltres els vostres motius per registrar-vos amb "
-"{platform_name}"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Account Acknowledgements"
-msgstr "Reconeixement del compte"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "I agree to the {link_start}Terms of Service{link_end}"
-msgstr "Accepto les {link_start} Condicions del servei {link_end}"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "I agree to the {link_start}Honor Code{link_end}"
-msgstr "Accepto el {link_start} Codi d'Honor {link_end}"
-
-#: lms/templates/register-form.html lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Create My Account"
-msgstr "Crear el meu compte"
-
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Preferences for {platform_name}"
-msgstr "Preferències per a {platform_name}"
-
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Update my {platform_name} Account"
-msgstr "Actualitzeu el meu compte {platform_name}"
-
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Welcome {username}!  Please set your preferences below"
-msgstr "Benvingut {username}! Establiu les vostres preferències a continuació"
-
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Enter a public username:"
-msgstr "Introduïu un nom d'usuari públic:"
-
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Update My Account"
-msgstr "Actualitza el meu compte"
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Registration Help"
-msgstr "Ajut de registre"
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Already registered?"
-msgstr "Ja registrat?"
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-#: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
-#: wiki/templates/wiki/accounts/signup.html
-msgid "Log in"
-msgstr "Iniciar Sessió"
-
-#: lms/templates/register-sidebar.html
-msgid ""
-"Registering with {platform_name} gives you access to all of our current and "
-"future free courses. Not ready to take a course just yet? Registering puts "
-"you on our mailing list - we will update you as courses are added."
-msgstr ""
-"Registrar-se amb {platform_name} us dóna accés a tots els nostres cursos "
-"gratuïts actuals i futurs. Encara no està preparat per fer un curs? El "
-"registre us col·loca a la vostra llista de correu: us actualitzarem a mesura"
-" que s'afegeixin els cursos."
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Next Steps"
-msgstr "Propers passos"
-
-#: lms/templates/register-sidebar.html
-msgid ""
-"As part of joining {platform_name}, you will receive an email message with "
-"instructions for activating your account. Don't see the email? Check your "
-"spam folder and mark {platform_name} emails as 'not spam'. At "
-"{platform_name}, we communicate mostly through email."
-msgstr ""
-"Com a part d'unir-te a {platform_name}, rebràs un missatge de correu "
-"electrònic amb instruccions per activar el teu compte. No veus el correu "
-"electrònic? Comproveu la vostra carpeta de correu brossa i marqueu "
-"{platform_name} correus electrònics com a \"no correu brossa\". A "
-"{platform_name}, ens comuniquem principalment a través del correu "
-"electrònic."
-
-#: lms/templates/register-sidebar.html
-msgid "Need help registering with {platform_name}?"
-msgstr "Necessiteu ajuda per registrar-se amb {platform_name}?"
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "View our FAQs for answers to commonly asked questions."
-msgstr ""
-"Consulteu les nostres preguntes més freqüents per obtenir respostes a les "
-"preguntes més comunes."
-
-#: lms/templates/register-sidebar.html
-msgid ""
-"You can find the answers to most of your questions in our list of FAQs. "
-"After you enroll in a course, you can also find answers in the course "
-"discussions."
-msgstr ""
-"Podeu trobar respostes a la majoria de les vostres preguntes a la nostra "
-"llista de preguntes freqüents. Després d'inscriure's en un curs, també podeu"
-" trobar respostes a les discussions del curs."
-
-#: lms/templates/register.html
-msgid "Register for {platform_name}"
-msgstr "Registre de {platform_name}"
-
-#: lms/templates/register.html
-msgid "Create My {platform_name} Account"
-msgstr "Crea el meu compte de {platform_name}"
-
-#: lms/templates/register.html
-msgid "Welcome!"
-msgstr "Benvinguda!"
-
-#: lms/templates/register.html
-msgid "Register below to create your {platform_name} account"
-msgstr ""
-"Registreu-vos a continuació per crear el vostre compte {platform_name}"
 
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
@@ -13256,6 +12940,11 @@ msgid "{start_li}Welcome{end_li} {name}"
 msgstr ""
 
 #: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Enter a public username:"
+msgstr "Introduïu un nom d'usuari públic:"
+
+#: lms/templates/signup_modal.html
 msgid "Full Name *"
 msgstr "Nom complet"
 
@@ -13266,6 +12955,23 @@ msgstr "Ed. Completat"
 #: lms/templates/signup_modal.html
 msgid "Goals in signing up for {platform_name}"
 msgstr "Objectius en la subscripció per a {platform_name}"
+
+#: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "I agree to the {link_start}Terms of Service{link_end}"
+msgstr "Accepto les {link_start} Condicions del servei {link_end}"
+
+#: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "I agree to the {link_start}Honor Code{link_end}"
+msgstr "Accepto el {link_start} Codi d'Honor {link_end}"
+
+#: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Create My Account"
+msgstr "Crear el meu compte"
 
 #: lms/templates/signup_modal.html
 msgid "Already have an account?"
@@ -14554,6 +14260,34 @@ msgstr ""
 "Introduïu un nom d'usuari per veure els catàlegs que pertanyen a aquest "
 "usuari."
 
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Unsubscribe Successful"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Unsubscribe Cancelled"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Confirm Unsubscribe"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "You have been unsubscribed from emails for {course}."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "You have not been unsubscribed from emails for {course}."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Do you want to unsubscribe from emails for {course}?"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Unsubscribe"
+msgstr ""
+
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Open Calculator"
 msgstr "Obrir la calculadora"
@@ -15523,6 +15257,13 @@ msgid "Search students"
 msgstr "Cercar estudiants"
 
 #: lms/templates/courseware/gradebook.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/receipt.html
+msgid "Total"
+msgstr "Total"
+
+#: lms/templates/courseware/gradebook.html
 msgid "previous page"
 msgstr "Pàgina anterior"
 
@@ -15916,7 +15657,6 @@ msgstr ""
 "{platform_name}."
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
-#: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "The {platform_name} Team"
 msgstr "L'equip {platform_name}"
@@ -16364,6 +16104,17 @@ msgstr ""
 "durant un any després de la seva presentació."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+"Your photo verification expires on {verification_expiry}. Please be aware "
+"photo verification can take up to three days once initiated and you will not"
+" be able to earn a certificate or take a proctored exam until approved."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Resubmit Verification"
+msgstr "Torneu a enviar la verificació"
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Pending"
 msgstr "Estat de verificació actual: Pendent"
 
@@ -16395,10 +16146,6 @@ msgid "Your verification was denied for the following reasons:"
 msgstr "La vostra verificació s'ha denegat pels motius següents:"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Resubmit Verification"
-msgstr "Torneu a enviar la verificació"
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Expired"
 msgstr "Estat de verificació actual: vençut"
 
@@ -16411,6 +16158,13 @@ msgstr ""
 "La teva verificació ha caducat. Per rebre un certificat verificat, heu de "
 "presentar una foto nova vostra i l'identificador de fotografia emès pel "
 "govern abans del termini de verificació del vostre curs."
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+" Please be aware photo verification can take up to three days once initiated"
+" and you will not be able to earn a certificate or take a proctored exam "
+"until approved."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
 msgid "Could Not Link Accounts"
@@ -16686,42 +16440,6 @@ msgstr "Amaga les notes"
 #: lms/templates/edxnotes/toggle_notes.html
 msgid "Show notes"
 msgstr "Mostra notes"
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"You're almost there! Use the link to activate your account to access "
-"engaging, high-quality {platform_name} courses. Note that you will not be "
-"able to log back into your account until you have activated it."
-msgstr ""
-"Estàs gairebé allà! Utilitzeu l'enllaç per activar el vostre compte per "
-"accedir a cursos d'alta qualitat {platform_name} d'alta qualitat. Tingueu en"
-" compte que no podreu tornar a iniciar sessió al compte fins que no l'hàgiu "
-"activat."
-
-#: lms/templates/emails/activation_email.txt
-msgid "Enjoy learning with {platform_name}."
-msgstr "Gaudeix d'aprendre amb {platform_name}."
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"If you need help, please use our web form at {support_url} or email "
-"{support_email}."
-msgstr ""
-"Si necessiteu ajuda, utilitzeu el nostre formulari web a {support_url} o "
-"envieu un correu electrònic a {support_email}."
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"This email message was automatically sent by {lms_url} because someone "
-"attempted to create an account on {platform_name} using this email address."
-msgstr ""
-"Aquest missatge de correu electrònic va ser enviat automàticament per "
-"{lms_url} perquè algú va intentar crear un compte a {platform_name} amb "
-"aquesta adreça de correu electrònic."
-
-#: lms/templates/emails/activation_email_subject.txt
-msgid "Action Required: Activate your {platform_name} account"
-msgstr "Acció necessària: activeu el vostre compte {platform_name}"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Thank you for your purchase of "
@@ -17061,6 +16779,10 @@ msgid "INVOICE"
 msgstr "FACTURA"
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Date: {date}"
+msgstr "Data: {date}"
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "Invoice No: {invoice_number}"
 msgstr "Factura No: {invoice_number}"
 
@@ -17342,14 +17064,6 @@ msgid ""
 msgstr ""
 "{begin_strong} Avís: {end_strong} El vostre navegador no és totalment "
 "compatible. Us recomanem que feu servir {chrome_link} o {ff_link}."
-
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/learner_dashboard/programs.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Programs"
-msgstr "Programes"
 
 #: lms/templates/header/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
@@ -19208,10 +18922,6 @@ msgstr "Mostra l'estat de les tasques que heu enviat per a aquest problema."
 msgid "My Courses"
 msgstr "Els meus cursos"
 
-#: lms/templates/learner_dashboard/program_details.html
-msgid "Program Details"
-msgstr "Detalls del programa"
-
 #: lms/templates/learner_dashboard/text-me-fragment.html
 msgid "Get the {platform_name} Mobile App!"
 msgstr "Obteniu l'aplicació mòbil {platform_name}."
@@ -19497,6 +19207,13 @@ msgstr "Reinicia la teva contrasenya {platform_name}"
 msgid "Invalid Password Reset Link"
 msgstr "Enllaç de restabliment de contrasenya no vàlid"
 
+#: lms/templates/registration/password_reset_confirm.html
+msgid ""
+"This password reset link is invalid. It may have been used already. To reset"
+" your password, go to the {start_link}sign-in{end_link} page and select "
+"{start_strong}Forgot password{end_strong}."
+msgstr ""
+
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"
 msgstr "Restabliment de la contrasenya amb èxit"
@@ -19673,6 +19390,10 @@ msgstr "Emprat"
 #: lms/templates/shoppingcart/receipt.html
 msgid "Invalid"
 msgstr "Invàlid"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Invoice"
+msgstr "Factura"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Date of purchase"
@@ -20023,6 +19744,12 @@ msgstr "Actualment els servidors {platform_name} estan sobrecarregats"
 #: lms/templates/student_account/account_settings.html
 msgid "Account Settings"
 msgstr "Configuració del compte"
+
+#: lms/templates/student_account/account_settings.html
+msgid ""
+" and access to private sites offered by MIT Open Learning, Wharton Executive"
+" Education, and Harvard Medical School"
+msgstr ""
 
 #: lms/templates/student_account/finish_auth.html
 msgid "Please Wait"
@@ -20599,11 +20326,7 @@ msgid "Connect"
 msgstr ""
 
 #: themes/edx.org/lms/templates/footer.html
-msgid "© 2012–{year} edX Inc. "
-msgstr "© 2012–{year} edX Inc. "
-
-#: themes/edx.org/lms/templates/footer.html
-msgid "edX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
+msgid "© {year} edX Inc. All rights reserved."
 msgstr ""
 
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
@@ -20733,6 +20456,29 @@ msgid "For anyone, anywhere, anytime"
 msgstr "Per a qualsevol persona, en qualsevol lloc i en qualsevol moment"
 
 #: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid ""
+"We're sorry, but this version of your browser is not supported. Try again "
+"using a different browser or a newer version of your browser."
+msgstr ""
+"Ho sentim, però aquesta versió del vostre navegador no és compatible. Torneu"
+" a provar d'utilitzar un navegador diferent o una versió més recent del "
+"vostre navegador."
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "The following errors occurred while processing your registration:"
+msgstr "S'han produït els següents errors durant el procés de registre:"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Sign up with {provider_name}"
+msgstr "Registreu-vos amb {provider_name}"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Create your own {platform_name} account below"
+msgstr "Creeu el vostre propi compte {platform_name} a continuació"
+
+#: themes/stanford-style/lms/templates/register-form.html
 msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
@@ -20740,11 +20486,122 @@ msgstr ""
 "Els camps obligatoris es destaquen mitjançant <strong class=\"indicator\"> "
 "text en negreta i un asterisc (*) </strong>."
 
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "You've successfully signed in with {selected_provider}."
+msgstr "Heu iniciat la sessió amb {selected_provider} amb èxit."
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid ""
+"We just need a little more information before you start learning with "
+"{platform_name}."
+msgstr ""
+"Només necessitem una mica més d'informació abans de començar a aprendre amb "
+"{platform_name}."
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Please complete the following fields to register for an account. "
+msgstr "Completeu els camps següents per registrar-se en un compte."
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "example: Jane Doe"
+msgstr "exemple: Joana Martí"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Your legal name, used for any certificates you earn."
+msgstr "El vostre nom legal, usat per a qualsevol certificat que guanyeu."
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "example: JaneDoe"
+msgstr "exemple: JoanaMarti"
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Will be shown in any discussions or forums you participate in"
+msgstr "Es mostrarà en qualsevol discussió o fòrum en què participis"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "cannot be changed later"
+msgstr "no es pot canviar més tard"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Welcome {username}"
+msgstr "Benvingut {username}"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Enter a Public Display Name:"
+msgstr "Introduïu un nom per visualitzar públicament:"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Public Display Name"
+msgstr "Nom per visualitzar públicament"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Additional Personal Information"
+msgstr "Informació personal addicional"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "example: New York"
+msgstr "exemple: Nova York"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Highest Level of Education Completed"
+msgstr "Nivell d'Educació més alt Finalitzat"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Please share with us your reasons for registering with {platform_name}"
+msgstr ""
+"Compartiu amb nosaltres els vostres motius per registrar-vos amb "
+"{platform_name}"
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Account Acknowledgements"
+msgstr "Reconeixement del compte"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Preferences for {platform_name}"
+msgstr "Preferències per a {platform_name}"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Update my {platform_name} Account"
+msgstr "Actualitzeu el meu compte {platform_name}"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Processing your account information"
+msgstr "Processament de la informació del vostre compte"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Welcome {username}!  Please set your preferences below"
+msgstr "Benvingut {username}! Establiu les vostres preferències a continuació"
+
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
 "Required fields are noted by {strong_indicator}bold text and an asterisk "
 "(*).{strong_close}"
 msgstr ""
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Update My Account"
+msgstr "Actualitza el meu compte"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Registration Help"
+msgstr "Ajut de registre"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Already registered?"
+msgstr "Ja registrat?"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+#: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
+#: wiki/templates/wiki/accounts/signup.html
+msgid "Log in"
+msgstr "Iniciar Sessió"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Next Steps"
+msgstr "Propers passos"
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
@@ -20760,8 +20617,18 @@ msgstr ""
 "electrònics dels vostres cursos."
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Need Help?"
+msgstr "Necessiteu ajuda?"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Need help in registering with {platform_name}?"
 msgstr "Necessiteu ajuda per registrar-se amb {platform_name}?"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "View our FAQs for answers to commonly asked questions."
+msgstr ""
+"Consulteu les nostres preguntes més freqüents per obtenir respostes a les "
+"preguntes més comunes."
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
@@ -20887,62 +20754,6 @@ msgstr ""
 #: cms/templates/accessibility.html
 msgid "Studio Accessibility Policy"
 msgstr "Política d'accessibilitat d'estudi"
-
-#: cms/templates/activation_active.html cms/templates/activation_complete.html
-#: cms/templates/activation_invalid.html
-msgid "{studio_name} Account Activation"
-msgstr "{studio_name} Activació del compte"
-
-#: cms/templates/activation_active.html
-msgid "Your account is already active"
-msgstr "El teu compte ja està actiu"
-
-#: cms/templates/activation_active.html
-msgid ""
-"This account, set up using {email}, has already been activated. Please sign "
-"in to start working within {studio_name}."
-msgstr ""
-"Aquest compte, configurat mitjançant {email}, ja s'ha activat. Inicieu "
-"sessió per començar a treballar a {studio_name}."
-
-#: cms/templates/activation_active.html cms/templates/activation_complete.html
-msgid "Sign into {studio_name}"
-msgstr "Inicieu la sessió a {studio_name}"
-
-#: cms/templates/activation_complete.html
-msgid "Your account activation is complete!"
-msgstr "El teu compte ha estat activat!"
-
-#: cms/templates/activation_complete.html
-msgid ""
-"Thank you for activating your account. You may now sign in and start using "
-"{studio_name} to author courses."
-msgstr ""
-"Gràcies per activar el vostre compte. Ara podeu iniciar la sessió i començar"
-" a utilitzar {studio_name} als cursos de l'autor."
-
-#: cms/templates/activation_invalid.html
-msgid "Your account activation is invalid"
-msgstr "L'activació del vostre compte no és vàlida"
-
-#: cms/templates/activation_invalid.html
-msgid ""
-"We're sorry. Something went wrong with your activation. Check to make sure "
-"the URL you went to was correct, as e-mail programs will sometimes split it "
-"into two lines."
-msgstr ""
-"Ho sentim. S'ha produït un error amb la vostra activació. Comproveu que "
-"l'URL que heu seguit sigui correcte, ja que, de vegades, els programes de "
-"correu electrònic es divideixen en dues línies."
-
-#: cms/templates/activation_invalid.html
-msgid ""
-"If you still have issues, contact {platform_name} Support. In the meantime, "
-"you can also return to {link_start}the {studio_name} homepage.{link_end}"
-msgstr ""
-"Si encara teniu problemes, contacteu amb el servei de {platform_name} . "
-"Mentrestant, també podeu tornar a {link_start} a la pàgina d'inici "
-"{studio_name}.{link_end}"
 
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
 msgid "Files & Uploads"
@@ -21180,10 +20991,6 @@ msgstr ""
 "Per crear un enllaç a aquesta unitat a partir d'un component HTML en aquest "
 "curs, introduïu \"/jump_to_id/<location ID>\" com a valor de l'URL."
 
-#: cms/templates/container.html
-msgid "Location in Course Outline"
-msgstr "Ubicació en el contorn del curs"
-
 #: cms/templates/course-create-rerun.html
 msgid "Create a Course Rerun of:"
 msgstr "Crea un curs Correu electrònic de:"
@@ -21370,10 +21177,6 @@ msgstr ""
 "d'inici del curs; configurar l'equip del curs; revisar les actualitzacions "
 "del curs i altres actius per al material de data; i plantegeu les "
 "discussions i wiki."
-
-#: cms/templates/course_outline.html
-msgid "Warning"
-msgstr "Avís"
 
 #: cms/templates/course_outline.html
 msgid "This course uses features that are no longer supported."
@@ -23266,111 +23069,6 @@ msgstr ""
 "també poden afegir i eliminar membres d'altres membres de l'equip. Ha "
 "d'haver un mínim d'un usuari amb la funció Admin en una biblioteca."
 
-#: cms/templates/register.html cms/templates/widgets/header.html
-msgid "Sign Up"
-msgstr "Registra't"
-
-#: cms/templates/register.html
-msgid "Sign Up for {studio_name}"
-msgstr "Inscriviu-vos a {studio_name}"
-
-#: cms/templates/register.html
-msgid "Already have a {studio_name} Account? Sign in"
-msgstr "Ja teniu un compte {studio_name}? Inicieu sessió"
-
-#: cms/templates/register.html
-msgid ""
-"Ready to start creating online courses? Sign up below and start creating "
-"your first {platform_name} course today."
-msgstr ""
-"Esteu preparat per començar a crear cursos en línia? Registra't a sota i "
-"comença a crear el teu primer curs {platform_name} avui mateix."
-
-#: cms/templates/register.html
-msgid "Required Information to Sign Up for {studio_name}"
-msgstr "Informació obligatòria per inscriure's a {studio_name}"
-
-#: cms/templates/register.html
-msgid ""
-"This will be used in public discussions with your courses and in our edX101 "
-"support forums"
-msgstr ""
-"Això s'utilitzarà en debats públics amb els vostres cursos i en els nostres "
-"fòrums d'assistència edX101"
-
-#: cms/templates/register.html
-msgid "Your Location"
-msgstr "La teva localització"
-
-#: cms/templates/register.html
-msgid "Preferred Language"
-msgstr "Idioma preferit"
-
-#: cms/templates/register.html
-msgid "I agree to the {a_start} Terms of Service {a_end}"
-msgstr "Accepto les {a_start} Condicions del servei {a_end}"
-
-#: cms/templates/register.html
-msgid "Create My Account &amp; Start Authoring Courses"
-msgstr "Crea el meu compte &amp; Cursos d'autoria d'inici"
-
-#: cms/templates/register.html
-msgid "Common {studio_name} Questions"
-msgstr "Preguntes freqüents {studio_name}"
-
-#: cms/templates/register.html
-msgid "Who is {studio_name} for?"
-msgstr "Qui és {studio_name} per?"
-
-#: cms/templates/register.html
-msgid ""
-"{studio_name} is for anyone that wants to create online courses that "
-"leverage the global {platform_name} platform. Our users are often faculty "
-"members, teaching assistants and course staff, and members of instructional "
-"technology groups."
-msgstr ""
-"{studio_name} és per a qualsevol que vulgui crear cursos en línia que "
-"aprofitin la plataforma global {platform_name}. Els nostres usuaris són "
-"sovint professors, assistents docents i personal del curs, i membres de "
-"grups tecnològics d'instrucció."
-
-#: cms/templates/register.html
-msgid ""
-"How technically savvy do I need to be to create courses in {studio_name}?"
-msgstr ""
-"Com és tècnicament intel·ligent necessito crear cursos a {studio_name}?"
-
-#: cms/templates/register.html
-msgid ""
-"{studio_name} is designed to be easy to use by almost anyone familiar with "
-"common web-based authoring environments (Wordpress, Moodle, etc.). No "
-"programming knowledge is required, but for some of the more advanced "
-"features, a technical background would be helpful. As always, we are here to"
-" help, so don't hesitate to dive right in."
-msgstr ""
-"{studio_name} està dissenyat per ser fàcil d'utilitzar per gairebé qualsevol"
-" persona familiaritzada amb entorns de creació basats en web comuns "
-"(Wordpress, Moodle, etc.). No es requereix cap coneixement de programació, "
-"però per a algunes de les funcions més avançades, un perfil tècnic seria "
-"útil. Com sempre, estem aquí per ajudar, així que no dubtis a submergir-te "
-"bé."
-
-#: cms/templates/register.html
-msgid "I've never authored a course online before. Is there help?"
-msgstr "Mai no he escrit cap curs en línia abans. Hi ha ajuda?"
-
-#: cms/templates/register.html
-msgid ""
-"Absolutely. We have created an online course, edX101, that describes some "
-"best practices: from filming video, creating exercises, to the basics of "
-"running an online course. Additionally, we're always here to help, just drop"
-" us a note."
-msgstr ""
-"Absolutament. Hem creat un curs en línia, edX101, que descriu algunes de les"
-" millors pràctiques: des de la filmació de vídeo, creació d'exercicis, fins "
-"als fonaments d'executar un curs en línia. A més, sempre estem aquí per "
-"ajudar-nos, només envieu-nos una nota."
-
 #: cms/templates/settings.html
 msgid "Schedule & Details Settings"
 msgstr "Programació i detalls de la Configuració"
@@ -23434,6 +23132,12 @@ msgstr ""
 "La vostra pàgina de resum del curs no serà visible fins que s'hagi anunciat "
 "el vostre curs. Per proporcionar contingut a la pàgina i previsualitzar-lo, "
 "seguiu les instruccions proporcionades pel vostre gestor de programes."
+
+#: cms/templates/settings.html
+msgid ""
+"Please note that changes here may take up to a business day to appear on "
+"your course summary page."
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Course Credit Requirements"
@@ -23565,6 +23269,18 @@ msgstr ""
 #: cms/templates/settings.html
 msgid "Enrollment End Time"
 msgstr "Hora de finalització d'inscripció"
+
+#: cms/templates/settings.html
+msgid "Upgrade Deadline Date"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Last day students can upgrade to a verified enrollment."
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Upgrade Deadline Time"
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Course Details"
@@ -24227,23 +23943,6 @@ msgstr ""
 "Aquest grup ja no existeix. Trieu un altre grup o elimineu la restricció "
 "d'accés."
 
-#: cms/templates/emails/activation_email.txt
-msgid ""
-"Thank you for signing up for {studio_name}! To activate your account, please"
-" copy and paste this address into your web browser's address bar:"
-msgstr ""
-
-#: cms/templates/emails/activation_email.txt
-msgid ""
-"If you didn't request this, you don't need to do anything; you won't receive"
-" any more email from us. Please do not reply to this e-mail; if you require "
-"assistance, check the help section of the {studio_name} web site."
-msgstr ""
-
-#: cms/templates/emails/activation_email_subject.txt
-msgid "Your account for {studio_name}"
-msgstr ""
-
 #: cms/templates/emails/course_creator_admin_subject.txt
 msgid "{email} has requested {studio_name} course creator privileges on edge"
 msgstr ""
@@ -24387,14 +24086,6 @@ msgstr ""
 msgid "Return to the {link_start}home page{link_end}."
 msgstr "Torna a la {link_start} pàgina d'inici {link_end}."
 
-#: cms/templates/registration/reg_complete.html
-msgid ""
-"We've sent an email message to {email} with instructions for activating your"
-" account."
-msgstr ""
-"Hem enviat un missatge de correu electrònic a {email} amb instruccions per "
-"activar el vostre compte."
-
 #: cms/templates/widgets/footer.html
 msgid "Policies"
 msgstr "Polítiques"
@@ -24420,6 +24111,10 @@ msgid "Outline"
 msgstr "Esbós"
 
 #: cms/templates/widgets/header.html
+msgid "Publisher"
+msgstr ""
+
+#: cms/templates/widgets/header.html
 msgid "Import"
 msgstr "Importar"
 
@@ -24442,6 +24137,10 @@ msgstr "Navegació del compte"
 #: cms/templates/widgets/header.html
 msgid "Contextual Online Help"
 msgstr "Ajuda en línia contextual"
+
+#: cms/templates/widgets/header.html
+msgid "Sign Up"
+msgstr "Registra't"
 
 #: cms/templates/widgets/metadata-edit.html
 msgid "Launch Latex Source Compiler"
@@ -24488,8 +24187,8 @@ msgid "Advanced Editor"
 msgstr "Editor avançat"
 
 #: cms/templates/widgets/problem-edit.html
-msgid "Toggle Cheatsheet"
-msgstr "Commuta el full de cursor"
+msgid "Markdown Help"
+msgstr ""
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Label"
@@ -25495,6 +25194,10 @@ msgstr "Font de"
 #: wiki/templates/wiki/source.html
 msgid "This article is currently locked for editing."
 msgstr "Aquest article està bloquejat actualment per editar-lo."
+
+#: wiki/templates/wiki/accounts/login.html
+msgid "Please log in"
+msgstr "Si us plau inicieu sessió"
 
 #: wiki/templates/wiki/accounts/login.html
 msgid "Log me in..."

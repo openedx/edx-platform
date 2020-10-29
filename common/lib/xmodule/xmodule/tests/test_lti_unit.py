@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """Test for LTI Xmodule functional logic."""
 
-from __future__ import absolute_import
 
 import datetime
 import textwrap
 from copy import copy
 
+import six
 import six.moves.urllib.error
 import six.moves.urllib.parse
 import six.moves.urllib.request
@@ -30,7 +30,7 @@ class LTIModuleTest(LogicTest):
     def setUp(self):
         super(LTIModuleTest, self).setUp()
         self.environ = {'wsgi.url_scheme': 'http', 'REQUEST_METHOD': 'POST'}
-        self.request_body_xml_template = textwrap.dedent("""
+        self.request_body_xml_template = textwrap.dedent(u"""
             <?xml version = "1.0" encoding = "UTF-8"?>
                 <imsx_POXEnvelopeRequest xmlns = "{namespace}">
                   <imsx_POXHeader>
@@ -87,7 +87,7 @@ class LTIModuleTest(LogicTest):
         data = copy(self.defaults)
 
         data.update(params)
-        return self.request_body_xml_template.format(**data)
+        return self.request_body_xml_template.format(**data).encode('utf-8')
 
     def get_response_values(self, response):
         """Gets the values from the given response"""
@@ -228,10 +228,14 @@ class LTIModuleTest(LogicTest):
         request.body = self.get_request_body(params={'grade': '0,5'})
         response = self.xmodule.grade_handler(request, '')
         real_response = self.get_response_values(response)
+        if six.PY2:
+            msg = u'invalid literal for float(): 0,5'
+        else:
+            msg = u"could not convert string to float: '0,5'"
         expected_response = {
             'action': None,
             'code_major': 'failure',
-            'description': 'Request body XML parsing error: invalid literal for float(): 0,5',
+            'description': u'Request body XML parsing error: {}'.format(msg),
             'messageIdentifier': 'unknown',
         }
         self.assertEqual(response.status_code, 200)
@@ -396,13 +400,13 @@ class LTIModuleTest(LogicTest):
         """
         mock_request = Mock()
         mock_request.headers = {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': (
+            u'X-Requested-With': u'XMLHttpRequest',
+            u'Content-Type': u'application/x-www-form-urlencoded',
+            u'Authorization': (
                 u'OAuth realm="https://testurl/", oauth_body_hash="wwzA3s8gScKD1VpJ7jMt9b%2BMj9Q%3D",'
-                'oauth_nonce="18821463", oauth_timestamp="1409321145", '
-                'oauth_consumer_key="__consumer_key__", oauth_signature_method="HMAC-SHA1", '
-                'oauth_version="1.0", oauth_signature="fHsE1hhIz76/msUoMR3Lyb7Aou4%3D"'
+                u'oauth_nonce="18821463", oauth_timestamp="1409321145", '
+                u'oauth_consumer_key="__consumer_key__", oauth_signature_method="HMAC-SHA1", '
+                u'oauth_version="1.0", oauth_signature="fHsE1hhIz76/msUoMR3Lyb7Aou4%3D"'
             )
         }
         mock_request.url = u'https://testurl'
@@ -410,15 +414,15 @@ class LTIModuleTest(LogicTest):
         mock_request.method = mock_request.http_method
 
         mock_request.body = (
-            '<?xml version=\'1.0\' encoding=\'utf-8\'?>\n'
-            '<imsx_POXEnvelopeRequest xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">'
-            '<imsx_POXHeader><imsx_POXRequestHeaderInfo><imsx_version>V1.0</imsx_version>'
-            '<imsx_messageIdentifier>edX_fix</imsx_messageIdentifier></imsx_POXRequestHeaderInfo>'
-            '</imsx_POXHeader><imsx_POXBody><replaceResultRequest><resultRecord><sourcedGUID>'
-            '<sourcedId>MITxLTI/MITxLTI/201x:localhost%3A8000-i4x-MITxLTI-MITxLTI-lti-3751833a214a4f66a0d18f63234207f2:363979ef768ca171b50f9d1bfb322131</sourcedId>'  # pylint: disable=line-too-long
-            '</sourcedGUID><result><resultScore><language>en</language><textString>0.32</textString></resultScore>'
-            '</result></resultRecord></replaceResultRequest></imsx_POXBody></imsx_POXEnvelopeRequest>'
-        )
+            u'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n'
+            u'<imsx_POXEnvelopeRequest xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">'
+            u'<imsx_POXHeader><imsx_POXRequestHeaderInfo><imsx_version>V1.0</imsx_version>'
+            u'<imsx_messageIdentifier>edX_fix</imsx_messageIdentifier></imsx_POXRequestHeaderInfo>'
+            u'</imsx_POXHeader><imsx_POXBody><replaceResultRequest><resultRecord><sourcedGUID>'
+            u'<sourcedId>MITxLTI/MITxLTI/201x:localhost%3A8000-i4x-MITxLTI-MITxLTI-lti-3751833a214a4f66a0d18f63234207f2:363979ef768ca171b50f9d1bfb322131</sourcedId>'  # pylint: disable=line-too-long
+            u'</sourcedGUID><result><resultScore><language>en</language><textString>0.32</textString></resultScore>'
+            u'</result></resultRecord></replaceResultRequest></imsx_POXBody></imsx_POXEnvelopeRequest>'
+        ).encode('utf-8')
 
         return mock_request
 

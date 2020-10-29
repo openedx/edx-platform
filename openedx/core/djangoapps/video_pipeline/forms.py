@@ -1,7 +1,7 @@
 """
 Defines a form to provide validations for course-specific configuration.
 """
-from __future__ import absolute_import
+
 from openedx.core.djangoapps.video_config.forms import CourseSpecificFlagAdminBaseForm
 from openedx.core.djangoapps.video_pipeline.models import CourseVideoUploadsEnabledByDefault
 

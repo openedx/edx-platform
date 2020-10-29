@@ -11,7 +11,8 @@
         'text!teams/templates/edit-team-member.underscore',
         'text!teams/templates/date.underscore'
     ],
-        function(Backbone, $, _, gettext, TeamModel, TeamUtils, ViewUtils, editTeamMemberTemplate, dateTemplate) {
+        function(
+            Backbone, $, _, gettext, TeamModel, TeamUtils, ViewUtils, editTeamMemberTemplate, dateTemplate) {
             return Backbone.View.extend({
                 dateTemplate: _.template(dateTemplate),
                 teamMemberTemplate: _.template(editTeamMemberTemplate),
@@ -35,9 +36,11 @@
 
                 render: function() {
                     if (this.model.get('membership').length === 0) {
-                        this.$el.html('<p>' + gettext('This team does not have any members.') + '</p>');
+                        this.$el.html( // xss-lint: disable=javascript-jquery-html
+                          // eslint-disable-next-line max-len
+                          '<p>' + gettext('This team does not have any members.') + '</p>'); // xss-lint: disable=javascript-concat-html
                     } else {
-                        this.$el.html('<ul class="edit-members"></ul>');
+                        this.$el.html('<ul class="edit-members"></ul>'); // xss-lint: disable=javascript-jquery-html
                         this.renderTeamMembers();
                     }
                     return this;
@@ -48,22 +51,29 @@
                         dateJoined, lastActivity;
 
                     _.each(this.model.get('membership'), function(membership) {
-                        dateJoined = interpolate(
-                            // Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
+                        // eslint-disable-next-line no-undef
+                        dateJoined = interpolate( // xss-lint: disable=javascript-interpolate
+                            /* Translators: 'date' is a placeholder for a fuzzy,
+                             * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
+                             */
                             gettext('Joined %(date)s'),
                             {date: self.dateTemplate({date: membership.date_joined})},
                             true
                         );
 
-                        lastActivity = interpolate(
-                            // Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
+                        // eslint-disable-next-line no-undef
+                        lastActivity = interpolate( // xss-lint: disable=javascript-interpolate
+                            /* Translators: 'date' is a placeholder for a fuzzy,
+                             * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
+                             */
                             gettext('Last Activity %(date)s'),
                             {date: self.dateTemplate({date: membership.last_activity_at})},
                             true
                         );
 
                         // It is assumed that the team member array is automatically in the order of date joined.
-                        self.$('.edit-members').append(self.teamMemberTemplate({
+                        // eslint-disable-next-line max-len
+                        self.$('.edit-members').append(self.teamMemberTemplate({ // xss-lint: disable=javascript-jquery-append
                             imageUrl: membership.user.profile_image.image_url_medium,
                             username: membership.user.username,
                             memberProfileUrl: '/u/' + membership.user.username,
@@ -81,7 +91,8 @@
 
                     ViewUtils.confirmThenRunOperation(
                         gettext('Remove this team member?'),
-                        gettext('This learner will be removed from the team, allowing another learner to take the available spot.'),
+                        gettext('This learner will be removed from the team,' +
+                            'allowing another learner to take the available spot.'),
                         gettext('Remove'),
                         function() {
                             $.ajax({

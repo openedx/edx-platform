@@ -1,7 +1,7 @@
 """
 Acceptance tests that ensure components with bad content do not break page.
 """
-from __future__ import absolute_import
+
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.studio.utils import verify_ordering

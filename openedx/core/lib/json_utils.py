@@ -2,7 +2,7 @@
 Helpers for json serialization
 """
 
-from __future__ import absolute_import
+
 import datetime
 from django.core.serializers.json import DjangoJSONEncoder
 from opaque_keys.edx.keys import CourseKey, UsageKey

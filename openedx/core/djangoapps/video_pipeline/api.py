@@ -1,7 +1,7 @@
 """
 API utils in order to communicate to edx-video-pipeline.
 """
-from __future__ import absolute_import
+
 import json
 import logging
 

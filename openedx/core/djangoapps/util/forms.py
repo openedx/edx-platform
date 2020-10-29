@@ -1,7 +1,7 @@
 """
 Custom forms-related types
 """
-from __future__ import absolute_import
+
 
 from django.core.exceptions import ValidationError
 from django.forms import Field, MultipleHiddenInput, NullBooleanField, Select

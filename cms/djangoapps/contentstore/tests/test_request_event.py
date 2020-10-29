@@ -1,5 +1,5 @@
 """Tests for CMS's requests to logs"""
-from __future__ import absolute_import
+
 
 import mock
 from django.test import TestCase

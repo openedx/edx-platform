@@ -53,7 +53,7 @@ Representation:
         *** 'original_version': definition_id of the root of the previous version relation on this
         definition. Acts as a pseudo-object identifier.
 """
-from __future__ import absolute_import
+
 
 import copy
 import datetime
@@ -100,6 +100,7 @@ from xmodule.modulestore.exceptions import (
     DuplicateItemError,
     InsufficientSpecificationError,
     MultipleCourseBlocksFound,
+    MultipleLibraryBlocksFound,
     VersionConflictError
 )
 from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
@@ -976,7 +977,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         return version_guids, id_version_map
 
     def _get_structures_for_branch_and_locator(self, branch, locator_factory, **kwargs):
-
         """
         Internal generator for fetching lists of courses, libraries, etc.
         :param str branch: Branch to fetch structures from
@@ -1547,7 +1547,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             next_versions = [struct for struct in next_entries]
             for course_structure in next_versions:
                 result.setdefault(course_structure['previous_version'], []).append(
-                    CourseLocator(version_guid=struct['_id']))
+                    CourseLocator(version_guid=next_entries[-1]['_id']))
         return VersionTree(course_locator, result)
 
     def get_block_generations(self, block_locator):

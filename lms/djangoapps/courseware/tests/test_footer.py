@@ -3,7 +3,6 @@ Tests related to the basic footer-switching based off SITE_NAME to ensure
 edx.org uses an edx footer but other instances use an Open edX footer.
 """
 
-from __future__ import absolute_import
 
 import unittest
 
@@ -23,7 +22,7 @@ class TestFooter(TestCase):
 
     SOCIAL_MEDIA_NAMES = [
         "facebook",
-        "google_plus",
+        "instagram",
         "twitter",
         "linkedin",
         "tumblr",
@@ -34,7 +33,7 @@ class TestFooter(TestCase):
 
     SOCIAL_MEDIA_URLS = {
         "facebook": "http://www.facebook.com/",
-        "google_plus": "https://plus.google.com/",
+        "instagram": "https://instagram.com/",
         "twitter": "https://twitter.com/",
         "linkedin": "http://www.linkedin.com/",
         "tumblr": "http://www.tumblr.com/",

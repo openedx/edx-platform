@@ -1,7 +1,7 @@
 """
 Test utils for CCX
 """
-from __future__ import absolute_import
+
 
 import datetime
 

@@ -2,7 +2,6 @@
 Course API Block Transformers
 """
 
-from __future__ import absolute_import
 
 from lms.djangoapps.course_blocks.transformers.visibility import VisibilityTransformer
 
@@ -44,6 +43,8 @@ SUPPORTED_FIELDS = [
     SupportedFieldType('graded'),
     SupportedFieldType('format'),
     SupportedFieldType('due'),
+    SupportedFieldType('has_score'),
+    SupportedFieldType('weight'),
     SupportedFieldType('show_correctness'),
     # 'student_view_data'
     SupportedFieldType(StudentViewTransformer.STUDENT_VIEW_DATA, StudentViewTransformer),

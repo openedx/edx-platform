@@ -2,7 +2,6 @@
 Tests for transformer_registry.py
 """
 
-from __future__ import absolute_import
 
 from unittest import TestCase
 
@@ -72,7 +71,7 @@ class TransformerRegistryTestCase(TestCase):
         # hash with TestTransformer1
         with mock_registered_transformers([TestTransformer1]):
             version_hash_1 = TransformerRegistry.get_write_version_hash()
-            self.assertEqual(version_hash_1.decode('utf-8'), '+2nc5o2YRerVfAtItQBQ/6jVkkw=')
+            self.assertEqual(version_hash_1, '+2nc5o2YRerVfAtItQBQ/6jVkkw=')
 
             # should return the same value again
             self.assertEqual(version_hash_1, TransformerRegistry.get_write_version_hash())
@@ -80,5 +79,5 @@ class TransformerRegistryTestCase(TestCase):
         # hash with TestTransformer1 and TestTransformer2
         with mock_registered_transformers([TestTransformer1, TestTransformer2]):
             version_hash_2 = TransformerRegistry.get_write_version_hash()
-            self.assertEqual(version_hash_2.decode('utf-8'), '5GwhvmSM9hknjUslzPnKDA5QaCo=')
+            self.assertEqual(version_hash_2, '5GwhvmSM9hknjUslzPnKDA5QaCo=')
             self.assertNotEqual(version_hash_1, version_hash_2)

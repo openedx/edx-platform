@@ -1,7 +1,7 @@
 """
 Tests for Course Blocks serializers
 """
-from __future__ import absolute_import
+
 
 import six
 from mock import MagicMock
@@ -64,11 +64,11 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
         Verifies the given serialized_block when basic fields are requested.
         """
         block_key = deserialize_usage_key(block_key_string, self.course.id)
-        self.assertEquals(
+        self.assertEqual(
             self.block_structure.get_xblock_field(block_key, 'category'),
             serialized_block['type'],
         )
-        self.assertEquals(
+        self.assertEqual(
             set(six.iterkeys(serialized_block)),
             {'id', 'block_id', 'type', 'lms_web_url', 'student_view_url'},
         )
@@ -170,14 +170,14 @@ class TestBlockSerializer(TestBlockSerializerBase):
         serializer = self.create_serializer()
         for serialized_block in serializer.data:
             self.assert_basic_block(serialized_block['id'], serialized_block)
-        self.assertEquals(len(serializer.data), 28)
+        self.assertEqual(len(serializer.data), 28)
 
     def test_additional_requested_fields(self):
         self.add_additional_requested_fields()
         serializer = self.create_serializer()
         for serialized_block in serializer.data:
             self.assert_extended_block(serialized_block)
-        self.assertEquals(len(serializer.data), 28)
+        self.assertEqual(len(serializer.data), 28)
 
     def test_staff_fields(self):
         """
@@ -189,7 +189,7 @@ class TestBlockSerializer(TestBlockSerializerBase):
         for serialized_block in serializer.data:
             self.assert_extended_block(serialized_block)
             self.assert_staff_fields(serialized_block)
-        self.assertEquals(len(serializer.data), 29)
+        self.assertEqual(len(serializer.data), 29)
 
 
 class TestBlockDictSerializer(TestBlockSerializerBase):
@@ -211,20 +211,20 @@ class TestBlockDictSerializer(TestBlockSerializerBase):
         serializer = self.create_serializer()
 
         # verify root
-        self.assertEquals(serializer.data['root'], six.text_type(self.block_structure.root_block_usage_key))
+        self.assertEqual(serializer.data['root'], six.text_type(self.block_structure.root_block_usage_key))
 
         # verify blocks
         for block_key_string, serialized_block in six.iteritems(serializer.data['blocks']):
-            self.assertEquals(serialized_block['id'], block_key_string)
+            self.assertEqual(serialized_block['id'], block_key_string)
             self.assert_basic_block(block_key_string, serialized_block)
-        self.assertEquals(len(serializer.data['blocks']), 28)
+        self.assertEqual(len(serializer.data['blocks']), 28)
 
     def test_additional_requested_fields(self):
         self.add_additional_requested_fields()
         serializer = self.create_serializer()
         for serialized_block in six.itervalues(serializer.data['blocks']):
             self.assert_extended_block(serialized_block)
-        self.assertEquals(len(serializer.data['blocks']), 28)
+        self.assertEqual(len(serializer.data['blocks']), 28)
 
     def test_staff_fields(self):
         """
@@ -236,4 +236,4 @@ class TestBlockDictSerializer(TestBlockSerializerBase):
         for serialized_block in six.itervalues(serializer.data['blocks']):
             self.assert_extended_block(serialized_block)
             self.assert_staff_fields(serialized_block)
-        self.assertEquals(len(serializer.data['blocks']), 29)
+        self.assertEqual(len(serializer.data['blocks']), 29)

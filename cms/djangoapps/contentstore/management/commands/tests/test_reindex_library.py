@@ -1,5 +1,5 @@
 """ Tests for library reindex command """
-from __future__ import absolute_import
+
 
 import ddt
 import mock
@@ -50,7 +50,7 @@ class TestReindexLibrary(ModuleStoreTestCase):
 
     def test_given_no_arguments_raises_command_error(self):
         """ Test that raises CommandError for incorrect arguments """
-        with self.assertRaisesRegexp(CommandError, ".* requires one or more *"):
+        with self.assertRaisesRegex(CommandError, ".* requires one or more *"):
             call_command('reindex_library')
 
     @ddt.data('qwerty', 'invalid_key', 'xblock-v1:qwe+rty')
@@ -61,13 +61,13 @@ class TestReindexLibrary(ModuleStoreTestCase):
 
     def test_given_course_key_raises_command_error(self):
         """ Test that raises CommandError if course key is passed """
-        with self.assertRaisesRegexp(CommandError, ".* is not a library key"):
+        with self.assertRaisesRegex(CommandError, ".* is not a library key"):
             call_command('reindex_library', six.text_type(self.first_course.id))
 
-        with self.assertRaisesRegexp(CommandError, ".* is not a library key"):
+        with self.assertRaisesRegex(CommandError, ".* is not a library key"):
             call_command('reindex_library', six.text_type(self.second_course.id))
 
-        with self.assertRaisesRegexp(CommandError, ".* is not a library key"):
+        with self.assertRaisesRegex(CommandError, ".* is not a library key"):
             call_command(
                 'reindex_library',
                 six.text_type(self.second_course.id),

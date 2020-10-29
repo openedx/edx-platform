@@ -2,7 +2,7 @@
 """
 End-to-end tests for the CCX dashboard.
 """
-from __future__ import absolute_import
+
 
 from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage

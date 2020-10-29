@@ -1,7 +1,7 @@
 """
 Signal handlers for the survey app
 """
-from __future__ import absolute_import
+
 
 from django.dispatch.dispatcher import receiver
 

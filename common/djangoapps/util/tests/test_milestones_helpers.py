@@ -2,7 +2,6 @@
 Tests for the milestones helpers library, which is the integration point for the edx_milestones API
 """
 
-from __future__ import absolute_import
 
 import ddt
 import pytest

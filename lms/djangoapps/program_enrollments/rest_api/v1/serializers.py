@@ -1,12 +1,11 @@
 """
 API Serializers
 """
-from __future__ import absolute_import, unicode_literals
+
 
 from rest_framework import serializers
 from six import text_type
 
-from lms.djangoapps.program_enrollments.constants import ProgramCourseEnrollmentStatuses, ProgramEnrollmentStatuses
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 
 from .constants import CourseRunProgressStatuses
@@ -45,6 +44,32 @@ class ProgramEnrollmentSerializer(serializers.Serializer):
         return bool(obj.user)
 
 
+class ProgramEnrollmentRequestMixin(InvalidStatusMixin, serializers.Serializer):
+    """
+    Base fields for all program enrollment related serializers.
+    """
+    student_key = serializers.CharField(allow_blank=False, source='external_user_key')
+    # We could have made this a ChoiceField on ProgramEnrollmentStatuses.__ALL__;
+    # however, we instead check statuses in api/writing.py,
+    # returning INVALID_STATUS for individual bad statuses instead of raising
+    # a ValidationError for the entire request.
+    status = serializers.CharField(allow_blank=False)
+
+
+class ProgramEnrollmentCreateRequestSerializer(ProgramEnrollmentRequestMixin):
+    """
+    Serializer for program enrollment creation requests.
+    """
+    curriculum_uuid = serializers.UUIDField()
+
+
+class ProgramEnrollmentUpdateRequestSerializer(ProgramEnrollmentRequestMixin):
+    """
+    Serializer for program enrollment update requests.
+    """
+    pass
+
+
 class ProgramCourseEnrollmentSerializer(serializers.Serializer):
     """
     Serializer for displaying program-course enrollments.
@@ -67,40 +92,16 @@ class ProgramCourseEnrollmentSerializer(serializers.Serializer):
         return text_type(obj.program_enrollment.curriculum_uuid)
 
 
-class ProgramEnrollmentRequestMixin(InvalidStatusMixin, serializers.Serializer):
-    """
-    Base fields for all program enrollment related serializers.
-    """
-    student_key = serializers.CharField()
-    status = serializers.ChoiceField(
-        allow_blank=False,
-        choices=ProgramEnrollmentStatuses.__ALL__,
-    )
-
-
-class ProgramEnrollmentCreateRequestSerializer(ProgramEnrollmentRequestMixin):
-    """
-    Serializer for program enrollment creation requests.
-    """
-    curriculum_uuid = serializers.UUIDField()
-
-
-class ProgramEnrollmentModifyRequestSerializer(ProgramEnrollmentRequestMixin):
-    """
-    Serializer for program enrollment modification requests
-    """
-    pass
-
-
 class ProgramCourseEnrollmentRequestSerializer(serializers.Serializer, InvalidStatusMixin):
     """
     Serializer for request to create a ProgramCourseEnrollment
     """
-    student_key = serializers.CharField(allow_blank=False)
-    status = serializers.ChoiceField(
-        allow_blank=False,
-        choices=ProgramCourseEnrollmentStatuses.__ALL__,
-    )
+    student_key = serializers.CharField(allow_blank=False, source='external_user_key')
+    # We could have made this a ChoiceField on ProgramCourseEnrollmentStatuses.__ALL__;
+    # however, we instead check statuses in api/writing.py,
+    # returning INVALID_STATUS for individual bad statuses instead of raising
+    # a ValidationError for the entire request.
+    status = serializers.CharField(allow_blank=False)
 
 
 class ProgramCourseGradeSerializer(serializers.Serializer):
@@ -110,7 +111,7 @@ class ProgramCourseGradeSerializer(serializers.Serializer):
     Meant to be used with BaseProgramCourseGrade.
     """
     # Required
-    student_key = serializers.CharField()
+    student_key = serializers.SerializerMethodField()
 
     # From ProgramCourseGradeOk only
     passed = serializers.BooleanField(required=False)
@@ -119,6 +120,9 @@ class ProgramCourseGradeSerializer(serializers.Serializer):
 
     # From ProgramCourseGradeError only
     error = serializers.CharField(required=False)
+
+    def get_student_key(self, obj):
+        return obj.program_course_enrollment.program_enrollment.external_user_key
 
 
 class DueDateSerializer(serializers.Serializer):
@@ -158,62 +162,3 @@ class CourseRunOverviewListSerializer(serializers.Serializer):
     Serializer for a list of course run overviews.
     """
     course_runs = serializers.ListField(child=CourseRunOverviewSerializer())
-
-
-# TODO: The following classes are not serializers, and should probably
-# be moved to api.py as part of EDUCATOR-4321.
-
-
-class BaseProgramCourseGrade(object):
-    """
-    Base for either a courserun grade or grade-loading failure.
-
-    Can be passed to ProgramCourseGradeResultSerializer.
-    """
-    is_error = None  # Override in subclass
-
-    def __init__(self, program_course_enrollment):
-        """
-        Given a ProgramCourseEnrollment,
-        create a BaseProgramCourseGradeResult instance.
-        """
-        self.student_key = (
-            program_course_enrollment.program_enrollment.external_user_key
-        )
-
-
-class ProgramCourseGradeOk(BaseProgramCourseGrade):
-    """
-    Represents a courserun grade for a user enrolled through a program.
-    """
-    is_error = False
-
-    def __init__(self, program_course_enrollment, course_grade):
-        """
-        Given a ProgramCourseEnrollment and course grade object,
-        create a ProgramCourseGradeOk.
-        """
-        super(ProgramCourseGradeOk, self).__init__(
-            program_course_enrollment
-        )
-        self.passed = course_grade.passed
-        self.percent = course_grade.percent
-        self.letter_grade = course_grade.letter_grade
-
-
-class ProgramCourseGradeError(BaseProgramCourseGrade):
-    """
-    Represents a failure to load a courserun grade for a user enrolled through
-    a program.
-    """
-    is_error = True
-
-    def __init__(self, program_course_enrollment, exception=None):
-        """
-        Given a ProgramCourseEnrollment and an Exception,
-        create a ProgramCourseGradeError.
-        """
-        super(ProgramCourseGradeError, self).__init__(
-            program_course_enrollment
-        )
-        self.error = text_type(exception) if exception else "Unknown error"

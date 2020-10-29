@@ -2,7 +2,6 @@
 Information about the release line of this Open edX code.
 """
 
-from __future__ import absolute_import
 
 import unittest
 

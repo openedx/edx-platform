@@ -1,7 +1,7 @@
 """
 Tests for the organizations helpers library, which is the integration point for the edx-organizations API
 """
-from __future__ import absolute_import
+
 
 import six
 from mock import patch

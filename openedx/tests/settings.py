@@ -3,7 +3,6 @@ Minimal Django settings for tests of common/lib.
 Required in Django 1.9+ due to imports of models in stock Django apps.
 """
 
-from __future__ import absolute_import, unicode_literals
 
 import sys
 import tempfile
@@ -70,7 +69,7 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.video_pipeline',
     'openedx.core.djangoapps.bookmarks.apps.BookmarksConfig',
     'edxval',
-    'courseware',
+    'lms.djangoapps.courseware',
     'student',
     'openedx.core.djangoapps.site_configuration',
     'lms.djangoapps.grades.apps.GradesConfig',

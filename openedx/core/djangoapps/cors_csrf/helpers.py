@@ -1,5 +1,5 @@
 """Helper methods for CORS and CSRF checks. """
-from __future__ import absolute_import
+
 
 import contextlib
 import logging

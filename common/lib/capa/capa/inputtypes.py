@@ -38,7 +38,6 @@ graded status as'status'
 # makes sense, but a bunch of problems have markup that assumes block.  Bigger TODO: figure out a
 # general css and layout strategy for capa, document it, then implement it.
 
-from __future__ import absolute_import
 
 import json
 import logging
@@ -58,6 +57,7 @@ from six import text_type
 
 from capa.xqueue_interface import XQUEUE_TIMEOUT
 from chem import chemcalc
+from django.utils.encoding import python_2_unicode_compatible
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib import edx_six
 from xmodule.stringify import stringify_children
@@ -74,6 +74,7 @@ log = logging.getLogger(__name__)
 registry = TagRegistry()  # pylint: disable=invalid-name
 
 
+@python_2_unicode_compatible
 class Status(object):
     """
     Problem status
@@ -119,14 +120,14 @@ class Status(object):
     def __str__(self):
         return self._status
 
-    def __unicode__(self):
-        return self._status.decode('utf8')
-
     def __repr__(self):
         return 'Status(%r)' % self._status
 
     def __eq__(self, other):
         return self._status == str(other)
+
+    def __hash__(self):
+        return hash(str(self))
 
 
 class Attribute(object):
@@ -259,7 +260,7 @@ class InputTypeBase(object):
             msg = u"Error in xml '{x}': {err} ".format(
                 x=etree.tostring(xml), err=text_type(err))
             msg = Exception(msg)
-            six.reraise(Exception, msg, sys.exc_info()[2])
+            six.reraise(Exception, Exception(msg), sys.exc_info()[2])
 
     @classmethod
     def get_attributes(cls):

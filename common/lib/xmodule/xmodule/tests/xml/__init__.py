@@ -1,7 +1,7 @@
 """
 Xml parsing tests for XModules
 """
-from __future__ import absolute_import
+
 
 import pprint
 

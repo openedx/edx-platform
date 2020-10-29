@@ -3,7 +3,7 @@ Enrollment API for creating, updating, and deleting enrollments. Also provides a
 course level, such as available course modes.
 
 """
-from __future__ import absolute_import
+
 
 import importlib
 import logging
@@ -20,14 +20,14 @@ log = logging.getLogger(__name__)
 DEFAULT_DATA_API = 'openedx.core.djangoapps.enrollments.data'
 
 
-def get_enrollments(user_id, include_inactive=False):
+def get_enrollments(username, include_inactive=False):
     """Retrieves all the courses a user is enrolled in.
 
     Takes a user and retrieves all relative enrollments. Includes information regarding how the user is enrolled
     in the the course.
 
     Args:
-        user_id (str): The username of the user we want to retrieve course enrollment information for.
+        username: The username of the user we want to retrieve course enrollment information for.
         include_inactive (bool): Determines whether inactive enrollments will be included
 
     Returns:
@@ -95,16 +95,16 @@ def get_enrollments(user_id, include_inactive=False):
         ]
 
     """
-    return _data_api().get_course_enrollments(user_id, include_inactive)
+    return _data_api().get_course_enrollments(username, include_inactive)
 
 
-def get_enrollment(user_id, course_id):
+def get_enrollment(username, course_id):
     """Retrieves all enrollment information for the user in respect to a specific course.
 
     Gets all the course enrollment information specific to a user in a course.
 
     Args:
-        user_id (str): The user to get course enrollment information for.
+        username: The user to get course enrollment information for.
         course_id (str): The course to get enrollment information for.
 
     Returns:
@@ -142,16 +142,16 @@ def get_enrollment(user_id, course_id):
         }
 
     """
-    return _data_api().get_course_enrollment(user_id, course_id)
+    return _data_api().get_course_enrollment(username, course_id)
 
 
-def add_enrollment(user_id, course_id, mode=None, is_active=True, enrollment_attributes=None):
+def add_enrollment(username, course_id, mode=None, is_active=True, enrollment_attributes=None):
     """Enrolls a user in a course.
 
     Enrolls a user in a course. If the mode is not specified, this will default to `CourseMode.DEFAULT_MODE_SLUG`.
 
     Arguments:
-        user_id (str): The user to enroll.
+        username: The user to enroll.
         course_id (str): The course to enroll the user in.
         mode (str): Optional argument for the type of enrollment to create. Ex. 'audit', 'honor', 'verified',
             'professional'. If not specified, this defaults to the default course mode.
@@ -196,21 +196,23 @@ def add_enrollment(user_id, course_id, mode=None, is_active=True, enrollment_att
     if mode is None:
         mode = _default_course_mode(course_id)
     validate_course_mode(course_id, mode, is_active=is_active)
-    enrollment = _data_api().create_course_enrollment(user_id, course_id, mode, is_active)
+    enrollment = _data_api().create_course_enrollment(username, course_id, mode, is_active)
 
     if enrollment_attributes is not None:
-        set_enrollment_attributes(user_id, course_id, enrollment_attributes)
+        set_enrollment_attributes(username, course_id, enrollment_attributes)
 
     return enrollment
 
 
-def update_enrollment(user_id, course_id, mode=None, is_active=None, enrollment_attributes=None, include_expired=False):
+def update_enrollment(
+    username, course_id, mode=None, is_active=None, enrollment_attributes=None, include_expired=False
+):
     """Updates the course mode for the enrolled user.
 
     Update a course enrollment for the given user and course.
 
     Arguments:
-        user_id (str): The user associated with the updated enrollment.
+        username: The user associated with the updated enrollment.
         course_id (str): The course associated with the updated enrollment.
 
     Keyword Arguments:
@@ -255,22 +257,22 @@ def update_enrollment(user_id, course_id, mode=None, is_active=None, enrollment_
 
     """
     log.info(u'Starting Update Enrollment process for user {user} in course {course} to mode {mode}'.format(
-        user=user_id,
+        user=username,
         course=course_id,
         mode=mode,
     ))
     if mode is not None:
         validate_course_mode(course_id, mode, is_active=is_active, include_expired=include_expired)
-    enrollment = _data_api().update_course_enrollment(user_id, course_id, mode=mode, is_active=is_active)
+    enrollment = _data_api().update_course_enrollment(username, course_id, mode=mode, is_active=is_active)
     if enrollment is None:
-        msg = u"Course Enrollment not found for user {user} in course {course}".format(user=user_id, course=course_id)
+        msg = u"Course Enrollment not found for user {user} in course {course}".format(user=username, course=course_id)
         log.warn(msg)
         raise errors.EnrollmentNotFoundError(msg)
     else:
         if enrollment_attributes is not None:
-            set_enrollment_attributes(user_id, course_id, enrollment_attributes)
+            set_enrollment_attributes(username, course_id, enrollment_attributes)
     log.info(u'Course Enrollment updated for user {user} in course {course} to mode {mode}'.format(
-        user=user_id,
+        user=username,
         course=course_id,
         mode=mode
     ))
@@ -346,13 +348,13 @@ def get_course_enrollment_details(course_id, include_expired=False):
     return course_enrollment_details
 
 
-def set_enrollment_attributes(user_id, course_id, attributes):
+def set_enrollment_attributes(username, course_id, attributes):
     """Set enrollment attributes for the enrollment of given user in the
     course provided.
 
     Args:
-        course_id (str): The Course to set enrollment attributes for.
-        user_id (str): The User to set enrollment attributes for.
+        course_id: The Course to set enrollment attributes for.
+        username: The User to set enrollment attributes for.
         attributes (list): Attributes to be set.
 
     Example:
@@ -368,15 +370,15 @@ def set_enrollment_attributes(user_id, course_id, attributes):
             ]
         )
     """
-    _data_api().add_or_update_enrollment_attr(user_id, course_id, attributes)
+    _data_api().add_or_update_enrollment_attr(username, course_id, attributes)
 
 
-def get_enrollment_attributes(user_id, course_id):
+def get_enrollment_attributes(username, course_id):
     """Retrieve enrollment attributes for given user for provided course.
 
     Args:
-        user_id: The User to get enrollment attributes for
-        course_id (str): The Course to get enrollment attributes for.
+        username: The User to get enrollment attributes for
+        course_id: The Course to get enrollment attributes for.
 
     Example:
         >>>get_enrollment_attributes("Bob", "course-v1-edX-DemoX-1T2015")
@@ -390,7 +392,7 @@ def get_enrollment_attributes(user_id, course_id):
 
     Returns: list
     """
-    return _data_api().get_enrollment_attributes(user_id, course_id)
+    return _data_api().get_enrollment_attributes(username, course_id)
 
 
 def _default_course_mode(course_id):
@@ -459,22 +461,22 @@ def validate_course_mode(course_id, mode, is_active=None, include_expired=False)
         raise errors.CourseModeNotFoundError(msg, course_enrollment_info)
 
 
-def unenroll_user_from_all_courses(user_id):
+def unenroll_user_from_all_courses(username):
     """
     Unenrolls a specified user from all of the courses they are currently enrolled in.
-    :param user_id: The id of the user being unenrolled.
+    :param username: The id of the user being unenrolled.
     :return: The IDs of all of the organizations from which the learner was unenrolled.
     """
-    return _data_api().unenroll_user_from_all_courses(user_id)
+    return _data_api().unenroll_user_from_all_courses(username)
 
 
-def get_user_roles(user_id):
+def get_user_roles(username):
     """
     Returns a list of all roles that this user has.
-    :param user_id: The id of the selected user.
+    :param username: The id of the selected user.
     :return: All roles for all courses that this user has.
     """
-    return _data_api().get_user_roles(user_id)
+    return _data_api().get_user_roles(username)
 
 
 def _data_api():

@@ -2,7 +2,6 @@
 This file defines any decorators used by the shopping cart app
 """
 
-from __future__ import absolute_import
 
 from django.http import Http404
 

@@ -1,7 +1,7 @@
 """
 Middleware for Mobile APIs
 """
-from __future__ import absolute_import
+
 
 from datetime import datetime
 
@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.http import HttpResponse
 from pytz import UTC
+import six
 
 from mobile_api.mobile_platform import MobilePlatform
 from mobile_api.models import AppVersionConfig
@@ -104,13 +105,13 @@ class AppVersionUpgrade(object):
                 cached_data = cache.get_many([last_supported_date_cache_key, latest_version_cache_key])
 
                 last_supported_date = cached_data.get(last_supported_date_cache_key)
-                if not last_supported_date:
+                if last_supported_date != self.NO_LAST_SUPPORTED_DATE and not isinstance(last_supported_date, datetime):
                     last_supported_date = self._get_last_supported_date(platform.NAME, platform.version)
                     cache.set(last_supported_date_cache_key, last_supported_date, self.CACHE_TIMEOUT)
                 request_cache_dict[self.LAST_SUPPORTED_DATE_HEADER] = last_supported_date
 
                 latest_version = cached_data.get(latest_version_cache_key)
-                if not latest_version:
+                if not (latest_version and isinstance(latest_version, six.text_type)):
                     latest_version = self._get_latest_version(platform.NAME)
                     cache.set(latest_version_cache_key, latest_version, self.CACHE_TIMEOUT)
                 request_cache_dict[self.LATEST_VERSION_HEADER] = latest_version

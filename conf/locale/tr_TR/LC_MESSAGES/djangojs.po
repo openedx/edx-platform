@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -30,7 +30,7 @@
 # ElektrikAkar <volkan.kumtepeli@gmail.com>, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -55,9 +55,9 @@
 # ElektrikAkar <volkan.kumtepeli@gmail.com>, 2014
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # Translators:
 # Pelin Çılgın <pelincilgin@hotmail.com>, 2019
@@ -66,7 +66,7 @@
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -85,7 +85,7 @@
 # sevde <savda95@hotmail.com>, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -107,9 +107,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-15 20:42+0000\n"
-"PO-Revision-Date: 2019-07-28 20:42+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2020-01-19 20:42+0000\n"
+"PO-Revision-Date: 2019-12-04 19:20+0000\n"
+"Last-Translator: Ali Işıngör <ali@artistanbul.io>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
 "Language: tr_TR\n"
 "MIME-Version: 1.0\n"
@@ -137,6 +137,21 @@ msgstr "Kaydediliyor"
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/show_textbook.js
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
+#: cms/templates/js/content-group-editor.underscore
+#: cms/templates/js/course-instructor-details.underscore
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/course-settings-learning-fields.underscore
+#: cms/templates/js/course_grade_policy.underscore
+#: cms/templates/js/course_info_update.underscore
+#: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/partition-group-details.underscore
+#: cms/templates/js/show-textbook.underscore
+#: cms/templates/js/signatory-editor.underscore
+#: cms/templates/js/video-transcripts.underscore
+#: cms/templates/js/xblock-outline.underscore
 msgid "Delete"
 msgstr "Sil"
 
@@ -305,6 +320,14 @@ msgid "Your changes have been saved."
 msgstr "Değişiklikleriniz kaydedildi."
 
 #. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: cms/static/js/views/xblock_validation.js
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Warning"
+msgstr "Uyarı"
+
+#. Translators: This message will be added to the front of messages of type
 #. error,
 #. e.g. "Error: required field is missing".
 #: cms/static/js/views/xblock_validation.js
@@ -399,8 +422,8 @@ msgstr[1] ""
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{num_points} point possible (ungraded)"
 msgid_plural "{num_points} points possible (ungraded)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num_points} alınabilir puan (notlandırılmayan)"
+msgstr[1] "{num_points} alınabilir puan (notlandırılmayan)"
 
 #. Translators: {earned} is the number of points earned. {possible} is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
@@ -409,8 +432,8 @@ msgstr[1] ""
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{earned}/{possible} point (graded)"
 msgid_plural "{earned}/{possible} points (graded)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{possible} üzerinden {earned} puan (notlandırılan)"
+msgstr[1] "{possible} üzerinden {earned} puan (notlandırılan)"
 
 #. Translators: {earned} is the number of points earned. {possible} is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
@@ -473,6 +496,11 @@ msgstr "Bu problem sıfırlandı."
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "unsubmitted"
 msgstr "gönderilmedi"
+
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+msgid ""
+"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -830,9 +858,18 @@ msgstr "Belge özellikleri"
 msgid "Edit HTML"
 msgstr "HTML düzenle"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/course_info_handouts.underscore
+#: cms/templates/js/course_info_update.underscore
+#: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/partition-group-details.underscore
+#: cms/templates/js/show-textbook.underscore
+#: cms/templates/js/signatory-details.underscore
+#: cms/templates/js/xblock-string-field-editor.underscore
 msgid "Edit"
 msgstr "Düzenle"
 
@@ -1578,9 +1615,12 @@ msgstr ""
 "Girdiğiniz URL harici bağlantı gibi görünüyor. Gerekli http:// önekini "
 "eklemek ister misiniz?"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/course-instructor-details.underscore
+#: cms/templates/js/signatory-details.underscore
 msgid "Title"
 msgstr "Başlık"
 
@@ -2162,16 +2202,16 @@ msgid "This post could not be reopened. Refresh the page and try again."
 msgstr "Bu gönderi yeniden açılamaz. Sayfayı yenileyin ve tekrar deneyin."
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Show Discussion"
+msgstr "Tartışmayı Göster"
+
+#: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Hide Discussion"
 msgstr "Tartışmayı Gizle"
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "This discussion could not be loaded. Refresh the page and try again."
 msgstr "Bu tartışma yüklenemedi. Sayfayı yeniden yükleyin ve tekrar deneyin."
-
-#: common/static/common/js/discussion/views/discussion_inline_view.js
-msgid "Show Discussion"
-msgstr "Tartışmayı Göster"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "There are no posts in this topic yet."
@@ -2471,7 +2511,7 @@ msgstr "Hesap Ayarları"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Billing/Payment Options"
-msgstr ""
+msgstr "Faturalandırma/Ödeme Seçenekleri"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Certificates"
@@ -2483,26 +2523,34 @@ msgstr "Ders İçeriği"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Deadlines"
-msgstr ""
+msgstr "Son tarihler"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Errors/Technical Issues"
-msgstr ""
+msgstr "Hatalar/Teknik Sorunlar"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Financial Aid"
-msgstr ""
+msgstr "Mâli Yardım"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Masters"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Photo Verification"
+msgid "MicroBachelors"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Photo Verification"
+msgstr "Fotoğraf Doğrulama"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Proctoring"
+msgstr "Gözetmenli"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Security"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
@@ -2552,7 +2600,7 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Select a subject for your support request."
-msgstr ""
+msgstr "Destek talebiniz için bir konu seçin."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
@@ -2702,14 +2750,14 @@ msgstr "Takımdan üyeyi çıkartırken bir hata oluştu. Tekrar deneyin."
 msgid "This team does not have any members."
 msgstr "Bu takımda hiç üye yok."
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Joined %(date)s"
 msgstr "Katıldı %(date)s"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Last Activity %(date)s"
 msgstr "Son Faaliyet %(date)s"
@@ -2720,11 +2768,9 @@ msgstr "Bu takım üyesini çıkart?"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid ""
-"This learner will be removed from the team, allowing another learner to take"
-" the available spot."
+"This learner will be removed from the team,allowing another learner to take "
+"the available spot."
 msgstr ""
-"Takımdan bu öğrenci çıkartılacak, başka bir öğrencinin uygun boşluğu "
-"almasına izin veriniz."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Delete this team?"
@@ -2732,35 +2778,38 @@ msgstr "Bu takımı sil?"
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid ""
-"Deleting a team is permanent and cannot be undone. All members are removed "
+"Deleting a team is permanent and cannot be undone.All members are removed "
 "from the team, and team discussions can no longer be accessed."
 msgstr ""
-"Bir takım silmek kalıcıdır ve geri alınamaz. Takımdan tüm üyeler "
-"çıkartılacak, ve takım tartışmaları artık erişilebilir olmayacak."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Team \"{team}\" successfully deleted."
 msgstr "\"{team}\" takımı başarıyla silindi."
 
+#: lms/djangoapps/teams/static/teams/js/views/manage.js
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Manage"
+msgstr "Yönet"
+
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
 msgstr "Şu anda herhangi bir takıma üye değilsiniz."
 
-#. Translators: "and others" refers to fact that additional members of a team
-#. exist that are not displayed.
+#. Translators: "and others" refers to fact that additional
+#. * members of a team exist that are not displayed.
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "and others"
 msgstr "ve diğerleri"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. http://momentjs.com/)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: http://momentjs.com/)
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "Last activity %(date)s"
-msgstr "Son Faaliyet %(date)s"
+msgid "Last activity {date}"
+msgstr "Son faaliyet {date}"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "View %(span_start)s %(team_name)s %(span_end)s"
-msgstr "%(span_start)s %(team_name)s %(span_end)s görüntüle"
+msgid "View {span_start} {team_name} {span_end}"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
@@ -2773,11 +2822,9 @@ msgstr "Bu takımdan ayrıl?"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 msgid ""
-"If you leave, you can no longer post in this team's discussions. Your place "
+"If you leave, you can no longer post in this team's discussions.Your place "
 "will be available to another learner."
 msgstr ""
-"Eğer ayrılırsanız, artık bu takımın tartışmalarına ileti "
-"gönderemeyeceksiniz. Sizin yeriniz başka bir öğrenci için uygun olacak."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/static/js/verify_student/views/reverify_view.js
@@ -2793,11 +2840,15 @@ msgstr "Şu anda başka bir takıma ait görünüyorsunuz."
 msgid "This team is full."
 msgstr "Bu takım dolu."
 
+#: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
+msgid "Cannot join instructor managed team"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
-msgid "%(memberCount)s / %(maxMemberCount)s Member"
-msgid_plural "%(memberCount)s / %(maxMemberCount)s Members"
-msgstr[0] ""
-msgstr[1] "%(memberCount)s / %(maxMemberCount)s Üyeler"
+msgid "{memberCount} / {maxMemberCount} Member"
+msgid_plural "{memberCount} / {maxMemberCount} Members"
+msgstr[0] "{memberCount} / {maxMemberCount} Üye"
+msgstr[1] "{memberCount} / {maxMemberCount} Üye"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "All teams"
@@ -2812,15 +2863,6 @@ msgid "Topics"
 msgstr "Konular"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid ""
-"See all teams in your course, organized by topic. Join a team to collaborate"
-" with other learners who are interested in the same topic as you are."
-msgstr ""
-"Dersinizdeki konu etrafında şekillenen tüm takımları görün. Sizinle aynı "
-"konuyla ilgilenen diğer öğrencilerle işbirliği yapmak için bir takıma "
-"katılın."
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "My Team"
 msgstr "Takımım"
 
@@ -2828,6 +2870,15 @@ msgstr "Takımım"
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Browse"
 msgstr "Göz at"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"See all teams in your course, organized by topic. Join a team to collaborate"
+" with other learners who are interested in the same topic as you are."
+msgstr ""
+"Dersinizdeki konu etrafında şekillenen tüm takımları görün. Sizinle aynı "
+"konuyla ilgilenen diğer öğrencilerle işbirliği yapmak için bir takıma "
+"katılın."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Your request could not be completed. Reload the page and try again."
@@ -2910,27 +2961,19 @@ msgid "The team \"{team}\" could not be found."
 msgstr "\"{team}\" takımı bulunamadı."
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "%(team_count)s Team"
-msgid_plural "%(team_count)s Teams"
-msgstr[0] ""
-msgstr[1] "%(team_count)s Takım"
+msgid "{team_count} Team"
+msgid_plural "{team_count} Teams"
+msgstr[0] "{team_count} Takım"
+msgstr[1] "{team_count} Takım"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "Topic"
 msgstr "Konu"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "View Teams in the %(topic_name)s Topic"
-msgstr "%(topic_name)s Başlığı altındaki Takımları Görüntüle"
+msgid "View Teams in the {topic_name} Topic"
+msgstr "{topic_name}  Başlığı Altındaki Takımları Görüntüle "
 
-#. Translators: this string is shown at the bottom of the teams page
-#. to find a team to join or else to create a new one. There are three
-#. links that need to be included in the message:
-#. 1. Browse teams in other topics
-#. 2. search teams
-#. 3. create a new team
-#. Be careful to start each link with the appropriate start indicator
-#. (e.g. {browse_span_start} for #1) and finish it with {span_end}.
 #: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
 msgid ""
 "{browse_span_start}Browse teams in other topics{span_end} or "
@@ -3334,6 +3377,8 @@ msgstr ""
 #: lms/static/js/dashboard/legacy.js
 msgid "Are you sure you want to unenroll from {courseName} ({courseNumber})?"
 msgstr ""
+"{courseName} ({courseNumber}) dersindeki kaydınızı iptal etmek istediğinize "
+"emin misiniz?"
 
 #: lms/static/js/dashboard/legacy.js
 msgid ""
@@ -4614,36 +4659,32 @@ msgid ""
 "{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read "
 "the above carefully before proceeding. This is an irreversible action, and "
 "{strongStart}you will no longer be able to use the same email on "
-"edX.{strongEnd}"
+"{platformName}.{strongEnd}"
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"Please note: Deletion of your account and personal data is permanent and "
+"cannot be undone. {platformName} will not be able to recover your account or"
+" the data that is deleted."
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"Once your account is deleted, you cannot use it to take courses on the "
+"{platformName} app, {siteName}, or any other site hosted by {platformName}."
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"This includes access to {siteName} from your employer’s or university’s "
+"system{additionalSiteSpecificDeletionText}."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "We’re sorry to see you go!"
 msgstr "Gittiğinizi görmek bizi üzüyor!"
-
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid ""
-"Please note: Deletion of your account and personal data is permanent and "
-"cannot be undone. EdX will not be able to recover your account or the data "
-"that is deleted."
-msgstr ""
-"Lütfen dikkate alın: Hesabınızın ve kişisel verilerinizin silinmesi kalıcı "
-"olup, sonradan geri döndürülemez. edX silinen hesap ya da verilerinizi "
-"hiçbir şekilde geri getiremez."
-
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid ""
-"Once your account is deleted, you cannot use it to take courses on the edX "
-"app, edx.org, or any other site hosted by edX. This includes access to "
-"edx.org from your employer’s or university’s system and access to private "
-"sites offered by MIT Open Learning, Wharton Executive Education, and Harvard"
-" Medical School."
-msgstr ""
-"Hesabınız bir kere silindiğinde, edX uygulaması, edx.org ya da edX "
-"tarafından barındırılan siteden ders alamazsınız. Buna; işvereninizin veya "
-"üniversitenin sisteminden edx.org'a erişim ve MIT Open Learning, Wharton "
-"Executive Education ve Harvard Medical School tarafından sunulan özel "
-"sitelere erişim dâhildir."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -4677,26 +4718,16 @@ msgstr "Bir parola gerekiyor"
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "You have selected “Delete my account.” Deletion of your account and personal"
-" data is permanent and cannot be undone. EdX will not be able to recover "
-"your account or the data that is deleted."
+" data is permanent and cannot be undone. {platformName} will not be able to "
+"recover your account or the data that is deleted."
 msgstr ""
-"\"Hesabımı sil\"i seçtiniz. Hesabınızın ve kişisel verilerinizin silinmesi "
-"kalıcı olup, sonradan geri döndürülemez. edX silinen hesap ya da "
-"verilerinizi hiçbir şekilde geri getiremez."
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "If you proceed, you will be unable to use this account to take courses on "
-"the edX app, edx.org, or any other site hosted by edX. This includes access "
-"to edx.org from your employer’s or university’s system and access to private"
-" sites offered by MIT Open Learning, Wharton Executive Education, and "
-"Harvard Medical School."
+"the {platformName} app, {siteName}, or any other site hosted by "
+"{platformName}."
 msgstr ""
-"İlerlemeyi seçmeniz durumunda, bu hesapla edX uygulaması, edx.org ya da edX "
-"tarafından barındırılan siteden ders alamazsınız. Buna; işvereninizin veya "
-"üniversitenin sisteminden edx.org'a erişim ve MIT Open Learning, Wharton "
-"Executive Education ve Harvard Medical School tarafından sunulan özel "
-"sitelere erişim dâhildir."
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
@@ -4789,6 +4820,10 @@ msgid ""
 msgstr ""
 "Bir hata meydana geldi. Sayfayı yenilemeyi deneyin veya internet "
 "bağlantınızı kontrol edin."
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid "An unexpected error has occurred."
+msgstr "Beklenmeyen bir hata oluştu."
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -6390,8 +6425,8 @@ msgstr "Tarih eklendi"
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
-msgid "Editing access for: %(title)s"
-msgstr "%(title)s için erişim düzenleniyor"
+msgid "Editing access for: {title}"
+msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
@@ -6942,13 +6977,6 @@ msgstr "Ayarlar"
 msgid "New {component_type}"
 msgstr "Yeni {component_type}"
 
-#. Translators: This message will be added to the front of messages of type
-#. warning,
-#. e.g. "Warning: this component has not been configured yet".
-#: cms/static/js/views/xblock_validation.js
-msgid "Warning"
-msgstr "Uyarı"
-
 #: cms/static/js/xblock_asides/structured_tags.js
 msgid "Updating Tags"
 msgstr "Etiketler Güncelleniyor"
@@ -7315,6 +7343,22 @@ msgstr "Takımı Sil"
 #: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
 msgid "Edit Membership"
 msgstr "Üyelikleri Düzenle"
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "View Current Team Memberships"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Download Memberships"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Assign Team Memberships"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Upload Memberships"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
 msgid "Are you having trouble finding a team to join?"
@@ -9433,6 +9477,10 @@ msgid ""
 "hidden."
 msgstr ""
 
+#: cms/templates/js/copy-clipboard-button.underscore
+msgid "Copy Component Location"
+msgstr ""
+
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Weekly Highlight Emails"
 msgstr "Haftalık Vurgulama E-postaları"
@@ -9866,6 +9914,10 @@ msgstr "Bölüm Bilgileri"
 msgid "Add a Chapter"
 msgstr "Bir bölüm ekle"
 
+#: cms/templates/js/edit-title-button.underscore
+msgid "Edit Title"
+msgstr ""
+
 #: cms/templates/js/grading-editor.underscore
 msgid "Grading"
 msgstr "Notlandırma"
@@ -10038,10 +10090,6 @@ msgstr "Temizle"
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear Value"
 msgstr "Değeri Temizle"
-
-#: cms/templates/js/metadata-editor.underscore
-msgid "Component Location ID"
-msgstr "Bileşen Konum ID"
 
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video-transcripts.underscore

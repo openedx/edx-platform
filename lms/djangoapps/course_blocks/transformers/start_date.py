@@ -1,7 +1,7 @@
 """
 Start Date Transformer implementation.
 """
-from __future__ import absolute_import
+
 
 from lms.djangoapps.courseware.access_utils import check_start_date
 from openedx.core.djangoapps.content.block_structure.transformer import (

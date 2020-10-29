@@ -1,7 +1,7 @@
 """
 Storage backend for course import and export.
 """
-from __future__ import absolute_import
+
 
 from django.conf import settings
 from django.core.files.storage import get_storage_class

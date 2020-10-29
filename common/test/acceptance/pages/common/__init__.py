@@ -1,7 +1,7 @@
 """
 Package of common page objects for acceptance tests
 """
-from __future__ import absolute_import
+
 
 import os
 

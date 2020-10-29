@@ -1,7 +1,7 @@
 """
 This file contains celery tasks for programs-related functionality.
 """
-from __future__ import absolute_import
+
 
 from celery import task
 from celery.exceptions import MaxRetriesExceededError
@@ -193,6 +193,8 @@ def award_program_certificates(self, username):
         for program_uuid in new_program_uuids:
             visible_date = completed_programs[program_uuid]
             try:
+                LOGGER.info(u'Visible date for user %s : program %s is %s', username, program_uuid,
+                            visible_date)
                 award_program_certificate(credentials_client, username, program_uuid, visible_date)
                 LOGGER.info(u'Awarded certificate for program %s to user %s', program_uuid, username)
             except exceptions.HttpNotFoundError:

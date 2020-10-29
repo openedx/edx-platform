@@ -1,7 +1,7 @@
 """
 CAPA HTML rendering tests.
 """
-from __future__ import absolute_import
+
 
 import os
 import textwrap
@@ -140,7 +140,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # expect the javascript is still present in the rendered html
         self.assertIn(
             "<script type=\"text/javascript\">function(){}</script>",
-            etree.tostring(rendered_html)
+            etree.tostring(rendered_html).decode('utf-8')
         )
 
     def test_render_response_xml(self):
@@ -306,7 +306,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Render the HTML
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>\s*</div>")
+        self.assertRegex(the_html, r"<div>\s*</div>")
 
     def _create_test_file(self, path, content_str):
         test_fp = self.capa_system.filestore.open(path, "w")

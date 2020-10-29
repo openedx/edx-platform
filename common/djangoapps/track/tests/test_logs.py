@@ -1,5 +1,5 @@
 """Tests that tracking data are successfully logged"""
-from __future__ import absolute_import
+
 
 import unittest
 

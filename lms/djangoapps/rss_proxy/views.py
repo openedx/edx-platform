@@ -1,7 +1,7 @@
 """
 Views for the rss_proxy djangoapp.
 """
-from __future__ import absolute_import, print_function
+
 
 import requests
 from django.conf import settings

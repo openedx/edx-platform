@@ -2,7 +2,7 @@
 Tests for waffle utils test utilities.
 """
 
-from __future__ import absolute_import
+
 import crum
 from django.test import TestCase
 from django.test.client import RequestFactory

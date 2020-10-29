@@ -2,7 +2,6 @@
 Tests of modulestore semantics: How do the interfaces methods of ModuleStore relate to each other?
 """
 
-from __future__ import absolute_import
 
 import itertools
 from collections import namedtuple
@@ -26,6 +25,8 @@ DETACHED_BLOCK_TYPES = dict(XBlock.load_tagged_classes('detached'))
 # These tests won't work with courses, since they're creating blocks inside courses
 TESTABLE_BLOCK_TYPES = set(DIRECT_ONLY_CATEGORIES)
 TESTABLE_BLOCK_TYPES.discard('course')
+TESTABLE_BLOCK_TYPES = list(TESTABLE_BLOCK_TYPES)
+TESTABLE_BLOCK_TYPES.sort()
 
 TestField = namedtuple('TestField', ['field_name', 'initial', 'updated'])
 
@@ -107,22 +108,22 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
                 target_block = self.store.get_item(
                     block_usage_key,
                 )
-                self.assertEquals(content, target_block.fields[field_name].read_from(target_block))
+                self.assertEqual(content, target_block.fields[field_name].read_from(target_block))
                 if aside_field_name and aside_content:
                     aside = self._get_aside(target_block)
                     self.assertIsNotNone(aside)
-                    self.assertEquals(aside_content, aside.fields[aside_field_name].read_from(aside))
+                    self.assertEqual(aside_content, aside.fields[aside_field_name].read_from(aside))
 
         if draft is None or draft:
             with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
                 target_block = self.store.get_item(
                     block_usage_key,
                 )
-                self.assertEquals(content, target_block.fields[field_name].read_from(target_block))
+                self.assertEqual(content, target_block.fields[field_name].read_from(target_block))
                 if aside_field_name and aside_content:
                     aside = self._get_aside(target_block)
                     self.assertIsNotNone(aside)
-                    self.assertEquals(aside_content, aside.fields[aside_field_name].read_from(aside))
+                    self.assertEqual(aside_content, aside.fields[aside_field_name].read_from(aside))
 
     def assertParentOf(self, parent_usage_key, child_usage_key, draft=None):
         """
@@ -312,7 +313,7 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
             test_data = self.DATA_FIELDS[block_type]
 
             updated_field_value = test_data.updated
-            self.assertNotEquals(updated_field_value, block.fields[test_data.field_name].read_from(block))
+            self.assertNotEqual(updated_field_value, block.fields[test_data.field_name].read_from(block))
 
             block.fields[test_data.field_name].write_to(block, updated_field_value)
 

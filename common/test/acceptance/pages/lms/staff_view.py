@@ -1,7 +1,7 @@
 """
 Staff views of various tabs (e.g. courseware, course home)
 """
-from __future__ import absolute_import
+
 
 from bok_choy.page_object import PageObject
 

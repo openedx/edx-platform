@@ -3,7 +3,6 @@
 Unit tests for preference APIs.
 """
 
-from __future__ import absolute_import
 
 import json
 
@@ -153,7 +152,12 @@ class TestPreferencesAPI(UserAPITestCase):
             expected_status=204
         )
         response = self.send_get(self.client)
-        self.assertEqual({u"dict_pref": u"{u'int_key': 10}", u"string_pref": u"value"}, response.data)
+        if six.PY2:
+            pref_dict = {u"dict_pref": u"{u'int_key': 10}", u"string_pref": u"value"}
+        else:
+            # pylint: disable=unicode-format-string
+            pref_dict = {"dict_pref": "{'int_key': 10}", "string_pref": "value"}
+        self.assertEqual(pref_dict, response.data)
 
     @ddt.data(
         ("different_client", "different_user"),
@@ -232,7 +236,7 @@ class TestPreferencesAPI(UserAPITestCase):
         )
         self.assertTrue(response.data.get("field_errors", None))
         field_errors = response.data["field_errors"]
-        self.assertEquals(
+        self.assertEqual(
             field_errors,
             {
                 TOO_LONG_PREFERENCE_KEY: {
@@ -514,7 +518,7 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         new_value = "new value"
         self._set_url(too_long_preference_key)
         response = self.send_put(self.client, new_value, expected_status=400)
-        self.assertEquals(
+        self.assertEqual(
             response.data,
             {
                 "developer_message": get_expected_validation_developer_message(too_long_preference_key, new_value),

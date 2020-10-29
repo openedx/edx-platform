@@ -39,7 +39,6 @@ When refering to XBlocks, we use the entry-point name. For example,
 # want to import all variables from base settings files
 # pylint: disable=unused-import
 
-from __future__ import absolute_import
 
 import imp
 import os
@@ -106,6 +105,9 @@ from lms.envs.common import (
 
     GENERATE_PROFILE_SCORES,
 
+    # Enterprise service settings
+    ENTERPRISE_CATALOG_INTERNAL_ROOT_URL,
+
     # Methods to derive settings
     _make_mako_template_dirs,
     _make_locale_paths,
@@ -167,10 +169,6 @@ FEATURES = {
     'ENABLE_DISCUSSION_SERVICE': True,
     'ENABLE_TEXTBOOK': True,
 
-    # .. documented_elsewhere: true
-    # .. documented_elsewhere_name: ENABLE_STUDENT_NOTES
-    'ENABLE_STUDENT_NOTES': True,
-
     # DO NOT SET TO True IN THIS FILE
     # Doing so will cause all courses to be released on production
     'DISABLE_START_DATES': False,  # When True, all courses will be active, regardless of start date
@@ -228,6 +226,13 @@ FEATURES = {
     # Show a new field in "Advanced settings" that can store custom data about a
     # course and that can be read from themes
     'ENABLE_OTHER_COURSE_SETTINGS': False,
+
+    # Write new CSM history to the extended table.
+    # This will eventually default to True and may be
+    # removed since all installs should have the separate
+    # extended history table. This is needed in the LMS and CMS
+    # for migration consistency.
+    'ENABLE_CSMH_EXTENDED': True,
 
     # Enable support for content libraries. Note that content libraries are
     # only supported in courses using split mongo.
@@ -307,6 +312,24 @@ FEATURES = {
 
     # Prevent auto auth from creating superusers or modifying existing users
     'RESTRICT_AUTOMATIC_AUTH': True,
+
+    'AUTH_USE_OPENID_PROVIDER': True,
+    'ENABLE_INSTRUCTOR_ANALYTICS': False,
+    'PREVIEW_LMS_BASE': "preview.localhost:18000",
+    'ENABLE_GRADE_DOWNLOADS': True,
+    'ENABLE_MKTG_SITE': False,
+    'ENABLE_DISCUSSION_HOME_PANEL': True,
+    'ENABLE_CORS_HEADERS': False,
+    'ENABLE_CROSS_DOMAIN_CSRF_COOKIE': False,
+    'ENABLE_COUNTRY_ACCESS': False,
+    'ENABLE_CREDIT_API': False,
+    'ENABLE_OAUTH2_PROVIDER': False,
+    'ENABLE_SYSADMIN_DASHBOARD': False,
+    'ENABLE_MOBILE_REST_API': False,
+    'CUSTOM_COURSES_EDX': False,
+    'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True,
+    'SHOW_FOOTER_LANGUAGE_SELECTOR': False,
+    'ENABLE_ENROLLMENT_RESET': False,
 }
 
 ENABLE_JASMINE = False
@@ -318,7 +341,11 @@ IDA_LOGOUT_URI_LIST = []
 ############################# SOCIAL MEDIA SHARING #############################
 SOCIAL_SHARING_SETTINGS = {
     # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in lms/envs/common.py
-    'CUSTOM_COURSE_URLS': False
+    'CUSTOM_COURSE_URLS': False,
+    'DASHBOARD_FACEBOOK': False,
+    'CERTIFICATE_FACEBOOK': False,
+    'CERTIFICATE_TWITTER': False,
+    'DASHBOARD_TWITTER': False
 }
 
 SOCIAL_MEDIA_FOOTER_URLS = {}
@@ -348,6 +375,11 @@ GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoLite2-Country.mmdb"
 
 DATA_DIR = COURSES_ROOT
 
+DJFS = {
+    'type': 'osfs',
+    'directory_root': '/edx/var/edxapp/django-pyfs/static/django-pyfs',
+    'url_root': '/static/django-pyfs',
+}
 ######################## BRANCH.IO ###########################
 BRANCH_IO_KEY = ''
 
@@ -438,12 +470,15 @@ DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
 # in the global settings.py
 AWS_SES_REGION_NAME = 'us-east-1'
 AWS_SES_REGION_ENDPOINT = 'email.us-east-1.amazonaws.com'
+AWS_ACCESS_KEY_ID = None
+AWS_SECRET_ACCESS_KEY = None
+AWS_QUERYSTRING_AUTH = False
+AWS_STORAGE_BUCKET_NAME = 'SET-ME-PLEASE (ex. bucket-name)'
+AWS_S3_CUSTOM_DOMAIN = 'SET-ME-PLEASE (ex. bucket-name.s3.amazonaws.com)'
 
 ##############################################################################
 
 EDX_ROOT_URL = ''
-LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/home/'
-LOGIN_URL = reverse_lazy('login_redirect_to_lms')
 
 # use the ratelimit backend to prevent brute force attacks
 AUTHENTICATION_BACKENDS = [
@@ -463,14 +498,23 @@ LOGGING_ENV = 'sandbox'
 LMS_BASE = 'localhost:18000'
 LMS_ROOT_URL = "https://localhost:18000"
 LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
+
+LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/home/'
+# TODO: Determine if LOGIN_URL could be set to the FRONTEND_LOGIN_URL value instead.
+LOGIN_URL = reverse_lazy('login_redirect_to_lms')
+FRONTEND_LOGIN_URL = lambda settings: settings.LMS_ROOT_URL + '/login'
+derived('FRONTEND_LOGIN_URL')
+FRONTEND_LOGOUT_URL = lambda settings: settings.LMS_ROOT_URL + '/logout'
+derived('FRONTEND_LOGOUT_URL')
+FRONTEND_REGISTER_URL = lambda settings: settings.LMS_ROOT_URL + '/register'
+derived('FRONTEND_REGISTER_URL')
+
 LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
 ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
 ENTERPRISE_CONSENT_API_URL = LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
-FRONTEND_LOGIN_URL = LOGIN_URL
-FRONTEND_LOGOUT_URL = lambda settings: settings.LMS_ROOT_URL + '/logout'
-derived('FRONTEND_LOGOUT_URL')
 
+# Public domain name of Studio (should be resolvable from the end-user's browser)
 CMS_BASE = 'localhost:18010'
 
 LOG_DIR = '/edx/var/log/edx'
@@ -510,6 +554,7 @@ CSRF_COOKIE_SECURE = False
 
 CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ''
 CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
+CSRF_TRUSTED_ORIGINS = []
 
 #################### CAPA External Code Evaluation #############################
 XQUEUE_INTERFACE = {
@@ -601,6 +646,8 @@ MIDDLEWARE_CLASSES = [
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 ]
 
+EXTRA_MIDDLEWARE_CLASSES = []
+
 # Clickjacking protection can be disabled by setting this to 'ALLOW'
 X_FRAME_OPTIONS = 'DENY'
 
@@ -633,7 +680,7 @@ XBLOCK_FIELD_DATA_WRAPPERS = ()
 ############################ ORA 2 ############################################
 
 # By default, don't use a file prefix
-ORA2_FILE_PREFIX = None
+ORA2_FILE_PREFIX = 'default_env-default_deployment/ora2'
 
 # Default File Upload Storage bucket and prefix. Used by the FileUpload Service.
 FILE_UPLOAD_STORAGE_BUCKET_NAME = 'SET-ME-PLEASE (ex. bucket-name)'
@@ -642,9 +689,21 @@ FILE_UPLOAD_STORAGE_PREFIX = 'submissions_attachments'
 ############################ Modulestore Configuration ################################
 
 DOC_STORE_CONFIG = {
+    'db': 'edxapp',
     'host': 'localhost',
-    'db': 'xmodule',
+    'replicaSet': '',
+    'user': 'edxapp',
+    'port': 27017,
     'collection': 'modulestore',
+    'ssl': False,
+    # https://api.mongodb.com/python/2.9.1/api/pymongo/mongo_client.html#module-pymongo.mongo_client
+    # default is never timeout while the connection is open,
+    #this means it needs to explicitly close raising pymongo.errors.NetworkTimeout
+    'socketTimeoutMS': 3000,
+    'connectTimeoutMS': 2000,  # default is 20000, I believe raises pymongo.errors.ConnectionFailure
+    # Not setting waitQueueTimeoutMS and waitQueueMultiple since pymongo defaults to nobody being allowed to wait
+    'auth_source': None,
+    'read_preference': 'PRIMARY'
     # If 'asset_collection' defined, it'll be used
     # as the collection name for asset metadata.
     # Otherwise, a default collection name will be used.
@@ -657,10 +716,11 @@ CONTENTSTORE = {
     'OPTIONS': {
         'db': 'edxapp',
         'host': 'localhost',
-        'password': 'edxapp',
+        'password': 'password',
         'port': 27017,
         'user': 'edxapp',
-        'ssl': False
+        'ssl': False,
+        'auth_source': None
     },
     'ADDITIONAL_OPTIONS': {},
     'DOC_STORE_CONFIG': DOC_STORE_CONFIG
@@ -736,7 +796,7 @@ DATABASES = {
         'OPTIONS': {},
         'PASSWORD': 'password',
         'PORT': '3306',
-        'USER': 'edxapp'
+        'USER': 'edxapp001'
     }
 }
 
@@ -779,7 +839,7 @@ COURSES_WITH_UNSAFE_CODE = []
 DEBUG = False
 SESSION_COOKIE_SECURE = False
 SESSION_SAVE_EVERY_REQUEST = False
-SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+SESSION_SERIALIZER = 'openedx.core.lib.session_serializers.PickleV2Serializer'
 SESSION_COOKIE_DOMAIN = ""
 SESSION_COOKIE_NAME = 'sessionid'
 
@@ -799,7 +859,7 @@ GIT_REPO_EXPORT_DIR = '/edx/var/edxapp/export_course_repos'
 
 # Email
 TECH_SUPPORT_EMAIL = 'technical@example.com'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 25
 EMAIL_USE_TLS = False
@@ -851,6 +911,7 @@ CERTIFICATE_TEMPLATE_LANGUAGES = {
 USE_I18N = True
 USE_L10N = True
 
+STATICI18N_FILENAME_FUNCTION = 'statici18n.utils.legacy_filename'
 STATICI18N_ROOT = PROJECT_ROOT / "static"
 
 LOCALE_PATHS = _make_locale_paths
@@ -880,6 +941,7 @@ PIPELINE = {
 }
 
 STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
+STATICFILES_STORAGE_KWARGS = {}
 
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
@@ -1115,6 +1177,9 @@ CELERY_BROKER_TRANSPORT = 'amqp'
 CELERY_BROKER_HOSTNAME = 'localhost'
 CELERY_BROKER_USER = 'celery'
 CELERY_BROKER_PASSWORD = 'celery'
+CELERY_BROKER_VHOST = ''
+CELERY_BROKER_USE_SSL = False
+CELERY_EVENT_QUEUE_TTL = None
 
 ############################## Video ##########################################
 
@@ -1293,7 +1358,8 @@ INSTALLED_APPS = [
     # by installed apps.
     'openedx.core.djangoapps.oauth_dispatch.apps.OAuthDispatchAppConfig',
     'oauth_provider',
-    'courseware',
+    'lms.djangoapps.courseware',
+    'coursewarehistoryextended',
     'survey.apps.SurveyConfig',
     'lms.djangoapps.verify_student.apps.VerifyStudentConfig',
     'completion',
@@ -1351,6 +1417,8 @@ INSTALLED_APPS = [
     'openedx.features.discounts',
     'experiments',
 
+    # so sample_task is available to celery workers
+    'openedx.core.djangoapps.heartbeat',
 ]
 
 
@@ -1372,6 +1440,7 @@ ACTIVATION_EMAIL_SUPPORT_LINK = ''
 
 ############################## EVENT TRACKING #################################
 
+CMS_SEGMENT_KEY = None
 TRACK_MAX_EVENT = 50000
 
 TRACKING_BACKENDS = {
@@ -1567,6 +1636,8 @@ RETIRED_EMAIL_FMT = lambda settings: settings.RETIRED_EMAIL_PREFIX + '{}@' + set
 derived('RETIRED_USERNAME_FMT', 'RETIRED_EMAIL_FMT')
 RETIRED_USER_SALTS = ['abc', '123']
 RETIREMENT_SERVICE_WORKER_USERNAME = 'RETIREMENT_SERVICE_USER'
+RETIREMENT_SERVICE_USER_EMAIL = "retirement_worker@example.com"
+RETIREMENT_SERVICE_USER_NAME = "retirement_worker"
 
 # These states are the default, but are designed to be overridden in configuration.
 RETIREMENT_STATES = [
@@ -1758,7 +1829,7 @@ OAUTH_ID_TOKEN_EXPIRATION = 5 * 60
 PARTNER_SUPPORT_EMAIL = ''
 
 # Affiliate cookie tracking
-AFFILIATE_COOKIE_NAME = 'affiliate_id'
+AFFILIATE_COOKIE_NAME = 'dev_affiliate_id'
 
 ############## Settings for Studio Context Sensitive Help ##############
 
@@ -1789,6 +1860,12 @@ ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = {}
 
 BASE_COOKIE_DOMAIN = 'localhost'
+
+# This limits the type of roles that are submittable via the `student` app's manual enrollment
+# audit API. While this isn't used in CMS, it is used via Enterprise which is installed in
+# the CMS. Without this, we get errors.
+MANUAL_ENROLLMENT_ROLE_CHOICES = ['Learner', 'Support', 'Partner']
+
 ############## Settings for the Discovery App ######################
 
 COURSE_CATALOG_API_URL = 'http://localhost:8008/api/v1'
@@ -1819,7 +1896,7 @@ MOBILE_STORE_URLS = {}
 RECALCULATE_GRADES_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
 # Queue to use for updating grades due to grading policy change
-POLICY_CHANGE_GRADES_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
+POLICY_CHANGE_GRADES_ROUTING_KEY = 'edx.lms.core.default'
 
 # Rate limit for regrading tasks that a grading policy change can kick off
 POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
@@ -1832,6 +1909,9 @@ VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
 
 ########## Settings youtube thumbnails scraper tasks ############
 SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
+
+########## Settings update search index task ############
+UPDATE_SEARCH_INDEX_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
 
 ###################### VIDEO IMAGE STORAGE ######################
 
@@ -1856,8 +1936,8 @@ VIDEO_IMAGE_ASPECT_RATIO_ERROR_MARGIN = 0.1
 
 ###################### ZENDESK ######################
 ZENDESK_URL = ''
-ZENDESK_USER = None
-ZENDESK_API_KEY = None
+ZENDESK_USER = ''
+ZENDESK_API_KEY = ''
 ZENDESK_CUSTOM_FIELDS = {}
 ZENDESK_OAUTH_ACCESS_TOKEN = ''
 # A mapping of string names to Zendesk Group IDs
@@ -1891,7 +1971,7 @@ ECOMMERCE_API_URL = 'http://localhost:8002/api/v2'
 ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:8005'
-CREDENTIALS_PUBLIC_SERVICE_URL = None
+CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:8005'
 
 ANALYTICS_DASHBOARD_URL = 'http://localhost:18110/courses'
 ANALYTICS_DASHBOARD_NAME = 'Your Platform Name Here Insights'
@@ -1993,7 +2073,7 @@ SWIFT_TENANT_NAME = None
 SWIFT_AUTH_URL = None
 SWIFT_AUTH_VERSION = None
 SWIFT_REGION_NAME = None
-SWIFT_USE_TEMP_URLS = None
+SWIFT_USE_TEMP_URLS = False
 SWIFT_TEMP_URL_KEY = None
 SWIFT_TEMP_URL_DURATION = 1800  # seconds
 
@@ -2020,3 +2100,74 @@ PROCTORING_BACKENDS = {
     # null is a language independent type in YAML
     'null': {}
 }
+
+PROCTORING_SETTINGS = {}
+
+################## BLOCKSTORE RELATED SETTINGS  #########################
+BLOCKSTORE_PUBLIC_URL_ROOT = 'http://localhost:18250'
+BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
+# Which of django's caches to use for storing anonymous user state for XBlocks
+# in the blockstore-based XBlock runtime
+XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
+
+###################### LEARNER PORTAL ################################
+LEARNER_PORTAL_URL_ROOT = 'https://learner-portal-localhost:18000'
+
+######################### MICROSITE ###############################
+MICROSITE_ROOT_DIR = '/edx/app/edxapp/edx-microsite'
+MICROSITE_CONFIGURATION = {}
+
+############################ JWT #################################
+JWT_ISSUER = 'http://127.0.0.1:8000/oauth2'
+DEFAULT_JWT_ISSUER = {
+    'ISSUER': 'http://127.0.0.1:8000/oauth2',
+    'AUDIENCE': 'SET-ME-PLEASE',
+    'SECRET_KEY': 'SET-ME-PLEASE'
+}
+JWT_EXPIRATION = 30
+JWT_PRIVATE_SIGNING_KEY = None
+
+
+SYSLOG_SERVER = ''
+FEEDBACK_SUBMISSION_EMAIL = ''
+REGISTRATION_EXTRA_FIELDS = {
+    'confirm_email': 'hidden',
+    'level_of_education': 'optional',
+    'gender': 'optional',
+    'year_of_birth': 'optional',
+    'mailing_address': 'optional',
+    'goals': 'optional',
+    'honor_code': 'required',
+    'terms_of_service': 'hidden',
+    'city': 'hidden',
+    'country': 'hidden',
+}
+EDXAPP_PARSE_KEYS = {}
+
+###################### DEPRECATED URLS ##########################
+
+# .. toggle_name: DISABLE_DEPRECATED_SIGNIN_URL
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Toggle for removing the deprecated /signin url.
+# .. toggle_category: n/a
+# .. toggle_use_cases: incremental_release
+# .. toggle_creation_date: 2019-12-02
+# .. toggle_expiration_date: 2020-06-01
+# .. toggle_warnings: This url can be removed once it no longer has any real traffic.
+# .. toggle_tickets: ARCH-1253
+# .. toggle_status: supported
+DISABLE_DEPRECATED_SIGNIN_URL = False
+
+# .. toggle_name: DISABLE_DEPRECATED_SIGNUP_URL
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Toggle for removing the deprecated /signup url.
+# .. toggle_category: n/a
+# .. toggle_use_cases: incremental_release
+# .. toggle_creation_date: 2019-12-02
+# .. toggle_expiration_date: 2020-06-01
+# .. toggle_warnings: This url can be removed once it no longer has any real traffic.
+# .. toggle_tickets: ARCH-1253
+# .. toggle_status: supported
+DISABLE_DEPRECATED_SIGNUP_URL = False

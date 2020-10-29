@@ -2,7 +2,7 @@
 Tests around our XML modulestore, including importing
 well-formed and not-well-formed XML.
 """
-from __future__ import absolute_import
+
 
 import os.path
 from glob import glob
@@ -42,7 +42,7 @@ class TestXMLModuleStore(TestCase):
         # uniquification of names, would raise a UnicodeError. It no longer does.
 
         # Ensure that there really is a non-ASCII character in the course.
-        with open(os.path.join(DATA_DIR, "toy/sequential/vertical_sequential.xml")) as xmlf:
+        with open(os.path.join(DATA_DIR, "toy/sequential/vertical_sequential.xml"), 'rb') as xmlf:
             xml = xmlf.read()
             with self.assertRaises(UnicodeDecodeError):
                 xml.decode('ascii')

@@ -2,7 +2,7 @@
 """
 The data type and use of it for declaratively creating test courses.
 """
-from __future__ import absolute_import
+
 
 import datetime
 from collections import namedtuple

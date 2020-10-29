@@ -1,5 +1,5 @@
 """Tests for the backpopulate_program_credentials management command."""
-from __future__ import absolute_import
+
 
 import ddt
 import mock
@@ -343,7 +343,6 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
         call_command('backpopulate_program_credentials', commit=True)
 
         mock_task.assert_called_once_with(self.alice.username)
-        mock_task.assert_not_called(self.bob.username)
 
     @mock.patch(COMMAND_MODULE + '.logger.exception')
     def test_handle_enqueue_failure(self, mock_log, mock_task, mock_get_programs):

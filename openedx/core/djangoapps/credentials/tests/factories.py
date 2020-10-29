@@ -1,7 +1,6 @@
 """Factories for generating fake credentials-related data."""
 # pylint: disable=missing-docstring, invalid-name
 
-from __future__ import absolute_import
 
 import factory
 

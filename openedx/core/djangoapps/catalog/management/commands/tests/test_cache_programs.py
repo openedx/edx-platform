@@ -1,7 +1,7 @@
 """
 Test cases for cache_programs command.
 """
-from __future__ import absolute_import
+
 import json
 
 import httpretty

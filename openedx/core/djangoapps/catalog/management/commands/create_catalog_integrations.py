@@ -1,6 +1,6 @@
 '''CatalogIntegration management command'''
 
-from __future__ import absolute_import
+
 from django.core.management import BaseCommand, CommandError
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 

@@ -2,7 +2,6 @@
 Unit tests for integration of the django-user-tasks app and its REST API.
 """
 
-from __future__ import absolute_import, print_function, unicode_literals
 
 import logging
 from uuid import uuid4

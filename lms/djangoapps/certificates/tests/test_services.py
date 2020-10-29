@@ -1,7 +1,7 @@
 """
 Unit Tests for the Certificate service
 """
-from __future__ import absolute_import
+
 
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.services import CertificateService

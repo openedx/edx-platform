@@ -1,5 +1,5 @@
 """ Management command to update libraries' search index """
-from __future__ import absolute_import, print_function
+
 
 from textwrap import dedent
 

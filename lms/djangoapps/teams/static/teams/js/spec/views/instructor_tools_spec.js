@@ -19,7 +19,7 @@ define([
                     teamEvents: TeamSpecHelpers.teamEvents
                 });
             },
-            deleteTeam = function(view, confirm) {
+            deleteTeam = function(view, confirm) { // eslint-disable-line no-shadow
                 view.$('.action-delete').click();
                 // Confirm delete dialog
                 if (confirm) {

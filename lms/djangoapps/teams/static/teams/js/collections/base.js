@@ -21,17 +21,17 @@
 
                 parse: function(response, options) {
                     if (!response) {
-                        response = {};
+                        response = {}; // eslint-disable-line no-param-reassign
                     }
 
                     if (!response.results) {
-                        response.results = [];
+                        response.results = []; // eslint-disable-line no-param-reassign
                     }
 
                     return PagingCollection.prototype.parse.call(this, response, options);
                 },
 
-                onUpdate: function(event) {
+                onUpdate: function(event) { // eslint-disable-line no-unused-vars
                     // Mark the collection as stale so that it knows to refresh when needed.
                     this.isStale = true;
                 },
@@ -40,10 +40,11 @@
                 // remove when backbone.paginator gets a new release
                 sync: function(method, model, options) {
                     // do not send total pages and total records in request
+                    var params;
                     if (method === 'read') {
-                        var params = _.values(_.pick(this.queryParams, ['totalPages', 'totalRecords']));
+                        params = _.values(_.pick(this.queryParams, ['totalPages', 'totalRecords']));
                         _.each(params, function(param) {
-                            delete options.data[param];
+                            delete options.data[param]; // eslint-disable-line no-param-reassign
                         });
                     }
 

@@ -13,7 +13,7 @@ There are two common use cases:
    the message will be shown on the subsequent page. This is typically
    used to show a success message to the use.
 """
-from __future__ import absolute_import
+
 
 from abc import abstractmethod
 from enum import Enum

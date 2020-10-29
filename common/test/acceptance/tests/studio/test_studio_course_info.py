@@ -1,7 +1,7 @@
 """
 Acceptance Tests for Course Information
 """
-from __future__ import absolute_import
+
 
 from common.test.acceptance.pages.studio.course_info import CourseUpdatesPage
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest

@@ -1,7 +1,7 @@
 """
 Tests for ProctoredExamTransformer.
 """
-from __future__ import absolute_import
+
 
 import ddt
 import six

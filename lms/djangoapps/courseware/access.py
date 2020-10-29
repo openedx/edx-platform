@@ -10,7 +10,7 @@ Note: The access control logic in this file does NOT check for enrollment in
   If enrollment is to be checked, use get_course_with_access in courseware.courses.
   It is a wrapper around has_access that additionally checks for enrollment.
 """
-from __future__ import absolute_import
+
 
 import logging
 from datetime import datetime
@@ -23,14 +23,14 @@ from pytz import UTC
 from six import text_type
 from xblock.core import XBlock
 
-from courseware.access_response import (
+from lms.djangoapps.courseware.access_response import (
     IncorrectPartitionGroupError,
     MilestoneAccessError,
     MobileAvailabilityError,
     NoAllowedPartitionGroupsError,
     VisibilityError
 )
-from courseware.access_utils import (
+from lms.djangoapps.courseware.access_utils import (
     ACCESS_DENIED,
     ACCESS_GRANTED,
     adjust_start_date,
@@ -39,7 +39,7 @@ from courseware.access_utils import (
     debug,
     in_preview_mode
 )
-from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
+from lms.djangoapps.courseware.masquerade import get_masquerade_role, is_masquerading_as_student
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.courseware.access_control_backends import access_control_backends

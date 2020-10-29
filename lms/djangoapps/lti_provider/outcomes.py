@@ -3,7 +3,6 @@ Helper functions for managing interactions with the LTI outcomes service defined
 in LTI v1.1.
 """
 
-from __future__ import absolute_import
 
 import logging
 import uuid

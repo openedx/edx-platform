@@ -1,5 +1,5 @@
 """Tests covering Credentials signals."""
-from __future__ import absolute_import
+
 
 import ddt
 import mock

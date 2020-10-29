@@ -2,7 +2,7 @@
 Toggles for Learner Profile page.
 """
 
-from __future__ import absolute_import
+
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 
@@ -11,8 +11,8 @@ from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='learner_profile')
 
 # Waffle flag to redirect to another learner profile experience.
-# .. toggle_name: REDIRECT_TO_PROFILE_MICROFRONTEND
-# .. toggle_type: waffle_flag
+# .. toggle_name: learner_profile.redirect_to_microfrontend
+# .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Supports staged rollout of a new micro-frontend-based implementation of the profile page.
 # .. toggle_category: micro-frontend

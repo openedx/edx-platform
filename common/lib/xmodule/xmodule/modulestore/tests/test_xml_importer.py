@@ -1,7 +1,7 @@
 """
 Tests for XML importer.
 """
-from __future__ import absolute_import
+
 
 import importlib
 import os
@@ -9,6 +9,7 @@ import unittest
 from uuid import uuid4
 
 import mock
+import six
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from path import Path as path
@@ -21,6 +22,11 @@ from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NU
 from xmodule.modulestore.xml_importer import StaticContentImporter, _update_and_import_module, _update_module_location
 from xmodule.tests import DATA_DIR
 from xmodule.x_module import XModuleMixin
+
+if six.PY2:
+    OPEN_BUILTIN = '__builtin__.open'
+else:
+    OPEN_BUILTIN = 'builtins.open'
 
 
 class ModuleStoreNoSettings(unittest.TestCase):
@@ -379,10 +385,10 @@ class StaticContentImporterTest(unittest.TestCase):
         base_dir = path('/path/to/dir')
         full_file_path = os.path.join(base_dir, 'static/some_file.txt')
         self.mocked_content_store.generate_thumbnail.return_value = (None, None)
-        with mock.patch("__builtin__.open", mock.mock_open(read_data="data")) as mock_file:
+        with mock.patch(OPEN_BUILTIN, mock.mock_open(read_data=b"data")) as mock_file:
             self.static_content_importer.import_static_file(
                 full_file_path=full_file_path,
                 base_dir=base_dir
             )
             mock_file.assert_called_with(full_file_path, 'rb')
-            self.mocked_content_store.assert_called_once()
+            self.mocked_content_store.generate_thumbnail.assert_called_once()

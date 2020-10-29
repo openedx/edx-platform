@@ -72,7 +72,6 @@ module.exports = Merge.smart({
             // Studio
             Import: './cms/static/js/features/import/factories/import.js',
             CourseOrLibraryListing: './cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx',
-            'js/factories/login': './cms/static/js/factories/login.js',
             'js/factories/textbooks': './cms/static/js/factories/textbooks.js',
             'js/factories/container': './cms/static/js/factories/container.js',
             'js/factories/context_course': './cms/static/js/factories/context_course.js',
@@ -91,6 +90,8 @@ module.exports = Merge.smart({
             StudentAccountDeletion: './lms/static/js/student_account/components/StudentAccountDeletion.jsx',
             StudentAccountDeletionInitializer: './lms/static/js/student_account/StudentAccountDeletionInitializer.js',
             ProblemBrowser: './lms/djangoapps/instructor/static/instructor/ProblemBrowser/index.jsx',
+            CustomUserMenuLinks: './lms/static/js/custom_user_menu_links/CustomUserMenuLinks.js',
+            EnterpriseLearnerPortalBanner: './lms/static/js/learner_dashboard/EnterpriseLearnerPortalBanner.jsx',
 
             // Learner Dashboard
             EntitlementFactory: './lms/static/js/learner_dashboard/course_entitlement_factory.js',

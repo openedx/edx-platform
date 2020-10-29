@@ -4,7 +4,6 @@ Tests for OAuth token exchange views
 
 # pylint: disable=no-member
 
-from __future__ import absolute_import
 
 import json
 import unittest

@@ -2,11 +2,11 @@
 Instructor Dashboard Views
 """
 
-from __future__ import absolute_import
 
 import datetime
 import logging
 import uuid
+from functools import reduce  # pylint: disable=redefined-builtin
 import beeline
 
 import pytz
@@ -33,8 +33,6 @@ from xblock.fields import ScopeIds
 from bulk_email.api import is_bulk_email_feature_enabled
 from class_dashboard.dashboard_data import get_array_section_has_problem, get_section_display_name
 from course_modes.models import CourseMode, CourseModesArchive
-from courseware.access import has_access
-from courseware.courses import get_course_by_id, get_studio_url
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
@@ -45,6 +43,8 @@ from lms.djangoapps.certificates.models import (
     CertificateWhitelist,
     GeneratedCertificate
 )
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_by_id, get_studio_url
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.discussion.django_comment_client.utils import available_division_schemes, has_forum_access
 from lms.djangoapps.grades.api import is_writable_gradebook_enabled
@@ -566,7 +566,8 @@ def _section_membership(course, access):
             'update_forum_role_membership',
             kwargs={'course_id': six.text_type(course_key)}
         ),
-        'enrollment_role_choices': enrollment_role_choices
+        'enrollment_role_choices': enrollment_role_choices,
+        'is_reason_field_enabled': configuration_helpers.get_value('ENABLE_MANUAL_ENROLLMENT_REASON_FIELD', False)
     }
     return section_data
 
@@ -846,10 +847,10 @@ def _section_open_response_assessment(request, course, openassessment_blocks, ac
         result_item_id = six.text_type(block.location)
         if block_parent_id not in parents:
             parents[block_parent_id] = modulestore().get_item(block.parent)
-
+        assessment_name = _("Team") + " : " + block.display_name if block.teams_enabled else block.display_name
         ora_items.append({
             'id': result_item_id,
-            'name': block.display_name,
+            'name': assessment_name,
             'parent_id': block_parent_id,
             'parent_name': parents[block_parent_id].display_name,
             'staff_assessment': 'staff-assessment' in block.assessment_steps,

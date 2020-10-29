@@ -1,5 +1,5 @@
 """ Tests for OAuth 2.0 client credentials support. """
-from __future__ import absolute_import, unicode_literals
+
 
 import json
 import unittest

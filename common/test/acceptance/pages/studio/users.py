@@ -1,7 +1,7 @@
 """
 Page classes to test either the Course Team page or the Library Team page.
 """
-from __future__ import absolute_import
+
 
 import os
 

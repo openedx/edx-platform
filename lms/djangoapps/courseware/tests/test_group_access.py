@@ -3,13 +3,12 @@ This module defines tests for courseware.access that are specific to group
 access control rules.
 """
 
-from __future__ import absolute_import
 
 import ddt
 from stevedore.extension import Extension, ExtensionManager
 
-import courseware.access as access
-from courseware.tests.factories import StaffFactory, UserFactory
+import lms.djangoapps.courseware.access as access
+from lms.djangoapps.courseware.tests.factories import StaffFactory, UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

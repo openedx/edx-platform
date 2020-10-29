@@ -118,7 +118,9 @@ if (is_proctored_exam) {
         <% } %>
                 <% if (xblockInfo.isVertical()) { %>
                     <span class="unit-title item-title">
-                        <a href="<%- xblockInfo.get('studio_url') %>"><%- xblockInfo.get('display_name') %></a>
+                    <span class="wrapper-<%- xblockType %>-title wrapper-xblock-field incontext-editor is-editable" data-field="display_name" data-field-display-name="<%- gettext("Display Name") %>">
+                        <a class="<%- xblockType %>-title item-title xblock-field-value incontext-editor-value" href="<%- xblockInfo.get('studio_url') %>"><%- xblockInfo.get('display_name') %></a>
+                    </span>
                     </span>
                 <% } else { %>
                     <span class="wrapper-<%- xblockType %>-title wrapper-xblock-field incontext-editor is-editable" data-field="display_name" data-field-display-name="<%- gettext("Display Name") %>">

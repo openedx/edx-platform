@@ -1,5 +1,5 @@
 """ Mixins for setting up particular course structures (such as split tests or cohorted content) """
-from __future__ import absolute_import
+
 
 from datetime import datetime
 

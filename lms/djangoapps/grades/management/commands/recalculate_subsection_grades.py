@@ -3,7 +3,6 @@ Command to recalculate grades for all subsections with problem submissions
 in the specified time range.
 """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
 
 import logging
 from datetime import datetime
@@ -13,7 +12,7 @@ from django.core.management.base import BaseCommand, CommandError
 from pytz import utc
 from submissions.models import Submission
 
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.events import PROBLEM_SUBMITTED_EVENT_TYPE
 from lms.djangoapps.grades.tasks import recalculate_subsection_grade_v3
@@ -63,6 +62,9 @@ class Command(BaseCommand):
         set_event_transaction_type(PROBLEM_SUBMITTED_EVENT_TYPE)
         kwargs = {'modified__range': (modified_start, modified_end), 'module_type': 'problem'}
         for record in StudentModule.objects.filter(**kwargs):
+            if not record.course_id.is_course:
+                # This is not a course, so we don't store subsection grades for it.
+                continue
             task_args = {
                 "user_id": record.student_id,
                 "course_id": six.text_type(record.course_id),
@@ -78,6 +80,9 @@ class Command(BaseCommand):
 
         kwargs = {'created_at__range': (modified_start, modified_end)}
         for record in Submission.objects.filter(**kwargs):
+            if not record.student_item.course_id.is_course:
+                # This is not a course, so ignore it
+                continue
             task_args = {
                 "user_id": user_by_anonymous_id(record.student_item.student_id).id,
                 "anonymous_user_id": record.student_item.student_id,

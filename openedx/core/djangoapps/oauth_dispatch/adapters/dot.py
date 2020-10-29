@@ -2,7 +2,6 @@
 Adapter to isolate django-oauth-toolkit dependencies
 """
 
-from __future__ import absolute_import
 
 from oauth2_provider import models
 

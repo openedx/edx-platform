@@ -2,7 +2,6 @@
 A tiny app that checks for a status message.
 """
 
-from __future__ import absolute_import
 
 import logging
 

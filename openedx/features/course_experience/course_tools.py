@@ -1,7 +1,7 @@
 """
 Support for course tool plugins.
 """
-from __future__ import absolute_import
+
 
 from openedx.core.lib.plugins import PluginManager
 

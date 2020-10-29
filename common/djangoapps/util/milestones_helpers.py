@@ -2,7 +2,7 @@
 """
 Utility library for working with the edx-milestones app
 """
-from __future__ import absolute_import
+
 
 import six
 from django.conf import settings

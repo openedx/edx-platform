@@ -2,7 +2,6 @@
 Tests for string_utils.py
 """
 
-from __future__ import absolute_import
 
 from django.test import TestCase
 

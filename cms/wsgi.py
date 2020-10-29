@@ -7,7 +7,7 @@ It exposes a module-level variable named ``application``. Django's
 ``runserver`` and ``runfcgi`` commands discover this application via the
 ``WSGI_APPLICATION`` setting.
 """
-from __future__ import absolute_import
+
 
 from openedx.core.lib.logsettings import log_python_warnings
 log_python_warnings()

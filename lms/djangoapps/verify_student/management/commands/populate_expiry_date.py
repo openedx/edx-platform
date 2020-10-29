@@ -1,7 +1,7 @@
 """
 Django admin command to populate expiry_date for approved verifications in SoftwareSecurePhotoVerification
 """
-from __future__ import absolute_import
+
 
 import logging
 import time

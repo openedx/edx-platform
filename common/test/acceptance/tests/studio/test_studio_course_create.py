@@ -1,7 +1,7 @@
 """
 Acceptance tests for course creation.
 """
-from __future__ import absolute_import
+
 
 import random
 import string
@@ -31,7 +31,7 @@ class CreateCourseTest(AcceptanceTest):
         self.dashboard_page = DashboardPage(self.browser)
         self.course_name = "New Course Name"
         self.course_org = "orgX"
-        self.course_number = str(uuid.uuid4().get_hex().upper()[0:6])
+        self.course_number = str(uuid.uuid4().hex.upper()[0:6])
         self.course_run = "2015_T2"
 
     def test_create_course_with_non_existing_org(self):

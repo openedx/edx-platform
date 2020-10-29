@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 from edxmako.shortcuts import render_to_string
 

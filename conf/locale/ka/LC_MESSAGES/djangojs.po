@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -15,7 +15,7 @@
 # Tamta Tchumburidze <tamtatioon@gmail.com>, 2016
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -25,9 +25,9 @@
 # Salome Gegeshidze <geges0@bp.com>, 2016
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Georgian (https://www.transifex.com/open-edx/teams/6205/ka/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # Translators:
 # Giorgi Goderdzishvili <biggeorgian@gmail.com>, 2019
@@ -35,7 +35,7 @@
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -45,7 +45,7 @@
 # Lasha Kokilashvili, 2018
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -56,8 +56,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-15 20:42+0000\n"
-"PO-Revision-Date: 2019-07-28 20:42+0000\n"
+"POT-Creation-Date: 2020-01-12 20:42+0000\n"
+"PO-Revision-Date: 2019-09-29 20:43+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/)\n"
 "Language: ka\n"
@@ -233,6 +233,14 @@ msgid "Your changes have been saved."
 msgstr "ცვლილებები შენახულია."
 
 #. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: cms/static/js/views/xblock_validation.js
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Warning"
+msgstr ""
+
+#. Translators: This message will be added to the front of messages of type
 #. error,
 #. e.g. "Error: required field is missing".
 #: cms/static/js/views/xblock_validation.js
@@ -393,6 +401,11 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "unsubmitted"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+msgid ""
+"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -2014,16 +2027,16 @@ msgid "This post could not be reopened. Refresh the page and try again."
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Show Discussion"
+msgstr "დისკუსიის ჩვენება"
+
+#: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Hide Discussion"
 msgstr "დისკუსიის დამალვა"
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "This discussion could not be loaded. Refresh the page and try again."
 msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_inline_view.js
-msgid "Show Discussion"
-msgstr "დისკუსიის ჩვენება"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "There are no posts in this topic yet."
@@ -2347,11 +2360,19 @@ msgid "Masters"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "MicroBachelors"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Photo Verification"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Proctoring"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Security"
 msgstr ""
 
 #: cms/templates/js/asset-library.underscore
@@ -2537,14 +2558,14 @@ msgstr "გუნდიდან წევრის ამოშლისას 
 msgid "This team does not have any members."
 msgstr "ამ გუნდს წევრები არ ჰყავს."
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Joined %(date)s"
 msgstr "შეუერთდა %(date)s"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Last Activity %(date)s"
 msgstr "ბოლო აქტივობა %(date)s"
@@ -2555,11 +2576,9 @@ msgstr "წავშალოთ გუნდის ეს წევრი?"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid ""
-"This learner will be removed from the team, allowing another learner to take"
-" the available spot."
+"This learner will be removed from the team,allowing another learner to take "
+"the available spot."
 msgstr ""
-"ეს მსმენელი მოცემული გუნდიდან წაიშლება, რაც სხვა მსმენელს თავისუფალი ადგილის"
-" დაკავების საშუალებას მისცემს."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Delete this team?"
@@ -2567,35 +2586,38 @@ msgstr "წავშალოთ ეს გუნდი?"
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid ""
-"Deleting a team is permanent and cannot be undone. All members are removed "
+"Deleting a team is permanent and cannot be undone.All members are removed "
 "from the team, and team discussions can no longer be accessed."
 msgstr ""
-"გუნდი საბოლოოდ წაიშლება და ბრძანების გაუქმება შეუძლებელი იქნება. გუნდიდან "
-"წაიძლება ყველა წევრი და გუნდის დისკუსიები ხელმისაწვდომი აღარ იქნება."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Team \"{team}\" successfully deleted."
 msgstr "„{team}“ გუნდის წაშლა წარმატებით განხორციელდა."
 
+#: lms/djangoapps/teams/static/teams/js/views/manage.js
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Manage"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
 msgstr "ამჟამად თქვენ არცერთი გუნდის წევრი არ ხართ."
 
-#. Translators: "and others" refers to fact that additional members of a team
-#. exist that are not displayed.
+#. Translators: "and others" refers to fact that additional
+#. * members of a team exist that are not displayed.
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "and others"
 msgstr "და სხვები"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. http://momentjs.com/)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: http://momentjs.com/)
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "Last activity %(date)s"
-msgstr "ბოლო აქტივობა %(date)s"
+msgid "Last activity {date}"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "View %(span_start)s %(team_name)s %(span_end)s"
-msgstr "%(span_start)s %(team_name)s %(span_end)s ნახვა"
+msgid "View {span_start} {team_name} {span_end}"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
@@ -2608,11 +2630,9 @@ msgstr "ტოვებთ ამ გუნდს?"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 msgid ""
-"If you leave, you can no longer post in this team's discussions. Your place "
+"If you leave, you can no longer post in this team's discussions.Your place "
 "will be available to another learner."
 msgstr ""
-"თუ წახვალთ, გუნდის განხილვებში ვეღარ გამოაქვეყნებთ. თქვენი ადგილი სხვა "
-"მსმენელისთვის იქნება ხელმისაწვდომი."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/static/js/verify_student/views/reverify_view.js
@@ -2628,11 +2648,15 @@ msgstr "თქვენ უკვე სხვა გუნდს მიეკ�
 msgid "This team is full."
 msgstr "ეს გუნდი შევსებულია."
 
+#: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
+msgid "Cannot join instructor managed team"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
-msgid "%(memberCount)s / %(maxMemberCount)s Member"
-msgid_plural "%(memberCount)s / %(maxMemberCount)s Members"
-msgstr[0] "%(memberCount)s / %(maxMemberCount)s წევრი"
-msgstr[1] "%(memberCount)s / %(maxMemberCount)s წევრი"
+msgid "{memberCount} / {maxMemberCount} Member"
+msgid_plural "{memberCount} / {maxMemberCount} Members"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "All teams"
@@ -2647,15 +2671,6 @@ msgid "Topics"
 msgstr "თემები"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid ""
-"See all teams in your course, organized by topic. Join a team to collaborate"
-" with other learners who are interested in the same topic as you are."
-msgstr ""
-"იხილეთ თემების მიხედვით დაწყობილი ყველა გუნდი თქვენს კურსში. შეუერთდით გუნდს"
-" რათა ითანამშრომლოთ იმ მსმენელებთან, რომლებიც იგივე თემით არიან "
-"დაინტერესებულნი რითაც თქვენ. "
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "My Team"
 msgstr "ჩემი გუნდი"
 
@@ -2663,6 +2678,12 @@ msgstr "ჩემი გუნდი"
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Browse"
 msgstr "დათვალიერება"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"See all teams in your course, organized by topic. Join a team to collaborate"
+" with other learners who are interested in the same topic as you are."
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Your request could not be completed. Reload the page and try again."
@@ -2742,27 +2763,19 @@ msgid "The team \"{team}\" could not be found."
 msgstr "გუნდი „{team}“ ვერ მოიძებნა."
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "%(team_count)s Team"
-msgid_plural "%(team_count)s Teams"
-msgstr[0] "%(team_count)s გუნდი"
-msgstr[1] "%(team_count)s გუნდი"
+msgid "{team_count} Team"
+msgid_plural "{team_count} Teams"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "Topic"
 msgstr "თემა"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "View Teams in the %(topic_name)s Topic"
-msgstr "გუნდების ნახვა %(topic_name)s თემაში"
+msgid "View Teams in the {topic_name} Topic"
+msgstr ""
 
-#. Translators: this string is shown at the bottom of the teams page
-#. to find a team to join or else to create a new one. There are three
-#. links that need to be included in the message:
-#. 1. Browse teams in other topics
-#. 2. search teams
-#. 3. create a new team
-#. Be careful to start each link with the appropriate start indicator
-#. (e.g. {browse_span_start} for #1) and finish it with {span_end}.
 #: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
 msgid ""
 "{browse_span_start}Browse teams in other topics{span_end} or "
@@ -4441,27 +4454,31 @@ msgid ""
 "{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read "
 "the above carefully before proceeding. This is an irreversible action, and "
 "{strongStart}you will no longer be able to use the same email on "
-"edX.{strongEnd}"
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "We’re sorry to see you go!"
+"{platformName}.{strongEnd}"
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
 "Please note: Deletion of your account and personal data is permanent and "
-"cannot be undone. EdX will not be able to recover your account or the data "
-"that is deleted."
+"cannot be undone. {platformName} will not be able to recover your account or"
+" the data that is deleted."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
-"Once your account is deleted, you cannot use it to take courses on the edX "
-"app, edx.org, or any other site hosted by edX. This includes access to "
-"edx.org from your employer’s or university’s system and access to private "
-"sites offered by MIT Open Learning, Wharton Executive Education, and Harvard"
-" Medical School."
+"Once your account is deleted, you cannot use it to take courses on the "
+"{platformName} app, {siteName}, or any other site hosted by {platformName}."
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"This includes access to {siteName} from your employer’s or university’s "
+"system{additionalSiteSpecificDeletionText}."
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid "We’re sorry to see you go!"
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
@@ -4494,17 +4511,15 @@ msgstr ""
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "You have selected “Delete my account.” Deletion of your account and personal"
-" data is permanent and cannot be undone. EdX will not be able to recover "
-"your account or the data that is deleted."
+" data is permanent and cannot be undone. {platformName} will not be able to "
+"recover your account or the data that is deleted."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "If you proceed, you will be unable to use this account to take courses on "
-"the edX app, edx.org, or any other site hosted by edX. This includes access "
-"to edx.org from your employer’s or university’s system and access to private"
-" sites offered by MIT Open Learning, Wharton Executive Education, and "
-"Harvard Medical School."
+"the {platformName} app, {siteName}, or any other site hosted by "
+"{platformName}."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
@@ -4592,6 +4607,10 @@ msgid ""
 msgstr ""
 "დაფიქსირდა შეცდომა. სცადეთ გვერდის განახლება ან შეამოწმეთ თქვენი ინტერნეტ "
 "კავშირი."
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid "An unexpected error has occurred."
+msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -6127,7 +6146,7 @@ msgstr ""
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
-msgid "Editing access for: %(title)s"
+msgid "Editing access for: {title}"
 msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
@@ -6661,13 +6680,6 @@ msgstr "პარამეტრები"
 msgid "New {component_type}"
 msgstr ""
 
-#. Translators: This message will be added to the front of messages of type
-#. warning,
-#. e.g. "Warning: this component has not been configured yet".
-#: cms/static/js/views/xblock_validation.js
-msgid "Warning"
-msgstr ""
-
 #: cms/static/js/xblock_asides/structured_tags.js
 msgid "Updating Tags"
 msgstr "თეგების განახლება"
@@ -7031,6 +7043,22 @@ msgstr "გუნდის წაშლა"
 #: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
 msgid "Edit Membership"
 msgstr "წევრობის რედაქტირება"
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "View Current Team Memberships"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Download Memberships"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Assign Team Memberships"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Upload Memberships"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
 msgid "Are you having trouble finding a team to join?"
@@ -9160,6 +9188,10 @@ msgid ""
 "hidden."
 msgstr ""
 
+#: cms/templates/js/copy-clipboard-button.underscore
+msgid "Copy Component Location"
+msgstr ""
+
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Weekly Highlight Emails"
 msgstr ""
@@ -9593,6 +9625,10 @@ msgstr "ინფორმაცია თავის შესახებ"
 msgid "Add a Chapter"
 msgstr "თავის დამატება"
 
+#: cms/templates/js/edit-title-button.underscore
+msgid "Edit Title"
+msgstr ""
+
 #: cms/templates/js/grading-editor.underscore
 msgid "Grading"
 msgstr "შეფასება"
@@ -9761,10 +9797,6 @@ msgstr "გასუფთავება"
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear Value"
 msgstr "მნიშვნელობის გასუფთავება"
-
-#: cms/templates/js/metadata-editor.underscore
-msgid "Component Location ID"
-msgstr "კომპონენტის მდებარეობის ID"
 
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video-transcripts.underscore

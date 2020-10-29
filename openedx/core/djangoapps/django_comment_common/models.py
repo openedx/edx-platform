@@ -1,5 +1,5 @@
 # pylint: disable=missing-docstring,unused-argument,model-missing-unicode
-from __future__ import absolute_import
+
 
 import json
 import logging
@@ -68,6 +68,7 @@ def assign_role(course_id, user, rolename):
     user.roles.add(role)
 
 
+@python_2_unicode_compatible
 class Role(models.Model):
     """
     Maps users to django_comment_client roles for a given course
@@ -85,7 +86,7 @@ class Role(models.Model):
         # use existing table that was originally created from lms.djangoapps.discussion.django_comment_client app
         db_table = 'django_comment_client_role'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name + " for " + (text_type(self.course_id) if self.course_id else "all courses")
 
     # TODO the name of this method is a little bit confusing,
@@ -194,6 +195,7 @@ def all_permissions_for_user_in_course(user, course_id):
     return permission_names
 
 
+@python_2_unicode_compatible
 class ForumsConfig(ConfigurationModel):
     """
     Config for the connection to the cs_comments_service forums backend.
@@ -203,7 +205,7 @@ class ForumsConfig(ConfigurationModel):
 
     connection_timeout = models.FloatField(
         default=5.0,
-        help_text="Seconds to wait when trying to connect to the comment service.",
+        help_text=u"Seconds to wait when trying to connect to the comment service.",
     )
 
     class Meta(ConfigurationModel.Meta):
@@ -215,7 +217,7 @@ class ForumsConfig(ConfigurationModel):
         """The API key used to authenticate to the comments service."""
         return getattr(settings, "COMMENTS_SERVICE_KEY", None)
 
-    def __unicode__(self):
+    def __str__(self):
         """
         Simple representation so the admin screen looks less ugly.
         """
@@ -237,7 +239,7 @@ class CourseDiscussionSettings(models.Model):
     discussions_id_map = JSONField(
         null=True,
         blank=True,
-        help_text="Key/value store mapping discussion IDs to discussion XBlock usage keys.",
+        help_text=u"Key/value store mapping discussion IDs to discussion XBlock usage keys.",
     )
     always_divide_inline_discussions = models.BooleanField(default=False)
     _divided_discussions = models.TextField(db_column='divided_discussions', null=True, blank=True)  # JSON list
@@ -275,7 +277,7 @@ class DiscussionsIdMapping(models.Model):
     """
     course_id = CourseKeyField(db_index=True, primary_key=True, max_length=255)
     mapping = JSONField(
-        help_text="Key/value store mapping discussion IDs to discussion XBlock usage keys.",
+        help_text=u"Key/value store mapping discussion IDs to discussion XBlock usage keys.",
     )
 
     class Meta(object):

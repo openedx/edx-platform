@@ -1,4 +1,4 @@
-from __future__ import absolute_import, print_function
+
 
 from django.contrib.auth.models import Group, User
 from django.core.management.base import BaseCommand, CommandError

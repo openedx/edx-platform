@@ -2,7 +2,6 @@
 This file contains receivers of course publication signals.
 """
 
-from __future__ import absolute_import
 
 import logging
 

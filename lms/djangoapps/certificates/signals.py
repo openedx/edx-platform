@@ -1,7 +1,7 @@
 """
 Signal handler for enabling/disabling self-generated certificates based on the course-pacing.
 """
-from __future__ import absolute_import
+
 
 import logging
 
@@ -62,7 +62,7 @@ def _listen_for_certificate_whitelist_append(sender, instance, **kwargs):  # pyl
 
 
 @receiver(COURSE_GRADE_NOW_PASSED, dispatch_uid="new_passing_learner")
-def _listen_for_passing_grade(sender, user, course_id, **kwargs):  # pylint: disable=unused-argument
+def listen_for_passing_grade(sender, user, course_id, **kwargs):  # pylint: disable=unused-argument
     """
     Listen for a learner passing a course, send cert generation task,
     downstream signal from COURSE_GRADE_CHANGED

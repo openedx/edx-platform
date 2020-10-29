@@ -6,7 +6,6 @@ This is the default template for our main set of AWS servers.
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-order
 
-from __future__ import absolute_import
 
 import codecs
 import os
@@ -44,6 +43,18 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
     ENV_TOKENS = __config__
     AUTH_TOKENS = __config__
 
+
+# A file path to a YAML file from which to load all the code revisions currently deployed
+REVISION_CONFIG_FILE = get_env_setting('REVISION_CFG')
+
+try:
+    with codecs.open(REVISION_CONFIG_FILE, encoding='utf-8') as f:
+        REVISION_CONFIG = yaml.safe_load(f)
+except Exception:  # pylint: disable=broad-except
+    REVISION_CONFIG = {}
+
+# Do NOT calculate this dynamically at startup with git because it's *slow*.
+EDX_PLATFORM_REVISION = REVISION_CONFIG.get('EDX_PLATFORM_REVISION', EDX_PLATFORM_REVISION)
 
 # SERVICE_VARIANT specifies name of the variant used, which decides what JSON
 # configuration files are read during startup.
@@ -110,9 +121,6 @@ CELERY_QUEUES = {
 
 CELERY_ROUTES = "{}celery.Router".format(QUEUE_VARIANT)
 
-# Do NOT calculate this dynamically at startup with git because it's *slow*.
-EDX_PLATFORM_REVISION = ENV_TOKENS.get('EDX_PLATFORM_REVISION', EDX_PLATFORM_REVISION)
-
 # STATIC_URL_BASE specifies the base url to use for static files
 STATIC_URL_BASE = ENV_TOKENS.get('STATIC_URL_BASE', None)
 if STATIC_URL_BASE:
@@ -162,6 +170,8 @@ EMAIL_HOST = ENV_TOKENS.get('EMAIL_HOST', EMAIL_HOST)
 EMAIL_PORT = ENV_TOKENS.get('EMAIL_PORT', EMAIL_PORT)
 EMAIL_USE_TLS = ENV_TOKENS.get('EMAIL_USE_TLS', EMAIL_USE_TLS)
 
+# CMS_BASE: Public domain name of Studio (should be resolvable from the end-user's browser)
+CMS_BASE = ENV_TOKENS.get('CMS_BASE')
 LMS_BASE = ENV_TOKENS.get('LMS_BASE')
 LMS_ROOT_URL = ENV_TOKENS.get('LMS_ROOT_URL')
 LMS_INTERNAL_ROOT_URL = ENV_TOKENS.get('LMS_INTERNAL_ROOT_URL', LMS_ROOT_URL)
@@ -180,7 +190,7 @@ SITE_NAME = ENV_TOKENS['SITE_NAME']
 ALLOWED_HOSTS = [
     # TODO: bbeggs remove this before prod, temp fix to get load testing running
     "*",
-    ENV_TOKENS.get('CMS_BASE')
+    CMS_BASE,
 ]
 
 LOG_DIR = ENV_TOKENS['LOG_DIR']
@@ -194,6 +204,22 @@ if 'loc_cache' not in CACHES:
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'edx_location_mem_cache',
     }
+
+if 'staticfiles' in CACHES:
+    CACHES['staticfiles']['KEY_PREFIX'] = EDX_PLATFORM_REVISION
+
+# In order to transition from local disk asset storage to S3 backed asset storage,
+# we need to run asset collection twice, once for local disk and once for S3.
+# Once we have migrated to service assets off S3, then we can convert this back to
+# managed by the yaml file contents
+STATICFILES_STORAGE = os.environ.get('STATICFILES_STORAGE', ENV_TOKENS.get('STATICFILES_STORAGE', STATICFILES_STORAGE))
+STATICFILES_STORAGE_KWARGS = ENV_TOKENS.get('STATICFILES_STORAGE_KWARGS', STATICFILES_STORAGE_KWARGS)
+
+# Load all AWS_ prefixed variables to allow an S3Boto3Storage to be configured
+_locals = locals()
+for key, value in ENV_TOKENS.items():
+    if key.startswith('AWS_'):
+        _locals[key] = value
 
 SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
 SESSION_COOKIE_HTTPONLY = ENV_TOKENS.get('SESSION_COOKIE_HTTPONLY', True)
@@ -305,13 +331,6 @@ if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
 HEARTBEAT_CHECKS = ENV_TOKENS.get('HEARTBEAT_CHECKS', HEARTBEAT_CHECKS)
 HEARTBEAT_EXTENDED_CHECKS = ENV_TOKENS.get('HEARTBEAT_EXTENDED_CHECKS', HEARTBEAT_EXTENDED_CHECKS)
 HEARTBEAT_CELERY_TIMEOUT = ENV_TOKENS.get('HEARTBEAT_CELERY_TIMEOUT', HEARTBEAT_CELERY_TIMEOUT)
-
-# Login using the LMS as the identity provider.
-# Turning the flag to True means that the LMS will NOT be used as the Identity Provider (idp)
-if FEATURES.get('DISABLE_STUDIO_SSO_OVER_LMS', False):
-    LOGIN_URL = reverse_lazy('login')
-    FRONTEND_LOGIN_URL = LOGIN_URL
-    FRONTEND_LOGOUT_URL = reverse_lazy('logout')
 
 LOGIN_REDIRECT_WHITELIST = [reverse_lazy('home')]
 
@@ -555,6 +574,9 @@ VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = ENV_TOKENS.get('VIDEO_TRANSCRIPT_MIGRATI
 ########## Settings youtube thumbnails scraper tasks ############
 SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE = ENV_TOKENS.get('SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE', DEFAULT_PRIORITY_QUEUE)
 
+########## Settings update search index task ############
+UPDATE_SEARCH_INDEX_JOB_QUEUE = ENV_TOKENS.get('UPDATE_SEARCH_INDEX_JOB_QUEUE', DEFAULT_PRIORITY_QUEUE)
+
 ########################## Parental controls config  #######################
 
 # The age at which a learner no longer requires parental consent, or None
@@ -588,6 +610,15 @@ ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = ENV_TOKENS.get(
     'ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER',
     ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER
 )
+ENTERPRISE_CATALOG_INTERNAL_ROOT_URL = ENV_TOKENS.get(
+    'ENTERPRISE_CATALOG_INTERNAL_ROOT_URL',
+    ENTERPRISE_CATALOG_INTERNAL_ROOT_URL
+)
+
+# This limits the type of roles that are submittable via the `student` app's manual enrollment
+# audit API. While this isn't used in CMS, it is used via Enterprise which is installed in
+# the CMS. Without this, we get errors.
+MANUAL_ENROLLMENT_ROLE_CHOICES = ENV_TOKENS.get('MANUAL_ENROLLMENT_ROLE_CHOICES', MANUAL_ENROLLMENT_ROLE_CHOICES)
 
 ############### Settings for Retirement #####################
 RETIRED_USERNAME_PREFIX = ENV_TOKENS.get('RETIRED_USERNAME_PREFIX', RETIRED_USERNAME_PREFIX)

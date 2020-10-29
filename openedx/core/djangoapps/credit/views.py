@@ -1,7 +1,7 @@
 """
 Views for the credit Django app.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import datetime
 import logging

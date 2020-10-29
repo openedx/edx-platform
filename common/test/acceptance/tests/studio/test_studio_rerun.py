@@ -2,7 +2,6 @@
 Acceptance tests for Studio related to course reruns.
 """
 
-from __future__ import absolute_import
 
 import random
 

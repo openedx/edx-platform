@@ -16,6 +16,7 @@ user_metadata = {
         'upgrade_link',
         'upgrade_price',
         'audit_access_deadline',
+        'course_duration',
         'pacing_type',
         'has_staff_access',
         'forum_roles',
@@ -40,10 +41,19 @@ for datekey in (
         'enrollment_time',
         'course_start',
         'course_end',
-        'upgrade_deadline'
+        'dynamic_upgrade_deadline',
+        'course_upgrade_deadline',
+        'audit_access_deadline',
 ):
     user_metadata[datekey] = (
         context.get(datekey).isoformat() if context.get(datekey) else None
+    )
+
+for timedeltakey in (
+    'course_duration',
+):
+    user_metadata[timedeltakey] = (
+        context.get(timedeltakey).total_seconds() if context.get(timedeltakey) else None
     )
 
 course_key = context.get('course_key')

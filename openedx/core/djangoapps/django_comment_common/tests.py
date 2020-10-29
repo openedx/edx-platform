@@ -1,5 +1,5 @@
 # pylint: disable=missing-docstring
-from __future__ import absolute_import
+
 
 import six
 from contracts import new_contract

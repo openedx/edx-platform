@@ -9,7 +9,6 @@ The specific implementation is determined at runtime using Django settings:
 
 """
 
-from __future__ import absolute_import
 
 from django.conf import settings
 

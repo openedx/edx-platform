@@ -3,7 +3,6 @@ LTI user management functionality. This module reconciles the two identities
 that an individual has in the campus LMS platform and on edX.
 """
 
-from __future__ import absolute_import
 
 import random
 import string
@@ -120,7 +119,7 @@ class LtiBackend(object):
     identity (i.e. the user was created by the create_lti_user method above).
     """
 
-    def authenticate(self, username=None, lti_user_id=None, lti_consumer=None):
+    def authenticate(self, _request, username=None, lti_user_id=None, lti_consumer=None):
         """
         Try to authenticate a user. This method will return a Django user object
         if a user with the corresponding username exists in the database, and

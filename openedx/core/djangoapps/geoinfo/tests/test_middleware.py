@@ -1,7 +1,7 @@
 """
 Tests for CountryMiddleware.
 """
-from __future__ import absolute_import
+
 
 import geoip2
 import maxminddb

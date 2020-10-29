@@ -1,7 +1,7 @@
 """
 Tests for grades.scores module.
 """
-from __future__ import absolute_import
+
 
 import itertools
 # pylint: disable=protected-access
@@ -221,7 +221,7 @@ class TestGetScore(TestCase):
             self._create_block(block_value),
         )
         expected_score = ProblemScore(**expected_result._asdict())
-        self.assertEquals(score, expected_score)
+        self.assertEqual(score, expected_score)
 
 
 @ddt.ddt
@@ -240,7 +240,7 @@ class TestWeightedScore(TestCase):
     )
     @ddt.unpack
     def test_cannot_compute(self, raw_earned, raw_possible, weight):
-        self.assertEquals(
+        self.assertEqual(
             scores.weighted_score(raw_earned, raw_possible, weight),
             (raw_earned, raw_possible),
         )
@@ -255,7 +255,7 @@ class TestWeightedScore(TestCase):
     )
     @ddt.unpack
     def test_computed(self, raw_earned, raw_possible, weight, expected_score):
-        self.assertEquals(
+        self.assertEqual(
             scores.weighted_score(raw_earned, raw_possible, weight),
             expected_score,
         )
@@ -287,7 +287,7 @@ class TestInternalGetGraded(TestCase):
     @ddt.data(None, True, False)
     def test_with_no_persisted_block(self, explicitly_graded_value):
         block = self._create_block(explicitly_graded_value)
-        self.assertEquals(
+        self.assertEqual(
             scores._get_graded_from_block(None, block),
             explicitly_graded_value is not False,  # defaults to True unless explicitly False
         )
@@ -299,7 +299,7 @@ class TestInternalGetGraded(TestCase):
     def test_with_persisted_block(self, persisted_block_value, block_value):
         block = self._create_block(block_value)
         block_record = BlockRecord(block.location, 0, 0, persisted_block_value)
-        self.assertEquals(
+        self.assertEqual(
             scores._get_graded_from_block(block_record, block),
             block_record.graded,  # persisted value takes precedence
         )
@@ -330,13 +330,13 @@ class TestInternalGetScoreFromBlock(TestCase):
             raw_earned, raw_possible, weighted_earned, weighted_possible, first_attempted
         ) = scores._get_score_from_persisted_or_latest_block(persisted_block, block, weight)
 
-        self.assertEquals(raw_earned, 0.0)
-        self.assertEquals(raw_possible, expected_r_possible)
-        self.assertEquals(weighted_earned, 0.0)
+        self.assertEqual(raw_earned, 0.0)
+        self.assertEqual(raw_possible, expected_r_possible)
+        self.assertEqual(weighted_earned, 0.0)
         if weight is None or expected_r_possible == 0:
-            self.assertEquals(weighted_possible, expected_r_possible)
+            self.assertEqual(weighted_possible, expected_r_possible)
         else:
-            self.assertEquals(weighted_possible, weight)
+            self.assertEqual(weighted_possible, weight)
         self.assertIsNone(first_attempted)
 
     @ddt.data(

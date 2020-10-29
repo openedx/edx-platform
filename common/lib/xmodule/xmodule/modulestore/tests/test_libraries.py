@@ -5,7 +5,6 @@ Basic unit tests related to content libraries.
 Higher-level tests are in `cms/djangoapps/contentstore`.
 """
 
-from __future__ import absolute_import
 
 import ddt
 import six

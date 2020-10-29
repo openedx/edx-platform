@@ -5,7 +5,6 @@ Integration tests for submitting problem responses and getting grades.
 
 # pylint: disable=attribute-defined-outside-init
 
-from __future__ import absolute_import
 
 import json
 import os
@@ -30,8 +29,8 @@ from capa.tests.response_xml_factory import (
     SchematicResponseXMLFactory
 )
 from course_modes.models import CourseMode
-from courseware.models import BaseStudentModuleHistory, StudentModule
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.grades.api import CourseGradeFactory, task_compute_all_grades_for_course
 from openedx.core.djangoapps.credit.api import get_credit_requirement_status, set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
@@ -324,8 +323,8 @@ class TestCourseGrades(TestSubmittingProblems):
         """
         hw_grade = self.hw_grade('homework')
         problem_score = list(hw_grade.problem_scores.values())[0]
-        self.assertEquals((problem_score.earned, problem_score.possible), expected_problem_score)
-        self.assertEquals((hw_grade.graded_total.earned, hw_grade.graded_total.possible), expected_hw_grade)
+        self.assertEqual((problem_score.earned, problem_score.possible), expected_problem_score)
+        self.assertEqual((hw_grade.graded_total.earned, hw_grade.graded_total.possible), expected_hw_grade)
 
     def test_basic(self):
         self._submit_correct_answer()
@@ -791,7 +790,7 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
             self.addCleanup(fileobj.close)
 
         self.problem_setup("the_problem", filenames)
-        with patch('courseware.module_render.XQUEUE_INTERFACE.session') as mock_session:
+        with patch('lms.djangoapps.courseware.module_render.XQUEUE_INTERFACE.session') as mock_session:
             resp = self.submit_question_answer("the_problem", {'2_1': fileobjs})
 
         self.assertEqual(resp.status_code, 200)

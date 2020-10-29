@@ -1,7 +1,7 @@
 """
 Test cases for image processing functions in the profile image package.
 """
-from __future__ import absolute_import
+
 from contextlib import closing
 from itertools import product
 import os

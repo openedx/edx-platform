@@ -2,7 +2,6 @@
 :class:`~xblock.field_data.FieldData` subclasses used by the CMS
 """
 
-from __future__ import absolute_import
 
 from xblock.field_data import SplitFieldData
 from xblock.fields import Scope

@@ -1,7 +1,7 @@
 """
 Utility methods useful for Studio page tests.
 """
-from __future__ import absolute_import
+
 
 from bok_choy.javascript import js_defined
 from bok_choy.promise import EmptyPromise

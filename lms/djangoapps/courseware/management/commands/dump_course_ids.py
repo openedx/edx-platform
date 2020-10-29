@@ -3,7 +3,7 @@ Dump the course_ids available to the lms.
 
 Output is UTF-8 encoded by default.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 from textwrap import dedent
 

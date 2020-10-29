@@ -2,7 +2,7 @@
 Annotations Tool Mixin
 This file contains global variables and functions used in the various Annotation Tools.
 """
-from __future__ import absolute_import
+
 
 from os.path import basename, splitext
 

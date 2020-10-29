@@ -5,7 +5,7 @@ This will mostly involve searching by course_id or task_id and manually failing
 a task.
 
 """
-from __future__ import absolute_import
+
 
 from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin

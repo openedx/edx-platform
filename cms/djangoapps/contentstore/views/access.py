@@ -1,6 +1,5 @@
 """ Helper methods for determining user access permissions in Studio """
 
-from __future__ import absolute_import
 
 from student import auth
 from student.roles import CourseInstructorRole

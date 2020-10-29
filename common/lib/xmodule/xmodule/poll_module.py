@@ -6,7 +6,6 @@ If student does not yet anwered - Question with set of choices.
 If student have answered - Question with statistics for each answers.
 """
 
-from __future__ import absolute_import
 
 import cgi
 import json

@@ -9,7 +9,7 @@ samples.
 """
 
 # should this move to cms since it's really only for module crud?
-from __future__ import absolute_import
+
 
 import logging
 from collections import defaultdict

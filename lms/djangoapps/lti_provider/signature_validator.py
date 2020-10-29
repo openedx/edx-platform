@@ -2,7 +2,6 @@
 Subclass of oauthlib's RequestValidator that checks an OAuth signature.
 """
 
-from __future__ import absolute_import
 
 import six
 from oauthlib.oauth1 import RequestValidator, SignatureOnlyEndpoint

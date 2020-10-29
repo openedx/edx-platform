@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 from xmodule.raw_module import RawDescriptor
 from xmodule.x_module import XModule

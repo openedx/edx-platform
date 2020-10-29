@@ -4,7 +4,7 @@
 """
 Check code quality using pycodestyle, pylint, and diff_quality.
 """
-from __future__ import absolute_import, print_function
+
 
 import io
 import json
@@ -766,22 +766,39 @@ def _extract_missing_pii_annotations(filename):
         filename: Filename where stdout of django_find_annotations was captured.
 
     Returns:
-        Number of uncovered models.
+        three-tuple containing:
+            1. The number of uncovered models,
+            2. A bool indicating whether the coverage is still below the threshold, and
+            3. The full report as a string.
     """
-    uncovered_models = None
+    uncovered_models = 0
+    pii_check_passed = True
     if os.path.isfile(filename):
         with io.open(filename, 'r') as report_file:
             lines = report_file.readlines()
+
+            # Find the count of uncovered models.
             uncovered_regex = re.compile(r'^Coverage found ([\d]+) uncovered')
             for line in lines:
                 uncovered_match = uncovered_regex.match(line)
                 if uncovered_match:
                     uncovered_models = int(uncovered_match.groups()[0])
                     break
+
+            # Find a message which suggests the check failed.
+            failure_regex = re.compile(r'^Coverage threshold not met!')
+            for line in lines:
+                failure_match = failure_regex.match(line)
+                if failure_match:
+                    pii_check_passed = False
+                    break
+
+            # Each line in lines already contains a newline.
+            full_log = ''.join(lines)
     else:
         fail_quality('pii', u'FAILURE: Log file could not be found: {}'.format(filename))
 
-    return uncovered_models
+    return (uncovered_models, pii_check_passed, full_log)
 
 
 @task
@@ -798,7 +815,8 @@ def run_pii_check(options):
     default_report_dir = (Env.REPORT_DIR / pii_report_name)
     report_dir = getattr(options, 'report_dir', default_report_dir)
     output_file = os.path.join(report_dir, 'pii_check_{}.report')
-    uncovered_model_counts = []
+    env_report = []
+    pii_check_passed = True
     for env_name, env_settings_file in (("CMS", "cms.envs.test"), ("LMS", "lms.envs.test")):
         try:
             print()
@@ -814,17 +832,30 @@ def run_pii_check(options):
                     report_dir, env_settings_file, report_dir, env_name.lower(), run_output_file
                 )
             )
-            uncovered_model_counts.append(_extract_missing_pii_annotations(run_output_file))
+            uncovered_model_count, pii_check_passed_env, full_log = _extract_missing_pii_annotations(run_output_file)
+            env_report.append((
+                uncovered_model_count,
+                full_log,
+            ))
 
         except BuildFailure as error_message:
             fail_quality(pii_report_name, 'FAILURE: {}'.format(error_message))
 
-    uncovered_count = max(uncovered_model_counts)
+        if not pii_check_passed_env:
+            pii_check_passed = False
+
+    # Determine which suite is the worst offender by obtaining the max() keying off uncovered_count.
+    uncovered_count, full_log = max(env_report, key=lambda r: r[0])
+
+    # Write metric file.
     if uncovered_count is None:
         uncovered_count = 0
-    _write_metric(uncovered_count, (Env.METRICS_DIR / pii_report_name))
+    metrics_str = u"Number of PII Annotation violations: {}\n".format(uncovered_count)
+    _write_metric(metrics_str, (Env.METRICS_DIR / pii_report_name))
 
-    return True
+    # Finally, fail the paver task if code_annotations suggests that the check failed.
+    if not pii_check_passed:
+        fail_quality('pii', full_log)
 
 
 @task

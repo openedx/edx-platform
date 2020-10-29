@@ -2,7 +2,6 @@
 Acceptance tests for Studio related to the split_test module.
 """
 
-from __future__ import absolute_import
 
 import math
 

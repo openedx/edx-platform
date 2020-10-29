@@ -6,12 +6,12 @@ functionality
 # For tests, ignore access to protected members
 # pylint: disable=protected-access
 
-from __future__ import absolute_import
 
 from unittest.case import SkipTest, TestCase
 
 import ddt
 import webob
+from webob.multidict import MultiDict
 from factory import (
     BUILD_STRATEGY,
     Factory,
@@ -385,16 +385,16 @@ class TestXModuleHandler(TestCase):
 
     def test_xmodule_handler_passed_data(self):
         self.module.xmodule_handler(self.request)
-        self.module.handle_ajax.assert_called_with(None, self.request.POST)
+        self.module.handle_ajax.assert_called_with(None, MultiDict(self.request.POST))
 
     def test_xmodule_handler_dispatch(self):
         self.module.xmodule_handler(self.request, 'dispatch')
-        self.module.handle_ajax.assert_called_with('dispatch', self.request.POST)
+        self.module.handle_ajax.assert_called_with('dispatch', MultiDict(self.request.POST))
 
     def test_xmodule_handler_return_value(self):
         response = self.module.xmodule_handler(self.request)
         self.assertIsInstance(response, webob.Response)
-        self.assertEqual(response.body, '{}')
+        self.assertEqual(response.body.decode('utf-8'), '{}')
 
     @ddt.data(
         u'{"test_key": "test_value"}',
@@ -409,7 +409,7 @@ class TestXModuleHandler(TestCase):
         self.module.handle_ajax = Mock(return_value=response_data)
         response = self.module.xmodule_handler(self.request)
         self.assertIsInstance(response, webob.Response)
-        self.assertEqual(response.body, '{"test_key": "test_value"}')
+        self.assertEqual(response.body.decode('utf-8'), '{"test_key": "test_value"}')
 
 
 class TestXmlExport(XBlockWrapperTestMixin, TestCase):
@@ -431,8 +431,8 @@ class TestXmlExport(XBlockWrapperTestMixin, TestCase):
 
         xmodule_node = etree.fromstring(descriptor.export_to_xml(xmodule_api_fs))
 
-        self.assertEquals(list(xmodule_api_fs.walk()), list(xblock_api_fs.walk()))
-        self.assertEquals(etree.tostring(xmodule_node), etree.tostring(xblock_node))
+        self.assertEqual(list(xmodule_api_fs.walk()), list(xblock_api_fs.walk()))
+        self.assertEqual(etree.tostring(xmodule_node), etree.tostring(xblock_node))
 
 
 class TestPublicView(XBlockWrapperTestMixin, TestCase):

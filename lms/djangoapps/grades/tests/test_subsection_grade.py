@@ -1,7 +1,7 @@
 """
 Tests of the SubsectionGrade classes.
 """
-from __future__ import absolute_import
+
 
 from ddt import data, ddt, unpack
 

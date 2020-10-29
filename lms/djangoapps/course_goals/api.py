@@ -1,7 +1,7 @@
 """
 Course Goals Python API
 """
-from __future__ import absolute_import
+
 
 from django.conf import settings
 from opaque_keys.edx.keys import CourseKey

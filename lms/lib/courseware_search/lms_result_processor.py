@@ -3,7 +3,7 @@ This file contains implementation override of SearchResultProcessor which will a
     * Blends in "location" property
     * Confirms user access to object
 """
-from __future__ import absolute_import
+
 
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey, UsageKey

@@ -5,7 +5,7 @@ This is a place to put simple functions that operate on course metadata. It
 allows us to share code between the CourseDescriptor and CourseOverview
 classes, which both need these type of functions.
 """
-from __future__ import absolute_import
+
 
 from base64 import b32encode
 from datetime import datetime, timedelta

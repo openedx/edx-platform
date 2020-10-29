@@ -1,7 +1,7 @@
 """
 Segregation of pymongo functions from the data modeling mechanisms for split modulestore.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import logging
@@ -226,20 +226,29 @@ class CourseStructureCache(object):
             return None
 
         with TIMER.timer("CourseStructureCache.get", course_context) as tagger:
-            compressed_pickled_data = self.cache.get(key)
-            tagger.tag(from_cache=str(compressed_pickled_data is not None).lower())
+            try:
+                compressed_pickled_data = self.cache.get(key)
+                tagger.tag(from_cache=str(compressed_pickled_data is not None).lower())
 
-            if compressed_pickled_data is None:
-                # Always log cache misses, because they are unexpected
-                tagger.sample_rate = 1
+                if compressed_pickled_data is None:
+                    # Always log cache misses, because they are unexpected
+                    tagger.sample_rate = 1
+                    return None
+
+                tagger.measure('compressed_size', len(compressed_pickled_data))
+
+                pickled_data = zlib.decompress(compressed_pickled_data)
+                tagger.measure('uncompressed_size', len(pickled_data))
+
+                if six.PY2:
+                    return pickle.loads(pickled_data)
+                else:
+                    return pickle.loads(pickled_data, encoding='latin-1')
+            except Exception:
+                # The cached data is corrupt in some way, get rid of it.
+                log.warning("CourseStructureCache: Bad data in cache for %s", course_context)
+                self.cache.delete(key)
                 return None
-
-            tagger.measure('compressed_size', len(compressed_pickled_data))
-
-            pickled_data = zlib.decompress(compressed_pickled_data)
-            tagger.measure('uncompressed_size', len(pickled_data))
-
-            return pickle.loads(pickled_data)
 
     def set(self, key, structure, course_context=None):
         """Given a structure, will pickle, compress, and write to cache."""
@@ -247,7 +256,7 @@ class CourseStructureCache(object):
             return None
 
         with TIMER.timer("CourseStructureCache.set", course_context) as tagger:
-            pickled_data = pickle.dumps(structure, pickle.HIGHEST_PROTOCOL)
+            pickled_data = pickle.dumps(structure, 2)  # Protocol can't be incremented until cache is cleared
             tagger.measure('uncompressed_size', len(pickled_data))
 
             # 1 = Fastest (slightly larger results)

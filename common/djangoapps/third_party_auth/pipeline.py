@@ -57,7 +57,6 @@ rather than spreading them across two functions in the pipeline.
 See https://python-social-auth.readthedocs.io/en/latest/pipeline.html for more docs.
 """
 
-from __future__ import absolute_import
 
 import base64
 import hashlib
@@ -209,6 +208,11 @@ def get(request):
     """Gets the running pipeline's data from the passed request."""
     strategy = social_django.utils.load_strategy(request)
     token = strategy.session_get('partial_pipeline_token')
+
+    if not token:
+        strategy.session_set('partial_pipeline_token', strategy.session_get('partial_pipeline_token_'))
+        token = strategy.session_get('partial_pipeline_token')
+
     partial_object = strategy.partial_load(token)
     pipeline_data = None
     if partial_object:
@@ -503,17 +507,17 @@ def redirect_to_custom_form(request, auth_entry, details, kwargs):
     if isinstance(secret_key, six.text_type):
         secret_key = secret_key.encode('utf-8')
     custom_form_url = form_info['url']
-    data_str = json.dumps({
+    data_bytes = json.dumps({
         "auth_entry": auth_entry,
         "backend_name": backend_name,
         "provider_id": provider_id,
         "user_details": details,
-    })
-    digest = hmac.new(secret_key, msg=data_str, digestmod=hashlib.sha256).digest()
+    }).encode('utf-8')
+    digest = hmac.new(secret_key, msg=data_bytes, digestmod=hashlib.sha256).digest()
     # Store the data in the session temporarily, then redirect to a page that will POST it to
     # the custom login/register page.
     request.session['tpa_custom_auth_entry_data'] = {
-        'data': base64.b64encode(data_str),
+        'data': base64.b64encode(data_bytes),
         'hmac': base64.b64encode(digest),
         'post_url': custom_form_url,
     }
@@ -559,6 +563,10 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
         saml_providers_list = list(provider.Registry.get_enabled_by_backend_name('tpa-saml'))
         return (current_provider and
                 current_provider.slug in [saml_provider.slug for saml_provider in saml_providers_list])
+
+    if current_partial:
+        strategy.session_set('partial_pipeline_token_', current_partial.token)
+        strategy.storage.partial.store(current_partial)
 
     if not user:
         # Use only email for user existence check in case of saml provider
@@ -816,13 +824,15 @@ def set_id_verification_status(auth_entry, strategy, details, user=None, *args, 
 
         # If there is none, create a new approved verification for the user.
         if not verifications:
-            SSOVerification.objects.create(
+            verification = SSOVerification.objects.create(
                 user=user,
                 status="approved",
                 name=user.profile.name,
                 identity_provider_type=current_provider.full_class_name,
                 identity_provider_slug=current_provider.slug,
             )
+            # Send a signal so users who have already passed their courses receive credit
+            verification.send_approval_signal(current_provider.slug)
 
 
 def get_username(strategy, details, backend, user=None, *args, **kwargs):

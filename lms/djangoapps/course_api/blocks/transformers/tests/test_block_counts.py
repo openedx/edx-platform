@@ -3,7 +3,7 @@ Tests for BlockCountsTransformer.
 """
 
 # pylint: disable=protected-access
-from __future__ import absolute_import
+
 
 from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -41,11 +41,11 @@ class TestBlockCountsTransformer(ModuleStoreTestCase):
         )
 
         # verify count of chapters
-        self.assertEquals(block_counts_for_course.chapter, 2)
+        self.assertEqual(block_counts_for_course.chapter, 2)
 
         # verify count of problems
-        self.assertEquals(block_counts_for_course.problem, 6)
-        self.assertEquals(block_counts_for_chapter_x.problem, 3)
+        self.assertEqual(block_counts_for_course.problem, 6)
+        self.assertEqual(block_counts_for_chapter_x.problem, 3)
 
         # verify other block types are not counted
         for block_type in ['course', 'html', 'video']:

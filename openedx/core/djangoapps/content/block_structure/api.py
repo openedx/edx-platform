@@ -1,7 +1,7 @@
 """
 Higher order functions built on the BlockStructureManager to interact with a django cache.
 """
-from __future__ import absolute_import
+
 
 from django.core.cache import cache
 

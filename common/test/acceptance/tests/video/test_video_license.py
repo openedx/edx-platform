@@ -2,7 +2,7 @@
 """
 Acceptance tests for licensing of the Video module
 """
-from __future__ import absolute_import, unicode_literals
+
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.lms.courseware import CoursewarePage

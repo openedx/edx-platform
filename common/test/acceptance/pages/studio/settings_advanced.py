@@ -2,7 +2,6 @@
 Course Advanced Settings page
 """
 
-from __future__ import absolute_import
 
 import six
 from bok_choy.promise import EmptyPromise

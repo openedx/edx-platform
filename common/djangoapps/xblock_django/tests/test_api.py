@@ -1,7 +1,7 @@
 """
 Tests related to XBlock support API.
 """
-from __future__ import absolute_import
+
 
 import six
 

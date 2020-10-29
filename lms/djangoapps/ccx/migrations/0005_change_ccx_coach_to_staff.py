@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+
 
 import logging
 
@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.db import migrations
 from django.http import Http404
 
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.instructor.access import allow_access, revoke_access
 
 log = logging.getLogger("edx.ccx")

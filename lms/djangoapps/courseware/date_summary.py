@@ -3,7 +3,7 @@ This module provides date summary blocks for the Course Info
 page. Each block gives information about a particular
 course-run-specific date which will be displayed to the user.
 """
-from __future__ import absolute_import
+
 
 import datetime
 

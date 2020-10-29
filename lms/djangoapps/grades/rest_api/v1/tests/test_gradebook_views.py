@@ -1,7 +1,7 @@
 """
 Tests for the course grading API view
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import json
 from collections import OrderedDict, namedtuple
@@ -29,7 +29,6 @@ from lms.djangoapps.grades.models import (
     BlockRecordList,
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride,
-    PersistentSubsectionGradeOverrideHistory,
     PersistentCourseGrade,
 )
 from lms.djangoapps.grades.rest_api.v1.tests.mixins import GradeViewTestMixin
@@ -1581,14 +1580,6 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
                     expected_value = getattr(expected_grades, field_name)
                     self.assertEqual(expected_value, getattr(grade, field_name))
 
-            update_records = PersistentSubsectionGradeOverrideHistory.objects.filter(user=request_user)
-            self.assertEqual(update_records.count(), 3)
-            for audit_item in update_records:
-                self.assertEqual(audit_item.user, request_user)
-                self.assertIsNotNone(audit_item.created)
-                self.assertEqual(audit_item.feature, GradeOverrideFeatureEnum.gradebook)
-                self.assertEqual(audit_item.action, PersistentSubsectionGradeOverrideHistory.CREATE_OR_UPDATE)
-
     def test_update_failing_grade(self):
         """
         Test that when we update a user's grade to failing, their certificate is marked notpassing
@@ -1653,7 +1644,8 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         cls.record_b = BlockRecord(locator=cls.locator_b, weight=1, raw_possible=10, graded=True)
         cls.block_records = BlockRecordList([cls.record_a, cls.record_b], cls.course_key)
         cls.usage_key = cls.subsections[cls.chapter_1.location][0].location
-        cls.user_id = 12345
+        cls.user = UserFactory.create()
+        cls.user_id = cls.user.id
         cls.params = {
             "user_id": cls.user_id,
             "usage_key": cls.usage_key,
@@ -1680,6 +1672,54 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         )
         return "{0}?user_id={1}".format(base_url, user_id or self.user_id)
 
+    @patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.create')
+    @ddt.data(
+        'login_staff',
+        'login_course_admin',
+        'login_course_staff',
+    )
+    def test_no_grade(self, login_method, mocked_factory):
+        getattr(self, login_method)()
+        user_no_grade = UserFactory.create()
+        all_total_mock = MagicMock(
+            earned=1,
+            possible=2,
+        )
+        graded_total_mock = MagicMock(
+            earned=3,
+            possible=4,
+        )
+        mock_return_value = MagicMock(
+            all_total=all_total_mock,
+            graded_total=graded_total_mock
+        )
+        mocked_factory.return_value = mock_return_value
+        with self.assertRaises(PersistentSubsectionGrade.DoesNotExist):
+            PersistentSubsectionGrade.objects.get(
+                user_id=user_no_grade.id,
+                course_id=self.usage_key.course_key,
+                usage_key=self.usage_key
+            )
+
+        resp = self.client.get(
+            self.get_url(subsection_id=self.usage_key, user_id=user_no_grade.id)
+        )
+
+        expected_data = {
+            'original_grade': OrderedDict([
+                ('earned_all', 1.0),
+                ('possible_all', 2.0),
+                ('earned_graded', 3.0),
+                ('possible_graded', 4.0)
+            ]),
+            'user_id': user_no_grade.id,
+            'override': None,
+            'course_id': text_type(self.usage_key.course_key),
+            'subsection_id': text_type(self.usage_key),
+            'history': []
+        }
+        self.assertEqual(expected_data, resp.data)
+
     @ddt.data(
         'login_staff',
         'login_course_admin',
@@ -1699,7 +1739,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
                 ('earned_graded', 6.0),
                 ('possible_graded', 8.0)
             ]),
-            'user_id': 12345,
+            'user_id': self.user_id,
             'override': None,
             'course_id': text_type(self.course_key),
             'subsection_id': text_type(self.usage_key),
@@ -1736,7 +1776,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
                 ('earned_graded', 6.0),
                 ('possible_graded', 8.0)
             ]),
-            'user_id': 12345,
+            'user_id': self.user_id,
             'override': OrderedDict([
                 ('earned_all_override', 0.0),
                 ('possible_all_override', 12.0),
@@ -1793,7 +1833,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
                 ('earned_graded', 6.0),
                 ('possible_graded', 8.0)
             ]),
-            'user_id': 12345,
+            'user_id': self.user_id,
             'override': OrderedDict([
                 ('earned_all_override', 0.0),
                 ('possible_all_override', 12.0),
@@ -1812,8 +1852,8 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
                 ('system', None),
                 ('history_date', '2019-01-01T00:00:00Z'),
                 ('history_type', u'+'),
-                ('history_user', None),
-                ('history_user_id', None),
+                ('history_user', self.global_staff.username),
+                ('history_user_id', self.global_staff.id),
                 ('id', 1),
                 ('possible_all_override', 12.0),
                 ('possible_graded_override', 8.0),
@@ -1821,6 +1861,27 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         }
 
         assert expected_data == resp.data
+
+    def test_comment_appears(self):
+        """
+        Test that comments passed (e.g. from proctoring) appear in the history rows
+        """
+        proctoring_failure_fake_comment = "Failed Test Proctoring"
+        self.login_course_staff()
+        override = PersistentSubsectionGradeOverride.update_or_create_override(
+            requesting_user=self.global_staff,
+            subsection_grade_model=self.grade,
+            earned_all_override=0.0,
+            earned_graded_override=0.0,
+            feature=GradeOverrideFeatureEnum.proctoring,
+            comment=proctoring_failure_fake_comment
+        )
+
+        resp = self.client.get(
+            self.get_url(subsection_id=self.usage_key)
+        )
+
+        assert resp.data['history'][0]['override_reason'] == proctoring_failure_fake_comment
 
     @ddt.data(
         'login_staff',
@@ -1862,15 +1923,20 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
             feature=GradeOverrideFeatureEnum.gradebook,
         )
 
+        other_user = UserFactory.create()
         resp = self.client.get(
-            self.get_url(subsection_id=self.usage_key, user_id=6789)
+            self.get_url(subsection_id=self.usage_key, user_id=other_user.id)
         )
-
         expected_data = {
-            'original_grade': None,
-            'user_id': 6789,
+            'original_grade': OrderedDict([
+                ('earned_all', 0.0),
+                ('possible_all', 0.0),
+                ('earned_graded', 0.0),
+                ('possible_graded', 0.0)
+            ]),
+            'user_id': other_user.id,
             'override': None,
-            'course_id': None,
+            'course_id': text_type(self.usage_key.course_key),
             'subsection_id': text_type(self.usage_key),
             'history': []
         }

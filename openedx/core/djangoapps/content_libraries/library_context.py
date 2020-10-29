@@ -1,7 +1,7 @@
 """
 Definition of "Library" as a learning context.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 import logging
 
 from openedx.core.djangoapps.content_libraries.library_bundle import (

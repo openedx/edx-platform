@@ -1,7 +1,7 @@
 """
 This file contains celery tasks for contentstore views
 """
-from __future__ import absolute_import
+
 
 import base64
 import json
@@ -12,7 +12,6 @@ from datetime import datetime
 from math import ceil
 from tempfile import NamedTemporaryFile, mkdtemp
 
-import six
 from celery import group
 from celery.task import task
 from celery.utils.log import get_task_logger
@@ -33,7 +32,7 @@ from opaque_keys.edx.locator import LibraryLocator, BlockUsageLocator
 from organizations.models import OrganizationCourse
 from path import Path as path
 from pytz import UTC
-from six import iteritems, text_type
+from six import iteritems, text_type, binary_type
 from six.moves import range
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.tasks import UserTask
@@ -529,7 +528,7 @@ def _parse_time(time_isoformat):
     ).replace(tzinfo=UTC)
 
 
-@task()
+@task(routing_key=settings.UPDATE_SEARCH_INDEX_JOB_QUEUE)
 def update_search_index(course_id, triggered_time_isoformat):
     """ Updates course search index. """
     try:
@@ -750,8 +749,8 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
     # Locate the uploaded OLX archive (and download it from S3 if necessary)
     # Do everything in a try-except block to make sure everything is properly cleaned up.
     data_root = path(settings.GITHUB_REPO_ROOT)
-    subdir = base64.urlsafe_b64encode(six.b(repr(courselike_key)))
-    course_dir = data_root / subdir.decode('utf-8')
+    subdir = base64.urlsafe_b64encode(repr(courselike_key).encode('utf-8')).decode('utf-8')
+    course_dir = data_root / subdir
     try:
         self.status.set_state(u'Unpacking')
 

@@ -1,7 +1,7 @@
 """
 Unit tests for testing inheritance mixins
 """
-from __future__ import absolute_import
+
 
 import ddt
 import unittest

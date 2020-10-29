@@ -1,18 +1,18 @@
 """ Management command to link program enrollments and external student_keys to an LMS user """
-from __future__ import absolute_import, unicode_literals
 
-import logging
+
+from uuid import UUID
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 
-from lms.djangoapps.program_enrollments.api import link_program_enrollments_to_lms_users
+from lms.djangoapps.program_enrollments.api import link_program_enrollments
 
-logger = logging.getLogger(__name__)
 User = get_user_model()
 
 INCORRECT_PARAMETER_TEMPLATE = (
-    'incorrectly formatted argument {}, must be in form <external user key>:<lms username>'
+    "incorrectly formatted argument '{}', "
+    "must be in form <external user key>:<lms username>"
 )
 DUPLICATE_KEY_TEMPLATE = 'external user key {} provided multiple times'
 
@@ -70,11 +70,17 @@ class Command(BaseCommand):
 
     # pylint: disable=arguments-differ
     def handle(self, program_uuid, user_items, *args, **options):
+        try:
+            parsed_program_uuid = UUID(program_uuid)
+        except ValueError:
+            raise CommandError("supplied program_uuid '{}' is not a valid UUID")
         ext_keys_to_usernames = self.parse_user_items(user_items)
         try:
-            link_program_enrollments_to_lms_users(program_uuid, ext_keys_to_usernames)
+            link_program_enrollments(
+                parsed_program_uuid, ext_keys_to_usernames
+            )
         except Exception as e:
-            raise CommandError(e)
+            raise CommandError(str(e))
 
     def parse_user_items(self, user_items):
         """
@@ -82,18 +88,21 @@ class Command(BaseCommand):
             list of strings in the format 'external_user_key:lms_username'
         Returns:
             dict mapping external user keys to lms usernames
+        Raises:
+            CommandError
         """
         result = {}
         for user_item in user_items:
             split_args = user_item.split(':')
             if len(split_args) != 2:
-                message = (INCORRECT_PARAMETER_TEMPLATE).format(user_item)
+                message = INCORRECT_PARAMETER_TEMPLATE.format(user_item)
                 raise CommandError(message)
-
-            external_user_key = split_args[0]
-            lms_username = split_args[1]
+            external_user_key = split_args[0].strip()
+            lms_username = split_args[1].strip()
+            if not (external_user_key and lms_username):
+                message = INCORRECT_PARAMETER_TEMPLATE.format(user_item)
+                raise CommandError(message)
             if external_user_key in result:
                 raise CommandError(DUPLICATE_KEY_TEMPLATE.format(external_user_key))
-
             result[external_user_key] = lms_username
         return result

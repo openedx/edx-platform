@@ -12,7 +12,6 @@ sessions. Assumes structure:
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
 
-from __future__ import absolute_import
 
 from openedx.core.lib.derived import derive_settings
 from openedx.core.lib.logsettings import get_logger_config

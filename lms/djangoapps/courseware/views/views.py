@@ -1,8 +1,7 @@
 """
 Courseware views functions
 """
-from __future__ import absolute_import
-from __future__ import division
+
 
 import beeline
 import json
@@ -52,9 +51,9 @@ from web_fragments.fragment import Fragment
 import shoppingcart
 import survey.views
 from course_modes.models import CourseMode, get_course_prices
-from courseware.access import has_access, has_ccx_coach_role
-from courseware.access_utils import check_course_open_for_learner
-from courseware.courses import (
+from lms.djangoapps.courseware.access import has_access, has_ccx_coach_role
+from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
+from lms.djangoapps.courseware.courses import (
     can_self_enroll_in_course,
     course_open_for_self_enrollment,
     get_course,
@@ -67,12 +66,14 @@ from courseware.courses import (
     sort_by_announcement,
     sort_by_start_date
 )
-from courseware.masquerade import setup_masquerade
-from courseware.model_data import FieldDataCache
-from courseware.models import BaseStudentModuleHistory, StudentModule
-from courseware.permissions import MASQUERADE_AS_STUDENT, VIEW_COURSE_HOME, VIEW_COURSEWARE, VIEW_XQA_INTERFACE
-from courseware.url_helpers import get_redirect_url
-from courseware.user_state_client import DjangoXBlockUserStateClient
+from lms.djangoapps.courseware.masquerade import setup_masquerade
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
+from lms.djangoapps.courseware.permissions import (
+    MASQUERADE_AS_STUDENT, VIEW_COURSE_HOME, VIEW_COURSEWARE, VIEW_XQA_INTERFACE,
+)
+from lms.djangoapps.courseware.url_helpers import get_redirect_url
+from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.certificates import api as certs_api
@@ -280,10 +281,21 @@ def yt_video_metadata(request):
     Will hit the youtube API if the key is available in settings
     :return: youtube video metadata
     """
-    response = {}
-    status_code = 500
     video_id = request.GET.get('id', None)
-    if settings.YOUTUBE_API_KEY and video_id:
+    metadata, status_code = load_metadata_from_youtube(video_id)
+    return Response(metadata, status=status_code, content_type='application/json')
+
+
+def load_metadata_from_youtube(video_id):
+    """
+    Get metadata about a YouTube video.
+
+    This method is used via the standalone /courses/yt_video_metadata REST API
+    endpoint, or via the video XBlock as a its 'yt_video_metadata' handler.
+    """
+    metadata = {}
+    status_code = 500
+    if video_id and settings.YOUTUBE_API_KEY and settings.YOUTUBE_API_KEY != 'PUT_YOUR_API_KEY_HERE':
         yt_api_key = settings.YOUTUBE_API_KEY
         yt_metadata_url = settings.YOUTUBE['METADATA_URL']
         yt_timeout = settings.YOUTUBE.get('TEST_TIMEOUT', 1500) / 1000  # converting milli seconds to seconds
@@ -293,9 +305,9 @@ def yt_video_metadata(request):
             status_code = res.status_code
             if res.status_code == 200:
                 try:
-                    res = res.json()
-                    if res.get('items', []):
-                        response = res
+                    res_json = res.json()
+                    if res_json.get('items', []):
+                        metadata = res_json
                     else:
                         logging.warning(u'Unable to find the items in response. Following response '
                                         u'was received: {res}'.format(res=res.text))
@@ -310,7 +322,7 @@ def yt_video_metadata(request):
     else:
         logging.warning(u'YouTube API key or video id is None. Please make sure API key and video id is not None')
 
-    return Response(response, status=status_code, content_type='application/json')
+    return metadata, status_code
 
 
 @ensure_csrf_cookie
@@ -354,7 +366,7 @@ def jump_to(_request, course_id, location):
     except InvalidKeyError:
         raise Http404(u"Invalid course_key or usage_key")
     try:
-        redirect_url = get_redirect_url(course_key, usage_key)
+        redirect_url = get_redirect_url(course_key, usage_key, _request)
     except ItemNotFoundError:
         raise Http404(u"No data at this location: {0}".format(usage_key))
     except NoPathToItem:
@@ -909,15 +921,18 @@ def course_about(request, course_id):
         ecommerce_checkout = ecomm_service.is_enabled(request.user)
         ecommerce_checkout_link = ''
         ecommerce_bulk_checkout_link = ''
-        professional_mode = None
-        is_professional_mode = CourseMode.PROFESSIONAL in modes or CourseMode.NO_ID_PROFESSIONAL_MODE in modes
-        if ecommerce_checkout and is_professional_mode:
-            professional_mode = modes.get(CourseMode.PROFESSIONAL, '') or \
-                modes.get(CourseMode.NO_ID_PROFESSIONAL_MODE, '')
-            if professional_mode.sku:
-                ecommerce_checkout_link = ecomm_service.get_checkout_page_url(professional_mode.sku)
-            if professional_mode.bulk_sku:
-                ecommerce_bulk_checkout_link = ecomm_service.get_checkout_page_url(professional_mode.bulk_sku)
+        single_paid_mode = None
+        if ecommerce_checkout:
+            if len(modes) == 1 and list(modes.values())[0].min_price:
+                single_paid_mode = list(modes.values())[0]
+            else:
+                # have professional ignore other modes for historical reasons
+                single_paid_mode = modes.get(CourseMode.PROFESSIONAL)
+
+            if single_paid_mode and single_paid_mode.sku:
+                ecommerce_checkout_link = ecomm_service.get_checkout_page_url(single_paid_mode.sku)
+            if single_paid_mode and single_paid_mode.bulk_sku:
+                ecommerce_bulk_checkout_link = ecomm_service.get_checkout_page_url(single_paid_mode.bulk_sku)
 
         registration_price, course_price = get_course_prices(course)
 
@@ -968,7 +983,7 @@ def course_about(request, course_id):
             'ecommerce_checkout': ecommerce_checkout,
             'ecommerce_checkout_link': ecommerce_checkout_link,
             'ecommerce_bulk_checkout_link': ecommerce_bulk_checkout_link,
-            'professional_mode': professional_mode,
+            'single_paid_mode': single_paid_mode,
             'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
             'show_courseware_link': show_courseware_link,
             'is_course_full': is_course_full,
@@ -1629,7 +1644,7 @@ FA_GOALS_LABEL = 'Tell us about your learning or professional goals. How will a 
 FA_EFFORT_LABEL = 'Tell us about your plans for this course. What steps will you take to help you complete ' \
                   'the course work and receive a certificate?'
 
-FA_SHORT_ANSWER_INSTRUCTIONS = _('Use between 250 and 500 words or so in your response.')
+FA_SHORT_ANSWER_INSTRUCTIONS = _('Use between 1250 and 2500 characters or so in your response.')
 
 
 @login_required

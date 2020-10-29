@@ -2,7 +2,6 @@
 Stub implementation of an HTTP service.
 """
 
-from __future__ import absolute_import
 
 import json
 import threading
@@ -16,7 +15,6 @@ import six.moves.urllib.request  # pylint: disable=import-error
 from lazy import lazy
 from six.moves.BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer  # pylint: disable=import-error
 from six.moves.socketserver import ThreadingMixIn  # pylint: disable=import-error
-
 LOGGER = getLogger(__name__)
 
 
@@ -92,7 +90,7 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         Retrieve the content of the request.
         """
         try:
-            length = int(self.headers.getheader('content-length'))
+            length = int(self.headers.get('content-length'))
 
         except (TypeError, ValueError):
             return ""
@@ -105,7 +103,11 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         Retrieve the request POST parameters from the client as a dictionary.
         If no POST parameters can be interpreted, return an empty dict.
         """
-        contents = self.request_content
+
+        if isinstance(self.request_content, bytes):
+            contents = self.request_content.decode('utf-8')
+        else:
+            contents = self.request_content
 
         # The POST dict will contain a list of values for each key.
         # None of our parameters are lists, however, so we map [val] --> val
@@ -159,13 +161,6 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
             if len(self.post_dict) > 0:
                 for key, value in six.iteritems(self.post_dict):
 
-                    # Decode the params as UTF-8
-                    try:
-                        key = six.text_type(key, 'utf-8')
-                        value = six.text_type(value, 'utf-8')
-                    except UnicodeDecodeError:
-                        self.log_message("Could not decode request params as UTF-8")
-
                     self.log_message(u"Set config '{0}' to '{1}'".format(key, value))
 
                     try:
@@ -209,6 +204,8 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
             self.end_headers()
 
         if content is not None:
+            if not six.PY2 and isinstance(content, six.text_type):
+                content = content.encode('utf-8')
             self.wfile.write(content)
 
     def send_json_response(self, content):
