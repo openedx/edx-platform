@@ -12,8 +12,8 @@ from opaque_keys.edx.locator import CourseLocator
 
 from cms.djangoapps.contentstore.tasks import rerun_course
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
-from course_action_state.managers import CourseRerunUIStateManager
-from course_action_state.models import CourseRerunState
+from common.djangoapps.course_action_state.managers import CourseRerunUIStateManager
+from common.djangoapps.course_action_state.models import CourseRerunState
 from student.auth import has_course_author_access
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
