@@ -6,6 +6,7 @@ Experimentation views
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django_filters.rest_framework import DjangoFilterBackend
+from django.http import Http404
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from lms.djangoapps.courseware import courses
@@ -98,8 +99,18 @@ class UserMetaDataView(APIView):
 
     def get(self, request, course_id=None, username=None):
         """ Return user-metadata for the given course and user """
-        user = get_user_by_username_or_email(username)
-        course = courses.get_course_by_id(CourseKey.from_string(course_id))
+        try:
+            user = get_user_by_username_or_email(username)
+        except User.DoesNotExist:
+            message = "Provided user is not found"
+            return JsonResponse({'message': message}, status=404)
+
+        try:
+            course = courses.get_course_by_id(CourseKey.from_string(course_id))
+        except Http404:
+            message = "Provided course is not found"
+            return JsonResponse({'message': message}, status=404)
+
         context = get_experiment_user_metadata_context(course, user)
         user_metadata = context.get('user_metadata')
         return JsonResponse(user_metadata)

@@ -304,3 +304,13 @@ class ExperimentUserMetaDataViewTests(APITestCase, ModuleStoreTestCase):
         call_args = [user.username, course.id]
         response = self.client.get(reverse('api_experiments:user_metadata', args=call_args))
         self.assertEqual(response.status_code, 200)
+
+        call_args_with_bogus_user = ['bugsbunny', course.id]
+        response = self.client.get(reverse('api_experiments:user_metadata', args=call_args_with_bogus_user))
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json()['message'], 'Provided user is not found')
+
+        call_args_with_bogus_course = [user.username, 'course-v1:edX+DemoX+Demo_BOGUS']
+        response = self.client.get(reverse('api_experiments:user_metadata', args=call_args_with_bogus_course))
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json()['message'], 'Provided course is not found')
