@@ -2693,7 +2693,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.crawlers',
 
     # Unusual migrations
-    'database_fixups',
+    'common.djangoapps.database_fixups',
 
     'openedx.core.djangoapps.waffle_utils',
 
