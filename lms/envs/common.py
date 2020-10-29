@@ -2478,9 +2478,7 @@ INSTALLED_APPS = [
     'util',
     'lms.djangoapps.certificates.apps.CertificatesConfig',
     'lms.djangoapps.dashboard',
-    'lms.djangoapps.instructor_task',
     'openedx.core.djangoapps.course_groups',
-    'lms.djangoapps.bulk_email',
     'lms.djangoapps.branding',
 
     # New (Blockstore-based) XBlock runtime
@@ -2708,6 +2706,34 @@ INSTALLED_APPS = [
 
     'ratelimitbackend',
 ]
+
+
+IN_CELERY_WORKER_PROCESS = sys.argv and sys.argv[0].endswith('celery') and 'worker' in sys.argv
+
+# This is a mitigation taken to address a startup race condition. Celery's
+# autodiscover_tasks() _usually_ works, but sometimes does not find the tasks
+# for these two apps. It's not clear at this point why this is. Using app
+# configs that explicitly load the tasks in their ready() will fix it, but at
+# the expense of breaking our common/lib tests and forcing us to import a bunch
+# of stuff into it. So in order to guarantee loading while not borking tests, we
+# have a separate set of AppConfigs that we only call when starting up as a
+# celery worker.
+#
+# If you ever feel that this is no longer necessary and remove this, be sure to
+# alert on "Received unregistered task" messages in the logs to detect
+# regressions. This affects a small percentage of celery workers on startup, so
+# you may only see breakage hours after it hits prod.
+if IN_CELERY_WORKER_PROCESS:
+    INSTALLED_APPS.extend([
+        'lms.djangoapps.instructor_task.apps.InstructorTaskCeleryConfig',
+        'lms.djangoapps.bulk_email.apps.BulkEmailCeleryConfig',
+    ])
+else:
+    INSTALLED_APPS.extend([
+        'lms.djangoapps.instructor_task.apps.InstructorTaskConfig',
+        'lms.djangoapps.bulk_email.apps.BulkEmailConfig',
+    ])
+
 
 ######################### CSRF #########################################
 
