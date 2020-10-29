@@ -14,7 +14,7 @@ from django.utils.timezone import now
 from mock import patch
 from pytz import UTC
 
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from student.helpers import (
     VERIFY_STATUS_APPROVED,

@@ -47,6 +47,8 @@ from xblock.fields import ScopeIds
 from xblock.runtime import DictKeyValueStore, KvsFieldData, Runtime
 from xblock.test.tools import TestRuntime
 
+from capa.tests.response_xml_factory import OptionResponseXMLFactory
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware import module_render as render
 from lms.djangoapps.courseware.access_response import AccessResponse
 from lms.djangoapps.courseware.courses import get_course_info_section, get_course_with_access

@@ -18,7 +18,7 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.experiments.models import ExperimentData
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group

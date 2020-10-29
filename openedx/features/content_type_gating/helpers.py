@@ -6,7 +6,7 @@ import logging
 
 from django.utils import timezone
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.config_model_utils.utils import is_in_holdback
 from student.models import CourseEnrollment
 from student.role_helpers import has_staff_roles

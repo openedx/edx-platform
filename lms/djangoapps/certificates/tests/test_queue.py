@@ -23,7 +23,7 @@ from testfixtures import LogCapture
 # and verify that items are being correctly added to the queue
 # in our `XQueueCertInterface` implementation.
 from capa.xqueue_interface import XQueueInterface
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import (
     CertificateStatuses,
     ExampleCertificate,

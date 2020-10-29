@@ -13,7 +13,7 @@ from opaque_keys.edx.keys import CourseKey
 from slumber.exceptions import HttpClientError, HttpServerError
 from testfixtures import LogCapture
 
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.certificates.signals import listen_for_passing_grade
 from openedx.core.djangoapps.commerce.utils import ECOMMERCE_DATE_FORMAT
 from openedx.core.djangoapps.credit.tests.test_api import TEST_ECOMMERCE_WORKER

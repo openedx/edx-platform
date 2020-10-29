@@ -38,8 +38,8 @@ from xblock.fields import Scope, String
 
 import lms.djangoapps.courseware.views.views as views
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from freezegun import freeze_time
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (

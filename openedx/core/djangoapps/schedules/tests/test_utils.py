@@ -5,7 +5,7 @@ Tests for schedules utils
 import datetime
 
 import ddt
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from mock import patch
 from pytz import utc
 

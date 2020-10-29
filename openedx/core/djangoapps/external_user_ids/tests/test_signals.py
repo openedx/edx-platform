@@ -19,7 +19,7 @@ from openedx.core.djangoapps.catalog.cache import (
 )
 from openedx.core.djangoapps.external_user_ids.models import ExternalId, ExternalIdType
 from student.models import CourseEnrollment
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

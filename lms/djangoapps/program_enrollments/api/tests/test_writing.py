@@ -16,7 +16,7 @@ from django.core.cache import cache
 from opaque_keys.edx.keys import CourseKey
 from organizations.tests.factories import OrganizationFactory
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.program_enrollments.constants import ProgramCourseEnrollmentRoles
 from lms.djangoapps.program_enrollments.constants import ProgramCourseOperationStatuses as CourseStatuses
 from lms.djangoapps.program_enrollments.constants import ProgramEnrollmentStatuses as PEStatuses

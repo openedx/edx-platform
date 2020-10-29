@@ -15,7 +15,7 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from course_modes.models import get_cosmetic_verified_display_price
+from common.djangoapps.course_modes.models import get_cosmetic_verified_display_price
 from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.utils import can_show_verified_upgrade
