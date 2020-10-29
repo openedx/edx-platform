@@ -1,29 +1,32 @@
 """
 Django module container for classes and operations related to the "Course Module" content type
 """
+from __future__ import absolute_import
+
 import json
 import logging
-from cStringIO import StringIO
 from datetime import datetime, timedelta
+from io import BytesIO
+
 import dateutil.parser
-
-from django.conf import settings
-
 import requests
+import six
+from django.conf import settings
 from lazy import lazy
 from lxml import etree
-from openedx.core.djangoapps.video_pipeline.models import VideoUploadsEnabledByDefault
-from openedx.core.lib.license import LicenseMixin
 from path import Path as path
 from pytz import utc
 from six import text_type
-from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
+from xblock.fields import Boolean, Dict, Float, Integer, List, Scope, String
 
+from openedx.core.djangoapps.video_pipeline.models import VideoUploadsEnabledByDefault
+from openedx.core.lib.license import LicenseMixin
 from xmodule import course_metadata_utils
-from xmodule.course_metadata_utils import DEFAULT_START_DATE, DEFAULT_GRADING_POLICY
+from xmodule.course_metadata_utils import DEFAULT_GRADING_POLICY, DEFAULT_START_DATE
 from xmodule.graders import grader_from_conf
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.tabs import CourseTabList, InvalidTabsException
+
 from .fields import Date
 
 log = logging.getLogger(__name__)
@@ -1045,7 +1048,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
             if not getattr(self, "tabs", []):
                 CourseTabList.initialize_default(self)
         except InvalidTabsException as err:
-            raise type(err)('{msg} For course: {course_id}'.format(msg=text_type(err), course_id=unicode(self.id)))
+            raise type(err)('{msg} For course: {course_id}'.format(msg=text_type(err), course_id=six.text_type(self.id)))
 
         self.set_default_certificate_available_date()
 
@@ -1105,7 +1108,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
 
         # bleh, have to parse the XML here to just pull out the url_name attribute
         # I don't think it's stored anywhere in the instance.
-        course_file = StringIO(xml_data.encode('ascii', 'ignore'))
+        course_file = BytesIO(xml_data.encode('ascii', 'ignore'))
         xml_obj = etree.parse(course_file, parser=edx_xml_parser).getroot()
 
         policy_dir = None
@@ -1333,7 +1336,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
                 return True
             else:
                 return False
-        elif isinstance(flag, basestring):
+        elif isinstance(flag, six.string_types):
             return flag.lower() in ['true', 'yes', 'y']
         else:
             return bool(flag)
@@ -1385,7 +1388,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
             ret = [
                 {"start": date_proxy.from_json(start), "end": date_proxy.from_json(end)}
                 for start, end
-                in filter(None, blackout_dates)
+                in [blackout_date for blackout_date in blackout_dates if blackout_date]
             ]
             for blackout in ret:
                 if not blackout["start"] or not blackout["end"]:
@@ -1589,7 +1592,7 @@ class CourseSummary(object):
         except TypeError as e:
             log.warning(
                 "Course '{course_id}' has an improperly formatted end date '{end_date}'. Error: '{err}'.".format(
-                    course_id=unicode(self.id), end_date=self.end, err=e
+                    course_id=six.text_type(self.id), end_date=self.end, err=e
                 )
             )
             modified_end = self.end.replace(tzinfo=utc)

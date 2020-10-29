@@ -4,6 +4,8 @@
         var template = [
             '<button class="control add-fullscreen" aria-disabled="false" title="',
             gettext('Fill browser'),
+            '" aria-label="',
+            gettext('Fill browser'),
             '">',
             '<span class="icon fa fa-arrows-alt" aria-hidden="true"></span>',
             '</button>'
@@ -134,7 +136,7 @@
             fullScreenClassNameEl.removeClass('video-fullscreen');
             $(window).scrollTop(this.scrollPos);
             this.videoFullScreen.fullScreenEl
-            .attr('title', gettext('Fill browser'))
+            .attr({title: gettext('Fill browser'), 'aria-label': gettext('Fill browser')})
             .find('.icon')
                 .removeClass('fa-compress')
                 .addClass('fa-arrows-alt');
@@ -156,7 +158,7 @@
             this.videoFullScreen.fullScreenState = this.isFullScreen = true;
             fullScreenClassNameEl.addClass('video-fullscreen');
             this.videoFullScreen.fullScreenEl
-            .attr('title', gettext('Exit full browser'))
+            .attr({title: gettext('Exit full browser'), 'aria-label': gettext('Exit full browser')})
             .find('.icon')
                 .removeClass('fa-arrows-alt')
                 .addClass('fa-compress');

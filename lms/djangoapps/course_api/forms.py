@@ -41,7 +41,7 @@ class CourseDetailGetForm(UsernameValidatorMixin, Form):
         try:
             return CourseKey.from_string(course_key_string)
         except InvalidKeyError:
-            raise ValidationError("'{}' is not a valid course key.".format(unicode(course_key_string)))
+            raise ValidationError(u"'{}' is not a valid course key.".format(unicode(course_key_string)))
 
 
 class CourseListGetForm(UsernameValidatorMixin, Form):

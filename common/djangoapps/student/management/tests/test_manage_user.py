@@ -1,12 +1,14 @@
 """
 Unit tests for user_management management commands.
 """
+from __future__ import absolute_import
+
 import itertools
 
 import ddt
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import Group, User
-from django.core.management import call_command, CommandError
+from django.core.management import CommandError, call_command
 from django.test import TestCase
 
 from openedx.core.djangoapps.user_api.accounts.utils import generate_password

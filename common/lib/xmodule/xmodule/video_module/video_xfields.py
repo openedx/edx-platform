@@ -1,9 +1,12 @@
 """
 XFields for video module.
 """
+from __future__ import absolute_import
+
 import datetime
 
-from xblock.fields import Scope, String, Float, Boolean, List, Dict, DateTime
+from xblock.fields import Boolean, DateTime, Dict, Float, List, Scope, String
+
 from xmodule.fields import RelativeTime
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of

@@ -262,7 +262,7 @@ def download_transcripts(request):
 
     # Construct an HTTP response
     response = HttpResponse(content, content_type=mimetype)
-    response['Content-Disposition'] = 'attachment; filename="{filename}"'.format(filename=filename.encode('utf-8'))
+    response['Content-Disposition'] = u'attachment; filename="{filename}"'.format(filename=filename.encode('utf-8'))
     return response
 
 
@@ -337,7 +337,7 @@ def check_transcripts(request):
                 local_transcripts = contentstore().find(content_location).data
                 transcripts_presence['youtube_local'] = True
             except NotFoundError:
-                log.debug("Can't find transcripts in storage for youtube id: %s", youtube_id)
+                log.debug(u"Can't find transcripts in storage for youtube id: %s", youtube_id)
 
             # youtube server
             youtube_text_api = copy.deepcopy(settings.YOUTUBE['TEXT_API'])
@@ -371,7 +371,7 @@ def check_transcripts(request):
                 html5_subs.append(contentstore().find(content_location).data)
                 transcripts_presence['html5_local'].append(html5_id)
             except NotFoundError:
-                log.debug("Can't find transcripts in storage for non-youtube video_id: %s", html5_id)
+                log.debug(u"Can't find transcripts in storage for non-youtube video_id: %s", html5_id)
             if len(html5_subs) == 2:  # check html5 transcripts for equality
                 transcripts_presence['html5_equal'] = json.loads(html5_subs[0]) == json.loads(html5_subs[1])
 
@@ -426,12 +426,12 @@ def _transcripts_logic(transcripts_presence, videos):
         else:  # html5 source have no subtitles
             # check if item sub has subtitles
             if transcripts_presence['current_item_subs'] and not transcripts_presence['is_youtube_mode']:
-                log.debug("Command is use existing %s subs", transcripts_presence['current_item_subs'])
+                log.debug(u"Command is use existing %s subs", transcripts_presence['current_item_subs'])
                 command = 'use_existing'
             else:
                 command = 'not_found'
     log.debug(
-        "Resulted command: %s, current transcripts: %s, youtube mode: %s",
+        u"Resulted command: %s, current transcripts: %s, youtube mode: %s",
         command,
         transcripts_presence['current_item_subs'],
         transcripts_presence['is_youtube_mode']

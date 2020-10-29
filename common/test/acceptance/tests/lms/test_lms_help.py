@@ -2,6 +2,7 @@
 Test Help links in LMS
 """
 
+from __future__ import absolute_import
 from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
 from common.test.acceptance.tests.discussion.helpers import CohortTestMixin
@@ -12,12 +13,23 @@ from common.test.acceptance.tests.helpers import (
     url_for_help,
     click_and_wait_for_window
 )
+from openedx.core.release import skip_unless_master
+
+# @skip_unless_master is used throughout this file because on named release
+# branches, most work happens leading up to the first release on the branch, and
+# that is before the docs have been published.  Tests that check readthedocs for
+# the right doc page will fail during this time, and it's just a big
+# distraction.  Also, if we bork the docs, it's not the end of the world, and we
+# can fix it easily, so this is a good tradeoff.
 
 
+@skip_unless_master         # See note at the top of the file.
 class TestCohortHelp(ContainerBase, CohortTestMixin):
     """
     Tests help links in Cohort page
     """
+    shard = 2
+
     def setUp(self, is_staff=True):
         super(TestCohortHelp, self).setUp(is_staff=is_staff)
         self.enable_cohorting(self.course_fixture)
@@ -78,10 +90,12 @@ class TestCohortHelp(ContainerBase, CohortTestMixin):
         self.verify_help_link(href)
 
 
+@skip_unless_master         # See note at the top of the file.
 class InstructorDashboardHelp(BaseInstructorDashboardTest):
     """
     Tests opening help from the general Help button in the instructor dashboard.
     """
+    shard = 2
 
     def setUp(self):
         super(InstructorDashboardHelp, self).setUp()

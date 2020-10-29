@@ -2,6 +2,7 @@
 TestCases verifying proper behavior of custom DRF request parsers.
 """
 
+from __future__ import absolute_import
 from collections import namedtuple
 from io import BytesIO
 
@@ -15,7 +16,6 @@ class TestTypedFileUploadParser(APITestCase):
     """
     Tests that verify the behavior of TypedFileUploadParser
     """
-    shard = 2
 
     def setUp(self):
         super(TestTypedFileUploadParser, self).setUp()

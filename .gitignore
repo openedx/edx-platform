@@ -132,7 +132,7 @@ build
 /src/
 \#*\#
 .env/
-lms/lib/comment_client/python
+openedx/core/djangoapps/django_comment_common/comment_client/python
 autodeploy.properties
 .ws_migrations_complete
 dist
@@ -140,3 +140,13 @@ dist
 
 # Visual Studio Code
 .vscode
+
+# Locally generated PII reports
+pii_report
+
+# Local documentation builds
+docs/_build
+docs/cms
+docs/common
+docs/lms
+docs/openedx

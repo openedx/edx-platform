@@ -10,7 +10,7 @@ from xblock.core import XBlock, XBlockAside
 from xblock.fields import Dict, Scope
 
 from edxmako.shortcuts import render_to_string
-from xmodule.capa_module import CapaModule
+from xmodule.capa_module import ProblemBlock
 from xmodule.x_module import AUTHOR_VIEW
 
 _ = lambda text: text
@@ -44,7 +44,7 @@ class StructuredTagsAside(XBlockAside):
         Display the tag selector with specific categories and allowed values,
         depending on the context.
         """
-        if isinstance(block, CapaModule):
+        if isinstance(block, ProblemBlock):
             tags = []
             for tag in self.get_available_tags():
                 tag_available_values = tag.get_values()
@@ -97,7 +97,7 @@ class StructuredTagsAside(XBlockAside):
 
                 for posted_tag_value in posted_data[av_tag.name]:
                     if posted_tag_value not in tag_available_values and posted_tag_value not in tag_current_values:
-                        return Response("Invalid tag value was passed: %s" % posted_tag_value, status=400)
+                        return Response(u"Invalid tag value was passed: %s" % posted_tag_value, status=400)
 
                 saved_tags[av_tag.name] = posted_data[av_tag.name]
                 need_update = True

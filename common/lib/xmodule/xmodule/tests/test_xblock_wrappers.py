@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tests for the wrapping layer that provides the XBlock API using XModule/Descriptor
 functionality
@@ -27,9 +28,8 @@ from xblock.core import XBlock
 
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
-from xmodule.x_module import ModuleSystem, XModule, XModuleDescriptor, DescriptorSystem, STUDENT_VIEW, STUDIO_VIEW
+from xmodule.x_module import ModuleSystem, XModule, XModuleDescriptor, DescriptorSystem, STUDENT_VIEW, STUDIO_VIEW, PUBLIC_VIEW
 from xmodule.annotatable_module import AnnotatableDescriptor
-from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
 from xmodule.html_module import HtmlDescriptor
 from xmodule.poll_module import PollDescriptor
@@ -48,7 +48,6 @@ from xmodule.tests import get_test_descriptor_system, get_test_system
 # TODO: Add more types of sample data
 LEAF_XMODULES = {
     AnnotatableDescriptor: [{}],
-    CapaDescriptor: [{}],
     HtmlDescriptor: [{}],
     PollDescriptor: [{'display_name': 'Poll Display Name'}],
     WordCloudDescriptor: [{}],
@@ -63,8 +62,8 @@ LEAF_XMODULES = {
 CONTAINER_XMODULES = {
     ConditionalDescriptor: [{}],
     CourseDescriptor: [{}],
-    RandomizeDescriptor: [{}],
-    SequenceDescriptor: [{}],
+    RandomizeDescriptor: [{'display_name': 'Test String Display'}],
+    SequenceDescriptor: [{'display_name': u'Test Unicode हिंदी Display'}],
     VerticalBlock: [{}],
     WrapperBlock: [{}],
 }
@@ -264,7 +263,6 @@ class XBlockWrapperTestMixin(object):
     You can create an actual test case by inheriting from this class and UnitTest,
     and implement skip_if_invalid and check_property.
     """
-    shard = 1
 
     def skip_if_invalid(self, descriptor_cls):
         """
@@ -323,7 +321,6 @@ class TestStudentView(XBlockWrapperTestMixin, TestCase):
     """
     This tests that student_view and XModule.get_html produce the same results.
     """
-    shard = 1
 
     def skip_if_invalid(self, descriptor_cls):
         pure_xblock_class = issubclass(descriptor_cls, XBlock) and not issubclass(descriptor_cls, XModuleDescriptor)
@@ -348,7 +345,6 @@ class TestStudioView(XBlockWrapperTestMixin, TestCase):
     """
     This tests that studio_view and XModuleDescriptor.get_html produce the same results
     """
-    shard = 1
 
     def skip_if_invalid(self, descriptor_cls):
         if descriptor_cls in NOT_STUDIO_EDITABLE:
@@ -374,7 +370,6 @@ class TestXModuleHandler(TestCase):
     """
     Tests that the xmodule_handler function correctly wraps handle_ajax
     """
-    shard = 1
 
     def setUp(self):
         super(TestXModuleHandler, self).setUp()
@@ -415,7 +410,6 @@ class TestXmlExport(XBlockWrapperTestMixin, TestCase):
     """
     This tests that XModuleDescriptor.export_course_to_xml and add_xml_to_node produce the same results.
     """
-    shard = 1
 
     def skip_if_invalid(self, descriptor_cls):
         if descriptor_cls.add_xml_to_node != XModuleDescriptor.add_xml_to_node:
@@ -433,3 +427,33 @@ class TestXmlExport(XBlockWrapperTestMixin, TestCase):
 
         self.assertEquals(list(xmodule_api_fs.walk()), list(xblock_api_fs.walk()))
         self.assertEquals(etree.tostring(xmodule_node), etree.tostring(xblock_node))
+
+
+class TestPublicView(XBlockWrapperTestMixin, TestCase):
+    """
+    This tests that default public_view shows the correct message.
+    """
+
+    def skip_if_invalid(self, descriptor_cls):
+        pure_xblock_class = issubclass(descriptor_cls, XBlock) and not issubclass(descriptor_cls, XModuleDescriptor)
+        if pure_xblock_class:
+            public_view = descriptor_cls.public_view
+        else:
+            public_view = descriptor_cls.module_class.public_view
+        if public_view != XModule.public_view:
+            raise SkipTest(descriptor_cls.__name__ + " implements public_view")
+
+    def check_property(self, descriptor):
+        """
+        Assert that public_view contains correct message.
+        """
+        if descriptor.display_name:
+            self.assertIn(
+                descriptor.display_name,
+                descriptor.render(PUBLIC_VIEW).content
+            )
+        else:
+            self.assertIn(
+                "This content is only accessible",
+                descriptor.render(PUBLIC_VIEW).content
+            )

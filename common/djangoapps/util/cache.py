@@ -5,9 +5,14 @@ invalidation. Import these instead of django.core.cache.
 Note that 'default' is being preserved for user session caching, which we're
 not migrating so as not to inconvenience users by logging them all out.
 """
-import urllib
+from __future__ import absolute_import
+
 from functools import wraps
 
+import six
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 from django.conf import settings
 from django.core import cache
 # If we can't find a 'general' CACHE defined in settings.py, we simply fall back
@@ -53,8 +58,7 @@ def cache_if_anonymous(*get_parameters):
             # If that page is cached the authentication doesn't
             # happen, so we disable the cache when that feature is enabled.
             if (
-                not request.user.is_authenticated and
-                not settings.FEATURES['AUTH_USE_CERTIFICATES']
+                not request.user.is_authenticated
             ):
                 # Use the cache. The same view accessed through different domain names may
                 # return different things, so include the domain name in the key.
@@ -75,8 +79,8 @@ def cache_if_anonymous(*get_parameters):
                     if parameter_value is not None:
                         # urlencode expects data to be of type str, and doesn't deal well with Unicode data
                         # since it doesn't provide a way to specify an encoding.
-                        cache_key = cache_key + '.' + urllib.urlencode({
-                            get_parameter: unicode(parameter_value).encode('utf-8')
+                        cache_key = cache_key + '.' + six.moves.urllib.parse.urlencode({
+                            get_parameter: six.text_type(parameter_value).encode('utf-8')
                         })
 
                 response = cache.get(cache_key, version=version)  # pylint: disable=maybe-no-member

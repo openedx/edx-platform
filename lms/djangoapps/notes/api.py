@@ -1,8 +1,10 @@
 from __future__ import absolute_import
+
 import collections
 import json
 import logging
 
+import six
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.http import Http404, HttpResponse
@@ -11,7 +13,6 @@ from opaque_keys.edx.keys import CourseKey
 from courseware.courses import get_course_with_access
 from notes.models import Note
 from notes.utils import notes_enabled_for_course
-import six
 
 log = logging.getLogger(__name__)
 
@@ -57,7 +58,7 @@ def api_request(request, course_id, **kwargs):
 
     # Verify that the api should be accessible to this course
     if not api_enabled(request, course_key):
-        log.debug('Notes are disabled for course: {0}'.format(course_id))
+        log.debug(u'Notes are disabled for course: {0}'.format(course_id))
         raise Http404
 
     # Locate the requested resource
@@ -67,21 +68,21 @@ def api_request(request, course_id, **kwargs):
     resource = resource_map.get(resource_name)
 
     if resource is None:
-        log.debug('Resource "{0}" does not exist'.format(resource_name))
+        log.debug(u'Resource "{0}" does not exist'.format(resource_name))
         raise Http404
 
     if resource_method not in list(resource.keys()):
-        log.debug('Resource "{0}" does not support method "{1}"'.format(resource_name, resource_method))
+        log.debug(u'Resource "{0}" does not support method "{1}"'.format(resource_name, resource_method))
         raise Http404
 
     # Execute the action associated with the resource
     func = resource.get(resource_method)
     module = globals()
     if func not in module:
-        log.debug('Function "{0}" does not exist for request {1} {2}'.format(func, resource_method, resource_name))
+        log.debug(u'Function "{0}" does not exist for request {1} {2}'.format(func, resource_method, resource_name))
         raise Http404
 
-    log.debug('API request: {0} {1}'.format(resource_method, resource_name))
+    log.debug(u'API request: {0} {1}'.format(resource_method, resource_name))
 
     api_response = module[func](request, course_key, **kwargs)
     http_response = api_format(api_response)
@@ -104,7 +105,7 @@ def api_format(api_response):
     http_response['Content-type'] = content_type
     http_response.content = content
 
-    log.debug('API response type: {0} content: {1}'.format(content_type, content))
+    log.debug(u'API response type: {0} content: {1}'.format(content_type, content))
 
     return http_response
 

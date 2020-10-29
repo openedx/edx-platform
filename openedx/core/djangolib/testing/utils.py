@@ -8,6 +8,7 @@ Utility classes for testing django applications.
     A TestCase baseclass that has per-test isolated caches.
 """
 
+from __future__ import absolute_import
 import copy
 import re
 from unittest import skipUnless
@@ -73,6 +74,9 @@ class CacheIsolationMixin(object):
                     'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
                     'LOCATION': cache_name,
                     'KEY_FUNCTION': 'util.memcache.safe_key',
+                    'OPTIONS': {
+                        'MAX_ENTRIES': 1000,
+                    },
                 } for cache_name in cls.ENABLED_CACHES
             })
 
@@ -187,7 +191,7 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
         executed = len(filtered_queries)
         self.test_case.assertEqual(
             executed, self.num,
-            "%d queries executed, %d expected\nCaptured queries were:\n%s" % (
+            u"%d queries executed, %d expected\nCaptured queries were:\n%s" % (
                 executed, self.num,
                 '\n'.join(
                     query['sql'] for query in filtered_queries

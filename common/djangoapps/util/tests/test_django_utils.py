@@ -6,6 +6,8 @@ cache values can't leak between different TestCase classes and methods. The need
 for this will go away whenever Django merges the fix to reset the caches between
 tests (https://code.djangoproject.com/ticket/11505).
 """
+from __future__ import absolute_import
+
 from django.core.cache import caches
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase

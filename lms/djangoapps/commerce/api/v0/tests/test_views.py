@@ -14,8 +14,8 @@ from django.test.utils import override_settings
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from enrollment.api import get_enrollment
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
+from openedx.core.djangoapps.enrollments.api import get_enrollment
 from openedx.core.lib.django_test_client_utils import get_absolute_url
 from student.models import CourseEnrollment
 from student.tests.tests import EnrollmentEventTestMixin
@@ -39,7 +39,6 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
     """
     Tests for the commerce Baskets view.
     """
-    shard = 1
 
     def _post_to_view(self, course_id=None, marketing_email_opt_in=False, include_utm_cookie=False):
         """
@@ -101,10 +100,10 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
 
     def test_login_required(self):
         """
-        The view should return HTTP 403 status if the user is not logged in.
+        The view should return HTTP 401 status if the user is not logged in.
         """
         self.client.logout()
-        self.assertEqual(403, self._post_to_view().status_code)
+        self.assertEqual(401, self._post_to_view().status_code)
 
     @ddt.data('delete', 'get', 'put')
     def test_post_required(self, method):
@@ -284,7 +283,6 @@ class BasketOrderViewTests(UserMixin, TestCase):
     view_name = 'commerce_api:v0:baskets:retrieve_order'
     MOCK_ORDER = {'number': 1}
     path = reverse_lazy(view_name, kwargs={'basket_id': 1})
-    shard = 1
 
     def setUp(self):
         super(BasketOrderViewTests, self).setUp()

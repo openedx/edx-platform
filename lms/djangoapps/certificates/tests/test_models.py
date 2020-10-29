@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.test.utils import override_settings
-from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.locator import CourseLocator, CourseKey
 from path import Path as path
 
 from lms.djangoapps.certificates.models import (
@@ -22,7 +22,7 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
-from openedx.core.lib.tests import attr
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.tests.factories import AdminFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -37,7 +37,6 @@ PLATFORM_ROOT = TEST_DIR.parent.parent.parent.parent
 TEST_DATA_ROOT = PLATFORM_ROOT / TEST_DATA_DIR
 
 
-@attr(shard=1)
 class ExampleCertificateTest(TestCase):
     """Tests for the ExampleCertificate model. """
 
@@ -103,7 +102,6 @@ class ExampleCertificateTest(TestCase):
         self.assertIs(result, None)
 
 
-@attr(shard=1)
 class CertificateHtmlViewConfigurationTest(TestCase):
     """
     Test the CertificateHtmlViewConfiguration model.
@@ -170,7 +168,6 @@ class CertificateHtmlViewConfigurationTest(TestCase):
         self.assertEquals(self.config.get_config(), {})
 
 
-@attr(shard=1)
 class CertificateTemplateAssetTest(TestCase):
     """
     Test Assets are uploading/saving successfully for CertificateTemplateAsset.
@@ -198,46 +195,57 @@ class CertificateTemplateAssetTest(TestCase):
         self.assertEqual(certificate_template_asset.asset, 'certificate_template_assets/1/picture2.jpg')
 
 
-@attr(shard=1)
 class EligibleCertificateManagerTest(SharedModuleStoreTestCase):
     """
     Test the GeneratedCertificate model's object manager for filtering
     out ineligible certs.
     """
 
-    @classmethod
-    def setUpClass(cls):
-        super(EligibleCertificateManagerTest, cls).setUpClass()
-        cls.courses = (CourseFactory(), CourseFactory())
-
     def setUp(self):
         super(EligibleCertificateManagerTest, self).setUp()
         self.user = UserFactory()
+
+        self.course1 = CourseOverviewFactory()
+        self.course2 = CourseOverviewFactory(
+            id=CourseKey.from_string('{}a'.format(self.course1.id))
+        )
+
         self.eligible_cert = GeneratedCertificateFactory.create(
             status=CertificateStatuses.downloadable,
             user=self.user,
-            course_id=self.courses[0].id
+            course_id=self.course1.id
         )
         self.ineligible_cert = GeneratedCertificateFactory.create(
             status=CertificateStatuses.audit_passing,
             user=self.user,
-            course_id=self.courses[1].id
+            course_id=self.course2.id
         )
 
     def test_filter_ineligible_certificates(self):
         """
-        Verify that the EligibleCertificateManager filters out
+        Verify that the EligibleAvailableCertificateManager filters out
         certificates marked as ineligible, and that the default object
         manager for GeneratedCertificate does not filter them out.
         """
-        self.assertEqual(list(GeneratedCertificate.eligible_certificates.filter(user=self.user)), [self.eligible_cert])
+        self.assertEqual(list(
+            GeneratedCertificate.eligible_available_certificates.filter(user=self.user)), [self.eligible_cert]
+        )
         self.assertEqual(
             list(GeneratedCertificate.objects.filter(user=self.user)),
             [self.eligible_cert, self.ineligible_cert]
         )
 
+    def test_filter_certificates_for_nonexistent_courses(self):
+        """
+        Verify that the EligibleAvailableCertificateManager filters out
+        certificates for courses with no CourseOverview.
+        """
+        self.course1.delete()
+        self.assertFalse(GeneratedCertificate.eligible_available_certificates.filter(
+            user=self.user)
+        )
 
-@attr(shard=1)
+
 @ddt.ddt
 class TestCertificateGenerationHistory(TestCase):
     """
@@ -303,7 +311,6 @@ class TestCertificateGenerationHistory(TestCase):
         )
 
 
-@attr(shard=1)
 class CertificateInvalidationTest(SharedModuleStoreTestCase):
     """
     Test for the Certificate Invalidation model.

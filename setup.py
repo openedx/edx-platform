@@ -63,11 +63,13 @@ setup(
             "completion = lms.djangoapps.course_api.blocks.transformers.block_completion:BlockCompletionTransformer",
             "load_override_data = lms.djangoapps.course_blocks.transformers.load_override_data:OverrideDataTransformer",
             "content_type_gate = openedx.features.content_type_gating.block_transformers:ContentTypeGateTransformer",
+            "access_denied_message_filter = lms.djangoapps.course_blocks.transformers.access_denied_filter:AccessDeniedMessageFilterTransformer",
         ],
         "openedx.ace.policy": [
             "bulk_email_optout = lms.djangoapps.bulk_email.policies:CourseEmailOptout"
         ],
         "lms.djangoapp": [
+            "announcements = openedx.features.announcements.apps:AnnouncementsConfig",
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
             "appsembler_settings = openedx.core.djangoapps.appsembler.settings.apps:SettingsConfig",
             "credentials = openedx.core.djangoapps.credentials.apps:CredentialsConfig",
@@ -81,9 +83,11 @@ setup(
             "zendesk_proxy = openedx.core.djangoapps.zendesk_proxy.apps:ZendeskProxyConfig",
             "instructor = lms.djangoapps.instructor.apps:InstructorConfig",
             "password_policy = openedx.core.djangoapps.password_policy.apps:PasswordPolicyConfig",
-            "user_authn = openedx.core.djangoapps.user_authn.apps:UserAuthnConfig"
+            "user_authn = openedx.core.djangoapps.user_authn.apps:UserAuthnConfig",
+            "program_enrollments = lms.djangoapps.program_enrollments.apps:ProgramEnrollmentsConfig",
         ],
         "cms.djangoapp": [
+            "announcements = openedx.features.announcements.apps:AnnouncementsConfig",
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
             "appsembler_settings = openedx.core.djangoapps.appsembler.settings.apps:SettingsConfig",
             # Importing an LMS app into the Studio process is not a good
@@ -98,7 +102,8 @@ setup(
             "bookmarks = openedx.core.djangoapps.bookmarks.apps:BookmarksConfig",
             "zendesk_proxy = openedx.core.djangoapps.zendesk_proxy.apps:ZendeskProxyConfig",
             "password_policy = openedx.core.djangoapps.password_policy.apps:PasswordPolicyConfig",
-            "user_authn = openedx.core.djangoapps.user_authn.apps:UserAuthnConfig"
+            "user_authn = openedx.core.djangoapps.user_authn.apps:UserAuthnConfig",
+            "instructor = lms.djangoapps.instructor.apps:InstructorConfig",
         ],
     }
 )

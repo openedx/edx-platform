@@ -2,15 +2,15 @@
 """
 Test cases to cover account retirement views
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import datetime
 import json
 import unittest
 
 import ddt
-import pytz
 import mock
+import pytz
 from consent.models import DataSharingConsent
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -20,40 +20,42 @@ from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from enterprise.models import (
+    EnterpriseCourseEnrollment,
     EnterpriseCustomer,
     EnterpriseCustomerUser,
-    EnterpriseCourseEnrollment,
-    PendingEnterpriseCustomerUser,
+    PendingEnterpriseCustomerUser
 )
-from integrated_channels.sap_success_factors.models import (
-    SapSuccessFactorsLearnerDataTransmissionAudit
-)
+from integrated_channels.sap_success_factors.models import SapSuccessFactorsLearnerDataTransmissionAudit
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from six import iteritems, text_type
+from six.moves import range
 from social_django.models import UserSocialAuth
-from wiki.models import ArticleRevision, Article
-from wiki.models.pluginbase import RevisionPluginRevision, RevisionPlugin
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from wiki.models import Article, ArticleRevision
+from wiki.models.pluginbase import RevisionPlugin, RevisionPluginRevision
 
 from entitlements.models import CourseEntitlementSupportDetail
 from entitlements.tests.factories import CourseEntitlementFactory
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
-from openedx.core.djangoapps.credit.models import (
-    CreditRequirementStatus, CreditRequest, CreditCourse, CreditProvider, CreditRequirement
-)
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup, UnregisteredLearnerCohortAssignments
+from openedx.core.djangoapps.credit.models import (
+    CreditCourse,
+    CreditProvider,
+    CreditRequest,
+    CreditRequirement,
+    CreditRequirementStatus
+)
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
+from openedx.core.djangoapps.user_api.accounts.views import AccountRetirementPartnerReportView
 from openedx.core.djangoapps.user_api.models import (
     RetirementState,
-    UserRetirementStatus,
+    UserOrgTag,
     UserRetirementPartnerReportingStatus,
-    UserOrgTag
+    UserRetirementStatus
 )
-from openedx.core.djangoapps.user_api.accounts.views import AccountRetirementPartnerReportView
 from student.models import (
+    AccountRecovery,
     CourseEnrollment,
     CourseEnrollmentAllowed,
     ManualEnrollmentAudit,
@@ -62,10 +64,11 @@ from student.models import (
     Registration,
     SocialLink,
     UserProfile,
-    get_retired_username_by_username,
     get_retired_email_by_email,
+    get_retired_username_by_username
 )
 from student.tests.factories import (
+    AccountRecoveryFactory,
     ContentTypeFactory,
     CourseEnrollmentAllowedFactory,
     PendingEmailChangeFactory,
@@ -73,13 +76,15 @@ from student.tests.factories import (
     SuperuserFactory,
     UserFactory
 )
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..views import AccountRetirementView, USER_PROFILE_PII
 from ...tests.factories import UserOrgTagFactory
+from ..views import USER_PROFILE_PII, AccountRetirementView
 from .retirement_helpers import (  # pylint: disable=unused-import
     RetirementTestCase,
-    fake_completed_retirement,
     create_retirement_status,
+    fake_completed_retirement,
     setup_retirement_states
 )
 
@@ -220,6 +225,24 @@ class TestDeactivateLogout(RetirementTestCase):
         self.assertEqual(len(mail.outbox), 1)
         # ensure that it's been sent to the correct email address
         self.assertIn(self.test_user.email, mail.outbox[0].to)
+
+    def test_user_can_deactivate_secondary_email(self):
+        """
+        Verify that if a user has a secondary/recovery email that record will be deleted
+        if the user requests a retirement
+        """
+        # Create secondary/recovery email for test user
+        AccountRecoveryFactory(user=self.test_user)
+        # Assert that there is an secondary/recovery email for test user
+        self.assertEqual(len(AccountRecovery.objects.filter(user_id=self.test_user.id)), 1)
+
+        self.client.login(username=self.test_user.username, password=self.test_password)
+        headers = build_jwt_headers(self.test_user)
+        response = self.client.post(self.url, self.build_post(self.test_password), **headers)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # Assert that there is no longer a secondary/recovery email for test user
+        self.assertEqual(len(AccountRecovery.objects.filter(user_id=self.test_user.id)), 0)
 
     def test_password_mismatch(self):
         """

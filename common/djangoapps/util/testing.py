@@ -2,12 +2,14 @@
 Utility Mixins for unit tests
 """
 
+from __future__ import absolute_import
+
 import json
 import sys
 
 from django.conf import settings
-from django.urls import clear_url_caches, resolve
 from django.test import TestCase
+from django.urls import clear_url_caches, resolve
 from mock import patch
 
 from util.db import CommitOnSuccessManager, OuterAtomic

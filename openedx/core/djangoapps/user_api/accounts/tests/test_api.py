@@ -4,6 +4,9 @@ Unit tests for behavior that is specific to the api methods (vs. the view method
 Most of the functionality is covered in test_views.py.
 """
 
+from __future__ import absolute_import
+
+import itertools
 import re
 import unicodedata
 
@@ -40,11 +43,7 @@ from openedx.core.djangoapps.user_api.accounts.tests.testutils import (
     INVALID_USERNAMES,
     VALID_USERNAMES_UNICODE
 )
-from openedx.core.djangoapps.user_api.config.waffle import (
-    PREVENT_AUTH_USER_WRITES,
-    SYSTEM_MAINTENANCE_MSG,
-    waffle
-)
+from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangoapps.user_api.errors import (
     AccountEmailInvalid,
     AccountPasswordInvalid,
@@ -58,7 +57,7 @@ from openedx.core.djangoapps.user_api.errors import (
     UserNotFound
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from openedx.core.lib.tests import attr
+from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerUserFactory
 from student.models import PendingEmailChange
 from student.tests.factories import UserFactory
 from student.tests.tests import UserSettingsEventTestMixin
@@ -69,8 +68,8 @@ def mock_render_to_string(template_name, context):
     return str((template_name, sorted(iteritems(context))))
 
 
-@attr(shard=2)
 @skip_unless_lms
+@ddt.ddt
 class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, RetirementTestCase):
     """
     These tests specifically cover the parts of the API methods that are not covered by test_views.py.
@@ -105,13 +104,8 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
         """Test the difference in behavior when a configuration is supplied to get_account_settings."""
         config = {
             "default_visibility": "private",
-
-            "shareable_fields": [
-                'name',
-            ],
-
             "public_fields": [
-                'email',
+                'email', 'name',
             ],
         }
 
@@ -150,14 +144,140 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
         with self.assertRaises(UserNotAuthorized):
             update_account_settings(self.different_user, {"name": "Pluto"}, username=self.user.username)
 
-    def test_update_user_not_found(self):
-        """Test that UserNotFound is thrown if there is no user with username."""
-        with self.assertRaises(UserNotFound):
+    def test_update_non_existent_user(self):
+        with self.assertRaises(UserNotAuthorized):
             update_account_settings(self.user, {}, username="does_not_exist")
 
         self.user.username = "does_not_exist"
         with self.assertRaises(UserNotFound):
             update_account_settings(self.user, {})
+
+    def test_get_empty_social_links(self):
+        account_settings = get_account_settings(self.default_request)[0]
+        self.assertEqual(account_settings['social_links'], [])
+
+    def test_set_single_social_link(self):
+        social_links = [
+            dict(platform="facebook", social_link="https://www.facebook.com/{}".format(self.user.username))
+        ]
+        update_account_settings(self.user, {"social_links": social_links})
+        account_settings = get_account_settings(self.default_request)[0]
+        self.assertEqual(account_settings['social_links'], social_links)
+
+    def test_set_multiple_social_links(self):
+        social_links = [
+            dict(platform="facebook", social_link="https://www.facebook.com/{}".format(self.user.username)),
+            dict(platform="twitter", social_link="https://www.twitter.com/{}".format(self.user.username)),
+        ]
+        update_account_settings(self.user, {"social_links": social_links})
+        account_settings = get_account_settings(self.default_request)[0]
+        self.assertEqual(account_settings['social_links'], social_links)
+
+    def test_add_social_links(self):
+        original_social_links = [
+            dict(platform="facebook", social_link="https://www.facebook.com/{}".format(self.user.username))
+        ]
+        update_account_settings(self.user, {"social_links": original_social_links})
+
+        extra_social_links = [
+            dict(platform="twitter", social_link="https://www.twitter.com/{}".format(self.user.username)),
+            dict(platform="linkedin", social_link="https://www.linkedin.com/in/{}".format(self.user.username)),
+        ]
+        update_account_settings(self.user, {"social_links": extra_social_links})
+
+        account_settings = get_account_settings(self.default_request)[0]
+        self.assertEqual(
+            account_settings['social_links'],
+            sorted(original_social_links + extra_social_links, key=lambda s: s['platform']),
+        )
+
+    def test_replace_social_links(self):
+        original_facebook_link = dict(platform="facebook", social_link="https://www.facebook.com/myself")
+        original_twitter_link = dict(platform="twitter", social_link="https://www.twitter.com/myself")
+        update_account_settings(self.user, {"social_links": [original_facebook_link, original_twitter_link]})
+
+        modified_facebook_link = dict(platform="facebook", social_link="https://www.facebook.com/new_me")
+        update_account_settings(self.user, {"social_links": [modified_facebook_link]})
+
+        account_settings = get_account_settings(self.default_request)[0]
+        self.assertEqual(account_settings['social_links'], [modified_facebook_link, original_twitter_link])
+
+    def test_remove_social_link(self):
+        original_facebook_link = dict(platform="facebook", social_link="https://www.facebook.com/myself")
+        original_twitter_link = dict(platform="twitter", social_link="https://www.twitter.com/myself")
+        update_account_settings(self.user, {"social_links": [original_facebook_link, original_twitter_link]})
+
+        removed_facebook_link = dict(platform="facebook", social_link="")
+        update_account_settings(self.user, {"social_links": [removed_facebook_link]})
+
+        account_settings = get_account_settings(self.default_request)[0]
+        self.assertEqual(account_settings['social_links'], [original_twitter_link])
+
+    def test_unsupported_social_link_platform(self):
+        social_links = [
+            dict(platform="unsupported", social_link="https://www.unsupported.com/{}".format(self.user.username))
+        ]
+        with self.assertRaises(AccountUpdateError):
+            update_account_settings(self.user, {"social_links": social_links})
+
+    def test_update_success_for_enterprise(self):
+        EnterpriseCustomerUserFactory(user_id=self.user.id)
+        level_of_education = "m"
+        successful_update = {
+            "level_of_education": level_of_education,
+        }
+        update_account_settings(self.user, successful_update)
+        account_settings = get_account_settings(self.default_request)[0]
+        self.assertEqual(level_of_education, account_settings["level_of_education"])
+
+    @patch('openedx.features.enterprise_support.api.get_enterprise_customer_for_learner')
+    @patch('openedx.features.enterprise_support.utils.third_party_auth.provider.Registry.get')
+    @ddt.data(
+        *itertools.product(
+            # field_name_value values
+            (("email", "new_email@example.com"), ("name", "new name"), ("country", "IN")),
+            # is_enterprise_user
+            (True, False),
+            # is_synch_learner_profile_data
+            (True, False),
+        )
+    )
+    @ddt.unpack
+    def test_update_validation_error_for_enterprise(
+        self,
+        field_name_value,
+        is_enterprise_user,
+        is_synch_learner_profile_data,
+        mock_auth_provider,
+        mock_customer,
+    ):
+        mock_customer.return_value = {}
+        if is_enterprise_user:
+            mock_customer.return_value.update({
+                'uuid': 'real-ent-uuid',
+                'name': 'Dummy Enterprise',
+                'identity_provider': 'saml-ubc'
+            })
+        mock_auth_provider.return_value.sync_learner_profile_data = is_synch_learner_profile_data
+
+        update_data = {field_name_value[0]: field_name_value[1]}
+
+        # prevent actual email change requests
+        with patch('openedx.core.djangoapps.user_api.accounts.api.student_views.do_email_change_request'):
+            # expect field un-editability only when both of the following conditions are met
+            if is_enterprise_user and is_synch_learner_profile_data:
+                with self.assertRaises(AccountValidationError) as validation_error:
+                    update_account_settings(self.user, update_data)
+                    field_errors = validation_error.exception.field_errors
+                    self.assertEqual(
+                        "This field is not editable via this API",
+                        field_errors[field_name_value[0]]["developer_message"],
+                    )
+            else:
+                update_account_settings(self.user, update_data)
+                account_settings = get_account_settings(self.default_request)[0]
+                if field_name_value[0] != "email":
+                    self.assertEqual(field_name_value[1], account_settings[field_name_value[0]])
 
     def test_update_error_validating(self):
         """Test that AccountValidationError is thrown if incorrect values are supplied."""
@@ -305,7 +425,6 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
         verify_event_emitted([], [{"code": "en"}, {"code": "fr"}])
 
 
-@attr(shard=2)
 @patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
 @patch.dict(
     'django.conf.settings.PROFILE_IMAGE_SIZES_MAP',
@@ -357,7 +476,9 @@ class AccountSettingsOnCreationTest(TestCase):
             'account_privacy': PRIVATE_VISIBILITY,
             'accomplishments_shared': False,
             'extended_profile': [],
-            'secondary_email': None
+            'secondary_email': None,
+            'time_zone': None,
+            'course_certificates': None,
         })
 
     def test_normalize_password(self):
@@ -376,7 +497,6 @@ class AccountSettingsOnCreationTest(TestCase):
         self.assertEqual(expected_user_password, user.password)
 
 
-@attr(shard=2)
 @pytest.mark.django_db
 def test_create_account_duplicate_email(django_db_use_migrations):
     """
@@ -402,7 +522,6 @@ def test_create_account_duplicate_email(django_db_use_migrations):
             create_account('different_user', password, email)
 
 
-@attr(shard=2)
 @ddt.ddt
 class AccountCreationActivationAndPasswordChangeTest(TestCase):
     """
@@ -545,7 +664,6 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
         self.assertEqual(response.status_code, 403)
 
 
-@attr(shard=2)
 @ddt.ddt
 class AccountCreationUnicodeUsernameTest(TestCase):
     """

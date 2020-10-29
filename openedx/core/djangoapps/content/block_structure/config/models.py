@@ -1,13 +1,17 @@
 """
 Models for configuration of Block Structures.
 """
-from django.db.models import IntegerField
+from __future__ import absolute_import
+
 from config_models.models import ConfigurationModel
+from django.db.models import IntegerField
 
 
 class BlockStructureConfiguration(ConfigurationModel):
     """
     Configuration model for Block Structures.
+
+    .. no_pii:
     """
     DEFAULT_PRUNE_KEEP_COUNT = 5
     DEFAULT_CACHE_TIMEOUT_IN_SECONDS = 60 * 60 * 24  # 24 hours

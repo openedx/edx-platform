@@ -6,6 +6,8 @@ framework.
 """
 
 
+from __future__ import absolute_import
+
 import hashlib
 import hmac
 import json
@@ -13,10 +15,11 @@ import logging
 import re
 import sys
 
+import six
 from django.conf import settings
+from eventtracking import tracker
 from ipware.ip import get_ip
 
-from eventtracking import tracker
 from track import contexts, views
 
 log = logging.getLogger(__name__)
@@ -137,7 +140,7 @@ class TrackMiddleware(object):
             'username': self.get_username(request),
             'ip': self.get_request_ip_address(request),
         }
-        for header_name, context_key in META_KEY_TO_CONTEXT_KEY.iteritems():
+        for header_name, context_key in six.iteritems(META_KEY_TO_CONTEXT_KEY):
             # HTTP headers may contain Latin1 characters. Decoding using Latin1 encoding here
             # avoids encountering UnicodeDecodeError exceptions when these header strings are
             # output to tracking logs.

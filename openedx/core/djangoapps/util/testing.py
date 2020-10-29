@@ -1,17 +1,19 @@
 """ Mixins for setting up particular course structures (such as split tests or cohorted content) """
+from __future__ import absolute_import
 
 from datetime import datetime
+
 from pytz import UTC
 
-from django_comment_common.models import Role
-from django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
+from openedx.core.djangoapps.django_comment_common.models import Role
+from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.partitions.partitions import UserPartition, Group
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.partitions.partitions import Group, UserPartition
 
 
 class ContentGroupTestCase(ModuleStoreTestCase):

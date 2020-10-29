@@ -27,11 +27,9 @@ from rest_framework.response import Response
 
 from organizations.models import OrganizationCourse
 
-from enrollment.serializers import CourseEnrollmentSerializer
-
-# from courseware.courses import get_course_by_id, get_course_with_access
 from courseware.courses import get_course_by_id
 
+from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentSerializer
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.views.register import create_account_with_params
@@ -43,9 +41,6 @@ from lms.djangoapps.instructor.enrollment import (
     enroll_email,
     get_email_params,
     unenroll_email,
-    # get_user_email_language,
-    # send_beta_role_email,
-    # send_mail_to_student,
 )
 
 from openedx.core.djangoapps.appsembler.api.helpers import as_course_key

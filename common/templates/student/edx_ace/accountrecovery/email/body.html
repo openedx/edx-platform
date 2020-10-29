@@ -15,11 +15,21 @@
             </p>
 
             <p style="color: rgba(0,0,0,.75);">
-                {% trans "If you didn't request this change, you can disregard this email - we have not yet created your password." %}
+                {% blocktrans %}We've restored access to your {{ platform_name }} account using the recovery email you provided at registration.{% endblocktrans %}
                 <br />
             </p>
 
-            {% trans "Create my Password" as course_cta_text %}
+            <p style="color: rgba(0,0,0,.75);">
+                {% blocktrans %}Once you've created a password [below], you will be able to log in to {{ platform_name }} with this email ({{ email }}) and your new password.{% endblocktrans %}
+                <br />
+            </p>
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% trans "If you didn't request this change, you can disregard this email - we have not yet reset your password." %}
+                <br />
+            </p>
+
+            {% trans "Create Password" as course_cta_text %}
 
             {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=reset_link %}
         </td>

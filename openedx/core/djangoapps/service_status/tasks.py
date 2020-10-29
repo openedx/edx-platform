@@ -2,6 +2,8 @@
 Django Celery tasks for service status app
 """
 
+from __future__ import absolute_import
+
 import time
 
 from djcelery import celery
@@ -15,7 +17,7 @@ def delayed_ping(value, delay):
     if value == 'ping':
         result = 'pong'
     else:
-        result = 'got: {0}'.format(value)
+        result = u'got: {0}'.format(value)
 
     time.sleep(delay)
 

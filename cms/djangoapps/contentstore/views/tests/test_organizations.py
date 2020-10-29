@@ -21,9 +21,9 @@ class TestOrganizationListing(TestCase):
         self.org_short_names = ["alphaX", "betaX", "orgX"]
         for index, short_name in enumerate(self.org_short_names):
             add_organization(organization_data={
-                'name': 'Test Organization %s' % index,
+                'name': u'Test Organization %s' % index,
                 'short_name': short_name,
-                'description': 'Testing Organization %s Description' % index,
+                'description': u'Testing Organization %s Description' % index,
             })
 
     def test_organization_list(self):

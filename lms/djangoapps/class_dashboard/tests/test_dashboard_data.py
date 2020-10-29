@@ -2,12 +2,15 @@
 Tests for class dashboard (Metrics tab in instructor dashboard)
 """
 
+from __future__ import absolute_import
+
 import json
 
-from django.urls import reverse
 from django.test.client import RequestFactory
+from django.urls import reverse
 from mock import patch
 from six import text_type
+from six.moves import range
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from class_dashboard.dashboard_data import (
@@ -35,7 +38,6 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
     """
     Tests related to class_dashboard/dashboard_data.py
     """
-    shard = 6
 
     @classmethod
     def setUpClass(cls):
@@ -61,7 +63,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
                 display_name=u"test unit omega \u03a9",
             )
             cls.items = []
-            for i in xrange(USER_COUNT - 1):
+            for i in range(USER_COUNT - 1):
                 item = ItemFactory.create(
                     parent_location=cls.unit.location,
                     category="problem",
@@ -81,7 +83,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
         self.attempts = 3
         self.users = [
             UserFactory.create(username="metric" + str(__))
-            for __ in xrange(USER_COUNT)
+            for __ in range(USER_COUNT)
         ]
 
         for user in self.users:
@@ -201,7 +203,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
 
     def test_get_students_problem_grades_csv(self):
 
-        tooltip = 'P1.2.1 Q1 - 3382 Students (100%: 1/1 questions)'
+        tooltip = u'P1.2.1 Q1 - 3382 Students (100%: 1/1 questions)'
         attributes = '?module_id=' + text_type(self.item.location) + '&tooltip=' + tooltip + '&csv=true'
         request = self.request_factory.get(reverse('get_students_problem_grades') + attributes)
 

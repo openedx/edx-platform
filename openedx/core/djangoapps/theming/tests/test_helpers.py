@@ -1,17 +1,23 @@
 """
 Test helpers for Comprehensive Theming.
 """
-from mock import patch, Mock
+from __future__ import absolute_import
 
-from django.test import TestCase, override_settings
 from django.conf import settings
+from django.test import TestCase, override_settings
 from edx_django_utils.cache import RequestCache
+from mock import Mock, patch
 
-from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
-from openedx.core.djangoapps.theming.helpers import get_template_path_with_theme, strip_site_theme_templates_path, \
-    get_themes, Theme, get_theme_base_dir
+from openedx.core.djangoapps.theming.helpers import (
+    Theme,
+    get_template_path_with_theme,
+    get_theme_base_dir,
+    get_themes,
+    strip_site_theme_templates_path
+)
+from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangolib.testing.utils import skip_unless_cms, skip_unless_lms
 
 

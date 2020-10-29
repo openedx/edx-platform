@@ -2,6 +2,8 @@
 Tests for course verification sock
 """
 
+from __future__ import absolute_import
+
 import ddt
 
 from course_modes.models import CourseMode

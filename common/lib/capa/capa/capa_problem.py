@@ -31,7 +31,7 @@ import capa.xqueue_interface as xqueue_interface
 from capa.correctmap import CorrectMap
 from capa.safe_exec import safe_exec
 from capa.util import contextualize_text, convert_files_to_filenames
-from openedx.core.djangolib.markup import HTML
+from openedx.core.djangolib.markup import HTML, Text
 from xmodule.stringify import stringify_children
 
 # extra things displayed after "show answers" is pressed
@@ -885,7 +885,7 @@ class LoncapaProblem(object):
                 )
             except Exception as err:
                 log.exception("Error while execing script code: " + all_code)
-                msg = "Error while executing script code: %s" % str(err).replace('<', '&lt;')
+                msg = Text("Error while executing script code: %s" % str(err))
                 raise responsetypes.LoncapaProblemError(msg)
 
         # Store code source in context, along with the Python path needed to run it correctly.
@@ -1120,7 +1120,7 @@ class LoncapaProblem(object):
             for inputfield in inputfields:
                 problem_data[inputfield.get('id')] = {
                     'group_label': group_label_tag_text,
-                    'label': inputfield.attrib.get('label', ''),
+                    'label': HTML(inputfield.attrib.get('label', '')),
                     'descriptions': {}
                 }
         else:

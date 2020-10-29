@@ -1,6 +1,8 @@
 """
 Tests for the course completion helper functions.
 """
+from __future__ import absolute_import
+
 from datetime import datetime
 
 from badges.events import course_complete
@@ -13,7 +15,6 @@ class CourseCompleteTestCase(ModuleStoreTestCase):
     """
     Tests for the course completion helper functions.
     """
-    shard = 4
 
     def setUp(self):
         super(CourseCompleteTestCase, self).setUp()

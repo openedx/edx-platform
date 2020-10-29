@@ -1,3 +1,6 @@
+""" Course run serializers. """
+import logging
+import time
 import six
 from django.contrib.auth import get_user_model
 from django.db import transaction
@@ -16,6 +19,7 @@ IMAGE_TYPES = {
     'image/png': 'png',
 }
 User = get_user_model()
+log = logging.getLogger(__name__)
 
 
 class CourseAccessRoleSerializer(serializers.ModelSerializer):
@@ -80,7 +84,7 @@ def image_is_jpeg_or_png(value):
     content_type = value.content_type
     if content_type not in IMAGE_TYPES.keys():
         raise serializers.ValidationError(
-            'Only JPEG and PNG image types are supported. {} is not valid'.format(content_type))
+            u'Only JPEG and PNG image types are supported. {} is not valid'.format(content_type))
 
 
 class CourseRunImageField(serializers.ImageField):
@@ -169,7 +173,7 @@ class CourseRunRerunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTe
         with store.default_store('split'):
             new_course_run_key = store.make_course_key(course_run_key.org, course_run_key.course, value)
         if store.has_course(new_course_run_key, ignore_case=True):
-            raise serializers.ValidationError('Course run {key} already exists'.format(key=new_course_run_key))
+            raise serializers.ValidationError(u'Course run {key} already exists'.format(key=new_course_run_key))
         return value
 
     def update(self, instance, validated_data):
@@ -181,8 +185,9 @@ class CourseRunRerunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTe
             'display_name': instance.display_name
         }
         fields.update(validated_data)
-        new_course_run_key = rerun_course(user, course_run_key, course_run_key.org, course_run_key.course, _id['run'],
-                                          fields, background=False)
+        new_course_run_key = rerun_course(
+            user, course_run_key, course_run_key.org, course_run_key.course, _id['run'], fields, False
+        )
 
         course_run = get_course_and_check_access(new_course_run_key, user)
         self.update_team(course_run, team)

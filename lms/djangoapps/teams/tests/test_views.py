@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the teams API at the HTTP request level."""
+from __future__ import absolute_import
+
 import json
 import unittest
 from datetime import datetime
@@ -8,18 +10,19 @@ import ddt
 import pytz
 from dateutil import parser
 from django.conf import settings
-from django.urls import reverse
 from django.db.models.signals import post_save
+from django.urls import reverse
 from django.utils import translation
 from elasticsearch.exceptions import ConnectionError
 from mock import patch
 from rest_framework.test import APIClient, APITestCase
 from search.search_engine_base import SearchEngine
+from six.moves import range
 
 from common.test.utils import skip_signal
 from courseware.tests.factories import StaffFactory
-from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
-from django_comment_common.utils import seed_permissions_roles
+from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
+from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from util.testing import EventTestMixin
@@ -33,7 +36,6 @@ from .factories import LAST_ACTIVITY_AT, CourseTeamFactory
 
 class TestDashboard(SharedModuleStoreTestCase):
     """Tests for the Teams dashboard."""
-    shard = 6
     test_password = "test"
 
     NUM_TOPICS = 10
@@ -46,9 +48,9 @@ class TestDashboard(SharedModuleStoreTestCase):
                 "max_team_size": 10,
                 "topics": [
                     {
-                        "name": "Topic {}".format(topic_id),
+                        "name": u"Topic {}".format(topic_id),
                         "id": topic_id,
-                        "description": "Description for topic {}".format(topic_id)
+                        "description": u"Description for topic {}".format(topic_id)
                     }
                     for topic_id in range(cls.NUM_TOPICS)
                 ]
@@ -178,25 +180,22 @@ class TestDashboard(SharedModuleStoreTestCase):
         # Check that initially list of user teams in course one is empty
         course_one_teams_url = reverse('teams_dashboard', args=[self.course.id])
         response = self.client.get(course_one_teams_url)
-        self.assertIn('"teams": {"count": 0', response.content)
-
+        self.assertIn('"teams": {"count": 0', response.content)  # pylint: disable=unicode-format-string
         # Add user to a course one team
         course_one_team.add_user(self.user)
 
         # Check that list of user teams in course one is not empty, it is one now
         response = self.client.get(course_one_teams_url)
-        self.assertIn('"teams": {"count": 1', response.content)
-
+        self.assertIn('"teams": {"count": 1', response.content)  # pylint: disable=unicode-format-string
         # Check that list of user teams in course two is still empty
         course_two_teams_url = reverse('teams_dashboard', args=[course_two.id])
         response = self.client.get(course_two_teams_url)
-        self.assertIn('"teams": {"count": 0', response.content)
+        self.assertIn('"teams": {"count": 0', response.content)  # pylint: disable=unicode-format-string
 
 
 class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
     """Base class for Team API test cases."""
 
-    shard = 6
     test_password = 'password'
 
     @classmethod
@@ -209,7 +208,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                     {
                         'id': 'topic_{}'.format(i),
                         'name': name,
-                        'description': 'Description for topic {}.'.format(i)
+                        'description': u'Description for topic {}.'.format(i)
                     } for i, name in enumerate([u'Sólar power', 'Wind Power', 'Nuclear Power', 'Coal Power'])
                 ]
             }
@@ -407,10 +406,10 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         self.assertEqual(
             expected_status,
             response.status_code,
-            msg="Expected status {expected} but got {actual}: {content}".format(
+            msg=u"Expected status {expected} but got {actual}: {content}".format(
                 expected=expected_status,
                 actual=response.status_code,
-                content=response.content,
+                content=response.content.decode(response.charset),
             )
         )
 
@@ -544,7 +543,6 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
 @ddt.ddt
 class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team listing API endpoint."""
-    shard = 6
 
     def setUp(self):  # pylint: disable=arguments-differ
         super(TestListTeamsAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
@@ -723,7 +721,6 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
 @ddt.ddt
 class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team creation endpoint."""
-    shard = 6
 
     def setUp(self):  # pylint: disable=arguments-differ
         super(TestCreateTeamAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
@@ -896,7 +893,6 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
 @ddt.ddt
 class TestDetailTeamAPI(TeamAPITestCase):
     """Test cases for the team detail endpoint."""
-    shard = 6
 
     @ddt.data(
         (None, 401),
@@ -936,7 +932,6 @@ class TestDetailTeamAPI(TeamAPITestCase):
 @ddt.ddt
 class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team delete endpoint."""
-    shard = 6
 
     def setUp(self):  # pylint: disable=arguments-differ
         super(TestDeleteTeamAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
@@ -987,7 +982,6 @@ class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
 @ddt.ddt
 class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team update endpoint."""
-    shard = 6
 
     def setUp(self):  # pylint: disable=arguments-differ
         super(TestUpdateTeamAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
@@ -1064,7 +1058,6 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
 @ddt.ddt
 class TestListTopicsAPI(TeamAPITestCase):
     """Test cases for the topic listing endpoint."""
-    shard = 6
 
     @ddt.data(
         (None, 401),
@@ -1184,7 +1177,6 @@ class TestListTopicsAPI(TeamAPITestCase):
 @ddt.ddt
 class TestDetailTopicAPI(TeamAPITestCase):
     """Test cases for the topic detail endpoint."""
-    shard = 6
 
     @ddt.data(
         (None, 401),
@@ -1223,7 +1215,6 @@ class TestDetailTopicAPI(TeamAPITestCase):
 @ddt.ddt
 class TestListMembershipAPI(TeamAPITestCase):
     """Test cases for the membership list endpoint."""
-    shard = 6
 
     @ddt.data(
         (None, 401),
@@ -1323,7 +1314,6 @@ class TestListMembershipAPI(TeamAPITestCase):
 @ddt.ddt
 class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the membership creation endpoint."""
-    shard = 6
 
     def setUp(self):  # pylint: disable=arguments-differ
         super(TestCreateMembershipAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
@@ -1422,7 +1412,6 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
 @ddt.ddt
 class TestDetailMembershipAPI(TeamAPITestCase):
     """Test cases for the membership detail endpoint."""
-    shard = 6
 
     @ddt.data(
         (None, 401),
@@ -1489,7 +1478,6 @@ class TestDetailMembershipAPI(TeamAPITestCase):
 @ddt.ddt
 class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the membership deletion endpoint."""
-    shard = 6
 
     def setUp(self):  # pylint: disable=arguments-differ
         super(TestDeleteMembershipAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
@@ -1550,7 +1538,6 @@ class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
 
 class TestElasticSearchErrors(TeamAPITestCase):
     """Test that the Team API is robust to Elasticsearch connection errors."""
-    shard = 6
 
     ES_ERROR = ConnectionError('N/A', 'connection error', {})
 

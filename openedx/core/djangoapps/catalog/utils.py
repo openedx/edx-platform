@@ -1,10 +1,13 @@
 """Helper functions for working with the catalog service."""
+from __future__ import absolute_import
+
 import copy
 import datetime
 import logging
 import uuid
 
 import pycountry
+import six
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from edx_rest_api_client.client import EdxRestApiClient
@@ -13,15 +16,21 @@ from pytz import UTC
 
 from entitlements.utils import is_course_run_entitlement_fulfillable
 from openedx.core.constants import COURSE_PUBLISHED
-from openedx.core.djangoapps.catalog.cache import (PATHWAY_CACHE_KEY_TPL, PROGRAM_CACHE_KEY_TPL,
-                                                   SITE_PATHWAY_IDS_CACHE_KEY_TPL,
-                                                   SITE_PROGRAM_UUIDS_CACHE_KEY_TPL)
+from openedx.core.djangoapps.catalog.cache import (
+    COURSE_PROGRAMS_CACHE_KEY_TPL,
+    PATHWAY_CACHE_KEY_TPL,
+    PROGRAM_CACHE_KEY_TPL,
+    SITE_PATHWAY_IDS_CACHE_KEY_TPL,
+    SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
+)
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from student.models import CourseEnrollment
 
 logger = logging.getLogger(__name__)
+
+missing_details_msg_tpl = u'Failed to get details for program {uuid} from the cache.'
 
 
 def create_catalog_api_client(user, site=None):
@@ -58,8 +67,8 @@ def check_catalog_integration_and_get_user(error_message_field):
             user = catalog_integration.get_service_user()
         except ObjectDoesNotExist:
             logger.error(
-                'Catalog service user with username [{username}] does not exist. '
-                '{field} will not be retrieved.'.format(
+                u'Catalog service user with username [{username}] does not exist. '
+                u'{field} will not be retrieved.'.format(
                     username=catalog_integration.service_username,
                     field=error_message_field,
                 )
@@ -68,29 +77,30 @@ def check_catalog_integration_and_get_user(error_message_field):
         return user, catalog_integration
     else:
         logger.error(
-            'Unable to retrieve details about {field} because Catalog Integration is not enabled'.format(
+            u'Unable to retrieve details about {field} because Catalog Integration is not enabled'.format(
                 field=error_message_field,
             )
         )
         return None, catalog_integration
 
 
-def get_programs(site, uuid=None):
+def get_programs(site=None, uuid=None, uuids=None, course=None):  # pylint: disable=redefined-outer-name
     """Read programs from the cache.
 
     The cache is populated by a management command, cache_programs.
 
-    Arguments:
-        site (Site): django.contrib.sites.models object
-
     Keyword Arguments:
+        site (Site): django.contrib.sites.models object
         uuid (string): UUID identifying a specific program to read from the cache.
+        uuids (list of string): UUIDs identifying a specific programs to read from the cache.
+        course (string): course id identifying a specific course run to read from the cache.
 
     Returns:
         list of dict, representing programs.
         dict, if a specific program is requested.
     """
-    missing_details_msg_tpl = 'Failed to get details for program {uuid} from the cache.'
+    if len([arg for arg in (site, uuid, uuids, course) if arg is not None]) != 1:
+        raise TypeError('get_programs takes exactly one argument')
 
     if uuid:
         program = cache.get(PROGRAM_CACHE_KEY_TPL.format(uuid=uuid))
@@ -98,11 +108,28 @@ def get_programs(site, uuid=None):
             logger.warning(missing_details_msg_tpl.format(uuid=uuid))
 
         return program
-    uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [])
-    if not uuids:
-        logger.warning('Failed to get program UUIDs from the cache for site {}.'.format(site.domain))
+    elif course:
+        uuids = cache.get(COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_run_id=course))
+        if not uuids:
+            # Currently, the cache does not differentiate between a cache miss and a course
+            # without programs. After this is changed, log any cache misses here.
+            return []
+    elif site:
+        uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [])
+        if not uuids:
+            logger.warning(u'Failed to get program UUIDs from the cache for site {}.'.format(site.domain))
 
-    programs = cache.get_many([PROGRAM_CACHE_KEY_TPL.format(uuid=uuid) for uuid in uuids])
+    return get_programs_by_uuids(uuids)
+
+
+def get_programs_by_uuids(uuids):
+    """
+    Gets a list of programs for the provided uuids
+    """
+    # a list of UUID objects would be a perfectly reasonable parameter to provide
+    uuid_strings = [six.text_type(handle) for handle in uuids]
+
+    programs = cache.get_many([PROGRAM_CACHE_KEY_TPL.format(uuid=handle) for handle in uuid_strings])
     programs = list(programs.values())
 
     # The get_many above sometimes fails to bring back details cached on one or
@@ -113,16 +140,16 @@ def get_programs(site, uuid=None):
     # immediately afterwards will succeed in bringing back all the keys. This
     # behavior can be mitigated by trying again for the missing keys, which is
     # what we do here. Splitting the get_many into smaller chunks may also help.
-    missing_uuids = set(uuids) - set(program['uuid'] for program in programs)
+    missing_uuids = set(uuid_strings) - set(program['uuid'] for program in programs)
     if missing_uuids:
         logger.info(
-            'Failed to get details for {count} programs. Retrying.'.format(count=len(missing_uuids))
+            u'Failed to get details for {count} programs. Retrying.'.format(count=len(missing_uuids))
         )
 
         retried_programs = cache.get_many([PROGRAM_CACHE_KEY_TPL.format(uuid=uuid) for uuid in missing_uuids])
         programs += list(retried_programs.values())
 
-        still_missing_uuids = set(uuids) - set(program['uuid'] for program in programs)
+        still_missing_uuids = set(uuid_strings) - set(program['uuid'] for program in programs)
         for uuid in still_missing_uuids:
             logger.warning(missing_details_msg_tpl.format(uuid=uuid))
 
@@ -171,7 +198,7 @@ def get_pathways(site, pathway_id=None):
         list of dict, representing pathways.
         dict, if a specific pathway is requested.
     """
-    missing_details_msg_tpl = 'Failed to get details for credit pathway {id} from the cache.'
+    missing_details_msg_tpl = u'Failed to get details for credit pathway {id} from the cache.'
 
     if pathway_id:
         pathway = cache.get(PATHWAY_CACHE_KEY_TPL.format(id=pathway_id))
@@ -184,7 +211,7 @@ def get_pathways(site, pathway_id=None):
         logger.warning('Failed to get credit pathway ids from the cache.')
 
     pathways = cache.get_many([PATHWAY_CACHE_KEY_TPL.format(id=pathway_id) for pathway_id in pathway_ids])
-    pathways = pathways.values()
+    pathways = list(pathways.values())
 
     # The get_many above sometimes fails to bring back details cached on one or
     # more Memcached nodes. It doesn't look like these keys are being evicted.
@@ -197,13 +224,13 @@ def get_pathways(site, pathway_id=None):
     missing_ids = set(pathway_ids) - set(pathway['id'] for pathway in pathways)
     if missing_ids:
         logger.info(
-            'Failed to get details for {count} pathways. Retrying.'.format(count=len(missing_ids))
+            u'Failed to get details for {count} pathways. Retrying.'.format(count=len(missing_ids))
         )
 
         retried_pathways = cache.get_many(
             [PATHWAY_CACHE_KEY_TPL.format(id=pathway_id) for pathway_id in missing_ids]
         )
-        pathways += retried_pathways.values()
+        pathways += list(retried_pathways.values())
 
         still_missing_ids = set(pathway_ids) - set(pathway['id'] for pathway in pathways)
         for missing_id in still_missing_ids:
@@ -240,8 +267,8 @@ def format_price(price, symbol='$', code='USD'):
     :return: A formatted price string, i.e. '$10 USD', '$10.52 USD'.
     """
     if int(price) == price:
-        return '{}{} {}'.format(symbol, int(price), code)
-    return '{}{:0.2f} {}'.format(symbol, price, code)
+        return u'{}{} {}'.format(symbol, int(price), code)
+    return u'{}{:0.2f} {}'.format(symbol, price, code)
 
 
 def get_localized_price_text(price, request):
@@ -263,8 +290,8 @@ def get_localized_price_text(price, request):
     # Override default user_currency if location is available
     if user_location and get_currency_data:
         currency_data = get_currency_data()
-        user_country = pycountry.countries.get(alpha2=user_location)
-        user_currency = currency_data.get(user_country.alpha3, user_currency)
+        user_country = pycountry.countries.get(alpha_2=user_location)
+        user_currency = currency_data.get(user_country.alpha_3, user_currency)
 
     return format_price(
         price=(price * user_currency['rate']),
@@ -399,7 +426,7 @@ def get_course_uuid_for_course(course_run_key):
         course_run_data = get_edx_api_data(
             catalog_integration,
             'course_runs',
-            resource_id=unicode(course_run_key),
+            resource_id=six.text_type(course_run_key),
             api=api,
             cache_key=run_cache_key if catalog_integration.is_cache_enabled else None,
             long_term_cache=True,
@@ -486,9 +513,9 @@ def get_fulfillable_course_runs_for_entitlement(entitlement, course_runs):
             # this will ensure it is available for the UI
             enrollable_sessions.append(course_run)
         elif (course_run.get('status') == COURSE_PUBLISHED and not
-              is_enrolled_in_mode and
-              is_course_run_entitlement_fulfillable(course_id, entitlement, search_time)):
-                enrollable_sessions.append(course_run)
+                is_enrolled_in_mode and
+                is_course_run_entitlement_fulfillable(course_id, entitlement, search_time)):
+            enrollable_sessions.append(course_run)
 
     enrollable_sessions.sort(key=lambda session: session.get('start'))
     return enrollable_sessions
@@ -506,7 +533,7 @@ def get_course_run_details(course_run_key, fields):
     """
     course_run_details = dict()
     user, catalog_integration = check_catalog_integration_and_get_user(
-        error_message_field='Data for course_run {}'.format(course_run_key)
+        error_message_field=u'Data for course_run {}'.format(course_run_key)
     )
     if user:
         api = create_catalog_api_client(user)

@@ -6,9 +6,9 @@ import os
 import re
 import sys
 import glob
-
 from collections import defaultdict
-from cStringIO import StringIO
+from io import BytesIO
+
 from fs.osfs import OSFS
 from importlib import import_module
 from lxml import etree
@@ -450,7 +450,7 @@ class XMLModuleStore(ModuleStoreReadBase):
             # VS[compat]
             # TODO (cpennington): Remove this once all fall 2012 courses have
             # been imported into the cms from xml
-            course_file = StringIO(clean_out_mako_templating(course_file.read()))
+            course_file = BytesIO(clean_out_mako_templating(course_file.read()))
 
             course_data = etree.parse(course_file, parser=edx_xml_parser).getroot()
 

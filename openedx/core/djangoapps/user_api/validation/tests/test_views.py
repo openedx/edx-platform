@@ -3,19 +3,22 @@
 Tests for an API endpoint for client-side user data validation.
 """
 
+from __future__ import absolute_import
+
 import unittest
 
 import ddt
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.test.utils import override_settings
+from django.urls import reverse
 from six import text_type
+from six.moves import range
 
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.accounts.tests import testutils
-from openedx.core.lib.api import test_utils
 from openedx.core.djangoapps.user_api.validation.views import RegistrationValidationThrottle
+from openedx.core.lib.api import test_utils
 from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 
 

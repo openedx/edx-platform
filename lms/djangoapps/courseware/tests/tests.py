@@ -1,6 +1,8 @@
 """
 Test for LMS courseware app.
 """
+from __future__ import absolute_import
+
 from textwrap import dedent
 from unittest import TestCase
 
@@ -11,14 +13,12 @@ from six import text_type
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
-from openedx.core.lib.tests import attr
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 
-@attr(shard=1)
 class ActivateLoginTest(LoginEnrollmentTestCase):
     """
     Test logging in and logging out.
@@ -111,7 +111,7 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
         response = self.client.get(url, follow=True)
 
         if response.status_code != 200:
-            self.fail('Status %d for page %s' %
+            self.fail(u'Status %d for page %s' %
                       (response.status_code, descriptor.location))
 
         if expect_redirect:
@@ -122,7 +122,6 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
             self.assertNotIsInstance(descriptor, ErrorDescriptor)
 
 
-@attr(shard=1)
 class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
     """
     Check that all pages in test courses load properly from Mongo.
@@ -146,7 +145,6 @@ class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
         self.assertGreater(len(course.textbooks), 0)
 
 
-@attr(shard=1)
 class TestDraftModuleStore(ModuleStoreTestCase):
     def test_get_items_with_course_items(self):
         store = modulestore()
@@ -159,7 +157,6 @@ class TestDraftModuleStore(ModuleStoreTestCase):
         # not allowed to be passed in (i.e. was throwing exception)
 
 
-@attr(shard=1)
 class TestLmsFieldData(TestCase):
     """
     Tests of the LmsFieldData class

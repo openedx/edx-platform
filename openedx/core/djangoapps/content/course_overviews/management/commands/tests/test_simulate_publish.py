@@ -1,12 +1,14 @@
 """
 Tests the simulate_publish management command.
 """
-from openedx.core.djangoapps.content.course_overviews.management.commands.simulate_publish import (
-    Command, name_from_fn
-)
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-import openedx.core.djangoapps.content.course_overviews.signals
+from __future__ import absolute_import
+
+import six
+
 import lms.djangoapps.ccx.tasks
+import openedx.core.djangoapps.content.course_overviews.signals
+from openedx.core.djangoapps.content.course_overviews.management.commands.simulate_publish import Command, name_from_fn
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SwitchedSignal
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -103,7 +105,7 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
         """Test sending only to specific courses."""
         self.command.handle(
             **self.options(
-                courses=[unicode(self.course_key_1), unicode(self.course_key_2)]
+                courses=[six.text_type(self.course_key_1), six.text_type(self.course_key_2)]
             )
         )
         self.assertIn(self.course_key_1, self.received_1)

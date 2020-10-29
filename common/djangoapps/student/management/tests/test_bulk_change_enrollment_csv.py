@@ -1,17 +1,18 @@
-from tempfile import NamedTemporaryFile
+from __future__ import absolute_import
+
 import unittest
+from tempfile import NamedTemporaryFile
 
 from django.conf import settings
 from django.core.management import call_command
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 from testfixtures import LogCapture
 
-from course_modes.tests.factories import CourseModeFactory
 from course_modes.models import CourseMode
-from student.tests.factories import UserFactory
+from course_modes.tests.factories import CourseModeFactory
 from student.models import CourseEnrollment
-
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 LOGGER_NAME = 'student.management.commands.bulk_change_enrollment_csv'
 

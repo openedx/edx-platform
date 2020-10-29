@@ -3,15 +3,18 @@
 Tests for support views.
 """
 
+from __future__ import absolute_import
+
 import itertools
 import json
 import re
 from datetime import datetime, timedelta
 
 import ddt
+import six
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.db.models import signals
+from django.urls import reverse
 from pytz import UTC
 
 from common.test.utils import disable_signal
@@ -93,7 +96,6 @@ class SupportViewAccessTests(SupportViewTestCase):
     """
     Tests for access control of support views.
     """
-    shard = 3
 
     @ddt.data(*(
         (url_name, role, has_access)
@@ -195,10 +197,10 @@ class SupportViewCertificatesTests(SupportViewTestCase):
 
     def test_certificates_along_with_course_filter(self):
         # Check that an initial filter is passed to the JavaScript client.
-        url = reverse("support:certificates") + "?user=student@example.com&course_id=" + unicode(self.course.id)
+        url = reverse("support:certificates") + "?user=student@example.com&course_id=" + six.text_type(self.course.id)
         response = self.client.get(url)
         self.assertContains(response, "userFilter: 'student@example.com'")
-        self.assertContains(response, "courseFilter: '" + unicode(self.course.id) + "'")
+        self.assertContains(response, "courseFilter: '" + six.text_type(self.course.id) + "'")
 
 
 @ddt.ddt
@@ -249,7 +251,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             'mode': CourseMode.AUDIT,
             'manual_enrollment': {},
             'user': self.student.username,
-            'course_id': unicode(self.course.id),
+            'course_id': six.text_type(self.course.id),
             'is_active': True,
             'verified_upgrade_deadline': None,
         }, data[0])
@@ -283,7 +285,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             kwargs={'username_or_email': getattr(self.student, search_string_type)}
         )
         response = self.client.post(url, data={
-            'course_id': unicode(self.course.id),
+            'course_id': six.text_type(self.course.id),
             'old_mode': CourseMode.AUDIT,
             'new_mode': CourseMode.VERIFIED,
             'reason': 'Financial Assistance'
@@ -319,7 +321,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         # `self` isn't available from within the DDT declaration, so
         # assign the course ID here
         if 'course_id' in data and data['course_id'] is None:
-            data['course_id'] = unicode(self.course.id)
+            data['course_id'] = six.text_type(self.course.id)
         response = self.client.post(self.url, data)
         self.assertEqual(response.status_code, 400)
         self.assertIsNotNone(re.match(error_message, response.content))
@@ -404,7 +406,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             kwargs={'username_or_email': getattr(self.student, search_string_type)}
         )
         response = self.client.post(url, data={
-            'course_id': unicode(self.course.id),
+            'course_id': six.text_type(self.course.id),
             'old_mode': CourseMode.AUDIT,
             'new_mode': new_mode,
             'reason': 'Financial Assistance'

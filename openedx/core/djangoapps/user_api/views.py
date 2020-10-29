@@ -15,18 +15,21 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from six import text_type
 
-import accounts
-from django_comment_common.models import Role
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx import locator
 from opaque_keys.edx.keys import CourseKey
+
+from openedx.core.djangoapps.django_comment_common.models import Role
+from openedx.core.djangoapps.user_api import accounts
+
 from openedx.core.djangoapps.appsembler.sites.utils import (
     is_request_for_new_amc_site,
     is_request_for_amc_admin,
     get_current_organization,
 )
 from organizations.models import UserOrganizationMapping
+
 from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
 from openedx.core.djangoapps.user_api.api import (
     RegistrationFormFactory,
@@ -319,7 +322,7 @@ class UpdateEmailOptInPreference(APIView):
         except InvalidKeyError:
             return HttpResponse(
                 status=400,
-                content="No course '{course_id}' found".format(course_id=course_id),
+                content=u"No course '{course_id}' found".format(course_id=course_id),
                 content_type="text/plain"
             )
         # Only check for true. All other values are False.

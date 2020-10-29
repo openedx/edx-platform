@@ -2,11 +2,14 @@
     Tests for comprehensive them
 """
 
-from courseware.tests.factories import GlobalStaffFactory
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.contrib.messages.middleware import MessageMiddleware
-from django.test import TestCase
 from django.contrib.sites.models import Site
+from django.test import TestCase
+
+from courseware.tests.factories import GlobalStaffFactory
 from openedx.core.djangoapps.theming.middleware import CurrentSiteThemeMiddleware
 from student.tests.factories import UserFactory
 
@@ -84,7 +87,7 @@ class TestThemingViews(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertContains(
             response,
-            '<option value="{theme_name}" selected=selected>'.format(theme_name=TEST_THEME_NAME)
+            u'<option value="{theme_name}" selected=selected>'.format(theme_name=TEST_THEME_NAME)
         )
 
         # Request to reset the theme
@@ -101,5 +104,5 @@ class TestThemingViews(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertContains(
             response,
-            '<option value="{theme_name}">'.format(theme_name=TEST_THEME_NAME)
+            u'<option value="{theme_name}">'.format(theme_name=TEST_THEME_NAME)
         )

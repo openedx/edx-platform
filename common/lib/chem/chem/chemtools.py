@@ -3,6 +3,7 @@
 Also, may be this module is the place for other chemistry-related grade functions. TODO: discuss it.
 """
 
+from __future__ import absolute_import
 import itertools
 import json
 import unittest

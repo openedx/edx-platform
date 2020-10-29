@@ -1,21 +1,23 @@
 """
 Unittests for populate_created_on_site_user_attribute management command.
 """
+from __future__ import absolute_import
+
 import ddt
 import mock
-from django.conf import settings
-from django.test import override_settings, TestCase
 from django.contrib.auth.models import User
-from django.core.management import call_command, CommandError
+from django.core.management import CommandError, call_command
+from django.test import TestCase
+from six.moves import range
 
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from student.models import Registration, UserAttribute
 from student.tests.factories import UserFactory
-from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+
 CREATED_ON_SITE = 'created_on_site'
 
 
 @ddt.ddt
-@override_settings(DEFAULT_SITE_THEME='edx-theme-codebase')
 class TestPopulateUserAttribute(SiteMixin, TestCase):
     """
     Test populate_created_on_site_user_attribute management command.

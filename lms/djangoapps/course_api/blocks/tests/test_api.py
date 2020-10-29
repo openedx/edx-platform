@@ -2,14 +2,14 @@
 Tests for Blocks api.py
 """
 
+from __future__ import absolute_import
+
 from itertools import product
-from mock import patch
 
 import ddt
+import six
 from django.test.client import RequestFactory
-from django.test.utils import override_settings
-
-import course_blocks.api as course_blocks_api
+from mock import patch
 
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
 from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, waffle
@@ -19,7 +19,6 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import SampleCourseFactory, check_mongo_calls
 from xmodule.modulestore.tests.sample_courses import BlockInfo
 
-
 from ..api import get_blocks
 
 
@@ -27,7 +26,6 @@ class TestGetBlocks(SharedModuleStoreTestCase):
     """
     Tests for the get_blocks function
     """
-    shard = 4
 
     @classmethod
     def setUpClass(cls):
@@ -48,15 +46,15 @@ class TestGetBlocks(SharedModuleStoreTestCase):
 
     def test_basic(self):
         blocks = get_blocks(self.request, self.course.location, self.user)
-        self.assertEquals(blocks['root'], unicode(self.course.location))
+        self.assertEquals(blocks['root'], six.text_type(self.course.location))
 
         # subtract for (1) the orphaned course About block and (2) the hidden Html block
         self.assertEquals(len(blocks['blocks']), len(self.store.get_items(self.course.id)) - 2)
-        self.assertNotIn(unicode(self.html_block.location), blocks['blocks'])
+        self.assertNotIn(six.text_type(self.html_block.location), blocks['blocks'])
 
     def test_no_user(self):
         blocks = get_blocks(self.request, self.course.location)
-        self.assertIn(unicode(self.html_block.location), blocks['blocks'])
+        self.assertIn(six.text_type(self.html_block.location), blocks['blocks'])
 
     def test_access_before_api_transformer_order(self):
         """
@@ -67,16 +65,16 @@ class TestGetBlocks(SharedModuleStoreTestCase):
         vertical_block = self.store.get_item(self.course.id.make_usage_key('vertical', 'vertical_x1a'))
         problem_block = self.store.get_item(self.course.id.make_usage_key('problem', 'problem_x1a_1'))
 
-        vertical_descendants = blocks['blocks'][unicode(vertical_block.location)]['descendants']
+        vertical_descendants = blocks['blocks'][six.text_type(vertical_block.location)]['descendants']
 
-        self.assertIn(unicode(problem_block.location), vertical_descendants)
-        self.assertNotIn(unicode(self.html_block.location), vertical_descendants)
+        self.assertIn(six.text_type(problem_block.location), vertical_descendants)
+        self.assertNotIn(six.text_type(self.html_block.location), vertical_descendants)
 
     def test_sub_structure(self):
         sequential_block = self.store.get_item(self.course.id.make_usage_key('sequential', 'sequential_y1'))
 
         blocks = get_blocks(self.request, sequential_block.location, self.user)
-        self.assertEquals(blocks['root'], unicode(sequential_block.location))
+        self.assertEquals(blocks['root'], six.text_type(sequential_block.location))
         self.assertEquals(len(blocks['blocks']), 5)
 
         for block_type, block_name, is_inside_of_structure in (
@@ -87,9 +85,9 @@ class TestGetBlocks(SharedModuleStoreTestCase):
         ):
             block = self.store.get_item(self.course.id.make_usage_key(block_type, block_name))
             if is_inside_of_structure:
-                self.assertIn(unicode(block.location), blocks['blocks'])
+                self.assertIn(six.text_type(block.location), blocks['blocks'])
             else:
-                self.assertNotIn(unicode(block.location), blocks['blocks'])
+                self.assertNotIn(six.text_type(block.location), blocks['blocks'])
 
     def test_filtering_by_block_types(self):
         sequential_block = self.store.get_item(self.course.id.make_usage_key('sequential', 'sequential_y1'))
@@ -98,7 +96,7 @@ class TestGetBlocks(SharedModuleStoreTestCase):
         blocks = get_blocks(self.request, sequential_block.location, self.user, requested_fields=['type'])
         self.assertEquals(len(blocks['blocks']), 5)
         found_not_problem = False
-        for block in blocks['blocks'].itervalues():
+        for block in six.itervalues(blocks['blocks']):
             if block['type'] != 'problem':
                 found_not_problem = True
         self.assertTrue(found_not_problem)
@@ -107,7 +105,7 @@ class TestGetBlocks(SharedModuleStoreTestCase):
         blocks = get_blocks(self.request, sequential_block.location, self.user,
                             block_types_filter=['problem'], requested_fields=['type'])
         self.assertEquals(len(blocks['blocks']), 3)
-        for block in blocks['blocks'].itervalues():
+        for block in six.itervalues(blocks['blocks']):
             self.assertEqual(block['type'], 'problem')
 
 
@@ -117,7 +115,6 @@ class TestGetBlocksMobileHack(SharedModuleStoreTestCase):
     """
     Tests that requests from the mobile app don't receive empty containers.
     """
-    shard = 4
 
     @classmethod
     def setUpClass(cls):
@@ -165,7 +162,6 @@ class TestGetBlocksQueryCountsBase(SharedModuleStoreTestCase):
     """
     Base for the get_blocks tests.
     """
-    shard = 4
 
     ENABLED_SIGNALS = ['course_published']
 
@@ -198,7 +194,6 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
     """
     Tests query counts for the get_blocks function.
     """
-    shard = 4
 
     @ddt.data(
         *product(
@@ -213,7 +208,7 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
             self._get_blocks(
                 course,
                 expected_mongo_queries=0,
-                expected_sql_queries=9 if with_storage_backing else 8,
+                expected_sql_queries=12 if with_storage_backing else 11,
             )
 
     @ddt.data(
@@ -230,58 +225,9 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
             clear_course_from_cache(course.id)
 
             if with_storage_backing:
-                num_sql_queries = 19
+                num_sql_queries = 22
             else:
-                num_sql_queries = 9
-
-            self._get_blocks(
-                course,
-                expected_mongo_queries,
-                expected_sql_queries=num_sql_queries,
-            )
-
-
-@ddt.ddt
-@override_settings(FIELD_OVERRIDE_PROVIDERS=(course_blocks_api.INDIVIDUAL_STUDENT_OVERRIDE_PROVIDER, ))
-class TestQueryCountsWithIndividualOverrideProvider(TestGetBlocksQueryCountsBase):
-    """
-    Tests query counts for the get_blocks function when IndividualStudentOverrideProvider is set.
-    """
-    shard = 4
-
-    @ddt.data(
-        *product(
-            (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split),
-            (True, False),
-        )
-    )
-    @ddt.unpack
-    def test_query_counts_cached(self, store_type, with_storage_backing):
-        with waffle().override(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
-            course = self._create_course(store_type)
-            self._get_blocks(
-                course,
-                expected_mongo_queries=0,
-                expected_sql_queries=10 if with_storage_backing else 9,
-            )
-
-    @ddt.data(
-        *product(
-            ((ModuleStoreEnum.Type.mongo, 5), (ModuleStoreEnum.Type.split, 3)),
-            (True, False),
-        )
-    )
-    @ddt.unpack
-    def test_query_counts_uncached(self, store_type_tuple, with_storage_backing):
-        store_type, expected_mongo_queries = store_type_tuple
-        with waffle().override(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
-            course = self._create_course(store_type)
-            clear_course_from_cache(course.id)
-
-            if with_storage_backing:
-                num_sql_queries = 20
-            else:
-                num_sql_queries = 10
+                num_sql_queries = 12
 
             self._get_blocks(
                 course,

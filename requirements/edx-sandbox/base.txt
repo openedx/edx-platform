@@ -4,30 +4,29 @@
 #
 #    make upgrade
 #
-common/lib/calc
 common/lib/chem
 common/lib/sandbox-packages
 common/lib/symmath
 asn1crypto==0.24.0
 backports-abc==0.5        # via tornado
-cffi==1.11.5
-cryptography==2.4.2
+git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
+cffi==1.12.3
+cryptography==2.7
 enum34==1.1.6
-futures==3.2.0            # via tornado
-idna==2.8
+futures==3.2.0 ; python_version == "2.7"  # via tornado
 ipaddress==1.0.22
 lxml==3.8.0
-markupsafe==1.1.0
+markupsafe==1.1.1
 matplotlib==1.3.1
 networkx==1.7
-nltk==3.4
+nltk==3.4.2
 nose==1.3.7               # via matplotlib
 numpy==1.6.2
 pycparser==2.19
 pyparsing==2.2.0
-python-dateutil==2.7.5    # via matplotlib
+python-dateutil==2.8.0    # via matplotlib
 scipy==0.14.0
 singledispatch==3.4.0.3
 six==1.11.0
 sympy==0.7.1
-tornado==5.1.1            # via matplotlib
+tornado==5.1.1

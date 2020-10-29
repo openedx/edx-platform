@@ -2,12 +2,21 @@
 Models for static_replace
 """
 
+from __future__ import absolute_import
+
+import six
+from six.moves import map
+
 from config_models.models import ConfigurationModel
 from django.db.models.fields import TextField
 
 
 class AssetBaseUrlConfig(ConfigurationModel):
-    """Configuration for the base URL used for static assets."""
+    """
+    Configuration for the base URL used for static assets.
+
+    .. no_pii:
+    """
 
     class Meta(object):
         app_label = 'static_replace'
@@ -26,11 +35,15 @@ class AssetBaseUrlConfig(ConfigurationModel):
         return '<AssetBaseUrlConfig(base_url={})>'.format(self.get_base_url())
 
     def __unicode__(self):
-        return unicode(repr(self))
+        return six.text_type(repr(self))
 
 
 class AssetExcludedExtensionsConfig(ConfigurationModel):
-    """Configuration for the the excluded file extensions when canonicalizing static asset paths."""
+    """
+    Configuration for the the excluded file extensions when canonicalizing static asset paths.
+
+    .. no_pii:
+    """
 
     class Meta(object):
         app_label = 'static_replace'
@@ -45,10 +58,10 @@ class AssetExcludedExtensionsConfig(ConfigurationModel):
     def get_excluded_extensions(cls):
         """Gets the excluded file extensions when canonicalizing static asset paths"""
         add_period = lambda x: '.' + x
-        return map(add_period, cls.current().excluded_extensions.split())
+        return list(map(add_period, cls.current().excluded_extensions.split()))
 
     def __repr__(self):
         return '<AssetExcludedExtensionsConfig(extensions={})>'.format(self.get_excluded_extensions())
 
     def __unicode__(self):
-        return unicode(repr(self))
+        return six.text_type(repr(self))

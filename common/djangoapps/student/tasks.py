@@ -1,6 +1,8 @@
 """
 This file contains celery tasks for sending email
 """
+from __future__ import absolute_import
+
 import logging
 
 from boto.exception import NoAuthHandlerFound

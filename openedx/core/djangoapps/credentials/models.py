@@ -18,6 +18,8 @@ class CredentialsApiConfig(ConfigurationModel):
     """
     Manages configuration for connecting to the Credential service and using its
     API.
+
+    .. no_pii:
     """
 
     class Meta(object):
@@ -113,6 +115,8 @@ class CredentialsApiConfig(ConfigurationModel):
 class NotifyCredentialsConfig(ConfigurationModel):
     """
     Manages configuration for a run of the notify_credentials management command.
+
+    .. no_pii:
     """
 
     class Meta(object):

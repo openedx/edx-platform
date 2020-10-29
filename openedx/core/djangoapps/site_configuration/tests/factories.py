@@ -1,6 +1,8 @@
 """
 Model factories for unit testing views or models.
 """
+from __future__ import absolute_import
+
 from django.contrib.sites.models import Site
 from factory.django import DjangoModelFactory
 from factory import SubFactory, Sequence, SelfAttribute, lazy_attribute

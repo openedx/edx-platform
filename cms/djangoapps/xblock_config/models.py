@@ -15,6 +15,8 @@ from openedx.core.lib.cache_utils import request_cached
 class StudioConfig(ConfigurationModel):
     """
     Configuration for XBlockAsides.
+
+    .. no_pii:
     """
     disabled_blocks = TextField(
         default="about course_info static_tab",
@@ -36,6 +38,8 @@ class CourseEditLTIFieldsEnabledFlag(ConfigurationModel):
     """
     Enables the editing of "request username" and "request email" fields
     of LTI consumer for a specific course.
+
+    .. no_pii:
     """
     KEY_FIELDS = ('course_id',)
 

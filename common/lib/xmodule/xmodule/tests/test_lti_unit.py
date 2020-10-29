@@ -20,7 +20,6 @@ from . import LogicTest
 
 class LTIModuleTest(LogicTest):
     """Logic tests for LTI module."""
-    shard = 1
     descriptor_class = LTIDescriptor
 
     def setUp(self):

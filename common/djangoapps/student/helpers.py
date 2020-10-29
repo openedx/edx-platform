@@ -1,34 +1,33 @@
 """
 Helpers for the student app.
 """
+from __future__ import absolute_import
+
 import json
 import logging
 import mimetypes
-import urllib
-import urlparse
+from collections import OrderedDict
 from datetime import datetime
 
+import six.moves.urllib.parse
+from completion.exceptions import UnavailableCompletionData
+from completion.utilities import get_key_to_last_completed_course_block
 from django.conf import settings
-from django.core.exceptions import PermissionDenied
-from django.urls import NoReverseMatch, reverse
-from django.core.validators import ValidationError
 from django.contrib.auth import load_backend
 from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
+from django.core.validators import ValidationError
 from django.db import IntegrityError, transaction
+from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext as _
 from pytz import UTC
 from six import iteritems, text_type
+
 import third_party_auth
 from course_modes.models import CourseMode
-from lms.djangoapps.certificates.api import (
-    get_certificate_url,
-    has_html_certificates_enabled
-)
-from lms.djangoapps.certificates.models import (
-    CertificateStatuses,
-    certificate_status_for_student
-)
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.certificates.api import get_certificate_url, has_html_certificates_enabled
+from lms.djangoapps.certificates.models import CertificateStatuses, certificate_status_for_student
+from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.utils import is_verification_expiring_soon, verification_for_datetime
@@ -42,12 +41,11 @@ from student.models import (
     Registration,
     UserAttribute,
     UserProfile,
-    unique_id_for_user,
     email_exists_or_retired,
+    unique_id_for_user,
     username_exists_or_retired
 )
 from util.password_policy_validators import normalize_password
-
 
 # Enumeration of per-course verification statuses
 # we display on the student dashboard.
@@ -289,7 +287,7 @@ def get_next_url_for_login_page(request):
         # Before we redirect to next/dashboard, we need to handle auto-enrollment:
         params = [(param, request.GET[param]) for param in POST_AUTH_PARAMS if param in request.GET]
         params.append(('next', redirect_to))  # After auto-enrollment, user will be sent to payment page or to this URL
-        redirect_to = '{}?{}'.format(reverse('finish_auth'), urllib.urlencode(params))
+        redirect_to = '{}?{}'.format(reverse('finish_auth'), six.moves.urllib.parse.urlencode(params))
         # Note: if we are resuming a third party auth pipeline, then the next URL will already
         # be saved in the session as part of the pipeline state. That URL will take priority
         # over this one.
@@ -303,12 +301,12 @@ def get_next_url_for_login_page(request):
         # Don't add tpa_hint if we're already in the TPA pipeline (prevent infinite loop),
         # and don't overwrite any existing tpa_hint params (allow tpa_hint override).
         running_pipeline = third_party_auth.pipeline.get(request)
-        (scheme, netloc, path, query, fragment) = list(urlparse.urlsplit(redirect_to))
+        (scheme, netloc, path, query, fragment) = list(six.moves.urllib.parse.urlsplit(redirect_to))
         if not running_pipeline and 'tpa_hint' not in query:
-            params = urlparse.parse_qs(query)
+            params = six.moves.urllib.parse.parse_qs(query)
             params['tpa_hint'] = [tpa_hint]
-            query = urllib.urlencode(params, doseq=True)
-            redirect_to = urlparse.urlunsplit((scheme, netloc, path, query, fragment))
+            query = six.moves.urllib.parse.urlencode(params, doseq=True)
+            redirect_to = six.moves.urllib.parse.urlunsplit((scheme, netloc, path, query, fragment))
 
     return redirect_to
 
@@ -360,7 +358,7 @@ def _get_redirect_to(request):
             redirect_to = None
         else:
             themes = get_themes()
-            next_path = urlparse.urlparse(redirect_to).path
+            next_path = six.moves.urllib.parse.urlparse(redirect_to).path
             for theme in themes:
                 if theme.theme_dir_name in next_path:
                     log.warning(
@@ -672,3 +670,32 @@ def do_create_account(form, custom_form=None):
         raise
 
     return user, profile, registration
+
+
+def get_resume_urls_for_enrollments(user, enrollments):
+    '''
+    For a given user, return a list of urls to the user's last completed block in
+    a course run for each course run in the user's enrollments.
+
+    Arguments:
+        user: the user object for which we want resume course urls
+        enrollments (list): a list of user enrollments
+
+    Returns:
+        resume_course_urls (OrderedDict): an OrderdDict of urls
+            key: CourseKey
+            value: url to the last completed block
+                if the value is '', then the user has not completed any blocks in the course run
+    '''
+    resume_course_urls = OrderedDict()
+    for enrollment in enrollments:
+        try:
+            block_key = get_key_to_last_completed_course_block(user, enrollment.course_id)
+            url_to_block = reverse(
+                'jump_to',
+                kwargs={'course_id': enrollment.course_id, 'location': block_key}
+            )
+        except UnavailableCompletionData:
+            url_to_block = ''
+        resume_course_urls[enrollment.course_id] = url_to_block
+    return resume_course_urls

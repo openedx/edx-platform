@@ -2,9 +2,12 @@
 Tests for reset_grades management command.
 """
 
+from __future__ import absolute_import
+
 from datetime import datetime
 
 import ddt
+import six
 from django.conf import settings
 from mock import MagicMock, patch
 from pytz import utc
@@ -16,7 +19,7 @@ from track.event_transaction_utils import get_event_transaction_id
 from util.date_utils import to_timestamp
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-DATE_FORMAT = "%Y-%m-%d %H:%M"
+DATE_FORMAT = u"%Y-%m-%d %H:%M"
 
 
 @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
@@ -25,7 +28,6 @@ class TestRecalculateSubsectionGrades(HasCourseWithProblemsMixin, ModuleStoreTes
     """
     Tests recalculate subsection grades management command.
     """
-    shard = 4
 
     def setUp(self):
         super(TestRecalculateSubsectionGrades, self).setUp()
@@ -70,7 +72,7 @@ class TestRecalculateSubsectionGrades(HasCourseWithProblemsMixin, ModuleStoreTes
             "only_if_higher": False,
             "expected_modified_time": to_timestamp(utc.localize(datetime.strptime('2016-08-23 16:43', DATE_FORMAT))),
             "score_deleted": False,
-            "event_transaction_id": unicode(get_event_transaction_id()),
+            "event_transaction_id": six.text_type(get_event_transaction_id()),
             "event_transaction_type": u'edx.grades.problem.submitted',
             "score_db_table": score_db_table,
         }

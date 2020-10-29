@@ -1,28 +1,27 @@
 """
 Tests for the Bulk Enrollment views.
 """
-import ddt
+from __future__ import absolute_import
+
 import json
+
+import ddt
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
-from django.urls import reverse
 from django.test.utils import override_settings
+from django.urls import reverse
+from opaque_keys.edx.keys import CourseKey
 from rest_framework.test import APIRequestFactory, APITestCase, force_authenticate
 
 from bulk_enroll.serializers import BulkEnrollmentSerializer
 from bulk_enroll.views import BulkEnrollView
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from microsite_configuration import microsite
-from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id
 from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
-from student.models import (
-    CourseEnrollment,
-    ManualEnrollmentAudit,
-    ENROLLED_TO_UNENROLLED,
-    UNENROLLED_TO_ENROLLED,
-)
+from openedx.core.djangoapps.site_configuration.helpers import get_value as get_site_value
+from student.models import ENROLLED_TO_UNENROLLED, UNENROLLED_TO_ENROLLED, CourseEnrollment, ManualEnrollmentAudit
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -34,7 +33,6 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
     """
     Test the bulk enrollment endpoint
     """
-    shard = 4
 
     USERNAME = "Bob"
     EMAIL = "bob@example.com"
@@ -56,7 +54,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
         )
 
         self.course = CourseFactory.create()
-        self.course_key = unicode(self.course.id)
+        self.course_key = six.text_type(self.course.id)
         self.enrolled_student = UserFactory(username='EnrolledStudent', first_name='Enrolled', last_name='Student')
         CourseEnrollment.enroll(
             self.enrolled_student,
@@ -66,7 +64,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
                                                last_name='Student')
 
         # Email URL values
-        self.site_name = microsite.get_value(
+        self.site_name = get_site_value(
             'SITE_NAME',
             settings.SITE_NAME
         )
@@ -366,7 +364,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
             'courses': self.course_key
         })
         self.assertEqual(response.status_code, 400)
-        self.assertIn('cohort {cohort_name} not found in course {course_id}.'.format(
+        self.assertIn(u'cohort {cohort_name} not found in course {course_id}.'.format(
             cohort_name='cohort1', course_id=self.course_key
         ), response.content)
 

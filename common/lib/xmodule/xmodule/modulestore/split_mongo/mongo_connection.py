@@ -1,34 +1,35 @@
 """
 Segregation of pymongo functions from the data modeling mechanisms for split modulestore.
 """
+from __future__ import absolute_import
+
 import datetime
-import cPickle as pickle
+import logging
 import math
-import zlib
-import pymongo
-import pytz
 import re
+import zlib
 from contextlib import contextmanager
 from time import time
 
+import pymongo
+import pytz
+import six
+import six.moves.cPickle as pickle
+from contracts import check, new_contract
+from mongodb_proxy import autoretry_read
 # Import this just to export it
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
+
+from xmodule.exceptions import HeartbeatFailure
+from xmodule.modulestore import BlockData
+from xmodule.modulestore.split_mongo import BlockKey
+from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
 
 try:
     from django.core.cache import caches, InvalidCacheBackendError
     DJANGO_AVAILABLE = True
 except ImportError:
     DJANGO_AVAILABLE = False
-
-import logging
-
-from contracts import check, new_contract
-from mongodb_proxy import autoretry_read
-from xmodule.exceptions import HeartbeatFailure
-from xmodule.modulestore import BlockData
-from xmodule.modulestore.split_mongo import BlockKey
-from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
-
 
 new_contract('BlockData', BlockData)
 log = logging.getLogger(__name__)
@@ -82,7 +83,7 @@ class Tagger(object):
             **kwargs: Each keyword is treated as a tag name, and the
                 value of the argument is the tag value.
         """
-        self.added_tags.extend(kwargs.items())
+        self.added_tags.extend(list(kwargs.items()))
 
     @property
     def tags(self):
@@ -187,14 +188,14 @@ def structure_to_mongo(structure, course_context=None):
 
         check('BlockKey', structure['root'])
         check('dict(BlockKey: BlockData)', structure['blocks'])
-        for block in structure['blocks'].itervalues():
+        for block in six.itervalues(structure['blocks']):
             if 'children' in block.fields:
                 check('list(BlockKey)', block.fields['children'])
 
         new_structure = dict(structure)
         new_structure['blocks'] = []
 
-        for block_key, block in structure['blocks'].iteritems():
+        for block_key, block in six.iteritems(structure['blocks']):
             new_block = dict(block.to_storable())
             new_block.setdefault('block_type', block_key.type)
             new_block['block_id'] = block_key.id
@@ -313,7 +314,7 @@ class MongoConnection(object):
                     if doc is None:
                         log.warning(
                             "doc was None when attempting to retrieve structure for item with key %s",
-                            unicode(key)
+                            six.text_type(key)
                         )
                         return None
                     tagger_find_one.measure("blocks", len(doc['blocks']))
@@ -461,7 +462,7 @@ class MongoConnection(object):
                     query['versions.{}'.format(branch)] = {'$exists': True}
 
                 if search_targets:
-                    for key, value in search_targets.iteritems():
+                    for key, value in six.iteritems(search_targets):
                         query['search_targets.{}'.format(key)] = value
 
                 if org_target:

@@ -1,10 +1,11 @@
+from __future__ import absolute_import
+
 import logging
 import random
 
 from lxml import etree
 from web_fragments.fragment import Fragment
 from xblock.fields import Integer, Scope
-
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.x_module import STUDENT_VIEW, XModule
 

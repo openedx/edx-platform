@@ -1,6 +1,8 @@
 """
 Provide tests for sysadmin dashboard feature in sysadmin.py
 """
+from __future__ import absolute_import
+
 import glob
 import os
 import re
@@ -11,23 +13,22 @@ from uuid import uuid4
 
 import mongoengine
 from django.conf import settings
-from django.urls import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
-from pytz import UTC
+from django.urls import reverse
 from opaque_keys.edx.locator import CourseLocator
+from pytz import UTC
 from six import text_type
+from six.moves import range
 
 from dashboard.git_import import GitImportErrorNoDir
 from dashboard.models import CourseImportLog
+from openedx.core.djangolib.markup import Text
 from student.roles import CourseStaffRole, GlobalStaff
 from student.tests.factories import UserFactory
 from util.date_utils import DEFAULT_DATE_TIME_FORMAT, get_time_display
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_SPLIT_MODULESTORE,
-    SharedModuleStoreTestCase
-)
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
 
 TEST_MONGODB_LOG = {
@@ -38,16 +39,13 @@ TEST_MONGODB_LOG = {
     'db': 'test_xlog',
 }
 
-FEATURES_WITH_SSL_AUTH = settings.FEATURES.copy()
-FEATURES_WITH_SSL_AUTH['AUTH_USE_CERTIFICATES'] = True
-
 
 class SysadminBaseTestCase(SharedModuleStoreTestCase):
     """
     Base class with common methods used in XML and Mongo tests
     """
 
-    TEST_REPO = 'https://github.com/mitocw/edx4edx_lite.git'
+    TEST_REPO = 'https://github.com/edx/edx4edx_lite.git'
     TEST_BRANCH = 'testing_do_not_delete'
     TEST_BRANCH_COURSE = CourseLocator.from_string('course-v1:MITx+edx4edx_branch+edx4edx')
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
@@ -122,7 +120,6 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
     """
     Check that importing into the mongo module store works
     """
-    shard = 1
 
     @classmethod
     def tearDownClass(cls):
@@ -156,7 +153,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         # Create git loaded course
         response = self._add_edx4edx()
-        self.assertIn(text_type(GitImportErrorNoDir(settings.GIT_REPO_DIR)),
+        self.assertIn(Text(text_type(GitImportErrorNoDir(settings.GIT_REPO_DIR))),
                       response.content.decode('UTF-8'))
 
     def test_mongo_course_add_delete(self):
@@ -186,7 +183,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         # Regex of first 3 columns of course information table row for
         # test course loaded from git. Would not have sha1 if
         # git_info_for_course failed.
-        table_re = re.compile(r"""
+        table_re = re.compile(ur"""
             <tr>\s+
             <td>edX\sAuthor\sCourse</td>\s+  # expected test git course name
             <td>course-v1:MITx\+edx4edx\+edx4edx</td>\s+  # expected test git course_id
@@ -305,7 +302,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         mongoengine.connect(TEST_MONGODB_LOG['db'])
 
-        for _ in xrange(15):
+        for _ in range(15):
             CourseImportLog(
                 course_id=CourseLocator.from_string("test/test/test"),
                 location="location",
@@ -323,8 +320,8 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
                 )
             )
             self.assertIn(
-                'Page {} of 2'.format(expected),
-                response.content
+                u'Page {} of 2'.format(expected),
+                response.content.decode(response.charset)
             )
 
         CourseImportLog.objects.delete()

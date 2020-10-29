@@ -3,13 +3,14 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import ddt
-from django.test import TestCase
-from django.test.utils import override_settings
 from mock import patch, Mock
 from unittest import skip
 
 from completion import models
 from completion.test_utils import CompletionWaffleTestMixin
+from django.test import TestCase
+from django.test.utils import override_settings
+
 from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.models import CourseEnrollment
@@ -19,7 +20,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from openedx.core.djangolib.testing.utils import FilteredQueryCountMixin
 
-from ..utils import format_social_link, validate_social_link, generate_password
+from ..utils import format_social_link, generate_password, validate_social_link
 
 
 @ddt.ddt

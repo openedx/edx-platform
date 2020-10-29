@@ -2,32 +2,36 @@
 """
 Miscellaneous tests for the student app.
 """
+from __future__ import absolute_import
+
 import logging
 import unittest
 from datetime import datetime, timedelta
-from urllib import quote
 
 import ddt
 import pytz
+import six
 from config_models.models import cache
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User
-from django.urls import reverse
 from django.test import TestCase, override_settings
 from django.test.client import Client
+from django.urls import reverse
 from markupsafe import escape
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import CourseLocator
 from pyquery import PyQuery as pq
 from six import text_type
+from six.moves import range
+from six.moves.urllib.parse import quote
 
 import shoppingcart  # pylint: disable=import-error
 from bulk_email.models import Optout  # pylint: disable=import-error
-from lms.djangoapps.certificates.models import CertificateStatuses  # pylint: disable=import-error
-from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.certificates.models import CertificateStatuses  # pylint: disable=import-error
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory, generate_course_run_key
@@ -240,7 +244,7 @@ class CourseEndingTest(TestCase):
         )
 
         if cert_grade is not None:
-            cert_status = {'status': 'generating', 'grade': unicode(cert_grade), 'mode': 'honor'}
+            cert_status = {'status': 'generating', 'grade': six.text_type(cert_grade), 'mode': 'honor'}
         else:
             cert_status = {'status': 'generating', 'mode': 'honor'}
 
@@ -252,7 +256,7 @@ class CourseEndingTest(TestCase):
                     'status': 'generating',
                     'show_survey_button': True,
                     'survey_url': survey_url,
-                    'grade': unicode(expected_grade),
+                    'grade': six.text_type(expected_grade),
                     'mode': 'honor',
                     'linked_in_url': None,
                     'can_unenroll': False,
@@ -1068,7 +1072,6 @@ class AnonymousLookupTable(ModuleStoreTestCase):
 @patch('openedx.core.djangoapps.programs.utils.get_programs')
 class RelatedProgramsTests(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
     """Tests verifying that related programs appear on the course dashboard."""
-    shard = 3
     maxDiff = None
     password = 'test'
     related_programs_preface = 'Related Programs'
@@ -1089,7 +1092,7 @@ class RelatedProgramsTests(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         self.create_programs_config()
         self.client.login(username=self.user.username, password=self.password)
 
-        course_run = CourseRunFactory(key=unicode(self.course.id))  # pylint: disable=no-member
+        course_run = CourseRunFactory(key=six.text_type(self.course.id))  # pylint: disable=no-member
         course = CatalogCourseFactory(course_runs=[course_run])
         self.programs = [ProgramFactory(courses=[course]) for __ in range(2)]
 
@@ -1163,4 +1166,4 @@ class UserAttributeTests(TestCase):
     def test_unicode(self):
         UserAttribute.set_user_attribute(self.user, self.name, self.value)
         for field in (self.name, self.value, self.user.username):
-            self.assertIn(field, unicode(UserAttribute.objects.get(user=self.user)))
+            self.assertIn(field, six.text_type(UserAttribute.objects.get(user=self.user)))

@@ -93,7 +93,7 @@ class TestXSSLinter(TestCase):
         # Assert no rule totals.
         self.assertIsNone(re.search(r'{}:\s*{} violations'.format(self.ruleset.python_parse_error.rule_id, 0), output))
         # Assert final total
-        self.assertIsNotNone(re.search(r'{} violations total'.format(7), output))
+        self.assertIsNotNone(re.search(r'{} violations total'.format(5), output))
 
     def test_lint_with_verbose(self):
         """
@@ -125,7 +125,7 @@ class TestXSSLinter(TestCase):
         # Assert no rule totals.
         self.assertIsNone(re.search(r'{}:\s*{} violations'.format(self.ruleset.python_parse_error.rule_id, 0), output))
         # Assert final total
-        self.assertIsNotNone(re.search(r'{} violations total'.format(7), output))
+        self.assertIsNotNone(re.search(r'{} violations total'.format(5), output))
 
     def test_lint_with_rule_totals(self):
         """
@@ -150,7 +150,7 @@ class TestXSSLinter(TestCase):
         # Assert totals output.
         self.assertIsNotNone(re.search(r'{}:\s*{} violations'.format(self.ruleset.python_parse_error.rule_id, 0), output))
         self.assertIsNotNone(re.search(r'{}:\s*{} violations'.format(self.ruleset.python_wrap_html.rule_id, 1), output))
-        self.assertIsNotNone(re.search(r'{} violations total'.format(7), output))
+        self.assertIsNotNone(re.search(r'{} violations total'.format(5), output))
 
     def test_lint_with_list_files(self):
         """

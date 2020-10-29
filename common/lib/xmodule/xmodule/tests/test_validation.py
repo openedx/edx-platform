@@ -14,7 +14,6 @@ class StudioValidationMessageTest(unittest.TestCase):
     """
     Tests for `ValidationMessage`
     """
-    shard = 1
 
     def test_bad_parameters(self):
         """
@@ -74,7 +73,6 @@ class StudioValidationTest(unittest.TestCase):
     """
     Tests for `StudioValidation` class.
     """
-    shard = 1
 
     def test_copy(self):
         validation = Validation("id")

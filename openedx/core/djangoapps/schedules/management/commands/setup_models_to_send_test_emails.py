@@ -2,19 +2,24 @@
 A managment command that can be used to set up Schedules with various configurations for testing.
 """
 
-import datetime
-import pytz
-import factory
+from __future__ import absolute_import
 
-from django.core.management.base import BaseCommand
+import datetime
+
+import factory
+import pytz
 from django.contrib.sites.models import Site
+from django.core.management.base import BaseCommand
+
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules.models import ScheduleExperience
 from openedx.core.djangoapps.schedules.tests.factories import (
-    ScheduleFactory, ScheduleConfigFactory, ScheduleExperienceFactory
+    ScheduleConfigFactory,
+    ScheduleExperienceFactory,
+    ScheduleFactory
 )
-from xmodule.modulestore.tests.factories import CourseFactory, XMODULE_FACTORY_LOCK
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.factories import XMODULE_FACTORY_LOCK, CourseFactory
 
 
 class ThreeDayNudgeSchedule(ScheduleFactory):
@@ -66,7 +71,7 @@ class Command(BaseCommand):
             start=datetime.datetime.today() - datetime.timedelta(days=30),
             end=datetime.datetime.today() + datetime.timedelta(days=30),
             number=factory.Sequence('schedules_test_course_{}'.format),
-            display_name=factory.Sequence('Schedules Test Course {}'.format),
+            display_name=factory.Sequence(u'Schedules Test Course {}'.format),
         )
         XMODULE_FACTORY_LOCK.disable()
         course_overview = CourseOverview.load_from_module_store(course.id)

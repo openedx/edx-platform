@@ -1,7 +1,7 @@
 """
 Generate a report of certificate statuses
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
@@ -57,7 +57,7 @@ class Command(BaseCommand):
 
         # find students who are active
         # number of enrolled students = downloadable + notpassing
-        print("Looking up certificate states for {0}".format(options['course']))
+        print(u"Looking up certificate states for {0}".format(options['course']))
         enrolled_current = User.objects.filter(
             courseenrollment__course_id=course_id,
             courseenrollment__is_active=True

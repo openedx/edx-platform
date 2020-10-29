@@ -37,7 +37,7 @@ def look_up_registration_code(request, course_id):
             'is_registration_code_exists': False,
             'is_registration_code_valid': False,
             'is_registration_code_redeemed': False,
-            'message': _('The enrollment code ({code}) was not found for the {course_name} course.').format(
+            'message': _(u'The enrollment code ({code}) was not found for the {course_name} course.').format(
                 code=code, course_name=course.display_name
             )
         }, status=400)  # status code 200: OK by default
@@ -78,7 +78,7 @@ def registration_code_details(request, course_id):
         registration_code = CourseRegistrationCode.objects.get(code=code)
     except CourseRegistrationCode.DoesNotExist:
         return JsonResponse({
-            'message': _('The enrollment code ({code}) was not found for the {course_name} course.').format(
+            'message': _(u'The enrollment code ({code}) was not found for the {course_name} course.').format(
                 code=code, course_name=course.display_name
             )}, status=400)
 
@@ -97,7 +97,7 @@ def registration_code_details(request, course_id):
         code_redemption = RegistrationCodeRedemption.get_registration_code_redemption(code, course_key)
         if code_redemption is None:
             return JsonResponse({
-                'message': _('The redemption does not exist against enrollment code ({code}).').format(
+                'message': _(u'The redemption does not exist against enrollment code ({code}).').format(
                     code=code)}, status=400)
 
         delete_redemption_entry(request, code_redemption, course_key)
@@ -124,5 +124,5 @@ def delete_redemption_entry(request, code_redemption, course_key):
     send_mail_to_student(email_address, email_params)
 
     # remove the redemption entry from the database.
-    log.info('deleting redemption entry (%s) from the database.', code_redemption.id)
+    log.info(u'deleting redemption entry (%s) from the database.', code_redemption.id)
     code_redemption.delete()

@@ -2,16 +2,20 @@
 """
 Unit tests for masquerade.
 """
+from __future__ import absolute_import
+
 import json
 import pickle
 from datetime import datetime
 
 import ddt
+import six
 from django.conf import settings
-from django.urls import reverse
 from django.test import TestCase
+from django.urls import reverse
 from mock import patch
 from pytz import UTC
+from xblock.runtime import DictKeyValueStore
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from courseware.masquerade import CourseMasquerade, MasqueradingKeyValueStore, get_masquerading_user_group
@@ -22,11 +26,9 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from openedx.core.lib.tests import attr
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-from xblock.runtime import DictKeyValueStore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -90,7 +92,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': unicode(self.course.id),
+                'course_id': six.text_type(self.course.id),
                 'chapter': self.chapter.location.block_id,
                 'section': self.sequential.location.block_id,
             }
@@ -104,7 +106,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse(
             'info',
             kwargs={
-                'course_id': unicode(self.course.id),
+                'course_id': six.text_type(self.course.id),
             }
         )
         return self.client.get(url)
@@ -116,7 +118,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse(
             'progress',
             kwargs={
-                'course_id': unicode(self.course.id),
+                'course_id': six.text_type(self.course.id),
             }
         )
         return self.client.get(url)
@@ -136,8 +138,8 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         problem_url = reverse(
             'xblock_handler',
             kwargs={
-                'course_id': unicode(self.course.id),
-                'usage_id': unicode(self.problem.location),
+                'course_id': six.text_type(self.course.id),
+                'usage_id': six.text_type(self.problem.location),
                 'handler': 'xmodule_handler',
                 'suffix': 'problem_get'
             }
@@ -166,7 +168,6 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(200, masquerade_as_group_member(self.test_user, self.course, partition_id, group_id))
 
 
-@attr(shard=1)
 class NormalStudentVisibilityTest(MasqueradeTestCase):
     """
     Verify the course displays as expected for a "normal" student (to ensure test setup is correct).
@@ -209,7 +210,7 @@ class StaffMasqueradeTestCase(MasqueradeTestCase):
         masquerade_url = reverse(
             'masquerade_update',
             kwargs={
-                'course_key_string': unicode(self.course.id),
+                'course_key_string': six.text_type(self.course.id),
             }
         )
         response = self.client.post(
@@ -221,7 +222,6 @@ class StaffMasqueradeTestCase(MasqueradeTestCase):
         return response
 
 
-@attr(shard=1)
 class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
     """
     Check for staff being able to masquerade as student.
@@ -260,7 +260,6 @@ class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
 
 
 @ddt.ddt
-@attr(shard=1)
 class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmissionTestMixin):
     """
     Check for staff being able to masquerade as a specific student.
@@ -455,7 +454,6 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         self.assertIn("2 of 2 possible points", masquerade_progress)
 
 
-@attr(shard=1)
 class TestGetMasqueradingGroupId(StaffMasqueradeTestCase):
     """
     Check for staff being able to masquerade as belonging to a group.

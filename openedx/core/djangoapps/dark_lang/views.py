@@ -1,6 +1,8 @@
 """
 Views file for the Darklang Django App
 """
+from __future__ import absolute_import
+
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import redirect
@@ -94,7 +96,7 @@ class PreviewLanguageFragmentView(EdxFragmentView):
         set_user_preference(request.user, DARK_LANGUAGE_KEY, preview_language)
         PageLevelMessages.register_success_message(
             request,
-            _('Language set to {preview_language}').format(
+            _(u'Language set to {preview_language}').format(
                 preview_language=preview_language
             )
         )

@@ -1,4 +1,6 @@
-"""Django models related to teams functionality."""
+"""
+Django models related to teams functionality.
+"""
 
 from datetime import datetime
 from uuid import uuid4
@@ -13,7 +15,7 @@ from django_countries.fields import CountryField
 from model_utils import FieldTracker
 from opaque_keys.edx.django.models import CourseKeyField
 
-from django_comment_common.signals import (
+from openedx.core.djangoapps.django_comment_common.signals import (
     comment_created,
     comment_deleted,
     comment_edited,
@@ -39,16 +41,20 @@ from .errors import AlreadyOnTeamInCourse, ImmutableMembershipFieldException, No
 @receiver(comment_voted)
 @receiver(comment_created)
 def post_create_vote_handler(sender, **kwargs):  # pylint: disable=unused-argument
-    """Update the user's last activity date upon creating or voting for a
-    post."""
+    """
+    Update the user's last activity date upon creating or voting for a
+    post.
+    """
     handle_activity(kwargs['user'], kwargs['post'])
 
 
 @receiver(thread_followed)
 @receiver(thread_unfollowed)
 def post_followed_unfollowed_handler(sender, **kwargs):  # pylint: disable=unused-argument
-    """Update the user's last activity date upon followed or unfollowed of a
-    post."""
+    """
+    Update the user's last activity date upon followed or unfollowed of a
+    post.
+    """
     handle_activity(kwargs['user'], kwargs['post'])
 
 
@@ -57,21 +63,26 @@ def post_followed_unfollowed_handler(sender, **kwargs):  # pylint: disable=unuse
 @receiver(comment_edited)
 @receiver(comment_deleted)
 def post_edit_delete_handler(sender, **kwargs):  # pylint: disable=unused-argument
-    """Update the user's last activity date upon editing or deleting a
-    post."""
+    """
+    Update the user's last activity date upon editing or deleting a
+    post.
+    """
     post = kwargs['post']
     handle_activity(kwargs['user'], post, long(post.user_id))
 
 
 @receiver(comment_endorsed)
 def comment_endorsed_handler(sender, **kwargs):  # pylint: disable=unused-argument
-    """Update the user's last activity date upon endorsing a comment."""
+    """
+    Update the user's last activity date upon endorsing a comment.
+    """
     comment = kwargs['post']
     handle_activity(kwargs['user'], comment, long(comment.thread.user_id))
 
 
 def handle_activity(user, post, original_author_id=None):
-    """Handle user activity from django_comment_client and discussion_api
+    """
+    Handle user activity from lms.djangoapps.discussion.django_comment_client and discussion.rest_api
     and update the user's last activity date. Checks if the user who
     performed the action is the original author, and that the
     discussion has the team context.
@@ -83,7 +94,11 @@ def handle_activity(user, post, original_author_id=None):
 
 
 class CourseTeam(models.Model):
-    """This model represents team related info."""
+    """
+    This model represents team related info.
+
+    .. no_pii:
+    """
 
     class Meta(object):
         app_label = "teams"
@@ -165,7 +180,11 @@ class CourseTeam(models.Model):
 
 
 class CourseTeamMembership(models.Model):
-    """This model represents the membership of a single user in a single team."""
+    """
+    This model represents the membership of a single user in a single team.
+
+    .. no_pii:
+    """
 
     class Meta(object):
         app_label = "teams"
@@ -198,7 +217,7 @@ class CourseTeamMembership(models.Model):
                 # Allow it *only* if the current value is None.
                 if current_value is not None:
                     raise ImmutableMembershipFieldException(
-                        "Field %r shouldn't change from %r to %r" % (name, current_value, value)
+                        u"Field %r shouldn't change from %r to %r" % (name, current_value, value)
                     )
         super(CourseTeamMembership, self).__setattr__(name, value)
 

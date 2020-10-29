@@ -1,5 +1,7 @@
 # pylint: disable=missing-docstring
 
+from __future__ import absolute_import
+
 import datetime
 import hashlib
 
@@ -11,24 +13,25 @@ from django.core.cache import cache
 from django.db.models import signals
 from django.db.models.functions import Lower
 from django.test import TestCase
+from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.models import DynamicUpgradeDeadlineConfiguration
-from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.models import (
+    ALLOWEDTOENROLL_TO_ENROLLED,
+    AccountRecovery,
     CourseEnrollment,
     CourseEnrollmentAllowed,
-    PendingEmailChange,
     ManualEnrollmentAudit,
-    ALLOWEDTOENROLL_TO_ENROLLED,
+    PendingEmailChange,
     PendingNameChange
 )
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from student.tests.factories import AccountRecoveryFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -383,3 +386,24 @@ class TestManualEnrollmentAudit(SharedModuleStoreTestCase):
         self.assertFalse(ManualEnrollmentAudit.objects.filter(enrollment=enrollment).exclude(
             reason=""
         ))
+
+
+class TestAccountRecovery(TestCase):
+    """
+    Tests for the AccountRecovery Model
+    """
+
+    def test_retire_recovery_email(self):
+        """
+        Assert that Account Record for a given user is deleted when `retire_recovery_email` is called
+        """
+        # Create user and associated recovery email record
+        user = UserFactory()
+        AccountRecoveryFactory(user=user)
+        assert len(AccountRecovery.objects.filter(user_id=user.id)) == 1
+
+        # Retire recovery email
+        AccountRecovery.retire_recovery_email(user_id=user.id)
+
+        # Assert that there is no longer an AccountRecovery record for this user
+        assert len(AccountRecovery.objects.filter(user_id=user.id)) == 0

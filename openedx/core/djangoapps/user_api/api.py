@@ -66,54 +66,6 @@ def get_password_reset_form():
     return form_desc
 
 
-def get_account_recovery_form():
-    """
-    Return a description of the password reset, using secondary email, form.
-
-    This decouples clients from the API definition:
-    if the API decides to modify the form, clients won't need
-    to be updated.
-
-    See `user_api.helpers.FormDescription` for examples
-    of the JSON-encoded form description.
-
-    Returns:
-        HttpResponse
-
-    """
-    form_desc = FormDescription("post", reverse("account_recovery"))
-
-    # Translators: This label appears above a field on the password reset
-    # form meant to hold the user's email address.
-    email_label = _(u"Secondary email")
-
-    # Translators: This example email address is used as a placeholder in
-    # a field on the password reset form meant to hold the user's email address.
-    email_placeholder = _(u"username@domain.com")
-
-    # Translators: These instructions appear on the password reset form,
-    # immediately below a field meant to hold the user's email address.
-    email_instructions = _(
-        u"Secondary email address you registered with {platform_name} using account settings page"
-    ).format(
-        platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
-    )
-
-    form_desc.add_field(
-        "email",
-        field_type="email",
-        label=email_label,
-        placeholder=email_placeholder,
-        instructions=email_instructions,
-        restrictions={
-            "min_length": accounts.EMAIL_MIN_LENGTH,
-            "max_length": accounts.EMAIL_MAX_LENGTH,
-        }
-    )
-
-    return form_desc
-
-
 def get_login_session_form(request):
     """Return a description of the login form.
 
@@ -141,7 +93,7 @@ def get_login_session_form(request):
 
     # Translators: These instructions appear on the login form, immediately
     # below a field meant to hold the user's email address.
-    email_instructions = _("The email address you used to register with {platform_name}").format(
+    email_instructions = _(u"The email address you used to register with {platform_name}").format(
         platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
     )
 
@@ -315,7 +267,7 @@ class RegistrationFormFactory(object):
                 field_type = field_options.get('field_type', FormDescription.FIELD_TYPE_MAP.get(field.__class__))
                 if not field_type:
                     raise ImproperlyConfigured(
-                        "Field type '{}' not recognized for registration extension field '{}'.".format(
+                        u"Field type '{}' not recognized for registration extension field '{}'.".format(
                             field_type,
                             field_name
                         )
@@ -563,14 +515,14 @@ class RegistrationFormFactory(object):
             include_default_option = False
             options = None
             error_msg = ''
-            exec("error_msg = accounts.REQUIRED_FIELD_%s_TEXT_MSG" % (field_name.upper()))
+            error_msg = getattr(accounts, u'REQUIRED_FIELD_{}_TEXT_MSG'.format(field_name.upper()))
         else:
             field_type = "select"
             include_default_option = True
             field_options = extra_field_options.get(field_name)
             options = [(unicode(option.lower()), option) for option in field_options]
             error_msg = ''
-            exec("error_msg = accounts.REQUIRED_FIELD_%s_SELECT_MSG" % (field_name.upper()))
+            error_msg = getattr(accounts, u'REQUIRED_FIELD_{}_SELECT_MSG'.format(field_name.upper()))
 
         form_desc.add_field(
             field_name,
@@ -854,7 +806,7 @@ class RegistrationFormFactory(object):
         )).format(
             platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_label,
-            terms_of_service_link_start=HTML("<a href='{terms_link}' target='_blank'>").format(terms_link=terms_link),
+            terms_of_service_link_start=HTML(u"<a href='{terms_link}' target='_blank'>").format(terms_link=terms_link),
             terms_of_service_link_end=HTML("</a>"),
         )
 
@@ -873,16 +825,16 @@ class RegistrationFormFactory(object):
 
             pp_link = marketing_link("PRIVACY")
             label = Text(_(
-                u"By creating an account with {platform_name}, you agree \
-                  to abide by our {platform_name} \
+                u"By creating an account, you agree to the \
                   {terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end} \
-                  and agree to our {privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
+                  and you acknowledge that {platform_name} and each Member process your personal data in accordance \
+                  with the {privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
             )).format(
                 platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
                 terms_of_service=terms_label,
-                terms_of_service_link_start=HTML("<a href='{terms_url}' target='_blank'>").format(terms_url=terms_link),
+                terms_of_service_link_start=HTML(u"<a href='{terms_url}' target='_blank'>").format(terms_url=terms_link),
                 terms_of_service_link_end=HTML("</a>"),
-                privacy_policy_link_start=HTML("<a href='{pp_url}' target='_blank'>").format(pp_url=pp_link),
+                privacy_policy_link_start=HTML(u"<a href='{pp_url}' target='_blank'>").format(pp_url=pp_link),
                 privacy_policy_link_end=HTML("</a>"),
             )
 
@@ -917,7 +869,7 @@ class RegistrationFormFactory(object):
         label = Text(_(u"I agree to the {platform_name} {tos_link_start}{terms_of_service}{tos_link_end}")).format(
             platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_label,
-            tos_link_start=HTML("<a href='{terms_link}' target='_blank'>").format(terms_link=terms_link),
+            tos_link_start=HTML(u"<a href='{terms_link}' target='_blank'>").format(terms_link=terms_link),
             tos_link_end=HTML("</a>"),
         )
 

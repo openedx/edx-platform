@@ -1,12 +1,14 @@
 """
 Configuration models for Video XModule
 """
-from django.db import models
-from django.db.models import BooleanField, TextField, PositiveIntegerField
+from __future__ import absolute_import
+
+import six
 from config_models.models import ConfigurationModel
+from django.db import models
+from django.db.models import BooleanField, PositiveIntegerField, TextField
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
-
 
 URL_REGEX = r'^[a-zA-Z0-9\-_]*$'
 
@@ -17,6 +19,8 @@ class HLSPlaybackEnabledFlag(ConfigurationModel):
     When this feature flag is set to true, individual courses
     must also have HLS Playback enabled for this feature to
     take effect.
+
+    .. no_pii:
     """
     # this field overrides course-specific settings
     enabled_for_all_courses = BooleanField(default=False)
@@ -56,6 +60,8 @@ class CourseHLSPlaybackEnabledFlag(ConfigurationModel):
     """
     Enables HLS Playback for a specific course. Global feature must be
     enabled for this to take effect.
+
+    .. no_pii:
     """
     KEY_FIELDS = ('course_id',)
 
@@ -67,7 +73,7 @@ class CourseHLSPlaybackEnabledFlag(ConfigurationModel):
             not_en = ""
 
         return u"Course '{course_key}': HLS Playback {not_enabled}Enabled".format(
-            course_key=unicode(self.course_id),
+            course_key=six.text_type(self.course_id),
             not_enabled=not_en
         )
 
@@ -80,6 +86,8 @@ class VideoTranscriptEnabledFlag(ConfigurationModel):
     take effect.
     When this feature is enabled, 3rd party transcript integration functionality would be available accross all
     courses or some specific courses and S3 video transcript would be served (currently as a fallback).
+
+    .. no_pii:
     """
     # this field overrides course-specific settings
     enabled_for_all_courses = BooleanField(default=False)
@@ -121,6 +129,8 @@ class CourseVideoTranscriptEnabledFlag(ConfigurationModel):
     enabled for this to take effect.
     When this feature is enabled, 3rd party transcript integration functionality would be available for the
     specific course and S3 video transcript would be served (currently as a fallback).
+
+    .. no_pii:
     """
     KEY_FIELDS = ('course_id',)
 
@@ -132,7 +142,7 @@ class CourseVideoTranscriptEnabledFlag(ConfigurationModel):
             not_en = ""
 
         return u"Course '{course_key}': Video Transcript {not_enabled}Enabled".format(
-            course_key=unicode(self.course_id),
+            course_key=six.text_type(self.course_id),
             not_enabled=not_en
         )
 
@@ -140,11 +150,13 @@ class CourseVideoTranscriptEnabledFlag(ConfigurationModel):
 class TranscriptMigrationSetting(ConfigurationModel):
     """
     Arguments for the Transcript Migration management command
+
+    .. no_pii:
     """
     def __unicode__(self):
         return (
-            "[TranscriptMigrationSetting] Courses {courses} with update if already present as {force}"
-            " and commit as {commit}"
+            u"[TranscriptMigrationSetting] Courses {courses} with update if already present as {force}"
+            u" and commit as {commit}"
         ).format(
             courses='ALL' if self.all_courses else self.course_ids,
             force=self.force_update,
@@ -181,6 +193,8 @@ class TranscriptMigrationSetting(ConfigurationModel):
 class MigrationEnqueuedCourse(TimeStampedModel):
     """
     Temporary model to persist the course IDs who has been enqueued for transcripts migration to S3.
+
+    .. no_pii:
     """
     course_id = CourseKeyField(db_index=True, primary_key=True, max_length=255)
     command_run = PositiveIntegerField(default=0)
@@ -194,6 +208,8 @@ class MigrationEnqueuedCourse(TimeStampedModel):
 class VideoThumbnailSetting(ConfigurationModel):
     """
     Arguments for the Video Thumbnail management command
+
+    .. no_pii:
     """
     command_run = PositiveIntegerField(default=0)
     offset = PositiveIntegerField(default=0)
@@ -234,6 +250,8 @@ class VideoThumbnailSetting(ConfigurationModel):
 class UpdatedCourseVideos(TimeStampedModel):
     """
     Temporary model to persist the course videos which have been enqueued to update video thumbnails.
+
+    .. no_pii:
     """
     course_id = CourseKeyField(db_index=True, max_length=255)
     edx_video_id = models.CharField(max_length=100)

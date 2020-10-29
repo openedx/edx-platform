@@ -74,7 +74,7 @@ class Command(BaseCommand):
         try:
             result = CourseKey.from_string(raw_value)
         except InvalidKeyError:
-            raise CommandError("Invalid course_key: '%s'." % raw_value)
+            raise CommandError(u"Invalid course_key: '%s'." % raw_value)
 
         if not isinstance(result, CourseLocator):
             raise CommandError(u"Argument {0} is not a course key".format(raw_value))
@@ -110,9 +110,9 @@ class Command(BaseCommand):
                 course_keys = non_migrated_courses[:migration_settings.batch_size]
 
                 log.info(
-                    ('[Transcript Migration] Courses(total): %s, '
-                     'Courses(migrated): %s, Courses(non-migrated): %s, '
-                     'Courses(migration-in-process): %s'),
+                    (u'[Transcript Migration] Courses(total): %s, '
+                     u'Courses(migrated): %s, Courses(non-migrated): %s, '
+                     u'Courses(migration-in-process): %s'),
                     len(all_courses),
                     len(migrated_courses),
                     len(non_migrated_courses),

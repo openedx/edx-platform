@@ -2,16 +2,20 @@
 Unit tests for the notes app.
 """
 
+from __future__ import absolute_import
+
 import json
 
+import six
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.urls import reverse
 from django.test import RequestFactory, TestCase
 from django.test.client import Client
+from django.urls import reverse
 from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
+from six.moves import range
 
 from courseware.tabs import CourseTab, get_course_tab_list
 from notes import api, models, utils
@@ -443,6 +447,6 @@ class NoteTest(TestCase):
     def test_as_dict(self):
         note = models.Note(course_id=self.course_key, user=self.student)
         d = note.as_dict()
-        self.assertNotIsInstance(d, basestring)
+        self.assertNotIsInstance(d, six.string_types)
         self.assertEqual(d['user_id'], self.student.id)
         self.assertNotIn('course_id', d)

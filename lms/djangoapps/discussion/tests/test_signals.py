@@ -1,16 +1,20 @@
-from django.test import TestCase
-import mock
+"""
+Tests the forum notification signals.
+"""
+from __future__ import absolute_import
 
-from django_comment_common import signals, models
+import mock
+from django.test import TestCase
 from edx_django_utils.cache import RequestCache
+
 from lms.djangoapps.discussion.signals.handlers import ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory, SiteConfigurationFactory
+from openedx.core.djangoapps.django_comment_common import models, signals
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class SendMessageHandlerTestCase(TestCase):
-    shard = 4
 
     def setUp(self):
         self.sender = mock.Mock()

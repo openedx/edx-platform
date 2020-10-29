@@ -6,11 +6,14 @@ Credit courses allow students to receive university credit for
 successful completion of a course on EdX
 """
 
+from __future__ import absolute_import
+
 import datetime
 import logging
 from collections import defaultdict
 
 import pytz
+import six
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.core.cache import cache
@@ -38,6 +41,8 @@ class CreditProvider(TimeStampedModel):
     includes a `url` where the student will be sent when he/she will try to
     get credit for course. Eligibility duration will be use to set duration
     for which credit eligible message appears on dashboard.
+
+    .. no_pii:
     """
     provider_id = models.CharField(
         max_length=255,
@@ -213,6 +218,8 @@ def invalidate_provider_cache(sender, **kwargs):  # pylint: disable=unused-argum
 class CreditCourse(models.Model):
     """
     Model for tracking a credit course.
+
+    .. no_pii:
     """
 
     course_key = CourseKeyField(max_length=255, db_index=True, unique=True)
@@ -235,12 +242,12 @@ class CreditCourse(models.Model):
         credit_courses = cache.get(cls.CREDIT_COURSES_CACHE_KEY)
         if credit_courses is None:
             credit_courses = set(
-                unicode(course.course_key)
+                six.text_type(course.course_key)
                 for course in cls.objects.filter(enabled=True)
             )
             cache.set(cls.CREDIT_COURSES_CACHE_KEY, credit_courses)
 
-        return unicode(course_key) in credit_courses
+        return six.text_type(course_key) in credit_courses
 
     @classmethod
     def get_credit_course(cls, course_key):
@@ -260,7 +267,7 @@ class CreditCourse(models.Model):
 
     def __unicode__(self):
         """Unicode representation of the credit course. """
-        return unicode(self.course_key)
+        return six.text_type(self.course_key)
 
 
 @receiver(models.signals.post_save, sender=CreditCourse)
@@ -282,6 +289,8 @@ class CreditRequirement(TimeStampedModel):
     The 'display_name' field stores the display name of the requirement.
     The 'criteria' field dictionary provides additional information, clients
     may need to determine whether a user has satisfied the requirement.
+
+    .. no_pii:
     """
 
     course = models.ForeignKey(CreditCourse, related_name="credit_requirements", on_delete=models.CASCADE)
@@ -418,6 +427,7 @@ class CreditRequirementStatus(TimeStampedModel):
 
     In case (3), no CreditRequirementStatus record will exist for the requirement and user.
 
+    .. no_pii:
     """
 
     REQUIREMENT_STATUS_CHOICES = (
@@ -439,7 +449,7 @@ class CreditRequirementStatus(TimeStampedModel):
 
     class Meta(object):
         unique_together = ('username', 'requirement')
-        verbose_name_plural = _('Credit requirement statuses')
+        verbose_name_plural = ugettext_lazy('Credit requirement statuses')
 
     @classmethod
     def get_statuses(cls, requirements, username):
@@ -527,14 +537,20 @@ class CreditRequirementStatus(TimeStampedModel):
 
 
 def default_deadline_for_credit_eligibility():
-    """ The default deadline to use when creating a new CreditEligibility model. """
+    """
+    The default deadline to use when creating a new CreditEligibility model.
+    """
     return datetime.datetime.now(pytz.UTC) + datetime.timedelta(
         days=getattr(settings, "CREDIT_ELIGIBILITY_EXPIRATION_DAYS", 365)
     )
 
 
 class CreditEligibility(TimeStampedModel):
-    """ A record of a user's eligibility for credit for a specific course. """
+    """
+    A record of a user's eligibility for credit for a specific course.
+
+    .. no_pii:
+    """
     username = models.CharField(max_length=255, db_index=True)
     course = models.ForeignKey(CreditCourse, related_name="eligibilities", on_delete=models.CASCADE)
 
@@ -645,6 +661,8 @@ class CreditRequest(TimeStampedModel):
     at the time the request is made.  If the user re-issues the request
     (perhaps because the user did not finish filling in forms on the credit provider's site),
     the request record will be updated, but the UUID will remain the same.
+
+    .. no_pii:
     """
 
     uuid = models.CharField(max_length=32, unique=True, db_index=True)
@@ -760,13 +778,17 @@ class CreditRequest(TimeStampedModel):
 
 
 class CreditConfig(ConfigurationModel):
-    """ Manage credit configuration """
+    """
+    Manage credit configuration
+
+    .. no_pii:
+    """
     CACHE_KEY = 'credit.providers.api.data'
 
     cache_ttl = models.PositiveIntegerField(
-        verbose_name=_("Cache Time To Live"),
+        verbose_name=ugettext_lazy("Cache Time To Live"),
         default=0,
-        help_text=_(
+        help_text=ugettext_lazy(
             "Specified in seconds. Enable caching by setting this to a value greater than 0."
         )
     )

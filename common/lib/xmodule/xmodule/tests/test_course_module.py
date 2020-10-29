@@ -29,7 +29,6 @@ _NEXT_WEEK = _TODAY + timedelta(days=7)
 
 
 class CourseFieldsTestCase(unittest.TestCase):
-    shard = 1
 
     def test_default_start_date(self):
         self.assertEqual(
@@ -100,7 +99,6 @@ def get_dummy_course(start, announcement=None, is_new=None, advertised_start=Non
 
 class HasEndedMayCertifyTestCase(unittest.TestCase):
     """Double check the semantics around when to finalize courses."""
-    shard = 1
 
     def setUp(self):
         super(HasEndedMayCertifyTestCase, self).setUp()
@@ -151,7 +149,6 @@ class HasEndedMayCertifyTestCase(unittest.TestCase):
 
 class CourseSummaryHasEnded(unittest.TestCase):
     """ Test for has_ended method when end date is missing timezone information. """
-    shard = 1
 
     def test_course_end(self):
         test_course = get_dummy_course("2012-01-01T12:00")
@@ -163,7 +160,6 @@ class CourseSummaryHasEnded(unittest.TestCase):
 @ddt.ddt
 class IsNewCourseTestCase(unittest.TestCase):
     """Make sure the property is_new works on courses"""
-    shard = 1
 
     def setUp(self):
         super(IsNewCourseTestCase, self).setUp()
@@ -267,7 +263,6 @@ class IsNewCourseTestCase(unittest.TestCase):
 
 
 class DiscussionTopicsTestCase(unittest.TestCase):
-    shard = 1
 
     def test_default_discussion_topics(self):
         d = get_dummy_course('2012-12-02T12:00')
@@ -278,7 +273,6 @@ class TeamsConfigurationTestCase(unittest.TestCase):
     """
     Tests for the configuration of teams and the helper methods for accessing them.
     """
-    shard = 1
 
     def setUp(self):
         super(TeamsConfigurationTestCase, self).setUp()
@@ -347,7 +341,6 @@ class TeamsConfigurationTestCase(unittest.TestCase):
 
 class SelfPacedTestCase(unittest.TestCase):
     """Tests for self-paced courses."""
-    shard = 1
 
     def setUp(self):
         super(SelfPacedTestCase, self).setUp()
@@ -359,7 +352,6 @@ class SelfPacedTestCase(unittest.TestCase):
 
 class BypassHomeTestCase(unittest.TestCase):
     """Tests for setting which allows course home to be bypassed."""
-    shard = 1
 
     def setUp(self):
         super(BypassHomeTestCase, self).setUp()
@@ -378,7 +370,6 @@ class CourseDescriptorTestCase(unittest.TestCase):
     class definitely isn't a comprehensive test case for CourseDescriptor, as
     writing a such a test case was out of the scope of the PR.
     """
-    shard = 1
 
     def setUp(self):
         """
@@ -428,7 +419,6 @@ class ProctoringProviderTestCase(unittest.TestCase):
     """
     Tests for ProctoringProvider, including the default value, validation, and inheritance behavior.
     """
-    shard = 1
 
     def setUp(self):
         """

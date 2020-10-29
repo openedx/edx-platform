@@ -19,6 +19,7 @@ from enterprise.models import (
     PendingEnterpriseCustomerUser
 )
 
+from third_party_auth.exceptions import IncorrectConfigurationException
 from openedx.core.djangoapps.theming.helpers import get_current_request
 
 STANDARD_SAML_PROVIDER_KEY = 'standard_saml_provider'
@@ -86,6 +87,21 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
             return config
         else:
             return super(SAMLAuthBackend, self).generate_saml_config()
+
+    def get_user_id(self, details, response):
+        """
+        Calling the parent function and handling the exception properly.
+        """
+        try:
+            return super(SAMLAuthBackend, self).get_user_id(details, response)
+        except KeyError as ex:
+            log.warning(
+                u"Error in SAML authentication flow of IdP '{idp_name}': {message}".format(
+                    message=ex.message,
+                    idp_name=response.get('idp_name')
+                )
+            )
+            raise IncorrectConfigurationException(self)
 
     def generate_metadata_xml(self, idp_name=None):  # pylint: disable=arguments-differ
         """
@@ -155,7 +171,7 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
             for expected in idp.conf['requiredEntitlements']:
                 if expected not in entitlements:
                     log.warning(
-                        "SAML user from IdP %s rejected due to missing eduPersonEntitlement %s", idp.name, expected)
+                        u"SAML user from IdP %s rejected due to missing eduPersonEntitlement %s", idp.name, expected)
                     raise AuthForbidden(self)
 
     def _create_saml_auth(self, idp):
@@ -177,7 +193,7 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
                 def wrapped_method(*args, **kwargs):
                     """ Wrapped login or process_response method """
                     result = method(*args, **kwargs)
-                    log.info("SAML login %s for IdP %s. XML is:\n%s", action_description, idp.name, xml_getter())
+                    log.info(u"SAML login %s for IdP %s. XML is:\n%s", action_description, idp.name, xml_getter())
                     return result
                 setattr(auth_inst, method_name, wrapped_method)
 
@@ -219,8 +235,12 @@ class EdXSAMLIdentityProvider(SAMLIdentityProvider):
         another attribute to use.
         """
         key = self.conf.get(conf_key, default_attribute)
-        default = self.conf['attr_defaults'].get(conf_key) or None
-        return attributes[key][0] if key in attributes else default
+        if key in attributes:
+            try:
+                return attributes[key][0]
+            except IndexError:
+                log.warning(u'SAML attribute "%s" value not found.', key)
+        return self.conf['attr_defaults'].get(conf_key) or None
 
     @property
     def saml_sp_configuration(self):
@@ -363,8 +383,8 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         if not all(var in self.conf for var in self.required_variables):
             missing = [var for var in self.required_variables if var not in self.conf]
             log.warning(
-                "To retrieve rich user data for an SAP SuccessFactors identity provider, the following keys in "
-                "'other_settings' are required, but were missing: %s",
+                u"To retrieve rich user data for an SAP SuccessFactors identity provider, the following keys in "
+                u"'other_settings' are required, but were missing: %s",
                 missing
             )
             return missing
@@ -381,14 +401,14 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         token_data = transaction_data.get('token_data')
         token_data = token_data if token_data else 'Not available'
         log_msg_template = (
-            'SAPSuccessFactors exception received for {operation_name} request.  ' +
-            'URL: {url}  ' +
-            'Company ID: {company_id}.  ' +
-            'User ID: {user_id}.  ' +
-            'Error message: {err_msg}.  ' +
-            'System message: {sys_msg}.  ' +
-            'Headers: {headers}.  ' +
-            'Token Data: {token_data}.'
+            u'SAPSuccessFactors exception received for {operation_name} request.  ' +
+            u'URL: {url}  ' +
+            u'Company ID: {company_id}.  ' +
+            u'User ID: {user_id}.  ' +
+            u'Error message: {err_msg}.  ' +
+            u'System message: {sys_msg}.  ' +
+            u'Headers: {headers}.  ' +
+            u'Token Data: {token_data}.'
         )
         log_msg = log_msg_template.format(
             operation_name=transaction_data['operation_name'],
@@ -469,7 +489,7 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         if not access_token_data:
             return None
         token_string = access_token_data['access_token']
-        session.headers.update({'Authorization': 'Bearer {}'.format(token_string), 'Accept': 'application/json'})
+        session.headers.update({'Authorization': u'Bearer {}'.format(token_string), 'Accept': 'application/json'})
         session.token_data = access_token_data
         return session
 
@@ -512,7 +532,14 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
             }
             self.log_bizx_api_exception(transaction_data, err)
             return basic_details
-        return self.get_registration_fields(response)
+        registration_fields = self.get_registration_fields(response)
+        # This statement is here for debugging purposes and should be removed when ENT-1500 is resolved.
+        if user_id != registration_fields.get('username'):
+            log.info(u'loggedinuser_id %s is different from BizX username %s',
+                     user_id,
+                     registration_fields.get('username'))
+
+        return registration_fields
 
 
 def get_saml_idp_choices():
@@ -537,7 +564,7 @@ def get_saml_idp_class(idp_identifier_string):
     }
     if idp_identifier_string not in choices:
         log.error(
-            '%s is not a valid EdXSAMLIdentityProvider subclass; using EdXSAMLIdentityProvider base class.',
+            u'%s is not a valid EdXSAMLIdentityProvider subclass; using EdXSAMLIdentityProvider base class.',
             idp_identifier_string
         )
     return choices.get(idp_identifier_string, EdXSAMLIdentityProvider)

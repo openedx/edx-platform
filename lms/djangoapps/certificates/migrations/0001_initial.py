@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
-from django.db import migrations, models
-import jsonfield.fields
-import model_utils.fields
 import django.db.models.deletion
 import django.utils.timezone
-from badges.models import validate_badge_image
+import jsonfield.fields
+import model_utils.fields
 from django.conf import settings
-from lms.djangoapps.certificates import models as cert_models
+from django.db import migrations, models
 from opaque_keys.edx.django.models import CourseKeyField
+
+from badges.models import validate_badge_image
+from lms.djangoapps.certificates import models as cert_models
 
 
 class Migration(migrations.Migration):

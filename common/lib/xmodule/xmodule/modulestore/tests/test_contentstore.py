@@ -1,22 +1,25 @@
 """
  Test contentstore.mongo functionality
 """
-import logging
-from uuid import uuid4
-import unittest
-import mimetypes
-from tempfile import mkdtemp
-import path
-import shutil
+from __future__ import absolute_import
 
-from opaque_keys.edx.locator import CourseLocator, AssetLocator
-from opaque_keys.edx.keys import AssetKey
-from xmodule.tests import DATA_DIR
-from xmodule.contentstore.mongo import MongoContentStore
-from xmodule.contentstore.content import StaticContent
-from xmodule.exceptions import NotFoundError
+import logging
+import mimetypes
+import shutil
+import unittest
+from tempfile import mkdtemp
+from uuid import uuid4
+
 import ddt
-from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+import path
+from opaque_keys.edx.keys import AssetKey
+from opaque_keys.edx.locator import AssetLocator, CourseLocator
+
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.mongo import MongoContentStore
+from xmodule.exceptions import NotFoundError
+from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
+from xmodule.tests import DATA_DIR
 
 log = logging.getLogger(__name__)
 
@@ -30,7 +33,6 @@ class TestContentstore(unittest.TestCase):
     """
     Test the methods in contentstore.mongo using deprecated and non-deprecated keys
     """
-    shard = 2
 
     # don't use these 2 class vars as they restore behavior once the tests are done
     asset_deprecated = None

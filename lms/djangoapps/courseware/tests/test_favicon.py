@@ -1,3 +1,9 @@
+"""
+Tests of the courseware favicon
+"""
+
+from __future__ import absolute_import
+
 from django.test import TestCase
 from django.test.utils import override_settings
 
@@ -8,7 +14,6 @@ class FaviconTestCase(UrlResetMixin, TestCase):
     """
     Tests of the courseware favicon.
     """
-    shard = 1
 
     def test_favicon_redirect(self):
         resp = self.client.get("/favicon.ico")

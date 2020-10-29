@@ -1,30 +1,32 @@
 """
 Declaration of CourseOverview model
 """
+from __future__ import absolute_import
+
 import json
 import logging
-from urlparse import urlparse, urlunparse
 
+import six
+from ccx_keys.locator import CCXLocator
+from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Q
-from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField, IntegerField
+from django.db.models.fields import BooleanField, DateTimeField, DecimalField, FloatField, IntegerField, TextField
 from django.db.utils import IntegrityError
 from django.template import defaultfilters
-
-from ccx_keys.locator import CCXLocator
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
-from six import text_type
+from six import text_type  # pylint: disable=ungrouped-imports
+from six.moves.urllib.parse import urlparse, urlunparse  # pylint: disable=import-error
 
-from config_models.models import ConfigurationModel
-from lms.djangoapps import django_comment_client
+from lms.djangoapps.discussion import django_comment_client
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from static_replace.models import AssetBaseUrlConfig
-from xmodule import course_metadata_utils, block_metadata_utils
-from xmodule.course_module import CourseDescriptor, DEFAULT_START_DATE
+from xmodule import block_metadata_utils, course_metadata_utils
+from xmodule.course_module import DEFAULT_START_DATE, CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 
@@ -41,6 +43,8 @@ class CourseOverview(TimeStampedModel):
         user dashboard (enrolled courses)
         course catalog (courses to enroll in)
         course about (meta data about the course)
+
+    .. no_pii:
     """
 
     class Meta(object):
@@ -148,10 +152,10 @@ class CourseOverview(TimeStampedModel):
 
         course_overview = cls.objects.filter(id=course.id)
         if course_overview.exists():
-            log.info('Updating course overview for %s.', unicode(course.id))
+            log.info(u'Updating course overview for %s.', six.text_type(course.id))
             course_overview = course_overview.first()
         else:
-            log.info('Creating course overview for %s.', unicode(course.id))
+            log.info(u'Creating course overview for %s.', six.text_type(course.id))
             course_overview = cls()
 
         course_overview.version = cls.VERSION
@@ -250,7 +254,7 @@ class CourseOverview(TimeStampedModel):
                     pass
                 except Exception:
                     log.exception(
-                        "CourseOverview for course %s failed!",
+                        u"CourseOverview for course %s failed!",
                         course_id,
                     )
                     raise
@@ -258,9 +262,9 @@ class CourseOverview(TimeStampedModel):
                 return course_overview
             elif course is not None:
                 raise IOError(
-                    "Error while loading course {} from the module store: {}",
-                    unicode(course_id),
-                    course.error_msg if isinstance(course, ErrorDescriptor) else unicode(course)
+                    u"Error while loading course {} from the module store: {}",
+                    six.text_type(course_id),
+                    course.error_msg if isinstance(course, ErrorDescriptor) else six.text_type(course)
                 )
             else:
                 raise cls.DoesNotExist()
@@ -410,7 +414,8 @@ class CourseOverview(TimeStampedModel):
         migrate and test switching to display_name_with_default, which is no
         longer escaped.
         """
-        return block_metadata_utils.display_name_with_default_escaped(self)
+        # pylint: disable=line-too-long
+        return block_metadata_utils.display_name_with_default_escaped(self)  # xss-lint: disable=python-deprecated-display-name
 
     @property
     def dashboard_start_display(self):
@@ -541,8 +546,8 @@ class CourseOverview(TimeStampedModel):
                 whether the requested CourseOverview objects should be
                 forcefully updated (i.e., re-synched with the modulestore).
         """
-        log.info('Generating course overview for %d courses.', len(course_keys))
-        log.debug('Generating course overview(s) for the following courses: %s', course_keys)
+        log.info(u'Generating course overview for %d courses.', len(course_keys))
+        log.debug(u'Generating course overview(s) for the following courses: %s', course_keys)
 
         action = CourseOverview.load_from_module_store if force_update else CourseOverview.get_from_id
 
@@ -551,8 +556,8 @@ class CourseOverview(TimeStampedModel):
                 action(course_key)
             except Exception as ex:  # pylint: disable=broad-except
                 log.exception(
-                    'An error occurred while generating course overview for %s: %s',
-                    unicode(course_key),
+                    u'An error occurred while generating course overview for %s: %s',
+                    six.text_type(course_key),
                     text_type(ex),
                 )
 
@@ -561,7 +566,7 @@ class CourseOverview(TimeStampedModel):
     @classmethod
     def get_all_courses(cls, orgs=None, filter_=None):
         """
-        Returns all CourseOverview objects in the database.
+        Return a queryset containing all CourseOverview objects in the database.
 
         Arguments:
             orgs (list[string]): Optional parameter that allows case-insensitive
@@ -721,12 +726,14 @@ class CourseOverview(TimeStampedModel):
 
     def __unicode__(self):
         """Represent ourselves with the course key."""
-        return unicode(self.id)
+        return six.text_type(self.id)
 
 
 class CourseOverviewTab(models.Model):
     """
     Model for storing and caching tabs information of a course.
+
+    .. no_pii:
     """
     tab_id = models.CharField(max_length=50)
     course_overview = models.ForeignKey(CourseOverview, db_index=True, related_name="tabs", on_delete=models.CASCADE)
@@ -799,6 +806,8 @@ class CourseOverviewImageSet(TimeStampedModel):
        process to do it, and it can happen in a follow-on PR if anyone is
        interested in extending this functionality.
 
+
+    .. no_pii:
     """
     course_overview = models.OneToOneField(CourseOverview, db_index=True, related_name="image_set",
                                            on_delete=models.CASCADE)
@@ -838,7 +847,7 @@ class CourseOverviewImageSet(TimeStampedModel):
                 image_set.large_url = create_course_image_thumbnail(course, config.large)
             except Exception:  # pylint: disable=broad-except
                 log.exception(
-                    "Could not create thumbnail for course %s with image %s (small=%s), (large=%s)",
+                    u"Could not create thumbnail for course %s with image %s (small=%s), (large=%s)",
                     course.id,
                     course.course_image,
                     config.small,
@@ -880,6 +889,8 @@ class CourseOverviewImageConfig(ConfigurationModel):
     to take effect. You might want to do this if you're doing precise theming of
     your install of edx-platform... but really, you probably don't want to do this
     at all at the moment, given how new this is. :-P
+
+    .. no_pii:
     """
     # Small thumbnail, for things like the student dashboard
     small_width = models.IntegerField(default=375)

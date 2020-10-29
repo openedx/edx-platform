@@ -1,14 +1,16 @@
 """
 Tests for credit courses on the student dashboard.
 """
+from __future__ import absolute_import
+
 import datetime
 import unittest
 
 import ddt
 import pytz
 from django.conf import settings
-from django.urls import reverse
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch
 
 from openedx.core.djangoapps.credit import api as credit_api
@@ -233,7 +235,7 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
         self._make_eligible()
 
         # The user should have the option to purchase credit
-        with patch('student.views.dashboard.get_credit_provider_display_names') as mock_method:
+        with patch('student.views.dashboard.get_credit_provider_attribute_values') as mock_method:
             mock_method.return_value = providers_list
             response = self._load_dashboard()
 

@@ -1,6 +1,8 @@
 """
 Mixins for TestCase classes that need to account for multiple sites
 """
+from __future__ import absolute_import
+
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 
 

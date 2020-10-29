@@ -1,12 +1,16 @@
 """
 Test for the registration code status information.
 """
+from __future__ import absolute_import
+
 import json
 
-from django.urls import reverse
+import six
 from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from six import text_type
+from six.moves import range
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -31,7 +35,6 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
     """
     Test registration code status.
     """
-    shard = 1
 
     @classmethod
     def setUpClass(cls):
@@ -101,7 +104,7 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
         response = self.client.get(self.lookup_code_url, data)
         self.assertEqual(response.status_code, 400)
         json_dict = json.loads(response.content)
-        message = _('The enrollment code ({code}) was not found for the {course_name} course.').format(
+        message = _(u'The enrollment code ({code}) was not found for the {course_name} course.').format(
             course_name=self.course.display_name, code=data['registration_code']
         )
         self.assertEqual(message, json_dict['message'])
@@ -121,7 +124,7 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
         for i in range(2):
             CourseRegistrationCode.objects.create(
                 code='reg_code{}'.format(i),
-                course_id=unicode(self.course.id),
+                course_id=six.text_type(self.course.id),
                 created_by=self.instructor,
                 invoice=self.sale_invoice,
                 invoice_item=self.invoice_item,
@@ -239,7 +242,7 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 400)
 
         json_dict = json.loads(response.content)
-        message = _('The enrollment code ({code}) was not found for the {course_name} course.').format(
+        message = _(u'The enrollment code ({code}) was not found for the {course_name} course.').format(
             course_name=self.course.display_name, code=data['registration_code']
         )
         self.assertEqual(message, json_dict['message'])
@@ -299,5 +302,5 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 400)
 
         json_dict = json.loads(response.content)
-        message = _('The redemption does not exist against enrollment code ({code}).').format(code=reg_code.code)
+        message = _(u'The redemption does not exist against enrollment code ({code}).').format(code=reg_code.code)
         self.assertEqual(message, json_dict['message'])

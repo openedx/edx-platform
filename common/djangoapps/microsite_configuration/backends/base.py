@@ -7,11 +7,11 @@ AbstractBaseMicrositeBackend is Abstract Base Class for the microsite configurat
 BaseMicrositeBackend is Base Class for microsite configuration backend.
 BaseMicrositeTemplateBackend is Base Class for the microsite template backend.
 """
-
 from __future__ import absolute_import
 
 import abc
 import os.path
+import six
 import threading
 
 from django.conf import settings
@@ -20,11 +20,10 @@ from util.url import strip_port_from_host
 
 
 # pylint: disable=unused-argument
-class AbstractBaseMicrositeBackend(object):
+class AbstractBaseMicrositeBackend(six.with_metaclass(abc.ABCMeta, object)):
     """
     Abstract Base Class for the microsite backends.
     """
-    __metaclass__ = abc.ABCMeta
 
     def __init__(self, **kwargs):
         pass
@@ -207,7 +206,7 @@ class BaseMicrositeBackend(AbstractBaseMicrositeBackend):
         """
         config = {}
 
-        for key, value in settings.MICROSITE_CONFIGURATION.iteritems():
+        for key, value in six.iteritems(settings.MICROSITE_CONFIGURATION):
             config[key] = value
 
         return config
@@ -222,7 +221,7 @@ class BaseMicrositeBackend(AbstractBaseMicrositeBackend):
             return default
 
         # Filter at the setting file
-        for value in settings.MICROSITE_CONFIGURATION.itervalues():
+        for value in six.itervalues(settings.MICROSITE_CONFIGURATION):
             org_filter = value.get('course_org_filter', None)
             if org_filter == org:
                 return value.get(val_name, default)
@@ -239,7 +238,7 @@ class BaseMicrositeBackend(AbstractBaseMicrositeBackend):
             return org_filter_set
 
         # Get the orgs in the db
-        for microsite in settings.MICROSITE_CONFIGURATION.itervalues():
+        for microsite in six.itervalues(settings.MICROSITE_CONFIGURATION):
             org_filter = microsite.get('course_org_filter')
             if org_filter:
                 org_filter_set.add(org_filter)

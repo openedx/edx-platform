@@ -1,5 +1,7 @@
 """Tests of comprehensive theming."""
 
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.contrib import staticfiles
 from django.test import TestCase
@@ -12,7 +14,6 @@ from openedx.core.lib.tempdir import create_symlink, delete_symlink, mkdtemp_cle
 
 class TestComprehensiveTheming(TestCase):
     """Test comprehensive theming."""
-    shard = 4
 
     def setUp(self):
         super(TestComprehensiveTheming, self).setUp()

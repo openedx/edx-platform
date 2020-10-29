@@ -32,7 +32,13 @@ LOGFIELDS = [
 
 
 class TrackingLog(models.Model):
-    """Defines the fields that are stored in the tracking log database."""
+    """
+    Defines the fields that are stored in the tracking log database.
+
+    .. pii: Stores a great deal of PII as it is an event tracker of browsing history, unused and empty on edx.org
+    .. pii_types: username, ip, other
+    .. pii_retirement: retained
+    """
 
     dtcreated = models.DateTimeField('creation date', auto_now_add=True)
     username = models.CharField(max_length=32, blank=True)

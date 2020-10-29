@@ -1,9 +1,11 @@
 """
 Support tool for disabling user accounts.
 """
+from __future__ import absolute_import
+
 from django.contrib.auth import get_user_model
-from django.urls import reverse
 from django.db.models import Q
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import View

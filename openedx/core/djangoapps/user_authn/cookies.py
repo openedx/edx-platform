@@ -18,7 +18,7 @@ from edx_rest_framework_extensions.auth.jwt import cookies as jwt_cookies
 from edx_rest_framework_extensions.auth.jwt.constants import JWT_DELIMITER
 from oauth2_provider.models import Application
 from openedx.core.djangoapps.oauth_dispatch.adapters import DOTAdapter
-from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token, refresh_dot_access_token
+from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_from_token
 from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
@@ -38,9 +38,6 @@ JWT_COOKIE_NAMES = (
 
     # Signature section of a JSON Web Token.
     jwt_cookies.jwt_cookie_signature_name(),
-
-    # Refresh token, which can be used to get a new JSON Web Token.
-    jwt_cookies.jwt_refresh_cookie_name(),
 )
 
 # TODO (ARCH-245): Remove the following deprecated cookies.
@@ -89,21 +86,13 @@ def delete_logged_in_cookies(response):
 def standard_cookie_settings(request):
     """ Returns the common cookie settings (e.g. expiration time). """
 
-    if request.session.get_expire_at_browser_close():
-        max_age = None
-        expires = None
-    else:
-        max_age = request.session.get_expiry_age()
-        _expires_time = time.time() + max_age
-        expires = cookie_date(_expires_time)
-
     cookie_settings = {
-        'max_age': max_age,
-        'expires': expires,
         'domain': settings.SESSION_COOKIE_DOMAIN,
         'path': '/',
         'httponly': None,
     }
+
+    _set_expires_in_cookie_settings(cookie_settings, request.session.get_expiry_age())
 
     # In production, TLS should be enabled so that this cookie is encrypted
     # when we send it.  We also need to set "secure" to True so that the browser
@@ -117,6 +106,20 @@ def standard_cookie_settings(request):
     cookie_settings['secure'] = request.is_secure()
 
     return cookie_settings
+
+
+def _set_expires_in_cookie_settings(cookie_settings, expires_in):
+    """
+    Updates the max_age and expires fields of the given cookie_settings,
+    based on the value of expires_in.
+    """
+    expires_time = time.time() + expires_in
+    expires = cookie_date(expires_time)
+
+    cookie_settings.update({
+        'max_age': expires_in,
+        'expires': expires,
+    })
 
 
 def set_logged_in_cookies(request, response, user):
@@ -151,23 +154,17 @@ def set_logged_in_cookies(request, response, user):
     return response
 
 
-def refresh_jwt_cookies(request, response):
+def refresh_jwt_cookies(request, response, user):
     """
-    Resets the JWT related cookies in the response, while expecting a refresh
-    cookie in the request.
+    Resets the JWT related cookies in the response for the given user.
     """
-    try:
-        refresh_token = request.COOKIES[jwt_cookies.jwt_refresh_cookie_name()]
-    except KeyError:
-        raise AuthFailedError(u"JWT Refresh Cookie not found in request.")
-
-    # TODO don't extend the cookie expiration - reuse value from existing cookie
     cookie_settings = standard_cookie_settings(request)
-    _create_and_set_jwt_cookies(response, request, cookie_settings, refresh_token=refresh_token)
+    _create_and_set_jwt_cookies(response, request, cookie_settings, user=user)
+
     return response
 
 
-def _set_deprecated_user_info_cookie(response, request, user, cookie_settings=None):
+def _set_deprecated_user_info_cookie(response, request, user, cookie_settings):
     """
     Sets the user info cookie on the response.
 
@@ -184,7 +181,6 @@ def _set_deprecated_user_info_cookie(response, request, user, cookie_settings=No
         }
     }
     """
-    cookie_settings = cookie_settings or standard_cookie_settings(request)
     user_info = _get_user_info_cookie_data(request, user)
     response.set_cookie(
         settings.EDXMKTG_USER_INFO_COOKIE_NAME.encode('utf-8'),
@@ -249,7 +245,7 @@ def _get_user_info_cookie_data(request, user):
     return user_info
 
 
-def _create_and_set_jwt_cookies(response, request, cookie_settings, user=None, refresh_token=None):
+def _create_and_set_jwt_cookies(response, request, cookie_settings, user=None):
     """ Sets a cookie containing a JWT on the response. """
 
     # Skip setting JWT cookies for most unit tests, since it raises errors when
@@ -259,28 +255,30 @@ def _create_and_set_jwt_cookies(response, request, cookie_settings, user=None, r
     if settings.FEATURES.get('DISABLE_SET_JWT_COOKIES_FOR_TESTS', False):
         return
 
-    # For security reasons, the JWT that is embedded inside the cookie expires
-    # much sooner than the cookie itself, per the following setting.
     expires_in = settings.JWT_AUTH['JWT_IN_COOKIE_EXPIRATION']
+    _set_expires_in_cookie_settings(cookie_settings, expires_in)
 
-    oauth_application = _get_login_oauth_client()
-    if refresh_token:
-        access_token = refresh_dot_access_token(
-            request, oauth_application.client_id, refresh_token, expires_in=expires_in,
-        )
-    else:
-        access_token = create_dot_access_token(
-            request, user, oauth_application, expires_in=expires_in, scopes=['email', 'profile'],
-        )
-    jwt = create_jwt_from_token(access_token, DOTAdapter(), use_asymmetric_key=True)
+    jwt = _create_jwt(request, user, expires_in)
     jwt_header_and_payload, jwt_signature = _parse_jwt(jwt)
+
     _set_jwt_cookies(
         response,
         cookie_settings,
         jwt_header_and_payload,
         jwt_signature,
-        access_token['refresh_token'],
     )
+
+
+def _create_jwt(request, user, expires_in):
+    """
+    Creates and returns a jwt for the given user with the given expires_in value.
+    """
+    oauth_application = _get_login_oauth_client()
+    access_token = create_dot_access_token(
+        # Note: Scopes for JWT cookies do not require additional permissions
+        request, user, oauth_application, expires_in=expires_in, scopes=['user_id', 'email', 'profile'],
+    )
+    return create_jwt_from_token(access_token, DOTAdapter(), use_asymmetric_key=True)
 
 
 def _parse_jwt(jwt):
@@ -293,7 +291,7 @@ def _parse_jwt(jwt):
     return header_and_payload, signature
 
 
-def _set_jwt_cookies(response, cookie_settings, jwt_header_and_payload, jwt_signature, refresh_token):
+def _set_jwt_cookies(response, cookie_settings, jwt_header_and_payload, jwt_signature):
     """
     Sets the given jwt_header_and_payload, jwt_signature, and refresh token in 3 different cookies.
     The latter 2 cookies are set as httponly.
@@ -309,11 +307,6 @@ def _set_jwt_cookies(response, cookie_settings, jwt_header_and_payload, jwt_sign
     response.set_cookie(
         jwt_cookies.jwt_cookie_signature_name(),
         jwt_signature,
-        **cookie_settings
-    )
-    response.set_cookie(
-        jwt_cookies.jwt_refresh_cookie_name(),
-        refresh_token,
         **cookie_settings
     )
 

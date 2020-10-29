@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-import ddt
 import json
 from io import BytesIO
-from mock import Mock, patch, ANY
 
+import ddt
 from django.test.testcases import TestCase
 from django.urls import reverse
 from edxval import api
+from mock import ANY, Mock, patch
 
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url

@@ -14,6 +14,8 @@ from xblock.core import XBlockAside
 class XBlockAsidesConfig(ConfigurationModel):
     """
     Configuration for XBlockAsides.
+
+    .. no_pii:
     """
 
     class Meta(ConfigurationModel.Meta):

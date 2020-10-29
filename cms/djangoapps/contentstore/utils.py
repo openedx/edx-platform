@@ -15,14 +15,10 @@ from opaque_keys.edx.locator import LibraryLocator
 from pytz import UTC
 from six import text_type
 
-from django_comment_common.models import assign_default_role
-from django_comment_common.utils import seed_permissions_roles
+from openedx.core.djangoapps.django_comment_common.models import assign_default_role
+from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.appsembler.sites.utils import get_lms_link_from_course_key
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-from openedx.features.course_duration_limits.config import (
-    CONTENT_TYPE_GATING_FLAG,
-    FEATURE_BASED_ENROLLMENT_GLOBAL_KILL_FLAG
-)
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
 from student import auth
@@ -102,7 +98,7 @@ def _remove_instructors(course_key):
     try:
         remove_all_instructors(course_key)
     except Exception as err:
-        log.error("Error in deleting course groups for {0}: {1}".format(course_key, err))
+        log.error(u"Error in deleting course groups for {0}: {1}".format(course_key, err))
 
 
 def get_lms_link_for_item(location, preview=False):
@@ -305,7 +301,7 @@ def get_split_group_display_name(xblock, course):
     """
     for user_partition in get_user_partition_info(xblock, schemes=['random'], course=course):
         for group in user_partition['groups']:
-            if 'Group ID {group_id}'.format(group_id=group['id']) == xblock.display_name_with_default:
+            if u'Group ID {group_id}'.format(group_id=group['id']) == xblock.display_name_with_default:
                 return group['name']
 
 
@@ -373,7 +369,7 @@ def get_user_partition_info(xblock, schemes=None, course=None):
 
     if course is None:
         log.warning(
-            "Could not find course %s to retrieve user partition information",
+            u"Could not find course %s to retrieve user partition information",
             xblock.location.course_key
         )
         return []
@@ -452,12 +448,9 @@ def get_visibility_partition_info(xblock, course=None):
         if len(partition["groups"]) > 1 or any(group["selected"] for group in partition["groups"]):
             selectable_partitions.append(partition)
 
-    flag_enabled = CONTENT_TYPE_GATING_FLAG.is_enabled() and not FEATURE_BASED_ENROLLMENT_GLOBAL_KILL_FLAG.is_enabled()
     course_key = xblock.scope_ids.usage_id.course_key
     is_library = isinstance(course_key, LibraryLocator)
-    if not is_library and (
-        flag_enabled or ContentTypeGatingConfig.current(course_key=course_key).studio_override_enabled
-    ):
+    if not is_library and ContentTypeGatingConfig.current(course_key=course_key).studio_override_enabled:
         selectable_partitions += get_user_partition_info(xblock, schemes=[CONTENT_TYPE_GATING_SCHEME], course=course)
 
     # Now add the cohort user partitions.
@@ -478,7 +471,7 @@ def get_visibility_partition_info(xblock, course=None):
                 else:
                     # Translators: This is building up a list of groups. It is marked for translation because of the
                     # comma, which is used as a separator between each group.
-                    selected_groups_label = _('{previous_groups}, {current_group}').format(
+                    selected_groups_label = _(u'{previous_groups}, {current_group}').format(
                         previous_groups=selected_groups_label,
                         current_group=group['name']
                     )

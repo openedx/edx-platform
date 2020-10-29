@@ -3,13 +3,13 @@
 """
 Acceptance tests for CMS Video Module.
 """
+from __future__ import absolute_import
+
 import os
 from unittest import skipIf
 
-import pytest
-from mock import patch
-
 from bok_choy.promise import EmptyPromise
+from mock import patch
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -334,11 +334,11 @@ class CMSVideoTest(CMSVideoBaseTest):
         self.video.click_player_button('play')
 
 
-@pytest.mark.a11y
 class CMSVideoA11yTest(CMSVideoBaseTest):
     """
     CMS Video Accessibility Test Class
     """
+    a11y = True
 
     def setUp(self):
         browser = os.environ.get('SELENIUM_BROWSER', 'firefox')

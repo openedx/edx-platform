@@ -3,13 +3,15 @@ Extra views required for SSO
 """
 from django.conf import settings
 from django.urls import reverse
-from django.http import Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseServerError
+from django.http import Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseServerError, HttpResponseNotFound
 from django.shortcuts import redirect, render
+from django.views.generic.base import View
 from django.views.decorators.csrf import csrf_exempt
 from social_django.utils import load_strategy, load_backend, psa
 from social_django.views import complete
 from social_core.utils import setting_name
 
+from student.helpers import get_next_url_for_login_page
 from student.models import UserProfile
 from student.views import compose_and_send_activation_email
 import third_party_auth
@@ -110,3 +112,41 @@ def post_to_custom_auth_form(request):
         'hmac': pipeline_data['hmac'],
     }
     return render(request, 'third_party_auth/post_custom_auth_entry.html', data)
+
+
+class IdPRedirectView(View):
+    """
+    Redirect to an IdP's login page if the IdP exists; otherwise, return a 404.
+
+    Example usage:
+
+        GET auth/idp_redirect/saml-default
+
+    """
+    def get(self, request, *args, **kwargs):
+        """
+        Return either a redirect to the login page of an identity provider that
+        corresponds to the provider_slug keyword argument or a 404 if the
+        provider_slug does not correspond to an identity provider.
+
+        Args:
+            request (HttpRequest)
+
+        Keyword Args:
+            provider_slug (str): a slug corresponding to a configured identity provider
+
+        Returns:
+            HttpResponse: 302 to a provider's login url if the provider_slug kwarg matches an identity provider
+            HttpResponse: 404 if the provider_slug kwarg does not match an identity provider
+        """
+        # this gets the url to redirect to after login/registration/third_party_auth
+        # it also handles checking the safety of the redirect url (next query parameter)
+        # it checks against settings.LOGIN_REDIRECT_WHITELIST, so be sure to add the url
+        # to this setting
+        next_destination_url = get_next_url_for_login_page(request)
+
+        try:
+            url = pipeline.get_login_url(kwargs['provider_slug'], pipeline.AUTH_ENTRY_LOGIN, next_destination_url)
+            return redirect(url)
+        except ValueError:
+            return HttpResponseNotFound()

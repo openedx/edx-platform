@@ -1,5 +1,5 @@
 # Do things in edx-platform
-.PHONY: clean extract_translations help pull_translations push_translations requirements upgrade
+.PHONY: clean docs extract_translations help pull pull_translations push_translations requirements shell upgrade
 
 # Careful with mktemp syntax: it has to work on Mac and Ubuntu, which have differences.
 PRIVATE_FILES := $(shell mktemp -u /tmp/private_files.XXXXXX)
@@ -17,6 +17,10 @@ clean: ## archive and delete most git-ignored files
 	-git clean -fdX
 	tar xf $(PRIVATE_FILES)
 	rm $(PRIVATE_FILES)
+
+docs: ## build the developer documentation for this repository
+	rm -rf docs/_build docs/cms docs/common docs/lms docs/openedx
+	cd docs; make html
 
 extract_translations: ## extract localizable strings from sources
 	i18n_tool extract -v
@@ -37,8 +41,18 @@ pull_translations: ## pull translations from Transifex
 detect_changed_source_translations: ## check if translation files are up-to-date
 	i18n_tool changed
 
+pull: ## update the Docker image used by "make shell"
+	docker pull edxops/edxapp:latest
+
 requirements: ## install development environment requirements
 	pip install -qr requirements/edx/development.txt --exists-action w
+
+shell: ## launch a bash shell in a Docker container with all edx-platform dependencies installed
+	docker run -it -e "NO_PYTHON_UNINSTALL=1" -e "PIP_INDEX_URL=https://pypi.python.org/simple" -e TERM \
+	-v `pwd`:/edx/app/edxapp/edx-platform:cached \
+	-v edxapp_lms_assets:/edx/var/edxapp/staticfiles/ \
+	-v edxapp_node_modules:/edx/app/edxapp/edx-platform/node_modules \
+	edxops/edxapp:latest /edx/app/edxapp/devstack.sh open
 
 # Order is very important in this list: files must appear after everything they include!
 REQ_FILES = \
@@ -57,7 +71,7 @@ upgrade: ## update the pip requirements files to use the latest releases satisfy
 	@for f in $(REQ_FILES); do \
 		echo ; \
 		echo "== $$f ===============================" ; \
-		pip-compile -v --no-emit-trusted-host --no-index --upgrade -o $$f.txt $$f.in || exit 1; \
+		pip-compile -v --no-emit-trusted-host --no-index --rebuild --upgrade -o $$f.txt $$f.in || exit 1; \
 	done
 	# Post process all of the files generated above to work around open pip-tools issues
 	scripts/post-pip-compile.sh $(REQ_FILES:=.txt)

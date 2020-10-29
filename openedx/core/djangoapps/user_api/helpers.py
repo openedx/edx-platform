@@ -268,7 +268,7 @@ class FormDescription(object):
                 if key in allowed_restrictions:
                     field_dict["restrictions"][key] = val
                 else:
-                    msg = "Restriction '{restriction}' is not allowed for field type '{field_type}'".format(
+                    msg = u"Restriction '{restriction}' is not allowed for field type '{field_type}'".format(
                         restriction=key,
                         field_type=field_type
                     )

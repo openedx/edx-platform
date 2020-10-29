@@ -95,17 +95,17 @@ def add_email_marketing_cookies(sender, response=None, user=None,
         _log_sailthru_api_call_time(time_before_call)
 
     except TimeoutError as exc:
-        log.error("Timeout error while attempting to obtain cookie from Sailthru: %s", text_type(exc))
+        log.error(u"Timeout error while attempting to obtain cookie from Sailthru: %s", text_type(exc))
         return response
     except SailthruClientError as exc:
-        log.error("Exception attempting to obtain cookie from Sailthru: %s", text_type(exc))
+        log.error(u"Exception attempting to obtain cookie from Sailthru: %s", text_type(exc))
         return response
     except Exception:
-        log.error("Exception Connecting to celery task for %s", user.email)
+        log.error(u"Exception Connecting to celery task for %s", user.email)
         return response
 
     if not cookie:
-        log.error("No cookie returned attempting to obtain cookie from Sailthru for %s", user.email)
+        log.error(u"No cookie returned attempting to obtain cookie from Sailthru for %s", user.email)
         return response
     else:
         response.set_cookie(
@@ -115,7 +115,7 @@ def add_email_marketing_cookies(sender, response=None, user=None,
             domain=settings.SESSION_COOKIE_DOMAIN,
             path='/',
         )
-        log.info("sailthru_hid cookie:%s successfully retrieved for user %s", cookie, user.email)
+        log.info(u"sailthru_hid cookie:%s successfully retrieved for user %s", cookie, user.email)
 
     return response
 
@@ -255,7 +255,7 @@ def _log_sailthru_api_call_time(time_before_call):
     time_after_call = datetime.datetime.now()
     delta_sailthru_api_call_time = time_after_call - time_before_call
 
-    log.info("Started at %s and ended at %s, time spent:%s milliseconds",
+    log.info(u"Started at %s and ended at %s, time spent:%s milliseconds",
              time_before_call.isoformat(' '),
              time_after_call.isoformat(' '),
              delta_sailthru_api_call_time.microseconds / 1000)

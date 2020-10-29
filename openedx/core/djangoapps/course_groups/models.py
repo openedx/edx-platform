@@ -2,6 +2,8 @@
 Django models related to course groups functionality.
 """
 
+from __future__ import absolute_import
+
 import json
 import logging
 
@@ -10,8 +12,8 @@ from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
-
 from opaque_keys.edx.django.models import CourseKeyField
+
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
 
 log = logging.getLogger(__name__)
@@ -22,6 +24,8 @@ class CourseUserGroup(models.Model):
     This model represents groups of users in a course.  Groups may have different types,
     which may be treated specially.  For example, a user can be in at most one cohort per
     course, and cohorts are used to split up the forums by group.
+
+    .. no_pii:
     """
     class Meta(object):
         unique_together = (('name', 'course_id'), )
@@ -67,8 +71,11 @@ class CourseUserGroup(models.Model):
 
 
 class CohortMembership(models.Model):
-    """Used internally to enforce our particular definition of uniqueness"""
+    """
+    Used internally to enforce our particular definition of uniqueness.
 
+    .. no_pii:
+    """
     course_user_group = models.ForeignKey(CourseUserGroup, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course_id = CourseKeyField(max_length=255)
@@ -107,7 +114,7 @@ class CohortMembership(models.Model):
                 membership.course_user_group.users.add(user)
                 previous_cohort = None
             elif membership.course_user_group == cohort:
-                raise ValueError("User {user_name} already present in cohort {cohort_name}".format(
+                raise ValueError(u"User {user_name} already present in cohort {cohort_name}".format(
                     user_name=user.username,
                     cohort_name=cohort.name))
             else:
@@ -122,8 +129,7 @@ class CohortMembership(models.Model):
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         self.full_clean(validate_unique=False)
 
-        log.info("Saving CohortMembership for user '%s' in '%s'", self.user.id, self.course_id)
-
+        log.info(u"Saving CohortMembership for user '%s' in '%s'", self.user.id, self.course_id)
         return super(CohortMembership, self).save(force_insert=force_insert,
                                                   force_update=force_update,
                                                   using=using,
@@ -144,6 +150,8 @@ def remove_user_from_cohort(sender, instance, **kwargs):  # pylint: disable=unus
 class CourseUserGroupPartitionGroup(models.Model):
     """
     Create User Partition Info.
+
+    .. no_pii:
     """
     course_user_group = models.OneToOneField(CourseUserGroup, on_delete=models.CASCADE)
     partition_id = models.IntegerField(
@@ -160,6 +168,8 @@ class CourseCohortsSettings(models.Model):
     """
     This model represents cohort settings for courses.
     The only non-deprecated fields are `is_cohorted` and `course_id`.
+
+    .. no_pii:
     """
     is_cohorted = models.BooleanField(default=False)
 
@@ -198,6 +208,8 @@ class CourseCohortsSettings(models.Model):
 class CourseCohort(models.Model):
     """
     This model represents cohort related info.
+
+    .. no_pii:
     """
     course_user_group = models.OneToOneField(CourseUserGroup, unique=True, related_name='cohort',
                                              on_delete=models.CASCADE)
@@ -232,6 +244,10 @@ class CourseCohort(models.Model):
 class UnregisteredLearnerCohortAssignments(DeletableByUserValue, models.Model):
     """
     Tracks the assignment of an unregistered learner to a course's cohort.
+
+    .. pii: The email field stores PII.
+    .. pii_types: email_address
+    .. pii_retirement: local_api
     """
     # pylint: disable=model-missing-unicode
     class Meta(object):

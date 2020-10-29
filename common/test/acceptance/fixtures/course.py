@@ -74,7 +74,7 @@ class XBlockFixtureDesc(object):
         Return a string representation of the description.
         Useful for error messages.
         """
-        return dedent("""
+        return dedent(u"""
             <XBlockFixtureDescriptor:
                 category={0},
                 data={1},
@@ -152,7 +152,7 @@ class CourseFixture(XBlockContainerFixture):
         """
         String representation of the course fixture, useful for debugging.
         """
-        return "<CourseFixture: org='{org}', number='{number}', run='{run}'>".format(**self._course_dict)
+        return u"<CourseFixture: org='{org}', number='{number}', run='{run}'>".format(**self._course_dict)
 
     def add_course_details(self, course_details):
         """
@@ -234,14 +234,14 @@ class CourseFixture(XBlockContainerFixture):
 
         if not response.ok:
             raise FixtureError(
-                "Could not retrieve course outline json.  Status was {0}".format(
+                u"Could not retrieve course outline json.  Status was {0}".format(
                     response.status_code))
 
         try:
             course_outline_json = response.json()
         except ValueError:
             raise FixtureError(
-                "Could not decode course outline as JSON: '{0}'".format(response)
+                u"Could not decode course outline as JSON: '{0}'".format(response)
             )
         return course_outline_json
 
@@ -289,18 +289,18 @@ class CourseFixture(XBlockContainerFixture):
 
         except ValueError:
             raise FixtureError(
-                "Could not parse response from course request as JSON: '{0}'".format(
+                u"Could not parse response from course request as JSON: '{0}'".format(
                     response.content))
 
         # This will occur if the course identifier is not unique
         if err is not None:
-            raise FixtureError("Could not create course {0}.  Error message: '{1}'".format(self, err))
+            raise FixtureError(u"Could not create course {0}.  Error message: '{1}'".format(self, err))
 
         if response.ok:
             self._course_key = response.json()['course_key']
         else:
             raise FixtureError(
-                "Could not create course {0}.  Status was {1}\nResponse content was: {2}".format(
+                u"Could not create course {0}.  Status was {1}\nResponse content was: {2}".format(
                     self._course_dict, response.status_code, response.content))
 
     def _configure_course(self):
@@ -314,14 +314,14 @@ class CourseFixture(XBlockContainerFixture):
 
         if not response.ok:
             raise FixtureError(
-                "Could not retrieve course details.  Status was {0}".format(
+                u"Could not retrieve course details.  Status was {0}".format(
                     response.status_code))
 
         try:
             details = response.json()
         except ValueError:
             raise FixtureError(
-                "Could not decode course details as JSON: '{0}'".format(details)
+                u"Could not decode course details as JSON: '{0}'".format(details)
             )
 
         # Update the old details with our overrides
@@ -335,7 +335,7 @@ class CourseFixture(XBlockContainerFixture):
 
         if not response.ok:
             raise FixtureError(
-                "Could not update course details to '{0}' with {1}: Status was {2}.".format(
+                u"Could not update course details to '{0}' with {1}: Status was {2}.".format(
                     self._course_details, url, response.status_code))
 
     def _install_course_handouts(self):
@@ -346,10 +346,10 @@ class CourseFixture(XBlockContainerFixture):
 
         # Construct HTML with each of the handout links
         handouts_li = [
-            '<li><a href="/static/{handout}">Example Handout</a></li>'.format(handout=handout)
+            u'<li><a href="/static/{handout}">Example Handout</a></li>'.format(handout=handout)
             for handout in self._handouts
         ]
-        handouts_html = '<ol class="treeview-handoutsnav">{}</ol>'.format("".join(handouts_li))
+        handouts_html = u'<ol class="treeview-handoutsnav">{}</ol>'.format("".join(handouts_li))
 
         # Update the course's handouts HTML
         payload = json.dumps({
@@ -363,7 +363,7 @@ class CourseFixture(XBlockContainerFixture):
 
         if not response.ok:
             raise FixtureError(
-                "Could not update course handouts with {0}.  Status was {1}".format(url, response.status_code))
+                u"Could not update course handouts with {0}.  Status was {1}".format(url, response.status_code))
 
     def _install_course_updates(self):
         """
@@ -380,7 +380,7 @@ class CourseFixture(XBlockContainerFixture):
 
             if not response.ok:
                 raise FixtureError(
-                    "Could not add update to course: {0} with {1}.  Status was {2}".format(
+                    u"Could not add update to course: {0} with {1}.  Status was {2}".format(
                         update, url, response.status_code))
 
     def _upload_assets(self):
@@ -406,7 +406,7 @@ class CourseFixture(XBlockContainerFixture):
             upload_response = self.session.post(url, files=files, headers=headers)
 
             if not upload_response.ok:
-                raise FixtureError('Could not upload {asset_name} with {url}. Status code: {code}'.format(
+                raise FixtureError(u'Could not upload {asset_name} with {url}. Status code: {code}'.format(
                     asset_name=asset_name, url=url, code=upload_response.status_code))
 
     def _install_course_textbooks(self):
@@ -421,7 +421,7 @@ class CourseFixture(XBlockContainerFixture):
 
             if not response.ok:
                 raise FixtureError(
-                    "Could not add book to course: {0} with {1}.  Status was {2}".format(
+                    u"Could not add book to course: {0} with {1}.  Status was {2}".format(
                         book, url, response.status_code))
 
     def _add_advanced_settings(self):
@@ -438,7 +438,7 @@ class CourseFixture(XBlockContainerFixture):
 
         if not response.ok:
             raise FixtureError(
-                "Could not update advanced details to '{0}' with {1}: Status was {2}.".format(
+                u"Could not update advanced details to '{0}' with {1}: Status was {2}.".format(
                     self._advanced_settings, url, response.status_code))
 
     def _create_xblock_children(self, parent_loc, xblock_descriptions):

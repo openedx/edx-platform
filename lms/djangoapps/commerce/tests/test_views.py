@@ -1,5 +1,7 @@
 """ Tests for commerce views. """
 
+from __future__ import absolute_import
+
 import json
 
 import ddt
@@ -29,7 +31,6 @@ class UserMixin(object):
 @ddt.ddt
 class ReceiptViewTests(UserMixin, ModuleStoreTestCase):
     """ Tests for the receipt view. """
-    shard = 1
 
     def setUp(self):
         """

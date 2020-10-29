@@ -70,7 +70,7 @@ class TestVideoThumbnails(ModuleStoreTestCase):
                 ),
                 (
                     LOGGER_NAME, 'INFO',
-                    '[video thumbnails] selected course videos: {course_videos} '.format(
+                    u'[video thumbnails] selected course videos: {course_videos} '.format(
                         course_videos=text_type(course_videos)
                     )
                 )
@@ -122,12 +122,12 @@ class TestVideoThumbnails(ModuleStoreTestCase):
             logger.check(
                 (
                     tasks_logger, 'ERROR',
-                    ("[video thumbnails] [run=1] [video-thumbnails-scraping-failed-with-unknown-exc] "
-                     "[edx_video_id=super-soaker] [youtube_id=OscRe3pSP80] [course={}]".format(self.course.id))
+                    (u"[video thumbnails] [run=1] [video-thumbnails-scraping-failed-with-unknown-exc] "
+                     u"[edx_video_id=super-soaker] [youtube_id=OscRe3pSP80] [course={}]".format(self.course.id))
                 ),
                 (
                     tasks_logger, 'ERROR',
-                    ("[video thumbnails] [run=1] [video-thumbnails-scraping-failed-with-unknown-exc] "
-                     "[edx_video_id=medium-soaker] [youtube_id=OscRe3pSP81] [course={}]".format(self.course_2.id))
+                    (u"[video thumbnails] [run=1] [video-thumbnails-scraping-failed-with-unknown-exc] "
+                     u"[edx_video_id=medium-soaker] [youtube_id=OscRe3pSP81] [course={}]".format(self.course_2.id))
                 )
             )

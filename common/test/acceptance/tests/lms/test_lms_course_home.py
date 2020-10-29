@@ -3,9 +3,14 @@
 End-to-end tests for the LMS that utilize the course home page and course outline.
 """
 
+from __future__ import absolute_import
+
+from datetime import datetime, timedelta
+
+import six
+
 from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 from openedx.core.lib.tests import attr
-
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.lms.bookmarks import BookmarksPage
 from ...pages.lms.course_home import CourseHomePage
@@ -62,6 +67,8 @@ class CourseHomeTest(CourseHomeBaseTest):
     """
     Tests the course home page with course outline.
     """
+    shard = 20
+
     def test_course_home(self):
         """
         Smoke test of course goals, course outline, breadcrumbs to and from course outline, and bookmarks.
@@ -95,7 +102,7 @@ class CourseHomeTest(CourseHomeBaseTest):
         }
 
         actual_sections = self.course_home_page.outline.sections
-        for section, subsections in EXPECTED_SECTIONS.iteritems():
+        for section, _ in six.iteritems(EXPECTED_SECTIONS):
             self.assertIn(section, actual_sections)
             self.assertEqual(actual_sections[section], EXPECTED_SECTIONS[section])
 
@@ -139,6 +146,8 @@ class CourseHomeA11yTest(CourseHomeBaseTest):
         course_home_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
+                'landmark-no-duplicate-banner',  # TODO: AC-934
             ]
         })
         course_home_page.a11y_audit.check_for_accessibility_errors()
@@ -153,6 +162,78 @@ class CourseHomeA11yTest(CourseHomeBaseTest):
         course_search_results_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
+                'landmark-no-duplicate-banner',  # TODO: AC-934
             ]
         })
         course_search_results_page.a11y_audit.check_for_accessibility_errors()
+
+
+class CourseOutlineTest(UniqueCourseTest):
+    """
+    Test Suite to verify the course outline page on the LMS.
+    """
+    USERNAME = "STUDENT_TESTER"
+    EMAIL = "student101@example.com"
+
+    def setUp(self):
+        """
+        Initialize pages and install a course fixture.
+        """
+        super(CourseOutlineTest, self).setUp()
+
+        self.course_home_page = CourseHomePage(self.browser, self.course_id)
+        # Install a course with sections and problems
+        self.course_fix = CourseFixture(
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run'],
+            self.course_info['display_name'],
+            start_date=datetime.now() + timedelta(days=-10),
+            end_date=datetime.now() + timedelta(days=10)
+        )
+
+        self.course_fix.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection', metadata={
+                    'due': (datetime.now() + timedelta(days=-20)).isoformat(),
+                    'format': 'Homework'
+                }).add_children(
+                    XBlockFixtureDesc('problem', 'Test Problem', data=load_data_str('multiple_choice.xml')),
+                )
+            ),
+        ).install()
+        # Auto-auth register for the course.
+        auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
+
+    def change_course_pacing_to_self_paced(self):
+        """
+        Change the course pacing from Instructor Paced to Self-paced course
+        for a live course.
+        """
+        self.course_fix.add_course_details({'start_date': (datetime.now() + timedelta(days=5))})
+        self.course_fix.configure_course()
+        self.course_fix.add_course_details({'self_paced': True})
+        self.course_fix.configure_course()
+        self.course_fix.add_course_details({'start_date': (datetime.now() + timedelta(days=-10))})
+        self.course_fix.configure_course()
+
+    def test_outline_when_pacing_changed_to_self_paced(self):
+        """
+        Scenario: Ensure that due dates are not displayed on the course outline page
+                  when switched to self-paced mode from instructor-paced.
+
+        Given an instructor paced course with a due graded content
+        Visit the course outline page
+        Verify the due date visibility
+        Change the course pacing to self-paced
+        Visit the course outline page again
+        Verify that due date is not visible
+        """
+        self.course_home_page.visit()
+        due_date = self.course_home_page.outline.get_subsection_due_date()
+        self.assertIn(str(datetime.now().year), due_date)
+        self.change_course_pacing_to_self_paced()
+        self.course_home_page.visit()
+        due_date = self.course_home_page.outline.get_subsection_due_date()
+        self.assertNotIn(str(datetime.now().year), due_date)

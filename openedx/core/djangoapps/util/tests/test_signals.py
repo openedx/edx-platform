@@ -1,8 +1,10 @@
 # pylint: disable=no-member, missing-docstring
+from __future__ import absolute_import
+
 from unittest import TestCase
+
 from celery.task import task
 from django.test.utils import override_settings
-
 from edx_django_utils.cache import RequestCache
 
 

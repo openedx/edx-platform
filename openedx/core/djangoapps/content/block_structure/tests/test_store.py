@@ -1,6 +1,8 @@
 """
 Tests for block_structure/cache.py
 """
+from __future__ import absolute_import
+
 import ddt
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
@@ -9,7 +11,7 @@ from ..config import STORAGE_BACKING_FOR_CACHE, waffle
 from ..config.models import BlockStructureConfiguration
 from ..exceptions import BlockStructureNotFound
 from ..store import BlockStructureStore
-from .helpers import ChildrenMapTestMixin, UsageKeyFactoryMixin, MockCache, MockTransformer
+from .helpers import ChildrenMapTestMixin, MockCache, MockTransformer, UsageKeyFactoryMixin
 
 
 @ddt.ddt
@@ -18,7 +20,6 @@ class TestBlockStructureStore(UsageKeyFactoryMixin, ChildrenMapTestMixin, CacheI
     Tests for BlockStructureStore
     """
     ENABLED_CACHES = ['default']
-    shard = 2
 
     def setUp(self):
         super(TestBlockStructureStore, self).setUp()
@@ -41,7 +42,7 @@ class TestBlockStructureStore(UsageKeyFactoryMixin, ChildrenMapTestMixin, CacheI
                 self.block_key_factory(0),
                 transformer,
                 key='test',
-                value='{} val'.format(transformer.name()),
+                value=u'{} val'.format(transformer.name()),
             )
 
     @ddt.data(True, False)

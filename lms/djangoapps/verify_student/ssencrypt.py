@@ -149,12 +149,12 @@ def has_valid_signature(method, headers_dict, body_dict, access_key, secret_key)
 
     if post_access_key != access_key:
         log.error("Posted access key does not match ours")
-        log.debug("Their access: %s; Our access: %s", post_access_key, access_key)
+        log.debug(u"Their access: %s; Our access: %s", post_access_key, access_key)
         return False
 
     if post_signature != expected_signature:
         log.error("Posted signature does not match expected")
-        log.debug("Their sig: %s; Expected: %s", post_signature, expected_signature)
+        log.debug(u"Their sig: %s; Expected: %s", post_signature, expected_signature)
         return False
 
     return True
@@ -169,7 +169,7 @@ def generate_signed_message(method, headers_dict, body_dict, access_key, secret_
     # hmac needs a byte string for it's starting key, can't be unicode.
     hashed = hmac.new(secret_key.encode('utf-8'), message, sha256)
     signature = binascii.b2a_base64(hashed.digest()).rstrip('\n')
-    authorization_header = "SSI {}:{}".format(access_key, signature)
+    authorization_header = u"SSI {}:{}".format(access_key, signature)
 
     message += '\n'
     return message, signature, authorization_header

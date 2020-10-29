@@ -11,6 +11,7 @@ Provides sympy representation.
 # Author: I. Chuang <ichuang@mit.edu>
 #
 
+from __future__ import absolute_import
 import logging
 import operator
 import os
@@ -28,6 +29,8 @@ from sympy.physics.quantum.qubit import Qubit
 from sympy.physics.quantum.state import Ket
 from sympy.printing.latex import LatexPrinter
 from sympy.printing.str import StrPrinter
+import six
+from functools import reduce
 
 log = logging.getLogger(__name__)
 
@@ -206,7 +209,7 @@ class formula(object):
         for k in xml:
             tag = gettag(k)
             if tag == 'mi' or tag == 'ci':
-                usym = unicode(k.text)
+                usym = six.text_type(k.text)
                 try:
                     udata = unicodedata.name(usym)
                 except Exception:  # pylint: disable=broad-except
@@ -232,7 +235,7 @@ class formula(object):
         it, if possible...
         """
 
-        if isinstance(xml, (str, unicode)):
+        if isinstance(xml, (str, six.text_type)):
             xml = etree.fromstring(xml)		# TODO: wrap in try
 
         xml = self.fix_greek_in_mathml(xml)	 # convert greek utf letters to greek spelled out in ascii
@@ -451,7 +454,7 @@ class formula(object):
                 try:
                     cmml = self.cmathml
                     xml = etree.fromstring(str(cmml))
-                except Exception, err:
+                except Exception as err:
                     if 'conversion from Presentation MathML to Content MathML was not successful' in cmml:
                         msg = "Illegal math expression"
                     else:
@@ -538,7 +541,7 @@ class formula(object):
                 args = [self.make_sympy(expr) for expr in xml[1:]]
                 try:
                     res = op(*args)
-                except Exception, err:
+                except Exception as err:
                     self.args = args  # pylint: disable=attribute-defined-outside-init
                     self.op = op      # pylint: disable=attribute-defined-outside-init, invalid-name
                     raise Exception('[formula] error=%s failed to apply %s to args=%s' % (err, opstr, args))
@@ -568,7 +571,7 @@ class formula(object):
                 usym = parse_presentation_symbol(xml[0])
                 sym = sympy.Symbol(str(usym))
             else:
-                usym = unicode(xml.text)
+                usym = six.text_type(xml.text)
                 if 'hat' in usym:
                     sym = my_sympify(usym)
                 else:

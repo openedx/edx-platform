@@ -8,7 +8,7 @@ def plugin_settings(settings):
     Appsembler overrides for all of the environments (devstack, prod and test) in both of CMS and LMS.
 
     This is a useful place for placing Appsembler-wide settings, for production
-    and devstack settings checkout the other `common_aws.py` and `common_devstack.py` sibling files.
+    and devstack settings checkout the other `production_common.py` and `common_devstack.py` sibling files.
     """
     settings.APPSEMBLER_FEATURES = {}
 

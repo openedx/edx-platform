@@ -2,6 +2,7 @@
 """
 End-to-end tests for the gating feature.
 """
+from __future__ import absolute_import
 from textwrap import dedent
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
@@ -23,6 +24,8 @@ class GatingTest(UniqueCourseTest):
 
     STUDENT_USERNAME = "STUDENT_TESTER"
     STUDENT_EMAIL = "student101@example.com"
+
+    shard = 23
 
     def setUp(self):
         super(GatingTest, self).setUp()

@@ -46,24 +46,15 @@ unless otherwise noted. Please see the `LICENSE`_ file for details.
 .. _LICENSE: https://github.com/edx/edx-platform/blob/master/LICENSE
 
 
-The Open edX Portal
----------------------
+More about Open edX
+-------------------
 
-See the `Open edX Portal`_ to learn more about Open edX. You can find
+See the `Open edX site`_ to learn more about Open edX. You can find
 information about the edX roadmap, as well as about hosting, extending, and
 contributing to Open edX. In addition, the Open edX Portal provides product
 announcements, the Open edX blog, and other rich community resources.
 
-To comment on blog posts or the edX roadmap, you must create an account and log
-in. If you do not have an account, follow these steps.
-
-#. Visit `open.edx.org/user/register`_.
-#. Fill in your personal details.
-#. Select **Create New Account**. You are then logged in to the `Open edX
-   Portal`_.
-
-.. _Open edX Portal: https://open.edx.org
-.. _open.edx.org/user/register: https://open.edx.org/user/register
+.. _Open edX site: https://open.edx.org
 
 Documentation
 -------------
@@ -107,7 +98,7 @@ Issue Tracker
 or request a new feature, please make a free account on our JIRA and
 create a new issue! If you’re filing a bug, we’d appreciate it if you
 would follow `our guidelines for filing high-quality, actionable bug
-reports`_. Thanks!
+reports`_. Thanks!! 
 
 .. _We use JIRA for our issue tracker: https://openedx.atlassian.net/
 .. _our guidelines for filing high-quality, actionable bug reports: https://openedx.atlassian.net/wiki/display/SUST/How+to+File+a+Quality+Bug+Report
@@ -129,5 +120,5 @@ Reporting Security Issues
 Please do not report security issues in public. Please email
 security@edx.org.
 
-.. _individual contributor agreement: http://open.edx.org/sites/default/files/wysiwyg/individual-contributor-agreement.pdf
+.. _individual contributor agreement: https://open.edx.org/wp-content/uploads/2019/01/individual-contributor-agreement.pdf
 .. _CONTRIBUTING: https://github.com/edx/edx-platform/blob/master/CONTRIBUTING.rst

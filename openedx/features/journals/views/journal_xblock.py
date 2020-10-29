@@ -1,13 +1,15 @@
 """
 View for journal page
 """
+from __future__ import absolute_import
+
 import datetime
 
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
+from opaque_keys.edx.keys import UsageKey
 
 from lms.djangoapps.courseware.views.views import render_xblock
-from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.features.journals.api import fetch_journal_access
 

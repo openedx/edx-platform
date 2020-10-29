@@ -1,6 +1,8 @@
 """
 Utility functions related to databases.
 """
+from __future__ import absolute_import
+
 import random
 # TransactionManagementError used below actually *does* derive from the standard "Exception" class.
 # pylint: disable=nonstandard-exception
@@ -164,9 +166,11 @@ def enable_named_outer_atomic(*names):
 
     for name in names:
         cache[name] = True
-    yield
-    for name in names:
-        del cache[name]
+    try:
+        yield
+    finally:
+        for name in names:
+            del cache[name]
 
 
 class OuterAtomic(transaction.Atomic):

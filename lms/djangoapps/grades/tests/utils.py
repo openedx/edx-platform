@@ -1,11 +1,13 @@
 """
 Utilities for grades related tests
 """
+from __future__ import absolute_import
+
 from contextlib import contextmanager
 from datetime import datetime
 
 import pytz
-from mock import patch, MagicMock
+from mock import MagicMock, patch
 
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
@@ -76,11 +78,10 @@ def answer_problem(course, request, problem, score=1, max_value=1):
         course,
         depth=2
     )
-    # pylint: disable=protected-access
     module = get_module(
         user,
         request,
         problem.scope_ids.usage_id,
         field_data_cache,
-    )._xmodule
+    )
     module.system.publish(problem, 'grade', grade_dict)

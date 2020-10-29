@@ -1,6 +1,7 @@
 """
 Test dashboard search
 """
+from __future__ import absolute_import
 import json
 import os
 
@@ -13,6 +14,7 @@ from common.test.acceptance.pages.studio.container import ContainerPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from common.test.acceptance.pages.studio.utils import add_html_component, type_in_codemirror
 from common.test.acceptance.tests.helpers import AcceptanceTest, generate_course_key
+import six
 
 
 class DashboardSearchTest(AcceptanceTest):
@@ -64,7 +66,7 @@ class DashboardSearchTest(AcceptanceTest):
         # generate course fixtures and outline pages
         self.studio_course_outlines = {}
         self.course_fixtures = {}
-        for key, course_info in self.courses.iteritems():
+        for key, course_info in six.iteritems(self.courses):
             studio_course_outline = StudioCourseOutlinePage(
                 self.browser,
                 course_info['org'],

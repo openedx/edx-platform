@@ -1,5 +1,7 @@
 """Tests for self-paced course due date overrides."""
 # pylint: disable=missing-docstring
+from __future__ import absolute_import
+
 import datetime
 
 import pytz
@@ -10,7 +12,7 @@ from courseware.access import has_access
 from courseware.tests.factories import BetaTesterFactory
 from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData, OverrideModulestoreFieldData
-from lms.djangoapps.django_comment_client.utils import get_accessible_discussion_xblocks
+from lms.djangoapps.discussion.django_comment_client.utils import get_accessible_discussion_xblocks
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -23,7 +25,6 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
     """
     Tests for self-paced due date overrides.
     """
-    shard = 4
 
     def setUp(self):
         self.reset_setting_cache_variables()

@@ -1,23 +1,25 @@
+from __future__ import absolute_import
+
 import datetime
-from itertools import groupby
 import logging
+from itertools import groupby
 
 import attr
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.templatetags.staticfiles import static
-from django.urls import reverse
 from django.db.models import F, Q
-from edx_ace.recipient_resolver import RecipientResolver
+from django.urls import reverse
 from edx_ace.recipient import Recipient
+from edx_ace.recipient_resolver import RecipientResolver
 from edx_django_utils.monitoring import function_trace, set_custom_metric
 
 from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.schedules.content_highlights import get_week_highlights
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleExperience
 from openedx.core.djangoapps.schedules.utils import PrefixedDebugLoggerMixin
-from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangolib.translation_utils import translate_date
 from openedx.features.course_experience import course_home_url_name
@@ -135,13 +137,13 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
         if "read_replica" in settings.DATABASES:
             schedules = schedules.using("read_replica")
 
-        LOG.info('Query = %r', schedules.query.sql_with_params())
+        LOG.info(u'Query = %r', schedules.query.sql_with_params())
 
         with function_trace('schedule_query_set_evaluation'):
             # This will run the query and cache all of the results in memory.
             num_schedules = len(schedules)
 
-        LOG.info('Number of schedules = %d', num_schedules)
+        LOG.info(u'Number of schedules = %d', num_schedules)
 
         # This should give us a sense of the volume of data being processed by each task.
         set_custom_metric('num_schedules', num_schedules)
@@ -352,7 +354,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
                 week_highlights = get_week_highlights(user, enrollment.course_id, week_num)
             except CourseUpdateDoesNotExist:
                 LOG.warning(
-                    'Weekly highlights for user {} in week {} of course {} does not exist or is disabled'.format(
+                    u'Weekly highlights for user {} in week {} of course {} does not exist or is disabled'.format(
                         user, week_num, enrollment.course_id
                     )
                 )

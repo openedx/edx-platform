@@ -2,7 +2,7 @@
 This file contains a management command for exporting the modulestore to
 neo4j, a graph database.
 """
-from __future__ import unicode_literals, print_function
+from __future__ import absolute_import, print_function, unicode_literals
 
 import logging
 
@@ -33,7 +33,7 @@ class Command(BaseCommand):
 
     Example usage:
       python manage.py lms dump_to_neo4j --host localhost --https_port 7473 \
-        --secure --user user --password password --settings=aws
+        --secure --user user --password password --settings=production
     """
     def add_arguments(self, parser):
         parser.add_argument('--host', type=six.text_type)

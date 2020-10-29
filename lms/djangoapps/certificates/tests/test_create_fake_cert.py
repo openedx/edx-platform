@@ -12,7 +12,6 @@ from student.tests.factories import UserFactory
 
 class CreateFakeCertTest(TestCase):
     """Tests for the create_fake_certs management command. """
-    shard = 1
     USERNAME = "test"
     COURSE_KEY = CourseLocator(org='edX', course='DemoX', run='Demo_Course')
 

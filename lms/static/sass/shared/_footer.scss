@@ -138,7 +138,7 @@
         display: inline-block;
         font-size: em(11);
 
-        &:not(:first-child) a::before {
+        &:not(:first-child)::before {
           margin-right: ($baseline/4);
           content: "-";
         }
@@ -201,6 +201,19 @@
         display: inline-block;
         cursor: initial;
       }
+    }
+
+    .select-lang-button {
+        padding: 5px;
+        color: $m-blue-d3 !important;
+        height: 30px;
+
+        &:hover,
+        &:active,
+        &:focus {
+            background: $m-blue-d3 !important;
+            color: white !important;
+        }
     }
   }
 

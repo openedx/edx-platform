@@ -1,5 +1,7 @@
 """Tests for the retire_order command"""
 
+from __future__ import absolute_import
+
 from tempfile import NamedTemporaryFile
 
 from django.core.management import call_command
@@ -13,7 +15,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 class TestRetireOrder(ModuleStoreTestCase):
     """Test the retire_order command"""
-    shard = 4
 
     def setUp(self):
         super(TestRetireOrder, self).setUp()

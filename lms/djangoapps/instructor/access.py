@@ -11,7 +11,7 @@ TO DO sync instructor and staff flags
 
 import logging
 
-from django_comment_common.models import Role
+from openedx.core.djangoapps.django_comment_common.models import Role
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
 from student.roles import CourseBetaTesterRole, CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
 
@@ -67,7 +67,7 @@ def _change_access(course, user, level, action, send_email=True):
     try:
         role = ROLES[level](course.id)
     except KeyError:
-        raise ValueError("unrecognized level '{}'".format(level))
+        raise ValueError(u"unrecognized level '{}'".format(level))
 
     if action == 'allow':
         if level == 'ccx_coach':
@@ -83,7 +83,7 @@ def _change_access(course, user, level, action, send_email=True):
     elif action == 'revoke':
         role.remove_users(user)
     else:
-        raise ValueError("unrecognized action '{}'".format(action))
+        raise ValueError(u"unrecognized action '{}'".format(action))
 
 
 def update_forum_role(course_id, user, rolename, action):
@@ -103,4 +103,4 @@ def update_forum_role(course_id, user, rolename, action):
     elif action == 'revoke':
         role.users.remove(user)
     else:
-        raise ValueError("unrecognized action '{}'".format(action))
+        raise ValueError(u"unrecognized action '{}'".format(action))

@@ -2,7 +2,7 @@
 """
 Tests for the dump_to_neo4j management command.
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 from datetime import datetime
 
@@ -247,16 +247,16 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         """
         fields, label = serialize_item(self.course)
         self.assertEqual(label, "course")
-        self.assertIn("edited_on", fields.keys())
-        self.assertIn("display_name", fields.keys())
-        self.assertIn("org", fields.keys())
-        self.assertIn("course", fields.keys())
-        self.assertIn("run", fields.keys())
-        self.assertIn("course_key", fields.keys())
-        self.assertIn("location", fields.keys())
-        self.assertIn("block_type", fields.keys())
-        self.assertIn("detached", fields.keys())
-        self.assertNotIn("checklist", fields.keys())
+        self.assertIn("edited_on", list(fields.keys()))
+        self.assertIn("display_name", list(fields.keys()))
+        self.assertIn("org", list(fields.keys()))
+        self.assertIn("course", list(fields.keys()))
+        self.assertIn("run", list(fields.keys()))
+        self.assertIn("course_key", list(fields.keys()))
+        self.assertIn("location", list(fields.keys()))
+        self.assertIn("block_type", list(fields.keys()))
+        self.assertIn("detached", list(fields.keys()))
+        self.assertNotIn("checklist", list(fields.keys()))
 
     def test_serialize_course(self):
         """

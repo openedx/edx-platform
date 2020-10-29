@@ -1,19 +1,23 @@
 """
 Tests for course_overviews app.
 """
-from cStringIO import StringIO
+from __future__ import absolute_import
+
 import datetime
-import ddt
 import itertools
 import math
+from cStringIO import StringIO
+
+import ddt
 import mock
 import pytz
-
+import six
 from django.conf import settings
 from django.db.utils import IntegrityError
 from django.test.utils import override_settings
 from django.utils import timezone
 from PIL import Image
+from six.moves import range  # pylint: disable=ungrouped-imports
 
 from lms.djangoapps.certificates.api import get_active_web_certificate
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
@@ -23,13 +27,13 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.lib.courses import course_image_url
 from static_replace.models import AssetBaseUrlConfig
 from xmodule.assetstore.assetmgr import AssetManager
-from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 from xmodule.course_module import (
-    CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
     CATALOG_VISIBILITY_ABOUT,
-    CATALOG_VISIBILITY_NONE,
+    CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
+    CATALOG_VISIBILITY_NONE
 )
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
@@ -37,7 +41,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 
-from ..models import CourseOverview, CourseOverviewImageSet, CourseOverviewImageConfig
+from ..models import CourseOverview, CourseOverviewImageConfig, CourseOverviewImageSet
 from .factories import CourseOverviewFactory
 
 
@@ -46,7 +50,6 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
     """
     Tests for CourseOverview model.
     """
-    shard = 3
     TODAY = timezone.now()
     LAST_MONTH = 'last_month'
     LAST_WEEK = 'last_week'
@@ -473,7 +476,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         org_courses = []  # list of lists of courses
         for index in range(3):
             org_courses.append([
-                CourseFactory.create(org='test_org_' + unicode(index), emit_signals=True)
+                CourseFactory.create(org='test_org_' + six.text_type(index), emit_signals=True)
                 for __ in range(3)
             ])
 
@@ -512,7 +515,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
                     CourseOverview.get_all_courses(filter_=filter_)
                 },
                 expected_courses,
-                "testing CourseOverview.get_all_courses with filter_={}"
+                u"testing CourseOverview.get_all_courses with filter_={}"
                 .format(filter_),
             )
 
@@ -564,7 +567,6 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
     Course thumbnail generation tests.
     """
     ENABLED_SIGNALS = ['course_published']
-    shard = 3
 
     def setUp(self):
         """Create an active CourseOverviewImageConfig with non-default values."""
@@ -1042,7 +1044,6 @@ class CourseOverviewTabTestCase(ModuleStoreTestCase):
     """
     Tests for CourseOverviewTab model.
     """
-    shard = 3
 
     ENABLED_SIGNALS = ['course_published']
 

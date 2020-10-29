@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 """ Tests for user authn views. """
 
-from http.cookies import SimpleCookie
+from __future__ import absolute_import
+
 import logging
 import re
+from http.cookies import SimpleCookie
 from unittest import skipUnless
-from urllib import urlencode
 
 import ddt
 import mock
@@ -17,29 +18,29 @@ from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.http import Http404
-from django.urls import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory, RefreshTokenFactory
 from oauth2_provider.models import AccessToken as dot_access_token
 from oauth2_provider.models import RefreshToken as dot_refresh_token
 from provider.oauth2.models import AccessToken as dop_access_token
 from provider.oauth2.models import RefreshToken as dop_refresh_token
+from six.moves import range
+from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
 from testfixtures import LogCapture
 from waffle.models import Switch
-from waffle.testutils import override_switch
 
 from course_modes.models import CourseMode
-from openedx.core.djangoapps.user_authn.views.login_form import login_and_registration_form
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
-from openedx.core.djangoapps.user_api.errors import UserAPIInternalError
 from openedx.core.djangoapps.user_api.accounts.utils import ENABLE_SECONDARY_EMAIL_FEATURE_SWITCH
+from openedx.core.djangoapps.user_api.errors import UserAPIInternalError
+from openedx.core.djangoapps.user_authn.views.login_form import login_and_registration_form
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
@@ -169,7 +170,7 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         html_body = sent_message.alternatives[0][0]
 
         for email_body in [text_body, html_body]:
-            msg = 'However, there is currently no user account associated with your email address: {email}'.format(
+            msg = u'However, there is currently no user account associated with your email address: {email}'.format(
                 email=bad_email
             )
 
@@ -243,7 +244,7 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         self.client.logout()
 
         # Make many consecutive bad requests in an attempt to trigger the rate limiter
-        for __ in xrange(self.INVALID_ATTEMPTS):
+        for __ in range(self.INVALID_ATTEMPTS):
             self._change_password(email=self.NEW_EMAIL)
 
         response = self._change_password(email=self.NEW_EMAIL)
@@ -261,83 +262,6 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
             response = getattr(self.client, method)(url)
             self.assertEqual(response.status_code, 405)
 
-    @override_switch(ENABLE_SECONDARY_EMAIL_FEATURE_SWITCH, active=False)
-    def test_404_if_account_recovery_not_enabled(self):
-        with mock.patch('openedx.core.djangoapps.user_api.accounts.api.request_account_recovery',
-                        side_effect=UserAPIInternalError):
-            self._recover_account()
-            self.assertRaises(Http404)
-
-    def test_account_recovery_failure(self):
-        with mock.patch('openedx.core.djangoapps.user_api.accounts.api.request_account_recovery',
-                        side_effect=UserAPIInternalError):
-            self._recover_account()
-            self.assertRaises(UserAPIInternalError)
-
-    @override_settings(FEATURES=FEATURES_WITH_FAILED_PASSWORD_RESET_EMAIL)
-    def test_account_recovery_failure_email(self):
-        """Test that log message is added when email does not match any in the system."""
-        # Log the user out
-        self.client.logout()
-
-        with LogCapture(LOGGER_NAME, level=logging.INFO) as logger:
-            bad_email = 'doesnotexist@example.com'
-            response = self._recover_account(email=bad_email)
-            self.assertEqual(response.status_code, 200)
-            logger.check(
-                (
-                    LOGGER_NAME,
-                    "WARNING", "Account recovery attempt via invalid secondary email '{email}'.".format(
-                        email=bad_email
-                    )
-                )
-            )
-
-    @override_settings(FEATURES=FEATURES_WITH_FAILED_PASSWORD_RESET_EMAIL)
-    def test_account_recovery_failure_not_active(self):
-        """Test that log message is added when email does not match any active account recovery records."""
-        # Log the user out
-        self.client.logout()
-        self.account_recovery.is_active = False
-        self.account_recovery.save()
-
-        with LogCapture(LOGGER_NAME, level=logging.INFO) as logger:
-            response = self._recover_account(email=self.account_recovery.secondary_email)
-            self.assertEqual(response.status_code, 200)
-            logger.check(
-                (
-                    LOGGER_NAME,
-                    "WARNING", "Account recovery attempt via invalid secondary email '{email}'.".format(
-                        email=self.account_recovery.secondary_email
-                    )
-                )
-            )
-
-    def test_password_change_rate_limited_during_account_recovery(self):
-        # Log out the user created during test setup, to prevent the view from
-        # selecting the logged-in user's email address over the email provided
-        # in the POST data
-        self.client.logout()
-
-        # Make many consecutive bad requests in an attempt to trigger the rate limiter
-        for __ in xrange(self.INVALID_ATTEMPTS):
-            self._recover_account(email=self.NEW_EMAIL)
-
-        response = self._recover_account(email=self.NEW_EMAIL)
-        self.assertEqual(response.status_code, 403)
-
-    @ddt.data(
-        ('post', 'account_recovery', []),
-    )
-    @ddt.unpack
-    def test_require_http_method_during_account_recovery(self, correct_method, url_name, args):
-        wrong_methods = {'get', 'put', 'post', 'head', 'options', 'delete'} - {correct_method}
-        url = reverse(url_name, args=args)
-
-        for method in wrong_methods:
-            response = getattr(self.client, method)(url)
-            self.assertEqual(response.status_code, 405)
-
     def _change_password(self, email=None):
         """Request to change the user's password. """
         data = {}
@@ -346,15 +270,6 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
             data['email'] = email
 
         return self.client.post(path=reverse('password_change_request'), data=data)
-
-    def _recover_account(self, email=None):
-        """Request to create the user's password. """
-        data = {}
-
-        if email:
-            data['email'] = email
-
-        return self.client.post(path=reverse('account_recovery'), data=data)
 
     def _create_dop_tokens(self, user=None):
         """Create dop access token for given user if user provided else for default user."""
@@ -386,7 +301,6 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
 @ddt.ddt
 class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase):
     """ Tests for the student account views that update the user's account information. """
-    shard = 7
     USERNAME = "bob"
     EMAIL = "bob@example.com"
     PASSWORD = u"password"
@@ -419,7 +333,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
     @ddt.unpack
     def test_login_and_registration_form(self, url_name, initial_mode):
         response = self.client.get(reverse(url_name))
-        expected_data = '"initial_mode": "{mode}"'.format(mode=initial_mode)
+        expected_data = u'"initial_mode": "{mode}"'.format(mode=initial_mode)
         self.assertContains(response, expected_data)
 
     @ddt.data("signin_user", "register_user")
@@ -682,7 +596,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         tpa_hint = self.hidden_enabled_provider.provider_id
         params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
         response = self.client.get(reverse('signin_user'), params, HTTP_ACCEPT="text/html")
-        self.assertContains(response, '"third_party_auth_hint": "{0}"'.format(tpa_hint))
+        self.assertContains(response, u'"third_party_auth_hint": "{0}"'.format(tpa_hint))
 
         tpa_hint = self.hidden_disabled_provider.provider_id
         params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
@@ -725,7 +639,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         tpa_hint = self.hidden_enabled_provider.provider_id
         params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
         response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
-        self.assertContains(response, '"third_party_auth_hint": "{0}"'.format(tpa_hint))
+        self.assertContains(response, u'"third_party_auth_hint": "{0}"'.format(tpa_hint))
 
         # Even disabled providers in the query string will override THIRD_PARTY_AUTH_HINT
         tpa_hint = self.hidden_disabled_provider.provider_id
@@ -791,7 +705,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
                 line_break=HTML('<br/>'),
                 enterprise_name=ec_name,
                 platform_name=settings.PLATFORM_NAME,
-                privacy_policy_link_start=HTML("<a href='{pp_url}' target='_blank'>").format(
+                privacy_policy_link_start=HTML(u"<a href='{pp_url}' target='_blank'>").format(
                     pp_url=settings.MKTG_URLS.get('PRIVACY', 'https://www.edx.org/edx-privacy-policy')
                 ),
                 privacy_policy_link_end=HTML("</a>"),
@@ -857,7 +771,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
             auth_info['providers'] = []
         auth_info = dump_js_escaped_json(auth_info)
 
-        expected_data = '"third_party_auth": {auth_info}'.format(
+        expected_data = u'"third_party_auth": {auth_info}'.format(
             auth_info=auth_info
         )
         self.assertContains(response, expected_data)
@@ -884,7 +798,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         }
         auth_info = dump_js_escaped_json(auth_info)
 
-        expected_data = '"third_party_auth": {auth_info}'.format(
+        expected_data = u'"third_party_auth": {auth_info}'.format(
             auth_info=auth_info
         )
         self.assertContains(response, expected_data)
@@ -953,5 +867,5 @@ class AccountCreationTestCaseWithSiteOverrides(SiteMixin, TestCase):
         ALLOW_PUBLIC_ACCOUNT_CREATION flag is turned off
         """
         response = self.client.get(reverse('signin_user'))
-        self.assertNotIn('<a class="btn-neutral" href="/register?next=%2Fdashboard">Register</a>',
-                         response.content)
+        self.assertNotIn(u'<a class="btn-neutral" href="/register?next=%2Fdashboard">Register</a>',
+                         response.content.decode(response.charset))

@@ -2,10 +2,13 @@
 Middleware that checks user standing for the purpose of keeping users with
 disabled accounts from accessing the site.
 """
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.http import HttpResponseForbidden
 from django.utils.translation import ugettext as _
 
+from openedx.core.djangolib.markup import HTML, Text
 from student.models import UserStanding
 
 
@@ -24,12 +27,12 @@ class UserStandingMiddleware(object):
             pass
         else:
             if user_account.account_status == UserStanding.ACCOUNT_DISABLED:
-                msg = _(
+                msg = Text(_(
                     'Your account has been disabled. If you believe '
                     'this was done in error, please contact us at '
                     '{support_email}'
-                ).format(
-                    support_email=u'<a href="mailto:{address}?subject={subject_line}">{address}</a>'.format(
+                )).format(
+                    support_email=HTML(u'<a href="mailto:{address}?subject={subject_line}">{address}</a>').format(
                         address=settings.DEFAULT_FEEDBACK_EMAIL,
                         subject_line=_('Disabled Account'),
                     ),

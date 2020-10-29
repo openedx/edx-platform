@@ -2,9 +2,12 @@
     Tests for middleware for comprehensive themes.
 """
 
+from __future__ import absolute_import
+
 from django.contrib.messages.middleware import MessageMiddleware
-from django.test import RequestFactory, TestCase, override_settings
 from django.contrib.sites.models import Site
+from django.test import RequestFactory, TestCase, override_settings
+
 from openedx.core.djangoapps.theming.middleware import CurrentSiteThemeMiddleware
 from student.tests.factories import UserFactory
 

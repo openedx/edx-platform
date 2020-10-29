@@ -11,15 +11,18 @@ file and check it in at the same time as your model changes. To do that,
 3. Add the migration file created in edx-platform/openedx/core/djangoapps/embargo/migrations/
 """
 
+from __future__ import absolute_import
+
+import ipaddress
 import json
 import logging
 
-import ipaddr
+import six
 from config_models.models import ConfigurationModel
 from django.core.cache import cache
-from django.urls import reverse
 from django.db import models
 from django.db.models.signals import post_delete, post_save
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from django_countries import countries
@@ -40,6 +43,8 @@ class EmbargoedCourse(models.Model):
     Enable course embargo on a course-by-course basis.
 
     Deprecated by `RestrictedCourse`
+
+    .. no_pii:
     """
     objects = NoneToEmptyManager()
 
@@ -74,6 +79,8 @@ class EmbargoedState(ConfigurationModel):
     Register countries to be embargoed.
 
     Deprecated by `Country`.
+
+    .. no_pii:
     """
     # The countries to embargo
     embargoed_countries = models.TextField(
@@ -95,7 +102,8 @@ class EmbargoedState(ConfigurationModel):
 
 
 class RestrictedCourse(models.Model):
-    """Course with access restrictions.
+    """
+    Course with access restrictions.
 
     Restricted courses can block users at two points:
 
@@ -110,18 +118,19 @@ class RestrictedCourse(models.Model):
     messages to users when they are blocked.
     These displayed on pages served by the embargo app.
 
+    .. no_pii:
     """
     COURSE_LIST_CACHE_KEY = 'embargo.restricted_courses'
     MESSAGE_URL_CACHE_KEY = 'embargo.message_url_path.{access_point}.{course_key}'
 
     ENROLL_MSG_KEY_CHOICES = tuple([
         (msg_key, msg.description)
-        for msg_key, msg in ENROLL_MESSAGES.iteritems()
+        for msg_key, msg in six.iteritems(ENROLL_MESSAGES)
     ])
 
     COURSEWARE_MSG_KEY_CHOICES = tuple([
         (msg_key, msg.description)
-        for msg_key, msg in COURSEWARE_MESSAGES.iteritems()
+        for msg_key, msg in six.iteritems(COURSEWARE_MESSAGES)
     ])
 
     course_key = CourseKeyField(
@@ -147,7 +156,7 @@ class RestrictedCourse(models.Model):
         default=False,
         help_text=ugettext_lazy(
             u"Allow users who enrolled in an allowed country "
-            u"to access restricted courses from excluded countries."
+            "to access restricted courses from excluded countries."
         )
     )
 
@@ -163,7 +172,7 @@ class RestrictedCourse(models.Model):
             Boolean
             True if course is in restricted course list.
         """
-        return unicode(course_id) in cls._get_restricted_courses_from_cache()
+        return six.text_type(course_id) in cls._get_restricted_courses_from_cache()
 
     @classmethod
     def is_disabled_access_check(cls, course_id):
@@ -181,8 +190,8 @@ class RestrictedCourse(models.Model):
         # checking is_restricted_course method also here to make sure course exists in the list otherwise in case of
         # no course found it will throw the key not found error on 'disable_access_check'
         return (
-            cls.is_restricted_course(unicode(course_id))
-            and cls._get_restricted_courses_from_cache().get(unicode(course_id))["disable_access_check"]
+            cls.is_restricted_course(six.text_type(course_id))
+            and cls._get_restricted_courses_from_cache().get(six.text_type(course_id))["disable_access_check"]
         )
 
     @classmethod
@@ -193,7 +202,7 @@ class RestrictedCourse(models.Model):
         restricted_courses = cache.get(cls.COURSE_LIST_CACHE_KEY)
         if restricted_courses is None:
             restricted_courses = {
-                unicode(course.course_key): {
+                six.text_type(course.course_key): {
                     'disable_access_check': course.disable_access_check
                 }
                 for course in RestrictedCourse.objects.all()
@@ -231,7 +240,7 @@ class RestrictedCourse(models.Model):
             'access_msg': self.access_msg_key,
             'country_rules': [
                 {
-                    'country': unicode(rule.country.country),
+                    'country': six.text_type(rule.country.country),
                     'rule_type': rule.rule_type
                 }
                 for rule in country_rules_for_course
@@ -259,7 +268,7 @@ class RestrictedCourse(models.Model):
             return self.access_msg_key
 
     def __unicode__(self):
-        return unicode(self.course_key)
+        return six.text_type(self.course_key)
 
     @classmethod
     def message_url_path(cls, course_key, access_point):
@@ -370,6 +379,7 @@ class Country(models.Model):
     There is a data migration that creates entries for
     each country code.
 
+    .. no_pii:
     """
     country = CountryField(
         db_index=True, unique=True,
@@ -378,8 +388,8 @@ class Country(models.Model):
 
     def __unicode__(self):
         return u"{name} ({code})".format(
-            name=unicode(self.country.name),
-            code=unicode(self.country)
+            name=six.text_type(self.country.name),
+            code=six.text_type(self.country)
         )
 
     class Meta(object):
@@ -403,6 +413,7 @@ class CountryAccessRule(models.Model):
     2) From the initial list, remove all blacklisted countries
     for the course.
 
+    .. no_pii:
     """
 
     WHITELIST_RULE = 'whitelist'
@@ -511,13 +522,13 @@ class CountryAccessRule(models.Model):
     def __unicode__(self):
         if self.rule_type == self.WHITELIST_RULE:
             return _(u"Whitelist {country} for {course}").format(
-                course=unicode(self.restricted_course.course_key),
-                country=unicode(self.country),
+                course=six.text_type(self.restricted_course.course_key),
+                country=six.text_type(self.country),
             )
         elif self.rule_type == self.BLACKLIST_RULE:
             return _(u"Blacklist {country} for {course}").format(
-                course=unicode(self.restricted_course.course_key),
-                country=unicode(self.country),
+                course=six.text_type(self.restricted_course.course_key),
+                country=six.text_type(self.country),
             )
 
     @classmethod
@@ -525,7 +536,7 @@ class CountryAccessRule(models.Model):
         """Invalidate the cache. """
         cache_key = cls.CACHE_KEY.format(course_key=course_key)
         cache.delete(cache_key)
-        log.info("Invalidated country access list for course %s", course_key)
+        log.info(u"Invalidated country access list for course %s", course_key)
 
     class Meta(object):
         """a course can be added with either black or white list.  """
@@ -579,7 +590,11 @@ post_delete.connect(invalidate_country_rule_cache, sender=RestrictedCourse)
 
 
 class CourseAccessRuleHistory(models.Model):
-    """History of course access rule changes. """
+    """
+    History of course access rule changes.
+
+    .. no_pii:
+    """
     # pylint: disable=model-missing-unicode
 
     timestamp = models.DateTimeField(db_index=True, auto_now_add=True)
@@ -667,6 +682,8 @@ post_delete.connect(CourseAccessRuleHistory.snapshot_post_delete_receiver, sende
 class IPFilter(ConfigurationModel):
     """
     Register specific IP addresses to explicitly block or unblock.
+
+    .. no_pii:
     """
     whitelist = models.TextField(
         blank=True,
@@ -684,7 +701,7 @@ class IPFilter(ConfigurationModel):
         """
 
         def __init__(self, ips):
-            self.networks = [ipaddr.IPNetwork(ip) for ip in ips]
+            self.networks = [ipaddress.ip_network(ip) for ip in ips]
 
         def __iter__(self):
             for network in self.networks:
@@ -692,12 +709,12 @@ class IPFilter(ConfigurationModel):
 
         def __contains__(self, ip_addr):
             try:
-                ip_addr = ipaddr.IPAddress(ip_addr)
+                ip_addr = ipaddress.ip_address(ip_addr)
             except ValueError:
                 return False
 
             for network in self.networks:
-                if network.Contains(ip_addr):
+                if ip_addr in network:
                     return True
 
             return False

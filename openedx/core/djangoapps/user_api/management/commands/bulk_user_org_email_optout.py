@@ -16,14 +16,16 @@ If the user/org combo does not currently exist in the table, a row will be creat
 will be have the 'email-optin' tag set to 'False'.
 """
 
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
 import csv
 import logging
 import time
 
+from django.core.management.base import BaseCommand, CommandError
 from django.db import connections
 from django.db.utils import DatabaseError
-from django.core.management.base import BaseCommand, CommandError
+from six.moves import range
 
 log = logging.getLogger(__name__)
 
@@ -72,15 +74,15 @@ class Command(BaseCommand):
         optout_path = options['optout_csv_path']
 
         if chunk_size <= 0:
-            raise CommandError('Only positive chunk size is allowed ({}).'.format(chunk_size))
+            raise CommandError(u'Only positive chunk size is allowed ({}).'.format(chunk_size))
         if sleep_between < 0:
-            raise CommandError('Only non-negative sleep between seconds is allowed ({}).'.format(sleep_between))
+            raise CommandError(u'Only non-negative sleep between seconds is allowed ({}).'.format(sleep_between))
 
         # Read the CSV file. Log the number of user/org rows read.
         with open(optout_path, 'r') as csv_file:
             optout_reader = csv.reader(csv_file)
             optout_rows = list(optout_reader)
-        log.info("Read %s opt-out rows from CSV file '%s'.", len(optout_rows), optout_path)
+        log.info(u"Read %s opt-out rows from CSV file '%s'.", len(optout_rows), optout_path)
 
         cursor = connections['default'].cursor()
 
@@ -91,7 +93,7 @@ class Command(BaseCommand):
             start_idx = curr_row_idx
             end_idx = min(start_idx + chunk_size - 1, len(optout_rows) - 1)
 
-            log.info("Attempting opt-out for rows (%s, %s) through (%s, %s)...",
+            log.info(u"Attempting opt-out for rows (%s, %s) through (%s, %s)...",
                      optout_rows[start_idx][0], optout_rows[start_idx][1],
                      optout_rows[end_idx][0], optout_rows[end_idx][1])
 
@@ -114,16 +116,16 @@ class Command(BaseCommand):
                     cursor.execute(query)
                 except DatabaseError as err:
                     cursor.execute('ROLLBACK;')
-                    log.error("Rolled-back opt-out for rows (%s, %s) through (%s, %s): %s",
+                    log.error(u"Rolled-back opt-out for rows (%s, %s) through (%s, %s): %s",
                               optout_rows[start_idx][0], optout_rows[start_idx][1],
                               optout_rows[end_idx][0], optout_rows[end_idx][1],
                               str(err))
                     raise
                 else:
                     cursor.execute('COMMIT;')
-                    log.info("Committed opt-out for rows (%s, %s) through (%s, %s).",
+                    log.info(u"Committed opt-out for rows (%s, %s) through (%s, %s).",
                              optout_rows[start_idx][0], optout_rows[start_idx][1],
                              optout_rows[end_idx][0], optout_rows[end_idx][1])
-                log.info("Sleeping %s seconds...", sleep_between)
+                log.info(u"Sleeping %s seconds...", sleep_between)
                 time.sleep(sleep_between)
             curr_row_idx += chunk_size

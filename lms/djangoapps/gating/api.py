@@ -1,6 +1,8 @@
 """
 API for the gating djangoapp
 """
+from __future__ import absolute_import
+
 import logging
 from collections import defaultdict
 

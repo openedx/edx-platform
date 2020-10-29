@@ -1,3 +1,8 @@
+"""
+Base file for testing email sending functionality
+"""
+from __future__ import absolute_import
+
 import datetime
 import logging
 from collections import namedtuple
@@ -13,6 +18,7 @@ from edx_ace.utils.date import serialize
 from freezegun import freeze_time
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
+from six.moves import range
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -111,7 +117,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
 
     def _get_template_overrides(self):
         templates_override = deepcopy(settings.TEMPLATES)
-        templates_override[0]['OPTIONS']['string_if_invalid'] = "TEMPLATE WARNING - MISSING VARIABLE [%s]"
+        templates_override[0]['OPTIONS']['string_if_invalid'] = u"TEMPLATE WARNING - MISSING VARIABLE [%s]"
         return templates_override
 
     def _schedule_factory(self, offset=None, **factory_kwargs):
@@ -187,7 +193,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
             target_day_str = serialize(target_day)
 
             for b in range(self.task.num_bins):
-                LOG.debug('Checking bin %d', b)
+                LOG.debug(u'Checking bin %d', b)
                 expected_queries = NUM_QUERIES_SITE_SCHEDULES
                 if b in bins_in_use:
                     if is_first_match:

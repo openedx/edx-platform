@@ -7,7 +7,11 @@ from django.db.models.fields import TextField
 
 
 class VideoUploadConfig(ConfigurationModel):
-    """Configuration for the video upload feature."""
+    """
+    Configuration for the video upload feature.
+
+    .. no_pii:
+    """
     profile_whitelist = TextField(
         blank=True,
         help_text="A comma-separated list of names of profiles to include in video encoding downloads."
@@ -20,4 +24,8 @@ class VideoUploadConfig(ConfigurationModel):
 
 
 class PushNotificationConfig(ConfigurationModel):
-    """Configuration for mobile push notifications."""
+    """
+    Configuration for mobile push notifications.
+
+    .. no_pii:
+    """

@@ -10,7 +10,7 @@ from ddt import data, ddt
 from django.conf import settings
 from django.test.utils import override_settings
 from mock import patch
-from opaque_keys.edx.locations import AssetLocation
+from opaque_keys.edx.keys import AssetKey
 from opaque_keys.edx.locator import CourseLocator
 from PIL import Image
 from pytz import UTC
@@ -102,7 +102,7 @@ class BasicAssetsTestCase(AssetsTestCase):
         # Test valid contentType for pdf asset (textbook.pdf)
         resp = self.client.get(url, HTTP_ACCEPT='application/json')
         self.assertContains(resp, "/c4x/edX/toy/asset/textbook.pdf")
-        asset_location = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/textbook.pdf')
+        asset_location = AssetKey.from_string('/c4x/edX/toy/asset/textbook.pdf')
         content = contentstore().find(asset_location)
         # Check after import textbook.pdf has valid contentType ('application/pdf')
 
@@ -294,7 +294,7 @@ class PaginationTestCase(AssetsTestCase):
         assets_response = json_response['assets']
         self.assertEquals(filter_value_split, json_response['assetTypes'])
 
-        if filter_value is not '':
+        if filter_value != '':
             content_types = [asset['content_type'].lower()
                              for asset in assets_response]
             if 'OTHER' in filter_value_split:
@@ -522,7 +522,7 @@ class DeleteAssetTestCase(AssetsTestCase):
         self.assertEquals(response.status_code, 200)
         self.uploaded_url = json.loads(response.content)['asset']['url']
 
-        self.asset_location = AssetLocation.from_deprecated_string(self.uploaded_url)
+        self.asset_location = AssetKey.from_string(self.uploaded_url)
         self.content = contentstore().find(self.asset_location)
 
     def test_delete_asset(self):
@@ -548,7 +548,7 @@ class DeleteAssetTestCase(AssetsTestCase):
         thumbnail_url = json.loads(response.content)['asset']['url']
         thumbnail_location = StaticContent.get_location_from_path(thumbnail_url)
 
-        image_asset_location = AssetLocation.from_deprecated_string(uploaded_image_url)
+        image_asset_location = AssetKey.from_string(uploaded_image_url)
         content = contentstore().find(image_asset_location)
         content.thumbnail_location = thumbnail_location
         contentstore().save(content)

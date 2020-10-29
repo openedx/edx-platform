@@ -1,34 +1,37 @@
 """
 Test the student dashboard view.
 """
+from __future__ import absolute_import
+
 import itertools
 import json
 import re
 import unittest
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 
 import ddt
-from completion.test_utils import submit_completions_for_testing, CompletionWaffleTestMixin
+import six
+from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
-from django.urls import reverse
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils.timezone import now
+from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from pyquery import PyQuery as pq
+from six.moves import range
 
-from bulk_email.models import BulkEmailFlag
 from course_modes.models import CourseMode
 from entitlements.tests.factories import CourseEntitlementFactory
-from milestones.tests.utils import MilestonesTestCaseMixin
-from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
-from pyquery import PyQuery as pq
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from openedx.core.djangoapps.user_authn.cookies import _get_user_info_cookie_data
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
@@ -37,9 +40,7 @@ from student.helpers import DISABLE_UNENROLL_CERT_STATES
 from student.models import CourseEnrollment, UserProfile
 from student.signals import REFUND_ORDER
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.milestones_helpers import (get_course_milestones,
-                                     remove_prerequisite_course,
-                                     set_prerequisite_courses)
+from util.milestones_helpers import get_course_milestones, remove_prerequisite_course, set_prerequisite_courses
 from util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -269,11 +270,11 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             org='edx',
             number='998',
             display_name='Test Course',
-            pre_requisite_courses=[unicode(self.pre_requisite_course.id)]
+            pre_requisite_courses=[six.text_type(self.pre_requisite_course.id)]
         )
         self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
 
-        set_prerequisite_courses(self.course.id, [unicode(self.pre_requisite_course.id)])
+        set_prerequisite_courses(self.course.id, [six.text_type(self.pre_requisite_course.id)])
         response = self.client.get(reverse('dashboard'))
         self.assertIn('<div class="prerequisites">', response.content)
 
@@ -301,7 +302,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         mock_course_overview.return_value = CourseOverviewFactory.create(start=self.TOMORROW, id=course_key)
         mock_course_runs.return_value = [
             {
-                'key': unicode(course_key),
+                'key': six.text_type(course_key),
                 'enrollment_end': str(self.TOMORROW),
                 'pacing_type': 'instructor_paced',
                 'type': 'verified',
@@ -309,7 +310,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             }
         ]
         mock_pseudo_session.return_value = {
-            'key': unicode(course_key),
+            'key': six.text_type(course_key),
             'type': 'verified'
         }
         response = self.client.get(self.path)
@@ -320,7 +321,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         # If an entitlement has already been redeemed by the user for a course run, do not let the run be selectable
         enrollment = CourseEnrollmentFactory(
-            user=self.user, course_id=unicode(mock_course_overview.return_value.id), mode=CourseMode.VERIFIED
+            user=self.user, course_id=six.text_type(mock_course_overview.return_value.id), mode=CourseMode.VERIFIED
         )
         CourseEntitlementFactory.create(
             user=self.user, course_uuid=program['courses'][0]['uuid'], enrollment_course_run=enrollment
@@ -386,7 +387,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             start=self.TOMORROW, end=self.THREE_YEARS_FROM_NOW, self_paced=True, enrollment_end=self.THREE_YEARS_AGO
         )
         mock_course_overview.return_value = mocked_course_overview
-        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=unicode(mocked_course_overview.id))
+        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=six.text_type(mocked_course_overview.id))
         mock_course_runs.return_value = [
             {
                 'key': str(mocked_course_overview.id),
@@ -450,7 +451,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
         )
         mock_course_overview.return_value = mocked_course_overview
-        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=unicode(mocked_course_overview.id))
+        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=six.text_type(mocked_course_overview.id))
         mock_course_runs.return_value = [
             {
                 'key': str(mocked_course_overview.id),
@@ -462,7 +463,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         ]
         entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment)
         program = ProgramFactory()
-        program['courses'][0]['course_runs'] = [{'key': unicode(mocked_course_overview.id)}]
+        program['courses'][0]['course_runs'] = [{'key': six.text_type(mocked_course_overview.id)}]
         program['courses'][0]['uuid'] = entitlement.course_uuid
         mock_get_programs.return_value = [program]
         response = self.client.get(self.path)
@@ -485,7 +486,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
         )
         mock_course_overview.return_value = mocked_course_overview
-        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=unicode(mocked_course_overview.id), created=self.THREE_YEARS_AGO)
+        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=six.text_type(mocked_course_overview.id), created=self.THREE_YEARS_AGO)
         mock_course_runs.return_value = [
             {
                 'key': str(mocked_course_overview.id),
@@ -497,7 +498,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         ]
         entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment, created=self.THREE_YEARS_AGO)
         program = ProgramFactory()
-        program['courses'][0]['course_runs'] = [{'key': unicode(mocked_course_overview.id)}]
+        program['courses'][0]['course_runs'] = [{'key': six.text_type(mocked_course_overview.id)}]
         program['courses'][0]['uuid'] = entitlement.course_uuid
         mock_get_programs.return_value = [program]
         response = self.client.get(self.path)
@@ -506,7 +507,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         self.assertIn('Related Programs:', response.content)
 
     @patch('openedx.core.djangoapps.catalog.utils.get_course_runs_for_course')
-    @patch.object(BulkEmailFlag, 'feature_enabled')
+    @patch('student.views.dashboard.is_bulk_email_feature_enabled')
     def test_email_settings_fulfilled_entitlement(self, mock_email_feature, mock_get_course_runs):
         """
         Assert that the Email Settings action is shown when the user has a fulfilled entitlement.
@@ -518,7 +519,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         course_enrollment = CourseEnrollmentFactory(user=self.user)
         entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment)
         course_runs = [{
-            'key': unicode(course_overview.id),
+            'key': six.text_type(course_overview.id),
             'uuid': entitlement.course_uuid
         }]
         mock_get_course_runs.return_value = course_runs
@@ -527,7 +528,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         self.assertEqual(pq(response.content)(self.EMAIL_SETTINGS_ELEMENT_ID).length, 1)
 
     @patch.object(CourseOverview, 'get_from_id')
-    @patch.object(BulkEmailFlag, 'feature_enabled')
+    @patch('student.views.dashboard.is_bulk_email_feature_enabled')
     def test_email_settings_unfulfilled_entitlement(self, mock_email_feature, mock_course_overview):
         """
         Assert that the Email Settings action is not shown when the entitlement is not fulfilled.
@@ -690,9 +691,9 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             ItemFactory.create(
                 category='video',
                 parent_location=course.location,
-                display_name='Video {0}'.format(unicode(number))
+                display_name='Video {0}'.format(six.text_type(number))
             ).location
-            for number in xrange(5)
+            for number in range(5)
         ]
 
         submit_completions_for_testing(self.user, course_key, block_keys)
@@ -742,7 +743,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             user=self.user,
             course_id=course.id
         )
-        schedule = ScheduleFactory(start=self.THREE_YEARS_AGO, enrollment=enrollment)
+        schedule = ScheduleFactory(start=self.THREE_YEARS_AGO + timedelta(days=1), enrollment=enrollment)
 
         response = self.client.get(reverse('dashboard'))
         dashboard_html = self._remove_whitespace_from_html_string(response.content)
@@ -802,9 +803,9 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                     ItemFactory.create(
                         category='video',
                         parent_location=course.location,
-                        display_name='Video {0}'.format(unicode(number))
+                        display_name='Video {0}'.format(six.text_type(number))
                     ).location
-                    for number in xrange(5)
+                    for number in range(5)
                 ]
                 last_completed_block_string = str(block_keys[-1])
 

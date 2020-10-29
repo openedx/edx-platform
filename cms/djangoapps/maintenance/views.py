@@ -3,11 +3,14 @@ Views for the maintenance app.
 """
 import logging
 
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.core.validators import ValidationError
 from django.db import transaction
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import View
+from django.views.generic.list import ListView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
@@ -19,6 +22,9 @@ from util.views import require_global_staff
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+
+from openedx.features.announcements.models import Announcement
+from openedx.features.announcements.forms import AnnouncementForm
 
 log = logging.getLogger(__name__)
 
@@ -32,6 +38,15 @@ MAINTENANCE_VIEWS = {
             'Sometimes the draft and published branches of a course can get out of sync. Force publish course command '
             'resets the published branch of a course to point to the draft branch, effectively force publishing the '
             'course. This view dry runs the force publish command'
+        ),
+    },
+    'announcement_index': {
+        'url': 'maintenance:announcement_index',
+        'name': _('Edit Announcements'),
+        'slug': 'announcement_index',
+        'description': _(
+            'This view shows the announcement editor to create or alter announcements that are shown on the right'
+            'side of the dashboard.'
         ),
     },
 }
@@ -67,6 +82,7 @@ class MaintenanceBaseView(View):
     template = 'maintenance/container.html'
 
     def __init__(self, view=None):
+        super(MaintenanceBaseView, self).__init__()
         self.context = {
             'view': view if view else '',
             'form_data': {},
@@ -182,7 +198,7 @@ class ForcePublishCourseView(MaintenanceBaseView):
         if not hasattr(source_store, 'force_publish_course'):
             self.context['msg'] = _('Force publishing course is not supported with old mongo courses.')
             log.warning(
-                'Force publishing course is not supported with old mongo courses. \
+                u'Force publishing course is not supported with old mongo courses. \
                 %s attempted to force publish the course %s.',
                 request.user,
                 course_id,
@@ -196,7 +212,7 @@ class ForcePublishCourseView(MaintenanceBaseView):
         if current_versions['published-branch'] == current_versions['draft-branch']:
             self.context['msg'] = _('Course is already in published state.')
             log.warning(
-                'Course is already in published state. %s attempted to force publish the course %s.',
+                u'Course is already in published state. %s attempted to force publish the course %s.',
                 request.user,
                 course_id,
                 exc_info=True
@@ -205,9 +221,81 @@ class ForcePublishCourseView(MaintenanceBaseView):
 
         self.context['current_versions'] = current_versions
         log.info(
-            '%s dry ran force publish the course %s.',
+            u'%s dry ran force publish the course %s.',
             request.user,
             course_id,
             exc_info=True
         )
         return self.render_response()
+
+
+class AnnouncementBaseView(View):
+    """
+    Base view for Announcements pages
+    """
+
+    @method_decorator(require_global_staff)
+    def dispatch(self, request, *args, **kwargs):
+        return super(AnnouncementBaseView, self).dispatch(request, *args, **kwargs)
+
+
+class AnnouncementIndexView(ListView, MaintenanceBaseView):
+    """
+    View for viewing the announcements shown on the dashboard, used by the global staff.
+    """
+    model = Announcement
+    object_list = Announcement.objects.order_by('-active')
+    context_object_name = 'announcement_list'
+    paginate_by = 8
+
+    def __init__(self):
+        super(AnnouncementIndexView, self).__init__(MAINTENANCE_VIEWS['announcement_index'])
+
+    def get_context_data(self, **kwargs):
+        context = super(AnnouncementIndexView, self).get_context_data(**kwargs)
+        context['view'] = MAINTENANCE_VIEWS['announcement_index']
+        return context
+
+    @method_decorator(require_global_staff)
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data()
+        return render_to_response(self.template, context)
+
+
+class AnnouncementEditView(UpdateView, AnnouncementBaseView):
+    """
+    View for editing an announcement.
+    """
+    model = Announcement
+    form_class = AnnouncementForm
+    success_url = reverse_lazy('maintenance:announcement_index')
+    template_name = '/maintenance/_announcement_edit.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(AnnouncementEditView, self).get_context_data(**kwargs)
+        context['action_url'] = reverse('maintenance:announcement_edit', kwargs={'pk': context['announcement'].pk})
+        return context
+
+
+class AnnouncementCreateView(CreateView, AnnouncementBaseView):
+    """
+    View for creating an announcement.
+    """
+    model = Announcement
+    form_class = AnnouncementForm
+    success_url = reverse_lazy('maintenance:announcement_index')
+    template_name = '/maintenance/_announcement_edit.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(AnnouncementCreateView, self).get_context_data(**kwargs)
+        context['action_url'] = reverse('maintenance:announcement_create')
+        return context
+
+
+class AnnouncementDeleteView(DeleteView, AnnouncementBaseView):
+    """
+    View for deleting an announcement.
+    """
+    model = Announcement
+    success_url = reverse_lazy('maintenance:announcement_index')
+    template_name = '/maintenance/_announcement_delete.html'

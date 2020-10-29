@@ -1,5 +1,7 @@
 """Tests for the Zendesk"""
 
+from __future__ import absolute_import
+
 import json
 from smtplib import SMTPException
 

@@ -155,7 +155,7 @@ class EndToEndCohortedCoursewareTest(ContainerBase, CohortTestMixin):
         set_visibility(4, [AUDIT_TRACK], enrollment_group)
         set_visibility(5, [self.content_group_a, self.content_group_b])
 
-        container_page.publish_action.click()
+        container_page.publish()
 
     def create_cohorts_and_assign_students(self):
         """

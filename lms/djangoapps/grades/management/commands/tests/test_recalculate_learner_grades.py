@@ -2,17 +2,19 @@
 Tests for recalculate_learner_grades management command.
 """
 
+from __future__ import absolute_import
+
 from tempfile import NamedTemporaryFile
 
 import mock
 
 from lms.djangoapps.grades.management.commands import recalculate_learner_grades
 from lms.djangoapps.grades.tests.test_tasks import HasCourseWithProblemsMixin
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
-DATE_FORMAT = "%Y-%m-%d %H:%M"
+DATE_FORMAT = u"%Y-%m-%d %H:%M"
 
 
 class TestRecalculateLearnerGrades(HasCourseWithProblemsMixin, ModuleStoreTestCase):

@@ -1,6 +1,8 @@
 """
 Defines a form for providing validation of subsection grade templates.
 """
+from __future__ import absolute_import
+
 import logging
 
 from django import forms

@@ -1,12 +1,13 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/).
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # Anna Lifshits Agmon <anna@campus.gov.il>, 2018
 # Bentsi Magidovich <magidovich@gmail.com>, 2015
 # dana bublil <dana.bublil@gmail.com>, 2016
+# Danit Keren <danitK@mse.gov.il>, 2019
 # dotanlaks <dotanlaks6@gmail.com>, 2014
 # dotanlaks <dotanlaks6@gmail.com>, 2014
 # e2f_HE c1 <e2f_HE_c1@outlook.com>, 2016-2017
@@ -20,7 +21,7 @@
 # yaaqov, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/).
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -37,13 +38,14 @@
 # Yoav Caspin <yoavc@pmo.gov.il>, 2017
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # Anna Lifshits Agmon <anna@campus.gov.il>, 2018
 # Bentsi Magidovich <magidovich@gmail.com>, 2015
 # dana bublil <dana.bublil@gmail.com>, 2016
+# Danit Keren <danitK@mse.gov.il>, 2019
 # e2f_HE c1 <e2f_HE_c1@outlook.com>, 2016-2017
 # e2f he_r1 <e2f_he_r1@outlook.com>, 2016
 # Nadav Stark <nadav@yeda.org.il>, 2015
@@ -53,7 +55,7 @@
 # yuval zana, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -70,8 +72,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-30 20:42+0000\n"
-"PO-Revision-Date: 2018-12-09 20:43+0000\n"
+"POT-Creation-Date: 2019-02-17 20:42+0000\n"
+"PO-Revision-Date: 2019-02-10 20:45+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
 "Language: he\n"
@@ -3330,13 +3332,15 @@ msgstr "אירעה שגיאה, נסה לחפש שוב."
 
 #: lms/static/js/discussions_management/views/discussions.js
 msgid "Not divided"
-msgstr ""
+msgstr "לא מחולק"
 
 #: lms/static/js/discussions_management/views/discussions.js
 msgid ""
 "Discussions are unified; all learners interact with posts from other "
 "learners, regardless of the group they are in."
 msgstr ""
+"במצב זה כל הדיונים מאוחדים וכל הלומדים מתקשרים עם לומדים אחרים, ללא תלות "
+"באוכלוסייה שהוגדרה להם."
 
 #: lms/static/js/discussions_management/views/discussions.js
 msgid "Enrollment Tracks"
@@ -3360,6 +3364,8 @@ msgid ""
 "of cohort, see the same discussion topics, but within divided topics, only "
 "members of the same cohort see and respond to each others’ posts. "
 msgstr ""
+"השתמשו ב'קבוצות למידה' שהגדרתם עבור חלוקת הדיונים. שימו לב שכל קבוצת למידה "
+"תהיה חשופה אך ורק לתוכן הדיון שלה - הודעות ותגובות."
 
 #: lms/static/js/discussions_management/views/discussions.js
 msgid "Discussion topics in the course are not divided."
@@ -4625,18 +4631,12 @@ msgstr "בדוק את הדואר האלקטרוני שלך"
 msgid ""
 "{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
 "address is associated with your {platform_name} account, we will send a "
-"message with password reset instructions to this email "
+"message with password recovery instructions to this email "
 "address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
 " message, verify that you entered the correct email address, or check your "
 "spam folder.{paragraphEnd}{paragraphStart}If you need further assistance, "
 "{anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
 msgstr ""
-"{paragraphStart}הזנת {boldStart}{email}{boldEnd}. אם כתובת הדוא\"ל הזו קשורה"
-" לחשבון {platform_name} שלך, נשלח הודעה עם הנחיות לאיפוס הסיסמה לכתובת "
-"הדוא\"ל הזו.{paragraphEnd}{paragraphStart}אם לא תקבל הודעה לאיפוס סיסמה, "
-"בדוק שהזנת את הכתובת הנכונה או בדוק בתיקיית דואר הזבל "
-"אצלך.{paragraphEnd}{paragraphStart}אם יש לך צורך בעזרה נוספת, "
-"{anchorStart}פנה לתמיכה הטכנית{anchorEnd}.{paragraphEnd}"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -4693,11 +4693,13 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Secondary Email Address"
+msgid "Recovery Email Address"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "You may access your account when single-sign on is not available."
+msgid ""
+"You may access your account with this address if single-sign on or access to"
+" your primary email is not available."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -4794,6 +4796,12 @@ msgstr "שנת לידה"
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Preferred Language"
 msgstr "שפה מועדפת"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"We've sent a confirmation message to {new_secondary_email_address}. Click "
+"the link in the message to update your secondary email address."
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Social Media Links"
@@ -4921,6 +4929,18 @@ msgstr "פרטי חשבון"
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Order History"
 msgstr "היסטוריית הזמנות"
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid ""
+"You have set your language to {beta_language}, which is currently not fully "
+"translated. You can help us translate this language fully by joining the "
+"Transifex community and adding translations from English for learners that "
+"speak {beta_language}."
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Help Translate into {beta_language}"
+msgstr ""
 
 #: lms/static/js/verify_student/views/image_input_view.js
 msgid "Image Upload Error"
@@ -5170,6 +5190,14 @@ msgstr ""
 #: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "There was an error updating your goal."
 msgstr ""
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Expand All"
+msgstr "הרחב הכל"
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Collapse All"
+msgstr "כווץ הכל"
 
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
@@ -7337,14 +7365,6 @@ msgid "This catalog's courses:"
 msgstr "הקורסים בקטלוג זה:"
 
 #: lms/templates/ccx/schedule.underscore
-msgid "Expand All"
-msgstr "הרחב הכל"
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Collapse All"
-msgstr "כווץ הכל"
-
-#: lms/templates/ccx/schedule.underscore
 msgid "Start Date"
 msgstr "תאריך התחלה"
 
@@ -7494,8 +7514,12 @@ msgid "Mark Exam As Completed"
 msgstr "סמן מבחן כהושלם"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
-msgid "timed"
-msgstr "מתוזמן"
+msgid "a timed exam"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "The timer on the right shows the time remaining in the exam."
+msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid ""
@@ -7504,6 +7528,18 @@ msgid ""
 msgstr ""
 "כדי לקבל נקודת זכות על בעיות, עליך לבחור \"הגש\"' עבור כל בעיה לפני שתבחר "
 "ב\"סיום המבחן שלי\"."
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Exam timer and end exam button"
+msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "End My Exam"
@@ -7926,7 +7962,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/discussions.underscore
 msgid "Specify whether discussion topics are divided"
-msgstr ""
+msgstr "יש לציין אם ישנה חלוקה לנושאי דיון"
 
 #: lms/templates/instructor/instructor_dashboard_2/divided-discussions-course-wide.underscore
 msgid "Course-Wide Discussion Topics"
@@ -7946,11 +7982,11 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/divided-discussions-inline.underscore
 msgid "Always divide content-specific discussion topics"
-msgstr ""
+msgstr "חלקו באופן גורף את כל נושאי הדיונים לפי תוכן ספציפי"
 
 #: lms/templates/instructor/instructor_dashboard_2/divided-discussions-inline.underscore
 msgid "Divide the selected content-specific discussion topics"
-msgstr ""
+msgstr "חלקו את נושאי הדיונים מבוססי-התוכן שנבחרו"
 
 #: lms/templates/instructor/instructor_dashboard_2/divided-discussions-inline.underscore
 msgid "No content-specific discussion topics exist."
@@ -8205,18 +8241,8 @@ msgstr "שנה את כתובת הדואר האלקטרוני שלי"
 msgid "Reset Password"
 msgstr "איפוס סיסמה"
 
-#: lms/templates/student_account/account_recovery.underscore
-msgid "Account Recovery"
-msgstr ""
-
-#: lms/templates/student_account/account_recovery.underscore
-msgid ""
-"Please enter your secondary email address below and we will send you "
-"instructions for recovering your account and setting a new password."
-msgstr ""
-
-#: lms/templates/student_account/account_recovery.underscore
-msgid "Recover my account"
+#: lms/templates/student_account/account_settings.underscore
+msgid "Switch Language Back"
 msgstr ""
 
 #: lms/templates/student_account/account_settings.underscore
@@ -8228,8 +8254,8 @@ msgid "An error occurred. Please reload the page."
 msgstr "אירעה שגיאה. נא טען מחדש את העמוד."
 
 #: lms/templates/student_account/form_field.underscore
-msgid "Forgot password?"
-msgstr "שכחת סיסמה?"
+msgid "Need help logging in?"
+msgstr ""
 
 #: lms/templates/student_account/hinted_login.underscore
 #, python-format
@@ -8268,7 +8294,7 @@ msgstr "הירשם דרך edX"
 
 #: lms/templates/student_account/login.underscore
 msgid "First time here?"
-msgstr ""
+msgstr "פעם ראשונה שלך כאן?"
 
 #: lms/templates/student_account/login.underscore
 msgid "Create an Account."
@@ -8305,7 +8331,7 @@ msgstr ""
 
 #: lms/templates/student_account/login.underscore
 msgid "Sign In"
-msgstr "התחבר"
+msgstr "התחבר/י"
 
 #: lms/templates/student_account/login.underscore
 msgid ""
@@ -8343,15 +8369,13 @@ msgstr "עזרה עם סיסמה"
 
 #: lms/templates/student_account/password_reset.underscore
 msgid ""
-"Please enter your email address below and we will send you instructions for "
-"setting a new password."
+"Please enter your log-in or recovery email address below and we will send "
+"you an email with instructions."
 msgstr ""
-"נא הזן להלן את כתובת הדואר האלקטרוני שלך ואנו נשלח לך הנחיות לקביעת סיסמה "
-"חדשה.  "
 
 #: lms/templates/student_account/password_reset.underscore
-msgid "Reset my password"
-msgstr "שחזר את הסיסמה שלי"
+msgid "Recover my password"
+msgstr ""
 
 #: lms/templates/student_account/register.underscore
 msgid "Already have an {platformName} account?"
@@ -8359,7 +8383,7 @@ msgstr "כבר יש לך חשבון  {platformName} ?"
 
 #: lms/templates/student_account/register.underscore
 msgid "Sign in."
-msgstr "הירשם"
+msgstr "התחבר/י"
 
 #: lms/templates/student_account/register.underscore
 msgid "Create an account using"
@@ -9477,6 +9501,10 @@ msgid "Ungraded"
 msgstr "ללא ציון"
 
 #: cms/templates/js/course-outline.underscore
+msgid "Onboarding Exam"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 msgid "Practice proctored Exam"
 msgstr "מבחן תרגול תחת פיקוח"
 
@@ -9497,6 +9525,10 @@ msgstr "כווץ/הרחב את %(xblock_type)s"
 #: cms/templates/js/course-outline.underscore
 msgid "Display Name"
 msgstr "שם לתצוגה"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Proctoring Settings"
+msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Configure"
@@ -10355,6 +10387,18 @@ msgid ""
 msgstr ""
 "מבחנים תחת פיקוח מתוזמנים ומקליטים בוידאו כל תלמיד שנבחן. לאחר מכן, נסקרים "
 "סרטוני הווידאו על מנת להבטיח שהתלמידים יצייתו לכל כללי המבחן."
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Onboarding"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Use Onboarding to introduce learners to proctoring, verify their identity, "
+"and create an onboarding profile. Learners must complete the onboarding "
+"profile step prior to taking a proctored exam. Profile reviews take 2+ "
+"business days."
+msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Practice Proctored"

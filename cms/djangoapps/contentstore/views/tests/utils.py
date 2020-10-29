@@ -29,7 +29,7 @@ class StudioPageTestCase(CourseTestCase):
         self.assertIsNotNone(url)
         resp = self.client.get_html(url)
         self.assertEqual(resp.status_code, 200)
-        return resp.content
+        return resp.content.decode(resp.charset)
 
     def get_preview_html(self, xblock, view_name):
         """

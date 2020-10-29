@@ -1,12 +1,13 @@
 """
 Views for the credit Django app.
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 import logging
 
 import pytz
+import six
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -158,7 +159,7 @@ class CreditEligibilityView(generics.ListAPIView):
             raise ValidationError(
                 {'detail': 'Both the course_key and username querystring parameters must be supplied.'})
 
-        course_key = unicode(course_key)
+        course_key = six.text_type(course_key)
 
         try:
             course_key = CourseKey.from_string(course_key)

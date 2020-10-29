@@ -1,6 +1,7 @@
 """
 API for the gating djangoapp
 """
+from __future__ import absolute_import
 import json
 import logging
 
@@ -11,7 +12,7 @@ from django.utils.translation import ugettext as _
 from completion.models import BlockCompletion
 from lms.djangoapps.courseware.access import _has_access_to_course
 from lms.djangoapps.course_blocks.api import get_course_blocks
-from lms.djangoapps.grades.subsection_grade_factory import SubsectionGradeFactory
+from lms.djangoapps.grades.api import SubsectionGradeFactory
 from milestones import api as milestones_api
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.lib.gating.exceptions import GatingValidationError
@@ -19,6 +20,7 @@ from util import milestones_helpers
 from xblock.completable import XBlockCompletionMode as CompletionMode
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+import six
 
 log = logging.getLogger(__name__)
 
@@ -42,13 +44,13 @@ def _get_prerequisite_milestone(prereq_content_key):
     ))
 
     if not milestones:
-        log.warning("Could not find gating milestone for prereq UsageKey %s", prereq_content_key)
+        log.warning(u"Could not find gating milestone for prereq UsageKey %s", prereq_content_key)
         return None
 
     if len(milestones) > 1:
         # We should only ever have one gating milestone per UsageKey
         # Log a warning here and pick the first one
-        log.warning("Multiple gating milestones found for prereq UsageKey %s", prereq_content_key)
+        log.warning(u"Multiple gating milestones found for prereq UsageKey %s", prereq_content_key)
 
     return milestones[0]
 
@@ -67,7 +69,7 @@ def _validate_min_score(min_score):
         GatingValidationError: If the minimum score is not valid
     """
     if min_score:
-        message = _("%(min_score)s is not a valid grade percentage") % {'min_score': min_score}
+        message = _(u"%(min_score)s is not a valid grade percentage") % {'min_score': min_score}
         try:
             min_score = int(min_score)
         except ValueError:
@@ -162,7 +164,7 @@ def get_prerequisites(course_key):
         milestone = milestones_by_block_id.get(block.location.block_id)
         if milestone:
             milestone['block_display_name'] = block.display_name
-            milestone['block_usage_key'] = unicode(block.location)
+            milestone['block_usage_key'] = six.text_type(block.location)
             result.append(milestone)
 
     return result
@@ -182,7 +184,7 @@ def add_prerequisite(course_key, prereq_content_key):
     """
     milestone = milestones_api.add_milestone(
         {
-            'name': _('Gating milestone for {usage_key}').format(usage_key=unicode(prereq_content_key)),
+            'name': _(u'Gating milestone for {usage_key}').format(usage_key=six.text_type(prereq_content_key)),
             'namespace': "{usage_key}{qualifier}".format(
                 usage_key=prereq_content_key,
                 qualifier=GATING_NAMESPACE_QUALIFIER
@@ -435,20 +437,16 @@ def get_subsection_grade_percentage(subsection_usage_key, user):
     Returns:
         User's grade percentage for given subsection
     """
-    subsection_grade_percentage = 0.0
     try:
         subsection_structure = get_course_blocks(user, subsection_usage_key)
         if any(subsection_structure):
             subsection_grade_factory = SubsectionGradeFactory(user, course_structure=subsection_structure)
             if subsection_usage_key in subsection_structure:
-                # this will force a recalculation of the subsection grade
-                subsection_grade = subsection_grade_factory.update(
-                    subsection_structure[subsection_usage_key], persist_grade=False
-                )
-                subsection_grade_percentage = subsection_grade.percent_graded * 100.0
+                subsection_grade = subsection_grade_factory.update(subsection_structure[subsection_usage_key])
+                return _get_subsection_percentage(subsection_grade)
     except ItemNotFoundError as err:
-        log.warning("Could not find course_block for subsection=%s error=%s", subsection_usage_key, err)
-    return subsection_grade_percentage
+        log.warning(u"Could not find course_block for subsection=%s error=%s", subsection_usage_key, err)
+    return 0.0
 
 
 def get_subsection_completion_percentage(subsection_usage_key, user):
@@ -488,7 +486,7 @@ def get_subsection_completion_percentage(subsection_usage_key, user):
             )
 
     except ItemNotFoundError as err:
-        log.warning("Could not find course_block for subsection=%s error=%s", subsection_usage_key, err)
+        log.warning(u"Could not find course_block for subsection=%s error=%s", subsection_usage_key, err)
 
     return subsection_completion_percentage
 

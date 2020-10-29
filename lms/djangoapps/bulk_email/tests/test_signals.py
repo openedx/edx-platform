@@ -1,6 +1,8 @@
 """
 Unit tests for student optouts from course email
 """
+from __future__ import absolute_import
+
 import json
 
 from django.core import mail
@@ -21,7 +23,6 @@ class TestOptoutCourseEmailsBySignal(ModuleStoreTestCase):
     """
     Tests that the force_optout_all signal receiver opts the user out of course emails
     """
-    shard = 1
 
     def setUp(self):
         super(TestOptoutCourseEmailsBySignal, self).setUp()

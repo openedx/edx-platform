@@ -5,6 +5,8 @@ Runs tasks on answers to course problems to validate that code
 paths actually work.
 """
 
+from __future__ import absolute_import
+
 import json
 from functools import partial
 from uuid import uuid4
@@ -14,6 +16,7 @@ from celery.states import FAILURE, SUCCESS
 from django.utils.translation import ugettext_noop
 from mock import MagicMock, Mock, patch
 from opaque_keys.edx.locations import i4xEncoder
+from six.moves import range
 
 from course_modes.models import CourseMode
 from courseware.models import StudentModule
@@ -24,14 +27,13 @@ from lms.djangoapps.instructor_task.tasks import (
     delete_problem_state,
     export_ora2_data,
     generate_certificates,
+    override_problem_score,
     rescore_problem,
-    reset_problem_attempts,
-    override_problem_score
+    reset_problem_attempts
 )
 from lms.djangoapps.instructor_task.tasks_helper.misc import upload_ora2_data
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskModuleTestCase
-from openedx.core.lib.tests import attr
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 PROBLEM_URL_NAME = "test_urlname"
@@ -168,7 +170,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         """Create & enroll students for testing"""
         return [
             self.create_student(username='robot%d' % i, email='robot+test+%d@edx.org' % i, mode=mode)
-            for i in xrange(num_students)
+            for i in range(num_students)
         ]
 
     def _create_students_with_no_state(self, num_students):
@@ -374,7 +376,6 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
         )
 
 
-@attr(shard=3)
 @ddt.ddt
 class TestRescoreInstructorTask(TestInstructorTasks):
     """Tests problem-rescoring instructor task."""
@@ -433,7 +434,7 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         entry = InstructorTask.objects.get(id=task_entry.id)
         output = json.loads(entry.task_output)
         self.assertEquals(output['exception'], "UpdateProblemModuleStateError")
-        self.assertEquals(output['message'], "Specified module {0} of type {1} does not support rescoring.".format(
+        self.assertEquals(output['message'], u"Specified module {0} of type {1} does not support rescoring.".format(
             self.location,
             mock_instance.__class__,
         ))
@@ -490,7 +491,6 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         )
 
 
-@attr(shard=3)
 class TestResetAttemptsInstructorTask(TestInstructorTasks):
     """Tests instructor task that resets problem attempts."""
 
@@ -589,7 +589,6 @@ class TestResetAttemptsInstructorTask(TestInstructorTasks):
         self._test_reset_with_student(True)
 
 
-@attr(shard=3)
 class TestDeleteStateInstructorTask(TestInstructorTasks):
     """Tests instructor task that deletes problem state."""
 

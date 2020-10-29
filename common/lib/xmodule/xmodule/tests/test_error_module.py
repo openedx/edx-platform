@@ -16,7 +16,6 @@ from xblock.test.tools import unabc
 
 class SetupTestErrorModules(unittest.TestCase):
     """Common setUp for use in ErrorModule tests."""
-    shard = 1
 
     def setUp(self):
         super(SetupTestErrorModules, self).setUp()
@@ -31,7 +30,6 @@ class TestErrorModule(SetupTestErrorModules):
     """
     Tests for ErrorModule and ErrorDescriptor
     """
-    shard = 1
 
     def test_error_module_xml_rendering(self):
         descriptor = ErrorDescriptor.from_xml(
@@ -66,7 +64,6 @@ class TestNonStaffErrorModule(SetupTestErrorModules):
     """
     Tests for NonStaffErrorModule and NonStaffErrorDescriptor
     """
-    shard = 1
 
     def test_non_staff_error_module_create(self):
         descriptor = NonStaffErrorDescriptor.from_xml(
@@ -127,7 +124,6 @@ class TestErrorModuleConstruction(unittest.TestCase):
     """
     Test that error module construction happens correctly
     """
-    shard = 1
 
     def setUp(self):
         # pylint: disable=abstract-class-instantiated

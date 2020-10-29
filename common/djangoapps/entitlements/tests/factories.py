@@ -1,10 +1,11 @@
+from __future__ import absolute_import
+
 import string
 from uuid import uuid4
 
 import factory
 from factory.fuzzy import FuzzyChoice, FuzzyText
 
-from student.tests.factories import UserFactory
 from course_modes.helpers import CourseMode
 from entitlements.models import CourseEntitlement, CourseEntitlementPolicy
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory

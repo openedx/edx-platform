@@ -1,15 +1,15 @@
 """Helpers for tests related to emitting events to the tracking logs."""
 
+from __future__ import absolute_import
+
 from datetime import datetime
 
 from django.test import TestCase
 from django.test.utils import override_settings
-from freezegun import freeze_time
-from pytz import UTC
-
 from eventtracking import tracker
 from eventtracking.django import DjangoTracker
-
+from freezegun import freeze_time
+from pytz import UTC
 
 FROZEN_TIME = datetime(2013, 10, 3, 8, 24, 55, tzinfo=UTC)
 IN_MEMORY_BACKEND_CONFIG = {

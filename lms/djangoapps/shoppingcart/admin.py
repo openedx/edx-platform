@@ -43,8 +43,8 @@ class SoftDeleteCouponAdmin(admin.ModelAdmin):
         if queryset.count() == 1:
             message_bit = "1 coupon entry was"
         else:
-            message_bit = "%s coupon entries were" % queryset.count()
-        self.message_user(request, "%s successfully deleted." % message_bit)
+            message_bit = u"%s coupon entries were" % queryset.count()
+        self.message_user(request, u"%s successfully deleted." % message_bit)
 
     def delete_model(self, request, obj):
         """override the default behavior of single instance of model delete method"""

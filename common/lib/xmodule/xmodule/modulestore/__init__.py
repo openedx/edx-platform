@@ -12,7 +12,7 @@ from collections import defaultdict
 from contextlib import contextmanager
 import threading
 from operator import itemgetter
-from sortedcontainers import SortedListWithKey
+from sortedcontainers import SortedKeyList
 
 from abc import ABCMeta, abstractmethod
 from contracts import contract, new_contract
@@ -509,7 +509,7 @@ class IncorrectlySortedList(Exception):
     pass
 
 
-class SortedAssetList(SortedListWithKey):
+class SortedAssetList(SortedKeyList):
     """
     List of assets that is sorted based on an asset attribute.
     """
@@ -549,12 +549,11 @@ class SortedAssetList(SortedListWithKey):
         """
         metadata_to_insert = asset_md.to_storable()
         asset_idx = self.find(asset_md.asset_id)
-        if asset_idx is None:
-            # Add new metadata sorted into the list.
-            self.add(metadata_to_insert)
-        else:
-            # Replace existing metadata.
-            self[asset_idx] = metadata_to_insert
+        if asset_idx is not None:
+            # Delete existing metadata.
+            del self[asset_idx]
+        # Add new metadata sorted into the list.
+        self.add(metadata_to_insert)
 
 
 class ModuleStoreAssetBase(object):
@@ -575,10 +574,7 @@ class ModuleStoreAssetBase(object):
             - the index of asset in list (None if asset does not exist)
         """
         course_assets = self._find_course_assets(asset_key.course_key)
-        all_assets = SortedAssetList(iterable=[])
-        # Assets should be pre-sorted, so add them efficiently without sorting.
-        # extend() will raise a ValueError if the passed-in list is not sorted.
-        all_assets.extend(course_assets.setdefault(asset_key.block_type, []))
+        all_assets = SortedAssetList(iterable=course_assets.setdefault(asset_key.block_type, []))
         idx = all_assets.find(asset_key)
 
         return course_assets, idx

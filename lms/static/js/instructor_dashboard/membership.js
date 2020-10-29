@@ -269,12 +269,12 @@ such that the value can be defined later than this assignment (file load order).
             this.clear_input();
             if (data.userDoesNotExist) {
                 msg = gettext("Could not find a user with username or email address '<%- identifier %>'.");
-                return this.show_errors(_.template(msg, {
+                return this.show_errors(_.template(msg)({
                     identifier: data.unique_student_identifier
                 }));
             } else if (data.inactiveUser) {
                 msg = gettext("Error: User '<%- username %>' has not yet activated their account. Users must create and activate their accounts before they can be assigned a role.");  // eslint-disable-line max-len
-                return this.show_errors(_.template(msg, {
+                return this.show_errors(_.template(msg)({
                     username: data.unique_student_identifier
                 }));
             } else if (data.removingSelfAsInstructor) {

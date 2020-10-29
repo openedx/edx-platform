@@ -92,7 +92,7 @@ class TestOrphan(TestOrphanBase):
                 HTTP_ACCEPT='application/json'
             ).content
         )
-        self.assertEqual(len(orphans), 3, "Wrong # {}".format(orphans))
+        self.assertEqual(len(orphans), 3, u"Wrong # {}".format(orphans))
         location = course.location.replace(category='chapter', name='OrphanChapter')
         self.assertIn(unicode(location), orphans)
         location = course.location.replace(category='vertical', name='OrphanVert')
@@ -118,7 +118,7 @@ class TestOrphan(TestOrphanBase):
         orphans = json.loads(
             self.client.get(orphan_url, HTTP_ACCEPT='application/json').content
         )
-        self.assertEqual(len(orphans), 0, "Orphans not deleted {}".format(orphans))
+        self.assertEqual(len(orphans), 0, u"Orphans not deleted {}".format(orphans))
 
         # make sure that any children with one orphan parent and one non-orphan
         # parent are not deleted

@@ -14,7 +14,6 @@ class CCXConTaskTestCase(TestCase):
     """
     Tests for CCXCon tasks.
     """
-    shard = 2
 
     @mock.patch('openedx.core.djangoapps.ccxcon.api.course_info_to_ccxcon')
     def test_update_ccxcon_task_ok(self, mock_citc):

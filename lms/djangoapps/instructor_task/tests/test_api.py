@@ -1,13 +1,17 @@
 """
 Test for LMS instructor background task queue management
 """
+from __future__ import absolute_import
+
 import ddt
+from celery.states import FAILURE
 from mock import MagicMock, Mock, patch
+from six.moves import range
 
 from bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail
-from lms.djangoapps.certificates.models import CertificateGenerationHistory, CertificateStatuses
 from common.test.utils import normalize_repr
 from courseware.tests.factories import UserFactory
+from lms.djangoapps.certificates.models import CertificateGenerationHistory, CertificateStatuses
 from lms.djangoapps.instructor_task.api import (
     SpecificStudentIdMissingError,
     generate_certificates_for_students,
@@ -43,7 +47,6 @@ from lms.djangoapps.instructor_task.tests.test_base import (
     TestReportMixin
 )
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from celery.states import FAILURE
 
 
 class InstructorTaskReportTest(InstructorTaskTestCase):
@@ -91,7 +94,6 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
 @ddt.ddt
 class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
     """Tests API methods that involve the submission of module-based background tasks."""
-    shard = 3
 
     def setUp(self):
         super(InstructorTaskModuleSubmitTest, self).setUp()
@@ -213,7 +215,6 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCase):
     """Tests API methods that involve the submission of course-based background tasks."""
-    shard = 3
 
     def setUp(self):
         super(InstructorTaskCourseSubmitTest, self).setUp()

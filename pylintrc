@@ -26,17 +26,28 @@
 # 1. Edit the pylintrc file in the edx-lint repo at
 #    https://github.com/edx/edx-lint/blob/master/edx_lint/files/pylintrc
 #
-# 2. Make a new version of edx_lint, which involves the usual steps of
-#    incrementing the version number, submitting and reviewing a pull
-#    request, and updating the edx-lint version reference in this repo.
+# 2. install the updated version of edx-lint (in edx-lint):
 #
-# 3. Install the newer version of edx-lint.
+#       $ pip install .
 #
-# 4. Run:
+# 3. Run (in edx-lint):
 #
+#       # uses pylintrc_tweaks from edx-lint for linting in edx-lint
+#       # NOTE: Use Python 3.x, which no longer includes comments in the output file
 #       $ edx_lint write pylintrc
 #
-# 5. This will modify the local file.  Submit a pull request to get it
+# 4. Make a new version of edx_lint, submit and review a pull request with the
+#    pylintrc update, and after merging, update the edx-lint version by
+#    creating a new tag in the repo (uses pbr).
+#
+# 5. In your local repo, install the newer version of edx-lint.
+#
+# 6. Run:
+#
+#       # uses local pylintrc_tweaks
+#       $ edx_lint write pylintrc
+#
+# 7. This will modify the local file.  Submit a pull request to get it
 #    checked in so that others will benefit.
 #
 #
@@ -55,7 +66,7 @@
 [MASTER]
 ignore = ,.git,.tox,migrations,node_modules,.pycharm_helpers
 persistent = yes
-load-plugins = edx_lint.pylint,pylint_django,pylint_celery
+load-plugins = edx_lint.pylint,pylint_django,pylint_celery,caniusepython3.pylint_checker
 init-hook = "import sys; sys.path.extend(['lms/djangoapps', 'cms/djangoapps', 'common/djangoapps'])"
 
 [MESSAGES CONTROL]
@@ -252,7 +263,6 @@ enable =
 	too-many-boolean-expressions,
 	# Consistent import order makes finding where code is
 	# imported from easier
-	ungrouped-imports,
 	wrong-import-order,
 	wrong-import-position,
 	wildcard-import,
@@ -294,11 +304,13 @@ disable =
 	dict-view-method,
 	duplicate-code,
 	execfile-builtin,
+	feature-toggle-needs-doc,
 	file-builtin,
 	filter-builtin-not-iterating,
 	fixme,
 	getslice-method,
 	hex-method,
+	illegal-waffle-usage,
 	import-star-module-level,
 	indexing-exception,
 	input-builtin,
@@ -340,12 +352,14 @@ disable =
 	too-many-locals,
 	too-many-public-methods,
 	too-many-return-statements,
+	ungrouped-imports,
 	unichr-builtin,
 	unicode-builtin,
 	unpacking-in-except,
 	using-cmp-argument,
 	xrange-builtin,
-	zip-builtin-not-iterating,,unicode-format-string
+	zip-builtin-not-iterating,
+	native-string,
 
 [REPORTS]
 output-format = text
@@ -372,7 +386,7 @@ docstring-min-length = 5
 
 [FORMAT]
 max-line-length = 120
-ignore-long-lines = ^\s*(# )?<?https?://\S+>?$
+ignore-long-lines = ^\s*(# )?((<?https?://\S+>?)|(\.\. \w+: .*))$
 single-line-if-stmt = no
 no-space-check = trailing-comma,dict-separator
 max-module-lines = 1000
@@ -445,4 +459,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# c8b8d35a9a123f3c2eb3ce0cb466156bab2beedc
+# c9c6a6da98d5eb4ede060038e6b0f1892f32f83b

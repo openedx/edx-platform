@@ -2,11 +2,14 @@
 """
 Tests for student activation and login
 """
+from __future__ import absolute_import
+
 import json
 import unicodedata
-import unittest
 
 import ddt
+import six
+from six.moves import range
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
@@ -16,9 +19,7 @@ from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, reverse
 from mock import patch
-from six import text_type
 
-from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.password_policy.compliance import (
     NonCompliantPasswordException,
     NonCompliantPasswordWarning
@@ -28,8 +29,6 @@ from openedx.core.djangoapps.user_authn.cookies import jwt_cookies
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
@@ -78,7 +77,7 @@ class LoginTest(CacheIsolationTestCase):
         self._assert_not_in_audit_log(mock_audit_log, 'info', [u'test@edx.org'])
 
     def test_login_success_unicode_email(self):
-        unicode_email = u'test' + unichr(40960) + u'@edx.org'
+        unicode_email = u'test' + six.unichr(40960) + u'@edx.org'
         self.user.email = unicode_email
         self.user.save()
 
@@ -184,7 +183,7 @@ class LoginTest(CacheIsolationTestCase):
         self._assert_not_in_audit_log(mock_audit_log, 'warning', [u'test'])
 
     def test_login_unicode_email(self):
-        unicode_email = u'test@edx.org' + unichr(40960)
+        unicode_email = u'test@edx.org' + six.unichr(40960)
         response, mock_audit_log = self._login_response(
             unicode_email,
             'test_password',
@@ -193,7 +192,7 @@ class LoginTest(CacheIsolationTestCase):
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', unicode_email])
 
     def test_login_unicode_password(self):
-        unicode_password = u'test_password' + unichr(1972)
+        unicode_password = u'test_password' + six.unichr(1972)
         response, mock_audit_log = self._login_response(
             'test@edx.org',
             unicode_password,
@@ -208,7 +207,7 @@ class LoginTest(CacheIsolationTestCase):
         logout_url = reverse('logout')
         with patch('student.models.AUDIT_LOG') as mock_audit_log:
             response = self.client.post(logout_url)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         self._assert_audit_log(mock_audit_log, 'info', [u'Logout', u'test'])
 
     def test_login_user_info_cookie(self):
@@ -256,7 +255,10 @@ class LoginTest(CacheIsolationTestCase):
         self._assert_response(response, success=True)
 
         response = self.client.post(reverse('logout'))
-        self.assertRedirects(response, "/")
+        expected = {
+            'target': '/',
+        }
+        self.assertDictContainsSubset(expected, response.context_data)
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_logout_logging_no_pii(self):
@@ -265,14 +267,14 @@ class LoginTest(CacheIsolationTestCase):
         logout_url = reverse('logout')
         with patch('student.models.AUDIT_LOG') as mock_audit_log:
             response = self.client.post(logout_url)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         self._assert_audit_log(mock_audit_log, 'info', [u'Logout'])
         self._assert_not_in_audit_log(mock_audit_log, 'info', [u'test'])
 
     def test_login_ratelimited_success(self):
         # Try (and fail) logging in with fewer attempts than the limit of 30
         # and verify that you can still successfully log in afterwards.
-        for i in xrange(20):
+        for i in range(20):
             password = u'test_password{0}'.format(i)
             response, _audit_log = self._login_response('test@edx.org', password)
             self._assert_response(response, success=False)
@@ -283,7 +285,7 @@ class LoginTest(CacheIsolationTestCase):
     def test_login_ratelimited(self):
         # try logging in 30 times, the default limit in the number of failed
         # login attempts in one 5 minute period before the rate gets limited
-        for i in xrange(30):
+        for i in range(30):
             password = u'test_password{0}'.format(i)
             self._login_response('test@edx.org', password)
         # check to see if this response indicates that this was ratelimited
@@ -294,7 +296,7 @@ class LoginTest(CacheIsolationTestCase):
     def test_login_refresh(self):
         def _assert_jwt_cookie_present(response):
             self.assertEqual(response.status_code, 200)
-            self.assertIn(jwt_cookies.jwt_refresh_cookie_name(), self.client.cookies)
+            self.assertIn(jwt_cookies.jwt_cookie_header_payload_name(), self.client.cookies)
 
         setup_login_oauth_client()
         response, _ = self._login_response('test@edx.org', 'test_password')
@@ -302,6 +304,12 @@ class LoginTest(CacheIsolationTestCase):
 
         response = self.client.post(reverse('login_refresh'))
         _assert_jwt_cookie_present(response)
+
+    @patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": False})
+    def test_login_refresh_anonymous_user(self):
+        response = self.client.post(reverse('login_refresh'))
+        self.assertEqual(response.status_code, 401)
+        self.assertNotIn(jwt_cookies.jwt_cookie_header_payload_name(), self.client.cookies)
 
     @patch.dict("django.conf.settings.FEATURES", {'PREVENT_CONCURRENT_LOGINS': True})
     def test_single_session(self):
@@ -398,7 +406,7 @@ class LoginTest(CacheIsolationTestCase):
         url = reverse('logout')
 
         response = client1.get(url)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
 
     def test_change_enrollment_400(self):
         """
@@ -532,15 +540,15 @@ class LoginTest(CacheIsolationTestCase):
         try:
             response_dict = json.loads(response.content)
         except ValueError:
-            self.fail("Could not parse response content as JSON: %s"
+            self.fail(u"Could not parse response content as JSON: %s"
                       % str(response.content))
 
         if success is not None:
             self.assertEqual(response_dict['success'], success)
 
         if value is not None:
-            msg = ("'%s' did not contain '%s'" %
-                   (unicode(response_dict['value']), unicode(value)))
+            msg = (u"'%s' did not contain '%s'" %
+                   (six.text_type(response_dict['value']), six.text_type(value)))
             self.assertIn(value, response_dict['value'], msg)
 
     def _assert_audit_log(self, mock_audit_log, level, log_strings):
@@ -566,88 +574,3 @@ class LoginTest(CacheIsolationTestCase):
         format_string = args[0]
         for log_string in log_strings:
             self.assertNotIn(log_string, format_string)
-
-
-class ExternalAuthShibTest(ModuleStoreTestCase):
-    """
-    Tests how login_user() interacts with ExternalAuth, in particular Shib
-    """
-
-    def setUp(self):
-        super(ExternalAuthShibTest, self).setUp()
-        self.course = CourseFactory.create(
-            org='Stanford',
-            number='456',
-            display_name='NO SHIB',
-            user_id=self.user.id,
-        )
-        self.shib_course = CourseFactory.create(
-            org='Stanford',
-            number='123',
-            display_name='Shib Only',
-            enrollment_domain='shib:https://idp.stanford.edu/',
-            user_id=self.user.id,
-        )
-        self.user_w_map = UserFactory.create(email='withmap@stanford.edu')
-        self.extauth = ExternalAuthMap(external_id='withmap@stanford.edu',
-                                       external_email='withmap@stanford.edu',
-                                       external_domain='shib:https://idp.stanford.edu/',
-                                       external_credentials="",
-                                       user=self.user_w_map)
-        self.user_w_map.save()
-        self.extauth.save()
-        self.user_wo_map = UserFactory.create(email='womap@gmail.com')
-        self.user_wo_map.save()
-
-    @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
-    def test_login_page_redirect(self):
-        """
-        Tests that when a shib user types their email address into the login page, they get redirected
-        to the shib login.
-        """
-        response = self.client.post(reverse('login'), {'email': self.user_w_map.email, 'password': ''})
-        self.assertEqual(response.status_code, 200)
-        obj = json.loads(response.content)
-        self.assertEqual(obj, {
-            'success': False,
-            'redirect': reverse('shib-login'),
-        })
-
-    @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
-    def test_login_required_dashboard(self):
-        """
-        Tests redirects to when @login_required to dashboard, which should always be the normal login,
-        since there is no course context
-        """
-        response = self.client.get(reverse('dashboard'))
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], '/login?next=/dashboard')
-
-    @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
-    def test_externalauth_login_required_course_context(self):
-        """
-        Tests the redirects when visiting course-specific URL with @login_required.
-        Should vary by course depending on its enrollment_domain
-        """
-        target_url = reverse('courseware', args=[text_type(self.course.id)])
-        noshib_response = self.client.get(target_url, follow=True, HTTP_ACCEPT="text/html")
-        self.assertEqual(noshib_response.redirect_chain[-1],
-                         ('/login?next={url}'.format(url=target_url), 302))
-        self.assertContains(noshib_response, (u"Sign in or Register | {platform_name}"
-                                              .format(platform_name=settings.PLATFORM_NAME)))
-        self.assertEqual(noshib_response.status_code, 200)
-
-        target_url_shib = reverse('courseware', args=[text_type(self.shib_course.id)])
-        shib_response = self.client.get(**{'path': target_url_shib,
-                                           'follow': True,
-                                           'REMOTE_USER': self.extauth.external_id,
-                                           'Shib-Identity-Provider': 'https://idp.stanford.edu/',
-                                           'HTTP_ACCEPT': "text/html"})
-        # Test that the shib-login redirect page with ?next= and the desired page are part of the redirect chain
-        # The 'courseware' page actually causes a redirect itself, so it's not the end of the chain and we
-        # won't test its contents
-        self.assertEqual(shib_response.redirect_chain[-3],
-                         ('/shib-login/?next={url}'.format(url=target_url_shib), 302))
-        self.assertEqual(shib_response.redirect_chain[-2],
-                         (target_url_shib, 302))
-        self.assertEqual(shib_response.status_code, 200)

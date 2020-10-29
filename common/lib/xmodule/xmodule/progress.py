@@ -5,6 +5,8 @@ For most subclassing needs, you should only need to reimplement
 frac() and __str__().
 '''
 
+from __future__ import absolute_import
+
 import numbers
 
 

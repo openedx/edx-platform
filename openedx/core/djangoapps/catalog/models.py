@@ -1,4 +1,6 @@
 """Models governing integration with the catalog service."""
+from __future__ import absolute_import
+
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -9,7 +11,11 @@ from openedx.core.djangoapps.site_configuration import helpers
 
 
 class CatalogIntegration(ConfigurationModel):
-    """Manages configuration for connecting to the catalog service and using its API."""
+    """
+    Manages configuration for connecting to the catalog service and using its API.
+
+    .. no_pii:
+    """
     API_NAME = 'catalog'
     CACHE_KEY = 'catalog.api.data'
 

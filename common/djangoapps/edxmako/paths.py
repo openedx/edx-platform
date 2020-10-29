@@ -2,9 +2,12 @@
 Set up lookup paths for mako templates.
 """
 
+from __future__ import absolute_import
+
 import contextlib
 import hashlib
 import os
+import six
 
 import pkg_resources
 from django.conf import settings
@@ -18,7 +21,7 @@ from openedx.core.lib.cache_utils import request_cached
 from . import LOOKUP
 
 
-class TopLevelTemplateURI(unicode):
+class TopLevelTemplateURI(six.text_type):
     """
     A marker class for template URIs used to signal the template lookup infrastructure that the template corresponding
     to the URI should be looked up straight in the standard edx-platform location instead of trying to locate an

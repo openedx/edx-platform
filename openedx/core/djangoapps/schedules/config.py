@@ -1,5 +1,9 @@
-from openedx.core.djangoapps.waffle_utils import WaffleFlagNamespace, CourseWaffleFlag, WaffleFlag
+"""
+Contains configuration for schedules app
+"""
+from __future__ import absolute_import
 
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlag, WaffleFlagNamespace
 
 WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name=u'schedules')
 

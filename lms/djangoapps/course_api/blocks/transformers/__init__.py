@@ -2,12 +2,15 @@
 Course API Block Transformers
 """
 
+from __future__ import absolute_import
+
 from lms.djangoapps.course_blocks.transformers.visibility import VisibilityTransformer
-from .student_view import StudentViewTransformer
+
 from .block_completion import BlockCompletionTransformer
 from .block_counts import BlockCountsTransformer
-from .navigation import BlockNavigationTransformer
 from .milestones import MilestonesAndSpecialExamsTransformer
+from .navigation import BlockNavigationTransformer
+from .student_view import StudentViewTransformer
 
 
 class SupportedFieldType(object):

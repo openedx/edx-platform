@@ -2,9 +2,12 @@
 Utility methods related to file handling.
 """
 
+from __future__ import absolute_import
+
 import os
 from datetime import datetime
 
+import six
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import DefaultStorage, get_valid_filename
 from django.utils.translation import ugettext as _
@@ -98,7 +101,7 @@ def course_filename_prefix_generator(course_id, separator='_'):
         str: A unicode string which can safely be inserted into a
             filename.
     """
-    return get_valid_filename(unicode(separator).join([course_id.org, course_id.course, course_id.run]))
+    return get_valid_filename(six.text_type(separator).join([course_id.org, course_id.course, course_id.run]))
 
 
 # pylint: disable=invalid-name

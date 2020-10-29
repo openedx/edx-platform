@@ -17,7 +17,7 @@ JSON Configuration Files
 ------------------------
 
 In addition, there is a mechanism for reading and overriding configuration
-settings from JSON files on-disk. The :file:`/lms/envs/aws.py` module loads
+settings from JSON files on-disk. The :file:`/lms/envs/production.py` module loads
 settings from ``lms.env.json`` and ``lms.auth.json`` files. All
 security-sensitive settings and data belong in the ``lms.auth.json`` file, while
 the rest are configured via the ``lms.env.json`` file.
@@ -66,7 +66,7 @@ In this case, ``LOCALE_PATHS`` will be defined correctly at the end of the
 settings module parsing no matter what ``REPO_ROOT``,
 `ENABLE_COMPREHENSIVE_THEMING`, and ``COMPREHENSIVE_THEME_LOCALE_PATHS`` are
 currently set to.  This is true even if the ``LOCALE_PATHS`` calculation was
-defined in ``lms/envs/common.py`` and you're using ``lms/envs/aws.py`` which
+defined in ``lms/envs/common.py`` and you're using ``lms/envs/production.py`` which
 includes overrides both from that module and the JSON configuration files.
 
 List entries and dictionary values can also be derived from other settings, even

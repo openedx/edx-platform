@@ -3,6 +3,7 @@ Command to delete all rows from these tables:
 microsite_configuration_historicalmicrositeorganizationmapping
 microsite_configuration_historicalmicrositetemplate
 """
+from __future__ import absolute_import
 
 import logging
 from microsite_configuration.models import MicrositeOrganizationMapping, MicrositeTemplate

@@ -5,35 +5,36 @@ StudentViewHandlers are handlers for video module instance.
 StudioViewHandlers are handlers for video descriptor instance.
 """
 
+from __future__ import absolute_import
+
 import json
 import logging
 
 import six
 from django.core.files.base import ContentFile
 from django.utils.timezone import now
+from edxval.api import create_external_video, create_or_update_video_transcript, delete_video_transcript
+from opaque_keys.edx.locator import CourseLocator
 from webob import Response
-
 from xblock.core import XBlock
 from xblock.exceptions import JsonHandlerError
 
 from xmodule.exceptions import NotFoundError
 from xmodule.fields import RelativeTime
-from opaque_keys.edx.locator import CourseLocator
 
-from edxval.api import create_or_update_video_transcript, create_external_video, delete_video_transcript
 from .transcripts_utils import (
-    clean_video_id,
-    get_or_create_sjson,
-    generate_sjson_for_all_speeds,
-    subs_filename,
     Transcript,
     TranscriptException,
     TranscriptsGenerationException,
-    youtube_speed_dict,
+    clean_video_id,
+    generate_sjson_for_all_speeds,
+    get_html5_ids,
+    get_or_create_sjson,
     get_transcript,
     get_transcript_from_contentstore,
     remove_subs_from_store,
-    get_html5_ids
+    subs_filename,
+    youtube_speed_dict
 )
 
 log = logging.getLogger(__name__)
@@ -153,7 +154,7 @@ class VideoStudentViewHandlers(object):
                 generate_sjson_for_all_speeds(
                     self,
                     other_lang[self.transcript_language],
-                    {speed: youtube_id for youtube_id, speed in youtube_ids.iteritems()},
+                    {speed: youtube_id for youtube_id, speed in six.iteritems(youtube_ids)},
                     self.transcript_language
                 )
                 sjson_transcript = Transcript.asset(self.location, youtube_id, self.transcript_language).data
@@ -309,7 +310,7 @@ class VideoStudentViewHandlers(object):
                 log.info("Invalid /translation request: no language.")
                 return Response(status=400)
 
-            if language not in ['en'] + transcripts["transcripts"].keys():
+            if language not in ['en'] + list(transcripts["transcripts"].keys()):
                 log.info("Video: transcript facilities are not available for given language.")
                 return Response(status=404)
 

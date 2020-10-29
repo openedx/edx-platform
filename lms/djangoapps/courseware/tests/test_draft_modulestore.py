@@ -1,3 +1,9 @@
+"""
+Test the draft modulestore
+"""
+
+from __future__ import absolute_import
+
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 
@@ -8,7 +14,6 @@ class TestDraftModuleStore(TestCase):
     """
     Test the draft modulestore
     """
-    shard = 1
 
     def test_get_items_with_course_items(self):
         store = modulestore()

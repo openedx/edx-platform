@@ -35,7 +35,7 @@ def repo_root():
             absolute_path = file_path.abspath()
             break
         except OSError:
-            print('Attempt {}/180 to get an absolute path failed'.format(attempt))
+            print(u'Attempt {}/180 to get an absolute path failed'.format(attempt))
             if attempt < 180:
                 attempt += 1
                 sleep(1)
@@ -76,9 +76,6 @@ class Env(object):
         "lib" / "custom_a11y_rules.js"
     )
 
-    PA11YCRAWLER_REPORT_DIR = REPORT_DIR / "pa11ycrawler"
-    PA11YCRAWLER_COVERAGERC = BOK_CHOY_DIR / ".pa11ycrawlercoveragerc"
-
     # If set, put reports for run in "unique" directories.
     # The main purpose of this is to ensure that the reports can be 'slurped'
     # in the main jenkins flow job without overwriting the reports from other
@@ -88,9 +85,8 @@ class Env(object):
         BOK_CHOY_REPORT_DIR = BOK_CHOY_REPORT_DIR / shard_str
         BOK_CHOY_LOG_DIR = BOK_CHOY_LOG_DIR / shard_str
 
-    # For the time being, stubs are used by both the bok-choy and lettuce acceptance tests
-    # For this reason, the stubs package is currently located in the Django app called "terrain"
-    # where other lettuce configuration is stored.
+    # The stubs package is currently located in the Django app called "terrain"
+    # from when they were used by both the bok-choy and lettuce (deprecated) acceptance tests
     BOK_CHOY_STUB_DIR = REPO_ROOT / "common" / "djangoapps" / "terrain"
 
     # Directory that videos are served from
@@ -162,6 +158,11 @@ class Env(object):
             'port': 8091,
             'log': BOK_CHOY_LOG_DIR / "bok_choy_catalog.log",
         },
+
+        'lti': {
+            'port': 8765,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_lti.log",
+        },
     }
 
     # Mongo databases that will be dropped before/after the tests run
@@ -216,6 +217,7 @@ class Env(object):
         if dir_name.isdir() and not dir_name.endswith(IGNORED_TEST_DIRS):
             LIB_TEST_DIRS.append(path("common/lib") / item.basename())
     #LIB_TEST_DIRS.append(path("pavelib/paver_tests"))
+    LIB_TEST_DIRS.append(path("scripts/xsslint/tests"))
 
     # Directory for i18n test reports
     I18N_REPORT_DIR = REPORT_DIR / 'i18n'
@@ -251,7 +253,7 @@ class Env(object):
                 django_cmd(
                     system,
                     settings,
-                    "print_setting {django_setting} 2>{log_file}".format(
+                    u"print_setting {django_setting} 2>{log_file}".format(
                         django_setting=django_setting,
                         log_file=cls.PRINT_SETTINGS_LOG_FILE
                     )
@@ -260,7 +262,7 @@ class Env(object):
             )
             return unicode(value).strip()
         except BuildFailure:
-            print("Unable to print the value of the {} setting:".format(django_setting))
+            print(u"Unable to print the value of the {} setting:".format(django_setting))
             with io.open(cls.PRINT_SETTINGS_LOG_FILE, 'r') as f:
                 print(f.read())
             sys.exit(1)
@@ -300,8 +302,8 @@ class Env(object):
             env_path = env_path.parent.parent / env_path.basename()
         if not env_path.isfile():
             print(
-                "Warning: could not find environment JSON file "
-                "at '{path}'".format(path=env_path),
+                u"Warning: could not find environment JSON file "
+                "at '{path}'".format(path=env_path),  # pylint: disable=unicode-format-string
                 file=sys.stderr,
             )
             return dict()
@@ -313,8 +315,8 @@ class Env(object):
 
         except ValueError:
             print(
-                "Error: Could not parse JSON "
-                "in {path}".format(path=env_path),
+                u"Error: Could not parse JSON "
+                "in {path}".format(path=env_path),  # pylint: disable=unicode-format-string
                 file=sys.stderr,
             )
             sys.exit(1)

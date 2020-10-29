@@ -3,7 +3,10 @@
 """
 Acceptance tests for CMS Video Editor.
 """
+from __future__ import absolute_import
+
 import ddt
+
 from common.test.acceptance.pages.common.utils import confirm_prompt
 from common.test.acceptance.tests.video.test_studio_video_module import CMSVideoBaseTest
 
@@ -107,7 +110,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.save_unit_settings()
         self.assertTrue(self.video.is_captions_visible())
         self.assertIn(unicode_text, self.video.captions_text)
-        self.assertEqual(self.video.caption_languages.keys(), ['zh', 'uk'])
+        self.assertEqual(list(self.video.caption_languages.keys()), ['zh', 'uk'])
 
     def test_save_language_upload_no_transcript(self):
         """
@@ -128,7 +131,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         translations_count = self.video.translations_count()
         self.video.select_translation_language(language_code, translations_count - 1)
         self.save_unit_settings()
-        self.assertNotIn(language_code, self.video.caption_languages.keys())
+        self.assertNotIn(language_code, list(self.video.caption_languages.keys()))
 
     def test_upload_large_transcript(self):
         """
@@ -177,7 +180,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.edit_component()
         self.open_advanced_tab()
         self.assertEqual(self.video.translations(), ['zh', 'uk'])
-        self.assertEqual(self.video.caption_languages.keys(), ['zh', 'uk'])
+        self.assertEqual(list(self.video.caption_languages.keys()), ['zh', 'uk'])
         zh_unicode_text = "好 各位同学".decode('utf-8')
         self.assertTrue(self.video.download_translation('zh', zh_unicode_text))
         uk_unicode_text = "Привіт, edX вітає вас.".decode('utf-8')
@@ -396,8 +399,8 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.assertTrue(self.video.is_captions_visible())
         unicode_text = "好 各位同学".decode('utf-8')
         self.assertIn(unicode_text, self.video.captions_text)
-        self.assertEqual(self.video.caption_languages.keys(), [u'ab', u'uk'])
-        self.assertEqual(self.video.caption_languages.keys()[0], 'ab')
+        self.assertEqual(list(self.video.caption_languages.keys()), [u'ab', u'uk'])
+        self.assertEqual(list(self.video.caption_languages.keys())[0], 'ab')
 
     def test_upload_transcript_with_BOM(self):
         """

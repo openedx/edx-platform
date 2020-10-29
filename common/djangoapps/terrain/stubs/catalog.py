@@ -2,8 +2,11 @@
 Stub implementation of catalog service for acceptance tests
 """
 # pylint: disable=invalid-name, missing-docstring
+from __future__ import absolute_import
+
 import re
-import urlparse
+
+import six.moves.urllib.parse  # pylint: disable=import-error
 
 from .http import StubHttpRequestHandler, StubHttpService
 
@@ -27,7 +30,7 @@ class StubCatalogServiceHandler(StubHttpRequestHandler):
         """
         Find the correct handler method given the path info from the HTTP request.
         """
-        path = urlparse.urlparse(self.path).path
+        path = six.moves.urllib.parse.urlparse(self.path).path
         for pattern, handler in pattern_handlers.items():
             match = re.match(pattern, path)
             if match:

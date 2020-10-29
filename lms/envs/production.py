@@ -17,8 +17,9 @@ Common traits:
 # and throws spurious errors. Therefore, we disable invalid-name checking.
 # pylint: disable=invalid-name
 
+import codecs
 import datetime
-import json
+import yaml
 
 import os
 import dateutil
@@ -26,10 +27,32 @@ import dateutil
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from path import Path as path
 from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
+from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
+from django.core.exceptions import ImproperlyConfigured
 
 from .common import *
 from openedx.core.lib.derived import derive_settings  # pylint: disable=wrong-import-order
 from openedx.core.lib.logsettings import get_logger_config  # pylint: disable=wrong-import-order
+
+
+def get_env_setting(setting):
+    """ Get the environment setting or return exception """
+    try:
+        return os.environ[setting]
+    except KeyError:
+        error_msg = u"Set the %s env variable" % setting
+        raise ImproperlyConfigured(error_msg)
+
+# A file path to a YAML file from which to load all the configuration for the edx platform
+CONFIG_FILE = get_env_setting('LMS_CFG')
+
+with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
+    __config__ = yaml.safe_load(f)
+
+    # ENV_TOKENS and AUTH_TOKENS are included for reverse compatability.
+    # Removing them may break plugins that rely on them.
+    ENV_TOKENS = __config__
+    AUTH_TOKENS = __config__
 
 # SERVICE_VARIANT specifies name of the variant used, which decides what JSON
 # configuration files are read during startup.
@@ -99,12 +122,6 @@ CELERY_QUEUES = {
 
 CELERY_ROUTES = "{}celery.Router".format(QUEUE_VARIANT)
 CELERYBEAT_SCHEDULE = {}  # For scheduling tasks, entries can be added to this dict
-
-########################## NON-SECURE ENV CONFIG ##############################
-# Things like server locations, ports, etc.
-
-with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
-    ENV_TOKENS = json.load(env_file)
 
 # STATIC_ROOT specifies the directory where static files are
 # collected
@@ -178,6 +195,10 @@ EDXMKTG_USER_INFO_COOKIE_NAME = ENV_TOKENS.get('EDXMKTG_USER_INFO_COOKIE_NAME', 
 
 LMS_ROOT_URL = ENV_TOKENS.get('LMS_ROOT_URL')
 LMS_INTERNAL_ROOT_URL = ENV_TOKENS.get('LMS_INTERNAL_ROOT_URL', LMS_ROOT_URL)
+
+# List of logout URIs for each IDA that the learner should be logged out of when they logout of the LMS. Only applies to
+# IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
+IDA_LOGOUT_URI_LIST = ENV_TOKENS.get('IDA_LOGOUT_URI_LIST', [])
 
 ENV_FEATURES = ENV_TOKENS.get('FEATURES', {})
 for feature, value in ENV_FEATURES.items():
@@ -295,6 +316,10 @@ ENABLE_COMPREHENSIVE_THEMING = ENV_TOKENS.get('ENABLE_COMPREHENSIVE_THEMING', EN
 
 # Marketing link overrides
 MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
+ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = ENV_TOKENS.get(
+    'ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS',
+    ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS
+)
 
 # Intentional defaults.
 SUPPORT_SITE_LINK = ENV_TOKENS.get('SUPPORT_SITE_LINK', SUPPORT_SITE_LINK)
@@ -308,7 +333,7 @@ ACTIVATION_EMAIL_SUPPORT_LINK = ENV_TOKENS.get(
 MOBILE_STORE_URLS = ENV_TOKENS.get('MOBILE_STORE_URLS', MOBILE_STORE_URLS)
 
 # Timezone overrides
-TIME_ZONE = ENV_TOKENS.get('TIME_ZONE', TIME_ZONE)
+TIME_ZONE = ENV_TOKENS.get('CELERY_TIMEZONE', CELERY_TIMEZONE)
 
 # Translation overrides
 LANGUAGES = ENV_TOKENS.get('LANGUAGES', LANGUAGES)
@@ -379,28 +404,8 @@ if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
 SSL_AUTH_EMAIL_DOMAIN = ENV_TOKENS.get("SSL_AUTH_EMAIL_DOMAIN", "MIT.EDU")
 SSL_AUTH_DN_FORMAT_STRING = ENV_TOKENS.get(
     "SSL_AUTH_DN_FORMAT_STRING",
-    "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}"
+    u"/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}"
 )
-
-# Django CAS external authentication settings
-CAS_EXTRA_LOGIN_PARAMS = ENV_TOKENS.get("CAS_EXTRA_LOGIN_PARAMS", None)
-if FEATURES.get('AUTH_USE_CAS'):
-    CAS_SERVER_URL = ENV_TOKENS.get("CAS_SERVER_URL", None)
-    AUTHENTICATION_BACKENDS = [
-        'django.contrib.auth.backends.ModelBackend',
-        'django_cas.backends.CASBackend',
-    ]
-
-    INSTALLED_APPS.append('django_cas')
-
-    MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
-    CAS_ATTRIBUTE_CALLBACK = ENV_TOKENS.get('CAS_ATTRIBUTE_CALLBACK', None)
-    if CAS_ATTRIBUTE_CALLBACK:
-        import importlib
-        CAS_USER_DETAILS_RESOLVER = getattr(
-            importlib.import_module(CAS_ATTRIBUTE_CALLBACK['module']),
-            CAS_ATTRIBUTE_CALLBACK['function']
-        )
 
 # Video Caching. Pairing country codes with CDN URLs.
 # Example: {'CN': 'http://api.xuetangx.com/edx/video?s3_url='}
@@ -473,12 +478,6 @@ if FEATURES.get('ENABLE_CORS_HEADERS') or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF
 # Field overrides. To use the IDDE feature, add
 # 'courseware.student_field_overrides.IndividualStudentOverrideProvider'.
 FIELD_OVERRIDE_PROVIDERS = tuple(ENV_TOKENS.get('FIELD_OVERRIDE_PROVIDERS', []))
-
-############################## SECURE AUTH ITEMS ###############
-# Secret things: passwords, access keys, etc.
-
-with open(CONFIG_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
-    AUTH_TOKENS = json.load(auth_file)
 
 ############### XBlock filesystem field config ##########
 if 'DJFS' in AUTH_TOKENS and AUTH_TOKENS['DJFS'] is not None:
@@ -914,6 +913,9 @@ if ENV_TOKENS.get('AUDIT_CERT_CUTOFF_DATE', None):
 
 CREDENTIALS_GENERATION_ROUTING_KEY = ENV_TOKENS.get('CREDENTIALS_GENERATION_ROUTING_KEY', DEFAULT_PRIORITY_QUEUE)
 
+# Queue to use for award program certificates
+PROGRAM_CERTIFICATES_ROUTING_KEY = ENV_TOKENS.get('PROGRAM_CERTIFICATES_ROUTING_KEY', DEFAULT_PRIORITY_QUEUE)
+
 # The extended StudentModule history table
 if FEATURES.get('ENABLE_CSMH_EXTENDED'):
     INSTALLED_APPS.append('coursewarehistoryextended')
@@ -1033,6 +1035,10 @@ BASE_COOKIE_DOMAIN = ENV_TOKENS.get(
     'BASE_COOKIE_DOMAIN',
     BASE_COOKIE_DOMAIN
 )
+SYSTEM_TO_FEATURE_ROLE_MAPPING = ENV_TOKENS.get(
+    'SYSTEM_TO_FEATURE_ROLE_MAPPING',
+    SYSTEM_TO_FEATURE_ROLE_MAPPING
+)
 
 ############## CATALOG/DISCOVERY SERVICE API CLIENT CONFIGURATION ######################
 # The LMS communicates with the Catalog service via the EdxRestApiClient class
@@ -1043,6 +1049,7 @@ COURSES_API_CACHE_TIMEOUT = ENV_TOKENS.get('COURSES_API_CACHE_TIMEOUT', COURSES_
 
 # Add an ICP license for serving content in China if your organization is registered to do so
 ICP_LICENSE = ENV_TOKENS.get('ICP_LICENSE', None)
+ICP_LICENSE_INFO = ENV_TOKENS.get('ICP_LICENSE_INFO', {})
 
 ############## Settings for CourseGraph ############################
 COURSEGRAPH_JOB_QUEUE = ENV_TOKENS.get('COURSEGRAPH_JOB_QUEUE', DEFAULT_PRIORITY_QUEUE)
@@ -1092,18 +1099,32 @@ RETIREMENT_SERVICE_WORKER_USERNAME = ENV_TOKENS.get(
 )
 RETIREMENT_STATES = ENV_TOKENS.get('RETIREMENT_STATES', RETIREMENT_STATES)
 
+############### Settings for Username Replacement ###############
+USERNAME_REPLACEMENT_WORKER = ENV_TOKENS.get('USERNAME_REPLACEMENT_WORKER', USERNAME_REPLACEMENT_WORKER)
+
 ############## Settings for Course Enrollment Modes ######################
 COURSE_ENROLLMENT_MODES = ENV_TOKENS.get('COURSE_ENROLLMENT_MODES', COURSE_ENROLLMENT_MODES)
 
-############## Settings for Writable Gradebook  #########################
+############## Settings for Microfrontend URLS  #########################
 WRITABLE_GRADEBOOK_URL = ENV_TOKENS.get('WRITABLE_GRADEBOOK_URL', WRITABLE_GRADEBOOK_URL)
+PROFILE_MICROFRONTEND_URL = ENV_TOKENS.get('PROFILE_MICROFRONTEND_URL', PROFILE_MICROFRONTEND_URL)
+ORDER_HISTORY_MICROFRONTEND_URL = ENV_TOKENS.get('ORDER_HISTORY_MICROFRONTEND_URL', ORDER_HISTORY_MICROFRONTEND_URL)
+ACCOUNT_MICROFRONTEND_URL = ENV_TOKENS.get('ACCOUNT_MICROFRONTEND_URL', ACCOUNT_MICROFRONTEND_URL)
+
+############### Settings for edx-rbac  ###############
+SYSTEM_WIDE_ROLE_CLASSES = ENV_TOKENS.get('SYSTEM_WIDE_ROLE_CLASSES') or SYSTEM_WIDE_ROLE_CLASSES
 
 ############################### Plugin Settings ###############################
 
 # This is at the bottom because it is going to load more settings after base settings are loaded
-from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants  # pylint: disable=wrong-import-order, wrong-import-position
-plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_constants.SettingsType.AWS)
+
+# Load production.py in plugins
+plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_constants.SettingsType.PRODUCTION)
 
 ########################## Derive Any Derived Settings  #######################
 
 derive_settings(__name__)
+
+######################### Overriding custom enrollment roles ###############
+
+MANUAL_ENROLLMENT_ROLE_CHOICES = ENV_TOKENS.get('MANUAL_ENROLLMENT_ROLE_CHOICES', MANUAL_ENROLLMENT_ROLE_CHOICES)

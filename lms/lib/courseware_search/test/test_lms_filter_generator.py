@@ -12,7 +12,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
     """ Tests for search result processor """
-    shard = 5
 
     def build_courses(self):
         """

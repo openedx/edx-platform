@@ -495,6 +495,7 @@
             saveValue: function() {
                 var attributes = {};
                 attributes[this.options.valueAttribute] = this.fieldValue();
+                $.cookie('old-pref-lang', this.modelValue());
                 this.saveAttributes(attributes);
             },
 

@@ -28,14 +28,14 @@ class AnnotatableProblemTest(UniqueCourseTest):
     USERNAME = "STAFF_TESTER"
     EMAIL = "johndoe@example.com"
 
-    DATA_TEMPLATE = dedent("""\
+    DATA_TEMPLATE = dedent(u"""\
         <annotatable>
             <instructions>Instruction text</instructions>
             <p>{}</p>
         </annotatable>
     """)
 
-    ANNOTATION_TEMPLATE = dedent("""\
+    ANNOTATION_TEMPLATE = dedent(u"""\
         Before {0}.
         <annotation title="region {0}" body="Comment {0}" highlight="yellow" problem="{0}">
             Region Contents {0}
@@ -43,7 +43,7 @@ class AnnotatableProblemTest(UniqueCourseTest):
         After {0}.
     """)
 
-    PROBLEM_TEMPLATE = dedent("""\
+    PROBLEM_TEMPLATE = dedent(u"""\
     <problem max_attempts="1" weight="">
       <annotationresponse>
         <annotationinput>
@@ -63,7 +63,7 @@ class AnnotatableProblemTest(UniqueCourseTest):
     </problem>
     """)
 
-    OPTION_TEMPLATE = """<option choice="{correctness}">{number}</option>"""
+    OPTION_TEMPLATE = u"""<option choice="{correctness}">{number}</option>"""
 
     def setUp(self):
         super(AnnotatableProblemTest, self).setUp()

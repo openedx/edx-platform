@@ -268,6 +268,7 @@ class UnderscoreTemplateLinter(BaseLinter):
 
         Safe examples::
 
+            <%= edx.HtmlUtils.ensureHtml(message) %>
             <%= HtmlUtils.ensureHtml(message) %>
             <%= _.escape(message) %>
 
@@ -278,6 +279,8 @@ class UnderscoreTemplateLinter(BaseLinter):
             True if the Expression has been safely escaped, and False otherwise.
 
         """
+        if expression.expression_inner.startswith('edx.HtmlUtils.'):
+            return True
         if expression.expression_inner.startswith('HtmlUtils.'):
             return True
         if expression.expression_inner.startswith('_.escape('):

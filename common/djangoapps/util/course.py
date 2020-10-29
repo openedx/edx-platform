@@ -1,9 +1,14 @@
 """
 Utility methods related to course
 """
-import logging
-import urllib
+from __future__ import absolute_import
 
+import logging
+
+import six
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 from django.conf import settings
 from openedx.core.djangoapps.appsembler.sites.utils import get_lms_link_from_course_key
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -29,8 +34,8 @@ def get_encoded_course_sharing_utm_params():
     Returns encoded Course Sharing UTM Parameters.
     """
     return {
-        utm_source: urllib.urlencode(utm_params)
-        for utm_source, utm_params in COURSE_SHARING_UTM_PARAMETERS.iteritems()
+        utm_source: six.moves.urllib.parse.urlencode(utm_params)
+        for utm_source, utm_params in six.iteritems(COURSE_SHARING_UTM_PARAMETERS)
     }
 
 
@@ -63,7 +68,7 @@ def get_link_for_about_page(course):
 
         course_about_url = u'{about_base_url}/courses/{course_key}/about'.format(
             about_base_url=about_base,
-            course_key=unicode(course.id),
+            course_key=six.text_type(course.id),
         )
 
     return course_about_url

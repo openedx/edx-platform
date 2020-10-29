@@ -190,6 +190,7 @@ class TestUnderscoreTemplateLinter(TestLinter):
         self.assertEqual(results.violations[1].is_disabled, False)
 
     @data(
+        {'template': '<%= edx.HtmlUtils.ensureHtml(message) %>'},
         {'template': '<%= HtmlUtils.ensureHtml(message) %>'},
         {'template': '<%= _.escape(message) %>'},
     )

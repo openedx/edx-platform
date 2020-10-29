@@ -1,9 +1,12 @@
 # pylint: disable=missing-docstring
 
+from __future__ import absolute_import
+
+import unittest
+
 from django.conf import settings
 from django.test import TestCase
-from oauth2_provider.models import Application, AccessToken, RefreshToken
-import unittest
+from oauth2_provider.models import AccessToken, Application, RefreshToken
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories
 from student.tests.factories import UserFactory

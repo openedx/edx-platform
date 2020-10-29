@@ -73,6 +73,8 @@ MKTG_URLS = {
     'WHAT_IS_VERIFIED_CERT': '/verified-certificate',
 }
 
+ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
+
 CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
 
 COURSE_CATALOG_API_URL = 'http://edx.devstack.discovery:18381/api/v1/'
@@ -84,3 +86,7 @@ REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'] += (  # noqa F405
 # Uncomment the lines below if you'd like to see SQL statements in your devstack LMS log.
 # LOGGING['handlers']['console']['level'] = 'DEBUG'
 # LOGGING['loggers']['django.db.backends'] = {'handlers': ['console'], 'level': 'DEBUG', 'propagate': False}
+
+if FEATURES['ENABLE_ENTERPRISE_INTEGRATION']:
+    SYSTEM_WIDE_ROLE_CLASSES = os.environ.get("SYSTEM_WIDE_ROLE_CLASSES", [])
+    SYSTEM_WIDE_ROLE_CLASSES.extend(['enterprise.SystemWideEnterpriseUserRoleAssignment'])

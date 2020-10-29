@@ -5,19 +5,23 @@ Integration tests for submitting problem responses and getting grades.
 
 # pylint: disable=attribute-defined-outside-init
 
+from __future__ import absolute_import
+
 import json
 import os
 from textwrap import dedent
 
 import ddt
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.urls import reverse
 from django.utils.timezone import now
 from mock import patch
 from six import text_type
+from submissions import api as submissions_api
 
 from capa.tests.response_xml_factory import (
     CodeResponseXMLFactory,
@@ -28,15 +32,12 @@ from capa.tests.response_xml_factory import (
 from course_modes.models import CourseMode
 from courseware.models import BaseStudentModuleHistory, StudentModule
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
-from lms.djangoapps.grades.tasks import compute_all_grades_for_course
+from lms.djangoapps.grades.api import CourseGradeFactory, task_compute_all_grades_for_course
 from openedx.core.djangoapps.credit.api import get_credit_requirement_status, set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
-from openedx.core.lib.tests import attr
 from openedx.core.lib.url_utils import quote_slashes
 from student.models import CourseEnrollment, anonymous_id_for_user
-from submissions import api as submissions_api
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
@@ -277,14 +278,15 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         Returns list of scores: [<points on hw_1>, <points on hw_2>, ..., <points on hw_n>]
         """
         return [
-            s.graded_total.earned for s in self.get_course_grade().graded_subsections_by_format['Homework'].itervalues()
+            s.graded_total.earned for s in six.itervalues(
+                self.get_course_grade().graded_subsections_by_format['Homework'])
         ]
 
     def hw_grade(self, hw_url_name):
         """
         Returns SubsectionGrade for given url.
         """
-        for chapter in self.get_course_grade().chapter_grades.itervalues():
+        for chapter in six.itervalues(self.get_course_grade().chapter_grades):
             for section in chapter['sections']:
                 if section.url_name == hw_url_name:
                     return section
@@ -321,7 +323,7 @@ class TestCourseGrades(TestSubmittingProblems):
         Verifies the problem score and the homework grade are as expected.
         """
         hw_grade = self.hw_grade('homework')
-        problem_score = hw_grade.problem_scores.values()[0]
+        problem_score = list(hw_grade.problem_scores.values())[0]
         self.assertEquals((problem_score.earned, problem_score.possible), expected_problem_score)
         self.assertEquals((hw_grade.graded_total.earned, hw_grade.graded_total.possible), expected_hw_grade)
 
@@ -335,7 +337,6 @@ class TestCourseGrades(TestSubmittingProblems):
         self._verify_grade(expected_problem_score=(0.0, 1.0), expected_hw_grade=(0.0, 1.0))
 
 
-@attr(shard=9)
 @ddt.ddt
 class TestCourseGrader(TestSubmittingProblems):
     """
@@ -408,7 +409,7 @@ class TestCourseGrader(TestSubmittingProblems):
             ]
         }
         self.add_grading_policy(grading_policy)
-        compute_all_grades_for_course.apply_async(kwargs={'course_key': unicode(self.course.id)})
+        task_compute_all_grades_for_course.apply_async(kwargs={'course_key': six.text_type(self.course.id)})
 
     def dropping_setup(self):
         """
@@ -493,14 +494,14 @@ class TestCourseGrader(TestSubmittingProblems):
         )
         # count how many state history entries there are
         baseline = BaseStudentModuleHistory.get_history(student_module)
-        self.assertEqual(len(baseline), 3)
+        self.assertEqual(len(baseline), 2)
 
         # now click "show answer"
         self.show_question_answer('p1')
 
         # check that we don't have more state history entries
         csmh = BaseStudentModuleHistory.get_history(student_module)
-        self.assertEqual(len(csmh), 3)
+        self.assertEqual(len(csmh), 2)
 
     def test_grade_with_collected_max_score(self):
         """
@@ -584,8 +585,8 @@ class TestCourseGrader(TestSubmittingProblems):
 
         student_item = {
             'student_id': anonymous_id_for_user(self.student_user, self.course.id),
-            'course_id': unicode(self.course.id),
-            'item_id': unicode(self.problem_location('p3')),
+            'course_id': six.text_type(self.course.id),
+            'item_id': six.text_type(self.problem_location('p3')),
             'item_type': 'problem'
         }
         submission = submissions_api.create_submission(student_item, 'any answer')
@@ -752,7 +753,6 @@ class TestCourseGrader(TestSubmittingProblems):
         self.assertEqual(req_status[0]["status"], 'satisfied')
 
 
-@attr(shard=9)
 class ProblemWithUploadedFilesTest(TestSubmittingProblems):
     """Tests of problems with uploaded files."""
     # Tell Django to clean out all databases, not just default
@@ -803,11 +803,10 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
         self.assertEqual(name, "post")
         self.assertEqual(len(args), 1)
         self.assertTrue(args[0].endswith("/submit/"))
-        self.assertItemsEqual(kwargs.keys(), ["files", "data", "timeout"])
-        self.assertItemsEqual(kwargs['files'].keys(), filenames.split())
+        self.assertItemsEqual(list(kwargs.keys()), ["files", "data", "timeout"])
+        self.assertItemsEqual(list(kwargs['files'].keys()), filenames.split())
 
 
-@attr(shard=9)
 class TestPythonGradedResponse(TestSubmittingProblems):
     """
     Check that we can submit a schematic and custom response, and it answers properly.
@@ -1058,7 +1057,6 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         self._check_ireset(name)
 
 
-@attr(shard=9)
 class TestConditionalContent(TestSubmittingProblems):
     """
     Check that conditional content works correctly with grading.

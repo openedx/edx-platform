@@ -16,6 +16,8 @@ Example usage:
     $ ./manage.py lms resubmit_error_certificates -c edX/DemoX/Fall_2015 -c edX/DemoX/Spring_2016
 
 """
+from __future__ import absolute_import
+
 import logging
 
 from django.core.management.base import BaseCommand, CommandError
@@ -62,7 +64,7 @@ class Command(BaseCommand):
                 only_course_keys.append(CourseKey.from_string(course_key_str))
             except InvalidKeyError:
                 raise CommandError(
-                    '"{course_key_str}" is not a valid course key.'.format(
+                    u'"{course_key_str}" is not a valid course key.'.format(
                         course_key_str=course_key_str
                     )
                 )
@@ -108,7 +110,7 @@ class Command(BaseCommand):
                     ), course_key, user.id
                 )
 
-        LOGGER.info("Finished resubmitting %s certificate tasks", resubmit_count)
+        LOGGER.info(u"Finished resubmitting %s certificate tasks", resubmit_count)
 
     def _load_course_with_cache(self, course_key, course_cache):
         """Retrieve the course, then cache it to avoid Mongo queries. """

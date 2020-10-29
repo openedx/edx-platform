@@ -57,7 +57,7 @@ def course_detail(request, username, course_key):
 
 def list_courses(request, username, org=None, filter_=None):
     """
-    Return a list of available courses.
+    Yield all available courses.
 
     The courses returned are all be visible to the user identified by
     `username` and the logged in user should have permission to view courses
@@ -81,7 +81,7 @@ def list_courses(request, username, org=None, filter_=None):
             by the given key-value pairs.
 
     Return value:
-        List of `CourseOverview` objects representing the collection of courses.
+        Yield `CourseOverview` objects representing the collection of courses.
     """
     user = get_effective_user(request.user, username)
     return get_courses(user, org=org, filter_=filter_)

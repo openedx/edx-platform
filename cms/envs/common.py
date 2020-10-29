@@ -130,6 +130,9 @@ from lms.envs.common import (
     CONTACT_EMAIL,
 
     DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH,
+
+    GENERATE_PROFILE_SCORES,
+
     # Video Image settings
     VIDEO_IMAGE_SETTINGS,
     VIDEO_TRANSCRIPTS_SETTINGS,
@@ -142,6 +145,8 @@ from lms.envs.common import (
     RETIRED_USER_SALTS,
     RETIREMENT_SERVICE_WORKER_USERNAME,
     RETIREMENT_STATES,
+
+    IDA_LOGOUT_URI_LIST,
 
     # Methods to derive settings
     _make_mako_template_dirs,
@@ -166,7 +171,7 @@ from openedx.core.release import doc_version
 
 # Dummy secret key for dev/test
 SECRET_KEY = 'dev key'
-
+FAVICON_PATH = 'images/favicon.ico'
 STUDIO_NAME = _("Your Platform Studio")
 STUDIO_SHORT_NAME = _("Studio")
 FEATURES = {
@@ -176,13 +181,14 @@ FEATURES = {
     # in sync with the ones in lms/envs/common.py
     'ENABLE_DISCUSSION_SERVICE': True,
     'ENABLE_TEXTBOOK': True,
+
+    # .. documented_elsewhere: true
+    # .. documented_elsewhere_name: ENABLE_STUDENT_NOTES
     'ENABLE_STUDENT_NOTES': True,
 
     # DO NOT SET TO True IN THIS FILE
     # Doing so will cause all courses to be released on production
     'DISABLE_START_DATES': False,  # When True, all courses will be active, regardless of start date
-
-    'AUTH_USE_CERTIFICATES': False,
 
     # email address for studio staff (eg to request course creation)
     'STUDIO_REQUEST_EMAIL': '',
@@ -345,8 +351,7 @@ sys.path.append(PROJECT_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 
 # For geolocation ip database
-GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoIP.dat"
-GEOIPV6_PATH = REPO_ROOT / "common/static/data/geoip/GeoIPv6.dat"
+GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoLite2-Country.mmdb"
 
 ############################# TEMPLATE CONFIGURATION #############################
 # Mako templating
@@ -442,6 +447,13 @@ LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
 LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
 ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
 ENTERPRISE_CONSENT_API_URL = LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
+FRONTEND_LOGIN_URL = LOGIN_URL
+FRONTEND_LOGOUT_URL = lambda settings: settings.LMS_ROOT_URL + '/logout'
+derived('FRONTEND_LOGOUT_URL')
+
+# List of logout URIs for each IDA that the learner should be logged out of when they logout of
+# Studio. Only applies to IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
+IDA_LOGOUT_URI_LIST = []
 
 # These are standard regexes for pulling out info like course_ids, usage_ids, etc.
 # They are used so that URLs with deprecated-format strings still work.
@@ -475,6 +487,9 @@ MIDDLEWARE_CLASSES = [
     # A newer and safer request cache.
     'edx_django_utils.cache.middleware.RequestCacheMiddleware',
     'edx_django_utils.monitoring.middleware.MonitoringMemoryMiddleware',
+
+    # Cookie monitoring
+    'openedx.core.lib.request_utils.CookieMetricsMiddleware',
 
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',
@@ -534,6 +549,9 @@ MIDDLEWARE_CLASSES = [
     'edx_rest_framework_extensions.middleware.RequestMetricsMiddleware',
 
     'edx_rest_framework_extensions.auth.jwt.middleware.EnsureJWTAuthSettingsMiddleware',
+
+    # Handles automatically storing user ids in django-simple-history tables when possible.
+    'simple_history.middleware.HistoryRequestMiddleware',
 
     # This must be last so that it runs first in the process_response chain
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
@@ -647,7 +665,7 @@ SERVER_EMAIL = 'devops@example.com'
 ADMINS = []
 MANAGERS = ADMINS
 
-# Initialize to 'unknown', but read from JSON in aws.py
+# Initialize to 'unknown', but read from JSON in production.py
 EDX_PLATFORM_REVISION = 'unknown'
 
 # Static content
@@ -663,6 +681,7 @@ STATICFILES_DIRS = [
 ]
 
 # Locale/Internationalization
+CELERY_TIMEZONE = 'UTC'
 TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGES_BIDI = lms.envs.common.LANGUAGES_BIDI
@@ -691,7 +710,18 @@ EMBARGO_SITE_REDIRECT_URL = None
 
 ############################### PIPELINE #######################################
 
-PIPELINE_ENABLED = True
+PIPELINE = {
+    'PIPELINE_ENABLED': True,
+    # Don't use compression by default
+    'CSS_COMPRESSOR': None,
+    'JS_COMPRESSOR': None,
+    # Don't wrap JavaScript as there is code that depends upon updating the global namespace
+    'DISABLE_WRAPPER': True,
+    # Specify the UglifyJS binary to use
+    'UGLIFYJS_BINARY': 'node_modules/.bin/uglifyjs',
+    'COMPILERS': (),
+    'YUI_BINARY': 'yui-compressor',
+}
 
 STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 
@@ -705,19 +735,9 @@ STATICFILES_FINDERS = [
     'pipeline.finders.PipelineFinder',
 ]
 
-# Don't use compression by default
-PIPELINE_CSS_COMPRESSOR = None
-PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.uglifyjs.UglifyJSCompressor'
-
-# Don't wrap JavaScript as there is code that depends upon updating the global namespace
-PIPELINE_DISABLE_WRAPPER = True
-
-# Specify the UglifyJS binary to use
-PIPELINE_UGLIFYJS_BINARY = 'node_modules/.bin/uglifyjs'
-
 from openedx.core.lib.rooted_paths import rooted_glob
 
-PIPELINE_CSS = {
+PIPELINE['STYLESHEETS'] = {
     'style-vendor': {
         'source_filenames': [
             'css/vendor/normalize.css',
@@ -815,7 +835,7 @@ base_vendor_js = [
 
 # test_order: Determines the position of this chunk of javascript on
 # the jasmine test page
-PIPELINE_JS = {
+PIPELINE['JAVASCRIPT'] = {
     'base_vendor': {
         'source_filenames': base_vendor_js,
         'output_filename': 'js/cms-base-vendor.js',
@@ -830,10 +850,6 @@ PIPELINE_JS = {
         'test_order': 1
     },
 }
-
-PIPELINE_COMPILERS = ()
-PIPELINE_CSS_COMPRESSOR = None
-PIPELINE_JS_COMPRESSOR = None
 
 STATICFILES_IGNORE_PATTERNS = (
     "*.py",
@@ -856,8 +872,6 @@ STATICFILES_IGNORE_PATTERNS = (
     "xmodule_js",
     "common_static",
 )
-
-PIPELINE_YUI_BINARY = 'yui-compressor'
 
 ################################# DJANGO-REQUIRE ###############################
 
@@ -1026,7 +1040,6 @@ INSTALLED_APPS = [
 
     'openedx.core.djangoapps.contentserver',
     'course_creators',
-    'openedx.core.djangoapps.external_auth',
     'student.apps.StudentConfig',  # misleading name due to sharing with lms
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
     'xblock_config.apps.XBlockConfig',
@@ -1052,8 +1065,8 @@ INSTALLED_APPS = [
     # Ability to detect and special-case crawler behavior
     'openedx.core.djangoapps.crawlers',
 
-    # comment common
-    'django_comment_common',
+    # Discussion
+    'openedx.core.djangoapps.django_comment_common',
 
     # for course creator table
     'django.contrib.admin',
@@ -1364,9 +1377,10 @@ ADVANCED_PROBLEM_TYPES = [
     {
         'component': 'drag-and-drop-v2',
         'boilerplate_name': None
-    }
+    },
 ]
 
+USERNAME_REPLACEMENT_WORKER = "REPLACE WITH VALID USERNAME"
 
 # Files and Uploads type filter values
 
@@ -1560,6 +1574,8 @@ ZENDESK_CUSTOM_FIELDS = {}
 # (0.0 = 0%, 1.0 = 100%)
 COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
 
+############### Settings for edx-rbac  ###############
+SYSTEM_WIDE_ROLE_CLASSES = []
 
 ############## Installed Django Apps #########################
 

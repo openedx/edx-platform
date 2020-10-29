@@ -1,12 +1,15 @@
 """
 Tests for Pdf file
 """
+from __future__ import absolute_import
+
 import unittest
 from datetime import datetime
 from io import BytesIO
 
 from django.conf import settings
 from django.test.utils import override_settings
+from six.moves import range
 
 from shoppingcart.pdf import PDFInvoice
 from shoppingcart.utils import parse_pages
@@ -40,7 +43,6 @@ class TestPdfFile(unittest.TestCase):
     """
     Unit test cases for pdf file generation
     """
-    shard = 4
 
     def setUp(self):
         super(TestPdfFile, self).setUp()
@@ -59,7 +61,7 @@ class TestPdfFile(unittest.TestCase):
         return the dictionary with the dummy data
         """
         return {
-            'item_description': 'Course %s Description' % index,
+            'item_description': u'Course %s Description' % index,
             'quantity': index,
             'list_price': 10,
             'discount': discount,

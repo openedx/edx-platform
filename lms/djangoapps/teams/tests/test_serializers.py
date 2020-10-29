@@ -2,6 +2,9 @@
 """
 Tests for custom Teams Serializers.
 """
+from __future__ import absolute_import
+
+import six
 from django.core.paginator import Paginator
 from django.test.client import RequestFactory
 
@@ -33,7 +36,6 @@ class MembershipSerializerTestCase(SerializerTestCase):
     """
     Tests for the membership serializer.
     """
-    shard = 4
 
     def setUp(self):
         super(MembershipSerializerTestCase, self).setUp()
@@ -72,7 +74,6 @@ class TopicSerializerTestCase(SerializerTestCase):
     Tests for the `TopicSerializer`, which should serialize team count data for
     a single topic.
     """
-    shard = 4
 
     def test_topic_with_no_team_count(self):
         """
@@ -122,7 +123,6 @@ class BaseTopicSerializerTestCase(SerializerTestCase):
     """
     Base class for testing the two paginated topic serializers.
     """
-    shard = 4
 
     __test__ = False
     PAGE_SIZE = 5
@@ -142,13 +142,13 @@ class BaseTopicSerializerTestCase(SerializerTestCase):
         """
         self.course.teams_configuration['topics'] = []
         topics = [
-            {u'name': u'Tøpic {}'.format(i), u'description': u'The bést topic! {}'.format(i), u'id': unicode(i)}
-            for i in xrange(num_topics)
+            {u'name': u'Tøpic {}'.format(i), u'description': u'The bést topic! {}'.format(i), u'id': six.text_type(i)}
+            for i in six.moves.range(num_topics)
         ]
-        for i in xrange(num_topics):
-            topic_id = unicode(i)
+        for i in six.moves.range(num_topics):
+            topic_id = six.text_type(i)
             self.course.teams_configuration['topics'].append(topics[i])
-            for _ in xrange(teams_per_topic):
+            for _ in six.moves.range(teams_per_topic):
                 CourseTeamFactory.create(course_id=self.course.id, topic_id=topic_id)
         return topics
 
@@ -179,7 +179,6 @@ class BulkTeamCountTopicSerializerTestCase(BaseTopicSerializerTestCase):
     Tests for the `BulkTeamCountTopicSerializer`, which should serialize team_count
     data for many topics with constant time SQL queries.
     """
-    shard = 4
     __test__ = True
     serializer = BulkTeamCountTopicSerializer
 
@@ -238,13 +237,13 @@ class BulkTeamCountTopicSerializerTestCase(BaseTopicSerializerTestCase):
         """
         self.course.teams_configuration['topics'] = []
         topics = [
-            {u'name': u'Tøpic {}'.format(i), u'description': u'The bést topic! {}'.format(i), u'id': unicode(i)}
-            for i in xrange(num_topics)
+            {u'name': u'Tøpic {}'.format(i), u'description': u'The bést topic! {}'.format(i), u'id': six.text_type(i)}
+            for i in six.moves.range(num_topics)
         ]
-        for i in xrange(num_topics):
-            topic_id = unicode(i)
+        for i in six.moves.range(num_topics):
+            topic_id = six.text_type(i)
             self.course.teams_configuration['topics'].append(topics[i])
-            for _ in xrange(teams_per_topic):
+            for _ in six.moves.range(teams_per_topic):
                 CourseTeamFactory.create(course_id=self.course.id, topic_id=topic_id)
         return topics
 

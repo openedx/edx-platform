@@ -11,7 +11,6 @@ class LibraryToolsServiceTest(MixedSplitTestCase):
     """
     Tests for library service.
     """
-    shard = 1
 
     def setUp(self):
         super(LibraryToolsServiceTest, self).setUp()

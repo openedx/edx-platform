@@ -2,36 +2,38 @@
 Test the enterprise support APIs.
 """
 
+from __future__ import absolute_import
+
+import mock
+
 import ddt
 import httpretty
-import mock
+from consent.models import DataSharingConsent
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.test.utils import override_settings
-
-from consent.models import DataSharingConsent
+from django.urls import reverse
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.features.enterprise_support.api import (
     ConsentApiClient,
     ConsentApiServiceClient,
-    consent_needed_for_course,
-    get_consent_required_courses,
-    data_sharing_consent_required,
     EnterpriseApiClient,
     EnterpriseApiServiceClient,
+    consent_needed_for_course,
+    data_sharing_consent_required,
     enterprise_customer_for_request,
+    enterprise_enabled,
+    get_consent_required_courses,
     get_dashboard_consent_notification,
     get_enterprise_consent_url,
-    insert_enterprise_pipeline_elements,
-    enterprise_enabled,
+    insert_enterprise_pipeline_elements
 )
 from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerUserFactory
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
-from openedx.features.enterprise_support.utils import get_cache_key
+from openedx.features.enterprise_support.utils import clear_data_consent_share_cache, get_cache_key
 from student.tests.factories import UserFactory
 
 
@@ -168,15 +170,27 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
     def test_consent_needed_for_course(self):
         user = UserFactory(username='janedoe')
         request = mock.MagicMock(session={}, user=user)
+        ec_uuid = 'cf246b88-d5f6-4908-a522-fc307e0b0c59'
+        course_id = 'fake-course'
         self.mock_enterprise_learner_api()
-        self.mock_consent_missing(user.username, 'fake-course', 'cf246b88-d5f6-4908-a522-fc307e0b0c59')
-        self.assertTrue(consent_needed_for_course(request, user, 'fake-course'))
-        self.mock_consent_get(user.username, 'fake-course', 'cf246b88-d5f6-4908-a522-fc307e0b0c59')
-        self.assertFalse(consent_needed_for_course(request, user, 'fake-course'))
-        # Test that the result is cached when false (remove the HTTP mock so if the result
-        # isn't cached, we'll fail spectacularly.)
-        httpretty.reset()
-        self.assertFalse(consent_needed_for_course(request, user, 'fake-course'))
+
+        # test not required consent for example non enterprise customer
+        self.mock_consent_not_required(user.username, course_id, ec_uuid)
+        self.assertFalse(consent_needed_for_course(request, user, course_id))
+
+        # test required and missing consent for example now he becomes a enterprise customer
+        self.mock_consent_missing(user.username, course_id, ec_uuid)
+        # still result should be False as it has been stored in cache "Not to show consent", so it will confirm that
+        # cache is working fine
+        self.assertFalse(consent_needed_for_course(request, user, course_id))
+        # Removing cache
+        clear_data_consent_share_cache(user.id, course_id)
+        # Now test again
+        self.assertTrue(consent_needed_for_course(request, user, course_id))
+
+        # test after consent permission is granted
+        self.mock_consent_get(user.username, course_id, ec_uuid)
+        self.assertFalse(consent_needed_for_course(request, user, course_id))
 
     @httpretty.activate
     @mock.patch('enterprise.models.EnterpriseCustomer.catalog_contains_course')

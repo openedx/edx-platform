@@ -2,22 +2,27 @@
 Utility functions for transcripts.
 ++++++++++++++++++++++++++++++++++
 """
-from functools import wraps
-from django.conf import settings
-import os
+from __future__ import absolute_import
+
 import copy
 import json
-import requests
 import logging
-from pysrt import SubRipTime, SubRipItem, SubRipFile
-from pysrt.srtexc import Error
-from lxml import etree
-from HTMLParser import HTMLParser
-from six import text_type
+import os
+from functools import wraps
 
-from xmodule.exceptions import NotFoundError
+import requests
+import six
+from django.conf import settings
+from lxml import etree
+from pysrt import SubRipFile, SubRipItem, SubRipTime
+from pysrt.srtexc import Error
+from six import text_type
+from six.moves import range, zip
+from six.moves.html_parser import HTMLParser  # pylint: disable=import-error
+
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
+from xmodule.exceptions import NotFoundError
 
 from .bumper_utils import get_bumper_settings
 
@@ -266,7 +271,7 @@ def generate_subs_from_source(speed_subs, subs_type, subs_filedata, item, langua
         'end': sub_ends,
         'text': sub_texts}
 
-    for speed, subs_id in speed_subs.iteritems():
+    for speed, subs_id in six.iteritems(speed_subs):
         save_subs_to_store(
             generate_subs(speed, 1, subs),
             subs_id,
@@ -300,7 +305,7 @@ def generate_srt_from_sjson(sjson_subs, speed):
             end=SubRipTime(milliseconds=sjson_speed_1['end'][i]),
             text=sjson_speed_1['text'][i]
         )
-        output += (unicode(item))
+        output += (six.text_type(item))
         output += '\n'
     return output
 
@@ -439,7 +444,7 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
                 generate_sjson_for_all_speeds(
                     item,
                     item.transcripts[lang],
-                    {speed: subs_id for subs_id, speed in youtube_speed_dict(item).iteritems()},
+                    {speed: subs_id for subs_id, speed in six.iteritems(youtube_speed_dict(item))},
                     lang,
                 )
             except TranscriptException as ex:
@@ -537,13 +542,13 @@ def get_video_ids_info(edx_video_id, youtube_id_1_0, html5_sources):
     Returns:
         tuple: external or internal, video ids list
     """
-    clean = lambda item: item.strip() if isinstance(item, basestring) else item
+    clean = lambda item: item.strip() if isinstance(item, six.string_types) else item
     external = not bool(clean(edx_video_id))
 
     video_ids = [edx_video_id, youtube_id_1_0] + get_html5_ids(html5_sources)
 
     # video_ids cleanup
-    video_ids = filter(lambda item: bool(clean(item)), video_ids)
+    video_ids = [item for item in video_ids if bool(clean(item))]
 
     return external, video_ids
 
@@ -669,7 +674,8 @@ class Transcript(object):
 
             if output_format == 'txt':
                 text = json.loads(content)['text']
-                return HTMLParser().unescape("\n".join(text))
+                text_without_none = [line if line else '' for line in text]
+                return HTMLParser().unescape("\n".join(text_without_none))
 
             elif output_format == 'srt':
                 return generate_srt_from_sjson(json.loads(content), speed=1.0)
@@ -754,7 +760,7 @@ class VideoTranscriptsMixin(object):
             if sub:
                 all_langs.update({'en': sub})
 
-            for language, filename in all_langs.iteritems():
+            for language, filename in six.iteritems(all_langs):
                 try:
                     # for bumper videos, transcripts are stored in content store only
                     if is_bumper:

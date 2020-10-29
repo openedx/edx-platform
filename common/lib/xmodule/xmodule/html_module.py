@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import copy
 import logging
 import os
@@ -6,15 +8,16 @@ import sys
 import textwrap
 from datetime import datetime
 
+from pkg_resources import resource_string
+
+import six
 from django.conf import settings
 from fs.errors import ResourceNotFound
 from lxml import etree
 from path import Path as path
-from pkg_resources import resource_string
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Boolean, List, Scope, String
-
 from xmodule.contentstore.content import StaticContent
 from xmodule.editing_module import EditingDescriptor
 from xmodule.edxnotes_utils import edxnotes
@@ -272,7 +275,7 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
                 msg = 'Unable to load file contents at path {0}: {1} '.format(
                     filepath, err)
                 # add more info and re-raise
-                raise Exception(msg), None, sys.exc_info()[2]
+                six.reraise(Exception(msg), None, sys.exc_info()[2])
 
     # TODO (vshnayder): make export put things in the right places.
 

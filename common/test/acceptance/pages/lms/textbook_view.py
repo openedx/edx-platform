@@ -2,6 +2,8 @@
 Course Textbooks page.
 """
 
+from __future__ import absolute_import
+
 from bok_choy.promise import EmptyPromise
 
 from common.test.acceptance.pages.lms.course_page import CoursePage

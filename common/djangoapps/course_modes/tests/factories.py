@@ -1,6 +1,8 @@
 """
 Factories for course mode models.
 """
+from __future__ import absolute_import
+
 import random
 
 from factory import lazy_attribute

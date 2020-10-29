@@ -3,21 +3,23 @@
 An API for client-side validation of (potential) user data.
 """
 
+from __future__ import absolute_import
+
+from ipware.ip import get_ip
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework.throttling import AnonRateThrottle
+from rest_framework.views import APIView
 
 from openedx.core.djangoapps.user_api.accounts.api import (
-    get_email_validation_error,
-    get_email_existence_validation_error,
     get_confirm_email_validation_error,
     get_country_validation_error,
+    get_email_existence_validation_error,
+    get_email_validation_error,
     get_name_validation_error,
     get_password_validation_error,
-    get_username_validation_error,
-    get_username_existence_validation_error
+    get_username_existence_validation_error,
+    get_username_validation_error
 )
-from ipware.ip import get_ip
 
 
 class RegistrationValidationThrottle(AnonRateThrottle):

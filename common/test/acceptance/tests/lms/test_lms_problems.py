@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Bok choy acceptance tests for problems in the LMS
-
-See also old lettuce tests in lms/djangoapps/courseware/features/problems.feature
 """
+from __future__ import absolute_import
 from textwrap import dedent
 import time
 import ddt
@@ -76,7 +75,7 @@ class ProblemClarificationTest(ProblemsTest):
         """
         Create a problem with a <clarification>
         """
-        xml = dedent("""
+        xml = dedent(u"""
             <problem markdown="null">
                 <text>
                     <p>
@@ -705,7 +704,7 @@ class ProblemQuestionDescriptionTest(ProblemsTest):
         """
         Create a problem with question and description.
         """
-        xml = dedent("""
+        xml = dedent(u"""
             <problem>
                 <choiceresponse>
                     <label>Eggplant is a _____?</label>
@@ -881,6 +880,8 @@ class ProblemMetaGradedTest(ProblemsTest):
     """
     TestCase Class to verify that the graded variable is passed
     """
+    shard = 23
+
     def get_problem(self):
         """
         Problem structure
@@ -911,6 +912,8 @@ class ProblemMetaUngradedTest(ProblemsTest):
     """
     TestCase Class to verify that the ungraded variable is passed
     """
+    shard = 23
+
     def get_problem(self):
         """
         Problem structure
@@ -941,6 +944,8 @@ class FormulaProblemTest(ProblemsTest):
     """
     Test Class to verify the formula problem on LMS.
     """
+    shard = 23
+
     def setUp(self):
         """
         Setup the test suite to verify various behaviors involving formula problem type.
@@ -968,26 +973,6 @@ class FormulaProblemTest(ProblemsTest):
                     </problem>
                 """)
         return XBlockFixtureDesc('problem', 'TEST PROBLEM', data=xml, metadata={'show_reset_button': True})
-
-    def test_reset_problem_after_incorrect_submission(self):
-        """
-        Scenario: Verify that formula problem can be resetted after an incorrect submission.
-
-        Given I am attempting a formula response problem type
-        When I input an incorrect answer
-        Then the answer preview is generated using MathJax
-        When I submit the problem
-        Then I can see incorrect status and a reset button
-        When I click reset, the input pane contents get clear
-        """
-        problem_page = ProblemPage(self.browser)
-        problem_page.fill_answer_numerical('R_1*R_2')
-        problem_page.verify_mathjax_rendered_in_preview()
-        problem_page.click_submit()
-        self.assertFalse(problem_page.simpleprob_is_correct())
-        self.assertTrue(problem_page.is_reset_button_present())
-        problem_page.click_reset()
-        self.assertEqual(problem_page.get_numerical_input_value, '')
 
     def test_reset_button_not_rendered_after_correct_submission(self):
         """
@@ -1037,6 +1022,7 @@ class FormulaProblemRandomizeTest(ProblemsTest):
     """
     Test Class to verify the formula problem on LMS with Randomization enabled.
     """
+    shard = 23
 
     def setUp(self):
         """
@@ -1071,9 +1057,7 @@ class FormulaProblemRandomizeTest(ProblemsTest):
         )
 
     @ddt.data(
-        ('R_1*R_2', 'incorrect'),
-        ('R_1/R_3', 'incorrect'),
-        ('R_1*R_2/R_3', 'correct')
+        ('R_1/R_3', 'incorrect')
     )
     @ddt.unpack
     def test_reset_problem_after_submission(self, input_value, correctness):

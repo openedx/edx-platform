@@ -23,7 +23,6 @@
             events: {
                 'click .js-login': 'submitForm',
                 'click .forgot-password': 'forgotPassword',
-                'click .account-recovery': 'accountRecovery',
                 'click .login-provider': 'thirdPartyAuth'
             },
             formType: 'login',
@@ -137,13 +136,6 @@
                 this.clearPasswordResetSuccess();
             },
 
-            accountRecovery: function(event) {
-                event.preventDefault();
-
-                this.trigger('account-recovery-help');
-                this.clearPasswordResetSuccess();
-            },
-
             postFormSubmission: function() {
                 this.clearPasswordResetSuccess();
             },
@@ -152,7 +144,7 @@
                 var email = $('#password-reset-email').val(),
                     successTitle = gettext('Check Your Email'),
                     successMessageHtml = HtmlUtils.interpolateHtml(
-                        gettext('{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email address is associated with your {platform_name} account, we will send a message with password reset instructions to this email address.{paragraphEnd}' + // eslint-disable-line max-len
+                        gettext('{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email address is associated with your {platform_name} account, we will send a message with password recovery instructions to this email address.{paragraphEnd}' + // eslint-disable-line max-len
                         '{paragraphStart}If you do not receive a password reset message, verify that you entered the correct email address, or check your spam folder.{paragraphEnd}' + // eslint-disable-line max-len
                         '{paragraphStart}If you need further assistance, {anchorStart}contact technical support{anchorEnd}.{paragraphEnd}'), { // eslint-disable-line max-len
                             boldStart: HtmlUtils.HTML('<b>'),
