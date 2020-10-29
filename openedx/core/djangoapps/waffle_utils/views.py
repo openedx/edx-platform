@@ -2,13 +2,13 @@
 Views that we will use to view toggle state in edx-platform.
 """
 from collections import OrderedDict
-from django.conf import settings
 
-from edx_django_utils.monitoring.code_owner.utils import get_code_owner_from_module, is_code_owner_mappings_configured
+from django.conf import settings
+from edx_django_utils.monitoring import get_code_owner_from_module
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.permissions import IsStaff
-from rest_framework.authentication import SessionAuthentication
 from rest_framework import permissions, views
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from waffle.models import Flag, Switch
 
@@ -107,7 +107,7 @@ class ToggleStateView(views.APIView):
         """
         toggle['class'] = toggle_instance.__class__.__name__
         toggle['module'] = toggle_instance.module_name
-        if is_code_owner_mappings_configured():
+        if toggle_instance.module_name:
             code_owner = get_code_owner_from_module(toggle_instance.module_name)
             if code_owner:
                 toggle['code_owner'] = code_owner

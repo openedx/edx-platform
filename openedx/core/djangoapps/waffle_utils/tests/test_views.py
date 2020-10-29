@@ -2,14 +2,16 @@
 Tests for waffle utils views.
 """
 from django.test import TestCase
+from edx_django_utils.monitoring.code_owner import utils as code_owner_utils
+from mock import patch
 from rest_framework.test import APIRequestFactory
 from waffle.testutils import override_switch
 
 from student.tests.factories import UserFactory
 
 from .. import WaffleFlag, WaffleFlagNamespace, WaffleSwitch, WaffleSwitchNamespace
-from ..views import ToggleStateView
 from ..testutils import override_waffle_flag
+from ..views import ToggleStateView
 
 TEST_WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace('test')
 TEST_WAFFLE_FLAG = WaffleFlag(TEST_WAFFLE_FLAG_NAMESPACE, 'flag', __name__)
@@ -44,6 +46,17 @@ class ToggleStateViewTests(TestCase):
         self.assertTrue(response.data['waffle_switches'])
         # This is no longer the first switch
         #self.assertEqual(response.data['waffle_switches'][0]['name'], 'test.switch')
+
+    def test_code_owners_without_module_information(self):
+        # Create a waffle flag without any associated module_name
+        waffle_flag = WaffleFlag(TEST_WAFFLE_FLAG_NAMESPACE, "flag2", module_name=None)
+        with patch.object(code_owner_utils, "get_code_owner_mappings", return_value={}):
+            response = self._get_toggle_state_response(is_staff=True)
+
+        result = [
+            flag for flag in response.data["waffle_flags"] if flag["name"] == waffle_flag.name
+        ][0]
+        self.assertNotIn("code_owner", result)
 
     def _get_toggle_state_response(self, is_staff=True):
         request = APIRequestFactory().get('/api/toggles/state/')
