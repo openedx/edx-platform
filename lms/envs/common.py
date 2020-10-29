@@ -702,12 +702,10 @@ NODE_MODULES_ROOT = REPO_ROOT / "node_modules"
 
 DATA_DIR = COURSES_ROOT
 
-# TODO: Is this next line necessary?
-sys.path.append(REPO_ROOT)
-# TODO: The next two path modifications will be removed in an upcoming Open edX release.
+# TODO: This path modification exists as temporary support for deprecated import patterns.
+# It will be removed in an upcoming Open edX release.
 # See docs/decisions/0007-sys-path-modification-removal.rst
 sys.path.append(REPO_ROOT / 'import_shims' / 'lms')
-sys.path.append(COMMON_ROOT / 'djangoapps')
 
 # For Node.js
 
