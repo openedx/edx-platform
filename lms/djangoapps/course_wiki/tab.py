@@ -3,12 +3,11 @@ These callables are used by django-wiki to check various permissions
 a user has on an article.
 """
 
-from __future__ import absolute_import
 
 from django.conf import settings
 from django.utils.translation import ugettext_noop
 
-from courseware.tabs import EnrolledTab
+from lms.djangoapps.courseware.tabs import EnrolledTab
 
 
 class WikiTab(EnrolledTab):

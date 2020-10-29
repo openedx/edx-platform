@@ -6,7 +6,7 @@ Exists at the top level of modulestore b/c it needs to know about and access eac
 In general, it's strategy is to treat the other modulestores as read-only and to never directly
 manipulate storage but use existing api's.
 '''
-from __future__ import absolute_import
+
 
 import logging
 

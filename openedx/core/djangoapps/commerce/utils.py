@@ -1,5 +1,5 @@
 """ Commerce API Service. """
-from __future__ import absolute_import
+
 
 from django.conf import settings
 from edx_rest_api_client.client import EdxRestApiClient

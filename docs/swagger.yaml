@@ -112,20 +112,7 @@ paths:
         \ passing parameter \"page_size=<page_size>\".\n\nTo include the optional\
         \ fields pass the values in \"fields\" parameter\nas a comma separated list.\
         \ Possible values are:\n\n* \"display_name\"\n* \"path\"\n\n# Example Requests\n\
-        \nGET /api/bookmarks/v1/bookmarks/?course_id={course_id1}&fields=display_name,path\n\
-        \n# Response Values\n\n* count: The number of bookmarks in a course.\n\n*\
-        \ next: The URI to the next page of bookmarks.\n\n* previous: The URI to the\
-        \ previous page of bookmarks.\n\n* num_pages: The number of pages listing\
-        \ bookmarks.\n\n* results:  A list of bookmarks returned. Each collection\
-        \ in the list\n  contains these fields.\n\n    * id: String. The identifier\
-        \ string for the bookmark: {user_id},{usage_id}.\n\n    * course_id: String.\
-        \ The identifier string of the bookmark's course.\n\n    * usage_id: String.\
-        \ The identifier string of the bookmark's XBlock.\n\n    * display_name: String.\
-        \ (optional) Display name of the XBlock.\n\n    * path: List. (optional) List\
-        \ of dicts containing {\"usage_id\": <usage-id>, display_name:<display-name>}\n\
-        \        for the XBlocks from the top of the course tree till the parent of\
-        \ the bookmarked XBlock.\n\n    * created: ISO 8601 String. The timestamp\
-        \ of bookmark's creation.\n\n"
+        \nGET /api/bookmarks/v1/bookmarks/?course_id={course_id1}&fields=display_name,path"
       parameters:
         - name: page
           in: query
@@ -139,11 +126,11 @@ paths:
           type: integer
         - name: course_id
           in: query
-          description: The id of the course, of course
+          description: The id of the course to limit the list
           type: string
         - name: fields
           in: query
-          description: "The fields to return: display_name, path.\n"
+          description: 'The fields to return: display_name, path.'
           type: string
       responses:
         '200':
@@ -157,7 +144,7 @@ paths:
         .\n\nHttp400 is returned if the format of the request is not correct,\nthe\
         \ usage_id is invalid or a block corresponding to the usage_id\ncould not\
         \ be found.\n\n# Example Requests\n\nPOST /api/bookmarks/v1/bookmarks/\nRequest\
-        \ data: {\"usage_id\": <usage-id>}\n\n"
+        \ data: {\"usage_id\": <usage-id>}"
       parameters: []
       responses:
         '201':
@@ -169,8 +156,7 @@ paths:
     get:
       operationId: bookmarks_v1_bookmarks_read
       summary: Get a specific bookmark for a user.
-      description: "# Example Requests\n\nGET /api/bookmarks/v1/bookmarks/{username},{usage_id}/?fields=display_name,path\n\
-        \n"
+      description: "# Example Requests\n\nGET /api/bookmarks/v1/bookmarks/{username},{usage_id}?fields=display_name,path"
       parameters: []
       responses:
         '200':
@@ -341,12 +327,10 @@ paths:
     get:
       operationId: certificates_v0_certificates_read
       summary: Get a paginated list of bookmarks for a user.
-      description: "**Use Case**\n\n    * Get the list of viewable course certificates\
-        \ for a specific user.\n\n**Example Request**\n\n    GET /api/certificates/v0/certificates/{username}\n\
-        \n**GET Parameters**\n\n    A GET request must include the following parameters.\n\
-        \n    * username: A string representation of an user's username.\n\n**GET\
-        \ Response Values**\n\n    If the request for information about the user's\
-        \ certificates is successful,\n    an HTTP 200 \"OK\" response is returned.\n\
+      description: "**Use Case**\n\nGet the list of viewable course certificates for\
+        \ a specific user.\n\n**Example Request**\n\nGET /api/certificates/v0/certificates/{username}\n\
+        \n**GET Response Values**\n\n    If the request for information about the\
+        \ user's certificates is successful,\n    an HTTP 200 \"OK\" response is returned.\n\
         \n    The HTTP 200 response contains a list of dicts with the following keys/values.\n\
         \n    * username: A string representation of an user's username passed in\
         \ the request.\n\n    * course_id: A string representation of a Course ID.\n\
@@ -363,8 +347,13 @@ paths:
         : \"edX/DemoX/Demo_Course\",\n        \"certificate_type\": \"verified\",\n\
         \        \"created_date\": \"2015-12-03T13:14:28+0000\",\n        \"status\"\
         : \"downloadable\",\n        \"is_passing\": true,\n        \"download_url\"\
-        : \"http://www.example.com/cert.pdf\",\n        \"grade\": \"0.98\"\n    }]\n"
-      parameters: []
+        : \"http://www.example.com/cert.pdf\",\n        \"grade\": \"0.98\"\n    }]"
+      parameters:
+        - name: username
+          in: path
+          description: The users to get certificates for
+          type: string
+          required: true
       responses:
         '200':
           description: ''
@@ -709,7 +698,14 @@ paths:
   /course_goals/v0/course_goals/:
     get:
       operationId: course_goals_v0_course_goals_list
-      description: description from swagger_auto_schema via method_decorator
+      summary: API calls to create and update a course goal.
+      description: "Validates incoming data to ensure that course_key maps to an actual\n\
+        course and that the goal_key is a valid option.\n\n**Use Case**\n    * Create\
+        \ a new goal for a user.\n    * Update an existing goal for a user\n\n**Example\
+        \ Requests**\n    POST /api/course_goals/v0/course_goals/\n        Request\
+        \ data: {\"course_key\": <course-key>, \"goal_key\": \"<goal-key>\", \"user\"\
+        : \"<username>\"}\n\nReturns Http400 response if the course_key does not map\
+        \ to a known\ncourse or if the goal_key does not map to a valid goal key."
       parameters:
         - name: page
           in: query
@@ -2001,7 +1997,7 @@ paths:
   /edx_proctoring/v1/proctored_exam/active_exams_for_user:
     get:
       operationId: edx_proctoring_v1_proctored_exam_active_exams_for_user_list
-      description: returns the get_active_exams_for_user
+      description: Returns the get_active_exams_for_user
       parameters: []
       responses:
         '200':
@@ -2704,6 +2700,18 @@ paths:
         required: true
         type: string
         pattern: '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}'
+  /experiments/v0/custom/REV-934/:
+    get:
+      operationId: experiments_v0_custom_REV-934_list
+      description: Return the if the course should be upsold in the mobile app, if
+        the user has appropriate permissions.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - experiments
+    parameters: []
   /experiments/v0/data/:
     get:
       operationId: experiments_v0_data_list
@@ -3577,7 +3585,7 @@ paths:
   /program_enrollments/v1/programs/{program_uuid}/courses/{course_id}/enrollments/:
     get:
       operationId: program_enrollments_v1_programs_courses_enrollments_list
-      description: Defines the GET list endpoint for ProgramCourseEnrollment objects.
+      description: Get a list of students enrolled in a course within a program.
       parameters:
         - name: cursor
           in: query
@@ -3690,7 +3698,7 @@ paths:
         - program_enrollments
     put:
       operationId: program_enrollments_v1_programs_enrollments_update
-      description: Create/modify program enrollments for a list of learners
+      description: Create/update program enrollments for a list of learners
       parameters: []
       responses:
         '200':
@@ -3699,7 +3707,7 @@ paths:
         - program_enrollments
     patch:
       operationId: program_enrollments_v1_programs_enrollments_partial_update
-      description: Modify program enrollments for a list of learners
+      description: Update program enrollments for a list of learners
       parameters: []
       responses:
         '200':
@@ -4592,6 +4600,62 @@ paths:
         required: true
         type: string
         pattern: ^[a-zA-Z0-9\-_]*$
+  /xblock/v2/xblocks/{usage_key_str}/:
+    get:
+      operationId: xblock_v2_xblocks_read
+      description: Get metadata about the specified block.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - xblock
+    parameters:
+      - name: usage_key_str
+        in: path
+        required: true
+        type: string
+  /xblock/v2/xblocks/{usage_key_str}/handler_url/{handler_name}/:
+    get:
+      operationId: xblock_v2_xblocks_handler_url_read
+      summary: "Get an absolute URL which can be used (without any authentication)\
+        \ to call\nthe given XBlock handler."
+      description: The URL will expire but is guaranteed to be valid for a minimum
+        of 2 days.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - xblock
+    parameters:
+      - name: handler_name
+        in: path
+        required: true
+        type: string
+      - name: usage_key_str
+        in: path
+        required: true
+        type: string
+  /xblock/v2/xblocks/{usage_key_str}/view/{view_name}/:
+    get:
+      operationId: xblock_v2_xblocks_view_read
+      description: Get the HTML, JS, and CSS needed to render the given XBlock.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - xblock
+    parameters:
+      - name: usage_key_str
+        in: path
+        required: true
+        type: string
+      - name: view_name
+        in: path
+        required: true
+        type: string
 definitions:
   BadgeClass:
     title: Badge class
@@ -5256,7 +5320,6 @@ definitions:
         title: Order number
         type: string
         maxLength: 128
-        minLength: 1
         x-nullable: true
       support_details:
         title: Support details

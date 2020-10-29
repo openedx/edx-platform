@@ -1,7 +1,7 @@
 """
 Bok-choy tests for the Studio Accessibility Feedback page.
 """
-from __future__ import absolute_import
+
 
 import ddt
 

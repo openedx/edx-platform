@@ -1,13 +1,13 @@
 """
 Serializers for Bookmarks.
 """
-from __future__ import absolute_import
 
-import six
+
+from edx_api_doc_tools import is_schema_request
 from rest_framework import serializers
+import six
 
 from openedx.core.lib.api.serializers import CourseKeyField, UsageKeyField
-from openedx.core.openapi import is_schema_request
 
 
 from . import DEFAULT_FIELDS, OPTIONAL_FIELDS

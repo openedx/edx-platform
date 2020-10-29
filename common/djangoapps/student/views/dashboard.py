@@ -2,7 +2,6 @@
 Dashboard view and supporting methods
 """
 
-from __future__ import absolute_import
 
 import datetime
 import logging
@@ -24,7 +23,7 @@ import track.views
 from bulk_email.api import is_bulk_email_feature_enabled
 from bulk_email.models import Optout  # pylint: disable=import-error
 from course_modes.models import CourseMode
-from courseware.access import has_access
+from lms.djangoapps.courseware.access import has_access
 from edxmako.shortcuts import render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
@@ -857,6 +856,7 @@ def student_dashboard(request):
         'reverifications': reverifications,
         'verification_display': verification_status['should_display'],
         'verification_status': verification_status['status'],
+        'verification_expiry': verification_status['verification_expiry'],
         'verification_status_by_course': verify_status_by_course,
         'verification_errors': verification_errors,
         'block_courses': block_courses,

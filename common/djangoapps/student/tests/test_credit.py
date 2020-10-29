@@ -1,7 +1,7 @@
 """
 Tests for credit courses on the student dashboard.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import unittest

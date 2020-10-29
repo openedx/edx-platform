@@ -1,6 +1,5 @@
 """Tests of openedx.features.course_duration_limits.access"""
 
-from __future__ import absolute_import
 
 import itertools
 from datetime import datetime, timedelta
@@ -11,7 +10,7 @@ from pytz import UTC
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.models import DynamicUpgradeDeadlineConfiguration
+from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_duration_limits.access import (

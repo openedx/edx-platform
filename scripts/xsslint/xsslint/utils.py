@@ -1,7 +1,7 @@
 """
 Utility classes/functions for the XSS Linter.
 """
-from __future__ import absolute_import
+
 
 import re
 

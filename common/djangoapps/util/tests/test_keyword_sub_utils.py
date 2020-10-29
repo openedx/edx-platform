@@ -2,7 +2,6 @@
 Tests for keyword_substitution.py
 """
 
-from __future__ import absolute_import
 
 import six
 from ddt import ddt, file_data
@@ -86,7 +85,7 @@ class KeywordSubTest(ModuleStoreTestCase):
             test_string, self.context,
         )
 
-        self.assertEquals(test_string, result)
+        self.assertEqual(test_string, result)
 
     def test_should_not_sub(self):
         """
@@ -97,7 +96,7 @@ class KeywordSubTest(ModuleStoreTestCase):
             test_string, self.context,
         )
 
-        self.assertEquals(test_string, result)
+        self.assertEqual(test_string, result)
 
     @file_data('fixtures/test_keywordsub_multiple_tags.json')
     def test_sub_multiple_tags(self, test_string, expected):

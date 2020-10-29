@@ -2,17 +2,16 @@
 API function for retrieving course blocks data
 """
 
-from __future__ import absolute_import
 
 import lms.djangoapps.course_blocks.api as course_blocks_api
 from lms.djangoapps.course_blocks.transformers.access_denied_filter import AccessDeniedMessageFilterTransformer
 from lms.djangoapps.course_blocks.transformers.hidden_content import HiddenContentTransformer
 from lms.djangoapps.course_blocks.transformers.hide_empty import HideEmptyTransformer
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
-from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
 from .serializers import BlockDictSerializer, BlockSerializer
+from .toggles import HIDE_ACCESS_DENIALS_FLAG
 from .transformers.block_completion import BlockCompletionTransformer
 from .transformers.blocks_api import BlocksAPITransformer
 from .transformers.milestones import MilestonesAndSpecialExamsTransformer
@@ -61,13 +60,7 @@ def get_blocks(
             attached.
     """
 
-    course_blocks_namespace = WaffleFlagNamespace(name=u'course_blocks_api')
-    hide_access_denials_flag = WaffleFlag(
-        waffle_namespace=course_blocks_namespace,
-        flag_name=u'hide_access_denials',
-        flag_undefined_default=False
-    )
-    if hide_access_denials_flag.is_enabled():
+    if HIDE_ACCESS_DENIALS_FLAG.is_enabled():
         hide_access_denials = True
 
     # create ordered list of transformers, adding BlocksAPITransformer at end.

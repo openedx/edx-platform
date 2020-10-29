@@ -4,7 +4,7 @@ Helper lib for instructor_tasks API.
 Includes methods to check args for rescoring task, encoding student input,
 and task submission logic, including handling the Celery backend.
 """
-from __future__ import absolute_import
+
 
 import hashlib
 import json
@@ -17,8 +17,8 @@ from opaque_keys.edx.keys import UsageKey
 import six
 from six import text_type
 
-from courseware.courses import get_problems_in_section
-from courseware.module_render import get_xqueue_callback_url_prefix
+from lms.djangoapps.courseware.courses import get_problems_in_section
+from lms.djangoapps.courseware.module_render import get_xqueue_callback_url_prefix
 from lms.djangoapps.instructor_task.models import PROGRESS, InstructorTask
 from util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
@@ -265,6 +265,13 @@ def _handle_instructor_task_failure(instructor_task, error):
     raise QueueConnectionError()
 
 
+def _get_async_result(task_id):
+    """
+    Use this minor indirection to facilitate mocking the AsyncResult in tests.
+    """
+    return AsyncResult(task_id)
+
+
 def get_updated_instructor_task(task_id):
     """
     Returns InstructorTask object corresponding to a given `task_id`.
@@ -282,7 +289,7 @@ def get_updated_instructor_task(task_id):
     # if the task is not already known to be done, then we need to query
     # the underlying task's result object:
     if instructor_task.task_state not in READY_STATES:
-        result = AsyncResult(task_id)
+        result = _get_async_result(task_id)
         _update_instructor_task(instructor_task, result)
 
     return instructor_task

@@ -2,7 +2,6 @@
 Unit tests for credit eligibility UI in Studio.
 """
 
-from __future__ import absolute_import
 
 import mock
 import six

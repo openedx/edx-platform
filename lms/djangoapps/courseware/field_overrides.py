@@ -14,7 +14,7 @@ package and is used to wrap the `authored_data` when constructing an
 `LmsFieldData`.  This means overrides will be in effect for all scopes covered
 by `authored_data`, e.g. course content and settings stored in Mongo.
 """
-from __future__ import absolute_import
+
 
 import threading
 from abc import ABCMeta, abstractmethod

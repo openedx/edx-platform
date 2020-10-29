@@ -1,7 +1,7 @@
 """
 Tests for system wide roles' django models.
 """
-from __future__ import unicode_literals
+
 
 from django.test import TestCase
 from student.tests.factories import UserFactory

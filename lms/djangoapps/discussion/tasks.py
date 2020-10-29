@@ -2,7 +2,7 @@
 Defines asynchronous celery task for sending email notification (through edx-ace)
 pertaining to new discussion forum comments.
 """
-from __future__ import absolute_import
+
 
 import logging
 

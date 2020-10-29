@@ -2,7 +2,7 @@
 This file exposes a number of password validators which can be optionally added to
 account creation
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import logging
 import unicodedata

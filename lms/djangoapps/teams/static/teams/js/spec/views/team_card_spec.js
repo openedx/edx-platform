@@ -88,7 +88,7 @@ define(['jquery',
                 expectThumbnailsOrder = function(members) {
                     var thumbnails = view.$('.item-member-thumb img');
                     expect(thumbnails.length).toBe(members.length);
-                    thumbnails.each(function(index, imgEl) {
+                    thumbnails.each(function(index) {
                         expect(thumbnails.eq(index).attr('alt')).toBe(members[index].username);
                         expect(thumbnails.eq(index).attr('src')).toBe(members[index].image_url);
                     });

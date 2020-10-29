@@ -5,28 +5,27 @@
 #    make upgrade
 #
 argh==0.26.2              # via watchdog
-certifi==2019.9.11        # via requests
+certifi==2019.11.28       # via requests
 chardet==3.0.4            # via requests
-edx-opaque-keys==2.0.0
+edx-opaque-keys==2.0.1
 idna==2.8                 # via requests
-lazy==1.1
+importlib-metadata==1.4.0  # via path
+lazy==1.4
 libsass==0.10.0
 markupsafe==1.1.1
-mock==1.0.1
-path.py==8.2.1
+mock==3.0.5
+path==13.1.0
 pathtools==0.1.2          # via watchdog
 paver==1.3.4
-pbr==5.4.3                # via stevedore
+pbr==5.4.4                # via stevedore
 psutil==1.2.1
 pymongo==3.9.0
 python-memcached==1.59
-pyyaml==5.1.2             # via watchdog
+pyyaml==5.3               # via watchdog
 requests==2.22.0
-six==1.12.0               # via edx-opaque-keys, libsass, paver, python-memcached, stevedore
+six==1.14.0               # via edx-opaque-keys, libsass, mock, paver, python-memcached, stevedore
 stevedore==1.31.0
-urllib3==1.25.3           # via requests
+urllib3==1.25.8           # via requests
 watchdog==0.9.0
-wrapt==1.10.5
-
-# The following packages are considered to be unsafe in a requirements file:
-# setuptools==41.2.0        # via lazy
+wrapt==1.11.2
+zipp==1.0.0               # via importlib-metadata

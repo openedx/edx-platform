@@ -2,7 +2,7 @@
 """
 End-to-end tests for Student's Profile Page.
 """
-from __future__ import absolute_import
+
 
 from contextlib import contextmanager
 from datetime import datetime
@@ -491,10 +491,22 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTest):
         self.assert_default_image_has_public_access(profile_page)
 
         profile_page.upload_file(filename='generic_csv.csv')
-        self.assertEqual(
-            profile_page.profile_image_message,
-            "The file must be one of the following types: .gif, .png, .jpeg, .jpg."
+        self.assertIn(
+            "The file must be one of the following types:", profile_page.profile_image_message,
         )
+        self.assertIn(
+            ".png", profile_page.profile_image_message,
+        )
+        self.assertIn(
+            ".gif", profile_page.profile_image_message,
+        )
+        self.assertIn(
+            ".jpeg", profile_page.profile_image_message,
+        )
+        self.assertIn(
+            ".jpg", profile_page.profile_image_message,
+        )
+
         profile_page.visit()
         self.assertTrue(profile_page.profile_has_default_image)
 
@@ -636,15 +648,6 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTes
         profile_page.wait_for_public_fields()
         self.verify_profile_page_is_public(profile_page, is_editable=False)
         self.verify_profile_page_view_event(username, different_user_id, visibility=self.PRIVACY_PUBLIC)
-
-    def test_badge_share_modal(self):
-        username = 'testcert'
-        AutoAuthPage(self.browser, username=username).visit()
-        profile_page = self.visit_profile_page(username)
-        profile_page.display_accomplishments()
-        badge = profile_page.badges[0]
-        badge.display_modal()
-        badge.close_modal()
 
 
 class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):

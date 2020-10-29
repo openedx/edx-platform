@@ -2,7 +2,7 @@
 This module provides a KEY_FUNCTION suitable for use with a memcache backend
 so that we can cache any keys, not just ones that memcache would ordinarily accept
 """
-from __future__ import absolute_import
+
 
 import hashlib
 

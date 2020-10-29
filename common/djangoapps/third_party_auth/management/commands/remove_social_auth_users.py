@@ -2,7 +2,7 @@
 Management command to remove social auth users.  Intended for use in masters
 integration sandboxes to allow partners reset users and enrollment data.
 """
-from __future__ import absolute_import
+
 
 import logging
 

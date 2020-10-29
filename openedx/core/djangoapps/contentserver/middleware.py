@@ -2,7 +2,6 @@
 Middleware to serve assets.
 """
 
-from __future__ import absolute_import
 
 import logging
 import datetime
@@ -156,7 +155,7 @@ class StaticContentServer(object):
                         if 0 <= first <= last < content.length:
                             # If the byte range is satisfiable
                             response = HttpResponse(content.stream_data_in_range(first, last))
-                            response['Content-Range'] = b'bytes {first}-{last}/{length}'.format(
+                            response['Content-Range'] = u'bytes {first}-{last}/{length}'.format(
                                 first=first, last=last, length=content.length
                             )
                             response['Content-Length'] = str(last - first + 1)
@@ -211,7 +210,7 @@ class StaticContentServer(object):
                 newrelic.agent.add_custom_parameter('contentserver.cacheable', True)
 
             response['Expires'] = StaticContentServer.get_expiration_value(datetime.datetime.utcnow(), cache_ttl)
-            response['Cache-Control'] = b"public, max-age={ttl}, s-maxage={ttl}".format(ttl=cache_ttl)
+            response['Cache-Control'] = u"public, max-age={ttl}, s-maxage={ttl}".format(ttl=cache_ttl)
         elif is_locked:
             if newrelic:
                 newrelic.agent.add_custom_parameter('contentserver.cacheable', False)

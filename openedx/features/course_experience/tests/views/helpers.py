@@ -1,7 +1,7 @@
 """
 Test helpers for the course experience.
 """
-from __future__ import absolute_import
+
 
 from datetime import timedelta
 

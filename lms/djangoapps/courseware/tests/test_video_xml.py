@@ -14,7 +14,7 @@ You can then use the CourseFactory and XModuleItemFactory as defined in
 common/lib/xmodule/xmodule/modulestore/tests/factories.py to create the
 course, section, subsection, unit, etc.
 """
-from __future__ import absolute_import
+
 
 from django.test import TestCase
 from xmodule.video_module import VideoBlock

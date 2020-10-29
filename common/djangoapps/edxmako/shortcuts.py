@@ -12,19 +12,19 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from __future__ import absolute_import
 
 import logging
-import six
-from six.moves.urllib.parse import urljoin
 
+import six
 from django.conf import settings
-from django.urls import reverse
 from django.http import HttpResponse
 from django.template import engines
+from django.urls import reverse
+from six.moves.urllib.parse import urljoin
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
+from xmodule.util.xmodule_django import get_current_request_hostname
 
 from . import Engines
 
@@ -70,9 +70,13 @@ def marketing_link(name):
     elif not enable_mktg_site and name in link_map:
         # don't try to reverse disabled marketing links
         if link_map[name] is not None:
-            return reverse(link_map[name])
+            host_name = get_current_request_hostname()
+            if all([host_name and 'edge' in host_name, 'http' in link_map[name]]):
+                return link_map[name]
+            else:
+                return reverse(link_map[name])
     else:
-        log.debug("Cannot find corresponding link for name: %s", name)
+        log.debug(u"Cannot find corresponding link for name: %s", name)
         return '#'
 
 

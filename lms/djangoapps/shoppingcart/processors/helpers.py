@@ -3,7 +3,7 @@ Helper methods for credit card processing modules.
 These methods should be shared among all processor implementations,
 but should NOT be imported by modules outside this package.
 """
-from __future__ import absolute_import
+
 
 from django.conf import settings
 

@@ -1,5 +1,5 @@
 # pylint: disable=missing-docstring
-from __future__ import absolute_import
+
 
 from django.template import VariableDoesNotExist
 from django.test import override_settings

@@ -2,7 +2,7 @@
 """
 Tests for the newer CyberSource API implementation.
 """
-from __future__ import absolute_import
+
 
 import ddt
 from django.conf import settings

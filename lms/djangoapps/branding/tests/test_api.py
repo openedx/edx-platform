@@ -1,6 +1,6 @@
 # encoding: utf-8
 """Tests of Branding API """
-from __future__ import absolute_import, unicode_literals
+
 
 import mock
 from django.conf import settings
@@ -146,12 +146,10 @@ class TestFooter(TestCase):
                  'icon-class': 'fa-facebook-square', 'title': 'Facebook'},
                 {'url': '#', 'action': 'Follow \xe9dX on Twitter', 'name': 'twitter',
                  'icon-class': 'fa-twitter-square', 'title': 'Twitter'},
-                {'url': '#', 'action': 'Subscribe to the \xe9dX YouTube channel',
-                 'name': 'youtube', 'icon-class': 'fa-youtube-square', 'title': 'Youtube'},
                 {'url': '#', 'action': 'Follow \xe9dX on LinkedIn', 'name': 'linkedin',
                  'icon-class': 'fa-linkedin-square', 'title': 'LinkedIn'},
-                {'url': '#', 'action': 'Follow \xe9dX on Google+', 'name': 'google_plus',
-                 'icon-class': 'fa-google-plus-square', 'title': 'Google+'},
+                {'url': '#', 'action': 'Follow \xe9dX on Instagram', 'name': 'instagram',
+                 'icon-class': 'fa-instagram', 'title': 'Instagram'},
                 {'url': '#', 'action': 'Subscribe to the \xe9dX subreddit',
                  'name': 'reddit', 'icon-class': 'fa-reddit-square', 'title': 'Reddit'}
             ],

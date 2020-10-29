@@ -2,7 +2,7 @@
 """
 Unit tests for masquerade.
 """
-from __future__ import absolute_import
+
 
 import json
 import pickle
@@ -18,10 +18,12 @@ from pytz import UTC
 from xblock.runtime import DictKeyValueStore
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
-from courseware.masquerade import CourseMasquerade, MasqueradingKeyValueStore, get_masquerading_user_group
-from courseware.tests.factories import StaffFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_group_member
-from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
+from lms.djangoapps.courseware.masquerade import (
+    CourseMasquerade, MasqueradingKeyValueStore, get_masquerading_user_group,
+)
+from lms.djangoapps.courseware.tests.factories import StaffFactory
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_group_member
+from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
@@ -328,17 +330,13 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         # Log in as staff, and check we can see the info page.
         self.login_staff()
         response = self.get_course_info_page()
-        self.assertEqual(response.status_code, 200)
-        content = response.content.decode('utf-8')
-        self.assertIn("OOGIE BLOOGIE", content)
+        self.assertContains(response, "OOGIE BLOOGIE")
 
         # Masquerade as the student,enable the self paced configuration, and check we can see the info page.
         SelfPacedConfiguration(enable_course_home_improvements=True).save()
         self.update_masquerade(role='student', user_name=self.student_user.username)
         response = self.get_course_info_page()
-        self.assertEqual(response.status_code, 200)
-        content = response.content.decode('utf-8')
-        self.assertIn("OOGIE BLOOGIE", content)
+        self.assertContains(response, "OOGIE BLOOGIE")
 
     @ddt.data(
         'john',  # Non-unicode username

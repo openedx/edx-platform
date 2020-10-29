@@ -3,7 +3,6 @@
 Module for checking permissions with the comment_client backend
 """
 
-from __future__ import absolute_import
 
 import logging
 

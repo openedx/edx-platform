@@ -1,3 +1,0 @@
-{% autoescape off %}
-{{ first_course_name }}
-{% endautoescape %}

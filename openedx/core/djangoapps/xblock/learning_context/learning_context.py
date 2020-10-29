@@ -2,7 +2,6 @@
 A "Learning Context" is a course, a library, a program, or some other collection
 of content where learning happens.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
 
 
 class LearningContext(object):

@@ -2,14 +2,15 @@
 Models for contentserver
 """
 
-from __future__ import absolute_import
 
 import six
 
 from config_models.models import ConfigurationModel
 from django.db.models.fields import PositiveIntegerField, TextField
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class CourseAssetCacheTtlConfig(ConfigurationModel):
     """
     Configuration for the TTL of course assets.
@@ -22,7 +23,7 @@ class CourseAssetCacheTtlConfig(ConfigurationModel):
 
     cache_ttl = PositiveIntegerField(
         default=0,
-        help_text="The time, in seconds, to report that a course asset is allowed to be cached for."
+        help_text=u"The time, in seconds, to report that a course asset is allowed to be cached for."
     )
 
     @classmethod
@@ -33,10 +34,11 @@ class CourseAssetCacheTtlConfig(ConfigurationModel):
     def __repr__(self):
         return '<CourseAssetCacheTtlConfig(cache_ttl={})>'.format(self.get_cache_ttl())
 
-    def __unicode__(self):
+    def __str__(self):
         return six.text_type(repr(self))
 
 
+@python_2_unicode_compatible
 class CdnUserAgentsConfig(ConfigurationModel):
     """
     Configuration for the user agents we expect to see from CDNs.
@@ -48,8 +50,8 @@ class CdnUserAgentsConfig(ConfigurationModel):
         app_label = 'contentserver'
 
     cdn_user_agents = TextField(
-        default='Amazon CloudFront',
-        help_text="A newline-separated list of user agents that should be considered CDNs."
+        default=u'Amazon CloudFront',
+        help_text=u"A newline-separated list of user agents that should be considered CDNs."
     )
 
     @classmethod
@@ -60,5 +62,5 @@ class CdnUserAgentsConfig(ConfigurationModel):
     def __repr__(self):
         return '<WhitelistedCdnConfig(cdn_user_agents={})>'.format(self.get_cdn_user_agents())
 
-    def __unicode__(self):
+    def __str__(self):
         return six.text_type(repr(self))

@@ -1,7 +1,7 @@
 """
 Tests for Course API views.
 """
-from __future__ import absolute_import
+
 
 from datetime import datetime
 from hashlib import md5
@@ -205,7 +205,7 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
             if filter_:
                 params.update(filter_)
             response = self.verify_response(params=params)
-            self.assertEquals(
+            self.assertEqual(
                 {course['course_id'] for course in response.data['results']},
                 {six.text_type(course.id) for course in expected_courses},
                 u"testing course_api.views.CourseListView with filter_={}".format(filter_),
@@ -237,7 +237,7 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
         # Requesting the courses as the non-staff user should *not* be allowed.
         self.setup_user(self.honor_user)
         filtered_response = self.verify_response(params={'username': self.honor_user.username, 'role': 'staff'})
-        self.assertEquals(len(filtered_response.data['results']), 0)
+        self.assertEqual(len(filtered_response.data['results']), 0)
 
     def test_filter_by_roles_course_staff(self):
         """
@@ -258,30 +258,30 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
             'username': course_staff_user.username,
             'role': 'staff'
         })
-        self.assertEquals(len(filtered_response.data['results']), 1)
-        self.assertEquals(filtered_response.data['results'][0]['org'], self.course.org)
+        self.assertEqual(len(filtered_response.data['results']), 1)
+        self.assertEqual(filtered_response.data['results'][0]['org'], self.course.org)
 
         # The course staff user does *not* have the course instructor role on any courses.
         filtered_response = self.verify_response(params={
             'username': course_staff_user.username,
             'role': 'instructor'
         })
-        self.assertEquals(len(filtered_response.data['results']), 0)
+        self.assertEqual(len(filtered_response.data['results']), 0)
 
         # The course instructor user only has the course instructor role on one course.
         filtered_response = self.verify_response(params={
             'username': course_instructor_user.username,
             'role': 'instructor'
         })
-        self.assertEquals(len(filtered_response.data['results']), 1)
-        self.assertEquals(filtered_response.data['results'][0]['org'], alternate_course.org)
+        self.assertEqual(len(filtered_response.data['results']), 1)
+        self.assertEqual(filtered_response.data['results'][0]['org'], alternate_course.org)
 
         # The honor user does *not* have the course staff -or- instructor role on any courses.
         filtered_response = self.verify_response(params={
             'username': self.honor_user.username,
             'role': 'staff,instructor'
         })
-        self.assertEquals(len(filtered_response.data['results']), 0)
+        self.assertEqual(len(filtered_response.data['results']), 0)
 
         # The course instructor user has the inferred course staff role on one course.
         self.setup_user(course_instructor_user)
@@ -289,7 +289,7 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
             'username': course_instructor_user.username,
             'role': 'staff'
         })
-        self.assertEquals(len(filtered_response.data['results']), 1)
+        self.assertEqual(len(filtered_response.data['results']), 1)
 
 
 class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
@@ -356,7 +356,7 @@ class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase
         request.query_params = {}
         request.user = self.staff_user
         response = CourseDetailView().dispatch(request, course_key_string='a:b:c')
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
 
 @override_settings(ELASTIC_FIELD_MAPPINGS={
@@ -477,7 +477,7 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
         self.setup_user(self.audit_user)
 
         # These query counts were found empirically
-        query_counts = [63, 50, 50, 50, 50, 50, 50, 50, 50, 50, 20]
+        query_counts = [63, 45, 45, 45, 45, 45, 45, 45, 45, 45, 15]
         ordered_course_ids = sorted([str(cid) for cid in (course_ids + [c.id for c in self.courses])])
 
         self.clear_caches()

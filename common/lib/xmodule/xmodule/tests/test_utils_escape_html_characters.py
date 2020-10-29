@@ -1,5 +1,5 @@
 """Tests for methods defined in util/misc.py"""
-from __future__ import absolute_import
+
 
 from unittest import TestCase
 

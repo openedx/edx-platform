@@ -1,7 +1,7 @@
 """
 Unit tests for course_goals.api methods.
 """
-from __future__ import absolute_import
+
 
 import mock
 from django.contrib.auth.models import User

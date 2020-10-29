@@ -12,7 +12,7 @@ Examples of html5 videos for manual testing:
     https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.webm
     https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.ogv
 """
-from __future__ import absolute_import
+
 
 import copy
 import json
@@ -22,6 +22,7 @@ from operator import itemgetter
 
 import six
 from django.conf import settings
+from edx_django_utils.cache import RequestCache
 from lxml import etree
 from opaque_keys.edx.locator import AssetLocator
 from web_fragments.fragment import Fragment
@@ -202,10 +203,14 @@ class VideoBlock(
     def youtube_disabled_for_course(self):
         if not self.location.context_key.is_course:
             return False  # Only courses have this flag
-        if CourseYoutubeBlockedFlag.feature_enabled(self.location.course_key):
-            return True
-        else:
-            return False
+        request_cache = RequestCache('youtube_disabled_for_course')
+        cache_response = request_cache.get_cached_response(self.location.context_key)
+        if cache_response.is_found:
+            return cache_response.value
+
+        youtube_is_disabled = CourseYoutubeBlockedFlag.feature_enabled(self.location.course_key)
+        request_cache.set(self.location.context_key, youtube_is_disabled)
+        return youtube_is_disabled
 
     def prioritize_hls(self, youtube_streams, html5_sources):
         """
@@ -252,6 +257,9 @@ class VideoBlock(
         """
         Returns a fragment that contains the html for the public view
         """
+        if getattr(self.runtime, 'suppports_state_for_anonymous_users', False):
+            # The new runtime can support anonymous users as fully as regular users:
+            return self.student_view(context)
         return Fragment(self.get_html(view=PUBLIC_VIEW))
 
     def get_html(self, view=STUDENT_VIEW):
@@ -407,6 +415,13 @@ class VideoBlock(
             'ytTestTimeout': settings.YOUTUBE['TEST_TIMEOUT'],
             'ytApiUrl': settings.YOUTUBE['API'],
             'lmsRootURL': settings.LMS_ROOT_URL,
+            'ytMetadataEndpoint': (
+                # In the new runtime, get YouTube metadata via a handler. The handler supports anonymous users and
+                # can work in sandboxed iframes. In the old runtime, the JS will call the LMS's yt_video_metadata
+                # API endpoint directly (not an XBlock handler).
+                self.runtime.handler_url(self, 'yt_video_metadata')
+                if getattr(self.runtime, 'suppports_state_for_anonymous_users', False) else ''
+            ),
 
             'transcriptTranslationUrl': self.runtime.handler_url(
                 self, 'transcript', 'translation/__lang__'
@@ -481,7 +496,7 @@ class VideoBlock(
                         'There is no transcript file associated with the {lang} language.',
                         'There are no transcript files associated with the {lang} languages.',
                         len(no_transcript_lang)
-                    ).format(lang=', '.join(no_transcript_lang))
+                    ).format(lang=', '.join(sorted(no_transcript_lang)))
                 )
             )
         return validation
@@ -609,13 +624,11 @@ class VideoBlock(
         video_block = runtime.construct_xblock_from_class(cls, keys)
         field_data = cls.parse_video_xml(node)
         for key, val in field_data.items():
+            if key not in cls.fields:
+                continue  # parse_video_xml returns some old non-fields like 'source'
             setattr(video_block, key, cls.fields[key].from_json(val))
-        # Update VAL with info extracted from `xml_object`
-        video_block.edx_video_id = video_block.import_video_info_into_val(
-            node,
-            runtime.resources_fs,
-            keys.usage_id.context_key,
-        )
+        # Don't use VAL in the new runtime:
+        video_block.edx_video_id = None
         return video_block
 
     @classmethod
@@ -669,16 +682,16 @@ class VideoBlock(
         if youtube_string and youtube_string != '1.00:3_yD_cEKoCk':
             xml.set('youtube', six.text_type(youtube_string))
         xml.set('url_name', self.url_name)
-        attrs = {
-            'display_name': self.display_name,
-            'show_captions': json.dumps(self.show_captions),
-            'start_time': self.start_time,
-            'end_time': self.end_time,
-            'sub': self.sub,
-            'download_track': json.dumps(self.download_track),
-            'download_video': json.dumps(self.download_video),
-        }
-        for key, value in attrs.items():
+        attrs = [
+            ('display_name', self.display_name),
+            ('show_captions', json.dumps(self.show_captions)),
+            ('start_time', self.start_time),
+            ('end_time', self.end_time),
+            ('sub', self.sub),
+            ('download_track', json.dumps(self.download_track)),
+            ('download_video', json.dumps(self.download_video))
+        ]
+        for key, value in attrs:
             # Mild workaround to ensure that tests pass -- if a field
             # is set to its default value, we don't write it out.
             if value:
@@ -745,7 +758,7 @@ class VideoBlock(
                     xml.set('sub', '')
 
                 # Update `transcripts` attribute in the xml
-                xml.set('transcripts', json.dumps(transcripts))
+                xml.set('transcripts', json.dumps(transcripts, sort_keys=True))
 
             except edxval_api.ValVideoNotFoundError:
                 pass

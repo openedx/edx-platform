@@ -1,6 +1,5 @@
 # pylint: disable=missing-docstring,maybe-no-member
 
-from __future__ import absolute_import
 
 import ddt
 import six

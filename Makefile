@@ -24,11 +24,13 @@ SWAGGER = docs/swagger.yaml
 docs: api-docs guides ## build all the developer documentation for this repository
 
 swagger: ## generate the swagger.yaml file
-	DJANGO_SETTINGS_MODULE=docs.docs_settings python manage.py lms generate_swagger --generator-class=openedx.core.openapi.ApiSchemaGenerator -o $(SWAGGER)
+	DJANGO_SETTINGS_MODULE=docs.docs_settings python manage.py lms generate_swagger --generator-class=edx_api_doc_tools.ApiSchemaGenerator -o $(SWAGGER)
 
-api-docs: swagger	## build the REST api docs
+api-docs-sphinx: swagger	## generate the sphinx source files for api-docs
 	rm -f docs/api/gen/*
-	python docs/sw2md.py $(SWAGGER) docs/api/gen
+	python docs/sw2sphinxopenapi.py $(SWAGGER) docs/api/gen
+
+api-docs: api-docs-sphinx	## build the REST api docs
 	cd docs/api; make html
 
 guides:	## build the developer guide docs
@@ -72,7 +74,7 @@ REQ_FILES = \
 	requirements/edx/coverage \
 	requirements/edx/paver \
 	requirements/edx-sandbox/shared \
-	requirements/edx-sandbox/base \
+	requirements/edx-sandbox/py35 \
 	requirements/edx/base \
 	requirements/edx/testing \
 	requirements/edx/development \
@@ -88,9 +90,9 @@ upgrade: ## update the pip requirements files to use the latest releases satisfy
 	done
 	# Post process all of the files generated above to work around open pip-tools issues
 	scripts/post-pip-compile.sh $(REQ_FILES:=.txt)
-	# Let tox control the Django version for tests
-	grep "^django==" requirements/edx/base.txt > requirements/edx/django.txt
-	sed '/^[dD]jango==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
+	# Let tox control the Django version & django-oauth-toolkit version for tests
+	grep -e "^django==" -e "^django-oauth-toolkit==" requirements/edx/base.txt > requirements/edx/django.txt
+	sed '/^[dD]jango==/d;/^django-oauth-toolkit==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
 	mv requirements/edx/testing.tmp requirements/edx/testing.txt
 
 .PHONY: docker-tox

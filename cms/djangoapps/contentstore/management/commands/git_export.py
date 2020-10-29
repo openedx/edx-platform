@@ -13,7 +13,6 @@ This functionality is also available as an export view in studio if the giturl
 attribute is set and the FEATURE['ENABLE_EXPORT_GIT'] is set.
 """
 
-from __future__ import absolute_import
 
 import logging
 

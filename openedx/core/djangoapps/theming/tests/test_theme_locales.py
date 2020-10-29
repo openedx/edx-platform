@@ -1,7 +1,7 @@
 """
 Tests for Theming locales
 """
-from __future__ import absolute_import
+
 
 import os
 

@@ -5,7 +5,7 @@ StackedConfigurationModel: A ConfigurationModel that can be overridden at site, 
 """
 
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+
 
 from collections import defaultdict
 from enum import Enum

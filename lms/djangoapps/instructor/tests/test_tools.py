@@ -1,7 +1,7 @@
 """
 Tests for views/tools.py.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import datetime
 import json
@@ -162,7 +162,7 @@ class TestGetUnitsWithDueDate(ModuleStoreTestCase):
             """
             return sorted(six.text_type(i.location) for i in seq)
 
-        self.assertEquals(
+        self.assertEqual(
             urls(tools.get_units_with_due_date(self.course)),
             urls((self.week1, self.week2)))
 
@@ -173,7 +173,7 @@ class TestTitleOrUrl(unittest.TestCase):
     """
     def test_title(self):
         unit = mock.Mock(display_name='hello')
-        self.assertEquals(tools.title_or_url(unit), 'hello')
+        self.assertEqual(tools.title_or_url(unit), 'hello')
 
     def test_url(self):
         # pylint: disable=unused-argument
@@ -188,7 +188,7 @@ class TestTitleOrUrl(unittest.TestCase):
             unit.location.__unicode__ = mock_location_text
         else:
             unit.location.__str__ = mock_location_text
-        self.assertEquals(tools.title_or_url(unit), u'test:hello')
+        self.assertEqual(tools.title_or_url(unit), u'test:hello')
 
 
 def inject_field_data(blocks, course, user):

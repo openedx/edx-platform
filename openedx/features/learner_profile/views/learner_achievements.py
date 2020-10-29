@@ -2,7 +2,7 @@
 Views to render a learner's achievements.
 """
 
-from __future__ import absolute_import
+
 from django.template.loader import render_to_string
 from lms.djangoapps.certificates import api as certificate_api
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course

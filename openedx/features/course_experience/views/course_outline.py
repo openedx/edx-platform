@@ -1,7 +1,7 @@
 """
 Views to show a course outline.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import re
@@ -15,7 +15,7 @@ from pytz import UTC
 from waffle.models import Switch
 from web_fragments.fragment import Fragment
 
-from courseware.courses import get_course_overview_with_access
+from lms.djangoapps.courseware.courses import get_course_overview_with_access
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from student.models import CourseEnrollment
 from util.milestones_helpers import get_course_content_milestones

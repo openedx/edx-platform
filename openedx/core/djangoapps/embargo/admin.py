@@ -1,7 +1,7 @@
 """
 Django admin page for embargo models
 """
-from __future__ import absolute_import
+
 import textwrap
 
 from config_models.admin import ConfigurationModelAdmin

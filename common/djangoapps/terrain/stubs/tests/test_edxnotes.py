@@ -1,7 +1,7 @@
 """
 Unit tests for stub EdxNotes implementation.
 """
-from __future__ import absolute_import
+
 
 import json
 import unittest

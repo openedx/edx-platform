@@ -1,6 +1,5 @@
 # pylint: disable=missing-docstring
 
-from __future__ import absolute_import
 
 from unittest import TestCase
 
@@ -30,7 +29,7 @@ class TestContexts(TestCase):
         self.assert_parses_course_id_from_url(url, course_id)
 
     def assert_parses_course_id_from_url(self, format_string, course_id):
-        self.assertEquals(
+        self.assertEqual(
             contexts.course_context_from_url(format_string.format(course_id=course_id)),
             {
                 'course_id': course_id,
@@ -42,7 +41,7 @@ class TestContexts(TestCase):
         self.assert_empty_context_for_url('http://foo.bar.com/dashboard')
 
     def assert_empty_context_for_url(self, url):
-        self.assertEquals(
+        self.assertEqual(
             contexts.course_context_from_url(url),
             {
                 'course_id': '',

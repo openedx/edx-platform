@@ -2,7 +2,6 @@
 Utility methods for the entitlement application.
 """
 
-from __future__ import absolute_import
 
 import logging
 

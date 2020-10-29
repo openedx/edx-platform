@@ -2,7 +2,6 @@
 Utility methods for unit tests.
 """
 
-from __future__ import absolute_import
 
 import filecmp
 

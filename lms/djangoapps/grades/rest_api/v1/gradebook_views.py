@@ -1,7 +1,7 @@
 """
 Defines an endpoint for gradebook data related to a course.
 """
-from __future__ import absolute_import
+
 
 import logging
 from collections import namedtuple
@@ -9,6 +9,7 @@ from contextlib import contextmanager
 from functools import wraps
 
 import six
+from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.db.models import Case, Exists, F, OuterRef, When, Q
 from django.urls import reverse
@@ -20,7 +21,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from six import text_type
 
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.grades.api import CourseGradeFactory, clear_prefetched_course_and_subsection_grades
 from lms.djangoapps.grades.api import constants as grades_constants
 from lms.djangoapps.grades.api import context as grades_context
@@ -42,7 +43,9 @@ from lms.djangoapps.grades.rest_api.serializers import (
 )
 from lms.djangoapps.grades.rest_api.v1.utils import USER_MODEL, CourseEnrollmentPagination, GradeViewMixin
 from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
+from lms.djangoapps.grades.subsection_grade_factory import SubsectionGradeFactory
 from lms.djangoapps.grades.tasks import recalculate_subsection_grade_v3
+from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.util.forms import to_bool
 from openedx.core.lib.api.view_utils import (
@@ -1044,44 +1047,54 @@ class SubsectionGradeView(GradeViewMixin, APIView):
                 developer_message='Invalid UserID',
                 error_code='invalid_user_id'
             )
-
-        try:
-            original_grade = PersistentSubsectionGrade.read_grade(user_id, usage_key)
-        except PersistentSubsectionGrade.DoesNotExist:
-            results = SubsectionGradeResponseSerializer({
-                'original_grade': None,
-                'override': None,
-                'history': [],
-                'subsection_id': usage_key,
-                'user_id': user_id,
-                'course_id': None,
-            })
-
-            return Response(results.data)
-
-        limit_history_request_value = request.GET.get('history_record_limit')
-        if limit_history_request_value is not None:
+        override = None
+        history = []
+        history_record_limit = request.GET.get('history_record_limit')
+        if history_record_limit is not None:
             try:
-                history_record_limit = int(limit_history_request_value)
+                history_record_limit = int(history_record_limit)
             except ValueError:
                 history_record_limit = 0
 
         try:
-            override = original_grade.override
-            if limit_history_request_value is not None:
-                history = reversed(list(override.history.all().order_by('-history_date')[:history_record_limit]))
-            else:
-                history = override.history.all().order_by('history_date')
-        except PersistentSubsectionGradeOverride.DoesNotExist:
-            override = None
-            history = []
+            original_grade = PersistentSubsectionGrade.read_grade(user_id, usage_key)
+            if original_grade is not None and hasattr(original_grade, 'override'):
+                override = original_grade.override
+                # pylint: disable=no-member
+                history = list(PersistentSubsectionGradeOverride.history.filter(grade_id=original_grade.id).order_by(
+                    'history_date'
+                )[:history_record_limit])
+            grade_data = {
+                'earned_all': original_grade.earned_all,
+                'possible_all': original_grade.possible_all,
+                'earned_graded': original_grade.earned_graded,
+                'possible_graded': original_grade.possible_graded,
+            }
+        except PersistentSubsectionGrade.DoesNotExist:
+            grade_data = self._get_grade_data_for_not_attempted_assignment(user_id, usage_key)
 
         results = SubsectionGradeResponseSerializer({
-            'original_grade': original_grade,
+            'original_grade': grade_data,
             'override': override,
             'history': history,
-            'subsection_id': original_grade.usage_key,
-            'user_id': original_grade.user_id,
-            'course_id': original_grade.course_id,
+            'subsection_id': usage_key,
+            'user_id': user_id,
+            'course_id': usage_key.course_key,
         })
         return Response(results.data)
+
+    def _get_grade_data_for_not_attempted_assignment(self, user_id, usage_key):
+        """
+        Return grade for an assignment that wasn't attempted
+        """
+        student = get_user_model().objects.get(id=user_id)
+        course_structure = get_course_blocks(student, usage_key)
+        subsection_grade_factory = SubsectionGradeFactory(student, course_structure=course_structure)
+        grade = subsection_grade_factory.create(course_structure[usage_key], read_only=True, force_calculate=True)
+        grade_data = {
+            'earned_all': grade.all_total.earned,
+            'possible_all': grade.all_total.possible,
+            'earned_graded': grade.graded_total.earned,
+            'possible_graded': grade.graded_total.possible,
+        }
+        return grade_data

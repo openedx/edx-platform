@@ -2,7 +2,6 @@
 some xmodules by conditions.
 """
 
-from __future__ import absolute_import
 
 import json
 import logging
@@ -320,7 +319,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor, StudioEditabl
                     show_tag_list.append(location)
             else:
                 try:
-                    descriptor = system.process_xml(etree.tostring(child))
+                    descriptor = system.process_xml(etree.tostring(child, encoding='unicode'))
                     children.append(descriptor.scope_ids.usage_id)
                 except:
                     msg = "Unable to load child when parsing Conditional."

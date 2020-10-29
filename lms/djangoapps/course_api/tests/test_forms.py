@@ -2,7 +2,6 @@
 Tests for Course API forms.
 """
 
-from __future__ import absolute_import
 
 from itertools import product
 

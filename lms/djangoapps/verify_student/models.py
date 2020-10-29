@@ -8,8 +8,9 @@ of a student over a period of time. Right now, the only models are the abstract
 `SoftwareSecurePhotoVerification`. The hope is to keep as much of the
 photo verification process as generic as possible.
 """
-from __future__ import absolute_import, unicode_literals
 
+
+import base64
 import codecs
 import functools
 import json
@@ -20,12 +21,15 @@ from datetime import timedelta
 from email.utils import formatdate
 
 import requests
+import simplejson
 import six
+from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.db import models
 from django.urls import reverse
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy
@@ -41,6 +45,7 @@ from lms.djangoapps.verify_student.ssencrypt import (
 )
 from openedx.core.djangoapps.signals.signals import LEARNER_NOW_VERIFIED
 from openedx.core.storage import get_storage
+
 from .utils import earliest_allowed_verification_date
 
 log = logging.getLogger(__name__)
@@ -98,7 +103,7 @@ class IDVerificationAttempt(StatusModel):
     .. pii_types: name
     .. pii_retirement: retained
     """
-    STATUS = Choices('created', 'ready', 'submitted', 'must_retry', 'approved', 'denied')
+    STATUS = Choices(u'created', u'ready', u'submitted', u'must_retry', u'approved', u'denied')
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
 
     # They can change their name later on, so we want to copy the value here so
@@ -142,6 +147,7 @@ class IDVerificationAttempt(StatusModel):
         )
 
 
+@python_2_unicode_compatible
 class ManualVerification(IDVerificationAttempt):
     """
     Each ManualVerification represents a user's verification that bypasses the need for
@@ -156,14 +162,14 @@ class ManualVerification(IDVerificationAttempt):
         max_length=255,
         blank=True,
         help_text=(
-            'Specifies the reason for manual verification of the user.'
+            u'Specifies the reason for manual verification of the user.'
         )
     )
 
     class Meta(object):
         app_label = 'verify_student'
 
-    def __unicode__(self):
+    def __str__(self):
         return 'ManualIDVerification for {name}, status: {status}'.format(
             name=self.name,
             status=self.status,
@@ -176,6 +182,7 @@ class ManualVerification(IDVerificationAttempt):
         return False
 
 
+@python_2_unicode_compatible
 class SSOVerification(IDVerificationAttempt):
     """
     Each SSOVerification represents a Student's attempt to establish their identity
@@ -185,13 +192,13 @@ class SSOVerification(IDVerificationAttempt):
     .. no_pii:
     """
 
-    OAUTH2 = 'third_party_auth.models.OAuth2ProviderConfig'
-    SAML = 'third_party_auth.models.SAMLProviderConfig'
-    LTI = 'third_party_auth.models.LTIProviderConfig'
+    OAUTH2 = u'third_party_auth.models.OAuth2ProviderConfig'
+    SAML = u'third_party_auth.models.SAMLProviderConfig'
+    LTI = u'third_party_auth.models.LTIProviderConfig'
     IDENTITY_PROVIDER_TYPE_CHOICES = (
-        (OAUTH2, 'OAuth2 Provider'),
-        (SAML, 'SAML Provider'),
-        (LTI, 'LTI Provider'),
+        (OAUTH2, u'OAuth2 Provider'),
+        (SAML, u'SAML Provider'),
+        (LTI, u'LTI Provider'),
     )
 
     identity_provider_type = models.CharField(
@@ -200,20 +207,20 @@ class SSOVerification(IDVerificationAttempt):
         choices=IDENTITY_PROVIDER_TYPE_CHOICES,
         default=SAML,
         help_text=(
-            'Specifies which type of Identity Provider this verification originated from.'
+            u'Specifies which type of Identity Provider this verification originated from.'
         )
     )
 
     identity_provider_slug = models.SlugField(
-        max_length=30, db_index=True, default='default',
+        max_length=30, db_index=True, default=u'default',
         help_text=(
-            'The slug uniquely identifying the Identity Provider this verification originated from.'
+            u'The slug uniquely identifying the Identity Provider this verification originated from.'
         ))
 
     class Meta(object):
         app_label = "verify_student"
 
-    def __unicode__(self):
+    def __str__(self):
         return 'SSOIDVerification for {name}, status: {status}'.format(
             name=self.name,
             status=self.status,
@@ -222,6 +229,23 @@ class SSOVerification(IDVerificationAttempt):
     def should_display_status_to_user(self):
         """Whether or not the status from this attempt should be displayed to the user."""
         return False
+
+    def send_approval_signal(self, approved_by='None'):
+        """
+        Send a signal indicating that this verification was approved.
+        """
+        log.info(u"Verification for user '{user_id}' approved by '{reviewer}' SSO.".format(
+            user_id=self.user, reviewer=approved_by
+        ))
+
+        # Emit signal to find and generate eligible certificates
+        LEARNER_NOW_VERIFIED.send_robust(
+            sender=SSOVerification,
+            user=self.user
+        )
+
+        message = u'LEARNER_NOW_VERIFIED signal fired for {user} from SSOVerification'
+        log.info(message.format(user=self.user.username))
 
 
 class PhotoVerification(IDVerificationAttempt):
@@ -312,7 +336,7 @@ class PhotoVerification(IDVerificationAttempt):
     error_msg = models.TextField(blank=True)
 
     # Non-required field. External services can add any arbitrary codes as time
-    # goes on. We don't try to define an exhuastive list -- this is just
+    # goes on. We don't try to define an exhaustive list -- this is just
     # capturing it so that we can later query for the common problems.
     error_code = models.CharField(blank=True, max_length=50)
 
@@ -399,7 +423,7 @@ class PhotoVerification(IDVerificationAttempt):
             of `reviewed_by_user_id` and `reviewed_by_service` will be changed
             to whoever is doing the approving, and `error_msg` will be reset.
             The only record that this record was ever denied would be in our
-            logs. This should be a relatively rare occurence.
+            logs. This should be a relatively rare occurrence.
         """
         # If someone approves an outdated version of this, the first one wins
         if self.status == "approved":
@@ -420,7 +444,7 @@ class PhotoVerification(IDVerificationAttempt):
             user=self.user
         )
 
-        message = u'LEARNER_NOW_VERIFIED signal fired for {user}'
+        message = u'LEARNER_NOW_VERIFIED signal fired for {user} from PhotoVerification'
         log.info(message.format(user=self.user.username))
 
     @status_before_must_be("must_retry", "submitted", "approved", "denied")
@@ -453,7 +477,7 @@ class PhotoVerification(IDVerificationAttempt):
             previous values of `reviewed_by_user_id` and `reviewed_by_service`
             will be changed to whoever is doing the denying. The only record
             that this record was ever approved would be in our logs. This should
-            be a relatively rare occurence.
+            be a relatively rare occurrence.
         `denied` → `denied`
             Update the error message and reviewing_user/reviewing_service. Just
             lets you amend the error message in case there were additional
@@ -528,20 +552,20 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
     sensitive nature of the data, the following security precautions are taken:
 
     1. The snapshot of their face is encrypted using AES-256 in CBC mode. All
-       face photos are encypted with the same key, and this key is known to
+       face photos are encrypted with the same key, and this key is known to
        both Software Secure and edx-platform.
 
     2. The snapshot of a user's photo ID is also encrypted using AES-256, but
        the key is randomly generated using os.urandom. Every verification
        attempt has a new key. The AES key is then encrypted using a public key
-       provided by Software Secure. We store only the RSA-encryped AES key.
+       provided by Software Secure. We store only the RSA-encrypted AES key.
        Since edx-platform does not have Software Secure's private RSA key, it
        means that we can no longer even read photo ID.
 
     3. The encrypted photos are base64 encoded and stored in an S3 bucket that
        edx-platform does not have read access to.
 
-    Note: this model handles *inital* verifications (which you must perform
+    Note: this model handles *initial* verifications (which you must perform
     at the time you register for a verified cert).
 
     .. pii: The User's name is stored in the parent model, this one stores links to face and photo ID images
@@ -664,7 +688,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
         # Update our record fields
         if six.PY3:
-            self.photo_id_key = codecs.encode(rsa_encrypted_aes_key, 'base64')
+            self.photo_id_key = codecs.encode(rsa_encrypted_aes_key, 'base64').decode('utf-8')
         else:
             self.photo_id_key = rsa_encrypted_aes_key.encode('base64')
 
@@ -810,11 +834,10 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         faces.
         """
         face_aes_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["FACE_IMAGE_AES_KEY"]
-        face_aes_key = face_aes_key_str.decode("hex")
+        face_aes_key = codecs.decode(face_aes_key_str, 'hex')
         rsa_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["RSA_PUBLIC_KEY"]
         rsa_encrypted_face_aes_key = rsa_encrypt(face_aes_key, rsa_key_str)
-
-        return rsa_encrypted_face_aes_key.encode("base64")
+        return base64.b64encode(rsa_encrypted_face_aes_key).decode('utf-8')
 
     def create_request(self, copy_id_photo_from=None):
         """
@@ -884,7 +907,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         header_txt = "\n".join(
             u"{}: {}".format(h, v) for h, v in sorted(headers.items())
         )
-        body_txt = json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8')
+        body_txt = json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False)
 
         return header_txt + "\n\n" + body_txt
 
@@ -912,10 +935,11 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
             return fake_response
 
         headers, body = self.create_request(copy_id_photo_from=copy_id_photo_from)
+
         response = requests.post(
             settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["API_URL"],
             headers=headers,
-            data=json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8'),
+            data=simplejson.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8'),
             verify=False
         )
 
@@ -1086,3 +1110,23 @@ class VerificationDeadline(TimeStampedModel):
             return deadline.deadline
         except cls.DoesNotExist:
             return None
+
+
+class SSPVerificationRetryConfig(ConfigurationModel):  # pylint: disable=model-missing-unicode, useless-suppression
+    """
+        SSPVerificationRetryConfig used to inject arguments
+        to retry_failed_photo_verifications management command
+    """
+
+    class Meta(object):
+        app_label = 'verify_student'
+        verbose_name = 'sspv retry student argument'
+
+    arguments = models.TextField(
+        blank=True,
+        help_text='Useful for manually running a Jenkins job. Specify like --verification-ids 1 2 3',
+        default=''
+    )
+
+    def __str__(self):
+        return six.text_type(self.arguments)

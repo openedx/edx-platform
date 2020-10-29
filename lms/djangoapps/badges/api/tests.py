@@ -1,7 +1,7 @@
 """
 Tests for the badges API views.
 """
-from __future__ import absolute_import
+
 
 import six
 from ddt import data, ddt, unpack

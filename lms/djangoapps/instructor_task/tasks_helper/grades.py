@@ -1,7 +1,7 @@
 """
 Functionality for generating grade reports.
 """
-from __future__ import absolute_import
+
 
 import logging
 import re
@@ -14,26 +14,31 @@ import six
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from lazy import lazy
-from opaque_keys.edx.keys import UsageKey
 from pytz import UTC
 from six import text_type
 from six.moves import zip, zip_longest
 
 from course_blocks.api import get_course_blocks
-from courseware.courses import get_course_by_id
-from courseware.user_state_client import DjangoXBlockUserStateClient
-from lms.djangoapps.instructor_analytics.basic import list_problem_responses
-from lms.djangoapps.instructor_analytics.csvs import format_dictlist
+from course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import CertificateWhitelist, GeneratedCertificate, certificate_info_for_user
+from lms.djangoapps.courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.grades.api import context as grades_context
 from lms.djangoapps.grades.api import prefetch_course_and_subsection_grades
+from lms.djangoapps.instructor_analytics.basic import list_problem_responses
+from lms.djangoapps.instructor_analytics.csvs import format_dictlist
+from lms.djangoapps.instructor_task.config.waffle import (
+    course_grade_report_verified_only,
+    optimize_get_learners_switch_enabled,
+    problem_grade_report_verified_only
+)
 from lms.djangoapps.teams.models import CourseTeamMembership
 from lms.djangoapps.verify_student.services import IDVerificationService
+from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.course_groups.cohorts import bulk_cache_cohorts, get_cohort, is_course_cohorted
 from openedx.core.djangoapps.user_api.course_tag.api import BulkCourseTags
-from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from student.models import CourseEnrollment
 from student.roles import BulkRoleCache
 from xmodule.modulestore.django import modulestore
@@ -42,10 +47,6 @@ from xmodule.split_test_module import get_split_user_partitions
 
 from .runner import TaskProgress
 from .utils import upload_csv_to_report_store
-
-WAFFLE_NAMESPACE = 'instructor_task'
-WAFFLE_SWITCHES = WaffleSwitchNamespace(name=WAFFLE_NAMESPACE)
-OPTIMIZE_GET_LEARNERS_FOR_COURSE = 'optimize_get_learners_for_course'
 
 TASK_LOG = logging.getLogger('edx.celery.task')
 
@@ -306,7 +307,21 @@ class CourseGradeReport(object):
             args = [iter(iterable)] * chunk_size
             return zip_longest(*args, fillvalue=fillvalue)
 
-        def users_for_course(course_id):
+        def get_enrolled_learners_for_course(course_id, verified_only=False):
+            """
+            Get enrolled learners in a course.
+
+            verified_only(bool): It indicates if we need only the verified
+            enrollments or all enrollments.
+            """
+            if optimize_get_learners_switch_enabled():
+                TASK_LOG.info(u'%s, Creating Course Grade with optimization', task_log_message)
+                return users_for_course_v2(course_id, verified_only=verified_only)
+
+            TASK_LOG.info(u'%s, Creating Course Grade without optimization', task_log_message)
+            return users_for_course(course_id, verified_only=verified_only)
+
+        def users_for_course(course_id, verified_only=False):
             """
             Get all the enrolled users in a course.
 
@@ -314,11 +329,15 @@ class CourseGradeReport(object):
             out-of-memory errors in large courses. This method will be removed when
             `OPTIMIZE_GET_LEARNERS_FOR_COURSE` waffle flag is removed.
             """
-            users = CourseEnrollment.objects.users_enrolled_in(course_id, include_inactive=True)
+            users = CourseEnrollment.objects.users_enrolled_in(
+                course_id,
+                include_inactive=True,
+                verified_only=verified_only,
+            )
             users = users.select_related('profile')
             return grouper(users)
 
-        def users_for_course_v2(course_id):
+        def users_for_course_v2(course_id, verified_only=False):
             """
             Get all the enrolled users in a course chunk by chunk.
 
@@ -328,6 +347,8 @@ class CourseGradeReport(object):
             filter_kwargs = {
                 'courseenrollment__course_id': course_id,
             }
+            if verified_only:
+                filter_kwargs['courseenrollment__mode'] = CourseMode.VERIFIED
 
             user_ids_list = get_user_model().objects.filter(**filter_kwargs).values_list('id', flat=True).order_by('id')
             user_chunks = grouper(user_ids_list)
@@ -342,14 +363,10 @@ class CourseGradeReport(object):
                 ).select_related('profile')
                 yield users
 
+        course_id = context.course_id
         task_log_message = u'{}, Task type: {}'.format(context.task_info_string, context.action_name)
-        if WAFFLE_SWITCHES.is_enabled(OPTIMIZE_GET_LEARNERS_FOR_COURSE):
-            TASK_LOG.info(u'%s, Creating Course Grade with optimization', task_log_message)
-            return users_for_course_v2(context.course_id)
-
-        TASK_LOG.info(u'%s, Creating Course Grade without optimization', task_log_message)
-        batch_users = users_for_course(context.course_id)
-        return batch_users
+        verified_users_only = course_grade_report_verified_only(course_id)
+        return get_enrolled_learners_for_course(course_id, verified_users_only)
 
     def _user_grades(self, course_grade, context):
         """
@@ -358,7 +375,6 @@ class CourseGradeReport(object):
         """
         grade_results = []
         for _, assignment_info in six.iteritems(context.graded_assignments):
-
             subsection_grades, subsection_grades_results = self._user_subsection_grades(
                 course_grade,
                 assignment_info['subsection_headers'],
@@ -380,7 +396,7 @@ class CourseGradeReport(object):
         grade_results = []
         for subsection_location in subsection_headers:
             subsection_grade = course_grade.subsection_grade(subsection_location)
-            if subsection_grade.attempted_graded:
+            if subsection_grade.attempted_graded or subsection_grade.override:
                 grade_result = subsection_grade.percent_graded
             else:
                 grade_result = u'Not Attempted'
@@ -510,10 +526,28 @@ class ProblemGradeReport(object):
         Generate a CSV containing all students' problem grades within a given
         `course_id`.
         """
+
+        def log_task_info(message):
+            """
+            Updates the status on the celery task to the given message.
+            Also logs the update.
+            """
+            fmt = u'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
+            task_info_string = fmt.format(
+                task_id=task_id, entry_id=_entry_id, course_id=course_id, task_input=_task_input
+            )
+            TASK_LOG.info(u'%s, Task type: %s, %s, %s', task_info_string, action_name, message, task_progress.state)
+
         start_time = time()
         start_date = datetime.now(UTC)
         status_interval = 100
-        enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id, include_inactive=True)
+        task_id = _xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None
+
+        enrolled_students = CourseEnrollment.objects.users_enrolled_in(
+            course_id,
+            include_inactive=True,
+            verified_only=problem_grade_report_verified_only(course_id),
+        )
         task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 
         # This struct encapsulates both the display names of each static item in the
@@ -522,6 +556,7 @@ class ProblemGradeReport(object):
         header_row = OrderedDict([('id', 'Student ID'), ('email', 'Email'), ('username', 'Username')])
 
         course = get_course_by_id(course_id)
+        log_task_info(u'Retrieving graded scorable blocks')
         graded_scorable_blocks = cls._graded_scorable_blocks_to_header(course)
 
         # Just generate the static fields for now.
@@ -529,10 +564,10 @@ class ProblemGradeReport(object):
             list(header_row.values()) + ['Enrollment Status', 'Grade'] + _flatten(list(graded_scorable_blocks.values()))
         ]
         error_rows = [list(header_row.values()) + ['error_msg']]
-        current_step = {'step': 'Calculating Grades'}
 
         # Bulk fetch and cache enrollment states so we can efficiently determine
         # whether each user is currently enrolled in the course.
+        log_task_info(u'Fetching enrollment status')
         CourseEnrollment.bulk_fetch_enrollment_states(enrolled_students, course_id)
 
         for student, course_grade, error in CourseGradeFactory().iter(enrolled_students, course):
@@ -566,8 +601,12 @@ class ProblemGradeReport(object):
 
             task_progress.succeeded += 1
             if task_progress.attempted % status_interval == 0:
-                task_progress.update_task_state(extra_meta=current_step)
+                step = u'Calculating Grades'
+                task_progress.update_task_state(extra_meta={'step': step})
+                log_message = u'{0} {1}/{2}'.format(step, task_progress.attempted, task_progress.total)
+                log_task_info(log_message)
 
+        log_task_info('Uploading CSV to store')
         # Perform the upload if any students have been successfully graded
         if len(rows) > 1:
             upload_csv_to_report_store(rows, 'problem_grade_report', course_id, start_date)

@@ -3,7 +3,7 @@ Views related to content libraries.
 A content library is a structure containing XBlocks which can be re-used in the
 multiple courses.
 """
-from __future__ import absolute_import
+
 
 import logging
 

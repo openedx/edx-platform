@@ -14,7 +14,7 @@
     @include clearfix();
 
     max-width: grid-width(12);
-    min-width: 760px;
+    min-width: 320px;
     width: flex-grid(12);
     margin: 0 auto;
   }
@@ -97,6 +97,7 @@
   // object variations
   &.urgency-high {
     background: $notify-banner-bg-1;
+    margin-bottom: 5px;
 
     .msg {
       color: $white;
@@ -117,7 +118,7 @@
       box-shadow: none;
       border-top: 1px solid #579cc5;
       padding: 20px 20px 20px 40px;
-      margin-top: -16px;
+      margin: -16px 0 5px 0
     }
     .fa-close {
       position: relative;

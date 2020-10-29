@@ -1,7 +1,7 @@
 """
 Key-value store that holds XBlock field data read out of Blockstore
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 from collections import namedtuple
 from weakref import WeakKeyDictionary
 import logging
@@ -10,6 +10,7 @@ from xblock.exceptions import InvalidScopeError, NoSuchDefinition
 from xblock.fields import Field, BlockScope, Scope, UserScope, Sentinel
 from xblock.field_data import FieldData
 
+from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
 from openedx.core.djangolib.blockstore_cache import (
     get_bundle_version_files_cached,
     get_bundle_draft_files_cached,
@@ -20,6 +21,7 @@ log = logging.getLogger(__name__)
 ActiveBlock = namedtuple('ActiveBlock', ['olx_hash', 'changed_fields'])
 
 DELETED = Sentinel('DELETED')  # Special value indicating a field was reset to its default value
+CHILDREN_INCLUDES = Sentinel('CHILDREN_INCLUDES')  # Key for a pseudo-field that stores the XBlock's children info
 
 MAX_DEFINITIONS_LOADED = 100  # How many of the most recently used XBlocks' field data to keep in memory at max.
 
@@ -120,14 +122,13 @@ class BlockstoreFieldData(FieldData):
         Given a block and the name of one of its fields, check that we will be
         able to read/write it.
         """
+        if name == CHILDREN_INCLUDES:
+            return  # This is a pseudo-field used in conjunction with BlockstoreChildrenData
         field = self._getfield(block, name)
-        if field.scope == Scope.children:
-            if name != 'children':
-                raise InvalidScopeError("Expect Scope.children only for field named 'children', not '{}'".format(name))
-        elif field.scope == Scope.parent:
-            # This field data store is focused on definition-level field data, and parent is mostly
-            # relevant at the usage level. Luckily this doesn't even seem to be used?
-            raise NotImplementedError("Setting Scope.parent is not supported by BlockstoreFieldData.")
+        if field.scope in (Scope.children, Scope.parent):
+            # This field data store is focused on definition-level field data, and children/parent is mostly
+            # relevant at the usage level. Scope.parent doesn't even seem to be used?
+            raise NotImplementedError("Setting Scope.children/parent is not supported by BlockstoreFieldData.")
         else:
             if field.scope.user != UserScope.NONE:
                 raise InvalidScopeError("BlockstoreFieldData only supports UserScope.NONE fields")
@@ -172,7 +173,7 @@ class BlockstoreFieldData(FieldData):
         try:
             saved_fields = self.loaded_definitions[entry.olx_hash]
         except KeyError:
-            if name == 'children':
+            if name == CHILDREN_INCLUDES:
                 # Special case: parse_xml calls add_node_as_child which calls 'block.children.append()'
                 # BEFORE parse_xml is done, and .append() needs to read the value of children. So
                 return []  # start with an empty list, it will get filled in.
@@ -255,3 +256,95 @@ class BlockstoreFieldData(FieldData):
         # we have only half as many as MAX_DEFINITIONS_LOADED in memory, if possible.
         while olx_hashes_safe_to_delete and (len(self.loaded_definitions) > MAX_DEFINITIONS_LOADED / 2):
             del self.loaded_definitions[olx_hashes_safe_to_delete.pop()]
+
+
+class BlockstoreChildrenData(FieldData):
+    """
+    An XBlock FieldData implementation that reads 'children' data out of
+    the definition fields in BlockstoreFieldData.
+
+    The children field contains usage keys and so is usage-specific; the
+    BlockstoreFieldData can only store field data that is not usage-specific. So
+    we store data about the <xblock-include /> elements that define the children
+    in BlockstoreFieldData (since that is not usage-specific), and this field
+    data implementation loads that <xblock-include /> data and transforms it
+    into the usage keys that comprise the standard .children field.
+    """
+    def __init__(self, blockstore_field_data):
+        """
+        Initialize this BlockstoreChildrenData instance.
+        """
+        # The data store that holds Scope.usage and Scope.definition data:
+        self.authored_data_store = blockstore_field_data
+        super(BlockstoreChildrenData, self).__init__()
+
+    def _check_field(self, block, name):  # pylint: disable=unused-argument
+        """
+        Given a block and the name of one of its fields, check that we will be
+        able to read/write it.
+        """
+        if name != 'children':
+            raise InvalidScopeError("BlockstoreChildrenData can only read/write from a field named 'children'")
+
+    def get(self, block, name):
+        """
+        Get the "children' field value.
+
+        We do this by reading the parsed <xblock-include /> values from
+        the regular authored data store and then transforming them to usage IDs.
+        """
+        self._check_field(block, name)
+        children_includes = self.get_includes(block)
+        if not children_includes:
+            return []
+        # Now the .children field is required to be a list of usage IDs:
+        learning_context = get_learning_context_impl(block.scope_ids.usage_id)
+        child_usages = []
+        for parsed_include in children_includes:
+            child_usages.append(
+                learning_context.usage_for_child_include(
+                    block.scope_ids.usage_id, block.scope_ids.def_id, parsed_include,
+                )
+            )
+        return child_usages
+
+    def set(self, block, name, value):
+        """
+        Set the value of the field; requires name='children'
+        """
+        self._check_field(block, name)
+        children_includes = self.authored_data_store.get(block, CHILDREN_INCLUDES)
+        if len(value) != len(children_includes):
+            raise RuntimeError(
+                "This runtime does not allow changing .children directly - use runtime.add_child_include instead."
+            )
+        # This is a no-op; the value of 'children' is derived from CHILDREN_INCLUDES
+        # so we never write to the children field directly. All we do is make sure it
+        # looks like it's still in sync with CHILDREN_INCLUDES
+
+    def get_includes(self, block):
+        """
+        Get the list of <xblock-include /> elements representing this XBlock's
+        children.
+        """
+        try:
+            return self.authored_data_store.get(block, CHILDREN_INCLUDES)
+        except KeyError:
+            # KeyError raised by an XBlock field data store means "use the
+            # default value", and the default value for the children field is an
+            # empty list.
+            return []
+
+    def append_include(self, block, parsed_include):
+        """
+        Append an <xblock-include /> element to this XBlock's list of children
+        """
+        self.authored_data_store.set(block, CHILDREN_INCLUDES, self.get_includes(block) + [parsed_include])
+
+    def delete(self, block, name):
+        """
+        Reset the value of the field named `name` to the default
+        """
+        self._check_field(block, name)
+        self.authored_data_store.set(block, CHILDREN_INCLUDES, [])
+        self.set(block, name, [])

@@ -1,5 +1,5 @@
 """Django admin for course_modes"""
-from __future__ import absolute_import, unicode_literals
+
 
 import six
 from django import forms
@@ -180,6 +180,8 @@ class CourseModeForm(forms.ModelForm):
 class CourseModeAdmin(admin.ModelAdmin):
     """Admin for course modes"""
     form = CourseModeForm
+
+    raw_id_fields = ['course']
 
     fields = (
         'course',

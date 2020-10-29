@@ -2,7 +2,7 @@
 """
 End-to-end tests for LibraryContent block in LMS
 """
-from __future__ import absolute_import
+
 
 import textwrap
 
@@ -282,45 +282,3 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase, TestWithSearc
         self._auto_auth(self.USERNAME, self.EMAIL, False)
         self._goto_library_block_page()
         return self.library_content_page.children_headers
-
-    def test_problem_type_selector(self):
-        """
-        Scenario: Ensure setting "Any Type" for Problem Type does not filter out Problems
-        Given I have a library with two "Select Option" and two "Choice Group" problems, and a course containing
-               LibraryContent XBlock configured to draw XBlocks from that library
-        When I set library content xblock Problem Type to "Any Type" and Count to 3 and publish unit
-        When I go to LMS courseware page for library content xblock as student
-        Then I can see 3 xblocks from the library of any type
-        When I set library content xblock Problem Type to "Choice Group" and Count to 1 and publish unit
-        When I go to LMS courseware page for library content xblock as student
-        Then I can see 1 xblock from the library of "Choice Group" type
-        When I set library content xblock Problem Type to "Select Option" and Count to 2 and publish unit
-        When I go to LMS courseware page for library content xblock as student
-        Then I can see 2 xblock from the library of "Select Option" type
-        When I set library content xblock Problem Type to "Matlab" and Count to 2 and publish unit
-        When I go to LMS courseware page for library content xblock as student
-        Then I can see 0 xblocks from the library
-        """
-        children_headers = self._set_library_content_settings(count=3, capa_type="Any Type")
-        self.assertEqual(len(children_headers), 3)
-        self.assertLessEqual(children_headers, self._problem_headers)
-
-        # Choice group test
-        children_headers = self._set_library_content_settings(count=1, capa_type="Multiple Choice")
-        self.assertEqual(len(children_headers), 1)
-        self.assertLessEqual(
-            children_headers,
-            set(["Problem Choice Group 1", "Problem Choice Group 2"])
-        )
-
-        # Choice group test
-        children_headers = self._set_library_content_settings(count=2, capa_type="Dropdown")
-        self.assertEqual(len(children_headers), 2)
-        self.assertEqual(
-            children_headers,
-            set(["Problem Select 1", "Problem Select 2"])
-        )
-
-        # Missing problem type test
-        children_headers = self._set_library_content_settings(count=2, capa_type="Custom Evaluated Script")
-        self.assertEqual(children_headers, set())

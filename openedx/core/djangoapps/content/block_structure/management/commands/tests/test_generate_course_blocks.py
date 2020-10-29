@@ -1,7 +1,7 @@
 """
 Tests for generate_course_blocks management command.
 """
-from __future__ import absolute_import
+
 
 import itertools
 
@@ -146,7 +146,7 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
                         task_action = mock_tasks.get_course_in_cache_v2
                     task_options = task_action.apply_async.call_args[1]
                     if routing_key:
-                        self.assertEquals(task_options['routing_key'], routing_key)
+                        self.assertEqual(task_options['routing_key'], routing_key)
                     else:
                         self.assertNotIn('routing_key', task_options)
 

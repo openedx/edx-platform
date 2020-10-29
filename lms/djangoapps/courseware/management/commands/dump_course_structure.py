@@ -16,7 +16,6 @@ The resulting JSON object has one entry for each module in the course:
 
 """
 
-from __future__ import absolute_import
 
 import json
 from textwrap import dedent

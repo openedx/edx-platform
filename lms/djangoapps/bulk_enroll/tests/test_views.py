@@ -1,7 +1,7 @@
 """
 Tests for the Bulk Enrollment views.
 """
-from __future__ import absolute_import
+
 
 import json
 
@@ -17,7 +17,7 @@ from rest_framework.test import APIRequestFactory, APITestCase, force_authentica
 
 from bulk_enroll.serializers import BulkEnrollmentSerializer
 from bulk_enroll.views import BulkEnrollView
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id
 from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
 from openedx.core.djangoapps.site_configuration.helpers import get_value as get_site_value
@@ -349,10 +349,10 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
             'courses': self.course_key,
             'cohorts': "cohort1,cohort2"
         })
-        self.assertEqual(response.status_code, 400)
-        self.assertIn(
+        self.assertContains(
+            response,
             'If provided, the cohorts and courses should have equal number of items.',
-            response.content.decode('utf-8')
+            status_code=400,
         )
 
     def test_fail_on_missing_cohorts(self):
@@ -366,10 +366,13 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
             'cohorts': 'cohort1',
             'courses': self.course_key
         })
-        self.assertEqual(response.status_code, 400)
-        self.assertIn(u'cohort {cohort_name} not found in course {course_id}.'.format(
-            cohort_name='cohort1', course_id=self.course_key
-        ), response.content.decode('utf-8'))
+        self.assertContains(
+            response,
+            u'cohort {cohort_name} not found in course {course_id}.'.format(
+                cohort_name='cohort1', course_id=self.course_key
+            ),
+            status_code=400,
+        )
 
     def test_allow_cohorts_when_enrolling(self):
         """
@@ -383,8 +386,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
             'cohorts': 'cohort1',
             'courses': self.course_key
         })
-        self.assertEqual(response.status_code, 400)
-        self.assertIn('Cohorts can only be used for enrollments.', response.content.decode('utf-8'))
+        self.assertContains(response, 'Cohorts can only be used for enrollments.', status_code=400)
 
     def test_add_to_valid_cohort(self):
         config_course_cohorts(self.course, is_cohorted=True, manual_cohorts=["cohort1", "cohort2"])

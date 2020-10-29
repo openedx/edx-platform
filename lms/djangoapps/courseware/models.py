@@ -12,7 +12,7 @@ file and check it in at the same time as your model changes. To do that,
 ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
-from __future__ import absolute_import
+
 
 import itertools
 import logging
@@ -23,10 +23,11 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import BlockTypeKeyField, CourseKeyField, LearningContextKeyField, UsageKeyField
-from courseware.fields import UnsignedBigIntAutoField
+from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField
 from six import text_type
 from six.moves import range
 
@@ -77,6 +78,7 @@ class ChunkingManager(models.Manager):
         return res
 
 
+@python_2_unicode_compatible
 class StudentModule(models.Model):
     """
     Keeps student state for a particular XBlock usage and particular student.
@@ -110,9 +112,9 @@ class StudentModule(models.Model):
     grade = models.FloatField(null=True, blank=True, db_index=True)
     max_grade = models.FloatField(null=True, blank=True)
     DONE_TYPES = (
-        ('na', 'NOT_APPLICABLE'),
-        ('f', 'FINISHED'),
-        ('i', 'INCOMPLETE'),
+        (u'na', u'NOT_APPLICABLE'),
+        (u'f', u'FINISHED'),
+        (u'i', u'INCOMPLETE'),
     )
     done = models.CharField(max_length=8, choices=DONE_TYPES, default='na')
 
@@ -149,7 +151,7 @@ class StudentModule(models.Model):
                 'state': str(self.state)[:20],
             },)
 
-    def __unicode__(self):
+    def __str__(self):
         return six.text_type(repr(self))
 
     @classmethod
@@ -166,7 +168,7 @@ class StudentModule(models.Model):
 
     @classmethod
     def save_state(cls, student, course_id, module_state_key, defaults):
-        if not student.is_authenticated():
+        if not student.is_authenticated:
             return
         else:
             cls.objects.update_or_create(
@@ -232,6 +234,7 @@ class BaseStudentModuleHistory(models.Model):
         return history_entries
 
 
+@python_2_unicode_compatible
 class StudentModuleHistory(BaseStudentModuleHistory):
     """Keeps a complete history of state changes for a given XModule for a given
     Student. Right now, we restrict this to problems so that the table doesn't
@@ -243,7 +246,7 @@ class StudentModuleHistory(BaseStudentModuleHistory):
 
     student_module = models.ForeignKey(StudentModule, db_index=True, db_constraint=False, on_delete=models.CASCADE)
 
-    def __unicode__(self):
+    def __str__(self):
         return six.text_type(repr(self))
 
     def save_history(sender, instance, **kwargs):  # pylint: disable=no-self-argument, unused-argument
@@ -268,6 +271,7 @@ class StudentModuleHistory(BaseStudentModuleHistory):
         post_save.connect(save_history, sender=StudentModule)
 
 
+@python_2_unicode_compatible
 class XBlockFieldBase(models.Model):
     """
     Base class for all XBlock field storage.
@@ -289,7 +293,7 @@ class XBlockFieldBase(models.Model):
     created = models.DateTimeField(auto_now_add=True, db_index=True)
     modified = models.DateTimeField(auto_now=True, db_index=True)
 
-    def __unicode__(self):
+    def __str__(self):
         keys = [field.name for field in self._meta.get_fields() if field.name not in ('created', 'modified')]
         return HTML(u'{}<{!r}').format(
             HTML(self.__class__.__name__),
@@ -337,6 +341,7 @@ class XModuleStudentInfoField(XBlockFieldBase):
     student = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
 
 
+@python_2_unicode_compatible
 class OfflineComputedGrade(models.Model):
     """
     Table of grades computed offline for a given user and course.
@@ -355,10 +360,11 @@ class OfflineComputedGrade(models.Model):
         app_label = "courseware"
         unique_together = (('user', 'course_id'),)
 
-    def __unicode__(self):
+    def __str__(self):
         return "[OfflineComputedGrade] %s: %s (%s) = %s" % (self.user, self.course_id, self.created, self.gradeset)
 
 
+@python_2_unicode_compatible
 class OfflineComputedGradeLog(models.Model):
     """
     Log of when offline grades are computed.
@@ -377,7 +383,7 @@ class OfflineComputedGradeLog(models.Model):
     seconds = models.IntegerField(default=0)  # seconds elapsed for computation
     nstudents = models.IntegerField(default=0)
 
-    def __unicode__(self):
+    def __str__(self):
         return "[OCGLog] %s: %s" % (text_type(self.course_id), self.created)
 
 
@@ -441,6 +447,9 @@ class CourseDynamicUpgradeDeadlineConfiguration(OptOutDynamicUpgradeDeadlineMixi
 
     .. no_pii:
     """
+    class Meta(object):
+        app_label = "courseware"
+
     KEY_FIELDS = ('course_id',)
 
     course_id = CourseKeyField(max_length=255, db_index=True)
@@ -465,6 +474,9 @@ class OrgDynamicUpgradeDeadlineConfiguration(OptOutDynamicUpgradeDeadlineMixin, 
 
     .. no_pii:
     """
+    class Meta(object):
+        app_label = "courseware"
+
     KEY_FIELDS = ('org_id',)
 
     org_id = models.CharField(max_length=255, db_index=True)

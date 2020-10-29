@@ -2,7 +2,6 @@
 Test signal handlers for program_enrollments
 """
 
-from __future__ import absolute_import, unicode_literals
 
 import mock
 import pytest
@@ -170,6 +169,30 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
         self.assertEqual(student_course_enrollment.user, self.user)
         self.assertEqual(student_course_enrollment.course.id, program_course_enrollment.course_key)
         self.assertEqual(student_course_enrollment.mode, mode)
+
+    def test_update_social_auth(self):
+        """
+        Makes sure we can update a social_auth row to trigger the same program enrollments
+        """
+        program_enrollment = self._create_waiting_program_enrollment()
+        program_course_enrollments = self._create_waiting_course_enrollments(program_enrollment)
+
+        user_social_auth = UserSocialAuth.objects.create(
+            user=self.user,
+            uid='{0}:{1}'.format(self.provider_slug, 'gobbledegook')
+        )
+
+        # Not yet a thing, didn't match
+        program_enrollment.refresh_from_db()
+        self.assertIsNone(program_enrollment.user)
+
+        user_social_auth.uid = '{0}:{1}'.format(self.provider_slug, self.external_id)
+        user_social_auth.save()
+
+        # now we see the enrollments realized
+        self._assert_program_enrollment_user(program_enrollment, self.user)
+        for program_course_enrollment in program_course_enrollments:
+            self._assert_program_course_enrollment(program_course_enrollment)
 
     def test_waiting_course_enrollments_completed(self):
         program_enrollment = self._create_waiting_program_enrollment()
@@ -341,27 +364,16 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
                 )
             )
 
-    def test_log_on_enrollment_failure(self):
+    def test_exception_on_enrollment_failure(self):
         program_enrollment = self._create_waiting_program_enrollment()
-        program_course_enrollments = self._create_waiting_course_enrollments(program_enrollment)
+        self._create_waiting_course_enrollments(program_enrollment)
 
         with mock.patch('student.models.CourseEnrollment.enroll') as enrollMock:
             enrollMock.side_effect = CourseEnrollmentException('something has gone wrong')
-            with LogCapture(logger.name) as log:
-                with pytest.raises(CourseEnrollmentException):
-                    UserSocialAuth.objects.create(
-                        user=self.user,
-                        uid='{0}:{1}'.format(self.provider_slug, self.external_id)
-                    )
-                error_template = 'Failed to enroll user={} with waiting program_course_enrollment={}: {}'
-                log.check_present(
-                    (
-                        logger.name,
-                        'WARNING',
-                        error_template.format(
-                            self.user.id, program_course_enrollments[0].id, 'something has gone wrong'
-                        )
-                    )
+            with pytest.raises(CourseEnrollmentException):
+                UserSocialAuth.objects.create(
+                    user=self.user,
+                    uid='{0}:{1}'.format(self.provider_slug, self.external_id)
                 )
 
     def test_log_on_unexpected_exception(self):
@@ -371,7 +383,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
         program_enrollment = self._create_waiting_program_enrollment()
         self._create_waiting_course_enrollments(program_enrollment)
 
-        with mock.patch('lms.djangoapps.program_enrollments.models.ProgramCourseEnrollment.enroll') as enrollMock:
+        with mock.patch('lms.djangoapps.program_enrollments.api.linking.enroll_in_masters_track') as enrollMock:
             enrollMock.side_effect = Exception('unexpected error')
             with LogCapture(logger.name) as log:
                 with self.assertRaisesRegex(Exception, 'unexpected error'):

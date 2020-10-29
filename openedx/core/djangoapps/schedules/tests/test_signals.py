@@ -1,7 +1,7 @@
 """
 Tests for schedules signals
 """
-from __future__ import absolute_import
+
 
 import datetime
 
@@ -12,7 +12,7 @@ from pytz import utc
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.models import DynamicUpgradeDeadlineConfiguration
+from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.schedules.models import ScheduleExperience
 from openedx.core.djangoapps.schedules.signals import CREATE_SCHEDULE_WAFFLE_FLAG
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
@@ -49,7 +49,7 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
             course_id=course.id,
             mode=CourseMode.AUDIT,
         )
-        with pytest.raises(Schedule.DoesNotExist, message="Expecting Schedule to not exist"):
+        with pytest.raises(Schedule.DoesNotExist):
             enrollment.schedule
 
     @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
@@ -92,7 +92,7 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
         ScheduleConfigFactory.create(site=site, enabled=True, create_schedules=True)
         course = _create_course_run(self_paced=False)
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
-        with pytest.raises(Schedule.DoesNotExist, message="Expecting Schedule to not exist"):
+        with pytest.raises(Schedule.DoesNotExist):
             enrollment.schedule
 
     @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
@@ -156,7 +156,7 @@ class UpdateScheduleTests(SharedModuleStoreTestCase):
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True, deadline_days=self.VERIFICATION_DEADLINE_DAYS)
 
     def assert_schedule_dates(self, schedule, expected_start):
-        assert _strip_secs(schedule.start) == _strip_secs(expected_start)
+        assert _strip_secs(schedule.start_date) == _strip_secs(expected_start)
         deadline_delta = datetime.timedelta(days=self.VERIFICATION_DEADLINE_DAYS)
         assert _strip_secs(schedule.upgrade_deadline) == _strip_secs(expected_start) + deadline_delta
 

@@ -3,18 +3,18 @@
 Tests for support views.
 """
 
-from __future__ import absolute_import
 
 import itertools
 import json
 import re
 from datetime import datetime, timedelta
-from uuid import uuid4
+from uuid import uuid4, UUID
 
 import ddt
 import six
 from django.contrib.auth.models import User
 from django.db.models import signals
+from django.http import HttpResponse
 from django.urls import reverse
 from mock import patch
 from pytz import UTC
@@ -22,7 +22,6 @@ from pytz import UTC
 from common.test.utils import disable_signal
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from lms.djangoapps.program_enrollments.api import NO_PROGRAM_ENROLLMENT_TEMPLATE
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAttribute, ManualEnrollmentAudit
 from student.roles import GlobalStaff, SupportStaffRole
@@ -331,7 +330,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             data['course_id'] = six.text_type(self.course.id)
         response = self.client.post(self.url, data)
         self.assertEqual(response.status_code, 400)
-        self.assertIsNotNone(re.match(error_message, response.content))
+        self.assertIsNotNone(re.match(error_message, response.content.decode('utf-8')))
         self.assert_enrollment(CourseMode.AUDIT)
         self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
 
@@ -446,6 +445,12 @@ class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
     """
     Tests for the link_program_enrollments support view.
     """
+    patch_render = patch(
+        'support.views.program_enrollments.render_to_response',
+        return_value=HttpResponse(),
+        autospec=True,
+    )
+
     def setUp(self):
         """Make the user support staff. """
         super(SupportViewLinkProgramEnrollmentsTests, self).setUp()
@@ -454,53 +459,62 @@ class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
         self.program_uuid = str(uuid4())
         self.text = '0001,user-0001\n0002,user-02'
 
-    def _assert_props(self, field_name, value, response):
-        self.assertIn('"{}": "{}"'.format(field_name, value), six.text_type(response.content, encoding='utf-8'))
+    @patch_render
+    def test_get(self, mocked_render):
+        self.client.get(self.url)
+        render_call_dict = mocked_render.call_args[0][1]
+        assert render_call_dict == {
+            'successes': [],
+            'errors': [],
+            'program_uuid': '',
+            'text': ''
+        }
 
-    def _assert_props_list(self, field_name, values, response):
+    def test_rendering(self):
         """
-        Assert that that page is being rendered with a specific list of props
+        Test the view without mocking out the rendering like the rest of the tests.
         """
-        values_str = ''
-        if values:
-            values_str = '", "'.join(values)
-            values_str = '"{}"'.format(values_str)
-        self.assertIn(u'"{}": [{}]'.format(field_name, values_str), six.text_type(response.content, encoding='utf-8'))
-
-    def test_get(self):
         response = self.client.get(self.url)
-        self._assert_props_list('successes', [], response)
-        self._assert_props_list('errors', [], response)
-        self._assert_props('programUUID', '', response)
-        self._assert_props('text', '', response)
+        content = six.text_type(response.content, encoding='utf-8')
+        assert '"programUUID": ""' in content
+        assert '"text": ""' in content
 
-    def test_invalid_uuid(self):
-        response = self.client.post(self.url, data={
+    @patch_render
+    def test_invalid_uuid(self, mocked_render):
+        self.client.post(self.url, data={
             'program_uuid': 'notauuid',
             'text': self.text,
         })
-        self._assert_props_list('errors', [u'badly formed hexadecimal UUID string'], response)
+        msg = u"Supplied program UUID 'notauuid' is not a valid UUID."
+        render_call_dict = mocked_render.call_args[0][1]
+        assert render_call_dict['errors'] == [msg]
 
-    @ddt.unpack
+    @patch_render
     @ddt.data(
         ('program_uuid', ''),
         ('', 'text'),
         ('', ''),
     )
-    def test_missing_parameter(self, program_uuid, text):
-        msg = u'You must provide both a program uuid and a comma separated list of external_student_key, username'
-        response = self.client.post(self.url, data={
+    @ddt.unpack
+    def test_missing_parameter(self, program_uuid, text, mocked_render):
+        error = (
+            u"You must provide both a program uuid "
+            u"and a series of lines with the format "
+            u"'external_user_key,lms_username'."
+        )
+        self.client.post(self.url, data={
             'program_uuid': program_uuid,
             'text': text,
         })
-        self._assert_props_list('errors', [msg], response)
+        render_call_dict = mocked_render.call_args[0][1]
+        assert render_call_dict['errors'] == [error]
 
     @ddt.data(
         '0001,learner-01\n0002,learner-02',                                 # normal
         '0001,learner-01,apple,orange\n0002,learner-02,purple',             # extra fields
         '\t0001        ,    \t  learner-01    \n   0002 , learner-02    ',  # whitespace
     )
-    @patch('support.views.program_enrollments.link_program_enrollments_to_lms_users')
+    @patch('support.views.program_enrollments.link_program_enrollments')
     def test_text(self, text, mocked_link):
         self.client.post(self.url, data={
             'program_uuid': self.program_uuid,
@@ -508,18 +522,20 @@ class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
         })
         mocked_link.assert_called_once()
         mocked_link.assert_called_with(
-            self.program_uuid,
+            UUID(self.program_uuid),
             {
                 '0001': 'learner-01',
                 '0002': 'learner-02',
             }
         )
 
-    def test_junk_text(self):
+    @patch_render
+    def test_junk_text(self, mocked_render):
         text = 'alsdjflajsdflakjs'
-        response = self.client.post(self.url, data={
+        self.client.post(self.url, data={
             'program_uuid': self.program_uuid,
             'text': text,
         })
-        msg = NO_PROGRAM_ENROLLMENT_TEMPLATE.format(program_uuid=self.program_uuid, external_student_key=text)
-        self._assert_props_list('errors', [msg], response)
+        msg = u"All linking lines must be in the format 'external_user_key,lms_username'"
+        render_call_dict = mocked_render.call_args[0][1]
+        assert render_call_dict['errors'] == [msg]

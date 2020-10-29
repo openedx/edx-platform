@@ -2,7 +2,6 @@
 Tests for the CCXCon celery tasks
 """
 
-from __future__ import absolute_import
 
 import mock
 from django.test import TestCase

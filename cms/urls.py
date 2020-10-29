@@ -1,13 +1,13 @@
 """
 Urls of Studio.
 """
-from __future__ import absolute_import
 
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib.admin import autodiscover as django_autodiscover
 from django.utils.translation import ugettext_lazy as _
+from edx_api_doc_tools import make_docs_urls
 from ratelimitbackend import admin
 
 import contentstore.views
@@ -17,7 +17,7 @@ import openedx.core.djangoapps.lang_pref.views
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
-from openedx.core.openapi import schema_view
+from openedx.core.apidocs import api_info
 
 
 django_autodiscover()
@@ -64,7 +64,6 @@ urlpatterns = [
     # noop to squelch ajax errors
     url(r'^event$', contentstore.views.event, name='event'),
     url(r'^heartbeat', include('openedx.core.djangoapps.heartbeat.urls')),
-    url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
     url(r'^i18n/', include('django.conf.urls.i18n')),
 
     # User API endpoints
@@ -86,8 +85,6 @@ urlpatterns = [
     # restful api
     url(r'^$', contentstore.views.howitworks, name='homepage'),
     url(r'^howitworks$', contentstore.views.howitworks, name='howitworks'),
-    url(r'^signup$', contentstore.views.signup, name='signup'),
-    url(r'^signin$', contentstore.views.login_page, name='login'),
     url(r'^signin_redirect_to_lms$', contentstore.views.login_redirect_to_lms, name='login_redirect_to_lms'),
     url(r'^request_course_creator$', contentstore.views.request_course_creator, name='request_course_creator'),
     url(r'^course_team/{}(?:/(?P<email>.+))?$'.format(COURSELIKE_KEY_PATTERN),
@@ -180,6 +177,18 @@ urlpatterns = [
     url(r'^accessibility$', contentstore.views.accessibility, name='accessibility'),
 ]
 
+if not settings.DISABLE_DEPRECATED_SIGNIN_URL:
+    # TODO: Remove deprecated signin url when traffic proves it is no longer in use
+    urlpatterns += [
+        url(r'^signin$', contentstore.views.login_redirect_to_lms),
+    ]
+
+if not settings.DISABLE_DEPRECATED_SIGNUP_URL:
+    # TODO: Remove deprecated signup url when traffic proves it is no longer in use
+    urlpatterns += [
+        url(r'^signup$', contentstore.views.register_redirect_to_lms, name='register_redirect_to_lms'),
+    ]
+
 JS_INFO_DICT = {
     'domain': 'djangojs',
     # We need to explicitly include external Django apps that are not in LOCALE_PATHS.
@@ -208,7 +217,7 @@ if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
 # changes go through our user portal and follow complexity requirements.
 urlpatterns.append(url(r'^admin/password_change/$', handler404))
 urlpatterns.append(url(r'^admin/auth/user/\d+/password/$', handler404))
-urlpatterns.append(url(r'^admin/', include(admin.site.urls)))
+urlpatterns.append(url(r'^admin/', admin.site.urls))
 
 # enable entrance exams
 if settings.FEATURES.get('ENTRANCE_EXAMS'):
@@ -273,18 +282,7 @@ urlpatterns += [
 ]
 
 # API docs.
-urlpatterns += [
-    url(
-        r'^swagger(?P<format>\.json|\.yaml)$',
-        schema_view.without_ui(cache_timeout=settings.OPENAPI_CACHE_TIMEOUT), name='schema-json',
-    ),
-    url(
-        r'^swagger/$',
-        schema_view.with_ui('swagger', cache_timeout=settings.OPENAPI_CACHE_TIMEOUT),
-        name='schema-swagger-ui',
-    ),
-    url(r'^api-docs/$', schema_view.with_ui('swagger', cache_timeout=settings.OPENAPI_CACHE_TIMEOUT)),
-]
+urlpatterns += make_docs_urls(api_info)
 
 if 'openedx.testing.coverage_context_listener' in settings.INSTALLED_APPS:
     urlpatterns += [

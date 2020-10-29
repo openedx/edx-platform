@@ -21,7 +21,7 @@ course.certificates: {
     ]
 }
 """
-from __future__ import absolute_import
+
 
 import json
 import logging
@@ -245,6 +245,8 @@ class CertificateManager(object):
         Deserialize from a JSON representation into a Certificate object.
         'value' should be either a Certificate instance, or a valid JSON string
         """
+        if not six.PY2 and isinstance(value, bytes):
+            value = value.decode('utf-8')
 
         # Ensure the schema fieldset meets our expectations
         for key in ("name", "description", "version"):

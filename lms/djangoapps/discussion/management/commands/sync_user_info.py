@@ -3,7 +3,6 @@ One-off script to sync all user information to the
 discussion service (later info will be synced automatically)
 """
 
-from __future__ import absolute_import
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand

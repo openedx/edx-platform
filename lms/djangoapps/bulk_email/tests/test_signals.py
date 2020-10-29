@@ -1,7 +1,7 @@
 """
 Unit tests for student optouts from course email
 """
-from __future__ import absolute_import
+
 
 import json
 
@@ -60,7 +60,7 @@ class TestOptoutCourseEmailsBySignal(ModuleStoreTestCase):
         email_section = '<div class="vert-left send-email" id="section-send-email">'
 
         # If this fails, it is likely because BulkEmailFlag.is_enabled() is set to False
-        self.assertIn(email_section, response.content)
+        self.assertContains(response, email_section)
 
         test_email = {
             'action': 'Send email',
@@ -69,7 +69,7 @@ class TestOptoutCourseEmailsBySignal(ModuleStoreTestCase):
             'message': 'test message for all'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content.decode('utf-8')), self.success_content)
+        self.assertEqual(json.loads(response.content.decode('utf-8')), self.success_content)
 
     def test_optout_course(self):
         """

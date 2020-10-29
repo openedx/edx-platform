@@ -1,7 +1,7 @@
 """
 This module contains signals / handlers related to programs.
 """
-from __future__ import absolute_import
+
 
 import logging
 

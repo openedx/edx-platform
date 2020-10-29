@@ -2,7 +2,6 @@
 Tests for the LTI outcome service handlers, both in outcomes.py and in tasks.py
 """
 
-from __future__ import absolute_import
 
 import ddt
 import six

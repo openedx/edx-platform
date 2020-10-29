@@ -3,18 +3,14 @@
 Tests of verify_student views.
 """
 
-from __future__ import absolute_import
 
-import json
 from datetime import timedelta
 from uuid import uuid4
 
-import boto
 import ddt
 import httpretty
 import mock
-import moto
-import requests
+import simplejson as json
 import six
 import six.moves.urllib.error  # pylint: disable=import-error
 import six.moves.urllib.parse  # pylint: disable=import-error
@@ -34,7 +30,7 @@ from opaque_keys.edx.locator import CourseLocator
 from six.moves import zip
 from waffle.testutils import override_switch
 
-from common.test.utils import XssTestMixin
+from common.test.utils import MockS3BotoMixin, XssTestMixin
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.commerce.models import CommerceConfiguration
@@ -1340,7 +1336,7 @@ class TestCreateOrderView(ModuleStoreTestCase):
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_invalid_amount(self):
         response = self._create_order('1.a', self.course_id, expect_status_code=400)
-        self.assertIn('Selected price is not valid number.', response.content)
+        self.assertContains(response, 'Selected price is not valid number.', status_code=400)
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_invalid_mode(self):
@@ -1348,7 +1344,11 @@ class TestCreateOrderView(ModuleStoreTestCase):
         course_id = 'Fake/999/Test_Course'
         CourseFactory.create(org='Fake', number='999', display_name='Test Course')
         response = self._create_order('50', course_id, expect_status_code=400)
-        self.assertIn('This course doesn\'t support paid certificates', response.content)
+        self.assertContains(
+            response,
+            'This course doesn\'t support paid certificates',
+            status_code=400,
+        )
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_create_order_fail_with_get(self):
@@ -1412,7 +1412,7 @@ class TestCreateOrderView(ModuleStoreTestCase):
 
 @ddt.ddt
 @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-class TestSubmitPhotosForVerification(TestCase):
+class TestSubmitPhotosForVerification(MockS3BotoMixin, TestCase):
     """
     Tests for submitting photos for verification.
     """
@@ -1488,20 +1488,20 @@ class TestSubmitPhotosForVerification(TestCase):
         },
         "DAYS_GOOD_FOR": 10,
     })
-    @moto.mock_s3_deprecated
+    @httpretty.activate
     def test_submit_photos_for_reverification(self):
-        # Create the S3 bucket for photo upload
-        conn = boto.connect_s3()
-        conn.create_bucket("test.example.com")
-
-        # Mock the POST to Software Secure
-        moto.packages.httpretty.register_uri(httpretty.POST, "https://verify.example.com/submit/")
+        httpretty.register_uri(
+            httpretty.POST, settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["API_URL"],
+            status=200, body={},
+            content_type='application/json'
+        )
 
         # Submit an initial verification attempt
         self._submit_photos(
             face_image=self.IMAGE_DATA + "4567",
             photo_id_image=self.IMAGE_DATA + "8910",
         )
+
         initial_data = self._get_post_data()
 
         # Submit a face photo for re-verification
@@ -1632,7 +1632,7 @@ class TestSubmitPhotosForVerification(TestCase):
 
     def _get_post_data(self):
         """Retrieve POST data from the last request. """
-        last_request = moto.packages.httpretty.last_request()
+        last_request = httpretty.last_request()
         return json.loads(last_request.body)
 
 
@@ -1672,8 +1672,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
             HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB: testing',
             HTTP_DATE='testdate'
         )
-        self.assertIn('Invalid JSON', response.content)
-        self.assertEqual(response.status_code, 400)
+        self.assertContains(response, 'Invalid JSON', status_code=400)
 
     def test_invalid_dict(self):
         """
@@ -1687,8 +1686,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
             HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing',
             HTTP_DATE='testdate'
         )
-        self.assertIn('JSON should be dict', response.content)
-        self.assertEqual(response.status_code, 400)
+        self.assertContains(response, 'JSON should be dict', status_code=400)
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
@@ -1712,8 +1710,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
             HTTP_AUTHORIZATION='test testing:testing',
             HTTP_DATE='testdate'
         )
-        self.assertIn('Access key invalid', response.content)
-        self.assertEqual(response.status_code, 400)
+        self.assertContains(response, 'Access key invalid', status_code=400)
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
@@ -1737,8 +1734,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
             HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing',
             HTTP_DATE='testdate'
         )
-        self.assertIn('edX ID Invalid-Id not found', response.content)
-        self.assertEqual(response.status_code, 400)
+        self.assertContains(response, 'edX ID Invalid-Id not found', status_code=400)
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
@@ -1780,7 +1776,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEqual(attempt.expiry_date.date(), expiry_date.date())
         self.assertIsNone(old_verification.expiry_date)
         self.assertIsNone(old_verification.expiry_email_date)
-        self.assertEquals(response.content, 'OK!')
+        self.assertEqual(response.content.decode('utf-8'), 'OK!')
         self.assertEqual(len(mail.outbox), 1)
 
     @patch(
@@ -1814,7 +1810,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
         self.assertEqual(attempt.status, u'approved')
         self.assertEqual(attempt.expiry_date.date(), expiry_date.date())
-        self.assertEquals(response.content, 'OK!')
+        self.assertEqual(response.content.decode('utf-8'), 'OK!')
         self.assertEqual(len(mail.outbox), 1)
 
     @patch(
@@ -1845,7 +1841,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEqual(attempt.status, u'denied')
         self.assertEqual(attempt.error_code, u'Your photo doesn\'t meet standards.')
         self.assertEqual(attempt.error_msg, u'[{"photoIdReasons": ["Not provided"]}]')
-        self.assertEquals(response.content.decode('utf-8'), 'OK!')
+        self.assertEqual(response.content.decode('utf-8'), 'OK!')
         self.assertEqual(len(mail.outbox), 1)
 
     @patch(
@@ -1872,7 +1868,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEqual(attempt.status, u'must_retry')
         self.assertEqual(attempt.error_code, u'You must retry the verification.')
         self.assertEqual(attempt.error_msg, u'"Memory overflow"')
-        self.assertEquals(response.content, 'OK!')
+        self.assertEqual(response.content.decode('utf-8'), 'OK!')
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
@@ -1896,7 +1892,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
             HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing',
             HTTP_DATE='testdate'
         )
-        self.assertIn('Result Unknown not understood', response.content)
+        self.assertContains(response, 'Result Unknown not understood', status_code=400)
 
 
 class TestReverifyView(TestCase):

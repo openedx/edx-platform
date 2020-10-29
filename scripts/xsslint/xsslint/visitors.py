@@ -1,7 +1,7 @@
 """
 Custom AST NodeVisitor classes uses for Python xss linting.
 """
-from __future__ import absolute_import
+
 
 import ast
 import re

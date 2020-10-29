@@ -3,12 +3,12 @@ Platform plugins to support the course experience.
 
 This includes any locally defined CourseTools.
 """
-from __future__ import absolute_import
+
 
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 from student.models import CourseEnrollment
 
 from . import SHOW_REVIEWS_TOOL_FLAG, UNIFIED_COURSE_TAB_FLAG

@@ -1,7 +1,7 @@
 """
 Unit tests for bulk-email-related models.
 """
-from __future__ import absolute_import
+
 
 import datetime
 
@@ -188,6 +188,7 @@ class CourseEmailTemplateTest(TestCase):
             'email_settings_url': "/location/of/email/settings/url",
             'platform_name': 'edX',
             'email': 'your-email@test.com',
+            'unsubscribe_link': '/bulk_email/email/optout/dummy'
         }
         return context
 
@@ -288,7 +289,7 @@ class CourseAuthorizationTest(TestCase):
         # Now, course should be authorized
         self.assertTrue(is_bulk_email_feature_enabled(course_id))
         self.assertEqual(
-            cauth.__unicode__(),
+            str(cauth),
             "Course 'abc/123/doremi': Instructor Email Enabled"
         )
 
@@ -298,7 +299,7 @@ class CourseAuthorizationTest(TestCase):
         # Test that course is now unauthorized
         self.assertFalse(is_bulk_email_feature_enabled(course_id))
         self.assertEqual(
-            cauth.__unicode__(),
+            str(cauth),
             "Course 'abc/123/doremi': Instructor Email Not Enabled"
         )
 

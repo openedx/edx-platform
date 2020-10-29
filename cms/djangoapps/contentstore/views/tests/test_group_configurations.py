@@ -3,7 +3,7 @@
 """
 Group Configuration Tests.
 """
-from __future__ import absolute_import
+
 
 import json
 from operator import itemgetter

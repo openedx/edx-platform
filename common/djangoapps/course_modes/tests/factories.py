@@ -1,7 +1,7 @@
 """
 Factories for course mode models.
 """
-from __future__ import absolute_import
+
 
 import random
 

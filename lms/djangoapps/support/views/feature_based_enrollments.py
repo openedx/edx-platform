@@ -1,7 +1,7 @@
 """
 Support tool for viewing course duration information
 """
-from __future__ import absolute_import
+
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator

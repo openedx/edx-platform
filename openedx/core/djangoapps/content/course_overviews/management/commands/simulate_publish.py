@@ -11,7 +11,7 @@ This management command will emit the SignalHandler.course_published signal for
 some subset of courses and signal listeners, and then rely on existing listener
 behavior to trigger the necessary data updates.
 """
-from __future__ import absolute_import, print_function
+
 
 import copy
 import logging

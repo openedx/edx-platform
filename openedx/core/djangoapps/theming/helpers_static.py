@@ -1,5 +1,4 @@
 
-from __future__ import absolute_import
 
 from django.contrib.staticfiles.storage import staticfiles_storage
 

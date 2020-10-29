@@ -2,12 +2,11 @@
 Views for course info API
 """
 
-from __future__ import absolute_import
 
 from rest_framework import generics
 from rest_framework.response import Response
 
-from courseware.courses import get_course_info_section_module
+from lms.djangoapps.courseware.courses import get_course_info_section_module
 from openedx.core.lib.xblock_utils import get_course_update_items
 from static_replace import make_static_urls_absolute
 

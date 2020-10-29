@@ -1,4 +1,6 @@
-"""Errors thrown in the Team API"""
+"""
+Errors thrown in the Team API.
+"""
 
 
 class TeamAPIRequestError(Exception):

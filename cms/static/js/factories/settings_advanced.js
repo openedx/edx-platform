@@ -2,7 +2,7 @@ define([
     'jquery', 'gettext', 'js/models/settings/advanced', 'js/views/settings/advanced'
 ], function($, gettext, AdvancedSettingsModel, AdvancedSettingsView) {
     'use strict';
-    return function(advancedDict, advancedSettingsUrl) {
+    return function(advancedDict, advancedSettingsUrl, publisherEnabled) {
         var advancedModel, editor;
 
         $('form :input')
@@ -16,6 +16,14 @@ define([
         // proactively populate advanced b/c it has the filtered list and doesn't really follow the model pattern
         advancedModel = new AdvancedSettingsModel(advancedDict, {parse: true});
         advancedModel.url = advancedSettingsUrl;
+
+        // set the hidden property to true on relevant fields if publisher is enabled
+        if (publisherEnabled && advancedModel.attributes) {
+            Object.keys(advancedModel.attributes).forEach(function(am) {
+                var field = advancedModel.attributes[am];
+                field.hidden = field.hide_on_enabled_publisher;
+            });
+        }
 
         editor = new AdvancedSettingsView({
             el: $('.settings-advanced'),

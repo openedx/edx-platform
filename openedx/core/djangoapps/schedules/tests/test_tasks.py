@@ -1,7 +1,7 @@
 """
 Tests for schedules tasks
 """
-from __future__ import absolute_import
+
 
 import datetime
 from unittest import skipUnless

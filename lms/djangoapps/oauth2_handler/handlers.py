@@ -1,12 +1,11 @@
 """ Handlers for OpenID Connect provider. """
 
-from __future__ import absolute_import
 
 import six
 from django.conf import settings
 from django.core.cache import cache
 
-from courseware.access import has_access
+from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.models import UserPreference

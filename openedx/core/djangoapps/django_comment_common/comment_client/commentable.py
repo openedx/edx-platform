@@ -1,6 +1,6 @@
 # pylint: disable=missing-docstring
 """Provides base Commentable model class"""
-from __future__ import absolute_import
+
 
 from openedx.core.djangoapps.django_comment_common.comment_client import models, settings
 

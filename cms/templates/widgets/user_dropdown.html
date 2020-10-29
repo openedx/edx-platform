@@ -4,10 +4,16 @@
   from django.conf import settings
   from django.urls import reverse
   from django.utils.translation import ugettext as _
+  from edx_django_utils.monitoring import set_custom_metric
   from student.roles import GlobalStaff
 %>
 
 % if uses_pattern_library:
+  <%!
+    ## TODO: Use metric to see if CMS ever uses pattern library or if this case can be deleted.
+    ## NOTE: When removing, remove all references to `set_custom_metric`.
+    set_custom_metric('uses_pattern_library', True)
+  %>
   <div class="wrapper-user-menu dropdown-menu-container logged-in js-header-user-menu">
       <h3 class="title menu-title">
           <span class="sr-only">${_("Currently signed in as:")}</span>
@@ -26,12 +32,15 @@
               </li>
           </%block>
           <li class="dropdown-item item has-block-link">
-            <a class="action action-signout" href="${reverse('logout')}">${_("Sign Out")}</a>
+            <a class="action action-signout" href="${settings.FRONTEND_LOGOUT_URL}">${_("Sign Out")}</a>
           </li>
       </ul>
   </div>
 
 % else:
+  <%!
+    set_custom_metric('uses_pattern_library', False)
+  %>
   <h3 class="title">
     <span class="label">
       <span class="label-prefix sr-only">${_("Currently signed in as:")}</span>

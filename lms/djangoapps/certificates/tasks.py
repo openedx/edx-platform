@@ -1,7 +1,7 @@
 """
 Module for generating certificate for a user
 """
-from __future__ import absolute_import
+
 
 from celery import task
 from logging import getLogger

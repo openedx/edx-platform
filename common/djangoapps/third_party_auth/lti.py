@@ -1,7 +1,7 @@
 """
 Third-party-auth module for Learning Tools Interoperability
 """
-from __future__ import absolute_import
+
 
 import calendar
 import logging

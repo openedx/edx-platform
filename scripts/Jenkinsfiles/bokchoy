@@ -19,7 +19,7 @@ def runBokchoyTests() {
 }
 
 def bokchoyTestCleanup() {
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/bok_choy/*.coverage*,test_root/log/**/*.log,test_root/log/**/*.png'
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/bok_choy/*.coverage*,test_root/log/**/*.log,test_root/log/**/*.png,reports/bok_choy/**/xunit.xml'
     junit '**/reports/bok_choy/**/xunit.xml'
     sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
 }
@@ -92,28 +92,25 @@ pipeline {
             steps {
                 script {
                     sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
-                        checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: git_branch]],
-                            doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', honorRefspec: true,
-                            noTags: true, shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
-                            refspec: git_refspec, url: "git@github.com:edx/${REPO_NAME}.git"]]]
+                        try {
+                            checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: git_branch]],
+                                doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', honorRefspec: true,
+                                noTags: true, shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                                refspec: git_refspec, url: "git@github.com:edx/${REPO_NAME}.git"]]]
 
-                        for (int i = 1; i <= shardCount; i++) {
-                            unstash "bok-choy-reports-${i}"
+                            for (int i = 1; i <= shardCount; i++) {
+                                unstash "bok-choy-reports-${i}"
+                            }
+                            sh """
+                            export TEST_SUITE=bok-choy
+                            source scripts/jenkins-common.sh
+                            paver coverage --rcfile=common/test/acceptance/.coveragerc
+                            paver upload_coverage_to_s3
+                            """
+                        } finally {
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.coverage'
+                            sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
                         }
-                        sh """
-                        export TEST_SUITE=bok-choy
-                        source scripts/jenkins-common.sh
-                        paver coverage --rcfile=common/test/acceptance/.coveragerc
-                        paver upload_coverage_to_s3
-                        """
-                    }
-                }
-            }
-            post {
-                always {
-                    script {
-                        archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.coverage'
-                        sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
                     }
                 }
             }

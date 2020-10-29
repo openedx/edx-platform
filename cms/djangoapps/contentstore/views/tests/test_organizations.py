@@ -1,5 +1,5 @@
 """Tests covering the Organizations listing on the Studio home."""
-from __future__ import absolute_import
+
 
 import json
 

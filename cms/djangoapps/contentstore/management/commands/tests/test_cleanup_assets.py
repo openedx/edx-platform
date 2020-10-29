@@ -2,7 +2,7 @@
 Test for assets cleanup of courses for Mac OS metadata files (with filename ".DS_Store"
 or with filename which starts with "._")
 """
-from __future__ import absolute_import
+
 
 from django.conf import settings
 from django.core.management import call_command

@@ -1,17 +1,18 @@
 """
 Grades related signals.
 """
-from __future__ import absolute_import
+
 
 from contextlib import contextmanager
 from logging import getLogger
 
 import six
 from django.dispatch import receiver
+from opaque_keys.edx.keys import LearningContextKey
 from submissions.models import score_reset, score_set
 from xblock.scorable import ScorableXBlockMixin, Score
 
-from courseware.model_data import get_score, set_score
+from lms.djangoapps.courseware.model_data import get_score, set_score
 from openedx.core.djangoapps.course_groups.signals.signals import COHORT_MEMBERSHIP_UPDATED
 from openedx.core.lib.grade_utils import is_score_higher_or_equal
 from student.models import user_by_anonymous_id
@@ -39,7 +40,7 @@ from .signals import (
 log = getLogger(__name__)
 
 
-@receiver(score_set)
+@receiver(score_set, dispatch_uid='submissions_score_set_handler')
 def submissions_score_set_handler(sender, **kwargs):  # pylint: disable=unused-argument
     """
     Consume the score_set signal defined in the Submissions API, and convert it
@@ -79,7 +80,7 @@ def submissions_score_set_handler(sender, **kwargs):  # pylint: disable=unused-a
     )
 
 
-@receiver(score_reset)
+@receiver(score_reset, dispatch_uid='submissions_score_reset_handler')
 def submissions_score_reset_handler(sender, **kwargs):  # pylint: disable=unused-argument
     """
     Consume the score_reset signal defined in the Submissions API, and convert
@@ -120,16 +121,18 @@ def disconnect_submissions_signal_receiver(signal):
     """
     if signal == score_set:
         handler = submissions_score_set_handler
+        dispatch_uid = 'submissions_score_set_handler'
     else:
         if signal != score_reset:
             raise ValueError("This context manager only handles score_set and score_reset signals.")
         handler = submissions_score_reset_handler
+        dispatch_uid = 'submissions_score_reset_handler'
 
-    signal.disconnect(handler)
+    signal.disconnect(dispatch_uid=dispatch_uid)
     try:
         yield
     finally:
-        signal.connect(handler)
+        signal.connect(handler, dispatch_uid=dispatch_uid)
 
 
 @receiver(SCORE_PUBLISHED)
@@ -218,6 +221,9 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
     enqueueing a subsection update operation to occur asynchronously.
     """
     events.grade_updated(**kwargs)
+    context_key = LearningContextKey.from_string(kwargs['course_id'])
+    if not context_key.is_course:
+        return  # If it's not a course, it has no subsections, so skip the subsection grading update
     recalculate_subsection_grade_v3.apply_async(
         kwargs=dict(
             user_id=kwargs['user_id'],

@@ -2,7 +2,6 @@
 This file contains utility functions which will responsible for sending emails.
 """
 
-from __future__ import absolute_import
 
 import logging
 import os
@@ -171,7 +170,7 @@ def attach_image(img_dict, filename):
     if img_path:
         with open(img_path, 'rb') as img:
             msg_image = MIMEImage(img.read(), name=os.path.basename(img_path))
-            msg_image.add_header('Content-ID', b'<{}>'.format(img_dict['cid']))  # xss-lint: disable=python-wrap-html
+            msg_image.add_header('Content-ID', '<{}>'.format(img_dict['cid']))  # xss-lint: disable=python-wrap-html
             msg_image.add_header("Content-Disposition", "inline", filename=filename)
         return msg_image
 

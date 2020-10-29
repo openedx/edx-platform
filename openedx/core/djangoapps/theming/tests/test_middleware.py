@@ -2,7 +2,6 @@
     Tests for middleware for comprehensive themes.
 """
 
-from __future__ import absolute_import
 
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sites.models import Site

@@ -4,7 +4,6 @@ Utilities for writing third_party_auth tests.
 Used by Django and non-Django tests; must not have Django deps.
 """
 
-from __future__ import absolute_import
 
 import os.path
 from contextlib import contextmanager
@@ -18,7 +17,7 @@ from django.contrib.sites.models import Site
 from mako.template import Template
 from provider import constants
 from provider.oauth2.models import Client as OAuth2Client
-from django.core.files.storage import FileSystemStorage
+from openedx.core.storage import OverwriteStorage
 
 from third_party_auth.models import (
     LTIProviderConfig,

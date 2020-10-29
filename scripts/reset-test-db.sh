@@ -93,7 +93,7 @@ rebuild_cache_for_db() {
 
     # dump_data does not dump the django_migrations table so we do it separately.
     echo "Saving the django_migrations table of the $db bok_choy DB to the filesystem."
-    mysqldump $MYSQL_HOST -u root --no-create-info "${databases["$db"]}" django_migrations > $DB_CACHE_DIR/bok_choy_migrations_data_$db.sql
+    mysqldump $MYSQL_HOST -u root --no-create-info --skip-comments --skip-dump-date "${databases["$db"]}" django_migrations > $DB_CACHE_DIR/bok_choy_migrations_data_$db.sql
 }
 
 for db in "${database_order[@]}"; do

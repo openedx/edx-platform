@@ -1,7 +1,7 @@
 """
 Tests for the django comment client integration models
 """
-from __future__ import absolute_import
+
 
 from django.test.testcases import TestCase
 from opaque_keys.edx.keys import CourseKey

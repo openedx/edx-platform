@@ -109,7 +109,7 @@ to each node's parents.  This requires additional storage space, which
 could be eliminated if DAGs are not supported.
 
 """
-from __future__ import absolute_import
+
 from collections import deque
 
 

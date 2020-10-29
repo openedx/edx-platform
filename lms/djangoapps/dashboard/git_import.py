@@ -3,7 +3,6 @@ Provides a function for importing a git repository into the lms
 instance when using a mongo modulestore
 """
 
-from __future__ import absolute_import
 
 import logging
 import os
@@ -117,7 +116,7 @@ def cmd_log(cmd, cwd):
     used along with the output. Will raise subprocess.CalledProcessError if
     command doesn't return 0, and returns the command's output.
     """
-    output = subprocess.check_output(cmd, cwd=cwd, stderr=subprocess.STDOUT)
+    output = subprocess.check_output(cmd, cwd=cwd, stderr=subprocess.STDOUT).decode('utf-8')
 
     log.debug(u'Command was: %r. Working directory was: %r', ' '.join(cmd), cwd)
     log.debug(u'Command output was: %r', output)
@@ -230,7 +229,7 @@ def add_repo(repo, rdir_in, branch=None):
 
     cwd = os.path.abspath(cwd)
     try:
-        ret_git = cmd_log(cmd, cwd=cwd).decode('utf-8')
+        ret_git = cmd_log(cmd, cwd=cwd)
     except subprocess.CalledProcessError as ex:
         log.exception(u'Error running git pull: %r', ex.output)
         raise GitImportErrorCannotPull()
@@ -246,7 +245,7 @@ def add_repo(repo, rdir_in, branch=None):
         log.exception(u'Unable to get git log: %r', ex.output)
         raise GitImportErrorBadRepo()
 
-    ret_git += u'\nCommit ID: {0}'.format(commit_id.decode('utf-8'))
+    ret_git += u'\nCommit ID: {0}'.format(commit_id)
 
     # get branch
     cmd = ['git', 'symbolic-ref', '--short', 'HEAD', ]

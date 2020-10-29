@@ -2,7 +2,6 @@
 LTI Provider view functions
 """
 
-from __future__ import absolute_import
 
 import logging
 
@@ -146,7 +145,7 @@ def render_courseware(request, usage_key):
     context to render the courseware.
     """
     # return an HttpResponse object that contains the template and necessary context to render the courseware.
-    from courseware.views.views import render_xblock
+    from lms.djangoapps.courseware.views.views import render_xblock
     return render_xblock(request, six.text_type(usage_key), check_if_enrolled=False)
 
 

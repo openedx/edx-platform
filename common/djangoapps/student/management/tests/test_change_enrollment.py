@@ -1,6 +1,5 @@
 """ Test the change_enrollment command line script."""
 
-from __future__ import absolute_import
 
 import ddt
 from django.core.management import call_command

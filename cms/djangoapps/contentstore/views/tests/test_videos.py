@@ -2,7 +2,7 @@
 """
 Unit tests for video-related REST APIs.
 """
-from __future__ import absolute_import
+
 
 import csv
 import json
@@ -324,12 +324,12 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
     def test_get_html(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertRegexpMatches(response["Content-Type"], "^text/html(;.*)?$")
-        self.assertIn(_get_default_video_image_url(), response.content)
+        self.assertRegex(response["Content-Type"], "^text/html(;.*)?$")
+        self.assertContains(response, _get_default_video_image_url())
         # Crude check for presence of data in returned HTML
         for video in self.previous_uploads:
-            self.assertIn(video["edx_video_id"], response.content)
-        self.assertNotIn('video_upload_pagination', response.content)
+            self.assertContains(response, video["edx_video_id"])
+        self.assertNotContains(response, 'video_upload_pagination')
 
     @override_waffle_flag(ENABLE_VIDEO_UPLOAD_PAGINATION, active=True)
     def test_get_html_paginated(self):
@@ -338,7 +338,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         """
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertIn('video_upload_pagination', response.content)
+        self.assertContains(response, 'video_upload_pagination')
 
     def test_post_non_json(self):
         response = self.client.post(self.url, {"files": []})
@@ -781,10 +781,11 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         self.assertEqual(response.status_code, 200)
 
         # Verify that course video button is present in the response if videos transcript feature is enabled.
-        self.assertEqual(
-            '<button class="button course-video-settings-button">' in response.content,
-            is_video_transcript_enabled
-        )
+        button_html = '<button class="button course-video-settings-button">'
+        if is_video_transcript_enabled:
+            self.assertContains(response, button_html)
+        else:
+            self.assertNotContains(response, button_html)
 
 
 @ddt.ddt
@@ -810,7 +811,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
             uploaded image url
         """
         self.assertEqual(upload_response.status_code, 200)
-        response = json.loads(upload_response.content)
+        response = json.loads(upload_response.content.decode('utf-8'))
         val_image_url = get_course_video_image_url(course_id=course_id, edx_video_id=edx_video_id)
         self.assertEqual(response['image_url'], val_image_url)
 
@@ -1417,7 +1418,7 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
             response["Content-Disposition"],
             u"attachment; filename={course}_video_urls.csv".format(course=self.course.id.course)
         )
-        response_reader = StringIO(response.content)
+        response_reader = StringIO(response.content.decode('utf-8') if six.PY3 else response.content)
         reader = csv.DictReader(response_reader, dialect=csv.excel)
         self.assertEqual(
             reader.fieldnames,
@@ -1430,17 +1431,21 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
         self.assertEqual(len(rows), len(self.previous_uploads))
         for i, row in enumerate(rows):
             response_video = {
-                key.decode("utf-8"): value.decode("utf-8") for key, value in row.items()
+                key.decode("utf-8") if six.PY2 else key: value.decode("utf-8") if six.PY2 else value
+                for key, value in row.items()
             }
             # Videos should be returned by creation date descending
             original_video = self.previous_uploads[-(i + 1)]
-            self.assertEqual(response_video["Name"], original_video["client_video_id"])
+            client_video_id = original_video["client_video_id"].encode('utf-8') if six.PY2 \
+                else original_video["client_video_id"]
+            self.assertEqual(response_video["Name"].encode('utf-8') if six.PY2
+                             else response_video["Name"], client_video_id)
             self.assertEqual(response_video["Duration"], str(original_video["duration"]))
             dateutil.parser.parse(response_video["Date Added"])
             self.assertEqual(response_video["Video ID"], original_video["edx_video_id"])
             self.assertEqual(response_video["Status"], convert_video_status(original_video))
             for profile in expected_profiles:
-                response_profile_url = response_video[u"{} URL".format(profile)]
+                response_profile_url = response_video["{} URL".format(profile)]  # pylint: disable=unicode-format-string
                 original_encoded_for_profile = next(
                     (
                         original_encoded
@@ -1450,7 +1455,10 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
                     None
                 )
                 if original_encoded_for_profile:
-                    self.assertEqual(response_profile_url, original_encoded_for_profile["url"])
+                    original_encoded_for_profile_url = original_encoded_for_profile["url"].encode('utf-8') if six.PY2 \
+                        else original_encoded_for_profile["url"]
+                    self.assertEqual(response_profile_url.encode('utf-8') if six.PY2 else response_profile_url,
+                                     original_encoded_for_profile_url)
                 else:
                     self.assertEqual(response_profile_url, "")
 

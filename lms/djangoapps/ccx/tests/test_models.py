@@ -1,7 +1,7 @@
 """
 tests for the models
 """
-from __future__ import absolute_import
+
 
 import json
 from datetime import datetime, timedelta

@@ -2,7 +2,7 @@
 Django management command to migrate a course from the old Mongo modulestore
 to the new split-Mongo modulestore.
 """
-from __future__ import absolute_import
+
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError

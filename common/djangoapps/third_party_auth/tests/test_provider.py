@@ -1,6 +1,5 @@
 """Unit tests for provider.py."""
 
-from __future__ import absolute_import
 
 import unittest
 

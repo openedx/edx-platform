@@ -1,7 +1,7 @@
 """
 Tools to create programs-related data for use in bok choy tests.
 """
-from __future__ import absolute_import
+
 
 from common.test.acceptance.fixtures.config import ConfigModelFixture
 

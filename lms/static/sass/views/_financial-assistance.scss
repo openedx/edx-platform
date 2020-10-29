@@ -150,6 +150,8 @@
   .financial-assistance-form {
     @extend .login-register;
 
+    max-width: 800px;
+
     .action-primary {
       @include float(left);
 

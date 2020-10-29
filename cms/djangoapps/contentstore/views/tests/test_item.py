@@ -1,5 +1,5 @@
 """Tests for items views."""
-from __future__ import absolute_import
+
 
 import json
 import re
@@ -161,7 +161,7 @@ class GetItemTest(ItemTest):
         resp = self._get_preview(usage_key, data)
         self.assertEqual(resp.status_code, expected_code)
         if content_contains:
-            self.assertIn(content_contains, resp.content)
+            self.assertContains(resp, content_contains, status_code=expected_code)
         return resp
 
     @ddt.data(
@@ -253,7 +253,7 @@ class GetItemTest(ItemTest):
         # Get the preview HTML and verify the View -> link is present.
         html, __ = self._get_container_preview(root_usage_key)
         self.assertIn('wrapper-xblock', html)
-        self.assertRegexpMatches(
+        self.assertRegex(
             html,
             # The instance of the wrapper class will have an auto-generated ID. Allow any
             # characters after wrapper.
@@ -561,7 +561,7 @@ class TestCreateItem(ItemTest):
 
         # Check that its name is not None
         new_tab = self.get_item_from_modulestore(usage_key)
-        self.assertEquals(new_tab.display_name, 'Empty')
+        self.assertEqual(new_tab.display_name, 'Empty')
 
 
 class DuplicateHelper(object):
@@ -961,7 +961,7 @@ class TestMoveItem(ItemTest):
         # Move component and verify that response contains initial index
         response = self._move_component(self.html_usage_key, self.vert2_usage_key)
         response = json.loads(response.content.decode('utf-8'))
-        self.assertEquals(original_index, response['source_index'])
+        self.assertEqual(original_index, response['source_index'])
 
         # Verify that new parent has the moved component at the last index.
         parent = self.get_item_from_modulestore(self.vert2_usage_key)
@@ -969,12 +969,12 @@ class TestMoveItem(ItemTest):
 
         # Verify original and new index is different now.
         source_index = _get_source_index(self.html_usage_key, parent)
-        self.assertNotEquals(original_index, source_index)
+        self.assertNotEqual(original_index, source_index)
 
         # Undo Move to the original index, use the source index fetched from the response.
         response = self._move_component(self.html_usage_key, self.vert_usage_key, response['source_index'])
         response = json.loads(response.content.decode('utf-8'))
-        self.assertEquals(original_index, response['source_index'])
+        self.assertEqual(original_index, response['source_index'])
 
     def test_move_large_target_index(self):
         """
@@ -1501,7 +1501,7 @@ class TestEditItem(TestEditItemSetup):
             user=self.user
         )
         # Both display and actual value should be None
-        self.assertEquals(xblock_info['due_date'], u'')
+        self.assertEqual(xblock_info['due_date'], u'')
         self.assertIsNone(xblock_info['due'])
 
     def test_update_generic_fields(self):
@@ -1617,8 +1617,7 @@ class TestEditItem(TestEditItemSetup):
             self.seq2_update_url,
             data={'children': [six.text_type(unit_1_key)]}
         )
-        self.assertEqual(resp.status_code, 400)
-        self.assertIn("Invalid data, possibly caused by concurrent authors", resp.content)
+        self.assertContains(resp, "Invalid data, possibly caused by concurrent authors", status_code=400)
 
         # verify children
         self.assertListEqual(
@@ -1642,8 +1641,7 @@ class TestEditItem(TestEditItemSetup):
             self.seq2_update_url,
             data={'children': [six.text_type(unit_1_key)]}
         )
-        self.assertEqual(resp.status_code, 400)
-        self.assertIn("Invalid data, possibly caused by concurrent authors", resp.content)
+        self.assertContains(resp, "Invalid data, possibly caused by concurrent authors", status_code=400)
 
         # verify children
         self.assertListEqual(
@@ -2181,7 +2179,7 @@ class TestComponentHandler(TestCase):
     def test_request_method(self, method):
 
         def check_handler(handler, request, suffix):
-            self.assertEquals(request.method, method)
+            self.assertEqual(request.method, method)
             return Response()
 
         self.descriptor.handle = check_handler
@@ -2200,8 +2198,8 @@ class TestComponentHandler(TestCase):
 
         self.descriptor.handle = create_response
 
-        self.assertEquals(component_handler(self.request, self.usage_key_string, 'dummy_handler').status_code,
-                          status_code)
+        self.assertEqual(component_handler(self.request, self.usage_key_string, 'dummy_handler').status_code,
+                         status_code)
 
     @ddt.data((True, True), (False, False),)
     @ddt.unpack

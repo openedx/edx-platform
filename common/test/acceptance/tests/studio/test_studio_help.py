@@ -3,7 +3,6 @@
 Test the Studio help links.
 """
 
-from __future__ import absolute_import
 
 from unittest import skip
 

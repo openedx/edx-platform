@@ -1,7 +1,7 @@
 """
 Unittests for populate_created_on_site_user_attribute management command.
 """
-from __future__ import absolute_import
+
 
 import ddt
 import mock

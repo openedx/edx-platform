@@ -1,22 +1,36 @@
 """
-Tests for account linking Python API.
+Tests for program enrollment reading Python API.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 from uuid import UUID
 
 import ddt
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
+from organizations.tests.factories import OrganizationFactory
+from social_django.models import UserSocialAuth
 
 from course_modes.models import CourseMode
 from lms.djangoapps.program_enrollments.constants import ProgramCourseEnrollmentStatuses as PCEStatuses
 from lms.djangoapps.program_enrollments.constants import ProgramEnrollmentStatuses as PEStatuses
+from lms.djangoapps.program_enrollments.exceptions import (
+    OrganizationDoesNotExistException,
+    ProgramDoesNotExistException,
+    ProviderConfigurationException,
+    ProviderDoesNotExistException
+)
 from lms.djangoapps.program_enrollments.models import ProgramEnrollment
 from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
+from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL
+from openedx.core.djangoapps.catalog.tests.factories import OrganizationFactory as CatalogOrganizationFactory
+from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from third_party_auth.tests.factories import SAMLProviderConfigFactory
 
 from ..reading import (
     fetch_program_course_enrollments,
@@ -24,7 +38,8 @@ from ..reading import (
     fetch_program_enrollments,
     fetch_program_enrollments_by_student,
     get_program_course_enrollment,
-    get_program_enrollment
+    get_program_enrollment,
+    get_users_by_external_keys
 )
 
 User = get_user_model()
@@ -75,6 +90,7 @@ class ProgramEnrollmentReadingTests(TestCase):
             (cls.user_3, cls.ext_3, cls.program_uuid_y, cls.curriculum_uuid_c, PEStatuses.CANCELED),  # 7
             (None, cls.ext_4, cls.program_uuid_y, cls.curriculum_uuid_c, PEStatuses.ENROLLED),        # 8
             (cls.user_1, None, cls.program_uuid_x, cls.curriculum_uuid_b, PEStatuses.SUSPENDED),      # 9
+            (cls.user_2, None, cls.program_uuid_y, cls.curriculum_uuid_c, PEStatuses.ENDED),          # 10
         ]
         for user, external_user_key, program_uuid, curriculum_uuid, status in enrollment_test_data:
             ProgramEnrollmentFactory(
@@ -133,6 +149,7 @@ class ProgramEnrollmentReadingTests(TestCase):
         # Specifying no curriculum (because ext_6 only has Program Y
         # enrollments in one curriculum, so it's not ambiguous).
         (program_uuid_y, None, None, ext_6, 6),
+        (program_uuid_y, None, username_2, None, 10),
     )
     @ddt.unpack
     def test_get_program_enrollment(
@@ -425,3 +442,136 @@ class ProgramEnrollmentReadingTests(TestCase):
             )
             del result['usernames']
         return result
+
+
+class GetUsersByExternalKeysTests(CacheIsolationTestCase):
+    """
+    Tests for the get_users_by_external_keys function
+    """
+    ENABLED_CACHES = ['default']
+
+    @classmethod
+    def setUpTestData(cls):
+        super(GetUsersByExternalKeysTests, cls).setUpTestData()
+        cls.program_uuid = UUID('e7a82f8d-d485-486b-b733-a28222af92bf')
+        cls.organization_key = 'ufo'
+        cls.external_user_id = '1234'
+        cls.user_0 = UserFactory(username='user-0')
+        cls.user_1 = UserFactory(username='user-1')
+        cls.user_2 = UserFactory(username='user-2')
+
+    def setUp(self):
+        super(GetUsersByExternalKeysTests, self).setUp()
+        catalog_org = CatalogOrganizationFactory.create(key=self.organization_key)
+        program = ProgramFactory.create(
+            uuid=self.program_uuid,
+            authoring_organizations=[catalog_org]
+        )
+        cache.set(PROGRAM_CACHE_KEY_TPL.format(uuid=self.program_uuid), program, None)
+
+    def create_social_auth_entry(self, user, provider, external_id):
+        """
+        helper functio to create a user social auth entry
+        """
+        UserSocialAuth.objects.create(
+            user=user,
+            uid='{0}:{1}'.format(provider.slug, external_id),
+            provider=provider.backend_name,
+        )
+
+    def test_happy_path(self):
+        """
+        Test that get_users_by_external_keys returns the expected
+        mapping of external keys to users.
+        """
+        organization = OrganizationFactory.create(short_name=self.organization_key)
+        provider = SAMLProviderConfigFactory.create(organization=organization)
+        self.create_social_auth_entry(self.user_0, provider, 'ext-user-0')
+        self.create_social_auth_entry(self.user_1, provider, 'ext-user-1')
+        self.create_social_auth_entry(self.user_2, provider, 'ext-user-2')
+        requested_keys = {'ext-user-1', 'ext-user-2', 'ext-user-3'}
+        actual = get_users_by_external_keys(self.program_uuid, requested_keys)
+        # ext-user-0 not requested, ext-user-3 doesn't exist
+        expected = {
+            'ext-user-1': self.user_1,
+            'ext-user-2': self.user_2,
+            'ext-user-3': None,
+        }
+        assert actual == expected
+
+    def test_empty_request(self):
+        """
+        Test that requesting no external keys does not cause an exception.
+        """
+        organization = OrganizationFactory.create(short_name=self.organization_key)
+        SAMLProviderConfigFactory.create(organization=organization)
+        actual = get_users_by_external_keys(self.program_uuid, set())
+        assert actual == {}
+
+    def test_catalog_program_does_not_exist(self):
+        """
+        Test ProgramDoesNotExistException is thrown if the program cache does
+        not include the requested program uuid.
+        """
+        fake_program_uuid = UUID('80cc59e5-003e-4664-a582-48da44bc7e12')
+        with self.assertRaises(ProgramDoesNotExistException):
+            get_users_by_external_keys(fake_program_uuid, [])
+
+    def test_catalog_program_missing_org(self):
+        """
+        Test OrganizationDoesNotExistException is thrown if the cached program does not
+        have an authoring organization.
+        """
+        program = ProgramFactory.create(
+            uuid=self.program_uuid,
+            authoring_organizations=[]
+        )
+        cache.set(PROGRAM_CACHE_KEY_TPL.format(uuid=self.program_uuid), program, None)
+        with self.assertRaises(OrganizationDoesNotExistException):
+            get_users_by_external_keys(self.program_uuid, [])
+
+    def test_lms_organization_not_found(self):
+        """
+        Test an OrganizationDoesNotExistException is thrown if the LMS has no organization
+        matching the catalog program's authoring_organization
+        """
+        organization = OrganizationFactory.create(short_name='some_other_org')
+        SAMLProviderConfigFactory.create(organization=organization)
+        with self.assertRaises(OrganizationDoesNotExistException):
+            get_users_by_external_keys(self.program_uuid, [])
+
+    def test_saml_provider_not_found(self):
+        """
+        Test that Prov exception is thrown if no SAML provider exists for this
+        program's organization.
+        """
+        OrganizationFactory.create(short_name=self.organization_key)
+        with self.assertRaises(ProviderDoesNotExistException):
+            get_users_by_external_keys(self.program_uuid, [])
+
+    def test_extra_saml_provider_disabled(self):
+        """
+        If multiple samlprovider records exist with the same organization,
+        but the extra record is disabled, no exception is raised.
+        """
+        organization = OrganizationFactory.create(short_name=self.organization_key)
+        SAMLProviderConfigFactory.create(organization=organization)
+        # create a second active config for the same organization, NOT enabled
+        SAMLProviderConfigFactory.create(
+            organization=organization, slug='foox', enabled=False
+        )
+        get_users_by_external_keys(self.program_uuid, [])
+
+    def test_extra_saml_provider_enabled(self):
+        """
+        If multiple enabled samlprovider records exist with the same organization
+        an exception is raised.
+        """
+        organization = OrganizationFactory.create(short_name=self.organization_key)
+        SAMLProviderConfigFactory.create(organization=organization)
+        # create a second active config for the same organizationm, IS enabled
+        SAMLProviderConfigFactory.create(
+            organization=organization, slug='foox', enabled=True
+        )
+        with self.assertRaises(ProviderConfigurationException):
+            get_users_by_external_keys(self.program_uuid, [])

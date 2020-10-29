@@ -4,7 +4,6 @@ Management command for creating a Django OAuth Toolkit Application model.
 Also creates an oauth_dispatch application access if scopes are provided.
 """
 
-from __future__ import absolute_import, unicode_literals
 
 import logging
 

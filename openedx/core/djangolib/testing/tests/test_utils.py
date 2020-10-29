@@ -1,7 +1,7 @@
 """
 Test that testing utils do what they say.
 """
-from __future__ import absolute_import
+
 from crum import set_current_request
 
 from django.contrib.auth import get_user_model

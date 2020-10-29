@@ -2,7 +2,6 @@
 Login page for the LMS.
 """
 
-from __future__ import absolute_import
 
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise

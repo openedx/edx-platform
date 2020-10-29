@@ -1,6 +1,5 @@
 """Tests for zendesk_proxy views."""
 
-from __future__ import absolute_import
 
 from copy import deepcopy
 import json

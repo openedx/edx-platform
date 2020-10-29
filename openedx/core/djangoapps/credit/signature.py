@@ -16,7 +16,6 @@ we receive from the credit provider.
 
 """
 
-from __future__ import absolute_import
 
 import hashlib
 import hmac

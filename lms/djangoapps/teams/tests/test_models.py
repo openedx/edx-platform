@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Tests for the teams API at the HTTP request level."""
-from __future__ import absolute_import
+"""
+Tests for the teams API at the HTTP request level.
+"""
+
 
 import itertools
 from contextlib import contextmanager
@@ -8,6 +10,7 @@ from datetime import datetime
 
 import ddt
 import pytz
+import six
 from mock import Mock
 from opaque_keys.edx.keys import CourseKey
 
@@ -31,6 +34,50 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 COURSE_KEY1 = CourseKey.from_string('edx/history/1')
 COURSE_KEY2 = CourseKey.from_string('edx/history/2')
+
+
+class TestModelStrings(SharedModuleStoreTestCase):
+    """
+    Test `__repr__` and `__str__` methods of this app's models.
+    """
+    @classmethod
+    def setUpClass(cls):
+        super(TestModelStrings, cls).setUpClass()
+        cls.user = UserFactory.create(username="the-user")
+        CourseEnrollmentFactory.create(user=cls.user, course_id="edx/the-course/1")
+        cls.team = CourseTeamFactory(
+            course_id="edx/the-course/1",
+            team_id="the-team",
+            topic_id="the-teamset",
+            name="The Team"
+        )
+        cls.team_membership = cls.team.add_user(cls.user)
+
+    def test_team_repr(self):
+        assert repr(self.team) == (
+            "<CourseTeam"
+            " id=1"
+            " team_id=the-team"
+            " team_size=1"
+            " topic_id=the-teamset"
+            " course_id=edx/the-course/1"
+            ">"
+        )
+
+    def test_team_text(self):
+        assert six.text_type(self.team) == (
+            "The Team in edx/the-course/1"
+        )
+
+    def test_team_membership_repr(self):
+        assert repr(self.team_membership) == (
+            "<CourseTeamMembership id=1 user_id=1 team_id=1>"
+        )
+
+    def test_team_membership_text_type(self):
+        assert six.text_type(self.team_membership) == (
+            "the-user is member of The Team in edx/the-course/1"
+        )
 
 
 @ddt.ddt
@@ -133,7 +180,7 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
 
     DISCUSSION_TOPIC_ID = 'test_topic'
 
-    def setUp(self):
+    def setUp(self):  # pylint: disable=arguments-differ
         """Create a user with a team to test signals."""
         super(TeamSignalsTest, self).setUp('lms.djangoapps.teams.utils.tracker')
         self.user = UserFactory.create(username="user")

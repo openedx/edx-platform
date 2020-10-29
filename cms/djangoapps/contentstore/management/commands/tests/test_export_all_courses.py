@@ -1,7 +1,7 @@
 """
 Test for export all courses.
 """
-from __future__ import absolute_import
+
 
 import shutil
 from tempfile import mkdtemp

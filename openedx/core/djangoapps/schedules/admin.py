@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 import functools
 
@@ -66,12 +66,12 @@ class KnownErrorCases(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return (
-            ('schedule_start', _('Schedule start < course start')),
+            ('schedule_start_date', _('Schedule start < course start')),
         )
 
     def queryset(self, request, queryset):
-        if self.value() == 'schedule_start':
-            return queryset.filter(start__lt=F('enrollment__course__start'))
+        if self.value() == 'schedule_start_date':
+            return queryset.filter(start_date__lt=F('enrollment__course__start'))
 
 
 class CourseIdFilter(admin.SimpleListFilter):
@@ -122,8 +122,8 @@ class CourseIdFilter(admin.SimpleListFilter):
 
 @admin.register(models.Schedule)
 class ScheduleAdmin(admin.ModelAdmin):
-    list_display = ('username', 'course_id', 'active', 'start', 'upgrade_deadline', 'experience_display')
-    list_display_links = ('start', 'upgrade_deadline', 'experience_display')
+    list_display = ('username', 'course_id', 'active', 'start_date', 'upgrade_deadline', 'experience_display')
+    list_display_links = ('start_date', 'upgrade_deadline', 'experience_display')
     list_filter = (
         CourseIdFilter,
         'experience__experience_type',

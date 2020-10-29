@@ -1,7 +1,7 @@
 """
 Badging service for XBlocks
 """
-from __future__ import absolute_import
+
 
 from badges.models import BadgeClass
 

@@ -14,7 +14,6 @@ At present, it differs from Studio exports in several ways:
 * It only supports the export of courses.  It does not export libraries.
 """
 
-from __future__ import absolute_import
 
 import os
 import re
@@ -67,7 +66,7 @@ class Command(BaseCommand):
 
     def _get_results(self, filename):
         """Load results from file"""
-        with open(filename) as f:
+        with open(filename, 'rb') as f:  # pylint: disable=open-builtin
             results = f.read()
             os.remove(filename)
         return results

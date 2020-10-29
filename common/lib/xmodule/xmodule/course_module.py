@@ -1,7 +1,7 @@
 """
 Django module container for classes and operations related to the "Course Module" content type
 """
-from __future__ import absolute_import
+
 
 import json
 import logging
@@ -19,8 +19,10 @@ from pytz import utc
 from six import text_type
 from xblock.fields import Boolean, Dict, Float, Integer, List, Scope, String
 
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.video_pipeline.models import VideoUploadsEnabledByDefault
 from openedx.core.lib.license import LicenseMixin
+from openedx.core.lib.teams_config import TeamsConfig
 from xmodule import course_metadata_utils
 from xmodule.course_metadata_utils import DEFAULT_GRADING_POLICY, DEFAULT_START_DATE
 from xmodule.graders import grader_from_conf
@@ -269,6 +271,33 @@ def get_available_providers():
     return available_providers
 
 
+class TeamsConfigField(Dict):
+    """
+    XBlock field for teams configuration, including definitions for teamsets.
+
+    Serializes to JSON dictionary.
+    """
+    _default = TeamsConfig({})
+
+    def from_json(self, value):
+        """
+        Return a TeamsConfig instance from a dict.
+        """
+        return TeamsConfig(value)
+
+    def to_json(self, value):
+        """
+        Convert a TeamsConfig instance back to a dict.
+
+        If we have the data that was used to build the TeamsConfig instance,
+        return that instead of `value.cleaned_data`, thus preserving the
+        data in the form that the user entered it.
+        """
+        if value.source_data is not None:
+            return value.source_data
+        return value.cleaned_data
+
+
 class CourseFields(object):
     lti_passports = List(
         display_name=_("LTI Passports"),
@@ -332,7 +361,7 @@ class CourseFields(object):
         help=_("Enter the name of the course as it should appear in the edX.org course list."),
         default="Empty",
         display_name=_("Course Display Name"),
-        scope=Scope.settings
+        scope=Scope.settings,
     )
     course_edit_method = String(
         display_name=_("Course Editor"),
@@ -552,7 +581,8 @@ class CourseFields(object):
         ),
         scope=Scope.settings,
         # Ensure that courses imported from XML keep their image
-        default="images_course_image.jpg"
+        default="images_course_image.jpg",
+        hide_on_enabled_publisher=True
     )
     banner_image = String(
         display_name=_("Course Banner Image"),
@@ -796,7 +826,7 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
-    teams_configuration = Dict(
+    teams_configuration = TeamsConfigField(
         display_name=_("Teams Configuration"),
         # Translators: please don't translate "id".
         help=_(
@@ -807,6 +837,8 @@ class CourseFields(object):
             'For example, to specify that teams should have a maximum of 5 participants and provide a list of '
             '2 topics, enter the configuration in this format: {example_format}. '
             'In "id" values, the only supported special characters are underscore, hyphen, and period.'
+            # Note that we also support space (" "), which may have been an accident, but it's in
+            # our DB now. Let's not advertise the fact, though.
         ),
         help_format_args=dict(
             # Put the sample JSON into a format variable so that translators
@@ -1473,27 +1505,29 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
     @property
     def teams_enabled(self):
         """
-        Returns whether or not teams has been enabled for this course.
+        Alias to `self.teams_configuration.is_enabled`, for convenience.
 
-        Currently, teams are considered enabled when at least one topic has been configured for the course.
+        Returns bool.
         """
-        if self.teams_configuration:
-            return len(self.teams_configuration.get('topics', [])) > 0
-        return False
+        return self.teams_configuration.is_enabled  # pylint: disable=no-member
 
     @property
-    def teams_max_size(self):
+    def teamsets(self):
         """
-        Returns the max size for teams if teams has been configured, else None.
+        Alias to `self.teams_configuration.teamsets`, for convenience.
+
+        Returns list[TeamsetConfig].
         """
-        return self.teams_configuration.get('max_team_size', None)
+        return self.teams_configuration.teamsets  # pylint: disable=no-member
 
     @property
-    def teams_topics(self):
+    def teamsets_by_id(self):
         """
-        Returns the topics that have been configured for teams for this course, else None.
+        Alias to `self.teams_configuration.teamsets_by_id`, for convenience.
+
+        Returns dict[str: TeamsetConfig].
         """
-        return self.teams_configuration.get('topics', None)
+        return self.teams_configuration.teamsets_by_id
 
     def set_user_partitions_for_scheme(self, partitions, scheme):
         """

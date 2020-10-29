@@ -1,7 +1,7 @@
 """
 Migrates user preferences from one language code to another in batches. Dark lang preferences are not affected.
 """
-from __future__ import absolute_import, print_function
+
 
 import logging
 from time import sleep

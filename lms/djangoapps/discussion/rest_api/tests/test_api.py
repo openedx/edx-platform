@@ -1,7 +1,7 @@
 """
 Tests for Discussion API internal interface
 """
-from __future__ import absolute_import
+
 
 import itertools
 from datetime import datetime, timedelta
@@ -19,7 +19,7 @@ from six.moves import range
 from six.moves.urllib.parse import parse_qs, urlencode, urlparse, urlunparse  # pylint: disable=import-error
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
-from courseware.tests.factories import BetaTesterFactory, StaffFactory
+from lms.djangoapps.courseware.tests.factories import BetaTesterFactory, StaffFactory
 from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
 from lms.djangoapps.discussion.rest_api import api
 from lms.djangoapps.discussion.rest_api.api import (
@@ -102,7 +102,7 @@ def _create_course_and_cohort_with_user_role(course_is_cohorted, user, role_name
     CourseEnrollmentFactory.create(user=user, course_id=cohort_course.id)
     cohort = CohortFactory.create(course_id=cohort_course.id, users=[user])
     role = Role.objects.create(name=role_name, course_id=cohort_course.id)
-    role.users = [user]
+    role.users.set([user])
     return [cohort_course, cohort]
 
 
@@ -767,7 +767,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         CourseEnrollmentFactory.create(user=self.user, course_id=cohort_course.id)
         CohortFactory.create(course_id=cohort_course.id, users=[self.user])
         role = Role.objects.create(name=role_name, course_id=cohort_course.id)
-        role.users = [self.user]
+        role.users.set([self.user])
         self.get_thread_list([], course=cohort_course)
         actual_has_group = "group_id" in httpretty.last_request().querystring
         expected_has_group = (course_is_cohorted and role_name == FORUM_ROLE_STUDENT)
@@ -1083,7 +1083,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
         CourseEnrollmentFactory.create(user=self.user, course_id=cohort_course.id)
         cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.user])
         role = Role.objects.create(name=role_name, course_id=cohort_course.id)
-        role.users = [self.user]
+        role.users.set([self.user])
         thread = self.make_minimal_cs_thread({
             "course_id": six.text_type(cohort_course.id),
             "commentable_id": "test_topic",
@@ -1615,7 +1615,7 @@ class CreateThreadTest(
         if course_is_cohorted:
             cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.user])
         role = Role.objects.create(name=role_name, course_id=cohort_course.id)
-        role.users = [self.user]
+        role.users.set([self.user])
         self.register_post_thread_response({"username": self.user.username})
         data = self.minimal_data.copy()
         data["course_id"] = six.text_type(cohort_course.id)
@@ -1857,7 +1857,7 @@ class CreateCommentTest(
     @ddt.unpack
     def test_endorsed(self, role_name, is_thread_author, thread_type):
         role = Role.objects.create(name=role_name, course_id=self.course.id)
-        role.users = [self.user]
+        role.users.set([self.user])
         self.register_get_thread_response(
             make_minimal_cs_thread({
                 "id": "test_thread",
@@ -2140,7 +2140,7 @@ class UpdateThreadTest(
     )
     def test_author_only_fields(self, role_name):
         role = Role.objects.create(name=role_name, course_id=self.course.id)
-        role.users = [self.user]
+        role.users.set([self.user])
         self.register_thread({"user_id": str(self.user.id + 1)})
         data = {field: "edited" for field in ["topic_id", "title", "raw_body"]}
         data["type"] = "question"
@@ -2548,7 +2548,7 @@ class UpdateCommentTest(
     @ddt.unpack
     def test_raw_body_access(self, role_name, is_thread_author, is_comment_author):
         role = Role.objects.create(name=role_name, course_id=self.course.id)
-        role.users = [self.user]
+        role.users.set([self.user])
         self.register_comment(
             {"user_id": str(self.user.id if is_comment_author else (self.user.id + 1))},
             thread_overrides={
@@ -2580,7 +2580,7 @@ class UpdateCommentTest(
     @ddt.unpack
     def test_endorsed_access(self, role_name, is_thread_author, thread_type, is_comment_author):
         role = Role.objects.create(name=role_name, course_id=self.course.id)
-        role.users = [self.user]
+        role.users.set([self.user])
         self.register_comment(
             {"user_id": str(self.user.id if is_comment_author else (self.user.id + 1))},
             thread_overrides={
@@ -2854,7 +2854,7 @@ class DeleteThreadTest(
     )
     def test_non_author_delete_allowed(self, role_name):
         role = Role.objects.create(name=role_name, course_id=self.course.id)
-        role.users = [self.user]
+        role.users.set([self.user])
         self.register_thread({"user_id": str(self.user.id + 1)})
         expected_error = role_name == FORUM_ROLE_STUDENT
         try:
@@ -3005,7 +3005,7 @@ class DeleteCommentTest(
     )
     def test_non_author_delete_allowed(self, role_name):
         role = Role.objects.create(name=role_name, course_id=self.course.id)
-        role.users = [self.user]
+        role.users.set([self.user])
         self.register_comment_and_thread(
             overrides={"user_id": str(self.user.id + 1)}
         )

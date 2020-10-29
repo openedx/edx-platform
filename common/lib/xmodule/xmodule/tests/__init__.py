@@ -7,7 +7,6 @@ Run like this:
 
 """
 
-from __future__ import absolute_import
 
 import inspect
 import json
@@ -21,6 +20,7 @@ from functools import wraps
 
 import six
 from django.test import TestCase
+from django.utils.encoding import python_2_unicode_compatible
 from mock import Mock
 from opaque_keys.edx.keys import CourseKey
 from path import Path as path
@@ -176,7 +176,7 @@ def mock_render_template(*args, **kwargs):
     Allows us to not depend on any actual template rendering mechanism,
     while still returning a unicode object
     """
-    return pprint.pformat((args, kwargs)).decode()
+    return pprint.pformat((args, kwargs)).encode().decode()
 
 
 class ModelsTest(unittest.TestCase):
@@ -225,6 +225,7 @@ def map_references(value, field, actual_course_key):
     return value
 
 
+@python_2_unicode_compatible
 class LazyFormat(object):
     """
     An stringy object that delays formatting until it's put into a string context.
@@ -237,7 +238,7 @@ class LazyFormat(object):
         self.kwargs = kwargs
         self._message = None
 
-    def __unicode__(self):
+    def __str__(self):
         if self._message is None:
             self._message = self.template.format(*self.args, **self.kwargs)
         return self._message
@@ -499,10 +500,10 @@ class CourseComparisonTest(TestCase):
         actual_course_assets = actual_modulestore.get_all_asset_metadata(
             actual_course_key, None, sort=('displayname', ModuleStoreEnum.SortOrder.descending)
         )
-        self.assertEquals(len(expected_course_assets), len(actual_course_assets))
+        self.assertEqual(len(expected_course_assets), len(actual_course_assets))
         for idx, __ in enumerate(expected_course_assets):
             for attr in AssetMetadata.ATTRS_ALLOWED_TO_UPDATE:
                 if attr in ('edited_on',):
                     # edited_on is updated upon import.
                     continue
-                self.assertEquals(getattr(expected_course_assets[idx], attr), getattr(actual_course_assets[idx], attr))
+                self.assertEqual(getattr(expected_course_assets[idx], attr), getattr(actual_course_assets[idx], attr))

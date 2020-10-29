@@ -2,9 +2,9 @@
 Views for user API
 """
 
-from __future__ import absolute_import
 
 import six
+from django.contrib.auth.signals import user_logged_in
 from django.shortcuts import redirect
 from django.utils import dateparse
 from opaque_keys import InvalidKeyError
@@ -14,12 +14,13 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from xblock.fields import Scope
 from xblock.runtime import KeyValueStore
+from django.contrib.auth.models import User
 
-from courseware.access import is_mobile_available_for_user
-from courseware.courses import get_current_child
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module_for_descriptor
-from courseware.views.index import save_positions_recursively_up
+from lms.djangoapps.courseware.access import is_mobile_available_for_user
+from lms.djangoapps.courseware.courses import get_current_child
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.module_render import get_module_for_descriptor
+from lms.djangoapps.courseware.views.index import save_positions_recursively_up
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
 from mobile_api.utils import API_V05
 from openedx.features.course_duration_limits.access import check_course_expired
@@ -336,4 +337,7 @@ def my_user_info(request, api_version):
     """
     Redirect to the currently-logged-in user's info page
     """
+    # update user's last logged in from here because
+    # updating it from the oauth2 related code is too complex
+    user_logged_in.send(sender=User, user=request.user, request=request)
     return redirect("user-detail", api_version=api_version, username=request.user.username)

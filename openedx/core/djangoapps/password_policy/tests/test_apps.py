@@ -2,7 +2,7 @@
 Test password policy settings
 """
 
-from __future__ import absolute_import
+
 import datetime
 from dateutil.parser import parse as parse_date
 from django.conf import settings

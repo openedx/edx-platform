@@ -1,5 +1,5 @@
 """ OAuth related Python apis. """
-from __future__ import absolute_import
+
 
 from oauth2_provider.models import AccessToken as dot_access_token
 from oauth2_provider.models import RefreshToken as dot_refresh_token

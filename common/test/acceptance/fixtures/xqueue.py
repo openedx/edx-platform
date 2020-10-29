@@ -2,7 +2,6 @@
 Fixture to configure XQueue response.
 """
 
-from __future__ import absolute_import
 
 import json
 

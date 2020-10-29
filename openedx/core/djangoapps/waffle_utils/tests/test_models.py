@@ -1,7 +1,7 @@
 """
 Tests for waffle utils models.
 """
-from __future__ import absolute_import
+
 from ddt import data, ddt, unpack
 from django.test import TestCase
 from edx_django_utils.cache import RequestCache

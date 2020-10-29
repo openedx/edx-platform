@@ -2,7 +2,6 @@
 Third Party Auth REST API views
 """
 
-from __future__ import absolute_import
 
 from collections import namedtuple
 

@@ -1,5 +1,5 @@
 # pylint: skip-file
-from __future__ import absolute_import
+
 
 import json
 import logging
@@ -18,8 +18,8 @@ from pytz import UTC
 from six import text_type
 from six.moves import map
 
-from courseware import courses
-from courseware.access import has_access
+from lms.djangoapps.courseware import courses
+from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from lms.djangoapps.discussion.django_comment_client.permissions import (
     check_permissions_by_view,

@@ -2,8 +2,8 @@
 
 <%!
 import six
-from six.moves.urllib import parse as urllib
 
+from django.utils.http import urlencode, urlquote_plus
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 from django.urls import reverse
@@ -177,10 +177,10 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
           <div class="course-actions">
             % if (show_courseware_link or is_unfulfilled_entitlement) and not is_course_expired:
               % if course_overview.has_ended():
-                % if not is_course_blocked:
+                % if is_course_blocked:
+                    <a class="enter-course-blocked archived course-target-link" data-course-key="${enrollment.course_id}">${_('View Archived Course')}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
+                % elif not is_unfulfilled_entitlement:
                   <a href="${course_target}" class="enter-course archived course-target-link" data-course-key="${enrollment.course_id}">${_('View Archived Course')}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
-                % else:
-                  <a class="enter-course-blocked archived course-target-link" data-course-key="${enrollment.course_id}">${_('View Archived Course')}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
                 % endif
 
               % else:
@@ -225,9 +225,9 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                     %>
                     % if share_settings.get('DASHBOARD_FACEBOOK', False):
                         <%
-                          facebook_share_url = "{url}?{utm_params}".format(url=share_url.encode('utf-8'), utm_params=encoded_utm_parameters['facebook'])
+                          facebook_share_url = u"{url}?{utm_params}".format(url=share_url, utm_params=encoded_utm_parameters['facebook'])
                           share_text = _("I'm taking {course_name} online with {facebook_brand}. Check it out!").format(course_name=course_overview.display_name_with_default, facebook_brand=share_settings.get('FACEBOOK_BRAND', 'edX.org'))
-                          query_params = urllib.urlencode((('u', facebook_share_url), ('quote', share_text.encode('utf-8')),))
+                          query_params = urlencode((('u', facebook_share_url), ('quote', share_text),))
                           facebook_url = 'https://www.facebook.com/sharer/sharer.php?{query}'.format(query=query_params)
                           share_msg = _("Share {course_name} on Facebook").format(course_name=course_overview.display_name_with_default)
                         %>
@@ -247,10 +247,10 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                     % endif
                     % if share_settings.get('DASHBOARD_TWITTER', False):
                         <%
-                          twitter_share_url = "{url}?{utm_params}".format(url=share_url.encode('utf-8'), utm_params=encoded_utm_parameters['twitter'])
+                          twitter_share_url = u"{url}?{utm_params}".format(url=share_url, utm_params=encoded_utm_parameters['twitter'])
                           default_share_text = _("I'm taking {course_name} online with {twitter_brand}. Check it out!").format(course_name=course_overview.display_name_with_default, twitter_brand=share_settings.get('TWITTER_BRAND', '@edxonline'))
-                          share_text = urllib.quote_plus(share_settings.get('DASHBOARD_TWITTER_TEXT', default_share_text.encode('utf-8')))
-                          twitter_url = 'https://twitter.com/intent/tweet?text=' + share_text + '%20' + urllib.quote_plus(twitter_share_url)
+                          share_text = urlquote_plus(share_settings.get('DASHBOARD_TWITTER_TEXT', default_share_text))
+                          twitter_url = u'https://twitter.com/intent/tweet?text=' + share_text + u'%20' + urlquote_plus(twitter_share_url)
                           share_msg = _("Share {course_name} on Twitter").format(course_name=course_overview.display_name_with_default)
                         %>
                         <a

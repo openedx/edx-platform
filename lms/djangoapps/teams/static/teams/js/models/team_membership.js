@@ -13,7 +13,7 @@
             },
 
             parse: function(response) {
-                response.team = new TeamModel(response.team);
+                response.team = new TeamModel(response.team); // eslint-disable-line no-param-reassign
                 return response;
             }
         });

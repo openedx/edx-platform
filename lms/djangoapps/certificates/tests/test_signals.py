@@ -2,7 +2,7 @@
 Unit tests for enabling self-generated certificates for self-paced courses
 and disabling for instructor-paced courses.
 """
-from __future__ import absolute_import
+
 
 import ddt
 import mock

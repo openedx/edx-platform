@@ -1,14 +1,14 @@
 """
 Tests for send_course_update management command.
 """
-from __future__ import absolute_import
+
 
 from unittest import skipUnless
 
 import ddt
 from django.conf import settings
 from edx_ace.utils.date import serialize
-from mock import _is_started, patch
+from mock import patch
 from six.moves import range
 
 from openedx.core.djangoapps.schedules import resolvers, tasks
@@ -60,7 +60,7 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
         Stops the patcher for the get_week_highlights method
         if the patch is still in progress.
         """
-        if _is_started(self.highlights_patcher):
+        if self.highlights_patcher is not None:
             self.highlights_patcher.stop()
 
     @ddt.data(
@@ -75,6 +75,7 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
     @patch('openedx.core.djangoapps.schedules.signals.get_current_site')
     def test_with_course_data(self, mock_get_current_site):
         self.highlights_patcher.stop()
+        self.highlights_patcher = None
         mock_get_current_site.return_value = self.site_config.site
 
         course = CourseFactory(highlights_enabled_for_messaging=True, self_paced=True)
@@ -86,6 +87,7 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
 
         _, offset, target_day, _ = self._get_dates(offset=self.expected_offsets[0])
         enrollment.schedule.start = target_day
+        enrollment.schedule.start_date = target_day
         enrollment.schedule.save()
 
         with patch.object(tasks, 'ace') as mock_ace:

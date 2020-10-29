@@ -1,7 +1,7 @@
 """
 Tests for the reset_enrollment_data management command.
 """
-from __future__ import absolute_import
+
 
 import sys
 from contextlib import contextmanager

@@ -1,5 +1,5 @@
 """Tests for the certificates panel of the instructor dash. """
-from __future__ import absolute_import
+
 
 import contextlib
 import io
@@ -20,7 +20,7 @@ from django.urls import reverse
 
 from capa.xqueue_interface import XQueueInterface
 from course_modes.models import CourseMode
-from courseware.tests.factories import GlobalStaffFactory, InstructorFactory, UserFactory
+from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, InstructorFactory, UserFactory
 from courseware.tests.factories import StaffFactory
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
@@ -393,7 +393,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         """
         # Check that user is enrolled in audit mode.
         enrollment = CourseEnrollment.get_enrollment(self.user, self.course.id)
-        self.assertEquals(enrollment.mode, CourseMode.AUDIT)
+        self.assertEqual(enrollment.mode, CourseMode.AUDIT)
 
         with mock_passing_grade():
             # Generate certificate for user and check that user has a audit passing certificate.
@@ -404,11 +404,11 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
             )
 
             # Check that certificate status is 'audit_passing'.
-            self.assertEquals(cert_status, CertificateStatuses.audit_passing)
+            self.assertEqual(cert_status, CertificateStatuses.audit_passing)
 
             # Update user enrollment mode to verified mode.
             enrollment.update_enrollment(mode=CourseMode.VERIFIED)
-            self.assertEquals(enrollment.mode, CourseMode.VERIFIED)
+            self.assertEqual(enrollment.mode, CourseMode.VERIFIED)
 
             # Create and assert user's ID verification record.
             SoftwareSecurePhotoVerificationFactory.create(user=self.user, status=id_verification_status)
@@ -416,7 +416,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
                 self.user,
                 enrollment.mode
             )
-            self.assertEquals(actual_verification_status, verification_output)
+            self.assertEqual(actual_verification_status, verification_output)
 
             # Login the client and access the url with 'audit_passing' status.
             self.client.login(username=self.global_staff.username, password='test')
@@ -433,14 +433,14 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
                 )
 
                 # Assert 200 status code in response
-                self.assertEquals(response.status_code, 200)
+                self.assertEqual(response.status_code, 200)
                 res_json = json.loads(response.content.decode('utf-8'))
 
                 # Assert request is successful
                 self.assertTrue(res_json['success'])
 
                 # Assert success message
-                self.assertEquals(
+                self.assertEqual(
                     res_json['message'],
                     u'Certificate regeneration task has been started. '
                     u'You can view the status of the generation task in '
@@ -449,8 +449,8 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
 
             # Now, check whether user has audit certificate.
             cert = certs_api.get_certificate_for_user(self.user.username, self.course.id)
-            self.assertNotEquals(cert['status'], CertificateStatuses.audit_passing)
-            self.assertEquals(cert['status'], expected_cert_status)
+            self.assertNotEqual(cert['status'], CertificateStatuses.audit_passing)
+            self.assertEqual(cert['status'], expected_cert_status)
 
     def test_certificate_regeneration_error(self):
         """
@@ -943,29 +943,29 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
         """
         Happy path test to create a single new white listed record
         """
-        csv_content = "test_student1@example.com,dummy_notes\n" \
-                      "test_student2@example.com,dummy_notes"
+        csv_content = b"test_student1@example.com,dummy_notes\n" \
+                      b"test_student2@example.com,dummy_notes"
         data = self.upload_file(csv_content=csv_content)
-        self.assertEquals(len(data['general_errors']), 0)
-        self.assertEquals(len(data['row_errors']['data_format_error']), 0)
-        self.assertEquals(len(data['row_errors']['user_not_exist']), 0)
-        self.assertEquals(len(data['row_errors']['user_already_white_listed']), 0)
-        self.assertEquals(len(data['row_errors']['user_not_enrolled']), 0)
-        self.assertEquals(len(data['success']), 2)
-        self.assertEquals(len(CertificateWhitelist.objects.all()), 2)
+        self.assertEqual(len(data['general_errors']), 0)
+        self.assertEqual(len(data['row_errors']['data_format_error']), 0)
+        self.assertEqual(len(data['row_errors']['user_not_exist']), 0)
+        self.assertEqual(len(data['row_errors']['user_already_white_listed']), 0)
+        self.assertEqual(len(data['row_errors']['user_not_enrolled']), 0)
+        self.assertEqual(len(data['success']), 2)
+        self.assertEqual(len(CertificateWhitelist.objects.all()), 2)
 
     def test_invalid_data_format_in_csv(self):
         """
         Try uploading a CSV file with invalid data formats and verify the errors.
         """
-        csv_content = "test_student1@example.com,test,1,USA\n" \
-                      "test_student2@example.com,test,1"
+        csv_content = b"test_student1@example.com,test,1,USA\n" \
+                      b"test_student2@example.com,test,1"
 
         data = self.upload_file(csv_content=csv_content)
-        self.assertEquals(len(data['row_errors']['data_format_error']), 2)
-        self.assertEquals(len(data['general_errors']), 0)
-        self.assertEquals(len(data['success']), 0)
-        self.assertEquals(len(CertificateWhitelist.objects.all()), 0)
+        self.assertEqual(len(data['row_errors']['data_format_error']), 2)
+        self.assertEqual(len(data['general_errors']), 0)
+        self.assertEqual(len(data['success']), 0)
+        self.assertEqual(len(CertificateWhitelist.objects.all()), 0)
 
     def test_file_upload_type_not_csv(self):
         """
@@ -975,9 +975,9 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertNotEquals(len(data['general_errors']), 0)
-        self.assertEquals(data['general_errors'][0], 'Make sure that the file you upload is in CSV format with '
-                                                     'no extraneous characters or rows.')
+        self.assertNotEqual(len(data['general_errors']), 0)
+        self.assertEqual(data['general_errors'][0], 'Make sure that the file you upload is in CSV format with '
+                         'no extraneous characters or rows.')
 
     def test_bad_file_upload_type(self):
         """
@@ -987,30 +987,30 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertNotEquals(len(data['general_errors']), 0)
-        self.assertEquals(data['general_errors'][0], 'Could not read uploaded file.')
+        self.assertNotEqual(len(data['general_errors']), 0)
+        self.assertEqual(data['general_errors'][0], 'Could not read uploaded file.')
 
     def test_invalid_email_in_csv(self):
         """
         Test failure case of a poorly formatted email field
         """
-        csv_content = "test_student.example.com,dummy_notes"
+        csv_content = b"test_student.example.com,dummy_notes"
 
         data = self.upload_file(csv_content=csv_content)
-        self.assertEquals(len(data['row_errors']['user_not_exist']), 1)
-        self.assertEquals(len(data['success']), 0)
-        self.assertEquals(len(CertificateWhitelist.objects.all()), 0)
+        self.assertEqual(len(data['row_errors']['user_not_exist']), 1)
+        self.assertEqual(len(data['success']), 0)
+        self.assertEqual(len(CertificateWhitelist.objects.all()), 0)
 
     def test_csv_user_not_enrolled(self):
         """
         If the user is not enrolled in the course then there should be a user_not_enrolled error.
         """
-        csv_content = "nonenrolled@test.com,dummy_notes"
+        csv_content = b"nonenrolled@test.com,dummy_notes"
 
         data = self.upload_file(csv_content=csv_content)
-        self.assertEquals(len(data['row_errors']['user_not_enrolled']), 1)
-        self.assertEquals(len(data['general_errors']), 0)
-        self.assertEquals(len(data['success']), 0)
+        self.assertEqual(len(data['row_errors']['user_not_enrolled']), 1)
+        self.assertEqual(len(data['general_errors']), 0)
+        self.assertEqual(len(data['success']), 0)
 
     def test_certificate_exception_already_exist(self):
         """
@@ -1022,27 +1022,27 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
             whitelist=True,
             notes=''
         )
-        csv_content = "test_student1@example.com,dummy_notes"
+        csv_content = b"test_student1@example.com,dummy_notes"
         data = self.upload_file(csv_content=csv_content)
-        self.assertEquals(len(data['row_errors']['user_already_white_listed']), 1)
-        self.assertEquals(len(data['general_errors']), 0)
-        self.assertEquals(len(data['success']), 0)
-        self.assertEquals(len(CertificateWhitelist.objects.all()), 1)
+        self.assertEqual(len(data['row_errors']['user_already_white_listed']), 1)
+        self.assertEqual(len(data['general_errors']), 0)
+        self.assertEqual(len(data['success']), 0)
+        self.assertEqual(len(CertificateWhitelist.objects.all()), 1)
 
     def test_csv_file_not_attached(self):
         """
         Test when the user does not attach a file
         """
-        csv_content = "test_student1@example.com,dummy_notes\n" \
-                      "test_student2@example.com,dummy_notes"
+        csv_content = b"test_student1@example.com,dummy_notes\n" \
+                      b"test_student2@example.com,dummy_notes"
 
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
 
         response = self.client.post(self.url, {'file_not_found': uploaded_file})
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEquals(len(data['general_errors']), 1)
-        self.assertEquals(len(data['success']), 0)
+        self.assertEqual(len(data['general_errors']), 1)
+        self.assertEqual(len(data['success']), 0)
 
     def upload_file(self, csv_content):
         """

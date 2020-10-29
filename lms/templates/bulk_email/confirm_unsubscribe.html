@@ -1,0 +1,46 @@
+<%page expression_filter="h"/>
+<%!
+from openedx.core.djangolib.markup import Text, HTML
+from django.utils.translation import ugettext as _
+
+%>
+<%inherit file="../main.html" />
+
+<%namespace name='static' file='../static_content.html'/>
+
+<%block name="pagetitle">${Text(_("Unsubscribe"))}</%block>
+<section class="container unsubscribe-bulk-email">
+
+  <section>
+      <h1>
+
+          <%block name="pageheader">${Text(_("Unsubscribe"))} </%block>
+
+      </h1>
+
+        <form class="message" action="" method="POST">
+
+            <%block name="pagecontent">
+
+            <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+            <input type="checkbox" name="unsubscribe" checked>
+            ${Text(_("confirm unsubscribe from {org} {course} emails.")).format(
+                    org=HTML("<strong>{}'s</strong>").format(course.display_org_with_default),
+                    course=HTML("<strong>{}</strong>").format(course.display_name_with_default)
+                    )
+            }
+            <br><br>
+            <p>
+                 <strong>${_("Note:")}</strong>
+                ${_("You will still receive course emails from other courses you are enrolled in.")}
+            </p>
+           <br><br>
+          <input class="button" type="submit" value="Confirm">
+
+          </%block>
+
+        </form>
+
+
+  </section>
+</section>

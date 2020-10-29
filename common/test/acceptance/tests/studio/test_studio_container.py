@@ -3,7 +3,7 @@ Acceptance tests for Studio related to the container page.
 The container page is used both for displaying units, and
 for displaying containers within units.
 """
-from __future__ import absolute_import
+
 
 import datetime
 

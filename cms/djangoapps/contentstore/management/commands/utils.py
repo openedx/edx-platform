@@ -1,7 +1,7 @@
 """
 Common methods for cms commands to use
 """
-from __future__ import absolute_import
+
 
 from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey

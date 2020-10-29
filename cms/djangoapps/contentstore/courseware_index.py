@@ -1,5 +1,5 @@
 """ Code to allow module store to interface with courseware index """
-from __future__ import absolute_import
+
 
 import logging
 import re

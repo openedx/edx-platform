@@ -1,7 +1,7 @@
 """
 Bok choy acceptance and a11y tests for problem types in the LMS
 """
-from __future__ import absolute_import
+
 
 import random
 import textwrap

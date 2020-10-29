@@ -1,12 +1,14 @@
 """
 Django models supporting the Comprehensive Theming subsystem
 """
-from __future__ import absolute_import
+
 
 from django.contrib.sites.models import Site
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class SiteTheme(models.Model):
     """
     This is where the information about the site's theme gets stored to the db.
@@ -19,7 +21,7 @@ class SiteTheme(models.Model):
     site = models.ForeignKey(Site, related_name='themes', on_delete=models.CASCADE)
     theme_dir_name = models.CharField(max_length=255)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.theme_dir_name
 
     @staticmethod

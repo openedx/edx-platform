@@ -4,8 +4,21 @@ Python API functions related to reading program enrollments.
 Outside of this subpackage, import these functions
 from `lms.djangoapps.program_enrollments.api`.
 """
-from __future__ import absolute_import, unicode_literals
 
+
+from organizations.models import Organization
+from social_django.models import UserSocialAuth
+
+from openedx.core.djangoapps.catalog.utils import get_programs
+from third_party_auth.models import SAMLProviderConfig
+
+from ..exceptions import (
+    BadOrganizationShortNameException,
+    ProgramDoesNotExistException,
+    ProgramHasNoAuthoringOrganizationException,
+    ProviderConfigurationException,
+    ProviderDoesNotExistException
+)
 from ..models import ProgramCourseEnrollment, ProgramEnrollment
 
 _STUDENT_ARG_ERROR_MESSAGE = (
@@ -144,6 +157,7 @@ def fetch_program_course_enrollments(
         users=None,
         external_user_keys=None,
         program_enrollment_statuses=None,
+        program_enrollments=None,
         active_only=False,
         inactive_only=False,
         realized_only=False,
@@ -161,6 +175,7 @@ def fetch_program_course_enrollments(
         * users (iterable[User])
         * external_user_keys (iterable[str])
         * program_enrollment_statuses (iterable[str])
+        * program_enrollments (iterable[ProgramEnrollment])
         * active_only (bool)
         * inactive_only (bool)
         * realized_only (bool)
@@ -185,6 +200,7 @@ def fetch_program_course_enrollments(
         "program_enrollment__user__in": users,
         "program_enrollment__external_user_key__in": external_user_keys,
         "program_enrollment__status__in": program_enrollment_statuses,
+        "program_enrollment__in": program_enrollments,
     }
     if active_only:
         filters["status"] = "active"
@@ -319,3 +335,106 @@ def _remove_none_values(dictionary):
     return {
         key: value for key, value in dictionary.items() if value is not None
     }
+
+
+def get_users_by_external_keys(program_uuid, external_user_keys):
+    """
+    Given a program and a set of external keys,
+    return a dict from external user keys to Users.
+
+    Args:
+        program_uuid (UUID|str):
+            uuid for program these users is/will be enrolled in
+        external_user_keys (sequence[str]):
+            external user keys used by the program creator's IdP.
+
+    Returns: dict[str: User|None]
+        A dict mapping external user keys to Users.
+        If an external user key is not registered, then None is returned instead
+            of a User for that key.
+
+    Raises:
+        ProgramDoesNotExistException
+        ProgramHasNoAuthoringOrganizationException
+        BadOrganizationShortNameException
+        ProviderDoesNotExistsException
+        ProviderConfigurationException
+    """
+    saml_provider = get_saml_provider_for_program(program_uuid)
+    social_auth_uids = {
+        saml_provider.get_social_auth_uid(external_user_key)
+        for external_user_key in external_user_keys
+    }
+    social_auths = UserSocialAuth.objects.filter(uid__in=social_auth_uids)
+    found_users_by_external_keys = {
+        saml_provider.get_remote_id_from_social_auth(social_auth): social_auth.user
+        for social_auth in social_auths
+    }
+    # Default all external keys to None, because external keys
+    # without a User will not appear in `found_users_by_external_keys`.
+    users_by_external_keys = {key: None for key in external_user_keys}
+    users_by_external_keys.update(found_users_by_external_keys)
+    return users_by_external_keys
+
+
+def get_saml_provider_for_program(program_uuid):
+    """
+    Return currently configured SAML provider for the Organization
+    administering the given program.
+
+    Arguments:
+        program_uuid (UUID|str)
+
+    Returns: SAMLProvider
+
+    Raises:
+        ProgramDoesNotExistException
+        ProgramHasNoAuthoringOrganizationException
+        BadOrganizationShortNameException
+    """
+    program = get_programs(uuid=program_uuid)
+    if program is None:
+        raise ProgramDoesNotExistException(program_uuid)
+    authoring_orgs = program.get('authoring_organizations')
+    org_key = authoring_orgs[0].get('key') if authoring_orgs else None
+    if not org_key:
+        raise ProgramHasNoAuthoringOrganizationException(program_uuid)
+    try:
+        organization = Organization.objects.get(short_name=org_key)
+    except Organization.DoesNotExist:
+        raise BadOrganizationShortNameException(org_key)
+    return get_saml_provider_for_organization(organization)
+
+
+def get_saml_provider_for_organization(organization):
+    """
+    Return currently configured SAML provider for the given Organization.
+
+    Arguments:
+        organization: Organization
+
+    Returns: SAMLProvider
+
+    Raises:
+        ProviderDoesNotExistsException
+        ProviderConfigurationException
+    """
+    try:
+        provider_config = organization.samlproviderconfig_set.current_set().get(enabled=True)
+    except SAMLProviderConfig.DoesNotExist:
+        raise ProviderDoesNotExistException(organization)
+    except SAMLProviderConfig.MultipleObjectsReturned:
+        raise ProviderConfigurationException(organization)
+    return provider_config
+
+
+def get_provider_slug(provider_config):
+    """
+    Returns slug identifying a SAML provider.
+
+    Arguments:
+        provider_config: SAMLProvider
+
+    Returns: str
+    """
+    return provider_config.provider_id.strip('saml-')

@@ -1,7 +1,7 @@
 """
 Command-line utility to start a stub service.
 """
-from __future__ import absolute_import, print_function
+
 
 import logging
 import sys

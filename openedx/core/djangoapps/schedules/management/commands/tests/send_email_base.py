@@ -1,7 +1,7 @@
 """
 Base file for testing email sending functionality
 """
-from __future__ import absolute_import
+
 
 import datetime
 import logging
@@ -24,7 +24,7 @@ from six.moves import range
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.models import DynamicUpgradeDeadlineConfiguration
+from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.resolvers import _get_datetime_beginning_of_day
@@ -137,6 +137,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
     def _schedule_factory(self, offset=None, **factory_kwargs):
         _, _, target_day, upgrade_deadline = self._get_dates(offset=offset)
         factory_kwargs.setdefault('start', target_day)
+        factory_kwargs.setdefault('start_date', target_day)
         factory_kwargs.setdefault('upgrade_deadline', upgrade_deadline)
         factory_kwargs.setdefault('enrollment__course__self_paced', True)
         # Make all schedules in the same course

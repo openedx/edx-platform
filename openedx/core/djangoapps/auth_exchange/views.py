@@ -9,7 +9,6 @@ The following are currently implemented:
 
 # pylint: disable=abstract-method
 
-from __future__ import absolute_import
 
 import django.contrib.auth as auth
 import social_django.utils as social_utils

@@ -132,13 +132,8 @@
                                 ## \u2013 is the en-dash. It looks like a year, but it isn't.
                               <!--"EdX, Open edX, and MicroMasters are trademarks of edX Inc. registered in the U.S. and other countries-->
                               <p class="copyright">${_(
-                                  u"\u00A9 2012\u2013{year} edX Inc. ").format(year=datetime.datetime.now().year)}
+                                  u"\u00A9 {year} edX Inc. All rights reserved.").format(year=datetime.datetime.now().year)}
                                   <br/>
-                                  ${_(
-
-                                  u"edX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
-
-                                  )}
                                  % if icp_license_info.get('icp_license'):
                                     ${u" | {text}".format(text=icp_license_info.get('text'))}
                                     <a href="${icp_license_info.get('icp_license_link', '#')}">

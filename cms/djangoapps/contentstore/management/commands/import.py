@@ -1,7 +1,7 @@
 """
 Script for importing courseware from XML format
 """
-from __future__ import absolute_import
+
 
 from django.core.management.base import BaseCommand
 

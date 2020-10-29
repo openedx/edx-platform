@@ -2,7 +2,7 @@
 Stub implementation of catalog service for acceptance tests
 """
 # pylint: disable=invalid-name, missing-docstring
-from __future__ import absolute_import
+
 
 import re
 

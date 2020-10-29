@@ -2,7 +2,7 @@
 """
 Acceptance tests for studio related to the outline page.
 """
-from __future__ import absolute_import
+
 
 import itertools
 import json
@@ -340,6 +340,7 @@ class WarningMessagesTest(CourseOutlineTest):
             subsection.add_unit()
             unit = ContainerPage(self.browser, None)
             unit.wait_for_page()
+            unit.set_name(name)
 
         if unit.is_staff_locked != unit_state.is_locked:
             unit.toggle_staff_lock()
@@ -1284,7 +1285,7 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
             And all sections are expanded
         """
         self.course_outline_page.visit()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
         self.verify_all_sections(collapsed=False)
 
     def test_no_expand_link_for_empty_course(self):
@@ -1300,7 +1301,7 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         self.course_outline_page.visit()
         for section in self.course_outline_page.sections():
             section.delete()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
         self.assertTrue(self.course_outline_page.has_no_content_message)
 
     def test_collapse_all_when_all_expanded(self):
@@ -1315,7 +1316,7 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         self.course_outline_page.visit()
         self.verify_all_sections(collapsed=False)
         self.course_outline_page.toggle_expand_collapse()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
         self.verify_all_sections(collapsed=True)
 
     def test_collapse_all_when_some_expanded(self):
@@ -1332,7 +1333,7 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         self.verify_all_sections(collapsed=False)
         self.course_outline_page.section_at(0).expand_subsection()
         self.course_outline_page.toggle_expand_collapse()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
         self.verify_all_sections(collapsed=True)
 
     def test_expand_all_when_all_collapsed(self):
@@ -1346,9 +1347,9 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         """
         self.course_outline_page.visit()
         self.course_outline_page.toggle_expand_collapse()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
         self.course_outline_page.toggle_expand_collapse()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
         self.verify_all_sections(collapsed=False)
 
     def test_expand_all_when_some_collapsed(self):
@@ -1366,11 +1367,11 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         # if that helps.
         disable_animations(self.course_outline_page)
         self.course_outline_page.toggle_expand_collapse()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
         self.verify_all_sections(collapsed=True)
         self.course_outline_page.section_at(0).expand_subsection()
         self.course_outline_page.toggle_expand_collapse()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
         self.verify_all_sections(collapsed=False)
 
 
@@ -1394,7 +1395,7 @@ class ExpandCollapseSingleSectionTest(CourseOutlineTest):
         """
         self.course_outline_page.visit()
         self.course_outline_page.section_at(0).delete()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
         self.assertTrue(self.course_outline_page.has_no_content_message)
 
     def test_old_subsection_stays_collapsed_after_creation(self):
@@ -1434,7 +1435,7 @@ class ExpandCollapseEmptyTest(CourseOutlineTest):
             Then I do not see the "Collapse All Sections" link
         """
         self.course_outline_page.visit()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
 
     def test_link_appears_after_section_creation(self):
         """
@@ -1446,9 +1447,9 @@ class ExpandCollapseEmptyTest(CourseOutlineTest):
             And all sections are expanded
         """
         self.course_outline_page.visit()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
         self.course_outline_page.add_section_from_top_button()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
         self.assertFalse(self.course_outline_page.section_at(0).is_collapsed)
 
 

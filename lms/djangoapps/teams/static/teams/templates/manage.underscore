@@ -1,0 +1,42 @@
+<div class="team-management">
+    <div class="page-content-main">
+        <div class="team-management-section">
+            <h3 class="team-detail-header">
+                <%- gettext("View Current Team Memberships") %>
+            </h3>
+            <p>
+                <%- gettext(
+                    "Click to download a comma-separated values (CSV) file that, " +
+                    "for each user, lists the team they are on for each topic."
+                ) %>
+            </p>
+            <button
+                id="download-team-csv-input"
+                class="download-team-csv action action-primary"
+            >
+                <%- gettext("Download Memberships") %>
+            </button>
+        </div>
+        <div class="team-management-section">
+            <h3 class="team-detail-header">
+                <%- gettext("Assign Team Memberships") %>
+            </h3>
+            <p>
+                <%- gettext(
+                    "Click to upload a comma-separated values (CSV) file to assign " +
+                    "users to teams."
+                ) %>
+            </p>
+            <div class="upload-team-csv btn action action-primary">
+                <input
+                    id="upload-team-csv-input"
+                    type="file"
+                    accept="text/csv"
+                    class="input-overlay-hack"
+                />
+                <%- gettext("Upload Memberships") %>
+            </div>
+            <!-- We need to describe the format of the CSV here (TODO MST-49) -->
+        </div>
+    </div>
+</div>

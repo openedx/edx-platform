@@ -1,8 +1,9 @@
 """
 Test the test_bulk_user_org_email_optout management command
 """
-from __future__ import absolute_import
 
+
+import io
 import os
 import tempfile
 from contextlib import contextmanager
@@ -14,7 +15,7 @@ from django.core.management import call_command
 pytestmark = pytest.mark.django_db
 
 
-CSV_DATA = """1,UniversityX
+CSV_DATA = u"""1,UniversityX
 2,CollegeX
 3,StateUX
 """
@@ -26,8 +27,8 @@ def _create_test_csv(csv_data):
     Context manager to create and populate a CSV file - and delete it after usage.
     """
     __, file_name = tempfile.mkstemp(text=True)
-    with open(file_name, 'w') as file_pointer:
-        file_pointer.write(csv_data.encode('utf-8'))
+    with io.open(file_name, 'w') as file_pointer:
+        file_pointer.write(csv_data)
     try:
         yield file_name
     finally:

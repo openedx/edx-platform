@@ -1,7 +1,7 @@
 """
 Tests for Discussion API views
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import json
 from datetime import datetime

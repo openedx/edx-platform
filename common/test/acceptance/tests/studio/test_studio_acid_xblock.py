@@ -1,7 +1,7 @@
 """
 Acceptance tests for Studio related to the acid xblock.
 """
-from __future__ import absolute_import
+
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage

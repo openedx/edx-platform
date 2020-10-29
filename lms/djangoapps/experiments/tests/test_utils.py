@@ -1,7 +1,7 @@
 """
 Tests of experiment functionality
 """
-from __future__ import absolute_import
+
 
 from decimal import Decimal
 from unittest import TestCase

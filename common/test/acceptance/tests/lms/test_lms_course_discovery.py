@@ -1,7 +1,7 @@
 """
 Test course discovery.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import json
@@ -41,7 +41,7 @@ class CourseDiscoveryTest(AcceptanceTest):
 
         for i in range(12):
             org = 'test_org'
-            number = "{}{}".format(str(i), str(uuid.uuid4().get_hex().upper()[0:6]))
+            number = "{}{}".format(str(i), str(uuid.uuid4().hex.upper()[0:6]))
             run = "test_run"
             name = "test course" if i < 10 else "grass is always greener"
             settings = {'enrollment_start': datetime.datetime(1970, 1, 1).isoformat()}

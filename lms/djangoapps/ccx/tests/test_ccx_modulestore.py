@@ -1,7 +1,7 @@
 """
 Test the CCXModulestoreWrapper
 """
-from __future__ import absolute_import
+
 
 import datetime
 from collections import deque

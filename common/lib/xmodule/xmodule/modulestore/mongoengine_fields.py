@@ -1,7 +1,7 @@
 """
 Custom field types for mongoengine
 """
-from __future__ import absolute_import
+
 
 import mongoengine
 import six

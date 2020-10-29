@@ -1,7 +1,7 @@
 """
 Helper functions for the course complete event that was originally included with the Badging MVP.
 """
-from __future__ import absolute_import
+
 
 import hashlib
 import logging

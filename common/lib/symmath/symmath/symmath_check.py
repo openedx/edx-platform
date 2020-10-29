@@ -8,7 +8,7 @@
 #
 # Takes in math expressions given as Presentation MathML (from ASCIIMathML), converts to Content MathML using SnuggleTeX
 
-from __future__ import absolute_import
+
 import logging
 import traceback
 

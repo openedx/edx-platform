@@ -2,7 +2,7 @@
 """
 Test the course_info xblock
 """
-from __future__ import absolute_import
+
 
 from datetime import datetime
 
@@ -61,9 +61,8 @@ class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase,
         self.setup_user()
         url = reverse('info', args=[text_type(self.course.id)])
         resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 200)
-        self.assertIn(b"OOGIE BLOOGIE", resp.content)
-        self.assertIn(b"You are not currently enrolled in this course", resp.content)
+        self.assertContains(resp, "OOGIE BLOOGIE")
+        self.assertContains(resp, "You are not currently enrolled in this course")
 
     def test_logged_in_enrolled(self):
         self.enroll(self.course)
@@ -389,15 +388,13 @@ class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.setup_user()
         url = reverse('info', args=[text_type(self.xml_course_key)])
         resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 200)
-        self.assertIn(self.xml_data, resp.content)
+        self.assertContains(resp, self.xml_data)
 
     @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_anonymous_user_xml(self):
         url = reverse('info', args=[text_type(self.xml_course_key)])
         resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 200)
-        self.assertNotIn(self.xml_data, resp.content)
+        self.assertNotContains(resp, self.xml_data)
 
 
 @override_settings(FEATURES=dict(settings.FEATURES, EMBARGO=False))
@@ -434,8 +431,8 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
 
     def test_num_queries_instructor_paced(self):
         # TODO: decrease query count as part of REVO-28
-        self.fetch_course_info_with_queries(self.instructor_paced_course, 45, 3)
+        self.fetch_course_info_with_queries(self.instructor_paced_course, 43, 3)
 
     def test_num_queries_self_paced(self):
         # TODO: decrease query count as part of REVO-28
-        self.fetch_course_info_with_queries(self.self_paced_course, 45, 3)
+        self.fetch_course_info_with_queries(self.self_paced_course, 43, 3)

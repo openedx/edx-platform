@@ -1,7 +1,7 @@
 """
 Views related to the video upload feature
 """
-from __future__ import absolute_import
+
 
 import csv
 import json
@@ -412,7 +412,7 @@ def video_encodings_download(request, course_key_string):
             ]
         )
         return {
-            key.encode("utf-8"): value.encode("utf-8")
+            key.encode("utf-8") if six.PY2 else key: value.encode("utf-8") if six.PY2 else value
             for key, value in ret.items()
         }
 
@@ -428,7 +428,7 @@ def video_encodings_download(request, course_key_string):
     writer = csv.DictWriter(
         response,
         [
-            col_name.encode("utf-8")
+            col_name.encode("utf-8") if six.PY2 else col_name
             for col_name
             in [name_col, duration_col, added_col, video_id_col, status_col] + profile_cols
         ],

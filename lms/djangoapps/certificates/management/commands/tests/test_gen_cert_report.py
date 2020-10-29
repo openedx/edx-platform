@@ -1,7 +1,7 @@
 """
 Extremely basic tests for the gen_cert_report command
 """
-from __future__ import absolute_import
+
 
 import pytest
 from django.core.management import call_command

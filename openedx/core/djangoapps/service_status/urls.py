@@ -2,7 +2,6 @@
 Django URLs for service status app
 """
 
-from __future__ import absolute_import
 
 from django.conf.urls import url
 from openedx.core.djangoapps.service_status.views import celery_ping, celery_status, index

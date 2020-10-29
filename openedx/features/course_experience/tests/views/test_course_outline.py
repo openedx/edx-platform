@@ -1,7 +1,7 @@
 """
 Tests for the Course Outline view and supporting views.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import json
@@ -22,7 +22,7 @@ from six import text_type
 from waffle.models import Switch
 from waffle.testutils import override_switch
 
-from courseware.tests.factories import StaffFactory
+from lms.djangoapps.courseware.tests.factories import StaffFactory
 from gating import api as lms_gating_api
 from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesAndSpecialExamsTransformer
 from openedx.core.lib.gating import api as gating_api
@@ -121,21 +121,18 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
 
             url = course_home_url(course)
             response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
-            response_content = response.content.decode("utf-8")
-
             self.assertTrue(course.children)
             for chapter in course.children:
-                self.assertIn(chapter.display_name, response_content)
+                self.assertContains(response, chapter.display_name)
                 self.assertTrue(chapter.children)
                 for sequential in chapter.children:
-                    self.assertIn(sequential.display_name, response_content)
+                    self.assertContains(response, sequential.display_name)
                     if sequential.graded:
-                        self.assertIn(sequential.due.strftime(u'%Y-%m-%d %H:%M:%S'), response_content)
-                        self.assertIn(sequential.format, response_content)
+                        self.assertContains(response, sequential.due.strftime(u'%Y-%m-%d %H:%M:%S'))
+                        self.assertContains(response, sequential.format)
                     self.assertTrue(sequential.children)
                     for vertical in sequential.children:
-                        self.assertIn(vertical.display_name, response_content)
+                        self.assertContains(response, vertical.display_name)
 
 
 class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
@@ -367,10 +364,12 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         course_key = CourseKey.from_string(str(course.id))
         # Fake a visit to sequence2/vertical2
         block_key = UsageKey.from_string(six.text_type(sequential.location))
+        if block_key.course_key.run is None:
+            # Old mongo keys must be annotated with course run info before calling submit_completion:
+            block_key = block_key.replace(course_key=course_key)
         completion = 1.0
         BlockCompletion.objects.submit_completion(
             user=self.user,
-            course_key=course_key,
             block_key=block_key,
             completion=completion
         )
@@ -553,7 +552,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         sequential2 = chapter.children[1]
 
         response_content = self.client.get(course_home_url(course)).content
-        stripped_response = text_type(re.sub("\\s+", "", response_content), "utf-8")
+        stripped_response = text_type(re.sub(b"\\s+", b"", response_content), "utf-8")
 
         self.assertTrue(get_sequential_button(text_type(sequential1.location), False) in stripped_response)
         self.assertTrue(get_sequential_button(text_type(sequential2.location), True) in stripped_response)

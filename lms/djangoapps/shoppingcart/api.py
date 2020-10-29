@@ -1,7 +1,7 @@
 """
 API for for getting information about the user's shopping cart.
 """
-from __future__ import absolute_import
+
 
 from django.urls import reverse
 

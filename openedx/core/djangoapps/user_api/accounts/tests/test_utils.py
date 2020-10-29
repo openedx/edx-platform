@@ -1,6 +1,5 @@
 """ Unit tests for custom UserProfile properties. """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
 
 import ddt
 from mock import patch, Mock
@@ -20,7 +19,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from openedx.core.djangolib.testing.utils import FilteredQueryCountMixin
 
-from ..utils import format_social_link, generate_password, validate_social_link
+from ..utils import format_social_link, validate_social_link
 
 
 @ddt.ddt
@@ -112,7 +111,6 @@ class CompletionUtilsTestCase(SharedModuleStoreTestCase, FilteredQueryCountMixin
         for block in self.course.children[0].children[0].children:
             models.BlockCompletion.objects.submit_completion(
                 user=self.engaged_user,
-                course_key=self.course.id,
                 block_key=block.location,
                 completion=1.0
             )
@@ -167,29 +165,3 @@ class CompletionUtilsTestCase(SharedModuleStoreTestCase, FilteredQueryCountMixin
             function_path = 'openedx.core.djangoapps.user_api.accounts.utils.get_config_value_from_site_or_settings'
             with patch(function_path, Mock(return_value=None)):  # Pretend that no sites are matching the courses
                 assert retrieve_last_sitewide_block_completed(self.engaged_user).startswith('/')
-
-
-class GeneratePasswordTest(TestCase):
-    """Tests formation of randomly generated passwords."""
-
-    def test_default_args(self):
-        password = generate_password()
-        self.assertEqual(12, len(password))
-        self.assertTrue(any(c.isdigit for c in password))
-        self.assertTrue(any(c.isalpha for c in password))
-
-    def test_length(self):
-        length = 25
-        self.assertEqual(length, len(generate_password(length=length)))
-
-    def test_chars(self):
-        char = '!'
-        password = generate_password(length=12, chars=(char,))
-
-        self.assertTrue(any(c.isdigit for c in password))
-        self.assertTrue(any(c.isalpha for c in password))
-        self.assertEqual(char * 10, password[2:])
-
-    def test_min_length(self):
-        with self.assertRaises(ValueError):
-            generate_password(length=7)

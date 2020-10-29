@@ -1,5 +1,5 @@
 """Tests for certificate Django models. """
-from __future__ import absolute_import
+
 
 import json
 
@@ -87,7 +87,7 @@ class ExampleCertificateTest(TestCase):
         )
 
     def test_update_status_invalid(self):
-        with self.assertRaisesRegexp(ValueError, 'status'):
+        with self.assertRaisesRegex(ValueError, 'status'):
             self.cert.update_status('invalid')
 
     def test_latest_status_unavailable(self):
@@ -126,7 +126,7 @@ class CertificateHtmlViewConfigurationTest(TestCase):
         Tests creation of configuration.
         """
         self.config.save()
-        self.assertEquals(self.config.configuration, self.configuration_string)
+        self.assertEqual(self.config.configuration, self.configuration_string)
 
     def test_clean_bad_json(self):
         """
@@ -150,7 +150,7 @@ class CertificateHtmlViewConfigurationTest(TestCase):
                 "logo_src": "http://www.edx.org/static/images/honor-logo.png"
             }
         }
-        self.assertEquals(self.config.get_config(), expected_config)
+        self.assertEqual(self.config.get_config(), expected_config)
 
     def test_get_not_enabled_returns_blank(self):
         """
@@ -158,7 +158,7 @@ class CertificateHtmlViewConfigurationTest(TestCase):
         """
         self.config.enabled = False
         self.config.save()
-        self.assertEquals(len(self.config.get_config()), 0)
+        self.assertEqual(len(self.config.get_config()), 0)
 
     @override_settings(FEATURES=FEATURES_INVALID_FILE_PATH)
     def test_get_no_database_no_file(self):
@@ -167,7 +167,7 @@ class CertificateHtmlViewConfigurationTest(TestCase):
         """
         self.config.configuration = ''
         self.config.save()
-        self.assertEquals(self.config.get_config(), {})
+        self.assertEqual(self.config.get_config(), {})
 
 
 class CertificateTemplateAssetTest(TestCase):
@@ -180,17 +180,17 @@ class CertificateTemplateAssetTest(TestCase):
         """
         CertificateTemplateAsset(description='test description', asset=SimpleUploadedFile(
             'picture1.jpg',
-            'these are the file contents!')).save()
+            b'these are the file contents!')).save()
         certificate_template_asset = CertificateTemplateAsset.objects.get(id=1)
         self.assertEqual(certificate_template_asset.asset, 'certificate_template_assets/1/picture1.jpg')
 
         # Now save asset with same file again, New file will be uploaded after deleting the old one with the same name.
-        certificate_template_asset.asset = SimpleUploadedFile('picture1.jpg', 'file contents')
+        certificate_template_asset.asset = SimpleUploadedFile('picture1.jpg', b'file contents')
         certificate_template_asset.save()
         self.assertEqual(certificate_template_asset.asset, 'certificate_template_assets/1/picture1.jpg')
 
         # Now replace the asset with another file
-        certificate_template_asset.asset = SimpleUploadedFile('picture2.jpg', 'file contents')
+        certificate_template_asset.asset = SimpleUploadedFile('picture2.jpg', b'file contents')
         certificate_template_asset.save()
 
         certificate_template_asset = CertificateTemplateAsset.objects.get(id=1)

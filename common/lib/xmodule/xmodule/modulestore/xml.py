@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 import codecs
 import glob
@@ -15,6 +15,7 @@ from contextlib import contextmanager
 from importlib import import_module
 
 import six
+from django.utils.encoding import python_2_unicode_compatible
 from fs.osfs import OSFS
 from lazy import lazy
 from lxml import etree
@@ -118,7 +119,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                         orig_name = orig_name[len(tag) + 1:-12]
                     # append the hash of the content--the first 12 bytes should be plenty.
                     orig_name = "_" + orig_name if orig_name not in (None, "") else ""
-                    xml_bytes = xml.encode('utf8')
+                    xml_bytes = xml if isinstance(xml, bytes) else xml.encode('utf-8')
                     return tag + orig_name + "_" + hashlib.sha1(xml_bytes).hexdigest()[:12]
 
                 # Fallback if there was nothing we could use:
@@ -302,6 +303,7 @@ class CourseImportLocationManager(CourseLocationManager):
         self.target_course_id = target_course_id
 
 
+@python_2_unicode_compatible
 class XMLModuleStore(ModuleStoreReadBase):
     """
     An XML backed ModuleStore
@@ -395,7 +397,7 @@ class XMLModuleStore(ModuleStoreReadBase):
             course_id = self.id_from_descriptor(course_descriptor)
             self._course_errors[course_id] = errorlog
 
-    def __unicode__(self):
+    def __str__(self):
         '''
         String representation - for debugging
         '''

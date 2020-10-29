@@ -20,21 +20,6 @@
   }
 }
 
-// First purchase offer banner
-.first-purchase-offer-banner {
-  background-color: #DEE3F1;
-  font-size: 16px;
-  border-radius: 7px;
-  padding: 20px;
-  margin: 20px auto;
-
-  .first-purchase-offer-banner-bold {
-      font-weight: bold;
-      color: #23419F;
-  }
-
-}
-
 // Course call to action message
 .course-message {
   display: flex;
@@ -472,9 +457,10 @@ button.accordion-trigger, button.prerequisite-button {
 .date-summary-container {
   .date-summary {
     @include clearfix;
-    @include border-left(3px solid $gray-300);
 
-    padding: $baseline/2;
+    display: flex;
+    justify-content: space-between;
+    padding: $baseline/2 $baseline/2 $baseline/2 0;
 
     .heading {
       font-size: 0.9rem;
@@ -484,44 +470,44 @@ button.accordion-trigger, button.prerequisite-button {
       color: theme-color("dark");
     }
 
-    .description {
-      margin-top: $baseline/2;
-      margin-bottom: $baseline/2;
-      display: inline-block;
+    .left-column {
+      flex: 5%;
+
+      .calendar-icon {
+        margin-top: 3px;
+        height: 1em;
+        width: auto;
+        background: url('#{$static-path}/images/calendar-alt-regular.svg');
+        background-repeat: no-repeat;
+      }
     }
 
-    .date-summary-link {
-      font-weight: $font-semibold;
+    .right-column {
+      flex: 85%;
 
-      a {
-        color: $link-color;
-        font-weight: $font-regular;
+      .localized-datetime {
+        font-weight: $font-weight-bold;
+        margin-bottom: 8px;
+      }
+
+      .description {
+        margin-bottom: $baseline/2;
+        display: inline-block;
+      }
+
+      .date-summary-link {
+        font-weight: $font-semibold;
+
+        a {
+          color: $link-color;
+          font-weight: $font-regular;
+        }
       }
     }
 
     .date {
       color: theme-color("dark");
       font: -apple-system-body;
-    }
-
-    &-todays-date {
-      @include border-left(3px solid $blue);
-    }
-
-    &-verified-upgrade-deadline {
-      @include border-left(3px solid $green);
-    }
-
-    &-verification-deadline-passed {
-      @include border-left(3px solid $red);
-    }
-
-    &-verification-deadline-retry {
-      @include border-left(3px solid $red);
-    }
-
-    &-verification-deadline-upcoming {
-      @include border-left(3px solid $orange);
     }
   }
 }

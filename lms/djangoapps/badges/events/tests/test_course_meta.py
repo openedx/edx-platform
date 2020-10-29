@@ -1,7 +1,7 @@
 """
 Tests the course meta badging events
 """
-from __future__ import absolute_import
+
 
 import six
 from six.moves import range, zip

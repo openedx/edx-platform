@@ -3,9 +3,7 @@ Tests for OAuth2.  This module is copied from django-rest-framework-oauth
 (tests/test_authentication.py) and updated to use our subclass of OAuth2Authentication.
 """
 
-from __future__ import unicode_literals
 
-from __future__ import absolute_import
 import itertools
 import json
 import unittest
@@ -57,7 +55,7 @@ class OAuth2AuthenticationDebug(authentication.OAuth2AuthenticationAllowInactive
 
 
 urlpatterns = [
-    url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
+    url(r'^oauth2/', include(('provider.oauth2.urls', 'oauth2'), namespace='oauth2')),
     url(
         r'^oauth2-test/$',
         MockView.as_view(authentication_classes=[authentication.OAuth2AuthenticationAllowInactiveUser])

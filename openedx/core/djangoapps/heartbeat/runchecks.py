@@ -1,7 +1,7 @@
 """
 Code for system checks.
 """
-from __future__ import absolute_import
+
 
 from importlib import import_module
 

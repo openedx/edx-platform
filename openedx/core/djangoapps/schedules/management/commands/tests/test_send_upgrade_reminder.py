@@ -1,7 +1,7 @@
 """
 Tests for send_upgrade_reminder management command.
 """
-from __future__ import absolute_import
+
 
 import logging
 from unittest import skipUnless

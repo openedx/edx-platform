@@ -1,11 +1,12 @@
 """
 'library' XBlock (LibraryRoot)
 """
-from __future__ import absolute_import
+
 
 import logging
-
 import six
+
+from django.utils.encoding import python_2_unicode_compatible
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Boolean, List, Scope, String
@@ -18,6 +19,7 @@ log = logging.getLogger(__name__)
 _ = lambda text: text
 
 
+@python_2_unicode_compatible
 class LibraryRoot(XBlock):
     """
     The LibraryRoot is the root XBlock of a content library. All other blocks in
@@ -47,11 +49,8 @@ class LibraryRoot(XBlock):
     has_children = True
     has_author_view = True
 
-    def __unicode__(self):
-        return u"Library: {}".format(self.display_name)
-
     def __str__(self):
-        return six.text_type(self).encode('utf-8')
+        return u"Library: {}".format(self.display_name)
 
     def author_view(self, context):
         """

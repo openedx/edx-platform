@@ -1,7 +1,7 @@
 """
 Test the populate_retirement_states management command
 """
-from __future__ import absolute_import
+
 
 import copy
 

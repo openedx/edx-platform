@@ -1,5 +1,5 @@
 """ Verification API v1 views. """
-from __future__ import absolute_import
+
 
 from django.http import Http404
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication

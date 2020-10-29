@@ -2,7 +2,7 @@
 Models for configuration of settings relevant
 to instructor tasks.
 """
-from __future__ import absolute_import
+
 
 from config_models.models import ConfigurationModel
 from django.db.models import IntegerField

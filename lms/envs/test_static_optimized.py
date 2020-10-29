@@ -11,7 +11,7 @@ from the same directory.
 """
 
 # Start with the common settings
-from __future__ import absolute_import
+
 
 from openedx.core.lib.derived import derive_settings
 

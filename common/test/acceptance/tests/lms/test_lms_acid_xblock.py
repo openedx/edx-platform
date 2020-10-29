@@ -3,7 +3,6 @@
 End-to-end tests for the LMS.
 """
 
-from __future__ import absolute_import
 
 import pytest
 

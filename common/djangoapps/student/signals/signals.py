@@ -1,7 +1,7 @@
 """
 Enrollment track related signals.
 """
-from __future__ import absolute_import
+
 
 from django.dispatch import Signal
 

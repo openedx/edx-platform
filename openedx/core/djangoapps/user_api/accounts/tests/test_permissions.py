@@ -1,7 +1,7 @@
 """
 Tests for User deactivation API permissions
 """
-from __future__ import absolute_import
+
 
 from django.test import RequestFactory, TestCase
 

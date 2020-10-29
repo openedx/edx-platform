@@ -1,7 +1,7 @@
 """
 Base file for Grades tests
 """
-from __future__ import absolute_import
+
 
 from crum import set_current_request
 

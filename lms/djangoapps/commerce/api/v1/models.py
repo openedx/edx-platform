@@ -1,5 +1,5 @@
 """ API v1 models. """
-from __future__ import absolute_import
+
 
 import logging
 from itertools import groupby

@@ -2,7 +2,7 @@
 mailchimp_id: Returns whether or not a given mailchimp key represents
 a valid list.
 """
-from __future__ import absolute_import, print_function
+
 
 import sys
 

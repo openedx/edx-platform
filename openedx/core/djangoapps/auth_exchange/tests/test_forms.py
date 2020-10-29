@@ -2,7 +2,7 @@
 """
 Tests for OAuth token exchange forms
 """
-from __future__ import absolute_import
+
 
 import unittest
 

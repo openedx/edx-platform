@@ -2,7 +2,6 @@
 Tests for bookmark services.
 """
 
-from __future__ import absolute_import
 
 from opaque_keys.edx.keys import UsageKey
 

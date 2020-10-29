@@ -2,7 +2,7 @@
 """
 Miscellaneous tests for the student app.
 """
-from __future__ import absolute_import
+
 
 import logging
 import unittest
@@ -386,7 +386,7 @@ class DashboardTest(ModuleStoreTestCase):
         enrollment = CourseEnrollment.enroll(self.user, self.course.id)
         course_mode_info = complete_course_mode_info(self.course.id, enrollment)
         self.assertTrue(course_mode_info['show_upsell'])
-        self.assertEquals(course_mode_info['days_for_upsell'], 1)
+        self.assertEqual(course_mode_info['days_for_upsell'], 1)
 
         verified_mode.expiration_datetime = datetime.now(pytz.UTC) + timedelta(days=-1)
         verified_mode.save()
@@ -395,7 +395,7 @@ class DashboardTest(ModuleStoreTestCase):
         self.assertIsNone(course_mode_info['days_for_upsell'])
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    @patch('courseware.views.index.log.warning')
+    @patch('lms.djangoapps.courseware.views.index.log.warning')
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_blocked_course_scenario(self, log_warning):
 
@@ -431,15 +431,15 @@ class DashboardTest(ModuleStoreTestCase):
 
         redeem_url = reverse('register_code_redemption', args=[course_reg_code.code])
         response = self.client.get(redeem_url)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content)
+        self.assertContains(response, 'Activate Course Enrollment')
 
         #now activate the user by enrolling him/her to the course
         response = self.client.post(redeem_url)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         response = self.client.get(reverse('dashboard'))
-        self.assertIn('You can no longer access this course because payment has not yet been received', response.content)
+        self.assertContains(response, 'You can no longer access this course because payment has not yet been received')
         optout_object = Optout.objects.filter(user=self.user, course_id=self.course.id)
         self.assertEqual(len(optout_object), 1)
 
@@ -457,7 +457,10 @@ class DashboardTest(ModuleStoreTestCase):
         invoice.save()
 
         response = self.client.get(reverse('dashboard'))
-        self.assertNotIn('You can no longer access this course because payment has not yet been received', response.content)
+        self.assertNotContains(
+            response,
+            'You can no longer access this course because payment has not yet been received',
+        )
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_linked_in_add_to_profile_btn_not_appearing_without_config(self):
@@ -489,8 +492,8 @@ class DashboardTest(ModuleStoreTestCase):
         )
         response = self.client.get(reverse('dashboard'))
 
-        self.assertEquals(response.status_code, 200)
-        self.assertNotIn('Add Certificate to LinkedIn', response.content)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'Add Certificate to LinkedIn')
 
         response_url = 'http://www.linkedin.com/profile/add?_ed='
         self.assertNotContains(response, escape(response_url))
@@ -533,8 +536,8 @@ class DashboardTest(ModuleStoreTestCase):
         )
         response = self.client.get(reverse('dashboard'))
 
-        self.assertEquals(response.status_code, 200)
-        self.assertIn('Add Certificate to LinkedIn', response.content)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Add Certificate to LinkedIn')
 
         expected_url = (
             u'http://www.linkedin.com/profile/add'
@@ -579,9 +582,9 @@ class DashboardTest(ModuleStoreTestCase):
         # CourseOverview object that has been created.
         with check_mongo_calls(0):
             response_1 = self.client.get(reverse('dashboard'))
-            self.assertEquals(response_1.status_code, 200)
+            self.assertEqual(response_1.status_code, 200)
             response_2 = self.client.get(reverse('dashboard'))
-            self.assertEquals(response_2.status_code, 200)
+            self.assertEqual(response_2.status_code, 200)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_dashboard_header_nav_has_find_courses(self):
@@ -599,7 +602,7 @@ class DashboardTest(ModuleStoreTestCase):
         """It will be true only if enrollment mode is honor and course has verified mode."""
         course_mode_info = self._enrollment_with_complete_course('honor')
         self.assertTrue(course_mode_info['show_upsell'])
-        self.assertEquals(course_mode_info['days_for_upsell'], 1)
+        self.assertEqual(course_mode_info['days_for_upsell'], 1)
 
     @ddt.data('verified', 'credit')
     def test_course_mode_info_with_different_enrollments(self, enrollment_mode):
@@ -797,11 +800,11 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
 
         # Make sure mode is updated properly if user unenrolls & re-enrolls
         enrollment = CourseEnrollment.enroll(user, course_id, "verified")
-        self.assertEquals(enrollment.mode, "verified")
+        self.assertEqual(enrollment.mode, "verified")
         CourseEnrollment.unenroll(user, course_id)
         enrollment = CourseEnrollment.enroll(user, course_id, "audit")
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
-        self.assertEquals(enrollment.mode, "audit")
+        self.assertEqual(enrollment.mode, "audit")
 
     def test_enrollment_non_existent_user(self):
         # Testing enrollment of newly unsaved user (i.e. no database entry)

@@ -1,7 +1,7 @@
 """
 Utils for video bumper
 """
-from __future__ import absolute_import
+
 
 import copy
 import json

@@ -2,7 +2,7 @@
 """
 End-to-end tests for the gating feature.
 """
-from __future__ import absolute_import
+
 
 from textwrap import dedent
 

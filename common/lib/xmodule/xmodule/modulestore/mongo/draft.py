@@ -6,7 +6,6 @@ returns the i4x://org/course/cat/name@draft object if that exists,
 and otherwise returns i4x://org/course/cat/name).
 """
 
-from __future__ import absolute_import
 
 import logging
 

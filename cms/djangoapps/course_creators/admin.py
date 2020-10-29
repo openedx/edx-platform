@@ -2,7 +2,6 @@
 django admin page for the course creators table
 """
 
-from __future__ import absolute_import
 
 import logging
 from smtplib import SMTPException

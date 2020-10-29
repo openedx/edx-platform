@@ -1,7 +1,7 @@
 """
 Extension of XBlock Validation class to include information for presentation in Studio.
 """
-from __future__ import absolute_import
+
 
 import six
 from xblock.validation import Validation, ValidationMessage

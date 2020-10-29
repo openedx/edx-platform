@@ -4,7 +4,6 @@ Module that provides a connection to the ModuleStore specified in the django set
 Passes settings.MODULESTORE as kwargs to MongoModuleStore
 """
 
-from __future__ import absolute_import
 
 from importlib import import_module
 import beeline
@@ -388,6 +387,7 @@ class ModuleI18nService(object):
                 pass
 
     def __getattr__(self, name):
+        name = 'gettext' if six.PY3 and name == 'ugettext' else name
         return getattr(self.translator, name)
 
     def strftime(self, *args, **kwargs):

@@ -8,7 +8,7 @@ To enable this feature, set in a settings.py:
 
 This was taken from StackOverflow (http://stackoverflow.com/questions/14830669/how-to-expire-django-session-in-5minutes)
 """
-from __future__ import absolute_import
+
 
 from datetime import datetime, timedelta
 

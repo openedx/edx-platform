@@ -3,7 +3,7 @@
 End-to-end tests for the LMS that utilize the
 progress page.
 """
-from __future__ import absolute_import
+
 
 from contextlib import contextmanager
 
@@ -229,7 +229,6 @@ class PersistentGradesTest(ProgressPageBaseTest):
             self.assertEqual(self._get_section_score(), (1, 2))
 
     @ddt.data(
-        _change_correct_answer_for_problem,
         _change_subsection_structure,
         _change_weight_for_problem
     )

@@ -1,7 +1,7 @@
 """
 Tests for Discussion API serializers
 """
-from __future__ import absolute_import
+
 
 import itertools
 
@@ -66,7 +66,7 @@ class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetM
         """Create a Role in self.course with the given name and users"""
         course = course or self.course
         role = Role.objects.create(name=role_name, course_id=course.id)
-        role.users = users
+        role.users.set(users)
 
     @ddt.data(
         (FORUM_ROLE_ADMINISTRATOR, True, False, True),

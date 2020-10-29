@@ -1,7 +1,7 @@
 """
 Utility methods related to course
 """
-from __future__ import absolute_import
+
 
 import logging
 
@@ -10,6 +10,8 @@ import six.moves.urllib.error
 import six.moves.urllib.parse
 import six.moves.urllib.request
 from django.conf import settings
+from django.utils.timezone import now
+
 from openedx.core.djangoapps.appsembler.sites.utils import get_lms_link_from_course_key
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
@@ -83,3 +85,9 @@ def has_certificates_enabled(course):
     if not settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
         return False
     return course.cert_html_view_enabled
+
+
+def should_display_grade(end_date):
+    if end_date and end_date < now().replace(hour=0, minute=0, second=0, microsecond=0):
+        return True
+    return False

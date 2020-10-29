@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
 
-import json
+
+import base64
+import simplejson as json
 from datetime import datetime, timedelta
 
-import boto
 import ddt
 import mock
 import requests.exceptions
@@ -18,7 +18,7 @@ from student.tests.factories import UserFactory
 from testfixtures import LogCapture
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-from common.test.utils import MockS3Mixin
+from common.test.utils import MockS3BotoMixin
 from lms.djangoapps.verify_student.models import (
     SoftwareSecurePhotoVerification,
     SSOVerification,
@@ -66,8 +66,8 @@ def mock_software_secure_post(url, headers=None, data=None, **kwargs):
         assert data_dict.get(key)
 
     # The keys should be stored as Base64 strings, i.e. this should not explode
-    data_dict["PhotoIDKey"].decode("base64")
-    data_dict["UserPhotoKey"].decode("base64")
+    data_dict["PhotoIDKey"] = base64.b64decode(data_dict["PhotoIDKey"])
+    data_dict["UserPhotoKey"] = base64.b64decode(data_dict["UserPhotoKey"])
 
     response = requests.Response()
     response.status_code = 200
@@ -122,12 +122,7 @@ class TestVerification(TestCase):
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
 @ddt.ddt
-class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
-
-    def setUp(self):
-        super(TestPhotoVerification, self).setUp()
-        connection = boto.connect_s3()
-        connection.create_bucket(FAKE_SETTINGS['SOFTWARE_SECURE']['S3_BUCKET'])
+class TestPhotoVerification(TestVerification, MockS3BotoMixin, ModuleStoreTestCase):
 
     def test_state_transitions(self):
         """

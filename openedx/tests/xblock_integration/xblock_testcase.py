@@ -34,7 +34,7 @@ Our next steps would be to:
 * Move more blocks out of the platform, and more tests into the
   blocks themselves.
 """
-from __future__ import absolute_import, print_function
+
 
 import collections
 import json

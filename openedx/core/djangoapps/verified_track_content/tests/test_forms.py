@@ -1,7 +1,7 @@
 """
 Test for forms helpers.
 """
-from __future__ import absolute_import
+
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 

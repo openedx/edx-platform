@@ -256,8 +256,8 @@ How to output coverage locally
 
 These are examples of how to run a single test and get coverage::
 
-    pytest cms/djangoapps/contentstore/tests/test_import.py --cov --cov-conifg=.coveragerc-local # cms example
-    pytest lms/djangoapps/courseware/tests/test_module_render.py --cov --cov-conifg=.coveragerc-local # lms example
+    pytest cms/djangoapps/contentstore/tests/test_import.py --cov --cov-config=.coveragerc-local # cms example
+    pytest lms/djangoapps/courseware/tests/test_module_render.py --cov --cov-config=.coveragerc-local # lms example
 
 That ``--cov-conifg=.coveragerc-local`` option is important - without it, the coverage
 tool will look for paths that exist on our jenkins test servers, but not on your local devstack.
@@ -350,6 +350,7 @@ console, run these commands::
     paver test_js_run -s cms
     paver test_js_run -s cms-squire
     paver test_js_run -s xmodule
+    paver test_js_run -s xmodule-webpack
     paver test_js_run -s common
     paver test_js_run -s common-requirejs
 
@@ -359,6 +360,7 @@ To run JavaScript tests in a browser, run these commands::
     paver test_js_dev -s cms
     paver test_js_dev -s cms-squire
     paver test_js_dev -s xmodule
+    paver test_js_dev -s xmodule-webpack
     paver test_js_dev -s common
     paver test_js_dev -s common-requirejs
 

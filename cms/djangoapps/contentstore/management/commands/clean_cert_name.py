@@ -3,7 +3,6 @@ A single-use management command that provides an interactive way to remove
 erroneous certificate names.
 """
 
-from __future__ import absolute_import
 
 from collections import namedtuple
 

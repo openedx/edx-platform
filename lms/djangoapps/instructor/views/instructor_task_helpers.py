@@ -2,7 +2,7 @@
 A collection of helper utility functions for working with instructor
 tasks.
 """
-from __future__ import absolute_import
+
 
 import json
 import logging

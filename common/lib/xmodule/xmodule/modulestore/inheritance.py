@@ -1,7 +1,7 @@
 """
 Support for inheritance of fields down an XBlock hierarchy.
 """
-from __future__ import absolute_import
+
 
 from django.utils import timezone
 

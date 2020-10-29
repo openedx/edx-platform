@@ -1,5 +1,5 @@
 """Tests for the resubmit_error_certificates management command. """
-from __future__ import absolute_import
+
 
 import ddt
 from django.core.management import call_command
@@ -136,7 +136,7 @@ class ResubmitErrorCertificatesTest(CertificateManagementTest):
 
     def test_invalid_course_key(self):
         invalid_key = u"invalid/"
-        with self.assertRaisesRegexp(CommandError, invalid_key):
+        with self.assertRaisesRegex(CommandError, invalid_key):
             call_command(self.command, course_key_list=[invalid_key])
 
     def test_course_does_not_exist(self):
@@ -193,7 +193,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
             template_file=None,
             generate_pdf=True
         )
-        self.assertEquals(
+        self.assertEqual(
             bool(BadgeAssertion.objects.filter(user=self.user, badge_class=badge_class)), not issue_badges
         )
 

@@ -1,19 +1,19 @@
 """
 Utilities related to API views
 """
-from __future__ import absolute_import
+
 from collections import Sequence
 from functools import wraps
 
 from django.core.exceptions import NON_FIELD_ERRORS, ObjectDoesNotExist, ValidationError
-from django.http import Http404
+from django.http import Http404, HttpResponseBadRequest
 from django.utils.translation import ugettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import APIException, ErrorDetail
 from rest_framework.generics import GenericAPIView
 from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
@@ -132,11 +132,28 @@ def view_auth_classes(is_user=False, is_authenticated=True):
     return _decorator
 
 
+def clean_errors(error):
+    """
+    DRF error messages are of type ErrorDetail and serialize out as such.
+    We want to coerce the strings into the message only.
+
+    This cursively handles the nesting of errors.
+    """
+    if isinstance(error, ErrorDetail):
+        return text_type(error)
+    if isinstance(error, list):
+        return [clean_errors(el) for el in error]
+    else:
+        # We assume that it's a nested dictionary if it's not a list.
+        return {key: clean_errors(value) for key, value in error.items()}
+
+
 def add_serializer_errors(serializer, data, field_errors):
     """Adds errors from serializer validation to field_errors. data is the original data to deserialize."""
     if not serializer.is_valid():
         errors = serializer.errors
         for key, error in iteritems(errors):
+            error = clean_errors(error)
             field_errors[key] = {
                 'developer_message': u"Value '{field_value}' is not valid for field '{field_name}': {error}".format(
                     field_value=data.get(key, ''), field_name=key, error=error
@@ -343,6 +360,34 @@ class PaginatedAPIView(APIView):
         """
         assert self.paginator is not None
         return self.paginator.get_paginated_response(data, *args, **kwargs)
+
+
+def require_post_params(required_params):
+    """
+    View decorator that ensures the required POST params are
+    present.  If not, returns an HTTP response with status 400.
+
+    Args:
+        required_params (list): The required parameter keys.
+
+    Returns:
+        HttpResponse
+
+    """
+    def _decorator(func):  # pylint: disable=missing-docstring
+        @wraps(func)
+        def _wrapped(*args, **_kwargs):
+            request = args[0]
+            missing_params = set(required_params) - set(request.POST.keys())
+            if missing_params:
+                msg = u"Missing POST parameters: {missing}".format(
+                    missing=", ".join(missing_params)
+                )
+                return HttpResponseBadRequest(msg)
+            else:
+                return func(request)
+        return _wrapped
+    return _decorator
 
 
 def get_course_key(request, course_id=None):

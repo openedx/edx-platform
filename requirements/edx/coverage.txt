@@ -4,11 +4,18 @@
 #
 #    make upgrade
 #
-coverage==5.0a6
-diff-cover==0.9.8
-inflect==2.1.0            # via jinja2-pluralize
+coverage==5.0.3
+diff-cover==2.5.2
+importlib-metadata==1.4.0  # via pluggy
+inflect==3.0.2            # via jinja2-pluralize
 jinja2-pluralize==0.3.0   # via diff-cover
-jinja2==2.10.1            # via diff-cover, jinja2-pluralize
+jinja2==2.10.3            # via diff-cover, jinja2-pluralize
 markupsafe==1.1.1         # via jinja2
-pygments==2.4.2           # via diff-cover
-six==1.12.0               # via diff-cover
+numpy==1.18.1             # via pandas
+pandas==0.22.0
+pluggy==0.13.1            # via diff-cover
+pygments==2.5.2           # via diff-cover
+python-dateutil==2.4.0    # via pandas
+pytz==2019.3              # via pandas
+six==1.14.0               # via diff-cover
+zipp==1.0.0               # via importlib-metadata

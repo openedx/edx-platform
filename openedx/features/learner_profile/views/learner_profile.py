@@ -1,6 +1,6 @@
 """ Views for a student's profile information. """
 
-from __future__ import absolute_import
+
 from badges.utils import badges_enabled
 from django.conf import settings
 from django.contrib.auth.decorators import login_required

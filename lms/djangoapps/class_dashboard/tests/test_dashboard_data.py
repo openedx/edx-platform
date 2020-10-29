@@ -2,7 +2,6 @@
 Tests for class dashboard (Metrics tab in instructor dashboard)
 """
 
-from __future__ import absolute_import
 
 import json
 
@@ -26,7 +25,7 @@ from class_dashboard.dashboard_data import (
     get_students_problem_grades
 )
 from class_dashboard.views import has_instructor_access_for_class
-from courseware.tests.factories import StudentModuleFactory
+from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -112,10 +111,10 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
 
         for problem in prob_grade_distrib:
             max_grade = prob_grade_distrib[problem]['max_grade']
-            self.assertEquals(1, max_grade)
+            self.assertEqual(1, max_grade)
 
         for val in total_student_count.values():
-            self.assertEquals(USER_COUNT, val)
+            self.assertEqual(USER_COUNT, val)
 
     def test_get_sequential_open_distibution(self):
 
@@ -123,7 +122,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
 
         for problem in sequential_open_distrib:
             num_students = sequential_open_distrib[problem]
-            self.assertEquals(USER_COUNT, num_students)
+            self.assertEqual(USER_COUNT, num_students)
 
     def test_get_problemset_grade_distrib(self):
 
@@ -132,13 +131,13 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
 
         for problem in probset_grade_distrib:
             max_grade = probset_grade_distrib[problem]['max_grade']
-            self.assertEquals(1, max_grade)
+            self.assertEqual(1, max_grade)
 
             grade_distrib = probset_grade_distrib[problem]['grade_distrib']
             sum_attempts = 0
             for item in grade_distrib:
                 sum_attempts += item[1]
-            self.assertEquals(USER_COUNT, sum_attempts)
+            self.assertEqual(USER_COUNT, sum_attempts)
 
     def test_get_d3_problem_grade_distrib(self):
 
@@ -148,7 +147,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
                 sum_values = 0
                 for problem in stack_data['stackData']:
                     sum_values += problem['value']
-                self.assertEquals(USER_COUNT, sum_values)
+                self.assertEqual(USER_COUNT, sum_values)
 
     def test_get_d3_sequential_open_distrib(self):
 
@@ -158,7 +157,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
             for stack_data in data['data']:
                 for problem in stack_data['stackData']:
                     value = problem['value']
-                self.assertEquals(0, value)
+                self.assertEqual(0, value)
 
     def test_get_d3_section_grade_distrib(self):
 
@@ -168,7 +167,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
             sum_values = 0
             for problem in stack_data['stackData']:
                 sum_values += problem['value']
-            self.assertEquals(USER_COUNT, sum_values)
+            self.assertEqual(USER_COUNT, sum_values)
 
     def test_get_students_problem_grades(self):
 
@@ -179,13 +178,13 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
         response_content = json.loads(response.content.decode('utf-8'))['results']
         response_max_exceeded = json.loads(response.content.decode('utf-8'))['max_exceeded']
 
-        self.assertEquals(USER_COUNT, len(response_content))
-        self.assertEquals(False, response_max_exceeded)
+        self.assertEqual(USER_COUNT, len(response_content))
+        self.assertEqual(False, response_max_exceeded)
         for item in response_content:
             if item['grade'] == 0:
-                self.assertEquals(0, item['percent'])
+                self.assertEqual(0, item['percent'])
             else:
-                self.assertEquals(100, item['percent'])
+                self.assertEqual(100, item['percent'])
 
     def test_get_students_problem_grades_max(self):
 
@@ -198,8 +197,8 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
             response_max_exceeded = json.loads(response.content.decode('utf-8'))['max_exceeded']
 
             # Only 2 students in the list and response_max_exceeded is True
-            self.assertEquals(2, len(response_results))
-            self.assertEquals(True, response_max_exceeded)
+            self.assertEqual(2, len(response_results))
+            self.assertEqual(True, response_max_exceeded)
 
     def test_get_students_problem_grades_csv(self):
 
@@ -230,8 +229,8 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
         response = get_students_opened_subsection(request)
         response_results = json.loads(response.content.decode('utf-8'))['results']
         response_max_exceeded = json.loads(response.content.decode('utf-8'))['max_exceeded']
-        self.assertEquals(USER_COUNT, len(response_results))
-        self.assertEquals(False, response_max_exceeded)
+        self.assertEqual(USER_COUNT, len(response_results))
+        self.assertEqual(False, response_max_exceeded)
 
     def test_get_students_opened_subsection_max(self):
 
@@ -245,8 +244,8 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
             response_max_exceeded = json.loads(response.content.decode('utf-8'))['max_exceeded']
 
             # Only 2 students in the list and response_max_exceeded is True
-            self.assertEquals(2, len(response_results))
-            self.assertEquals(True, response_max_exceeded)
+            self.assertEqual(2, len(response_results))
+            self.assertEqual(True, response_max_exceeded)
 
     def test_get_students_opened_subsection_csv(self):
 
@@ -257,7 +256,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
         response = get_students_opened_subsection(request)
         self.assertContains(response, '"Name","Username"')
         # Check response contains 1 line for each user +1 for the header
-        self.assertEquals(USER_COUNT + 1, len(response.content.splitlines()))
+        self.assertEqual(USER_COUNT + 1, len(response.content.splitlines()))
 
     def test_post_metrics_data_subsections_csv(self):
 
@@ -276,7 +275,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
 
         response = self.client.post(url, {'data': data})
         # Check response contains 1 line for header, 1 line for Section and 1 line for Subsection
-        self.assertEquals(3, len(response.content.splitlines()))
+        self.assertEqual(3, len(response.content.splitlines()))
 
     def test_post_metrics_data_problems_csv(self):
 
@@ -312,7 +311,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
 
         response = self.client.post(url, {'data': data})
         # Check response contains 1 line for header, 1 line for Sections and 2 lines for problems
-        self.assertEquals(4, len(response.content.splitlines()))
+        self.assertEqual(4, len(response.content.splitlines()))
 
     def test_get_section_display_name(self):
 
@@ -322,11 +321,11 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
     def test_get_array_section_has_problem(self):
 
         b_section_has_problem = get_array_section_has_problem(self.course.id)
-        self.assertEquals(b_section_has_problem[0], True)
+        self.assertEqual(b_section_has_problem[0], True)
 
     def test_has_instructor_access_for_class(self):
         """
         Test for instructor access
         """
         ret_val = bool(has_instructor_access_for_class(self.instructor, self.course.id))
-        self.assertEquals(ret_val, True)
+        self.assertEqual(ret_val, True)

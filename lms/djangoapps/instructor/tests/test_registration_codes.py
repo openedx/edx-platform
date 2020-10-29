@@ -1,7 +1,7 @@
 """
 Test for the registration code status information.
 """
-from __future__ import absolute_import
+
 
 import json
 
@@ -14,7 +14,7 @@ from six.moves import range
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.tests.factories import InstructorFactory
+from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from shoppingcart.models import (
     CourseRegCodeItem,
     CourseRegistrationCode,

@@ -1,8 +1,9 @@
 """
 Image file manipulation functions related to profile images.
 """
-from __future__ import absolute_import
 
+
+import binascii
 from collections import namedtuple
 from contextlib import closing
 from io import BytesIO
@@ -128,7 +129,7 @@ def validate_uploaded_image(uploaded_file):
 
     # check magic number matches expected file type
     headers = IMAGE_TYPES[filetype].magic
-    if uploaded_file.read(len(headers[0]) / 2).encode('hex') not in headers:
+    if binascii.hexlify(uploaded_file.read(len(headers[0]) // 2)).decode('utf-8') not in headers:
         file_upload_bad_ext = _(
             u'The file name extension for this file does not match '
             u'the file data. The file may be corrupted.'
@@ -242,6 +243,6 @@ def _user_friendly_size(size):
     units = [_('bytes'), _('KB'), _('MB')]
     i = 0
     while size >= 1024 and i < len(units):
-        size /= 1024
+        size //= 1024
         i += 1
     return u'{} {}'.format(size, units[i])

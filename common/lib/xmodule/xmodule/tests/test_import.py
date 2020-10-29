@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import absolute_import, print_function
 
 import datetime
 from tempfile import mkdtemp
@@ -77,7 +76,7 @@ class BaseCourseTestCase(TestCase):
             xblock_select=only_xmodules,
         )
         courses = modulestore.get_courses()
-        self.assertEquals(len(courses), 1)
+        self.assertEqual(len(courses), 1)
         return courses[0]
 
 
@@ -522,7 +521,7 @@ class ImportTestCase(BaseCourseTestCase):
         # Not using get_courses because we need the modulestore object too afterward
         modulestore = XMLModuleStore(DATA_DIR, source_dirs=['toy'])
         courses = modulestore.get_courses()
-        self.assertEquals(len(courses), 1)
+        self.assertEqual(len(courses), 1)
         course = courses[0]
 
         print("course errors:")
@@ -531,20 +530,20 @@ class ImportTestCase(BaseCourseTestCase):
             print(err)
 
         chapters = course.get_children()
-        self.assertEquals(len(chapters), 5)
+        self.assertEqual(len(chapters), 5)
 
         ch2 = chapters[1]
-        self.assertEquals(ch2.url_name, "secret:magic")
+        self.assertEqual(ch2.url_name, "secret:magic")
 
         print("Ch2 location: ", ch2.location)
 
         also_ch2 = modulestore.get_item(ch2.location)
-        self.assertEquals(ch2, also_ch2)
+        self.assertEqual(ch2, also_ch2)
 
         print("making sure html loaded")
         loc = course.id.make_usage_key('html', 'secret:toylab')
         html = modulestore.get_item(loc)
-        self.assertEquals(html.display_name, "Toy lab")
+        self.assertEqual(html.display_name, "Toy lab")
 
     def test_unicode(self):
         """Check that courses with unicode characters in filenames and in
@@ -556,7 +555,7 @@ class ImportTestCase(BaseCourseTestCase):
         print("Starting import")
         modulestore = XMLModuleStore(DATA_DIR, source_dirs=['test_unicode'])
         courses = modulestore.get_courses()
-        self.assertEquals(len(courses), 1)
+        self.assertEqual(len(courses), 1)
         course = courses[0]
 
         print("course errors:")
@@ -564,7 +563,7 @@ class ImportTestCase(BaseCourseTestCase):
         # Expect to find an error/exception about characters in "®esources"
         expect = "InvalidKeyError"
         errors = [
-            (msg.encode("utf-8"), err.encode("utf-8"))
+            (msg, err)
             for msg, err
             in modulestore.get_course_errors(course.id)
         ]

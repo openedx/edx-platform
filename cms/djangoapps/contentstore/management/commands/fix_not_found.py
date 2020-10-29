@@ -1,7 +1,7 @@
 """
 Script for fixing the item not found errors in a course
 """
-from __future__ import absolute_import
+
 
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys.edx.keys import CourseKey

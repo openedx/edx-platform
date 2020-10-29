@@ -1,5 +1,5 @@
 """Common utility for testing third party oauth2 features."""
-from __future__ import absolute_import
+
 
 import json
 from base64 import b64encode
@@ -98,7 +98,7 @@ class ThirdPartyOAuthTestMixinFacebook(object):
 class ThirdPartyOAuthTestMixinGoogle(object):
     """Tests oauth with the Google backend"""
     BACKEND = "google-oauth2"
-    USER_URL = "https://www.googleapis.com/plus/v1/people/me"
+    USER_URL = "https://www.googleapis.com/oauth2/v3/userinfo"
     # In google-oauth2 responses, the "email" field is used as the user's identifier
     UID_FIELD = "email"
 
@@ -135,7 +135,7 @@ def prepare_saml_response_from_xml(xml, relay_state='testshib'):
     Returns:
          (str): Base64 and URL encoded XML.
     """
-    b64encoded_xml = b64encode(xml)
+    b64encoded_xml = b64encode(xml.encode())
     return 'RelayState={relay_state}&SAMLResponse={saml_response}'.format(
         relay_state=OneLogin_Saml2_Utils.escape_url(relay_state),
         saml_response=OneLogin_Saml2_Utils.escape_url(b64encoded_xml)

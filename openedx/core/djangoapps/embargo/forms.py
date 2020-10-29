@@ -2,7 +2,7 @@
 Defines forms for providing validation of embargo admin details.
 """
 
-from __future__ import absolute_import
+
 import ipaddress
 from django import forms
 from django.utils.translation import ugettext as _

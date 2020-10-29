@@ -2,7 +2,6 @@
 Django models related to course groups functionality.
 """
 
-from __future__ import absolute_import
 
 import json
 import logging
@@ -12,6 +11,7 @@ from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
+from django.utils.encoding import python_2_unicode_compatible
 from opaque_keys.edx.django.models import CourseKeyField
 
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
@@ -19,6 +19,7 @@ from openedx.core.djangolib.model_mixins import DeletableByUserValue
 log = logging.getLogger(__name__)
 
 
+@python_2_unicode_compatible
 class CourseUserGroup(models.Model):
     """
     This model represents groups of users in a course.  Groups may have different types,
@@ -66,7 +67,7 @@ class CourseUserGroup(models.Model):
             name=name
         )
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 

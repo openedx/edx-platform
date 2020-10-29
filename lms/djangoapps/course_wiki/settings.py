@@ -3,7 +3,6 @@ These callables are used by django-wiki to check various permissions
 a user has on an article.
 """
 
-from __future__ import absolute_import
 
 from course_wiki.utils import user_is_article_course_staff
 

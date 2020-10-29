@@ -22,3 +22,26 @@
     width: flex-grid(6);
   }
 }
+
+
+.container.unsubscribe-bulk-email {
+  max-width: 400px;
+  min-width: 320px;
+  margin: 0 auto;
+  padding: ($baseline*3) 15px ($baseline*6);
+
+  h1 {
+    @include text-align(left);
+
+    font-size: 30px;
+  }
+
+  .button {
+    background-color: #23419f;
+    border-color: #23419f;
+    border: 2px solid;
+    border-radius: 25px;
+    text-align: center;
+    width: 100%;
+  }
+}

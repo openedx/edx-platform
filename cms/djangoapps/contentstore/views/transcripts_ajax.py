@@ -5,7 +5,7 @@ Actions manager for transcripts ajax calls.
 Module do not support rollback (pressing "Cancel" button in Studio)
 All user changes are saved immediately.
 """
-from __future__ import absolute_import
+
 
 import copy
 import json
@@ -219,7 +219,7 @@ def upload_transcripts(request):
             # Convert 'srt' transcript into the 'sjson' and upload it to
             # configured transcript storage. For example, S3.
             sjson_subs = Transcript.convert(
-                content=transcript_file.read(),
+                content=transcript_file.read().decode('utf-8'),
                 input_format=Transcript.SRT,
                 output_format=Transcript.SJSON
             )
@@ -264,7 +264,7 @@ def download_transcripts(request):
 
     # Construct an HTTP response
     response = HttpResponse(content, content_type=mimetype)
-    response['Content-Disposition'] = u'attachment; filename="{filename}"'.format(filename=filename.encode('utf-8'))
+    response['Content-Disposition'] = u'attachment; filename="{filename}"'.format(filename=filename)
     return response
 
 
@@ -322,7 +322,7 @@ def check_transcripts(request):
         filename = 'subs_{0}.srt.sjson'.format(item.sub)
         content_location = StaticContent.compute_location(item.location.course_key, filename)
         try:
-            local_transcripts = contentstore().find(content_location).data
+            local_transcripts = contentstore().find(content_location).data.decode('utf-8')
             transcripts_presence['current_item_subs'] = item.sub
         except NotFoundError:
             pass
@@ -336,7 +336,7 @@ def check_transcripts(request):
             filename = 'subs_{0}.srt.sjson'.format(youtube_id)
             content_location = StaticContent.compute_location(item.location.course_key, filename)
             try:
-                local_transcripts = contentstore().find(content_location).data
+                local_transcripts = contentstore().find(content_location).data.decode('utf-8')
                 transcripts_presence['youtube_local'] = True
             except NotFoundError:
                 log.debug(u"Can't find transcripts in storage for youtube id: %s", youtube_id)
@@ -375,7 +375,9 @@ def check_transcripts(request):
             except NotFoundError:
                 log.debug(u"Can't find transcripts in storage for non-youtube video_id: %s", html5_id)
             if len(html5_subs) == 2:  # check html5 transcripts for equality
-                transcripts_presence['html5_equal'] = json.loads(html5_subs[0]) == json.loads(html5_subs[1])
+                transcripts_presence['html5_equal'] = (
+                    json.loads(html5_subs[0].decode('utf-8')) == json.loads(html5_subs[1].decode('utf-8'))
+                )
 
         command, __ = _transcripts_logic(transcripts_presence, videos)
 

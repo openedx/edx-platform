@@ -1,7 +1,7 @@
 """
 Helpers for student roles
 """
-from __future__ import absolute_import
+
 
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,

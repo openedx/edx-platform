@@ -6,6 +6,8 @@ The Student app supplements Django's default user information with student-speci
 
 If you are thinking of adding something here, strongly consider adding a new Django app instead. If you are extending something here, please consider extracting it into a separate app.
 
+Intended responsibility: Student dashboard functionality.
+
 Glossary
 ========
 

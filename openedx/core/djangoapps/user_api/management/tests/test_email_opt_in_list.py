@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Tests for the email opt-in list management command. """
-from __future__ import absolute_import
+
 
 import csv
 import os.path
@@ -9,6 +9,7 @@ import tempfile
 from collections import defaultdict
 
 import ddt
+import six
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -188,7 +189,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
         self._set_opt_in_pref(self.user, self.TEST_ORG, True)
 
         # No course available for this particular org
-        with self.assertRaisesRegexp(CommandError, "^No courses found for orgs:"):
+        with self.assertRaisesRegex(CommandError, "^No courses found for orgs:"):
             self._run_command("other_org")
 
     def test_specify_subset_of_courses(self):
@@ -213,7 +214,15 @@ class EmailOptInListTest(ModuleStoreTestCase):
 
         # Execute the command, but exclude the second course from the list
         output = self._run_command(self.TEST_ORG, chunk_size=2)
-        course_ids = [row['course_id'].strip().decode('utf-8') for row in output]
+        course_ids = []
+        for row in output:
+            course_id = row['course_id'].strip()
+            # Python3 takes care of the decoding in the csv object
+            # but python 2 doesn't
+            if six.PY2:
+                course_id = course_id.decode('utf-8')
+            course_ids.append(course_id)
+
         for course in self.courses:
             assert text_type(course.id) in course_ids
 
@@ -261,10 +270,19 @@ class EmailOptInListTest(ModuleStoreTestCase):
     @ddt.data(0, 1)
     def test_not_enough_args(self, num_args):
         args = ["dummy"] * num_args
-        expected_msg_regex = (
-            "^Error: too few arguments$"
-        )
-        with self.assertRaisesRegexp(CommandError, expected_msg_regex):
+        if six.PY2:
+            expected_msg_regex = (
+                "^Error: too few arguments$"
+            )
+        elif num_args == 1:
+            expected_msg_regex = (
+                "^Error: the following arguments are required: ORG_ALIASES$"
+            )
+        elif num_args == 0:
+            expected_msg_regex = (
+                "^Error: the following arguments are required: OUTPUT_FILENAME, ORG_ALIASES$"
+            )
+        with self.assertRaisesRegex(CommandError, expected_msg_regex):
             call_command('email_opt_in_list', *args)
 
     def test_file_already_exists(self):
@@ -273,7 +291,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
         def _cleanup():
             temp_file.close()
 
-        with self.assertRaisesRegexp(CommandError, "^File already exists"):
+        with self.assertRaisesRegex(CommandError, "^File already exists"):
             call_command('email_opt_in_list', temp_file.name, self.TEST_ORG)
 
     def test_no_user_profile(self):
@@ -436,18 +454,14 @@ class EmailOptInListTest(ModuleStoreTestCase):
         for user, course_id, opt_in_pref in args:
             self.assertIn({
                 "user_id": str(user.id),
-                "username": user.username.encode('utf-8'),
-                "email": user.email.encode('utf-8'),
-                "full_name": (
-                    user.profile.name.encode('utf-8')
-                    if hasattr(user, 'profile')
-                    else ''
-                ),
-                "course_id": text_type(course_id).encode('utf-8'),
-                "is_opted_in_for_email": text_type(opt_in_pref),
+                "username": user.username,
+                "email": user.email if six.PY3 else user.email.encode('utf-8'),
+                "full_name": ((user.profile.name if six.PY3 else user.profile.name.encode('utf-8')) if
+                              hasattr(user, 'profile') else ''),
+                "course_id": text_type(course_id) if six.PY3 else text_type(course_id).encode('utf-8'),
+                "is_opted_in_for_email": text_type(opt_in_pref) if six.PY3 else text_type(opt_in_pref).encode('utf-8'),
                 "preference_set_datetime": (
                     self._latest_pref_set_datetime(self.user)
                     if kwargs.get("expect_pref_datetime", True)
-                    else self.DEFAULT_DATETIME_STR
-                )
+                    else self.DEFAULT_DATETIME_STR)
             }, output[1:])

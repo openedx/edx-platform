@@ -1,12 +1,13 @@
 """
 Helper functions for test tasks
 """
-from __future__ import absolute_import, print_function
+
 
 import os
 import re
 import subprocess
 
+import six
 from paver.easy import cmdopts, sh, task
 
 from pavelib.utils.envs import Env
@@ -131,30 +132,21 @@ def check_firefox_version():
 
     # Firefox will be run as a local process
     expected_firefox_ver = "Mozilla Firefox " + str(MINIMUM_FIREFOX_VERSION)
-    firefox_ver_string = subprocess.check_output("firefox --version", shell=True).strip().decode('utf-8')
+    firefox_ver_string = subprocess.check_output("firefox --version", shell=True).strip()
+    if isinstance(firefox_ver_string, six.binary_type):
+        firefox_ver_string = firefox_ver_string.decode('utf-8')
     firefox_version_regex = re.compile(r"Mozilla Firefox (\d+.\d+)")
     try:
         firefox_ver = float(firefox_version_regex.search(firefox_ver_string).group(1))
     except AttributeError:
         firefox_ver = 0.0
-    debian_location = 'https://s3.amazonaws.com/vagrant.testeng.edx.org/'
-    debian_package = 'firefox-mozilla-build_42.0-0ubuntu1_amd64.deb'
-    debian_path = '{location}{package}'.format(location=debian_location, package=debian_package)
 
     if firefox_ver < MINIMUM_FIREFOX_VERSION:
         raise Exception(
             u'Required firefox version not found.\n'
-            u'Expected: {expected_version}; Actual: {actual_version}.\n\n'
-            u'As the vagrant user in devstack, run the following:\n\n'
-            u'\t$ sudo wget -O /tmp/firefox_42.deb {debian_path}\n'
-            u'\t$ sudo apt-get remove firefox\n\n'
-            u'\t$ sudo gdebi -nq /tmp/firefox_42.deb\n\n'
-            u'Confirm the new version:\n'
-            u'\t$ firefox --version\n'
-            u'\t{expected_version}'.format(
+            u'Expected: {expected_version}; Actual: {actual_version}.'.format(
                 actual_version=firefox_ver,
-                expected_version=expected_firefox_ver,
-                debian_path=debian_path
+                expected_version=expected_firefox_ver
             )
         )
 

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """ Tests for the language API. """
 
-from __future__ import absolute_import
 
 import ddt
 from django.contrib.auth.models import User

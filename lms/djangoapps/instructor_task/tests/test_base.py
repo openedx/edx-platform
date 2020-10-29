@@ -2,7 +2,7 @@
 Base test classes for LMS instructor-initiated background tasks
 
 """
-from __future__ import absolute_import
+
 
 import json
 # pylint: disable=attribute-defined-outside-init
@@ -22,8 +22,8 @@ from opaque_keys.edx.locations import Location
 from six import text_type
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
-from courseware.model_data import StudentModule
-from courseware.tests.tests import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.model_data import StudentModule
+from lms.djangoapps.courseware.tests.tests import LoginEnrollmentTestCase
 from lms.djangoapps.instructor_task.api_helper import encode_problem_and_student_input
 from lms.djangoapps.instructor_task.models import PROGRESS, QUEUING, ReportStore
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory

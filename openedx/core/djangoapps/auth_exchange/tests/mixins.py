@@ -3,7 +3,6 @@ Mixins to facilitate testing OAuth connections to Django-OAuth-Toolkit or
 Django-OAuth2-Provider.
 """
 
-from __future__ import absolute_import
 
 from unittest import expectedFailure
 

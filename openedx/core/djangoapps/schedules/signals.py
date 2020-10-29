@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 import datetime
 import logging
@@ -10,7 +10,7 @@ from django.dispatch import receiver
 from edx_ace.utils import date
 
 from course_modes.models import CourseMode
-from courseware.models import (
+from lms.djangoapps.courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
     DynamicUpgradeDeadlineConfiguration,
     OrgDynamicUpgradeDeadlineConfiguration
@@ -196,7 +196,9 @@ def _create_schedule(enrollment, enrollment_created):
 
     schedule = Schedule.objects.create(
         enrollment=enrollment,
+        # TODO remove 'start' field in removing writes from old field step in column renaming release
         start=content_availability_date,
+        start_date=content_availability_date,
         upgrade_deadline=upgrade_deadline
     )
 

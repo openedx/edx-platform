@@ -12,7 +12,7 @@ You can then use the CourseFactory and XModuleItemFactory as defined
 in common/lib/xmodule/xmodule/modulestore/tests/factories.py to create
 the course, section, subsection, unit, etc.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import json
@@ -220,7 +220,10 @@ class VideoBlockTestBase(unittest.TestCase):
             return [child.tag for child in elem]
 
         for attr in ['tag', 'attrib', 'text', 'tail']:
-            self.assertEqual(getattr(expected, attr), getattr(xml, attr))
+            expected_attr = getattr(expected, attr)
+            actual_attr = getattr(xml, attr)
+            self.assertEqual(expected_attr, actual_attr)
+
         self.assertEqual(get_child_tags(expected), get_child_tags(xml))
         for left, right in zip(expected, xml):
             self.assertXmlEqual(left, right)
@@ -277,7 +280,7 @@ class VideoBlockImportTestCase(TestCase):
         Assert that `video` has the correct attributes. `attrs` is a map of {metadata_field: value}.
         """
         for key, value in attrs.items():
-            self.assertEquals(getattr(video, key), value)
+            self.assertEqual(getattr(video, key), value)
 
     def test_constructor(self):
         sample_xml = '''
@@ -817,7 +820,7 @@ class VideoExportTestCase(VideoBlockTestBase):
         xml = self.descriptor.definition_to_xml(self.file_system)
         # Check that download_video field is also set to default (False) in xml for backward compatibility
         expected = '<video url_name="SampleProblem"/>\n'
-        self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
+        self.assertEqual(expected, etree.tostring(xml, pretty_print=True).decode('utf-8'))
 
     @patch('xmodule.video_module.video_module.edxval_api', None)
     def test_export_to_xml_with_transcripts_as_none(self):
@@ -826,8 +829,8 @@ class VideoExportTestCase(VideoBlockTestBase):
         """
         self.descriptor.transcripts = None
         xml = self.descriptor.definition_to_xml(self.file_system)
-        expected = '<video url_name="SampleProblem"/>\n'
-        self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
+        expected = b'<video url_name="SampleProblem"/>\n'
+        self.assertEqual(expected, etree.tostring(xml, pretty_print=True))
 
     @patch('xmodule.video_module.video_module.edxval_api', None)
     def test_export_to_xml_invalid_characters_in_attributes(self):
@@ -895,7 +898,7 @@ class VideoBlockStudentViewDataTestCase(unittest.TestCase):
         descriptor = instantiate_descriptor(**field_data)
         descriptor.runtime.course_id = MagicMock()
         student_view_data = descriptor.student_view_data()
-        self.assertEquals(student_view_data, expected_student_view_data)
+        self.assertEqual(student_view_data, expected_student_view_data)
 
     @patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
     @patch('xmodule.video_module.transcripts_utils.get_available_transcript_languages', Mock(return_value=['es']))
@@ -1118,7 +1121,7 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
 
         descriptor = instantiate_descriptor(data=xml_data_transcripts)
         translations = descriptor.available_translations(descriptor.get_transcripts_info())
-        self.assertEqual(translations, ['hr', 'ge'])
+        self.assertEqual(sorted(translations), sorted(['hr', 'ge']))
 
     def test_video_with_no_transcripts_translation_retrieval(self):
         """
@@ -1171,7 +1174,9 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
         self.assertFalse(validation.empty)  # Validation contains some warning/message
         self.assertTrue(validation.summary)
         self.assertEqual(StudioValidationMessage.WARNING, validation.summary.type)
-        self.assertIn(expected_msg, validation.summary.text)
+        self.assertIn(
+            expected_msg, validation.summary.text.replace('Urdu, Esperanto', 'Esperanto, Urdu')
+        )
 
     @ddt.data(
         (
@@ -1215,4 +1220,4 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
         descriptor.transcripts = None
         response = descriptor.get_transcripts_info()
         expected = {'transcripts': {}, 'sub': ''}
-        self.assertEquals(expected, response)
+        self.assertEqual(expected, response)

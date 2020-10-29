@@ -2,6 +2,7 @@
 <%namespace name='static' file='../static_content.html'/>
 <%!
   import six
+  from six.moves.urllib.parse import quote
   from django.conf import settings
   from django.urls import reverse
   from django.utils.translation import ugettext as _
@@ -21,6 +22,7 @@
       % if context_course:
       <%
             course_key = context_course.id
+            url_encoded_course_key = quote(six.text_type(course_key).encode('utf-8'), safe='')
             current_organization = request.user.organizations.first()
             index_url = reverse('course_handler', kwargs={'course_key_string': six.text_type(course_key)})
             course_team_url = reverse('course_team_handler', kwargs={'course_key_string': six.text_type(course_key)})
@@ -105,6 +107,11 @@
                   % if certificates_url:
                   <li class="nav-item nav-course-settings-certificates">
                     <a href="${certificates_url}">${_("Certificates")}</a>
+                  </li>
+                  % endif
+                  % if frontend_app_publisher_url:
+                  <li class="nav-item nav-course-courseware-videos">
+                    <a href="${frontend_app_publisher_url}/course-runs/${url_encoded_course_key}">${_("Publisher")}</a>
                   </li>
                   % endif
                 </ul>
@@ -231,9 +238,6 @@
       </nav>
 
     % else:
-      <%
-        register_url = settings.LMS_ROOT_URL + '/register'
-      %>
       <nav class="nav-not-signedin nav-pitch" aria-label="${_('Account')}">
         <h2 class="sr-only">${_("Account Navigation")}</h2>
         <ol>
@@ -242,11 +246,11 @@
           </li>
           % if static.get_value('ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION')):
               <li class="nav-item nav-not-signedin-signup">
-                <a class="action action-signup" href="${register_url}?next=${current_url}">${_("Sign Up")}</a>
+                <a class="action action-signup" href="${settings.FRONTEND_REGISTER_URL}?next=${current_url}">${_("Sign Up")}</a>
               </li>
           % endif
           <li class="nav-item nav-not-signedin-signin">
-            <a class="action action-signin" href="${settings.FRONTEND_LOGIN_URL}?next=${current_url}">${_("Sign In")}</a>
+            <a class="action action-signin" href="${settings.LOGIN_URL}?next=${current_url}">${_("Sign In")}</a>
           </li>
         </ol>
       </nav>

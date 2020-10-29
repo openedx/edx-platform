@@ -5,7 +5,6 @@
 # add them below. This file is consumed by
 # scripts/dead_code/find-dead-code.sh
 
-from __future__ import absolute_import
 
 from vulture.whitelist_utils import Whitelist
 

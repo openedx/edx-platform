@@ -2,7 +2,6 @@
 This file contains helper functions for configuring module_store_setting settings and support for backward compatibility with older formats.
 """
 
-from __future__ import absolute_import
 
 import copy
 import warnings

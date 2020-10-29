@@ -1,6 +1,6 @@
 """Get log settings."""
 
-from __future__ import absolute_import
+
 import logging
 import platform
 import sys
@@ -14,7 +14,6 @@ def get_logger_config(log_dir,
                       logging_env="no_env",
                       local_loglevel='INFO',
                       service_variant=""):
-
     """
 
     Return the appropriate logging config dictionary. You should assign the
@@ -123,6 +122,7 @@ def log_python_warnings():
     warnings.filterwarnings('ignore', 'Not importing directory ')
     warnings.filterwarnings('ignore', 'Setting _field_data is deprecated')
     warnings.filterwarnings('ignore', 'Setting _field_data via the constructor is deprecated')
+    warnings.filterwarnings('ignore', '.*unclosed.*', category=ResourceWarning)
     try:
         # There are far too many of these deprecation warnings in startup to output for every management command;
         # suppress them until we've fixed at least the most common ones as reported by the test suite

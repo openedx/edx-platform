@@ -1,7 +1,7 @@
 """
 Test that inherited fields work correctly when parsing XML
 """
-from __future__ import absolute_import
+
 
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests.xml.factories import CourseFactory, ProblemFactory, SequenceFactory, XmlImportFactory

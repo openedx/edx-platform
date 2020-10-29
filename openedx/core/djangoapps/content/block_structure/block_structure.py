@@ -8,7 +8,7 @@ The following internal data structures are implemented:
     _BlockRelations - Data structure for a single block's relations.
     _BlockData - Data structure for a single block's data.
 """
-from __future__ import absolute_import
+
 
 from copy import deepcopy
 from functools import partial

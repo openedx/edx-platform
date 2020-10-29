@@ -2,18 +2,21 @@
 Tests for SettingsService
 """
 
-from __future__ import absolute_import
 
-from unittest import TestCase
+import unittest
+from django.test import TestCase
 
 import ddt
 import mock
+
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.test.utils import override_settings
 from xblock.runtime import Mixologist
 
-from xmodule.services import ConfigurationService, SettingsService
+from opaque_keys.edx.locator import CourseLocator
+from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService
+from openedx.core.lib.teams_config import TeamsConfig
 
 
 class _DummyBlock(object):
@@ -37,7 +40,7 @@ class DummyUnexpected(object):
 
 
 @ddt.ddt
-class TestSettingsService(TestCase):
+class TestSettingsService(unittest.TestCase):
     """ Test SettingsService """
 
     xblock_setting_key1 = 'dummy_block'
@@ -96,7 +99,7 @@ class TestSettingsService(TestCase):
         self.assertEqual(self.settings_service.get_settings_bucket(block), [1, 2, 3])
 
 
-class TestConfigurationService(TestCase):
+class TestConfigurationService(unittest.TestCase):
     """
     Tests for ConfigurationService
     """
@@ -115,3 +118,43 @@ class TestConfigurationService(TestCase):
         """
         config_service = ConfigurationService(DummyConfig)
         self.assertEqual(config_service.configuration, DummyConfig)
+
+
+class MockConfigurationService(TeamsConfigurationService):
+    """
+    Mock ConfigurationService for testing.
+    """
+    def __init__(self, course, **kwargs):
+        super(MockConfigurationService, self).__init__()
+        self._course = course
+
+    def get_course(self, course_id):
+        return self._course
+
+
+class ConfigurationServiceBaseClass(TestCase):
+    """
+    Base test class for testing the ConfigurationService.
+    """
+
+    def setUp(self):
+        super(ConfigurationServiceBaseClass, self).setUp()
+
+        self.teams_config = TeamsConfig(
+            {'max_size': 2, 'topics': [{'id': 'topic', 'name': 'Topic', 'description': 'A Topic'}]}
+        )
+        self.course = mock.Mock(
+            id=CourseLocator('org_0', 'course_0', 'run_0'),
+            teams_configuration=self.teams_config
+        )
+        self.configuration_service = MockConfigurationService(self.course)
+
+
+class TestTeamsConfigurationService(ConfigurationServiceBaseClass):
+    """
+    Test operations of the teams configuration service
+    """
+
+    def test_get_teamsconfiguration(self):
+        teams_config = self.configuration_service.get_teams_configuration(self.course.id)
+        self.assertEqual(teams_config, self.teams_config)

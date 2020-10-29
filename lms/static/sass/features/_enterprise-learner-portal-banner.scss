@@ -1,0 +1,102 @@
+$enterprise-learner-portal-banner-background-color: #d9edf7 !default;
+$enterprise-learner-portal-banner-text-color: #000000 !default;
+$enterprise-learner-portal-banner-cta-base: #0075b4 !default;
+$enterprise-learner-portal-banner-cta-hover: #075683 !default;
+$enterprise-learner-portal-banner-btn-color: #000000 !default;
+
+.edx-enterprise-learner-portal-banner-wrapper {
+  background: $enterprise-learner-portal-banner-background-color;
+  box-sizing: border-box;
+
+  /** Base Styles - start **/
+  text-align: left;
+  line-height: 1.5;
+  margin-bottom: 5px;
+  font: {
+    family: 'Open Sans', "Helvetica Neue", Helvetica, Arial, sans-serif;
+    size: 1rem;
+    weight: 400;
+  }
+
+  .alert {
+    position: relative;
+    padding: 0.75rem 1.25rem;
+  }
+
+  .alert-dismissible {
+    .close {
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 0.75rem 1.25rem;
+      background: transparent;
+      border: 0;
+      text-shadow: 0 1px 0 #fff;
+      opacity: 1;
+      float: right;
+      line-height: 1;
+      font: {
+        size: 1.5rem;
+        weight: 700;
+      }
+    }
+
+    .btn {
+      display: inline-block;
+      text-align: center;
+      white-space: nowrap;
+      vertical-align: middle;
+      box-shadow: none;
+    }
+  }
+  /** Base Styles - end **/
+
+
+  .edx-enterprise-learner-portal-banner {
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    max-width: none !important;
+    min-width: 0;
+    margin: 0 auto;
+    background: inherit;
+    border: none;
+    padding: 20px 20px 20px 40px;
+
+    .policy-link {
+      color: $enterprise-learner-portal-banner-cta-base;
+      text-decoration: underline;
+
+      &:focus,
+      &:hover {
+        color: $enterprise-learner-portal-banner-cta-hover;
+        border: none;
+      }
+    }
+
+    .copy-content {
+      font-size: 0.875rem;
+      line-height: 1.4;
+      color: $enterprise-learner-portal-banner-text-color;
+     }
+
+    .alert-dialog {
+      margin-right: 30px;
+      color: $enterprise-learner-portal-banner-text-color;
+      max-width: 1180px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .btn.close {
+      color: $enterprise-learner-portal-banner-btn-color;
+      text-shadow: 0 0 1px $enterprise-learner-portal-banner-btn-color;
+      bottom: 0;
+
+      &:focus,
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+
 
 import logging
 
@@ -8,7 +8,7 @@ from ccx_keys.locator import CCXLocator
 from django.db import migrations
 from django.http import Http404
 
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.ccx.utils import add_master_course_staff_to_ccx, remove_master_course_staff_from_ccx
 
 log = logging.getLogger("edx.ccx")
@@ -83,7 +83,7 @@ class Migration(migrations.Migration):
         ('ccx', '0001_initial'),
         ('ccx', '0002_customcourseforedx_structure_json'),
         ('course_overviews','0010_auto_20160329_2317'), # because we use course overview and are in the same release as that table is modified
-        ('verified_track_content','0001_initial'), # because we use enrollement code and are in the same release as an enrollement related table is created 
+        ('verified_track_content','0001_initial'), # because we use enrollement code and are in the same release as an enrollement related table is created
     ]
 
     operations = [

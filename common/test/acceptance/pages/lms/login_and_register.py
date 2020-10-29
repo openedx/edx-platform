@@ -1,6 +1,5 @@
 """Login and Registration pages """
 
-from __future__ import absolute_import
 
 from bok_choy.page_object import PageObject, unguarded
 from bok_choy.promise import EmptyPromise, Promise
@@ -109,10 +108,6 @@ class ResetPasswordPage(PageObject):
 
 class CombinedLoginAndRegisterPage(PageObject):
     """Interact with combined login and registration page.
-
-    This page is currently hidden behind the feature flag
-    `ENABLE_COMBINED_LOGIN_REGISTRATION`, which is enabled
-    in the bok choy settings.
 
     When enabled, the new page is available from either
     `/login` or `/register`; the new page is also served at

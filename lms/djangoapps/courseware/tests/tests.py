@@ -1,7 +1,7 @@
 """
 Test for LMS courseware app.
 """
-from __future__ import absolute_import
+
 
 from textwrap import dedent
 from unittest import TestCase
@@ -11,7 +11,7 @@ from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
@@ -174,5 +174,5 @@ class TestLmsFieldData(TestCase):
         base_student = mock.Mock()
         first_level = LmsFieldData(base_authored, base_student)
         second_level = LmsFieldData(first_level, base_student)
-        self.assertEquals(second_level._authored_data, first_level._authored_data)
+        self.assertEqual(second_level._authored_data, first_level._authored_data)
         self.assertNotIsInstance(second_level._authored_data, LmsFieldData)

@@ -1,7 +1,7 @@
 """
 Helper classes and methods for running modulestore tests without Django.
 """
-from __future__ import absolute_import
+
 
 import io
 import os

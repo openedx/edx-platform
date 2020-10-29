@@ -1,7 +1,7 @@
 """
 Course Updates page.
 """
-from __future__ import absolute_import
+
 
 from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
 from common.test.acceptance.pages.studio.course_page import CoursePage

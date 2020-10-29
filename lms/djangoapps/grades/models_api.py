@@ -1,7 +1,7 @@
 """
 Provides Python APIs exposed from Grades models.
 """
-from __future__ import absolute_import
+
 
 from opaque_keys.edx.keys import CourseKey, UsageKey
 

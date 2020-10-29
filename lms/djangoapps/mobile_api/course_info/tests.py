@@ -2,7 +2,6 @@
 Tests for course_info
 """
 
-from __future__ import absolute_import
 
 import ddt
 from django.conf import settings
@@ -75,7 +74,7 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTest
         response = self.api_response(api_version=api_version)
 
         # verify static URLs are replaced in the content returned by the API
-        self.assertNotIn("\"/static/", response.content.decode('utf-8'))
+        self.assertNotContains(response, "\"/static/")
 
         # verify static URLs remain in the underlying content
         underlying_updates = modulestore().get_item(updates_usage_key)
@@ -85,8 +84,8 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTest
         # verify content and sort order of updates (most recent first)
         for num in range(1, num_updates + 1):
             update_data = response.data[num_updates - num]
-            self.assertEquals(num, update_data['id'])
-            self.assertEquals("Date" + str(num), update_data['date'])
+            self.assertEqual(num, update_data['id'])
+            self.assertEqual("Date" + str(num), update_data['date'])
             self.assertIn("Update" + str(num), update_data['content'])
 
 

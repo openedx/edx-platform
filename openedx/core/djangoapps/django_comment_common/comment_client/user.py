@@ -1,6 +1,6 @@
 # pylint: disable=missing-docstring,protected-access
 """ User model wrapper for comment service"""
-from __future__ import absolute_import
+
 
 from six import text_type
 

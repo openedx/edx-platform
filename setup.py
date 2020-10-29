@@ -39,7 +39,7 @@ setup(
             "course_bookmarks = openedx.features.course_bookmarks.plugins:CourseBookmarksTool",
             "course_updates = openedx.features.course_experience.plugins:CourseUpdatesTool",
             "course_reviews = openedx.features.course_experience.plugins:CourseReviewsTool",
-            "verified_upgrade = courseware.course_tools:VerifiedUpgradeTool",
+            "verified_upgrade = lms.djangoapps.courseware.course_tools:VerifiedUpgradeTool",
         ],
         "openedx.user_partition_scheme": [
             "random = openedx.core.djangoapps.user_api.partition_schemes:RandomUserPartitionScheme",

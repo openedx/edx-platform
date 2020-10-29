@@ -1,5 +1,5 @@
 """Integration tests for Azure Active Directory / Microsoft Account provider."""
-from __future__ import absolute_import
+
 
 from third_party_auth.tests.specs import base
 

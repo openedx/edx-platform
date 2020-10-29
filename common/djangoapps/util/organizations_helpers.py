@@ -2,7 +2,6 @@
 Utility library for working with the edx-organizations app
 """
 
-from __future__ import absolute_import
 
 from django.conf import settings
 from django.db.utils import DatabaseError

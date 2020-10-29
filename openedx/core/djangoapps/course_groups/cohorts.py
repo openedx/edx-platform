@@ -3,7 +3,6 @@ This file contains the logic for cohorts, as exposed internally to the
 forums, and to the cohort admin views.
 """
 
-from __future__ import absolute_import
 
 import logging
 import random
@@ -20,7 +19,7 @@ from django.utils.translation import ugettext as _
 from edx_django_utils.cache import RequestCache
 from eventtracking import tracker
 
-from courseware import courses
+from lms.djangoapps.courseware import courses
 from openedx.core.lib.cache_utils import request_cached
 from student.models import get_user_by_username_or_email
 

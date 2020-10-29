@@ -2261,10 +2261,18 @@
     font-size: 16px;
     border-radius: 7px;
     padding: 20px;
+    line-height: 1.5;
 
     .first-purchase-offer-banner-bold {
       font-weight: bold;
-      color: #23419f;
+      color: #393f43;
+    }
+
+    a {
+      color: #23419F;
+      text-decoration: underline !important;
+      font-weight: bold;
+      border-bottom: none;
     }
   }
 }

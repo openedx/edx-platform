@@ -2,7 +2,6 @@
 Tests of the encryption and decryption utilities in the ssencrypt module.
 """
 
-from __future__ import absolute_import
 
 import base64
 import binascii

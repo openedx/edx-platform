@@ -4,7 +4,7 @@ An API for retrieving user account information.
 For additional information and historical context, see:
 https://openedx.atlassian.net/wiki/display/TNL/User+API
 """
-from __future__ import absolute_import
+
 
 import datetime
 import logging

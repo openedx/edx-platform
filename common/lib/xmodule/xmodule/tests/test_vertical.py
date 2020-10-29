@@ -3,7 +3,7 @@ Tests for vertical module.
 """
 
 # pylint: disable=protected-access
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 from collections import namedtuple
 import json

@@ -2,14 +2,13 @@
 Tests of the instructor dashboard spoc gradebook
 """
 
-from __future__ import absolute_import
 
 from django.urls import reverse
 from six import text_type
 from six.moves import range
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
-from courseware.tests.factories import StudentModuleFactory
+from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.grades.api import task_compute_all_grades_for_course
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -104,11 +103,11 @@ class TestDefaultGradingPolicy(TestGradebook):
         # Users 1-10 attempted any homework (and get Fs) [10]
         # Users 4-10 scored enough to not get rounded to 0 for the class (and get Fs) [7]
         # One use at top of the page [1]
-        self.assertEqual(22, self.response.content.count(b'grade_F'))
+        self.assertEqual(23, self.response.content.count(b'grade_F'))
 
         # All other grades are None [29 categories * 11 users - 27 non-empty grades = 292]
         # One use at the top of the page [1]
-        self.assertEqual(293, self.response.content.count(b'grade_None'))
+        self.assertEqual(292, self.response.content.count(b'grade_None'))
 
 
 class TestLetterCutoffPolicy(TestGradebook):
@@ -136,10 +135,10 @@ class TestLetterCutoffPolicy(TestGradebook):
 
     def test_styles(self):
 
-        self.assertIn(u"grade_A {color:green;}", self.response.content.decode(self.response.charset))
-        self.assertIn(u"grade_B {color:Chocolate;}", self.response.content.decode(self.response.charset))
-        self.assertIn(u"grade_C {color:DarkSlateGray;}", self.response.content.decode(self.response.charset))
-        self.assertIn(u"grade_D {color:DarkSlateGray;}", self.response.content.decode(self.response.charset))
+        self.assertContains(self.response, u"grade_A {color:green;}")
+        self.assertContains(self.response, u"grade_B {color:Chocolate;}")
+        self.assertContains(self.response, u"grade_C {color:DarkSlateGray;}")
+        self.assertContains(self.response, u"grade_D {color:DarkSlateGray;}")
 
     def test_assigned_grades(self):
         # Users 9-10 have >= 90% on Homeworks [2]

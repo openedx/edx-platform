@@ -1,10 +1,11 @@
 """
 Models for new Content Libraries
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from opaque_keys.edx.locator import LibraryLocatorV2
 from organizations.models import Organization
@@ -25,7 +26,7 @@ class ContentLibraryManager(models.Manager):
         return self.get(org__short_name=library_key.org, slug=library_key.slug)
 
 
-@six.python_2_unicode_compatible  # pylint: disable=model-missing-unicode
+@python_2_unicode_compatible
 class ContentLibrary(models.Model):
     """
     A Content Library is a collection of content (XBlocks and/or static assets)
@@ -84,7 +85,7 @@ class ContentLibrary(models.Model):
         return "ContentLibrary ({})".format(six.text_type(self.library_key))
 
 
-@six.python_2_unicode_compatible  # pylint: disable=model-missing-unicode
+@python_2_unicode_compatible
 class ContentLibraryPermission(models.Model):
     """
     Row recording permissions for a content library

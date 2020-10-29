@@ -1,7 +1,7 @@
 """
 Tests for Video Pipeline api utils.
 """
-from __future__ import absolute_import
+
 import ddt
 import json
 from mock import Mock, patch

@@ -714,6 +714,7 @@ function(VideoPlayer, HLS, _) {
             describe('when the video player is not full screen', function() {
                 beforeEach(function() {
                     state = jasmine.initializePlayer();
+                    jasmine.mockFullscreenAPI();
                     state.videoEl = $('video, iframe');
                     spyOn($.fn, 'trigger').and.callThrough();
                     $('.add-fullscreen').click();
@@ -733,12 +734,10 @@ function(VideoPlayer, HLS, _) {
             describe('when the video player already full screen', function() {
                 beforeEach(function() {
                     state = jasmine.initializePlayer();
+                    jasmine.mockFullscreenAPI();
                     state.videoEl = $('video, iframe');
                     spyOn($.fn, 'trigger').and.callThrough();
-                    state.el.addClass('video-fullscreen');
-                    state.videoFullScreen.fullScreenState = true;
-                    state.videoFullScreen.isFullScreen = true;
-                    state.videoFullScreen.fullScreenEl.attr('title', 'Exit-fullscreen');
+                    state.videoFullScreen.enter();
                     $('.add-fullscreen').click();
                 });
 

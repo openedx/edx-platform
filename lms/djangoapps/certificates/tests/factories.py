@@ -1,6 +1,6 @@
 # Factories are self documenting
 # pylint: disable=missing-docstring
-from __future__ import absolute_import
+
 
 from uuid import uuid4
 

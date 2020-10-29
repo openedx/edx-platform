@@ -7,7 +7,6 @@ of the submit_problem method of a capa module when the "delay between quiz
 submissions" setting is set to different values
 """
 
-from __future__ import absolute_import
 
 import datetime
 import textwrap
@@ -182,7 +181,7 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         )
         # You should get a dialog that tells you to wait
         # Also, the number of attempts should not be incremented
-        self.assertRegexpMatches(result['success'], r"You must wait at least.*")
+        self.assertRegex(result['success'], r"You must wait at least.*")
         self.assertEqual(module.attempts, num_attempts)
 
     def test_submit_quiz_too_soon(self):
@@ -196,7 +195,7 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         )
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented
-        self.assertRegexpMatches(result['success'], r"You must wait at least 3 minutes between submissions. 2 minutes remaining\..*")
+        self.assertRegex(result['success'], r"You must wait at least 3 minutes between submissions. 2 minutes remaining\..*")
         self.assertEqual(module.attempts, num_attempts)
 
     def test_submit_quiz_1_second_too_soon(self):
@@ -210,7 +209,7 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         )
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented
-        self.assertRegexpMatches(result['success'], r"You must wait at least 3 minutes between submissions. 1 second remaining\..*")
+        self.assertRegex(result['success'], r"You must wait at least 3 minutes between submissions. 1 second remaining\..*")
         self.assertEqual(module.attempts, num_attempts)
 
     def test_submit_quiz_as_soon_as_allowed(self):
@@ -275,7 +274,7 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         )
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented
-        self.assertRegexpMatches(result['success'], r"You must wait at least 2 hours between submissions. 2 minutes 1 second remaining\..*")
+        self.assertRegex(result['success'], r"You must wait at least 2 hours between submissions. 2 minutes 1 second remaining\..*")
         self.assertEqual(module.attempts, num_attempts)
 
     def test_submit_quiz_with_involved_pretty_print(self):
@@ -289,7 +288,7 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         )
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented
-        self.assertRegexpMatches(result['success'], r"You must wait at least 2 hours 1 minute 3 seconds between submissions. 1 hour 2 minutes 59 seconds remaining\..*")
+        self.assertRegex(result['success'], r"You must wait at least 2 hours 1 minute 3 seconds between submissions. 1 hour 2 minutes 59 seconds remaining\..*")
         self.assertEqual(module.attempts, num_attempts)
 
     def test_submit_quiz_with_nonplural_pretty_print(self):
@@ -303,5 +302,5 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         )
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented
-        self.assertRegexpMatches(result['success'], r"You must wait at least 1 minute between submissions. 1 minute remaining\..*")
+        self.assertRegex(result['success'], r"You must wait at least 1 minute between submissions. 1 minute remaining\..*")
         self.assertEqual(module.attempts, num_attempts)

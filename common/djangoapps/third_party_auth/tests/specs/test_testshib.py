@@ -1,7 +1,7 @@
 """
 Third_party_auth integration tests using a mock version of the TestShib provider
 """
-from __future__ import absolute_import
+
 
 import datetime
 import json
@@ -12,6 +12,7 @@ from unittest import skip
 
 import ddt
 import httpretty
+from django.conf import settings
 from django.contrib import auth
 from freezegun import freeze_time
 from mock import MagicMock, patch
@@ -21,7 +22,6 @@ from social_django.models import UserSocialAuth
 from testfixtures import LogCapture
 
 from enterprise.models import EnterpriseCustomerIdentityProvider, EnterpriseCustomerUser
-from openedx.core.djangoapps.user_authn.views.deprecated import signin_user
 from openedx.core.djangoapps.user_authn.views.login import login_user
 from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerFactory
@@ -158,7 +158,13 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         'attributes': {u'urn:oid:0.9.2342.19200300.100.1.1': [u'myself']}
     }
 
-    def test_full_pipeline_succeeds_for_unlinking_testshib_account(self):
+    @patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
+    @patch('openedx.core.djangoapps.user_api.accounts.settings_views.enterprise_customer_for_request')
+    def test_full_pipeline_succeeds_for_unlinking_testshib_account(
+        self,
+        mock_enterprise_customer_for_request_settings_view,
+        mock_enterprise_customer_for_request,
+    ):
 
         # First, create, the request and strategy that store pipeline state,
         # configure the backend, and mock out wire traffic.
@@ -185,6 +191,14 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         EnterpriseCustomerIdentityProvider.objects.get_or_create(enterprise_customer=enterprise_customer,
                                                                  provider_id=self.provider.provider_id)
 
+        enterprise_customer_data = {
+            'uuid': enterprise_customer.uuid,
+            'name': enterprise_customer.name,
+            'identity_provider': 'saml-default',
+        }
+        mock_enterprise_customer_for_request.return_value = enterprise_customer_data
+        mock_enterprise_customer_for_request_settings_view.return_value = enterprise_customer_data
+
         # Instrument the pipeline to get to the dashboard with the full expected state.
         self.client.get(
             pipeline.get_login_url(self.provider.provider_id, pipeline.AUTH_ENTRY_LOGIN))
@@ -192,7 +206,6 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
                             request=request)
 
         with self._patch_edxmako_current_request(strategy.request):
-            signin_user(strategy.request)
             login_user(strategy.request)
             actions.do_complete(request.backend, social_views._do_login, user=user,  # pylint: disable=protected-access
                                 request=request)
@@ -201,34 +214,39 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         self.assert_account_settings_context_looks_correct(account_settings_context(request), linked=True)
         self.assert_social_auth_exists_for_user(request.user, strategy)
 
-        # Fire off the disconnect pipeline without the user information.
-        actions.do_disconnect(
-            request.backend,
-            None,
-            None,
-            redirect_field_name=auth.REDIRECT_FIELD_NAME,
-            request=request
-        )
-        self.assertFalse(
-            EnterpriseCustomerUser.objects.filter(enterprise_customer=enterprise_customer, user_id=user.id).count() == 0
-        )
-
-        # Fire off the disconnect pipeline to unlink.
-        self.assert_redirect_after_pipeline_completes(
+        FEATURES_WITH_ENTERPRISE_ENABLED = settings.FEATURES.copy()
+        FEATURES_WITH_ENTERPRISE_ENABLED['ENABLE_ENTERPRISE_INTEGRATION'] = True
+        with patch.dict("django.conf.settings.FEATURES", FEATURES_WITH_ENTERPRISE_ENABLED):
+            # Fire off the disconnect pipeline without the user information.
             actions.do_disconnect(
                 request.backend,
-                user,
+                None,
                 None,
                 redirect_field_name=auth.REDIRECT_FIELD_NAME,
                 request=request
             )
-        )
-        # Now we expect to be in the unlinked state, with no backend entry.
-        self.assert_account_settings_context_looks_correct(account_settings_context(request), linked=False)
-        self.assert_social_auth_does_not_exist_for_user(user, strategy)
-        self.assertTrue(
-            EnterpriseCustomerUser.objects.filter(enterprise_customer=enterprise_customer, user_id=user.id).count() == 0
-        )
+            self.assertNotEqual(
+                EnterpriseCustomerUser.objects.filter(enterprise_customer=enterprise_customer, user_id=user.id).count(),
+                0
+            )
+
+            # Fire off the disconnect pipeline to unlink.
+            self.assert_redirect_after_pipeline_completes(
+                actions.do_disconnect(
+                    request.backend,
+                    user,
+                    None,
+                    redirect_field_name=auth.REDIRECT_FIELD_NAME,
+                    request=request
+                )
+            )
+            # Now we expect to be in the unlinked state, with no backend entry.
+            self.assert_account_settings_context_looks_correct(account_settings_context(request), linked=False)
+            self.assert_social_auth_does_not_exist_for_user(user, strategy)
+            self.assertEqual(
+                EnterpriseCustomerUser.objects.filter(enterprise_customer=enterprise_customer, user_id=user.id).count(),
+                0
+            )
 
     def get_response_data(self):
         """Gets dict (string -> object) of merged data about the user."""
@@ -251,8 +269,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         self.assertEqual(try_login_response['Location'], self.login_page_url)
         # When loading the login page, the user will see an error message:
         response = self.client.get(self.login_page_url)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('Authentication with TestShib is currently unavailable.', response.content)
+        self.assertContains(response, 'Authentication with TestShib is currently unavailable.')
 
     def test_login(self):
         """ Configure TestShib before running the login test """
@@ -373,10 +390,10 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
             """
             Return a fake assertion after checking that the input is what we expect.
             """
-            self.assertIn('private_key=fake_private_key_here', _request.body)
-            self.assertIn('user_id=myself', _request.body)
-            self.assertIn('token_url=http%3A%2F%2Fsuccessfactors.com%2Foauth%2Ftoken', _request.body)
-            self.assertIn('client_id=TatVotSEiCMteSNWtSOnLanCtBGwNhGB', _request.body)
+            self.assertIn(b'private_key=fake_private_key_here', _request.body)
+            self.assertIn(b'user_id=myself', _request.body)
+            self.assertIn(b'token_url=http%3A%2F%2Fsuccessfactors.com%2Foauth%2Ftoken', _request.body)
+            self.assertIn(b'client_id=TatVotSEiCMteSNWtSOnLanCtBGwNhGB', _request.body)
             return (200, headers, 'fake_saml_assertion')
 
         httpretty.register_uri(httpretty.POST, SAPSF_ASSERTION_URL, content_type='text/plain', body=assertion_callback)
@@ -398,10 +415,10 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
             """
             Return a fake assertion after checking that the input is what we expect.
             """
-            self.assertIn('assertion=fake_saml_assertion', _request.body)
-            self.assertIn('company_id=NCC1701D', _request.body)
-            self.assertIn('grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Asaml2-bearer', _request.body)
-            self.assertIn('client_id=TatVotSEiCMteSNWtSOnLanCtBGwNhGB', _request.body)
+            self.assertIn(b'assertion=fake_saml_assertion', _request.body)
+            self.assertIn(b'company_id=NCC1701D', _request.body)
+            self.assertIn(b'grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Asaml2-bearer', _request.body)
+            self.assertIn(b'client_id=TatVotSEiCMteSNWtSOnLanCtBGwNhGB', _request.body)
             return (200, headers, '{"access_token": "faketoken"}')
 
         httpretty.register_uri(httpretty.POST, SAPSF_TOKEN_URL, content_type='application/json', body=token_callback)

@@ -3,7 +3,6 @@ Tests for Verified Track Cohorting models
 """
 # pylint: disable=attribute-defined-outside-init
 
-from __future__ import absolute_import
 
 import ddt
 import mock

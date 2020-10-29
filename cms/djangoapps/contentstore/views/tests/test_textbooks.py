@@ -1,6 +1,5 @@
 """ Test cases for the textbook index page. """
 
-from __future__ import absolute_import
 
 import json
 from unittest import TestCase

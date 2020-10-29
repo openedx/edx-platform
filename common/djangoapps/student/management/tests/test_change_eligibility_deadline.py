@@ -1,6 +1,5 @@
 """ Test the change_eligibility_deadline command line script."""
 
-from __future__ import absolute_import
 
 from datetime import datetime, timedelta
 

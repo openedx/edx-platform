@@ -1,7 +1,7 @@
 """
 Tests for programs celery tasks.
 """
-from __future__ import absolute_import
+
 
 import json
 import logging
@@ -109,7 +109,8 @@ class AwardProgramCertificateTestCase(TestCase):
                 }
             ]
         }
-        self.assertEqual(json.loads(httpretty.last_request().body), expected_body)
+        last_request_body = httpretty.last_request().body.decode('utf-8')
+        self.assertEqual(json.loads(last_request_body), expected_body)
 
 
 @skip_unless_lms
@@ -144,7 +145,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         programs.
         """
         tasks.award_program_certificates.delay(self.student.username).get()
-        mock_get_completed_programs.assert_called(self.site, self.student)
+        mock_get_completed_programs.assert_any_call(self.site, self.student)
 
     @ddt.data(
         ([1], [2, 3]),
@@ -471,7 +472,8 @@ class PostCourseCertificateTestCase(TestCase):
                 'value': visible_date.strftime('%Y-%m-%dT%H:%M:%SZ')  # text representation of date
             }]
         }
-        self.assertEqual(json.loads(httpretty.last_request().body), expected_body)
+        last_request_body = httpretty.last_request().body.decode('utf-8')
+        self.assertEqual(json.loads(last_request_body), expected_body)
 
 
 @skip_unless_lms

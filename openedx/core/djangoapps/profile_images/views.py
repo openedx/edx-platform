@@ -1,7 +1,7 @@
 """
 This module implements the upload and remove endpoints of the profile image api.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import itertools

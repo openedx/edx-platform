@@ -1,7 +1,7 @@
 """
 Helpful methods to use when parsing OLX (XBlock XML)
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 from collections import namedtuple
 
 from opaque_keys.edx.locator import BundleDefinitionLocator

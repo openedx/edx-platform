@@ -3,7 +3,7 @@
 """
 Tests for import_course_from_xml using the mongo modulestore.
 """
-from __future__ import absolute_import, print_function
+
 
 import copy
 from uuid import uuid4

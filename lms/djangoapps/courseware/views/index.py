@@ -4,7 +4,6 @@ View for Courseware Index
 
 # pylint: disable=attribute-defined-outside-init
 
-from __future__ import absolute_import
 
 import beeline
 import logging
@@ -36,6 +35,7 @@ from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.gating.api import get_entrance_exam_score_ratio, get_entrance_exam_usage_key
 from lms.djangoapps.grades.api import CourseGradeFactory
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
@@ -142,6 +142,7 @@ class CoursewareIndex(View):
                     depth=CONTENT_DEPTH,
                     check_if_enrolled=not self.enable_unenrolled_access,
                 )
+                self.course_overview = CourseOverview.get_from_id(self.course.id)
 
                 if self.enable_unenrolled_access:
                     # Check if the user is considered enrolled (i.e. is an enrolled learner or staff).
@@ -431,6 +432,10 @@ class CoursewareIndex(View):
         """
         course_url_name = default_course_url_name(self.course.id)
         course_url = reverse(course_url_name, kwargs={'course_id': six.text_type(self.course.id)})
+        show_search = (
+            settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH') or
+            (settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF') and self.is_staff)
+        )
 
         courseware_context = {
             'csrf': csrf(self.request)['csrf_token'],
@@ -452,6 +457,7 @@ class CoursewareIndex(View):
             'section_title': None,
             'sequence_title': None,
             'disable_accordion': COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id),
+            'show_search': show_search,
         }
         courseware_context.update(
             get_experiment_user_metadata_context(
@@ -474,7 +480,7 @@ class CoursewareIndex(View):
         )
 
         courseware_context['course_sock_fragment'] = CourseSockFragmentView().render_to_fragment(
-            request, course=self.course)
+            request, course=self.course_overview)
 
         # entrance exam data
         self._add_entrance_exam_to_context(courseware_context)

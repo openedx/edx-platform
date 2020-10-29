@@ -2,7 +2,7 @@
 Contains tests for OAuth2 model-retirement methods.
 """
 
-from __future__ import absolute_import
+
 import datetime
 
 from django.test import TestCase

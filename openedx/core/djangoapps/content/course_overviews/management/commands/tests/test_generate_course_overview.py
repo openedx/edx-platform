@@ -1,7 +1,7 @@
 """
 Tests that the generate_course_overview management command actually generates course overviews.
 """
-from __future__ import absolute_import
+
 
 import six
 from django.core.management.base import CommandError
@@ -77,8 +77,8 @@ class TestGenerateCourseOverview(ModuleStoreTestCase):
         self.command.handle(six.text_type(self.course_key_1), all_courses=False, force_update=True)
         self.command.handle(six.text_type(self.course_key_2), all_courses=False, force_update=False)
 
-        self.assertEquals(CourseOverview.get_from_id(self.course_key_1).display_name, updated_course_name)
-        self.assertNotEquals(CourseOverview.get_from_id(self.course_key_2).display_name, updated_course_name)
+        self.assertEqual(CourseOverview.get_from_id(self.course_key_1).display_name, updated_course_name)
+        self.assertNotEqual(CourseOverview.get_from_id(self.course_key_2).display_name, updated_course_name)
 
     def test_invalid_key(self):
         """
@@ -107,11 +107,11 @@ class TestGenerateCourseOverview(ModuleStoreTestCase):
         self.command.handle(all_courses=True, force_update=True, routing_key='my-routing-key', chunk_size=10000)
 
         called_kwargs = mock_async_task.apply_async.call_args_list[0][1]
-        self.assertEquals(
+        self.assertEqual(
             sorted([six.text_type(self.course_key_1), six.text_type(self.course_key_2)]),
             sorted(called_kwargs.pop('args'))
         )
-        self.assertEquals({
+        self.assertEqual({
             'kwargs': {'force_update': True},
             'routing_key': 'my-routing-key'
         }, called_kwargs

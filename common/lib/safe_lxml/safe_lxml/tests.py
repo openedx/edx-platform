@@ -1,6 +1,5 @@
 """Test that we have defused XML."""
 
-from __future__ import absolute_import
 
 import defusedxml
 from lxml import etree

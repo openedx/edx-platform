@@ -1,5 +1,5 @@
 """ Tests for auto auth. """
-from __future__ import absolute_import
+
 
 import json
 

@@ -1,7 +1,7 @@
 """
 Base Message types to be used to construct ace messages.
 """
-from __future__ import absolute_import
+
 
 from edx_ace.message import MessageType
 

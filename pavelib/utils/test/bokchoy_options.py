@@ -2,7 +2,6 @@
 Definitions of all options used by the various bok_choy tasks.
 """
 
-from __future__ import absolute_import
 
 import os
 from optparse import make_option

@@ -1,7 +1,7 @@
 """
 Test cases for the HTTP endpoints of the profile image api.
 """
-from __future__ import absolute_import
+
 from contextlib import closing
 import datetime
 from pytz import UTC

@@ -1,7 +1,7 @@
 """
 Test the user api's partition extensions.
 """
-from __future__ import absolute_import
+
 
 from collections import defaultdict
 
@@ -98,7 +98,7 @@ class TestRandomUserPartitionScheme(PartitionTestCase):
             scheme=RandomUserPartitionScheme
         )
         # get a group assigned to the user
-        with self.assertRaisesRegexp(UserPartitionError, "Cannot assign user to an empty user partition"):
+        with self.assertRaisesRegex(UserPartitionError, "Cannot assign user to an empty user partition"):
             RandomUserPartitionScheme.get_group_for_user(self.MOCK_COURSE_ID, self.user, empty_partition)
 
     def test_user_in_deleted_group(self):
@@ -147,5 +147,5 @@ class TestExtension(TestCase):
 
     def test_get_scheme(self):
         self.assertEqual(UserPartition.get_scheme('random'), RandomUserPartitionScheme)
-        with self.assertRaisesRegexp(UserPartitionError, 'Unrecognized scheme'):
+        with self.assertRaisesRegex(UserPartitionError, 'Unrecognized scheme'):
             UserPartition.get_scheme('other')

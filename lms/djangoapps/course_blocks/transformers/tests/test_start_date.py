@@ -1,7 +1,7 @@
 """
 Tests for StartDateTransformer.
 """
-from __future__ import absolute_import
+
 
 from datetime import timedelta
 
@@ -10,7 +10,7 @@ import six
 from django.utils.timezone import now
 from mock import patch
 
-from courseware.tests.factories import BetaTesterFactory
+from lms.djangoapps.courseware.tests.factories import BetaTesterFactory
 
 from ..start_date import DEFAULT_START_DATE, StartDateTransformer
 from .helpers import BlockParentsMapTestCase, update_block

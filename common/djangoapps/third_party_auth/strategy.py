@@ -3,7 +3,6 @@ A custom Strategy for python-social-auth that allows us to fetch configuration f
 ConfigurationModels rather than django.settings
 """
 
-from __future__ import absolute_import
 
 from social_core.backends.oauth import OAuthAuth
 from social_django.strategy import DjangoStrategy

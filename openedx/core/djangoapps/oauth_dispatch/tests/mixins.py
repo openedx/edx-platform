@@ -1,7 +1,7 @@
 """
 OAuth Dispatch test mixins
 """
-from __future__ import absolute_import
+
 
 import jwt
 from django.conf import settings

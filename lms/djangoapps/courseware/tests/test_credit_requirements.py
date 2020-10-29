@@ -2,7 +2,6 @@
 Tests for credit requirement display on the progress page.
 """
 
-from __future__ import absolute_import
 
 import ddt
 import six

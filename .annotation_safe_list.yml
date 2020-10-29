@@ -131,36 +131,6 @@ djcelery.WorkerState:
 edx_oauth2_provider.TrustedClient:
   ".. no_pii:": "No PII"
 
-# Via Proctoring
-edx_proctoring.ProctoredExam:
-  ".. no_pii:": "No PII"
-edx_proctoring.ProctoredExamReviewPolicy:
-  ".. no_pii:": "No PII"
-edx_proctoring.ProctoredExamReviewPolicyHistory:
-  ".. no_pii:": "No PII"
-edx_proctoring.ProctoredExamSoftwareSecureComment:
-  ".. no_pii:": "No PII"
-edx_proctoring.ProctoredExamSoftwareSecureReview:
-  ".. pii:": "Proctored exam review feedback from Software Secure, contains video_url. Retained for record keeping."
-  ".. pii_types:": video
-  ".. pii_retirement:": retained
-edx_proctoring.ProctoredExamSoftwareSecureReviewHistory:
-  ".. pii:": "Proctored exam review feedback from Software Secure, contains video_url. Retained for record keeping."
-  ".. pii_types:": video
-  ".. pii_retirement:": retained
-edx_proctoring.ProctoredExamStudentAllowance:
-  ".. no_pii:": "No PII"
-edx_proctoring.ProctoredExamStudentAllowanceHistory:
-  ".. no_pii:": "No PII"
-edx_proctoring.ProctoredExamStudentAttempt:
-  ".. pii:": "Tracks attempts by a user to take a proctored exam. Contains student_name. Retained for record keeping."
-  ".. pii_types:": name
-  ".. pii_retirement:": retained
-edx_proctoring.ProctoredExamStudentAttemptHistory:
-  ".. pii:": "Tracks attempts by a user to take a proctored exam. Contains student_name. Retained for record keeping."
-  ".. pii_types:": name
-  ".. pii_retirement:": retained
-
 # Via VAL
 edxval.CourseVideo:
   ".. no_pii:": "No PII"

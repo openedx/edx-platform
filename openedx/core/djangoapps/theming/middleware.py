@@ -5,7 +5,7 @@ Note:
     This middleware depends on "django_sites_extensions" app
     So it must be added to INSTALLED_APPS in django settings files.
 """
-from __future__ import absolute_import
+
 
 from django.conf import settings
 

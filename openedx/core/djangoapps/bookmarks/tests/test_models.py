@@ -1,7 +1,7 @@
 """
 Tests for Bookmarks models.
 """
-from __future__ import absolute_import
+
 
 import datetime
 from contextlib import contextmanager

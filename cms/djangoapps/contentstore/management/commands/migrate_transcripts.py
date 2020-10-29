@@ -2,7 +2,6 @@
 Command to migrate transcripts to django storage.
 """
 
-from __future__ import absolute_import
 
 import logging
 

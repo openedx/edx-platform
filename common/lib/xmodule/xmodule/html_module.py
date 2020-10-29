@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 import copy
 import logging
@@ -291,7 +291,7 @@ class HtmlBlock(
                 msg = 'Unable to load file contents at path {0}: {1} '.format(
                     filepath, err)
                 # add more info and re-raise
-                six.reraise(Exception(msg), None, sys.exc_info()[2])
+                six.reraise(Exception, Exception(msg), sys.exc_info()[2])
 
     @classmethod
     def parse_xml_new_runtime(cls, node, runtime, keys):

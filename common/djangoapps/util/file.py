@@ -2,7 +2,6 @@
 Utility methods related to file handling.
 """
 
-from __future__ import absolute_import
 
 import os
 from datetime import datetime

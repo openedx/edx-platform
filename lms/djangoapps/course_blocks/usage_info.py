@@ -2,7 +2,7 @@
 Declares CourseUsageInfo class to be used by the transform method in
 Transformers.
 """
-from __future__ import absolute_import
+
 
 from lms.djangoapps.courseware.access import _has_access_to_course
 

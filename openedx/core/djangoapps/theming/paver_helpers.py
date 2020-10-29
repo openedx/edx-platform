@@ -2,7 +2,7 @@
 This file contains helpers for paver commands, Django is not initialized in paver commands.
 So, django settings, models etc. can not be used here.
 """
-from __future__ import absolute_import, print_function
+
 
 import os
 

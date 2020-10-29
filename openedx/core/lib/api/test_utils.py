@@ -1,7 +1,7 @@
 """
 Helpers for API tests.
 """
-from __future__ import absolute_import
+
 import base64
 import json
 import re
@@ -23,7 +23,7 @@ class ApiTestCase(TestCase):
         """
         Returns a dictionary containing the http auth header with encoded username+password
         """
-        return {'HTTP_AUTHORIZATION': 'Basic ' + base64.b64encode('%s:%s' % (username, password))}
+        return {'HTTP_AUTHORIZATION': b'Basic ' + base64.b64encode(b'%s:%s' % (username.encode(), password.encode()))}
 
     def request_with_auth(self, method, *args, **kwargs):
         """Issue a request to the given URI with the API key header"""
@@ -86,6 +86,6 @@ class ApiTestCase(TestCase):
         # Django rest framework interprets basic auth headers
         # as an attempt to authenticate with the API.
         # We don't want this for views available to anonymous users.
-        basic_auth_header = "Basic " + base64.b64encode('username:password')
+        basic_auth_header = "Basic " + base64.b64encode('username:password'.encode('utf-8')).decode('utf-8')
         response = getattr(self.client, method)(uri, HTTP_AUTHORIZATION=basic_auth_header)
         self.assertNotEqual(response.status_code, 403)

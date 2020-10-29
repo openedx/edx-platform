@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+
 """Tests of email marketing signal handlers."""
-from __future__ import absolute_import
+
 
 import datetime
 import logging
@@ -129,7 +131,7 @@ class EmailMarketingTests(TestCase):
                                           'id': TEST_EMAIL,
                                           'vars': {'last_login_date': ANY}})
         self.assertTrue('sailthru_hid' in response.cookies)
-        self.assertEquals(response.cookies['sailthru_hid'].value, "test_cookie")
+        self.assertEqual(response.cookies['sailthru_hid'].value, "test_cookie")
 
     @patch('sailthru.sailthru_client.SailthruClient.api_post')
     def test_get_cookies_via_sailthu(self, mock_sailthru):
@@ -188,14 +190,14 @@ class EmailMarketingTests(TestCase):
             {'gender': 'm', 'username': 'test', 'activated': 1}, TEST_EMAIL, site_dict, new_user=True
         )
         self.assertFalse(mock_log_error.called)
-        self.assertEquals(mock_sailthru_post.call_args[0][0], "user")
+        self.assertEqual(mock_sailthru_post.call_args[0][0], "user")
         userparms = mock_sailthru_post.call_args[0][1]
-        self.assertEquals(userparms['key'], "email")
-        self.assertEquals(userparms['id'], TEST_EMAIL)
-        self.assertEquals(userparms['vars']['gender'], "m")
-        self.assertEquals(userparms['vars']['username'], "test")
-        self.assertEquals(userparms['vars']['activated'], 1)
-        self.assertEquals(userparms['lists']['new list'], 1)
+        self.assertEqual(userparms['key'], "email")
+        self.assertEqual(userparms['id'], TEST_EMAIL)
+        self.assertEqual(userparms['vars']['gender'], "m")
+        self.assertEqual(userparms['vars']['username'], "test")
+        self.assertEqual(userparms['vars']['activated'], 1)
+        self.assertEqual(userparms['lists']['new list'], 1)
 
     @patch('lms.djangoapps.email_marketing.signals.get_email_cookies_via_sailthru.delay')
     def test_drop_cookie_task_error(self, mock_email_cookies):
@@ -340,11 +342,11 @@ class EmailMarketingTests(TestCase):
         """
         mock_sailthru.return_value = SailthruResponse(JsonResponse({'ok': True}))
         update_user_email.delay(TEST_EMAIL, "old@edx.org")
-        self.assertEquals(mock_sailthru.call_args[0][0], "user")
+        self.assertEqual(mock_sailthru.call_args[0][0], "user")
         userparms = mock_sailthru.call_args[0][1]
-        self.assertEquals(userparms['key'], "email")
-        self.assertEquals(userparms['id'], "old@edx.org")
-        self.assertEquals(userparms['keys']['email'], TEST_EMAIL)
+        self.assertEqual(userparms['key'], "email")
+        self.assertEqual(userparms['id'], "old@edx.org")
+        self.assertEqual(userparms['keys']['email'], TEST_EMAIL)
 
     @patch('email_marketing.tasks.SailthruClient')
     def test_get_or_create_sailthru_list(self, mock_sailthru_client):
@@ -417,7 +419,7 @@ class EmailMarketingTests(TestCase):
         """Test create list in sailthru"""
         mock_sailthru_client.api_post.return_value = SailthruResponse(JsonResponse({'ok': True}))
         self.assertEqual(_create_user_list(mock_sailthru_client, 'test_list_name'), True)
-        self.assertEquals(mock_sailthru_client.api_post.call_args[0][0], "list")
+        self.assertEqual(mock_sailthru_client.api_post.call_args[0][0], "list")
         listparms = mock_sailthru_client.api_post.call_args[0][1]
         self.assertEqual(listparms['list'], 'test_list_name')
         self.assertEqual(listparms['primary'], 0)
@@ -678,3 +680,14 @@ class SailthruTests(TestCase):
         switch.return_value = True
         update_sailthru(None, self.user, 'verified', self.course_id)
         self.assertFalse(mock_sailthru_purchase.called)
+
+    @patch('openedx.core.djangoapps.waffle_utils.WaffleSwitchNamespace.is_enabled')
+    @patch('sailthru.sailthru_client.SailthruClient.purchase')
+    def test_encoding_is_working_for_email_contains_unicode(self, mock_sailthru_purchase, switch):
+        """Make sure encoding is working for emails contains unicode characters
+        while sending it to sail through.
+        """
+        switch.return_value = True
+        self.user.email = u'tèst@edx.org'
+        update_sailthru(None, self.user, 'audit', self.course_id)
+        self.assertTrue(mock_sailthru_purchase.called)
