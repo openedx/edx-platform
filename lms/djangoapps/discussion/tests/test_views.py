@@ -56,8 +56,8 @@ from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.lib.teams_config import TeamsConfig
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
-from student.roles import CourseStaffRole, UserBasedRole
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.roles import CourseStaffRole, UserBasedRole
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import EventTestMixin, UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -89,7 +89,7 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
 
         # Patch the comment client user save method so it does not try
         # to create a new cc user when creating a django user
-        with patch('student.models.cc.User.save'):
+        with patch('common.djangoapps.student.models.cc.User.save'):
             uname = 'student'
             email = 'student@edx.org'
             password = 'test'
@@ -108,8 +108,8 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
         config.enabled = True
         config.save()
 
-    @patch('student.models.cc.User.from_django_user')
-    @patch('student.models.cc.User.active_threads')
+    @patch('common.djangoapps.student.models.cc.User.from_django_user')
+    @patch('common.djangoapps.student.models.cc.User.active_threads')
     def test_user_profile_exception(self, mock_threads, mock_from_django_user):
 
         # Mock the code that makes the HTTP requests to the cs_comment_service app
@@ -125,8 +125,8 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    @patch('student.models.cc.User.from_django_user')
-    @patch('student.models.cc.User.subscribed_threads')
+    @patch('common.djangoapps.student.models.cc.User.from_django_user')
+    @patch('common.djangoapps.student.models.cc.User.subscribed_threads')
     def test_user_followed_threads_exception(self, mock_threads, mock_from_django_user):
 
         # Mock the code that makes the HTTP requests to the cs_comment_service app
@@ -1654,7 +1654,7 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         self.assertTrue(self.client.login(username=username, password=password))
 
     @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
-    @patch('student.models.cc.User.from_django_user')
+    @patch('common.djangoapps.student.models.cc.User.from_django_user')
     def test_forum_discussion_xss_prevent(self, malicious_code, mock_user, mock_req):
         """
         Test that XSS attack is prevented
@@ -1670,8 +1670,8 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         self.assertNotContains(resp, malicious_code)
 
     @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
-    @patch('student.models.cc.User.from_django_user')
-    @patch('student.models.cc.User.active_threads')
+    @patch('common.djangoapps.student.models.cc.User.from_django_user')
+    @patch('common.djangoapps.student.models.cc.User.active_threads')
     def test_forum_user_profile_xss_prevent(self, malicious_code, mock_threads, mock_from_django_user, mock_request):
         """
         Test that XSS attack is prevented

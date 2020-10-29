@@ -12,7 +12,7 @@ from six import text_type
 
 from lms.djangoapps.bulk_email.api import is_bulk_email_enabled_for_course, is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models import BulkEmailFlag, CourseAuthorization
-from student.tests.factories import AdminFactory
+from common.djangoapps.student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

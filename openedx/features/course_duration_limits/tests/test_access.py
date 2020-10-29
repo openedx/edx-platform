@@ -19,7 +19,7 @@ from openedx.features.course_duration_limits.access import (
     get_user_course_expiration_date
 )
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from student.tests.factories import CourseEnrollmentFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 from util.date_utils import strftime_localized
 
 

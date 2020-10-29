@@ -19,7 +19,7 @@ from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataC
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor_internal
 from lms.djangoapps.grades.api import events as grades_events
-from student.models import get_user_by_username_or_email
+from common.djangoapps.student.models import get_user_by_username_or_email
 from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
 from track.views import task_track
 from util.db import outer_atomic

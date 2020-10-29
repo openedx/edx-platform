@@ -689,7 +689,7 @@ MIDDLEWARE = [
     # Instead of AuthenticationMiddleware, we use a cache-backed version
     'openedx.core.djangoapps.cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
 
-    'student.middleware.UserStandingMiddleware',
+    'common.djangoapps.student.middleware.UserStandingMiddleware',
     'openedx.core.djangoapps.contentserver.middleware.StaticContentServer',
 
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -1345,7 +1345,7 @@ INSTALLED_APPS = [
 
     'openedx.core.djangoapps.contentserver',
     'cms.djangoapps.course_creators',
-    'student.apps.StudentConfig',  # misleading name due to sharing with lms
+    'common.djangoapps.student.apps.StudentConfig',  # misleading name due to sharing with lms
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
     'cms.djangoapps.xblock_config.apps.XBlockConfig',
 

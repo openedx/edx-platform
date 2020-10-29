@@ -9,8 +9,8 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import GenericAPIView
 
 from openedx.core.lib.api.permissions import IsCourseStaffInstructor, IsMasterCourseStaffInstructor, IsStaffOrOwner
-from student.roles import CourseInstructorRole, CourseStaffRole
-from student.tests.factories import UserFactory
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class TestObject(object):

@@ -9,8 +9,8 @@ from datetime import datetime, timedelta
 import ddt
 from pytz import utc
 
-from student.roles import CourseCcxCoachRole
-from student.tests.factories import AdminFactory
+from common.djangoapps.student.roles import CourseCcxCoachRole
+from common.djangoapps.student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 

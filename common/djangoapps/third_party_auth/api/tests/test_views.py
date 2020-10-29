@@ -17,7 +17,7 @@ from rest_framework.test import APITestCase
 from six.moves import range
 from social_django.models import UserSocialAuth
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from third_party_auth.api.permissions import (
     JwtHasScope,
     JwtHasTpaProviderFilterForRequestedProvider,

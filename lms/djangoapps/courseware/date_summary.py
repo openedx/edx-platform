@@ -29,7 +29,7 @@ from openedx.core.djangoapps.certificates.api import can_show_certificate_availa
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.course_experience import RELATIVE_DATES_FLAG, UPGRADE_DEADLINE_MESSAGE, CourseHomeMessages
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 
 from .context_processor import user_timezone_locale_prefs
 

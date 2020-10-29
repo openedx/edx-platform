@@ -11,8 +11,8 @@ from six import text_type
 
 from edx_proctoring.api import create_exam
 from edx_proctoring.backends.tests.test_backend import TestBackendProvider
-from student.roles import CourseInstructorRole, CourseStaffRole
-from student.tests.factories import AdminFactory
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

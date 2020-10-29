@@ -51,9 +51,9 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangolib.markup import HTML, Text
-from student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info, generate_activation_email_context
-from student.message_types import AccountActivation, EmailChange, EmailChangeConfirmation, RecoveryEmailCreate
-from student.models import (
+from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info, generate_activation_email_context
+from common.djangoapps.student.message_types import AccountActivation, EmailChange, EmailChangeConfirmation, RecoveryEmailCreate
+from common.djangoapps.student.models import (
     AccountRecovery,
     CourseEnrollment,
     PendingEmailChange,
@@ -67,9 +67,9 @@ from student.models import (
     create_comments_service_user,
     email_exists_or_retired
 )
-from student.signals import REFUND_ORDER
-from student.tasks import send_activation_email
-from student.text_me_the_app import TextMeTheAppFragmentView
+from common.djangoapps.student.signals import REFUND_ORDER
+from common.djangoapps.student.tasks import send_activation_email
+from common.djangoapps.student.text_me_the_app import TextMeTheAppFragmentView
 from util.db import outer_atomic
 from util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore

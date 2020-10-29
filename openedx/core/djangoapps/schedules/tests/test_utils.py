@@ -13,7 +13,7 @@ from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory
 from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import CourseEnrollmentFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

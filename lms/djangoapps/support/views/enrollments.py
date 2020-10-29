@@ -25,7 +25,7 @@ from openedx.core.djangoapps.credit.email_utils import get_credit_provider_attri
 from openedx.core.djangoapps.enrollments.api import get_enrollments, update_enrollment
 from openedx.core.djangoapps.enrollments.errors import CourseModeNotFoundError
 from openedx.core.djangoapps.enrollments.serializers import ModeSerializer
-from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAttribute, ManualEnrollmentAudit
+from common.djangoapps.student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAttribute, ManualEnrollmentAudit
 from util.json_request import JsonResponse
 
 

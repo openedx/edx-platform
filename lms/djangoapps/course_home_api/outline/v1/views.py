@@ -38,7 +38,7 @@ from openedx.features.course_experience.utils import get_course_outline_block_tr
 from openedx.features.course_experience.views.latest_update import LatestUpdateFragmentView
 from openedx.features.course_experience.views.welcome_message import PREFERENCE_KEY, WelcomeMessageFragmentView
 from openedx.features.discounts.utils import generate_offer_html
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore.django import modulestore
 

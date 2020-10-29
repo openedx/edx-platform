@@ -10,7 +10,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils.translation import LANGUAGE_SESSION_KEY, get_language
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class TestLangPrefView(TestCase):

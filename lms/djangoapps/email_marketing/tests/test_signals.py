@@ -30,8 +30,8 @@ from lms.djangoapps.email_marketing.tasks import (
     update_user_email
 )
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
-from student.models import Registration
-from student.tests.factories import CourseEnrollmentFactory, UserFactory, UserProfileFactory
+from common.djangoapps.student.models import Registration
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory, UserProfileFactory
 from util.json_request import JsonResponse
 
 from ..models import EmailMarketingConfiguration

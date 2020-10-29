@@ -14,7 +14,7 @@ from django.test.utils import override_settings
 from django.urls import reverse
 
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

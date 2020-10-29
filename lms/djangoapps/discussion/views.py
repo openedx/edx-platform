@@ -57,7 +57,7 @@ from openedx.core.djangoapps.django_comment_common.utils import (
 )
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from util.json_request import JsonResponse, expect_json
 from xmodule.modulestore.django import modulestore
 

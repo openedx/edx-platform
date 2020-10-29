@@ -19,7 +19,7 @@ from edx_when.api import set_dates_for_course
 from edx_when.field_data import DateLookupFieldData
 from openedx.core.djangoapps.course_date_signals import handlers
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

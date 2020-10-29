@@ -14,14 +14,14 @@ from mock import patch
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
-from student.models import (
+from common.djangoapps.student.models import (
     SCORE_RECALCULATION_DELAY_ON_ENROLLMENT_UPDATE,
     CourseEnrollment,
     CourseFullError,
     EnrollmentClosedError
 )
-from student.roles import CourseInstructorRole, CourseStaffRole
-from student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

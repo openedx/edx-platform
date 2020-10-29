@@ -10,7 +10,7 @@ from django.test.client import RequestFactory
 from requests.exceptions import HTTPError
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.helpers import get_next_url_for_login_page
+from common.djangoapps.student.helpers import get_next_url_for_login_page
 from third_party_auth.middleware import ExceptionMiddleware
 from third_party_auth.tests.testutil import TestCase
 

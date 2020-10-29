@@ -26,7 +26,7 @@ from lms.djangoapps.email_marketing.tasks import (
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_authn.cookies import CREATE_LOGON_COOKIE
 from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER
-from student.signals import SAILTHRU_AUDIT_PURCHASE
+from common.djangoapps.student.signals import SAILTHRU_AUDIT_PURCHASE
 from util.model_utils import USER_FIELD_CHANGED
 
 from .models import EmailMarketingConfiguration

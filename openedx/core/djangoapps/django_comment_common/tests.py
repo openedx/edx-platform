@@ -13,7 +13,7 @@ from openedx.core.djangoapps.django_comment_common.utils import (
     get_course_discussion_settings,
     set_course_discussion_settings
 )
-from student.models import CourseEnrollment, User
+from common.djangoapps.student.models import CourseEnrollment, User
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

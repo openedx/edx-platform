@@ -14,7 +14,7 @@ from organizations.models import Organization
 from rest_framework.test import APITestCase, APIClient
 from search.search_engine_base import SearchEngine
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries.libraries_index import MAX_SIZE
 from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIGHTS_RESERVED
 from openedx.core.djangolib.testing.utils import skip_unless_cms

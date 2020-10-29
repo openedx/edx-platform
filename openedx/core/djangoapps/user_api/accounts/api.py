@@ -15,8 +15,8 @@ from django.utils.translation import override as override_language
 from django.utils.translation import ugettext as _
 from pytz import UTC
 from six import text_type  # pylint: disable=ungrouped-imports
-from student import views as student_views
-from student.models import (
+from common.djangoapps.student import views as student_views
+from common.djangoapps.student.models import (
     AccountRecovery,
     User,
     UserProfile,

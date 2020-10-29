@@ -14,7 +14,7 @@ from cms.djangoapps.contentstore.tasks import rerun_course
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from common.djangoapps.course_action_state.managers import CourseRerunUIStateManager
 from common.djangoapps.course_action_state.models import CourseRerunState
-from student.auth import has_course_author_access
+from common.djangoapps.student.auth import has_course_author_access
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum

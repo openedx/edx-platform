@@ -41,7 +41,7 @@ from openedx.core.lib.api.view_utils import (
     add_serializer_errors,
     build_api_error
 )
-from student.models import CourseAccessRole, CourseEnrollment
+from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
 from util.model_utils import truncate_fields
 from xmodule.modulestore.django import modulestore
 

@@ -56,7 +56,7 @@ from openedx.core.djangoapps.user_api.models import (
     UserRetirementPartnerReportingStatus,
     UserRetirementStatus
 )
-from student.models import (
+from common.djangoapps.student.models import (
     AccountRecovery,
     CourseEnrollment,
     CourseEnrollmentAllowed,
@@ -69,7 +69,7 @@ from student.models import (
     get_retired_email_by_email,
     get_retired_username_by_username
 )
-from student.tests.factories import (
+from common.djangoapps.student.tests.factories import (
     AccountRecoveryFactory,
     ContentTypeFactory,
     CourseEnrollmentAllowedFactory,

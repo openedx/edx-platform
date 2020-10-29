@@ -9,7 +9,7 @@ from factory.fuzzy import FuzzyChoice, FuzzyText
 from common.djangoapps.course_modes.helpers import CourseMode
 from common.djangoapps.entitlements.models import CourseEntitlement, CourseEntitlementPolicy
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class CourseEntitlementPolicyFactory(factory.django.DjangoModelFactory):

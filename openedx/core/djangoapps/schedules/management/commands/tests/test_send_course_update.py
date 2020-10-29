@@ -23,7 +23,7 @@ from openedx.core.djangoapps.schedules.management.commands.tests.send_email_base
 from openedx.core.djangoapps.schedules.management.commands.tests.upsell_base import ScheduleUpsellTestMixin
 from openedx.core.djangoapps.schedules.models import ScheduleExperience
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import CourseEnrollmentFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 

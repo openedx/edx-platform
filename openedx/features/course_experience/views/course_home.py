@@ -33,7 +33,7 @@ from openedx.features.course_duration_limits.access import generate_course_expir
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.discounts.utils import get_first_purchase_offer_banner_fragment
 from openedx.features.discounts.utils import format_strikeout_price
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from util.views import ensure_valid_course_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 

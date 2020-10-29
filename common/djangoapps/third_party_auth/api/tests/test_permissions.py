@@ -14,7 +14,7 @@ from mock import patch
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 from third_party_auth.api.permissions import TPA_PERMISSIONS
 

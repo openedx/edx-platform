@@ -12,8 +12,8 @@ from simple_history.utils import bulk_create_with_history
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.models import CourseEnrollment, NonExistentCourseError
-from student.roles import CourseStaffRole
+from common.djangoapps.student.models import CourseEnrollment, NonExistentCourseError
+from common.djangoapps.student.roles import CourseStaffRole
 
 from ..constants import ProgramCourseEnrollmentRoles, ProgramCourseEnrollmentStatuses
 from ..constants import ProgramCourseOperationStatuses as ProgramCourseOpStatuses

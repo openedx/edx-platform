@@ -7,7 +7,7 @@ from django.test import TestCase
 from django.urls import reverse
 from mock import patch
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from util.organizations_helpers import add_organization
 
 

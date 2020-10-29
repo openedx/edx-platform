@@ -26,8 +26,8 @@ from openedx.core.djangoapps.user_authn.views.login_form import login_and_regist
 from openedx.core.djangoapps.user_authn.views.register import RegistrationView
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context
-from student import models as student_models
-from student.tests.factories import UserFactory
+from common.djangoapps.student import models as student_models
+from common.djangoapps.student.tests.factories import UserFactory
 
 from third_party_auth import middleware, pipeline
 from third_party_auth.tests import testutil

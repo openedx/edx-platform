@@ -4,7 +4,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from student.auth import has_course_author_access
+from common.djangoapps.student.auth import has_course_author_access
 from xmodule.modulestore.django import modulestore
 
 __all__ = ['checklists_handler']

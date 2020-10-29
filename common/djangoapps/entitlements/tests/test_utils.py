@@ -12,7 +12,7 @@ from opaque_keys.edx.keys import CourseKey
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, CourseOverviewFactory, UserFactory
+from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, CourseOverviewFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection

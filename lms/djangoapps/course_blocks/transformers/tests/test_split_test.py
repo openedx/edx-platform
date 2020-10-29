@@ -7,7 +7,7 @@ import ddt
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
-from student.tests.factories import CourseEnrollmentFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.partitions.partitions import Group, UserPartition
 from xmodule.partitions.partitions_service import get_user_partition_groups

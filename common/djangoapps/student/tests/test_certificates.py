@@ -17,7 +17,7 @@ from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import (
     GeneratedCertificateFactory, LinkedInAddToProfileConfigurationFactory
 )
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -167,7 +167,7 @@ class CertificateDisplayTest(CertificateDisplayTestBase):
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
     def test_no_certificate_status_no_problem(self):
-        with patch('student.views.dashboard.cert_info', return_value={}):
+        with patch('common.djangoapps.student.views.dashboard.cert_info', return_value={}):
             self._create_certificate('honor')
             self._check_can_not_download_certificate()
 

@@ -8,7 +8,7 @@ from django.test import TestCase
 from django.utils.timezone import now
 
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class TestVerificationBase(TestCase):

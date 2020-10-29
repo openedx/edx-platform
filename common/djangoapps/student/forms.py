@@ -24,8 +24,8 @@ from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.user_authn.utils import should_redirect_to_logistration_mircrofrontend
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
-from student.message_types import AccountRecovery as AccountRecoveryMessage
-from student.models import CourseEnrollmentAllowed, email_exists_or_retired
+from common.djangoapps.student.message_types import AccountRecovery as AccountRecoveryMessage
+from common.djangoapps.student.models import CourseEnrollmentAllowed, email_exists_or_retired
 
 
 def send_account_recovery_email_for_user(user, request, email=None):

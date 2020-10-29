@@ -42,7 +42,7 @@ from openedx.core.djangoapps.enrollments.api import get_enrollments
 from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.core.djangoapps.programs import ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
 

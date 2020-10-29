@@ -30,7 +30,7 @@ from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.course_groups.models import CohortMembership
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
-from student.auth import has_course_author_access
+from common.djangoapps.student.auth import has_course_author_access
 from util.json_request import JsonResponse, expect_json
 
 from . import api, cohorts

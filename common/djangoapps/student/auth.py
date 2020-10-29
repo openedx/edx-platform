@@ -11,7 +11,7 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from opaque_keys.edx.locator import LibraryLocator
 
-from student.roles import (
+from common.djangoapps.student.roles import (
     CourseBetaTesterRole,
     CourseCreatorRole,
     CourseInstructorRole,

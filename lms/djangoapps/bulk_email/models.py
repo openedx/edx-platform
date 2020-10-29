@@ -22,7 +22,7 @@ from openedx.core.djangoapps.enrollments.api import validate_course_mode
 from openedx.core.djangoapps.enrollments.errors import CourseModeNotFoundError
 from openedx.core.lib.html_to_text import html_to_text
 from openedx.core.lib.mail_utils import wrap_message
-from student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from util.keyword_substitution import substitute_keywords_with_data
 from util.query import use_read_replica_if_available
 

@@ -13,8 +13,8 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework.test import APIClient
 
 from openedx.core.lib.courses import course_image_url
-from student.models import CourseAccessRole
-from student.tests.factories import TEST_PASSWORD, AdminFactory, UserFactory
+from common.djangoapps.student.models import CourseAccessRole
+from common.djangoapps.student.tests.factories import TEST_PASSWORD, AdminFactory, UserFactory
 from util.organizations_helpers import add_organization, get_course_organizations
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore

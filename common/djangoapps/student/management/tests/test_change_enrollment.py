@@ -7,8 +7,8 @@ from mock import patch
 from six import text_type
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -42,7 +42,7 @@ class ChangeEnrollmentTests(SharedModuleStoreTestCase):
             self.users.append(user)
             self.enrollments.append(CourseEnrollment.enroll(user, self.course.id, mode='audit'))
 
-    @patch('student.management.commands.change_enrollment.logger')
+    @patch('common.djangoapps.student.management.commands.change_enrollment.logger')
     @ddt.data(
         ('email', False, 3),
         ('username', False, 3),
@@ -86,7 +86,7 @@ class ChangeEnrollmentTests(SharedModuleStoreTestCase):
             len(self.users)
         )
 
-    @patch('student.management.commands.change_enrollment.logger')
+    @patch('common.djangoapps.student.management.commands.change_enrollment.logger')
     @ddt.data(
         ('email', 'dtennant@thedoctor.com', 3),
         ('username', 'dtennant', 3),

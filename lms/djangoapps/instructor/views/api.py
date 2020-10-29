@@ -94,8 +94,8 @@ from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
-from student import auth
-from student.models import (
+from common.djangoapps.student import auth
+from common.djangoapps.student.models import (
     ALLOWEDTOENROLL_TO_ENROLLED,
     ALLOWEDTOENROLL_TO_UNENROLLED,
     DEFAULT_TRANSITION_STATE,
@@ -115,7 +115,7 @@ from student.models import (
     is_email_retired,
     unique_id_for_user
 )
-from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
+from common.djangoapps.student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
 from util.file import (
     FileValidationException,
     UniversalNewlineIterator,

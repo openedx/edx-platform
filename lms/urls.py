@@ -51,7 +51,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_authn.views.login import redirect_to_lms_login
 from openedx.core.djangoapps.verified_track_content import views as verified_track_content_views
 from openedx.features.enterprise_support.api import enterprise_enabled
-from student import views as student_views
+from common.djangoapps.student import views as student_views
 from util import views as util_views
 
 RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
@@ -95,7 +95,7 @@ notification_prefs_urls = [
 urlpatterns = [
     url(r'^$', branding_views.index, name='root'),  # Main marketing page, or redirect to courseware
 
-    url(r'', include('student.urls')),
+    url(r'', include('common.djangoapps.student.urls')),
     # TODO: Move lms specific student views out of common code
     url(r'^dashboard/?$', student_views.student_dashboard, name='dashboard'),
     url(r'^change_enrollment$', student_views.change_enrollment, name='change_enrollment'),

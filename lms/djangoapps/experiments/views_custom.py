@@ -25,7 +25,7 @@ from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cros
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermissionIsAuthenticated
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from track import segment
 
 # .. toggle_name: experiments.mobile_upsell_rev934

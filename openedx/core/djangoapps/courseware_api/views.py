@@ -45,7 +45,7 @@ from openedx.features.course_duration_limits.access import (
     get_user_course_expiration_date, generate_course_expired_message
 )
 from openedx.features.discounts.utils import generate_offer_html
-from student.models import CourseEnrollment, CourseEnrollmentCelebration, LinkedInAddToProfileConfiguration
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentCelebration, LinkedInAddToProfileConfiguration
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import path_to_location
 

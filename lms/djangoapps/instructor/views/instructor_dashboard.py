@@ -53,8 +53,8 @@ from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackC
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_utils import wrap_xblock
-from student.models import CourseEnrollment
-from student.roles import (
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import (
     CourseFinanceAdminRole, CourseInstructorRole,
     CourseSalesAdminRole, CourseStaffRole
 )
