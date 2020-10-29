@@ -68,7 +68,6 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
     OLD_EMAIL = u"walter@graymattertech.com"
     NEW_EMAIL = u"walt@savewalterwhite.com"
 
-    INVALID_ATTEMPTS = 100
     INVALID_KEY = u"123abc"
 
     URLCONF_MODULES = ['student_accounts.urls']
@@ -238,17 +237,23 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
             logger.check((LOGGER_NAME, 'INFO', 'Invalid password reset attempt'))
 
     def test_password_change_rate_limited(self):
+        """
+        Tests that consective password reset requests are rate limited.
+        """
         # Log out the user created during test setup, to prevent the view from
         # selecting the logged-in user's email address over the email provided
         # in the POST data
         self.client.logout()
+        for status in [200, 403]:
+            response = self._change_password(email=self.NEW_EMAIL)
+            self.assertEqual(response.status_code, status)
 
-        # Make many consecutive bad requests in an attempt to trigger the rate limiter
-        for __ in range(self.INVALID_ATTEMPTS):
-            self._change_password(email=self.NEW_EMAIL)
-
-        response = self._change_password(email=self.NEW_EMAIL)
-        self.assertEqual(response.status_code, 403)
+        with mock.patch(
+            'util.request_rate_limiter.PasswordResetEmailRateLimiter.is_rate_limit_exceeded',
+            return_value=False
+        ):
+            response = self._change_password(email=self.NEW_EMAIL)
+            self.assertEqual(response.status_code, 200)
 
     @ddt.data(
         ('post', 'password_change_request', []),
@@ -318,7 +323,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
             visible=True,
             enabled=True,
             icon_class='',
-            icon_image=SimpleUploadedFile('icon.svg', '<svg><rect width="50" height="100"/></svg>'),
+            icon_image=SimpleUploadedFile('icon.svg', b'<svg><rect width="50" height="100"/></svg>'),
         )
         self.hidden_enabled_provider = self.configure_linkedin_provider(
             visible=False,
@@ -601,7 +606,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         tpa_hint = self.hidden_disabled_provider.provider_id
         params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
         response = self.client.get(reverse('signin_user'), params, HTTP_ACCEPT="text/html")
-        self.assertNotIn(response.content, tpa_hint)
+        self.assertNotIn(response.content.decode('utf-8'), tpa_hint)
 
     @ddt.data(
         ('signin_user', 'login'),
@@ -645,7 +650,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         tpa_hint = self.hidden_disabled_provider.provider_id
         params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
         response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
-        self.assertNotIn(response.content, tpa_hint)
+        self.assertNotIn(response.content.decode('utf-8'), tpa_hint)
 
     @override_settings(FEATURES=dict(settings.FEATURES, THIRD_PARTY_AUTH_HINT='oa2-google-oauth2'))
     @ddt.data(
@@ -705,7 +710,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
                 line_break=HTML('<br/>'),
                 enterprise_name=ec_name,
                 platform_name=settings.PLATFORM_NAME,
-                privacy_policy_link_start=HTML(u"<a href='{pp_url}' target='_blank'>").format(
+                privacy_policy_link_start=HTML(u"<a href='{pp_url}' rel='noopener' target='_blank'>").format(
                     pp_url=settings.MKTG_URLS.get('PRIVACY', 'https://www.edx.org/edx-privacy-policy')
                 ),
                 privacy_policy_link_end=HTML("</a>"),

@@ -3,6 +3,7 @@ Computes the data to display on the Instructor Dashboard
 """
 from __future__ import absolute_import
 
+import decimal
 import json
 
 from django.db.models import Count
@@ -11,7 +12,7 @@ from opaque_keys.edx.locator import BlockUsageLocator
 from six import text_type
 
 from courseware import models
-from instructor_analytics.csvs import create_csv_response
+from lms.djangoapps.instructor_analytics.csvs import create_csv_response
 from util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata
@@ -534,7 +535,7 @@ def get_students_problem_grades(request, csv=False):
         for student in students:
             percent = 0
             if student['max_grade'] > 0:
-                percent = round(student['grade'] * 100 / student['max_grade'])
+                percent = round(decimal.Decimal(student['grade'] * 100 / student['max_grade']), 1)
             results.append([student['student__profile__name'], student['student__username'], student['grade'], percent])
 
         response = create_csv_response(filename, header, results)
@@ -599,5 +600,5 @@ def sanitize_filename(filename):
     """
     filename = filename.replace(" ", "_")
     filename = filename.encode('utf-8')
-    filename = filename[0:25] + '.csv'
+    filename = filename[0:25].decode('utf-8') + '.csv'
     return filename

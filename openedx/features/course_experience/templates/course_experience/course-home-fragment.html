@@ -13,7 +13,7 @@ from django.urls import reverse
 
 from lms.djangoapps.discussion.django_comment_client.permissions import has_permission
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
-from openedx.core.djangolib.markup import HTML
+from openedx.core.djangolib.markup import Text, HTML
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REVIEWS_TOOL_FLAG
 %>
 
@@ -124,7 +124,7 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REV
                 </div>
             % endif
             % if upgrade_url and upgrade_price:
-                <div class="section section-upgrade course-home-sidebar-upgrade">
+                <div class="section section-upgrade course-home-sidebar-upgrade ${'discount' if has_discount else 'no-discount'}">
                     <h3 class="hd hd-6">${_("Pursue a verified certificate")}</h3>
                         <img src="https://courses.edx.org/static/images/edx-verified-mini-cert.png" alt="">
                         <div class="upgrade-container">
@@ -132,11 +132,12 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REV
                                 <a class="btn-brand btn-upgrade"
                                    href="${upgrade_url}"
                                    data-creative="sidebarupsell"
-                                   data-position="sidebar-message">
-                                   ${_("Upgrade ({price})").format(price=upgrade_price)}
+                                   data-position="sidebar-message"
+                                >
+                                    ${Text(_("Upgrade ({price})")).format(price=upgrade_price)}
                                 </a>
                             </p>
-                    <p><button class="btn-link btn-small promo-learn-more">${_('Learn More')}</button></p>
+                            <p><button class="btn-link btn-small promo-learn-more">${_('Learn More')}</button></p>
                         </div>
                 </div>
             % endif

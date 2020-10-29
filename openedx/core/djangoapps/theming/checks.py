@@ -1,7 +1,10 @@
 """
 Settings validations for the theming app
 """
+from __future__ import absolute_import
+
 import os
+
 import six
 from django.conf import settings
 from django.core.checks import Error, Tags, register

@@ -234,7 +234,7 @@ class CourseEndingTest(TestCase):
         Tests that the higher of the persisted grade and the grade
         from the certs table is used on the learner dashboard.
         """
-        expected_grade = max(persisted_grade, cert_grade)
+        expected_grade = max(filter(lambda x: x is not None, [persisted_grade, cert_grade]))
         user = Mock(username="fred", id="1")
         survey_url = "http://a_survey.com"
         course = Mock(

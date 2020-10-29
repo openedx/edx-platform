@@ -43,12 +43,7 @@ from student.models import (
 from util.model_utils import emit_setting_changed_event
 from util.password_policy_validators import normalize_password, validate_password
 
-from .serializers import (
-    AccountLegacyProfileSerializer,
-    AccountUserSerializer,
-    UserReadOnlySerializer,
-    _visible_fields
-)
+from .serializers import AccountLegacyProfileSerializer, AccountUserSerializer, UserReadOnlySerializer, _visible_fields
 
 # Public access point for this function.
 visible_fields = _visible_fields

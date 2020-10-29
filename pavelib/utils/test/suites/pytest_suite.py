@@ -2,11 +2,15 @@
 """
 Classes used for defining and running pytest test suites
 """
+from __future__ import absolute_import
+
 import os
 from glob import glob
+
+from pavelib.utils.envs import Env
 from pavelib.utils.test import utils as test_utils
 from pavelib.utils.test.suites.suite import TestSuite
-from pavelib.utils.envs import Env
+from pavelib.utils.test.utils import COVERAGE_CACHE_BASELINE, COVERAGE_CACHE_BASEPATH, WHO_TESTS_WHAT_DIFF
 
 __test__ = False  # do not collect
 
@@ -44,6 +48,7 @@ class PytestSuite(TestSuite):
         self.xunit_report = self.report_dir / "nosetests.xml"
 
         self.cov_args = kwargs.get('cov_args', '')
+        self.with_wtw = kwargs.get('with_wtw', False)
 
     def __enter__(self):
         super(PytestSuite, self).__enter__()
@@ -100,6 +105,14 @@ class PytestSuite(TestSuite):
 
         if self.fail_fast or env_fail_fast_set:
             opts.append("--exitfirst")
+
+        if self.with_wtw:
+            opts.extend([
+                '--wtw',
+                '{}/{}'.format(COVERAGE_CACHE_BASEPATH, WHO_TESTS_WHAT_DIFF),
+                '--wtwdb',
+                '{}/{}'.format(COVERAGE_CACHE_BASEPATH, COVERAGE_CACHE_BASELINE)
+            ])
 
         return opts
 
@@ -167,12 +180,12 @@ class SystemTestSuite(PytestSuite):
                 xdist_remote_processes = self.processes
             for ip in self.xdist_ip_addresses.split(','):
                 # Propogate necessary env vars to xdist containers
-                env_var_cmd = u'export DJANGO_SETTINGS_MODULE={} DISABLE_COURSEENROLLMENT_HISTORY={}'\
+                env_var_cmd = u'export DJANGO_SETTINGS_MODULE={} DISABLE_COURSEENROLLMENT_HISTORY={} PYTHONHASHSEED=0'\
                     .format('{}.envs.{}'.format(self.root, self.settings),
                             self.disable_courseenrollment_history)
-                xdist_string = u'--tx {}*ssh="ubuntu@{} -o StrictHostKeyChecking=no"' \
-                               '//python="source /edx/app/edxapp/edxapp_env; {}; python"' \
-                               '//chdir="/edx/app/edxapp/edx-platform"' \
+                xdist_string = u'--tx {}*ssh="jenkins@{} -o StrictHostKeyChecking=no"' \
+                               '//python="source edx-venv/bin/activate; {}; python"' \
+                               '//chdir="edx-platform"' \
                                .format(xdist_remote_processes, ip, env_var_cmd)
                 cmd.append(xdist_string)
             for rsync_dir in Env.rsync_dirs():
@@ -220,6 +233,7 @@ class SystemTestSuite(PytestSuite):
         if self.root == 'lms':
             default_test_globs.append("{system}/tests.py".format(system=self.root))
             default_test_globs.append("openedx/core/djangolib/*")
+            default_test_globs.append("openedx/core/tests/*")
             default_test_globs.append("openedx/features")
 
         def included(path):
@@ -295,9 +309,9 @@ class LibTestSuite(PytestSuite):
                 env_var_cmd = u'{} DISABLE_COURSEENROLLMENT_HISTORY={}' \
                     .format(django_env_var_cmd, self.disable_courseenrollment_history)
 
-                xdist_string = u'--tx {}*ssh="ubuntu@{} -o StrictHostKeyChecking=no"' \
-                               '//python="source /edx/app/edxapp/edxapp_env; {}; python"' \
-                               '//chdir="/edx/app/edxapp/edx-platform"' \
+                xdist_string = u'--tx {}*ssh="jenkins@{} -o StrictHostKeyChecking=no"' \
+                               '//python="source edx-venv/bin/activate; {}; python"' \
+                               '//chdir="edx-platform"' \
                                .format(xdist_remote_processes, ip, env_var_cmd)
                 cmd.append(xdist_string)
             for rsync_dir in Env.rsync_dirs():

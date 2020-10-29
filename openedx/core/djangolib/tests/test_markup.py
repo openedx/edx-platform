@@ -7,6 +7,7 @@ from __future__ import absolute_import
 import unittest
 
 import ddt
+from bs4 import BeautifulSoup
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 from mako.template import Template
@@ -100,3 +101,67 @@ class FormatHtmlTest(unittest.TestCase):
         html = strip_all_tags_but_br('{name}<br><script>')
         html = html.format(name='Rock & Roll')
         self.assertEqual(html.decode(), u'Rock &amp; Roll<br>')
+
+    def test_clean_dengers_html_filter(self):
+        """ Verify filter removes expected tags """
+        template = Template(
+            u"""
+                <%page expression_filter="h"/>
+                <%!
+                from openedx.core.djangolib.markup import clean_dangerous_html
+                %>
+                <%
+                    html_content = '''
+                        <html>
+                            <head>
+                                <script type="text/javascript" src="evil-site"></script>
+                                <link rel="alternate" type="text/rss" src="evil-rss">
+                                <style>
+                                    body {
+                                        background-image: url(javascript:do_evil)
+                                    };
+                                    div {
+                                        color: expression(evil)
+                                    };
+                                </style>
+                            </head>
+                            <body onload="evil_function()">
+                                <!-- I am interpreted for EVIL! -->
+                                <a href="javascript:evil_function()">a link</a>
+                                <a href="#" onclick="evil_function()">another link</a>
+                                <p onclick="evil_function()">a paragraph</p>
+                                <div style="display: none">secret EVIL!</div>
+                                <object> of EVIL!</object>
+                                <iframe src="evil-site"></iframe>
+                                <form action="evil-site">
+                                    Password: <input type="password" name="password">
+                                </form>
+                                <blink>annoying EVIL!</blink>
+                                <a href="evil-site">spam spam SPAM!</a>
+                                <image src="evil!">
+                            </body>
+                        </html>
+                    '''
+                %>
+                ${html_content | n, clean_dangerous_html}
+            """
+        )
+        rendered_template = template.render()
+        html_soup = BeautifulSoup(rendered_template, 'html.parser')
+
+        self.assertTrue(html_soup.find('a'))
+        self.assertTrue(html_soup.find('div'))
+        self.assertTrue(html_soup.find('div', attrs={'style': 'display: none'}))
+        self.assertTrue(html_soup.find('p'))
+        self.assertTrue(html_soup.find('img'))
+
+        self.assertFalse(html_soup.find('a', attrs={'onclick': 'evil_function()'}))
+        self.assertFalse(html_soup.find('html'))
+        self.assertFalse(html_soup.find('head'))
+        self.assertFalse(html_soup.find('script'))
+        self.assertFalse(html_soup.find('style'))
+        self.assertFalse(html_soup.find('link'))
+        self.assertFalse(html_soup.find('iframe'))
+        self.assertFalse(html_soup.find('form'))
+        self.assertFalse(html_soup.find('blink'))
+        self.assertFalse(html_soup.find('object'))

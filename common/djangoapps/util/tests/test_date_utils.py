@@ -9,6 +9,7 @@ import unittest
 from datetime import datetime, timedelta, tzinfo
 
 import ddt
+import six
 from mock import patch
 from pytz import utc
 
@@ -135,7 +136,8 @@ class StrftimeLocalizedTest(unittest.TestCase):
         dtime = datetime(2013, 2, 14, 16, 41, 17)
         self.assertEqual(expected, strftime_localized(dtime, fmt))
         # strftime doesn't like Unicode, so do the work in UTF8.
-        self.assertEqual(expected, dtime.strftime(fmt.encode('utf8')).decode('utf8'))
+        self.assertEqual(expected.encode('utf-8') if six.PY2 else expected,
+                         dtime.strftime(fmt.encode('utf-8') if six.PY2 else fmt))
 
     @ddt.data(
         ("SHORT_DATE", "Feb 14, 2013"),

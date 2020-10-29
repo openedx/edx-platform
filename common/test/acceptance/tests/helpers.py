@@ -2,6 +2,8 @@
 Test helper functions and base classes.
 """
 
+from __future__ import absolute_import
+
 import functools
 import inspect
 import io
@@ -10,12 +12,13 @@ import operator
 import os
 import pprint
 import sys
-import urlparse
 from contextlib import contextmanager
 from datetime import datetime
 from unittest import SkipTest, TestCase
 
 import requests
+import six
+import six.moves.urllib.parse  # pylint: disable=import-error
 from bok_choy.javascript import js_defined
 from bok_choy.page_object import XSS_INJECTION
 from bok_choy.promise import EmptyPromise, Promise
@@ -28,6 +31,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
+from six.moves import range, zip
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
@@ -86,7 +90,7 @@ def is_youtube_available():
         'transcript': 'http://video.google.com/timedtext?lang=en&v=3_yD_cEKoCk',
     }
 
-    for url in youtube_api_urls.itervalues():
+    for url in six.itervalues(youtube_api_urls):
         try:
             response = requests.get(url, allow_redirects=False)
         except requests.exceptions.ConnectionError:
@@ -672,7 +676,7 @@ class EventsTestMixin(TestCase):
 
     def relative_path_to_absolute_uri(self, relative_path):
         """Return an aboslute URI given a relative path taking into account the test context."""
-        return urlparse.urljoin(BASE_URL, relative_path)
+        return six.moves.urllib.parse.urljoin(BASE_URL, relative_path)
 
     def event_filter_to_descriptive_string(self, event_filter):
         """Find the source code of the callable or pretty-print the dictionary"""
@@ -817,7 +821,7 @@ class UniqueCourseTest(AcceptanceTest):
             self.course_info['run'],
             deprecated=(default_store == 'draft')
         )
-        return unicode(course_key)
+        return six.text_type(course_key)
 
 
 class YouTubeConfigError(Exception):
@@ -890,7 +894,7 @@ class YouTubeStubConfig(object):
         response = requests.get(youtube_stub_config_url)
 
         if response.ok:
-            return json.loads(response.content)
+            return json.loads(response.content.decode('utf-8'))
         else:
             return {}
 

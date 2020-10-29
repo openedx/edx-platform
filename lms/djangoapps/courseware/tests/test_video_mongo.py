@@ -46,14 +46,13 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_SPLIT_MODULESTORE
 from xmodule.tests.test_import import DummySystem
-from xmodule.tests.test_video import VideoDescriptorTestBase, instantiate_descriptor
-from xmodule.video_module import VideoDescriptor, bumper_utils, video_utils
+from xmodule.tests.test_video import VideoBlockTestBase
+from xmodule.video_module import VideoBlock, bumper_utils, video_utils
 from xmodule.video_module.transcripts_utils import Transcript, save_to_store, subs_filename
 from xmodule.video_module.video_module import EXPORT_IMPORT_COURSE_DIR, EXPORT_IMPORT_STATIC_DIR
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
-from .helpers import BaseTestXmodule
-from .test_video_handlers import TestVideo
+from .test_video_handlers import BaseTestVideoXBlock, TestVideo
 from .test_video_xml import SOURCE_XML
 
 MODULESTORES = {
@@ -96,7 +95,7 @@ class TestVideoYouTube(TestVideo):
             'metadata': json.dumps(OrderedDict({
                 'autoAdvance': False,
                 'saveStateEnabled': True,
-                'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
+                'saveStateUrl': self.item_descriptor.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',
                 'sources': sources,
@@ -113,8 +112,7 @@ class TestVideoYouTube(TestVideo):
                 'transcriptLanguages': OrderedDict({'en': 'English', 'uk': u'Українська'}),
                 'ytTestTimeout': 1500,
                 'ytApiUrl': 'https://www.youtube.com/iframe_api',
-                'ytMetadataUrl': 'https://www.googleapis.com/youtube/v3/videos/',
-                'ytKey': None,
+                'lmsRootURL': settings.LMS_ROOT_URL,
                 'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
                 'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
                 'autohideHtml5': False,
@@ -146,7 +144,7 @@ class TestVideoNonYouTube(TestVideo):
         display_name="A Name"
         sub="a_sub_file.srt.sjson"
         download_video="true"
-        start_time="01:00:03" end_time="01:00:10"
+        start_time="3603.0" end_time="3610.0"
         >
             <source src="example.mp4"/>
             <source src="example.webm"/>
@@ -178,7 +176,7 @@ class TestVideoNonYouTube(TestVideo):
             'metadata': json.dumps(OrderedDict({
                 'autoAdvance': False,
                 'saveStateEnabled': True,
-                'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
+                'saveStateUrl': self.item_descriptor.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '1.00:3_yD_cEKoCk',
                 'sources': sources,
@@ -195,8 +193,7 @@ class TestVideoNonYouTube(TestVideo):
                 'transcriptLanguages': OrderedDict({'en': 'English'}),
                 'ytTestTimeout': 1500,
                 'ytApiUrl': 'https://www.youtube.com/iframe_api',
-                'ytMetadataUrl': 'https://www.googleapis.com/youtube/v3/videos/',
-                'ytKey': None,
+                'lmsRootURL': settings.LMS_ROOT_URL,
                 'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
                 'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
                 'autohideHtml5': False,
@@ -222,7 +219,7 @@ class TestVideoNonYouTube(TestVideo):
 
 
 @ddt.ddt
-class TestGetHtmlMethod(BaseTestXmodule):
+class TestGetHtmlMethod(BaseTestVideoXBlock):
     '''
     Make sure that `get_html` works correctly.
     '''
@@ -254,8 +251,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'transcriptLanguages': OrderedDict({'en': 'English'}),
             'ytTestTimeout': 1500,
             'ytApiUrl': 'https://www.youtube.com/iframe_api',
-            'ytMetadataUrl': 'https://www.googleapis.com/youtube/v3/videos/',
-            'ytKey': None,
+            'lmsRootURL': settings.LMS_ROOT_URL,
             'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
             'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
             'autohideHtml5': False,
@@ -280,7 +276,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             <video show_captions="true"
             display_name="A Name"
                 sub="{sub}" download_track="{download_track}"
-            start_time="01:00:03" end_time="01:00:10" download_video="true"
+            start_time="3603.0" end_time="3610.0" download_video="true"
             >
                 <source src="example.mp4"/>
                 <source src="example.webm"/>
@@ -360,7 +356,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 transcripts=data['transcripts'],
             )
 
-            self.initialize_module(data=DATA)
+            self.initialize_block(data=DATA)
             track_url = self.get_handler_url('transcript', 'download')
 
             context = self.item_descriptor.render(STUDENT_VIEW).content
@@ -370,7 +366,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
                 'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
                 'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
-                'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
+                'saveStateUrl': self.item_descriptor.ajax_url + '/save_user_state',
             })
             expected_context.update({
                 'transcript_download_format': (
@@ -394,7 +390,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             display_name="A Name"
             sub="a_sub_file.srt.sjson" source="{source}"
             download_video="{download_video}"
-            start_time="01:00:03" end_time="01:00:10"
+            start_time="3603.0" end_time="3610.0"
             >
                 {sources}
             </video>
@@ -409,7 +405,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                     <source src="example.webm"/>
                 """,
                 'result': {
-                    'download_video_link': u'example_source.mp4',
+                    'download_video_link': u'example.mp4',
                     'sources': [u'example.mp4', u'example.webm'],
                 },
             },
@@ -474,7 +470,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 source=data['source'],
                 sources=data['sources']
             )
-            self.initialize_module(data=DATA)
+            self.initialize_block(data=DATA)
             context = self.item_descriptor.render(STUDENT_VIEW).content
 
             expected_context = dict(initial_context)
@@ -482,7 +478,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
                 'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
                 'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
-                'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
+                'saveStateUrl': self.item_descriptor.ajax_url + '/save_user_state',
                 'sources': data['result'].get('sources', []),
             })
             expected_context.update({
@@ -498,14 +494,14 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
     def test_get_html_with_non_existent_edx_video_id(self):
         """
-        Tests the VideoModule get_html where a edx_video_id is given but a video is not found
+        Tests the VideoBlock get_html where a edx_video_id is given but a video is not found
         """
         SOURCE_XML = u"""
             <video show_captions="true"
             display_name="A Name"
             sub="a_sub_file.srt.sjson" source="{source}"
             download_video="{download_video}"
-            start_time="01:00:03" end_time="01:00:10"
+            start_time="3603.0" end_time="3610.0"
             edx_video_id="{edx_video_id}"
             >
                 {sources}
@@ -520,7 +516,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             """,
             'edx_video_id': "meow",
             'result': {
-                'download_video_link': u'example_source.mp4',
+                'download_video_link': u'example.mp4',
                 'sources': [u'example.mp4', u'example.webm'],
             }
         }
@@ -530,11 +526,11 @@ class TestGetHtmlMethod(BaseTestXmodule):
             sources=no_video_data['sources'],
             edx_video_id=no_video_data['edx_video_id']
         )
-        self.initialize_module(data=DATA)
+        self.initialize_block(data=DATA)
 
         # Referencing a non-existent VAL ID in courseware won't cause an error --
-        # it'll just fall back to the values in the VideoDescriptor.
-        self.assertIn("example_source.mp4", self.item_descriptor.render(STUDENT_VIEW).content)
+        # it'll just fall back to the values in the VideoBlock.
+        self.assertIn("example.mp4", self.item_descriptor.render(STUDENT_VIEW).content)
 
     def test_get_html_with_mocked_edx_video_id(self):
         SOURCE_XML = """
@@ -542,7 +538,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             display_name="A Name"
             sub="a_sub_file.srt.sjson" source="{source}"
             download_video="{download_video}"
-            start_time="01:00:03" end_time="01:00:10"
+            start_time="3603.0" end_time="3610.0"
             edx_video_id="{edx_video_id}"
             >
                 {sources}
@@ -596,7 +592,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             sources=data['sources'],
             edx_video_id=data['edx_video_id']
         )
-        self.initialize_module(data=DATA)
+        self.initialize_block(data=DATA)
 
         with patch('edxval.api.get_video_info') as mock_get_video_info:
             mock_get_video_info.return_value = {
@@ -620,7 +616,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
             'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
             'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
-            'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
+            'saveStateUrl': self.item_descriptor.ajax_url + '/save_user_state',
             'sources': data['result']['sources'],
         })
         expected_context.update({
@@ -636,7 +632,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
     def test_get_html_with_existing_edx_video_id(self):
         """
-        Tests the `VideoModule` `get_html` where `edx_video_id` is given and related video is found
+        Tests the `VideoBlock` `get_html` where `edx_video_id` is given and related video is found
         """
         edx_video_id = 'thundercats'
         # create video with provided edx_video_id and return encoded_videos
@@ -665,7 +661,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
     def test_get_html_with_existing_unstripped_edx_video_id(self):
         """
-        Tests the `VideoModule` `get_html` where `edx_video_id` with some unwanted tab(\t)
+        Tests the `VideoBlock` `get_html` where `edx_video_id` with some unwanted tab(\t)
         is given and related video is found
         """
         edx_video_id = 'thundercats'
@@ -731,7 +727,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             display_name="A Name"
             sub="a_sub_file.srt.sjson" source="{source}"
             download_video="{download_video}"
-            start_time="01:00:03" end_time="01:00:10"
+            start_time="3603.0" end_time="3610.0"
             edx_video_id="{edx_video_id}"
             >
                 {sources}
@@ -769,7 +765,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             sources=data['sources'],
             edx_video_id=data['edx_video_id']
         )
-        self.initialize_module(data=DATA)
+        self.initialize_block(data=DATA)
         # context returned by get_html
         context = self.item_descriptor.render(STUDENT_VIEW).content
 
@@ -779,7 +775,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
             'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
             'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
-            'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
+            'saveStateUrl': self.item_descriptor.ajax_url + '/save_user_state',
             'sources': data['result']['sources'],
         })
         expected_context.update({
@@ -820,7 +816,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             sub="a_sub_file.srt.sjson" source="{source}"
             download_video="{download_video}"
             edx_video_id="{edx_video_id}"
-            start_time="01:00:03" end_time="01:00:10"
+            start_time="3603.0" end_time="3610.0"
             >
                 {sources}
             </video>
@@ -834,7 +830,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 <source src="http://example.com/example.webm"/>
             """,
             'result': {
-                'download_video_link': u'example_source.mp4',
+                'download_video_link': u'http://example.com/example.mp4',
                 'sources': [
                     u'http://cdn-example.com/example.mp4',
                     u'http://cdn-example.com/example.webm'
@@ -881,7 +877,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 sources=data['sources'],
                 edx_video_id=data['edx_video_id'],
             )
-            self.initialize_module(data=DATA)
+            self.initialize_block(data=DATA)
             self.item_descriptor.xmodule_runtime.user_location = 'CN'
             context = self.item_descriptor.render('student_view').content
             expected_context = dict(initial_context)
@@ -889,7 +885,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
                 'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
                 'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
-                'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
+                'saveStateUrl': self.item_descriptor.ajax_url + '/save_user_state',
                 'sources': data['result'].get('sources', []),
             })
             expected_context.update({
@@ -919,7 +915,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                     sub="a_sub_file.srt.sjson" source="{source}"
                     download_video="{download_video}"
                     edx_video_id="{edx_video_id}"
-                    start_time="01:00:03" end_time="01:00:10"
+                    start_time="3603.0" end_time="3610.0"
                     >
                         {sources}
                     </video>
@@ -932,7 +928,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                         <source src="http://example.com/example.mp4"/>
                     """,
             'result': {
-                'download_video_link': u'example_source.mp4',
+                'download_video_link': u'http://example.com/example.mp4',
                 'sources': [
                     u'http://example.com/example.mp4',
                 ],
@@ -972,7 +968,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 sources=data['sources'],
                 edx_video_id=data['edx_video_id'],
             )
-            self.initialize_module(data=DATA)
+            self.initialize_block(data=DATA)
 
             # Mocking the edxval API call because if not done,
             # the method throws exception as no VAL entry is found
@@ -992,7 +988,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
                 'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
                 'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
-                'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
+                'saveStateUrl': self.item_descriptor.ajax_url + '/save_user_state',
                 'sources': data['result'].get('sources', []),
             })
             expected_context.update({
@@ -1025,7 +1021,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             with patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled') as feature_enabled:
                 feature_enabled.return_value = hls_feature_enabled
                 video_xml = '<video display_name="Video" download_video="true" edx_video_id="12345-67890">[]</video>'
-                self.initialize_module(data=video_xml)
+                self.initialize_block(data=video_xml)
                 self.item_descriptor.render(STUDENT_VIEW)
                 get_urls_for_profiles.assert_called_with(
                     self.item_descriptor.edx_video_id,
@@ -1050,7 +1046,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'desktop_mp4': 'https://mp4.com/dm.mp4'
         }
 
-        self.initialize_module(data=video_xml)
+        self.initialize_block(data=video_xml)
         context = self.item_descriptor.render(STUDENT_VIEW).content
 
         self.assertIn("'download_video_link': 'https://mp4.com/dm.mp4'", context)
@@ -1069,7 +1065,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         </video>
         """
 
-        self.initialize_module(data=video_xml)
+        self.initialize_block(data=video_xml)
         context = self.item_descriptor.render(STUDENT_VIEW).content
         self.assertIn("'download_video_link': None", context)
 
@@ -1083,7 +1079,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         </video>
         """
 
-        self.initialize_module(data=video_xml)
+        self.initialize_block(data=video_xml)
         context = self.item_descriptor.render(STUDENT_VIEW).content
         self.assertIn('"saveStateEnabled": true', context)
         context = self.item_descriptor.render(PUBLIC_VIEW).content
@@ -1097,7 +1093,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         video_xml = '<video display_name="Video" download_video="true" edx_video_id="12345-67890">[]</video>'
         get_course_video_image_url.return_value = '/media/video-images/poster.png'
 
-        self.initialize_module(data=video_xml)
+        self.initialize_block(data=video_xml)
         context = self.item_descriptor.render(STUDENT_VIEW).content
 
         self.assertIn('"poster": "/media/video-images/poster.png"', context)
@@ -1110,7 +1106,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         video_xml = '<video display_name="Video" download_video="true" edx_video_id="null">[]</video>'
         get_course_video_image_url.return_value = '/media/video-images/poster.png'
 
-        self.initialize_module(data=video_xml)
+        self.initialize_block(data=video_xml)
         context = self.item_descriptor.render(STUDENT_VIEW).content
 
         self.assertIn("\'poster\': \'null\'", context)
@@ -1121,7 +1117,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         Verify that `prioritize_hls` is set to `False` if `HLSPlaybackEnabledFlag` is disabled.
         """
         video_xml = '<video display_name="Video" download_video="true" edx_video_id="12345-67890">[]</video>'
-        self.initialize_module(data=video_xml)
+        self.initialize_block(data=video_xml)
         context = self.item_descriptor.render(STUDENT_VIEW).content
         self.assertIn('"prioritizeHls": false', context)
 
@@ -1176,13 +1172,13 @@ class TestGetHtmlMethod(BaseTestXmodule):
         DEPRECATE_YOUTUBE_FLAG = waffle_flags()[DEPRECATE_YOUTUBE]
         with patch.object(WaffleFlagCourseOverrideModel, 'override_value', return_value=data['course_override']):
             with override_flag(DEPRECATE_YOUTUBE_FLAG.namespaced_flag_name, active=data['waffle_enabled']):
-                self.initialize_module(data=video_xml, metadata=metadata)
+                self.initialize_block(data=video_xml, metadata=metadata)
                 context = self.item_descriptor.render(STUDENT_VIEW).content
                 self.assertIn(u'"prioritizeHls": {}'.format(data['result']), context)
 
 
 @ddt.ddt
-class TestVideoDescriptorInitialization(BaseTestXmodule):
+class TestVideoBlockInitialization(BaseTestVideoXBlock):
     """
     Make sure that module initialization works correctly.
     """
@@ -1191,65 +1187,8 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
     METADATA = {}
 
     def setUp(self):
-        super(TestVideoDescriptorInitialization, self).setUp()
+        super(TestVideoBlockInitialization, self).setUp()
         self.setup_course()
-
-    def test_source_not_in_html5sources(self):
-        metadata = {
-            'source': 'http://example.org/video.mp4',
-            'html5_sources': ['http://youtu.be/3_yD_cEKoCk.mp4'],
-        }
-
-        self.initialize_module(metadata=metadata)
-        fields = self.item_descriptor.editable_metadata_fields
-
-        self.assertIn('source', fields)
-        self.assertEqual(self.item_descriptor.source, 'http://example.org/video.mp4')
-        self.assertTrue(self.item_descriptor.download_video)
-        self.assertTrue(self.item_descriptor.source_visible)
-
-    def test_source_in_html5sources(self):
-        metadata = {
-            'source': 'http://example.org/video.mp4',
-            'html5_sources': ['http://example.org/video.mp4'],
-        }
-
-        self.initialize_module(metadata=metadata)
-        fields = self.item_descriptor.editable_metadata_fields
-
-        self.assertNotIn('source', fields)
-        self.assertTrue(self.item_descriptor.download_video)
-        self.assertFalse(self.item_descriptor.source_visible)
-
-    def test_download_video_is_explicitly_set(self):
-        metadata = {
-            'track': u'http://some_track.srt',
-            'source': 'http://example.org/video.mp4',
-            'html5_sources': ['http://youtu.be/3_yD_cEKoCk.mp4'],
-            'download_video': False,
-        }
-
-        self.initialize_module(metadata=metadata)
-
-        fields = self.item_descriptor.editable_metadata_fields
-        self.assertIn('source', fields)
-        self.assertIn('download_video', fields)
-
-        self.assertFalse(self.item_descriptor.download_video)
-        self.assertTrue(self.item_descriptor.source_visible)
-        self.assertTrue(self.item_descriptor.download_track)
-
-    def test_source_is_empty(self):
-        metadata = {
-            'source': '',
-            'html5_sources': ['http://youtu.be/3_yD_cEKoCk.mp4'],
-        }
-
-        self.initialize_module(metadata=metadata)
-        fields = self.item_descriptor.editable_metadata_fields
-
-        self.assertNotIn('source', fields)
-        self.assertFalse(self.item_descriptor.download_video)
 
     @ddt.data(
         (
@@ -1295,7 +1234,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         """
         with patch('xmodule.video_module.video_module.edxval_api.get_urls_for_profiles') as get_urls_for_profiles:
             get_urls_for_profiles.return_value = val_video_encodings
-            self.initialize_module(
+            self.initialize_block(
                 data='<video display_name="Video" download_video="true" edx_video_id="12345-67890">[]</video>'
             )
             context = self.item_descriptor.get_context()
@@ -1332,7 +1271,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         """
         with patch('xmodule.video_module.video_module.edxval_api.get_urls_for_profiles') as get_urls_for_profiles:
             get_urls_for_profiles.return_value = val_video_encodings
-            self.initialize_module(
+            self.initialize_block(
                 data='<video display_name="Video" youtube_id_1_0="" download_video="true" edx_video_id="12345-67890">[]</video>'
             )
             context = self.item_descriptor.get_context()
@@ -1340,7 +1279,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
 
 
 @ddt.ddt
-class TestEditorSavedMethod(BaseTestXmodule):
+class TestEditorSavedMethod(BaseTestVideoXBlock):
     """
     Make sure that `editor_saved` method works correctly.
     """
@@ -1369,7 +1308,7 @@ class TestEditorSavedMethod(BaseTestXmodule):
         for video.
         """
         self.MODULESTORE = MODULESTORES[default_store]  # pylint: disable=invalid-name
-        self.initialize_module(metadata=self.metadata)
+        self.initialize_block(metadata=self.metadata)
         item = self.store.get_item(self.item_descriptor.location)
         with open(self.file_path, "r") as myfile:
             save_to_store(myfile.read(), self.file_name, 'text/sjson', item.location)
@@ -1389,7 +1328,7 @@ class TestEditorSavedMethod(BaseTestXmodule):
         sub will be generated by editor_saved function.
         """
         self.MODULESTORE = MODULESTORES[default_store]
-        self.initialize_module(metadata=self.metadata)
+        self.initialize_block(metadata=self.metadata)
         item = self.store.get_item(self.item_descriptor.location)
         with open(self.file_path, "r") as myfile:
             save_to_store(myfile.read(), self.file_name, 'text/sjson', item.location)
@@ -1414,7 +1353,7 @@ class TestEditorSavedMethod(BaseTestXmodule):
         self.metadata.update({
             'edx_video_id': unstripped_video_id
         })
-        self.initialize_module(metadata=self.metadata)
+        self.initialize_block(metadata=self.metadata)
         item = self.store.get_item(self.item_descriptor.location)
         self.assertEqual(item.edx_video_id, unstripped_video_id)
 
@@ -1432,7 +1371,7 @@ class TestEditorSavedMethod(BaseTestXmodule):
         for a given `edx_video_id`.
         """
         self.MODULESTORE = MODULESTORES[default_store]
-        self.initialize_module(metadata=self.metadata)
+        self.initialize_block(metadata=self.metadata)
         item = self.store.get_item(self.item_descriptor.location)
         self.assertEqual(item.youtube_id_1_0, '3_yD_cEKoCk')
 
@@ -1444,14 +1383,14 @@ class TestEditorSavedMethod(BaseTestXmodule):
 
 
 @ddt.ddt
-class TestVideoDescriptorStudentViewJson(CacheIsolationTestCase):
+class TestVideoBlockStudentViewJson(BaseTestVideoXBlock, CacheIsolationTestCase):
     """
-    Tests for the student_view_data method on VideoDescriptor.
+    Tests for the student_view_data method on VideoBlock.
     """
     TEST_DURATION = 111.0
     TEST_PROFILE = "mobile"
-    TEST_SOURCE_URL = "http://www.example.com/source.mp4"
-    TEST_LANGUAGE = "ge"
+    TEST_SOURCE_URL = u"http://www.example.com/source.mp4"
+    TEST_LANGUAGE = u"ge"
     TEST_ENCODED_VIDEO = {
         'profile': TEST_PROFILE,
         'bitrate': 333,
@@ -1460,10 +1399,10 @@ class TestVideoDescriptorStudentViewJson(CacheIsolationTestCase):
     }
     TEST_EDX_VIDEO_ID = 'test_edx_video_id'
     TEST_YOUTUBE_ID = 'test_youtube_id'
-    TEST_YOUTUBE_EXPECTED_URL = 'https://www.youtube.com/watch?v=test_youtube_id'
+    TEST_YOUTUBE_EXPECTED_URL = u'https://www.youtube.com/watch?v=test_youtube_id'
 
     def setUp(self):
-        super(TestVideoDescriptorStudentViewJson, self).setUp()
+        super(TestVideoBlockStudentViewJson, self).setUp()
         video_declaration = (
             "<video display_name='Test Video' edx_video_id='123' youtube_id_1_0=\'" + self.TEST_YOUTUBE_ID + "\'>"
         )
@@ -1474,7 +1413,8 @@ class TestVideoDescriptorStudentViewJson(CacheIsolationTestCase):
             "</video>"]
         )
         self.transcript_url = "transcript_url"
-        self.video = instantiate_descriptor(data=sample_xml)
+        self.initialize_block(data=sample_xml)
+        self.video = self.item_descriptor
         self.video.runtime.handler_url = Mock(return_value=self.transcript_url)
         self.video.runtime.course_id = MagicMock()
 
@@ -1576,7 +1516,8 @@ class TestVideoDescriptorStudentViewJson(CacheIsolationTestCase):
             "</video>"
         ])
         self.transcript_url = "transcript_url"
-        self.video = instantiate_descriptor(data=sample_xml)
+        self.initialize_block(data=sample_xml)
+        self.video = self.item_descriptor
         self.video.runtime.handler_url = Mock(return_value=self.transcript_url)
         self.video.runtime.course_id = MagicMock()
         result = self.get_result()
@@ -1635,16 +1576,16 @@ class TestVideoDescriptorStudentViewJson(CacheIsolationTestCase):
         self.video.transcripts = transcripts
         self.video.sub = english_sub
         student_view_response = self.get_result()
-        self.assertItemsEqual(list(student_view_response['transcripts'].keys()), expected_transcripts)
+        six.assertCountEqual(self, list(student_view_response['transcripts'].keys()), expected_transcripts)
 
 
 @ddt.ddt
-class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
+class VideoBlockTest(TestCase, VideoBlockTestBase):
     """
     Tests for video descriptor that requires access to django settings.
     """
     def setUp(self):
-        super(VideoDescriptorTest, self).setUp()
+        super(VideoBlockTest, self).setUp()
         self.descriptor.runtime.handler_url = MagicMock()
         self.descriptor.runtime.course_id = MagicMock()
         self.temp_dir = mkdtemp()
@@ -1724,7 +1665,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
 
         actual = self.descriptor.definition_to_xml(resource_fs=self.file_system)
         expected_str = u"""
-            <video download_video="false" url_name="SampleProblem" transcripts='{transcripts}'>
+            <video url_name="SampleProblem" transcripts='{transcripts}'>
                 <video_asset client_video_id="test_client_video_id" duration="111.0" image="">
                     <encoded_video profile="mobile" url="http://example.com/video" file_size="222" bitrate="333"/>
                     <transcripts>
@@ -1816,7 +1757,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         """
         self.descriptor.edx_video_id = 'nonexistent'
         actual = self.descriptor.definition_to_xml(resource_fs=self.file_system)
-        expected_str = """<video download_video="false" url_name="SampleProblem"/>"""
+        expected_str = """<video url_name="SampleProblem"/>"""
         parser = etree.XMLParser(remove_blank_text=True)
         expected = etree.XML(expected_str, parser=parser)
         self.assertXmlEqual(expected, actual)
@@ -1829,7 +1770,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         mock_get_video_ids_info.return_value = True, []
 
         actual = self.descriptor.definition_to_xml(resource_fs=self.file_system)
-        expected_str = '<video url_name="SampleProblem" download_video="false"></video>'
+        expected_str = '<video url_name="SampleProblem"></video>'
 
         parser = etree.XMLParser(remove_blank_text=True)
         expected = etree.XML(expected_str, parser=parser)
@@ -2162,7 +2103,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
             </video>
         """
         with self.assertRaises(ValCannotCreateError):
-            VideoDescriptor.from_xml(xml_data, module_system, id_generator=Mock())
+            VideoBlock.from_xml(xml_data, module_system, id_generator=Mock())
         with self.assertRaises(ValVideoNotFoundError):
             get_video_info("test_edx_video_id")
 
@@ -2226,7 +2167,7 @@ class TestVideoWithBumper(TestVideo):
             'branding_info': None,
             'license': None,
             'bumper_metadata': json.dumps(OrderedDict({
-                'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
+                'saveStateUrl': self.item_descriptor.ajax_url + '/save_user_state',
                 'showCaptions': 'true',
                 'sources': ['http://test_bumper.mp4'],
                 'streams': '',
@@ -2251,7 +2192,7 @@ class TestVideoWithBumper(TestVideo):
             'metadata': json.dumps(OrderedDict({
                 'autoAdvance': False,
                 'saveStateEnabled': True,
-                'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
+                'saveStateUrl': self.item_descriptor.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',
                 'sources': sources,
@@ -2268,8 +2209,7 @@ class TestVideoWithBumper(TestVideo):
                 'transcriptLanguages': OrderedDict({'en': 'English', 'uk': u'Українська'}),
                 'ytTestTimeout': 1500,
                 'ytApiUrl': 'https://www.youtube.com/iframe_api',
-                'ytMetadataUrl': 'https://www.googleapis.com/youtube/v3/videos/',
-                'ytKey': None,
+                'lmsRootURL': settings.LMS_ROOT_URL,
                 'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
                 'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
                 'autohideHtml5': False,
@@ -2325,7 +2265,7 @@ class TestAutoAdvanceVideo(TestVideo):
             'metadata': json.dumps(OrderedDict({
                 'autoAdvance': autoadvance_flag,
                 'saveStateEnabled': True,
-                'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
+                'saveStateUrl': self.item_descriptor.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',
                 'sources': [u'example.mp4', u'example.webm'],
@@ -2342,8 +2282,7 @@ class TestAutoAdvanceVideo(TestVideo):
                 'transcriptLanguages': OrderedDict({'en': 'English', 'uk': u'Українська'}),
                 'ytTestTimeout': 1500,
                 'ytApiUrl': 'https://www.youtube.com/iframe_api',
-                'ytMetadataUrl': 'https://www.googleapis.com/youtube/v3/videos/',
-                'ytKey': None,
+                'lmsRootURL': settings.LMS_ROOT_URL,
                 'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'translation/__lang__'
                 ).rstrip('/?'),
@@ -2395,8 +2334,8 @@ class TestAutoAdvanceVideo(TestVideo):
         """
         # This first render is done to initialize the instance
         self.item_descriptor.render(STUDENT_VIEW)
-        item_instance = self.item_descriptor.xmodule_runtime.xmodule_instance
-        item_instance.video_auto_advance = new_value
+        self.item_descriptor.video_auto_advance = new_value
+        self.item_descriptor._reset_dirty_field(self.item_descriptor.fields['video_auto_advance'])  # pylint: disable=protected-access
         # After this step, render() should see the new value
         # e.g. use self.item_descriptor.render(STUDENT_VIEW).content
 

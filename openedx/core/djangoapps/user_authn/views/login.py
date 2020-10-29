@@ -8,6 +8,7 @@ from __future__ import absolute_import
 
 import logging
 
+import six
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
@@ -20,7 +21,6 @@ from django.views.decorators.http import require_http_methods
 from ratelimitbackend.exceptions import RateLimitException
 
 import third_party_auth
-from third_party_auth import pipeline, provider
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -31,6 +31,7 @@ from openedx.core.djangolib.markup import HTML, Text
 from student.forms import send_password_reset_email_for_user
 from student.models import LoginFailures
 from student.views import send_reactivation_email_for_user
+from third_party_auth import pipeline, provider
 from track import segment
 from util.json_request import JsonResponse
 from util.password_policy_validators import normalize_password
@@ -110,11 +111,11 @@ def _enforce_password_policy_compliance(request, user):
         password_policy_compliance.enforce_compliance_on_login(user, request.POST.get('password'))
     except password_policy_compliance.NonCompliantPasswordWarning as e:
         # Allow login, but warn the user that they will be required to reset their password soon.
-        PageLevelMessages.register_warning_message(request, e.message)
+        PageLevelMessages.register_warning_message(request, six.text_type(e))
     except password_policy_compliance.NonCompliantPasswordException as e:
         send_password_reset_email_for_user(user, request)
         # Prevent the login attempt.
-        raise AuthFailedError(e.message)
+        raise AuthFailedError(six.text_type(e))
 
 
 def _generate_not_activated_message(user):
@@ -191,7 +192,7 @@ def _authenticate_first_party(request, unauthenticated_user):
         raise AuthFailedError(_('Too many failed login attempts. Try again later.'))
 
 
-def _handle_failed_authentication(user):
+def _handle_failed_authentication(user, authenticated_user):
     """
     Handles updating the failed login count, inactive user notifications, and logging failed authentications.
     """
@@ -199,7 +200,7 @@ def _handle_failed_authentication(user):
         if LoginFailures.is_feature_enabled():
             LoginFailures.increment_lockout_counter(user)
 
-        if not user.is_active:
+        if authenticated_user and not user.is_active:
             _log_and_raise_inactive_user_auth_error(user)
 
         # if we didn't find this username earlier, the account for this email
@@ -304,11 +305,11 @@ def login_user(request):
     AJAX request to log in the user.
     """
     third_party_auth_requested = third_party_auth.is_enabled() and pipeline.running(request)
-    trumped_by_first_party_auth = bool(request.POST.get('email')) or bool(request.POST.get('password'))
-    was_authenticated_third_party = False
+    first_party_auth_requested = bool(request.POST.get('email')) or bool(request.POST.get('password'))
+    is_user_third_party_authenticated = False
 
     try:
-        if third_party_auth_requested and not trumped_by_first_party_auth:
+        if third_party_auth_requested and not first_party_auth_requested:
             # The user has already authenticated via third-party auth and has not
             # asked to do first party auth by supplying a username or password. We
             # now want to put them through the same logging and cookie calculation
@@ -317,30 +318,30 @@ def login_user(request):
             # This nested try is due to us only returning an HttpResponse in this
             # one case vs. JsonResponse everywhere else.
             try:
-                email_user = _do_third_party_auth(request)
-                was_authenticated_third_party = True
+                user = _do_third_party_auth(request)
+                is_user_third_party_authenticated = True
             except AuthFailedError as e:
                 return HttpResponse(e.value, content_type="text/plain", status=403)
         else:
-            email_user = _get_user_by_email(request)
+            user = _get_user_by_email(request)
 
-        _check_excessive_login_attempts(email_user)
+        _check_excessive_login_attempts(user)
 
-        possibly_authenticated_user = email_user
+        possibly_authenticated_user = user
 
-        if not was_authenticated_third_party:
-            possibly_authenticated_user = _authenticate_first_party(request, email_user)
+        if not is_user_third_party_authenticated:
+            possibly_authenticated_user = _authenticate_first_party(request, user)
             if possibly_authenticated_user and password_policy_compliance.should_enforce_compliance_on_login():
                 # Important: This call must be made AFTER the user was successfully authenticated.
                 _enforce_password_policy_compliance(request, possibly_authenticated_user)
 
         if possibly_authenticated_user is None or not possibly_authenticated_user.is_active:
-            _handle_failed_authentication(email_user)
+            _handle_failed_authentication(user, possibly_authenticated_user)
 
         _handle_successful_authentication_and_login(possibly_authenticated_user, request)
 
         redirect_url = None  # The AJAX method calling should know the default destination upon success
-        if was_authenticated_third_party:
+        if is_user_third_party_authenticated:
             running_pipeline = pipeline.get(request)
             redirect_url = pipeline.get_complete_url(backend_name=running_pipeline['backend'])
 

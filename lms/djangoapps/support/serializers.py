@@ -1,6 +1,8 @@
 """
 Serializers for use in the support app.
 """
+from __future__ import absolute_import
+
 from rest_framework import serializers
 
 from student.models import ManualEnrollmentAudit

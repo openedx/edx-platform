@@ -2,6 +2,8 @@
 Defines the URL routes for this app.
 """
 
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.conf.urls import url
 
@@ -17,8 +19,8 @@ from .accounts.views import (
     UsernameReplacementView
 )
 from .preferences.views import PreferencesDetailView, PreferencesView
-from .verification_api.views import IDVerificationStatusView
 from .validation.views import RegistrationValidationView
+from .verification_api.views import IDVerificationStatusView
 
 ME = AccountViewSet.as_view({
     'get': 'get',

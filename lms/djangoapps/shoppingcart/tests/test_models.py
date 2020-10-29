@@ -1376,12 +1376,12 @@ class InvoiceHistoryTest(TestCase):
     def _assert_history_items(self, expected_items):
         """Check line item info in the latest history record. """
         items = self._latest_history()['items']
-        self.assertItemsEqual(items, expected_items)
+        six.assertCountEqual(self, items, expected_items)
 
     def _assert_history_transactions(self, expected_transactions):
         """Check transactions (payments/refunds) in the latest history record. """
         transactions = self._latest_history()['transactions']
-        self.assertItemsEqual(transactions, expected_transactions)
+        six.assertCountEqual(self, transactions, expected_transactions)
 
     def _latest_history(self):
         """Retrieve the snapshot from the latest history record. """

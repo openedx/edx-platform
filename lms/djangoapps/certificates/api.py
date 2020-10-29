@@ -4,11 +4,15 @@ This is a Python API for generating certificates asynchronously.
 Other Django apps should use the API functions defined in this module
 rather than importing Django models directly.
 """
+from __future__ import absolute_import
+
 import logging
 
+import six
 from django.conf import settings
-from django.urls import reverse
 from django.db.models import Q
+from django.urls import reverse
+from eventtracking import tracker
 from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey
 
@@ -25,7 +29,7 @@ from lms.djangoapps.certificates.models import (
     certificate_status_for_student
 )
 from lms.djangoapps.certificates.queue import XQueueCertInterface
-from eventtracking import tracker
+from lms.djangoapps.instructor.access import list_with_level
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from util.organizations_helpers import get_course_organization_id
@@ -170,12 +174,20 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
         forced_grade - a string indicating to replace grade parameter. if present grading
                        will be skipped.
     """
-    xqueue = XQueueCertInterface()
-    if insecure:
-        xqueue.use_https = False
 
     if not course:
         course = modulestore().get_course(course_key, depth=0)
+
+    beta_testers_queryset = list_with_level(course, u'beta')
+
+    if beta_testers_queryset.filter(username=student.username):
+        message = u'Cancelling course certificate generation for user [{}] against course [{}], user is a Beta Tester.'
+        log.info(message.format(course_key, student.username))
+        return
+
+    xqueue = XQueueCertInterface()
+    if insecure:
+        xqueue.use_https = False
 
     generate_pdf = not has_html_certificates_enabled(course)
 
@@ -186,6 +198,10 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
         generate_pdf=generate_pdf,
         forced_grade=forced_grade
     )
+
+    message = u'Queued Certificate Generation task for {user} : {course}'
+    log.info(message.format(user=student.id, course=course_key))
+
     # If cert_status is not present in certificate valid_statuses (for example unverified) then
     # add_cert returns None and raises AttributeError while accesing cert attributes.
     if cert is None:
@@ -194,7 +210,7 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
     if CertificateStatuses.is_passing_status(cert.status):
         emit_certificate_event('created', student, course_key, course, {
             'user_id': student.id,
-            'course_id': unicode(course_key),
+            'course_id': six.text_type(course_key),
             'certificate_id': cert.verify_uuid,
             'enrollment_mode': cert.mode,
             'generation_mode': generation_mode
@@ -232,7 +248,7 @@ def regenerate_user_certificates(student, course_key, course=None,
     generate_pdf = not has_html_certificates_enabled(course)
     log.info(
         u"Started regenerating certificates for user %s in course %s with generate_pdf status: %s",
-        student.username, unicode(course_key), generate_pdf
+        student.username, six.text_type(course_key), generate_pdf
     )
 
     return xqueue.regen_cert(
@@ -307,12 +323,12 @@ def set_cert_generation_enabled(course_key, is_enabled):
     cert_event_type = 'enabled' if is_enabled else 'disabled'
     event_name = '.'.join(['edx', 'certificate', 'generation', cert_event_type])
     tracker.emit(event_name, {
-        'course_id': unicode(course_key),
+        'course_id': six.text_type(course_key),
     })
     if is_enabled:
-        log.info(u"Enabled self-generated certificates for course '%s'.", unicode(course_key))
+        log.info(u"Enabled self-generated certificates for course '%s'.", six.text_type(course_key))
     else:
-        log.info(u"Disabled self-generated certificates for course '%s'.", unicode(course_key))
+        log.info(u"Disabled self-generated certificates for course '%s'.", six.text_type(course_key))
 
 
 def is_certificate_invalid(student, course_key):
@@ -437,7 +453,7 @@ def _certificate_html_url(user_id, course_id, uuid):
     if uuid:
         return reverse('certificates:render_cert_by_uuid', kwargs={'certificate_uuid': uuid})
     elif user_id and course_id:
-        kwargs = {"user_id": str(user_id), "course_id": unicode(course_id)}
+        kwargs = {"user_id": str(user_id), "course_id": six.text_type(course_id)}
         return reverse('certificates:html_view', kwargs=kwargs)
     return ''
 
@@ -453,7 +469,7 @@ def _certificate_download_url(user_id, course_id, user_certificate=None):
             log.critical(
                 u'Unable to lookup certificate\n'
                 u'user id: %d\n'
-                u'course: %s', user_id, unicode(course_id)
+                u'course: %s', user_id, six.text_type(course_id)
             )
 
     if user_certificate:
@@ -590,11 +606,11 @@ def emit_certificate_event(event_name, user, course_id, course=None, event_data=
         course = modulestore().get_course(course_id, depth=0)
     context = {
         'org_id': course.org,
-        'course_id': unicode(course_id)
+        'course_id': six.text_type(course_id)
     }
     data = {
         'user_id': user.id,
-        'course_id': unicode(course_id),
+        'course_id': six.text_type(course_id),
         'certificate_url': get_certificate_url(user.id, course_id)
     }
     event_data = event_data or {}

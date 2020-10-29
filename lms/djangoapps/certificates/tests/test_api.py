@@ -1,22 +1,23 @@
 """Tests for the certificates Python API. """
+from __future__ import absolute_import
+
 import uuid
 from contextlib import contextmanager
-from functools import wraps
+from datetime import datetime, timedelta
 
 import ddt
-from datetime import datetime
-from datetime import timedelta
+import pytz
+import six
 from config_models.models import cache
 from django.conf import settings
-from django.urls import reverse
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
-import pytz
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -476,7 +477,7 @@ class CertificateGetTests(SharedModuleStoreTestCase):
             'certificates:html_view',
             kwargs={
                 "user_id": str(self.student.id),
-                "course_id": unicode(self.web_cert_course.id),
+                "course_id": six.text_type(self.web_cert_course.id),
             }
         )
 
@@ -546,7 +547,7 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
         self.assert_event_emitted(
             'edx.certificate.created',
             user_id=self.student.id,
-            course_id=unicode(self.course.id),
+            course_id=six.text_type(self.course.id),
             certificate_url=certs_api.get_certificate_url(self.student.id, self.course.id),
             certificate_id=cert.verify_uuid,
             enrollment_mode=cert.mode,
@@ -637,7 +638,7 @@ class CertificateGenerationEnabledTest(EventTestMixin, TestCase):
             event_name = '.'.join(['edx', 'certificate', 'generation', cert_event_type])
             self.assert_event_emitted(
                 event_name,
-                course_id=unicode(self.COURSE_KEY),
+                course_id=six.text_type(self.COURSE_KEY),
             )
 
         self._assert_enabled_for_course(self.COURSE_KEY, expect_enabled)
@@ -761,8 +762,9 @@ class CertificatesBrandingTest(TestCase):
         data = certs_api.get_certificate_header_context(is_secure=True)
 
         # Make sure there are not unexpected keys in dict returned by 'get_certificate_header_context'
-        self.assertItemsEqual(
-            data.keys(),
+        six.assertCountEqual(
+            self,
+            list(data.keys()),
             ['logo_src', 'logo_url']
         )
         self.assertIn(
@@ -786,8 +788,9 @@ class CertificatesBrandingTest(TestCase):
         data = certs_api.get_certificate_footer_context()
 
         # Make sure there are not unexpected keys in dict returned by 'get_certificate_footer_context'
-        self.assertItemsEqual(
-            data.keys(),
+        six.assertCountEqual(
+            self,
+            list(data.keys()),
             ['company_about_url', 'company_privacy_url', 'company_tos_url']
         )
         self.assertIn(

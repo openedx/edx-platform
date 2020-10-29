@@ -18,7 +18,6 @@ def create_tracking_context(user):
 
     return {
         'lms_user_id': user.id,
-        'lms_client_id': context_tracker.get('client_id'),
         'lms_ip': context_tracker.get('ip'),
     }
 

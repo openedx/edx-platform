@@ -3,6 +3,7 @@
 from __future__ import absolute_import
 
 import ddt
+import six
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
@@ -316,7 +317,7 @@ class TestTrackViews(EventTrackingTestCase):
         }
 
         task_info = {
-            sentinel.task_key: sentinel.task_value
+            six.text_type(sentinel.task_key): sentinel.task_value
         }
         expected_event_data = dict(task_info)
         expected_event_data.update(self.event)

@@ -1,16 +1,18 @@
 """ Tests for course reindex command """
+from __future__ import absolute_import
+
 import ddt
-from django.core.management import call_command, CommandError
 import mock
+from django.core.management import CommandError, call_command
+import six
 from six import text_type
 
+from contentstore.courseware_index import SearchIndexingError
+from contentstore.management.commands.reindex_course import Command as ReindexCommand
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
-
-from contentstore.management.commands.reindex_course import Command as ReindexCommand
-from contentstore.courseware_index import SearchIndexingError
 
 
 @ddt.ddt
@@ -103,7 +105,7 @@ class TestReindexCourse(ModuleStoreTestCase):
 
                 patched_yes_no.assert_called_once_with(ReindexCommand.CONFIRMATION_PROMPT, default='no')
                 expected_calls = self._build_calls(self.first_course, self.second_course)
-                self.assertItemsEqual(patched_index.mock_calls, expected_calls)
+                six.assertCountEqual(self, patched_index.mock_calls, expected_calls)
 
     def test_given_all_key_prompts_and_reindexes_all_courses_cancelled(self):
         """ Test that does not reindex anything when --all key is given and cancelled """

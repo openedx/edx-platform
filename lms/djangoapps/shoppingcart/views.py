@@ -1,14 +1,18 @@
+"""This module contains views related to shopping cart"""
+
+from __future__ import absolute_import
+
 import datetime
 import decimal
 import json
 import logging
 
 import pytz
+import six
 from config_models.decorators import require_config
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
-from django.urls import reverse
 from django.db.models import Q
 from django.http import (
     Http404,
@@ -19,6 +23,7 @@ from django.http import (
     HttpResponseRedirect
 )
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods, require_POST
@@ -39,9 +44,9 @@ from shoppingcart.reports import (
     UniversityRevenueShareReport
 )
 from student.models import AlreadyEnrolledError, CourseEnrollment, CourseFullError, EnrollmentClosedError
-from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.date_utils import get_default_time_display
 from util.json_request import JsonResponse
+from util.request_rate_limiter import BadRequestRateLimiter
 
 from .decorators import enforce_shopping_cart_enabled
 from .exceptions import (
@@ -105,7 +110,7 @@ def add_course_to_cart(request, course_id):
     heavy lifting (logging, error checking, etc)
     """
 
-    assert isinstance(course_id, basestring)
+    assert isinstance(course_id, six.string_types)
     if not request.user.is_authenticated:
         log.info(u"Anon user trying to add course %s to cart", course_id)
         return HttpResponseForbidden(_('You must be logged-in to add to a shopping cart'))
@@ -319,7 +324,7 @@ def get_reg_code_validity(registration_code, request, limiter):
     if not reg_code_is_valid:
         # tick the rate limiter counter
         AUDIT_LOG.info(u"Redemption of a invalid RegistrationCode %s", registration_code)
-        limiter.tick_bad_request_counter(request)
+        limiter.tick_request_counter(request)
         raise Http404()
 
     return reg_code_is_valid, reg_code_already_redeemed, course_registration
@@ -605,7 +610,7 @@ def donate(request):
             amount,
             course_id
         )
-        return HttpResponseBadRequest(unicode(ex))
+        return HttpResponseBadRequest(six.text_type(ex))
 
     # Start the purchase.
     # This will "lock" the purchase so the user can't change
@@ -621,7 +626,7 @@ def donate(request):
 
     # Add extra to make it easier to track transactions
     extra_data = [
-        unicode(course_id) if course_id else "",
+        six.text_type(course_id) if course_id else "",
         "donation_course" if course_id else "donation_general"
     ]
 
@@ -669,7 +674,7 @@ def _get_verify_flow_redirect(order):
         course_id = cert_items[0].course_id
         url = reverse(
             'verify_student_payment_confirmation',
-            kwargs={'course_id': unicode(course_id)}
+            kwargs={'course_id': six.text_type(course_id)}
         )
         # Add a query string param for the order ID
         # This allows the view to query for the receipt information later.
@@ -877,7 +882,7 @@ def _show_receipt_json(order):
                 'unit_cost': item.unit_cost,
                 'line_cost': item.line_cost,
                 'line_desc': item.line_desc,
-                'course_key': unicode(item.course_id)
+                'course_key': six.text_type(item.course_id)
             }
             for item in OrderItem.objects.filter(order=order).select_subclasses()
         ]

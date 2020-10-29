@@ -2,6 +2,7 @@
 Acceptance tests for the teams feature.
 """
 from __future__ import absolute_import
+
 import json
 import random
 import time
@@ -10,6 +11,7 @@ from uuid import uuid4
 import ddt
 from dateutil.parser import parse
 from selenium.common.exceptions import TimeoutException
+from six.moves import map, range
 
 from common.test.acceptance.fixtures import LMS_BASE_URL
 from common.test.acceptance.fixtures.course import CourseFixture
@@ -30,8 +32,6 @@ from common.test.acceptance.pages.lms.teams import (
 )
 from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest, get_modal_alert
 from openedx.core.lib.tests import attr
-from six.moves import map
-from six.moves import range
 
 TOPICS_PER_PAGE = 12
 

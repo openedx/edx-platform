@@ -85,8 +85,8 @@ def randomization_bin(seed, problem_id):
     we'll combine the system's per-student seed with the problem id in picking the bin.
     """
     r_hash = hashlib.sha1()
-    r_hash.update(str(seed))
-    r_hash.update(str(problem_id))
+    r_hash.update(six.b(str(seed)))
+    r_hash.update(six.b(str(problem_id)))
     # get the first few digits of the hash, convert to an int, then mod.
     return int(r_hash.hexdigest()[:7], 16) % NUM_RANDOMIZATION_BINS
 
@@ -190,14 +190,12 @@ class CapaFields(object):
         scope=Scope.settings,
         default=False
     )
-    reset_key = "DEFAULT_SHOW_RESET_BUTTON"
-    default_reset_button = getattr(settings, reset_key) if hasattr(settings, reset_key) else False
     show_reset_button = Boolean(
         display_name=_("Show Reset Button"),
         help=_("Determines whether a 'Reset' button is shown so the user may reset their answer. "
                "A default value can be set in Advanced Settings."),
         scope=Scope.settings,
-        default=default_reset_button
+        default=False
     )
     rerandomize = Randomization(
         display_name=_("Randomization"),
@@ -387,8 +385,11 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         """
         For now, just return weighted earned / weighted possible
         """
-        raw_earned = self.score.raw_earned
-        raw_possible = self.score.raw_possible
+        if self.score:
+            raw_earned = self.score.raw_earned
+            raw_possible = self.score.raw_possible
+        else:
+            raw_earned = raw_possible = 0
 
         if raw_possible > 0:
             if self.weight is not None:
@@ -438,6 +439,18 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             'content': self.get_problem_html(encapsulate=False),
             'graded': self.graded,
         })
+
+    def handle_fatal_lcp_error(self, error):
+        if error:
+            return(
+                HTML(u'<p>Error formatting HTML for problem:</p><p><pre style="color:red">{msg}</pre></p>').format(
+                    msg=text_type(error))
+            )
+        else:
+            return HTML(
+                u'<p>Could not format HTML for problem. '
+                u'Contact course staff in the discussion forum for assistance.</p>'
+            )
 
     def submit_button_name(self):
         """
@@ -549,8 +562,8 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         # TODO (vshnayder): another switch on DEBUG.
         if self.runtime.DEBUG:
             msg = HTML(
-                u'[courseware.capa.capa_module] <font size="+1" color="red">'
-                u'Failed to generate HTML for problem {url}</font>'
+                u'[courseware.capa.capa_module] '
+                u'Failed to generate HTML for problem {url}'
             ).format(
                 url=text_type(self.location)
             )
@@ -564,6 +577,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
             # Presumably, student submission has corrupted LoncapaProblem HTML.
             #   First, pull down all student answers
+
             student_answers = self.lcp.student_answers
             answer_ids = list(student_answers.keys())
 

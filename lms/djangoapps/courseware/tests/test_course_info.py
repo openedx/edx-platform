@@ -62,14 +62,14 @@ class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase,
         url = reverse('info', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
-        self.assertIn("OOGIE BLOOGIE", resp.content)
-        self.assertIn("You are not currently enrolled in this course", resp.content)
+        self.assertIn(b"OOGIE BLOOGIE", resp.content)
+        self.assertIn(b"You are not currently enrolled in this course", resp.content)
 
     def test_logged_in_enrolled(self):
         self.enroll(self.course)
         url = reverse('info', args=[text_type(self.course.id)])
         resp = self.client.get(url)
-        self.assertNotIn("You are not currently enrolled in this course", resp.content)
+        self.assertNotIn(b"You are not currently enrolled in this course", resp.content)
 
     # TODO: LEARNER-611: If this is only tested under Course Info, does this need to move?
     @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
@@ -93,7 +93,7 @@ class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase,
         url = reverse('info', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
-        self.assertNotIn("OOGIE BLOOGIE", resp.content)
+        self.assertNotIn(b"OOGIE BLOOGIE", resp.content)
 
     def test_logged_in_not_enrolled(self):
         self.setup_user()
@@ -434,8 +434,8 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
 
     def test_num_queries_instructor_paced(self):
         # TODO: decrease query count as part of REVO-28
-        self.fetch_course_info_with_queries(self.instructor_paced_course, 44, 3)
+        self.fetch_course_info_with_queries(self.instructor_paced_course, 45, 3)
 
     def test_num_queries_self_paced(self):
         # TODO: decrease query count as part of REVO-28
-        self.fetch_course_info_with_queries(self.self_paced_course, 44, 3)
+        self.fetch_course_info_with_queries(self.self_paced_course, 45, 3)

@@ -50,7 +50,7 @@ class AccessTokenExchangeFormTest(AccessTokenExchangeTestMixin):
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data["user"], self.user)
         self.assertEqual(form.cleaned_data["client"], self.oauth_client)
-        self.assertEqual(scope.to_names(form.cleaned_data["scope"]), expected_scopes)
+        self.assertEqual(set(scope.to_names(form.cleaned_data["scope"])), set(expected_scopes))
 
 
 # This is necessary because cms does not implement third party auth

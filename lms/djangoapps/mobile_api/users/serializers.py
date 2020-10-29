@@ -2,11 +2,14 @@
 Serializer for user API
 """
 
+from __future__ import absolute_import
+
+import six
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from lms.djangoapps.certificates.api import certificate_downloadable_status
 from courseware.access import has_access
+from lms.djangoapps.certificates.api import certificate_downloadable_status
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from student.models import CourseEnrollment, User
@@ -18,7 +21,7 @@ class CourseOverviewField(serializers.RelatedField):
     Custom field to wrap a CourseOverview object. Read-only.
     """
     def to_representation(self, course_overview):
-        course_id = unicode(course_overview.id)
+        course_id = six.text_type(course_overview.id)
         request = self.context.get('request')
         api_version = self.context.get('api_version')
 
@@ -148,3 +151,5 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'username', 'email', 'name', 'course_enrollments', 'organizations')
         lookup_field = 'username'
+        # For disambiguating within the drf-yasg swagger schema
+        ref_name = 'mobile_api.User'

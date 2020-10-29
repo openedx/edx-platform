@@ -2,11 +2,14 @@
 Tests for the Studio Tagging XBlockAside
 """
 
+from __future__ import absolute_import
+
 import json
 from datetime import datetime
-from StringIO import StringIO
+from six import StringIO
 
 import ddt
+import six
 from django.test.client import RequestFactory
 from lxml import etree
 from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
@@ -192,7 +195,7 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
         """
         handler_url = reverse_usage_url(
             'component_handler',
-            unicode(aside_key_class(self.problem.location, self.aside_name)),
+            six.text_type(aside_key_class(self.problem.location, self.aside_name)),
             kwargs={'handler': 'save_tags'}
         )
 

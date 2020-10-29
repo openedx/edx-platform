@@ -1,15 +1,21 @@
 """
 Tests that check that we ignore the appropriate files when importing courses.
 """
-import unittest
-from mock import Mock
+from __future__ import absolute_import
 
-from xmodule.modulestore.xml_importer import StaticContentImporter
+import unittest
+
+from mock import Mock
 from opaque_keys.edx.locator import CourseLocator
-from xmodule.tests import DATA_DIR
+
 from xmodule.modulestore.tests.utils import (
-    add_temp_files_from_dict, remove_temp_files_from_list, DOT_FILES_DICT, TILDA_FILES_DICT
+    DOT_FILES_DICT,
+    TILDA_FILES_DICT,
+    add_temp_files_from_dict,
+    remove_temp_files_from_list
 )
+from xmodule.modulestore.xml_importer import StaticContentImporter
+from xmodule.tests import DATA_DIR
 
 
 class IgnoredFilesTestCase(unittest.TestCase):
@@ -20,7 +26,7 @@ class IgnoredFilesTestCase(unittest.TestCase):
     def setUp(self):
         super(IgnoredFilesTestCase, self).setUp()
         for dictionary in self.dict_list:
-            self.addCleanup(remove_temp_files_from_list, dictionary.keys(), self.course_dir / "static")
+            self.addCleanup(remove_temp_files_from_list, list(dictionary.keys()), self.course_dir / "static")
             add_temp_files_from_dict(dictionary, self.course_dir / "static")
 
     def test_sample_static_files(self):

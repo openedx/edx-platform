@@ -3,12 +3,13 @@
 End-to-end tests for the LMS.
 """
 from __future__ import absolute_import
-import json
 
+import json
 from datetime import datetime, timedelta
 from textwrap import dedent
 
 import pytz
+from six.moves import range
 
 from common.test.acceptance.fixtures.course import CourseFixture, CourseUpdateDesc, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -16,6 +17,7 @@ from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.common.utils import enroll_user_track
 from common.test.acceptance.pages.lms import BASE_URL
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
+from common.test.acceptance.pages.lms.course_about import CourseAboutPage
 from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.course_wiki import (
     CourseWikiChildrenPage,
@@ -26,14 +28,13 @@ from common.test.acceptance.pages.lms.course_wiki import (
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
+from common.test.acceptance.pages.lms.discovery import CourseDiscoveryPage
 from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage, ResetPasswordPage
 from common.test.acceptance.pages.lms.pay_and_verify import FakePaymentPage, PaymentAndVerificationFlow
 from common.test.acceptance.pages.lms.problem import ProblemPage
 from common.test.acceptance.pages.lms.progress import ProgressPage
 from common.test.acceptance.pages.lms.tab_nav import TabNavPage
 from common.test.acceptance.pages.lms.video.video import VideoPage
-from common.test.acceptance.pages.lms.discovery import CourseDiscoveryPage
-from common.test.acceptance.pages.lms.course_about import CourseAboutPage
 from common.test.acceptance.pages.studio.settings import SettingsPage
 from common.test.acceptance.tests.helpers import (
     EventsTestMixin,
@@ -41,11 +42,10 @@ from common.test.acceptance.tests.helpers import (
     element_has_text,
     get_selected_option_text,
     load_data_str,
-    select_option_by_text,
-    remove_file
+    remove_file,
+    select_option_by_text
 )
 from openedx.core.lib.tests import attr
-from six.moves import range
 
 
 @attr(shard=19)

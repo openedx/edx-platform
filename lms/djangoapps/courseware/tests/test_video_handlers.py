@@ -25,6 +25,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from xmodule.video_module import VideoBlock
 from xmodule.video_module.transcripts_utils import Transcript, edxval_api, subs_filename
 from xmodule.x_module import STUDENT_VIEW
 
@@ -33,7 +34,7 @@ from .test_video_xml import SOURCE_XML
 
 TRANSCRIPT = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
 BUMPER_TRANSCRIPT = {"start": [1], "end": [10], "text": ["A bumper"]}
-SRT_content = textwrap.dedent("""
+SRT_content = textwrap.dedent(u"""
         0
         00:00:00,12 --> 00:00:00,100
         Привіт, edX вітає вас.
@@ -45,9 +46,10 @@ def _create_srt_file(content=None):
     Create srt file in filesystem.
     """
     content = content or SRT_content
+
     srt_file = tempfile.NamedTemporaryFile(suffix=".srt")
     srt_file.content_type = 'application/x-subrip; charset=utf-8'
-    srt_file.write(content)
+    srt_file.write(content.encode('utf-8'))
     srt_file.seek(0)
     return srt_file
 
@@ -127,7 +129,26 @@ def attach_bumper_transcript(item, filename, lang="en"):
     item.video_bumper["transcripts"][lang] = filename
 
 
-class TestVideo(BaseTestXmodule):
+class BaseTestVideoXBlock(BaseTestXmodule):
+    """Base class for VideoXBlock tests."""
+
+    CATEGORY = 'video'
+
+    def initialize_block(self, data=None, **kwargs):
+        """ Initialize an XBlock to run tests on. """
+        if data:
+            # VideoBlock data field is no longer used but to avoid needing to re-do
+            # a lot of tests code, parse and set the values as fields.
+            fields_data = VideoBlock.parse_video_xml(data)
+            kwargs.update(fields_data)
+        super(BaseTestVideoXBlock, self).initialize_module(**kwargs)
+
+    def setUp(self):
+        super(BaseTestVideoXBlock, self).setUp()
+        self.initialize_block(data=self.DATA, metadata=self.METADATA)
+
+
+class TestVideo(BaseTestVideoXBlock):
     """Integration tests: web client + mongo."""
     CATEGORY = "video"
     DATA = SOURCE_XML
@@ -225,7 +246,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
     def setUp(self):
         super(TestTranscriptAvailableTranslationsDispatch, self).setUp()
         self.item_descriptor.render(STUDENT_VIEW)
-        self.item = self.item_descriptor.xmodule_runtime.xmodule_instance
+        self.item = self.item_descriptor
         self.subs = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
 
     def test_available_translation_en(self):
@@ -238,7 +259,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
         self.assertEqual(json.loads(response.body), ['en'])
 
     def test_available_translation_non_en(self):
-        _upload_file(self.srt_file, self.item_descriptor.location, os.path.split(self.srt_file.name)[1])
+        _upload_file(_create_srt_file(), self.item_descriptor.location, os.path.split(self.srt_file.name)[1])
 
         request = Request.blank('/available_translations')
         response = self.item.transcript(request=request, dispatch='available_translations')
@@ -345,7 +366,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
         # Make request to available translations dispatch.
         request = Request.blank('/available_translations')
         response = self.item.transcript(request=request, dispatch='available_translations')
-        self.assertItemsEqual(json.loads(response.body), result)
+        six.assertCountEqual(self, json.loads(response.body), result)
 
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages')
     def test_val_available_translations_feature_disabled(self, mock_get_available_transcript_languages):
@@ -383,7 +404,7 @@ class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):
     def setUp(self):
         super(TestTranscriptAvailableTranslationsBumperDispatch, self).setUp()
         self.item_descriptor.render(STUDENT_VIEW)
-        self.item = self.item_descriptor.xmodule_runtime.xmodule_instance
+        self.item = self.item_descriptor
         self.dispatch = "available_translations/?is_bumper=1"
         self.item.video_bumper = {"transcripts": {"en": ""}}
 
@@ -449,7 +470,7 @@ class TestTranscriptDownloadDispatch(TestVideo):
     def setUp(self):
         super(TestTranscriptDownloadDispatch, self).setUp()
         self.item_descriptor.render(STUDENT_VIEW)
-        self.item = self.item_descriptor.xmodule_runtime.xmodule_instance
+        self.item = self.item_descriptor
 
     def test_download_transcript_not_exist(self):
         request = Request.blank('/download')
@@ -499,7 +520,7 @@ class TestTranscriptDownloadDispatch(TestVideo):
         self.assertEqual(response.headers['Content-Disposition'], 'attachment; filename="en_塞.srt"')
 
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_video_transcript_data')
-    @patch('xmodule.video_module.VideoModule.get_transcript', Mock(side_effect=NotFoundError))
+    @patch('xmodule.video_module.VideoBlock.get_transcript', Mock(side_effect=NotFoundError))
     def test_download_fallback_transcript(self, mock_get_video_transcript_data):
         """
         Verify val transcript is returned as a fallback if it is not found in the content store.
@@ -560,7 +581,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
     def setUp(self):
         super(TestTranscriptTranslationGetDispatch, self).setUp()
         self.item_descriptor.render(STUDENT_VIEW)
-        self.item = self.item_descriptor.xmodule_runtime.xmodule_instance
+        self.item = self.item_descriptor
         self.item.video_bumper = {"transcripts": {"en": ""}}
 
     @ddt.data(
@@ -747,7 +768,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
                 response.headerlist
             )
 
-    @patch('xmodule.video_module.VideoModule.course_id', return_value='not_a_course_locator')
+    @patch('xmodule.video_module.VideoBlock.course_id', return_value='not_a_course_locator')
     def test_translation_static_non_course(self, __):
         """
         Test that get_static_transcript short-circuits in the case of a non-CourseLocator.
@@ -769,8 +790,8 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
             store.update_item(self.course, self.user.id)
 
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_video_transcript_data')
-    @patch('xmodule.video_module.VideoModule.translation', Mock(side_effect=NotFoundError))
-    @patch('xmodule.video_module.VideoModule.get_static_transcript', Mock(return_value=Response(status=404)))
+    @patch('xmodule.video_module.VideoBlock.translation', Mock(side_effect=NotFoundError))
+    @patch('xmodule.video_module.VideoBlock.get_static_transcript', Mock(return_value=Response(status=404)))
     def test_translation_fallback_transcript(self, mock_get_video_transcript_data):
         """
         Verify that the val transcript is returned as a fallback,
@@ -801,8 +822,8 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         for attribute, value in six.iteritems(expected_headers):
             self.assertEqual(response.headers[attribute], value)
 
-    @patch('xmodule.video_module.VideoModule.translation', Mock(side_effect=NotFoundError))
-    @patch('xmodule.video_module.VideoModule.get_static_transcript', Mock(return_value=Response(status=404)))
+    @patch('xmodule.video_module.VideoBlock.translation', Mock(side_effect=NotFoundError))
+    @patch('xmodule.video_module.VideoBlock.get_static_transcript', Mock(return_value=Response(status=404)))
     def test_translation_fallback_transcript_feature_disabled(self):
         """
         Verify that val transcript is not returned when its feature is disabled.
@@ -952,7 +973,7 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):
         request = Request.blank('/translation', POST=post_data)
         response = self.item_descriptor.studio_transcript(request=request, dispatch='translation')
         self.assertEqual(response.status, '201 Created')
-        response = json.loads(response.body)
+        response = json.loads(response.text)
         self.assertTrue(response["language_code"], "uk")
         self.assertDictEqual(self.item_descriptor.transcripts, {})
         self.assertTrue(edxval_api.get_video_transcript_data(video_id=response["edx_video_id"], language_code="uk"))
@@ -965,7 +986,7 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):
             "edx_video_id": "",
             "language_code": "ar",
             "new_language_code": "uk",
-            "file": ("filename.srt", SRT_content.decode("utf8").encode("cp1251"))
+            "file": ("filename.srt", SRT_content.encode("cp1251"))
         }
 
         request = Request.blank("/translation", POST=post_data)
@@ -1004,7 +1025,7 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
         """
         Verify that DELETE dispatch works as expected when required args are missing from request
         """
-        request = Request(self.REQUEST_META, body=json.dumps(params))
+        request = Request(self.REQUEST_META, body=json.dumps(params).encode('utf-8'))
         response = self.item_descriptor.studio_transcript(request=request, dispatch='translation')
         self.assertEqual(response.status_code, 400)
 
@@ -1031,7 +1052,7 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
         # verify that a video transcript exists for expected data
         self.assertTrue(api.get_video_transcript_data(video_id=self.EDX_VIDEO_ID, language_code=self.LANGUAGE_CODE_UK))
 
-        request = Request(self.REQUEST_META, body=request_body)
+        request = Request(self.REQUEST_META, body=request_body.encode('utf-8'))
         self.item_descriptor.edx_video_id = self.EDX_VIDEO_ID
         response = self.item_descriptor.studio_transcript(request=request, dispatch='translation')
         self.assertEqual(response.status_code, 200)
@@ -1045,7 +1066,7 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
         """
         request_body = json.dumps({'lang': self.LANGUAGE_CODE_UK, 'edx_video_id': ''})
         srt_file_name_uk = subs_filename('ukrainian_translation.srt', lang=self.LANGUAGE_CODE_UK)
-        request = Request(self.REQUEST_META, body=request_body)
+        request = Request(self.REQUEST_META, body=request_body.encode('utf-8'))
 
         # upload and verify that srt file exists in assets
         _upload_file(self.SRT_FILE, self.item_descriptor.location, srt_file_name_uk)
@@ -1070,7 +1091,7 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
         request_body = json.dumps({'lang': self.LANGUAGE_CODE_EN, 'edx_video_id': ''})
         srt_file_name_en = subs_filename('english_translation.srt', lang=self.LANGUAGE_CODE_EN)
         self.item_descriptor.transcripts['en'] = 'english_translation.srt'
-        request = Request(self.REQUEST_META, body=request_body)
+        request = Request(self.REQUEST_META, body=request_body.encode('utf-8'))
 
         # upload and verify that srt file exists in assets
         _upload_file(self.SRT_FILE, self.item_descriptor.location, srt_file_name_en)
@@ -1090,7 +1111,7 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
         """
         request_body = json.dumps({'lang': self.LANGUAGE_CODE_EN, 'edx_video_id': ''})
         sub_file_name = subs_filename(self.item_descriptor.sub, lang=self.LANGUAGE_CODE_EN)
-        request = Request(self.REQUEST_META, body=request_body)
+        request = Request(self.REQUEST_META, body=request_body.encode('utf-8'))
 
         # sub should not be empy
         self.assertFalse(self.item_descriptor.sub == u'')
@@ -1132,7 +1153,7 @@ class TestGetTranscript(TestVideo):
     def setUp(self):
         super(TestGetTranscript, self).setUp()
         self.item_descriptor.render(STUDENT_VIEW)
-        self.item = self.item_descriptor.xmodule_runtime.xmodule_instance
+        self.item = self.item_descriptor
 
     def test_good_transcript(self):
         """

@@ -504,7 +504,7 @@
                     cssClass: 'file-download-link',
                     formatter: function(row, cell, value, columnDef, dataContext) {
                         return edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML(
-                            '<a target="_blank" href="'), dataContext.url,
+                            '<a rel="noopener" target="_blank" href="'), dataContext.url,
                             edx.HtmlUtils.HTML('">'), dataContext.name,
                             edx.HtmlUtils.HTML('</a>'));
                     }

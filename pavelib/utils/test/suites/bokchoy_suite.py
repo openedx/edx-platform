@@ -2,26 +2,27 @@
 """
 Class used for defining and running Bok Choy acceptance test suite
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
 import os
 from time import sleep
 
-from common.test.acceptance.fixtures.course import CourseFixture, FixtureError
+from paver.easy import call_task, cmdopts, dry, might_call, needs, sh, task
 
-from paver.easy import sh, cmdopts, task, needs, might_call, call_task, dry
-from pavelib.utils.test.suites.suite import TestSuite
-from pavelib.utils.envs import Env
-from pavelib.utils.test.bokchoy_utils import (
-    clear_mongo, start_servers, check_services, wait_for_test_servers
-)
-from pavelib.utils.test.bokchoy_options import (
-    BOKCHOY_IMPORTS_DIR, BOKCHOY_IMPORTS_DIR_DEPR,
-    BOKCHOY_DEFAULT_STORE, BOKCHOY_DEFAULT_STORE_DEPR,
-    BOKCHOY_FASTTEST
-)
-from pavelib.utils.test import utils as test_utils
-from pavelib.utils.timer import timed
+from common.test.acceptance.fixtures.course import CourseFixture, FixtureError
 from pavelib.database import update_local_bokchoy_db_from_s3
+from pavelib.utils.envs import Env
+from pavelib.utils.test import utils as test_utils
+from pavelib.utils.test.bokchoy_options import (
+    BOKCHOY_DEFAULT_STORE,
+    BOKCHOY_DEFAULT_STORE_DEPR,
+    BOKCHOY_FASTTEST,
+    BOKCHOY_IMPORTS_DIR,
+    BOKCHOY_IMPORTS_DIR_DEPR
+)
+from pavelib.utils.test.bokchoy_utils import check_services, clear_mongo, start_servers, wait_for_test_servers
+from pavelib.utils.test.suites.suite import TestSuite
+from pavelib.utils.timer import timed
 
 try:
     from pygments.console import colorize
@@ -203,7 +204,7 @@ class BokChoyTestSuite(TestSuite):
         check_services()
 
         if not self.testsonly:
-            call_task('prepare_bokchoy_run', options={'log_dir': self.log_dir})
+            call_task('prepare_bokchoy_run', options={'log_dir': self.log_dir, 'coveragerc': self.coveragerc})
         else:
             # load data in db_fixtures
             load_bok_choy_data()  # pylint: disable=no-value-for-parameter
@@ -321,8 +322,14 @@ class BokChoyTestSuite(TestSuite):
         cmd += [
             "-m",
             "pytest",
-            test_spec,
-        ] + self.verbosity_processes_command
+        ]
+        if self.coveragerc:
+            cmd.extend([
+                '-p',
+                'openedx.testing.coverage_context_listener.pytest_plugin',
+            ])
+        cmd.append(test_spec)
+        cmd.extend(self.verbosity_processes_command)
         if self.extra_args:
             cmd.append(self.extra_args)
         cmd.extend(self.passthrough_options)

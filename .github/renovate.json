@@ -1,9 +1,10 @@
 {
   "extends": [
     "config:base",
-    "schedule:weekdays"
+    "schedule:weekdays",
+    ":preserveSemverRanges"
   ],
-  "prConcurrentLimit": 2,
+  "prConcurrentLimit": 5,
   "includePaths": [
     "package.json"
   ]

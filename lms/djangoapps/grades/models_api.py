@@ -1,15 +1,15 @@
 """
 Provides Python APIs exposed from Grades models.
 """
-from lms.djangoapps.grades.models import (
-    PersistentCourseGrade as _PersistentCourseGrade,
-    PersistentSubsectionGrade as _PersistentSubsectionGrade,
-    PersistentSubsectionGradeOverride as _PersistentSubsectionGradeOverride,
-    VisibleBlocks as _VisibleBlocks,
-)
-from lms.djangoapps.utils import _get_key
+from __future__ import absolute_import
 
 from opaque_keys.edx.keys import CourseKey, UsageKey
+
+from lms.djangoapps.grades.models import PersistentCourseGrade as _PersistentCourseGrade
+from lms.djangoapps.grades.models import PersistentSubsectionGrade as _PersistentSubsectionGrade
+from lms.djangoapps.grades.models import PersistentSubsectionGradeOverride as _PersistentSubsectionGradeOverride
+from lms.djangoapps.grades.models import VisibleBlocks as _VisibleBlocks
+from lms.djangoapps.utils import _get_key
 
 
 def prefetch_grade_overrides_and_visible_blocks(user, course_key):

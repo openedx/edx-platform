@@ -3,36 +3,30 @@
 Python APIs exposed by the grades app to other in-process apps.
 """
 from __future__ import absolute_import, unicode_literals
+
 from datetime import datetime
 
 import pytz
+from django.core.exceptions import ObjectDoesNotExist
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from six import text_type
 
-from django.core.exceptions import ObjectDoesNotExist
-
-# Public Grades Factories
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
-from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
-from lms.djangoapps.grades.subsection_grade_factory import SubsectionGradeFactory
-
-# Public Grades Functions
-from lms.djangoapps.grades.models_api import *
-from lms.djangoapps.grades.tasks import compute_all_grades_for_course as task_compute_all_grades_for_course
-
 # Public Grades Modules
-from lms.djangoapps.grades import events, constants, context, course_data
-from lms.djangoapps.grades.signals import signals
-from lms.djangoapps.grades.util_services import GradesUtilService
-
-# TODO exposing functionality from Grades handlers seems fishy.
-from lms.djangoapps.grades.signals.handlers import disconnect_submissions_signal_receiver
-
+from lms.djangoapps.grades import constants, context, course_data, events
 # Grades APIs that should NOT belong within the Grades subsystem
 # TODO move Gradebook to be an external feature outside of core Grades
-from lms.djangoapps.grades.config.waffle import is_writable_gradebook_enabled
+from lms.djangoapps.grades.config.waffle import is_writable_gradebook_enabled, gradebook_can_see_bulk_management
+# Public Grades Factories
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.models_api import *
+from lms.djangoapps.grades.signals import signals
+# TODO exposing functionality from Grades handlers seems fishy.
+from lms.djangoapps.grades.signals.handlers import disconnect_submissions_signal_receiver
+from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
+from lms.djangoapps.grades.subsection_grade_factory import SubsectionGradeFactory
+from lms.djangoapps.grades.tasks import compute_all_grades_for_course as task_compute_all_grades_for_course
+from lms.djangoapps.grades.util_services import GradesUtilService
 from lms.djangoapps.utils import _get_key
-
-from opaque_keys.edx.keys import CourseKey, UsageKey
 from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
 
 
@@ -71,6 +65,7 @@ def override_subsection_grade(
         requesting_user=overrider,
         subsection_grade_model=grade,
         feature=feature,
+        system=feature,
         earned_all_override=earned_all,
         earned_graded_override=earned_graded,
     )
@@ -99,6 +94,10 @@ def undo_override_subsection_grade(user_id, course_key_or_id, usage_key_or_id, f
 
     Fires off a recalculate_subsection_grade async task to update the PersistentSubsectionGrade table. If the
     override does not exist, no error is raised, it just triggers the recalculation.
+
+    feature: if specified, the deletion will only occur if the
+             override to be deleted was created by the corresponding
+             subsystem
     """
     course_key = _get_key(course_key_or_id, CourseKey)
     usage_key = _get_key(usage_key_or_id, UsageKey)
@@ -108,9 +107,11 @@ def undo_override_subsection_grade(user_id, course_key_or_id, usage_key_or_id, f
     except ObjectDoesNotExist:
         return
 
-    # Older rejected exam attempts that transition to verified might not have an override created
-    if override is not None:
+    if override is not None and (
+            not feature or not override.system or feature == override.system):
         override.delete(feature=feature)
+    else:
+        return
 
     # Cache a new event id and event type which the signal handler will use to emit a tracking log event.
     create_new_event_transaction_id()

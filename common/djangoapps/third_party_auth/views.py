@@ -1,20 +1,22 @@
 """
 Extra views required for SSO
 """
-from django.conf import settings
-from django.urls import reverse
-from django.http import Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseServerError, HttpResponseNotFound
-from django.shortcuts import redirect, render
-from django.views.generic.base import View
-from django.views.decorators.csrf import csrf_exempt
-from social_django.utils import load_strategy, load_backend, psa
-from social_django.views import complete
-from social_core.utils import setting_name
+from __future__ import absolute_import
 
+from django.conf import settings
+from django.http import Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseServerError
+from django.shortcuts import redirect, render
+from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic.base import View
+from social_core.utils import setting_name
+from social_django.utils import load_backend, load_strategy, psa
+from social_django.views import complete
+
+import third_party_auth
 from student.helpers import get_next_url_for_login_page
 from student.models import UserProfile
 from student.views import compose_and_send_activation_email
-import third_party_auth
 from third_party_auth import pipeline, provider
 
 from .models import SAMLConfiguration, SAMLProviderConfig

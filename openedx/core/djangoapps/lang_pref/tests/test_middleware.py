@@ -8,6 +8,7 @@ import itertools
 
 import ddt
 import mock
+import six
 from django.conf import settings
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.http import HttpResponse
@@ -149,7 +150,7 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
             accept_lang_out = parse_accept_lang_header(accept_lang_out)
 
         if accept_lang_out and accept_lang_result:
-            self.assertItemsEqual(accept_lang_result, accept_lang_out)
+            six.assertCountEqual(self, accept_lang_result, accept_lang_out)
         else:
             self.assertEqual(accept_lang_result, accept_lang_out)
 

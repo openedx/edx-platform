@@ -1556,8 +1556,13 @@
         @include text-align(left);
       }
 
-      .action-select input {
+      .action-select input, .action-select button {
         @extend %btn-verify-primary;
+      }
+
+      .action-select button[name="verified_mode"] {
+        font-weight: 600;
+        padding: 10px 15px;
       }
 
       // extra register options/info
@@ -2247,6 +2252,19 @@
 
     .wrapper-actions {
       margin-top: 20px;
+    }
+  }
+
+  // First purchase offer banner
+  .first-purchase-offer-banner {
+    background-color: #dee3f1;
+    font-size: 16px;
+    border-radius: 7px;
+    padding: 20px;
+
+    .first-purchase-offer-banner-bold {
+      font-weight: bold;
+      color: #23419f;
     }
   }
 }

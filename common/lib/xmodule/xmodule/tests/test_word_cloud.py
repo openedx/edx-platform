@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 """Test for Word cloud Xmodule functional logic."""
 
+from __future__ import absolute_import
+
 from webob.multidict import MultiDict
+
 from xmodule.word_cloud_module import WordCloudDescriptor
+
 from . import LogicTest
 
 

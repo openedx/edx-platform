@@ -127,7 +127,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Verifies that the staff debug control visibility is as expected (for staff only).
         """
-        content = self.get_courseware_page().content
+        content = self.get_courseware_page().content.decode('utf-8')
         self.assertIn(self.sequential_display_name, content, "Subsection should be visible")
         self.assertEqual(staff_debug_expected, 'Staff Debug Info' in content)
 
@@ -150,7 +150,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Verifies that "Show Answer" is only present when expected (for staff only).
         """
-        problem_html = json.loads(self.get_problem().content)['html']
+        problem_html = json.loads(self.get_problem().content.decode('utf-8'))['html']
         self.assertIn(self.problem_display_name, problem_html)
         self.assertEqual(show_answer_expected, "Show Answer" in problem_html)
 
@@ -295,7 +295,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
 
         The return value is a string like u'1/2'.
         """
-        json_data = json.loads(self.look_at_question(self.problem_display_name).content)
+        json_data = json.loads(self.look_at_question(self.problem_display_name).content.decode('utf-8'))
         progress = '%s/%s' % (str(json_data['current_score']), str(json_data['total_possible']))
         return progress
 
@@ -329,7 +329,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         self.login_staff()
         response = self.get_course_info_page()
         self.assertEqual(response.status_code, 200)
-        content = response.content
+        content = response.content.decode('utf-8')
         self.assertIn("OOGIE BLOOGIE", content)
 
         # Masquerade as the student,enable the self paced configuration, and check we can see the info page.
@@ -337,7 +337,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         self.update_masquerade(role='student', user_name=self.student_user.username)
         response = self.get_course_info_page()
         self.assertEqual(response.status_code, 200)
-        content = response.content
+        content = response.content.decode('utf-8')
         self.assertIn("OOGIE BLOOGIE", content)
 
     @ddt.data(
@@ -421,12 +421,12 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         """
         # Log in as staff, and check we can see the info page.
         self.login_staff()
-        content = self.get_course_info_page().content
+        content = self.get_course_info_page().content.decode('utf-8')
         self.assertIn("OOGIE BLOOGIE", content)
 
         # Masquerade as the student, and check we can see the info page.
         self.update_masquerade(role='student', user_name=self.student_user.username)
-        content = self.get_course_info_page().content
+        content = self.get_course_info_page().content.decode('utf-8')
         self.assertIn("OOGIE BLOOGIE", content)
 
     def test_masquerade_as_specific_student_progress(self):
@@ -436,20 +436,20 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         # Give the student some correct answers, check their progress page
         self.login_student()
         self.submit_answer('Correct', 'Correct')
-        student_progress = self.get_progress_page().content
+        student_progress = self.get_progress_page().content.decode('utf-8')
         self.assertNotIn("1 of 2 possible points", student_progress)
         self.assertIn("2 of 2 possible points", student_progress)
 
         # Staff answers are slightly different
         self.login_staff()
         self.submit_answer('Incorrect', 'Correct')
-        staff_progress = self.get_progress_page().content
+        staff_progress = self.get_progress_page().content.decode('utf-8')
         self.assertNotIn("2 of 2 possible points", staff_progress)
         self.assertIn("1 of 2 possible points", staff_progress)
 
         # Should now see the student's scores
         self.update_masquerade(role='student', user_name=self.student_user.username)
-        masquerade_progress = self.get_progress_page().content
+        masquerade_progress = self.get_progress_page().content.decode('utf-8')
         self.assertNotIn("1 of 2 possible points", masquerade_progress)
         self.assertIn("2 of 2 possible points", masquerade_progress)
 

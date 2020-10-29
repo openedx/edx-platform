@@ -1,17 +1,18 @@
 """
 Django management command to create a course in a specific modulestore
 """
+from __future__ import absolute_import
+
 from datetime import datetime, timedelta
-from six import text_type
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
+from six import text_type
 
 from contentstore.management.commands.utils import user_from_str
 from contentstore.views.course import create_new_course_in_store
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import DuplicateCourseError
-
 
 MODULESTORE_CHOICES = (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
 

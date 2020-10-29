@@ -1,7 +1,7 @@
 """
 Internationalization tasks
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import re
 import subprocess
@@ -9,6 +9,7 @@ import sys
 
 from path import Path as path
 from paver.easy import cmdopts, needs, sh, task
+from six.moves import input
 
 from .utils.cmd import django_cmd
 from .utils.envs import Env
@@ -222,7 +223,7 @@ def i18n_robot_pull_edx():
     print("\n\nValidating translations with `i18n_tool validate`...")
     sh("i18n_tool validate")
 
-    con = raw_input("Continue with committing these translations (y/n)? ")
+    con = input("Continue with committing these translations (y/n)? ")
 
     if con.lower() == 'y':
         sh('git add conf/locale')

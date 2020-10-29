@@ -2,6 +2,8 @@
 Asynchronous tasks for the LTI provider app.
 """
 
+from __future__ import absolute_import
+
 import logging
 
 from django.contrib.auth.models import User

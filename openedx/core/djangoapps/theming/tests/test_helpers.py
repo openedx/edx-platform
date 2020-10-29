@@ -3,6 +3,7 @@ Test helpers for Comprehensive Theming.
 """
 from __future__ import absolute_import
 
+import six
 from django.conf import settings
 from django.test import TestCase, override_settings
 from edx_django_utils.cache import RequestCache
@@ -39,7 +40,7 @@ class TestHelpers(TestCase):
             Theme('test-theme', 'test-theme', get_theme_base_dir('test-theme'), settings.PROJECT_ROOT),
         ]
         actual_themes = get_themes()
-        self.assertItemsEqual(expected_themes, actual_themes)
+        six.assertCountEqual(self, expected_themes, actual_themes)
 
     @override_settings(COMPREHENSIVE_THEME_DIRS=[settings.TEST_THEME.dirname()])
     def test_get_themes_2(self):
@@ -50,7 +51,7 @@ class TestHelpers(TestCase):
             Theme('test-theme', 'test-theme', get_theme_base_dir('test-theme'), settings.PROJECT_ROOT),
         ]
         actual_themes = get_themes()
-        self.assertItemsEqual(expected_themes, actual_themes)
+        six.assertCountEqual(self, expected_themes, actual_themes)
 
     def test_get_value_returns_override(self):
         """
@@ -69,148 +70,43 @@ class TestHelpers(TestCase):
         Tests to make sure the is_comprehensive_theming_enabled function works as expected.
         Here are different scenarios that we need to test
 
-        1. Theming is enabled, there is a SiteTheme record and microsite configuration for the current site.
+        1. Theming is enabled and there is a SiteTheme record.
             is_comprehensive_theming_enabled should return True
-        2. Theming is enabled, there is no SiteTheme record but there is microsite configuration for the current site.
+        2. Theming is enabled and there is no SiteTheme record.
             is_comprehensive_theming_enabled should return False
-        3. Theming is enabled, there is neither a SiteTheme record nor microsite configuration for the current site.
-            is_comprehensive_theming_enabled should return True
-        4. Theming is disabled, there is a SiteTheme record and microsite configuration for the current site.
+        3. Theming is disabled, there is a SiteTheme record for the current site.
             is_comprehensive_theming_enabled should return False
-        5. Theming is disabled, there is no SiteTheme record but there is microsite configuration for the current site.
-            is_comprehensive_theming_enabled should return False
-        6. Theming is disabled, there is neither a SiteTheme record nor microsite configuration for the current site.
+        4. Theming is disabled, there is no SiteTheme record.
             is_comprehensive_theming_enabled should return False
         """
-        # Theming is enabled, there is a SiteTheme record and microsite configuration for the current site
+        # Theming is enabled, there is a SiteTheme record
         with patch(
             "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
             Mock(return_value=True),
         ):
-            with patch(
-                "openedx.core.djangoapps.theming.helpers.microsite.is_request_in_microsite",
-                Mock(return_value=True),
-            ):
-                self.assertTrue(theming_helpers.is_comprehensive_theming_enabled())
+            self.assertTrue(theming_helpers.is_comprehensive_theming_enabled())
 
-        # Theming is enabled, there is no SiteTheme record but there is microsite configuration for the current site.
+        # Theming is enabled, there is not a SiteTheme record
         with patch(
             "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
             Mock(return_value=False),
         ):
+            self.assertTrue(theming_helpers.is_comprehensive_theming_enabled())
+
+        with override_settings(ENABLE_COMPREHENSIVE_THEMING=False):
+            # Theming is disabled, there is a SiteTheme record
             with patch(
-                "openedx.core.djangoapps.theming.helpers.microsite.is_request_in_microsite",
+                "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
                 Mock(return_value=True),
             ):
                 self.assertFalse(theming_helpers.is_comprehensive_theming_enabled())
 
-        # Theming is enabled, there is neither a SiteTheme record nor microsite configuration for the current site.
-        with patch(
-            "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
-            Mock(return_value=False),
-        ):
-            with patch(
-                "openedx.core.djangoapps.theming.helpers.microsite.is_request_in_microsite",
-                Mock(return_value=False),
-            ):
-                self.assertTrue(theming_helpers.is_comprehensive_theming_enabled())
-
-        with override_settings(ENABLE_COMPREHENSIVE_THEMING=False):
-            # Theming is disabled, there is a SiteTheme record and microsite configuration for the current site.
-            with patch(
-                "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
-                Mock(return_value=True),
-            ):
-                with patch(
-                    "openedx.core.djangoapps.theming.helpers.microsite.is_request_in_microsite",
-                    Mock(return_value=True),
-                ):
-                    self.assertFalse(theming_helpers.is_comprehensive_theming_enabled())
-
-            # Theming is disabled, there is no SiteTheme record but
-            # there is microsite configuration for the current site.
+            # Theming is disabled, there is no SiteTheme record
             with patch(
                 "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
                 Mock(return_value=False),
             ):
-                with patch(
-                    "openedx.core.djangoapps.theming.helpers.microsite.is_request_in_microsite",
-                    Mock(return_value=True),
-                ):
-                    self.assertFalse(theming_helpers.is_comprehensive_theming_enabled())
-
-            # Theming is disabled, there is neither a SiteTheme record nor microsite configuration for the current site.
-            with patch(
-                "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
-                Mock(return_value=False),
-            ):
-                with patch(
-                    "openedx.core.djangoapps.theming.helpers.microsite.is_request_in_microsite",
-                    Mock(return_value=False),
-                ):
-                    self.assertFalse(theming_helpers.is_comprehensive_theming_enabled())
-
-    def test_get_template(self):
-        """
-        Tests to make sure the get_template function works as expected.
-        """
-        # if the current site has associated SiteTheme then get_template should return None
-        with patch(
-            "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
-            Mock(return_value=True),
-        ):
-            with patch(
-                "openedx.core.djangoapps.theming.helpers.microsite.is_request_in_microsite",
-                Mock(return_value=True),
-            ):
-                with patch("microsite_configuration.microsite.TEMPLATES_BACKEND") as mock_microsite_backend:
-                    mock_microsite_backend.get_template = Mock(return_value="/microsite/about.html")
-                    self.assertIsNone(theming_helpers.get_template("about.html"))
-
-        # if the current site does not have associated SiteTheme then get_template should return microsite override
-        with patch(
-            "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
-            Mock(return_value=False),
-        ):
-            with patch(
-                "openedx.core.djangoapps.theming.helpers.microsite.is_request_in_microsite",
-                Mock(return_value=True),
-            ):
-                with patch("microsite_configuration.microsite.TEMPLATES_BACKEND") as mock_microsite_backend:
-                    mock_microsite_backend.get_template = Mock(return_value="/microsite/about.html")
-                    self.assertEqual(theming_helpers.get_template("about.html"), "/microsite/about.html")
-
-    def test_get_template_path(self):
-        """
-        Tests to make sure the get_template_path function works as expected.
-        """
-        # if the current site has associated SiteTheme then get_template_path should return the argument as is.
-        with patch(
-            "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
-            Mock(return_value=True),
-        ):
-            with patch(
-                "openedx.core.djangoapps.theming.helpers.microsite.is_request_in_microsite",
-                Mock(return_value=True),
-            ):
-                with patch("microsite_configuration.microsite.TEMPLATES_BACKEND") as mock_microsite_backend:
-                    mock_microsite_backend.get_template = Mock(return_value="/microsite/about.html")
-                    self.assertEqual(theming_helpers.get_template_path("about.html"), "about.html")
-
-        RequestCache.clear_all_namespaces()
-
-        # if the current site does not have associated SiteTheme then get_template_path should return microsite override
-        with patch(
-            "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
-            Mock(return_value=False),
-        ):
-            with patch(
-                "openedx.core.djangoapps.theming.helpers.microsite.is_request_in_microsite",
-                Mock(return_value=True),
-            ):
-                with patch("microsite_configuration.microsite.TEMPLATES_BACKEND") as mock_microsite_backend:
-                    mock_microsite_backend.get_template_path = Mock(return_value="/microsite/about.html")
-                    self.assertEqual(theming_helpers.get_template_path("about.html"), "/microsite/about.html")
+                self.assertFalse(theming_helpers.is_comprehensive_theming_enabled())
 
 
 @skip_unless_lms

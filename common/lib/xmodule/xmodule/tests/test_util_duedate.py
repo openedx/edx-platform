@@ -1,8 +1,11 @@
 """
 Tests for extended due date utilities.
 """
-import mock
+from __future__ import absolute_import
+
 import unittest
+
+import mock
 
 from ..util import duedate
 

@@ -5,6 +5,7 @@ Management command for expiring old entitlements.
 from __future__ import absolute_import
 
 import logging
+from textwrap import dedent
 
 from django.core.management import BaseCommand
 from six.moves import range
@@ -28,7 +29,7 @@ class Command(BaseCommand):
     The command's goal is to pass a narrow subset of entitlements to an
     idempotent Celery task for further (parallelized) processing.
     """
-    help = 'Expire old entitlements.'
+    help = dedent(__doc__).strip()
 
     def add_arguments(self, parser):
         parser.add_argument(

@@ -1,21 +1,25 @@
 """
 Course Grade Factory Class
 """
+from __future__ import absolute_import
+
 from collections import namedtuple
 from logging import getLogger
 
+import six
 from six import text_type
 
-from openedx.core.djangoapps.signals.signals import (COURSE_GRADE_CHANGED,
-                                                     COURSE_GRADE_NOW_PASSED,
-                                                     COURSE_GRADE_NOW_FAILED)
+from openedx.core.djangoapps.signals.signals import (
+    COURSE_GRADE_CHANGED,
+    COURSE_GRADE_NOW_FAILED,
+    COURSE_GRADE_NOW_PASSED
+)
 
 from .config import assume_zero_if_absent, should_persist_grades
 from .course_data import CourseData
 from .course_grade import CourseGrade, ZeroCourseGrade
 from .models import PersistentCourseGrade
 from .models_api import prefetch_grade_overrides_and_visible_blocks
-
 
 log = getLogger(__name__)
 
@@ -138,7 +142,7 @@ class CourseGradeFactory(object):
         """
         Returns a ZeroCourseGrade object for the given user and course.
         """
-        log.debug(u'Grades: CreateZero, %s, User: %s', unicode(course_data), user.id)
+        log.debug(u'Grades: CreateZero, %s, User: %s', six.text_type(course_data), user.id)
         return ZeroCourseGrade(user, course_data)
 
     @staticmethod
@@ -151,7 +155,7 @@ class CourseGradeFactory(object):
             raise PersistentCourseGrade.DoesNotExist
 
         persistent_grade = PersistentCourseGrade.read(user.id, course_data.course_key)
-        log.debug(u'Grades: Read, %s, User: %s, %s', unicode(course_data), user.id, persistent_grade)
+        log.debug(u'Grades: Read, %s, User: %s, %s', six.text_type(course_data), user.id, persistent_grade)
 
         return CourseGrade(
             user,

@@ -45,11 +45,14 @@ Eligibility:
        then the student will be issued a certificate regardless of his grade,
        unless he has allow_certificate set to False.
 """
+from __future__ import absolute_import
+
 import json
 import logging
 import os
 import uuid
 
+import six
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -180,12 +183,12 @@ class CertificateWhitelist(models.Model):
             result.append({
                 'id': item.id,
                 'user_id': item.user.id,
-                'user_name': unicode(item.user.username),
-                'user_email': unicode(item.user.email),
-                'course_id': unicode(item.course_id),
+                'user_name': six.text_type(item.user.username),
+                'user_email': six.text_type(item.user.email),
+                'course_id': six.text_type(item.course_id),
                 'created': item.created.strftime(u"%B %d, %Y"),
                 'certificate_generated': certificate_generated and certificate_generated.strftime(u"%B %d, %Y"),
-                'notes': unicode(item.notes or ''),
+                'notes': six.text_type(item.notes or ''),
             })
         return result
 

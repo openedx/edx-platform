@@ -27,7 +27,6 @@ setup(
             "external_link = lms.djangoapps.courseware.tabs:ExternalLinkCourseTab",
             "html_textbooks = lms.djangoapps.courseware.tabs:HtmlTextbookTabs",
             "instructor = lms.djangoapps.instructor.views.instructor_dashboard:InstructorDashboardTab",
-            "notes = lms.djangoapps.notes.views:NotesTab",
             "pdf_textbooks = lms.djangoapps.courseware.tabs:PDFTextbookTabs",
             "progress = lms.djangoapps.courseware.tabs:ProgressTab",
             "static_tab = xmodule.tabs:StaticTab",
@@ -73,9 +72,9 @@ setup(
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
             "appsembler_settings = openedx.core.djangoapps.appsembler.settings.apps:SettingsConfig",
             "credentials = openedx.core.djangoapps.credentials.apps:CredentialsConfig",
+            "content_libraries = openedx.core.djangoapps.content_libraries.apps:ContentLibrariesConfig",
             "discussion = lms.djangoapps.discussion.apps:DiscussionConfig",
             "grades = lms.djangoapps.grades.apps:GradesConfig",
-            "journals = openedx.features.journals.apps:JournalsConfig",
             "plugins = openedx.core.djangoapps.plugins.apps:PluginsConfig",
             "schedules = openedx.core.djangoapps.schedules.apps:SchedulesConfig",
             "theming = openedx.core.djangoapps.theming.apps:ThemingConfig",
@@ -89,6 +88,7 @@ setup(
         "cms.djangoapp": [
             "announcements = openedx.features.announcements.apps:AnnouncementsConfig",
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
+            "content_libraries = openedx.core.djangoapps.content_libraries.apps:ContentLibrariesConfig",
             "appsembler_settings = openedx.core.djangoapps.appsembler.settings.apps:SettingsConfig",
             # Importing an LMS app into the Studio process is not a good
             # practice. We're ignoring this for Discussions here because its
@@ -104,6 +104,9 @@ setup(
             "password_policy = openedx.core.djangoapps.password_policy.apps:PasswordPolicyConfig",
             "user_authn = openedx.core.djangoapps.user_authn.apps:UserAuthnConfig",
             "instructor = lms.djangoapps.instructor.apps:InstructorConfig",
+        ],
+        'openedx.learning_context': [
+            'lib = openedx.core.djangoapps.content_libraries.library_context:LibraryContextImpl',
         ],
     }
 )

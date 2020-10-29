@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import copy
 import shutil
@@ -14,6 +14,7 @@ from uuid import uuid4
 import ddt
 import lxml.html
 import mock
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.middleware.csrf import _compare_salted_tokens
@@ -27,12 +28,13 @@ from opaque_keys.edx.keys import AssetKey, CourseKey, UsageKey
 from opaque_keys.edx.locations import CourseLocator
 from path import Path as path
 from six import text_type
+from six.moves import range
 from waffle.testutils import override_switch
 
+from contentstore.config import waffle
 from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, get_url, parse_json
 from contentstore.utils import delete_course, reverse_course_url, reverse_url
 from contentstore.views.component import ADVANCED_COMPONENT_TYPES
-from contentstore.config import waffle
 from course_action_state.managers import CourseActionStateItemNotFoundError
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from openedx.core.djangoapps.django_comment_common.utils import are_permissions_roles_seeded
@@ -54,6 +56,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
 from xmodule.seq_module import SequenceDescriptor
+from xmodule.video_module import VideoBlock
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -676,7 +679,7 @@ class MiscCourseTests(ContentStoreTestCase):
         self.assertEqual(resp.status_code, 200)
 
         for expected in expected_types:
-            self.assertIn(expected, resp.content)
+            self.assertIn(expected, resp.content.decode('utf-8'))
 
     @ddt.data("<script>alert(1)</script>", "alert('hi')", "</script><script>alert(1)</script>")
     def test_container_handler_xss_prevent(self, malicious_code):
@@ -686,7 +689,7 @@ class MiscCourseTests(ContentStoreTestCase):
         resp = self.client.get_html(get_url('container_handler', self.vert_loc) + '?action=' + malicious_code)
         self.assertEqual(resp.status_code, 200)
         # Test that malicious code does not appear in html
-        self.assertNotIn(malicious_code, resp.content)
+        self.assertNotIn(malicious_code, resp.content.decode('utf-8'))
 
     def test_advanced_components_in_edit_unit(self):
         # This could be made better, but for now let's just assert that we see the advanced modules mentioned in the
@@ -1815,15 +1818,15 @@ class MetadataSaveTestCase(ContentStoreTestCase):
         <video display_name="Test Video"
                 youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
                 show_captions="false"
-                from="00:00:01"
-                to="00:01:00">
+                from="1.0"
+                to="60.0">
             <source src="http://www.example.com/file.mp4"/>
             <track src="http://www.example.com/track"/>
         </video>
         """
         self.video_descriptor = ItemFactory.create(
             parent_location=course.location, category='video',
-            data={'data': video_sample_xml}
+            **VideoBlock.parse_video_xml(video_sample_xml)
         )
 
     def test_metadata_not_persistence(self):
@@ -1840,7 +1843,6 @@ class MetadataSaveTestCase(ContentStoreTestCase):
             'youtube_id_1_5',
             'start_time',
             'end_time',
-            'source',
             'html5_sources',
             'track'
         }
@@ -1930,7 +1932,7 @@ class RerunCourseTest(ContentStoreTestCase):
             'course_key': destination_course_key,
             'should_display': True,
         }
-        for field_name, expected_value in expected_states.iteritems():
+        for field_name, expected_value in six.iteritems(expected_states):
             self.assertEquals(getattr(rerun_state, field_name), expected_value)
 
         # Verify that the creator is now enrolled in the course.

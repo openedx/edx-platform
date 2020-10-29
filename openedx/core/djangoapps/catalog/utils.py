@@ -1,5 +1,5 @@
 """Helper functions for working with the catalog service."""
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import copy
 import datetime
@@ -7,19 +7,21 @@ import logging
 import uuid
 
 import pycountry
-import six
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from edx_rest_api_client.client import EdxRestApiClient
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
+from six import text_type
 
 from entitlements.utils import is_course_run_entitlement_fulfillable
 from openedx.core.constants import COURSE_PUBLISHED
 from openedx.core.djangoapps.catalog.cache import (
     COURSE_PROGRAMS_CACHE_KEY_TPL,
+    PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL,
     PATHWAY_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
+    PROGRAMS_BY_TYPE_CACHE_KEY_TPL,
     SITE_PATHWAY_IDS_CACHE_KEY_TPL,
     SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 )
@@ -84,22 +86,24 @@ def check_catalog_integration_and_get_user(error_message_field):
         return None, catalog_integration
 
 
-def get_programs(site=None, uuid=None, uuids=None, course=None):  # pylint: disable=redefined-outer-name
+# pylint: disable=redefined-outer-name
+def get_programs(site=None, uuid=None, uuids=None, course=None, organization=None):
     """Read programs from the cache.
 
     The cache is populated by a management command, cache_programs.
 
     Keyword Arguments:
-        site (Site): django.contrib.sites.models object
+        site (Site): django.contrib.sites.models object to fetch programs of.
         uuid (string): UUID identifying a specific program to read from the cache.
         uuids (list of string): UUIDs identifying a specific programs to read from the cache.
         course (string): course id identifying a specific course run to read from the cache.
+        organization (string): short name for specific organization to read from the cache.
 
     Returns:
         list of dict, representing programs.
         dict, if a specific program is requested.
     """
-    if len([arg for arg in (site, uuid, uuids, course) if arg is not None]) != 1:
+    if len([arg for arg in (site, uuid, uuids, course, organization) if arg is not None]) != 1:
         raise TypeError('get_programs takes exactly one argument')
 
     if uuid:
@@ -118,7 +122,31 @@ def get_programs(site=None, uuid=None, uuids=None, course=None):  # pylint: disa
         uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [])
         if not uuids:
             logger.warning(u'Failed to get program UUIDs from the cache for site {}.'.format(site.domain))
+    elif organization:
+        uuids = get_programs_for_organization(organization)
+        if not uuids:
+            return []
 
+    return get_programs_by_uuids(uuids)
+
+
+def get_programs_by_type(site, program_type):
+    """
+    Keyword Arguments:
+        site (Site): The corresponding Site object to fetch programs for.
+        program_type (string): The program_type that matching programs must have.
+
+    Returns:
+        A list of programs for the given site with the given program_type.
+    """
+    program_type_cache_key = PROGRAMS_BY_TYPE_CACHE_KEY_TPL.format(
+        site_id=site.id, program_type=normalize_program_type(program_type)
+    )
+    uuids = cache.get(program_type_cache_key, [])
+    if not uuids:
+        logger.warning(text_type(
+            'Failed to get program UUIDs from cache for site {} and type {}'.format(site.id, program_type)
+        ))
     return get_programs_by_uuids(uuids)
 
 
@@ -127,7 +155,7 @@ def get_programs_by_uuids(uuids):
     Gets a list of programs for the provided uuids
     """
     # a list of UUID objects would be a perfectly reasonable parameter to provide
-    uuid_strings = [six.text_type(handle) for handle in uuids]
+    uuid_strings = [text_type(handle) for handle in uuids]
 
     programs = cache.get_many([PROGRAM_CACHE_KEY_TPL.format(uuid=handle) for handle in uuid_strings])
     programs = list(programs.values())
@@ -160,7 +188,7 @@ def get_program_types(name=None):
     """Retrieve program types from the catalog service.
 
     Keyword Arguments:
-        name (string): Name identifying a specific program.
+        name (string): Name identifying a specific program type.
 
     Returns:
         list of dict, representing program types.
@@ -426,7 +454,7 @@ def get_course_uuid_for_course(course_run_key):
         course_run_data = get_edx_api_data(
             catalog_integration,
             'course_runs',
-            resource_id=six.text_type(course_run_key),
+            resource_id=text_type(course_run_key),
             api=api,
             cache_key=run_cache_key if catalog_integration.is_cache_enabled else None,
             long_term_cache=True,
@@ -543,3 +571,91 @@ def get_course_run_details(course_run_key, fields):
         course_run_details = get_edx_api_data(catalog_integration, 'course_runs', api, resource_id=course_run_key,
                                               cache_key=cache_key, many=False, traverse_pagination=False, fields=fields)
     return course_run_details
+
+
+def is_course_run_in_program(course_run_key, program):
+    """
+    Check if a course run is part of a program.
+
+    Arguments:
+        program (dict): program data, as returned by get_programs()
+        course_run_key (CourseKey|str)
+
+    Returns: bool
+        Whether the program exists AND the course run is part of it.
+    """
+    # Right now, this function simply loads all the program data from the cache,
+    # walks the structure to collect the set of course run keys,
+    # and then sees if `course_run_key` is in that set.
+    # If we need to optimize this later, we can.
+    course_run_key_str = (
+        str(course_run_key) if isinstance(course_run_key, CourseKey)
+        else course_run_key
+    )
+    course_run_keys = course_run_keys_for_program(program)
+    return course_run_key_str in course_run_keys
+
+
+def course_run_keys_for_program(parent_program):
+    """
+    All of the course run keys associated with this ``parent_program``, either
+    via its ``curriculum`` field (looking at both the curriculum's courses
+    and child programs), or through the many-to-many ``courses`` field on the program.
+    """
+    keys = set()
+    for program in [parent_program] + child_programs(parent_program):
+        curriculum = _primary_active_curriculum(program)
+        if curriculum:
+            keys.update(_course_runs_from_container(curriculum))
+        keys.update(_course_runs_from_container(program))
+    return keys
+
+
+def child_programs(program):
+    """
+    Given a program, recursively find all child programs related
+    to this program through its curricula.
+    """
+    curriculum = _primary_active_curriculum(program)
+    if not curriculum:
+        return []
+    result = []
+    for child in curriculum.get('programs', []):
+        result.append(child)
+        result.extend(child_programs(child))
+    return result
+
+
+def _primary_active_curriculum(program):
+    """
+    Returns the first active curriculum in the given program, or None.
+    """
+    try:
+        return next(c for c in program.get('curricula', []) if c.get('is_active'))
+    except StopIteration:
+        return
+
+
+def _course_runs_from_container(container):
+    """
+    Pluck nested course runs out of a ``container`` dictionary,
+    which is either the ``curriculum`` field of a program, or
+    a program itself (since either may contain a ``courses`` list).
+    """
+    return [
+        course_run.get('key')
+        for course in container.get('courses', [])
+        for course_run in course.get('course_runs', [])
+    ]
+
+
+def normalize_program_type(program_type):
+    """ Function that normalizes a program type string for use in a cache key. """
+    return str(program_type).lower()
+
+
+def get_programs_for_organization(organization):
+    """
+    Retrieve list of program uuids authored by a given organization
+    """
+    return cache.get(PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL.format(org_key=organization))

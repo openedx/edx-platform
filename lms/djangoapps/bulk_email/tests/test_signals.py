@@ -69,7 +69,7 @@ class TestOptoutCourseEmailsBySignal(ModuleStoreTestCase):
             'message': 'test message for all'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEquals(json.loads(response.content.decode('utf-8')), self.success_content)
 
     def test_optout_course(self):
         """

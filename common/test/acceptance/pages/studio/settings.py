@@ -2,10 +2,11 @@
 """
 Course Schedule and Details Settings page.
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import os
 
+import six
 from bok_choy.javascript import requirejs
 from bok_choy.promise import EmptyPromise
 
@@ -77,7 +78,7 @@ class SettingsPage(CoursePage):
         Set the values of the elements to those specified
         in the element_values dict.
         """
-        for css, value in element_values.iteritems():
+        for css, value in six.iteritems(element_values):
             element = self.get_element(css)
             element.clear()
             element.send_keys(value)

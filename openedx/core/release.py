@@ -2,8 +2,9 @@
 Information about the release line of this Open edX code.
 """
 
-import unittest
+from __future__ import absolute_import
 
+import unittest
 
 # The release line: an Open edX release name ("ficus"), or "master".
 # This should always be "master" on the master branch, and will be changed

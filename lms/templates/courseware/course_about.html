@@ -9,7 +9,7 @@ from django.conf import settings
 from six import text_type
 from edxmako.shortcuts import marketing_link
 from openedx.core.djangolib.js_utils import js_escaped_string
-from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangolib.markup import clean_dangerous_html, HTML, Text
 from openedx.core.lib.courses import course_image_url
 
 from six import string_types
@@ -50,7 +50,7 @@ from six import string_types
         $.ajax({
           url: "${reverse('add_course_to_cart', args=[text_type(course.id)]) | n, js_escaped_string}",
           type: "POST",
-          /* Rant: HAD TO USE COMPLETE B/C PROMISE.DONE FOR SOME REASON DOES NOT WORK ON THIS PAGE. */
+          /* Using `complete` as promise.done did not work on this page */
           complete: add_course_complete_handler
         })
         event.preventDefault();
@@ -58,13 +58,17 @@ from six import string_types
     % endif
 
     $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
-      if(xhr.status == 200) {
+      if (xhr.status == 200) {
         if (xhr.responseText == "") {
           location.href = "${reverse('dashboard') | n, js_escaped_string}";
         }
         else {
           location.href = xhr.responseText;
         }
+      } else if (xhr.status == 403) {
+        $('#register_error').text(
+            (xhr.responseText ? xhr.responseText : "${_("An error has occurred. Please ensure that you are logged in to enroll.") | n, js_escaped_string}")
+        ).css("display", "block");
       } else {
         $('#register_error').text(
             (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.") | n, js_escaped_string}")
@@ -166,7 +170,7 @@ from six import string_types
               href_class = "register"
           %>
           <a href="${reg_href}" class="${href_class}">
-            ${_("Enroll in {course_name}").format(course_name=course.display_number_with_default)}
+            ${_("Enroll Now")}
           </a>
           <div id="register_error"></div>
         %endif
@@ -203,7 +207,7 @@ from six import string_types
       % endif
 
       <div class="inner-wrapper">
-        ${HTML(get_course_about_section(request, course, "overview"))}
+        ${clean_dangerous_html(get_course_about_section(request, course, "overview"))}
       </div>
     </div>
     </%block>
@@ -269,7 +273,7 @@ from six import string_types
           %endif
 
           % if pre_requisite_courses:
-          <% prc_target = reverse('about_course', args=[unicode(pre_requisite_courses[0]['key'])]) %>
+          <% prc_target = reverse('about_course', args=[text_type(pre_requisite_courses[0]['key'])]) %>
           <li class="prerequisite-course important-dates-item">
             <span class="icon fa fa-list-ul" aria-hidden="true"></span>
             <p class="important-dates-item-title">${_("Prerequisites")}</p>

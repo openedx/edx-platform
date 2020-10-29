@@ -1,9 +1,13 @@
 """
 HTML component editor in studio
 """
-from common.test.acceptance.pages.studio.utils import type_in_codemirror, get_codemirror_value
-from common.test.acceptance.pages.studio.xblock_editor import XBlockEditorView
+from __future__ import absolute_import
+
+from six.moves import zip
+
 from common.test.acceptance.pages.common.utils import click_css
+from common.test.acceptance.pages.studio.utils import get_codemirror_value, type_in_codemirror
+from common.test.acceptance.pages.studio.xblock_editor import XBlockEditorView
 
 
 class HtmlXBlockEditorView(XBlockEditorView):
@@ -68,7 +72,7 @@ class HtmlXBlockEditorView(XBlockEditorView):
             font = font.replace('font-family: ', '').replace(';', '')
             font_families[index] = font.split(',')
             font_families[index] = [x.lstrip() for x in font_families[index]]
-        font_dict = dict(zip(font_labels, font_families))
+        font_dict = dict(list(zip(font_labels, font_families)))
         return font_dict
 
     def set_content_and_save(self, content, raw=False):

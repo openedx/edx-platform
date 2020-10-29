@@ -1,26 +1,27 @@
 # disable missing docstring
 # pylint: disable=missing-docstring
 
+from __future__ import absolute_import
+
 import unittest
 
 from mock import Mock
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-
+from six.moves import range
 from xblock.field_data import DictFieldData
-from xblock.fields import Scope, String, Dict, Boolean, Integer, Float, Any, List
-from xblock.runtime import KvsFieldData, DictKeyValueStore
+from xblock.fields import Any, Boolean, Dict, Float, Integer, List, Scope, String
+from xblock.runtime import DictKeyValueStore, KvsFieldData
 
-from xmodule.fields import Date, Timedelta, RelativeTime
+from xmodule.course_module import CourseDescriptor
+from xmodule.fields import Date, RelativeTime, Timedelta
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, InheritanceMixin, InheritingFieldData
 from xmodule.modulestore.split_mongo.split_mongo_kvs import SplitMongoKVS
-from xmodule.xml_module import XmlDescriptor, serialize_field, deserialize_field
-from xmodule.course_module import CourseDescriptor
 from xmodule.seq_module import SequenceDescriptor
-from xmodule.x_module import XModuleMixin
-
 from xmodule.tests import get_test_descriptor_system
 from xmodule.tests.xml import XModuleXmlImportTest
-from xmodule.tests.xml.factories import CourseFactory, SequenceFactory, ProblemFactory
+from xmodule.tests.xml.factories import CourseFactory, ProblemFactory, SequenceFactory
+from xmodule.x_module import XModuleMixin
+from xmodule.xml_module import XmlDescriptor, deserialize_field, serialize_field
 
 
 class CrazyJsonString(String):

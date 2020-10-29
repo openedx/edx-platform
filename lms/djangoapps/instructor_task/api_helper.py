@@ -4,6 +4,8 @@ Helper lib for instructor_tasks API.
 Includes methods to check args for rescoring task, encoding student input,
 and task submission logic, including handling the Celery backend.
 """
+from __future__ import absolute_import
+
 import hashlib
 import json
 import logging
@@ -12,6 +14,7 @@ from celery.result import AsyncResult
 from celery.states import FAILURE, READY_STATES, REVOKED, SUCCESS
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import UsageKey
+import six
 from six import text_type
 
 from courseware.courses import get_problems_in_section
@@ -138,7 +141,7 @@ def _get_xmodule_instance_args(request, task_id):
     request_info = {'username': request.user.username,
                     'user_id': request.user.id,
                     'ip': request.META['REMOTE_ADDR'],
-                    'agent': request.META.get('HTTP_USER_AGENT', '').decode('latin1'),
+                    'agent': request.META.get('HTTP_USER_AGENT', '').encode().decode('latin1'),
                     'host': request.META['SERVER_NAME'],
                     }
 
@@ -364,7 +367,7 @@ def check_entrance_exam_problems_for_rescoring(exam_key):  # pylint: disable=inv
     descriptor doesn't exist for exam_key. NotImplementedError is raised if
     any of the problem in entrance exam doesn't support re-scoring calls.
     """
-    problems = get_problems_in_section(exam_key).values()
+    problems = list(get_problems_in_section(exam_key).values())
     if any(not _supports_rescore(problem) for problem in problems):
         msg = _("Not all problems in entrance exam support re-scoring.")
         raise NotImplementedError(msg)
@@ -388,7 +391,7 @@ def encode_problem_and_student_input(usage_key, student=None):
         task_key_stub = "_{problem}".format(problem=text_type(usage_key))
 
     # create the key value by using MD5 hash:
-    task_key = hashlib.md5(task_key_stub).hexdigest()
+    task_key = hashlib.md5(six.b(task_key_stub)).hexdigest()
 
     return task_input, task_key
 
@@ -410,7 +413,7 @@ def encode_entrance_exam_and_student_input(usage_key, student=None):
         task_key_stub = "_{entranceexam}".format(entranceexam=text_type(usage_key))
 
     # create the key value by using MD5 hash:
-    task_key = hashlib.md5(task_key_stub).hexdigest()
+    task_key = hashlib.md5(task_key_stub.encode('utf-8')).hexdigest()
 
     return task_input, task_key
 

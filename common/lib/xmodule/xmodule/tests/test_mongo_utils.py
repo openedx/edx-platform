@@ -1,11 +1,13 @@
 """
 Tests for methods defined in mongo_utils.py
 """
-import ddt
+from __future__ import absolute_import
+
 import os
 from unittest import TestCase
 from uuid import uuid4
 
+import ddt
 from pymongo import ReadPreference
 
 from xmodule.mongo_utils import connect_to_mongodb

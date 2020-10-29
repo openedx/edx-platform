@@ -14,10 +14,6 @@ futures ; python_version == "2.7"
 python-openid ; python_version == "2.7"
 pysqlite ; python_version == "2.7"
 
-# six is at 1.12.0, but transifex-client requires ==1.11.0
-# https://github.com/transifex/transifex-client/issues/252
-six==1.11.0
-
 # Convert text markup to HTML; used in capa problems, forums, and course wikis; pin Markdown version as tests failed for its upgrade to latest release
 Markdown==2.6.11
 
@@ -28,8 +24,9 @@ mysqlclient<1.5
 # Can be removed when we get to Python 3.
 pylint-plugin-utils==0.3
 
-# transifex-client 0.13.6 requires urllib3<1.24, but requests will pull in urllib3==1.24 (https://github.com/transifex/transifex-client/pull/241/files)
-urllib3<1.24
+# transifex-client 0.13.5 and 0.13.6 pin six and urllib3 to old versions needlessly
+#   https://github.com/transifex/transifex-client/issues/252
+transifex-client==0.13.4
 
 # Bumping requests-oauthlib to 1.2 updates oauthlib to 3.0.0, which changes a response code in certain cases
 # This causes a test to fail. Before fixing, we would need to make sure mobile apps are functional with this change
@@ -46,16 +43,41 @@ python3-saml==1.5.0
 # version 1.3.0 breaks make upgrade, as it requires py3.5 or above
 scipy<=1.2.1
 
-# Leaving this unpinned breaks make upgrade, since several packages require <1.0.0, but pip-compile
-# will find and select 1.0.0 for paver.txt and terminate unsuccessfully.
-edx-opaque-keys==0.4.4
-
 # Unless we constrain pytest to <4.6.0, it may break all tests inside of
 # xmodule.tests.test_resource_templates.ResourceTemplatesTests See TE-2391 for details.
 pytest<4.6.0
 
-# Pinning to older versions of edx-enterprise, edx-rbac, and edx-drf-extensions until
-# a bug is fixed in the edx-drf-extensions package.
-edx-drf-extensions==2.2.1
-edx-enterprise==1.6.0
-edx-rbac==0.2.1
+# 1.2.3 breaks unittest in
+# lms.djangoapps.course_api.tests.test_views.CourseListSearchViewTest.test_list_all_with_search_term
+# acceptance.tests.lms.test_lms_course_discovery.CourseDiscoveryTest.test_search
+edx-search==1.2.2
+
+# This ruamel.ordereddict will not be supported in python3 but is a dependency of ruamel.yaml
+# install it only on python 2.7
+ruamel.ordereddict; python_version == "2.7"
+
+# 1.16.1 requires djangorestframework>=3.8
+drf-yasg==1.16
+
+# 2.0.0 is a dummy package, because faulthandler has been incorporated into pytest 5.0
+pytest-faulthandler<2.0.0
+
+# faulthandler is part of core python staring with python 3.3
+faulthandler; python_version == "2.7"
+
+# Numpy 1.17.0 only supports python >= 3.5
+numpy<1.17.0
+
+# Pinned by moto to this but since moto is only a test requirement, we don't
+# see the constraint when generating base.txt
+#
+# There are incompatible versions in the resolved dependencies:
+#  jsondiff (from edx-enterprise==1.8.6->-r requirements/edx/base.txt (line 108))
+#  jsondiff==1.1.1 (from moto==1.2.0->-r requirements/edx/testing.in (line 33))
+#  jsondiff==1.2.0 (from -r requirements/edx/base.txt (line 146))
+jsondiff==1.1.1
+
+# faker 2.0.2 pinned text-unidecode==1.3 because 1.2 had a license that was incompatible.
+# but python-slugify pinned text-unidecode==1.2.  So pin faker to an earlier versions so
+# we can agree on text-unidecode.
+faker==2.0.1

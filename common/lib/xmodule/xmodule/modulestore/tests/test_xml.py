@@ -133,7 +133,7 @@ class TestXMLModuleStore(TestCase):
         self.assertIsNotNone(parent, "get_parent failed to return a value")
         parent_loc = course_key.make_usage_key('vertical', 'vertical_test')
         self.assertEqual(parent.location, parent_loc)
-        self.assertIn(shared_item, parent.get_children())
+        self.assertIn(shared_item.location, [x.location for x in parent.get_children()])
         # ensure it's still a child of the other parent even tho it doesn't claim the other parent as its parent
         other_parent_loc = course_key.make_usage_key('vertical', 'zeta')
         other_parent = store.get_item(other_parent_loc)

@@ -1,6 +1,8 @@
 """
 CMS Video
 """
+from __future__ import absolute_import
+
 import os
 import time
 
@@ -9,6 +11,7 @@ from bok_choy.javascript import js_defined, wait_for_js
 from bok_choy.promise import EmptyPromise, Promise
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
+from six.moves import range
 
 from common.test.acceptance.pages.common.utils import sync_on_notification
 from common.test.acceptance.pages.lms.video.video import VideoPage
@@ -17,7 +20,7 @@ from common.test.acceptance.tests.helpers import YouTubeStubConfig
 CLASS_SELECTORS = {
     'video_container': '.video',
     'video_init': '.is-initialized',
-    'video_xmodule': '.xmodule_VideoModule',
+    'video_xmodule': '.xmodule_VideoBlock',
     'video_spinner': '.video-wrapper .spinner',
     'video_controls': '.video-controls',
     'attach_asset': '.upload-dialog > input[type="file"]',
@@ -627,7 +630,7 @@ class VideoComponentPage(VideoPage):
         if field_numbers:
             index_list = [number - 1 for number in field_numbers]
         else:
-            index_list = range(3)  # maximum three fields
+            index_list = list(range(3))  # maximum three fields
 
         statuses = {}
         for index in index_list:

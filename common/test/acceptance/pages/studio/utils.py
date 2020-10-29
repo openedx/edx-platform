@@ -1,6 +1,8 @@
 """
 Utility methods useful for Studio page tests.
 """
+from __future__ import absolute_import
+
 from bok_choy.javascript import js_defined
 from bok_choy.promise import EmptyPromise
 from selenium.webdriver.common.action_chains import ActionChains
@@ -230,7 +232,7 @@ def verify_ordering(test_class, page, expected_orderings):
     blocks_checked = set()
     for expected_ordering in expected_orderings:
         for xblock in xblocks:
-            parent = expected_ordering.keys()[0]
+            parent = list(expected_ordering.keys())[0]
             if xblock.name == parent:
                 blocks_checked.add(parent)
                 children = xblock.children

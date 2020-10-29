@@ -2,6 +2,8 @@
 Views for course info API
 """
 
+from __future__ import absolute_import
+
 from rest_framework import generics
 from rest_framework.response import Response
 

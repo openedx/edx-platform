@@ -16,9 +16,9 @@ from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.instructor_dashboard import InstructorDashboardPage, StudentSpecificAdmin
 from ...pages.lms.problem import ProblemPage
 from ...pages.lms.progress import ProgressPage
-from ...pages.studio.xblock_editor import XBlockEditorView
 from ...pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from ...pages.studio.utils import type_in_codemirror
+from ...pages.studio.xblock_editor import XBlockEditorView
 from ..helpers import (
     UniqueCourseTest,
     auto_auth,

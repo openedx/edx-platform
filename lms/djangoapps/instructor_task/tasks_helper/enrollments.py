@@ -5,7 +5,7 @@ from __future__ import absolute_import
 
 import logging
 from datetime import datetime
-from StringIO import StringIO
+from six import StringIO
 from time import time
 
 from django.conf import settings
@@ -14,8 +14,8 @@ from pytz import UTC
 
 from courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_string
-from instructor_analytics.basic import enrolled_students_features, list_may_enroll
-from instructor_analytics.csvs import format_dictlist
+from lms.djangoapps.instructor_analytics.basic import enrolled_students_features, list_may_enroll
+from lms.djangoapps.instructor_analytics.csvs import format_dictlist
 from lms.djangoapps.instructor.paidcourse_enrollment_report import PaidCourseEnrollmentReportProvider
 from lms.djangoapps.instructor_task.models import ReportStore
 from shoppingcart.models import (

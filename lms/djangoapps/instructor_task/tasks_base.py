@@ -1,6 +1,8 @@
 """
 Base class for Instructor celery tasks.
 """
+from __future__ import absolute_import
+
 import logging
 
 from celery import Task

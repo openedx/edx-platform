@@ -2,8 +2,11 @@
 Test dashboard search
 """
 from __future__ import absolute_import
+
 import json
 import os
+
+import six
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -14,7 +17,6 @@ from common.test.acceptance.pages.studio.container import ContainerPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from common.test.acceptance.pages.studio.utils import add_html_component, type_in_codemirror
 from common.test.acceptance.tests.helpers import AcceptanceTest, generate_course_key
-import six
 
 
 class DashboardSearchTest(AcceptanceTest):

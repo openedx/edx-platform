@@ -1,4 +1,6 @@
 """Tests for certificate Django models. """
+from __future__ import absolute_import
+
 import json
 
 import ddt
@@ -7,7 +9,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.test.utils import override_settings
-from opaque_keys.edx.locator import CourseLocator, CourseKey
+from opaque_keys.edx.locator import CourseKey, CourseLocator
 from path import Path as path
 
 from lms.djangoapps.certificates.models import (

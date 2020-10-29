@@ -1,5 +1,8 @@
 """ CCX API v0 Serializers. """
 
+from __future__ import absolute_import
+
+import six
 from ccx_keys.locator import CCXLocator
 from rest_framework import serializers
 
@@ -43,7 +46,7 @@ class CCXCourseSerializer(serializers.ModelSerializer):
         """
         Getter for the CCX Course ID
         """
-        return unicode(CCXLocator.from_course_locator(obj.course.id, obj.id))
+        return six.text_type(CCXLocator.from_course_locator(obj.course.id, obj.id))
 
     @staticmethod
     def get_course_modules(obj):

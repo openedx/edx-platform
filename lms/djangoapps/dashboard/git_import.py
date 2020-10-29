@@ -8,7 +8,7 @@ from __future__ import absolute_import
 import logging
 import os
 import re
-import StringIO
+from six import StringIO
 import subprocess
 
 import mongoengine
@@ -230,7 +230,7 @@ def add_repo(repo, rdir_in, branch=None):
 
     cwd = os.path.abspath(cwd)
     try:
-        ret_git = cmd_log(cmd, cwd=cwd)
+        ret_git = cmd_log(cmd, cwd=cwd).decode('utf-8')
     except subprocess.CalledProcessError as ex:
         log.exception(u'Error running git pull: %r', ex.output)
         raise GitImportErrorCannotPull()
@@ -246,7 +246,7 @@ def add_repo(repo, rdir_in, branch=None):
         log.exception(u'Unable to get git log: %r', ex.output)
         raise GitImportErrorBadRepo()
 
-    ret_git += u'\nCommit ID: {0}'.format(commit_id)
+    ret_git += u'\nCommit ID: {0}'.format(commit_id.decode('utf-8'))
 
     # get branch
     cmd = ['git', 'symbolic-ref', '--short', 'HEAD', ]
@@ -261,7 +261,7 @@ def add_repo(repo, rdir_in, branch=None):
     ret_git += u'{0}Branch: {1}'.format('   \n', branch)
 
     # Get XML logging logger and capture debug to parse results
-    output = StringIO.StringIO()
+    output = StringIO()
     import_log_handler = logging.StreamHandler(output)
     import_log_handler.setLevel(logging.DEBUG)
 

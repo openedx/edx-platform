@@ -1,6 +1,8 @@
 """
 Django ORM model specifications for the User API application
 """
+from __future__ import absolute_import
+
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.db import models
@@ -8,7 +10,6 @@ from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
-from openedx.core.djangolib.model_mixins import DeletableByUserValue
 
 # Currently, the "student" app is responsible for
 # accounts, profiles, enrollments, and the student dashboard.
@@ -17,6 +18,7 @@ from openedx.core.djangolib.model_mixins import DeletableByUserValue
 # certain models.  For now we will leave the models in "student" and
 # create an alias in "user_api".
 
+from openedx.core.djangolib.model_mixins import DeletableByUserValue
 # pylint: disable=unused-import
 from student.models import (
     PendingEmailChange,

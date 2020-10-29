@@ -1,11 +1,12 @@
 """
 Acceptance tests for Studio related to the asset index page.
 """
+from __future__ import absolute_import
+
 import os
 
-from common.test.acceptance.pages.studio.asset_index import AssetIndexPageStudioFrontend
+from common.test.acceptance.pages.studio.asset_index import UPLOAD_FILE_DIR, AssetIndexPageStudioFrontend
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
-from common.test.acceptance.pages.studio.asset_index import UPLOAD_FILE_DIR
 
 
 class AssetIndexTestStudioFrontend(StudioCourseTest):

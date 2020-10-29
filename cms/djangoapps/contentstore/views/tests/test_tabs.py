@@ -1,5 +1,7 @@
 """ Tests for tab functions (just primitive). """
 
+from __future__ import absolute_import
+
 import json
 
 from contentstore.tests.utils import CourseTestCase
@@ -36,7 +38,7 @@ class TabsPageTests(CourseTestCase):
         """Verify response is an error listing the invalid_tab_id"""
 
         self.assertEqual(resp.status_code, 400)
-        resp_content = json.loads(resp.content)
+        resp_content = json.loads(resp.content.decode('utf-8'))
         self.assertIn("error", resp_content)
         self.assertIn("invalid_tab_id", resp_content['error'])
 
@@ -69,7 +71,7 @@ class TabsPageTests(CourseTestCase):
 
         resp = self.client.get_html(self.url)
         self.assertEqual(resp.status_code, 200)
-        self.assertIn('course-nav-list', resp.content)
+        self.assertIn('course-nav-list', resp.content.decode('utf-8'))
 
     def test_reorder_tabs(self):
         """Test re-ordering of tabs"""
@@ -87,7 +89,7 @@ class TabsPageTests(CourseTestCase):
 
         # remove the middle tab
         # (the code needs to handle the case where tabs requested for re-ordering is a subset of the tabs in the course)
-        removed_tab = tab_ids.pop(num_orig_tabs / 2)
+        removed_tab = tab_ids.pop(num_orig_tabs // 2)
         self.assertEqual(len(tab_ids), num_orig_tabs - 1)
 
         # post the request
@@ -118,7 +120,7 @@ class TabsPageTests(CourseTestCase):
             data={'tabs': [{'tab_id': tab_id} for tab_id in tab_ids]},
         )
         self.assertEqual(resp.status_code, 400)
-        resp_content = json.loads(resp.content)
+        resp_content = json.loads(resp.content.decode('utf-8'))
         self.assertIn("error", resp_content)
 
     def test_reorder_tabs_invalid_tab(self):
@@ -182,7 +184,7 @@ class TabsPageTests(CourseTestCase):
 
         resp = self.client.get(preview_url, HTTP_ACCEPT='application/json')
         self.assertEqual(resp.status_code, 200)
-        resp_content = json.loads(resp.content)
+        resp_content = json.loads(resp.content.decode('utf-8'))
         html = resp_content['html']
 
         # Verify that the HTML contains the expected elements
@@ -212,16 +214,16 @@ class PrimitiveTabEdit(ModuleStoreTestCase):
     def test_insert(self):
         """Test primitive tab insertion."""
         course = CourseFactory.create()
-        tabs.primitive_insert(course, 2, 'notes', 'aname')
-        self.assertEquals(course.tabs[2], {'type': 'notes', 'name': 'aname'})
+        tabs.primitive_insert(course, 2, 'pdf_textbooks', 'aname')
+        self.assertEquals(course.tabs[2], {'type': 'pdf_textbooks', 'name': 'aname'})
         with self.assertRaises(ValueError):
-            tabs.primitive_insert(course, 0, 'notes', 'aname')
+            tabs.primitive_insert(course, 0, 'pdf_textbooks', 'aname')
         with self.assertRaises(ValueError):
             tabs.primitive_insert(course, 3, 'static_tab', 'aname')
 
     def test_save(self):
         """Test course saving."""
         course = CourseFactory.create()
-        tabs.primitive_insert(course, 3, 'notes', 'aname')
+        tabs.primitive_insert(course, 3, 'pdf_textbooks', 'aname')
         course2 = modulestore().get_course(course.id)
-        self.assertEquals(course2.tabs[3], {'type': 'notes', 'name': 'aname'})
+        self.assertEquals(course2.tabs[3], {'type': 'pdf_textbooks', 'name': 'aname'})

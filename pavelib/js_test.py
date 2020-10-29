@@ -1,12 +1,14 @@
 """
 Javascript test tasks
 """
+from __future__ import absolute_import
+
 import sys
 
 from paver.easy import cmdopts, needs, task
 
 from pavelib.utils.envs import Env
-from pavelib.utils.test.suites import JsTestSuite, JestSnapshotTestSuite
+from pavelib.utils.test.suites import JestSnapshotTestSuite, JsTestSuite
 from pavelib.utils.timer import timed
 
 __test__ = False  # do not collect

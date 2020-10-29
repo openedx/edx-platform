@@ -1,20 +1,21 @@
 """
 Views handling read (GET) requests for the Discussion tab and inline discussions.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import logging
 from functools import wraps
 
+import six
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.template.context_processors import csrf
-from django.urls import reverse
 from django.http import Http404, HttpResponseServerError
 from django.shortcuts import render_to_response
+from django.template.context_processors import csrf
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.translation import get_language_bidi
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
@@ -23,10 +24,11 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from web_fragments.fragment import Fragment
 
+import lms.djangoapps.discussion.django_comment_client.utils as utils
+import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from courseware.access import has_access
 from courseware.courses import get_course_with_access
 from courseware.views.views import CourseTabView
-import lms.djangoapps.discussion.django_comment_client.utils as utils
 from lms.djangoapps.discussion.django_comment_client.base.views import track_thread_viewed_event
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY
 from lms.djangoapps.discussion.django_comment_client.permissions import get_team, has_permission
@@ -42,10 +44,11 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
     strip_none
 )
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
-import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.djangoapps.django_comment_common.utils import (
-    ThreadContext, get_course_discussion_settings, set_course_discussion_settings,
+    ThreadContext,
+    get_course_discussion_settings,
+    set_course_discussion_settings
 )
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
@@ -77,7 +80,7 @@ def make_course_settings(course, user, include_category_map=True):
         'allow_anonymous': course.allow_anonymous,
         'allow_anonymous_to_peers': course.allow_anonymous_to_peers,
         'groups': [
-            {"id": str(group_id), "name": group_name} for group_id, group_name in group_names_by_id.iteritems()
+            {"id": str(group_id), "name": group_name} for group_id, group_name in six.iteritems(group_names_by_id)
         ]
     }
     if include_category_map:
@@ -108,7 +111,7 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
         'per_page': per_page,
         'sort_key': 'activity',
         'text': '',
-        'course_id': unicode(course.id),
+        'course_id': six.text_type(course.id),
         'user_id': request.user.id,
         'context': ThreadContext.COURSE,
         'group_id': get_group_id_for_comments_service(request, course.id, discussion_id),  # may raise ValueError
@@ -279,7 +282,7 @@ def forum_form_discussion(request, course_key):
             'corrected_text': query_params['corrected_text'],
         })
     else:
-        course_id = unicode(course.id)
+        course_id = six.text_type(course.id)
         tab_view = CourseTabView()
         return tab_view.get(request, course_id, 'discussion')
 
@@ -326,7 +329,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
             'annotated_content_info': annotated_content_info,
         })
     else:
-        course_id = unicode(course.id)
+        course_id = six.text_type(course.id)
         tab_view = CourseTabView()
         return tab_view.get(request, course_id, 'discussion', discussion_id=discussion_id, thread_id=thread_id)
 
@@ -468,7 +471,7 @@ def _create_discussion_board_context(request, base_context, thread=None):
             if "pinned" not in thread:
                 thread["pinned"] = False
         thread_pages = 1
-        root_url = reverse('forum_form_discussion', args=[unicode(course.id)])
+        root_url = reverse('forum_form_discussion', args=[six.text_type(course.id)])
     else:
         threads, query_params = get_threads(request, course, user_info)   # This might process a search query
         thread_pages = query_params['num_pages']
@@ -600,7 +603,7 @@ def user_profile(request, course_key, user_id):
             # 'user_profile' page
             context['load_mathjax'] = False
 
-            return tab_view.get(request, unicode(course_key), 'discussion', profile_page_context=context)
+            return tab_view.get(request, six.text_type(course_key), 'discussion', profile_page_context=context)
     except User.DoesNotExist:
         raise Http404
     except ValueError:
@@ -919,7 +922,7 @@ def course_discussions_settings_handler(request, course_key_string):
             )
 
         if not settings_to_change:
-            return JsonResponse({"error": unicode("Bad Request")}, 400)
+            return JsonResponse({"error": six.text_type("Bad Request")}, 400)
 
         try:
             if settings_to_change:
@@ -927,7 +930,7 @@ def course_discussions_settings_handler(request, course_key_string):
 
         except ValueError as err:
             # Note: error message not translated because it is not exposed to the user (UI prevents this state).
-            return JsonResponse({"error": unicode(err)}, 400)
+            return JsonResponse({"error": six.text_type(err)}, 400)
 
     divided_course_wide_discussions, divided_inline_discussions = get_divided_discussions(
         course, discussion_settings

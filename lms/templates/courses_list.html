@@ -7,20 +7,6 @@
 
     % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
       <section class="courses">
-        <ul class="journal-list">
-          % for bundle in journal_info.get('journal_bundles'):
-          <li class="courses-listing-item">
-            <%include file="journals/bundle_card.html" args="bundle=bundle"/>
-          </li>
-          % endfor
-        </ul>
-        <ul class="journal-list">
-          %for journal in journal_info.get('journals'):
-          <li class="courses-listing-item">
-              <%include file="journals/journal_card.html" args="journal=journal" />
-          </li>
-          %endfor
-        </ul>
         <ul class="courses-listing">
           ## limiting the course number by using HOMEPAGE_COURSE_MAX as the maximum number of courses
           %for course in courses[:homepage_course_max]:

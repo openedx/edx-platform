@@ -72,7 +72,6 @@ from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangolib.markup import HTML, Text
 from organizations.models import Organization, UserOrganizationMapping
-from openedx.features.journals.api import get_journals_context
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
 from student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info, generate_activation_email_context
 from student.message_types import EmailChange, EmailChangeConfirmation, PasswordReset, RecoveryEmailCreate
@@ -93,7 +92,7 @@ from student.models import (
 from student.signals import REFUND_ORDER
 from student.tasks import send_activation_email
 from student.text_me_the_app import TextMeTheAppFragmentView
-from util.bad_request_rate_limiter import BadRequestRateLimiter
+from util.request_rate_limiter import BadRequestRateLimiter, PasswordResetEmailRateLimiter
 from util.db import outer_atomic
 from util.json_request import JsonResponse
 from util.password_policy_validators import normalize_password, validate_password
@@ -146,8 +145,8 @@ def index(request, extra_context=None, user=AnonymousUser()):
     courses = get_courses(user)
 
     if configuration_helpers.get_value(
-            "ENABLE_COURSE_SORTING_BY_START_DATE",
-            settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"],
+        "ENABLE_COURSE_SORTING_BY_START_DATE",
+        settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"],
     ):
         courses = sort_by_start_date(courses)
     else:
@@ -183,9 +182,6 @@ def index(request, extra_context=None, user=AnonymousUser()):
 
     # Add marketable programs to the context.
     context['programs_list'] = get_programs_with_type(request.site, include_hidden=False)
-
-    # TODO: Course Listing Plugin required
-    context['journal_info'] = get_journals_context(request)
 
     return render_to_response('index.html', context)
 
@@ -672,10 +668,14 @@ def password_change_request_handler(request):
 
     """
 
-    limiter = BadRequestRateLimiter()
-    if limiter.is_rate_limit_exceeded(request):
+    password_reset_email_limiter = PasswordResetEmailRateLimiter()
+
+    if password_reset_email_limiter.is_rate_limit_exceeded(request):
         AUDIT_LOG.warning("Password reset rate limit exceeded")
-        return HttpResponseForbidden()
+        return HttpResponse(
+            _("Your previous request is in progress, please try again in a few moments."),
+            status=403
+        )
 
     user = request.user
     # Prefer logged-in user's email
@@ -689,14 +689,10 @@ def password_change_request_handler(request):
             destroy_oauth_tokens(user)
         except UserNotFound:
             AUDIT_LOG.info("Invalid password reset attempt")
-            # Increment the rate limit counter
-            limiter.tick_bad_request_counter(request)
-
             # If enabled, send an email saying that a password reset was attempted, but that there is
             # no user associated with the email
             if configuration_helpers.get_value('ENABLE_PASSWORD_RESET_FAILURE_EMAIL',
                                                settings.FEATURES['ENABLE_PASSWORD_RESET_FAILURE_EMAIL']):
-
                 site = get_current_site()
                 message_context = get_base_template_context(site)
 
@@ -711,13 +707,13 @@ def password_change_request_handler(request):
                     language=settings.LANGUAGE_CODE,
                     user_context=message_context,
                 )
-
                 ace.send(msg)
         except UserAPIInternalError as err:
             log.exception('Error occured during password change for user {email}: {error}'
                           .format(email=email, error=err))
             return HttpResponse(_("Some error occured during password change. Please try again"), status=500)
 
+        password_reset_email_limiter.tick_request_counter(request)
         return HttpResponse(status=200)
     else:
         return HttpResponseBadRequest(_("No email address provided."))
@@ -779,7 +775,7 @@ def password_reset(request):
     else:
         # bad user? tick the rate limiter counter
         AUDIT_LOG.info("Bad password_reset user passed in.")
-        limiter.tick_bad_request_counter(request)
+        limiter.tick_request_counter(request)
 
     return JsonResponse({
         'success': True,
@@ -821,6 +817,9 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
 
     try:
         uid_int = base36_to_int(uidb36)
+        if request.user.is_authenticated and request.user.id != uid_int:
+            raise Http404
+
         user = User.objects.get(id=uid_int)
     except (ValueError, User.DoesNotExist):
         # if there's any error getting a user, just let django's
@@ -1185,7 +1184,7 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
         # Send it to the old email...
         try:
             ace.send(msg)
-        except Exception:    # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             log.warning('Unable to send confirmation email to old address', exc_info=True)
             response = render_to_response("email_change_failed.html", {'email': user.email})
             transaction.set_rollback(True)

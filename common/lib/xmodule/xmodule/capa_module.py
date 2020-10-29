@@ -103,13 +103,18 @@ class ProblemBlock(
         if 'lcp' in self.__dict__:
             del self.__dict__['lcp']
 
-    def student_view(self, _context):
+    def student_view(self, _context, show_detailed_errors=False):
         """
         Return the student view.
         """
         # self.score is initialized in self.lcp but in this method is accessed before self.lcp so just call it first.
-        self.lcp
-        fragment = Fragment(self.get_html())
+        try:
+            self.lcp
+        except Exception as err:
+            html = self.handle_fatal_lcp_error(err if show_detailed_errors else None)
+        else:
+            html = self.get_html()
+        fragment = Fragment(html)
         add_webpack_to_fragment(fragment, 'ProblemBlockPreview')
         shim_xmodule_js(fragment, 'Problem')
         return fragment
@@ -118,7 +123,7 @@ class ProblemBlock(
         """
         Renders the Studio preview view.
         """
-        return self.student_view(context)
+        return self.student_view(context, show_detailed_errors=True)
 
     def studio_view(self, _context):
         """

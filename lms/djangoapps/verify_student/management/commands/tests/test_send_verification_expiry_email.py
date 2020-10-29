@@ -10,12 +10,14 @@ import boto
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import mail
-from django.core.management import call_command
-from django.test import TestCase
+from django.core.management import call_command, CommandError
+from django.test.utils import override_settings
 from django.utils.timezone import now
 from mock import patch
-from student.tests.factories import UserFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from testfixtures import LogCapture
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.test.utils import MockS3Mixin
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
@@ -26,7 +28,7 @@ LOGGER_NAME = 'lms.djangoapps.verify_student.management.commands.send_verificati
 
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
-class TestSendVerificationExpiryEmail(MockS3Mixin, TestCase):
+class TestSendVerificationExpiryEmail(MockS3Mixin, ModuleStoreTestCase):
     """ Tests for django admin command `send_verification_expiry_email` in the verify_student module """
 
     def setUp(self):
@@ -181,3 +183,82 @@ class TestSendVerificationExpiryEmail(MockS3Mixin, TestCase):
                  u"to {} learner(s)".format(count)
                  ))
         self.assertEqual(len(mail.outbox), 0)
+
+    def test_not_enrolled_in_verified_course(self):
+        """
+        Test that if the user is not enrolled in verified track, then after sending the default no of
+        emails, `expiry_email_date` is updated to None so that it's not filtered in the future for
+        sending emails
+        """
+        user = UserFactory.create()
+        today = now().replace(hour=0, minute=0, second=0, microsecond=0)
+        verification = self.create_and_submit(user)
+        verification.status = 'approved'
+        verification.expiry_date = now() - timedelta(days=self.resend_days * (self.default_no_of_emails - 1))
+        verification.expiry_email_date = today - timedelta(days=self.resend_days)
+        verification.save()
+
+        call_command('send_verification_expiry_email')
+
+        # check that after sending the default number of emails, the expiry_email_date is set to none for a
+        # user who is not enrolled in verified track
+        attempt = SoftwareSecurePhotoVerification.objects.get(pk=verification.id)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIsNone(attempt.expiry_email_date)
+
+    def test_user_enrolled_in_verified_course(self):
+        """
+        Test that if the user is enrolled in verified track, then after sending the default no of
+        emails, `expiry_email_date` is updated to now() so that it's filtered in the future to send
+        email again
+        """
+        user = UserFactory.create()
+        course = CourseFactory()
+        CourseEnrollmentFactory.create(user=user, course_id=course.id, mode='verified')
+        today = now().replace(hour=0, minute=0, second=0, microsecond=0)
+        verification = self.create_and_submit(user)
+        verification.status = 'approved'
+        verification.expiry_date = now() - timedelta(days=self.resend_days * (self.default_no_of_emails - 1))
+        verification.expiry_email_date = today - timedelta(days=self.resend_days)
+        verification.save()
+
+        call_command('send_verification_expiry_email')
+
+        attempt = SoftwareSecurePhotoVerification.objects.get(pk=verification.id)
+        self.assertEqual(attempt.expiry_email_date, today)
+
+    def test_number_of_emails_sent(self):
+        """
+        Tests that the number of emails sent in case the user is only enrolled in audit track are same
+        as DEFAULT_EMAILS set in the settings
+        """
+        user = UserFactory.create()
+        verification = self.create_and_submit(user)
+        verification.status = 'approved'
+
+        verification.expiry_date = now() - timedelta(days=1)
+        verification.save()
+        call_command('send_verification_expiry_email')
+
+        # running the loop one extra time to verify that after sending DEFAULT_EMAILS no extra emails are sent and
+        # for this reason expiry_email_date is set to None
+        for i in range(1, self.default_no_of_emails + 1):
+            if SoftwareSecurePhotoVerification.objects.get(pk=verification.id).expiry_email_date:
+                today = now().replace(hour=0, minute=0, second=0, microsecond=0)
+                verification.expiry_date = today - timedelta(days=self.resend_days * i + 1)
+                verification.expiry_email_date = today - timedelta(days=self.resend_days)
+                verification.save()
+                call_command('send_verification_expiry_email')
+            else:
+                break
+
+        # expiry_email_date set to None means it no longer will be filtered hence no emails will be sent in future
+        self.assertIsNone(SoftwareSecurePhotoVerification.objects.get(pk=verification.id).expiry_email_date)
+        self.assertEqual(len(mail.outbox), self.default_no_of_emails)
+
+    @override_settings(VERIFICATION_EXPIRY_EMAIL={'RESEND_DAYS': 15, 'DAYS_RANGE': 1, 'DEFAULT_EMAILS': 0})
+    def test_command_error(self):
+        err_string = u"DEFAULT_EMAILS must be a positive integer. If you do not wish to send " \
+                     u"emails use --dry-run flag instead."
+        with self.assertRaisesRegexp(CommandError, err_string):
+            call_command('send_verification_expiry_email')

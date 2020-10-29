@@ -1,6 +1,8 @@
 """
 This file contains celery tasks for credentials-related functionality.
 """
+from __future__ import absolute_import
+
 from celery import task
 from celery.utils.log import get_task_logger
 from django.conf import settings
@@ -8,7 +10,6 @@ from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.credentials.utils import get_credentials_api_client
-
 
 logger = get_task_logger(__name__)
 

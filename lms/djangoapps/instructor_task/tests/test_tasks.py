@@ -344,6 +344,8 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
                 'lms.djangoapps.instructor_task.tasks_helper.module_state.get_module_for_descriptor_internal'
         ) as mock_get_module:
             mock_get_module.return_value = mock_instance
+            mock_instance.max_score = MagicMock(return_value=99999.0)
+            mock_instance.weight = 99999.0
             self._run_task_with_mock_celery(override_problem_score, task_entry.id, task_entry.task_id)
 
         self.assert_task_output(

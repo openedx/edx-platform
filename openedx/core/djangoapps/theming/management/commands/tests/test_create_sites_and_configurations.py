@@ -10,8 +10,9 @@ from django.contrib.sites.models import Site
 from django.core.management import CommandError, call_command
 from django.test import TestCase
 from edx_oauth2_provider.models import TrustedClient
-from openedx.core.djangoapps.theming.models import SiteTheme
 from provider.oauth2.models import Client
+
+from openedx.core.djangoapps.theming.models import SiteTheme
 from student.models import UserProfile
 
 SITES = ["site_a", "site_b"]

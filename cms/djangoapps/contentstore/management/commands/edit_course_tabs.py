@@ -6,7 +6,7 @@
 # Run it this way:
 #   ./manage.py cms --settings dev edit_course_tabs --course Stanford/CS99/2013_spring
 #
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys.edx.keys import CourseKey

@@ -2,8 +2,11 @@
 Grade book view for instructor and pagination work (for grade book)
 which is currently use by ccx and instructor apps.
 """
+from __future__ import absolute_import
+
 import math
 
+import six
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.urls import reverse
@@ -111,11 +114,11 @@ def spoc_gradebook(request, course_id):
 
     return render_to_response('courseware/gradebook.html', {
         'page': page,
-        'page_url': reverse('spoc_gradebook', kwargs={'course_id': unicode(course_key)}),
+        'page_url': reverse('spoc_gradebook', kwargs={'course_id': six.text_type(course_key)}),
         'students': student_info,
         'course': course,
         'course_id': course_key,
         # Checked above
         'staff_access': True,
-        'ordered_grades': sorted(course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
+        'ordered_grades': sorted(list(course.grade_cutoffs.items()), key=lambda i: i[1], reverse=True),
     })

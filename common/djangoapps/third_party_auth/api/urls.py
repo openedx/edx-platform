@@ -1,10 +1,11 @@
 """ URL configuration for the third party auth API """
 
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.conf.urls import url
 
 from .views import ThirdPartyAuthUserStatusView, UserMappingView, UserView, UserViewV2
-
 
 PROVIDER_PATTERN = r'(?P<provider_id>[\w.+-]+)(?:\:(?P<idp_slug>[\w.+-]+))?'
 

@@ -1,6 +1,10 @@
 """
 Course Group Configurations page.
 """
+from __future__ import absolute_import
+
+from six.moves import range
+
 from common.test.acceptance.pages.common.utils import confirm_prompt
 from common.test.acceptance.pages.studio.course_page import CoursePage
 
@@ -42,7 +46,7 @@ class GroupConfigurationsPage(CoursePage):
         Return list of the group-configurations-list-item's of specified type for the course.
         """
         css = prefix + ' .wrapper-collection'
-        return [GroupConfiguration(self, prefix, index) for index in xrange(len(self.q(css=css)))]
+        return [GroupConfiguration(self, prefix, index) for index in range(len(self.q(css=css)))]
 
     def create_experiment_group_configuration(self):
         """

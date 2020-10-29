@@ -17,7 +17,7 @@ def fasthash(string):
     Hashes `string` into a string representation of a 128-bit digest.
     """
     md4 = hashlib.new("md4")
-    md4.update(string)
+    md4.update(string.encode('utf-8'))
     return md4.hexdigest()
 
 

@@ -1108,7 +1108,9 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
 
         # bleh, have to parse the XML here to just pull out the url_name attribute
         # I don't think it's stored anywhere in the instance.
-        course_file = BytesIO(xml_data.encode('ascii', 'ignore'))
+        if isinstance(xml_data, six.text_type):
+            xml_data = xml_data.encode('ascii', 'ignore')
+        course_file = BytesIO(xml_data)
         xml_obj = etree.parse(course_file, parser=edx_xml_parser).getroot()
 
         policy_dir = None

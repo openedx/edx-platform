@@ -2,7 +2,6 @@
 from __future__ import absolute_import
 
 import edx_oauth2_provider
-from six.moves.urllib.parse import parse_qs, urlsplit, urlunsplit  # pylint: disable=import-error
 import six.moves.urllib.parse as parse  # pylint: disable=import-error
 from django.conf import settings
 from django.contrib.auth import logout
@@ -10,6 +9,7 @@ from django.shortcuts import redirect
 from django.utils.http import urlencode
 from django.views.generic import TemplateView
 from provider.oauth2.models import Client
+from six.moves.urllib.parse import parse_qs, urlsplit, urlunsplit  # pylint: disable=import-error
 
 from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect

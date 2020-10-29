@@ -1,9 +1,13 @@
 """
 Studio Problem Editor
 """
-from common.test.acceptance.pages.studio.xblock_editor import XBlockEditorView
-from common.test.acceptance.pages.common.utils import click_css
+from __future__ import absolute_import
+
 from selenium.webdriver.support.ui import Select
+from six.moves import range
+
+from common.test.acceptance.pages.common.utils import click_css
+from common.test.acceptance.pages.studio.xblock_editor import XBlockEditorView
 
 
 class ProblemXBlockEditorView(XBlockEditorView):

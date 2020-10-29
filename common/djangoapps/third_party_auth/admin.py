@@ -2,13 +2,16 @@
 """
 Admin site configuration for third party authentication
 """
+from __future__ import absolute_import
+
 from config_models.admin import KeyedConfigurationModelAdmin
 from django import forms
 from django.contrib import admin
-from django.urls import reverse
 from django.db import DatabaseError, transaction
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
+from openedx.core.djangolib.markup import HTML
 from third_party_auth.provider import Registry
 
 from .models import (
@@ -22,7 +25,6 @@ from .models import (
     SAMLProviderData
 )
 from .tasks import fetch_saml_metadata
-from openedx.core.djangolib.markup import HTML
 
 
 class OAuth2ProviderConfigForm(forms.ModelForm):

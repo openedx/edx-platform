@@ -1,10 +1,13 @@
 """
 This file contains signal handlers for credentials-related functionality.
 """
+from __future__ import absolute_import
+
 from logging import getLogger
 
-from course_modes.models import CourseMode
 from django.contrib.sites.models import Site
+
+from course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.core.djangoapps.catalog.utils import get_programs

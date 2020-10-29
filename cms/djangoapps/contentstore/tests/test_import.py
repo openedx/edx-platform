@@ -3,12 +3,13 @@
 """
 Tests for import_course_from_xml using the mongo modulestore.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import copy
 from uuid import uuid4
 
 import ddt
+import six
 from django.conf import settings
 from django.test.client import Client
 from django.test.utils import override_settings
@@ -268,7 +269,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         self.assertIsNotNone(split_test_module)
 
         remapped_verticals = {
-            key: target_id.make_usage_key('vertical', value) for key, value in groups_to_verticals.iteritems()
+            key: target_id.make_usage_key('vertical', value) for key, value in six.iteritems(groups_to_verticals)
         }
 
         self.assertEqual(remapped_verticals, split_test_module.group_id_to_child)

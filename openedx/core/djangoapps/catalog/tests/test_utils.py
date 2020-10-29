@@ -3,6 +3,7 @@
 
 from __future__ import absolute_import
 
+from collections import defaultdict
 from datetime import timedelta
 
 import mock
@@ -22,6 +23,7 @@ from openedx.core.djangoapps.catalog.cache import (
     COURSE_PROGRAMS_CACHE_KEY_TPL,
     PATHWAY_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
+    PROGRAMS_BY_TYPE_CACHE_KEY_TPL,
     SITE_PATHWAY_IDS_CACHE_KEY_TPL,
     SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 )
@@ -35,6 +37,9 @@ from openedx.core.djangoapps.catalog.tests.factories import (
 )
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.catalog.utils import (
+    child_programs,
+    course_run_keys_for_program,
+    is_course_run_in_program,
     get_course_run_details,
     get_course_runs,
     get_course_runs_for_course,
@@ -44,7 +49,9 @@ from openedx.core.djangoapps.catalog.utils import (
     get_pathways,
     get_program_types,
     get_programs,
-    get_visible_sessions_for_entitlement
+    get_programs_by_type,
+    get_visible_sessions_for_entitlement,
+    normalize_program_type,
 )
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
@@ -663,3 +670,210 @@ class TestGetCourseRunDetails(CatalogIntegrationMixin, TestCase):
         data = get_course_run_details(course_run['key'], ['content_language', 'weeks_to_complete', 'max_effort'])
         self.assertTrue(mock_get_edx_api_data.called)
         self.assertEqual(data, course_run_details)
+
+
+class TestProgramCourseRunCrawling(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super(TestProgramCourseRunCrawling, cls).setUpClass()
+        cls.grandchild_1 = {
+            'title': 'grandchild 1',
+            'curricula': [{'is_active': True, 'courses': [], 'programs': []}],
+        }
+        cls.grandchild_2 = {
+            'title': 'grandchild 2',
+            'curricula': [
+                {
+                    'is_active': True,
+                    'courses': [{
+                        'course_runs': [
+                            {'key': 'course-run-4'},
+                        ],
+                    }],
+                    'programs': [],
+                },
+            ],
+        }
+        cls.grandchild_3 = {
+            'title': 'grandchild 3',
+            'curricula': [{'is_active': False}],
+        }
+        cls.child_1 = {
+            'title': 'child 1',
+            'curricula': [{'is_active': True, 'courses': [], 'programs': [cls.grandchild_1]}],
+        }
+        cls.child_2 = {
+            'title': 'child 2',
+            'curricula': [
+                {
+                    'is_active': True,
+                    'courses': [{
+                        'course_runs': [
+                            {'key': 'course-run-3'},
+                        ],
+                    }],
+                    'programs': [cls.grandchild_2, cls.grandchild_3],
+                },
+            ],
+        }
+        cls.complex_program = {
+            'title': 'complex program',
+            'curricula': [
+                {
+                    'is_active': True,
+                    'courses': [{
+                        'course_runs': [
+                            {'key': 'course-run-2'},
+                        ],
+                    }],
+                    'programs': [cls.child_1, cls.child_2],
+                },
+            ],
+        }
+        cls.simple_program = {
+            'title': 'simple program',
+            'curricula': [
+                {
+                    'is_active': True,
+                    'courses': [{
+                        'course_runs': [
+                            {'key': 'course-run-1'},
+                        ],
+                    }],
+                    'programs': [cls.grandchild_1]
+                },
+            ],
+        }
+        cls.empty_program = {
+            'title': 'notice that I have a curriculum, but no programs inside it',
+            'curricula': [
+                {
+                    'is_active': True,
+                    'courses': [],
+                    'programs': [],
+                },
+            ],
+        }
+
+    def test_child_programs_no_curriculum(self):
+        program = {
+            'title': 'notice that I do not have a curriculum',
+        }
+        self.assertEqual([], child_programs(program))
+
+    def test_child_programs_no_children(self):
+        self.assertEqual([], child_programs(self.empty_program))
+
+    def test_child_programs_one_child(self):
+        self.assertEqual([self.grandchild_1], child_programs(self.simple_program))
+
+    def test_child_programs_many_children(self):
+        expected_children = [
+            self.child_1,
+            self.grandchild_1,
+            self.child_2,
+            self.grandchild_2,
+            self.grandchild_3,
+        ]
+        self.assertEqual(expected_children, child_programs(self.complex_program))
+
+    def test_course_run_keys_for_program_no_courses(self):
+        self.assertEqual(set(), course_run_keys_for_program(self.empty_program))
+
+    def test_course_run_keys_for_program_one_course(self):
+        self.assertEqual({'course-run-1'}, course_run_keys_for_program(self.simple_program))
+
+    def test_course_run_keys_for_program_many_courses(self):
+        expected_course_runs = {
+            'course-run-2',
+            'course-run-3',
+            'course-run-4',
+        }
+        self.assertEqual(expected_course_runs, course_run_keys_for_program(self.complex_program))
+
+    def test_is_course_run_in_program(self):
+        self.assertTrue(is_course_run_in_program('course-run-4', self.complex_program))
+        self.assertFalse(is_course_run_in_program('course-run-5', self.complex_program))
+        self.assertFalse(is_course_run_in_program('course-run-4', self.simple_program))
+
+
+@skip_unless_lms
+class TestGetProgramsByType(CacheIsolationTestCase):
+    """ Test for the ``get_programs_by_type()`` function. """
+    ENABLED_CACHES = ['default']
+
+    @classmethod
+    def setUpClass(cls):
+        """ Sets up program data. """
+        super(TestGetProgramsByType, cls).setUpClass()
+        cls.site = SiteFactory()
+        cls.other_site = SiteFactory()
+        cls.masters_program_1 = ProgramFactory.create(type='Masters')
+        cls.masters_program_2 = ProgramFactory.create(type='Masters')
+        cls.masters_program_other_site = ProgramFactory.create(type='Masters')
+        cls.bachelors_program = ProgramFactory.create(type='Bachelors')
+        cls.no_type_program = ProgramFactory.create(type=None)
+
+    def setUp(self):
+        """ Loads program data into the cache before each test function. """
+        super(TestGetProgramsByType, self).setUp()
+        self.init_cache()
+
+    def init_cache(self):
+        """ This function plays the role of the ``cache_programs`` management command. """
+        all_programs = [
+            self.masters_program_1,
+            self.masters_program_2,
+            self.bachelors_program,
+            self.no_type_program,
+            self.masters_program_other_site
+        ]
+        cached_programs = {
+            PROGRAM_CACHE_KEY_TPL.format(uuid=program['uuid']): program for program in all_programs
+        }
+        cache.set_many(cached_programs, None)
+
+        programs_by_type = defaultdict(list)
+        for program in all_programs:
+            program_type = normalize_program_type(program.get('type'))
+            site_id = self.site.id
+
+            if program == self.masters_program_other_site:
+                site_id = self.other_site.id
+
+            cache_key = PROGRAMS_BY_TYPE_CACHE_KEY_TPL.format(site_id=site_id, program_type=program_type)
+            programs_by_type[cache_key].append(program['uuid'])
+
+        cache.set_many(programs_by_type, None)
+
+    def test_get_masters_programs(self):
+        expected_programs = [self.masters_program_1, self.masters_program_2]
+        six.assertCountEqual(self, expected_programs, get_programs_by_type(self.site, 'masters'))
+
+    def test_get_bachelors_programs(self):
+        expected_programs = [self.bachelors_program]
+        self.assertEqual(expected_programs, get_programs_by_type(self.site, 'bachelors'))
+
+    def test_get_no_such_type_programs(self):
+        expected_programs = []
+        self.assertEqual(expected_programs, get_programs_by_type(self.site, 'doctorate'))
+
+    def test_get_masters_programs_other_site(self):
+        expected_programs = [self.masters_program_other_site]
+        self.assertEqual(expected_programs, get_programs_by_type(self.other_site, 'masters'))
+
+    def test_get_programs_null_type(self):
+        expected_programs = [self.no_type_program]
+        self.assertEqual(expected_programs, get_programs_by_type(self.site, None))
+
+    def test_get_programs_false_type(self):
+        expected_programs = []
+        self.assertEqual(expected_programs, get_programs_by_type(self.site, False))
+
+    def test_normalize_program_type(self):
+        self.assertEqual('none', normalize_program_type(None))
+        self.assertEqual('false', normalize_program_type(False))
+        self.assertEqual('true', normalize_program_type(True))
+        self.assertEqual('', normalize_program_type(''))
+        self.assertEqual('masters', normalize_program_type('Masters'))
+        self.assertEqual('masters', normalize_program_type('masters'))

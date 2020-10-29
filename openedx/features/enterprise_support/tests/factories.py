@@ -33,7 +33,6 @@ class EnterpriseCustomerFactory(factory.django.DjangoModelFactory):
     name = factory.LazyAttribute(lambda x: FAKER.company())  # pylint: disable=no-member
     active = True
     site = factory.SubFactory(SiteFactory)
-    catalog = factory.LazyAttribute(lambda x: FAKER.random_int(min=0, max=1000000))  # pylint: disable=no-member
     enable_data_sharing_consent = True
     enforce_data_sharing_consent = EnterpriseCustomer.AT_ENROLLMENT
 

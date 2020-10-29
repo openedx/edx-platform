@@ -11,10 +11,11 @@ import unittest
 import ddt
 from django.conf import settings
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX, make_password
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
 from django.core.cache import cache
+from django.http import Http404
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -125,8 +126,10 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         cache.clear()
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
-    @ddt.data('plain_text', 'html')
-    def test_reset_password_email(self, body_type):
+    @ddt.data(('plain_text', "You're receiving this e-mail because you requested a password reset"),
+              ('html', "You&#39;re receiving this e-mail because you requested a password reset"))
+    @ddt.unpack
+    def test_reset_password_email(self, body_type, expected_output):
         """Tests contents of reset password email, and that user is not active"""
         good_req = self.request_factory.post('/password_reset/', {'email': self.user.email})
         good_req.user = self.user
@@ -158,7 +161,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         body = bodies[body_type]
 
         self.assertIn("Password reset", sent_message.subject)
-        self.assertIn("You're receiving this e-mail because you requested a password reset", body)
+        self.assertIn(expected_output, body)
         self.assertEquals(sent_message.from_email, from_email)
         self.assertEquals(len(sent_message.to), 1)
         self.assertIn(self.user.email, sent_message.to)
@@ -285,6 +288,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
                 kwargs={"uidb36": uidb36, "token": token}
             )
         )
+        bad_request.user = AnonymousUser()
         password_reset_confirm_wrapper(bad_request, uidb36, token)
         self.user = User.objects.get(pk=self.user.pk)
         self.assertFalse(self.user.is_active)
@@ -298,6 +302,21 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
             kwargs={"uidb36": self.uidb36, "token": self.token}
         )
         good_reset_req = self.request_factory.get(url)
+        good_reset_req.user = self.user
+        password_reset_confirm_wrapper(good_reset_req, self.uidb36, self.token)
+        self.user = User.objects.get(pk=self.user.pk)
+        self.assertTrue(self.user.is_active)
+
+    def test_reset_password_good_token_with_anonymous_user(self):
+        """
+        Tests good token and uidb36 in password reset for anonymous user
+        """
+        url = reverse(
+            "password_reset_confirm",
+            kwargs={"uidb36": self.uidb36, "token": self.token}
+        )
+        good_reset_req = self.request_factory.get(url)
+        good_reset_req.user = AnonymousUser()
         password_reset_confirm_wrapper(good_reset_req, self.uidb36, self.token)
         self.user = User.objects.get(pk=self.user.pk)
         self.assertTrue(self.user.is_active)
@@ -314,6 +333,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         )
         request_params = {'new_password1': 'password1', 'new_password2': 'password2'}
         confirm_request = self.request_factory.post(url, data=request_params)
+        confirm_request.user = self.user
 
         # Make a password reset request with mismatching passwords.
         resp = password_reset_confirm_wrapper(confirm_request, self.uidb36, self.token)
@@ -337,6 +357,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
             kwargs={'uidb36': self.uidb36, 'token': self.token}
         )
         reset_req = self.request_factory.get(url)
+        reset_req.user = self.user
         resp = password_reset_confirm_wrapper(reset_req, self.uidb36, self.token)
 
         # Verify the response status code is: 200 with password reset fail and also verify that
@@ -351,6 +372,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
                 kwargs={"uidb36": self.uidb36, "token": self.token}
             )
             for request in [self.request_factory.get(url), self.request_factory.post(url)]:
+                request.user = self.user
                 response = password_reset_confirm_wrapper(request, self.uidb36, self.token)
                 assert response.context_data['err_msg'] == SYSTEM_MAINTENANCE_MSG
                 self.user.refresh_from_db()
@@ -370,7 +392,8 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         password = u'p\u212bssword'
         request_params = {'new_password1': password, 'new_password2': password}
         confirm_request = self.request_factory.post(url, data=request_params)
-        response = password_reset_confirm_wrapper(confirm_request, self.uidb36, self.token)
+        confirm_request.user = self.user
+        __ = password_reset_confirm_wrapper(confirm_request, self.uidb36, self.token)
 
         user = User.objects.get(pk=self.user.pk)
         salt_val = user.password.split('$')[1]
@@ -403,6 +426,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         )
         request_params = {'new_password1': password_dict['password'], 'new_password2': password_dict['password']}
         confirm_request = self.request_factory.post(url, data=request_params)
+        confirm_request.user = self.user
 
         # Make a password reset request with minimum/maximum passwords characters.
         response = password_reset_confirm_wrapper(confirm_request, self.uidb36, self.token)
@@ -420,6 +444,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
             kwargs={"uidb36": self.uidb36, "token": self.token}
         )
         good_reset_req = self.request_factory.get(url)
+        good_reset_req.user = self.user
         password_reset_confirm_wrapper(good_reset_req, self.uidb36, self.token)
         confirm_kwargs = reset_confirm.call_args[1]
         self.assertEquals(confirm_kwargs['extra_context']['platform_name'], 'Fake University')
@@ -444,3 +469,16 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
             subj, _, _, _ = send_email.call_args[0]
 
             self.assertIn(platform_name, subj)
+
+    def test_reset_password_with_other_user_link(self):
+        """
+        Tests that user should not be able to reset password through other user's token
+        """
+        reset_url = reverse(
+            "password_reset_confirm",
+            kwargs={"uidb36": self.uidb36, "token": self.token}
+        )
+        reset_request = self.request_factory.get(reset_url)
+        reset_request.user = UserFactory.create()
+
+        self.assertRaises(Http404, password_reset_confirm_wrapper, reset_request, self.uidb36, self.token)

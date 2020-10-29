@@ -1,11 +1,32 @@
 """
 Serializers for Course Blocks related return objects.
 """
+from __future__ import absolute_import
+
+import six
 from django.conf import settings
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
 from .transformers import SUPPORTED_FIELDS
+
+# This lists the names of all fields that are allowed
+# to be show to users who do not have access to a particular piece
+# of content
+FIELDS_ALLOWED_IN_AUTH_DENIED_CONTENT = [
+    "display_name",
+    "block_id",
+    "student_view_url",
+    "student_view_multi_device",
+    "lms_web_url",
+    "type",
+    "id",
+    "block_counts",
+    "graded",
+    "descendants",
+    "authorization_denial_reason",
+    "authorization_denial_message",
+]
 
 
 class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-method
@@ -40,26 +61,17 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
         authorization_denial_reason = block_structure.get_xblock_field(block_key, 'authorization_denial_reason')
         authorization_denial_message = block_structure.get_xblock_field(block_key, 'authorization_denial_message')
 
-        if authorization_denial_reason and authorization_denial_message:
-            data = {
-                'id': unicode(block_key),
-                'block_id': unicode(block_key.block_id),
-                'authorization_denial_reason': authorization_denial_reason,
-                'authorization_denial_message': authorization_denial_message
-            }
-            return data
-
         data = {
-            'id': unicode(block_key),
-            'block_id': unicode(block_key.block_id),
+            'id': six.text_type(block_key),
+            'block_id': six.text_type(block_key.block_id),
             'lms_web_url': reverse(
                 'jump_to',
-                kwargs={'course_id': unicode(block_key.course_key), 'location': unicode(block_key)},
+                kwargs={'course_id': six.text_type(block_key.course_key), 'location': six.text_type(block_key)},
                 request=self.context['request'],
             ),
             'student_view_url': reverse(
                 'render_xblock',
-                kwargs={'usage_key_string': unicode(block_key)},
+                kwargs={'usage_key_string': six.text_type(block_key)},
                 request=self.context['request'],
             ),
         }
@@ -67,7 +79,7 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
         if settings.FEATURES.get("ENABLE_LTI_PROVIDER") and 'lti_url' in self.context['requested_fields']:
             data['lti_url'] = reverse(
                 'lti_provider_launch',
-                kwargs={'course_id': unicode(block_key.course_key), 'usage_id': unicode(block_key)},
+                kwargs={'course_id': six.text_type(block_key.course_key), 'usage_id': six.text_type(block_key)},
                 request=self.context['request'],
             )
 
@@ -87,7 +99,14 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
         if 'children' in self.context['requested_fields']:
             children = block_structure.get_children(block_key)
             if children:
-                data['children'] = [unicode(child) for child in children]
+                data['children'] = [six.text_type(child) for child in children]
+
+        if authorization_denial_reason and authorization_denial_message:
+            data['authorization_denial_reason'] = authorization_denial_reason
+            data['authorization_denial_message'] = authorization_denial_message
+            for field in data.keys():  # pylint: disable=consider-iterating-dictionary
+                if field not in FIELDS_ALLOWED_IN_AUTH_DENIED_CONTENT:
+                    del data[field]
 
         return data
 
@@ -105,6 +124,6 @@ class BlockDictSerializer(serializers.Serializer):  # pylint: disable=abstract-m
         Serialize to a dictionary of blocks keyed by the block's usage_key.
         """
         return {
-            unicode(block_key): BlockSerializer(block_key, context=self.context).data
+            six.text_type(block_key): BlockSerializer(block_key, context=self.context).data
             for block_key in structure
         }

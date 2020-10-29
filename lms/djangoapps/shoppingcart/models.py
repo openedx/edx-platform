@@ -1,17 +1,19 @@
 # pylint: disable=arguments-differ
 """ Models for the shopping cart and assorted purchase types """
 
+from __future__ import absolute_import
+
 import csv
 import json
 import logging
 import smtplib
-import StringIO
 from collections import namedtuple
 from datetime import datetime, timedelta
 from decimal import Decimal
 from io import BytesIO
 
 import pytz
+import six
 from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
 from config_models.models import ConfigurationModel
 from django.conf import settings
@@ -19,22 +21,22 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.core.mail.message import EmailMessage
-from django.urls import reverse
 from django.db import models, transaction
 from django.db.models import Count, F, Q, Sum
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from model_utils.managers import InheritanceManager
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
+from six.moves import range
 
 from course_modes.models import CourseMode
 from courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_string
-from eventtracking import tracker
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import HTML, Text
 from shoppingcart.pdf import PDFInvoice
@@ -338,7 +340,7 @@ class Order(models.Model):
         this function generates the csv file
         """
         course_names = []
-        csv_file = StringIO.StringIO()
+        csv_file = six.StringIO()
         csv_writer = csv.writer(csv_file)
         csv_writer.writerow(['Course Name', 'Registration Code', 'URL'])
         for item in orderitems:
@@ -349,7 +351,7 @@ class Order(models.Model):
             for registration_code in registration_codes:
                 redemption_url = reverse('register_code_redemption', args=[registration_code.code])
                 url = '{base_url}{redemption_url}'.format(base_url=site_name, redemption_url=redemption_url)
-                csv_writer.writerow([unicode(course.display_name).encode("utf-8"), registration_code.code, url])
+                csv_writer.writerow([six.text_type(course.display_name).encode("utf-8"), registration_code.code, url])
 
         return csv_file, course_names
 
@@ -421,7 +423,7 @@ class Order(models.Model):
                 if pdf_file is not None:
                     email.attach(u'ReceiptOrder{}.pdf'.format(str(self.id)), pdf_file.getvalue(), 'application/pdf')
                 else:
-                    file_buffer = StringIO.StringIO(_('pdf download unavailable right now, please contact support.'))
+                    file_buffer = six.StringIO(_('pdf download unavailable right now, please contact support.'))
                     email.attach(u'pdf_not_available.txt', file_buffer.getvalue(), 'text/plain')
                 email.send()
         except (smtplib.SMTPException, BotoServerError):  # sadly need to handle diff. mail backends individually
@@ -596,10 +598,10 @@ class Order(models.Model):
            we throw an UnexpectedOrderItemStatus error)
         """
         # if an order is already retired, no-op:
-        if self.status in ORDER_STATUS_MAP.values():
+        if self.status in list(ORDER_STATUS_MAP.values()):
             return
 
-        if self.status not in ORDER_STATUS_MAP.keys():
+        if self.status not in list(ORDER_STATUS_MAP.keys()):
             raise InvalidStatusToRetire(
                 u"order status {order_status} is not 'paying' or 'cart'".format(
                     order_status=self.status
@@ -960,7 +962,7 @@ class Invoice(TimeStampedModel):
 
     def __unicode__(self):
         label = (
-            unicode(self.internal_reference)
+            six.text_type(self.internal_reference)
             if self.internal_reference
             else u"No label"
         )
@@ -1079,7 +1081,7 @@ class InvoiceTransaction(TimeStampedModel):
 
         """
         return {
-            'amount': unicode(self.amount),
+            'amount': six.text_type(self.amount),
             'currency': self.currency,
             'comments': self.comments,
             'status': self.status,
@@ -1133,7 +1135,7 @@ class InvoiceItem(TimeStampedModel):
         """
         return {
             'qty': self.qty,
-            'unit_price': unicode(self.unit_price),
+            'unit_price': six.text_type(self.unit_price),
             'currency': self.currency
         }
 
@@ -1161,7 +1163,7 @@ class CourseRegistrationCodeInvoiceItem(InvoiceItem):
 
         """
         snapshot = super(CourseRegistrationCodeInvoiceItem, self).snapshot()
-        snapshot['course_id'] = unicode(self.course_id)
+        snapshot['course_id'] = six.text_type(self.course_id)
         return snapshot
 
 
@@ -1674,10 +1676,10 @@ class PaidCourseRegistration(OrderItem):
         data = super(PaidCourseRegistration, self).analytics_data()
         sku = data['sku']
         if self.course_id != CourseKeyField.Empty:
-            data['name'] = unicode(self.course_id)
-            data['category'] = unicode(self.course_id.org)
+            data['name'] = six.text_type(self.course_id)
+            data['category'] = six.text_type(self.course_id.org)
         if self.mode:
-            data['sku'] = sku + u'.' + unicode(self.mode)
+            data['sku'] = sku + u'.' + six.text_type(self.mode)
         return data
 
 
@@ -1841,10 +1843,10 @@ class CourseRegCodeItem(OrderItem):
         data = super(CourseRegCodeItem, self).analytics_data()
         sku = data['sku']
         if self.course_id != CourseKeyField.Empty:
-            data['name'] = unicode(self.course_id)
-            data['category'] = unicode(self.course_id.org)
+            data['name'] = six.text_type(self.course_id)
+            data['category'] = six.text_type(self.course_id.org)
         if self.mode:
-            data['sku'] = sku + u'.' + unicode(self.mode)
+            data['sku'] = sku + u'.' + six.text_type(self.mode)
         return data
 
 
@@ -2033,7 +2035,7 @@ class CertificateItem(OrderItem):
 
         if is_enrollment_mode_verified:
             domain = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
-            path = reverse('verify_student_verify_now', kwargs={'course_id': unicode(self.course_id)})
+            path = reverse('verify_student_verify_now', kwargs={'course_id': six.text_type(self.course_id)})
             verification_url = "http://{domain}{path}".format(domain=domain, path=path)
 
             verification_reminder = _(
@@ -2107,10 +2109,10 @@ class CertificateItem(OrderItem):
         data = super(CertificateItem, self).analytics_data()
         sku = data['sku']
         if self.course_id != CourseKeyField.Empty:
-            data['name'] = unicode(self.course_id)
-            data['category'] = unicode(self.course_id.org)
+            data['name'] = six.text_type(self.course_id)
+            data['category'] = six.text_type(self.course_id.org)
         if self.mode:
-            data['sku'] = sku + u'.' + unicode(self.mode)
+            data['sku'] = sku + u'.' + six.text_type(self.mode)
         return data
 
 
@@ -2288,8 +2290,8 @@ class Donation(OrderItem):
         """
         data = super(Donation, self).analytics_data()
         if self.course_id != CourseKeyField.Empty:
-            data['name'] = unicode(self.course_id)
-            data['category'] = unicode(self.course_id.org)
+            data['name'] = six.text_type(self.course_id)
+            data['category'] = six.text_type(self.course_id.org)
         else:
             data['name'] = configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
             data['category'] = configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)

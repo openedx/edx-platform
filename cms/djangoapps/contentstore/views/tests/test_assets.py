@@ -1,11 +1,14 @@
 """
 Unit tests for the asset upload endpoint.
 """
+from __future__ import absolute_import
+
 import json
 from datetime import datetime
 from io import BytesIO
 
 import mock
+import six
 from ddt import data, ddt
 from django.conf import settings
 from django.test.utils import override_settings
@@ -242,7 +245,7 @@ class PaginationTestCase(AssetsTestCase):
         Get from the url and ensure it contains the expected number of responses
         """
         resp = self.client.get(url, HTTP_ACCEPT='application/json')
-        json_response = json.loads(resp.content)
+        json_response = json.loads(resp.content.decode('utf-8'))
         assets_response = json_response['assets']
         self.assertEquals(json_response['start'], expected_start)
         self.assertEquals(len(assets_response), expected_length)
@@ -254,7 +257,7 @@ class PaginationTestCase(AssetsTestCase):
         """
         resp = self.client.get(
             url + '?sort=' + sort + '&direction=' + direction, HTTP_ACCEPT='application/json')
-        json_response = json.loads(resp.content)
+        json_response = json.loads(resp.content.decode('utf-8'))
         assets_response = json_response['assets']
         self.assertEquals(sort, json_response['sort'])
         self.assertEquals(direction, json_response['direction'])
@@ -290,7 +293,7 @@ class PaginationTestCase(AssetsTestCase):
 
         resp = self.client.get(
             url + '?' + filter_type + '=' + filter_value, HTTP_ACCEPT='application/json')
-        json_response = json.loads(resp.content)
+        json_response = json.loads(resp.content.decode('utf-8'))
         assets_response = json_response['assets']
         self.assertEquals(filter_value_split, json_response['assetTypes'])
 
@@ -301,7 +304,9 @@ class PaginationTestCase(AssetsTestCase):
                 for content_type in content_types:
                     # content_type is either not any defined type (i.e. OTHER) or is a defined type (if multiple
                     # parameters including OTHER are used)
-                    self.assertTrue(content_type in requested_file_extensions or content_type not in all_file_extensions)
+                    self.assertTrue(
+                        content_type in requested_file_extensions or content_type not in all_file_extensions
+                    )
             else:
                 for content_type in content_types:
                     self.assertIn(content_type, requested_file_extensions)
@@ -320,7 +325,7 @@ class PaginationTestCase(AssetsTestCase):
         """
         resp = self.client.get(
             url + '?text_search=' + text_search, HTTP_ACCEPT='application/json')
-        json_response = json.loads(resp.content)
+        json_response = json.loads(resp.content.decode('utf-8'))
         assets_response = json_response['assets']
         self.assertEquals(text_search, json_response['textSearch'])
         self.assertEquals(len(assets_response), number_matches)
@@ -329,7 +334,7 @@ class PaginationTestCase(AssetsTestCase):
 
         for asset_response in assets_response:
             for token in text_search_tokens:
-                self.assertTrue(token.lower() in asset_response['display_name'].lower())
+                self.assertIn(token.lower(), asset_response['display_name'].lower())
 
 
 @ddt
@@ -383,7 +388,7 @@ class DownloadTestCase(AssetsTestCase):
         self.asset_name = 'download_test'
         resp = self.upload_asset(self.asset_name)
         self.assertEquals(resp.status_code, 200)
-        self.uploaded_url = json.loads(resp.content)['asset']['url']
+        self.uploaded_url = json.loads(resp.content.decode('utf-8'))['asset']['url']
 
     def test_download(self):
         # Now, download it.
@@ -433,10 +438,12 @@ class AssetToJsonTestCase(AssetsTestCase):
         self.assertEquals(output["display_name"], "my_file")
         self.assertEquals(output["date_added"], "Jun 01, 2013 at 10:30 UTC")
         self.assertEquals(output["url"], "/asset-v1:org+class+run+type@asset+block@my_file_name.jpg")
-        self.assertEquals(output["external_url"], "//lms_base_url/asset-v1:org+class+run+type@asset+block@my_file_name.jpg")
+        self.assertEquals(
+            output["external_url"], "//lms_base_url/asset-v1:org+class+run+type@asset+block@my_file_name.jpg"
+        )
         self.assertEquals(output["portable_url"], "/static/my_file_name.jpg")
         self.assertEquals(output["thumbnail"], "/asset-v1:org+class+run+type@thumbnail+block@my_file_name_thumb.jpg")
-        self.assertEquals(output["id"], unicode(self.location))
+        self.assertEquals(output["id"], six.text_type(self.location))
         self.assertEquals(output['locked'], True)
         # pylint: disable=protected-access
         output = assets._get_asset_json("name", self.content_type, self.upload_date, self.location, None, False)
@@ -469,7 +476,9 @@ class LockAssetTestCase(AssetsTestCase):
             content_type = 'application/txt'
             upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=UTC)
             asset_location = course.id.make_asset_key('asset', 'sample_static.html')
-            url = reverse_course_url('assets_handler', course.id, kwargs={'asset_key_string': unicode(asset_location)})
+            url = reverse_course_url(
+                'assets_handler', course.id, kwargs={'asset_key_string': six.text_type(asset_location)}
+            )
 
             resp = self.client.post(
                 url,
@@ -480,7 +489,7 @@ class LockAssetTestCase(AssetsTestCase):
             )
 
             self.assertEqual(resp.status_code, 201)
-            return json.loads(resp.content)
+            return json.loads(resp.content.decode('utf-8'))
 
         # Load the toy course.
         module_store = modulestore()
@@ -520,7 +529,7 @@ class DeleteAssetTestCase(AssetsTestCase):
 
         response = self.client.post(self.url, {"name": self.asset_name, "file": self.asset})
         self.assertEquals(response.status_code, 200)
-        self.uploaded_url = json.loads(response.content)['asset']['url']
+        self.uploaded_url = json.loads(response.content.decode('utf-8'))['asset']['url']
 
         self.asset_location = AssetKey.from_string(self.uploaded_url)
         self.content = contentstore().find(self.asset_location)
@@ -528,7 +537,7 @@ class DeleteAssetTestCase(AssetsTestCase):
     def test_delete_asset(self):
         """ Tests the happy path :) """
         test_url = reverse_course_url(
-            'assets_handler', self.course.id, kwargs={'asset_key_string': unicode(self.uploaded_url)})
+            'assets_handler', self.course.id, kwargs={'asset_key_string': six.text_type(self.uploaded_url)})
         resp = self.client.delete(test_url, HTTP_ACCEPT="application/json")
         self.assertEquals(resp.status_code, 204)
 
@@ -540,12 +549,12 @@ class DeleteAssetTestCase(AssetsTestCase):
         # upload image
         response = self.client.post(self.url, {"name": "delete_image_test", "file": image_asset})
         self.assertEquals(response.status_code, 200)
-        uploaded_image_url = json.loads(response.content)['asset']['url']
+        uploaded_image_url = json.loads(response.content.decode('utf-8'))['asset']['url']
 
         # upload image thumbnail
         response = self.client.post(self.url, {"name": "delete_image_thumb_test", "file": thumbnail_image_asset})
         self.assertEquals(response.status_code, 200)
-        thumbnail_url = json.loads(response.content)['asset']['url']
+        thumbnail_url = json.loads(response.content.decode('utf-8'))['asset']['url']
         thumbnail_location = StaticContent.get_location_from_path(thumbnail_url)
 
         image_asset_location = AssetKey.from_string(uploaded_image_url)
@@ -557,21 +566,23 @@ class DeleteAssetTestCase(AssetsTestCase):
             mock_asset_key.return_value = thumbnail_location
 
             test_url = reverse_course_url(
-                'assets_handler', self.course.id, kwargs={'asset_key_string': unicode(uploaded_image_url)})
+                'assets_handler', self.course.id, kwargs={'asset_key_string': six.text_type(uploaded_image_url)})
             resp = self.client.delete(test_url, HTTP_ACCEPT="application/json")
             self.assertEquals(resp.status_code, 204)
 
     def test_delete_asset_with_invalid_asset(self):
         """ Tests the sad path :( """
         test_url = reverse_course_url(
-            'assets_handler', self.course.id, kwargs={'asset_key_string': unicode("/c4x/edX/toy/asset/invalid.pdf")})
+            'assets_handler',
+            self.course.id, kwargs={'asset_key_string': six.text_type("/c4x/edX/toy/asset/invalid.pdf")}
+        )
         resp = self.client.delete(test_url, HTTP_ACCEPT="application/json")
         self.assertEquals(resp.status_code, 404)
 
     def test_delete_asset_with_invalid_thumbnail(self):
         """ Tests the sad path :( """
         test_url = reverse_course_url(
-            'assets_handler', self.course.id, kwargs={'asset_key_string': unicode(self.uploaded_url)})
+            'assets_handler', self.course.id, kwargs={'asset_key_string': six.text_type(self.uploaded_url)})
         self.content.thumbnail_location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/invalid')
         contentstore().save(self.content)
         resp = self.client.delete(test_url, HTTP_ACCEPT="application/json")

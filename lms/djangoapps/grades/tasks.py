@@ -2,6 +2,8 @@
 This module contains tasks for asynchronous execution of grade updates.
 """
 
+from __future__ import absolute_import
+
 from logging import getLogger
 
 import six
@@ -29,11 +31,10 @@ from .config.waffle import DISABLE_REGRADE_ON_POLICY_CHANGE, waffle
 from .constants import ScoreDatabaseTableEnum
 from .course_grade_factory import CourseGradeFactory
 from .exceptions import DatabaseNotReadyError
+from .grade_utils import are_grades_frozen
 from .signals.signals import SUBSECTION_SCORE_CHANGED
 from .subsection_grade_factory import SubsectionGradeFactory
 from .transformer import GradesTransformer
-from .grade_utils import are_grades_frozen
-
 
 log = getLogger(__name__)
 
@@ -211,7 +212,7 @@ def _recalculate_subsection_grade(self, **kwargs):
         scored_block_usage_key = UsageKey.from_string(kwargs['usage_id']).replace(course_key=course_key)
 
         set_custom_metrics_for_course_key(course_key)
-        set_custom_metric('usage_id', unicode(scored_block_usage_key))
+        set_custom_metric('usage_id', six.text_type(scored_block_usage_key))
 
         # The request cache is not maintained on celery workers,
         # where this code runs. So we take the values from the
@@ -261,8 +262,8 @@ def _has_db_updated_with_new_score(self, scored_block_usage_key, **kwargs):
         score = sub_api.get_score(
             {
                 "student_id": kwargs['anonymous_user_id'],
-                "course_id": unicode(scored_block_usage_key.course_key),
-                "item_id": unicode(scored_block_usage_key),
+                "course_id": six.text_type(scored_block_usage_key.course_key),
+                "item_id": six.text_type(scored_block_usage_key),
                 "item_type": scored_block_usage_key.block_type,
             }
         )

@@ -176,7 +176,7 @@ class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase)
         """Verify that courses are filtered by the provided org key."""
         # Create a second course to be filtered out of queries.
         alternate_course = self.create_course(
-            org=md5(self.course.org).hexdigest()
+            org=md5(self.course.org.encode('utf-8')).hexdigest()
         )
 
         self.assertNotEqual(alternate_course.org, self.course.org)

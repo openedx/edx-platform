@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 import logging
 from functools import partial
+import six
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -101,7 +102,7 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
         return reverse('preview_handler', kwargs={
-            'usage_key_string': unicode(block.scope_ids.usage_id),
+            'usage_key_string': six.text_type(block.scope_ids.usage_id),
             'handler': handler_name,
             'suffix': suffix,
         }) + '?' + query
@@ -166,7 +167,7 @@ def _preview_module_system(request, descriptor, field_data):
             wrap_xblock,
             'PreviewRuntime',
             display_name_only=display_name_only,
-            usage_id_serializer=unicode,
+            usage_id_serializer=six.text_type,
             request_token=request_token(request)
         ),
 
@@ -180,7 +181,7 @@ def _preview_module_system(request, descriptor, field_data):
         partial(
             wrap_xblock_aside,
             'PreviewRuntime',
-            usage_id_serializer=unicode,
+            usage_id_serializer=six.text_type,
             request_token=request_token(request)
         )
     ]

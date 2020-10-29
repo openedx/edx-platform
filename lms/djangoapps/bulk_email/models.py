@@ -1,14 +1,18 @@
 """
 Models for bulk email
 """
+from __future__ import absolute_import
+
 import logging
 
 import markupsafe
+import six
 from config_models.models import ConfigurationModel
 from django.contrib.auth.models import User
 from django.db import models
 from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
+from six.moves import zip
 
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
@@ -49,10 +53,10 @@ SEND_TO_STAFF = 'staff'
 SEND_TO_LEARNERS = 'learners'
 SEND_TO_COHORT = 'cohort'
 SEND_TO_TRACK = 'track'
-EMAIL_TARGET_CHOICES = zip(
+EMAIL_TARGET_CHOICES = list(zip(
     [SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS, SEND_TO_COHORT, SEND_TO_TRACK],
     ['Myself', 'Staff and instructors', 'All students', 'Specific cohort', 'Specific course mode']
-)
+))
 EMAIL_TARGETS = {target[0] for target in EMAIL_TARGET_CHOICES}
 
 
@@ -221,7 +225,7 @@ class CourseModeTarget(Target):
         if mode_slug is None:
             raise ValueError("Cannot create a CourseModeTarget without specifying a mode_slug.")
         try:
-            validate_course_mode(unicode(course_id), mode_slug, include_expired=True)
+            validate_course_mode(six.text_type(course_id), mode_slug, include_expired=True)
         except CourseModeNotFoundError:
             raise ValueError(
                 u"Track {track} does not exist in course {course_id}".format(
@@ -419,8 +423,8 @@ class CourseEmailTemplate(models.Model):
         stored HTML template and the provided `context` dict.
         """
         # HTML-escape string values in the context (used for keyword substitution).
-        for key, value in context.iteritems():
-            if isinstance(value, basestring):
+        for key, value in six.iteritems(context):
+            if isinstance(value, six.string_types):
                 context[key] = markupsafe.escape(value)
         return CourseEmailTemplate._render(self.html_template, htmltext, context)
 
@@ -459,11 +463,12 @@ class CourseAuthorization(models.Model):
 
 
 # .. toggle_name: require_course_email_auth
-# .. toggle_type: ConfigurationModel
+# .. toggle_type: configuration_model
 # .. toggle_default: True (enabled)
-# .. toggle_description: If the flag is enabled, course-specific authorization is required, and the course_id is either not provided or not authorixed, the feature is not available.
+# .. toggle_description: If the flag is enabled, course-specific authorization is required, and the course_id is either
+# not provided or not authorixed, the feature is not available.
 # .. toggle_category: bulk email
-# .. toggle_use_cases: open_edx
+# .. toggle_use_cases:  open_edx
 # .. toggle_creation_date: 2016-05-05
 # .. toggle_expiration_date: None
 # .. toggle_warnings: None

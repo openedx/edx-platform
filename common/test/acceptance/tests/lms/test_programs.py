@@ -1,5 +1,6 @@
 """Acceptance tests for LMS-hosted Programs pages"""
 from __future__ import absolute_import
+
 from common.test.acceptance.fixtures.catalog import CatalogFixture, CatalogIntegrationMixin
 from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.fixtures.programs import ProgramsConfigMixin

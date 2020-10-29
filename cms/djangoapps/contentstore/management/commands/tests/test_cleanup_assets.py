@@ -2,20 +2,20 @@
 Test for assets cleanup of courses for Mac OS metadata files (with filename ".DS_Store"
 or with filename which starts with "._")
 """
-from django.core.management import call_command
+from __future__ import absolute_import
 
+from django.conf import settings
+from django.core.management import call_command
 from opaque_keys.edx.keys import CourseKey
+
 from xmodule.contentstore.content import XASSET_LOCATION_TAG
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.mongo.base import location_to_query
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.utils import (
-    add_temp_files_from_dict, remove_temp_files_from_list, DOT_FILES_DICT
-)
+from xmodule.modulestore.tests.utils import DOT_FILES_DICT, add_temp_files_from_dict, remove_temp_files_from_list
 from xmodule.modulestore.xml_importer import import_course_from_xml
-from django.conf import settings
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -32,7 +32,7 @@ class ExportAllCourses(ModuleStoreTestCase):
         self.content_store = contentstore()
         # pylint: disable=protected-access
         self.module_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
-        self.addCleanup(remove_temp_files_from_list, DOT_FILES_DICT.keys(), self.course_dir / "static")
+        self.addCleanup(remove_temp_files_from_list, list(DOT_FILES_DICT.keys()), self.course_dir / "static")
         add_temp_files_from_dict(DOT_FILES_DICT, self.course_dir / "static")
 
     def test_export_all_courses(self):

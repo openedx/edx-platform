@@ -1,13 +1,14 @@
 """
 Custom AST NodeVisitor classes uses for Python xss linting.
 """
+from __future__ import absolute_import
+
 import ast
 import re
 
 from xsslint.reporting import ExpressionRuleViolation
 from xsslint.rules import RuleSet
 from xsslint.utils import Expression, ParseString, StringLines
-
 
 ruleset = RuleSet(
     python_concat_html='python-concat-html',
