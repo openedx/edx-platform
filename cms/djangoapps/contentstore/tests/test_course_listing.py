@@ -23,7 +23,7 @@ from cms.djangoapps.contentstore.views.course import (
     _accessible_courses_summary_iter,
     get_courses_accessible_to_user
 )
-from course_action_state.models import CourseRerunState
+from common.djangoapps.course_action_state.models import CourseRerunState
 from student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
