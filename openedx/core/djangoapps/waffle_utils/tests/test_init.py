@@ -18,6 +18,7 @@ from waffle.testutils import override_flag
 from .. import (
     CourseWaffleFlag,
     WaffleFlagNamespace,
+    WaffleSwitchNamespace,
 )
 from ..models import WaffleFlagCourseOverrideModel
 
@@ -175,3 +176,14 @@ class TestCourseWaffleFlag(TestCase):
             self.assertEqual(mock_set_custom_attribute.call_count, 1)
         else:
             self.assertEqual(mock_set_custom_attribute.call_count, 0)
+
+
+class DeprecatedWaffleFlagTests(TestCase):
+    """
+    Tests for the deprecated waffle methods, including override and import paths.
+    """
+
+    def test_waffle_switch_namespace_override(self):
+        namespace = WaffleSwitchNamespace("namespace")
+        with namespace.override("waffle_switch1", True):
+            self.assertTrue(namespace.is_enabled("waffle_switch1"))
