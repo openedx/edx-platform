@@ -156,8 +156,6 @@ from student.models import CourseEnrollment
     from openedx.core.djangoapps.enrollments.api import serialize_enrollments
     serialized_course_enrollments = serialize_enrollments(course_enrollments)
     demographics_enabled = getattr(settings, 'ENABLE_DEMOGRAPHICS_COLLECTION', False)
-    demographics_modal_enabled = getattr(settings, 'ENABLE_DEMOGRAPHICS_MODAL', False)
-
     show_user_demographics_fields = show_user_demographics(
         user,
         enrollments=serialized_course_enrollments,
@@ -168,41 +166,10 @@ from student.models import CourseEnrollment
         show_user_demographics_fields and
         show_call_to_action_for_user(user)
     )
-    display_demographics_modal = (
-        demographics_enabled and
-        demographics_modal_enabled and
-        show_user_demographics_fields
-    )
     account_mfe_url = getattr(settings, 'ACCOUNT_MICROFRONTEND_URL', '') or ''
     bannerLogoPath = staticfiles_storage.url('edx.org/images/quote_prompt.png')
   %>
-  % if display_demographics_banner and not display_demographics_modal:
-    <a id="demographics-banner-link" class="btn" href="${account_mfe_url}#demographics-information">
-      <div
-        class="demographics-banner d-flex justify-content-lg-between flex-row py-1 px-2 mb-2 mb-lg-4"
-        role="dialog"
-        aria-modal="false"
-        aria-label="demographics questionnaire pitch"
-      >
-        <div class="d-flex justify-content-left align-items-lg-center flex-column flex-lg-row  w-100">
-          <img class="demographics-banner-icon d-none d-lg-inline-block" src="${static.url('edx.org/images/quote_prompt.png')}" alt="" aria-hidden="true">
-          <div class="demographics-banner-prompt d-inline-block font-weight-bold text-white mr-4 py-3 px-2 px-lg-3">
-            ${_("Want to make edX better for everyone?")}
-          </div>
-          <button class="demographics-banner-btn d-flex align-items-center bg-white font-weight-bold border-0 py-2 px-3 mx-2 mb-3 m-lg-0 shadow justify-content-center">
-            <span class="fa fa-thumbs-up px-2" aria-hidden="true"></span>
-            ${_("Get started")}
-          </button>
-        </div>
-        <div class="demographics-dismiss-container md-flex justify-content-right align-self-start align-self-lg-center  ml-lg-auto">
-          <button type="button" class="demographics-dismiss-btn btn btn-default px-0" id="demographics-dismiss" aria-label="close">
-            <i class="fa fa-times-circle text-white px-2" aria-hidden="true"></i>
-          </button>
-        </div>
-      </div>
-    </a>
-  % endif
-  % if display_demographics_modal and display_demographics_banner:
+  % if display_demographics_banner:
       ${static.renderReact(
         component="DemographicsCollectionBanner",
         id="dashboard-demographics-collection-banner",
