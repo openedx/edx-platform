@@ -28,7 +28,7 @@ from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
 from xblock.scorable import ScorableXBlockMixin
 
-import static_replace
+from common.djangoapps import static_replace
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from xmodule.seq_module import SequenceModule
 from xmodule.util.xmodule_django import add_webpack_to_fragment

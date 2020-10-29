@@ -11,7 +11,7 @@ from opaque_keys.edx.keys import CourseKey
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_with_access
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from static_replace import replace_static_urls
+from common.djangoapps.static_replace import replace_static_urls
 
 
 @login_required
