@@ -4,16 +4,15 @@ xModule implementation of a learning sequence
 
 # pylint: disable=abstract-method
 
-
-import collections
-import json
 import logging
+from json import dumps
 from datetime import datetime
+from collections import Counter
+
 from functools import reduce
 
 from pkg_resources import resource_string
 
-import six
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
 from pytz import UTC
@@ -222,7 +221,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 self.position = int(position)
             else:
                 self.position = 1
-            return json.dumps({'success': True})
+            return dumps({'success': True})
 
         if dispatch == 'get_completion':
             completion_service = self.runtime.service(self, 'completion')
@@ -235,7 +234,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 return None
 
             complete = completion_service.vertical_is_complete(item)
-            return json.dumps({
+            return dumps({
                 'complete': complete
             })
         elif dispatch == 'metadata':
@@ -253,7 +252,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                     prereq_met, prereq_meta_info = self._compute_is_prereq_met(True)
             meta = self._get_render_metadata(context, display_items, prereq_met, prereq_meta_info, banner_text, STUDENT_VIEW)
             meta['display_name'] = self.display_name_with_default
-            return json.dumps(meta)
+            return dumps(meta)
         raise NotFoundError('Unexpected dispatch type')
 
     @classmethod
@@ -580,7 +579,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         """
         if not newrelic:
             return
-        newrelic.agent.add_custom_parameter('seq.block_id', six.text_type(self.location))
+        newrelic.agent.add_custom_parameter('seq.block_id', text_type(self.location))
         newrelic.agent.add_custom_parameter('seq.display_name', self.display_name or '')
         newrelic.agent.add_custom_parameter('seq.position', self.position)
         newrelic.agent.add_custom_parameter('seq.is_time_limited', self.is_time_limited)
@@ -603,7 +602,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         newrelic.agent.add_custom_parameter('seq.num_items', len(all_item_keys))
 
         # Count of all modules by block_type (e.g. "video": 2, "discussion": 4)
-        block_counts = collections.Counter(usage_key.block_type for usage_key in all_item_keys)
+        block_counts = Counter(usage_key.block_type for usage_key in all_item_keys)
         for block_type, count in block_counts.items():
             newrelic.agent.add_custom_parameter('seq.block_counts.{}'.format(block_type), count)
 
@@ -619,13 +618,13 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         if 1 <= self.position <= len(display_items):
             # Basic info about the Unit...
             current = display_items[self.position - 1]
-            newrelic.agent.add_custom_parameter('seq.current.block_id', six.text_type(current.location))
+            newrelic.agent.add_custom_parameter('seq.current.block_id', text_type(current.location))
             newrelic.agent.add_custom_parameter('seq.current.display_name', current.display_name or '')
 
             # Examining all items inside the Unit (or split_test, conditional, etc.)
             child_locs = self._locations_in_subtree(current)
             newrelic.agent.add_custom_parameter('seq.current.num_items', len(child_locs))
-            curr_block_counts = collections.Counter(usage_key.block_type for usage_key in child_locs)
+            curr_block_counts = Counter(usage_key.block_type for usage_key in child_locs)
             for block_type, count in curr_block_counts.items():
                 newrelic.agent.add_custom_parameter('seq.current.block_counts.{}'.format(block_type), count)
 

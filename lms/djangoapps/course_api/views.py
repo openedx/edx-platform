@@ -6,6 +6,8 @@ Course API Views
 from django.core.exceptions import ValidationError
 from django.core.paginator import InvalidPage
 from edx_rest_framework_extensions.paginators import NamespacedPageNumberPagination
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.exceptions import NotFound
@@ -16,6 +18,9 @@ from . import USE_RATE_LIMIT_2_FOR_COURSE_LIST_API, USE_RATE_LIMIT_10_FOR_COURSE
 from .api import course_detail, list_course_keys, list_courses
 from .forms import CourseDetailGetForm, CourseIdListGetForm, CourseListGetForm
 from .serializers import CourseDetailSerializer, CourseKeySerializer, CourseSerializer
+
+# MIT-OLL : course Id for temporary redirection of a course
+BIOLOGY_COURSE_ID = 'course-v1:OCW+Pre-7.01+1T2020'
 
 
 @view_auth_classes(is_authenticated=False)
@@ -378,3 +383,7 @@ class CourseIdListView(DeveloperErrorViewMixin, ListAPIView):
             form.cleaned_data['username'],
             role=form.cleaned_data['role'],
         )
+
+
+def redirect_courses(request):
+    return HttpResponseRedirect((reverse('about_course', kwargs={'course_id': BIOLOGY_COURSE_ID})))

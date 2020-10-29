@@ -107,6 +107,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
 from openedx.core.djangolib.markup import HTML, Text
+from milestones.exceptions import InvalidUserException
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
@@ -688,6 +689,15 @@ class CourseTabView(EdxFragmentView):
         """
         if isinstance(exception, Redirect) or isinstance(exception, Http404):
             raise
+        if isinstance(exception, UnicodeEncodeError):
+            raise Http404("URL contains Unicode characters")
+        if isinstance(exception, InvalidUserException):
+            next_url = urlquote_plus(reverse('about_course', kwargs={
+                'course_id': course_key
+            }))
+            url = '{}?next={}'.format(reverse('signin_user'), next_url)
+            return redirect(url)
+
         if settings.DEBUG:
             raise
         user = request.user
@@ -960,6 +970,11 @@ def course_about(request, course_id):
 
         # Embed the course reviews tool
         reviews_fragment_view = CourseReviewsModuleFragmentView().render_to_fragment(request, course=course)
+
+        # if the course has some pre-requisites and the user is not
+        # enrolled in the course, don't show the "View Course" button
+        if not registered and pre_requisite_courses:
+            show_courseware_link = False
 
         context = {
             'course': course,

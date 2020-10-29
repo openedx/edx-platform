@@ -6,20 +6,21 @@ Tests of the Capa XModule
 
 
 import datetime
-import json
-import os
-import random
-import textwrap
+from json import loads, dumps
+from os.path import join
+from random import randint
+from textwrap import dedent
 import unittest
 
 import ddt
-import requests
+from requests import exceptions
 import six
 import webob
+from django.urls import reverse
 from django.utils.encoding import smart_text
 from edx_user_state_client.interface import XBlockUserState
 from lxml import etree
-from mock import DEFAULT, Mock, patch
+from mock import call, ANY, DEFAULT, Mock, patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC
 from six.moves import range, zip
@@ -37,6 +38,7 @@ from xmodule.capa_module import ComplexEncoder, ProblemBlock
 from xmodule.tests import DATA_DIR
 
 from ..capa_base import RANDOMIZATION, SHOWANSWER
+from openedx.core.djangolib.markup import HTML, Text
 from . import get_test_system
 
 
@@ -45,7 +47,7 @@ class CapaFactory(object):
     A helper class to create problem modules with various parameters for testing.
     """
 
-    sample_problem_xml = textwrap.dedent("""\
+    sample_problem_xml = dedent("""\
         <?xml version="1.0"?>
         <problem>
             <text>
@@ -140,7 +142,7 @@ class CapaFactoryWithFiles(CapaFactory):
     """
     A factory for creating a Capa problem with files attached.
     """
-    sample_problem_xml = textwrap.dedent("""\
+    sample_problem_xml = dedent("""\
         <problem>
             <coderesponse queuename="BerkeleyX-cs188x">
                 <!-- actual filenames here don't matter for server-side tests,
@@ -244,8 +246,8 @@ class ProblemBlockTest(unittest.TestCase):
         self.assertFalse(problem.answer_available())
 
     @ddt.data(
-        (requests.exceptions.ReadTimeout, (1, 'failed to read from the server')),
-        (requests.exceptions.ConnectionError, (1, 'cannot connect to server')),
+        (exceptions.ReadTimeout, (1, 'failed to read from the server')),
+        (exceptions.ConnectionError, (1, 'cannot connect to server')),
     )
     @ddt.unpack
     def test_xqueue_request_exception(self, exception, result):
@@ -645,6 +647,23 @@ class ProblemBlockTest(unittest.TestCase):
                                     due=self.yesterday_str)
         self.assertTrue(module.closed())
 
+    def test_public_view(self):
+        """
+        Test that public view for capa problems returns
+        the same content as the student view
+        """
+        html = u'<p>This is a test</p>'
+
+        module_system = get_test_system()
+        module = CapaFactory.create()
+
+        module.runtime.render_template.return_value = html
+
+        rendered_student_view = module_system.render(module, STUDENT_VIEW, {}).content
+        rendered_public_view = module_system.render(module, PUBLIC_VIEW, {}).content
+
+        self.assertEqual(rendered_student_view, rendered_public_view)
+
     def test_parse_get_params(self):
 
         # Valid GET param dict
@@ -740,6 +759,39 @@ class ProblemBlockTest(unittest.TestCase):
         # and that this is considered the first attempt
         self.assertEqual(module.lcp.context['attempt'], 1)
 
+    def test_submit_problem_with_authenticated_user(self):
+        """
+        Test that publish is called with "grade" event upon submission
+        if the user is authenticated.
+        """
+        problem = CapaFactory.create(attempts=5)
+        get_request_dict = {CapaFactory.input_key(): '0'}
+        grade_publish_call = call(ANY, 'grade', ANY)
+
+        problem.runtime.publish = Mock(name='mock_publish')
+
+        problem.submit_problem(get_request_dict)
+
+        self.assertEqual(problem.runtime.publish.call_count, 2)
+        problem.runtime.publish.assert_has_calls([grade_publish_call])
+
+    def test_submit_problem_with_anonymous_user(self):
+        """
+        Test that publish is not called with "grade" event upon submission
+        if the user is anonymous.
+        """
+        problem = CapaFactory.create(attempts=5)
+        get_request_dict = {CapaFactory.input_key(): '0'}
+        grade_publish_call = call(ANY, 'grade', ANY)
+
+        problem.runtime.user_id = None
+        problem.runtime.publish = Mock(name='mock_publish')
+
+        problem.submit_problem(get_request_dict)
+
+        self.assertEqual(problem.runtime.publish.call_count, 1)
+        self.assertNotIn(grade_publish_call, problem.runtime.publish.call_args_list)
+
     def test_submit_problem_closed(self):
         module = CapaFactory.create(attempts=3)
 
@@ -820,7 +872,7 @@ class ProblemBlockTest(unittest.TestCase):
 
         # The files we'll be uploading.
         fnames = ["prog1.py", "prog2.py", "prog3.py"]
-        fpaths = [os.path.join(DATA_DIR, "capa", fname) for fname in fnames]
+        fpaths = [join(DATA_DIR, "capa", fname) for fname in fnames]
         fileobjs = [open(fpath) for fpath in fpaths]
         for fileobj in fileobjs:
             self.addCleanup(fileobj.close)
@@ -871,7 +923,7 @@ class ProblemBlockTest(unittest.TestCase):
 
         # The files we'll be uploading.
         fnames = ["prog1.py", "prog2.py", "prog3.py"]
-        fpaths = [os.path.join(DATA_DIR, "capa", fname) for fname in fnames]
+        fpaths = [join(DATA_DIR, "capa", fname) for fname in fnames]
         fileobjs = [open(fpath) for fpath in fpaths]
         for fileobj in fileobjs:
             self.addCleanup(fileobj.close)
@@ -1072,7 +1124,7 @@ class ProblemBlockTest(unittest.TestCase):
             # Check the problem
             get_request_dict = {CapaFactory.input_key(): '0'}
             json_result = module.handle_ajax('problem_check', get_request_dict)
-            result = json.loads(json_result)
+            result = loads(json_result)
 
         # Expect that the AJAX result withholds correctness and score
         self.assertEqual(result['current_score'], expected_score)
@@ -1273,6 +1325,47 @@ class ProblemBlockTest(unittest.TestCase):
         # Expect that the result is success
         self.assertTrue('success' in result and result['success'])
 
+    def test_save_problem_with_anonymous_user(self):
+        """
+        Test that when an anonymous user tries to save the problem,
+        they are displayed an error message.
+        """
+
+        module = CapaFactory.create(done=False)
+        next_url = urlquote_plus(reverse('about_course', kwargs={
+            'course_id': module.location.course_key,
+        }))
+
+        with_next_url = lambda url: u'{url}?next={next_url}'.format(
+            url=url,
+            next_url=next_url
+        )
+        link_start = lambda url: HTML(u'<span><a href="{url}">'.format(url=url))
+        link_end = HTML(u'</a></span>')
+
+
+        expected_error_message = (
+            u'You must be logged in to save your answers. Please {signin_link_start}sign{signin_link_end}'
+            u' in or {register_link_start}register{register_link_end} to use this feature.'
+        )
+        expected_error_message = Text(expected_error_message).format(
+            signin_link_start=link_start(with_next_url(reverse('signin_user'))),
+            signin_link_end=link_end,
+            register_link_start=link_start(with_next_url(reverse('register_user'))),
+            register_link_end=link_end,
+        )
+
+        module.runtime.user_id = None
+
+        # Save the problem
+        get_request_dict = {CapaFactory.input_key(): '3.14'}
+        result = module.save_problem(get_request_dict)
+
+        self.assertEqual(result['msg'], expected_error_message)
+
+        # Expect that the result is failure
+        self.assertTrue('success' in result and not result['success'])
+
     def test_save_problem_closed(self):
         module = CapaFactory.create(done=False)
 
@@ -1328,7 +1421,7 @@ class ProblemBlockTest(unittest.TestCase):
 
     def test_should_enable_submit_button(self):
 
-        attempts = random.randint(1, 10)
+        attempts = randint(1, 10)
 
         # If we're after the deadline, disable the submit button
         module = CapaFactory.create(due=self.yesterday_str)
@@ -1370,7 +1463,7 @@ class ProblemBlockTest(unittest.TestCase):
 
     def test_should_show_reset_button(self):
 
-        attempts = random.randint(1, 10)
+        attempts = randint(1, 10)
 
         # If we're after the deadline, do NOT show the reset button
         module = CapaFactory.create(due=self.yesterday_str, done=True)
@@ -1414,7 +1507,7 @@ class ProblemBlockTest(unittest.TestCase):
 
     def test_should_show_save_button(self):
 
-        attempts = random.randint(1, 10)
+        attempts = randint(1, 10)
 
         # If we're after the deadline, do NOT show the save button
         module = CapaFactory.create(due=self.yesterday_str, done=True)
@@ -1471,7 +1564,7 @@ class ProblemBlockTest(unittest.TestCase):
         self.assertFalse(module.should_show_save_button())
 
         # If the user is out of attempts, do NOT show the save button
-        attempts = random.randint(1, 10)
+        attempts = randint(1, 10)
         module = CapaFactory.create(attempts=attempts,
                                     max_attempts=attempts,
                                     force_save_button="true",
@@ -1502,9 +1595,9 @@ class ProblemBlockTest(unittest.TestCase):
 
         # We've tested the show/hide button logic in other tests,
         # so here we hard-wire the values
-        enable_submit_button = bool(random.randint(0, 1) % 2)
-        show_reset_button = bool(random.randint(0, 1) % 2)
-        show_save_button = bool(random.randint(0, 1) % 2)
+        enable_submit_button = bool(randint(0, 1) % 2)
+        show_reset_button = bool(randint(0, 1) % 2)
+        show_save_button = bool(randint(0, 1) % 2)
 
         module.should_enable_submit_button = Mock(return_value=enable_submit_button)
         module.should_show_reset_button = Mock(return_value=show_reset_button)
@@ -1980,7 +2073,7 @@ class ProblemBlockTest(unittest.TestCase):
         self.assertEqual(module.get_problem("data"), {'html': module.get_problem_html(encapsulate=False)})
 
     # Standard question with shuffle="true" used by a few tests
-    common_shuffle_xml = textwrap.dedent("""
+    common_shuffle_xml = dedent("""
         <problem>
         <multiplechoiceresponse>
           <choicegroup type="MultipleChoice" shuffle="true">
@@ -2054,7 +2147,7 @@ class ProblemBlockTest(unittest.TestCase):
 
     def test_check_unmask_answerpool(self):
         """Check answer-pool question track_function uses unmasked names"""
-        xml = textwrap.dedent("""
+        xml = dedent("""
             <problem>
             <multiplechoiceresponse>
               <choicegroup type="MultipleChoice" answer-pool="4">
@@ -2109,7 +2202,7 @@ class ProblemBlockTest(unittest.TestCase):
 
 @ddt.ddt
 class ProblemBlockXMLTest(unittest.TestCase):
-    sample_checkbox_problem_xml = textwrap.dedent("""
+    sample_checkbox_problem_xml = dedent("""
         <problem>
             <p>Title</p>
 
@@ -2142,7 +2235,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
         </problem>
     """)
 
-    sample_dropdown_problem_xml = textwrap.dedent("""
+    sample_dropdown_problem_xml = dedent("""
         <problem>
             <p>Dropdown problems allow learners to select only one option from a list of options.</p>
 
@@ -2169,7 +2262,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
         </problem>
     """)
 
-    sample_multichoice_problem_xml = textwrap.dedent("""
+    sample_multichoice_problem_xml = dedent("""
         <problem>
             <p>Multiple choice problems allow learners to select only one option.</p>
 
@@ -2205,7 +2298,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
         </problem>
     """)
 
-    sample_numerical_input_problem_xml = textwrap.dedent("""
+    sample_numerical_input_problem_xml = dedent("""
         <problem>
             <p>In a numerical input problem, learners enter numbers or a specific and relatively simple mathematical
             expression. Learners enter the response in plain text, and the system then converts the text to a symbolic
@@ -2245,7 +2338,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
         </problem>
     """)
 
-    sample_text_input_problem_xml = textwrap.dedent("""
+    sample_text_input_problem_xml = dedent("""
         <problem>
             <p>In text input problems, also known as "fill-in-the-blank" problems, learners enter text into a response
             field. The text can include letters and characters such as punctuation marks. The text that the learner
@@ -2277,7 +2370,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
         </problem>
     """)
 
-    sample_checkboxes_with_hints_and_feedback_problem_xml = textwrap.dedent("""
+    sample_checkboxes_with_hints_and_feedback_problem_xml = dedent("""
         <problem>
             <p>You can provide feedback for each option in a checkbox problem, with distinct feedback depending on
             whether or not the learner selects that option.</p>
@@ -2330,7 +2423,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
         </problem>
     """)
 
-    sample_dropdown_with_hints_and_feedback_problem_xml = textwrap.dedent("""
+    sample_dropdown_with_hints_and_feedback_problem_xml = dedent("""
         <problem>
             <p>You can provide feedback for each available option in a dropdown problem.</p>
 
@@ -2362,7 +2455,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
         </problem>
     """)
 
-    sample_multichoice_with_hints_and_feedback_problem_xml = textwrap.dedent("""
+    sample_multichoice_with_hints_and_feedback_problem_xml = dedent("""
         <problem>
             <p>You can provide feedback for each option in a multiple choice problem.</p>
 
@@ -2395,7 +2488,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
         </problem>
     """)
 
-    sample_numerical_input_with_hints_and_feedback_problem_xml = textwrap.dedent("""
+    sample_numerical_input_with_hints_and_feedback_problem_xml = dedent("""
         <problem>
             <p>You can provide feedback for correct answers in numerical input problems. You cannot provide feedback
             for incorrect answers.</p>
@@ -2431,7 +2524,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
         </problem>
     """)
 
-    sample_text_input_with_hints_and_feedback_problem_xml = textwrap.dedent("""
+    sample_text_input_with_hints_and_feedback_problem_xml = dedent("""
         <problem>
             <p>You can provide feedback for the correct answer in text input problems, as well as for specific
             incorrect answers.</p>
@@ -2487,7 +2580,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
         })
 
     def test_response_types_ignores_non_response_tags(self):
-        xml = textwrap.dedent("""
+        xml = dedent("""
             <problem>
             <p>Label</p>
             <div>Some comment</div>
@@ -2514,7 +2607,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
         })
 
     def test_response_types_multiple_tags(self):
-        xml = textwrap.dedent("""
+        xml = dedent("""
             <problem>
                 <p>Label</p>
                 <div>Some comment</div>
@@ -2548,7 +2641,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
         )
 
     def test_solutions_not_indexed(self):
-        xml = textwrap.dedent("""
+        xml = dedent("""
             <problem>
                 <solution>
                 <div class="detailed-solution">
@@ -2587,7 +2680,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
     def test_indexing_checkboxes(self):
         name = "Checkboxes"
         descriptor = self._create_descriptor(self.sample_checkbox_problem_xml, name=name)
-        capa_content = textwrap.dedent(u"""
+        capa_content = dedent(u"""
             Title
             Description
             Example
@@ -2615,7 +2708,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
     def test_indexing_dropdown(self):
         name = "Dropdown"
         descriptor = self._create_descriptor(self.sample_dropdown_problem_xml, name=name)
-        capa_content = textwrap.dedent("""
+        capa_content = dedent("""
             Dropdown problems allow learners to select only one option from a list of options.
             Description
             You can use the following example problem as a model.
@@ -2636,7 +2729,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
     def test_indexing_multiple_choice(self):
         name = "Multiple Choice"
         descriptor = self._create_descriptor(self.sample_multichoice_problem_xml, name=name)
-        capa_content = textwrap.dedent("""
+        capa_content = dedent("""
             Multiple choice problems allow learners to select only one option.
             When you add the problem, be sure to select Settings to specify a Display Name and other values.
             You can use the following example problem as a model.
@@ -2661,7 +2754,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
     def test_indexing_numerical_input(self):
         name = "Numerical Input"
         descriptor = self._create_descriptor(self.sample_numerical_input_problem_xml, name=name)
-        capa_content = textwrap.dedent("""
+        capa_content = dedent("""
             In a numerical input problem, learners enter numbers or a specific and relatively simple mathematical
             expression. Learners enter the response in plain text, and the system then converts the text to a symbolic
             expression that learners can see below the response field.
@@ -2689,7 +2782,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
     def test_indexing_text_input(self):
         name = "Text Input"
         descriptor = self._create_descriptor(self.sample_text_input_problem_xml, name=name)
-        capa_content = textwrap.dedent("""
+        capa_content = dedent("""
             In text input problems, also known as "fill-in-the-blank" problems, learners enter text into a response
             field. The text can include letters and characters such as punctuation marks. The text that the learner
             enters must match your specified answer text exactly. You can specify more than one correct answer.
@@ -2712,7 +2805,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
         )
 
     def test_indexing_non_latin_problem(self):
-        sample_text_input_problem_xml = textwrap.dedent("""
+        sample_text_input_problem_xml = dedent("""
             <problem>
                 <script type="text/python">FX1_VAL='Καλημέρα'</script>
                 <p>Δοκιμή με μεταβλητές με Ελληνικούς χαρακτήρες μέσα σε python: $FX1_VAL</p>
@@ -2730,7 +2823,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
     def test_indexing_checkboxes_with_hints_and_feedback(self):
         name = "Checkboxes with Hints and Feedback"
         descriptor = self._create_descriptor(self.sample_checkboxes_with_hints_and_feedback_problem_xml, name=name)
-        capa_content = textwrap.dedent("""
+        capa_content = dedent("""
             You can provide feedback for each option in a checkbox problem, with distinct feedback depending on
             whether or not the learner selects that option.
             You can also provide compound feedback for a specific combination of answers. For example, if you have
@@ -2760,7 +2853,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
     def test_indexing_dropdown_with_hints_and_feedback(self):
         name = "Dropdown with Hints and Feedback"
         descriptor = self._create_descriptor(self.sample_dropdown_with_hints_and_feedback_problem_xml, name=name)
-        capa_content = textwrap.dedent("""
+        capa_content = dedent("""
             You can provide feedback for each available option in a dropdown problem.
             You can also add hints for learners.
             Be sure to select Settings to specify a Display Name and other values that apply.
@@ -2786,7 +2879,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
     def test_indexing_multiple_choice_with_hints_and_feedback(self):
         name = "Multiple Choice with Hints and Feedback"
         descriptor = self._create_descriptor(self.sample_multichoice_with_hints_and_feedback_problem_xml, name=name)
-        capa_content = textwrap.dedent("""
+        capa_content = dedent("""
             You can provide feedback for each option in a multiple choice problem.
             You can also add hints for learners.
             Be sure to select Settings to specify a Display Name and other values that apply.
@@ -2812,7 +2905,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
     def test_indexing_numerical_input_with_hints_and_feedback(self):
         name = "Numerical Input with Hints and Feedback"
         descriptor = self._create_descriptor(self.sample_numerical_input_with_hints_and_feedback_problem_xml, name=name)
-        capa_content = textwrap.dedent("""
+        capa_content = dedent("""
             You can provide feedback for correct answers in numerical input problems. You cannot provide feedback
             for incorrect answers.
             Use feedback for the correct answer to reinforce the process for arriving at the numerical value.
@@ -2836,7 +2929,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
     def test_indexing_text_input_with_hints_and_feedback(self):
         name = "Text Input with Hints and Feedback"
         descriptor = self._create_descriptor(self.sample_text_input_with_hints_and_feedback_problem_xml, name=name)
-        capa_content = textwrap.dedent("""
+        capa_content = dedent("""
             You can provide feedback for the correct answer in text input problems, as well as for specific
             incorrect answers.
             Use feedback on expected incorrect answers to address common misconceptions and to provide guidance on
@@ -2858,7 +2951,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
         )
 
     def test_indexing_problem_with_html_tags(self):
-        sample_problem_xml = textwrap.dedent("""
+        sample_problem_xml = dedent("""
             <problem>
                 <style>p {left: 10px;}</style>
                 <!-- Beginning of the html -->
@@ -2874,7 +2967,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
         """)
         name = "Mixed business"
         descriptor = self._create_descriptor(sample_problem_xml, name=name)
-        capa_content = textwrap.dedent("""
+        capa_content = dedent("""
             This has HTML comment in it.
             HTML end.
         """)
@@ -2894,7 +2987,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
         Tests to confirm that invalid XML throws errors during xblock creation,
         so as not to allow bad data into modulestore.
         """
-        sample_invalid_xml = textwrap.dedent("""
+        sample_invalid_xml = dedent("""
             <problem>
             </proble-oh no my finger broke and I can't close the problem tag properly...
         """)
@@ -2905,7 +2998,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
         """
         Verify the capa problem cannot be created from dropdown xml with multiple correct answers.
         """
-        problem_xml = textwrap.dedent("""
+        problem_xml = dedent("""
         <problem>
             <optionresponse>
               <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for dropdown problems. Edit this component to replace this template with your own assessment.</p>
@@ -2931,7 +3024,7 @@ class ComplexEncoderTest(unittest.TestCase):
         """
         complex_num = 1 - 1j
         expected_str = '1-1*j'
-        json_str = json.dumps(complex_num, cls=ComplexEncoder)
+        json_str = dumps(complex_num, cls=ComplexEncoder)
         self.assertEqual(expected_str, json_str[1:-1])  # ignore quotes
 
 
@@ -3021,7 +3114,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
             """
             A factory for creating a Capa problem with arbitrary xml.
             """
-            sample_problem_xml = textwrap.dedent(xml)
+            sample_problem_xml = dedent(xml)
 
         return CustomCapaFactory
 
@@ -3191,7 +3284,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
 
     def test_file_inputs(self):
         fnames = ["prog1.py", "prog2.py", "prog3.py"]
-        fpaths = [os.path.join(DATA_DIR, "capa", fname) for fname in fnames]
+        fpaths = [join(DATA_DIR, "capa", fname) for fname in fnames]
         fileobjs = [open(fpath) for fpath in fpaths]
         for fileobj in fileobjs:
             self.addCleanup(fileobj.close)
@@ -3235,7 +3328,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
         """
         Make sure replace_jump_to_id_urls() is called in get_answer.
         """
-        problem_xml = textwrap.dedent("""
+        problem_xml = dedent("""
         <problem>
             <p>What is 1+4?</p>
                 <numericalresponse answer="5">

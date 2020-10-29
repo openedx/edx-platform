@@ -9,6 +9,7 @@ from django.conf.urls.static import static
 from django.contrib.admin import autodiscover as django_autodiscover
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import RedirectView
+from django.views.generic import TemplateView
 from edx_api_doc_tools import make_docs_urls
 from ratelimitbackend import admin
 
@@ -22,6 +23,8 @@ from lms.djangoapps.courseware.module_render import (
     xblock_view,
     xqueue_callback
 )
+# MIT redirect the url single course hotfix as client asked
+from lms.djangoapps.course_api.views import redirect_courses
 from lms.djangoapps.courseware.views import views as courseware_views
 from lms.djangoapps.courseware.views.index import CoursewareIndex
 from lms.djangoapps.courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
@@ -172,6 +175,11 @@ urlpatterns = [
     url(r'^api/experiments/', include(('experiments.urls', 'lms.djangoapps.experiments'), namespace='api_experiments')),
     url(r'^api/discounts/', include(('openedx.features.discounts.urls', 'openedx.features.discounts'),
                                     namespace='api_discounts')),
+    # robots.txt for mit oll
+    url(r'^robots\.txt/$', TemplateView.as_view(template_name='robots.txt', content_type='text/plain')),
+
+    # redirecting due to high priority hotfix
+    url(r'^pre-biology', redirect_courses, name='redirect_single_course'),
 ]
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):

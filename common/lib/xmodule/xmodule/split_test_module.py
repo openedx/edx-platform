@@ -169,6 +169,8 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         """
         For grading--return just the chosen child.
         """
+
+        child_descriptor = None
         group_id = self.get_group_id()
         if group_id is None:
             return []
@@ -305,6 +307,13 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
             html = html + rendered_child.content
 
         return html
+
+    def public_view(self, context):
+        """
+        Renders the same content as the student view.
+        """
+
+        return self.student_view(context)
 
     def student_view(self, context):
         """
