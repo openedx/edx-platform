@@ -3,8 +3,8 @@
 import logging
 import json
 from django.contrib.staticfiles.storage import staticfiles_storage
-from pipeline_mako import compressed_css, compressed_js
-from pipeline_mako.helpers.studiofrontend import load_sfe_i18n_messages
+from common.djangoapps.pipeline_mako import compressed_css, compressed_js
+from common.djangoapps.pipeline_mako.helpers.studiofrontend import load_sfe_i18n_messages
 from django.utils.translation import get_language_bidi
 from mako.exceptions import TemplateLookupException
 from common.djangoapps.edxmako.shortcuts import marketing_link
