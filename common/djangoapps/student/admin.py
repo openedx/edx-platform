@@ -224,11 +224,9 @@ class LinkedInAddToProfileConfigurationAdmin(admin.ModelAdmin):
     class Meta(object):
         model = LinkedInAddToProfileConfiguration
 
-    # Exclude deprecated fields
-    exclude = ('dashboard_tracking_code',)
-
 
 class CourseEnrollmentForm(forms.ModelForm):
+    """ Form for Course Enrollments in the Django Admin Panel. """
     def __init__(self, *args, **kwargs):
         # If args is a QueryDict, then the ModelForm addition request came in as a POST with a course ID string.
         # Change the course ID string to a CourseLocator object by copying the QueryDict to make it mutable.

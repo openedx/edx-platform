@@ -73,7 +73,7 @@ def get_user_course_duration(user, course):
     if not verified_mode:
         return None
 
-    return get_expected_duration(course)
+    return get_expected_duration(course.id)
 
 
 def get_user_course_expiration_date(user, course):
