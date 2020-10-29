@@ -33,7 +33,7 @@ import capa.responsetypes as responsetypes
 import capa.xqueue_interface as xqueue_interface
 from capa.correctmap import CorrectMap
 from capa.safe_exec import safe_exec
-from capa.util import contextualize_text, convert_files_to_filenames
+from capa.util import contextualize_text, convert_files_to_filenames, get_course_id_from_capa_module
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.edx_six import get_gettext
 from xmodule.stringify import stringify_children
@@ -930,6 +930,9 @@ class LoncapaProblem(object):
                     python_path=python_path,
                     extra_files=extra_files,
                     cache=self.capa_system.cache,
+                    limit_overrides_context=get_course_id_from_capa_module(
+                        self.capa_module
+                    ),
                     slug=self.problem_id,
                     unsafely=self.capa_system.can_execute_unsafe_code(),
                 )
