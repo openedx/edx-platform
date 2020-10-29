@@ -17,7 +17,7 @@ from openedx.core.djangoapps.course_groups.signals.signals import COHORT_MEMBERS
 from openedx.core.lib.grade_utils import is_score_higher_or_equal
 from common.djangoapps.student.models import user_by_anonymous_id
 from common.djangoapps.student.signals import ENROLLMENT_TRACK_UPDATED
-from track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
+from common.djangoapps.track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 from util.date_utils import to_timestamp
 
 from .. import events

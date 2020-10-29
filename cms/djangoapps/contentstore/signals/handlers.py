@@ -15,7 +15,7 @@ from cms.djangoapps.contentstore.proctoring import register_special_exams
 from lms.djangoapps.grades.api import task_compute_all_grades_for_course
 from openedx.core.djangoapps.credit.signals import on_course_publish
 from openedx.core.lib.gating import api as gating_api
-from track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
+from common.djangoapps.track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 from util.module_utils import yield_dynamic_descriptor_descendants
 from xmodule.modulestore.django import SignalHandler, modulestore
 

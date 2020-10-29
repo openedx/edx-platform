@@ -693,7 +693,7 @@ MIDDLEWARE = [
     'openedx.core.djangoapps.contentserver.middleware.StaticContentServer',
 
     'django.contrib.messages.middleware.MessageMiddleware',
-    'track.middleware.TrackMiddleware',
+    'common.djangoapps.track.middleware.TrackMiddleware',
 
     # This is used to set or update the user language preferences.
     'openedx.core.djangoapps.lang_pref.middleware.LanguagePreferenceMiddleware',
@@ -1357,7 +1357,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.util.apps.UtilConfig',
 
     # Tracking
-    'track',
+    'common.djangoapps.track',
     'eventtracking.django.apps.EventTrackingConfig',
 
     # For asset pipelining
@@ -1540,7 +1540,7 @@ TRACK_MAX_EVENT = 50000
 
 TRACKING_BACKENDS = {
     'logger': {
-        'ENGINE': 'track.backends.logger.LoggerBackend',
+        'ENGINE': 'common.djangoapps.track.backends.logger.LoggerBackend',
         'OPTIONS': {
             'name': 'tracking'
         }
@@ -1566,8 +1566,8 @@ EVENT_TRACKING_BACKENDS = {
                 }
             },
             'processors': [
-                {'ENGINE': 'track.shim.LegacyFieldMappingProcessor'},
-                {'ENGINE': 'track.shim.PrefixedEventProcessor'}
+                {'ENGINE': 'common.djangoapps.track.shim.LegacyFieldMappingProcessor'},
+                {'ENGINE': 'common.djangoapps.track.shim.PrefixedEventProcessor'}
             ]
         }
     },
@@ -1585,7 +1585,7 @@ EVENT_TRACKING_BACKENDS = {
                     }
                 },
                 {
-                    'ENGINE': 'track.shim.GoogleAnalyticsProcessor'
+                    'ENGINE': 'common.djangoapps.track.shim.GoogleAnalyticsProcessor'
                 }
             ]
         }

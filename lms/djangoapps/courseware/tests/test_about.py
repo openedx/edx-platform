@@ -26,7 +26,7 @@ from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBA
 from openedx.features.course_experience.waffle import WAFFLE_NAMESPACE as COURSE_EXPERIENCE_WAFFLE_NAMESPACE
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentAllowedFactory, UserFactory
-from track.tests import EventTrackingTestCase
+from common.djangoapps.track.tests import EventTrackingTestCase
 from util.milestones_helpers import get_prerequisite_courses_display, set_prerequisite_courses
 from xmodule.course_module import (
     CATALOG_VISIBILITY_ABOUT,

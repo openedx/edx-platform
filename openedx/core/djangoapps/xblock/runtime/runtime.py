@@ -19,8 +19,8 @@ from xblock.field_data import SplitFieldData
 from xblock.fields import Scope
 from xblock.runtime import KvsFieldData, MemoryIdManager, Runtime
 
-import track.contexts
-import track.views
+from common.djangoapps.track import contexts as track_contexts
+from common.djangoapps.track import views as track_views
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from lms.djangoapps.grades.api import signals as grades_signals
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
@@ -47,7 +47,7 @@ def make_track_function():
     current_request = crum.get_current_request()
 
     def function(event_type, event):
-        return track.views.server_track(current_request, event_type, event, page='x_module')
+        return track_views.server_track(current_request, event_type, event, page='x_module')
     return function
 
 
@@ -155,7 +155,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
         """
         Log this XBlock event to the tracking log
         """
-        log_context = track.contexts.context_dict_for_learning_context(block.scope_ids.usage_id.context_key)
+        log_context = track_contexts.context_dict_for_learning_context(block.scope_ids.usage_id.context_key)
         if self.user_id:
             log_context['user_id'] = self.user_id
         log_context['asides'] = {}

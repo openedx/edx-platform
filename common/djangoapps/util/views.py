@@ -14,12 +14,12 @@ from django.shortcuts import redirect
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from six.moves import map
+
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 from openedx.features.course_experience.utils import dates_banner_should_display
-
-import track.views
+from common.djangoapps.track import views as track_views
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.roles import GlobalStaff
 
@@ -162,7 +162,7 @@ def calculate(request):
     except:
         event = {'error': list(map(str, sys.exc_info())),
                  'equation': equation}
-        track.views.server_track(request, 'error:calc', event, page='calc')
+        track_views.server_track(request, 'error:calc', event, page='calc')
         return HttpResponse(json.dumps({'result': 'Invalid syntax'}))
     return HttpResponse(json.dumps({'result': str(result)}))
 

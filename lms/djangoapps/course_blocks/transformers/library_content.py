@@ -14,7 +14,7 @@ from openedx.core.djangoapps.content.block_structure.transformer import (
     BlockStructureTransformer,
     FilteringTransformerMixin
 )
-from track import contexts
+from common.djangoapps.track import contexts
 from xmodule.library_content_module import LibraryContentBlock
 from xmodule.modulestore.django import modulestore
 

@@ -46,8 +46,8 @@ IDA_LOGOUT_URI_LIST = [
 ################################ LOGGERS ######################################
 
 LOG_OVERRIDES = [
-    ('track.contexts', logging.CRITICAL),
-    ('track.middleware', logging.CRITICAL),
+    ('common.djangoapps.track.contexts', logging.CRITICAL),
+    ('common.djangoapps.track.middleware', logging.CRITICAL),
     ('lms.djangoapps.discussion.django_comment_client.utils', logging.CRITICAL),
 ]
 for log_name, log_level in LOG_OVERRIDES:

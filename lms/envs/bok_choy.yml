@@ -241,7 +241,7 @@ THIRD_PARTY_AUTH:
 TIME_ZONE: America/New_York
 TRACKING_BACKENDS:
   mongo:
-    ENGINE: track.backends.mongodb.MongoBackend
+    ENGINE: common.djangoapps.track.backends.mongodb.MongoBackend
     OPTIONS: {collection: events, database: test}
 WIKI_ENABLED: true
 WAFFLE_OVERRIDE: True

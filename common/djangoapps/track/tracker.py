@@ -27,7 +27,7 @@ from importlib import import_module
 import six
 from django.conf import settings
 
-from track.backends import BaseBackend
+from common.djangoapps.track.backends import BaseBackend
 
 __all__ = ['send']
 

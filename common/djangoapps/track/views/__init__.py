@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from eventtracking import tracker as eventtracker
 from ipware.ip import get_ip
 
-from track import contexts, shim, tracker
+from common.djangoapps.track import contexts, shim, tracker
 
 
 def _get_request_header(request, header_name, default=''):
