@@ -16,7 +16,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.helpers import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from entitlements.tests.factories import CourseEntitlementFactory
+from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
 from openedx.core.constants import COURSE_UNPUBLISHED
 from openedx.core.djangoapps.catalog.cache import (
     CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL,

@@ -23,8 +23,8 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
-    from entitlements.tests.factories import CourseEntitlementFactory
-    from entitlements.models import CourseEntitlement
+    from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
+    from common.djangoapps.entitlements.models import CourseEntitlement
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -37,7 +37,7 @@ class TestCourseEntitlementModelHelpers(ModuleStoreTestCase):
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
-    @patch("entitlements.models.get_course_uuid_for_course")
+    @patch("common.djangoapps.entitlements.models.get_course_uuid_for_course")
     def test_check_for_existing_entitlement_and_enroll(self, mock_get_course_uuid):
         course = CourseFactory()
         CourseModeFactory(
@@ -64,7 +64,7 @@ class TestCourseEntitlementModelHelpers(ModuleStoreTestCase):
         entitlement.refresh_from_db()
         assert entitlement.enrollment_course_run
 
-    @patch("entitlements.models.get_course_uuid_for_course")
+    @patch("common.djangoapps.entitlements.models.get_course_uuid_for_course")
     def test_check_for_no_entitlement_and_do_not_enroll(self, mock_get_course_uuid):
         course = CourseFactory()
         CourseModeFactory(
@@ -302,8 +302,8 @@ class TestModels(TestCase):
         assert expired_at_datetime
         assert entitlement.expired_at
 
-    @patch("entitlements.models.get_course_uuid_for_course")
-    @patch("entitlements.models.CourseEntitlement.refund")
+    @patch("common.djangoapps.entitlements.models.get_course_uuid_for_course")
+    @patch("common.djangoapps.entitlements.models.CourseEntitlement.refund")
     def test_unenroll_entitlement_with_audit_course_enrollment(self, mock_refund, mock_get_course_uuid):
         """
         Test that entitlement is not refunded if un-enroll is called on audit course un-enroll.

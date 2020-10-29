@@ -22,7 +22,7 @@ from waffle.testutils import override_switch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from entitlements.tests.factories import CourseEntitlementFactory
+from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.commerce.tests.test_utils import update_commerce_config

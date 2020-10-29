@@ -14,7 +14,7 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import text_type
 
-from entitlements.utils import is_course_run_entitlement_fulfillable
+from common.djangoapps.entitlements.utils import is_course_run_entitlement_fulfillable
 from openedx.core.constants import COURSE_PUBLISHED
 from openedx.core.djangoapps.catalog.cache import (
     COURSE_PROGRAMS_CACHE_KEY_TPL,

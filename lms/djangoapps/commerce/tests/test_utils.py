@@ -27,7 +27,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
-    from entitlements.tests.factories import CourseEntitlementFactory
+    from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
 
 
 def update_commerce_config(enabled=False, checkout_page='/test_basket/add/'):

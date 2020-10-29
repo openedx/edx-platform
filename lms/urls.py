@@ -114,8 +114,13 @@ urlpatterns = [
     url(r'^api/enrollment/v1/', include('openedx.core.djangoapps.enrollments.urls')),
 
     # Entitlement API RESTful endpoints
-    url(r'^api/entitlements/', include(('entitlements.rest_api.urls', 'common.djangoapps.entitlements'),
-                                       namespace='entitlements_api')),
+    url(
+        r'^api/entitlements/',
+        include(
+            ('common.djangoapps.entitlements.rest_api.urls', 'common.djangoapps.entitlements'),
+            namespace='entitlements_api',
+        ),
+    ),
 
     # Demographics API RESTful endpoints
     url(r'^api/demographics/', include('openedx.core.djangoapps.demographics.rest_api.urls')),

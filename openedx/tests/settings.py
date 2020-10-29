@@ -97,7 +97,7 @@ INSTALLED_APPS = (
 
     # Django 1.11 demands to have imported models supported by installed apps.
     'completion',
-    'entitlements',
+    'common.djangoapps.entitlements',
     'organizations',
 )
 
