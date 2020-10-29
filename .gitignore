@@ -86,6 +86,7 @@ django-pyfs
 .tox/
 common/test/db_cache/bok_choy_*.yaml
 common/test/data/badges/*.png
+sandbox/
 
 ### Installation artifacts
 *.egg-info
