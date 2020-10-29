@@ -1122,7 +1122,12 @@ def settings_handler(request, course_key_string):
             )
 
             about_page_editable = not marketing_site_enabled
-            enrollment_end_editable = GlobalStaff().has_user(request.user) or not marketing_site_enabled
+            enrollment_end_editable = GlobalStaff().has_user(
+                request.user
+            ) or CourseCreatorRole().has_user(
+                request.user
+            ) or not marketing_site_enabled
+
             short_description_editable = configuration_helpers.get_value_for_org(
                 course_module.location.org,
                 'EDITABLE_SHORT_DESCRIPTION',
