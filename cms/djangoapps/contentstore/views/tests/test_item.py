@@ -37,8 +37,8 @@ from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_
 from cms.djangoapps.contentstore.views import item as item_module
 from lms.djangoapps.lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
 from common.djangoapps.student.tests.factories import UserFactory
-from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
-from xblock_django.user_service import DjangoXBlockUserService
+from common.djangoapps.xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
+from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from xmodule.capa_module import ProblemBlock
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore import ModuleStoreEnum

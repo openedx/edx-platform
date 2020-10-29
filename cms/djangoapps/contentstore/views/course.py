@@ -66,7 +66,7 @@ from common.djangoapps.util.milestones_helpers import (
 from openedx.core import toggles as core_toggles
 from common.djangoapps.util.organizations_helpers import add_organization_course, get_organization_by_short_name, organizations_enabled
 from common.djangoapps.util.string_utils import _has_non_ascii_characters
-from xblock_django.api import deprecated_xblocks
+from common.djangoapps.xblock_django.api import deprecated_xblocks
 from xmodule.contentstore.content import StaticContent
 from xmodule.course_module import DEFAULT_START_DATE, CourseFields
 from xmodule.error_module import ErrorDescriptor
