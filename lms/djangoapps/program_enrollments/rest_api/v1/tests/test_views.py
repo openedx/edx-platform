@@ -53,7 +53,7 @@ from openedx.core.djangolib.testing.utils import CacheIsolationMixin
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from third_party_auth.tests.factories import SAMLProviderConfigFactory
+from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as ModulestoreCourseFactory
 from xmodule.modulestore.tests.factories import ItemFactory

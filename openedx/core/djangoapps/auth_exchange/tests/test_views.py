@@ -22,7 +22,7 @@ from social_django.models import Partial
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from common.djangoapps.student.tests.factories import UserFactory
-from third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
+from common.djangoapps.third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 
 from .mixins import DOTAdapterMixin
 from .utils import TPA_FEATURE_ENABLED, TPA_FEATURES_KEY, AccessTokenExchangeTestMixin

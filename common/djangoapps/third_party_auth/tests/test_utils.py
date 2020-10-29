@@ -8,8 +8,8 @@ import unittest
 from django.conf import settings
 
 from common.djangoapps.student.tests.factories import UserFactory
-from third_party_auth.tests.testutil import TestCase
-from third_party_auth.utils import user_exists, convert_saml_slug_provider_id
+from common.djangoapps.third_party_auth.tests.testutil import TestCase
+from common.djangoapps.third_party_auth.utils import user_exists, convert_saml_slug_provider_id
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

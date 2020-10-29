@@ -33,7 +33,7 @@ from common.djangoapps.student.views import (
     generate_activation_email_context,
     validate_new_email
 )
-from third_party_auth.views import inactive_user_view
+from common.djangoapps.third_party_auth.views import inactive_user_view
 from util.testing import EventTestMixin
 
 
@@ -190,10 +190,10 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
         request = RequestFactory().get(settings.SOCIAL_AUTH_INACTIVE_USER_URL)
         request.user = user
         with patch('common.djangoapps.student.views.management.compose_and_send_activation_email') as email:
-            with patch('third_party_auth.provider.Registry.get_from_pipeline') as reg:
-                with patch('third_party_auth.pipeline.get', return_value=pipeline_partial):
-                    with patch('third_party_auth.pipeline.running', return_value=True):
-                        with patch('third_party_auth.is_enabled', return_value=True):
+            with patch('common.djangoapps.third_party_auth.provider.Registry.get_from_pipeline') as reg:
+                with patch('common.djangoapps.third_party_auth.pipeline.get', return_value=pipeline_partial):
+                    with patch('common.djangoapps.third_party_auth.pipeline.running', return_value=True):
+                        with patch('common.djangoapps.third_party_auth.is_enabled', return_value=True):
                             reg.skip_email_verification = True
                             inactive_user_view(request)
                             self.assertEqual(user.is_active, True)
@@ -210,7 +210,7 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
         request = RequestFactory().get(settings.SOCIAL_AUTH_INACTIVE_USER_URL)
         request.user = inactive_user
         with patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=request):
-            with patch('third_party_auth.pipeline.running', return_value=False):
+            with patch('common.djangoapps.third_party_auth.pipeline.running', return_value=False):
                 inactive_user_view(request)
                 self.assertEqual(email.called, True, msg='method should have been called')
 

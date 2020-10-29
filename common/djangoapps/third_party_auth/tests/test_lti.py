@@ -7,8 +7,8 @@ import unittest
 
 from oauthlib.common import Request
 
-from third_party_auth.lti import LTI_PARAMS_KEY, LTIAuthBackend
-from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
+from common.djangoapps.third_party_auth.lti import LTI_PARAMS_KEY, LTIAuthBackend
+from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
 
 
 class UnitTestLTI(unittest.TestCase, ThirdPartyAuthTestMixin):

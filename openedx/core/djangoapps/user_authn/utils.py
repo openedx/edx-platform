@@ -13,9 +13,9 @@ from django.utils.translation import ugettext as _
 from oauth2_provider.models import Application
 from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
-import third_party_auth
+from common.djangoapps import third_party_auth
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from third_party_auth import pipeline
+from common.djangoapps.third_party_auth import pipeline
 
 
 def third_party_auth_context(request, redirect_to, tpa_hint=None):

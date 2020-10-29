@@ -34,7 +34,7 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from third_party_auth.tests.factories import SAMLProviderConfigFactory
+from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
 
 from ..writing import write_program_course_enrollments, write_program_enrollments
 

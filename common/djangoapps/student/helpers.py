@@ -23,7 +23,7 @@ from django.utils.translation import ugettext as _
 from pytz import UTC
 from six import iteritems, text_type
 
-import third_party_auth
+from common.djangoapps import third_party_auth
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import get_certificate_url, has_html_certificates_enabled
 from lms.djangoapps.certificates.models import CertificateStatuses, certificate_status_for_student
