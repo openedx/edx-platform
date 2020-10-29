@@ -35,7 +35,7 @@ from common.djangoapps.student.models import (
     anonymous_id_for_user,
     create_comments_service_user
 )
-from util.json_request import JsonResponse
+from common.djangoapps.util.json_request import JsonResponse
 
 
 def auto_auth(request):  # pylint: disable=too-many-statements

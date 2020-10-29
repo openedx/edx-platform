@@ -6,7 +6,7 @@ The instructor dashboard is broken into sections.
 Only one section is visible at a time,
   and is responsible for its own functionality.
 
-NOTE: plantTimeout (which is just setTimeout from util.js)
+NOTE: plantTimeout (which is just setTimeout from common.djangoapps.util.js)
       is used frequently in the instructor dashboard to isolate
       failures. If one piece of code under a plantTimeout fails
       then it will not crash the rest of the dashboard.

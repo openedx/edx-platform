@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from common.djangoapps.student.models import CourseEnrollment
-from util.query import use_read_replica_if_available
+from common.djangoapps.util.query import use_read_replica_if_available
 
 USER_MODEL = get_user_model()
 

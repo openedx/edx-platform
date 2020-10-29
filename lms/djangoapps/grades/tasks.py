@@ -23,7 +23,7 @@ from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.track.event_transaction_utils import set_event_transaction_id, set_event_transaction_type
-from util.date_utils import from_timestamp
+from common.djangoapps.util.date_utils import from_timestamp
 from xmodule.modulestore.django import modulestore
 
 from .config.waffle import DISABLE_REGRADE_ON_POLICY_CHANGE, waffle

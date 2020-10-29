@@ -18,7 +18,7 @@ from openedx.features.enterprise_support.tests import (
 )
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from common.djangoapps.student.tests.factories import UserFactory
-from util.testing import UrlResetMixin
+from common.djangoapps.util.testing import UrlResetMixin
 
 
 @ddt.ddt

@@ -22,8 +22,8 @@ from common.djangoapps.student import views as student_views
 from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_response
 from openedx.core.djangoapps.lang_pref.api import released_languages
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from util.cache import cache_if_anonymous
-from util.json_request import JsonResponse
+from common.djangoapps.util.cache import cache_if_anonymous
+from common.djangoapps.util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
 

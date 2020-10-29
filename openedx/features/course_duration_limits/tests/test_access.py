@@ -20,7 +20,7 @@ from openedx.features.course_duration_limits.access import (
 )
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
-from util.date_utils import strftime_localized
+from common.djangoapps.util.date_utils import strftime_localized
 
 
 @ddt.ddt

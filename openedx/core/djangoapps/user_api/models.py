@@ -29,7 +29,7 @@ from common.djangoapps.student.models import (
     get_retired_email_by_email,
     get_retired_username_by_username
 )
-from util.model_utils import emit_setting_changed_event, get_changed_fields_dict
+from common.djangoapps.util.model_utils import emit_setting_changed_event, get_changed_fields_dict
 
 
 class RetirementStateError(Exception):

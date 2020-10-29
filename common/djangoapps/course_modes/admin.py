@@ -23,7 +23,7 @@ from common.djangoapps.course_modes.models import CourseMode, CourseModeExpirati
 # the verification deadline table won't exist.
 from lms.djangoapps.verify_student import models as verification_models
 from openedx.core.lib.courses import clean_course_id
-from util.date_utils import get_time_display
+from common.djangoapps.util.date_utils import get_time_display
 
 COURSE_MODE_SLUG_CHOICES = [(key, enrollment_mode['display_name'])
                             for key, enrollment_mode in six.iteritems(settings.COURSE_ENROLLMENT_MODES)]

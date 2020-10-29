@@ -8,8 +8,8 @@ from ddt import ddt, file_data
 from mock import patch
 
 from common.djangoapps.student.tests.factories import UserFactory
-from util import keyword_substitution as Ks
-from util.date_utils import get_default_time_display
+from common.djangoapps.util import keyword_substitution as Ks
+from common.djangoapps.util.date_utils import get_default_time_display
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -103,7 +103,7 @@ class KeywordSubTest(ModuleStoreTestCase):
         """ Test that subbing works with multiple subtags """
         anon_id = '123456789'
 
-        with patch('util.keyword_substitution.anonymous_id_from_user_id', lambda user_id: anon_id):
+        with patch('common.djangoapps.util.keyword_substitution.anonymous_id_from_user_id', lambda user_id: anon_id):
             result = Ks.substitute_keywords_with_data(
                 test_string, self.context,
             )

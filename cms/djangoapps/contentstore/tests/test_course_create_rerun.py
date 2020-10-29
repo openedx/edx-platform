@@ -15,7 +15,7 @@ from opaque_keys.edx.keys import CourseKey
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, parse_json
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
-from util.organizations_helpers import add_organization, get_course_organizations
+from common.djangoapps.util.organizations_helpers import add_organization, get_course_organizations
 from xmodule.course_module import CourseFields
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

@@ -28,7 +28,7 @@ from openedx.features.content_type_gating.helpers import FULL_ACCESS
 from openedx.features.content_type_gating.helpers import LIMITED_ACCESS
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.role_helpers import has_staff_roles
-from util.json_request import JsonResponse, expect_json
+from common.djangoapps.util.json_request import JsonResponse, expect_json
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 from xmodule.partitions.partitions import NoSuchUserPartitionGroupError

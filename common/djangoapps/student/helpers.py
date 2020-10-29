@@ -45,7 +45,7 @@ from common.djangoapps.student.models import (
     unique_id_for_user,
     username_exists_or_retired
 )
-from util.password_policy_validators import normalize_password
+from common.djangoapps.util.password_policy_validators import normalize_password
 
 # Enumeration of per-course verification statuses
 # we display on the student dashboard.

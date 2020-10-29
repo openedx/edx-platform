@@ -53,8 +53,8 @@ from openedx.core.lib.tests.assertions.events import assert_event_matches
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.track.tests import EventTrackingTestCase
-from util import organizations_helpers as organizations_api
-from util.date_utils import strftime_localized
+from common.djangoapps.util import organizations_helpers as organizations_api
+from common.djangoapps.util.date_utils import strftime_localized
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

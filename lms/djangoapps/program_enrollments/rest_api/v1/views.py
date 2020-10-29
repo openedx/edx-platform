@@ -44,7 +44,7 @@ from openedx.core.djangoapps.catalog.utils import (
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, PaginatedAPIView
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, UserBasedRole
-from util.query import read_replica_or_default
+from common.djangoapps.util.query import read_replica_or_default
 
 from .constants import ENABLE_ENROLLMENT_RESET_FLAG, MAX_ENROLLMENT_RECORDS
 from .serializers import (

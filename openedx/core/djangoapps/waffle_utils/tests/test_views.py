@@ -69,7 +69,7 @@ class ToggleStateViewTests(TestCase):
             {
                 "name": "FEATURES['MILESTONES_APP']",
                 "is_active": True,
-                "module": "util.milestones_helpers",
+                "module": "common.djangoapps.util.milestones_helpers",
                 "class": "SettingDictToggle",
             },
             response.data["django_settings"],

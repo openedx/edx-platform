@@ -60,7 +60,7 @@ from common.djangoapps.third_party_auth.tests.utils import (
     ThirdPartyOAuthTestMixinFacebook,
     ThirdPartyOAuthTestMixinGoogle
 )
-from util.password_policy_validators import (
+from common.djangoapps.util.password_policy_validators import (
     DEFAULT_MAX_PASSWORD_LENGTH,
     create_validator_config,
     password_validators_instruction_texts,
@@ -473,9 +473,9 @@ class RegistrationViewTestV1(ThirdPartyAuthTestMixin, UserAPITestCase):
         )
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        create_validator_config('util.password_policy_validators.MinimumLengthValidator', {'min_length': 2}),
-        create_validator_config('util.password_policy_validators.UppercaseValidator', {'min_upper': 3}),
-        create_validator_config('util.password_policy_validators.SymbolValidator', {'min_symbol': 1}),
+        create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 2}),
+        create_validator_config('common.djangoapps.util.password_policy_validators.UppercaseValidator', {'min_upper': 3}),
+        create_validator_config('common.djangoapps.util.password_policy_validators.SymbolValidator', {'min_symbol': 1}),
     ])
     def test_register_form_password_complexity(self):
         no_extra_fields_setting = {}

@@ -57,7 +57,7 @@ from common.djangoapps.student.models import (
     PendingSecondaryEmailChange,
     UserProfile
 )
-from util.milestones_helpers import get_pre_requisite_courses_not_completed
+from common.djangoapps.util.milestones_helpers import get_pre_requisite_courses_not_completed
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.student")

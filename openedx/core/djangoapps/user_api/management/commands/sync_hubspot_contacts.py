@@ -19,7 +19,7 @@ from slumber.exceptions import HttpClientError, HttpServerError
 
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from common.djangoapps.student.models import UserAttribute
-from util.query import use_read_replica_if_available
+from common.djangoapps.util.query import use_read_replica_if_available
 
 HUBSPOT_API_BASE_URL = 'https://api.hubapi.com'
 

@@ -30,7 +30,7 @@ from openedx.core.lib.url_utils import quote_slashes
 from openedx.features.course_duration_limits.access import EXPIRATION_DATE_FORMAT_STR
 from common.djangoapps.student.models import CourseEnrollment, Registration
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.date_utils import strftime_localized
+from common.djangoapps.util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

@@ -21,7 +21,7 @@ from common.djangoapps.edxmako.shortcuts import (
     render_to_string
 )
 from common.djangoapps.student.tests.factories import UserFactory
-from util.testing import UrlResetMixin
+from common.djangoapps.util.testing import UrlResetMixin
 
 
 @ddt.ddt
