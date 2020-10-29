@@ -16,7 +16,7 @@ from xblock.django.request import django_to_webob_request, webob_to_django_respo
 from xblock.exceptions import NoSuchHandlerError
 from xblock.runtime import KvsFieldData
 
-import static_replace
+from common.djangoapps import static_replace
 from cms.djangoapps.xblock_config.models import StudioConfig
 from cms.lib.xblock.field_data import CmsFieldData
 from common.djangoapps.edxmako.shortcuts import render_to_string
