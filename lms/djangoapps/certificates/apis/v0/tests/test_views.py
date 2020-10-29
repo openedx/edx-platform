@@ -325,7 +325,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
     def test_query_counts(self):
         # Test student with no certificates
         student_no_cert = UserFactory.create(password=self.user_password)
-        with self.assertNumQueries(21):
+        with self.assertNumQueries(20):
             resp = self.get_response(
                 AuthType.jwt,
                 requesting_user=self.global_staff,
@@ -335,7 +335,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             self.assertEqual(len(resp.data), 0)
 
         # Test student with 1 certificate
-        with self.assertNumQueries(11):
+        with self.assertNumQueries(10):
             resp = self.get_response(
                 AuthType.jwt,
                 requesting_user=self.global_staff,
@@ -375,7 +375,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             download_url='www.google.com',
             grade="0.88",
         )
-        with self.assertNumQueries(11):
+        with self.assertNumQueries(10):
             resp = self.get_response(
                 AuthType.jwt,
                 requesting_user=self.global_staff,
