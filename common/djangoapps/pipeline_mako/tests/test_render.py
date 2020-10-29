@@ -9,7 +9,7 @@ from django.test import TestCase
 from mock import patch
 from six.moves import map
 
-from pipeline_mako import compressed_css, compressed_js, render_require_js_path_overrides
+from common.djangoapps.pipeline_mako import compressed_css, compressed_js, render_require_js_path_overrides
 
 
 class RequireJSPathOverridesTest(TestCase):
