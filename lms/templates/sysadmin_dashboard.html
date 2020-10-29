@@ -11,6 +11,12 @@ from django.utils.translation import ugettext as _
 </%block>
 
 <style type="text/css">
+.warning-alert h5{
+	color: red;
+	text-align: left;
+	text-decoration: underline;
+	margin-bottom: 10px;
+}
 a.active-section {
 	color: #551A8B;
 }
@@ -61,6 +67,11 @@ textarea {
       <a href="${reverse('gitlogs')}">${_('Git Logs')}</a>
     </h2>
 	<hr />
+	<div class="warning-alert">
+		<h5>
+			${_('Note: Sysadmin panel will be deprecated in the next release.')}
+		</h5>
+	</div>
 %if modeflag.get('users'):
 	<h3>${_('User Management')}</h3>
 
