@@ -10,11 +10,6 @@ import tempfile
 from django.utils.translation import ugettext_lazy as _
 from path import Path
 
-# TODO: Remove the rest of the sys.path modification here and in (cms|lms)/envs/common.py
-REPO_ROOT = Path(__file__).abspath().dirname().dirname().dirname()  # /edx-platform/
-sys.path.append(REPO_ROOT / 'common' / 'djangoapps')
-sys.path.append(REPO_ROOT / 'import_shims' / 'lms')
-
 ALL_LANGUAGES = []
 
 BLOCK_STRUCTURES_SETTINGS = dict(
