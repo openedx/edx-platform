@@ -54,9 +54,9 @@ CONTENTSTORE:
     host: [edx.devstack.mongo]
     port: 27017
 DATABASES:
-  default: {ENGINE: django.db.backends.mysql, HOST: edx.devstack.mysql, NAME: edxtest,
+  default: {ENGINE: django.db.backends.mysql, HOST: edx.devstack.mysql57, NAME: edxtest,
     PASSWORD: '', PORT: '3306', USER: root}
-  student_module_history: {ENGINE: django.db.backends.mysql, HOST: edx.devstack.mysql,
+  student_module_history: {ENGINE: django.db.backends.mysql, HOST: edx.devstack.mysql57,
     NAME: student_module_history_test, PASSWORD: '', PORT: '3306', USER: root}
 DEFAULT_FEEDBACK_EMAIL: feedback@example.com
 DEFAULT_FROM_EMAIL: registration@example.com
