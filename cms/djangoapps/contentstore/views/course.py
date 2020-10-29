@@ -35,8 +35,8 @@ from cms.djangoapps.course_creators.views import add_user_with_status_unrequeste
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from cms.djangoapps.models.settings.encoder import CourseSettingsEncoder
-from course_action_state.managers import CourseActionStateItemNotFoundError
-from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
+from common.djangoapps.course_action_state.managers import CourseActionStateItemNotFoundError
+from common.djangoapps.course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview

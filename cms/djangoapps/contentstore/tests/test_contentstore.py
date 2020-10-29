@@ -34,8 +34,8 @@ from cms.djangoapps.contentstore.config import waffle
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, get_url, parse_json
 from cms.djangoapps.contentstore.utils import delete_course, reverse_course_url, reverse_url
 from cms.djangoapps.contentstore.views.component import ADVANCED_COMPONENT_TYPES
-from course_action_state.managers import CourseActionStateItemNotFoundError
-from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
+from common.djangoapps.course_action_state.managers import CourseActionStateItemNotFoundError
+from common.djangoapps.course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from openedx.core.djangoapps.django_comment_common.utils import are_permissions_roles_seeded
 from openedx.core.lib.tempdir import mkdtemp_clean
 from student import auth
