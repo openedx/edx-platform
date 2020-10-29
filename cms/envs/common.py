@@ -1363,7 +1363,7 @@ INSTALLED_APPS = [
     # For asset pipelining
     'common.djangoapps.edxmako.apps.EdxMakoConfig',
     'pipeline',
-    'static_replace',
+    'common.djangoapps.static_replace',
     'require',
     'webpack_loader',
 

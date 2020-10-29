@@ -29,7 +29,7 @@ from openedx.core.djangoapps.xblock.runtime.ephemeral_field_data import Ephemera
 from openedx.core.djangoapps.xblock.runtime.mixin import LmsBlockMixin
 from openedx.core.djangoapps.xblock.utils import get_xblock_id_for_anonymous_user
 from openedx.core.lib.xblock_utils import wrap_fragment, xblock_local_resource_url
-from static_replace import process_static_urls
+from common.djangoapps.static_replace import process_static_urls
 from xmodule.errortracker import make_error_tracker
 from xmodule.modulestore.django import ModuleI18nService
 

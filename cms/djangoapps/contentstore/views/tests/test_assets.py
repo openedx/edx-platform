@@ -21,7 +21,7 @@ from pytz import UTC
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
 from cms.djangoapps.contentstore.views import assets
-from static_replace import replace_static_urls
+from common.djangoapps.static_replace import replace_static_urls
 from xmodule.assetstore import AssetMetadata
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
