@@ -2,7 +2,8 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
-import third_party_auth.models
+
+from common.djangoapps.third_party_auth import models as third_party_auth_models
 
 
 class Migration(migrations.Migration):
@@ -15,6 +16,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='samlproviderconfig',
             name='saml_configuration',
-            field=models.ForeignKey(blank=True, limit_choices_to=third_party_auth.models.active_saml_configurations_filter, null=True, on_delete=django.db.models.deletion.SET_NULL, to='third_party_auth.SAMLConfiguration'),
+            field=models.ForeignKey(blank=True, limit_choices_to=third_party_auth_models.active_saml_configurations_filter, null=True, on_delete=django.db.models.deletion.SET_NULL, to='third_party_auth.SAMLConfiguration'),
         ),
     ]

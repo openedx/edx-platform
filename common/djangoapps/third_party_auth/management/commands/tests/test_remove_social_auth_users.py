@@ -17,8 +17,8 @@ from social_django.models import UserSocialAuth
 
 from common.djangoapps.student.models import User
 from common.djangoapps.student.tests.factories import UserFactory
-from third_party_auth.management.commands import remove_social_auth_users
-from third_party_auth.tests.factories import SAMLProviderConfigFactory
+from common.djangoapps.third_party_auth.management.commands import remove_social_auth_users
+from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
 
 FEATURES_WITH_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_ENABLED['ENABLE_ENROLLMENT_RESET'] = True

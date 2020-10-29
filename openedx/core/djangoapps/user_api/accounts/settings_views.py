@@ -14,7 +14,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
 
-import third_party_auth
+from common.djangoapps import third_party_auth
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
@@ -33,7 +33,7 @@ from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from openedx.features.enterprise_support.utils import update_account_settings_context_for_enterprise
 from common.djangoapps.student.models import UserProfile
-from third_party_auth import pipeline
+from common.djangoapps.third_party_auth import pipeline
 from util.date_utils import strftime_localized
 
 log = logging.getLogger(__name__)

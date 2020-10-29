@@ -229,8 +229,8 @@ SUPPORT_SITE_LINK: https://support.example.com
 SYSLOG_SERVER: ''
 TECH_SUPPORT_EMAIL: technical@example.com
 THIRD_PARTY_AUTH_BACKENDS: [social_core.backends.google.GoogleOAuth2, social_core.backends.linkedin.LinkedinOAuth2,
-  social_core.backends.facebook.FacebookOAuth2, third_party_auth.dummy.DummyBackend,
-  third_party_auth.saml.SAMLAuthBackend]
+  social_core.backends.facebook.FacebookOAuth2, common.djangoapps.third_party_auth.dummy.DummyBackend,
+  common.djangoapps.third_party_auth.saml.SAMLAuthBackend]
 THIRD_PARTY_AUTH:
   Google:
     SOCIAL_AUTH_GOOGLE_OAUTH2_KEY": "test"

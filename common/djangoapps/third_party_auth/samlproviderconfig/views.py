@@ -11,7 +11,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import ParseError, ValidationError
 
 from enterprise.models import EnterpriseCustomerIdentityProvider, EnterpriseCustomer
-from third_party_auth.utils import validate_uuid4_string
+from common.djangoapps.third_party_auth.utils import validate_uuid4_string
 
 from ..models import SAMLProviderConfig
 from .serializers import SAMLProviderConfigSerializer

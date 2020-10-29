@@ -14,9 +14,9 @@ from social_django import models as social_models
 
 from lms.djangoapps.verify_student.models import SSOVerification
 from common.djangoapps.student.tests.factories import UserFactory
-from third_party_auth import pipeline, provider
-from third_party_auth.tests import testutil
-from third_party_auth.tests.utils import skip_unless_thirdpartyauth
+from common.djangoapps.third_party_auth import pipeline, provider
+from common.djangoapps.third_party_auth.tests import testutil
+from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
 # Get Django User model by reference from python-social-auth. Not a type
 # constant, pylint.
 User = social_models.DjangoStorage.user.user_model()  # pylint: disable=invalid-name
@@ -239,7 +239,7 @@ class TestPipelineUtilityFunctions(TestCase):
             }
         }
 
-        with mock.patch('third_party_auth.pipeline.get') as get_pipeline:
+        with mock.patch('common.djangoapps.third_party_auth.pipeline.get') as get_pipeline:
             get_pipeline.return_value = pipeline_partial
             real_social = pipeline.get_real_social_auth_object(request)
             self.assertEqual(real_social, self.social_auth)
@@ -256,7 +256,7 @@ class TestPipelineUtilityFunctions(TestCase):
             }
         }
 
-        with mock.patch('third_party_auth.pipeline.get') as get_pipeline:
+        with mock.patch('common.djangoapps.third_party_auth.pipeline.get') as get_pipeline:
             get_pipeline.return_value = pipeline_partial
             real_social = pipeline.get_real_social_auth_object(request)
             self.assertEqual(real_social, self.social_auth)
@@ -330,7 +330,7 @@ class EnsureUserInformationTestCase(TestCase):
             skip_email_verification=False
         )
 
-        with mock.patch('third_party_auth.pipeline.provider.Registry.get_from_pipeline') as get_from_pipeline:
+        with mock.patch('common.djangoapps.third_party_auth.pipeline.provider.Registry.get_from_pipeline') as get_from_pipeline:
             get_from_pipeline.return_value = provider
             with mock.patch('social_core.pipeline.partial.partial_prepare') as partial_prepare:
                 partial_prepare.return_value = mock.MagicMock(token='')
@@ -363,10 +363,10 @@ class EnsureUserInformationTestCase(TestCase):
             send_to_registration_first=True,
             skip_email_verification=False
         )
-        with mock.patch('third_party_auth.pipeline.provider.Registry.get_from_pipeline') as get_from_pipeline:
+        with mock.patch('common.djangoapps.third_party_auth.pipeline.provider.Registry.get_from_pipeline') as get_from_pipeline:
             get_from_pipeline.return_value = saml_provider
             with mock.patch(
-                'third_party_auth.pipeline.provider.Registry.get_enabled_by_backend_name'
+                'common.djangoapps.third_party_auth.pipeline.provider.Registry.get_enabled_by_backend_name'
             ) as enabled_saml_providers:
                 enabled_saml_providers.return_value = [saml_provider, ] if is_saml else []
                 with mock.patch('social_core.pipeline.partial.partial_prepare') as partial_prepare:
@@ -404,7 +404,7 @@ class UserDetailsForceSyncTestCase(TestCase):
         self.strategy = mock.MagicMock()
         self.strategy.storage.user.changed.side_effect = lambda user: user.save()
 
-        get_from_pipeline = mock.patch('third_party_auth.pipeline.provider.Registry.get_from_pipeline')
+        get_from_pipeline = mock.patch('common.djangoapps.third_party_auth.pipeline.provider.Registry.get_from_pipeline')
         self.get_from_pipeline = get_from_pipeline.start()
         self.get_from_pipeline.return_value = mock.MagicMock(sync_learner_profile_data=True)
         self.addCleanup(get_from_pipeline.stop)
@@ -493,7 +493,7 @@ class SetIDVerificationStatusTestCase(TestCase):
     def setUp(self):
         super(SetIDVerificationStatusTestCase, self).setUp()
         self.user = UserFactory.create()
-        self.provider_class_name = 'third_party_auth.models.SAMLProviderConfig'
+        self.provider_class_name = 'common.djangoapps.third_party_auth.models.SAMLProviderConfig'
         self.provider_slug = 'default'
         self.details = {}
 
@@ -501,7 +501,7 @@ class SetIDVerificationStatusTestCase(TestCase):
         self.strategy = mock.MagicMock()
         self.strategy.storage.user.changed.side_effect = lambda user: user.save()
 
-        get_from_pipeline = mock.patch('third_party_auth.pipeline.provider.Registry.get_from_pipeline')
+        get_from_pipeline = mock.patch('common.djangoapps.third_party_auth.pipeline.provider.Registry.get_from_pipeline')
         self.get_from_pipeline = get_from_pipeline.start()
         self.get_from_pipeline.return_value = mock.MagicMock(
             enable_sso_id_verification=True,
@@ -565,7 +565,7 @@ class SetIDVerificationStatusTestCase(TestCase):
             identity_provider_slug=self.provider_slug,
         )
 
-        with mock.patch('third_party_auth.pipeline.earliest_allowed_verification_date') as earliest_date:
+        with mock.patch('common.djangoapps.third_party_auth.pipeline.earliest_allowed_verification_date') as earliest_date:
             earliest_date.return_value = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=1)
             # Begin the pipeline.
             pipeline.set_id_verification_status(

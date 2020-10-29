@@ -2470,7 +2470,7 @@ INSTALLED_APPS = [
     'oauth2_provider',
     'openedx.core.djangoapps.oauth_dispatch.apps.OAuthDispatchAppConfig',
 
-    'third_party_auth',
+    'common.djangoapps.third_party_auth',
 
     # System Wide Roles
     'openedx.core.djangoapps.system_wide_roles',

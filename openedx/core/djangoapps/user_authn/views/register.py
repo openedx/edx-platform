@@ -31,7 +31,7 @@ from six import text_type
 from social_core.exceptions import AuthAlreadyAssociated, AuthException
 from social_django import utils as social_utils
 
-import third_party_auth
+from common.djangoapps import third_party_auth
 # Note that this lives in LMS, so this dependency should be refactored.
 # TODO Have the discussions code subscribe to the REGISTER_USER signal instead.
 from lms.djangoapps.discussion.notification_prefs.views import enable_notifications
@@ -70,8 +70,8 @@ from common.djangoapps.student.models import (
     username_exists_or_retired
 )
 from common.djangoapps.student.views import compose_and_send_activation_email
-from third_party_auth import pipeline, provider
-from third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
+from common.djangoapps.third_party_auth import pipeline, provider
+from common.djangoapps.third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
 from track import segment
 from util.db import outer_atomic
 from util.json_request import JsonResponse

@@ -19,13 +19,13 @@ from oauth2_provider.models import Application
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin
 from openedx.core.storage import OverwriteStorage
 
-from third_party_auth.models import (
+from common.djangoapps.third_party_auth.models import (
     LTIProviderConfig,
     OAuth2ProviderConfig,
     SAMLConfiguration,
     SAMLProviderConfig
 )
-from third_party_auth.models import cache as config_cache
+from common.djangoapps.third_party_auth.models import cache as config_cache
 
 AUTH_FEATURES_KEY = 'ENABLE_THIRD_PARTY_AUTH'
 AUTH_FEATURE_ENABLED = AUTH_FEATURES_KEY in settings.FEATURES
@@ -228,7 +228,7 @@ def simulate_running_pipeline(pipeline_target, backend, email=None, fullname=Non
     so you will need to provide the "target" module *as it is imported*
     in the software under test.  For example, if `foo/bar.py` does this:
 
-    >>> from third_party_auth import pipeline
+    >>> from common.djangoapps.third_party_auth import pipeline
 
     then you will need to do something like this:
 

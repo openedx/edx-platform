@@ -4,9 +4,9 @@
 import unittest
 
 from mock import patch
-from third_party_auth import provider, settings
-from third_party_auth.tests import testutil
-from third_party_auth.tests.utils import skip_unless_thirdpartyauth
+from common.djangoapps.third_party_auth import provider, settings
+from common.djangoapps.third_party_auth.tests import testutil
+from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
 _ORIGINAL_AUTHENTICATION_BACKENDS = ['first_authentication_backend']
 _ORIGINAL_INSTALLED_APPS = ['first_installed_app']
 _ORIGINAL_MIDDLEWARE_CLASSES = ['first_middleware_class']
@@ -37,7 +37,7 @@ class SettingsUnitTest(testutil.TestCase):
 
     def test_apply_settings_adds_exception_middleware(self):
         settings.apply_settings(self.settings)
-        self.assertIn('third_party_auth.middleware.ExceptionMiddleware', self.settings.MIDDLEWARE)
+        self.assertIn('common.djangoapps.third_party_auth.middleware.ExceptionMiddleware', self.settings.MIDDLEWARE)
 
     def test_apply_settings_adds_fields_stored_in_session(self):
         settings.apply_settings(self.settings)

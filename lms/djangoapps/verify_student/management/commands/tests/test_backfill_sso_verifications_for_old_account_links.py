@@ -10,7 +10,7 @@ from django.core.management.base import CommandError
 from lms.djangoapps.program_enrollments.management.commands.tests.utils import UserSocialAuthFactory
 from lms.djangoapps.verify_student.models import SSOVerification
 from lms.djangoapps.verify_student.tests.factories import SSOVerificationFactory
-from third_party_auth.tests.testutil import TestCase
+from common.djangoapps.third_party_auth.tests.testutil import TestCase
 
 
 class TestBackfillSSOVerificationsCommand(TestCase):

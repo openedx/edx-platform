@@ -15,7 +15,7 @@ from enterprise.api.v1.serializers import EnterpriseCustomerBrandingConfiguratio
 from enterprise.models import EnterpriseCustomer, EnterpriseCustomerUser
 from social_django.models import UserSocialAuth
 
-import third_party_auth
+from common.djangoapps import third_party_auth
 from lms.djangoapps.branding.api import get_privacy_url
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings
