@@ -45,7 +45,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from edx_toggles.toggles import WaffleFlagNamespace, WaffleSwitchNamespace
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_pipeline.config.waffle import (
     DEPRECATE_YOUTUBE,

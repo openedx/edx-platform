@@ -11,7 +11,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from student.auth import has_course_author_access
 from util.json_request import JsonResponse, expect_json
 from xmodule.modulestore import ModuleStoreEnum

@@ -23,8 +23,8 @@ from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.badges.events.course_complete import get_completion_badge
 from lms.djangoapps.badges.utils import badges_enabled
-from edxmako.shortcuts import render_to_response
-from edxmako.template import Template
+from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.template import Template
 from lms.djangoapps.certificates.api import (
     emit_certificate_event,
     get_active_web_certificate,

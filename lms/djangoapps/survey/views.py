@@ -14,7 +14,7 @@ from django.utils.html import escape
 from django.views.decorators.http import require_POST
 from opaque_keys.edx.keys import CourseKey
 
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from lms.djangoapps.survey.models import SurveyForm
 

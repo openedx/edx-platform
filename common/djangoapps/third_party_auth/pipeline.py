@@ -81,7 +81,7 @@ from social_core.pipeline.social_auth import associate_by_email
 from social_core.utils import module_member, slugify
 
 import third_party_auth
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from lms.djangoapps.verify_student.models import SSOVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers

@@ -12,7 +12,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import View
 from social_django.models import UserSocialAuth
 
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.program_enrollments.api import (
     fetch_program_enrollments_by_student,
     get_users_by_external_keys_and_org_key,

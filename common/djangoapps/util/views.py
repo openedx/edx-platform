@@ -20,7 +20,7 @@ from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 from openedx.features.course_experience.utils import dates_banner_should_display
 
 import track.views
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from student.roles import GlobalStaff
 
 log = logging.getLogger(__name__)

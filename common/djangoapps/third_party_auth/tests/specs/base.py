@@ -291,7 +291,7 @@ class HelperMixin(object):
     def _patch_edxmako_current_request(self, request):
         """Make ``request`` be the current request for edxmako template rendering."""
 
-        with mock.patch('edxmako.request_context.get_current_request', return_value=request):
+        with mock.patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=request):
             yield
 
     def get_user_by_email(self, strategy, email):

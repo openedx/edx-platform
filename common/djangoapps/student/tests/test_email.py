@@ -18,7 +18,7 @@ from django.utils.html import escape
 from mock import Mock, patch
 from six import text_type
 
-from edxmako.shortcuts import marketing_link, render_to_string
+from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_string
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
@@ -209,7 +209,7 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
         Registration().register(inactive_user)
         request = RequestFactory().get(settings.SOCIAL_AUTH_INACTIVE_USER_URL)
         request.user = inactive_user
-        with patch('edxmako.request_context.get_current_request', return_value=request):
+        with patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=request):
             with patch('third_party_auth.pipeline.running', return_value=False):
                 inactive_user_view(request)
                 self.assertEqual(email.called, True, msg='method should have been called')

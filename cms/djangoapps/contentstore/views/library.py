@@ -20,7 +20,7 @@ from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator
 from six import text_type
 
 from cms.djangoapps.course_creators.views import get_course_creator_status
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from student.auth import (
     STUDIO_EDIT_ROLES,
     STUDIO_VIEW_USERS,

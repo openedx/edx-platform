@@ -6,7 +6,7 @@ Index view for the support app.
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.support.decorators import require_support_permission
 
 SUPPORT_INDEX_URLS = [

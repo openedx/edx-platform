@@ -12,9 +12,14 @@ from django.urls import reverse
 from edx_django_utils.cache import RequestCache
 from mock import Mock, patch
 
-from edxmako import LOOKUP, add_lookup
-from edxmako.request_context import get_template_request_context
-from edxmako.shortcuts import is_any_marketing_link_set, is_marketing_link_set, marketing_link, render_to_string
+from common.djangoapps.edxmako import LOOKUP, add_lookup
+from common.djangoapps.edxmako.request_context import get_template_request_context
+from common.djangoapps.edxmako.shortcuts import (
+    is_any_marketing_link_set,
+    is_marketing_link_set,
+    marketing_link,
+    render_to_string
+)
 from student.tests.factories import UserFactory
 from util.testing import UrlResetMixin
 
@@ -118,7 +123,7 @@ class AddLookupTests(TestCase):
     """
     Test the `add_lookup` function.
     """
-    @patch('edxmako.LOOKUP', {})
+    @patch('common.djangoapps.edxmako.LOOKUP', {})
     def test_with_package(self):
         add_lookup('test', 'management', __name__)
         dirs = LOOKUP['test'].directories
@@ -147,7 +152,7 @@ class MakoRequestContextTest(TestCase):
         returns a RequestContext.
         """
 
-        with patch('edxmako.request_context.get_current_request', return_value=self.request):
+        with patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=self.request):
             # requestcontext should not be None.
             self.assertIsNotNone(get_template_request_context())
 
@@ -156,7 +161,7 @@ class MakoRequestContextTest(TestCase):
         Test that if get_current_request returns None, then get_template_request_context
         returns None.
         """
-        with patch('edxmako.request_context.get_current_request', return_value=None):
+        with patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=None):
             # requestcontext should be None.
             self.assertIsNone(get_template_request_context())
 
@@ -164,17 +169,17 @@ class MakoRequestContextTest(TestCase):
         """
         Test that the RequestContext is cached in the RequestCache.
         """
-        with patch('edxmako.request_context.get_current_request', return_value=None):
+        with patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=None):
             # requestcontext should be None, because the cache isn't filled
             self.assertIsNone(get_template_request_context())
 
-        with patch('edxmako.request_context.get_current_request', return_value=self.request):
+        with patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=self.request):
             # requestcontext should not be None, and should fill the cache
             self.assertIsNotNone(get_template_request_context())
 
         mock_get_current_request = Mock()
-        with patch('edxmako.request_context.get_current_request'):
-            with patch('edxmako.request_context.RequestContext.__init__') as mock_context_init:
+        with patch('common.djangoapps.edxmako.request_context.get_current_request'):
+            with patch('common.djangoapps.edxmako.request_context.RequestContext.__init__') as mock_context_init:
                 # requestcontext should not be None, because the cache is filled
                 self.assertIsNotNone(get_template_request_context())
                 mock_context_init.assert_not_called()
@@ -182,7 +187,7 @@ class MakoRequestContextTest(TestCase):
 
         RequestCache.clear_all_namespaces()
 
-        with patch('edxmako.request_context.get_current_request', return_value=None):
+        with patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=None):
             # requestcontext should be None, because the cache isn't filled
             self.assertIsNone(get_template_request_context())
 

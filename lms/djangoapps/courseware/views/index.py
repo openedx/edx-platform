@@ -27,7 +27,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from six.moves import urllib
 from web_fragments.fragment import Fragment
 
-from edxmako.shortcuts import render_to_response, render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.gating.api import get_entrance_exam_score_ratio, get_entrance_exam_usage_key
