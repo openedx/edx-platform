@@ -7,9 +7,6 @@ import textwrap
 from copy import copy
 
 import six
-import six.moves.urllib.error
-import six.moves.urllib.parse
-import six.moves.urllib.request
 from lxml import etree
 from mock import Mock, PropertyMock, patch
 from pytz import UTC
@@ -419,7 +416,8 @@ class LTIModuleTest(LogicTest):
             u'<imsx_POXHeader><imsx_POXRequestHeaderInfo><imsx_version>V1.0</imsx_version>'
             u'<imsx_messageIdentifier>edX_fix</imsx_messageIdentifier></imsx_POXRequestHeaderInfo>'
             u'</imsx_POXHeader><imsx_POXBody><replaceResultRequest><resultRecord><sourcedGUID>'
-            u'<sourcedId>MITxLTI/MITxLTI/201x:localhost%3A8000-i4x-MITxLTI-MITxLTI-lti-3751833a214a4f66a0d18f63234207f2:363979ef768ca171b50f9d1bfb322131</sourcedId>'  # pylint: disable=line-too-long
+            u'<sourcedId>MITxLTI/MITxLTI/201x:localhost%3A8000-i4x-MITxLTI-MITxLTI-lti-3751833a214a4f66a0d18f63234207f2'
+            u':363979ef768ca171b50f9d1bfb322131</sourcedId>'
             u'</sourcedGUID><result><resultScore><language>en</language><textString>0.32</textString></resultScore>'
             u'</result></resultRecord></replaceResultRequest></imsx_POXBody></imsx_POXEnvelopeRequest>'
         ).encode('utf-8')

@@ -133,10 +133,10 @@ class TestUserCourseBadgeAssertions(UserAssertionTestCase):
         # Also should not be included, as they don't share the same user.
         for dummy in range(6):
             BadgeAssertionFactory.create(badge_class=badge_class)
-        response = self.get_json(self.url(), data={'course_id': course_key})
+        response = self.get_json(self.url(), data={'course_id': str(course_key)})
         self.assertEqual(len(response['results']), 3)
         unused_course = CourseFactory.create()
-        response = self.get_json(self.url(), data={'course_id': unused_course.location.course_key})
+        response = self.get_json(self.url(), data={'course_id': str(unused_course.location.course_key)})
         self.assertEqual(len(response['results']), 0)
 
     def test_assertion_structure(self):

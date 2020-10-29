@@ -26,7 +26,6 @@ from entitlements.models import CourseEntitlement
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.commerce.utils import EcommerceService
-from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.core.djangoapps.catalog.utils import get_fulfillable_course_runs_for_entitlement, get_programs
 from openedx.core.djangoapps.certificates.api import available_date_for_certificate
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
@@ -113,8 +112,6 @@ class ProgramProgressMeter(object):
 
         self.entitlements = list(CourseEntitlement.unexpired_entitlements_for_user(self.user))
         self.course_uuids = [str(entitlement.course_uuid) for entitlement in self.entitlements]
-
-        self.course_grade_factory = CourseGradeFactory()
 
         if uuid:
             self.programs = [get_programs(uuid=uuid)]
@@ -270,17 +267,11 @@ class ProgramProgressMeter(object):
                 else:
                     not_started.append(course)
 
-            grades = {}
-            for run in self.course_run_ids:
-                grade = self.course_grade_factory.read(self.user, course_key=CourseKey.from_string(run))
-                grades[run] = grade.percent
-
             progress.append({
                 'uuid': program_copy['uuid'],
                 'completed': len(completed) if count_only else completed,
                 'in_progress': len(in_progress) if count_only else in_progress,
                 'not_started': len(not_started) if count_only else not_started,
-                'grades': grades,
             })
 
         return progress
@@ -638,6 +629,7 @@ class ProgramDataExtender(object):
         applicable_seat_types = set(seat for seat in self.data['applicable_seat_types'] if seat != 'credit')
 
         is_learner_eligible_for_one_click_purchase = self.data['is_program_eligible_for_one_click_purchase']
+        bundle_uuid = self.data.get('uuid')
         skus = []
         bundle_variant = 'full'
 
@@ -688,9 +680,18 @@ class ProgramDataExtender(object):
                 # The user specific program price is slow to calculate, so use switch to force the
                 # anonymous price for all users. See LEARNER-5555 for more details.
                 if is_anonymous or ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER.is_enabled():
-                    discount_data = api.baskets.calculate.get(sku=skus, is_anonymous=True)
+                    # The bundle uuid is necessary to see the program's discounted price
+                    if bundle_uuid:
+                        discount_data = api.baskets.calculate.get(sku=skus, is_anonymous=True, bundle=bundle_uuid)
+                    else:
+                        discount_data = api.baskets.calculate.get(sku=skus, is_anonymous=True)
                 else:
-                    discount_data = api.baskets.calculate.get(sku=skus, username=self.user.username)
+                    if bundle_uuid:
+                        discount_data = api.baskets.calculate.get(
+                            sku=skus, username=self.user.username, bundle=bundle_uuid
+                        )
+                    else:
+                        discount_data = api.baskets.calculate.get(sku=skus, username=self.user.username)
 
                 program_discounted_price = discount_data['total_incl_tax']
                 program_full_price = discount_data['total_incl_tax_excl_discounts']

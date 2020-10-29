@@ -232,30 +232,10 @@ define([
 
         describe('Manage Tab', function() {
             var manageTabSelector = '.page-content-nav>.nav-item[data-url=manage]';
-            var noManagedData = TeamSpecHelpers.createMockTopicData(1, 2);
-            var withManagedData = TeamSpecHelpers.createMockTopicData(1, 2);
-            var topicsNoManaged, topicsWithManaged;
-
-            topicsNoManaged = {
-                count: 2,
-                num_pages: 1,
-                current_page: 1,
-                start: 0,
-                results: noManagedData
-            };
-            withManagedData[1].type = 'public_managed';
-            topicsWithManaged = {
-                count: 2,
-                num_pages: 1,
-                current_page: 1,
-                start: 0,
-                results: withManagedData
-            };
-
             it('is not visible to unprivileged users', function() {
                 var teamsTabView = createTeamsTabView(this, {
                     userInfo: TeamSpecHelpers.createMockUserInfo({privileged: false}),
-                    topics: topicsNoManaged
+                    hasManagedTopic: true
                 });
                 expect(teamsTabView.$(manageTabSelector).length).toBe(0);
             });
@@ -263,7 +243,7 @@ define([
             it('is not visible when there are no managed topics', function() {
                 var teamsTabView = createTeamsTabView(this, {
                     userInfo: TeamSpecHelpers.createMockUserInfo({privileged: true}),
-                    topics: topicsNoManaged
+                    hasManagedTopic: false
                 });
                 expect(teamsTabView.$(manageTabSelector).length).toBe(0);
             });
@@ -271,9 +251,44 @@ define([
             it('is visible to privileged users when there is a managed topic', function() {
                 var teamsTabView = createTeamsTabView(this, {
                     userInfo: TeamSpecHelpers.createMockUserInfo({privileged: true}),
-                    topics: topicsWithManaged
+                    hasManagedTopic: true
                 });
                 expect(teamsTabView.$(manageTabSelector).length).toBe(1);
+            });
+        });
+
+        describe('Browse Tab', function() {
+            var browseTabSelector = '.page-content-nav>.nav-item[data-url=browse]';
+            it('is not visible if there are no open and no public teamsets', function() {
+                var teamsTabView = createTeamsTabView(this, {
+                    hasOpenTopic: false,
+                    hasPublicManagedTopic: false
+                });
+                expect(teamsTabView.$(browseTabSelector).length).toBe(0);
+            });
+
+            it('is visible if there are open teamsets', function() {
+                var teamsTabView = createTeamsTabView(this, {
+                    hasOpenTopic: true,
+                    hasPublicManagedTopic: false
+                });
+                expect(teamsTabView.$(browseTabSelector).length).toBe(1);
+            });
+
+            it('is visible if there are public teamsets', function() {
+                var teamsTabView = createTeamsTabView(this, {
+                    hasOpenTopic: false,
+                    hasPublicManagedTopic: true
+                });
+                expect(teamsTabView.$(browseTabSelector).length).toBe(1);
+            });
+
+            it('is visible if there are both public and open teamsets', function() {
+                var teamsTabView = createTeamsTabView(this, {
+                    hasOpenTopic: true,
+                    hasPublicManagedTopic: true
+                });
+                expect(teamsTabView.$(browseTabSelector).length).toBe(1);
             });
         });
 

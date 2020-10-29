@@ -5,6 +5,7 @@ API library for Django REST Framework permissions-oriented workflows
 
 from django.conf import settings
 from django.http import Http404
+from edx_django_utils.monitoring import set_custom_metric
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_condition import C
@@ -20,6 +21,9 @@ from .api_key_permissions import is_request_has_valid_api_key
 class ApiKeyHeaderPermission(permissions.BasePermission):
     """
     Django REST Framework permissions class used to manage API Key integrations
+
+    Deprecated
+
     """
 
     def has_permission(self, request, view):
@@ -33,6 +37,7 @@ class ApiKeyHeaderPermission(permissions.BasePermission):
                     `is_request_has_valid_api_key` to break circular
                     dependency.
         """
+        set_custom_metric('deprecated_api_key_header', True)
         return is_request_has_valid_api_key(request)
 
 

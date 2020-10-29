@@ -16,15 +16,18 @@ from rest_framework import exceptions, permissions, status, throttling
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_oauth.authentication import OAuth2Authentication
 from social_django.models import UserSocialAuth
 
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import (
+    BearerAuthentication,
+    BearerAuthenticationAllowInactiveUser
+)
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from third_party_auth import pipeline
 from third_party_auth.api import serializers
-from third_party_auth.api.permissions import ThirdPartyAuthProviderApiPermission
+from third_party_auth.api.permissions import TPA_PERMISSIONS
 from third_party_auth.provider import Registry
+from common.djangoapps.third_party_auth.api.utils import filter_user_social_auth_queryset_by_provider
 
 
 class ProviderBaseThrottle(throttling.UserRateThrottle):
@@ -65,7 +68,7 @@ class BaseUserView(APIView):
     authentication_classes = (
         # Users may want to view/edit the providers used for authentication before they've
         # activated their account, so we allow inactive users.
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     throttle_classes = [ProviderSustainedThrottle, ProviderBurstThrottle]
@@ -332,9 +335,9 @@ class UserMappingView(ListAPIView):
 
             * remote_id: The Id from third party auth provider
     """
-    authentication_classes = (
-        OAuth2Authentication,
-    )
+    authentication_classes = (JwtAuthentication, BearerAuthentication, )
+    permission_classes = (TPA_PERMISSIONS, )
+    required_scopes = ['tpa:read']
 
     serializer_class = serializers.UserMappingSerializer
     provider = None
@@ -342,28 +345,15 @@ class UserMappingView(ListAPIView):
     def get_queryset(self):
         provider_id = self.kwargs.get('provider_id')
 
-        # permission checking. We allow both API_KEY access and OAuth2 client credential access
-        if not (
-                self.request.user.is_superuser or ApiKeyHeaderPermission().has_permission(self.request, self) or
-                ThirdPartyAuthProviderApiPermission(provider_id).has_permission(self.request, self)
-        ):
-            raise exceptions.PermissionDenied()
-
         # provider existence checking
         self.provider = Registry.get(provider_id)
         if not self.provider:
             raise Http404
 
-        query_set = UserSocialAuth.objects.select_related('user').filter(provider=self.provider.backend_name)
-
-        # build our query filters
-        # When using multi-IdP backend, we only retrieve the ones that are for current IdP.
-        # test if the current provider has a slug
-        uid = self.provider.get_social_auth_uid('uid')
-        if uid != 'uid':
-            # if yes, we add a filter for the slug on uid column
-            query_set = query_set.filter(uid__startswith=uid[:-3])
-
+        query_set = filter_user_social_auth_queryset_by_provider(
+            UserSocialAuth.objects.select_related('user'),
+            self.provider,
+        )
         query = Q()
 
         usernames = self.request.query_params.getlist('username', None)
@@ -400,7 +390,7 @@ class ThirdPartyAuthUserStatusView(APIView):
     user with respect to the third party auth providers configured in the system.
     """
     authentication_classes = (
-        JwtAuthentication, OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser
+        JwtAuthentication, BearerAuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser
     )
     permission_classes = (permissions.IsAuthenticated,)
 
@@ -409,6 +399,7 @@ class ThirdPartyAuthUserStatusView(APIView):
         GET /api/third_party_auth/v0/providers/user_status/
 
         **GET Response Values**
+        ```
         {
             "accepts_logins": true,
             "name": "Google",
@@ -417,6 +408,7 @@ class ThirdPartyAuthUserStatusView(APIView):
             "connected": false,
             "id": "oa2-google-oauth2"
         }
+        ```
         """
         tpa_states = []
         for state in pipeline.get_provider_user_states(request.user):

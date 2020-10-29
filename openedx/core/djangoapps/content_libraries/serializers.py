@@ -2,11 +2,10 @@
 Serializers for the content libraries REST API
 """
 # pylint: disable=abstract-method
-
-
 from django.core.validators import validate_unicode_slug
 from rest_framework import serializers
 
+from openedx.core.djangoapps.content_libraries.models import ContentLibraryPermission
 from openedx.core.lib import blockstore_api
 
 
@@ -16,7 +15,9 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
     """
     # We rename the primary key field to "id" in the REST API since API clients
     # often implement magic functionality for fields with that name, and "key"
-    # is a reserved prop name in React
+    # is a reserved prop name in React. This 'id' field is a string that
+    # begins with 'lib:'. (The numeric ID of the ContentLibrary object in MySQL
+    # is not exposed via this API.)
     id = serializers.CharField(source="key", read_only=True)
     org = serializers.SlugField(source="key.org")
     slug = serializers.CharField(source="key.slug", validators=(validate_unicode_slug, ))
@@ -25,6 +26,8 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
     title = serializers.CharField()
     description = serializers.CharField(allow_blank=True)
     version = serializers.IntegerField(read_only=True)
+    allow_public_learning = serializers.BooleanField(default=False)
+    allow_public_read = serializers.BooleanField(default=False)
     has_unpublished_changes = serializers.BooleanField(read_only=True)
     has_unpublished_deletes = serializers.BooleanField(read_only=True)
 
@@ -36,6 +39,27 @@ class ContentLibraryUpdateSerializer(serializers.Serializer):
     # These are the only fields that support changes:
     title = serializers.CharField()
     description = serializers.CharField()
+    allow_public_learning = serializers.BooleanField()
+    allow_public_read = serializers.BooleanField()
+
+
+class ContentLibraryPermissionLevelSerializer(serializers.Serializer):
+    """
+    Serializer for the "Access Level" of a ContentLibraryPermission object.
+
+    This is used when updating a user or group's permissions re some content
+    library.
+    """
+    access_level = serializers.ChoiceField(choices=ContentLibraryPermission.ACCESS_LEVEL_CHOICES)
+
+
+class ContentLibraryPermissionSerializer(ContentLibraryPermissionLevelSerializer):
+    """
+    Serializer for a ContentLibraryPermission object, which grants either a user
+    or a group permission to view a content library.
+    """
+    user_id = serializers.IntegerField(source="user.id", allow_null=True)
+    group_name = serializers.CharField(source="group.name", allow_null=True, allow_blank=False, default=None)
 
 
 class LibraryXBlockMetadataSerializer(serializers.Serializer):
@@ -58,6 +82,32 @@ class LibraryXBlockTypeSerializer(serializers.Serializer):
     """
     block_type = serializers.CharField()
     display_name = serializers.CharField()
+
+
+class LibraryBundleLinkSerializer(serializers.Serializer):
+    """
+    Serializer for a link from a content library blockstore bundle to another
+    blockstore bundle.
+    """
+    id = serializers.SlugField()  # Link name
+    bundle_uuid = serializers.UUIDField(format='hex_verbose', read_only=True)
+    # What version of this bundle we are currently linking to.
+    # This is never NULL but can optionally be set to null when creating a new link, which means "use latest version."
+    version = serializers.IntegerField(allow_null=True)
+    # What the latest version of the linked bundle is:
+    # (if latest_version > version), the link can be "updated" to the latest version.
+    latest_version = serializers.IntegerField(read_only=True)
+    # Opaque key: If the linked bundle is a library or other learning context whose opaque key we can deduce, then this
+    # is the key. If we don't know what type of blockstore bundle this link is pointing to, then this is blank.
+    opaque_key = serializers.CharField()
+
+
+class LibraryBundleLinkUpdateSerializer(serializers.Serializer):
+    """
+    Serializer for updating an existing link in a content library blockstore
+    bundle.
+    """
+    version = serializers.IntegerField(allow_null=True)
 
 
 class LibraryXBlockCreationSerializer(serializers.Serializer):

@@ -1,6 +1,5 @@
 .search-bar {
-  @include box-sizing(border-box);
-
+  box-sizing: border-box;
   position: relative;
 
   .search-field-wrapper {
@@ -10,8 +9,7 @@
   .search-field {
     @extend %t-weight2;
 
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     top: 5px;
     width: 100%;
     border-radius: 4px;
@@ -24,7 +22,8 @@
   .cancel-button:hover {
     @extend %t-regular;
 
-    @include box-sizing(border-box);
+    box-sizing: border-box;
+
     @include right(0);
 
     display: block;
@@ -44,7 +43,7 @@
     line-height: 33px;
     text-shadow: none;
     text-transform: none;
-    
+
     &:hover,
     &:focus,
     &:active {
@@ -57,7 +56,6 @@
   .cancel-button {
     display: none;
   }
-
 }
 
 .search-results {

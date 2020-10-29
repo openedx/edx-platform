@@ -2,8 +2,9 @@
 // ====================
 
 .view-uploads {
-  .content-primary, .content-supplementary {
-    @include box-sizing(border-box);
+  .content-primary,
+  .content-supplementary {
+    box-sizing: border-box;
   }
 
   .content-primary {
@@ -210,7 +211,8 @@
         text-align: left;
         color: $gray;
 
-        .column-sort-link, .column-selected-link {
+        .column-sort-link,
+        .column-selected-link {
           cursor: pointer;
           color: $blue;
         }
@@ -266,7 +268,7 @@
 
               .nav-item {
                 &.reset-filter {
-                  display:none;
+                  display: none;
                 }
 
                 a {

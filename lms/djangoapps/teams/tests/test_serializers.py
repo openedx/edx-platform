@@ -88,7 +88,14 @@ class TopicSerializerTestCase(SerializerTestCase):
             )
             self.assertEqual(
                 serializer.data,
-                {u'name': u'Tøpic', u'description': u'The bést topic!', u'id': u'0', u'team_count': 0, u'type': u'open'}
+                {
+                    u'name': u'Tøpic',
+                    u'description': u'The bést topic!',
+                    u'id': u'0',
+                    u'team_count': 0,
+                    u'type': u'open',
+                    u'max_team_size': None
+                }
             )
 
     def test_topic_with_team_count(self):
@@ -106,7 +113,14 @@ class TopicSerializerTestCase(SerializerTestCase):
             )
             self.assertEqual(
                 serializer.data,
-                {u'name': u'Tøpic', u'description': u'The bést topic!', u'id': u'0', u'team_count': 1, u'type': u'open'}
+                {
+                    u'name': u'Tøpic',
+                    u'description': u'The bést topic!',
+                    u'id': u'0',
+                    u'team_count': 1,
+                    u'type': u'open',
+                    u'max_team_size': None
+                }
             )
 
     def test_scoped_within_course(self):
@@ -127,7 +141,14 @@ class TopicSerializerTestCase(SerializerTestCase):
             )
             self.assertEqual(
                 serializer.data,
-                {u'name': u'Tøpic', u'description': u'The bést topic!', u'id': u'0', u'team_count': 1, u'type': u'open'}
+                {
+                    u'name': u'Tøpic',
+                    u'description': u'The bést topic!',
+                    u'id': u'0',
+                    u'team_count': 1,
+                    u'type': u'open',
+                    u'max_team_size': None
+                }
             )
 
 
@@ -158,6 +179,7 @@ class BaseTopicSerializerTestCase(SerializerTestCase):
                 'description': 'The bést topic! {}'.format(i),
                 'id': six.text_type(i),
                 'type': 'open',
+                'max_team_size': i + 10
             }
             for i in six.moves.range(num_topics)
         ]
@@ -176,7 +198,7 @@ class BaseTopicSerializerTestCase(SerializerTestCase):
         """
         with self.assertNumQueries(num_queries):
             page = Paginator(
-                self.course.teams_configuration.cleaned_data_old_format['topics'],
+                self.course.teams_configuration.cleaned_data['teamsets'],
                 self.PAGE_SIZE,
             ).page(1)
             # pylint: disable=not-callable

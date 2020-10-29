@@ -1,6 +1,5 @@
 """Views for the branding app. """
 
-
 import logging
 
 import six
@@ -11,6 +10,7 @@ from django.db import transaction
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.urls.exceptions import NoReverseMatch
 from django.utils import translation
 from django.utils.translation.trans_real import get_supported_language_variant
 from django.views.decorators.cache import cache_control
@@ -66,7 +66,18 @@ def index(request):
 
     #  we do not expect this case to be reached in cases where
     #  marketing and edge are enabled
-    return student.views.index(request, user=request.user)
+
+    try:
+        return student.views.index(request, user=request.user)
+    except NoReverseMatch:
+        log.error(
+            'https is not a registered namespace Request from {}'.format(domain),
+            'request_site= {}'.format(request.site.__dict__),
+            'enable_mktg_site= {}'.format(enable_mktg_site),
+            'Auth Status= {}'.format(request.user.is_authenticated),
+            'Request Meta= {}'.format(request.META)
+        )
+        raise
 
 
 @ensure_csrf_cookie

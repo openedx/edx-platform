@@ -94,6 +94,13 @@ urlpatterns = [
         name="verify_student_submit_photos"
     ),
 
+    url(
+        r'^status/$',
+        views.VerificationStatusAPIView.as_view(),
+        name="verification_status_api"
+    ),
+
+
     # End-point for reverification
     # Reverification occurs when a user's initial verification attempt
     # is denied or expires.  The user is allowed to retry by submitting

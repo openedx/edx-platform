@@ -188,8 +188,9 @@
                 .addClass('fa-arrows-alt');
 
             $(closedCaptionsEl).css({top: '70%', left: '5%'});
-
-            this.resizer.delta.reset().setMode('width');
+            if (this.resizer) {
+                this.resizer.delta.reset().setMode('width');
+            }
             this.el.trigger('fullscreen', [this.isFullScreen]);
         }
 
@@ -210,8 +211,9 @@
                 .addClass('fa-compress');
 
             $(closedCaptionsEl).css({top: '70%', left: '5%'});
-
-            this.resizer.delta.substract(this.videoFullScreen.updateControlsHeight(), 'height').setMode('both');
+            if (this.resizer) {
+                this.resizer.delta.substract(this.videoFullScreen.updateControlsHeight(), 'height').setMode('both');
+            }
             this.el.trigger('fullscreen', [this.isFullScreen]);
         }
 

@@ -70,7 +70,8 @@ def format_certificate_for_user(username, cert):
             "is_passing": is_passing_status(cert.status),
             "is_pdf_certificate": bool(cert.download_url),
             "download_url": (
-                cert.download_url or get_certificate_url(cert.user.id, cert.course_id, user_certificate=cert)
+                cert.download_url or get_certificate_url(cert.user.id, cert.course_id, uuid=cert.verify_uuid,
+                                                         user_certificate=cert)
                 if cert.status == CertificateStatuses.downloadable
                 else None
             ),
@@ -132,6 +133,28 @@ def get_certificate_for_user(username, course_key):
     return format_certificate_for_user(username, cert)
 
 
+def get_certificates_for_user_by_course_keys(user, course_keys):
+    """
+    Retrieve certificate information for a particular user for a set of courses.
+
+    Arguments:
+        user (User)
+        course_keys (set[CourseKey])
+
+    Returns: dict[CourseKey: dict]
+        Mapping from course keys to dict of certificate data.
+        Course keys for courses for which the user does not have a certificate
+        will be omitted.
+    """
+    certs = GeneratedCertificate.eligible_certificates.filter(
+        user=user, course_id__in=course_keys
+    )
+    return {
+        cert.course_id: format_certificate_for_user(user.username, cert)
+        for cert in certs
+    }
+
+
 def get_recently_modified_certificates(course_keys=None, start_date=None, end_date=None):
     """
     Returns a QuerySet of GeneratedCertificate objects filtered by the input
@@ -148,7 +171,7 @@ def get_recently_modified_certificates(course_keys=None, start_date=None, end_da
     if end_date:
         cert_filter_args['modified_date__lte'] = end_date
 
-    return GeneratedCertificate.objects.filter(**cert_filter_args).order_by('modified_date')  # pylint: disable=no-member
+    return GeneratedCertificate.objects.filter(**cert_filter_args).order_by('modified_date')
 
 
 def generate_user_certificates(student, course_key, course=None, insecure=False, generation_mode='batch',
@@ -290,7 +313,10 @@ def certificate_downloadable_status(student, course_key):
 
     if current_status['status'] == CertificateStatuses.downloadable and may_view_certificate:
         response_data['is_downloadable'] = True
-        response_data['download_url'] = current_status['download_url'] or get_certificate_url(student.id, course_key)
+        response_data['download_url'] = current_status['download_url'] or get_certificate_url(
+            student.id, course_key, current_status['uuid']
+        )
+        response_data['is_pdf_certificate'] = bool(current_status['download_url'])
         response_data['uuid'] = current_status['uuid']
 
     return response_data
@@ -449,13 +475,13 @@ def _course_from_key(course_key):
     return CourseOverview.get_from_id(_safe_course_key(course_key))
 
 
-def _certificate_html_url(user_id, course_id, uuid):
-    if uuid:
-        return reverse('certificates:render_cert_by_uuid', kwargs={'certificate_uuid': uuid})
-    elif user_id and course_id:
-        kwargs = {"user_id": str(user_id), "course_id": six.text_type(course_id)}
-        return reverse('certificates:html_view', kwargs=kwargs)
-    return ''
+def _certificate_html_url(uuid):
+    """
+    Returns uuid based certificate URL.
+    """
+    return reverse(
+        'certificates:render_cert_by_uuid', kwargs={'certificate_uuid': uuid}
+    ) if uuid else ''
 
 
 def _certificate_download_url(user_id, course_id, user_certificate=None):
@@ -492,7 +518,7 @@ def get_certificate_url(user_id=None, course_id=None, uuid=None, user_certificat
         return url
 
     if has_html_certificates_enabled(course):
-        url = _certificate_html_url(user_id, course_id, uuid)
+        url = _certificate_html_url(uuid)
     else:
         url = _certificate_download_url(user_id, course_id, user_certificate=user_certificate)
     return url
@@ -608,10 +634,11 @@ def emit_certificate_event(event_name, user, course_id, course=None, event_data=
         'org_id': course.org,
         'course_id': six.text_type(course_id)
     }
+
     data = {
         'user_id': user.id,
         'course_id': six.text_type(course_id),
-        'certificate_url': get_certificate_url(user.id, course_id)
+        'certificate_url': get_certificate_url(user.id, course_id, uuid=event_data['certificate_id'])
     }
     event_data = event_data or {}
     event_data.update(data)

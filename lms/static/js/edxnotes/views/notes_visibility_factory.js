@@ -12,13 +12,17 @@
             errorMessage: gettext('An error has occurred. Make sure that you are connected to the Internet, and then try refreshing the page.'),
 
             initialize: function(options) {
-                _.bindAll(this, 'onSuccess', 'onError', 'keyDownToggleHandler');
+                _.bindAll(this, 'onSuccess', 'onError', 'keyDownToggleHandler', 'receiveMessage');
                 this.visibility = options.visibility;
                 this.visibilityUrl = options.visibilityUrl;
+
                 this.label = this.$('.utility-control-label');
                 this.actionLink = this.$('.action-toggle-notes');
                 this.actionLink.removeClass('is-disabled');
                 this.actionToggleMessage = this.$('.action-toggle-message');
+                if (options.hideUI) {
+                    $(window).on('message', this.receiveMessage);
+                }
                 this.notification = new Annotator.Notification();
                 $(document).on('keydown.edxnotes:togglenotes', this.keyDownToggleHandler);
             },
@@ -28,6 +32,18 @@
                 Backbone.View.prototype.remove.call(this);
             },
 
+            receiveMessage: function(event) {
+                var data = event.originalEvent.data;
+                if (data === 'tools.toggleNotes') {
+                    event.preventDefault();
+                    this.visibility = !this.visibility;
+                    if (this.visibility) {
+                        this.enableNotes();
+                    } else {
+                        this.disableNotes();
+                    }
+                }
+            },
             toggleHandler: function(event) {
                 event.preventDefault();
                 this.visibility = !this.visibility;
@@ -94,11 +110,12 @@
         });
 
         return {
-            ToggleVisibilityView: function(visibility, visibilityUrl) {
+            ToggleVisibilityView: function(visibility, visibilityUrl, hideUI) {
                 return new ToggleVisibilityView({
                     el: $('.edx-notes-visibility').get(0),
                     visibility: visibility,
-                    visibilityUrl: visibilityUrl
+                    visibilityUrl: visibilityUrl,
+                    hideUI: hideUI
                 });
             },
             VisibilityDecorator: VisibilityDecorator

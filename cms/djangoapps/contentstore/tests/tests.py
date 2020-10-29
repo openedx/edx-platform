@@ -7,14 +7,15 @@ import datetime
 import time
 
 import mock
-from contentstore.tests.test_course_settings import CourseTestCase
-from contentstore.tests.utils import AjaxEnabledTestClient, parse_json, registration, user
 from ddt import data, ddt, unpack
 from django.conf import settings
 from django.core.cache import cache
 from django.test.utils import override_settings
 from django.urls import reverse
 from pytz import UTC
+
+from contentstore.tests.test_course_settings import CourseTestCase
+from contentstore.tests.utils import AjaxEnabledTestClient, parse_json, registration, user
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -175,13 +176,13 @@ class AuthTestCase(ContentStoreTestCase):
             assertion_method = getattr(self, assertion_method_name)
             assertion_method(
                 response,
-                u'<a class="action action-signup" href="{}/register?next=http%3A%2F%2Ftestserver%2F">Sign Up</a>'.format(  # pylint: disable=line-too-long
-                    settings.LMS_ROOT_URL
-                )
+                u'<a class="action action-signup" href="{}/register?next=http%3A%2F%2Ftestserver%2F">Sign Up</a>'.format
+                (settings.LMS_ROOT_URL)
             )
             self.assertContains(
                 response,
-                u'<a class="action action-signin" href="/signin_redirect_to_lms?next=http%3A%2F%2Ftestserver%2F">Sign In</a>'  # pylint: disable=line-too-long
+                '<a class="action action-signin" href="/signin_redirect_to_lms?next=http%3A%2F%2Ftestserver%2F">'
+                'Sign In</a>'
             )
 
 

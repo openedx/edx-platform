@@ -43,7 +43,7 @@ class TextbookUploadPage(CoursePage):
         Uploads a pdf textbook.
         """
         # If the pdf upload section has not yet been toggled on, click on the upload pdf button
-        test_dir = path(__file__).abspath().dirname().dirname().dirname().dirname()  # pylint:disable=no-value-for-parameter
+        test_dir = path(__file__).abspath().dirname().dirname().dirname().dirname()
         file_path = test_dir + '/data/uploads/' + file_name
 
         click_css(self, ".edit-textbook .action-upload", require_notification=False)

@@ -19,7 +19,7 @@ from six import string_types, text_type
 from six.moves import zip
 
 from student.models import get_user_by_username_or_email_inside_organization
-from student.models import get_user_by_username_or_email
+from student.models import get_user_by_username_or_email, CourseEnrollment
 
 
 class DashboardError(Exception):
@@ -163,9 +163,16 @@ def title_or_url(node):
 
 def set_due_date_extension(course, unit, student, due_date, actor=None, reason=''):
     """
-    Sets a due date extension. Raises DashboardError if the unit or extended
-    due date is invalid.
+    Sets a due date extension.
+
+    Raises:
+        DashboardError if the unit or extended, due date is invalid or user is
+        not enrolled in the course.
     """
+    mode, __ = CourseEnrollment.enrollment_mode_for_user(user=student, course_id=six.text_type(course.id))
+    if not mode:
+        raise DashboardError(_("Could not find student enrollment in the course."))
+
     if due_date:
         try:
             api.set_date_for_block(course.id, unit.location, 'due', due_date, user=student, reason=reason, actor=actor)

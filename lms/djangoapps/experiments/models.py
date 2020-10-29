@@ -6,6 +6,7 @@ Experimentation models
 from django.conf import settings
 from django.db import models
 from model_utils.models import TimeStampedModel
+from simple_history.models import HistoricalRecords
 
 
 class ExperimentData(TimeStampedModel):
@@ -43,6 +44,8 @@ class ExperimentKeyValue(TimeStampedModel):
     )
     key = models.CharField(null=False, blank=False, max_length=255)
     value = models.TextField()
+
+    history = HistoricalRecords()
 
     class Meta(object):
         verbose_name = 'Experiment Key-Value Pair'

@@ -3,10 +3,21 @@ Support for course tool plugins.
 """
 
 
+from enum import Enum
+
 from openedx.core.lib.plugins import PluginManager
 
 # Stevedore extension point namespace
 COURSE_TOOLS_NAMESPACE = 'openedx.course_tool'
+
+
+class HttpMethod(Enum):
+    """ Enum for HTTP Methods """
+    DELETE = 'DELETE'
+    GET = 'GET'
+    OPTIONS = 'OPTIONS'
+    POST = 'POST'
+    PUT = 'PUT'
 
 
 class CourseTool(object):
@@ -18,6 +29,8 @@ class CourseTool(object):
     not a requirement, and plugin implementations outside of this repo should
     simply follow the contract defined below.
     """
+    http_method = HttpMethod.GET
+
     @classmethod
     def analytics_id(cls):
         """
@@ -56,6 +69,16 @@ class CourseTool(object):
         Returns the URL for this tool for the specified course key.
         """
         raise NotImplementedError("Must specify a url for a course tool.")
+
+    @classmethod
+    def data(cls):
+        """
+        Additional data to send with a form submission
+        """
+        if cls.http_method == HttpMethod.POST:
+            return {}
+        else:
+            return None
 
 
 class CourseToolsPluginManager(PluginManager):

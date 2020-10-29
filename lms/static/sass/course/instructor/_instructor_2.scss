@@ -251,7 +251,7 @@
     @include margin-left(1px);
     @include font-size(14);
 
-    font-family: verdana,arial,sans-serif;
+    font-family: verdana, arial, sans-serif;
     color: #333;
 
     .slick-cell {
@@ -557,7 +557,7 @@
 
       input[name="send_to"]:disabled + label {
         font-weight: lighter;
-        background-color: $light-gray3
+        background-color: $light-gray3;
       }
 
       .email-targets-primary {
@@ -647,7 +647,7 @@
     }
   }
 
-  .batch-enrollment-ccx{
+  .batch-enrollment-ccx {
     @extend .batch-enrollment;
 
     float: left;
@@ -674,7 +674,9 @@
       display: block;
       position: absolute;
       top: ($baseline/2);
-      left: -9999em;
+
+      @include left(-9999em);
+
       padding: ($baseline/2);
       width: 50%;
       background-color: $light-gray3;
@@ -734,7 +736,8 @@
 
       .member-list-widget {
         .header {
-          @include box-sizing(border-box);
+          box-sizing: border-box;
+
           @include border-top-radius(3);
 
           position: relative;
@@ -756,8 +759,7 @@
         }
 
         .info {
-          @include box-sizing(border-box);
-
+          box-sizing: border-box;
           padding: ($baseline/2);
           border: 1px solid $light-gray;
           color: $lighter-base-font-color;
@@ -766,7 +768,7 @@
         }
 
         .member-list {
-          @include box-sizing(border-box);
+          box-sizing: border-box;
 
           table {
             width: 100%;
@@ -795,7 +797,8 @@
         }
 
         .bottom-bar {
-          @include box-sizing(border-box);
+          box-sizing: border-box;
+
           @include border-bottom-radius(3);
 
           position: relative;
@@ -1568,7 +1571,8 @@
 
     margin-top: 25px;
 
-    .metrics-left, .metrics-left-header {
+    .metrics-left,
+    .metrics-left-header {
       position: relative;
       width: 30%;
 
@@ -1717,7 +1721,7 @@
 }
 
 input[name="subject"] {
-  width:600px;
+  width: 600px;
 }
 
 .enrollment-wrapper {
@@ -1779,7 +1783,6 @@ input[name="subject"] {
       @include float(right);
     }
   }
-
 }
 
 #e-commerce {
@@ -1813,7 +1816,7 @@ input[name="subject"] {
 
   .error-msgs {
     background: #ffeef5;
-    color:#b72667;
+    color: #b72667;
     text-align: center;
     padding: ($baseline/2) 0;
     font-family: $font-family-sans-serif;
@@ -2034,7 +2037,7 @@ input[name="subject"] {
       white-space: normal;
     }
 
-    input[name="generate-registration-codes-csv"]{
+    input[name="generate-registration-codes-csv"] {
       @include button(simple, $primary);
 
       @extend .button-reset;
@@ -2134,7 +2137,8 @@ input[name="subject"] {
         min-height: 45px !important;
       }
 
-      li#generate-registration-modal-field-city, li#generate-registration-modal-field-state,
+      li#generate-registration-modal-field-city,
+      li#generate-registration-modal-field-state,
       li#generate-registration-modal-field-zipcode {
         width: 205px;
       }
@@ -2336,7 +2340,6 @@ input[name="subject"] {
   .example-certificate-status-wrapper {
     width: 75%;
   }
-
 }
 
 input[name="subject"] {
@@ -2395,7 +2398,7 @@ input[name="subject"] {
       @include float(right);
 
       line-height: 14px;
-      font-size: 0.7em;
+      font-size: 0.7em; /* stylelint-disable-line */
     }
   }
 
@@ -2786,7 +2789,8 @@ input[name="subject"] {
     }
   }
 
-  .white-listed-students, .invalidation-history {
+  .white-listed-students,
+  .invalidation-history {
     margin-top: 10px;
     padding-top: 5px;
 
@@ -2819,7 +2823,6 @@ input[name="subject"] {
         &.action {
           width: 150px;
         }
-
       }
 
       td {
@@ -2890,7 +2893,6 @@ input[name="subject"] {
           margin: 2px;
           border-top-style: none;
         }
-
       }
 
       .arrow {
@@ -2903,5 +2905,42 @@ input[name="subject"] {
         font-weight: bold;
       }
     }
+  }
+}
+
+div.staff_info {
+  display: none;
+
+  @include clearfix();
+
+  white-space: pre-wrap;
+  border-top: 1px solid $gray-l3;
+  padding-top: lh();
+  margin-top: lh();
+  line-height: lh();
+  font-family: Consolas, "Lucida Console", Monaco, "Courier New", Courier, monospace;
+
+  // Debugging content is always in English, therefore it's never RTL
+  direction: ltr;
+  text-align: left;
+}
+
+.xqa-modal,
+.staff-modal,
+.history-modal {
+  width: 80%;
+  height: 80%;
+  left: left(20%);
+  overflow: auto;
+  display: none;
+}
+
+div.staff_actions {
+  p.error {
+    color: theme-color("danger");
+  }
+
+  p.success {
+    color: theme-color("success");
   }
 }

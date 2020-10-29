@@ -11,10 +11,12 @@ from datetime import datetime
 import ddt
 import pytz
 import six
-from mock import Mock
+from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 
+from course_modes.models import CourseMode
 from lms.djangoapps.teams import TEAM_DISCUSSION_CONTEXT
+from lms.djangoapps.teams.errors import AddToIncompatibleTeamError
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from openedx.core.djangoapps.django_comment_common.signals import (
@@ -28,12 +30,32 @@ from openedx.core.djangoapps.django_comment_common.signals import (
     thread_edited,
     thread_voted
 )
+from openedx.core.lib.teams_config import TeamsConfig
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import EventTestMixin
+
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 COURSE_KEY1 = CourseKey.from_string('edx/history/1')
-COURSE_KEY2 = CourseKey.from_string('edx/history/2')
+COURSE_KEY2 = CourseKey.from_string('edx/math/1')
+TEAMSET_1_ID = "the-teamset"
+TEAMSET_2_ID = "the-teamset-2"
+TEAMS_CONFIG_1 = TeamsConfig({
+    'team_sets': [{'id': TEAMSET_1_ID, 'name': 'Teamset1Name', 'description': 'Teamset1Desc'}]
+})
+TEAMS_CONFIG_2 = TeamsConfig({
+    'team_sets': [{'id': TEAMSET_2_ID, 'name': 'Teamset2Name', 'description': 'Teamset2Desc'}]
+})
+
+
+def create_course(course_key, teams_config):
+    return CourseFactory.create(
+        teams_configuration=teams_config,
+        org=course_key.org,
+        course=course_key.course,
+        run=course_key.run
+    )
 
 
 class TestModelStrings(SharedModuleStoreTestCase):
@@ -43,12 +65,14 @@ class TestModelStrings(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestModelStrings, cls).setUpClass()
+        cls.course_id = "edx/the-course/1"
+        cls.course1 = create_course(CourseKey.from_string(cls.course_id), TEAMS_CONFIG_1)
         cls.user = UserFactory.create(username="the-user")
-        CourseEnrollmentFactory.create(user=cls.user, course_id="edx/the-course/1")
+        CourseEnrollmentFactory.create(user=cls.user, course_id=cls.course_id)
         cls.team = CourseTeamFactory(
-            course_id="edx/the-course/1",
+            course_id=cls.course_id,
             team_id="the-team",
-            topic_id="the-teamset",
+            topic_id=TEAMSET_1_ID,
             name="The Team"
         )
         cls.team_membership = cls.team.add_user(cls.user)
@@ -80,9 +104,58 @@ class TestModelStrings(SharedModuleStoreTestCase):
         )
 
 
+class CourseTeamTest(SharedModuleStoreTestCase):
+    """Tests for the CourseTeam model."""
+
+    @classmethod
+    def setUpClass(cls):
+        super(CourseTeamTest, cls).setUpClass()
+        cls.course_id = "edx/the-course/1"
+        cls.course1 = create_course(CourseKey.from_string(cls.course_id), TEAMS_CONFIG_1)
+
+        cls.audit_learner = UserFactory.create(username="audit")
+        CourseEnrollmentFactory.create(user=cls.audit_learner, course_id="edx/the-course/1", mode=CourseMode.AUDIT)
+        cls.audit_team = CourseTeamFactory(
+            course_id="edx/the-course/1",
+            team_id="audit-team",
+            topic_id=TEAMSET_1_ID,
+            name="The Team"
+        )
+
+        cls.masters_learner = UserFactory.create(username="masters")
+        CourseEnrollmentFactory.create(user=cls.masters_learner, course_id="edx/the-course/1", mode=CourseMode.MASTERS)
+        cls.masters_team = CourseTeamFactory(
+            course_id="edx/the-course/1",
+            team_id="masters-team",
+            topic_id=TEAMSET_1_ID,
+            name="The Team",
+            organization_protected=True
+        )
+
+    def test_add_user(self):
+        """Test that we can add users with correct protection status to a team"""
+        self.assertIsNotNone(self.masters_team.add_user(self.masters_learner))
+        self.assertIsNotNone(self.audit_team.add_user(self.audit_learner))
+
+    def test_add_user_bad_team_access(self):
+        """Test that we are blocked from adding a user to a team of mixed enrollment types"""
+
+        with self.assertRaises(AddToIncompatibleTeamError):
+            self.audit_team.add_user(self.masters_learner)
+
+        with self.assertRaises(AddToIncompatibleTeamError):
+            self.masters_team.add_user(self.audit_learner)
+
+
 @ddt.ddt
 class TeamMembershipTest(SharedModuleStoreTestCase):
     """Tests for the TeamMembership model."""
+
+    @classmethod
+    def setUpClass(cls):
+        super(TeamMembershipTest, cls).setUpClass()
+        create_course(COURSE_KEY1, TEAMS_CONFIG_1)
+        create_course(COURSE_KEY2, TEAMS_CONFIG_2)
 
     def setUp(self):
         """
@@ -98,8 +171,16 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
             CourseEnrollmentFactory.create(user=user, course_id=COURSE_KEY1)
         CourseEnrollmentFactory.create(user=self.user1, course_id=COURSE_KEY2)
 
-        self.team1 = CourseTeamFactory(course_id=COURSE_KEY1, team_id='team1')
-        self.team2 = CourseTeamFactory(course_id=COURSE_KEY2, team_id='team2')
+        self.team1 = CourseTeamFactory(
+            course_id=COURSE_KEY1,
+            team_id='team1',
+            topic_id=TEAMSET_1_ID,
+        )
+        self.team2 = CourseTeamFactory(
+            course_id=COURSE_KEY2,
+            team_id='team2',
+            topic_id=TEAMSET_2_ID,
+        )
 
         self.team_membership11 = self.team1.add_user(self.user1)
         self.team_membership12 = self.team1.add_user(self.user2)
@@ -138,13 +219,13 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
         (None, None, None, 3),
         ('user1', None, None, 2),
         ('user1', [COURSE_KEY1], None, 1),
-        ('user1', None, 'team1', 1),
+        ('user1', None, ['team1'], 1),
         ('user2', None, None, 1),
     )
     @ddt.unpack
-    def test_get_memberships(self, username, course_ids, team_id, expected_count):
+    def test_get_memberships(self, username, course_ids, team_ids, expected_count):
         self.assertEqual(
-            CourseTeamMembership.get_memberships(username=username, course_ids=course_ids, team_id=team_id).count(),
+            CourseTeamMembership.get_memberships(username=username, course_ids=course_ids, team_ids=team_ids).count(),
             expected_count
         )
 
@@ -158,6 +239,22 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
         user = getattr(self, username)
         self.assertEqual(
             CourseTeamMembership.user_in_team_for_course(user, course_id),
+            expected_value
+        )
+
+    @ddt.data(
+        ('user1', COURSE_KEY1, TEAMSET_1_ID, True),
+        ('user1', COURSE_KEY1, TEAMSET_2_ID, False),
+        ('user2', COURSE_KEY1, TEAMSET_1_ID, True),
+        ('user2', COURSE_KEY1, TEAMSET_2_ID, False),
+        ('user1', COURSE_KEY2, TEAMSET_1_ID, False),
+        ('user2', COURSE_KEY2, TEAMSET_1_ID, False),
+    )
+    @ddt.unpack
+    def test_user_in_team_for_course_teamset(self, username, course_id, teamset_id, expected_value):
+        user = getattr(self, username)
+        self.assertEqual(
+            CourseTeamMembership.user_in_team_for_course(user, course_id, teamset_id),
             expected_value
         )
 

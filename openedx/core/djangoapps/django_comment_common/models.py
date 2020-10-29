@@ -1,4 +1,4 @@
-# pylint: disable=missing-docstring,unused-argument,model-missing-unicode
+# pylint: disable=missing-docstring,unused-argument
 
 
 import json

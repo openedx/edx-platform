@@ -11,6 +11,7 @@ from opaque_keys.edx.keys import UsageKey
 
 from contentstore.tests.test_course_settings import CourseTestCase
 from contentstore.utils import reverse_course_url, reverse_usage_url
+from openedx.core.lib.xblock_utils import get_course_update_items
 from xmodule.modulestore.django import modulestore
 
 
@@ -280,3 +281,42 @@ class CourseUpdateTest(CourseTestCase):
 
         payload = json.loads(resp.content.decode('utf-8'))
         self.assertHTMLEqual(payload['data'], content)
+
+    def test_course_update_id(self):
+        """
+        Test that a user can successfully update a course update without a sequential ids
+        """
+        # create two course updates
+        self.post_course_update()
+        self.post_course_update()
+
+        updates_location = self.course.id.make_usage_key('course_info', 'updates')
+        self.assertTrue(isinstance(updates_location, UsageKey))
+        self.assertEqual(updates_location.block_id, u'updates')
+
+        course_updates = modulestore().get_item(updates_location)
+        course_update_items = list(reversed(get_course_update_items(course_updates)))
+
+        # Delete the course update with id 1
+        course_update_items = [
+            course_update_item for course_update_item in course_update_items if course_update_item.get('id') != 1
+        ]
+
+        course_updates.items = course_update_items
+        course_updates.data = ""
+
+        # update db record
+        modulestore().update_item(course_updates, self.user.id)
+
+        update_content = 'Testing'
+        update_date = u"January 23, 2014"
+        course_update_url = self.create_update_url()
+        payload = {'content': update_content, 'date': update_date}
+        resp = self.client.ajax_post(
+            course_update_url + '2', payload, HTTP_X_HTTP_METHOD_OVERRIDE="PUT", REQUEST_METHOD="POST"
+        )
+
+        self.assertHTMLEqual(update_content, json.loads(resp.content.decode('utf-8'))['content'])
+        course_updates = modulestore().get_item(updates_location)
+        del course_updates.items[0]["status"]
+        self.assertEqual(course_updates.items, [{u'date': update_date, u'content': update_content, u'id': 2}])

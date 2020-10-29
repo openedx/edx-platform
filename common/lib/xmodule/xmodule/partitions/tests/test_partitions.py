@@ -118,7 +118,7 @@ class MockUserPartitionScheme(object):
 
 class MockEnrollmentTrackUserPartitionScheme(MockUserPartitionScheme):
 
-    def create_user_partition(self, id, name, description, groups=None, parameters=None, active=True):  # pylint: disable=redefined-builtin, invalid-name, unused-argument
+    def create_user_partition(self, id, name, description, groups=None, parameters=None, active=True):  # pylint: disable=redefined-builtin, invalid-name
         """
         The EnrollmentTrackPartitionScheme provides this method to return a subclass of UserPartition.
         """

@@ -9,7 +9,6 @@ import re
 
 import ddt
 import six
-import six.moves.urllib.parse  # pylint: disable=import-error
 from six.moves import range, zip
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
@@ -631,7 +630,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         )
         data = {
             button_tuple[0]: button_tuple[1],
-            student_form_input_name: u','.join([student.email, ]),  # pylint: disable=no-member
+            student_form_input_name: u','.join([student.email, ]),
         }
         if send_email:
             data['email-students'] = 'Notify-students-by-email'
@@ -642,7 +641,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.assertIn(302, response.redirect_chain[0])
         self.assertEqual(len(outbox), outbox_count)
         if send_email:
-            self.assertIn(student.email, outbox[0].recipients())  # pylint: disable=no-member
+            self.assertIn(student.email, outbox[0].recipients())
         # a CcxMembership exists for this student
         self.assertTrue(
             CourseEnrollment.objects.filter(course_id=self.course.id, user=student).exists()
@@ -727,7 +726,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         )
         data = {
             button_tuple[0]: button_tuple[1],
-            student_form_input_name: u','.join([student.email, ]),  # pylint: disable=no-member
+            student_form_input_name: u','.join([student.email, ]),
         }
         if send_email:
             data['email-students'] = 'Notify-students-by-email'
@@ -738,7 +737,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.assertIn(302, response.redirect_chain[0])
         self.assertEqual(len(outbox), outbox_count)
         if send_email:
-            self.assertIn(student.email, outbox[0].recipients())  # pylint: disable=no-member
+            self.assertIn(student.email, outbox[0].recipients())
         # a CcxMembership does not exists for this student
         self.assertFalse(
             CourseEnrollment.objects.filter(course_id=self.course.id, user=student).exists()
@@ -1156,9 +1155,7 @@ class CCXCoachTabTestCase(CcxTestCase):
 
     def check_ccx_tab(self, course, user):
         """Helper function for verifying the ccx tab."""
-        request = RequestFactory().request()
-        request.user = user
-        all_tabs = get_course_tab_list(request, course)
+        all_tabs = get_course_tab_list(user, course)
         return any(tab.type == 'ccx_coach' for tab in all_tabs)
 
     @ddt.data(

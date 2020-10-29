@@ -11,7 +11,7 @@ define([
     describe('Team Management Dashboard', function() {
         var view;
         var uploadFile = new File([], 'empty-test-file.csv');
-        var mockUploadClickEvent = {target: {files: [uploadFile]}};
+        var mockFileSelectEvent = {target: {files: [uploadFile]}};
 
         beforeEach(function() {
             setFixtures('<div class="teams-container"></div>');
@@ -24,13 +24,14 @@ define([
         });
 
         it('can render itself', function() {
-            expect(_.strip(view.$('.download-team-csv').text())).toEqual('Download Memberships');
-            expect(_.strip(view.$('.upload-team-csv').text())).toEqual('Upload Memberships');
+            expect(_.strip(view.$('#download-team-csv').text())).toEqual('Download Memberships');
+            expect(_.strip(view.$('#upload-team-csv').text())).toEqual('Upload Memberships');
         });
 
         it('can handle a successful file upload', function() {
             var requests = AjaxHelpers.requests(this);
-            view.uploadCsv(mockUploadClickEvent);
+            view.setTeamMembershipCsv(mockFileSelectEvent);
+            view.uploadCsv();
             AjaxHelpers.expectRequest(requests, 'POST', view.csvUploadUrl);
             AjaxHelpers.respondWithJson(requests, {});
             expect(view.handleCsvUploadSuccess).toHaveBeenCalled();
@@ -38,7 +39,8 @@ define([
 
         it('can handle a failed file upload', function() {
             var requests = AjaxHelpers.requests(this);
-            view.uploadCsv(mockUploadClickEvent);
+            view.setTeamMembershipCsv(mockFileSelectEvent);
+            view.uploadCsv();
             AjaxHelpers.expectRequest(requests, 'POST', view.csvUploadUrl);
             AjaxHelpers.respondWithError(requests);
             expect(view.handleCsvUploadFailure).toHaveBeenCalled();

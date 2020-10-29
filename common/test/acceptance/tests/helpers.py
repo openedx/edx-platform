@@ -17,7 +17,6 @@ from unittest import SkipTest, TestCase
 
 import requests
 import six
-import six.moves.urllib.parse  # pylint: disable=import-error
 from bok_choy.javascript import js_defined
 from bok_choy.page_object import XSS_INJECTION
 from bok_choy.promise import EmptyPromise, Promise
@@ -113,7 +112,7 @@ def load_data_str(rel_path):
     Load a file from the "data" directory as a string.
     `rel_path` is the path relative to the data directory.
     """
-    full_path = path(__file__).abspath().dirname() / "data" / rel_path  # pylint: disable=no-value-for-parameter
+    full_path = path(__file__).abspath().dirname() / "data" / rel_path
     with open(full_path) as data_file:
         return data_file.read()
 

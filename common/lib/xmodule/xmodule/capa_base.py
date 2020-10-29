@@ -681,7 +681,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
                     )
                 ),
                 # Course-authored HTML demand hints are supported.
-                hint_text=HTML(get_inner_html_from_xpath(demand_hints[counter]))
+                hint_text=HTML(self.runtime.replace_urls(get_inner_html_from_xpath(demand_hints[counter])))
             )
             counter += 1
 
@@ -725,6 +725,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             html = self.handle_problem_html_error(err)
 
         html = self.remove_tags_from_html(html)
+        _ = self.runtime.service(self, "i18n").ugettext
 
         # Enable/Disable Submit button if should_enable_submit_button returns True/False.
         submit_button = self.submit_button_name()
@@ -821,6 +822,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
             # Build the notification message based on the notification type and translate it.
             ungettext = self.runtime.service(self, "i18n").ungettext
+            _ = self.runtime.service(self, "i18n").ugettext
             if answer_notification_type == 'incorrect':
                 if progress is not None:
                     answer_notification_message = ungettext(
@@ -1212,6 +1214,12 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
         # Too late. Cannot submit
         if self.closed():
+            problem_location = text_type(self.location)
+            if 'HarvardX+MCB80.1x+3T2019' in problem_location:
+                log.info(
+                    'Problem %s closed, close date: %s, attempts: %s/%s, is_past_due: %s',
+                    problem_location, self.close_date, self.attempts, self.max_attempts, self.is_past_due()
+                )
             event_info['failure'] = 'closed'
             self.track_function_unmask('problem_check_fail', event_info)
             raise NotFoundError(_("Problem is closed."))

@@ -16,7 +16,7 @@ from django.utils.timezone import now
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
 from six.moves import range
-from six.moves.urllib.parse import parse_qs  # pylint: disable=import-error
+from six.moves.urllib.parse import parse_qs
 
 from course_modes.models import CourseMode
 from lms.djangoapps.courseware.access_response import MilestoneAccessError, StartDateError, VisibilityError
@@ -281,7 +281,6 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
                 course_id=course.id
             )
             ScheduleFactory(
-                start=self.THREE_YEARS_AGO + datetime.timedelta(days=1),
                 start_date=self.THREE_YEARS_AGO + datetime.timedelta(days=1),
                 enrollment=enrollment
             )
@@ -408,10 +407,7 @@ class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, Milestone
         certificate_data = response.data[0]['certificate']
         self.assertRegex(
             certificate_data['url'],
-            r'http.*/certificates/user/{user_id}/course/{course_id}'.format(
-                user_id=self.user.id,
-                course_id=self.course.id,
-            )
+            r'http.*/certificates/[0-9a-f]{32}'
         )
 
 

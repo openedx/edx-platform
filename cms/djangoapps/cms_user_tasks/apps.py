@@ -17,4 +17,4 @@ class CmsUserTasksConfig(AppConfig):
         """
         Connect signal handlers.
         """
-        from . import signals  # pylint: disable=unused-variable
+        from . import signals  # pylint: disable=unused-import

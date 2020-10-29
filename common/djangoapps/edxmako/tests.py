@@ -72,6 +72,32 @@ class ShortcutsTests(UrlResetMixin, TestCase):
             # return any cms url name
             return 'organizations'
 
+    @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'TOS': '/tos'})
+    @override_settings(MKTG_URL_OVERRIDES={'TOS': 'https://edx.org'})
+    def test_override_marketing_link_valid(self):
+        expected_link = 'https://edx.org'
+        # test marketing site on
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
+            link = marketing_link('TOS')
+            self.assertEqual(link, expected_link)
+        # test marketing site off
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
+            link = marketing_link('TOS')
+            self.assertEqual(link, expected_link)
+
+    @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'TOS': '/tos'})
+    @override_settings(MKTG_URL_OVERRIDES={'TOS': '123456'})
+    def test_override_marketing_link_invalid(self):
+        expected_link = '#'
+        # test marketing site on
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
+            link = marketing_link('TOS')
+            self.assertEqual(link, expected_link)
+        # test marketing site off
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
+            link = marketing_link('TOS')
+            self.assertEqual(link, expected_link)
+
 
 class AddLookupTests(TestCase):
     """

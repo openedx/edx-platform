@@ -193,7 +193,7 @@ class TaskTestCase(ModuleStoreTestCase):
         comment = cc.Comment.find(id=self.comment['id']).retrieve()
         site = Site.objects.get_current()
         site_config = SiteConfigurationFactory.create(site=site)
-        site_config.values[ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY] = True
+        site_config.site_values[ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY] = True
         site_config.save()
         with mock.patch('lms.djangoapps.discussion.signals.handlers.get_current_site', return_value=site):
             comment_created.send(sender=None, user=user, post=comment)
@@ -232,7 +232,6 @@ class TaskTestCase(ModuleStoreTestCase):
         with emulate_http_request(
             site=message.context['site'], user=self.thread_author
         ):
-            # pylint: disable=unsupported-membership-test
             rendered_email = EmailRenderer().render(get_channel_for_message(ChannelType.EMAIL, message), message)
             assert self.comment['body'] in rendered_email.body_html
             assert self.comment_author.username in rendered_email.body_html

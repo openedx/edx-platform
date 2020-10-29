@@ -45,8 +45,7 @@ class TrackMiddlewareTestCase(TestCase):
         When HTTP headers contains latin1 characters.
         """
         request = self.request_factory.get('/somewhere')
-        # pylint: disable=no-member
-        request.META[meta_key] = 'test latin1 \xd3 \xe9 \xf1'  # pylint: disable=no-member
+        request.META[meta_key] = 'test latin1 \xd3 \xe9 \xf1'
 
         context = self.get_context_for_request(request)
         self.assertEqual(context[context_key], u'test latin1 Ó é ñ')

@@ -3,18 +3,17 @@
 
 import re
 
-import edx_oauth2_provider
 import six.moves.urllib.parse as parse  # pylint: disable=import-error
 from django.conf import settings
 from django.contrib.auth import logout
-from django.shortcuts import redirect
 from django.utils.http import urlencode
 from django.views.generic import TemplateView
-from provider.oauth2.models import Client
+from oauth2_provider.models import Application
 from six.moves.urllib.parse import parse_qs, urlsplit, urlunsplit  # pylint: disable=import-error
 
 from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
+from third_party_auth import pipeline as tpa_pipeline
 
 
 class LogoutView(TemplateView):
@@ -29,6 +28,7 @@ class LogoutView(TemplateView):
 
     # Keep track of the page to which the user should ultimately be redirected.
     default_target = '/'
+    tpa_logout_url = ''
 
     def post(self, request, *args, **kwargs):
         """
@@ -59,17 +59,20 @@ class LogoutView(TemplateView):
         if target_url:
             target_url = parse.unquote(parse.quote_plus(target_url))
 
-        if target_url and is_safe_login_or_logout_redirect(self.request, target_url):
-            return target_url
-        else:
-            return self.default_target
+        use_target_url = target_url and is_safe_login_or_logout_redirect(
+            redirect_to=target_url,
+            request_host=self.request.get_host(),
+            dot_client_id=self.request.GET.get('client_id'),
+            require_https=self.request.is_secure(),
+        )
+        return target_url if use_target_url else self.default_target
 
     def dispatch(self, request, *args, **kwargs):
         # We do not log here, because we have a handler registered to perform logging on successful logouts.
         request.is_from_logout = True
 
-        # Get the list of authorized clients before we clear the session.
-        self.oauth_client_ids = request.session.get(edx_oauth2_provider.constants.AUTHORIZED_CLIENTS_SESSION_KEY, [])
+        # Get third party auth provider's logout url
+        self.tpa_logout_url = tpa_pipeline.get_idp_logout_url_from_running_pipeline(request)
 
         logout(request)
 
@@ -103,7 +106,21 @@ class LogoutView(TemplateView):
         Args: url(str): url path
         """
         unquoted_url = parse.unquote_plus(parse.quote(url))
-        return bool(re.match(r'^/enterprise/[a-z0-9\-]+/course', unquoted_url))
+        return bool(re.match(r'^/enterprise(/handle_consent_enrollment)?/[a-z0-9\-]+/course', unquoted_url))
+
+    def _show_tpa_logout_link(self, target, referrer):
+        """
+        Return Boolean value indicating if TPA logout link needs to displayed or not.
+        We display TPA logout link when user has active SSO session and logout flow is
+        triggered via learner portal.
+        Args:
+            target: url of the page to land after logout
+            referrer: url of the page where logout request initiated
+        """
+        if bool(target == self.default_target and self.tpa_logout_url) and settings.LEARNER_PORTAL_URL_ROOT in referrer:
+            return True
+
+        return False
 
     def get_context_data(self, **kwargs):
         context = super(LogoutView, self).get_context_data(**kwargs)
@@ -113,8 +130,8 @@ class LogoutView(TemplateView):
 
         # Add the logout URIs for IDAs that the user was logged into (according to the session).  This line is specific
         # to DOP.
-        uris += Client.objects.filter(client_id__in=self.oauth_client_ids,
-                                      logout_uri__isnull=False).values_list('logout_uri', flat=True)
+        uris += Application.objects.filter(client_id__in=self.oauth_client_ids,
+                                           redirect_uris__isnull=False).values_list('redirect_uris', flat=True)
 
         # Add the extra logout URIs from settings.  This is added as a stop-gap solution for sessions that were
         # established via DOT.
@@ -134,6 +151,8 @@ class LogoutView(TemplateView):
             'target': target,
             'logout_uris': logout_uris,
             'enterprise_target': self._is_enterprise_target(target),
+            'tpa_logout_url': self.tpa_logout_url,
+            'show_tpa_logout_link': self._show_tpa_logout_link(target, referrer),
         })
 
         return context

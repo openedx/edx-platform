@@ -29,7 +29,7 @@ class PytestWorkerManager():
     """
     Responsible for spinning up and terminating EC2 workers to be used with pytest-xdist
     """
-    WORKER_BOOTUP_TIMEOUT_MINUTES = 5
+    WORKER_BOOTUP_TIMEOUT_MINUTES = 10
     WORKER_SSH_ATTEMPTS = 10
     MAX_RUN_WORKER_RETRIES = 7
 
@@ -59,7 +59,10 @@ class PytestWorkerManager():
                             'ResourceType': 'instance',
                             'Tags': [
                                 {"Key": "master", "Value": "build.testeng.edx.org"},
-                                {"Key": "worker", "Value": "pytest_xdist_worker"}
+                                {"Key": "worker", "Value": "pytest_xdist_worker"},
+                                {"Key": "environment", "Value": "testeng"},
+                                {"Key": "deployment", "Value": "edx"},
+                                {"Key": "cluster", "Value": "xdist-worker"}
                             ]
                         }
                     ]

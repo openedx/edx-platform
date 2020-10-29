@@ -17,6 +17,7 @@ from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.courseware.tabs import (
     CourseInfoTab,
     CoursewareTab,
+    DatesTab,
     ExternalDiscussionCourseTab,
     ExternalLinkCourseTab,
     ProgressTab,
@@ -385,7 +386,6 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
             'description': 'Testing Courseware Tabs'
         }
         self.user.is_staff = False
-        request = get_mock_request(self.user)
         self.course.entrance_exam_enabled = True
         self.course.entrance_exam_id = six.text_type(entrance_exam.location)
         milestone = add_milestone(milestone)
@@ -400,7 +400,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
             self.relationship_types['FULFILLS'],
             milestone
         )
-        course_tab_list = get_course_tab_list(request, self.course)
+        course_tab_list = get_course_tab_list(self.user, self.course)
         self.assertEqual(len(course_tab_list), 1)
         self.assertEqual(course_tab_list[0]['tab_id'], 'courseware')
         self.assertEqual(course_tab_list[0]['name'], 'Entrance Exam')
@@ -425,8 +425,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
         # log in again as student
         self.client.logout()
         self.login(self.email, self.password)
-        request = get_mock_request(self.user)
-        course_tab_list = get_course_tab_list(request, self.course)
+        course_tab_list = get_course_tab_list(self.user, self.course)
         self.assertEqual(len(course_tab_list), 4)
 
     def test_course_tabs_list_for_staff_members(self):
@@ -438,8 +437,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
         self.client.logout()
         staff_user = StaffFactory(course_key=self.course.id)
         self.client.login(username=staff_user.username, password='test')
-        request = get_mock_request(staff_user)
-        course_tab_list = get_course_tab_list(request, self.course)
+        course_tab_list = get_course_tab_list(staff_user, self.course)
         self.assertEqual(len(course_tab_list), 4)
 
 
@@ -480,8 +478,7 @@ class TextBookCourseViewsTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         """
         type_to_reverse_name = {'textbook': 'book', 'pdftextbook': 'pdf_book', 'htmltextbook': 'html_book'}
         self.addCleanup(set_current_request, None)
-        request = get_mock_request(self.user)
-        course_tab_list = get_course_tab_list(request, self.course)
+        course_tab_list = get_course_tab_list(self.user, self.course)
         num_of_textbooks_found = 0
         for tab in course_tab_list:
             # Verify links of all textbook type tabs.
@@ -547,6 +544,7 @@ class TabListTestCase(TabTestCase):
             [
                 {'type': CoursewareTab.type},
                 {'type': CourseInfoTab.type, 'name': 'fake_name'},
+                {'type': DatesTab.type},  # Add this even though we filter it out, for testing purposes
                 {'type': 'discussion', 'name': 'fake_name'},
                 {'type': ExternalLinkCourseTab.type, 'name': 'fake_name', 'link': 'fake_link'},
                 {'type': ExternalLinkCourseTab.type, 'name': 'fake_name', 'link': 'fake_link'},
@@ -660,13 +658,16 @@ class CourseTabListTestCase(TabListTestCase):
         # enumerate the tabs with a staff user
         user = UserFactory(is_staff=True)
         CourseEnrollment.enroll(user, self.course.id)
-        for i, tab in enumerate(xmodule_tabs.CourseTabList.iterate_displayable(self.course, user=user)):
-            if getattr(tab, 'is_collection_item', False):
-                # a collection item was found as a result of a collection tab
-                self.assertTrue(getattr(self.course.tabs[i], 'is_collection', False))
-            else:
-                # all other tabs must match the expected type
-                self.assertEqual(tab.type, self.course.tabs[i].type)
+        # Need to mock this flag as we care that orders match, and a tab not enabled will result in a failure
+        with patch('lms.djangoapps.courseware.tabs.RELATIVE_DATES_FLAG') as mock_flag:
+            mock_flag.is_enabled().return_value = True
+            for i, tab in enumerate(xmodule_tabs.CourseTabList.iterate_displayable(self.course, user=user)):
+                if getattr(tab, 'is_collection_item', False):
+                    # a collection item was found as a result of a collection tab
+                    self.assertTrue(getattr(self.course.tabs[i], 'is_collection', False))
+                else:
+                    # all other tabs must match the expected type
+                    self.assertEqual(tab.type, self.course.tabs[i].type)
 
         # test including non-empty collections
         self.assertIn(
@@ -706,8 +707,7 @@ class CourseTabListTestCase(TabListTestCase):
 
         user = self.create_mock_user(is_staff=False, is_enrolled=True)
         self.addCleanup(set_current_request, None)
-        request = get_mock_request(user)
-        course_tab_list = get_course_tab_list(request, self.course)
+        course_tab_list = get_course_tab_list(user, self.course)
         name_list = [x.name for x in course_tab_list]
         self.assertIn('Static Tab Free', name_list)
         self.assertNotIn('Static Tab Instructors Only', name_list)
@@ -716,8 +716,7 @@ class CourseTabListTestCase(TabListTestCase):
         self.client.logout()
         staff_user = StaffFactory(course_key=self.course.id)
         self.client.login(username=staff_user.username, password='test')
-        request = get_mock_request(staff_user)
-        course_tab_list_staff = get_course_tab_list(request, self.course)
+        course_tab_list_staff = get_course_tab_list(staff_user, self.course)
         name_list_staff = [x.name for x in course_tab_list_staff]
         self.assertIn('Static Tab Free', name_list_staff)
         self.assertIn('Static Tab Instructors Only', name_list_staff)
@@ -775,18 +774,17 @@ class CourseInfoTabTestCase(TabTestCase):
     def setUp(self):
         self.user = self.create_mock_user()
         self.addCleanup(set_current_request, None)
-        self.request = get_mock_request(self.user)
 
     @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
     def test_default_tab(self):
         # Verify that the course info tab is the first tab
-        tabs = get_course_tab_list(self.request, self.course)
+        tabs = get_course_tab_list(self.user, self.course)
         self.assertEqual(tabs[0].type, 'course_info')
 
     @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_default_tab_for_new_course_experience(self):
         # Verify that the unified course experience hides the course info tab
-        tabs = get_course_tab_list(self.request, self.course)
+        tabs = get_course_tab_list(self.user, self.course)
         self.assertEqual(tabs[0].type, 'courseware')
 
     # TODO: LEARNER-611 - remove once course_info is removed.
@@ -902,3 +900,29 @@ class DiscussionLinkTestCase(TabTestCase):
             is_enrolled=is_enrolled,
             is_staff=is_staff
         )
+
+
+class DatesTabTestCase(TabListTestCase):
+    """Test cases for making sure no persisted dates tab is surfaced"""
+
+    def test_singular_dates_tab(self):
+        user = self.create_mock_user()
+        self.course.tabs = self.all_valid_tab_list
+        self.course.save()
+
+        # Verify that there is a dates tab in the modulestore
+        has_dates_tab = False
+        for tab in self.course.tabs:
+            if tab.type == 'dates':
+                has_dates_tab = True
+        self.assertTrue(has_dates_tab)
+
+        # Verify that there is only 1 'dates' tab in the returned result from get_course_tab_list()
+        with patch('lms.djangoapps.courseware.tabs.RELATIVE_DATES_FLAG') as mock_flag:
+            mock_flag.is_enabled().return_value = True
+            tabs = get_course_tab_list(user, self.course)
+            num_dates_tabs = 0
+            for tab in tabs:
+                if tab.type == 'dates':
+                    num_dates_tabs += 1
+            self.assertEqual(num_dates_tabs, 1)

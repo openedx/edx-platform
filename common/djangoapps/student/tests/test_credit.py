@@ -189,7 +189,7 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
     def _purchase_credit(self):
         """Purchase credit from a provider in the course. """
         self.enrollment.mode = "credit"
-        self.enrollment.save()  # pylint: disable=no-member
+        self.enrollment.save()
 
         CourseEnrollmentAttribute.objects.create(
             enrollment=self.enrollment,

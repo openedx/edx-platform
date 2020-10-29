@@ -7,7 +7,7 @@ import ddt
 import six
 from django.test import TestCase
 
-from ..teams_config import TeamsConfig, TeamsetConfig
+from ..teams_config import TeamsConfig, TeamsetConfig, MANAGED_TEAM_MAX_TEAM_SIZE, DEFAULT_COURSE_RUN_MAX_TEAM_SIZE
 
 
 @ddt.ddt
@@ -112,7 +112,7 @@ class TeamsConfigTests(TestCase):
     }
 
     OUTPUT_DATA_2 = {
-        "max_team_size": None,
+        "max_team_size": DEFAULT_COURSE_RUN_MAX_TEAM_SIZE,
         "team_sets": [
             {
                 "id": "_1. How quickly daft-jumping zebras vex",
@@ -139,14 +139,14 @@ class TeamsConfigTests(TestCase):
         self.assertDictEqual(actual_output_data, expected_output_data)
 
     @ddt.data(
-        (None, None, "open", None),
-        (None, None, "public_managed", None),
+        (None, None, "open", DEFAULT_COURSE_RUN_MAX_TEAM_SIZE),
+        (None, None, "public_managed", MANAGED_TEAM_MAX_TEAM_SIZE),
         (None, 6666, "open", 6666),
-        (None, 6666, "public_managed", None),
+        (None, 6666, "public_managed", MANAGED_TEAM_MAX_TEAM_SIZE),
         (1812, None, "open", 1812),
-        (1812, None, "public_managed", None),
+        (1812, None, "public_managed", MANAGED_TEAM_MAX_TEAM_SIZE),
         (1812, 6666, "open", 6666),
-        (1812, 6666, "public_managed", None),
+        (1812, 6666, "public_managed", MANAGED_TEAM_MAX_TEAM_SIZE),
     )
     @ddt.unpack
     def test_calc_max_team_size(

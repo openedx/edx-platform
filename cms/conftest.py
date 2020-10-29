@@ -9,11 +9,11 @@ only running cms tests.
 
 import importlib
 import os
+import logging
 import contracts
 import pytest
 
-from openedx.core.pytest_hooks import pytest_json_modifyreport  # pylint: disable=unused-import
-from openedx.core.pytest_hooks import pytest_sessionfinish  # pylint: disable=unused-import
+from openedx.core.pytest_hooks import DeferPlugin
 
 
 # Patch the xml libs before anything else.
@@ -25,6 +25,11 @@ def pytest_configure(config):
     """
     Do core setup operations from manage.py before collecting tests.
     """
+    if config.pluginmanager.hasplugin("pytest_jsonreport") or config.pluginmanager.hasplugin("json-report"):
+        config.pluginmanager.register(DeferPlugin())
+    else:
+        logging.info("pytest did not register json_report correctly")
+
     if config.getoption('help'):
         return
     enable_contracts = os.environ.get('ENABLE_CONTRACTS', False)

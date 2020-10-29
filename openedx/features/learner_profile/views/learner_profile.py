@@ -1,17 +1,18 @@
 """ Views for a student's profile information. """
 
 
-from badges.utils import badges_enabled
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ObjectDoesNotExist
-from django.urls import reverse
 from django.http import Http404
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import redirect, render_to_response
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
+
+from badges.utils import badges_enabled
 from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.credentials.utils import get_credentials_records_url
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig

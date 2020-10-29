@@ -15,7 +15,7 @@ const deactivate = (password) => fetch('/api/user/v1/accounts/deactivate_logout/
     return response;
   }
 
-  throw new Error(response);
+  throw new Error(response.status);
 });
 
 export {

@@ -26,7 +26,8 @@ class LearningContext(object):
     def can_edit_block(self, user, usage_key):  # pylint: disable=unused-argument
         """
         Does the specified usage key exist in its context, and if so, does the
-        specified user have permission to edit it?
+        specified user have permission to edit it (make changes to the authored
+        data store)?
 
         user: a Django User object (may be an AnonymousUser)
 

@@ -1,4 +1,3 @@
-# pylint: disable=missing-docstring
 """
 Views to support notification preferences.
 """
@@ -71,7 +70,7 @@ class UsernameCipher(object):
         encryptor = aes_cipher.encryptor()
         padder = PKCS7(AES.block_size).padder()
         padded = padder.update(username.encode("utf-8")) + padder.finalize()
-        return urlsafe_b64encode(initialization_vector + encryptor.update(padded) + encryptor.finalize())
+        return urlsafe_b64encode(initialization_vector + encryptor.update(padded) + encryptor.finalize()).decode()
 
     @staticmethod
     def decrypt(token):
@@ -96,7 +95,7 @@ class UsernameCipher(object):
 
         try:
             unpadded = unpadder.update(decrypted) + unpadder.finalize()
-            if len(unpadded) == 0:  # pylint: disable=len-as-condition
+            if len(unpadded) == 0:
                 raise UsernameDecryptionException("padding")
             return unpadded
         except ValueError:
@@ -173,7 +172,7 @@ def ajax_status(request):
 
 
 @require_GET
-def set_subscription(request, token, subscribe):  # pylint: disable=unused-argument
+def set_subscription(request, token, subscribe):
     """
     A view that disables or re-enables notifications for a user who may not be authenticated
 
@@ -187,7 +186,7 @@ def set_subscription(request, token, subscribe):  # pylint: disable=unused-argum
     success, the response will contain a page indicating success.
     """
     try:
-        username = UsernameCipher().decrypt(token.encode())
+        username = UsernameCipher().decrypt(token.encode()).decode()
         user = User.objects.get(username=username)
     except UnicodeDecodeError:
         raise Http404("base64url")

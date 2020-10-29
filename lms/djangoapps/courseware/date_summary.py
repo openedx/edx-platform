@@ -20,12 +20,15 @@ from lazy import lazy
 from pytz import utc
 
 from course_modes.models import CourseMode, get_cosmetic_verified_display_price
-from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link, can_show_verified_upgrade
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
+from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.certificates.api import can_show_certificate_available_date_field
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.features.course_experience import UPGRADE_DEADLINE_MESSAGE, CourseHomeMessages
+from openedx.features.course_duration_limits.access import get_user_course_expiration_date
+from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from openedx.features.course_experience import RELATIVE_DATES_FLAG, UPGRADE_DEADLINE_MESSAGE, CourseHomeMessages
 from student.models import CourseEnrollment
 
 from .context_processor import user_timezone_locale_prefs
@@ -55,8 +58,17 @@ class DateSummary(object):
         return ''
 
     @property
+    def date_type(self):
+        return 'event'
+
+    @property
     def title(self):
         """The title of this summary."""
+        return ''
+
+    @property
+    def title_html(self):
+        """The title as html for this summary."""
         return ''
 
     @property
@@ -219,6 +231,10 @@ class TodaysDate(DateSummary):
         return self.current_time
 
     @property
+    def date_type(self):
+        return 'todays-date'
+
+    @property
     def title(self):
         return 'current_datetime'
 
@@ -232,7 +248,15 @@ class CourseStartDate(DateSummary):
 
     @property
     def date(self):
-        return self.course.start
+        if not self.course.self_paced:
+            return self.course.start
+        else:
+            enrollment = CourseEnrollment.get_enrollment(self.user, self.course_id)
+            return max(enrollment.created, self.course.start) if enrollment else self.course.start
+
+    @property
+    def date_type(self):
+        return 'course-start-date'
 
     def register_alerts(self, request, course):
         """
@@ -287,7 +311,19 @@ class CourseEndDate(DateSummary):
 
     @property
     def date(self):
+        if self.course.self_paced and RELATIVE_DATES_FLAG.is_enabled(self.course_id):
+            weeks_to_complete = get_course_run_details(self.course.id, ['weeks_to_complete']).get('weeks_to_complete')
+            if weeks_to_complete:
+                course_duration = datetime.timedelta(weeks=weeks_to_complete)
+                if self.course.end < (self.current_time + course_duration):
+                    return self.course.end
+                return None
+
         return self.course.end
+
+    @property
+    def date_type(self):
+        return 'course-end-date'
 
     def register_alerts(self, request, course):
         """
@@ -316,6 +352,85 @@ class CourseEndDate(DateSummary):
                         course_end_time=self.short_time_html,
                     )
                 )
+
+
+class CourseAssignmentDate(DateSummary):
+    """
+    Displays due dates for homework assignments with a link to the homework
+    assignment if the link is provided.
+    """
+    css_class = 'assignment'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.assignment_date = None
+        self.assignment_link = ''
+        self.assignment_title = None
+        self.assignment_title_html = None
+        self.contains_gated_content = False
+        self.complete = None
+        self.past_due = None
+
+    @property
+    def date(self):
+        return self.assignment_date
+
+    @date.setter
+    def date(self, date):
+        self.assignment_date = date
+
+    @property
+    def date_type(self):
+        return 'assignment-due-date'
+
+    @property
+    def link(self):
+        return self.assignment_link
+
+    @link.setter
+    def link(self, link):
+        self.assignment_link = link
+
+    @property
+    def title(self):
+        return self.assignment_title
+
+    @property
+    def title_html(self):
+        return self.assignment_title_html
+
+    def set_title(self, title, link=None):
+        """ Used to set the title_html and title properties for the assignment date block """
+        if link:
+            self.assignment_title_html = HTML(
+                '<a href="{assignment_link}">{assignment_title}</a>'
+            ).format(assignment_link=link, assignment_title=title)
+        self.assignment_title = title
+
+
+class CourseExpiredDate(DateSummary):
+    """
+    Displays the course expiration date for Audit learners (if enabled)
+    """
+    css_class = 'course-expired'
+
+    @property
+    def date(self):
+        if not CourseDurationLimitConfig.enabled_for_enrollment(user=self.user, course_key=self.course_id):
+            return
+        return get_user_course_expiration_date(self.user, self.course)
+
+    @property
+    def date_type(self):
+        return 'course-expired-date'
+
+    @property
+    def description(self):
+        return _('You lose all access to this course, including your progress.')
+
+    @property
+    def title(self):
+        return _('Audit Access Expires')
 
 
 class CertificateAvailableDate(DateSummary):
@@ -351,6 +466,10 @@ class CertificateAvailableDate(DateSummary):
         return self.course.certificate_available_date
 
     @property
+    def date_type(self):
+        return 'certificate-available-date'
+
+    @property
     def has_certificate_modes(self):
         return any([
             mode.slug for mode in CourseMode.modes_for_course(
@@ -384,53 +503,6 @@ class CertificateAvailableDate(DateSummary):
             )
 
 
-def verified_upgrade_deadline_link(user, course=None, course_id=None):
-    """
-    Format the correct verified upgrade link for the specified ``user``
-    in a course.
-
-    One of ``course`` or ``course_id`` must be supplied. If both are specified,
-    ``course`` will take priority.
-
-    Arguments:
-        user (:class:`~django.contrib.auth.models.User`): The user to display
-            the link for.
-        course (:class:`.CourseOverview`): The course to render a link for.
-        course_id (:class:`.CourseKey`): The course_id of the course to render for.
-
-    Returns:
-        The formatted link that will allow the user to upgrade to verified
-        in this course.
-    """
-    if course is not None:
-        course_id = course.id
-    return EcommerceService().upgrade_url(user, course_id)
-
-
-def verified_upgrade_link_is_valid(enrollment=None):
-    """
-    Return whether this enrollment can be upgraded.
-
-    Arguments:
-        enrollment (:class:`.CourseEnrollment`): The enrollment under consideration.
-            If None, then the enrollment is considered to be upgradeable.
-    """
-    # Return `true` if user is not enrolled in course
-    if enrollment is None:
-        return False
-
-    upgrade_deadline = enrollment.upgrade_deadline
-
-    if upgrade_deadline is None:
-        return False
-
-    if datetime.datetime.now(utc).date() > upgrade_deadline.date():
-        return False
-
-    # Show the summary if user enrollment is in which allow user to upsell
-    return enrollment.is_active and enrollment.mode in CourseMode.UPSELL_TO_VERIFIED_MODES
-
-
 class VerifiedUpgradeDeadlineDate(DateSummary):
     """
     Displays the date before which learners must upgrade to the
@@ -459,7 +531,7 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
         if not is_enabled:
             return False
 
-        return verified_upgrade_link_is_valid(self.enrollment)
+        return can_show_verified_upgrade(self.user, self.enrollment, self.course)
 
     @lazy
     def date(self):
@@ -467,6 +539,10 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
             return self.enrollment.upgrade_deadline
         else:
             return None
+
+    @property
+    def date_type(self):
+        return 'verified-upgrade-deadline'
 
     @property
     def title(self):
@@ -603,6 +679,10 @@ class VerificationDeadlineDate(DateSummary):
     @lazy
     def date(self):
         return VerificationDeadline.deadline_for_course(self.course_id)
+
+    @property
+    def date_type(self):
+        return 'verification-deadline-date'
 
     @lazy
     def is_enabled(self):

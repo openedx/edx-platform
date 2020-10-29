@@ -8,11 +8,11 @@ import ddt
 import pytz
 from django.contrib.sites.models import Site
 from django.utils.timezone import now
+from enterprise.models import EnterpriseCustomer, EnterpriseCustomerUser
 from mock import Mock, patch
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from enterprise.models import EnterpriseCustomer, EnterpriseCustomerUser
 from entitlements.tests.factories import CourseEntitlementFactory
 from experiments.models import ExperimentData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview

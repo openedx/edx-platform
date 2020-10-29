@@ -5,7 +5,7 @@ Django Celery tasks for service status app
 
 import time
 
-from djcelery import celery
+from celery import current_app as celery
 
 
 @celery.task

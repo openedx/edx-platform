@@ -60,7 +60,7 @@ class Command(BaseCommand):
 
         export_course_to_tarfile(course_key, filename)
 
-        results = self._get_results(filename) if pipe_results else None
+        results = self._get_results(filename) if pipe_results else ''
 
         self.stdout.write(results, ending="")
 

@@ -9,6 +9,7 @@ Studio APIs cover use cases like adding/deleting/editing blocks.
 """
 
 import logging
+import threading
 
 from django.urls import reverse
 from django.utils.translation import ugettext as _
@@ -38,15 +39,24 @@ def get_runtime_system():
     keep application startup faster, it's only initialized when first accessed
     via this method.
     """
-    # pylint: disable=protected-access
-    if not hasattr(get_runtime_system, '_system'):
+    # The runtime system should not be shared among threads, as there is currently a race condition when parsing XML
+    # that can lead to duplicate children.
+    # (In BlockstoreXBlockRuntime.get_block(), has_cached_definition(def_id) returns false so parse_xml is called, but
+    # meanwhile another thread parses the XML and caches the definition; then when parse_xml gets to XML nodes for
+    # child blocks, it appends them to the children already cached by the other thread and saves the doubled list of
+    # children; this happens only occasionally but is very difficult to avoid in a clean way due to the API of parse_xml
+    # and XBlock field data in general [does not distinguish between setting initial values during parsing and changing
+    # values at runtime due to user interaction], and how it interacts with BlockstoreFieldData. Keeping the caches
+    # local to each thread completely avoids this problem.)
+    cache_name = '_system_{}'.format(threading.get_ident())
+    if not hasattr(get_runtime_system, cache_name):
         params = dict(
             handler_url=get_handler_url,
             runtime_class=BlockstoreXBlockRuntime,
         )
         params.update(get_xblock_app_config().get_runtime_system_params())
-        get_runtime_system._system = XBlockRuntimeSystem(**params)
-    return get_runtime_system._system
+        setattr(get_runtime_system, cache_name, XBlockRuntimeSystem(**params))
+    return getattr(get_runtime_system, cache_name)
 
 
 def load_block(usage_key, user):
@@ -62,14 +72,9 @@ def load_block(usage_key, user):
     # Is this block part of a course, a library, or what?
     # Get the Learning Context Implementation based on the usage key
     context_impl = get_learning_context_impl(usage_key)
-    # Now, using the LearningContext and the Studio/LMS-specific logic, check if
-    # the block exists in this context and if the user has permission to render
-    # this XBlock view:
-    if get_xblock_app_config().require_edit_permission:
-        authorized = context_impl.can_edit_block(user, usage_key)
-    else:
-        authorized = context_impl.can_view_block(user, usage_key)
-    if not authorized:
+    # Now, check if the block exists in this context and if the user has
+    # permission to render this XBlock view:
+    if user is not None and not context_impl.can_view_block(user, usage_key):
         # We do not know if the block was not found or if the user doesn't have
         # permission, but we want to return the same result in either case:
         raise NotFound("XBlock {} does not exist, or you don't have permission to view it.".format(usage_key))
@@ -84,15 +89,46 @@ def load_block(usage_key, user):
     return runtime.get_block(usage_key)
 
 
-def get_block_metadata(block):
+def get_block_metadata(block, includes=()):
     """
-    Get metadata about the specified XBlock
+    Get metadata about the specified XBlock.
+
+    This metadata is the same for all users. Any data which varies per-user must
+    be served from a different API.
+
+    Optionally provide a list or set of metadata keys to include. Valid keys are:
+        index_dictionary: a dictionary of data used to add this XBlock's content
+            to a search index.
+        student_view_data: data needed to render the XBlock on mobile or in
+            custom frontends.
+        children: list of usage keys of the XBlock's children
+        editable_children: children in the same bundle, as opposed to linked
+            children in other bundles.
     """
-    return {
+    data = {
         "block_id": six.text_type(block.scope_ids.usage_id),
         "block_type": block.scope_ids.block_type,
         "display_name": get_block_display_name(block),
     }
+
+    if "index_dictionary" in includes:
+        data["index_dictionary"] = block.index_dictionary()
+
+    if "student_view_data" in includes:
+        data["student_view_data"] = block.student_view_data() if hasattr(block, 'student_view_data') else None
+
+    if "children" in includes:
+        data["children"] = block.children if hasattr(block, 'children') else []  # List of usage keys of children
+
+    if "editable_children" in includes:
+        # "Editable children" means children in the same bundle, as opposed to linked children in other bundles.
+        data["editable_children"] = []
+        child_includes = block.runtime.child_includes_of(block)
+        for idx, include in enumerate(child_includes):
+            if include.link_id is None:
+                data["editable_children"].append(block.children[idx])
+
+    return data
 
 
 def resolve_definition(block_or_key):

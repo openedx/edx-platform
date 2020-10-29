@@ -4,12 +4,14 @@ Common utility functions useful throughout the contentstore
 
 
 import logging
+from contextlib import contextmanager
 import re
 from datetime import datetime
 
 import six
 from django.conf import settings
 from django.urls import reverse
+from django.utils import translation
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocator
@@ -126,7 +128,7 @@ def get_lms_link_for_item(location, preview=False):
     )
 
 
-def get_lms_link_for_certificate_web_view(user_id, course_key, mode):
+def get_lms_link_for_certificate_web_view(course_key, mode):
     """
     Returns the url to the certificate web view.
     """
@@ -135,9 +137,8 @@ def get_lms_link_for_certificate_web_view(user_id, course_key, mode):
     if settings.LMS_BASE is None:
         return None
 
-    return u"//{certificate_web_base}/certificates/user/{user_id}/course/{course_id}?preview={mode}".format(
+    return u"//{certificate_web_base}/certificates/course/{course_id}?preview={mode}".format(
         certificate_web_base=get_lms_link_from_course_key(settings.LMS_BASE, course_key),
-        user_id=user_id,
         course_id=six.text_type(course_key),
         mode=mode
     )
@@ -568,3 +569,19 @@ def get_sibling_urls(subsection):
     if next_loc:
         next_url = reverse_usage_url('container_handler', next_loc)
     return prev_url, next_url
+
+
+@contextmanager
+def translation_language(language):
+    """Context manager to override the translation language for the scope
+    of the following block. Has no effect if language is None.
+    """
+    if language:
+        previous = translation.get_language()
+        translation.activate(language)
+        try:
+            yield
+        finally:
+            translation.activate(previous)
+    else:
+        yield

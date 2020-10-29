@@ -176,6 +176,7 @@ class BaseTopicSerializer(serializers.Serializer):  # pylint: disable=abstract-m
     name = serializers.CharField()
     id = serializers.CharField()  # pylint: disable=invalid-name
     type = serializers.CharField()
+    max_team_size = serializers.IntegerField()
 
 
 class TopicSerializer(BaseTopicSerializer):  # pylint: disable=abstract-method

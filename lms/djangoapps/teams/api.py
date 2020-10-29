@@ -12,9 +12,11 @@ from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
-from lms.djangoapps.teams.models import CourseTeam
-from student.models import CourseEnrollment
+from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
+from openedx.core.lib.teams_config import TeamsetType
+from student.models import CourseEnrollment, anonymous_id_for_user
 from student.roles import CourseInstructorRole, CourseStaffRole
+from xmodule.modulestore.django import modulestore
 
 logger = logging.getLogger(__name__)
 
@@ -61,33 +63,41 @@ def get_team_by_discussion(discussion_id):
         return None
 
 
+def _get_teamset_type(course_id, teamset_id):
+    """
+    Helper to get teamset type from a course_id and teamset_id.
+    Assumes course_id exists and teamset_id is defined
+    """
+    course = modulestore().get_course(course_id)
+    return course.teams_configuration.teamsets_by_id[teamset_id].teamset_type
+
+
 def is_team_discussion_private(team):
     """
-    This is the function to check if the team is configured to have its discussion
-    to be private. We need a way to check the setting on the team.
-    This function also provide ways to toggle the setting of discussion visibility on the
-    individual team level.
-    To be followed up by MST-25
+    Checks to see if the team is configured to have its discussion to be private
     """
-    return getattr(team, 'is_discussion_private', False)
+    if not team:
+        return False
+    return _get_teamset_type(team.course_id, team.topic_id) == TeamsetType.private_managed
 
 
-def is_instructor_managed_team(team):  # pylint: disable=unused-argument
+def is_instructor_managed_team(team):
     """
     Return true if the team is managed by instructors.
-    For now always return false, will complete the logic later.
-    TODO MST-25
     """
-    return False
+    if not team:
+        return False
+    return is_instructor_managed_topic(team.course_id, team.topic_id)
 
 
-def is_instructor_managed_topic(topic):  # pylint: disable=unused-argument
+def is_instructor_managed_topic(course_id, topic):
     """
     Return true if the topic is managed by instructors.
-    For now always return false, will complete the logic later.
-    TODO MST-25
     """
-    return False
+    if not course_id or not topic:
+        return False
+    managed_types = (TeamsetType.private_managed, TeamsetType.public_managed)
+    return _get_teamset_type(course_id, topic) in managed_types
 
 
 def user_is_a_team_member(user, team):
@@ -172,6 +182,61 @@ def user_organization_protection_status(user, course_key):
 
 def has_specific_team_access(user, team):
     """
+    To have access to a team a user must:
+        - Be course staff
+        OR
+        - be in the correct bubble
+        - be in the team if it is private
+    """
+    return has_course_staff_privileges(user, team.course_id) or (
+        user_protection_status_matches_team(user, team) and user_on_team_or_team_is_public(user, team)
+    )
+
+
+def has_specific_teamset_access(user, course_module, teamset_id):
+    """
+    Staff have access to all teamsets.
+    All non-staff users have access to open and public_managed teamsets.
+    Non-staff users only have access to a private_managed teamset if they are in a team in that teamset
+    """
+    return has_course_staff_privileges(user, course_module.id) or \
+        teamset_is_public_or_user_is_on_team_in_teamset(user, course_module, teamset_id)
+
+
+def teamset_is_public_or_user_is_on_team_in_teamset(user, course_module, teamset_id):
+    """
+    The only users who should be able to see private_managed teamsets
+    or recieve any information about them at all from the API are:
+    - Course staff
+    - Users who are enrolled in a team in a private_managed teamset
+
+    course_module is passed in because almost universally where we'll be calling this, we will already
+    need to have looked up the course from modulestore to make sure that the topic we're interested in
+    exists in the course.
+    """
+    teamset = course_module.teams_configuration.teamsets_by_id[teamset_id]
+    if teamset.teamset_type != TeamsetType.private_managed:
+        return True
+    return CourseTeamMembership.user_in_team_for_course(user, course_module.id, topic_id=teamset_id)
+
+
+def user_on_team_or_team_is_public(user, team):
+    """
+    The only users who should be able to see private_managed teams
+    or recieve any information about them at all from the API are:
+    - Course staff
+    - Users who are enrolled in a team in a private_managed teamset
+    * They should only be able to see their own team, no other teams.
+    """
+    if CourseTeamMembership.is_user_on_team(user, team):
+        return True
+    course_module = modulestore().get_course(team.course_id)
+    teamset = course_module.teams_configuration.teamsets_by_id[team.topic_id]
+    return teamset.teamset_type != TeamsetType.private_managed
+
+
+def user_protection_status_matches_team(user, team):
+    """
     Check whether the user have access to the specific team.
     The user can be of a different organization protection bubble with the team in question.
     If user is not in the same organization protection bubble with the team, return False.
@@ -240,7 +305,7 @@ def can_user_create_team_in_topic(user, course_id, topic_id):
     Assumes that user is enrolled in course run.
     """
     return (
-        (not is_instructor_managed_topic(topic_id)) or
+        (not is_instructor_managed_topic(course_id, topic_id)) or
         has_course_staff_privileges(user, course_id)
     )
 
@@ -278,3 +343,25 @@ def get_team_for_user_course_topic(user, course_id, topic_id):
             membership__user__username=user.username,
             topic_id=topic_id,
         ).first()
+
+
+def anonymous_user_ids_for_team(user, team):
+    """ Get the anonymous user IDs for members of a team, used in team submissions
+        Requesting user must be a member of the team or course staff
+
+        Returns:
+            (Array) User IDs, sorted to remove any correlation to usernames
+    """
+    if not user or not team:
+        raise Exception("User and team must be provided for ID lookup")
+
+    if not has_course_staff_privileges(user, team.course_id) and not user_is_a_team_member(user, team):
+        raise Exception("User {user} is not permitted to access team info for {team}".format(
+            user=user.username,
+            team=team.team_id
+        ))
+
+    return sorted([
+        anonymous_id_for_user(user=team_member, course_id=team.course_id, save=False)
+        for team_member in team.users.all()
+    ])

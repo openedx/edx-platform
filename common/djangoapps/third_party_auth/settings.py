@@ -23,7 +23,7 @@ def apply_settings(django_settings):
     django_settings.FIELDS_STORED_IN_SESSION = ['auth_entry', 'next']
 
     # Inject exception middleware to make redirects fire.
-    django_settings.MIDDLEWARE_CLASSES.extend(
+    django_settings.MIDDLEWARE.extend(
         ['third_party_auth.middleware.ExceptionMiddleware']
     )
 
@@ -80,6 +80,9 @@ def apply_settings(django_settings):
     # instead of a Django error page. During development you may want to
     # enable this when you want to get stack traces rather than redirections.
     django_settings.SOCIAL_AUTH_RAISE_EXCEPTIONS = False
+
+    # Clean username to make sure username is compatible with our system requirements
+    django_settings.SOCIAL_AUTH_CLEAN_USERNAME_FUNCTION = 'third_party_auth.models.clean_username'
 
     # Allow users to login using social auth even if their account is not verified yet
     # This is required since we [ab]use django's 'is_active' flag to indicate verified

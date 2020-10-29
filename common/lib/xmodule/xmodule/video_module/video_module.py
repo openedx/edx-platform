@@ -260,7 +260,11 @@ class VideoBlock(
         if getattr(self.runtime, 'suppports_state_for_anonymous_users', False):
             # The new runtime can support anonymous users as fully as regular users:
             return self.student_view(context)
-        return Fragment(self.get_html(view=PUBLIC_VIEW))
+
+        fragment = Fragment(self.get_html(view=PUBLIC_VIEW))
+        add_webpack_to_fragment(fragment, 'VideoBlockPreview')
+        shim_xmodule_js(fragment, 'Video')
+        return fragment
 
     def get_html(self, view=STUDENT_VIEW):
 
@@ -817,7 +821,8 @@ class VideoBlock(
 
         _ = self.runtime.service(self, "i18n").ugettext
         video_url.update({
-            'help': _('The URL for your video. This can be a YouTube URL or a link to an .mp4, .ogg, or .webm video file hosted elsewhere on the Internet.'),  # pylint: disable=line-too-long
+            'help': _('The URL for your video. This can be a YouTube URL or a link to an .mp4, .ogg, or '
+                      '.webm video file hosted elsewhere on the Internet.'),
             'display_name': _('Default Video URL'),
             'field_name': 'video_url',
             'type': 'VideoList',

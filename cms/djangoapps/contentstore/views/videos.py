@@ -13,6 +13,7 @@ from uuid import uuid4
 import rfc6266_parser
 import six
 from boto import s3
+from boto.sts import STSConnection
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -44,7 +45,11 @@ from contentstore.utils import reverse_course_url
 from contentstore.video_utils import validate_video_image
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
-from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE, waffle_flags
+from openedx.core.djangoapps.video_pipeline.config.waffle import (
+    DEPRECATE_YOUTUBE,
+    ENABLE_DEVSTACK_VIDEO_UPLOADS,
+    waffle_flags
+)
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace, WaffleSwitchNamespace
 from util.json_request import JsonResponse, expect_json
 from xmodule.video_module.transcripts_utils import Transcript
@@ -91,6 +96,38 @@ MAX_UPLOAD_HOURS = 24
 VIDEOS_PER_PAGE = 100
 
 
+class AssumeRole(object):
+    """ Singleton class to establish connection to aws using mfa and assume role """
+    __instance = None
+
+    @staticmethod
+    def get_instance():
+        """ Static access method. """
+        if not AssumeRole.__instance:
+            AssumeRole()
+
+        return AssumeRole.__instance
+
+    def __init__(self):
+        """ Virtually private constructor. """
+        if AssumeRole.__instance:
+            raise Exception("This is a singleton class!")
+
+        sts = STSConnection(
+            settings.AWS_ACCESS_KEY_ID,
+            settings.AWS_SECRET_ACCESS_KEY
+        )
+        self.credentials = sts.assume_role(
+            role_arn=settings.ROLE_ARN,
+            role_session_name='vem',
+            duration_seconds=3600,
+            mfa_serial_number=settings.MFA_SERIAL_NUMBER,
+            mfa_token=settings.MFA_TOKEN
+        ).credentials.to_dict()
+
+        AssumeRole.__instance = self
+
+
 class TranscriptProvider(object):
     """
     Transcription Provider Enumeration
@@ -134,6 +171,10 @@ class StatusDisplayStrings(object):
     _TRANSCRIPTION_IN_PROGRESS = ugettext_noop("Transcription in Progress")
     # Translators: This is the status for a video whose transcription is complete
     _TRANSCRIPT_READY = ugettext_noop("Transcript Ready")
+    # Translators: This is the status for a video whose transcription job was failed for some languages
+    _PARTIAL_FAILURE = ugettext_noop("Partial Failure")
+    # Translators: This is the status for a video whose transcription job has failed altogether
+    _TRANSCRIPT_FAILED = ugettext_noop("Transcript Failed")
 
     _STATUS_MAP = {
         "upload": _UPLOADING,
@@ -154,6 +195,9 @@ class StatusDisplayStrings(object):
         "imported": _IMPORTED,
         "transcription_in_progress": _TRANSCRIPTION_IN_PROGRESS,
         "transcript_ready": _TRANSCRIPT_READY,
+        "partial_failure": _PARTIAL_FAILURE,
+        # TODO: Add a related unit tests when the VAL update is part of platform
+        "transcript_failed": _TRANSCRIPT_FAILED,
     }
 
     @staticmethod
@@ -271,7 +315,7 @@ def validate_transcript_preferences(provider, cielo24_fidelity, cielo24_turnarou
                     return error, preferences
 
                 if not preferred_languages or not set(preferred_languages) <= set(supported_languages.keys()):
-                    error = 'Invalid languages {}.'.format(preferred_languages)  # pylint: disable=unicode-format-string
+                    error = 'Invalid languages {}.'.format(preferred_languages)
                     return error, preferences
 
                 # Validated Cielo24 preferences
@@ -487,7 +531,7 @@ def convert_video_status(video, is_video_encodes_ready=False):
         ])
     elif video['status'] == 'invalid_token':
         status = StatusDisplayStrings.get('youtube_duplicate')
-    elif is_video_encodes_ready or video['status'] == 'transcript_ready':
+    elif is_video_encodes_ready:
         status = StatusDisplayStrings.get('file_complete')
     else:
         status = StatusDisplayStrings.get(video['status'])
@@ -509,21 +553,19 @@ def _get_videos(course, pagination_conf=None):
 
     # This is required to see if edx video pipeline is enabled while converting the video status.
     course_video_upload_token = course.video_upload_pipeline.get('course_video_upload_token')
+    transcription_statuses = ['transcription_in_progress', 'transcript_ready', 'partial_failure', 'transcript_failed']
 
     # convert VAL's status to studio's Video Upload feature status.
     for video in videos:
-        # If we are using "new video workflow" and status is `transcription_in_progress` then video encodes are ready.
+        # If we are using "new video workflow" and status is in `transcription_statuses` then video encodes are ready.
         # This is because Transcription starts once all the encodes are complete except for YT, but according to
         # "new video workflow" YT is disabled as well as deprecated. So, Its precise to say that the Transcription
         # starts once all the encodings are complete *for the new video workflow*.
-        is_video_encodes_ready = not course_video_upload_token and video['status'] == 'transcription_in_progress'
+        is_video_encodes_ready = not course_video_upload_token and (video['status'] in transcription_statuses)
         # Update with transcript languages
         video['transcripts'] = get_available_transcript_languages(video_id=video['edx_video_id'])
-        # Transcription status should only be visible if 3rd party transcripts are pending.
         video['transcription_status'] = (
-            StatusDisplayStrings.get(video['status'])
-            if not video['transcripts'] and is_video_encodes_ready else
-            ''
+            StatusDisplayStrings.get(video['status']) if is_video_encodes_ready else ''
         )
         # Convert the video status.
         video['status'] = convert_video_status(video, is_video_encodes_ready)
@@ -546,6 +588,7 @@ def _get_index_videos(course, pagination_conf=None):
     attrs = [
         'edx_video_id', 'client_video_id', 'created', 'duration',
         'status', 'courses', 'transcripts', 'transcription_status',
+        'error_description'
     ]
 
     def _get_values(video):
@@ -765,10 +808,20 @@ def storage_service_bucket():
     """
     Returns an S3 bucket for video uploads.
     """
-    conn = s3.connection.S3Connection(
-        settings.AWS_ACCESS_KEY_ID,
-        settings.AWS_SECRET_ACCESS_KEY
-    )
+    if waffle_flags()[ENABLE_DEVSTACK_VIDEO_UPLOADS].is_enabled():
+        credentials = AssumeRole.get_instance().credentials
+        params = {
+            'aws_access_key_id': credentials['access_key'],
+            'aws_secret_access_key': credentials['secret_key'],
+            'security_token': credentials['session_token']
+        }
+    else:
+        params = {
+            'aws_access_key_id': settings.AWS_ACCESS_KEY_ID,
+            'aws_secret_access_key': settings.AWS_SECRET_ACCESS_KEY
+        }
+
+    conn = s3.connection.S3Connection(**params)
     # We don't need to validate our bucket, it requires a very permissive IAM permission
     # set since behind the scenes it fires a HEAD request that is equivalent to get_all_keys()
     # meaning it would need ListObjects on the whole bucket, not just the path used in each

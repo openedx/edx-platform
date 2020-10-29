@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django.http import Http404
 
 from bulk_email.models import Optout
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.discussion.notification_prefs.views import (
     UsernameCipher,
@@ -35,9 +35,8 @@ def opt_out_email_updates(request, token, course_id):
 
     Raises a 404 if there are any errors parsing the input.
     """
-
     try:
-        username = UsernameCipher().decrypt(token)
+        username = UsernameCipher().decrypt(token).decode("utf-8")
         user = User.objects.get(username=username)
         course_key = CourseKey.from_string(course_id)
         course = get_course_by_id(course_key, depth=0)

@@ -20,14 +20,22 @@
             },
 
             teamCapacityText: function(memberCount, maxMemberCount) {
+                var formatString;
+                var parameters = {memberCount: memberCount};
+                if (maxMemberCount === null) {
+                    formatString = '{memberCount}';
+                } else {
+                    formatString = '{memberCount} / {maxMemberCount}';
+                    parameters.maxMemberCount = maxMemberCount;
+                }
                 return StringUtils.interpolate(
                     // Translators: The following message displays the number of members on a team.
                     ngettext(
-                        '{memberCount} / {maxMemberCount} Member',
-                        '{memberCount} / {maxMemberCount} Members',
-                        maxMemberCount
+                        formatString + ' Member',
+                        formatString + ' Members',
+                        maxMemberCount || memberCount
                     ),
-                    {memberCount: memberCount, maxMemberCount: maxMemberCount}, true
+                    parameters, true
                 );
             },
 
@@ -72,6 +80,38 @@
                     return false;
                 }
                 return topicType.toLowerCase() !== 'open';
+            },
+
+            /** Shows info/error banner for team membership CSV upload
+             * @param: content - string or array for display
+             * @param: isError - true sets error styling, false/none uses info styling
+             */
+            showInfoBanner: function(content, isError) {
+                // clear message
+                var $message = $('#team-management-assign .page-banner .message-content');
+                $message.html('');
+
+                // set message
+                if (Array.isArray(content)) {
+                    content.forEach(function(item) {
+                        // xss-lint: disable=javascript-jquery-append
+                        $message.append($('<p>').text(item));
+                    });
+                } else {
+                    $('#team-management-assign .page-banner .message-content').text(content);
+                }
+
+                // set color sytling
+                $('#team-management-assign .page-banner .alert')
+                    .toggleClass('alert-success', !isError)
+                    .toggleClass('alert-danger', isError);
+
+                // set icon styling
+                $('#team-management-assign .page-banner .icon')
+                    .toggleClass('fa-check', !isError)
+                    .toggleClass('fa-warning', isError);
+
+                $('#team-management-assign .page-banner').show();
             }
         };
     });

@@ -7,7 +7,6 @@ courses.
 import json
 import logging
 import os
-from six import StringIO
 import subprocess
 
 import mongoengine
@@ -27,14 +26,14 @@ from django.views.decorators.http import condition
 from django.views.generic.base import TemplateView
 from opaque_keys.edx.keys import CourseKey
 from path import Path as path
-from six import text_type
+from six import StringIO, text_type
 
 import dashboard.git_import as git_import
 import track.views
-from lms.djangoapps.courseware.courses import get_course_by_id
 from dashboard.git_import import GitImportError
 from dashboard.models import CourseImportLog
 from edxmako.shortcuts import render_to_response
+from lms.djangoapps.courseware.courses import get_course_by_id
 from openedx.core.djangolib.markup import HTML
 from student.models import CourseEnrollment, Registration, UserProfile
 from student.roles import CourseInstructorRole, CourseStaffRole

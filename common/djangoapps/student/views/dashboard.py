@@ -21,12 +21,12 @@ from six import iteritems, text_type
 
 import track.views
 from bulk_email.api import is_bulk_email_feature_enabled
-from bulk_email.models import Optout  # pylint: disable=import-error
+from bulk_email.models import Optout
 from course_modes.models import CourseMode
-from lms.djangoapps.courseware.access import has_access
 from edxmako.shortcuts import render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
-from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
+from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.experiments.utils import get_dashboard_course_info
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.utils import (
@@ -35,23 +35,25 @@ from openedx.core.djangoapps.catalog.utils import (
     get_visible_sessions_for_entitlement
 )
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_attribute_values, make_providers_strings
+from openedx.core.djangoapps.plugins import constants as plugin_constants
+from openedx.core.djangoapps.plugins.plugin_contexts import get_plugins_view_context
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled_for_user
-from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
+from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import get_dashboard_consent_notification
-from shoppingcart.api import order_history
 from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
+from student.api import COURSE_DASHBOARD_PLUGIN_VIEW_NAME
 from student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
 from student.models import (
     AccountRecovery,
     CourseEnrollment,
     CourseEnrollmentAttribute,
     DashboardConfiguration,
+    PendingSecondaryEmailChange,
     UserProfile
 )
 from util.milestones_helpers import get_pre_requisite_courses_not_completed
@@ -148,7 +150,7 @@ def _allow_donation(course_modes, course_id, enrollment):
     )
 
 
-def _create_recent_enrollment_message(course_enrollments, course_modes):  # pylint: disable=invalid-name
+def _create_recent_enrollment_message(course_enrollments, course_modes):
     """
     Builds a recent course enrollment message.
 
@@ -653,30 +655,33 @@ def student_dashboard(request):
     enterprise_message = get_dashboard_consent_notification(request, user, course_enrollments)
 
     recovery_email_message = recovery_email_activation_message = None
-    if is_secondary_email_feature_enabled_for_user(user=user):
+    if is_secondary_email_feature_enabled():
         try:
-            account_recovery_obj = AccountRecovery.objects.get(user=user)
-        except AccountRecovery.DoesNotExist:
-            recovery_email_message = Text(
-                _(
-                    "Add a recovery email to retain access when single-sign on is not available. "
-                    "Go to {link_start}your Account Settings{link_end}.")
-            ).format(
-                link_start=HTML("<a href='{account_setting_page}'>").format(
-                    account_setting_page=reverse('account_settings'),
-                ),
-                link_end=HTML("</a>")
-            )
-        else:
-            if not account_recovery_obj.is_active:
-                recovery_email_activation_message = Text(
+            pending_email = PendingSecondaryEmailChange.objects.get(user=user)
+        except PendingSecondaryEmailChange.DoesNotExist:
+            try:
+                account_recovery_obj = AccountRecovery.objects.get(user=user)
+            except AccountRecovery.DoesNotExist:
+                recovery_email_message = Text(
                     _(
-                        "Recovery email is not activated yet. "
-                        "Kindly visit your email and follow the instructions to activate it."
-                    )
+                        "Add a recovery email to retain access when single-sign on is not available. "
+                        "Go to {link_start}your Account Settings{link_end}.")
+                ).format(
+                    link_start=HTML("<a href='{account_setting_page}'>").format(
+                        account_setting_page=reverse('account_settings'),
+                    ),
+                    link_end=HTML("</a>")
                 )
+        else:
+            recovery_email_activation_message = Text(
+                _(
+                    "Recovery email is not activated yet. "
+                    "Kindly visit your email and follow the instructions to activate it."
+                )
+            )
 
-    # Disable lookup of Enterprise consent_required_course due to ENT-727
+
+# Disable lookup of Enterprise consent_required_course due to ENT-727
     # Will re-enable after fixing WL-1315
     consent_required_courses = set()
     enterprise_customer_name = None
@@ -792,13 +797,6 @@ def student_dashboard(request):
     # we'll display the banner
     denied_banner = any(item.display for item in reverifications["denied"])
 
-    # Populate the Order History for the side-bar.
-    order_history_list = order_history(
-        user,
-        course_org_filter=site_org_whitelist,
-        org_filter_out_set=site_org_blacklist
-    )
-
     # get list of courses having pre-requisites yet to be completed
     courses_having_prerequisites = frozenset(
         enrollment.course_id for enrollment in course_enrollments
@@ -821,9 +819,8 @@ def student_dashboard(request):
         redirect_message = ''
 
     valid_verification_statuses = ['approved', 'must_reverify', 'pending', 'expired']
-    display_sidebar_on_dashboard = (len(order_history_list) or
-                                    (verification_status['status'] in valid_verification_statuses and
-                                    verification_status['should_display']))
+    display_sidebar_on_dashboard = verification_status['status'] in valid_verification_statuses and \
+        verification_status['should_display']
 
     # Filter out any course enrollment course cards that are associated with fulfilled entitlements
     for entitlement in [e for e in course_entitlements if e.enrollment_course_run is not None]:
@@ -867,7 +864,6 @@ def student_dashboard(request):
         'platform_name': platform_name,
         'enrolled_courses_either_paid': enrolled_courses_either_paid,
         'provider_states': [],
-        'order_history_list': order_history_list,
         'courses_requirements_not_met': courses_requirements_not_met,
         'nav_hidden': True,
         'inverted_programs': inverted_programs,
@@ -886,6 +882,13 @@ def student_dashboard(request):
         'course_info': get_dashboard_course_info(user, course_enrollments),
         # TODO START: clean up as part of REVEM-199 (END)
     }
+
+    context_from_plugins = get_plugins_view_context(
+        plugin_constants.ProjectType.LMS,
+        COURSE_DASHBOARD_PLUGIN_VIEW_NAME,
+        context
+    )
+    context.update(context_from_plugins)
 
     if ecommerce_service.is_enabled(request.user):
         context.update({

@@ -13,7 +13,6 @@ from django.conf import settings
 from django.test import Client, TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
-from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.credit.models import (
@@ -32,6 +31,7 @@ from openedx.core.djangoapps.credit.tests.factories import (
     CreditRequestFactory
 )
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory, AccessTokenFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import AdminFactory, UserFactory
 from util.date_utils import to_timestamp
@@ -77,7 +77,7 @@ class AuthMixin(object):
 
     def test_oauth(self):
         """ Verify the endpoint supports authentication via OAuth 2.0. """
-        access_token = AccessTokenFactory(user=self.user, client=ClientFactory()).token
+        access_token = AccessTokenFactory(user=self.user, application=ApplicationFactory()).token
         headers = {
             'HTTP_AUTHORIZATION': 'Bearer ' + access_token
         }
@@ -173,8 +173,8 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
     def test_oauth(self):
         """ Verify the endpoint supports OAuth, and only allows authorization for staff users. """
         user = UserFactory(is_staff=False)
-        oauth_client = ClientFactory.create()
-        access_token = AccessTokenFactory.create(user=user, client=oauth_client).token
+        oauth_client = ApplicationFactory.create()
+        access_token = AccessTokenFactory.create(user=user, application=oauth_client).token
         headers = {
             'HTTP_AUTHORIZATION': 'Bearer ' + access_token
         }

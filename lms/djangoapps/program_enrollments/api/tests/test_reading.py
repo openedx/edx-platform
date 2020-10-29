@@ -22,24 +22,31 @@ from lms.djangoapps.program_enrollments.exceptions import (
     ProviderConfigurationException,
     ProviderDoesNotExistException
 )
-from lms.djangoapps.program_enrollments.models import ProgramEnrollment
-from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
+from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
+from lms.djangoapps.program_enrollments.tests.factories import (
+    CourseAccessRoleAssignmentFactory,
+    ProgramCourseEnrollmentFactory,
+    ProgramEnrollmentFactory
+)
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL
 from openedx.core.djangoapps.catalog.tests.factories import OrganizationFactory as CatalogOrganizationFactory
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from student.roles import CourseStaffRole
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from third_party_auth.tests.factories import SAMLProviderConfigFactory
 
 from ..reading import (
     fetch_program_course_enrollments,
-    fetch_program_course_enrollments_by_student,
+    fetch_program_course_enrollments_by_students,
     fetch_program_enrollments,
     fetch_program_enrollments_by_student,
+    get_external_key_by_user_and_course,
     get_program_course_enrollment,
     get_program_enrollment,
-    get_users_by_external_keys
+    get_users_by_external_keys,
+    is_course_staff_enrollment
 )
 
 User = get_user_model()
@@ -368,14 +375,14 @@ class ProgramEnrollmentReadingTests(TestCase):
 
         # User with no program enrollments
         (
-            {'username': username_0},
+            {'usernames': [username_0]},
             set(),
         ),
 
         # Course keys and active-only filters
         (
             {
-                'external_user_key': ext_4,
+                'external_user_keys': [ext_4],
                 'course_keys': {course_key_p, course_key_q},
                 'active_only': True,
             },
@@ -384,26 +391,26 @@ class ProgramEnrollmentReadingTests(TestCase):
 
         # Curriculum filter
         (
-            {'username': username_3, 'curriculum_uuids': {curriculum_uuid_b}},
+            {'usernames': [username_3], 'curriculum_uuids': {curriculum_uuid_b}},
             {5},
         ),
 
         # Program filter
         (
-            {'username': username_3, 'program_uuids': {program_uuid_y}},
+            {'usernames': [username_3], 'program_uuids': {program_uuid_y}},
             {12},
         ),
 
         # Realized-only filter
         (
-            {'external_user_key': ext_4, 'realized_only': True},
+            {'external_user_keys': [ext_4], 'realized_only': True},
             set(),
         ),
 
         # Waiting-only and inactive-only filter
         (
             {
-                'external_user_key': ext_4,
+                'external_user_keys': [ext_4],
                 'waiting_only': True,
                 'inactive_only': True,
             },
@@ -411,9 +418,9 @@ class ProgramEnrollmentReadingTests(TestCase):
         ),
     )
     @ddt.unpack
-    def test_fetch_program_course_enrollments_by_student(self, kwargs, expected_enrollment_ids):
-        kwargs = self._username_to_user(kwargs)
-        actual_enrollments = fetch_program_course_enrollments_by_student(**kwargs)
+    def test_fetch_program_course_enrollments_by_students(self, kwargs, expected_enrollment_ids):
+        kwargs = self._usernames_to_users(kwargs)
+        actual_enrollments = fetch_program_course_enrollments_by_students(**kwargs)
         actual_enrollment_ids = {enrollment.id for enrollment in actual_enrollments}
         assert actual_enrollment_ids == expected_enrollment_ids
 
@@ -442,6 +449,42 @@ class ProgramEnrollmentReadingTests(TestCase):
             )
             del result['usernames']
         return result
+
+    @ddt.data(
+        (
+            {'username': username_0, 'course_key': course_key_p},
+            None
+        ),
+        (
+            {'username': username_1, 'course_key': course_key_p},
+            None
+        ),
+        (
+            {'username': username_1, 'course_key': course_key_r},
+            None
+        ),
+        (
+            {'username': username_2, 'course_key': course_key_p},
+            None
+        ),
+        (
+            {'username': username_3, 'course_key': course_key_p},
+            ext_3
+        ),
+        (
+            {'username': username_3, 'course_key': course_key_r},
+            None
+        ),
+        (
+            {'username': username_4, 'course_key': course_key_p},
+            None
+        )
+    )
+    @ddt.unpack
+    def test_get_external_key_by_user_and_course(self, kwargs, expected_external_user_key):
+        kwarg = self._username_to_user(kwargs)
+        external_user_key = get_external_key_by_user_and_course(**kwarg)
+        assert expected_external_user_key == external_user_key
 
 
 class GetUsersByExternalKeysTests(CacheIsolationTestCase):
@@ -575,3 +618,84 @@ class GetUsersByExternalKeysTests(CacheIsolationTestCase):
         )
         with self.assertRaises(ProviderConfigurationException):
             get_users_by_external_keys(self.program_uuid, [])
+
+
+@ddt.ddt
+class IsCourseStaffEnrollmentTest(TestCase):
+    """
+    Tests for the is_course_staff_enrollment function
+    """
+    program_uuid_x = UUID('dddddddd-5f48-493d-9410-84e1d36c657f')
+    program_uuid_y = UUID('eeeeeeee-f803-43f6-bbf3-5ae15d393649')
+    curriculum_uuid_a = UUID('aaaaaaaa-bd26-43d0-94b8-b0063858210b')
+    curriculum_uuid_b = UUID('bbbbbbbb-145f-43db-ad05-f9ad65eec285')
+    course_key_p = CourseKey.from_string('course-v1:TestX+ProEnroll+P')
+    course_key_q = CourseKey.from_string('course-v1:TestX+ProEnroll+Q')
+    username_0 = 'user-0'
+    ext_3 = 'student-3'
+    ext_4 = 'student-4'
+
+    @classmethod
+    def setUpTestData(cls):
+        super(IsCourseStaffEnrollmentTest, cls).setUpTestData()
+        cls.user_0 = UserFactory(username=cls.username_0)  # No enrollments
+        CourseOverviewFactory(id=cls.course_key_p)
+        CourseOverviewFactory(id=cls.course_key_q)
+        enrollment_test_data = [                                                                      # ID
+            (cls.user_0, None, cls.program_uuid_x, cls.curriculum_uuid_a, PEStatuses.ENROLLED),       # 1
+            (None, cls.ext_3, cls.program_uuid_x, cls.curriculum_uuid_b, PEStatuses.PENDING),         # 2
+            (None, cls.ext_4, cls.program_uuid_y, cls.curriculum_uuid_a, PEStatuses.ENROLLED),        # 3
+            (cls.user_0, None, cls.program_uuid_y, cls.curriculum_uuid_b, PEStatuses.SUSPENDED),      # 4
+        ]
+        for user, external_user_key, program_uuid, curriculum_uuid, status in enrollment_test_data:
+            ProgramEnrollmentFactory(
+                user=user,
+                external_user_key=external_user_key,
+                program_uuid=program_uuid,
+                curriculum_uuid=curriculum_uuid,
+                status=status,
+            )
+        course_enrollment_test_data = [                          # ID
+            (1, cls.course_key_p, PCEStatuses.ACTIVE, True),     # 1
+            (2, cls.course_key_q, PCEStatuses.ACTIVE, False),    # 2
+            (3, cls.course_key_p, PCEStatuses.ACTIVE, True),     # 3
+            (4, cls.course_key_q, PCEStatuses.ACTIVE, False),    # 4
+        ]
+        for program_enrollment_id, course_key, status, course_staff in course_enrollment_test_data:
+            program_enrollment = ProgramEnrollment.objects.get(id=program_enrollment_id)
+            course_enrollment = (
+                CourseEnrollmentFactory(
+                    course_id=course_key,
+                    user=program_enrollment.user,
+                    mode=CourseMode.MASTERS,
+                )
+                if program_enrollment.user
+                else None
+            )
+
+            program_course_enrollment = ProgramCourseEnrollmentFactory(
+                program_enrollment=program_enrollment,
+                course_enrollment=course_enrollment,
+                course_key=course_key,
+                status=status,
+            )
+            if course_staff:
+                if program_enrollment.user:
+                    CourseStaffRole(course_key).add_users(program_enrollment.user)
+                else:
+                    CourseAccessRoleAssignmentFactory(
+                        enrollment=program_course_enrollment
+                    )
+
+    @ddt.data(
+        (1, True),
+        (2, False),
+        (3, True),
+        (4, False),
+    )
+    @ddt.unpack
+    def test_is_course_staff_enrollment(self, program_course_enrollment_id, is_course_staff):
+        program_course_enrollment = ProgramCourseEnrollment.objects.get(
+            id=program_course_enrollment_id
+        )
+        assert is_course_staff == is_course_staff_enrollment(program_course_enrollment)

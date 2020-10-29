@@ -109,7 +109,8 @@
 
   .container,
   .introduction {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
+
     @include clearfix();
 
     margin: 0 auto;
@@ -231,8 +232,7 @@
   // basic layout
   .content,
   aside {
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     margin: $baseline 0 0 0;
   }
 
@@ -625,8 +625,7 @@
 
   // forms - messages/status
   .status {
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     margin: 0 0 $baseline 0;
     border-bottom: 3px solid shade($yellow, 10%);
     padding: $baseline $baseline;
@@ -812,9 +811,7 @@
     @extend %body-text;
 
     box-shadow: inset 0 -1px 2px 0 tint($red, 85%);
-
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     margin: $baseline 0 ($baseline/2) 0 !important;
     padding: $baseline;
     border: none;

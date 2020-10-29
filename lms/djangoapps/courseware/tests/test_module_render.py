@@ -6,6 +6,7 @@ Test for lms courseware app, module render unit
 
 import itertools
 import json
+import textwrap
 from datetime import datetime
 from functools import partial
 
@@ -22,7 +23,6 @@ from django.middleware.csrf import get_token
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
-from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from edx_proctoring.api import create_exam, create_exam_attempt, update_attempt_status
 from edx_proctoring.runtime import set_runtime_service
 from edx_proctoring.tests.test_services import MockCertificateService, MockCreditService, MockGradesService
@@ -62,6 +62,7 @@ from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.credit.api import set_credit_requirement_status, set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory, AccessTokenFactory
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.url_utils import quote_slashes
@@ -348,7 +349,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     def test_oauth_authentication(self):
         """ Test that the xblock endpoint supports OAuth authentication."""
         dispatch_url = self._get_dispatch_url()
-        access_token = AccessTokenFactory(user=self.mock_user, client=ClientFactory()).token
+        access_token = AccessTokenFactory(user=self.mock_user, application=ApplicationFactory()).token
         headers = {'HTTP_AUTHORIZATION': 'Bearer ' + access_token}
         response = self.client.post(dispatch_url, {}, **headers)
         self.assertEqual(200, response.status_code)
@@ -387,7 +388,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {'success': True})
 
-        response = self.client.post(dispatch_url, {'position': None})
+        response = self.client.post(dispatch_url, {'position': ''})
         self.assertEqual(200, response.status_code)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {'success': True})
 
@@ -1879,6 +1880,47 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
         )
         result_fragment = module.render(STUDENT_VIEW)
         self.assertIn('Staff Debug', result_fragment.content)
+
+    def test_staff_debug_info_score_for_invalid_dropdown(self):
+        """
+        Verifies that for an invalid drop down problem, the max score is set
+        to zero in the html.
+        """
+        problem_xml = """
+        <problem>
+            <optionresponse>
+              <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for dropdown problems. Edit this component to replace this template with your own assessment.</p>
+            <label>Add the question text, or prompt, here. This text is required.</label>
+            <description>You can add an optional tip or note related to the prompt like this. </description>
+            <optioninput>
+                <option correct="False">an incorrect answer</option>
+                <option correct="True">the correct answer</option>
+                <option correct="True">an incorrect answer</option>
+              </optioninput>
+            </optionresponse>
+        </problem>
+        """
+        problem_descriptor = ItemFactory.create(
+            category='problem',
+            data=problem_xml
+        )
+        module = render.get_module(
+            self.user,
+            self.request,
+            problem_descriptor.location,
+            self.field_data_cache
+        )
+        html_fragment = module.render(STUDENT_VIEW)
+        expected_score_override_html = textwrap.dedent("""<div>
+        <label for="sd_fs_{block_id}">Score (for override only):</label>
+        <input type="text" tabindex="0" id="sd_fs_{block_id}" placeholder="0"/>
+        <label for="sd_fs_{block_id}"> / 0</label>
+      </div>""")
+
+        self.assertIn(
+            expected_score_override_html.format(block_id=problem_descriptor.location.block_id),
+            html_fragment.content
+        )
 
     @XBlock.register_temp_plugin(DetachedXBlock, identifier='detached-block')
     def test_staff_debug_info_disabled_for_detached_blocks(self):

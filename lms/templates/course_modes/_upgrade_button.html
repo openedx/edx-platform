@@ -17,9 +17,9 @@ from openedx.core.djangolib.markup import HTML, Text
             <span>${_('Pursue a Verified Certificate')}</span>
     % endif
         % if price_before_discount:
-        (<span class="upgrade-price-string">$${min_price} USD</span> <del> <span class="upgrade-price-string">${Text('${price} USD').format(price=price_before_discount)}</span></del>)
+        (<span class="upgrade-price-string">${currency_symbol}${min_price} ${currency}</span> <del> <span class="upgrade-price-string">${Text('{currency_symbol}{price} {currency}').format(currency_symbol=currency_symbol, price=price_before_discount, currency=currency)}</span></del>)
         % else:
-        (<span class="upgrade-price-string">$${min_price} USD</span>)
+        (<span class="upgrade-price-string">${currency_symbol}${min_price} ${currency}</span>)
         % endif
         </button>
 </li>

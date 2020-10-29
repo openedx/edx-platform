@@ -34,7 +34,8 @@ EXPECTED_COLLECT_STATIC_COMMAND = (
     u'--noinput {log_string}'
 )
 EXPECTED_CELERY_COMMAND = (
-    u"python manage.py lms --settings={settings} celery worker --beat --loglevel=INFO --pythonpath=."
+    u"DJANGO_SETTINGS_MODULE=lms.envs.{settings} celery worker "
+    u"--app=lms.celery:APP --beat --loglevel=INFO --pythonpath=."
 )
 EXPECTED_RUN_SERVER_COMMAND = (
     u"python manage.py {system} --settings={settings} runserver --traceback --pythonpath=. 0.0.0.0:{port}"
@@ -45,15 +46,10 @@ EXPECTED_INDEX_COURSE_COMMAND = (
 EXPECTED_PRINT_SETTINGS_COMMAND = [
     u"python manage.py lms --settings={settings} print_setting STATIC_ROOT 2>{log_file}",
     u"python manage.py cms --settings={settings} print_setting STATIC_ROOT 2>{log_file}",
-    u"python manage.py lms --settings={settings} print_setting LMS_ROOT_URL 2>{log_file}",
-    u"python manage.py lms --settings={settings} print_setting JWT_AUTH 2>{log_file}",
-    u"python manage.py lms --settings={settings} print_setting EDXMKTG_USER_INFO_COOKIE_NAME 2>{log_file}",
     u"python manage.py lms --settings={settings} print_setting WEBPACK_CONFIG_PATH 2>{log_file}"
 ]
 EXPECTED_WEBPACK_COMMAND = (
     u"NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} "
-    u"LMS_ROOT_URL={lms_root_url} JWT_AUTH_COOKIE_HEADER_PAYLOAD={jwt_auth_cookie_header_payload_name} "
-    u"EDXMKTG_USER_INFO_COOKIE_NAME={user_info_cookie_name} "
     u"$(npm bin)/webpack --config={webpack_config_path}"
 )
 
@@ -256,9 +252,6 @@ class TestPaverServerTasks(PaverTestCase):
                 node_env="production",
                 static_root_lms=None,
                 static_root_cms=None,
-                lms_root_url=None,
-                jwt_auth_cookie_header_payload_name=None,
-                user_info_cookie_name=None,
                 webpack_config_path=None
             ))
             expected_messages.extend(self.expected_sass_commands(system=system, asset_settings=expected_asset_settings))
@@ -305,9 +298,6 @@ class TestPaverServerTasks(PaverTestCase):
                 node_env="production",
                 static_root_lms=None,
                 static_root_cms=None,
-                lms_root_url=None,
-                jwt_auth_cookie_header_payload_name=None,
-                user_info_cookie_name=None,
                 webpack_config_path=None
             ))
             expected_messages.extend(self.expected_sass_commands(asset_settings=expected_asset_settings))

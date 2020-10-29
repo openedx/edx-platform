@@ -135,7 +135,7 @@ def get_student_data(students, exclude=None):
     """
     # To speed the query, we won't retrieve the full User object, only
     # two of its values. The namedtuple simulates the User object.
-    FakeUser = namedtuple('Fake', 'id username is_anonymous')  # pylint: disable=invalid-name
+    FakeUser = namedtuple('Fake', 'id username is_anonymous')
 
     exclude = exclude if exclude else set()
 

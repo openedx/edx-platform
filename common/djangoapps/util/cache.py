@@ -10,9 +10,6 @@ not migrating so as not to inconvenience users by logging them all out.
 from functools import wraps
 
 import six
-import six.moves.urllib.error
-import six.moves.urllib.parse
-import six.moves.urllib.request
 from django.conf import settings
 from django.core import cache
 # If we can't find a 'general' CACHE defined in settings.py, we simply fall back
@@ -83,7 +80,7 @@ def cache_if_anonymous(*get_parameters):
                             get_parameter: six.text_type(parameter_value).encode('utf-8')
                         })
 
-                response = cache.get(cache_key, version=version)  # pylint: disable=maybe-no-member
+                response = cache.get(cache_key, version=version)
 
                 if response:
                     # A hack to ensure that the response data is a valid text type for both Python 2 and 3.
@@ -93,7 +90,7 @@ def cache_if_anonymous(*get_parameters):
                         response.write(item)
                 else:
                     response = view_func(request, *args, **kwargs)
-                    cache.set(cache_key, response, 60 * 3, version=version)  # pylint: disable=maybe-no-member
+                    cache.set(cache_key, response, 60 * 3, version=version)
 
                 return response
 

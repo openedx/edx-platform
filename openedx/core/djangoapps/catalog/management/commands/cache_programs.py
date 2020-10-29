@@ -13,6 +13,7 @@ from six import text_type
 
 from openedx.core.djangoapps.catalog.cache import (
     COURSE_PROGRAMS_CACHE_KEY_TPL,
+    CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL,
     PATHWAY_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
     PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL,
@@ -23,6 +24,7 @@ from openedx.core.djangoapps.catalog.cache import (
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.catalog.utils import (
     course_run_keys_for_program,
+    course_uuids_for_program,
     create_catalog_api_client,
     normalize_program_type
 )
@@ -60,6 +62,7 @@ class Command(BaseCommand):
         programs = {}
         pathways = {}
         courses = {}
+        catalog_courses = {}
         programs_by_type = {}
         organizations = {}
         for site in Site.objects.all():
@@ -88,6 +91,7 @@ class Command(BaseCommand):
             programs.update(new_programs)
             pathways.update(new_pathways)
             courses.update(self.get_courses(new_programs))
+            catalog_courses.update(self.get_catalog_courses(new_programs))
             programs_by_type.update(self.get_programs_by_type(site, new_programs))
             organizations.update(self.get_programs_by_organization(new_programs))
 
@@ -112,6 +116,9 @@ class Command(BaseCommand):
 
         logger.info(u'Caching programs uuids for {} courses.'.format(len(courses)))
         cache.set_many(courses, None)
+
+        logger.info(u'Caching programs uuids for {} catalog courses.'.format(len(catalog_courses)))
+        cache.set_many(catalog_courses, None)
 
         logger.info(text_type('Caching program UUIDs by {} program types.'.format(len(programs_by_type))))
         cache.set_many(programs_by_type, None)
@@ -218,7 +225,7 @@ class Command(BaseCommand):
 
     def get_courses(self, programs):
         """
-        Get all courses for the programs.
+        Get all course runs for programs.
 
         TODO: when course discovery can handle it, use that instead. That will allow us to put all course runs
         in the cache not just the course runs in a program. Therefore, a cache miss would be different from a
@@ -231,6 +238,18 @@ class Command(BaseCommand):
                 course_run_cache_key = COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_run_id=course_run_key)
                 course_runs[course_run_cache_key].append(program['uuid'])
         return course_runs
+
+    def get_catalog_courses(self, programs):
+        """
+        Get all catalog courses for the programs.
+        """
+        courses = defaultdict(list)
+
+        for program in programs.values():
+            for course_uuid in course_uuids_for_program(program):
+                course_cache_key = CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_uuid=course_uuid)
+                courses[course_cache_key].append(program['uuid'])
+        return courses
 
     def get_programs_by_type(self, site, programs):
         """

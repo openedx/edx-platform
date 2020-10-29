@@ -8,8 +8,6 @@ import time
 from collections import namedtuple
 from functools import partial
 
-from pkg_resources import resource_exists, resource_isdir, resource_listdir, resource_string
-
 import six
 import yaml
 from contracts import contract, new_contract
@@ -18,7 +16,7 @@ from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.asides import AsideDefinitionKeyV2, AsideUsageKeyV2
 from opaque_keys.edx.keys import UsageKey
-from openedx.core.djangolib.markup import HTML
+from pkg_resources import resource_exists, resource_isdir, resource_listdir, resource_string
 from six import text_type
 from six.moves import map
 from web_fragments.fragment import Fragment
@@ -39,6 +37,8 @@ from xblock.fields import (
     UserScope
 )
 from xblock.runtime import IdGenerator, IdReader, Runtime
+
+from openedx.core.djangolib.markup import HTML
 from xmodule import block_metadata_utils
 from xmodule.errortracker import exc_info_to_str
 from xmodule.exceptions import UndefinedContext
@@ -675,7 +675,6 @@ class XModuleMixin(XModuleFields, XBlock):
                       Note that the functions will be applied in the order in
                       which they're listed. So [f1, f2] -> f2(f1(field_data))
         """
-        # pylint: disable=attribute-defined-outside-init
 
         # Skip rebinding if we're already bound a user, and it's this user.
         if self.scope_ids.user_id is not None and user_id == self.scope_ids.user_id:
@@ -967,7 +966,7 @@ class XModule(XModuleToXBlockMixin, HTMLSnippet, XModuleMixin):
         return CombinedSystem(self._runtime, self.descriptor._runtime)  # pylint: disable=protected-access
 
     @runtime.setter
-    def runtime(self, value):  # pylint: disable=arguments-differ
+    def runtime(self, value):
         self._runtime = value
 
     def __str__(self):
@@ -1397,7 +1396,7 @@ class ConfigurableFragmentWrapper(object):
 # Runtime.handler_url interface.
 #
 # The monkey-patching happens in cms/djangoapps/xblock_config/apps.py and lms/djangoapps/lms_xblock/apps.py
-def descriptor_global_handler_url(block, handler_name, suffix='', query='', thirdparty=False):  # pylint: disable=unused-argument
+def descriptor_global_handler_url(block, handler_name, suffix='', query='', thirdparty=False):
     """
     See :meth:`xblock.runtime.Runtime.handler_url`.
     """
@@ -1409,7 +1408,7 @@ def descriptor_global_handler_url(block, handler_name, suffix='', query='', thir
 # the Runtime part of its interface. This function matches the Runtime.local_resource_url interface
 #
 # The monkey-patching happens in cms/djangoapps/xblock_config/apps.py and lms/djangoapps/lms_xblock/apps.py
-def descriptor_global_local_resource_url(block, uri):  # pylint: disable=invalid-name, unused-argument
+def descriptor_global_local_resource_url(block, uri):
     """
     See :meth:`xblock.runtime.Runtime.local_resource_url`.
     """

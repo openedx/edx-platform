@@ -23,7 +23,7 @@ code-annotations          # Perform code annotation checking, such as for PII an
 cssselect                 # Used to extract HTML fragments via CSS selectors in 2 test cases and pyquery
 ddt                       # Run a test case multiple times with different input; used in many, many of our tests
 edx-i18n-tools>=0.4.6     # Commands for developers and translators to extract, compile and validate translations
-edx-lint==1.3.0           # pylint extensions for Open edX repositories
+edx-lint                  # pylint extensions for Open edX repositories
 factory-boy               # Library for creating test fixtures, used in many tests
 # Pinning the freezegun version because 0.3.13 is causing failures which have also been reported on the git repo by public.
 freezegun                 # Allows tests to mock the output of assorted datetime module functions
@@ -38,6 +38,7 @@ pytest-cov                # pytest plugin for measuring code coverage
 git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0
 pytest-django             # Django support for pytest
 pytest-json-report        # Output json formatted warnings after running pytest
+pytest-metadata==1.8.0     # To prevent 'make upgrade' failure, dependency of pytest-json-report
 pytest-randomly           # pytest plugin to randomly order tests
 pytest-xdist              # Parallel execution of tests on multiple CPU cores or hosts
 radon                     # Calculates cyclomatic complexity of Python code (code quality utility)
@@ -48,4 +49,3 @@ tox                       # virtualenv management for tests
 tox-battery               # Makes tox aware of requirements file changes
 transifex-client          # Command-line interface for the Transifex localization service
 unidiff                   # Required by coverage_pytest_plugin
-

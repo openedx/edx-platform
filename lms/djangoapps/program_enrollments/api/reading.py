@@ -10,8 +10,10 @@ from organizations.models import Organization
 from social_django.models import UserSocialAuth
 
 from openedx.core.djangoapps.catalog.utils import get_programs
+from student.roles import CourseStaffRole
 from third_party_auth.models import SAMLProviderConfig
 
+from ..constants import ProgramCourseEnrollmentRoles
 from ..exceptions import (
     BadOrganizationShortNameException,
     ProgramDoesNotExistException,
@@ -26,6 +28,10 @@ _STUDENT_ARG_ERROR_MESSAGE = (
 )
 _REALIZED_FILTER_ERROR_TEMPLATE = (
     "{} and {} are mutually exclusive; at most one of them may be passed in as True."
+)
+_STUDENT_LIST_ARG_ERROR_MESSAGE = (
+    'user list and external_user_key_list are both empty or None;'
+    ' At least one of the lists must be provided.'
 )
 
 
@@ -265,9 +271,9 @@ def fetch_program_enrollments_by_student(
     return ProgramEnrollment.objects.filter(**_remove_none_values(filters))
 
 
-def fetch_program_course_enrollments_by_student(
-        user=None,
-        external_user_key=None,
+def fetch_program_course_enrollments_by_students(
+        users=None,
+        external_user_keys=None,
         program_uuids=None,
         curriculum_uuids=None,
         course_keys=None,
@@ -278,11 +284,11 @@ def fetch_program_course_enrollments_by_student(
         waiting_only=False,
 ):
     """
-    Fetch program-course enrollments for a specific student.
+    Fetch program-course enrollments for a specific list of students.
 
     Required arguments (at least one must be provided):
-        * user (User)
-        * external_user_key (str)
+        * users (iterable[User])
+        * external_user_keys (iterable[str])
 
     Optional arguments:
         * provided_uuids (iterable[UUID|str])
@@ -298,8 +304,9 @@ def fetch_program_course_enrollments_by_student(
 
     Returns: queryset[ProgramCourseEnrollment]
     """
-    if not (user or external_user_key):
-        raise ValueError(_STUDENT_ARG_ERROR_MESSAGE)
+    if not (users or external_user_keys):
+        raise ValueError(_STUDENT_LIST_ARG_ERROR_MESSAGE)
+
     if active_only and inactive_only:
         raise ValueError(
             _REALIZED_FILTER_ERROR_TEMPLATE.format("active_only", "inactive_only")
@@ -309,8 +316,8 @@ def fetch_program_course_enrollments_by_student(
             _REALIZED_FILTER_ERROR_TEMPLATE.format("realized_only", "waiting_only")
         )
     filters = {
-        "program_enrollment__user": user,
-        "program_enrollment__external_user_key": external_user_key,
+        "program_enrollment__user__in": users,
+        "program_enrollment__external_user_key__in": external_user_keys,
         "program_enrollment__program_uuid__in": program_uuids,
         "program_enrollment__curriculum_uuid__in": curriculum_uuids,
         "course_key__in": course_keys,
@@ -337,6 +344,44 @@ def _remove_none_values(dictionary):
     }
 
 
+def get_users_by_external_keys_and_org_key(external_user_keys, org_key):
+    """
+    Given an organization_key and a set of external keys,
+    return a dict from external user keys to Users.
+
+    Args:
+        external_user_keys (sequence[str]):
+            external user keys used by the program creator's IdP.
+        org_key (str):
+            The organization short name of which the external_user_key belongs to
+
+    Returns: dict[str: User|None]
+        A dict mapping external user keys to Users.
+        If an external user key is not registered, then None is returned instead
+            of a User for that key.
+
+    Raises:
+        BadOrganizationShortNameException
+        ProviderDoesNotExistsException
+        ProviderConfigurationException
+    """
+    saml_provider = get_saml_provider_by_org_key(org_key)
+    social_auth_uids = {
+        saml_provider.get_social_auth_uid(external_user_key)
+        for external_user_key in external_user_keys
+    }
+    social_auths = UserSocialAuth.objects.filter(uid__in=social_auth_uids)
+    found_users_by_external_keys = {
+        saml_provider.get_remote_id_from_social_auth(social_auth): social_auth.user
+        for social_auth in social_auths
+    }
+    # Default all external keys to None, because external keys
+    # without a User will not appear in `found_users_by_external_keys`.
+    users_by_external_keys = {key: None for key in external_user_keys}
+    users_by_external_keys.update(found_users_by_external_keys)
+    return users_by_external_keys
+
+
 def get_users_by_external_keys(program_uuid, external_user_keys):
     """
     Given a program and a set of external keys,
@@ -360,37 +405,69 @@ def get_users_by_external_keys(program_uuid, external_user_keys):
         ProviderDoesNotExistsException
         ProviderConfigurationException
     """
-    saml_provider = get_saml_provider_for_program(program_uuid)
-    social_auth_uids = {
-        saml_provider.get_social_auth_uid(external_user_key)
-        for external_user_key in external_user_keys
-    }
-    social_auths = UserSocialAuth.objects.filter(uid__in=social_auth_uids)
-    found_users_by_external_keys = {
-        saml_provider.get_remote_id_from_social_auth(social_auth): social_auth.user
-        for social_auth in social_auths
-    }
-    # Default all external keys to None, because external keys
-    # without a User will not appear in `found_users_by_external_keys`.
-    users_by_external_keys = {key: None for key in external_user_keys}
-    users_by_external_keys.update(found_users_by_external_keys)
-    return users_by_external_keys
+    org_key = get_org_key_for_program(program_uuid)
+    return get_users_by_external_keys_and_org_key(external_user_keys, org_key)
 
 
-def get_saml_provider_for_program(program_uuid):
+def get_external_key_by_user_and_course(user, course_key):
     """
-    Return currently configured SAML provider for the Organization
+    Returns the external_user_key of the edX account/user
+    enrolled into the course
+
+    Arguments:
+        user (User):
+            The edX account representing the user in auth_user table
+        course_key (CourseKey|str):
+            The course key of the course user is enrolled in
+
+    Returns: external_user_key (str|None)
+        The external user key provided by Masters degree provider
+        Or None if cannot find edX user to Masters learner mapping
+    """
+    program_course_enrollments = ProgramCourseEnrollment.objects.filter(
+        course_enrollment__user=user,
+        course_key=course_key
+    ).order_by('status', '-modified')
+
+    if not program_course_enrollments:
+        return None
+
+    relevant_pce = program_course_enrollments.first()
+    return relevant_pce.program_enrollment.external_user_key
+
+
+def get_saml_provider_by_org_key(org_key):
+    """
+    Returns the SAML provider associated with the provided org_key
+
+    Arguments:
+        org_key (str)
+
+    Returns: SAMLProvider
+
+    Raises:
+        BadOrganizationShortNameException
+    """
+    try:
+        organization = Organization.objects.get(short_name=org_key)
+    except Organization.DoesNotExist:
+        raise BadOrganizationShortNameException(org_key)
+    return get_saml_provider_for_organization(organization)
+
+
+def get_org_key_for_program(program_uuid):
+    """
+    Return the key of the first Organization
     administering the given program.
 
     Arguments:
         program_uuid (UUID|str)
 
-    Returns: SAMLProvider
+    Returns: org_key (str)
 
     Raises:
         ProgramDoesNotExistException
         ProgramHasNoAuthoringOrganizationException
-        BadOrganizationShortNameException
     """
     program = get_programs(uuid=program_uuid)
     if program is None:
@@ -399,11 +476,7 @@ def get_saml_provider_for_program(program_uuid):
     org_key = authoring_orgs[0].get('key') if authoring_orgs else None
     if not org_key:
         raise ProgramHasNoAuthoringOrganizationException(program_uuid)
-    try:
-        organization = Organization.objects.get(short_name=org_key)
-    except Organization.DoesNotExist:
-        raise BadOrganizationShortNameException(org_key)
-    return get_saml_provider_for_organization(organization)
+    return org_key
 
 
 def get_saml_provider_for_organization(organization):
@@ -438,3 +511,21 @@ def get_provider_slug(provider_config):
     Returns: str
     """
     return provider_config.provider_id.strip('saml-')
+
+
+def is_course_staff_enrollment(program_course_enrollment):
+    """
+    Returns whether the provided program_course_enrollment have the
+    course staff role on the course.
+
+    Arguments:
+        program_course_enrollment: ProgramCourseEnrollment
+
+    returns: bool
+    """
+    associated_user = program_course_enrollment.program_enrollment.user
+    if associated_user:
+        return CourseStaffRole(program_course_enrollment.course_key).has_user(associated_user)
+    return program_course_enrollment.courseaccessroleassignment_set.filter(
+        role=ProgramCourseEnrollmentRoles.COURSE_STAFF
+    ).exists()

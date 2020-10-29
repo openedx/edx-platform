@@ -105,6 +105,7 @@ from .library import LIBRARIES_ENABLED, get_library_creator_status
 
 log = logging.getLogger(__name__)
 
+
 __all__ = ['course_info_handler', 'course_handler', 'course_listing',
            'course_info_update_handler', 'course_search_index_handler',
            'course_rerun_handler',
@@ -208,7 +209,7 @@ def _course_notifications_json_get(course_action_state_id):
     return JsonResponse(action_state_info)
 
 
-def _dismiss_notification(request, course_action_state_id):  # pylint: disable=unused-argument
+def _dismiss_notification(request, course_action_state_id):
     """
     Update the display of the course notification
     """
@@ -385,7 +386,6 @@ def _accessible_courses_summary_iter(request, org=None):
         """
         Filter out unusable and inaccessible courses
         """
-        # pylint: disable=fixme
         # TODO remove this condition when templates purged from db
         if course_summary.location.course == 'templates':
             return False
@@ -416,7 +416,6 @@ def _accessible_courses_iter(request):
         if isinstance(course.id, CCXLocator):
             return False
 
-        # pylint: disable=fixme
         # TODO remove this condition when templates purged from db
         if course.location.course == 'templates':
             return False
@@ -445,7 +444,6 @@ def _accessible_courses_iter_for_tests(request):
         if isinstance(course.id, CCXLocator):
             return False
 
-        # pylint: disable=fixme
         # TODO remove this condition when templates purged from db
         if course.location.course == 'templates':
             return False
@@ -1324,6 +1322,11 @@ def advanced_settings_handler(request, course_key_string):
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)
+
+        advanced_dict = CourseMetadata.fetch(course_module)
+        if settings.FEATURES.get('DISABLE_MOBILE_COURSE_AVAILABLE', False):
+            advanced_dict.get('mobile_available')['deprecated'] = True
+
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
             publisher_enabled = configuration_helpers.get_value_for_org(
                 course_module.location.org,
@@ -1333,7 +1336,7 @@ def advanced_settings_handler(request, course_key_string):
 
             return render_to_response('settings_advanced.html', {
                 'context_course': course_module,
-                'advanced_dict': CourseMetadata.fetch(course_module),
+                'advanced_dict': advanced_dict,
                 'advanced_settings_url': reverse_course_url('advanced_settings_handler', course_key),
                 'publisher_enabled': publisher_enabled,
 

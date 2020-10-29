@@ -19,7 +19,6 @@ from opaque_keys.edx.keys import AssetKey, CourseKey
 from pymongo import ASCENDING, DESCENDING
 from six import text_type
 
-from ..utils import reverse_course_url
 from contentstore.views.exception import AssetNotFoundException, AssetSizeTooLargeException
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.contentserver.caching import del_cached_content
@@ -34,6 +33,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from openedx.core.djangoapps.appsembler.api.sites import get_site_for_course
 
+from ..utils import reverse_course_url
 
 __all__ = ['assets_handler']
 

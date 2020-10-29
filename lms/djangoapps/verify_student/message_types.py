@@ -13,4 +13,4 @@ class VerificationExpiry(BaseMessageType):
     def __init__(self, *args, **kwargs):
         super(VerificationExpiry, self).__init__(*args, **kwargs)
 
-        self.options['transactional'] = True  # pylint: disable=unsupported-assignment-operation
+        self.options['transactional'] = True

@@ -34,29 +34,38 @@
             className: 'team-members',
 
             initialize: function(options) {
-                this.maxTeamSize = options.maxTeamSize;
+                this.getTopic = options.getTopic;
+                this.topicId = options.topicId;
+                this.courseMaxTeamSize = options.courseMaxTeamSize;
                 this.memberships = options.memberships;
             },
 
             render: function() {
+                var view = this;
+                this.getTopic(this.topicId).done(function(topic) {
+                    view.renderMessage(topic.getMaxTeamSize(view.courseMaxTeamSize));
+                }).fail(function() {
+                    view.renderMessage(view.courseMaxTeamSize);
+                });
+                return view;
+            },
+
+            renderMessage: function(maxTeamSize) {
                 var allMemberships = _(this.memberships).sortBy(function(member) {
                         return new Date(member.last_activity_at);
                     }).reverse(),
-                    displayableMemberships = allMemberships.slice(0, 5),
-                    maxMemberCount = this.maxTeamSize;
+                    displayableMemberships = allMemberships.slice(0, 5);
                 HtmlUtils.setHtml(
                     this.$el,
                     HtmlUtils.template(teamMembershipDetailsTemplate)({
-                        membership_message: TeamUtils.teamCapacityText(allMemberships.length, maxMemberCount),
+                        membership_message: TeamUtils.teamCapacityText(allMemberships.length, maxTeamSize),
                         memberships: displayableMemberships,
                         has_additional_memberships: displayableMemberships.length < allMemberships.length,
                         /* Translators: "and others" refers to fact that additional
                          * members of a team exist that are not displayed. */
                         sr_message: gettext('and others')
-
                     })
                 );
-                return this;
             }
         });
 
@@ -113,7 +122,12 @@
                 CardView.prototype.initialize.apply(this, arguments);
                 // TODO: show last activity detail view
                 this.detailViews = [
-                    new TeamMembershipView({memberships: this.model.get('membership'), maxTeamSize: this.maxTeamSize}),
+                    new TeamMembershipView({
+                        memberships: this.model.get('membership'),
+                        courseMaxTeamSize: this.courseMaxTeamSize,
+                        topicId: this.model.get('topic_id'),
+                        getTopic: this.getTopic
+                    }),
                     new TeamCountryLanguageView({
                         model: this.model,
                         countries: this.countries,
@@ -141,6 +155,12 @@
             },
             actionUrl: function() {
                 return '#teams/' + this.model.get('topic_id') + '/' + this.model.get('id');
+            },
+            // eslint-disable-next-line no-unused-vars
+            getTopic: function(topicId) {
+                // This function will be overrwritten in the extended class
+                // that will in turn be overwritten by functions in TopicTeamsView and MyTeamsView
+                return null;
             }
         });
         return TeamCardView;

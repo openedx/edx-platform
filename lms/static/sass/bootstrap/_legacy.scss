@@ -40,8 +40,7 @@ $grid-breakpoints-lg: 992px !default;
 // Wrap grids with grid-container.
 @mixin grid-container() {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-flow: row wrap;
   justify-content: flex-start;
   align-items: flex-start;
   box-sizing: border-box;
@@ -109,3 +108,42 @@ $shadow-l1: rgba(0, 0, 0, 0.1) !default;
 $shadow-l2: rgba(0, 0, 0, 0.05) !default;
 $shadow-d1: rgba(0, 0, 0, 0.4) !default;
 $shadow-d2: rgba($black, 0.6) !default;
+
+$primary-dark: rgba(6, 86, 131, 100) !default;
+$primary-dark1: mix($black, $blue, 20%) !default;
+$primary-dark2: desaturate($blue, 15%) !default;
+$primary-base: rgba(0, 117, 180, 100) !default;
+$primary-accent: rgba(41, 145, 195, 100) !default;
+
+$gray-dark: rgba(17, 17, 17, 100) !default;
+$gray-base: rgba(65, 65, 65, 100) !default;
+$gray-light1: rgb(252, 252, 252) !default;
+$gray-light2: mix($white, $gray, 60%) !default;
+$gray-light3: mix($white, $gray, 80%) !default;
+$gray-light4: mix($white, $gray, 95%) !default;
+
+// ----------------------------
+// #COLORS- Bootstrap-style
+// ----------------------------
+
+$state-success-text: $black !default;
+$state-success-bg: #dff0d8 !default;
+$state-success-border: darken($state-success-bg, 5%) !default;
+
+$state-info-text: #31708f !default;
+$state-info-text-link: #245269 !default;
+$state-info-bg: #d9edf7 !default;
+$state-info-border: darken($state-info-bg, 7%) !default;
+
+$state-warning-text: $black !default;
+$state-warning-bg: #fcf8e3 !default;
+$state-warning-border: darken($state-warning-bg, 5%) !default;
+
+$state-danger-text: $black !default;
+$state-danger-bg: #f2dede !default;
+$state-danger-border: darken($state-danger-bg, 5%) !default;
+
+// logo colors
+$micromasters-color: #005585 !default;
+$zebra-stripe-color: rgb(249, 250, 252) !default;
+$divider-color: rgb(226, 231, 236) !default;

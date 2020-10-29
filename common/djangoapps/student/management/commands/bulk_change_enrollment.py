@@ -36,7 +36,7 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        group = parser.add_mutually_exclusive_group()
+        group = parser.add_mutually_exclusive_group(required=True)
         group.add_argument(
             '-c', '--course',
             help='The course to change enrollments in')
@@ -64,7 +64,6 @@ class Command(BaseCommand):
         to_mode = options['to_mode']
         commit = options['commit']
         course_keys = []
-
         if course_id:
             try:
                 course_key = CourseKey.from_string(course_id)

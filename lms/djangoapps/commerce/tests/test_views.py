@@ -63,13 +63,17 @@ class ReceiptViewTests(UserMixin, ModuleStoreTestCase):
         """
         # Enroll as verified in the course with the current user.
         CourseEnrollment.enroll(self.user, self.course.id, mode=CourseMode.VERIFIED)
-        response = self.client.get(reverse('commerce:user_verification_status'), data={'course_id': self.course.id})
+        response = self.client.get(
+            reverse('commerce:user_verification_status'), data={'course_id': str(self.course.id)}
+        )
         json_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_data['is_verification_required'], True)
 
         # Enroll as honor in the course with the current user.
         CourseEnrollment.enroll(self.user, self.course.id, mode=CourseMode.HONOR)
-        response = self.client.get(reverse('commerce:user_verification_status'), data={'course_id': self.course.id})
+        response = self.client.get(
+            reverse('commerce:user_verification_status'), data={'course_id': str(self.course.id)}
+        )
         json_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_data['is_verification_required'], False)
 
@@ -126,7 +130,7 @@ class ReceiptViewTests(UserMixin, ModuleStoreTestCase):
             response.content.decode('utf-8'),
             user_message if is_user_message_expected else system_message
         )
-        self.assertNotRegexpMatches(
+        self.assertNotRegex(
             response.content.decode('utf-8'),
             user_message if not is_user_message_expected else system_message
         )
