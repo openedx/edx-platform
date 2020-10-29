@@ -12,7 +12,7 @@ from django.test.utils import override_settings
 from eventtracking import tracker
 from mock import patch, sentinel
 
-from track.middleware import TrackMiddleware
+from common.djangoapps.track.middleware import TrackMiddleware
 
 
 @ddt.ddt
@@ -24,7 +24,7 @@ class TrackMiddlewareTestCase(TestCase):
         self.track_middleware = TrackMiddleware()
         self.request_factory = RequestFactory()
 
-        patcher = patch('track.views.server_track')
+        patcher = patch('common.djangoapps.track.views.server_track')
         self.mock_server_track = patcher.start()
         self.addCleanup(patcher.stop)
 

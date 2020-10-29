@@ -22,7 +22,7 @@ from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from common.djangoapps.student.models import CourseEnrollment
-from track.event_transaction_utils import set_event_transaction_id, set_event_transaction_type
+from common.djangoapps.track.event_transaction_utils import set_event_transaction_id, set_event_transaction_type
 from util.date_utils import from_timestamp
 from xmodule.modulestore.django import modulestore
 

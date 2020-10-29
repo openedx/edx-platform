@@ -21,7 +21,6 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import iteritems, text_type
 
-import track.views
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models import Optout
 from common.djangoapps.course_modes.models import CourseMode

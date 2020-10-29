@@ -46,7 +46,7 @@ from openedx.core.djangoapps.user_api.accounts.api import update_account_setting
 from openedx.core.djangoapps.user_api.errors import AccountValidationError, UserNotFound
 from openedx.core.lib.log_utils import audit_log
 from common.djangoapps.student.models import CourseEnrollment
-from track import segment
+from common.djangoapps.track import segment
 from util.db import outer_atomic
 from util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore

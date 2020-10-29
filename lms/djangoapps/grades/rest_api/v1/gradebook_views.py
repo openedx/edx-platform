@@ -61,7 +61,7 @@ from openedx.core.lib.cache_utils import request_cached
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import BulkRoleCache
-from track.event_transaction_utils import (
+from common.djangoapps.track.event_transaction_utils import (
     create_new_event_transaction_id,
     get_event_transaction_id,
     get_event_transaction_type,

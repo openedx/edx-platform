@@ -101,7 +101,7 @@ urlpatterns = [
     url(r'^change_enrollment$', student_views.change_enrollment, name='change_enrollment'),
 
     # Event tracking endpoints
-    url(r'', include('track.urls')),
+    url(r'', include('common.djangoapps.track.urls')),
 
     # Static template view endpoints like blog, faq, etc.
     url(r'', include('lms.djangoapps.static_template_view.urls')),

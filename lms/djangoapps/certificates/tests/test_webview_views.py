@@ -52,7 +52,7 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from track.tests import EventTrackingTestCase
+from common.djangoapps.track.tests import EventTrackingTestCase
 from util import organizations_helpers as organizations_api
 from util.date_utils import strftime_localized
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

@@ -36,7 +36,7 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import text_type
 
-import track.views
+from common.djangoapps.track import views as track_views
 from lms.djangoapps.bulk_email.models import Optout
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.courses import get_courses, sort_by_announcement, sort_by_start_date
@@ -824,7 +824,7 @@ def change_email_settings(request):
             user.email,
             course_id,
         )
-        track.views.server_track(
+        track_views.server_track(
             request,
             "change-email-settings",
             {"receive_emails": "yes", "course": course_id},
@@ -838,7 +838,7 @@ def change_email_settings(request):
             user.email,
             course_id,
         )
-        track.views.server_track(
+        track_views.server_track(
             request,
             "change-email-settings",
             {"receive_emails": "no", "course": course_id},

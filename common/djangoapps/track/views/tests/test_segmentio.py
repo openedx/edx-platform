@@ -10,9 +10,9 @@ from django.test.utils import override_settings
 from mock import sentinel
 
 from openedx.core.lib.tests.assertions.events import assert_event_matches
-from track.middleware import TrackMiddleware
-from track.views import segmentio
-from track.views.tests.base import SEGMENTIO_TEST_ENDPOINT, SEGMENTIO_TEST_USER_ID, SegmentIOTrackingTestCaseBase
+from common.djangoapps.track.middleware import TrackMiddleware
+from common.djangoapps.track.views import segmentio
+from common.djangoapps.track.views.tests.base import SEGMENTIO_TEST_ENDPOINT, SEGMENTIO_TEST_USER_ID, SegmentIOTrackingTestCaseBase
 
 
 def expect_failure_with_message(message):
