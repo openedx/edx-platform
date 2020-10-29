@@ -2,6 +2,8 @@
 Unit tests for the unit page.
 """
 
+from __future__ import absolute_import
+
 from contentstore.views.tests.utils import StudioPageTestCase
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import ItemFactory

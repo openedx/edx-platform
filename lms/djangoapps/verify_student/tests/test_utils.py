@@ -3,16 +3,19 @@
 Tests for verify_student utility functions.
 """
 
+from __future__ import absolute_import
+
+import unittest
 from datetime import timedelta
 
 import ddt
-import unittest
-from mock import patch
-from pytest import mark
 from django.conf import settings
 from django.utils import timezone
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSOVerification, ManualVerification
-from lms.djangoapps.verify_student.utils import verification_for_datetime, most_recent_verification
+from mock import patch
+from pytest import mark
+
+from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
+from lms.djangoapps.verify_student.utils import most_recent_verification, verification_for_datetime
 from student.tests.factories import UserFactory
 
 FAKE_SETTINGS = {

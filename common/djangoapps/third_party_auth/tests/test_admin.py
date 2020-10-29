@@ -1,12 +1,14 @@
 """
 Tests third_party_auth admin views
 """
+from __future__ import absolute_import
+
 import unittest
 
 from django.contrib.admin.sites import AdminSite
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.urls import reverse
 from django.forms import models
+from django.urls import reverse
 
 from student.tests.factories import UserFactory
 from third_party_auth.admin import OAuth2ProviderConfigAdmin

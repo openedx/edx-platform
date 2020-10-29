@@ -12,22 +12,31 @@ sessions. Assumes structure:
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
-from collections import OrderedDict
+from __future__ import absolute_import
 
-from django.utils.translation import ugettext_lazy
-
-from .common import *
+import logging
 import os
-from path import Path as path
+from collections import OrderedDict
+from random import choice
+from string import digits, ascii_letters, punctuation
 from uuid import uuid4
 
-from util.db import NoOpMigrationModules
+import openid.oidutil
+from django.utils.translation import ugettext_lazy
+from path import Path as path
+from six.moves import range
+
+from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
 from openedx.core.lib.derived import derive_settings
 from openedx.core.lib.tempdir import mkdtemp_clean
 
+from .common import *
+
+from util.db import NoOpMigrationModules  # pylint: disable=wrong-import-order
+from util.testing import patch_sessions, patch_testcase  # pylint: disable=wrong-import-order
+
 # This patch disables the commit_on_success decorator during tests
 # in TestCase subclasses.
-from util.testing import patch_testcase, patch_sessions
 patch_testcase()
 patch_sessions()
 
@@ -37,7 +46,6 @@ ALLOWED_HOSTS = [
 ]
 
 # Silence noisy logs to make troubleshooting easier when tests fail.
-import logging
 LOG_OVERRIDES = [
     ('factory.generate', logging.ERROR),
     ('factory.containers', logging.ERROR),
@@ -83,8 +91,6 @@ FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
 
 FEATURES['ENABLE_BULK_ENROLLMENT_VIEW'] = True
 
-FEATURES['ENABLE_API_DOCS'] = True
-
 DEFAULT_MOBILE_AVAILABLE = True
 
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
@@ -124,6 +130,14 @@ XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 # Don't rely on a real staff grading backend
 MOCK_STAFF_GRADING = True
 MOCK_PEER_GRADING = True
+
+COMMENTS_SERVICE_URL = 'http://localhost:4567'
+
+DJFS = {
+    'type': 'osfs',
+    'directory_root': '{}/django-pyfs/static/django-pyfs'.format(DATA_DIR),
+    'url_root': '/static/django-pyfs',
+}
 
 ############################ STATIC FILES #############################
 
@@ -217,7 +231,20 @@ CACHES = {
     'course_structure_cache': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     },
+    # Blockstore caching tests require a cache that actually works:
+    'blockstore': {
+        'KEY_PREFIX': 'blockstore',
+        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'LOCATION': 'edx_loc_mem_cache',
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    },
 }
+
+############################### BLOCKSTORE #####################################
+# Blockstore tests
+RUN_BLOCKSTORE_TESTS = os.environ.get('EDXAPP_RUN_BLOCKSTORE_TESTS', 'no').lower() in ('true', 'yes', '1')
+BLOCKSTORE_API_URL = os.environ.get('EDXAPP_BLOCKSTORE_API_URL', "http://edx.devstack.blockstore-test:18251/api/v1/")
+BLOCKSTORE_API_AUTH_TOKEN = os.environ.get('EDXAPP_BLOCKSTORE_API_AUTH_TOKEN', 'edxapp-test-key')
 
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
@@ -261,6 +288,7 @@ OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
 FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
 # don't cache courses for testing
 OIDC_COURSE_HANDLER_CACHE_TIMEOUT = 0
+OAUTH_ENFORCE_SECURE = False
 
 ########################### External REST APIs #################################
 FEATURES['ENABLE_MOBILE_REST_API'] = True
@@ -274,10 +302,8 @@ FEATURES['ENABLE_PAYMENT_FAKE'] = True
 # Since both the fake payment page and the shoppingcart app are using
 # the same settings, we can generate this randomly and guarantee
 # that they are using the same secret.
-from random import choice
-from string import letters, digits, punctuation
 RANDOM_SHARED_SECRET = ''.join(
-    choice(letters + digits + punctuation)
+    choice(ascii_letters + digits + punctuation)
     for x in range(250)
 )
 
@@ -322,7 +348,7 @@ MKTG_URL_LINK_MAP = {
     'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
 }
 
-SUPPORT_SITE_LINK = 'https://support.example.com'
+SUPPORT_SITE_LINK = 'https://example.support.edx.org'
 PASSWORD_RESET_SUPPORT_LINK = 'https://support.example.com/password-reset-help.html'
 ACTIVATION_EMAIL_SUPPORT_LINK = 'https://support.example.com/activation-email-help.html'
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = OrderedDict([
@@ -389,9 +415,9 @@ FEATURES['CLASS_DASHBOARD'] = True
 ################### Make tests quieter
 
 # OpenID spews messages like this to stderr, we don't need to see them:
-#   Generated checkid_setup request to http://testserver/openid/provider/login/ with assocication {HMAC-SHA1}{51d49995}{s/kRmA==}
+# Generated checkid_setup request to http://testserver/openid/provider/login/
+# With assocication {HMAC-SHA1}{51d49995}{s/kRmA==}
 
-import openid.oidutil
 openid.oidutil.log = lambda message, level=0: None
 
 
@@ -401,77 +427,6 @@ PLATFORM_NAME = ugettext_lazy(u"édX")
 PLATFORM_DESCRIPTION = ugettext_lazy(u"Open édX Platform")
 
 SITE_NAME = "edx.org"
-
-# set up some testing for microsites
-FEATURES['USE_MICROSITES'] = True
-MICROSITE_ROOT_DIR = COMMON_ROOT / 'test' / 'test_sites'
-MICROSITE_CONFIGURATION = {
-    "test_site": {
-        "domain_prefix": "test-site",
-        "university": "test_site",
-        "platform_name": "Test Site",
-        "logo_image_url": "test_site/images/header-logo.png",
-        "email_from_address": "test_site@edx.org",
-        "ACTIVATION_EMAIL_FROM_ADDRESS": "test_activate@edx.org",
-        "payment_support_email": "test_site@edx.org",
-        "ENABLE_MKTG_SITE": False,
-        "SITE_NAME": "test_site.localhost",
-        "course_org_filter": "TestSiteX",
-        "course_about_show_social_links": False,
-        "css_overrides_file": "test_site/css/test_site.css",
-        "show_partners": False,
-        "show_homepage_promo_video": False,
-        "course_index_overlay_text": "This is a Test Site Overlay Text.",
-        "course_index_overlay_logo_file": "test_site/images/header-logo.png",
-        "homepage_overlay_html": "<h1>This is a Test Site Overlay HTML</h1>",
-        "ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER": False,
-        "COURSE_CATALOG_VISIBILITY_PERMISSION": "see_in_catalog",
-        "COURSE_ABOUT_VISIBILITY_PERMISSION": "see_about_page",
-        "ENABLE_SHOPPING_CART": True,
-        "ENABLE_PAID_COURSE_REGISTRATION": True,
-        "SESSION_COOKIE_DOMAIN": "test_site.localhost",
-        "LINKEDIN_COMPANY_ID": "test",
-        "FACEBOOK_APP_ID": "12345678908",
-        "urls": {
-            'ABOUT': 'test-site/about',
-            'PRIVACY': 'test-site/privacy',
-            'TOS_AND_HONOR': 'test-site/tos-and-honor',
-        },
-    },
-    "site_with_logistration": {
-        "domain_prefix": "logistration",
-        "university": "logistration",
-        "platform_name": "Test logistration",
-        "logo_image_url": "test_site/images/header-logo.png",
-        "email_from_address": "test_site@edx.org",
-        "ACTIVATION_EMAIL_FROM_ADDRESS": "test_activate@edx.org",
-        "payment_support_email": "test_site@edx.org",
-        "ENABLE_MKTG_SITE": False,
-        "ENABLE_COMBINED_LOGIN_REGISTRATION": True,
-        "SITE_NAME": "test_site.localhost",
-        "course_org_filter": "LogistrationX",
-        "course_about_show_social_links": False,
-        "css_overrides_file": "test_site/css/test_site.css",
-        "show_partners": False,
-        "show_homepage_promo_video": False,
-        "course_index_overlay_text": "Logistration.",
-        "course_index_overlay_logo_file": "test_site/images/header-logo.png",
-        "homepage_overlay_html": "<h1>This is a Logistration HTML</h1>",
-        "ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER": False,
-        "COURSE_CATALOG_VISIBILITY_PERMISSION": "see_in_catalog",
-        "COURSE_ABOUT_VISIBILITY_PERMISSION": "see_about_page",
-        "ENABLE_SHOPPING_CART": True,
-        "ENABLE_PAID_COURSE_REGISTRATION": True,
-        "SESSION_COOKIE_DOMAIN": "test_logistration.localhost",
-    },
-    "default": {
-        "university": "default_university",
-        "domain_prefix": "www",
-    }
-}
-
-MICROSITE_TEST_HOSTNAME = 'test-site.testserver'
-MICROSITE_LOGISTRATION_HOSTNAME = 'logistration.testserver'
 
 TEST_THEME = COMMON_ROOT / "test" / "test-theme"
 
@@ -553,6 +508,7 @@ COURSE_CATALOG_API_URL = 'https://catalog.example.com/api/v1'
 
 COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "common/test/appsembler", REPO_ROOT / "themes", REPO_ROOT / "common/test"]
 COMPREHENSIVE_THEME_LOCALE_PATHS = [REPO_ROOT / "themes/conf/locale", ]
+ENABLE_COMPREHENSIVE_THEMING = True
 
 # Appsembler: We have a single theme for all customers. We might want to undo this if it turns out that it fails
 #             More tests than it fixes. If we undo this, we need to
@@ -565,6 +521,7 @@ LMS_ROOT_URL = "http://localhost:8000"
 FRONTEND_LOGOUT_URL = LMS_ROOT_URL + '/logout'
 
 ECOMMERCE_API_URL = 'https://ecommerce.example.com/api/v2/'
+ECOMMERCE_PUBLIC_URL_ROOT = None
 ENTERPRISE_API_URL = 'http://enterprise.example.com/enterprise/api/v1/'
 ENTERPRISE_CONSENT_API_URL = 'http://enterprise.example.com/consent/api/v1/'
 
@@ -613,7 +570,6 @@ JWT_AUTH.update({
 # pylint: enable=unicode-format-string
 ####################### Plugin Settings ##########################
 
-from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_constants.SettingsType.TEST)
 
 ########################## Derive Any Derived Settings  #######################
@@ -622,3 +578,32 @@ derive_settings(__name__)
 
 ############### Settings for edx-rbac  ###############
 SYSTEM_WIDE_ROLE_CLASSES = os.environ.get("SYSTEM_WIDE_ROLE_CLASSES", [])
+
+###################### Grade Downloads ######################
+# These keys are used for all of our asynchronous downloadable files, including
+# the ones that contain information other than grades.
+
+GRADES_DOWNLOAD = {
+    'STORAGE_TYPE': 'localfs',
+    'BUCKET': 'edx-grades',
+    'ROOT_PATH': '/tmp/edx-s3/grades',
+}
+
+# Configuration used for generating PDF Receipts/Invoices
+
+PDF_RECEIPT_TAX_ID = 'add here'
+PDF_RECEIPT_FOOTER_TEXT = 'add your own specific footer text here'
+PDF_RECEIPT_DISCLAIMER_TEXT = 'add your own specific disclaimer text here'
+PDF_RECEIPT_BILLING_ADDRESS = 'add your own billing address here with appropriate line feed characters'
+PDF_RECEIPT_TERMS_AND_CONDITIONS = 'add your own terms and conditions'
+PDF_RECEIPT_TAX_ID_LABEL = 'Tax ID'
+
+PROFILE_MICROFRONTEND_URL = "http://profile-mfe/abc/"
+ORDER_HISTORY_MICROFRONTEND_URL = "http://order-history-mfe/"
+ACCOUNT_MICROFRONTEND_URL = "http://account-mfe/"
+
+########################## limiting dashboard courses ######################
+
+DASHBOARD_COURSE_LIMIT = 250
+
+PROCTORING_SETTINGS = {}

@@ -2,21 +2,24 @@
 """
 Django model specifications for the Program Enrollments API
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
+
 import logging
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from course_modes.models import CourseMode
-from lms.djangoapps.program_enrollments.api.v1.constants import (
-    CourseEnrollmentResponseStatuses as ProgramCourseEnrollmentResponseStatuses
-)
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords
-from student.models import AlreadyEnrolledError, CourseEnrollment
+from six import text_type
+
+from course_modes.models import CourseMode
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from student.models import CourseEnrollment, NonExistentCourseError
+
+from .constants import ProgramCourseEnrollmentStatuses, ProgramEnrollmentStatuses
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -29,21 +32,16 @@ class ProgramEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unic
     .. pii_types: other
     .. pii_retirement: local_api
     """
-    STATUSES = (
-        ('enrolled', 'enrolled'),
-        ('pending', 'pending'),
-        ('suspended', 'suspended'),
-        ('canceled', 'canceled'),
-    )
+    STATUS_CHOICES = ProgramEnrollmentStatuses.__MODEL_CHOICES__
 
     class Meta(object):
         app_label = "program_enrollments"
-        unique_together = ('external_user_key', 'program_uuid', 'curriculum_uuid')
 
         # A student enrolled in a given (program, curriculum) should always
         # have a non-null ``user`` or ``external_user_key`` field (or both).
         unique_together = (
-            ('user', 'external_user_key', 'program_uuid', 'curriculum_uuid'),
+            ('user', 'program_uuid', 'curriculum_uuid'),
+            ('external_user_key', 'program_uuid', 'curriculum_uuid'),
         )
 
     user = models.ForeignKey(
@@ -58,25 +56,12 @@ class ProgramEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unic
     )
     program_uuid = models.UUIDField(db_index=True, null=False)
     curriculum_uuid = models.UUIDField(db_index=True, null=False)
-    status = models.CharField(max_length=9, choices=STATUSES)
+    status = models.CharField(max_length=9, choices=STATUS_CHOICES)
     historical_records = HistoricalRecords()
 
     def clean(self):
         if not (self.user or self.external_user_key):
             raise ValidationError(_('One of user or external_user_key must not be null.'))
-
-    @classmethod
-    def bulk_read_by_student_key(cls, program_uuid, student_data):
-        """
-        args:
-            program_uuid - The UUID of the program to read enrollment data of.
-            student_data - A dictionary keyed by external_user_key and
-            valued by a dict containing the curriculum_uuid for the user in the given program.
-        """
-        return cls.objects.filter(
-            program_uuid=program_uuid,
-            external_user_key__in=student_data.keys(),
-        )
 
     @classmethod
     def retire_user(cls, user_id):
@@ -119,13 +104,21 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
 
     .. no_pii:
     """
-    STATUSES = (
-        ('active', 'active'),
-        ('inactive', 'inactive'),
-    )
+    STATUS_CHOICES = ProgramCourseEnrollmentStatuses.__MODEL_CHOICES__
 
     class Meta(object):
         app_label = "program_enrollments"
+
+        # For each program enrollment, there may be only one
+        # waiting program-course enrollment per course key.
+        # This same constraint is implicitly enforced for
+        # completed program-course enrollments by the
+        # OneToOneField on `course_enrollment`, which mandates that
+        # there may be at most one program-course enrollment per
+        # (user, course) pair.
+        unique_together = (
+            ('program_enrollment', 'course_key'),
+        )
 
     program_enrollment = models.ForeignKey(
         ProgramEnrollment,
@@ -138,7 +131,7 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
         blank=True,
     )
     course_key = CourseKeyField(max_length=255)
-    status = models.CharField(max_length=9, choices=STATUSES)
+    status = models.CharField(max_length=9, choices=STATUS_CHOICES)
     historical_records = HistoricalRecords()
 
     def __str__(self):
@@ -169,9 +162,9 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
 
         self.status = status
         if self.course_enrollment:
-            if status == ProgramCourseEnrollmentResponseStatuses.ACTIVE:
+            if status == ProgramCourseEnrollmentStatuses.ACTIVE:
                 self.course_enrollment.activate()
-            elif status == ProgramCourseEnrollmentResponseStatuses.INACTIVE:
+            elif status == ProgramCourseEnrollmentStatuses.INACTIVE:
                 self.course_enrollment.deactivate()
             else:
                 message = ("Changed {enrollment} status to {status}, not changing course_enrollment"
@@ -179,8 +172,8 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
                 logger.warn(message.format(
                     enrollment=self,
                     status=status,
-                    active=ProgramCourseEnrollmentResponseStatuses.ACTIVE,
-                    inactive=ProgramCourseEnrollmentResponseStatuses.INACTIVE
+                    active=ProgramCourseEnrollmentStatuses.ACTIVE,
+                    inactive=ProgramCourseEnrollmentStatuses.INACTIVE
                 ))
         elif self.program_enrollment.user:
             logger.warn("User {user} {program_enrollment} {course_key} has no course_enrollment".format(
@@ -196,24 +189,36 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
         Create a CourseEnrollment to enroll user in course
         """
         try:
-            self.course_enrollment = CourseEnrollment.enroll(
-                user,
-                self.course_key,
-                mode=CourseMode.MASTERS,
-                check_access=True,
+            CourseOverview.get_from_id(self.course_key)
+        except CourseOverview.DoesNotExist:
+            logger.warning(
+                "User %s failed to enroll in non-existent course %s", user.id,
+                text_type(self.course_key),
             )
-        except AlreadyEnrolledError:
+            raise NonExistentCourseError
+
+        if CourseEnrollment.is_enrolled(user, self.course_key):
             course_enrollment = CourseEnrollment.objects.get(
                 user=user,
                 course_id=self.course_key,
             )
-            if course_enrollment.mode == CourseMode.AUDIT or course_enrollment.mode == CourseMode.HONOR:
+            if course_enrollment.mode in {CourseMode.AUDIT, CourseMode.HONOR}:
                 course_enrollment.mode = CourseMode.MASTERS
                 course_enrollment.save()
             self.course_enrollment = course_enrollment
-            message = ("Attempted to create course enrollment for user={user} and course={course}"
-                       " but an enrollment already exists. Existing enrollment will be used instead")
-            logger.info(message.format(user=user.id, course=self.course_key))
-        if self.status == ProgramCourseEnrollmentResponseStatuses.INACTIVE:
+            message_template = (
+                "Attempted to create course enrollment for user={user} "
+                "and course={course} but an enrollment already exists. "
+                "Existing enrollment will be used instead."
+            )
+            logger.info(message_template.format(user=user.id, course=self.course_key))
+        else:
+            self.course_enrollment = CourseEnrollment.enroll(
+                user,
+                self.course_key,
+                mode=CourseMode.MASTERS,
+                check_access=False,
+            )
+        if self.status == ProgramCourseEnrollmentStatuses.INACTIVE:
             self.course_enrollment.deactivate()
         self.save()

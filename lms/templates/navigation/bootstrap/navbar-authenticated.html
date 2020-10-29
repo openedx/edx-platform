@@ -46,13 +46,6 @@ from django.utils.translation import ugettext as _
           </a>
         </li>
       % endif
-      % if show_journal_listing:
-        <li class="nav-item mt-2 nav-item-open-collapsed">
-          <a class="nav-link active" href="${reverse('openedx.journals.dashboard')}">
-            ${_("Journals")}
-          </a>
-        </li>
-      % endif
     % endif
 
     % if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD','') and user.is_staff:
@@ -72,7 +65,8 @@ from django.utils.translation import ugettext as _
 
     <li class="nav-item mt-2 nav-item-open-collapsed">
       <a href="${get_online_help_info(online_help_token)['doc_url']}"
-       target="_blank"
+      rel="noopener" 
+      target="_blank"
        class="nav-link">${_("Help")}</a>
     </li>
 

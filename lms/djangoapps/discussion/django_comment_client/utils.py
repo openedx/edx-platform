@@ -1,35 +1,41 @@
 # pylint: skip-file
+from __future__ import absolute_import
+
 import json
 import logging
 from collections import defaultdict
 from datetime import datetime
 
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.db import connection
 from django.http import HttpResponse
-from pytz import UTC
+from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import i4xEncoder
+from pytz import UTC
 from six import text_type
+from six.moves import map
 
 from courseware import courses
 from courseware.access import has_access
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from lms.djangoapps.discussion.django_comment_client.permissions import (
-    check_permissions_by_view, get_team, has_permission,
+    check_permissions_by_view,
+    get_team,
+    has_permission
 )
 from lms.djangoapps.discussion.django_comment_client.settings import MAX_COMMENT_DEPTH
+from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, get_cohort_names, is_course_cohorted
 from openedx.core.djangoapps.django_comment_common.models import (
-    FORUM_ROLE_STUDENT,
     FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_STUDENT,
     CourseDiscussionSettings,
     DiscussionsIdMapping,
     Role
 )
 from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
-from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, get_cohort_names, is_course_cohorted
 from openedx.core.lib.cache_utils import request_cached
 from student.models import get_user_by_username_or_email
 from student.roles import GlobalStaff
@@ -51,7 +57,7 @@ def strip_none(dic):
     """
     Returns a dictionary stripped of any keys having values of None
     """
-    return dict([(k, v) for k, v in dic.iteritems() if v is not None])
+    return dict([(k, v) for k, v in six.iteritems(dic) if v is not None])
 
 
 def strip_blank(dic):
@@ -63,7 +69,7 @@ def strip_blank(dic):
         Determines if the provided value contains no information
         """
         return isinstance(v, str) and len(v.strip()) == 0
-    return dict([(k, v) for k, v in dic.iteritems() if not _is_blank(v)])
+    return dict([(k, v) for k, v in six.iteritems(dic) if not _is_blank(v)])
 
 # TODO should we be checking if d1 and d2 have the same keys with different values?
 
@@ -236,7 +242,7 @@ def get_discussion_id_map_by_course_id(course_id, user):
     by discussion_id.
     """
     xblocks = get_accessible_discussion_xblocks_by_course_id(course_id, user)
-    return dict(map(get_discussion_id_map_entry, xblocks))
+    return dict(list(map(get_discussion_id_map_entry, xblocks)))
 
 
 @request_cached()
@@ -299,7 +305,8 @@ def _sort_map_entries(category_map, sort_alpha):
     for title, category in category_map["subcategories"].items():
         things.append((title, category, TYPE_SUBCATEGORY))
         _sort_map_entries(category_map["subcategories"][title], sort_alpha)
-    category_map["children"] = [(x[0], x[2]) for x in sorted(things, key=lambda x: x[1]["sort_key"])]
+    key_method = lambda x: x[1]["sort_key"] if x[1]["sort_key"] is not None else ''
+    category_map["children"] = [(x[0], x[2]) for x in sorted(things, key=key_method)]
 
 
 def get_discussion_category_map(course, user, divided_only_if_explicit=False, exclude_unstarted=True):
@@ -501,7 +508,7 @@ class JsonError(HttpResponse):
         """
         Object constructor, returns an error response containing the provided exception messages
         """
-        if isinstance(error_messages, basestring):
+        if isinstance(error_messages, six.string_types):
             error_messages = [error_messages]
         content = json.dumps({'errors': error_messages}, indent=2, ensure_ascii=False)
         super(JsonError, self).__init__(content,
@@ -900,7 +907,7 @@ def is_comment_too_deep(parent):
     return (
         MAX_COMMENT_DEPTH is not None and (
             MAX_COMMENT_DEPTH < 0 or
-            (parent and parent["depth"] >= MAX_COMMENT_DEPTH)
+            (parent and (parent["depth"] or 0) >= MAX_COMMENT_DEPTH)
         )
     )
 

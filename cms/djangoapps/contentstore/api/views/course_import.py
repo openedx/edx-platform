@@ -1,20 +1,20 @@
 """
 APIs related to Course Import.
 """
+from __future__ import absolute_import
+
 import base64
 import logging
 import os
 
-from path import Path as path
-from six import text_type
-
 from django.conf import settings
-
 from django.core.files import File
+from path import Path as path
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
+from six import text_type
 from user_tasks.models import UserTaskStatus
 
 from contentstore.storage import course_import_export_storage
@@ -22,7 +22,6 @@ from contentstore.tasks import CourseImportTask, import_olx
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 
 from .utils import course_author_access_required
-
 
 log = logging.getLogger(__name__)
 
@@ -129,7 +128,9 @@ class CourseImportView(CourseImportExportViewMixin, GenericAPIView):
                     developer_message='Parameter in the wrong format',
                     error_code='internal_error',
                 )
-            course_dir = path(settings.GITHUB_REPO_ROOT) / base64.urlsafe_b64encode(repr(course_key))
+            course_dir = path(settings.GITHUB_REPO_ROOT) / base64.urlsafe_b64encode(
+                repr(course_key).encode('utf-8')
+            ).decode('utf-8')
             temp_filepath = course_dir / filename
             if not course_dir.isdir():
                 os.mkdir(course_dir)

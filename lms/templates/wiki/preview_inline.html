@@ -10,14 +10,14 @@
     <div class="main-article">
       {% if revision %}
         <div class="alert alert-info">
-          <strong>{% trans "Previewing revision:" %}</strong>
+          <strong>{% trans "Previewing revision:" as tmsg%}{{tmsg|force_escape}}</strong>
           {% include "wiki/includes/revision_info.html" %}
         </div>
       {% endif %}
 
       {% if merge %}
         <div class="alert alert-info">
-          <strong>{% trans "Previewing a merge between two revisions:" %}</strong>
+          <strong>{% trans "Previewing a merge between two revisions:" as tmsg%}{{tmsg|force_escape}}</strong>
           <ol>
             <li>{% include "wiki/includes/revision_info.html" with revision=merge1 %}</li>
             <li>{% include "wiki/includes/revision_info.html" with revision=merge2 %}</li>
@@ -29,22 +29,22 @@
 
       {% if revision and revision.deleted %}
         <div class="warning">
-          <strong>{% trans "This revision has been deleted." %}</strong> 
-          <p>{% trans "Restoring to this revision will mark the article as deleted." %}</p>
+          <strong>{% trans "This revision has been deleted." as tmsg %}{{tmsg|force_escape}}</strong>
+          <p>{% trans "Restoring to this revision will mark the article as deleted." as tmsg %}{{tmsg|force_escape}}</p>
         </div>
       {% else %}
         {% wiki_render article content %}
       {% endif %}
-      
+
     </div>
   </section>
-  
+
   {% javascript 'application' %}
   {% javascript 'module-js' %}
   {% with mathjax_mode='wiki' %}
     {% include "mathjax_include.html" %}
   {% endwith %}
-  
+
 </body>
 </html>
 

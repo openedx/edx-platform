@@ -1,6 +1,8 @@
 """
 This file contains view functions for wrapping the django-wiki.
 """
+from __future__ import absolute_import
+
 import logging
 import re
 

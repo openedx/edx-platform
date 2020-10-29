@@ -21,6 +21,7 @@ from __future__ import absolute_import, print_function
 import csv
 import logging
 import time
+from textwrap import dedent
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connections
@@ -32,8 +33,23 @@ log = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     """
-    Implementation of the bulk_user_org_email_optout command.
+    One-off script to opt-out users for email from orgs.
+
+    Input: A CSV file with a user_id,org pair per line. For example:
+
+    1962921,FooX
+    5506350,BarX
+    5709986,FooX
+
+    Lines formatted with a double-quoted org also work fine, such as:
+
+    5506350,"BarX"
+
+    Opts-out every specified user/org combo row from email by setting the 'email-optin' tag to 'False'.
+    If the user/org combo does not currently exist in the table, a row will be created for it which
+    will be have the 'email-optin' tag set to 'False'.
     """
+    help = dedent(__doc__).strip()
     # Default number of user/org opt-outs to perform in each DB transaction.
     DEFAULT_CHUNK_SIZE = 1000
 

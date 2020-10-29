@@ -127,7 +127,7 @@ def bumper_metadata(video, sources):
     unused_track_url, bumper_transcript_language, bumper_languages = video.get_transcripts_for_student(transcripts)
 
     metadata = OrderedDict({
-        'saveStateUrl': video.system.ajax_url + '/save_user_state',
+        'saveStateUrl': video.ajax_url + '/save_user_state',
         'showCaptions': json.dumps(video.show_captions),
         'sources': sources,
         'streams': '',

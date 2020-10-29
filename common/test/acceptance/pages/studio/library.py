@@ -1,6 +1,9 @@
 """
 Library edit page in Studio
 """
+from __future__ import absolute_import
+
+import six
 from bok_choy.javascript import js_defined, wait_for_js
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise
@@ -9,11 +12,11 @@ from selenium.webdriver.support.select import Select
 
 from common.test.acceptance.pages.common.utils import confirm_prompt, sync_on_notification
 from common.test.acceptance.pages.studio import BASE_URL
-from common.test.acceptance.pages.studio.xblock_editor import XBlockEditorView
 from common.test.acceptance.pages.studio.container import XBlockWrapper
 from common.test.acceptance.pages.studio.pagination import PaginatedMixin
 from common.test.acceptance.pages.studio.users import UsersPageMixin
 from common.test.acceptance.pages.studio.utils import HelpMixin
+from common.test.acceptance.pages.studio.xblock_editor import XBlockEditorView
 
 
 class LibraryPage(PageObject, HelpMixin):
@@ -29,7 +32,7 @@ class LibraryPage(PageObject, HelpMixin):
         """
         URL to the library edit page for the given library.
         """
-        return "{}/library/{}".format(BASE_URL, unicode(self.locator))
+        return "{}/library/{}".format(BASE_URL, six.text_type(self.locator))
 
     def is_browser_on_page(self):
         """

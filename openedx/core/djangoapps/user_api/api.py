@@ -1,23 +1,31 @@
-import copy
-import crum
+"""
+User Apis.
+"""
+from __future__ import absolute_import
 
+import copy
+
+import crum
+import six
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django_countries import countries
 
-import accounts
 import third_party_auth
 from edxmako.shortcuts import marketing_link
-from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.helpers import FormDescription
+from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from student.forms import get_registration_extension_form
 from student.models import UserProfile
 from util.password_policy_validators import (
-    password_validators_instruction_texts, password_validators_restrictions, DEFAULT_MAX_PASSWORD_LENGTH,
+    DEFAULT_MAX_PASSWORD_LENGTH,
+    password_validators_instruction_texts,
+    password_validators_restrictions
 )
 
 
@@ -118,14 +126,6 @@ def get_login_session_form(request):
         label=password_label,
         field_type="password",
         restrictions={'max_length': DEFAULT_MAX_PASSWORD_LENGTH}
-    )
-
-    form_desc.add_field(
-        "remember",
-        field_type="checkbox",
-        label=_("Remember me"),
-        default=False,
-        required=False,
     )
 
     return form_desc
@@ -484,7 +484,7 @@ class RegistrationFormFactory(object):
         # form used to select the user's year of birth.
         yob_label = _(u"Year of birth")
 
-        options = [(unicode(year), unicode(year)) for year in UserProfile.VALID_YEARS]
+        options = [(six.text_type(year), six.text_type(year)) for year in UserProfile.VALID_YEARS]
         form_desc.add_field(
             "year_of_birth",
             label=yob_label,
@@ -520,7 +520,7 @@ class RegistrationFormFactory(object):
             field_type = "select"
             include_default_option = True
             field_options = extra_field_options.get(field_name)
-            options = [(unicode(option.lower()), option) for option in field_options]
+            options = [(six.text_type(option.lower()), option) for option in field_options]
             error_msg = ''
             error_msg = getattr(accounts, u'REQUIRED_FIELD_{}_SELECT_MSG'.format(field_name.upper()))
 
@@ -806,7 +806,9 @@ class RegistrationFormFactory(object):
         )).format(
             platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_label,
-            terms_of_service_link_start=HTML(u"<a href='{terms_link}' target='_blank'>").format(terms_link=terms_link),
+            terms_of_service_link_start=HTML(u"<a href='{terms_link}' rel='noopener' target='_blank'>").format(
+                terms_link=terms_link
+            ),
             terms_of_service_link_end=HTML("</a>"),
         )
 
@@ -832,9 +834,13 @@ class RegistrationFormFactory(object):
             )).format(
                 platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
                 terms_of_service=terms_label,
-                terms_of_service_link_start=HTML(u"<a href='{terms_url}' target='_blank'>").format(terms_url=terms_link),
+                terms_of_service_link_start=HTML(u"<a href='{terms_url}' rel='noopener' target='_blank'>").format(
+                    terms_url=terms_link
+                ),
                 terms_of_service_link_end=HTML("</a>"),
-                privacy_policy_link_start=HTML(u"<a href='{pp_url}' target='_blank'>").format(pp_url=pp_link),
+                privacy_policy_link_start=HTML(u"<a href='{pp_url}' rel='noopener' target='_blank'>").format(
+                    pp_url=pp_link
+                ),
                 privacy_policy_link_end=HTML("</a>"),
             )
 
@@ -869,7 +875,9 @@ class RegistrationFormFactory(object):
         label = Text(_(u"I agree to the {platform_name} {tos_link_start}{terms_of_service}{tos_link_end}")).format(
             platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_label,
-            tos_link_start=HTML(u"<a href='{terms_link}' target='_blank'>").format(terms_link=terms_link),
+            tos_link_start=HTML(u"<a href='{terms_link}' rel='noopener' target='_blank'>").format(
+                terms_link=terms_link
+            ),
             tos_link_end=HTML("</a>"),
         )
 

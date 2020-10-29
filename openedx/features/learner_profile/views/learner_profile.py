@@ -22,7 +22,6 @@ from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.learner_profile.toggles import should_redirect_to_profile_microfrontend
 from openedx.features.learner_profile.views.learner_achievements import LearnerAchievementsFragmentView
-from openedx.features.journals.api import journals_enabled
 from student.models import User
 
 
@@ -111,7 +110,6 @@ def learner_profile_context(request, profile_username, user_is_staff):
             'social_platforms': settings.SOCIAL_PLATFORMS,
         },
         'show_program_listing': ProgramsApiConfig.is_enabled(),
-        'show_journal_listing': journals_enabled(),
         'show_dashboard_tabs': True,
         'disable_courseware_js': True,
         'nav_hidden': True,

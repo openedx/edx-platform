@@ -18,6 +18,7 @@
 # marichkafox <marichka.fox@gmail.com>, 2014
 # marichkafox <marichka.fox@gmail.com>, 2014
 # Maryna Holovnova <MGG-2008@yandex.ru>, 2014
+# Muhammad Adeel Khan <adeel@edx.org>, 2019
 # Natalia Vynogradenko <tannaha@gmail.com>, 2017-2018
 # olexiim <olexiim@gmail.com>, 2014-2016
 # Olga Filipova <chudaol@gmail.com>, 2015-2016
@@ -46,6 +47,7 @@
 # Denis <prohibiti@gmail.com>, 2015
 # Irene Korotkova <irca.gav@gmail.com>, 2017
 # IvanPrimachenko <jastudent1@gmail.com>, 2014
+# Muhammad Adeel Khan <adeel@edx.org>, 2019
 # Natalia Vynogradenko <tannaha@gmail.com>, 2017-2018
 # Zapadenska <oruda@ymail.com>, 2014
 # Zoriana Zaiats, 2015
@@ -96,9 +98,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-04-22 10:49+0000\n"
-"PO-Revision-Date: 2019-03-09 21:43+0000\n"
-"Last-Translator: Anastasiia Bondarenko <anastasiia.bondarenko@raccoongang.com>\n"
+"POT-Creation-Date: 2019-09-15 20:42+0000\n"
+"PO-Revision-Date: 2019-07-28 20:42+0000\n"
+"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/)\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
@@ -126,22 +128,6 @@ msgstr "Збереження"
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/show_textbook.js
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
-#: cms/templates/js/certificate-details.underscore
-#: cms/templates/js/certificate-editor.underscore
-#: cms/templates/js/content-group-editor.underscore
-#: cms/templates/js/course-instructor-details.underscore
-#: cms/templates/js/course-outline.underscore
-#: cms/templates/js/course-settings-learning-fields.underscore
-#: cms/templates/js/course_grade_policy.underscore
-#: cms/templates/js/course_info_update.underscore
-#: cms/templates/js/group-configuration-details.underscore
-#: cms/templates/js/group-configuration-editor.underscore
-#: cms/templates/js/partition-group-details.underscore
-#: cms/templates/js/show-textbook.underscore
-#: cms/templates/js/signatory-editor.underscore
-#: cms/templates/js/video-transcripts.underscore
-#: cms/templates/js/xblock-outline.underscore
-#: common/static/common/templates/discussion/forum-action-delete.underscore
 msgid "Delete"
 msgstr "Видалити"
 
@@ -170,10 +156,6 @@ msgstr "Видалити"
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/signatory-actions.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
-#: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/response-comment-edit.underscore
-#: common/static/common/templates/discussion/thread-edit.underscore
-#: common/static/common/templates/discussion/thread-response-edit.underscore
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
@@ -368,69 +350,69 @@ msgstr "Коментарі"
 msgid "Reply to Annotation"
 msgstr "Відповісти на анотацію"
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (graded, results hidden)"
-msgid_plural "%(num_points)s points possible (graded, results hidden)"
-msgstr[0] "%(num_points)sможливі бали (оцінено, результати приховані)"
-msgstr[1] "%(num_points)sможливі бали (оцінено, результати приховані)"
-msgstr[2] "%(num_points)sможливі бали (оцінено, результати приховані)"
-msgstr[3] "%(num_points)sможливі бали (оцінено, результати приховані)"
+msgid "{num_points} point possible (graded, results hidden)"
+msgid_plural "{num_points} points possible (graded, results hidden)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (ungraded, results hidden)"
-msgid_plural "%(num_points)s points possible (ungraded, results hidden)"
-msgstr[0] "%(num_points)sможливі бали (неоцінено, результати приховані)"
-msgstr[1] "%(num_points)sможливі бали (неоцінено, результати приховані)"
-msgstr[2] "%(num_points)sможливі бали (неоцінено, результати приховані)"
-msgstr[3] "%(num_points)sможливі бали (неоцінено, результати приховані)"
+msgid "{num_points} point possible (ungraded, results hidden)"
+msgid_plural "{num_points} points possible (ungraded, results hidden)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (graded)"
-msgid_plural "%(num_points)s points possible (graded)"
-msgstr[0] "%(num_points)sможливі бали (оцінено)."
-msgstr[1] "%(num_points)sможливі бали (оцінено)."
-msgstr[2] "%(num_points)sможливі бали (оцінено)."
-msgstr[3] "%(num_points)sможливі бали (оцінено)."
+msgid "{num_points} point possible (graded)"
+msgid_plural "{num_points} points possible (graded)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (ungraded)"
-msgid_plural "%(num_points)s points possible (ungraded)"
-msgstr[0] "%(num_points)sможливі бали (неоцінено)."
-msgstr[1] "%(num_points)sможливі бали (неоцінено)."
-msgstr[2] "%(num_points)sможливі бали (неоцінено)."
-msgstr[3] "%(num_points)sможливі бали (неоцінено)."
+msgid "{num_points} point possible (ungraded)"
+msgid_plural "{num_points} points possible (ungraded)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
-#. Translators: %(earned)s is the number of points earned. %(possible)s is the
+#. Translators: {earned} is the number of points earned. {possible} is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
 #. points will always be at least 1. We pluralize based on the total number of
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(earned)s/%(possible)s point (graded)"
-msgid_plural "%(earned)s/%(possible)s points (graded)"
-msgstr[0] "%(earned)s/%(possible)sбали (оцінено)"
-msgstr[1] "%(earned)s/%(possible)sбали (оцінено)"
-msgstr[2] "%(earned)s/%(possible)sбали (оцінено)"
-msgstr[3] "%(earned)s/%(possible)sбали (оцінено)"
+msgid "{earned}/{possible} point (graded)"
+msgid_plural "{earned}/{possible} points (graded)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
-#. Translators: %(earned)s is the number of points earned. %(possible)s is the
+#. Translators: {earned} is the number of points earned. {possible} is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
 #. points will always be at least 1. We pluralize based on the total number of
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(earned)s/%(possible)s point (ungraded)"
-msgid_plural "%(earned)s/%(possible)s points (ungraded)"
-msgstr[0] "%(earned)s/%(possible)sбали (неоцінено)"
-msgstr[1] "%(earned)s/%(possible)sбали (неоцінено)"
-msgstr[2] "%(earned)s/%(possible)sбали (неоцінено)"
-msgstr[3] "%(earned)s/%(possible)sбали (неоцінено)"
+msgid "{earned}/{possible} point (ungraded)"
+msgid_plural "{earned}/{possible} points (ungraded)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "The grading process is still running. Refresh the page to see updates."
@@ -831,19 +813,9 @@ msgstr "Властивості документа"
 msgid "Edit HTML"
 msgstr "Редагувати HTML"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/certificate-details.underscore
-#: cms/templates/js/course_info_handouts.underscore
-#: cms/templates/js/course_info_update.underscore
-#: cms/templates/js/group-configuration-details.underscore
-#: cms/templates/js/partition-group-details.underscore
-#: cms/templates/js/show-textbook.underscore
-#: cms/templates/js/signatory-details.underscore
-#: cms/templates/js/xblock-string-field-editor.underscore
-#: common/static/common/templates/discussion/forum-action-edit.underscore
 msgid "Edit"
 msgstr "Редагувати"
 
@@ -1580,14 +1552,9 @@ msgstr ""
 "Ваше посилання схоже на зовнішнє. Чи хочете ви додати до нього префікс "
 "http://?"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/course-instructor-details.underscore
-#: cms/templates/js/signatory-details.underscore
-#: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Title"
 msgstr "Назва"
 
@@ -2487,17 +2454,68 @@ msgid "Course Name"
 msgstr "Назва курсу"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Not specific to a course"
-msgstr "Неспецифічне для курсу"
+msgid ""
+"For inquiries regarding assignments, grades, or structure of a specific "
+"course, please post in the discussion forums for that course directly."
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "What can we help you with, {username}?"
-msgstr ""
+msgid "Not specific to a course"
+msgstr "Неспецифічне для курсу"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Subject"
 msgstr "Предмет"
+
+#: lms/templates/student_account/account_settings.underscore
+msgid "Account Settings"
+msgstr "Налаштування облікового запису"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Billing/Payment Options"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Certificates"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Course Content"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Deadlines"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Errors/Technical Issues"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Financial Aid"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Masters"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Photo Verification"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Proctoring"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+#: cms/templates/js/asset-library.underscore
+msgid "Other"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "What can we help you with, {username}?"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
@@ -2508,9 +2526,6 @@ msgid "The more you tell us, the more quickly and helpfully we can respond!"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-response.underscore
-#: common/static/common/templates/discussion/thread.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Submit"
 msgstr "Надіслати"
@@ -2533,8 +2548,8 @@ msgstr ""
 "підтримку."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Enter a subject for your support request."
-msgstr "Введіть тему для підтримки вашого запиту."
+msgid "Select a subject for your support request."
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
@@ -3269,7 +3284,6 @@ msgid "There has been an error processing your survey."
 msgstr "Виникла помилка під час обробки вашої роботи."
 
 #: lms/static/js/courseware/credit_progress.js
-#: common/static/common/templates/discussion/forum-actions.underscore
 #: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
 msgid "More"
@@ -3687,7 +3701,7 @@ msgid ""
 msgstr ""
 "Цей курс має автоматичний когортинг для перевірених учнів, але необхідна "
 "когорта не існує. Вам необхідно створити когорту вручну, з назвою "
-"'{verifyCohortName}', щоб функція працювала."
+"'{verifiedCohortName}', щоб функція працювала."
 
 #: lms/static/js/groups/views/verified_track_settings_notification.js
 msgid ""
@@ -4121,8 +4135,8 @@ msgid ""
 "Success! Problem attempts reset for problem '<%- problem_id %>' and student "
 "'<%- student_id %>'."
 msgstr ""
-"Спроби успішно скинуті для завдання '<% - problem_id%>' та учня '<% - "
-"student_id%>'."
+"Спроби успішно скинуті для завдання '<%- problem_id %>' та учня '<%- "
+"student_id %>'."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4130,15 +4144,15 @@ msgid ""
 " '<%- student_id %>'. Make sure that the problem and student identifiers are"
 " complete and correct."
 msgstr ""
-"Помилка при скиданнях спроб для завдання '<% = problem_id%>' та студента '<%"
-" - student_id%>'. Переконайтеся, що завдання та ідентифікатори студентів є "
-"повними та правильними."
+"Помилка при скиданнях спроб для завдання '<%= problem_id %>' та студента "
+"'<%- student_id %>'. Переконайтеся, що завдання та ідентифікатори студентів "
+"є повними та правильними."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Delete student '<%- student_id %>'s state on problem '<%- problem_id %>'?"
 msgstr ""
-"Видалити стан студента '<%- student_id %>' для проблеми '<%= problem_id %>'?"
+"Видалити стан студента '<%- student_id %>' для проблеми '<%- problem_id %>'?"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4225,7 +4239,7 @@ msgid ""
 "Successfully started task to reset attempts for problem '<%- problem_id %>'."
 " Click the 'Show Task Status' button to see the status of the task."
 msgstr ""
-"Успішно розпочато задачу скинути спроби для завдання '<% - problem_id%>'. "
+"Успішно розпочато задачу скинути спроби для завдання '<%- problem_id %>'. "
 "Натисніть кнопку «Показати стан задачі», щоб побачити статус задачі."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4234,8 +4248,8 @@ msgid ""
 "problem_id %>'. Make sure that the problem identifier is complete and "
 "correct."
 msgstr ""
-"Помилка при запуску задачі для скидання спроб усіх студентів на завданні '<%"
-" - problem_id%>'. Переконайтеся, що ідентифікатор завдання є повним і "
+"Помилка при запуску задачі для скидання спроб усіх студентів на завданні "
+"'<%- problem_id %>'. Переконайтеся, що ідентифікатор завдання є повним і "
 "правильним."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4284,9 +4298,9 @@ msgid ""
 "student '<%- student_id %>'. Make sure that the the score and the problem "
 "and student identifiers are complete and correct."
 msgstr ""
-"Помилка запуску завдання для перевизначення оцінки для задачі \"<% - "
-"problem_id%> ' для студента\" <% - student_id%>'. Переконайтеся, що оцінка "
-"та ідентифікатори задачі та студента є повними та правильними."
+"Помилка запуску завдання для перевизначення оцінки для задачі '<%- "
+"problem_id %>' для студента '<%- student_id %>'. Переконайтеся, що оцінка та"
+" ідентифікатори задачі та студента є повними та правильними."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4640,7 +4654,7 @@ msgid ""
 "{htmlStart}Want to change your email, name, or password instead?{htmlEnd}"
 msgstr ""
 "{htmlStart}Бажаєте замінити адресу електронної пошти, імені або пароля? "
-"{HtmlEnd}"
+"{htmlEnd}"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -4652,7 +4666,7 @@ msgstr ""
 "{strongStart}Попередження: видалення Аккаунту є постійним. {strongEnd} Будь "
 "ласка, уважно прочитайте вище, перш ніж продовжити. Це незворотні дії, і "
 "{strongStart} ви більше не зможете використовувати ту саму пошту на edX. "
-"{StrongEnd}"
+"{strongEnd}"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "We’re sorry to see you go!"
@@ -4806,18 +4820,10 @@ msgid ""
 "address is associated with your {platform_name} account, we will send a "
 "message with password recovery instructions to this email "
 "address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
-" message, verify that you entered the correct email address, or check your "
-"spam folder.{paragraphEnd}{paragraphStart}If you need further assistance, "
-"{anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
+" message after 1 minute, verify that you entered the correct email address, "
+"or check your spam folder.{paragraphEnd}{paragraphStart}If you need further "
+"assistance, {anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
 msgstr ""
-"{paragraphStart}Ви увійшли {boldStart}{email}{boldEnd}. Якщо ця адреса "
-"пов`язана з вашим {platform_name} аккаунтом, то вам буде надіслано "
-"повідомлення з інструкціями щодо відновлення "
-"пароля.{paragraphEnd}{paragraphStart}Якщо ви не отримали повідомлення про "
-"скидання пароля, переконайтеся, що ви ввели правильну адресу електронної "
-"пошти або перевірте папку зі спамом.{paragraphEnd}{paragraphStart}Якщо вам "
-"потрібна допомога, {anchorStart} зверніться до служби технічної підтримки "
-"{anchorEnd}. {ParagraphEnd}"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -5620,7 +5626,6 @@ msgstr ""
 
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
-#: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Staff"
 msgstr "Персонал"
 
@@ -5977,8 +5982,8 @@ msgstr "Тип"
 #: cms/static/js/views/assets.js
 msgid "File {filename} exceeds maximum size of {maxFileSizeInMBs} MB"
 msgstr ""
-"Файл {filename} перевищує максимально допустимий розмір в "
-"{maximum_size_in_megabytes} MБ"
+"Файл {filename} перевищує максимально допустимий розмір в {maxFileSizeInMBs}"
+" MБ"
 
 #: cms/static/js/views/assets.js
 msgid ""
@@ -6634,8 +6639,8 @@ msgid "Upload your video thumbnail image."
 msgstr "Завантажити зображення-мініатюру до відео"
 
 #: cms/static/js/views/show_textbook.js
-msgid "Delete “<%= name %>”?"
-msgstr "Видалити “<%= name %>”?"
+msgid "Delete “<%- name %>”?"
+msgstr ""
 
 #: cms/static/js/views/show_textbook.js
 msgid ""
@@ -7052,7 +7057,6 @@ msgstr ""
 
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
-#: common/static/common/templates/discussion/pagination.underscore
 msgid "Previous"
 msgstr "Попередній"
 
@@ -7099,305 +7103,6 @@ msgstr ""
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 msgid "Search"
 msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-answer.underscore
-msgid "Mark as Answer"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-answer.underscore
-msgid "Unmark as Answer"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-close.underscore
-msgid "Open"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-endorse.underscore
-msgid "Endorse"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-endorse.underscore
-msgid "Unendorse"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-follow.underscore
-msgid "Follow"
-msgstr "Стежити"
-
-#: common/static/common/templates/discussion/forum-action-follow.underscore
-msgid "Unfollow"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-pin.underscore
-msgid "Pin"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-pin.underscore
-msgid "Unpin"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-report.underscore
-msgid "Report abuse"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-report.underscore
-msgid "Report"
-msgstr "Поскаржитися"
-
-#: common/static/common/templates/discussion/forum-action-report.underscore
-msgid "Unreport"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-vote.underscore
-msgid "Vote for this post,"
-msgstr ""
-
-#: common/static/common/templates/discussion/nav-load-more-link.underscore
-msgid "Load more"
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post-alert.underscore
-msgid "Error posting your message."
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post-visibility.underscore
-#, python-format
-msgid "This post will be visible only to %(group_name)s."
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post-visibility.underscore
-msgid "This post will be visible to everyone."
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "Add a Post"
-msgstr "Додати повідомлення"
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "Visible to"
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid ""
-"Discussion admins, moderators, and TAs can make their posts visible to all "
-"students or specify a single group."
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "All Groups"
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid ""
-"Add a clear and descriptive title to encourage participation. (Required)"
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "follow this post"
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "post anonymously"
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "post anonymously to classmates"
-msgstr ""
-
-#: common/static/common/templates/discussion/post-user-display.underscore
-msgid "(Community TA)"
-msgstr ""
-
-#: common/static/common/templates/discussion/post-user-display.underscore
-msgid "(Staff)"
-msgstr "(Персонал)"
-
-#: common/static/common/templates/discussion/profile-thread.underscore
-#: common/static/common/templates/discussion/thread.underscore
-msgid "This thread is closed."
-msgstr ""
-
-#: common/static/common/templates/discussion/profile-thread.underscore
-msgid "View discussion"
-msgstr ""
-
-#: common/static/common/templates/discussion/response-comment-edit.underscore
-msgid "Editing comment"
-msgstr ""
-
-#: common/static/common/templates/discussion/response-comment-edit.underscore
-msgid "Update comment"
-msgstr ""
-
-#: common/static/common/templates/discussion/response-comment-show.underscore
-#, python-format
-msgid "posted %(time_ago)s by %(author)s"
-msgstr "опубліковано %(time_ago)s  %(author)s"
-
-#: common/static/common/templates/discussion/response-comment-show.underscore
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#: common/static/common/templates/discussion/thread-show.underscore
-msgid "Reported"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Editing post"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Edit your post below."
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Update post"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "discussion"
-msgstr "обговорення"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "answered question"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "unanswered question"
-msgstr "питання без відповіді"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-#: common/static/common/templates/discussion/thread-show.underscore
-msgid "Pinned"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "Following"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "Community TA"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "{unread_comments_count} new"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-#, python-format
-msgid ""
-"%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
-"unread comments)%(span_close)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-#, python-format
-msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-response-edit.underscore
-msgid "Editing response"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-response-edit.underscore
-msgid "Update response"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#, python-format
-msgid "marked as answer %(time_ago)s by %(user)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#, python-format
-msgid "marked as answer %(time_ago)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#, python-format
-msgid "endorsed %(time_ago)s by %(user)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#, python-format
-msgid "endorsed %(time_ago)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-response.underscore
-#, python-format
-msgid "Show Comment (%(num_comments)s)"
-msgid_plural "Show Comments (%(num_comments)s)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-
-#: common/static/common/templates/discussion/thread-response.underscore
-msgid "Add a comment"
-msgstr "Додати коментар"
-
-#: common/static/common/templates/discussion/thread-show.underscore
-#, python-format
-msgid "discussion posted %(time_ago)s by %(author)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-show.underscore
-#, python-format
-msgid "question posted %(time_ago)s by %(author)s"
-msgstr "Питання залишив %(time_ago)s тому автор%(author)s"
-
-#: common/static/common/templates/discussion/thread-show.underscore
-msgid "Closed"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-show.underscore
-#, python-format
-msgid "Related to: %(courseware_title_linked)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-show.underscore
-#, python-format
-msgid "This post is visible only to %(group_name)s."
-msgstr "Це повідомлення видно лише для %(group_name)s. "
-
-#: common/static/common/templates/discussion/thread-show.underscore
-msgid "This post is visible to everyone."
-msgstr "Це повідомлення видно всім."
-
-#: common/static/common/templates/discussion/thread-type.underscore
-msgid "Post type"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-type.underscore
-msgid ""
-"Questions raise issues that need answers. Discussions share ideas and start "
-"conversations. (Required)"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-type.underscore
-msgid "Question"
-msgstr "Питання"
-
-#: common/static/common/templates/discussion/thread-type.underscore
-msgid "Discussion"
-msgstr "Обговорення"
-
-#: common/static/common/templates/discussion/thread.underscore
-msgid "Add a Response"
-msgstr "Додати відповідь"
-
-#: common/static/common/templates/discussion/thread.underscore
-msgid "Add a response:"
-msgstr "Додати відповідь:"
-
-#: common/static/common/templates/discussion/topic.underscore
-msgid "Topic area"
-msgstr "Обрати тему"
-
-#: common/static/common/templates/discussion/topic.underscore
-msgid "Add your post to a relevant topic to help others find it. (Required)"
-msgstr ""
-"Додайте ваше повідомлення до відповідної теми, щоб допомогти іншим знайти "
-"його. (Обов'язково)"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Discussion Home"
@@ -7848,6 +7553,10 @@ msgstr ""
 
 #: lms/templates/courseware/proctored-exam-controls.underscore
 msgid "Mark Exam As Completed"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "You are taking \"{exam_link}\" as {exam_type}. "
 msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
@@ -8575,10 +8284,6 @@ msgstr ""
 msgid "Switch Language Back"
 msgstr ""
 
-#: lms/templates/student_account/account_settings.underscore
-msgid "Account Settings"
-msgstr "Налаштування облікового запису"
-
 #: lms/templates/student_account/account_settings_section.underscore
 msgid "An error occurred. Please reload the page."
 msgstr ""
@@ -8624,7 +8329,8 @@ msgid "Register with Institution/Campus Credentials"
 msgstr ""
 
 #: lms/templates/student_account/institution_register.underscore
-msgid "Register through edX"
+#: lms/templates/student_account/register.underscore
+msgid "Create an Account"
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
@@ -8683,17 +8389,16 @@ msgid "If you do not yet have an account, use the button below to register."
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
+msgid "Use my university info"
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
 msgid "or sign in with"
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
 #, python-format
 msgid "Sign in with %(providerName)s"
-msgstr ""
-
-#: lms/templates/student_account/login.underscore
-#: lms/templates/student_account/register.underscore
-msgid "Use my institution/campus credentials"
 msgstr ""
 
 #: lms/templates/student_account/password_reset.underscore
@@ -8728,11 +8433,11 @@ msgid "Create account using %(providerName)s."
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
-msgid "or create a new one here"
+msgid "Use my institution/campus credentials"
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
-msgid "Create an Account"
+msgid "or create a new one here"
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
@@ -9304,18 +9009,16 @@ msgid ""
 msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-#, python-format
 msgid ""
-"Create a %(link_start)sMozilla Backpack%(link_end)s account, or log in to "
-"your existing account"
+"Create a {link_start}Mozilla Backpack{link_end} account, or log in to your "
+"existing account"
 msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-#, python-format
 msgid ""
-"%(download_link_start)sDownload this image (right-click or option-click, "
-"save as)%(link_end)s and then %(upload_link_start)supload%(link_end)s it to "
-"your backpack.</li>"
+"{download_link_start}Download this image (right-click or option-click, save "
+"as){link_end} and then {upload_link_start}upload{link_end} it to your "
+"backpack."
 msgstr ""
 
 #: cms/templates/js/access-editor.underscore
@@ -9428,10 +9131,6 @@ msgstr ""
 #: cms/templates/js/asset-library.underscore
 msgid "Show All"
 msgstr "Показати усе"
-
-#: cms/templates/js/asset-library.underscore
-msgid "Other"
-msgstr ""
 
 #: cms/templates/js/asset-library.underscore
 msgid "You haven't added any assets to this course yet."
@@ -10003,14 +9702,6 @@ msgstr ""
 msgid ""
 "There is invalid code in your content. Please check to make sure it is valid"
 " HTML."
-msgstr ""
-
-#: cms/templates/js/course_info_update.underscore
-msgid "Send push notification to mobile apps"
-msgstr ""
-
-#: cms/templates/js/course_info_update.underscore
-msgid "Send notification to mobile apps"
 msgstr ""
 
 #: cms/templates/js/course_info_update.underscore

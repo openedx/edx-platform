@@ -1,8 +1,11 @@
 """
 Page classes to test either the Course Team page or the Library Team page.
 """
+from __future__ import absolute_import
+
 import os
 
+import six
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise
 from opaque_keys.edx.locator import CourseLocator
@@ -165,7 +168,7 @@ class LibraryUsersPage(UsersPageMixin, HelpMixin):
         """
         URL to the "User Access" page for the given library.
         """
-        return "{}/library/{}/team/".format(BASE_URL, unicode(self.locator))
+        return "{}/library/{}/team/".format(BASE_URL, six.text_type(self.locator))
 
 
 class CourseTeamPage(UsersPageMixin, CoursePage):
@@ -187,7 +190,7 @@ class CourseTeamPage(UsersPageMixin, CoursePage):
             self.course_info['course_run'],
             deprecated=(default_store == 'draft')
         )
-        return "/".join([BASE_URL, self.url_path, unicode(course_key)])
+        return "/".join([BASE_URL, self.url_path, six.text_type(course_key)])
 
 
 class UserWrapper(PageObject):

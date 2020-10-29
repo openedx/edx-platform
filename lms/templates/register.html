@@ -1,8 +1,10 @@
+<%page expression_filter="h"/>
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
 <%namespace file='main.html' import="login_query"/>
 <%!
 from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import js_escaped_string
 from django.urls import reverse
 from django.utils import html
 from django_countries import countries
@@ -27,7 +29,7 @@ import calendar
       // new window/tab opening
       $('a[rel="external"], a[class="new-vp"]')
       .click( function() {
-      window.open( $(this).attr('href') );
+      window.open( $(this).attr('href'), '', 'noopener' );
       return false;
       });
 
@@ -52,14 +54,14 @@ import calendar
       });
 
       $('#register-form').on('ajax:success', function(event, json, xhr) {
-        var nextUrl = "${login_redirect_url}";
+        var nextUrl = "${login_redirect_url | n, js_escaped_string}";
         if (json.redirect_url) {
           nextUrl = json.redirect_url; // Most likely third party auth completion. This trumps 'nextUrl' above.
         }
         if (!isExternal(nextUrl)) {
           location.href=nextUrl;
         } else {
-          location.href="${reverse('dashboard')}";
+          location.href="${reverse('dashboard') | n, js_escaped_string}";
         }
       });
 
@@ -67,7 +69,7 @@ import calendar
         toggleSubmitButton(true);
         json = $.parseJSON(jqXHR.responseText);
         $('.status.message.submission-error').addClass('is-shown').focus();
-        $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
+        $('.status.message.submission-error .message-copy').text(json.value).stop().css("display", "block");
         $(".field-error").removeClass('field-error');
         $("[data-field='"+json.field+"']").addClass('field-error')
       });
@@ -86,13 +88,13 @@ import calendar
           removeClass('is-disabled').
           attr('aria-disabled', false).
           prop('disabled', false).
-          html("${_('Create My {platform_name} Account').format(platform_name=platform_name)}");
+          text("${_('Create My {platform_name} Account').format(platform_name=platform_name) | n, js_escaped_string}");
       }
       else {
         $submitButton.
           addClass('is-disabled').
           prop('disabled', true).
-          text("${_('Processing your account information')}");
+          text("${_('Processing your account information') | n, js_escaped_string}");
       }
     }
   </script>

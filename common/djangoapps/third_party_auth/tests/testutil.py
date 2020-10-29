@@ -4,11 +4,14 @@ Utilities for writing third_party_auth tests.
 Used by Django and non-Django tests; must not have Django deps.
 """
 
+from __future__ import absolute_import
+
 import os.path
 from contextlib import contextmanager
 
 import django.test
 import mock
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
@@ -17,7 +20,6 @@ from provider import constants
 from provider.oauth2.models import Client as OAuth2Client
 from django.core.files.storage import FileSystemStorage
 
-from third_party_auth.models import cache as config_cache
 from third_party_auth.models import (
     LTIProviderConfig,
     OAuth2ProviderConfig,
@@ -25,6 +27,7 @@ from third_party_auth.models import (
     SAMLConfiguration,
     SAMLProviderConfig
 )
+from third_party_auth.models import cache as config_cache
 
 AUTH_FEATURES_KEY = 'ENABLE_THIRD_PARTY_AUTH'
 AUTH_FEATURE_ENABLED = AUTH_FEATURES_KEY in settings.FEATURES
@@ -47,7 +50,7 @@ class FakeDjangoSettings(object):
 
     def __init__(self, mappings):
         """Initializes the fake from mappings dict."""
-        for key, value in mappings.iteritems():
+        for key, value in six.iteritems(mappings):
             setattr(self, key, value)
 
 
@@ -154,6 +157,12 @@ class ThirdPartyAuthTestMixin(object):
         """ Update the settings for the Dummy third party auth provider/backend """
         kwargs.setdefault("name", "Dummy")
         kwargs.setdefault("backend_name", "dummy")
+        return cls.configure_oauth_provider(**kwargs)
+
+    @classmethod
+    def configure_identityServer3_provider(cls, **kwargs):
+        kwargs.setdefault("name", "identityServer3TestConfig")
+        kwargs.setdefault("backend_name", "identityServer3")
         return cls.configure_oauth_provider(**kwargs)
 
     @classmethod

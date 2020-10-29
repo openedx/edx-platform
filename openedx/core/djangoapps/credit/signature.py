@@ -36,7 +36,7 @@ def get_shared_secret_key(provider_id):
 
     if isinstance(secret, six.text_type):
         try:
-            secret = str(secret)
+            secret.encode('ascii')
         except UnicodeEncodeError:
             secret = None
             log.error(u'Shared secret key for credit provider "%s" contains non-ASCII unicode.', provider_id)

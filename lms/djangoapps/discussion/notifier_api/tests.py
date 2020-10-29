@@ -234,7 +234,7 @@ class NotifierUsersViewSetTest(UrlResetMixin, ModuleStoreTestCase):
             users.append(new_user)
             UserPreferenceFactory(user=new_user, key=NOTIFICATION_PREF_KEY)
 
-        num_pages = (num_users - 1) / page_size + 1
+        num_pages = (num_users - 1) // page_size + 1
         result_list = []
         for i in range(1, num_pages + 1):
             result_list.extend(self._get_list(page=i, page_size=page_size))

@@ -10,6 +10,8 @@ from importlib import import_module
 import beeline
 import gettext
 import logging
+
+import six
 from pkg_resources import resource_filename
 import re
 
@@ -252,7 +254,7 @@ def create_modulestore_instance(
 
     FUNCTION_KEYS = ['render_template']
     for key in FUNCTION_KEYS:
-        if key in _options and isinstance(_options[key], basestring):
+        if key in _options and isinstance(_options[key], six.string_types):
             _options[key] = load_function(_options[key])
 
     request_cache = DEFAULT_REQUEST_CACHE
@@ -427,7 +429,7 @@ def _get_modulestore_branch_setting():
 
             # compare hostname against the regex expressions set of mappings which will tell us which branch to use
             if mappings:
-                for key in mappings.iterkeys():
+                for key in mappings:
                     if re.match(key, hostname):
                         return mappings[key]
         if branch is None:

@@ -1,20 +1,30 @@
-import whichCountry from 'which-country';
 import 'jquery.cookie';
 import $ from 'jquery'; // eslint-disable-line import/extensions
 
 export class Currency {  // eslint-disable-line import/prefer-default-export
 
-  setPrice() {
+  editText(price) {
     const l10nCookie = this.countryL10nData;
-    const lmsregex = /(\$)(\d*)( USD)/g;
-    const price = $('input[name="verified_mode"]').filter(':visible')[0];
-    const regexMatch = lmsregex.exec(price.value);
-    const dollars = parseFloat(regexMatch[2]);
-    const converted = dollars * l10nCookie.rate;
-    const string = `${l10nCookie.symbol}${Math.round(converted)} ${l10nCookie.code}`;
-    // Use regex to change displayed price on track selection
-    // based on edx-price-l10n cookie currency_data
-    price.value = price.value.replace(regexMatch[0], string);
+    const lmsregex = /(\$)([\d|.]*)( USD)/g;
+    const priceText = price.text();
+    const regexMatch = lmsregex.exec(priceText);
+    if (regexMatch) {
+      const currentPrice = regexMatch[2];
+      const dollars = parseFloat(currentPrice);
+      const newPrice = dollars * l10nCookie.rate;
+      const newPriceString = `${l10nCookie.symbol}${Math.round(newPrice)} ${l10nCookie.code}`;
+      // Change displayed price based on edx-price-l10n cookie currency_data
+      price.text(newPriceString);
+    }
+  }
+
+  setPrice() {
+    $('.upgrade-price-string').each((i, price) => {
+      // When the button includes two prices (discounted and previous)
+      // we call the method twice, since it modifies one price at a time.
+      // Could also be used to modify all prices on any page
+      this.editText($(price));
+    });
   }
 
   getCountry() {

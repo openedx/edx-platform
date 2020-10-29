@@ -1,3 +1,9 @@
+"""
+Configuration for Studio API Django application
+"""
+
+from __future__ import absolute_import
+
 from django.apps import AppConfig
 
 

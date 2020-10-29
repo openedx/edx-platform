@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 """Tests for LTI Xmodule LTIv2.0 functional logic."""
+from __future__ import absolute_import
+
 import datetime
 import textwrap
 
-from pytz import UTC
 from mock import Mock
-from xmodule.lti_module import LTIDescriptor
+from pytz import UTC
+
 from xmodule.lti_2_util import LTIError
+from xmodule.lti_module import LTIDescriptor
 
 from . import LogicTest
 

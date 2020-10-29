@@ -414,7 +414,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         )
 
         if expected_status == 200:
-            return json.loads(response.content)
+            return json.loads(response.content.decode('utf-8'))
         else:
             return response
 
@@ -790,7 +790,7 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
         )
         self.assertEqual(
             "You are already in a team in this course.",
-            json.loads(response.content)["user_message"]
+            json.loads(response.content.decode('utf-8'))["user_message"]
         )
 
     @ddt.data('staff', 'course_staff', 'community_ta')
@@ -1355,11 +1355,11 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
 
     def test_no_username(self):
         response = self.post_create_membership(400, {'team_id': self.solar_team.team_id})
-        self.assertIn('username', json.loads(response.content)['field_errors'])
+        self.assertIn('username', json.loads(response.content.decode('utf-8'))['field_errors'])
 
     def test_no_team(self):
         response = self.post_create_membership(400, {'username': self.users['student_enrolled_not_on_team'].username})
-        self.assertIn('team_id', json.loads(response.content)['field_errors'])
+        self.assertIn('team_id', json.loads(response.content.decode('utf-8'))['field_errors'])
 
     def test_bad_team(self):
         self.post_create_membership(
@@ -1381,7 +1381,7 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
             self.build_membership_data('student_enrolled', self.solar_team),
             user=user
         )
-        self.assertIn('already a member', json.loads(response.content)['developer_message'])
+        self.assertIn('already a member', json.loads(response.content.decode('utf-8'))['developer_message'])
 
     def test_join_second_team_in_course(self):
         response = self.post_create_membership(
@@ -1389,7 +1389,7 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
             self.build_membership_data('student_enrolled_both_courses_other_team', self.solar_team),
             user='student_enrolled_both_courses_other_team'
         )
-        self.assertIn('already a member', json.loads(response.content)['developer_message'])
+        self.assertIn('already a member', json.loads(response.content.decode('utf-8'))['developer_message'])
 
     @ddt.data('staff', 'course_staff')
     def test_not_enrolled_in_team_course(self, user):
@@ -1398,7 +1398,7 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
             self.build_membership_data('student_unenrolled', self.solar_team),
             user=user
         )
-        self.assertIn('not enrolled', json.loads(response.content)['developer_message'])
+        self.assertIn('not enrolled', json.loads(response.content.decode('utf-8'))['developer_message'])
 
     def test_over_max_team_size_in_course_2(self):
         response = self.post_create_membership(
@@ -1406,7 +1406,7 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
             self.build_membership_data('student_enrolled_other_course_not_on_team', self.another_team),
             user='student_enrolled_other_course_not_on_team'
         )
-        self.assertIn('full', json.loads(response.content)['developer_message'])
+        self.assertIn('full', json.loads(response.content.decode('utf-8'))['developer_message'])
 
 
 @ddt.ddt

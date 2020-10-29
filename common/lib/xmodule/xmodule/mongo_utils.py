@@ -49,9 +49,8 @@ def connect_to_mongodb(
     # If the MongoDB server uses a separate authentication database that should be specified here
     auth_source = kwargs.pop('auth_source', '') or None
 
-    # If read_preference is given as a name of a valid ReadPreference.<NAME>
-    # constant such as "SECONDARY_PREFERRED" or a mongo mode such as
-    # "secondaryPreferred", convert it. Otherwise pass it through unchanged.
+    # If read_preference is given as a name of a valid ReadPreference.<NAME> constant
+    # such as "SECONDARY_PREFERRED", convert it. Otherwise pass it through unchanged.
     if 'read_preference' in kwargs:
         read_preference = MONGO_READ_PREFERENCE_MAP.get(
             kwargs['read_preference'],
@@ -80,14 +79,9 @@ def connect_to_mongodb(
             wait_time=retry_wait_time
         )
 
-    # default the authSource to be whatever db we are connecting to (for backwards compatiblity)
-    authSource = db
-    if kwargs.get('authSource'):
-        authSource = kwargs.get('authSource')
-
     # If credentials were provided, authenticate the user.
     if user is not None and password is not None:
-        mongo_conn.authenticate(user, password, authSource)
+        mongo_conn.authenticate(user, password, source=auth_source)
 
     return mongo_conn
 

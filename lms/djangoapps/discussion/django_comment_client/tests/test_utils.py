@@ -7,6 +7,7 @@ import json
 
 import ddt
 import mock
+import six
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from edx_django_utils.cache import RequestCache
@@ -358,6 +359,7 @@ class CategoryMapTestMixin(object):
         Call `get_discussion_category_map`, and verify that it returns
         what is expected.
         """
+
         self.assertEqual(
             utils.get_discussion_category_map(self.course, requesting_user or self.user),
             expected
@@ -1019,7 +1021,8 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             "Topic B": {"id": "Topic_B"},
             "Topic C": {"id": "Topic_C"}
         }
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             utils.get_discussion_categories_ids(self.course, self.user),
             ["Topic_A", "Topic_B", "Topic_C"]
         )
@@ -1031,7 +1034,8 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion")
         self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion")
         self.create_discussion("Chapter 3 / Section 1", "Discussion")
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             utils.get_discussion_categories_ids(self.course, self.user),
             ["discussion1", "discussion2", "discussion3", "discussion4", "discussion5", "discussion6"]
         )
@@ -1045,7 +1049,8 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter 1", "Discussion 1")
         self.create_discussion("Chapter 2", "Discussion")
         self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion")
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             utils.get_discussion_categories_ids(self.course, self.user),
             ["Topic_A", "Topic_B", "Topic_C", "discussion1", "discussion2", "discussion3"]
         )
@@ -1147,38 +1152,43 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
         Verify that the beta user can access the beta and global
         discussion topics.
         """
-        self.assert_category_map_equals(
-            {
-                'subcategories': {
-                    'Week 1': {
-                        'subcategories': {},
-                        'children': [
-                            ('Visible to Beta', 'entry'),
-                            ('Visible to Everyone', 'entry')
-                        ],
-                        'entries': {
-                            'Visible to Beta': {
-                                'sort_key': None,
-                                'is_divided': False,
-                                'id': 'beta_group_discussion'
-                            },
-                            'Visible to Everyone': {
-                                'sort_key': None,
-                                'is_divided': False,
-                                'id': 'global_group_discussion'
-                            }
+
+        children = [('Visible to Beta', 'entry'), ('Visible to Everyone', 'entry')]
+
+        if six.PY3:
+            children = [('Visible to Everyone', 'entry'), ('Visible to Beta', 'entry')]
+
+        expected = {
+            'subcategories': {
+                'Week 1': {
+                    'subcategories': {},
+                    'children': children,
+                    'entries': {
+                        'Visible to Beta': {
+                            'sort_key': None,
+                            'is_divided': False,
+                            'id': 'beta_group_discussion'
+                        },
+                        'Visible to Everyone': {
+                            'sort_key': None,
+                            'is_divided': False,
+                            'id': 'global_group_discussion'
                         }
-                    }
-                },
-                'children': [('General', 'entry'), ('Week 1', 'subcategory')],
-                'entries': {
-                    'General': {
-                        'sort_key': 'General',
-                        'is_divided': False,
-                        'id': 'i4x-org-number-course-run'
                     }
                 }
             },
+            'children': [('General', 'entry'), ('Week 1', 'subcategory')],
+            'entries': {
+                'General': {
+                    'sort_key': 'General',
+                    'is_divided': False,
+                    'id': 'i4x-org-number-course-run'
+                }
+            }
+        }
+
+        self.assert_category_map_equals(
+            expected,
             requesting_user=self.beta_user
         )
 
@@ -1220,7 +1230,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
 class JsonResponseTestCase(TestCase, UnicodeTestMixin):
     def _test_unicode_data(self, text):
         response = utils.JsonResponse(text)
-        reparsed = json.loads(response.content)
+        reparsed = json.loads(response.content.decode('utf-8'))
         self.assertEqual(reparsed, text)
 
 

@@ -3,12 +3,15 @@ Unit tests for contentstore.views.library
 
 More important high-level tests are in contentstore/tests/test_libraries.py
 """
+from __future__ import absolute_import
+
 import ddt
 import mock
 from django.conf import settings
 from mock import patch
 from opaque_keys.edx.locator import CourseKey, LibraryLocator
 from six import binary_type, text_type
+from six.moves import range
 
 from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, parse_json
 from contentstore.utils import reverse_course_url, reverse_library_url
@@ -325,7 +328,7 @@ class UnitTestLibraries(CourseTestCase):
         response = self.client.get(manage_users_url)
         self.assertEqual(response.status_code, 200)
         # extra_user has not been assigned to the library so should not show up in the list:
-        self.assertNotIn(binary_type(extra_user.username), response.content)
+        self.assertNotIn(extra_user.username, response.content.decode('utf-8'))
 
         # Now add extra_user to the library:
         user_details_url = reverse_course_url(
@@ -338,4 +341,4 @@ class UnitTestLibraries(CourseTestCase):
         # Now extra_user should apear in the list:
         response = self.client.get(manage_users_url)
         self.assertEqual(response.status_code, 200)
-        self.assertIn(binary_type(extra_user.username), response.content)
+        self.assertIn(extra_user.username, response.content.decode('utf-8'))

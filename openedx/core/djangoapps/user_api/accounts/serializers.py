@@ -67,6 +67,17 @@ class SocialLinkSerializer(serializers.ModelSerializer):
         model = SocialLink
         fields = ("platform", "social_link")
 
+    def validate_platform(self, platform):
+        """
+        Validate that the platform value is one of (facebook, twitter or linkedin)
+        """
+        valid_platforms = ["facebook", "twitter", "linkedin"]
+        if platform not in valid_platforms:
+            raise serializers.ValidationError(
+                u"The social platform must be facebook, twitter or linkedin"
+            )
+        return platform
+
 
 class UserReadOnlySerializer(serializers.Serializer):
     """
@@ -233,7 +244,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         """ Enforce minimum length for name. """
         if len(new_name) < NAME_MIN_LENGTH:
             raise serializers.ValidationError(
-                u"The name field must be at least {} characters long.".format(NAME_MIN_LENGTH)
+                u"The name field must be at least {} character long.".format(NAME_MIN_LENGTH)
             )
         return new_name
 

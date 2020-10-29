@@ -2,11 +2,11 @@
 """
 ProgramEnrollments Application Configuration
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 from django.apps import AppConfig
 
-from openedx.core.djangoapps.plugins.constants import ProjectType, PluginURLs
+from openedx.core.djangoapps.plugins.constants import PluginURLs, ProjectType
 
 
 class ProgramEnrollmentsConfig(AppConfig):
@@ -20,7 +20,7 @@ class ProgramEnrollmentsConfig(AppConfig):
             ProjectType.LMS: {
                 PluginURLs.NAMESPACE: 'programs_api',
                 PluginURLs.REGEX: 'api/program_enrollments/',
-                PluginURLs.RELATIVE_PATH: 'api.urls',
+                PluginURLs.RELATIVE_PATH: 'rest_api.urls',
             }
         },
     }

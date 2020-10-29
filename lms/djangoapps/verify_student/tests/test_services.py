@@ -3,12 +3,14 @@
 Tests for the service classes in verify_student.
 """
 
+from __future__ import absolute_import
+
 import ddt
 from django.conf import settings
 from mock import patch
 
 from common.test.utils import MockS3Mixin
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSOVerification, ManualVerification
+from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 from lms.djangoapps.verify_student.services import IDVerificationService
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

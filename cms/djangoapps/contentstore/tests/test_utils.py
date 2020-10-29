@@ -1,7 +1,10 @@
 """ Tests for utils. """
+from __future__ import absolute_import
+
 import collections
 from datetime import datetime, timedelta
 
+import six
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
 from pytz import UTC
@@ -24,19 +27,22 @@ class LMSLinksTestCase(TestCase):
         course_key = CourseLocator('mitX', '101', 'test')
         location = course_key.make_usage_key('vertical', 'contacting_us')
         link = utils.get_lms_link_for_item(location, False)
-        self.assertEquals(link, "//localhost:8000/courses/course-v1:mitX+101+test/jump_to/block-v1:mitX+101+test+type@vertical+block@contacting_us")
+        self.assertEquals(link, "//localhost:8000/courses/course-v1:mitX+101+test/jump_to/block-v1:mitX+101+test+type"
+                                "@vertical+block@contacting_us")
 
         # test preview
         link = utils.get_lms_link_for_item(location, True)
         self.assertEquals(
             link,
-            "//preview.localhost/courses/course-v1:mitX+101+test/jump_to/block-v1:mitX+101+test+type@vertical+block@contacting_us"
+            "//preview.localhost/courses/course-v1:mitX+101+test/jump_to/block-v1:mitX+101+test+type@vertical+block"
+            "@contacting_us "
         )
 
         # now test with the course' location
         location = course_key.make_usage_key('course', 'test')
         link = utils.get_lms_link_for_item(location)
-        self.assertEquals(link, "//localhost:8000/courses/course-v1:mitX+101+test/jump_to/block-v1:mitX+101+test+type@course+block@test")
+        self.assertEquals(link, "//localhost:8000/courses/course-v1:mitX+101+test/jump_to/block-v1:mitX+101+test+type"
+                                "@course+block@test")
 
     def lms_link_for_certificate_web_view_test(self):
         """ Tests get_lms_link_for_certificate_web_view. """
@@ -79,7 +85,7 @@ class ExtraPanelTabTestCase(TestCase):
         if tabs is None:
             tabs = []
         course = collections.namedtuple('MockCourse', ['tabs'])
-        if isinstance(tabs, basestring):
+        if isinstance(tabs, six.string_types):
             course.tabs = self.get_tab_type_dicts(tabs)
         else:
             course.tabs = tabs

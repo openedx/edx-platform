@@ -71,7 +71,11 @@ QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
 class MockRequestSetupMixin(object):
     def _create_response_mock(self, data):
-        return Mock(text=json.dumps(data), json=Mock(return_value=data))
+        return Mock(
+            text=json.dumps(data),
+            json=Mock(return_value=data),
+            status_code=200
+        )
 
     def _set_mock_request_data(self, mock_request, data):
         mock_request.return_value = self._create_response_mock(data)
@@ -88,7 +92,6 @@ class CreateThreadGroupIdTestCase(
 
     def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
         self._set_mock_request_data(mock_request, {})
-        mock_request.return_value.status_code = 200
         request_data = {"body": "body", "title": "title", "thread_type": "discussion"}
         if pass_group_id:
             request_data["group_id"] = group_id
@@ -139,7 +142,6 @@ class ThreadActionGroupIdTestCase(
                 "commentable_id": "non_team_dummy_id"
             }
         )
-        mock_request.return_value.status_code = 200
         request = RequestFactory().post("dummy_url", post_params or {})
         request.user = user or self.student
         request.view_name = view_name
@@ -264,7 +266,6 @@ class ViewsTestCaseMixin(object):
         Ensure that mock_request returns the data necessary to make views
         function correctly
         """
-        mock_request.return_value.status_code = 200
         data = {
             "user_id": str(self.student.id),
             "closed": False,
@@ -278,7 +279,6 @@ class ViewsTestCaseMixin(object):
         """
         Issues a request to create a thread and verifies the result.
         """
-        mock_request.return_value.status_code = 200
         self._set_mock_request_data(mock_request, {
             "thread_type": "discussion",
             "title": "Hello",
@@ -363,7 +363,7 @@ class ViewsTestCaseMixin(object):
                 data={"body": "foo", "title": "foo", "commentable_id": "some_topic"}
             )
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data['body'], 'foo')
         self.assertEqual(data['title'], 'foo')
         self.assertEqual(data['commentable_id'], 'some_topic')
@@ -747,7 +747,6 @@ class ViewsTestCase(
         self.flag_thread(mock_request, True)
 
     def flag_thread(self, mock_request, is_closed):
-        mock_request.return_value.status_code = 200
         self._set_mock_request_data(mock_request, {
             "title": "Hello",
             "body": "this is a post",
@@ -824,7 +823,6 @@ class ViewsTestCase(
         self.un_flag_thread(mock_request, True)
 
     def un_flag_thread(self, mock_request, is_closed):
-        mock_request.return_value.status_code = 200
         self._set_mock_request_data(mock_request, {
             "title": "Hello",
             "body": "this is a post",
@@ -902,7 +900,6 @@ class ViewsTestCase(
         self.flag_comment(mock_request, True)
 
     def flag_comment(self, mock_request, is_closed):
-        mock_request.return_value.status_code = 200
         self._set_mock_request_data(mock_request, {
             "body": "this is a comment",
             "course_id": "MITx/999/Robot_Super_Course",
@@ -974,7 +971,6 @@ class ViewsTestCase(
         self.un_flag_comment(mock_request, True)
 
     def un_flag_comment(self, mock_request, is_closed):
-        mock_request.return_value.status_code = 200
         self._set_mock_request_data(mock_request, {
             "body": "this is a comment",
             "course_id": "MITx/999/Robot_Super_Course",
@@ -1703,43 +1699,6 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
             )
             self.assertEqual(response.status_code, status_code)
 
-    @ddt.data(*ddt_permissions_args)
-    @ddt.unpack
-    def test_create_thread(self, user, commentable_id, status_code, __):
-        """
-        Verify that creation of threads is limited to members of the team or users with 'edit_content' permission.
-        """
-        commentable_id = getattr(self, commentable_id)
-        # mock_request is not used because Commentables don't exist in comment service.
-        self.client.login(username=getattr(self, user).username, password=self.password)
-        response = self.client.post(
-            reverse(
-                "create_thread",
-                kwargs={"course_id": six.text_type(self.course.id), "commentable_id": commentable_id}
-            ),
-            data={"body": "foo", "title": "foo", "thread_type": "discussion"}
-        )
-        self.assertEqual(response.status_code, status_code)
-
-    @ddt.data(*ddt_permissions_args)
-    @ddt.unpack
-    def test_commentable_actions(self, user, commentable_id, status_code, __):
-        """
-        Verify that following of commentables is limited to members of the team or users with
-        'edit_content' permission.
-        """
-        commentable_id = getattr(self, commentable_id)
-        # mock_request is not used because Commentables don't exist in comment service.
-        self.client.login(username=getattr(self, user).username, password=self.password)
-        for action in ["follow_commentable", "unfollow_commentable"]:
-            response = self.client.post(
-                reverse(
-                    action,
-                    kwargs={"course_id": six.text_type(self.course.id), "commentable_id": commentable_id}
-                )
-            )
-            self.assertEqual(response.status_code, status_code)
-
 
 TEAM_COMMENTABLE_ID = 'test-team-discussion'
 
@@ -1794,7 +1753,7 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
         self.assertEqual(event['anonymous'], False)
         self.assertEqual(event['group_id'], None)
         self.assertEqual(event['thread_type'], 'discussion')
-        self.assertEquals(event['anonymous_to_peers'], False)
+        self.assertEqual(event['anonymous_to_peers'], False)
 
     @patch('eventtracking.tracker.emit')
     @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
@@ -1802,7 +1761,6 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
         """
         Check to make sure an event is fired when a user responds to a thread.
         """
-        mock_request.return_value.status_code = 200
         self._set_mock_request_data(mock_request, {
             "closed": False,
             "commentable_id": 'test_commentable_id',
@@ -1877,7 +1835,6 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
         team = CourseTeamFactory.create(discussion_topic_id=TEAM_COMMENTABLE_ID)
         CourseTeamMembershipFactory.create(team=team, user=user)
 
-        mock_request.return_value.status_code = 200
         self._set_mock_request_data(mock_request, {
             'closed': False,
             'commentable_id': TEAM_COMMENTABLE_ID,
@@ -1970,7 +1927,7 @@ class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRe
         response = self.make_request(username="other")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            json.loads(response.content)["users"],
+            json.loads(response.content.decode('utf-8'))["users"],
             [{"id": self.other_user.id, "username": self.other_user.username}]
         )
 
@@ -1979,7 +1936,7 @@ class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRe
         self.set_post_counts(mock_request)
         response = self.make_request(username="othor")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content)["users"], [])
+        self.assertEqual(json.loads(response.content.decode('utf-8'))["users"], [])
 
     def test_requires_GET(self):
         response = self.make_request(method='post', username="other")
@@ -1988,7 +1945,7 @@ class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRe
     def test_requires_username_param(self):
         response = self.make_request()
         self.assertEqual(response.status_code, 400)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertIn("errors", content)
         self.assertNotIn("users", content)
 
@@ -1997,7 +1954,7 @@ class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRe
         response = self.make_request(course_id=course_id, username="other")
 
         self.assertEqual(response.status_code, 404)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertIn("errors", content)
         self.assertNotIn("users", content)
 
@@ -2007,7 +1964,7 @@ class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRe
 
         response = self.make_request(username="other")
         self.assertEqual(response.status_code, 404)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertIn("errors", content)
         self.assertNotIn("users", content)
 
@@ -2016,7 +1973,7 @@ class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRe
         self.set_post_counts(mock_request, 0, 0)
         response = self.make_request(username="other")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content)["users"], [])
+        self.assertEqual(json.loads(response.content.decode('utf-8'))["users"], [])
 
 
 @ddt.ddt
@@ -2037,7 +1994,7 @@ class SegmentIOForumThreadViewedEventTestCase(SegmentIOTrackingTestCaseBase):
         middleware.process_request(request)
         try:
             response = segmentio.segmentio_event(request)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
         finally:
             middleware.process_response(request, None)
 

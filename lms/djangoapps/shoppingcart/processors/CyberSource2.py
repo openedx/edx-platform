@@ -123,7 +123,8 @@ def processor_hash(value):
     """
     secret_key = get_processor_config().get('SECRET_KEY', '')
     hash_obj = hmac.new(secret_key.encode('utf-8'), value.encode('utf-8'), sha256)
-    return binascii.b2a_base64(hash_obj.digest())[:-1]  # last character is a '\n', which we don't want
+    signature = binascii.b2a_base64(hash_obj.digest())[:-1]  # last character is a '\n', which we don't want
+    return signature.decode('utf-8')
 
 
 def verify_signatures(params):
@@ -448,6 +449,7 @@ def _record_payment_info(params, order):
     Returns:
         None
     """
+
     if settings.FEATURES.get("LOG_POSTPAY_CALLBACKS"):
         log.info(
             u"Order %d processed (but not completed) with params: %s", order.id, json.dumps(params)

@@ -1,4 +1,7 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%page expression_filter="h"/>
+<%! from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
 
 <%inherit file="../main.html" />
 
@@ -7,6 +10,8 @@
 
 <section class="container">
     <h1>${_("Checkout Error")}</h1>
-    ${ _(u"An error has occurred with your payment. <b>You have not been charged.</b> Please try to submit your payment again. If this problem persists, contact {email}.").format(
-    email="<a href=\"mailto:{email}\">{email}</a>".format(email=payment_support_email)) }
+    ${ Text(_(u"An error has occurred with your payment. {b_start}You have not been charged.{b_end} Please try to submit your payment again. If this problem persists, contact {email}.")).format(
+    b_start=HTML('<b>'),
+    b_end=HTML('</b>'),
+    email=HTML("<a href=\"mailto:{email}\">{email}</a>").format(email=payment_support_email)) }
 </section>

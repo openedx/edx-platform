@@ -124,18 +124,18 @@ class SplitTestBase(SharedModuleStoreTestCase):
                     'chapter': self.chapter.url_name,
                     'section': self.sequential.url_name}
         ))
-        content = resp.content
+        unicode_content = resp.content.decode(resp.charset)
 
         # Assert we see the proper icon in the top display
         self.assertIn(
             u'<button class="{} inactive nav-item tab"'.format(self.ICON_CLASSES[user_tag]),
-            content.decode(resp.charset)
+            unicode_content
         )
+
         # And proper tooltips
         for tooltip in self.TOOLTIPS[user_tag]:
-            self.assertIn(tooltip, content)
+            self.assertIn(tooltip, unicode_content)
 
-        unicode_content = content.decode("utf-8")
         for key in self.included_usage_keys[user_tag]:
             self.assertIn(six.text_type(key), unicode_content)
 
@@ -144,7 +144,7 @@ class SplitTestBase(SharedModuleStoreTestCase):
 
         # Assert that we can see the data from the appropriate test condition
         for visible in self.VISIBLE_CONTENT[user_tag]:
-            self.assertIn(visible, content)
+            self.assertIn(visible, unicode_content)
 
 
 class TestSplitTestVert(SplitTestBase):

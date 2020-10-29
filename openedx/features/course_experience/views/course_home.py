@@ -15,7 +15,6 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
-from course_modes.models import get_cosmetic_verified_display_price
 from courseware.access import has_access
 from courseware.courses import can_self_enroll_in_course, get_course_info_section, get_course_with_access
 from lms.djangoapps.commerce.utils import EcommerceService
@@ -33,6 +32,7 @@ from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_bann
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.utils import get_first_purchase_offer_banner_fragment
+from openedx.features.discounts.utils import format_strikeout_price
 from student.models import CourseEnrollment
 from util.views import ensure_valid_course_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
@@ -206,11 +206,12 @@ class CourseHomeFragmentView(EdxFragmentView):
         # Get info for upgrade messaging
         upgrade_price = None
         upgrade_url = None
+        has_discount = False
 
         # TODO Add switch to control deployment
         if SHOW_UPGRADE_MSG_ON_COURSE_HOME.is_enabled(course_key) and enrollment and enrollment.upgrade_deadline:
             upgrade_url = EcommerceService().upgrade_url(request.user, course_key)
-            upgrade_price = get_cosmetic_verified_display_price(course)
+            upgrade_price, has_discount = format_strikeout_price(request.user, course)
 
         # Render the course home fragment
         context = {
@@ -238,6 +239,7 @@ class CourseHomeFragmentView(EdxFragmentView):
             'uses_pattern_library': True,
             'upgrade_price': upgrade_price,
             'upgrade_url': upgrade_url,
+            'has_discount': has_discount,
         }
         html = render_to_string('course_experience/course-home-fragment.html', context)
         return Fragment(html)

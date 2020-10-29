@@ -1,20 +1,22 @@
 """Integration tests for pipeline.py."""
 
-import unittest
+from __future__ import absolute_import
 
 import datetime
+import unittest
+
+import ddt
 import mock
 import pytz
-import ddt
 from django import test
 from django.contrib.auth import models
 from django.core import mail
 from social_django import models as social_models
 
+from lms.djangoapps.verify_student.models import SSOVerification
 from student.tests.factories import UserFactory
 from third_party_auth import pipeline, provider
 from third_party_auth.tests import testutil
-from lms.djangoapps.verify_student.models import SSOVerification
 
 # Get Django User model by reference from python-social-auth. Not a type
 # constant, pylint.

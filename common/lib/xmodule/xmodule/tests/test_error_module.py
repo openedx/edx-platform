@@ -1,17 +1,21 @@
 """
 Tests for ErrorModule and NonStaffErrorModule
 """
+from __future__ import absolute_import
+
 import unittest
-from xmodule.tests import get_test_system
-from xmodule.error_module import ErrorDescriptor, ErrorModule, NonStaffErrorDescriptor
-from xmodule.modulestore.xml import CourseLocationManager
-from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW
+
 from mock import MagicMock, Mock, patch
-from xblock.runtime import Runtime, IdReader
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
+from xblock.runtime import IdReader, Runtime
 from xblock.test.tools import unabc
+
+from xmodule.error_module import ErrorDescriptor, ErrorModule, NonStaffErrorDescriptor
+from xmodule.modulestore.xml import CourseLocationManager
+from xmodule.tests import get_test_system
+from xmodule.x_module import STUDENT_VIEW, XModule, XModuleDescriptor
 
 
 class SetupTestErrorModules(unittest.TestCase):

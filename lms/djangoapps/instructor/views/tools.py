@@ -1,20 +1,24 @@
 """
 Tools for the instructor dashboard
 """
+from __future__ import absolute_import
+
 import json
 import operator
 
 import dateutil
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponseBadRequest
 from django.utils.translation import ugettext as _
+from edx_when import api
 from opaque_keys.edx.keys import UsageKey
 from pytz import UTC
 from six import string_types, text_type
+from six.moves import zip
 
 from student.models import get_user_by_username_or_email_inside_organization
-from edx_when import api
 from student.models import get_user_by_username_or_email
 
 
@@ -26,7 +30,7 @@ class DashboardError(Exception):
         """
         Generate an instance of HttpResponseBadRequest for this error.
         """
-        error = unicode(self)
+        error = six.text_type(self)
         return HttpResponseBadRequest(json.dumps({'error': error}))
 
 
@@ -182,7 +186,7 @@ def dump_module_extensions(course, unit):
     data = []
     for username, fullname, due_date in api.get_overrides_for_block(course.id, unit.location):
         due_date = due_date.strftime(u'%Y-%m-%d %H:%M')
-        data.append(dict(zip(header, (username, fullname, due_date))))
+        data.append(dict(list(zip(header, (username, fullname, due_date)))))
     data.sort(key=operator.itemgetter(_("Username")))
     return {
         "header": header,
@@ -209,7 +213,7 @@ def dump_student_extensions(course, student):
         due = override['actual_date']
         due = due.strftime(u"%Y-%m-%d %H:%M")
         title = title_or_url(units[location])
-        data.append(dict(zip(header, (title, due))))
+        data.append(dict(list(zip(header, (title, due)))))
     data.sort(key=operator.itemgetter(_("Unit")))
     return {
         "header": header,

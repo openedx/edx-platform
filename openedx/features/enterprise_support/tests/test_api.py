@@ -15,6 +15,7 @@ from django.core.cache import cache
 from django.http import HttpResponseRedirect
 from django.test.utils import override_settings
 from django.urls import reverse
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.features.enterprise_support.api import (
     ConsentApiClient,
@@ -169,7 +170,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
     @httpretty.activate
     def test_consent_needed_for_course(self):
         user = UserFactory(username='janedoe')
-        request = mock.MagicMock(session={}, user=user)
+        request = mock.MagicMock(session={}, user=user, site=SiteFactory(domain="example.com"))
         ec_uuid = 'cf246b88-d5f6-4908-a522-fc307e0b0c59'
         course_id = 'fake-course'
         self.mock_enterprise_learner_api()

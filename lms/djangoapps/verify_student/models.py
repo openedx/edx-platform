@@ -8,6 +8,9 @@ of a student over a period of time. Right now, the only models are the abstract
 `SoftwareSecurePhotoVerification`. The hope is to keep as much of the
 photo verification process as generic as possible.
 """
+from __future__ import absolute_import, unicode_literals
+
+import codecs
 import functools
 import json
 import logging
@@ -20,11 +23,9 @@ import requests
 import six
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.cache import cache
 from django.core.files.base import ContentFile
-from django.urls import reverse
 from django.db import models
-from django.dispatch import receiver
+from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy
@@ -40,7 +41,6 @@ from lms.djangoapps.verify_student.ssencrypt import (
 )
 from openedx.core.djangoapps.signals.signals import LEARNER_NOW_VERIFIED
 from openedx.core.storage import get_storage
-
 from .utils import earliest_allowed_verification_date
 
 log = logging.getLogger(__name__)
@@ -48,7 +48,7 @@ log = logging.getLogger(__name__)
 
 def generateUUID():  # pylint: disable=invalid-name
     """ Utility function; generates UUIDs """
-    return str(uuid.uuid4())
+    return six.text_type(uuid.uuid4())
 
 
 class VerificationException(Exception):
@@ -420,6 +420,9 @@ class PhotoVerification(IDVerificationAttempt):
             user=self.user
         )
 
+        message = u'LEARNER_NOW_VERIFIED signal fired for {user}'
+        log.info(message.format(user=self.user.username))
+
     @status_before_must_be("must_retry", "submitted", "approved", "denied")
     def deny(self,
              error_msg,
@@ -618,7 +621,11 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
             return
 
         aes_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["FACE_IMAGE_AES_KEY"]
-        aes_key = aes_key_str.decode("hex")
+
+        if six.PY3:
+            aes_key = codecs.decode(aes_key_str, "hex")
+        else:
+            aes_key = aes_key_str.decode("hex")
 
         path = self._get_path("face")
         buff = ContentFile(encrypt_and_encode(img_data, aes_key))
@@ -656,7 +663,11 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         self._storage.save(path, buff)
 
         # Update our record fields
-        self.photo_id_key = rsa_encrypted_aes_key.encode('base64')
+        if six.PY3:
+            self.photo_id_key = codecs.encode(rsa_encrypted_aes_key, 'base64')
+        else:
+            self.photo_id_key = rsa_encrypted_aes_key.encode('base64')
+
         self.save()
 
     @status_before_must_be("must_retry", "ready", "submitted")
@@ -929,6 +940,44 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         """Whether or not the status from this attempt should be displayed to the user."""
         return True
 
+    @classmethod
+    def get_recent_verification(cls, user):
+        """
+        Return the most recent approved verification of user
+
+        Keyword Arguments:
+            user (User): The user for which the most recent approved verification is fetched
+
+        Returns:
+            SoftwareSecurePhotoVerification (object) or None
+        """
+        recent_verification = SoftwareSecurePhotoVerification.objects.filter(status='approved',
+                                                                             user_id=user.id,
+                                                                             expiry_date__isnull=False)
+
+        return recent_verification.latest('updated_at') if recent_verification.exists() else None
+
+    @classmethod
+    def update_expiry_email_date_for_user(cls, user, email_config):
+        """
+        Updates the expiry_email_date to send expiry email if the most recent approved
+        verification for the user is expired.
+
+        Keyword Arguments:
+            user (User): user object
+            email_config (dict): Contains configuration related to verification expiry email
+
+        """
+        today = now().replace(hour=0, minute=0, second=0, microsecond=0)
+        recently_expired_date = today - timedelta(days=email_config['DAYS_RANGE'])
+
+        verification = SoftwareSecurePhotoVerification.get_recent_verification(user)
+
+        if verification and verification.expiry_date < recently_expired_date and not verification.expiry_email_date:
+            expiry_email_date = today - timedelta(days=email_config['RESEND_DAYS'])
+            SoftwareSecurePhotoVerification.objects.filter(pk=verification.pk).update(
+                expiry_email_date=expiry_email_date)
+
 
 class VerificationDeadline(TimeStampedModel):
     """
@@ -969,8 +1018,6 @@ class VerificationDeadline(TimeStampedModel):
     # overwrite the manual setting of the field.
     deadline_is_explicit = models.BooleanField(default=False)
 
-    ALL_DEADLINES_CACHE_KEY = "verify_student.all_verification_deadlines"
-
     @classmethod
     def set_deadline(cls, course_key, deadline, is_explicit=False):
         """
@@ -999,29 +1046,27 @@ class VerificationDeadline(TimeStampedModel):
                 record.save()
 
     @classmethod
-    def deadlines_for_courses(cls, course_keys):
+    def deadlines_for_enrollments(cls, enrollments_qs):
         """
-        Retrieve verification deadlines for particular courses.
+        Retrieve verification deadlines for a user's enrolled courses.
 
         Arguments:
-            course_keys (list): List of `CourseKey`s.
+            enrollments_qs: CourseEnrollment queryset. For performance reasons
+                            we want the queryset here instead of passing in a
+                            big list of course_keys in an "SELECT IN" query.
+                            If we have a queryset, Django is smart enough to do
+                            a performant subquery at the MySQL layer instead of
+                            passing down all the course_keys through Python.
 
         Returns:
             dict: Map of course keys to datetimes (verification deadlines)
-
         """
-        all_deadlines = cache.get(cls.ALL_DEADLINES_CACHE_KEY)
-        if all_deadlines is None:
-            all_deadlines = {
-                deadline.course_key: deadline.deadline
-                for deadline in VerificationDeadline.objects.all()
-            }
-            cache.set(cls.ALL_DEADLINES_CACHE_KEY, all_deadlines)
-
+        verification_deadlines = VerificationDeadline.objects.filter(
+            course_key__in=enrollments_qs.values('course_id')
+        )
         return {
-            course_key: all_deadlines[course_key]
-            for course_key in course_keys
-            if course_key in all_deadlines
+            deadline.course_key: deadline.deadline
+            for deadline in verification_deadlines
         }
 
     @classmethod
@@ -1041,10 +1086,3 @@ class VerificationDeadline(TimeStampedModel):
             return deadline.deadline
         except cls.DoesNotExist:
             return None
-
-
-@receiver(models.signals.post_save, sender=VerificationDeadline)
-@receiver(models.signals.post_delete, sender=VerificationDeadline)
-def invalidate_deadline_caches(sender, **kwargs):  # pylint: disable=unused-argument
-    """Invalidate the cached verification deadline information. """
-    cache.delete(VerificationDeadline.ALL_DEADLINES_CACHE_KEY)

@@ -637,12 +637,14 @@
     @extend %t-action4;
     @extend %t-regular;
 
-    border-color: $lightGrey1;
+    font-size: 1rem;
+    font-weight: 600;
     padding: 0;
-    height: $third-party-button-height;
 
     &:hover {
       border-color: $m-blue-d3;
+      box-shadow: none;
+
     }
   }
 
@@ -797,7 +799,7 @@
     &:first-of-type {
       margin-top: 20px;
     }
-        
+
     font-size: 16px;
     line-height: 1.5;
     color: $gray-d2;

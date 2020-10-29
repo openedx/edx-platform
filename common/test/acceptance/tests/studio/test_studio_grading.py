@@ -1,10 +1,14 @@
 """
 Acceptance tests for grade settings in Studio.
 """
+from __future__ import absolute_import
+
+from bok_choy.promise import EmptyPromise
+from six.moves import range
+
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.studio.settings_graders import GradingPage
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
-from common.test.acceptance.fixtures.course import XBlockFixtureDesc
-from bok_choy.promise import EmptyPromise
 
 
 class GradingPageTest(StudioCourseTest):

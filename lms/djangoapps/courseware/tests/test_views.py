@@ -38,6 +38,7 @@ from xblock.fields import Scope, String
 
 import courseware.views.views as views
 import shoppingcart
+
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -224,8 +225,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 181),
-        (ModuleStoreEnum.Type.split, 4, 175),
+        (ModuleStoreEnum.Type.mongo, 10, 182),
+        (ModuleStoreEnum.Type.split, 4, 176),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
@@ -484,11 +485,9 @@ class ViewsTestCase(ModuleStoreTestCase):
     def assert_enrollment_link_present(self, is_anonymous):
         """
         Prepare ecommerce checkout data and assert if the ecommerce link is contained in the response.
-
         Arguments:
             is_anonymous(bool): Tell the method to use an anonymous user or the logged in one.
             _id(bool): Tell the method to either expect an id in the href or not.
-
         """
         sku = 'TEST123'
         configuration = CommerceConfiguration.objects.create(checkout_on_ecommerce_service=True)
@@ -600,13 +599,12 @@ class ViewsTestCase(ModuleStoreTestCase):
         # TODO add a test for invalid location
         # TODO add a test for no data *
         response = self.client.get(reverse('jump_to', args=['foo/bar/baz', 'baz']))
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def verify_end_date(self, course_id, expected_end_text=None):
         """
         Visits the about page for `course_id` and tests that both the text "Classes End", as well
         as the specified `expected_end_text`, is present on the page.
-
         If `expected_end_text` is None, verifies that the about page *does not* contain the text
         "Classes End".
         """
@@ -846,8 +844,8 @@ class ViewsTestCase(ModuleStoreTestCase):
         url = reverse('submit_financial_assistance_request')
         return self.client.post(url, json.dumps(data), content_type='application/json')
 
-    @patch.object(views, '_record_feedback_in_zendesk')
-    def test_submit_financial_assistance_request(self, mock_record_feedback):
+    @patch.object(views, 'create_zendesk_ticket', return_value=200)
+    def test_submit_financial_assistance_request(self, mock_create_zendesk_ticket):
         username = self.user.username
         course = six.text_type(self.course_key)
         legal_name = 'Jesse Pinkman'
@@ -871,10 +869,12 @@ class ViewsTestCase(ModuleStoreTestCase):
         response = self._submit_financial_assistance_form(data)
         self.assertEqual(response.status_code, 204)
 
-        __, __, ticket_subject, __, tags, additional_info = mock_record_feedback.call_args[0]
-        mocked_kwargs = mock_record_feedback.call_args[1]
-        group_name = mocked_kwargs['group_name']
-        require_update = mocked_kwargs['require_update']
+        __, __, ticket_subject, __ = mock_create_zendesk_ticket.call_args[0]
+        mocked_kwargs = mock_create_zendesk_ticket.call_args[1]
+        group_name = mocked_kwargs['group']
+        tags = mocked_kwargs['tags']
+        additional_info = mocked_kwargs['additional_info']
+
         private_comment = '\n'.join(list(additional_info.values()))
         for info in (country, income, reason_for_applying, goals, effort, username, legal_name, course):
             self.assertIn(info, private_comment)
@@ -891,10 +891,9 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertDictContainsSubset({'course_id': course}, tags)
         self.assertIn('Client IP', additional_info)
         self.assertEqual(group_name, 'Financial Assistance')
-        self.assertTrue(require_update)
 
-    @patch.object(views, '_record_feedback_in_zendesk', return_value=False)
-    def test_zendesk_submission_failed(self, _mock_record_feedback):
+    @patch.object(views, 'create_zendesk_ticket', return_value=500)
+    def test_zendesk_submission_failed(self, _mock_create_zendesk_ticket):
         response = self._submit_financial_assistance_form({
             'username': self.user.username,
             'course': six.text_type(self.course.id),
@@ -1029,7 +1028,6 @@ class BaseDueDateTests(ModuleStoreTestCase):
     def set_up_course(self, **course_kwargs):
         """
         Create a stock course with a specific due date.
-
         :param course_kwargs: All kwargs are passed to through to the :class:`CourseFactory`
         """
         course = CourseFactory.create(**course_kwargs)
@@ -1158,7 +1156,6 @@ class StartDateTests(ModuleStoreTestCase):
     def set_up_course(self):
         """
         Create a stock course with a specific due date.
-
         :param course_kwargs: All kwargs are passed to through to the :class:`CourseFactory`
         """
         course = CourseFactory.create(start=datetime(2013, 9, 16, 7, 17, 28))
@@ -1254,7 +1251,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         """
         resp = self._get_student_progress_page()
         # Test that malicious code does not appear in html
-        self.assertNotIn(malicious_code, resp.content)
+        self.assertNotIn(malicious_code, resp.content.decode('utf-8'))
 
     def test_pure_ungraded_xblock(self):
         ItemFactory.create(category='acid', parent_location=self.vertical.location)
@@ -1282,7 +1279,7 @@ class ProgressPageTests(ProgressPageBaseTests):
             resp = self.client.get(
                 reverse('student_progress', args=[six.text_type(self.course.id), invalid_id])
             )
-            self.assertEquals(resp.status_code, 404)
+            self.assertEqual(resp.status_code, 404)
 
         # Assert that valid 'student_id' returns 200 status
         self._get_student_progress_page()
@@ -1291,7 +1288,6 @@ class ProgressPageTests(ProgressPageBaseTests):
     def test_unenrolled_student_progress_for_credit_course(self, default_store):
         """
          Test that student progress page does not break while checking for an unenrolled student.
-
          Scenario: When instructor checks the progress of a student who is not enrolled in credit course.
          It should return 200 response.
         """
@@ -1466,8 +1462,8 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        (True, 55),
-        (False, 54)
+        (True, 56),
+        (False, 55)
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
@@ -1480,8 +1476,8 @@ class ProgressPageTests(ProgressPageBaseTests):
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 63, 43),
-        (True, 54, 38)
+        (False, 64, 44),
+        (True, 55, 39)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
@@ -1538,7 +1534,7 @@ class ProgressPageTests(ProgressPageBaseTests):
 
                 self.assertEqual(
                     cert_button_hidden,
-                    'Request Certificate' not in resp.content
+                    'Request Certificate' not in resp.content.decode('utf-8')
                 )
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
@@ -2029,7 +2025,7 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         resp = self._get_progress_page()
 
         # Test that no problem scores are present
-        self.assertIn('No problem scores in this section', resp.content)
+        self.assertIn('No problem scores in this section', resp.content.decode('utf-8'))
 
     @ddt.data(
         ('', None, False, True),
@@ -2362,9 +2358,8 @@ class TestIndexView(ModuleStoreTestCase):
                 }
             )
         )
-
         # Trigger the assertions embedded in the ViewCheckerBlocks
-        self.assertEquals(response.content.count("ViewCheckerPassed"), 3)
+        self.assertEqual(response.content.decode('utf-8').count("ViewCheckerPassed"), 3)
 
     @XBlock.register_temp_plugin(ActivateIDCheckerBlock, 'id_checker')
     def test_activate_block_id(self):
@@ -2391,7 +2386,7 @@ class TestIndexView(ModuleStoreTestCase):
                 }
             ) + '?activate_block_id=test_block_id'
         )
-        self.assertIn("Activate Block ID: test_block_id", response.content)
+        self.assertIn("Activate Block ID: test_block_id", response.content.decode('utf-8'))
 
     @ddt.data(
         [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.ANONYMOUS, False],
@@ -2449,26 +2444,26 @@ class TestIndexView(ModuleStoreTestCase):
 
             response = self.client.get(url, follow=False)
             assert response.status_code == (200 if expected_course_content else 302)
-
+            unicode_content = response.content.decode('utf-8')
             if expected_course_content:
                 if user_type in (CourseUserType.ANONYMOUS, CourseUserType.UNENROLLED):
-                    self.assertIn('data-save-position="false"', response.content)
-                    self.assertIn('data-show-completion="false"', response.content)
-                    self.assertIn('xblock-public_view-sequential', response.content)
-                    self.assertIn('xblock-public_view-vertical', response.content)
-                    self.assertIn('xblock-public_view-html', response.content)
-                    self.assertIn('xblock-public_view-video', response.content)
+                    self.assertIn('data-save-position="false"', unicode_content)
+                    self.assertIn('data-show-completion="false"', unicode_content)
+                    self.assertIn('xblock-public_view-sequential', unicode_content)
+                    self.assertIn('xblock-public_view-vertical', unicode_content)
+                    self.assertIn('xblock-public_view-html', unicode_content)
+                    self.assertIn('xblock-public_view-video', unicode_content)
                     if user_type == CourseUserType.ANONYMOUS and course_visibility == COURSE_VISIBILITY_PRIVATE:
-                        self.assertIn('To see course content', response.content)
+                        self.assertIn('To see course content', unicode_content)
                     if user_type == CourseUserType.UNENROLLED and course_visibility == COURSE_VISIBILITY_PRIVATE:
-                        self.assertIn('You must be enrolled', response.content)
+                        self.assertIn('You must be enrolled', unicode_content)
                 else:
-                    self.assertIn('data-save-position="true"', response.content)
-                    self.assertIn('data-show-completion="true"', response.content)
-                    self.assertIn('xblock-student_view-sequential', response.content)
-                    self.assertIn('xblock-student_view-vertical', response.content)
-                    self.assertIn('xblock-student_view-html', response.content)
-                    self.assertIn('xblock-student_view-video', response.content)
+                    self.assertIn('data-save-position="true"', unicode_content)
+                    self.assertIn('data-show-completion="true"', unicode_content)
+                    self.assertIn('xblock-student_view-sequential', unicode_content)
+                    self.assertIn('xblock-student_view-vertical', unicode_content)
+                    self.assertIn('xblock-student_view-html', unicode_content)
+                    self.assertIn('xblock-student_view-video', unicode_content)
 
     @patch('courseware.views.views.CourseTabView.course_open_for_learner_enrollment')
     @patch('openedx.core.djangoapps.util.user_messages.PageLevelMessages.register_warning_message')
@@ -2649,7 +2644,7 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
 
         response = self.client.get(self.section_1_url)
         self.assertIn('data-mark-completed-on-view-after-delay', response.content)
-        self.assertEquals(response.content.count("data-mark-completed-on-view-after-delay"), 2)
+        self.assertEqual(response.content.count("data-mark-completed-on-view-after-delay"), 2)
 
         request = self.request_factory.post(
             '/',
@@ -2663,11 +2658,11 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
             quote_slashes(six.text_type(self.html_1_1.scope_ids.usage_id)),
             'publish_completion',
         )
-        self.assertEqual(json.loads(response.content), {'result': "ok"})
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {'result': "ok"})
 
         response = self.client.get(self.section_1_url)
         self.assertIn('data-mark-completed-on-view-after-delay', response.content)
-        self.assertEquals(response.content.count("data-mark-completed-on-view-after-delay"), 1)
+        self.assertEqual(response.content.count("data-mark-completed-on-view-after-delay"), 1)
 
         request = self.request_factory.post(
             '/',
@@ -2681,7 +2676,7 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
             quote_slashes(six.text_type(self.html_1_2.scope_ids.usage_id)),
             'publish_completion',
         )
-        self.assertEqual(json.loads(response.content), {'result': "ok"})
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {'result': "ok"})
 
         response = self.client.get(self.section_1_url)
         self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
@@ -2746,7 +2741,6 @@ class TestIndexViewWithVerticalPositions(ModuleStoreTestCase):
     def test_vertical_positions(self, input_position, expected_position):
         """
         Tests the following cases:
-
         * Load first position when negative position inputted.
         * Load first position when 0/-0 position inputted.
         * Load given position when 0 < input_position <= num_positions_available.
@@ -2803,7 +2797,7 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
                 }
             )
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertIn("Content Locked", response.content)
 
 
@@ -2941,7 +2935,7 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
             'publish_completion',
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content), {'result': "ok"})
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {'result': "ok"})
 
         response = self.get_response(usage_key=self.html_block.location)
         self.assertEqual(response.status_code, 200)
@@ -2971,7 +2965,6 @@ class TestRenderXBlockSelfPaced(TestRenderXBlock):
 class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
     """
     Ensure that courseware index requests do not trigger student state writes.
-
     This is to prevent locking issues that have caused latency spikes in the
     courseware_studentmodule table when concurrent requests each try to update
     the same rows for sequence, section, and course positions.

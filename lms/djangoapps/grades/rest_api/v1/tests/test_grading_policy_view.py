@@ -122,7 +122,7 @@ class GradingPolicyTestMixin(object):
         """
         The view should return HTTP status 401 if user is unauthenticated.
         """
-        self.assert_get_for_course(expected_status_code=401, HTTP_AUTHORIZATION=None)
+        self.assert_get_for_course(expected_status_code=401, HTTP_AUTHORIZATION="")
 
     def test_staff_authorized(self):
         """

@@ -3,6 +3,7 @@ Test courseware search
 """
 
 from __future__ import absolute_import
+
 import json
 import uuid
 
@@ -12,9 +13,9 @@ from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
 from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
-from common.test.acceptance.pages.studio.xblock_editor import XBlockVisibilityEditorView
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
+from common.test.acceptance.pages.studio.xblock_editor import XBlockVisibilityEditorView
 from common.test.acceptance.tests.discussion.helpers import CohortTestMixin
 from common.test.acceptance.tests.helpers import remove_file
 from common.test.acceptance.tests.studio.base_studio_test import ContainerBase

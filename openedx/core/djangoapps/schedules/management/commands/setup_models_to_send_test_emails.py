@@ -5,6 +5,7 @@ A managment command that can be used to set up Schedules with various configurat
 from __future__ import absolute_import
 
 import datetime
+from textwrap import dedent
 
 import factory
 import pytz
@@ -57,6 +58,7 @@ class Command(BaseCommand):
     A management command that generates schedule objects for all expected schedule email types, so that it is easy to
     generate test emails of all available types.
     """
+    help = dedent(__doc__).strip()
 
     def handle(self, *args, **options):
         courses = modulestore().get_courses()

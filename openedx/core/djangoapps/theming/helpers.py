@@ -4,6 +4,8 @@ Helpers for accessing comprehensive theming related variables.
 This file is imported at startup. Imports of models or things which import models will break startup on Django 1.9+. If
 you need models here, please import them inside the function which uses them.
 """
+from __future__ import absolute_import
+
 import os
 import re
 from logging import getLogger
@@ -11,7 +13,6 @@ from logging import getLogger
 import crum
 from django.conf import settings
 
-from microsite_configuration import microsite
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers_dirs import (
     Theme,
@@ -28,15 +29,8 @@ logger = getLogger(__name__)  # pylint: disable=invalid-name
 @request_cached()
 def get_template_path(relative_path, **kwargs):
     """
-    This is a proxy function to hide microsite_configuration behind comprehensive theming.
-
     The calculated value is cached for the lifetime of the current request.
     """
-    # We need to give priority to theming over microsites
-    # So, we apply microsite override only if there is no associated site theme
-    # and associated microsite is present.
-    if not current_request_has_associated_site_theme() and microsite.is_request_in_microsite():
-        relative_path = microsite.get_template_path(relative_path, **kwargs)
     return relative_path
 
 
@@ -45,18 +39,7 @@ def is_request_in_themed_site():
     This is a proxy function to hide microsite_configuration behind comprehensive theming.
     """
     # We need to give priority to theming/site-configuration over microsites
-    return configuration_helpers.is_site_configuration_enabled() or microsite.is_request_in_microsite()
-
-
-def get_template(uri):
-    """
-    This is a proxy function to hide microsite_configuration behind comprehensive theming.
-    :param uri: uri of the template
-    """
-    # We need to give priority to theming over microsites
-    # So, we apply microsite template override only when there is no associated theme,
-    if not current_request_has_associated_site_theme():
-        return microsite.get_template(uri)
+    return configuration_helpers.is_site_configuration_enabled()
 
 
 def get_template_path_with_theme(relative_path):
@@ -336,14 +319,8 @@ def is_comprehensive_theming_enabled():
     Returns:
          (bool): True if comprehensive theming is enabled else False
     """
-    # We need to give priority to theming over microsites
     if settings.ENABLE_COMPREHENSIVE_THEMING and current_request_has_associated_site_theme():
         return True
-
-    # Disable theming for microsites
-    # Microsite configurations take priority over the default site theme.
-    if microsite.is_request_in_microsite():
-        return False
 
     return settings.ENABLE_COMPREHENSIVE_THEMING
 

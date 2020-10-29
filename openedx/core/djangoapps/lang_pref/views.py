@@ -22,7 +22,7 @@ def update_session_language(request):
     """
     response = HttpResponse(200)
     if request.method == 'PATCH':
-        data = json.loads(request.body)
+        data = json.loads(request.body.decode('utf8'))
         language = data.get(LANGUAGE_KEY, settings.LANGUAGE_CODE)
         if request.session.get(LANGUAGE_SESSION_KEY, None) != language:
             request.session[LANGUAGE_SESSION_KEY] = six.text_type(language)

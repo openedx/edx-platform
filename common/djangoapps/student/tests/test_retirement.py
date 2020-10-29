@@ -284,7 +284,7 @@ class TestRegisterRetiredUsername(TestCase):
         Validates a response stating that a username already exists -or- is invalid.
         """
         assert response.status_code == 409
-        obj = json.loads(response.content)
+        obj = json.loads(response.content.decode('utf-8'))
 
         username_msg = obj['username'][0]['user_message']
         assert username_msg.startswith(start_msg)

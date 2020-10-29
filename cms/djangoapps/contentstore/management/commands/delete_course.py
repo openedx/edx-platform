@@ -1,14 +1,18 @@
-from __future__ import print_function
-from six import text_type
+"""
+Management Command to delete course.
+"""
+from __future__ import absolute_import, print_function
 
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from contentstore.utils import delete_course
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+
 from .prompt import query_yes_no
 
 

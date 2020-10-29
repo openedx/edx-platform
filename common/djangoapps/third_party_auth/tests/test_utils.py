@@ -1,12 +1,15 @@
 """
 Tests for third_party_auth utility functions.
 """
+from __future__ import absolute_import
+
 import unittest
 
 from django.conf import settings
+
+from student.tests.factories import UserFactory
 from third_party_auth.tests.testutil import TestCase
 from third_party_auth.utils import user_exists
-from student.tests.factories import UserFactory
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

@@ -1,35 +1,30 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
 import datetime
 from tempfile import mkdtemp
 
 import ddt
-
 from django.test import TestCase
-
 from fs.osfs import OSFS
 from lxml import etree
 from mock import Mock, patch
-
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC
 from six import text_type
-
-from xmodule.xml_module import is_pointer_tag
-from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from xmodule.modulestore import only_xmodules
-from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, LibraryXMLModuleStore
-from xmodule.modulestore.inheritance import compute_inherited_metadata
-from xmodule.x_module import XModuleMixin
-from xmodule.fields import Date
-from xmodule.tests import DATA_DIR
-from xmodule.modulestore.inheritance import InheritanceMixin
-from opaque_keys.edx.keys import CourseKey
-
 from xblock.core import XBlock
-from xblock.fields import Scope, String, Integer
-from xblock.runtime import KvsFieldData, DictKeyValueStore
+from xblock.fields import Integer, Scope, String
+from xblock.runtime import DictKeyValueStore, KvsFieldData
 
+from xmodule.fields import Date
+from xmodule.modulestore import only_xmodules
+from xmodule.modulestore.inheritance import InheritanceMixin, compute_inherited_metadata
+from xmodule.modulestore.xml import ImportSystem, LibraryXMLModuleStore, XMLModuleStore
+from xmodule.tests import DATA_DIR
+from xmodule.x_module import XModuleMixin
+from xmodule.xml_module import is_pointer_tag
 
 ORG = 'test_org'
 COURSE = 'test_course'

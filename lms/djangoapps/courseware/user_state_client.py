@@ -3,14 +3,17 @@ An implementation of :class:`XBlockUserStateClient`, which stores XBlock Scope.u
 data in a Django ORM model.
 """
 
+from __future__ import absolute_import
+
 import itertools
 import logging
 from operator import attrgetter
 from time import time
 
+import six
 from django.conf import settings
-from django.core.paginator import Paginator
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.utils import IntegrityError
 from edx_django_utils import monitoring as monitoring_utils
@@ -258,7 +261,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                 # process. This seems to happen frequently, and ignoring it is the
                 # best course of action for now
                 log.warning(u"set_many: IntegrityError for student {} - course_id {} - usage key {}".format(
-                    user, repr(unicode(usage_key.course_key)), usage_key
+                    user, repr(six.text_type(usage_key.course_key)), usage_key
                 ))
                 return
 
@@ -281,10 +284,10 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                     # The UPDATE above failed. Log information - but ignore the error.
                     # See https://openedx.atlassian.net/browse/TNL-5365
                     log.warning(u"set_many: IntegrityError for student {} - course_id {} - usage key {}".format(
-                        user, repr(unicode(usage_key.course_key)), usage_key
+                        user, repr(six.text_type(usage_key.course_key)), usage_key
                     ))
                     log.warning(u"set_many: All {} block keys: {}".format(
-                        len(block_keys_to_state), block_keys_to_state.keys()
+                        len(block_keys_to_state), list(block_keys_to_state.keys())
                     ))
 
             # DataDog and New Relic reporting

@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import logging
 
 import unicodecsv
@@ -8,7 +10,6 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from student.models import CourseEnrollment, User
-
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 

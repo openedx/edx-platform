@@ -4,10 +4,13 @@ End-to-end tests for the LMS.
 """
 
 from __future__ import absolute_import
+
 import json
 from datetime import datetime, timedelta
-from six.moves import range
+
 import ddt
+import six
+from six.moves import range
 
 from openedx.core.lib.tests import attr
 
@@ -937,4 +940,4 @@ class WordCloudTests(UniqueCourseTest):
         self.assertTrue(self.courseware_page.is_word_cloud_rendered)
         self.courseware_page.input_word_cloud('test_wordcloud')
         self.courseware_page.save_word_cloud()
-        self.assertItemsEqual(expected_data, self.courseware_page.word_cloud_answer_list)
+        six.assertCountEqual(self, expected_data, self.courseware_page.word_cloud_answer_list)

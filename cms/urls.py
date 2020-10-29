@@ -1,19 +1,24 @@
+"""
+Urls of Studio.
+"""
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib.admin import autodiscover as django_autodiscover
 from django.utils.translation import ugettext_lazy as _
-from rest_framework_swagger.views import get_swagger_view
+from ratelimitbackend import admin
 
 import contentstore.views
-from cms.djangoapps.contentstore.views.organization import OrganizationListView
 import openedx.core.djangoapps.common_views.xblock
 import openedx.core.djangoapps.debug.views
 import openedx.core.djangoapps.lang_pref.views
+from cms.djangoapps.contentstore.views.organization import OrganizationListView
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
+from openedx.core.openapi import schema_view
 
-from ratelimitbackend import admin
 
 django_autodiscover()
 admin.site.site_header = _('Studio Administration')
@@ -51,6 +56,7 @@ urlpatterns = [
         contentstore.views.component_handler, name='component_handler'),
     url(r'^xblock/resource/(?P<block_type>[^/]*)/(?P<uri>.*)$',
         openedx.core.djangoapps.common_views.xblock.xblock_resource, name='xblock_resource_url'),
+    url(r'', include('openedx.core.djangoapps.xblock.rest_api.urls', namespace='xblock_api')),
     url(r'^not_found$', contentstore.views.not_found, name='not_found'),
     url(r'^server_error$', contentstore.views.server_error, name='server_error'),
     url(r'^organizations$', OrganizationListView.as_view(), name='organizations'),
@@ -266,9 +272,23 @@ urlpatterns += [
     url(r'^500$', handler500),
 ]
 
-if settings.FEATURES.get('ENABLE_API_DOCS'):
+# API docs.
+urlpatterns += [
+    url(
+        r'^swagger(?P<format>\.json|\.yaml)$',
+        schema_view.without_ui(cache_timeout=settings.OPENAPI_CACHE_TIMEOUT), name='schema-json',
+    ),
+    url(
+        r'^swagger/$',
+        schema_view.with_ui('swagger', cache_timeout=settings.OPENAPI_CACHE_TIMEOUT),
+        name='schema-swagger-ui',
+    ),
+    url(r'^api-docs/$', schema_view.with_ui('swagger', cache_timeout=settings.OPENAPI_CACHE_TIMEOUT)),
+]
+
+if 'openedx.testing.coverage_context_listener' in settings.INSTALLED_APPS:
     urlpatterns += [
-        url(r'^api-docs/$', get_swagger_view(title='Studio API')),
+        url(r'coverage_context', include('openedx.testing.coverage_context_listener.urls'))
     ]
 
 from openedx.core.djangoapps.plugins import constants as plugin_constants, plugin_urls

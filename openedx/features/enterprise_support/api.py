@@ -8,6 +8,7 @@ from functools import wraps
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
@@ -187,7 +188,6 @@ class EnterpriseApiClient(object):
                         "enterprise_customer": {
                             "uuid": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
                             "name": "TestShib",
-                            "catalog": 2,
                             "active": true,
                             "site": {
                                 "domain": "example.com",
@@ -463,7 +463,8 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
     else:
         client = ConsentApiClient(user=request.user)
         consent_needed = any(
-            client.consent_required(
+            Site.objects.get(domain=learner['enterprise_customer']['site']['domain']) == request.site
+            and client.consent_required(
                 username=user.username,
                 course_id=course_id,
                 enterprise_customer_uuid=learner['enterprise_customer']['uuid'],

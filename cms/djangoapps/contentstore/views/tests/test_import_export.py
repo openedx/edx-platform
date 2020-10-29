@@ -1,19 +1,22 @@
 """
 Unit tests for course import and export
 """
+from __future__ import absolute_import
+
 import copy
 import json
 import logging
 import os
 import re
 import shutil
-import StringIO
+from six import StringIO
 import tarfile
 import tempfile
 from uuid import uuid4
 
 import ddt
 import lxml
+import six
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.test.utils import override_settings
@@ -21,6 +24,7 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 from opaque_keys.edx.locator import LibraryLocator
 from path import Path as path
+from six.moves import zip
 from storages.backends.s3boto import S3BotoStorage
 from user_tasks.models import UserTaskStatus
 
@@ -103,7 +107,7 @@ class ImportEntranceExamTestCase(CourseTestCase, MilestonesTestCaseMixin):
         """
         Check that pre existed entrance exam content should be overwrite with the imported course.
         """
-        exam_url = '/course/{}/entrance_exam/'.format(unicode(self.course.id))
+        exam_url = '/course/{}/entrance_exam/'.format(six.text_type(self.course.id))
         resp = self.client.post(exam_url, {'entrance_exam_minimum_score_pct': 0.5}, http_accept='application/json')
         self.assertEqual(resp.status_code, 201)
 
@@ -113,9 +117,9 @@ class ImportEntranceExamTestCase(CourseTestCase, MilestonesTestCaseMixin):
         self.assertTrue(metadata['entrance_exam_enabled'])
         self.assertIsNotNone(metadata['entrance_exam_minimum_score_pct'])
         self.assertEqual(metadata['entrance_exam_minimum_score_pct']['value'], 0.5)
-        self.assertTrue(len(milestones_helpers.get_course_milestones(unicode(self.course.id))))
+        self.assertTrue(len(milestones_helpers.get_course_milestones(six.text_type(self.course.id))))
         content_milestones = milestones_helpers.get_course_content_milestones(
-            unicode(self.course.id),
+            six.text_type(self.course.id),
             metadata['entrance_exam_id']['value'],
             milestones_helpers.get_milestone_relationship_types()['FULFILLS']
         )
@@ -149,7 +153,7 @@ class ImportTestCase(CourseTestCase):
 
         def touch(name):
             """ Equivalent to shell's 'touch'"""
-            with file(name, 'a'):
+            with open(name, 'a'):  # pylint: disable=W6005
                 os.utime(name, None)
 
         # Create tar test files -----------------------------------------------
@@ -349,7 +353,7 @@ class ImportTestCase(CourseTestCase):
                     kwargs={'filename': os.path.split(tarpath)[1]}
                 )
             )
-            status = json.loads(resp.content)["ImportStatus"]
+            status = json.loads(resp.content.decode('utf-8'))["ImportStatus"]
             self.assertEqual(status, -1)
 
         try_tar(self._fifo_tar())
@@ -562,15 +566,18 @@ class ExportTestCase(CourseTestCase):
         resp = self.client.post(self.url)
         self.assertEquals(resp.status_code, 200)
         resp = self.client.get(self.status_url)
-        result = json.loads(resp.content)
+        result = json.loads(resp.content.decode('utf-8'))
         status = result['ExportStatus']
         self.assertEquals(status, 3)
         self.assertIn('ExportOutput', result)
         output_url = result['ExportOutput']
         resp = self.client.get(output_url)
         self._verify_export_succeeded(resp)
+        resp_content = b''
+        for item in resp.streaming_content:
+            resp_content += item
 
-        buff = StringIO.StringIO(b"".join(resp.streaming_content))
+        buff = six.BytesIO(resp_content)
         return tarfile.open(fileobj=buff)
 
     def _verify_export_succeeded(self, resp):
@@ -669,7 +676,7 @@ class ExportTestCase(CourseTestCase):
         self.assertEquals(resp.status_code, 200)
         resp = self.client.get(self.status_url)
         self.assertEquals(resp.status_code, 200)
-        result = json.loads(resp.content)
+        result = json.loads(resp.content.decode('utf-8'))
         self.assertNotIn('ExportOutput', result)
         self.assertIn('ExportError', result)
         error = result['ExportError']
@@ -757,7 +764,7 @@ class ExportTestCase(CourseTestCase):
         """
         resp = self.client.get(self.status_url)
         self.assertEqual(resp.status_code, 200)
-        result = json.loads(resp.content)
+        result = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(result['ExportStatus'], 0)
 
     def test_output_non_course_author(self):
@@ -796,7 +803,7 @@ class ExportTestCase(CourseTestCase):
             file_url='/path/to/testfile.tar.gz',
         )
         resp = self.client.get(self.status_url)
-        result = json.loads(resp.content)
+        result = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(result['ExportOutput'], '/path/to/testfile.tar.gz')
 
     @patch('contentstore.views.import_export._latest_task_status')
@@ -816,7 +823,7 @@ class ExportTestCase(CourseTestCase):
             file_url='/s3/file/path/testfile.tar.gz',
         )
         resp = self.client.get(self.status_url)
-        result = json.loads(resp.content)
+        result = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(result['ExportOutput'], '/s3/file/path/testfile.tar.gz')
 
     @patch('contentstore.views.import_export._latest_task_status')
@@ -833,7 +840,7 @@ class ExportTestCase(CourseTestCase):
         mock_latest_task_status.return_value = Mock(state=UserTaskStatus.SUCCEEDED)
         mock_get_user_task_artifact.return_value = self._mock_artifact(spec=FileSystemStorage)
         resp = self.client.get(self.status_url)
-        result = json.loads(resp.content)
+        result = json.loads(resp.content.decode('utf-8'))
         file_export_output_url = reverse_course_url('export_output_handler', self.course.id)
         self.assertEqual(result['ExportOutput'], file_export_output_url)
 

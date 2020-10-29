@@ -29,6 +29,62 @@ class TestCreateDotApplication(TestCase):
         super(TestCreateDotApplication, self).tearDown()
         Application.objects.filter(user=self.user).delete()
 
+    def test_update_dot_application(self):
+        APP_NAME = "update_test_application"
+        URI_OLD = "https://example.com/old"
+        URI_NEW = "https://example.com/new"
+        SCOPES_X = ["email", "profile", "user_id"]
+        SCOPES_Y = ["email", "profile"]
+        base_call_args = [
+            APP_NAME,
+            self.user.username,
+            "--update",
+            "--grant-type",
+            Application.GRANT_CLIENT_CREDENTIALS,
+            "--public",
+            "--redirect-uris",
+        ]
+
+        # Make sure we can create Application with --update
+        call_args = base_call_args + [URI_OLD]
+        call_command(Command(), *call_args)
+        app = Application.objects.get(name=APP_NAME)
+        self.assertEqual(app.redirect_uris, URI_OLD)
+        with self.assertRaises(ApplicationAccess.DoesNotExist):
+            ApplicationAccess.objects.get(application_id=app.id)
+
+        # Make sure we can call again with no changes
+        call_args = base_call_args + [URI_OLD]
+        call_command(Command(), *call_args)
+        app = Application.objects.get(name=APP_NAME)
+        self.assertEqual(app.redirect_uris, URI_OLD)
+        with self.assertRaises(ApplicationAccess.DoesNotExist):
+            ApplicationAccess.objects.get(application_id=app.id)
+
+        # Make sure calling with new URI changes URI, but does not add access
+        call_args = base_call_args + [URI_NEW]
+        call_command(Command(), *call_args)
+        app = Application.objects.get(name=APP_NAME)
+        self.assertEqual(app.redirect_uris, URI_NEW)
+        with self.assertRaises(ApplicationAccess.DoesNotExist):
+            ApplicationAccess.objects.get(application_id=app.id)
+
+        # Make sure calling with scopes adds access
+        call_args = base_call_args + [URI_NEW, "--scopes", ",".join(SCOPES_X)]
+        call_command(Command(), *call_args)
+        app = Application.objects.get(name=APP_NAME)
+        self.assertEqual(app.redirect_uris, URI_NEW)
+        access = ApplicationAccess.objects.get(application_id=app.id)
+        self.assertEqual(access.scopes, SCOPES_X)
+
+        # Make sure calling with new scopes changes them
+        call_args = base_call_args + [URI_NEW, "--scopes", ",".join(SCOPES_Y)]
+        call_command(Command(), *call_args)
+        app = Application.objects.get(name=APP_NAME)
+        self.assertEqual(app.redirect_uris, URI_NEW)
+        access = ApplicationAccess.objects.get(application_id=app.id)
+        self.assertEqual(access.scopes, SCOPES_Y)
+
     @ddt.data(
         (None, None, None, None, False, None),
         (None, None, 'client-abc', None, False, None),

@@ -19,6 +19,7 @@ from django.utils.translation import ugettext_lazy as _
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey
+from simple_history.models import HistoricalRecords
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.cache_utils import request_cached
@@ -139,6 +140,8 @@ class CourseMode(models.Model):
             u"This is the bulk SKU (stock keeping unit) of this mode in the external ecommerce service."
         )
     )
+
+    history = HistoricalRecords()
 
     HONOR = 'honor'
     PROFESSIONAL = 'professional'
@@ -330,7 +333,9 @@ class CourseMode(models.Model):
 
     @classmethod
     @request_cached(CACHE_NAMESPACE)
-    def modes_for_course(cls, course_id=None, include_expired=False, only_selectable=True, course=None):
+    def modes_for_course(
+        cls, course_id=None, include_expired=False, only_selectable=True, course=None, exclude_credit=True
+    ):
         """
         Returns a list of the non-expired modes for a given course id
 
@@ -381,7 +386,7 @@ class CourseMode(models.Model):
         if only_selectable:
             if course is not None and hasattr(course, 'selectable_modes'):
                 found_course_modes = course.selectable_modes
-            else:
+            elif exclude_credit:
                 found_course_modes = found_course_modes.exclude(mode_slug__in=cls.CREDIT_MODES)
 
         modes = ([mode.to_tuple() for mode in found_course_modes])

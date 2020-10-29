@@ -1,10 +1,12 @@
 """ URLs for User Authentication """
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.conf.urls import include, url
 
 from openedx.core.djangoapps.user_api.accounts import settings_views
-from .views import login_form, login, deprecated
 
+from .views import deprecated, login, login_form
 
 urlpatterns = [
     # TODO this should really be declared in the user_api app

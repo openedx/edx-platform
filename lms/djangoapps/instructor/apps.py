@@ -2,11 +2,14 @@
 Instructor Application Configuration
 """
 
+from __future__ import absolute_import
+
 from django.apps import AppConfig
 from django.conf import settings
 from edx_proctoring.runtime import set_runtime_service
+
 from openedx.core.constants import COURSE_ID_PATTERN
-from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType, PluginURLs, PluginSettings
+from openedx.core.djangoapps.plugins.constants import PluginSettings, PluginURLs, ProjectType, SettingsType
 
 
 class InstructorConfig(AppConfig):

@@ -501,7 +501,7 @@ class TestCreateAccountValidation(TestCase):
         """
         response = self.client.post(self.url, params)
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         self.assertTrue(response_data["success"])
 
     def assert_error(self, params, expected_field, expected_value):
@@ -511,7 +511,7 @@ class TestCreateAccountValidation(TestCase):
         """
         response = self.client.post(self.url, params)
         self.assertEqual(response.status_code, 400)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         self.assertFalse(response_data["success"])
         self.assertEqual(response_data["field"], expected_field)
         self.assertEqual(response_data["value"], expected_value)
@@ -658,12 +658,11 @@ class TestCreateAccountValidation(TestCase):
 
         # Missing
         del params["name"]
-        assert_name_error("Your legal name must be a minimum of two characters long")
+        assert_name_error("Your legal name must be a minimum of one character long")
 
         # Empty, too short
-        for name in ["", "a"]:
-            params["name"] = name
-            assert_name_error("Your legal name must be a minimum of two characters long")
+        params["name"] = ""
+        assert_name_error("Your legal name must be a minimum of one character long")
 
     def test_honor_code(self):
         params = dict(self.minimal_params)
@@ -835,7 +834,7 @@ class TestUnicodeUsername(TestCase):
         response = self.client.post(self.url, self.url_params)
 
         self.assertEquals(response.status_code, 400)
-        obj = json.loads(response.content)
+        obj = json.loads(response.content.decode('utf-8'))
         self.assertEquals(USERNAME_INVALID_CHARS_ASCII, obj['value'])
 
         with self.assertRaises(User.DoesNotExist):
@@ -860,7 +859,7 @@ class TestUnicodeUsername(TestCase):
         response = self.client.post(self.url, invalid_params)
         self.assertEquals(response.status_code, 400)
 
-        obj = json.loads(response.content)
+        obj = json.loads(response.content.decode('utf-8'))
         self.assertEquals(USERNAME_INVALID_CHARS_UNICODE, obj['value'])
 
         with self.assertRaises(User.DoesNotExist):

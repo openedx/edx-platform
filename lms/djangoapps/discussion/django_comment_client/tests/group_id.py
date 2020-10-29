@@ -32,10 +32,10 @@ class GroupIdAssertionMixin(object):
 
     def _assert_html_response_contains_group_info(self, response):
         group_info = {"group_id": None, "group_name": None}
-        match = re.search(r'"group_id": (\d*),', response.content)
+        match = re.search(r'"group_id": (\d*),', response.content.decode('utf-8'))
         if match and match.group(1) != '':
             group_info["group_id"] = int(match.group(1))
-        match = re.search(r'"group_name": "(\w*)",', response.content)
+        match = re.search(r'"group_name": "(\w*)"', response.content.decode('utf-8'))
         if match:
             group_info["group_name"] = match.group(1)
         self._assert_thread_contains_group_info(group_info)
@@ -47,7 +47,7 @@ class GroupIdAssertionMixin(object):
             occurrence of a thread model within that payload).  if None is
             passed, the identity function is assumed.
         """
-        payload = json.loads(response.content)
+        payload = json.loads(response.content.decode('utf-8'))
         thread = extract_thread(payload) if extract_thread else payload
         self._assert_thread_contains_group_info(thread)
 

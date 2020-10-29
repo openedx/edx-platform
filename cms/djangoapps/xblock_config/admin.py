@@ -2,6 +2,8 @@
 Django admin dashboard configuration for LMS XBlock infrastructure.
 """
 
+from __future__ import absolute_import
+
 from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
 from django.contrib import admin
 

@@ -4,7 +4,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# LTMC Latvijas Tiesnešu mācību centrs <ltmc.training@gmail.com>, 2018
+# LTMC Latvijas Tiesnešu mācību centrs <ltmc.training@gmail.com>, 2018-2019
 # Waheed Ahmed <waheed@edx.org>, 2019
 # LTMC Latvijas Tiesnešu mācību centrs <ltmc.training@gmail.com>, 2018
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
@@ -38,9 +38,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-04-22 10:49+0000\n"
-"PO-Revision-Date: 2019-02-10 20:45+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2019-07-24 06:10+0000\n"
+"PO-Revision-Date: 2019-07-21 20:42+0000\n"
+"Last-Translator: LTMC Latvijas Tiesnešu mācību centrs <ltmc.training@gmail.com>\n"
 "Language-Team: Latvian (http://www.transifex.com/open-edx/edx-platform/language/lv/)\n"
 "Language: lv\n"
 "MIME-Version: 1.0\n"
@@ -68,22 +68,6 @@ msgstr "Saglabā"
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/show_textbook.js
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
-#: cms/templates/js/certificate-details.underscore
-#: cms/templates/js/certificate-editor.underscore
-#: cms/templates/js/content-group-editor.underscore
-#: cms/templates/js/course-instructor-details.underscore
-#: cms/templates/js/course-outline.underscore
-#: cms/templates/js/course-settings-learning-fields.underscore
-#: cms/templates/js/course_grade_policy.underscore
-#: cms/templates/js/course_info_update.underscore
-#: cms/templates/js/group-configuration-details.underscore
-#: cms/templates/js/group-configuration-editor.underscore
-#: cms/templates/js/partition-group-details.underscore
-#: cms/templates/js/show-textbook.underscore
-#: cms/templates/js/signatory-editor.underscore
-#: cms/templates/js/video-transcripts.underscore
-#: cms/templates/js/xblock-outline.underscore
-#: common/static/common/templates/discussion/forum-action-delete.underscore
 msgid "Delete"
 msgstr "Dzēst"
 
@@ -112,10 +96,6 @@ msgstr "Dzēst"
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/signatory-actions.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
-#: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/response-comment-edit.underscore
-#: common/static/common/templates/discussion/thread-edit.underscore
-#: common/static/common/templates/discussion/thread-response-edit.underscore
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
@@ -139,9 +119,6 @@ msgstr "Augšupielādē"
 #: lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
 #: common/static/common/templates/image-modal.underscore
-#: common/static/common/templates/discussion/alert-popup.underscore
-#: common/static/common/templates/discussion/forum-action-close.underscore
-#: common/static/common/templates/discussion/search-alert.underscore
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Close"
 msgstr "Aizvērt"
@@ -170,7 +147,6 @@ msgstr "Izvēlēties failu"
 #: cms/static/js/views/course_info_update.js cms/static/js/views/tabs.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/js/Markdown.Editor.js
-#: common/static/common/templates/discussion/alert-popup.underscore
 #: lms/templates/learner_dashboard/verification_popover.underscore
 msgid "OK"
 msgstr "LABI"
@@ -790,19 +766,9 @@ msgstr "Dokumenta rekvizīti"
 msgid "Edit HTML"
 msgstr "Rediģēt HTML"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/certificate-details.underscore
-#: cms/templates/js/course_info_handouts.underscore
-#: cms/templates/js/course_info_update.underscore
-#: cms/templates/js/group-configuration-details.underscore
-#: cms/templates/js/partition-group-details.underscore
-#: cms/templates/js/show-textbook.underscore
-#: cms/templates/js/signatory-details.underscore
-#: cms/templates/js/xblock-string-field-editor.underscore
-#: common/static/common/templates/discussion/forum-action-edit.underscore
 msgid "Edit"
 msgstr "Rediģēt"
 
@@ -1205,7 +1171,6 @@ msgstr "Jauns logs"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
-#: common/static/common/templates/discussion/pagination.underscore
 msgid "Next"
 msgstr "Nākamais"
 
@@ -1549,14 +1514,9 @@ msgstr ""
 "URL, kuru Jūs ievadījāt, satur ārējo saiti. Vai Jūs vēlētos pievienot "
 "nepieciešamo http:// prefiksu?"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/course-instructor-details.underscore
-#: cms/templates/js/signatory-details.underscore
-#: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Title"
 msgstr "Amats"
 
@@ -1978,20 +1938,21 @@ msgid "Turn off transcripts"
 msgstr "Izslēgt norakstus"
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
+#: cms/templates/js/move-xblock-list.underscore
 msgid "View child items"
 msgstr "Apskatīt apakšvienības"
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Navigate up"
-msgstr ""
+msgstr "Doties uz augšu"
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Browsing"
-msgstr ""
+msgstr "Pārlūko"
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Select"
-msgstr ""
+msgstr "Atlasīt"
 
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
@@ -2038,7 +1999,6 @@ msgstr ""
 "vēlreiz."
 
 #: common/static/common/js/discussion/utils.js
-#: common/static/common/templates/discussion/pagination.underscore
 msgid "…"
 msgstr "…"
 
@@ -2253,8 +2213,6 @@ msgid "Your post will be discarded."
 msgstr "Jūsu ziņojums tiks atmests."
 
 #: common/static/common/js/discussion/views/response_comment_show_view.js
-#: common/static/common/templates/discussion/post-user-display.underscore
-#: common/static/common/templates/discussion/profile-thread.underscore
 msgid "anonymous"
 msgstr "anonīms"
 
@@ -2444,24 +2402,76 @@ msgstr "(Neobligāts)"
 
 #: lms/djangoapps/support/static/support/jsx/file_upload.jsx
 msgid "Remove file"
-msgstr ""
+msgstr "Noņemt failu"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Course Name"
 msgstr "Kursa nosaukums"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Not specific to a course"
-msgstr "nav par specifisku kursu"
+msgid ""
+"For inquiries regarding assignments, grades, or structure of a specific "
+"course, please post in the discussion forums for that course directly."
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "What can we help you with, {username}?"
-msgstr ""
+msgid "Not specific to a course"
+msgstr "nav par specifisku kursu"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Subject"
 msgstr "Temats"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+#: lms/templates/student_account/account_settings.underscore
+msgid "Account Settings"
+msgstr "Konta iestatījumi"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Billing/Payment Options"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Certificates"
+msgstr "Sertifikāti"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Course Content"
+msgstr "Kursa saturs"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Deadlines"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Errors/Technical Issues"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Financial Aid"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Masters"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Photo Verification"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Proctoring"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+#: cms/templates/js/asset-library.underscore
+msgid "Other"
+msgstr "Cits"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "What can we help you with, {username}?"
+msgstr "Kā mēs varam tev palīdzēt, {username}?"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
@@ -2470,11 +2480,10 @@ msgstr "Apraksts"
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "The more you tell us, the more quickly and helpfully we can respond!"
 msgstr ""
+"Sniedz mums detalizētu problēmas aprakstu, lai mums būs vieglāk Tev "
+"palīdzēt. "
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-response.underscore
-#: common/static/common/templates/discussion/thread.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Submit"
 msgstr "Iesniegt"
@@ -2497,8 +2506,8 @@ msgstr ""
 "par specifisku kursu\"."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Enter a subject for your support request."
-msgstr "Ievadiet atbalsta pieprasījuma tēmu."
+msgid "Select a subject for your support request."
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
@@ -2507,7 +2516,7 @@ msgstr "Ievadiet aprakstu atbalsta pieprasījumam."
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid "Contact Us"
-msgstr "Sazināties ar mums"
+msgstr "Sazinies ar mums"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Find answers to the top questions asked by learners."
@@ -2515,7 +2524,7 @@ msgstr "Atrodiet atbildes dalībnieku biežāk uzdotajiem jautājumiem."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Search the {platform} Help Center"
-msgstr ""
+msgstr "Meklēt {platform} sadaļā \"Palīdzība\""
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid "Go to my Dashboard"
@@ -2529,6 +2538,8 @@ msgstr "Iet uz {platform} galveno lapu"
 msgid ""
 "Thank you for submitting a request! We will contact you within 24 hours."
 msgstr ""
+"Paldies, ka iesniedzāt pieprasījumu! Mēs ar Jums sazināsimies 24 stundu "
+"laikā. "
 
 #: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
 msgid "Cancel upload"
@@ -3244,7 +3255,6 @@ msgid "There has been an error processing your survey."
 msgstr "Notika kļūda, apstrādājot Jūsu aptauju."
 
 #: lms/static/js/courseware/credit_progress.js
-#: common/static/common/templates/discussion/forum-actions.underscore
 #: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
 msgid "More"
@@ -3261,7 +3271,6 @@ msgid "HTML preview of post"
 msgstr "Ziņas HTML priekšskatījums"
 
 #: lms/static/js/customwmd.js
-#: common/static/common/templates/discussion/new-post.underscore
 msgid "Your question or idea (required)"
 msgstr "Jūsu jautājums vai ideja (nepieciešams)"
 
@@ -4565,7 +4574,7 @@ msgstr "Jauna parole"
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Confirm Password"
-msgstr ""
+msgstr "Apstiprināt paroli"
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Passwords do not match."
@@ -4573,7 +4582,7 @@ msgstr ""
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Reset My Password"
-msgstr ""
+msgstr "Atiestatīt manu paroli"
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -4689,7 +4698,7 @@ msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Yes, Delete"
-msgstr ""
+msgstr "Jā, izdzēst"
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "We're sorry to see you go! Your account will be deleted shortly."
@@ -4754,9 +4763,9 @@ msgid ""
 "address is associated with your {platform_name} account, we will send a "
 "message with password recovery instructions to this email "
 "address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
-" message, verify that you entered the correct email address, or check your "
-"spam folder.{paragraphEnd}{paragraphStart}If you need further assistance, "
-"{anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
+" message after 1 minute, verify that you entered the correct email address, "
+"or check your spam folder.{paragraphEnd}{paragraphStart}If you need further "
+"assistance, {anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
 msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
@@ -5326,14 +5335,15 @@ msgstr "Jūs esat veiksmīgi jauninājuši Jūsu mērķi."
 msgid "There was an error updating your goal."
 msgstr "Notika kļūda, jauninot Jūsu mērķi."
 
+#: openedx/features/course_experience/static/course_experience/js/CourseOutline.js
 #: lms/templates/ccx/schedule.underscore
 msgid "Expand All"
-msgstr "Izvērst visu"
+msgstr "Izvērst saturu"
 
 #: openedx/features/course_experience/static/course_experience/js/CourseOutline.js
 #: lms/templates/ccx/schedule.underscore
 msgid "Collapse All"
-msgstr ""
+msgstr "Sakļaut saturu"
 
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
@@ -5546,7 +5556,6 @@ msgstr ""
 
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
-#: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Staff"
 msgstr "Personāls"
 
@@ -6502,7 +6511,7 @@ msgid "Upload your video thumbnail image."
 msgstr ""
 
 #: cms/static/js/views/show_textbook.js
-msgid "Delete “<%= name %>”?"
+msgid "Delete “<%- name %>”?"
 msgstr ""
 
 #: cms/static/js/views/show_textbook.js
@@ -6603,6 +6612,7 @@ msgid "subsection"
 msgstr "apakšiedaļa"
 
 #: cms/static/js/views/utils/xblock_utils.js
+#: cms/templates/js/container-access.underscore
 msgid "unit"
 msgstr "aktivitāte"
 
@@ -6892,7 +6902,6 @@ msgstr "Datums"
 
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
-#: common/static/common/templates/discussion/pagination.underscore
 msgid "Previous"
 msgstr "Iepriekšējais"
 
@@ -6939,302 +6948,6 @@ msgstr "Notīrīt meklēšanu"
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 msgid "Search"
 msgstr "Meklēt"
-
-#: common/static/common/templates/discussion/forum-action-answer.underscore
-msgid "Mark as Answer"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-answer.underscore
-msgid "Unmark as Answer"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-close.underscore
-msgid "Open"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-endorse.underscore
-msgid "Endorse"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-endorse.underscore
-msgid "Unendorse"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-follow.underscore
-msgid "Follow"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-follow.underscore
-msgid "Unfollow"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-pin.underscore
-msgid "Pin"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-pin.underscore
-msgid "Unpin"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-report.underscore
-msgid "Report abuse"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-report.underscore
-msgid "Report"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-report.underscore
-msgid "Unreport"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-vote.underscore
-msgid "Vote for this post,"
-msgstr ""
-
-#: common/static/common/templates/discussion/nav-load-more-link.underscore
-msgid "Load more"
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post-alert.underscore
-msgid "Error posting your message."
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post-visibility.underscore
-#, python-format
-msgid "This post will be visible only to %(group_name)s."
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post-visibility.underscore
-msgid "This post will be visible to everyone."
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "Add a Post"
-msgstr "Pievienot ziņu"
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "Visible to"
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid ""
-"Discussion admins, moderators, and TAs can make their posts visible to all "
-"students or specify a single group."
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "All Groups"
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid ""
-"Add a clear and descriptive title to encourage participation. (Required)"
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "follow this post"
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "post anonymously"
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "post anonymously to classmates"
-msgstr ""
-
-#: common/static/common/templates/discussion/post-user-display.underscore
-msgid "(Community TA)"
-msgstr ""
-
-#: common/static/common/templates/discussion/post-user-display.underscore
-msgid "(Staff)"
-msgstr ""
-
-#: common/static/common/templates/discussion/profile-thread.underscore
-#: common/static/common/templates/discussion/thread.underscore
-msgid "This thread is closed."
-msgstr ""
-
-#: common/static/common/templates/discussion/profile-thread.underscore
-msgid "View discussion"
-msgstr "Skatīt diskusiju"
-
-#: common/static/common/templates/discussion/response-comment-edit.underscore
-msgid "Editing comment"
-msgstr ""
-
-#: common/static/common/templates/discussion/response-comment-edit.underscore
-msgid "Update comment"
-msgstr ""
-
-#: common/static/common/templates/discussion/response-comment-show.underscore
-#, python-format
-msgid "posted %(time_ago)s by %(author)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/response-comment-show.underscore
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#: common/static/common/templates/discussion/thread-show.underscore
-msgid "Reported"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Editing post"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Edit your post below."
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Update post"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "discussion"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "answered question"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "unanswered question"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-#: common/static/common/templates/discussion/thread-show.underscore
-msgid "Pinned"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "Following"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "Community TA"
-msgstr "Kopienas TA"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "{unread_comments_count} new"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-#, python-format
-msgid ""
-"%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
-"unread comments)%(span_close)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-#, python-format
-msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-response-edit.underscore
-msgid "Editing response"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-response-edit.underscore
-msgid "Update response"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#, python-format
-msgid "marked as answer %(time_ago)s by %(user)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#, python-format
-msgid "marked as answer %(time_ago)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#, python-format
-msgid "endorsed %(time_ago)s by %(user)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#, python-format
-msgid "endorsed %(time_ago)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-response.underscore
-#, python-format
-msgid "Show Comment (%(num_comments)s)"
-msgid_plural "Show Comments (%(num_comments)s)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-
-#: common/static/common/templates/discussion/thread-response.underscore
-msgid "Add a comment"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-show.underscore
-#, python-format
-msgid "discussion posted %(time_ago)s by %(author)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-show.underscore
-#, python-format
-msgid "question posted %(time_ago)s by %(author)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-show.underscore
-msgid "Closed"
-msgstr "Aizvērts"
-
-#: common/static/common/templates/discussion/thread-show.underscore
-#, python-format
-msgid "Related to: %(courseware_title_linked)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-show.underscore
-#, python-format
-msgid "This post is visible only to %(group_name)s."
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-show.underscore
-msgid "This post is visible to everyone."
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-type.underscore
-msgid "Post type"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-type.underscore
-msgid ""
-"Questions raise issues that need answers. Discussions share ideas and start "
-"conversations. (Required)"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-type.underscore
-msgid "Question"
-msgstr "Jautājums"
-
-#: common/static/common/templates/discussion/thread-type.underscore
-msgid "Discussion"
-msgstr "Diskusija"
-
-#: common/static/common/templates/discussion/thread.underscore
-msgid "Add a Response"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread.underscore
-msgid "Add a response:"
-msgstr ""
-
-#: common/static/common/templates/discussion/topic.underscore
-msgid "Topic area"
-msgstr ""
-
-#: common/static/common/templates/discussion/topic.underscore
-msgid "Add your post to a relevant topic to help others find it. (Required)"
-msgstr ""
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Discussion Home"
@@ -7683,6 +7396,10 @@ msgstr "Verificēt tagad"
 
 #: lms/templates/courseware/proctored-exam-controls.underscore
 msgid "Mark Exam As Completed"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "You are taking \"{exam_link}\" as {exam_type}. "
 msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
@@ -8316,7 +8033,7 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Learn More"
-msgstr ""
+msgstr "Uzzināt vairāk"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Additional Professional Opportunities"
@@ -8397,10 +8114,6 @@ msgstr ""
 msgid "Switch Language Back"
 msgstr ""
 
-#: lms/templates/student_account/account_settings.underscore
-msgid "Account Settings"
-msgstr "Konta iestatījumi"
-
 #: lms/templates/student_account/account_settings_section.underscore
 msgid "An error occurred. Please reload the page."
 msgstr ""
@@ -8446,7 +8159,8 @@ msgid "Register with Institution/Campus Credentials"
 msgstr ""
 
 #: lms/templates/student_account/institution_register.underscore
-msgid "Register through edX"
+#: lms/templates/student_account/register.underscore
+msgid "Create an Account"
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
@@ -8505,17 +8219,16 @@ msgid "If you do not yet have an account, use the button below to register."
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
+msgid "Use my university info"
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
 msgid "or sign in with"
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
 #, python-format
 msgid "Sign in with %(providerName)s"
-msgstr ""
-
-#: lms/templates/student_account/login.underscore
-#: lms/templates/student_account/register.underscore
-msgid "Use my institution/campus credentials"
 msgstr ""
 
 #: lms/templates/student_account/password_reset.underscore
@@ -8550,11 +8263,11 @@ msgid "Create account using %(providerName)s."
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
-msgid "or create a new one here"
+msgid "Use my institution/campus credentials"
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
-msgid "Create an Account"
+msgid "or create a new one here"
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
@@ -9249,10 +8962,6 @@ msgstr ""
 #: cms/templates/js/asset-library.underscore
 msgid "Show All"
 msgstr ""
-
-#: cms/templates/js/asset-library.underscore
-msgid "Other"
-msgstr "Cits"
 
 #: cms/templates/js/asset-library.underscore
 msgid "You haven't added any assets to this course yet."

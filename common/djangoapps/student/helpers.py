@@ -37,6 +37,7 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.theming.helpers import get_themes
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 from student.models import (
+    CourseEnrollment,
     LinkedInAddToProfileConfiguration,
     Registration,
     UserAttribute,
@@ -119,9 +120,9 @@ def check_verify_status_by_course(user, course_enrollments):
     verification_expiring_soon = is_verification_expiring_soon(expiration_datetime)
 
     # Retrieve verification deadlines for the enrolled courses
-    enrolled_course_keys = [enrollment.course_id for enrollment in course_enrollments]
-    course_deadlines = VerificationDeadline.deadlines_for_courses(enrolled_course_keys)
-
+    course_deadlines = VerificationDeadline.deadlines_for_enrollments(
+        CourseEnrollment.enrollments_for_user(user)
+    )
     recent_verification_datetime = None
 
     for enrollment in course_enrollments:
@@ -330,14 +331,14 @@ def _get_redirect_to(request):
         mime_type, _ = mimetypes.guess_type(redirect_to, strict=False)
         if not is_safe_login_or_logout_redirect(request, redirect_to):
             log.warning(
-                u'Unsafe redirect parameter detected after login page: %(redirect_to)r',
+                u"Unsafe redirect parameter detected after login page: '%(redirect_to)s'",
                 {"redirect_to": redirect_to}
             )
             redirect_to = None
         elif 'text/html' not in header_accept:
             log.info(
-                u'Redirect to non html content %(content_type)r detected from %(user_agent)r'
-                u' after login page: %(redirect_to)r',
+                u"Redirect to non html content '%(content_type)s' detected from '%(user_agent)s'"
+                u" after login page: '%(redirect_to)s'",
                 {
                     "redirect_to": redirect_to, "content_type": header_accept,
                     "user_agent": request.META.get('HTTP_USER_AGENT', '')
@@ -346,13 +347,13 @@ def _get_redirect_to(request):
             redirect_to = None
         elif mime_type:
             log.warning(
-                u'Redirect to url path with specified filed type %(mime_type)r not allowed: %(redirect_to)r',
+                u"Redirect to url path with specified filed type '%(mime_type)s' not allowed: '%(redirect_to)s'",
                 {"redirect_to": redirect_to, "mime_type": mime_type}
             )
             redirect_to = None
         elif settings.STATIC_URL in redirect_to:
             log.warning(
-                u'Redirect to static content detected after login page: %(redirect_to)r',
+                u"Redirect to static content detected after login page: '%(redirect_to)s'",
                 {"redirect_to": redirect_to}
             )
             redirect_to = None
@@ -362,7 +363,7 @@ def _get_redirect_to(request):
             for theme in themes:
                 if theme.theme_dir_name in next_path:
                     log.warning(
-                        u'Redirect to theme content detected after login page: %(redirect_to)r',
+                        u"Redirect to theme content detected after login page: '%(redirect_to)s'",
                         {"redirect_to": redirect_to}
                     )
                     redirect_to = None
@@ -391,7 +392,7 @@ def generate_activation_email_context(user, registration):
 
 def create_or_set_user_attribute_created_on_site(user, site):
     """
-    Create or Set UserAttribute indicating the microsite site the user account was created on.
+    Create or Set UserAttribute indicating the site the user account was created on.
     User maybe created on 'courses.edx.org', or a white-label site. Due to the very high
     traffic on this table we now ignore the default site (eg. 'courses.edx.org') and
     code which comsumes this attribute should assume a 'created_on_site' which doesn't exist
@@ -573,8 +574,9 @@ def _cert_info(user, course_overview, cert_status):
             # who need to be regraded (we weren't tracking 'notpassing' at first).
             # We can add a log.warning here once we think it shouldn't happen.
             return default_info
-
-        status_dict['grade'] = text_type(max(cert_grade_percent, persisted_grade_percent))
+        grades_input = [cert_grade_percent, persisted_grade_percent]
+        max_grade = None if all(grade is None for grade in grades_input) else max(filter(lambda x: x is not None, grades_input))
+        status_dict['grade'] = text_type(max_grade)
 
     return status_dict
 

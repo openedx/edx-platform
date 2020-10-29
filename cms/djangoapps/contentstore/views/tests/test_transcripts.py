@@ -1,5 +1,7 @@
 """Tests for items views."""
 
+from __future__ import absolute_import
+
 import copy
 import json
 import tempfile
@@ -8,6 +10,7 @@ from codecs import BOM_UTF8
 from uuid import uuid4
 
 import ddt
+import six
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -21,17 +24,18 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
+from xmodule.video_module import VideoBlock
 from xmodule.video_module.transcripts_utils import (
     GetTranscriptsFromYouTubeException,
     Transcript,
     get_video_transcript_content,
-    remove_subs_from_store,
+    remove_subs_from_store
 )
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
-SRT_TRANSCRIPT_CONTENT = """0
+SRT_TRANSCRIPT_CONTENT = b"""0
 00:00:10,500 --> 00:00:13,000
 Elephant's Dream
 
@@ -83,7 +87,7 @@ class BaseTranscripts(CourseTestCase):
 
         # Add video module
         data = {
-            'parent_locator': unicode(self.course.location),
+            'parent_locator': six.text_type(self.course.location),
             'category': 'video',
             'type': 'video'
         }
@@ -94,7 +98,9 @@ class BaseTranscripts(CourseTestCase):
         self.item = modulestore().get_item(self.video_usage_key)
         # hI10vDNYz4M - valid Youtube ID with transcripts.
         # JMD_ifUUfsU, AKqURZnYqpk, DYpADpL7jAY - valid Youtube IDs without transcripts.
-        self.item.data = '<video youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY" />'
+        self.set_fields_from_xml(
+            self.item, '<video youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY" />'
+        )
         modulestore().update_item(self.item, self.user.id)
 
         self.item = modulestore().get_item(self.video_usage_key)
@@ -103,7 +109,7 @@ class BaseTranscripts(CourseTestCase):
 
     def _get_usage_key(self, resp):
         """ Returns the usage key from the response returned by a create operation. """
-        usage_key_string = json.loads(resp.content).get('locator')
+        usage_key_string = json.loads(resp.content.decode('utf-8')).get('locator')
         return UsageKey.from_string(usage_key_string)
 
     def get_youtube_ids(self):
@@ -122,22 +128,27 @@ class BaseTranscripts(CourseTestCase):
         Setup non video module for tests.
         """
         data = {
-            'parent_locator': unicode(self.course.location),
+            'parent_locator': six.text_type(self.course.location),
             'category': 'non_video',
             'type': 'non_video'
         }
         response = self.client.ajax_post('/xblock/', data)
         usage_key = self._get_usage_key(response)
         item = modulestore().get_item(usage_key)
-        item.data = '<non_video youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M" />'
+        self.set_fields_from_xml(self.item, '<non_video youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M" />')
         modulestore().update_item(item, self.user.id)
 
         return usage_key
 
     def assert_response(self, response, expected_status_code, expected_message):
-        response_content = json.loads(response.content)
+        response_content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response.status_code, expected_status_code)
         self.assertEqual(response_content['status'], expected_message)
+
+    def set_fields_from_xml(self, item, xml):
+        fields_data = VideoBlock.parse_video_xml(xml)
+        for key, value in fields_data.items():
+            setattr(item, key, value)
 
 
 @ddt.ddt
@@ -149,7 +160,7 @@ class TestUploadTranscripts(BaseTranscripts):
         super(TestUploadTranscripts, self).setUp()
         self.contents = {
             'good': SRT_TRANSCRIPT_CONTENT,
-            'bad': 'Some BAD data',
+            'bad': b'Some BAD data',
         }
         # Create temporary transcript files
         self.good_srt_file = self.create_transcript_file(content=self.contents['good'], suffix='.srt')
@@ -164,7 +175,7 @@ class TestUploadTranscripts(BaseTranscripts):
             'client_video_id': u'Test Video',
             'duration': 0,
             'encoded_videos': [],
-            'courses': [unicode(self.course.id)]
+            'courses': [six.text_type(self.course.id)]
         })
 
         # Add clean up handler
@@ -175,13 +186,14 @@ class TestUploadTranscripts(BaseTranscripts):
         Setup a transcript file with suffix and content.
         """
         transcript_file = tempfile.NamedTemporaryFile(suffix=suffix)
-        wrapped_content = textwrap.dedent(content)
+        wrapped_content = textwrap.dedent(content.decode('utf-8'))
         if include_bom:
             wrapped_content = wrapped_content.encode('utf-8-sig')
             # Verify that ufeff(BOM) character is in content.
             self.assertIn(BOM_UTF8, wrapped_content)
-
-        transcript_file.write(wrapped_content)
+            transcript_file.write(wrapped_content)
+        else:
+            transcript_file.write(wrapped_content.encode('utf-8'))
         transcript_file.seek(0)
 
         return transcript_file
@@ -242,7 +254,7 @@ class TestUploadTranscripts(BaseTranscripts):
         self.assert_response(response, expected_status_code=200, expected_message='Success')
 
         # Verify the `edx_video_id` on the video component
-        json_response = json.loads(response.content)
+        json_response = json.loads(response.content.decode('utf-8'))
         expected_edx_video_id = edx_video_id if edx_video_id else json_response['edx_video_id']
         video = modulestore().get_item(self.video_usage_key)
         self.assertEqual(video.edx_video_id, expected_edx_video_id)
@@ -391,7 +403,7 @@ class TestChooseTranscripts(BaseTranscripts):
             'client_video_id': u'Test Video',
             'duration': 0,
             'encoded_videos': [],
-            'courses': [unicode(self.course.id)]
+            'courses': [six.text_type(self.course.id)]
         })
 
     def choose_transcript(self, locator, chosen_html5_id):
@@ -400,7 +412,7 @@ class TestChooseTranscripts(BaseTranscripts):
         """
         payload = {}
         if locator:
-            payload.update({'locator': unicode(locator)})
+            payload.update({'locator': six.text_type(locator)})
 
         if chosen_html5_id:
             payload.update({'html5_id': chosen_html5_id})
@@ -430,7 +442,7 @@ class TestChooseTranscripts(BaseTranscripts):
         self.assert_response(response, expected_status_code=200, expected_message='Success')
 
         # Verify the `edx_video_id` on the video component
-        json_response = json.loads(response.content)
+        json_response = json.loads(response.content.decode('utf-8'))
         expected_edx_video_id = edx_video_id if edx_video_id else json_response['edx_video_id']
         video = modulestore().get_item(self.video_usage_key)
         self.assertEqual(video.edx_video_id, expected_edx_video_id)
@@ -511,7 +523,7 @@ class TestRenameTranscripts(BaseTranscripts):
             'client_video_id': u'Test Video',
             'duration': 0,
             'encoded_videos': [],
-            'courses': [unicode(self.course.id)]
+            'courses': [six.text_type(self.course.id)]
         })
 
     def rename_transcript(self, locator):
@@ -520,7 +532,7 @@ class TestRenameTranscripts(BaseTranscripts):
         """
         payload = {}
         if locator:
-            payload.update({'locator': unicode(locator)})
+            payload.update({'locator': six.text_type(locator)})
 
         rename_transcript_url = reverse('rename_transcripts')
         response = self.client.get(rename_transcript_url, {'data': json.dumps(payload)})
@@ -547,7 +559,7 @@ class TestRenameTranscripts(BaseTranscripts):
         self.assert_response(response, expected_status_code=200, expected_message='Success')
 
         # Verify the `edx_video_id` on the video component
-        json_response = json.loads(response.content)
+        json_response = json.loads(response.content.decode('utf-8'))
         expected_edx_video_id = edx_video_id if edx_video_id else json_response['edx_video_id']
         video = modulestore().get_item(self.video_usage_key)
         self.assertEqual(video.edx_video_id, expected_edx_video_id)
@@ -629,7 +641,7 @@ class TestReplaceTranscripts(BaseTranscripts):
             'client_video_id': u'Test Video',
             'duration': 0,
             'encoded_videos': [],
-            'courses': [unicode(self.course.id)]
+            'courses': [six.text_type(self.course.id)]
         })
 
     def replace_transcript(self, locator, youtube_id):
@@ -638,7 +650,7 @@ class TestReplaceTranscripts(BaseTranscripts):
         """
         payload = {}
         if locator:
-            payload.update({'locator': unicode(locator)})
+            payload.update({'locator': six.text_type(locator)})
 
         if youtube_id:
             payload.update({
@@ -675,7 +687,7 @@ class TestReplaceTranscripts(BaseTranscripts):
         self.assert_response(response, expected_status_code=200, expected_message='Success')
 
         # Verify the `edx_video_id` on the video component
-        json_response = json.loads(response.content)
+        json_response = json.loads(response.content.decode('utf-8'))
         expected_edx_video_id = edx_video_id if edx_video_id else json_response['edx_video_id']
         video = modulestore().get_item(self.video_usage_key)
         self.assertEqual(video.edx_video_id, expected_edx_video_id)
@@ -767,7 +779,7 @@ class TestDownloadTranscripts(BaseTranscripts):
         """
         payload = {}
         if locator:
-            payload.update({'locator': unicode(locator)})
+            payload.update({'locator': six.text_type(locator)})
 
         download_transcript_url = reverse('download_transcripts')
         response = self.client.get(download_transcript_url, payload)
@@ -836,7 +848,7 @@ class TestCheckTranscripts(BaseTranscripts):
     """
     def test_success_download_nonyoutube(self):
         subs_id = str(uuid4())
-        self.item.data = textwrap.dedent(u"""
+        self.set_fields_from_xml(self.item, u"""
             <video youtube="" sub="{}">
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
@@ -857,7 +869,7 @@ class TestCheckTranscripts(BaseTranscripts):
         self.save_subs_to_store(subs, subs_id)
 
         data = {
-            'locator': unicode(self.video_usage_key),
+            'locator': six.text_type(self.video_usage_key),
             'videos': [{
                 'type': 'html5',
                 'video': subs_id,
@@ -868,16 +880,16 @@ class TestCheckTranscripts(BaseTranscripts):
         resp = self.client.get(link, {'data': json.dumps(data)})
         self.assertEqual(resp.status_code, 200)
         self.assertDictEqual(
-            json.loads(resp.content),
+            json.loads(resp.content.decode('utf-8')),
             {
                 u'status': u'Success',
                 u'youtube_local': False,
                 u'is_youtube_mode': False,
                 u'youtube_server': False,
                 u'command': u'found',
-                u'current_item_subs': unicode(subs_id),
+                u'current_item_subs': six.text_type(subs_id),
                 u'youtube_diff': True,
-                u'html5_local': [unicode(subs_id)],
+                u'html5_local': [six.text_type(subs_id)],
                 u'html5_equal': False,
             }
         )
@@ -885,7 +897,7 @@ class TestCheckTranscripts(BaseTranscripts):
         remove_subs_from_store(subs_id, self.item)
 
     def test_check_youtube(self):
-        self.item.data = '<video youtube="1:JMD_ifUUfsU" />'
+        self.set_fields_from_xml(self.item, '<video youtube="1:JMD_ifUUfsU" />')
         modulestore().update_item(self.item, self.user.id)
 
         subs = {
@@ -900,7 +912,7 @@ class TestCheckTranscripts(BaseTranscripts):
         self.save_subs_to_store(subs, 'JMD_ifUUfsU')
         link = reverse('check_transcripts')
         data = {
-            'locator': unicode(self.video_usage_key),
+            'locator': six.text_type(self.video_usage_key),
             'videos': [{
                 'type': 'youtube',
                 'video': 'JMD_ifUUfsU',
@@ -912,7 +924,7 @@ class TestCheckTranscripts(BaseTranscripts):
 
         self.assertEqual(resp.status_code, 200)
         self.assertDictEqual(
-            json.loads(resp.content),
+            json.loads(resp.content.decode('utf-8')),
             {
                 u'status': u'Success',
                 u'youtube_local': True,
@@ -931,7 +943,7 @@ class TestCheckTranscripts(BaseTranscripts):
         """
         Test that the transcripts are fetched correctly when the the transcript name is set
         """
-        self.item.data = '<video youtube="good_id_2" />'
+        self.set_fields_from_xml(self.item, '<video youtube="good_id_2" />')
         modulestore().update_item(self.item, self.user.id)
 
         subs = {
@@ -946,7 +958,7 @@ class TestCheckTranscripts(BaseTranscripts):
         self.save_subs_to_store(subs, 'good_id_2')
         link = reverse('check_transcripts')
         data = {
-            'locator': unicode(self.video_usage_key),
+            'locator': six.text_type(self.video_usage_key),
             'videos': [{
                 'type': 'youtube',
                 'video': 'good_id_2',
@@ -963,7 +975,7 @@ class TestCheckTranscripts(BaseTranscripts):
         self.assertEqual(resp.status_code, 200)
 
         self.assertDictEqual(
-            json.loads(resp.content),
+            json.loads(resp.content.decode('utf-8')),
             {
                 u'status': u'Success',
                 u'youtube_local': True,
@@ -989,7 +1001,7 @@ class TestCheckTranscripts(BaseTranscripts):
         }
         resp = self.client.get(link, {'data': json.dumps(data)})
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(json.loads(resp.content).get('status'), "Can't find item by locator.")
+        self.assertEqual(json.loads(resp.content.decode('utf-8')).get('status'), "Can't find item by locator.")
 
     def test_fail_data_with_bad_locator(self):
         # Test for raising `InvalidLocationError` exception.
@@ -1004,7 +1016,7 @@ class TestCheckTranscripts(BaseTranscripts):
         }
         resp = self.client.get(link, {'data': json.dumps(data)})
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(json.loads(resp.content).get('status'), "Can't find item by locator.")
+        self.assertEqual(json.loads(resp.content.decode('utf-8')).get('status'), "Can't find item by locator.")
 
         # Test for raising `ItemNotFoundError` exception.
         data = {
@@ -1017,12 +1029,12 @@ class TestCheckTranscripts(BaseTranscripts):
         }
         resp = self.client.get(link, {'data': json.dumps(data)})
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(json.loads(resp.content).get('status'), "Can't find item by locator.")
+        self.assertEqual(json.loads(resp.content.decode('utf-8')).get('status'), "Can't find item by locator.")
 
     def test_fail_for_non_video_module(self):
         # Not video module: setup
         data = {
-            'parent_locator': unicode(self.course.location),
+            'parent_locator': six.text_type(self.course.location),
             'category': 'not_video',
             'type': 'not_video'
         }
@@ -1030,13 +1042,13 @@ class TestCheckTranscripts(BaseTranscripts):
         usage_key = self._get_usage_key(resp)
         subs_id = str(uuid4())
         item = modulestore().get_item(usage_key)
-        item.data = textwrap.dedent(u"""
+        self.set_fields_from_xml(self.item, (u"""
             <not_video youtube="" sub="{}">
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
-            </videoalpha>
-        """.format(subs_id))
+            </not_video>
+        """.format(subs_id)))
         modulestore().update_item(item, self.user.id)
 
         subs = {
@@ -1051,7 +1063,7 @@ class TestCheckTranscripts(BaseTranscripts):
         self.save_subs_to_store(subs, subs_id)
 
         data = {
-            'locator': unicode(usage_key),
+            'locator': six.text_type(usage_key),
             'videos': [{
                 'type': '',
                 'video': '',
@@ -1061,7 +1073,10 @@ class TestCheckTranscripts(BaseTranscripts):
         link = reverse('check_transcripts')
         resp = self.client.get(link, {'data': json.dumps(data)})
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(json.loads(resp.content).get('status'), 'Transcripts are supported only for "video" modules.')
+        self.assertEqual(
+            json.loads(resp.content.decode('utf-8')).get('status'),
+            'Transcripts are supported only for "video" modules.',
+        )
 
     @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content')
     def test_command_for_fallback_transcript(self, mock_get_video_transcript_content):
@@ -1078,18 +1093,18 @@ class TestCheckTranscripts(BaseTranscripts):
         }
 
         # video_transcript_feature.return_value = feature_enabled
-        self.item.data = textwrap.dedent("""
+        self.set_fields_from_xml(self.item, (u"""
             <video youtube="" sub="" edx_video_id="123">
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
             </video>
-        """)
+        """))
         modulestore().update_item(self.item, self.user.id)
 
         # Make request to check transcript view
         data = {
-            'locator': unicode(self.video_usage_key),
+            'locator': six.text_type(self.video_usage_key),
             'videos': [{
                 'type': 'html5',
                 'video': "",
@@ -1102,7 +1117,7 @@ class TestCheckTranscripts(BaseTranscripts):
         # Assert the response
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(
-            json.loads(response.content),
+            json.loads(response.content.decode('utf-8')),
             {
                 u'status': u'Success',
                 u'youtube_local': False,

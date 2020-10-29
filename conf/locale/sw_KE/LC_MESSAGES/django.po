@@ -41,6 +41,7 @@
 # JOHN MASANDA <translations_6@camara.ie>, 2017
 # Mathieu Lacasse <mathieulacasse@camara.org>, 2017,2019
 # Mikias Ephrem <mikiasephrem@camara.org>, 2019
+# Muhammad Adeel Khan <adeel@edx.org>, 2019
 # Nasry Uronu <translations_4@camara.ie>, 2017
 # Said Mlima <saidmohamedmlima@camara.ie>, 2017
 # swaleh amin <mkupuofirstnameswaleh@yahoo.com>, 2016
@@ -57,6 +58,7 @@
 # Isihaka Issa <translations_8@camara.ie>, 2017
 # JOHN MASANDA <translations_6@camara.ie>, 2017
 # Mathieu Lacasse <mathieulacasse@camara.org>, 2017
+# Muhammad Adeel Khan <adeel@edx.org>, 2019
 # Nasry Uronu <translations_4@camara.ie>, 2017
 # swaleh amin <mkupuofirstnameswaleh@yahoo.com>, 2016
 # swalehe manture <translations_3@camara.ie>, 2017
@@ -83,7 +85,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-04-22 10:50+0000\n"
+"POT-Creation-Date: 2019-09-15 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Swahili (Kenya) (https://www.transifex.com/open-edx/teams/6205/sw_KE/)\n"
@@ -135,6 +137,7 @@ msgid "Subsection"
 msgstr "Kifungu kidogo"
 
 #: cms/djangoapps/contentstore/views/helpers.py
+#: common/lib/xmodule/xmodule/unit_block.py
 #: lms/djangoapps/instructor/views/tools.py lms/templates/ccx/schedule.html
 msgid "Unit"
 msgstr "Kitengo"
@@ -172,7 +175,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
+#: lms/djangoapps/instructor/views/api.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/shoppingcart/billing_details.html
@@ -295,6 +298,7 @@ msgstr "Mtaalamu wa Elimu"
 #: common/lib/xmodule/xmodule/library_content_module.py
 #: common/lib/xmodule/xmodule/lti_module.py
 #: common/lib/xmodule/xmodule/split_test_module.py
+#: common/lib/xmodule/xmodule/unit_block.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: common/lib/xmodule/xmodule/x_module.py
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
@@ -407,28 +411,6 @@ msgstr "Kiasi batili kimechaguliwa."
 msgid "No selected price or selected price is too low."
 msgstr "Hakuna bei iliyochaguliwa au bei iliyochaguliwa ni ndogo sana."
 
-#: common/djangoapps/django_comment_common/models.py
-msgid "Administrator"
-msgstr "Msimamizi/Mtawala"
-
-#: common/djangoapps/django_comment_common/models.py
-msgid "Moderator"
-msgstr "Msimamizi"
-
-#: common/djangoapps/django_comment_common/models.py
-msgid "Group Moderator"
-msgstr ""
-
-#: common/djangoapps/django_comment_common/models.py
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Community TA"
-msgstr "Jamii TA"
-
-#: common/djangoapps/django_comment_common/models.py
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Student"
-msgstr "Mwanafunzi"
-
 #: common/djangoapps/student/admin.py
 msgid "User profile"
 msgstr "Wasifu wa Mtumiaji"
@@ -490,8 +472,8 @@ msgid "A properly formatted e-mail is required"
 msgstr "Anwani ya barua pepe iliyo na mfumo sahihi inahitajika"
 
 #: common/djangoapps/student/forms.py
-msgid "Your legal name must be a minimum of two characters long"
-msgstr "Jina lako halali kwa uchache liwe na urefu wa herufi mbili "
+msgid "Your legal name must be a minimum of one character long"
+msgstr ""
 
 #: common/djangoapps/student/forms.py
 #, python-format
@@ -882,11 +864,11 @@ msgstr "Kozi unayoitafuta  usajili umefungwa  tangu {date}."
 
 #: common/djangoapps/student/views/management.py
 msgid "No inactive user with this e-mail exists"
-msgstr "Hakuna mtumiaji asiye hai mwenye hii \"barua pepe\" anayeonekana"
+msgstr ""
 
 #: common/djangoapps/student/views/management.py
 msgid "Unable to send reactivation email"
-msgstr "Imeshindikana kutuma \"barua pepe\" ya kuwezesha tena"
+msgstr ""
 
 #: common/djangoapps/student/views/management.py
 msgid "Course id not specified"
@@ -967,6 +949,11 @@ msgid ""
 msgstr ""
 
 #: common/djangoapps/student/views/management.py
+msgid ""
+"Your previous request is in progress, please try again in a few moments."
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
 msgid "Some error occured during password change. Please try again"
 msgstr ""
 
@@ -1031,6 +1018,12 @@ msgstr "Uthibitisho wa {} kwa sasa hivi haupatikani."
 msgid ""
 "Secondary providers are displayed less prominently, in a separate list of "
 "\"Institution\" login providers."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"optional. If this provider is an Organization, this attribute can be used "
+"reference users in that Organization"
 msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
@@ -1111,9 +1104,10 @@ msgstr ""
 msgid "The Site that this SAML configuration belongs to."
 msgstr "Tovuti ambayo inamiliki usanidi huu wa SAML."
 
-#: lms/templates/help_modal.html
+#: common/djangoapps/third_party_auth/models.py
+#, python-brace-format
 msgid "{platform_name} Support"
-msgstr "Msaada wa {platform_name} "
+msgstr ""
 
 #: common/djangoapps/third_party_auth/templates/third_party_auth/post_custom_auth_entry.html
 #: lms/templates/student_account/finish_auth.html
@@ -2161,6 +2155,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/library_content_module.py
 #: common/lib/xmodule/xmodule/library_root_xblock.py
 #: common/lib/xmodule/xmodule/poll_module.py
+#: common/lib/xmodule/xmodule/unit_block.py
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: common/lib/xmodule/xmodule/x_module.py
@@ -2392,8 +2387,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
 #: cms/templates/index.html cms/templates/videos_index_pagination.html
-#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
-#: lms/templates/register-shib.html
+#: lms/templates/manage_user_standing.html lms/templates/register-shib.html
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
@@ -2822,13 +2816,13 @@ msgstr "Upangaji Mada ya Majadiliano"
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
-"must be unique. In \"id\" values, the only special characters that are "
-"supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
+"category must be unique. In \"id\" values, the only special characters that "
+"are supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3764,7 +3758,7 @@ msgstr "Kitambulisho cha LTI "
 msgid ""
 "Enter the LTI ID for the external LTI provider.  This value must be the same"
 " LTI ID that you entered in the LTI Passports setting on the Advanced "
-"Settings page.<br />See {docs_anchor_open}the edX LTI "
+"Settings page.{break_tag}See {docs_anchor_open}the edX LTI "
 "documentation{anchor_close} for more details on this setting."
 msgstr ""
 
@@ -3776,7 +3770,7 @@ msgstr "URL ya LTI"
 #, python-brace-format
 msgid ""
 "Enter the URL of the external tool that this component launches. This "
-"setting is only used when Hide External Tool is set to False.<br />See "
+"setting is only used when Hide External Tool is set to False.{break_tag}See "
 "{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
 "on this setting."
 msgstr ""
@@ -3789,9 +3783,9 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "Add the key/value pair for any custom parameters, such as the page your "
-"e-book should open to or the background color for this component.<br />See "
-"{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
-"on this setting."
+"e-book should open to or the background color for this "
+"component.{break_tag}See {docs_anchor_open}the edX LTI "
+"documentation{anchor_close} for more details on this setting."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
@@ -4346,7 +4340,7 @@ msgstr "Nyumbani"
 #: lms/djangoapps/courseware/views/views.py
 #: lms/djangoapps/shoppingcart/reports.py
 #: openedx/features/course_experience/__init__.py
-#: cms/templates/widgets/header.html lms/templates/help_modal.html
+#: cms/templates/widgets/header.html
 #: lms/templates/courseware/course_navigation.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
@@ -4469,14 +4463,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Video Stop Time"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "The external URL to download the video."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Download Video"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
@@ -4711,8 +4697,8 @@ msgstr ""
 #: common/templates/admin/student/loginfailures/change_form_template.html
 #: lms/templates/wiki/edit.html lms/templates/wiki/history.html
 #: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
-#: lms/templates/forgot_password_modal.html lms/templates/help_modal.html
-#: lms/templates/signup_modal.html lms/templates/ccx/schedule.html
+#: lms/templates/forgot_password_modal.html lms/templates/signup_modal.html
+#: lms/templates/ccx/schedule.html
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
@@ -4978,13 +4964,13 @@ msgstr ""
 msgid "Take free online courses at edX.org"
 msgstr ""
 
-#. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
+#. Translators: 'edX' and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
 #: lms/djangoapps/branding/api.py
 #, python-brace-format
 msgid ""
-"© {org_name}.  All rights reserved except where noted.  EdX, Open edX and "
-"their respective logos are trademarks or registered trademarks of edX Inc."
+"© {org_name}.  All rights reserved except where noted.  edX, Open edX and "
+"their respective logos are registered trademarks of edX Inc."
 msgstr ""
 
 #. Translators: 'Open edX' is a brand, please keep this untranslated. See
@@ -6056,6 +6042,18 @@ msgid "To see course content, {sign_in_link} or {register_link}."
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
+#: openedx/features/course_experience/views/course_home_messages.py
+#, python-brace-format
+msgid "{sign_in_link} or {register_link}."
+msgstr ""
+
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/navbar-not-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
+msgid "Sign in"
+msgstr "Ingia mtandaoni "
+
+#: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid ""
 "You must be enrolled in the course to see course content."
@@ -6111,27 +6109,6 @@ msgid "Annual Household Income"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your current financial situation. Why do you need assistance?"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your learning or professional goals. How will a Verified "
-"Certificate in this course help you achieve these goals?"
-msgstr ""
-"Tueleze kuhusu mafunzo yako au malengo ya uweledi. Vipi Cheti "
-"Kilichothibitishwa katika kozi hii kitakusaidia kufikia malengo haya?"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your plans for this course. What steps will you take to help "
-"you complete the course work and receive a certificate?"
-msgstr ""
-"Tueleze kuhusu mipango yako kwa kozi hii. Hatua gani utachukua zikusaidie "
-"kukamilisha mazoezi ya kozi na upokee cheti? "
-
-#: lms/djangoapps/courseware/views/views.py
 msgid "Use between 250 and 500 words or so in your response."
 msgstr ""
 
@@ -6165,7 +6142,7 @@ msgstr ""
 #: lms/djangoapps/dashboard/git_import.py
 msgid ""
 "Non usable git url provided. Expecting something like: "
-"git@github.com:mitocw/edx4edx_lite.git"
+"git@github.com:edx/edx4edx_lite.git"
 msgstr ""
 
 #: lms/djangoapps/dashboard/git_import.py
@@ -6346,6 +6323,31 @@ msgstr "jukumu"
 msgid "full_name"
 msgstr "jina_kamili"
 
+#: lms/djangoapps/discussion/django_comment_client/base/views.py
+msgid "Title can't be empty"
+msgstr "Kichwa hakiwezi kuachwa wazi"
+
+#: lms/djangoapps/discussion/django_comment_client/base/views.py
+msgid "Body can't be empty"
+msgstr ""
+
+#: lms/djangoapps/discussion/django_comment_client/base/views.py
+msgid "Topic doesn't exist"
+msgstr "Mada haipo"
+
+#: lms/djangoapps/discussion/django_comment_client/base/views.py
+msgid "Comment level too deep"
+msgstr ""
+
+#: lms/djangoapps/discussion/django_comment_client/base/views.py
+msgid ""
+"Error uploading file. Please contact the site administrator. Thank you."
+msgstr ""
+
+#: lms/djangoapps/discussion/django_comment_client/base/views.py
+msgid "Good"
+msgstr "Vizuri"
+
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
 #, python-format
@@ -6361,31 +6363,6 @@ msgstr ""
 #, python-format
 msgid "Response to %(thread_title)s"
 msgstr ""
-
-#: lms/djangoapps/django_comment_client/base/views.py
-msgid "Title can't be empty"
-msgstr "Kichwa hakiwezi kuachwa wazi"
-
-#: lms/djangoapps/django_comment_client/base/views.py
-msgid "Body can't be empty"
-msgstr ""
-
-#: lms/djangoapps/django_comment_client/base/views.py
-msgid "Topic doesn't exist"
-msgstr "Mada haipo"
-
-#: lms/djangoapps/django_comment_client/base/views.py
-msgid "Comment level too deep"
-msgstr ""
-
-#: lms/djangoapps/django_comment_client/base/views.py
-msgid ""
-"Error uploading file. Please contact the site administrator. Thank you."
-msgstr ""
-
-#: lms/djangoapps/django_comment_client/base/views.py
-msgid "Good"
-msgstr "Vizuri"
 
 #: lms/djangoapps/edxnotes/helpers.py
 msgid "EdxNotes Service is unavailable. Please try again in a few minutes."
@@ -6508,6 +6485,11 @@ msgstr ""
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "Course Staff"
 msgstr "Walimu wa Kozi"
+
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+#: openedx/core/djangoapps/django_comment_common/models.py
+msgid "Student"
+msgstr "Mwanafunzi"
 
 #: lms/templates/preview_menu.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -7292,10 +7274,6 @@ msgstr ""
 msgid "An extended due date must be later than the original due date."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/tools.py
-msgid "No due date extension is set for that student and unit."
-msgstr ""
-
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's full name.
@@ -7353,6 +7331,10 @@ msgstr ""
 
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "Not all problems in entrance exam support re-scoring."
+msgstr ""
+
+#: lms/djangoapps/instructor_task/models.py
+msgid "An error has occurred. Task was not created."
 msgstr ""
 
 #. Translators: This is a past-tense verb that is inserted into task progress
@@ -7733,9 +7715,9 @@ msgid ""
 "the block is visible_to_staff_only."
 msgstr ""
 
-#: lms/templates/notes.html
-msgid "My Notes"
-msgstr "Nukuu Zangu"
+#: lms/djangoapps/program_enrollments/models.py
+msgid "One of user or external_user_key must not be null."
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Order Payment Confirmation"
@@ -8539,6 +8521,15 @@ msgstr ""
 msgid "View feature based enrollment settings"
 msgstr ""
 
+#: lms/djangoapps/support/views/index.py
+#: lms/templates/support/link_program_enrollments.html
+msgid "Link Program Enrollments"
+msgstr ""
+
+#: lms/djangoapps/support/views/index.py
+msgid "Link LMS users to program enrollments"
+msgstr ""
+
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
 msgstr ""
@@ -8756,8 +8747,8 @@ msgstr "Hakuna wasifu wa mtumiaji "
 
 #: lms/djangoapps/verify_student/views.py
 #, python-brace-format
-msgid "Name must be at least {min_length} characters long."
-msgstr "Jina lazima liwe japo na urefu wa herufi {min_length}."
+msgid "Name must be at least {min_length} character long."
+msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Image data is not valid."
@@ -8788,11 +8779,9 @@ msgid "Are you sure you want to cancel retirement for user \"%(username)s\"? "
 msgstr ""
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
-msgid ""
-"\n"
-"                    Welcome to %(course_name)s\n"
-"                "
+msgid "Welcome to %(course_name)s"
 msgstr ""
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
@@ -8825,11 +8814,6 @@ msgstr ""
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
 msgid "Sincerely yours, The %(course_name)s Team"
-msgstr ""
-
-#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
-#, python-format
-msgid "Welcome to %(course_name)s"
 msgstr ""
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
@@ -8872,7 +8856,9 @@ msgstr ""
 
 #: lms/templates/instructor/edx_ace/addbetatester/email/body.html
 #, python-format
-msgid "Visit %(site_name)s"
+msgid ""
+"Visit %(site_name)s\n"
+"                "
 msgstr ""
 
 #: lms/templates/instructor/edx_ace/addbetatester/email/body.html
@@ -9126,10 +9112,10 @@ msgid "You have signed out."
 msgstr "Umetoka mtandaoni."
 
 #: lms/templates/logout.html
-#, python-format
+#, python-brace-format
 msgid ""
-"If you are not redirected within 5 seconds, <a href=\"%(target)s\">click "
-"here to go to the home page</a>."
+"If you are not redirected within 5 seconds, {start_anchor}click here to go "
+"to the home page{end_anchor}."
 msgstr ""
 
 #: lms/templates/main_django.html cms/templates/base.html
@@ -9190,8 +9176,9 @@ msgid "Hello %(full_name)s,"
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
-msgid "Your %(platform_name)s ID verification has expired.\" "
+msgid "Your %(platform_name)s ID verification has expired. "
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
@@ -9240,11 +9227,6 @@ msgstr ""
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
 msgid "Hello %(full_name)s, "
-msgstr ""
-
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
-#, python-format
-msgid "Your %(platform_name)s ID verification has expired. "
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/subject.txt
@@ -9424,11 +9406,10 @@ msgid "Create new merged version"
 msgstr "Buni toleo jipya "
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
-#: wiki/templates/wiki/includes/anonymous_blocked.html
-#, python-format
+#, python-brace-format
 msgid ""
-"You need to <a href=\"%(login_url)s\">log in</a> or <a "
-"href=\"%(signup_url)s\">sign up</a> to use this function."
+"You need to {anchor_start_login}log in{anchor_end} or "
+"{anchor_start_signup}sign up{anchor_end} to use this function."
 msgstr ""
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
@@ -9444,9 +9425,11 @@ msgid "Wiki Syntax Help"
 msgstr ""
 
 #: lms/templates/wiki/includes/cheatsheet.html
+#, python-brace-format
 msgid ""
-"This wiki uses <strong>Markdown</strong> for styling. There are several "
-"useful guides online. See any of the links below for in-depth details:"
+"This wiki uses {start_strong}Markdown{end_strong} for styling. There are "
+"several useful guides online. See any of the links below for in-depth "
+"details:"
 msgstr ""
 
 #: lms/templates/wiki/includes/cheatsheet.html
@@ -9808,15 +9791,6 @@ msgstr "URL ya tovuti ihusianayo na mtumiaji wa API hii. "
 msgid "The reason this user wants to access the API."
 msgstr "Sababu ya 'mtumiaji' kuhitaji kutumia API."
 
-#: openedx/core/djangoapps/api_admin/models.py
-#, python-brace-format
-msgid "API access request from {company}"
-msgstr "Ombi la kutumia API kutoka kwa {company} "
-
-#: openedx/core/djangoapps/api_admin/models.py
-msgid "API access request"
-msgstr "Ombi la kutumia API"
-
 #: openedx/core/djangoapps/api_admin/widgets.py
 #, python-brace-format
 msgid ""
@@ -9954,6 +9928,18 @@ msgstr ""
 
 #: openedx/core/djangoapps/config_model_utils/models.py
 msgid "Configuration may not be specified at more than one level at once."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Administer users and author content"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Author content"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Read-only"
 msgstr ""
 
 #: openedx/core/djangoapps/cors_csrf/models.py
@@ -10152,6 +10138,23 @@ msgstr ""
 msgid "This is a test error"
 msgstr ""
 
+#: openedx/core/djangoapps/django_comment_common/models.py
+msgid "Administrator"
+msgstr "Msimamizi/Mtawala"
+
+#: openedx/core/djangoapps/django_comment_common/models.py
+msgid "Moderator"
+msgstr "Msimamizi"
+
+#: openedx/core/djangoapps/django_comment_common/models.py
+msgid "Group Moderator"
+msgstr ""
+
+#: openedx/core/djangoapps/django_comment_common/models.py
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Community TA"
+msgstr "Jamii TA"
+
 #: openedx/core/djangoapps/embargo/forms.py
 #: openedx/core/djangoapps/verified_track_content/forms.py
 msgid "COURSE NOT FOUND.  Please check that the course ID is valid."
@@ -10348,10 +10351,10 @@ msgid "Welcome to week %(week_num)s of %(course_name)s!"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
-"We hope you're enjoying <strong>%(course_name)s</strong>! We want to let you"
-" know what you can look forward to in week %(week_num)s:"
+"We hope you're enjoying {start_strong}%(course_name)s{end_strong}! We want "
+"to let you know what you can look forward to in week %(week_num)s:"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
@@ -10402,11 +10405,11 @@ msgid "Keep up the momentum!"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
-"Many %(platform_name)s learners in <strong>%(course_name)s</strong> are "
-"completing more problems every week, and participating in the discussion "
-"forums. What do you want to do to keep learning?"
+"Many %(platform_name)s learners in {start_strong}%(course_name)s{end_strong}"
+" are completing more problems every week, and participating in the "
+"discussion forums. What do you want to do to keep learning?"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
@@ -10436,17 +10439,17 @@ msgid "Keep learning today"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
-"Remember when you enrolled in <strong>%(course_name)s</strong>, and other "
-"courses on %(platform_name)s? We do, and we’re glad to have you! Come see "
-"what everyone is learning."
+"Remember when you enrolled in {start_strong}%(course_name)s{end_strong}, and"
+" other courses on %(platform_name)s? We do, and we’re glad to have you! Come"
+" see what everyone is learning."
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
-"Remember when you enrolled in <strong>%(course_name)s</strong> on "
+"Remember when you enrolled in {start_strong}%(course_name)s{end_strong} on "
 "%(platform_name)s? We do, and we’re glad to have you! Come see what everyone"
 " is learning."
 msgstr ""
@@ -10492,26 +10495,28 @@ msgid "Upgrade now"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
 "We hope you are enjoying learning with us so far on "
-"<strong>%(platform_name)s</strong>! A verified certificate allows you to "
-"highlight your new knowledge and skills. An %(platform_name)s certificate is"
-" official and easily shareable."
+"{start_strong}%(platform_name)s{end_strong}! A verified certificate allows "
+"you to highlight your new knowledge and skills. An %(platform_name)s "
+"certificate is official and easily shareable."
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
 "We hope you are enjoying learning with us so far in "
-"<strong>%(first_course_name)s</strong>! A verified certificate allows you to"
-" highlight your new knowledge and skills. An %(platform_name)s certificate "
-"is official and easily shareable."
+"{start_strong}%(first_course_name)s{end_strong}! A verified certificate "
+"allows you to highlight your new knowledge and skills. An %(platform_name)s "
+"certificate is official and easily shareable."
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
-#, python-format
-msgid "Upgrade by <strong>%(user_schedule_upgrade_deadline_time)s</strong>."
+#, python-format, python-brace-format
+msgid ""
+"Upgrade by "
+"{start_strong}%(user_schedule_upgrade_deadline_time)s{end_strong}."
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
@@ -10717,8 +10722,11 @@ msgid "Specialty"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/utils.py
+#, python-brace-format
 msgid ""
-" Make sure that you are providing a valid username or a URL that contains \""
+"Make sure that you are providing a valid username or a URL that contains "
+"\"{url_stub}\". To remove the link from your edX profile, leave this field "
+"blank."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/views.py
@@ -10770,10 +10778,6 @@ msgstr "jina la mtumiaji@domain.com"
 #, python-brace-format
 msgid "The email address you used to register with {platform_name}"
 msgstr "Anwani ya barua pepe uliyotumia kujisajili na{platform_name}"
-
-#: openedx/core/djangoapps/user_api/api.py lms/templates/login.html
-msgid "Remember me"
-msgstr "Nikumbuke"
 
 #. Translators: These instructions appear on the registration form,
 #. immediately
@@ -10861,11 +10865,11 @@ msgstr "Lazima ukubaliane na {platform_name} {terms_of_service}."
 #: openedx/core/djangoapps/user_api/api.py
 #, python-brace-format
 msgid ""
-"By creating an account with {platform_name}, you agree                   to "
-"abide by our {platform_name}                   "
+"By creating an account, you agree to the                   "
 "{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
-"                   and agree to our {privacy_policy_link_start}Privacy "
-"Policy{privacy_policy_link_end}."
+"                   and you acknowledge that {platform_name} and each Member "
+"process your personal data in accordance                   with the "
+"{privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
 msgstr ""
 
 #. Translators: "Terms of service" is a legal document users must agree to
@@ -11310,16 +11314,17 @@ msgstr "Ukimilishaji"
 msgid "Reviews"
 msgstr "Mapitio"
 
+#: openedx/features/course_experience/utils.py
+#, no-python-format, python-brace-format
+msgid ""
+"{banner_open}{percentage}% off your first upgrade.{span_close} Discount "
+"automatically applied.{div_close}"
+msgstr ""
+
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
 msgid "{sign_in_link} or {register_link} and then enroll in this course."
 msgstr ""
-
-#: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
-msgid "Sign in"
-msgstr "Ingia mtandaoni "
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
@@ -11358,6 +11363,36 @@ msgstr ""
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
 msgid "Set goal to: {goal_text}"
+msgstr ""
+
+#: openedx/features/discounts/admin.py
+msgid ""
+"These define the context to disable lms-controlled discounts on. If no "
+"values are set, then the configuration applies globally. If a single value "
+"is set, then the configuration applies to all courses within that context. "
+"At most one value can be set at a time.<br>If multiple contexts apply to a "
+"course (for example, if configuration is specified for the course "
+"specifically, and for the org that the course is in, then the more specific "
+"context overrides the more general context."
+msgstr ""
+
+#: openedx/features/discounts/admin.py
+msgid ""
+"If any of these values is left empty or \"Unknown\", then their value at "
+"runtime will be retrieved from the next most specific context that applies. "
+"For example, if \"Disabled\" is left as \"Unknown\" in the course context, "
+"then that course will be Disabled only if the org that it is in is Disabled."
+msgstr ""
+
+#: openedx/features/discounts/models.py
+msgid "Disabled"
+msgstr ""
+
+#: openedx/features/discounts/utils.py
+#, python-brace-format
+msgid ""
+"{s_sr}Original price: {s_op}{original_price}{e_p}, discount price: "
+"{e_sr}{formatted_discount_price}"
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py
@@ -11471,10 +11506,8 @@ msgstr ""
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "Non writable git url provided. Expecting something like: "
-"git@github.com:mitocw/edx4edx_lite.git"
+"git@github.com:edx/edx4edx_lite.git"
 msgstr ""
-"KIRASA kilichotolewa cha Git isiyo andikika. Kutarajia kitu kama: "
-"git@github.com:mitocw/edx4edx_lite.git"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
@@ -12230,10 +12263,9 @@ msgid "Required Information to Sign In to {studio_name}"
 msgstr "Taarifa inayohitajika kuingia kwenye {studio_name}"
 
 #: cms/templates/login.html cms/templates/register.html
-#: lms/templates/help_modal.html lms/templates/login.html
-#: lms/templates/provider_login.html lms/templates/register-form.html
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: themes/red-theme/cms/templates/login.html
+#: lms/templates/login.html lms/templates/provider_login.html
+#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/signup_modal.html themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "E-mail"
@@ -12285,8 +12317,7 @@ msgstr "Wakufunzi"
 msgid "Requirements"
 msgstr "Yanayohitajika"
 
-#: cms/templates/studio_xblock_wrapper.html lms/templates/help_modal.html
-#: lms/templates/module-error.html
+#: cms/templates/studio_xblock_wrapper.html lms/templates/module-error.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Details"
 msgstr "Utondoti"
@@ -12323,6 +12354,15 @@ msgstr "Tegesha upya"
 #: themes/red-theme/lms/templates/footer.html
 msgid "Legal"
 msgstr "Halali"
+
+#. Translators: 'edX' and 'Open edX' are trademarks of 'edX Inc.'. Please do
+#. not translate any of these trademarks and company names.
+#: cms/templates/widgets/footer.html
+#: themes/red-theme/lms/templates/footer.html
+msgid ""
+"edX, Open edX, and the edX and Open edX logos are registered trademarks of "
+"{link_start}edX Inc.{link_end}"
+msgstr ""
 
 #: cms/templates/widgets/header.html lms/templates/header/header.html
 #: lms/templates/navigation/navigation.html
@@ -12548,8 +12588,6 @@ msgid "You do not have access to this dependency module."
 msgstr "Huna ruhusa kwenye module hii tegemezi"
 
 #: lms/templates/course.html
-#: openedx/features/journals/templates/journals/bundle_card.html
-#: openedx/features/journals/templates/journals/journal_card.html
 msgid "LEARN MORE"
 msgstr "JIFUNZE ZAIDI"
 
@@ -12570,6 +12608,14 @@ msgstr "Angalia Kozi zote"
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Dashboard"
 msgstr "Dashibodi"
+
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+msgid "results successfully populated,"
+msgstr ""
+
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+msgid "Click to load all enrolled courses"
+msgstr ""
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "You are not enrolled in any courses yet."
@@ -12712,6 +12758,10 @@ msgstr "Tafuta na ondoa kasoro:"
 msgid "External Authentication failed"
 msgstr "Uthibitisho wa nje haukufaulu"
 
+#: lms/templates/footer.html
+msgid "organization logo"
+msgstr ""
+
 #: lms/templates/forgot_password_modal.html
 msgid ""
 "Please enter your e-mail address below, and we will e-mail instructions for "
@@ -12750,149 +12800,6 @@ msgstr "Badili Nywila Yangu"
 msgid "Email is incorrect."
 msgstr "Anwani ya barua pepe sio sahihi."
 
-#: lms/templates/help_modal.html
-msgid "Support"
-msgstr "Msaada"
-
-#: lms/templates/help_modal.html
-msgid ""
-"For {strong_start}questions on course lectures, homework, tools, or "
-"materials for this course{strong_end}, post in the {link_start}course "
-"discussion forum{link_end}."
-msgstr ""
-"Kwa {strong_start}maswali ya mihadhara ya kozi, kazi na mazoezi, zana, au "
-"vifaa vya kozi hii{strong_end}, chapisha kwenye {link_start}jukwaa la "
-"majadiliano ya kozi{link_end}.  "
-
-#: lms/templates/help_modal.html
-msgid ""
-"Have {strong_start}general questions about {platform_name}{strong_end}? You "
-"can find lots of helpful information in the {platform_name} "
-"{link_start}FAQ{link_end}."
-msgstr ""
-"Pata {strong_start}maswali ya kawaida kuhusu {platform_name}{strong_end}? "
-"Waweza kupata taarifa nyingi zenye kusaidia katika {platform_name} "
-"{link_start}FAQ{link_end}."
-
-#: lms/templates/help_modal.html
-msgid ""
-"Have a {strong_start}question about something specific{strong_end}? You can "
-"contact the {platform_name} general support team directly:"
-msgstr ""
-"Kuwa na {strong_start}maswali kuhusu kitu maalum{strong_end}? Unaweza "
-"kuwasiliana na {platform_name} moja kwa moja na timu ya msaada:"
-
-#: lms/templates/help_modal.html
-msgid "Report a problem"
-msgstr "Toa habari za tatizo"
-
-#: lms/templates/help_modal.html
-msgid "Make a suggestion"
-msgstr "Toa maoni"
-
-#: lms/templates/help_modal.html
-msgid "Ask a question"
-msgstr "Uliza swali"
-
-#: lms/templates/help_modal.html
-msgid ""
-"Please note: The {platform_name} support team is English speaking. While we "
-"will do our best to address your inquiry in any language, our responses will"
-" be in English."
-msgstr ""
-"Tafadhali tambua: Kikosi cha msaada cha {platform_name} kinatumia Kiingereza"
-" kwa mawasiliano. Ingawa tutafanya juhudi kutafuta majibu ya maswali yako "
-"kwa kutumia lugha yoyote, majibu yetu kwako yatakua kwa Kiingereza."
-
-#: lms/templates/help_modal.html
-msgid "Briefly describe your issue"
-msgstr "Elezea hoja yako kwa ufupi"
-
-#: lms/templates/help_modal.html
-msgid "Tell us the details"
-msgstr "Tueleze kwa kirefu"
-
-#: lms/templates/help_modal.html
-msgid ""
-"Describe what you were doing when you encountered the issue. Include any "
-"details that will help us to troubleshoot, including error messages that you"
-" saw."
-msgstr ""
-"Dadavua ulichokua ukifanya ulipopatwa na tatizo. Jumuisha kila maelezo "
-"yatakayotusaidia kutatua,jumuisha ujumbe wa kosa uliouona"
-
-#: lms/templates/help_modal.html
-msgid "Thank You!"
-msgstr "Ahsante!"
-
-#: lms/templates/help_modal.html
-msgid ""
-"Thank you for your inquiry or feedback.  We typically respond to a request "
-"within one business day, Monday to Friday.  In the meantime, please review "
-"our {link_start}detailed FAQs{link_end} where most questions have already "
-"been answered."
-msgstr ""
-"Asante kwa ulizo lako au mrejesho. Sisi kwa kawaida tunajibu maombi ndani ya"
-" siku moja ya kazi, Jumatatu hadi Ijumaa. Kwa muda huu tafadhali "
-"pitia{link_start} maswali na majibu {link_end}  ambapo maswali mengi "
-"yamejibiwa kwa kina"
-
-#: lms/templates/help_modal.html
-msgid "- Select -"
-msgstr "-Chagua-"
-
-#: lms/templates/help_modal.html
-msgid "problem"
-msgstr "tatizo"
-
-#: lms/templates/help_modal.html
-msgid "Report a Problem"
-msgstr "Toa Taarifa za Tatizo"
-
-#: lms/templates/help_modal.html
-msgid "Brief description of the problem"
-msgstr " Mukhtasari wa ufafanuzi wa tatizo"
-
-#: lms/templates/help_modal.html
-msgid "Details of the problem you are encountering{asterisk}"
-msgstr "Maelezo ya tatizo unalokutananalo{asterisk}"
-
-#: lms/templates/help_modal.html
-msgid "suggestion"
-msgstr "maoni"
-
-#: lms/templates/help_modal.html
-msgid "Make a Suggestion"
-msgstr "Toa Maoni"
-
-#: lms/templates/help_modal.html
-msgid "Brief description of your suggestion"
-msgstr "Mukhtasari wa maelezo ya maoni yako"
-
-#: lms/templates/help_modal.html
-msgid "question"
-msgstr "swali"
-
-#: lms/templates/help_modal.html
-msgid "Ask a Question"
-msgstr "Uliza Swali"
-
-#: lms/templates/help_modal.html
-msgid "Brief summary of your question"
-msgstr "Mukhtasari mfupi wa swali lako"
-
-#: lms/templates/help_modal.html
-msgid "An error has occurred."
-msgstr "Hitilafu imetokea."
-
-#: lms/templates/help_modal.html
-msgid "Please {link_start}send us e-mail{link_end}."
-msgstr "Tafadhali {link_start}tutumie barua pepe{link_end}."
-
-#: lms/templates/help_modal.html
-msgid "Please try again later."
-msgstr "Tafadhali jaribu tena baadae."
-
 #: lms/templates/hidden_content.html
 msgid "The course has ended."
 msgstr "Kozi imeisha"
@@ -12926,18 +12833,15 @@ msgstr ""
 msgid "Search for a course"
 msgstr "Tafuta \"kozi\""
 
-#. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See http://open.edx.org for more information.
-#: lms/templates/index_overlay.html
-msgid "Welcome to the Open edX{registered_trademark} platform!"
-msgstr "Karibu kwenye jukwaa huru la edX {registered_trademark}!"
+#: lms/templates/index_overlay.html lms/templates/register-sidebar.html
+msgid "Welcome to {platform_name}"
+msgstr "Karibu kwenye {platform_name}"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
 #. untranslated. See http://open.edx.org for more information.
 #: lms/templates/index_overlay.html
-msgid "It works! This is the default homepage for this Open edX instance."
+msgid "It works! Powered by Open edX{registered_trademark}"
 msgstr ""
-"Iko sawa! Huu ndio ukurasa halisi wa mwanzo wa tovuti 'hii' ya Open edX."
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -13055,16 +12959,9 @@ msgstr "Hitilafu ilitokea wakati wakuingia kwenye {platform_name}."
 #: lms/templates/login.html
 msgid ""
 "Please provide the following information to log into your {platform_name} "
-"account. Required fields are noted by <strong class=\"indicator\">bold text "
-"and an asterisk (*)</strong>."
+"account. Required fields are noted by {strong_start}bold text and an "
+"asterisk (*){strong_end}."
 msgstr ""
-"Tafadhali toa taarifa zifuatazo uweze kuingia mtandaoni kwa akaunti yako ya "
-"{platform_name} . Sehemu zinazohitajika zimenukuliwa na <strong "
-"class=\"indicator\">maandishi manene na maandishi ya mlazo(*)</strong>."
-
-#: lms/templates/login.html
-msgid "Account Preferences"
-msgstr "Pendekezo za Akaunti"
 
 #: lms/templates/login.html
 msgid "Sign in with {provider_name}"
@@ -13180,10 +13077,6 @@ msgstr ""
 msgid "Raw data:"
 msgstr "Takwimu ghafi:"
 
-#: lms/templates/notes.html
-msgid "You do not have any notes."
-msgstr "Huna nukuu zozote."
-
 #: lms/templates/preview_menu.html
 msgid "Course View"
 msgstr "Mwonekano wa Kozi"
@@ -13242,6 +13135,10 @@ msgstr "Hifadhi majibu yako"
 msgid "Reset your answer"
 msgstr "Futa/Ondoa majibu yako"
 
+#: lms/templates/problem.html
+msgid "Answers are displayed within the problem"
+msgstr ""
+
 #: lms/templates/problem_notifications.html
 msgid "Next Hint"
 msgstr "Dondoo zifuatazo"
@@ -13297,14 +13194,10 @@ msgid "Create your own {platform_name} account below"
 msgstr "Unda akaunti yako ya {platform_name} hapo chini"
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
-"Required fields are noted by <strong class=\"indicator\">bold text and an "
-"asterisk (*)</strong>."
+"Required fields are noted by {strong_start}bold text and an asterisk "
+"(*){strong_end}."
 msgstr ""
-"Sehemu zinazohitajika zinaoneshwa kwatumia <strong class=\"indicator\"> "
-"maandishi yaliyokozwa na alama ya kinyota (*)</strong>."
 
 #. Translators: selected_provider is the name of an external, third-party user
 #. authentication service (like Google or LinkedIn).
@@ -13444,10 +13337,6 @@ msgid "Log in"
 msgstr "Ingia mtandaoni"
 
 #: lms/templates/register-sidebar.html
-msgid "Welcome to {platform_name}"
-msgstr "Karibu kwenye {platform_name}"
-
-#: lms/templates/register-sidebar.html
 msgid ""
 "Registering with {platform_name} gives you access to all of our current and "
 "future free courses. Not ready to take a course just yet? Registering puts "
@@ -13544,17 +13433,26 @@ msgstr ""
 msgid "Important!"
 msgstr ""
 
+#. Translators: A button for showing the Previous Unit
 #: lms/templates/seq_module.html
+msgctxt "unit"
 msgid "Previous"
-msgstr "Iliyopita"
+msgstr ""
 
+#. Translators: A button for showing the Next Unit
 #: lms/templates/seq_module.html
+msgctxt "unit"
 msgid "Next"
-msgstr "Ifuatayo"
+msgstr ""
 
 #: lms/templates/seq_module.html
 msgid "Sequence"
 msgstr "Mfululizo"
+
+#: lms/templates/seq_module.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "Completed"
+msgstr ""
 
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"
@@ -13573,8 +13471,8 @@ msgid "e.g. Your Name (for certificates)"
 msgstr "kwa mfano. Jina Lako (kwa ajili ya vyeti)"
 
 #: lms/templates/signup_modal.html
-msgid "<i>Welcome</i> {name}"
-msgstr "<i>Karibu</i> {name}"
+msgid "{start_li}Welcome{end_li} {name}"
+msgstr ""
 
 #: lms/templates/signup_modal.html
 msgid "Full Name *"
@@ -13810,11 +13708,6 @@ msgstr "Kitambulisho cha Kozi au dir"
 #: lms/templates/sysadmin_dashboard.html
 msgid "Delete course from site"
 msgstr "Futa 'kozi' kutoka kwenye tovuti"
-
-#. Translators: A version number appears after this string
-#: lms/templates/sysadmin_dashboard.html
-msgid "Platform Version"
-msgstr "Tafsiri ya Jukwaa"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Page {current_page} of {total_pages}"
@@ -14487,7 +14380,7 @@ msgstr ""
 "{platform_name} AU YOYOTE KATI YA {platform_name} WAHUSIKA ATAKUWA NA "
 "DHAMANA KWA YATOKEYAYO, SIO KWA DHAHIRI, KUPONEA, MAALUM, KIMFANO AU "
 "KIBAHATI MBAYA  YA HASARA, IKIWA IMEWEZA KUONEKANA KABLA AU ISO ONEKANA NA "
-"IKIWA AU ISWE {platform_name} AU AU YOYOTE YA {platform-name} WAHUSIKA "
+"IKIWA AU ISWE {platform_name} AU AU YOYOTE YA {platform_name} WAHUSIKA "
 "ALIEPUUZA AU KIVYOVYOTE KUKOSEA (PAMOJA, LAKINI BILA VIKOMO KWA, MALALAMISHI"
 " YA UHARIBIFU WA JINA, HITLAFU, UPOTEZAJI WA FAIDA, UPOTEZAJI WA TAKWIMU AU "
 "KWA UINGILIAJI KATI KATIKA UPATAJI WA TAKWIMU)"
@@ -14692,8 +14585,8 @@ msgid ""
 " Students{guide_link_end}."
 msgstr ""
 "Kwa habari za utondoti, tizama {math_link_start}Uingizaji wa Maelezo ya "
-"Kihesabu na Sayansi{math_link_end} katika {guide_link_started} Muongozo wa "
-"edX kwa wanafunzi{guide_link_end}."
+"Kihesabu na Sayansi{math_link_end} katika {guide_link_start} Muongozo wa edX"
+" kwa wanafunzi{guide_link_end}."
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Tips"
@@ -15190,13 +15083,10 @@ msgstr "Hitilafu ya Utokaji"
 
 #: lms/templates/commerce/checkout_error.html
 msgid ""
-"An error has occurred with your payment. <b>You have not been charged.</b> "
-"Please try to submit your payment again. If this problem persists, contact "
-"{email}."
+"An error has occurred with your payment. {b_start}You have not been "
+"charged.{b_end} Please try to submit your payment again. If this problem "
+"persists, contact {email}."
 msgstr ""
-"Hitilafu imetokea kwenye malipo yako. <b>hujalipishwa/hujatozwa.</b> "
-"Tafadhali jaribu kufikisha malipo yako tena. Tatizo hili likiendelea, "
-"wasiliana na {email}."
 
 #: lms/templates/commerce/checkout_receipt.html
 msgid "Loading Order Data..."
@@ -15205,6 +15095,20 @@ msgstr "Upakiaji wa maelezo ya uagizishaji"
 #: lms/templates/commerce/checkout_receipt.html
 msgid "Please wait while we retrieve your order details."
 msgstr "Tafadhali subiri tukiwa tunarudisha uagizaji wako."
+
+#: lms/templates/course_modes/_upgrade_button.html
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/_upgrade_button.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Pursue the Verified Track"
+msgstr ""
+
+#: lms/templates/course_modes/_upgrade_button.html
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/_upgrade_button.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Pursue a Verified Certificate"
+msgstr "Tafuta Cheti Kilichothibitishwa"
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -15295,16 +15199,6 @@ msgid ""
 msgstr ""
 "{b_start}Ni rahisi kuituma kwa wengine:{b_end} Weka cheti katika CV yako au "
 "anza tena, au chapisha makala moja kwa moja kwenye Linkedln"
-
-#: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
-msgid "Pursue a Verified Certificate"
-msgstr "Tafuta Cheti Kilichothibitishwa"
-
-#: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
-msgid "Pursue the Verified Track"
-msgstr ""
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -15427,13 +15321,16 @@ msgid "An error occurred. Please try again later."
 msgstr "Hitilafu imetokea. Tafadhali jaribu tena baadae."
 
 #: lms/templates/courseware/course_about.html
+msgid "An error has occurred. Please ensure that you are logged in to enroll."
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
 msgid "You are enrolled in this course"
 msgstr "Umesajiliwa katika kozi hii"
 
 #: lms/templates/courseware/course_about.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/shoppingcart/registration_code_receipt.html
-#: openedx/features/journals/templates/journals/bundle_about.html
 msgid "View Course"
 msgstr "Angalia Kozi"
 
@@ -15458,8 +15355,8 @@ msgid "Add {course_name} to Cart {start_span}({price} USD){end_span}"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
-msgid "Enroll in {course_name}"
-msgstr "Sajili kwenye {course_name}"
+msgid "Enroll Now"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "View About Page in studio"
@@ -15509,12 +15406,12 @@ msgid "I just enrolled in {number} {title} through {account}: {url}"
 msgstr "Nimejisajili katika {number} {title} kupitia {account}: {url}"
 
 #: lms/templates/courseware/course_about_sidebar_header.html
-msgid "Take a course with {platform} online"
-msgstr "Chukua kozi mtandaoni kwa {platform} "
-
-#: lms/templates/courseware/course_about_sidebar_header.html
 msgid "I just enrolled in {number} {title} through {platform} {url}"
 msgstr "Nimejisajili katika {number} {title} kupitia {platform} {url}"
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+msgid "Take a course with {platform} online"
+msgstr "Chukua kozi mtandaoni kwa {platform} "
 
 #: lms/templates/courseware/course_about_sidebar_header.html
 #: themes/stanford-style/lms/templates/courseware/course_about_sidebar_header.html
@@ -15568,7 +15465,6 @@ msgstr "Rekebisha Utafutaji Wako"
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 #: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
-#: openedx/features/learner_analytics/templates/learner_analytics/dashboard.html
 msgid "{course_number} Courseware"
 msgstr "{course_number} Maudhui ya kozi"
 
@@ -15600,7 +15496,7 @@ msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "Your score is {current_score}%. You have passed the entrance exam."
-msgstr "Alama ulizopata ni %{current-score}. Umefaulu mtihani wa kujiunga."
+msgstr "Alama ulizopata ni %{current_score}. Umefaulu mtihani wa kujiunga."
 
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
@@ -15680,7 +15576,6 @@ msgid "Purchase the Program ("
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
-#: openedx/features/journals/templates/journals/bundle_about.html
 msgid "Original Price"
 msgstr ""
 
@@ -15689,7 +15584,6 @@ msgid "${oldPrice}"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
-#: openedx/features/journals/templates/journals/bundle_about.html
 msgid "Discounted Price"
 msgstr ""
 
@@ -15786,7 +15680,6 @@ msgid "Courses in the {}"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
-#: openedx/features/journals/templates/journals/bundle_about.html
 msgid "Starts on {}"
 msgstr ""
 
@@ -15799,8 +15692,8 @@ msgid "View Grading in studio"
 msgstr "Tizama Utoaji Daraja katika studio"
 
 #: lms/templates/courseware/progress.html
-msgid "Course Progress for Student '{username}' ({email})"
-msgstr "Maendeleo ya Kozi kwa Mwanafunzi '{username}' ({email})"
+msgid "Course Progress for '{username}' ({email})"
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "View Certificate"
@@ -16044,10 +15937,10 @@ msgid ""
 " know by contacting {email}."
 msgstr ""
 "Cheti {cert_name_long} kimezuiwa kusubiri uhakikishaji kuwa utoaji wa "
-"{cert_name_long} una kubaliana na vikwazo vikali vya MAREKANI dhidi ya Iran,"
-" Cuba, Syria na Sudan. Kama unaona mpagilio wetu umekutambua wewe kwa makosa"
-" kuwa na uhusiano na moja ya hizo nchi, tafadhali tujulishe kwa kuwasiliana "
-"na {email}."
+"{cert_name_short} una kubaliana na vikwazo vikali vya MAREKANI dhidi ya "
+"Iran, Cuba, Syria na Sudan. Kama unaona mpagilio wetu umekutambua wewe kwa "
+"makosa kuwa na uhusiano na moja ya hizo nchi, tafadhali tujulishe kwa "
+"kuwasiliana na {email}."
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
@@ -16071,7 +15964,7 @@ msgstr "Kiungo-wavuti hiki kitafungua tovuti ya kukuonesha cheti"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "View {cert_name_short}"
-msgstr "Angalia {sert_name_short}"
+msgstr "Angalia {cert_name_short}"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "This link will open/download a PDF document"
@@ -16083,7 +15976,7 @@ msgstr "Pakua {cert_name_short} (PDF)"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Download Your {cert_name_short} (PDF)"
-msgstr "Pakua  {cert_name-short} (PDF) yako"
+msgstr "Pakua  {cert_name_short} (PDF) yako"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
@@ -16322,7 +16215,7 @@ msgid ""
 "{cert_name_long}{link_end}."
 msgstr ""
 "Ni rasmi. Ni rahisi kushirikiana. Ni kichochezi kilichothibitishwa kumaliza "
-"kozi. {link_break}{link_start}JIfunze mengi kuhusu "
+"kozi. {line_break}{link_start}JIfunze mengi kuhusu "
 "{cert_name_long}iliothibitishwa{link_end}."
 
 #. Translators: provider_name is the name of a credit provider or university
@@ -16330,10 +16223,8 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
 "You have completed this course and are eligible to purchase course credit. "
-"Select <strong>Get Credit</strong> to get started."
+"Select {strong_start}Get Credit{strong_end} to get started."
 msgstr ""
-"Umekamilisha kozi hii na unastahili kununua mkopo wa kozi. Chagua "
-"<strong>Pata Mkopo</strong> uanze."
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "You are now eligible for credit from {provider}. Congratulations!"
@@ -16349,11 +16240,9 @@ msgstr "Pata Mkopo"
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
 "Thank you for your payment. To receive course credit, you must now request "
-"credit at the {link_to_provider_site} website. Select <b>Request Credit</b> "
-"to get started."
+"credit at the {link_to_provider_site} website. Select {start_bold}Request "
+"Credit{end_bold} to get started."
 msgstr ""
-"Asante kwa malipo yako. Kupata mkopo wa kozi, lazima sasa uombe mkopo kwa "
-"{link_to_provider_site} tovuti. Chagua <b>Omba Mkopo</b> uanze."
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "Request Credit"
@@ -16377,12 +16266,10 @@ msgstr "Angalia Maelezo"
 #. provider.
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"<b>Congratulations!</b> {provider_name} has approved your request for course"
-" credit. To see your course credit, visit the {link_to_provider_site} "
-"website."
+"{start_bold}Congratulations!{end_bold} {provider_name} has approved your "
+"request for course credit. To see your course credit, visit the "
+"{link_to_provider_site} website."
 msgstr ""
-"<b>Hongera!</b> {provider_name} imeidhinisha ombi lako la mkopo wa kozi. "
-"Kuona mkopo wako wa kozi, tembelea {link_to_provider_site} tovuti."
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "View Credit"
@@ -16394,7 +16281,7 @@ msgid ""
 "information, contact {link_to_provider_site} directly."
 msgstr ""
 "{provider_name} haikuidhinisha ombi lako la mkopo wa kozi. Kwa habari zaidi,"
-" wasiliana na {link_to_provider-site} moja kwa moja."
+" wasiliana na {link_to_provider_site} moja kwa moja."
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
@@ -16754,34 +16641,26 @@ msgid ""
 "engaging, high-quality {platform_name} courses. Note that you will not be "
 "able to log back into your account until you have activated it."
 msgstr ""
-"Tayari umefika! Tumia kiungo wavuti kuamsha akaunti yako ili uweze kuzipata "
-"kozi shirikishi na zenye ubora kwenye {platform_name}. Kumbuka kwamba "
-"hautaweza kuingia mtandaoni tena kwenye akaunti yako mpaka uiamshe tena."
 
 #: lms/templates/emails/activation_email.txt
 msgid "Enjoy learning with {platform_name}."
-msgstr "Furahia kujifunza kwenye {platform_name}."
+msgstr ""
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
 "If you need help, please use our web form at {support_url} or email "
 "{support_email}."
 msgstr ""
-"Kama unahitaji msaada, tafadhali wasiliana nasi kupitia tovuti yetu "
-"{support_url} au tuma barua pepe {support_email}."
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
 "This email message was automatically sent by {lms_url} because someone "
 "attempted to create an account on {platform_name} using this email address."
 msgstr ""
-"Ujumbe wa barua pepe hii ulitumwa moja kwa moja na {site_name} kwasababu "
-"kuna mtu alijaribu kutengeneza akaunti kwenye{platform_name} kwa kutumia "
-"anwani hii ya barua pepe."
 
 #: lms/templates/emails/activation_email_subject.txt
 msgid "Action Required: Activate your {platform_name} account"
-msgstr "Hatua muhimu inahitajika: Amsha akaunti yako ya {platform_name} "
+msgstr ""
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Thank you for your purchase of "
@@ -17402,13 +17281,7 @@ msgid "Programs"
 msgstr "Programu"
 
 #: lms/templates/header/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Journals"
-msgstr ""
-
-#: lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr ""
 
@@ -17694,7 +17567,7 @@ msgid ""
 "View detailed Git import logs for this course {link_start}by clicking "
 "here{link_end}."
 msgstr ""
-"Angalia tondoti za habari za mapokezi ya Git kwa kozi hii {llink_start}kwa "
+"Angalia tondoti za habari za mapokezi ya Git kwa kozi hii {link_start}kwa "
 "kubonyeza hapa{link_end}. "
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -17864,15 +17737,9 @@ msgstr "Ripoti Iliyopo kwa ajili ya Kupakuliwa"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The reports listed below are available for download. A link to every report "
-"remains available on this page, identified by the UTC date and time of "
-"generation. Reports are not deleted, so you will always be able to access "
-"previously generated reports from this page."
+"The reports listed below are available for download, identified by UTC date "
+"and time of generation."
 msgstr ""
-"Habari zilizo orodheshwa hapo chini zapatikana kwa upakuaji. Kiungo-wavuti "
-"cha kila habari kipatikana kwenye ukurasa huu, zikitambuliwa kwa tarehe na "
-"wakati wa UTC ya uzalishaji. Habari hazifutwi, kwa hivyo daima utaweza "
-"kufikia habari zilizotangulia kuzalishwa kutoka kwenye ukurasa huu.  "
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -17888,13 +17755,13 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"{strong_start}Note{strong_end}: To keep student data secure, you cannot save"
-" or email these links for direct access. Copies of links expire within 5 "
-"minutes."
+"{strong_start}Note{strong_end}: {ul_start}{li_start}To keep student data "
+"secure, you cannot save or email these links for direct access. Copies of "
+"links expire within 5 minutes.{li_end}{li_start}Report files are deleted 90 "
+"days after generation. If you will need access to old reports, download and "
+"store the files, in accordance with your institution's data security "
+"policies.{li_end}{ul_end}"
 msgstr ""
-"{strong_start}Zingatia{strong_end}: Kuweka taarifa za mwanafunzi salama, "
-"huwezi kuhifadhi au kuvituma kwa barua pepe viunganishi hivi ili kuvipata "
-"moja kwa moja.  Nakala za viunganishi hudumu kwa muda wa dakika 5."
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Enrollment Codes"
@@ -18286,15 +18153,11 @@ msgstr "Tarehe za mwisho zilizoongezwa kwa kila mmoja"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
-"In this section, you have the ability to grant extensions on specific units "
-"to individual students. Please note that the latest date is always taken; "
-"you cannot use this tool to make an assignment due earlier for a particular "
-"student."
+"In this section, you have the ability to grant extensions on specific "
+"subsections to individual students. Please note that the latest date is "
+"always taken; you cannot use this tool to make an assignment due earlier for"
+" a particular student."
 msgstr ""
-"Katika kifungu hiki, una uwezo kuidhinisha uongezaji wa vitengo maalum mpaka"
-" kwa wanafunzi. Tafadhali tambua ya kwamba tarehe ya mwisho kawaida ina "
-"chukuliwa; huwezi kutumia chombo hiki kufanya kazi iliyotolewa kumalizika "
-"mapema kwa mwanafunzi fulani.  "
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
@@ -18308,8 +18171,8 @@ msgid "Student Email or Username"
 msgstr "Anwani ya Barua pepe au Jinatumishi"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
-msgid "Choose the graded unit:"
-msgstr "Chagua kitu kilichopewa alama:"
+msgid "Choose the graded subsection:"
+msgstr ""
 
 #. Translators: "format_string" is the string MM/DD/YYYY HH:MM, as that is the
 #. format the system requires.
@@ -18321,6 +18184,10 @@ msgstr ""
 "Taja tarehe na mda iliyoongezwa (in UTC; please specify {format_string})."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
+msgid "Reason for extension"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Change due date for student"
 msgstr "Badilisha tarehe ya mwanafunzi ya kumaliza"
 
@@ -18330,19 +18197,15 @@ msgstr "Kuangalia nyongeza iliyotolewa"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
-"Here you can see what extensions have been granted on particular units or "
-"for a particular student."
+"Here you can see what extensions have been granted on particular subsection "
+"or for a particular student."
 msgstr ""
-"Hapa unaweza kuona nyongeza iliyotolewa kwa kila kimoja au kwa kila "
-"mwanafunzi."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
-"Choose a graded unit and click the button to obtain a list of all students "
-"who have extensions for the given unit."
+"Choose a graded subsection and click the button to obtain a list of all "
+"students who have extensions for the given subsection."
 msgstr ""
-"Chagua fomu na bofya kitufe kupata orodha ya wanafunzi wote waliopata "
-"ongezeko kwa kila kitu alichopewa."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "List all students with due date extensions"
@@ -18363,12 +18226,13 @@ msgstr "Kurekebisha ongezeko"
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
 "Resetting a problem's due date rescinds a due date extension for a student "
-"on a particular unit. This will revert the due date for the student back to "
-"the problem's original due date."
+"on a particular subsection. This will revert the due date for the student "
+"back to the problem's original due date."
 msgstr ""
-"Uwekaji upya wa tarehe ya mwisho ya tatizo una tangua tarehe ya mwisho wa "
-"maongezi kwa mwanafunzi kwenye kitengo maalum. Hii itarudisha tarehe ya "
-"mwisho kwa mwanafunzi kwa tarehe ya mwisho asili."
+
+#: lms/templates/instructor/instructor_dashboard_2/extensions.html
+msgid "Reason for reset"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Reset due date for student"
@@ -19199,10 +19063,6 @@ msgstr "Onesha hali ya shughuli ulizowasilisha kwa tatizo hili."
 msgid "My Courses"
 msgstr "Kozi Zangu"
 
-#: lms/templates/learner_dashboard/_dashboard_navigation_journals.html
-msgid "My Journals"
-msgstr ""
-
 #: lms/templates/learner_dashboard/program_details.html
 msgid "Program Details"
 msgstr "Utondoti wa Mpangilio"
@@ -19835,8 +19695,8 @@ msgid ""
 "{course_names} has been removed because the enrollment period has closed."
 msgid_plural ""
 "{course_names} have been removed because the enrollment period has closed."
-msgstr[0] "{course-name} imeondolewa kwa sababu muda wa kusajili umefungwa."
-msgstr[1] "{course_name} zimeondolewa kwa sababu muda ya kusajili umefungwa."
+msgstr[0] "{course_names} imeondolewa kwa sababu muda wa kusajili umefungwa."
+msgstr[1] "{course_names} zimeondolewa kwa sababu muda ya kusajili umefungwa."
 
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Cover Image"
@@ -20217,7 +20077,7 @@ msgstr "Risiti ya {course_name}"
 
 #: lms/templates/verify_student/pay_and_verify.html
 msgid "Verify For {course_name}"
-msgstr "Thibitisha Kwa ajili ya {course-name}"
+msgstr "Thibitisha Kwa ajili ya {course_name}"
 
 #: lms/templates/verify_student/pay_and_verify.html
 msgid "Enroll In {course_name}"
@@ -20236,9 +20096,9 @@ msgid ""
 msgstr ""
 "Tafadhali hakikisha kivinjari chako kime sasishwa "
 "{strong_start}{a_start}kwenye toleo jipya{a_end}{strong_end}. Pia, tafadhali"
-" hakikisha webcam{strong_browser}yako imewekwa kwenye umeme, imewashwa, na "
+" hakikisha webcam{strong_start}yako imewekwa kwenye umeme, imewashwa, na "
 "imeruhusiwa kufanya kazi kwenye kivinjari cha wavuti yako (inarekebishika "
-"kwenye mitegesho ya kivinjari chako).{strong-end}"
+"kwenye mitegesho ya kivinjari chako).{strong_end}"
 
 #: lms/templates/verify_student/reverify.html
 msgid "Re-Verification"
@@ -20468,81 +20328,6 @@ msgstr ""
 msgid "Search Results"
 msgstr "Tafuta Matokeo"
 
-#: openedx/features/journals/templates/journals/bundle_about.html
-msgid "Purchase the Bundle ("
-msgstr ""
-
-#: openedx/features/journals/templates/journals/bundle_about.html
-msgid "Courses included"
-msgstr ""
-
-#: openedx/features/journals/templates/journals/bundle_about.html
-msgid "Journals included"
-msgstr ""
-
-#: openedx/features/journals/templates/journals/bundle_about.html
-msgid "{access_length} Day Access"
-msgstr ""
-
-#: openedx/features/journals/templates/journals/bundle_about.html
-#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
-msgid "View Journal"
-msgstr ""
-
-#: openedx/features/journals/templates/journals/bundle_card.html
-msgid "Bundle"
-msgstr ""
-
-#: openedx/features/journals/templates/journals/journal_card.html
-msgid "Journal"
-msgstr ""
-
-#: openedx/features/journals/templates/journals/journal_card.html
-msgid "{num_months} month"
-msgid_plural "{num_months} months"
-msgstr[0] ""
-msgstr[1] ""
-
-#: openedx/features/journals/templates/journals/journal_card.html
-msgid "unlimited"
-msgstr ""
-
-#: openedx/features/journals/templates/journals/journal_card.html
-msgid "Access Length"
-msgstr ""
-
-#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
-msgid "Journal Dashboard"
-msgstr ""
-
-#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
-msgid "{journal_title} Cover Image"
-msgstr ""
-
-#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
-msgid "Access Expired: {date}"
-msgstr ""
-
-#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
-msgid "Access Expires: {date}"
-msgstr ""
-
-#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
-msgid "Renew Access"
-msgstr ""
-
-#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
-msgid "You have not purchased access to any journals yet."
-msgstr ""
-
-#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
-msgid "Explore journals and courses"
-msgstr ""
-
-#: openedx/features/learner_analytics/templates/learner_analytics/dashboard.html
-msgid "My Stats (Beta)"
-msgstr ""
-
 #. Translators: this section lists all the third-party authentication
 #. providers
 #. (for example, Google and LinkedIn) the user can link with or unlink from
@@ -20644,7 +20429,7 @@ msgid "© 2012–{year} edX Inc. "
 msgstr ""
 
 #: themes/edx.org/lms/templates/footer.html
-msgid "EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
+msgid "edX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
 msgstr ""
 
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
@@ -20710,7 +20495,7 @@ msgstr ""
 #: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
 msgid ""
 "All rights reserved except where noted. edX, Open edX and the edX and Open "
-"edX logos are registered trademarks or trademarks of edX Inc."
+"edX logos are registered trademarks of edX Inc."
 msgstr ""
 
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -20736,17 +20521,6 @@ msgstr "Tafuta Kozi"
 msgid "Schools & Partners"
 msgstr "Shule & Wabia"
 
-#. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
-#. Please do not translate any of these trademarks and company names.
-#: themes/red-theme/lms/templates/footer.html
-msgid ""
-"EdX, Open edX, and the edX and Open edX logos are registered trademarks or "
-"trademarks of {link_start}edX Inc.{link_end}"
-msgstr ""
-"Nembo za EdX, Open edX, na edX na Open edX ni alama za kibiashara zilizo "
-"ordheshwa kihalali na serikali au alama za kibiashara za {link_start}edX "
-"Inc.{link_end}"
-
 #: themes/red-theme/lms/templates/footer.html
 msgid ""
 "{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor "
@@ -20767,6 +20541,20 @@ msgstr "Haki miliki {year}. Haki zote zimehifadhiwa."
 #: themes/stanford-style/lms/templates/index.html
 msgid "For anyone, anywhere, anytime"
 msgstr "Kwa yeyote, popote, wakati wowote "
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid ""
+"Required fields are noted by <strong class=\"indicator\">bold text and an "
+"asterisk (*)</strong>."
+msgstr ""
+"Sehemu zinazohitajika zinaoneshwa kwatumia <strong class=\"indicator\"> "
+"maandishi yaliyokozwa na alama ya kinyota (*)</strong>."
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid ""
+"Required fields are noted by {strong_indicator}bold text and an asterisk "
+"(*).{strong_close}"
+msgstr ""
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
@@ -20873,8 +20661,8 @@ msgid ""
 "Go back to the {homepage} or let us know about any pages that may have been "
 "moved at {email}."
 msgstr ""
-"Rudi nyuma kwenye {ukurasa wa mwanzo} au tujulishe kuhusu ukurasa wowote "
-"ambao umewekwa kwenye {email}."
+"Rudi nyuma kwenye {homepage} au tujulishe kuhusu ukurasa wowote ambao "
+"umewekwa kwenye {email}."
 
 #: cms/templates/500.html
 msgid "{studio_name} Server Error"
@@ -21038,9 +20826,10 @@ msgstr ""
 msgid "Learn more about certificates"
 msgstr "Jifunze mengi kuhusu vyeti"
 
-#: cms/templates/certificates.html cms/templates/settings_graders.html
-msgid "Details &amp; Schedule"
-msgstr ""
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/settings_advanced.html
+msgid "Details & Schedule"
+msgstr "Utondoti & Ratiba"
 
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
@@ -21140,7 +20929,7 @@ msgid ""
 "Click the {strong_start}Edit{strong_end} icon in a component to edit its "
 "content."
 msgstr ""
-"Bofya {strong_start}Hariri{strong-end} ikoni katika kiambajengo ili uhariri "
+"Bofya {strong_start}Hariri{strong_end} ikoni katika kiambajengo ili uhariri "
 "maudhui yake."
 
 #: cms/templates/container.html
@@ -22031,11 +21820,6 @@ msgid ""
 "not in use in an experiment. To delete a configuration, hover over its box "
 "and click the delete icon."
 msgstr ""
-
-#: cms/templates/group_configurations.html
-#: cms/templates/settings_advanced.html
-msgid "Details & Schedule"
-msgstr "Utondoti & Ratiba"
 
 #: cms/templates/howitworks.html
 msgid "Welcome"
@@ -23061,10 +22845,10 @@ msgid ""
 "members, teaching assistants and course staff, and members of instructional "
 "technology groups."
 msgstr ""
-"{Jina_la studio} ni kwa yoyote anaehitaji kubuni kozi inayotawaliwa "
-"mtandaoni inayo enua jukwaa {platform_name} la kilimwengu. Watumiaji wetu "
-"aghlabu ni wanafanni, wasaidizi wa kufundisha na wafanya kazi wa kozi, na "
-"wanachama wa makundi ya kufundisha taaluma. "
+"{studio_name} ni kwa yoyote anaehitaji kubuni kozi inayotawaliwa mtandaoni "
+"inayo enua jukwaa {platform_name} la kilimwengu. Watumiaji wetu aghlabu ni "
+"wanafanni, wasaidizi wa kufundisha na wafanya kazi wa kozi, na wanachama wa "
+"makundi ya kufundisha taaluma. "
 
 #: cms/templates/register.html
 msgid ""
@@ -23719,6 +23503,10 @@ msgid ""
 "worth."
 msgstr ""
 
+#: cms/templates/settings_graders.html
+msgid "Details &amp; Schedule"
+msgstr ""
+
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
 msgstr ""
@@ -24034,14 +23822,6 @@ msgstr ""
 
 #: cms/templates/widgets/footer.html
 msgid "LMS"
-msgstr ""
-
-#. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX
-#. Inc.'. Please do not translate any of these trademarks and company names.
-#: cms/templates/widgets/footer.html
-msgid ""
-"EdX, Open edX, Studio, and the edX and Open edX logos are registered "
-"trademarks or trademarks of {link_start}edX Inc.{link_end}"
 msgstr ""
 
 #: cms/templates/widgets/header.html
@@ -25143,6 +24923,13 @@ msgstr ""
 
 #: wiki/templates/wiki/article/create_root.html
 msgid "Create root"
+msgstr ""
+
+#: wiki/templates/wiki/includes/anonymous_blocked.html
+#, python-format
+msgid ""
+"You need to <a href=\"%(login_url)s\">log in</a> or <a "
+"href=\"%(signup_url)s\">sign up</a> to use this function."
 msgstr ""
 
 #: wiki/templates/wiki/includes/anonymous_blocked.html

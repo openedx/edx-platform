@@ -46,7 +46,7 @@ class SingleUserGradesTests(GradeViewTestMixin, AuthAndScopesTestMixin, APITestC
         """ This method is required by AuthAndScopesTestMixin. """
         expected_data = [{
             'username': self.student.username,
-            'email': self.student.email,
+            'email': '',
             'letter_grade': None,
             'percent': 0.0,
             'course_id': str(self.course_key),
@@ -87,7 +87,7 @@ class SingleUserGradesTests(GradeViewTestMixin, AuthAndScopesTestMixin, APITestC
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         expected_data = [{
             'username': self.student.username,
-            'email': self.student.email,
+            'email': '',
             'course_id': str(self.course_key),
             'passed': False,
             'percent': 0.0,
@@ -157,7 +157,7 @@ class SingleUserGradesTests(GradeViewTestMixin, AuthAndScopesTestMixin, APITestC
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         expected_data = {
             'username': self.student.username,
-            'email': self.student.email,
+            'email': '',
             'course_id': str(self.course_key),
         }
 
@@ -232,7 +232,7 @@ class CourseGradesViewTest(GradeViewTestMixin, APITestCase):
             ('results', [
                 {
                     'username': self.student.username,
-                    'email': self.student.email,
+                    'email': '',
                     'course_id': str(self.course.id),
                     'passed': False,
                     'percent': 0.0,
@@ -240,11 +240,27 @@ class CourseGradesViewTest(GradeViewTestMixin, APITestCase):
                 },
                 {
                     'username': self.other_student.username,
-                    'email': self.other_student.email,
+                    'email': '',
                     'course_id': str(self.course.id),
                     'passed': False,
                     'percent': 0.0,
                     'letter_grade': None
+                },
+                {
+                    'username': self.program_student.username,
+                    'email': '',
+                    'course_id': str(self.course.id),
+                    'passed': False,
+                    'percent': 0.0,
+                    'letter_grade': None,
+                },
+                {
+                    'username': self.program_masters_student.username,
+                    'email': self.program_masters_student.email,
+                    'course_id': str(self.course.id),
+                    'passed': False,
+                    'percent': 0.0,
+                    'letter_grade': None,
                 },
             ]),
         ])

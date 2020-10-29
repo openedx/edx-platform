@@ -1,5 +1,6 @@
 # Do things in edx-platform
-.PHONY: clean docs extract_translations help pull pull_translations push_translations requirements shell upgrade
+.PHONY: clean extract_translations help pull pull_translations push_translations requirements shell upgrade
+.PHONY: api-docs docs guides swagger
 
 # Careful with mktemp syntax: it has to work on Mac and Ubuntu, which have differences.
 PRIVATE_FILES := $(shell mktemp -u /tmp/private_files.XXXXXX)
@@ -18,9 +19,20 @@ clean: ## archive and delete most git-ignored files
 	tar xf $(PRIVATE_FILES)
 	rm $(PRIVATE_FILES)
 
-docs: ## build the developer documentation for this repository
-	rm -rf docs/_build docs/cms docs/common docs/lms docs/openedx
-	cd docs; make html
+SWAGGER = docs/swagger.yaml
+
+docs: api-docs guides ## build all the developer documentation for this repository
+
+swagger: ## generate the swagger.yaml file
+	DJANGO_SETTINGS_MODULE=docs.docs_settings python manage.py lms generate_swagger --generator-class=openedx.core.openapi.ApiSchemaGenerator -o $(SWAGGER)
+
+api-docs: swagger	## build the REST api docs
+	rm -f docs/api/gen/*
+	python docs/sw2md.py $(SWAGGER) docs/api/gen
+	cd docs/api; make html
+
+guides:	## build the developer guide docs
+	cd docs/guides; make clean html
 
 extract_translations: ## extract localizable strings from sources
 	i18n_tool extract -v
@@ -63,7 +75,8 @@ REQ_FILES = \
 	requirements/edx-sandbox/base \
 	requirements/edx/base \
 	requirements/edx/testing \
-	requirements/edx/development
+	requirements/edx/development \
+	scripts/xblock/requirements
 
 upgrade: export CUSTOM_COMPILE_COMMAND=make upgrade
 upgrade: ## update the pip requirements files to use the latest releases satisfying our constraints

@@ -7,8 +7,10 @@ import six
 from rest_framework import serializers
 
 from openedx.core.lib.api.serializers import CourseKeyField, UsageKeyField
+from openedx.core.openapi import is_schema_request
 
-from . import DEFAULT_FIELDS
+
+from . import DEFAULT_FIELDS, OPTIONAL_FIELDS
 from .models import Bookmark
 
 
@@ -16,12 +18,27 @@ class BookmarkSerializer(serializers.ModelSerializer):
     """
     Serializer for the Bookmark model.
     """
-    id = serializers.SerializerMethodField()  # pylint: disable=invalid-name
-    course_id = CourseKeyField(source='course_key')
-    usage_id = UsageKeyField(source='usage_key')
+    id = serializers.SerializerMethodField(     # pylint: disable=invalid-name
+        help_text=u"The identifier string for the bookmark: {user_id},{usage_id}.",
+    )
+    course_id = CourseKeyField(
+        source='course_key',
+        help_text=u"The identifier string of the bookmark's course.",
+    )
+    usage_id = UsageKeyField(
+        source='usage_key',
+        help_text=u"The identifier string of the bookmark's XBlock.",
+    )
     block_type = serializers.ReadOnlyField(source='usage_key.block_type')
-    display_name = serializers.ReadOnlyField()
-    path = serializers.SerializerMethodField()
+    display_name = serializers.ReadOnlyField(
+        help_text=u"Display name of the XBlock.",
+    )
+    path = serializers.SerializerMethodField(
+        help_text=u"""
+            List of dicts containing {"usage_id": <usage-id>, display_name:<display-name>}
+            for the XBlocks from the top of the course tree till the parent of the bookmarked XBlock.
+        """,
+    )
 
     def __init__(self, *args, **kwargs):
         # Don't pass the 'fields' arg up to the superclass
@@ -34,6 +51,11 @@ class BookmarkSerializer(serializers.ModelSerializer):
 
         # Drop any fields that are not specified in the `fields` argument.
         required_fields = set(fields)
+
+        if 'request' in kwargs['context'] and is_schema_request(kwargs['context']['request']):
+            # We are serving the schema: include everything
+            required_fields.update(OPTIONAL_FIELDS)
+
         all_fields = set(self.fields.keys())
         for field_name in all_fields - required_fields:
             self.fields.pop(field_name)

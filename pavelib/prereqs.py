@@ -1,17 +1,18 @@
 """
 Install Python and Node prerequisites.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import hashlib
+import io
 import os
 import re
-import sys
 import subprocess
-import io
+import sys
 from distutils import sysconfig
 
 from paver.easy import BuildFailure, sh, task
+from six.moves import range
 
 from .utils.envs import Env
 from .utils.timer import timed
@@ -78,7 +79,7 @@ def compute_fingerprint(path_list):
             for dirname in sorted(os.listdir(path_item)):
                 path_name = os.path.join(path_item, dirname)
                 if os.path.isdir(path_name):
-                    hasher.update(str(os.stat(path_name).st_mtime))
+                    hasher.update(str(os.stat(path_name).st_mtime).encode('utf-8'))
 
         # For files, hash the contents of the file
         if os.path.isfile(path_item):
@@ -119,7 +120,7 @@ def prereq_cache(cache_name, paths, install_func):
             # Since the pip requirement files are modified during the install
             # process, we need to store the hash generated AFTER the installation
             post_install_hash = compute_fingerprint(paths)
-            cache_file.write(post_install_hash)
+            cache_file.write(post_install_hash.encode('utf-8'))
     else:
         print(u'{cache} unchanged, skipping...'.format(cache=cache_name))
 
@@ -223,7 +224,7 @@ def uninstall_python_packages():
     # So that we don't constantly uninstall things, use a hash of the packages
     # to be uninstalled.  Check it, and skip this if we're up to date.
     hasher = hashlib.sha1()
-    hasher.update(repr(PACKAGES_TO_UNINSTALL))
+    hasher.update(repr(PACKAGES_TO_UNINSTALL).encode('utf-8'))
     expected_version = hasher.hexdigest()
     state_file_path = os.path.join(PREREQS_STATE_DIR, "Python_uninstall.sha1")
     create_prereqs_cache_dir()
@@ -256,7 +257,7 @@ def uninstall_python_packages():
 
     # Write our version.
     with io.open(state_file_path, "wb") as state_file:
-        state_file.write(expected_version)
+        state_file.write(expected_version.encode('utf-8'))
 
 
 def package_in_frozen(package_name, frozen_output):

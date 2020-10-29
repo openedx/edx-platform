@@ -1,8 +1,10 @@
 """
 Tests stringify functions used in xmodule html
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
 from lxml import etree
+
 from xmodule.stringify import stringify_children
 
 

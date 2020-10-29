@@ -1,5 +1,7 @@
 """Unit tests for the Paver JavaScript testing tasks."""
 
+from __future__ import absolute_import
+
 import ddt
 from mock import patch
 from paver.easy import call_task

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the XQueue certificates interface. """
+from __future__ import absolute_import
+
 import json
 from contextlib import contextmanager
 from datetime import datetime, timedelta
@@ -7,6 +9,7 @@ from datetime import datetime, timedelta
 import ddt
 import freezegun
 import pytz
+import six
 from django.test import TestCase
 from django.test.utils import override_settings
 from mock import Mock, patch
@@ -19,10 +22,15 @@ from testfixtures import LogCapture
 # and verify that items are being correctly added to the queue
 # in our `XQueueCertInterface` implementation.
 from capa.xqueue_interface import XQueueInterface
-from lms.djangoapps.certificates.models import CertificateStatuses, ExampleCertificate, ExampleCertificateSet, GeneratedCertificate
+from course_modes.models import CourseMode
+from lms.djangoapps.certificates.models import (
+    CertificateStatuses,
+    ExampleCertificate,
+    ExampleCertificateSet,
+    GeneratedCertificate
+)
 from lms.djangoapps.certificates.queue import LOGGER, XQueueCertInterface
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
-from course_modes.models import CourseMode
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -344,7 +352,7 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
                         u"and download_url '{download_url}'."
                     ).format(
                         student_id=self.user_2.id,
-                        course_id=unicode(self.course.id),
+                        course_id=six.text_type(self.course.id),
                         status=CertificateStatuses.downloadable,
                         download_url=download_url
                     )
@@ -414,7 +422,7 @@ class XQueueCertInterfaceExampleCertificateTest(TestCase):
             'action': 'create',
             'username': cert.uuid,
             'name': u'John Doë',
-            'course_id': unicode(self.COURSE_KEY),
+            'course_id': six.text_type(self.COURSE_KEY),
             'template_pdf': 'test.pdf',
             'example_certificate': True
         }

@@ -9,19 +9,22 @@ import itertools
 import json
 import re
 from datetime import datetime, timedelta
+from uuid import uuid4
 
 import ddt
 import six
 from django.contrib.auth.models import User
 from django.db.models import signals
 from django.urls import reverse
+from mock import patch
 from pytz import UTC
 
 from common.test.utils import disable_signal
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.program_enrollments.api import NO_PROGRAM_ENROLLMENT_TEMPLATE
 from lms.djangoapps.verify_student.models import VerificationDeadline
-from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, ManualEnrollmentAudit
+from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAttribute, ManualEnrollmentAudit
 from student.roles import GlobalStaff, SupportStaffRole
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -71,7 +74,7 @@ class SupportViewManageUserTests(SupportViewTestCase):
         """
         url = reverse('support:manage_user_detail') + self.user.username
         response = self.client.get(url)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data['username'], self.user.username)
 
     def test_disable_user_account(self):
@@ -85,7 +88,7 @@ class SupportViewManageUserTests(SupportViewTestCase):
         response = self.client.post(url, data={
             'username_or_email': test_user.username
         })
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data['success_msg'], 'User Disabled Successfully')
         test_user = User.objects.get(username=test_user.username, email=test_user.email)
         self.assertEqual(test_user.has_usable_password(), False)
@@ -108,6 +111,7 @@ class SupportViewAccessTests(SupportViewTestCase):
             'support:enrollment_list',
             'support:manage_user',
             'support:manage_user_detail',
+            'support:link_program_enrollments',
         ), (
             (GlobalStaff, True),
             (SupportStaffRole, True),
@@ -135,6 +139,7 @@ class SupportViewAccessTests(SupportViewTestCase):
         "support:enrollment_list",
         "support:manage_user",
         "support:manage_user_detail",
+        "support:link_program_enrollments",
     )
     def test_require_login(self, url_name):
         url = reverse(url_name)
@@ -159,6 +164,7 @@ class SupportViewIndexTests(SupportViewTestCase):
     EXPECTED_URL_NAMES = [
         "support:certificates",
         "support:refund",
+        "support:link_program_enrollments",
     ]
 
     def setUp(self):
@@ -245,7 +251,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(len(data), 1)
         self.assertDictContainsSubset({
             'mode': CourseMode.AUDIT,
@@ -257,7 +263,8 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         }, data[0])
         self.assertEqual(
             {CourseMode.VERIFIED, CourseMode.AUDIT, CourseMode.HONOR,
-             CourseMode.NO_ID_PROFESSIONAL_MODE, CourseMode.PROFESSIONAL},
+             CourseMode.NO_ID_PROFESSIONAL_MODE, CourseMode.PROFESSIONAL,
+             CourseMode.CREDIT_MODE},
             {mode['slug'] for mode in data[0]['course_modes']}
         )
 
@@ -274,7 +281,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         self.assertDictContainsSubset({
             'enrolled_by': self.user.email,
             'reason': 'Financial Assistance',
-        }, json.loads(response.content)[0]['manual_enrollment'])
+        }, json.loads(response.content.decode('utf-8'))[0]['manual_enrollment'])
 
     @disable_signal(signals, 'post_save')
     @ddt.data('username', 'email')
@@ -329,10 +336,9 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
 
     @disable_signal(signals, 'post_save')
-    @ddt.data('honor', 'audit', 'verified', 'professional', 'no-id-professional')
+    @ddt.data('honor', 'audit', 'verified', 'professional', 'no-id-professional', 'credit')
     def test_update_enrollment_for_all_modes(self, new_mode):
-        """ Verify support can changed the enrollment to all available modes
-        except credit. """
+        """ Verify support can changed the enrollment to all available modes"""
         self.assert_update_enrollment('username', new_mode)
 
     @disable_signal(signals, 'post_save')
@@ -341,10 +347,6 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         """ Verify support can changed the enrollment of archived course. """
         self.set_course_end_date_and_expiry()
         self.assert_update_enrollment('username', new_mode)
-
-    def test_update_enrollment_with_credit_mode_throws_error(self):
-        """ Verify that enrollment cannot be changed to credit mode. """
-        self.assert_update_enrollment('username', CourseMode.CREDIT_MODE)
 
     @ddt.data('username', 'email')
     def test_get_enrollments_with_expired_mode(self, search_string_type):
@@ -367,7 +369,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
 
     def _assert_generated_modes(self, response):
         """Dry method to generate course modes dict and test with response data."""
-        modes = CourseMode.modes_for_course(self.course.id, include_expired=True)
+        modes = CourseMode.modes_for_course(self.course.id, include_expired=True, exclude_credit=False)
         modes_data = []
         for mode in modes:
             expiry = mode.expiration_datetime.strftime('%Y-%m-%dT%H:%M:%SZ') if mode.expiration_datetime else None
@@ -384,7 +386,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             })
 
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(len(data), 1)
 
         self.assertEqual(
@@ -394,7 +396,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
 
         self.assertEqual(
             {CourseMode.VERIFIED, CourseMode.AUDIT, CourseMode.NO_ID_PROFESSIONAL_MODE,
-             CourseMode.PROFESSIONAL, CourseMode.HONOR},
+             CourseMode.PROFESSIONAL, CourseMode.HONOR, CourseMode.CREDIT_MODE},
             {mode['slug'] for mode in data[0]['course_modes']}
         )
 
@@ -405,19 +407,25 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             'support:enrollment_list',
             kwargs={'username_or_email': getattr(self.student, search_string_type)}
         )
-        response = self.client.post(url, data={
-            'course_id': six.text_type(self.course.id),
-            'old_mode': CourseMode.AUDIT,
-            'new_mode': new_mode,
-            'reason': 'Financial Assistance'
-        })
-        # Enrollment cannot be changed to credit mode.
-        if new_mode == CourseMode.CREDIT_MODE:
-            self.assertEqual(response.status_code, 400)
-        else:
-            self.assertEqual(response.status_code, 200)
-            self.assertIsNotNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
-            self.assert_enrollment(new_mode)
+
+        with patch('support.views.enrollments.get_credit_provider_attribute_values') as mock_method:
+            credit_provider = (
+                [u'Arizona State University'], 'You are now eligible for credit from Arizona State University'
+            )
+            mock_method.return_value = credit_provider
+            response = self.client.post(url, data={
+                'course_id': six.text_type(self.course.id),
+                'old_mode': CourseMode.AUDIT,
+                'new_mode': new_mode,
+                'reason': 'Financial Assistance'
+            })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
+        self.assert_enrollment(new_mode)
+        if new_mode == 'credit':
+            enrollment_attr = CourseEnrollmentAttribute.objects.first()
+            self.assertEqual(enrollment_attr.value, six.text_type(credit_provider[0]))
 
     def set_course_end_date_and_expiry(self):
         """ Set the course-end date and expire its verified mode."""
@@ -431,3 +439,87 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         )
         verified_mode.expiration_datetime = datetime(year=1970, month=1, day=9, tzinfo=UTC)
         verified_mode.save()
+
+
+@ddt.ddt
+class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
+    """
+    Tests for the link_program_enrollments support view.
+    """
+    def setUp(self):
+        """Make the user support staff. """
+        super(SupportViewLinkProgramEnrollmentsTests, self).setUp()
+        self.url = reverse("support:link_program_enrollments")
+        SupportStaffRole().add_users(self.user)
+        self.program_uuid = str(uuid4())
+        self.text = '0001,user-0001\n0002,user-02'
+
+    def _assert_props(self, field_name, value, response):
+        self.assertIn('"{}": "{}"'.format(field_name, value), six.text_type(response.content, encoding='utf-8'))
+
+    def _assert_props_list(self, field_name, values, response):
+        """
+        Assert that that page is being rendered with a specific list of props
+        """
+        values_str = ''
+        if values:
+            values_str = '", "'.join(values)
+            values_str = '"{}"'.format(values_str)
+        self.assertIn(u'"{}": [{}]'.format(field_name, values_str), six.text_type(response.content, encoding='utf-8'))
+
+    def test_get(self):
+        response = self.client.get(self.url)
+        self._assert_props_list('successes', [], response)
+        self._assert_props_list('errors', [], response)
+        self._assert_props('programUUID', '', response)
+        self._assert_props('text', '', response)
+
+    def test_invalid_uuid(self):
+        response = self.client.post(self.url, data={
+            'program_uuid': 'notauuid',
+            'text': self.text,
+        })
+        self._assert_props_list('errors', [u'badly formed hexadecimal UUID string'], response)
+
+    @ddt.unpack
+    @ddt.data(
+        ('program_uuid', ''),
+        ('', 'text'),
+        ('', ''),
+    )
+    def test_missing_parameter(self, program_uuid, text):
+        msg = u'You must provide both a program uuid and a comma separated list of external_student_key, username'
+        response = self.client.post(self.url, data={
+            'program_uuid': program_uuid,
+            'text': text,
+        })
+        self._assert_props_list('errors', [msg], response)
+
+    @ddt.data(
+        '0001,learner-01\n0002,learner-02',                                 # normal
+        '0001,learner-01,apple,orange\n0002,learner-02,purple',             # extra fields
+        '\t0001        ,    \t  learner-01    \n   0002 , learner-02    ',  # whitespace
+    )
+    @patch('support.views.program_enrollments.link_program_enrollments_to_lms_users')
+    def test_text(self, text, mocked_link):
+        self.client.post(self.url, data={
+            'program_uuid': self.program_uuid,
+            'text': text,
+        })
+        mocked_link.assert_called_once()
+        mocked_link.assert_called_with(
+            self.program_uuid,
+            {
+                '0001': 'learner-01',
+                '0002': 'learner-02',
+            }
+        )
+
+    def test_junk_text(self):
+        text = 'alsdjflajsdflakjs'
+        response = self.client.post(self.url, data={
+            'program_uuid': self.program_uuid,
+            'text': text,
+        })
+        msg = NO_PROGRAM_ENROLLMENT_TEMPLATE.format(program_uuid=self.program_uuid, external_student_key=text)
+        self._assert_props_list('errors', [msg], response)

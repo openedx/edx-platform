@@ -2,6 +2,8 @@
 Module rendering
 """
 
+from __future__ import absolute_import
+
 import beeline
 import hashlib
 import json
@@ -10,15 +12,16 @@ import textwrap
 from collections import OrderedDict
 from functools import partial
 
-from completion.models import BlockCompletion
+import six
 from completion import waffle as completion_waffle
+from completion.models import BlockCompletion
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
+from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.middleware.csrf import CsrfViewMiddleware
 from django.template.context_processors import csrf
 from django.urls import reverse
-from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.utils.text import slugify
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
@@ -27,12 +30,15 @@ from edx_django_utils.monitoring import set_custom_metrics_for_course_key, set_m
 from edx_proctoring.api import get_attempt_status_summary
 from edx_proctoring.services import ProctoringService
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_when.field_data import DateLookupFieldData
+from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from requests.auth import HTTPBasicAuth
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import APIException
 from six import text_type
+from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
@@ -42,7 +48,6 @@ from xblock.runtime import KvsFieldData
 import static_replace
 from capa.xqueue_interface import XQueueInterface
 from courseware.access import get_user_role, has_access
-from courseware.access_response import IncorrectPartitionGroupError
 from courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
 from courseware.masquerade import (
     MasqueradingKeyValueStore,
@@ -52,9 +57,9 @@ from courseware.masquerade import (
 )
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from edxmako.shortcuts import render_to_string
-from eventtracking import tracker
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
-from lms.djangoapps.grades.api import signals as grades_signals, GradesUtilService
+from lms.djangoapps.grades.api import GradesUtilService
+from lms.djangoapps.grades.api import signals as grades_signals
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
@@ -63,30 +68,28 @@ from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
 from openedx.core.djangoapps.util.user_utils import SystemUser
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.djangolib.markup import HTML
+from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.lib.gating.services import GatingService
 from openedx.core.lib.license import wrap_with_license
 from openedx.core.lib.url_utils import quote_slashes, unquote_slashes
-from openedx.core.lib.xblock_utils import request_token as xblock_request_token
 from openedx.core.lib.xblock_utils import (
     add_staff_markup,
+    get_aside_from_xblock,
+    is_xblock_aside,
     replace_course_urls,
     replace_jump_to_id_urls,
-    replace_static_urls,
-    wrap_xblock,
-    is_xblock_aside,
-    get_aside_from_xblock,
+    replace_static_urls
 )
+from openedx.core.lib.xblock_utils import request_token as xblock_request_token
+from openedx.core.lib.xblock_utils import wrap_xblock
 from openedx.features.course_duration_limits.access import course_expiration_wrapper
 from student.models import anonymous_id_for_user, user_by_anonymous_id
 from student.roles import CourseBetaTesterRole
 from track import contexts
 from util import milestones_helpers
 from util.json_request import JsonResponse
-from web_fragments.fragment import Fragment
-from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
@@ -94,10 +97,8 @@ from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.lti_module import LTIModule
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from xmodule.x_module import XModuleDescriptor
-
-from edx_when.field_data import DateLookupFieldData
-
 
 log = logging.getLogger(__name__)
 
@@ -195,7 +196,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
             display_id = slugify(chapter.display_name_with_default_escaped)
             local_hide_from_toc = False
             if required_content:
-                if unicode(chapter.location) not in required_content:
+                if six.text_type(chapter.location) not in required_content:
                     local_hide_from_toc = True
 
             # Skip the current chapter if a hide flag is tripped
@@ -271,8 +272,8 @@ def _add_timed_exam_info(user, course, section, section_context):
         try:
             timed_exam_attempt_context = get_attempt_status_summary(
                 user.id,
-                unicode(course.id),
-                unicode(section.location)
+                six.text_type(course.id),
+                six.text_type(section.location)
             )
         except Exception as ex:  # pylint: disable=broad-except
             # safety net in case something blows up in edx_proctoring
@@ -587,16 +588,17 @@ def get_module_system_for_user(
         """
         Submit a grade for the block.
         """
-        grades_signals.SCORE_PUBLISHED.send(
-            sender=None,
-            block=block,
-            user=user,
-            raw_earned=event['value'],
-            raw_possible=event['max_value'],
-            only_if_higher=event.get('only_if_higher'),
-            score_deleted=event.get('score_deleted'),
-            grader_response=event.get('grader_response')
-        )
+        if not user.is_anonymous():
+            grades_signals.SCORE_PUBLISHED.send(
+                sender=None,
+                block=block,
+                user=user,
+                raw_earned=event['value'],
+                raw_possible=event['max_value'],
+                only_if_higher=event.get('only_if_higher'),
+                score_deleted=event.get('score_deleted'),
+                grader_response=event.get('grader_response')
+            )
 
     @beeline.traced(name="lms.courseware.module_render.handle_deprecated_progress_event")
     def handle_deprecated_progress_event(block, event):
@@ -899,6 +901,7 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
         system,
         user.id,
         [
+            partial(DateLookupFieldData, course_id=course_id, user=user),
             partial(OverrideFieldData.wrap, user, course),
             partial(LmsFieldData, student_data=student_data),
         ],
@@ -1109,14 +1112,14 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
         'module': {
             # xss-lint: disable=python-deprecated-display-name
             'display_name': descriptor.display_name_with_default_escaped,
-            'usage_key': unicode(descriptor.location),
+            'usage_key': six.text_type(descriptor.location),
         }
     }
 
     # For blocks that are inherited from a content library, we add some additional metadata:
     if descriptor_orig_usage_key is not None:
-        tracking_context['module']['original_usage_key'] = unicode(descriptor_orig_usage_key)
-        tracking_context['module']['original_usage_version'] = unicode(descriptor_orig_version)
+        tracking_context['module']['original_usage_key'] = six.text_type(descriptor_orig_usage_key)
+        tracking_context['module']['original_usage_version'] = six.text_type(descriptor_orig_version)
 
     unused_masquerade, user = setup_masquerade(request, course_id, has_access(user, 'staff', descriptor, course_id))
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
@@ -1181,7 +1184,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         else:
             block_usage_key = usage_key
         instance, tracking_context = get_module_by_usage_id(
-            request, course_id, unicode(block_usage_key), course=course
+            request, course_id, six.text_type(block_usage_key), course=course
         )
 
         # Name the transaction so that we can view XBlock handlers separately in
@@ -1239,7 +1242,7 @@ def hash_resource(resource):
     """
     md5 = hashlib.md5()
     for data in resource:
-        md5.update(repr(data))
+        md5.update(repr(data).encode('utf-8'))
     return md5.hexdigest()
 
 
@@ -1281,8 +1284,8 @@ def xblock_view(request, course_id, usage_id, view_name):
 
         return JsonResponse({
             'html': fragment.content,
-            'resources': hashed_resources.items(),
-            'csrf_token': unicode(csrf(request)['csrf_token']),
+            'resources': list(hashed_resources.items()),
+            'csrf_token': six.text_type(csrf(request)['csrf_token']),
         })
 
 
@@ -1327,7 +1330,8 @@ def append_data_to_webob_response(response, data):
 
     """
     if getattr(response, 'content_type', None) == 'application/json':
-        response_data = json.loads(response.body)
+        json_input = response.body.decode('utf-8') if isinstance(response.body, bytes) else response.body
+        response_data = json.loads(json_input)
         response_data.update(data)
-        response.body = json.dumps(response_data)
+        response.body = json.dumps(response_data).encode('utf-8')
     return response

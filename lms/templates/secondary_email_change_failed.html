@@ -1,5 +1,7 @@
-## xss-lint: disable=mako-missing-default,python-wrap-html
-<%! from django.utils.translation import ugettext as _ %>
+<%page expression_filter="h"/>
+<%! from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
 
 <%inherit file="main.html" />
 
@@ -14,7 +16,6 @@
     % else:
     <p>${_("We were unable to activate your secondary email {secondary_email}").format(secondary_email=secondary_email)}</p>
     % endif
-    ## xss-lint: disable=python-wrap-html
-    <p>${_('Go back to the {link_start}home page{link_end}.').format(link_start='<a href="/">', link_end='</a>')}</p>
+    <p>${Text(_('Go back to the {link_start}home page{link_end}.')).format(link_start=HTML('<a href="/">'), link_end=HTML('</a>'))}</p>
   </section>
 </section>

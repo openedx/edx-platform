@@ -89,7 +89,7 @@ class TestEmailErrors(ModuleStoreTestCase):
             'message': 'test message for myself'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEquals(json.loads(response.content.decode('utf-8')), self.success_content)
 
         # Test that we retry upon hitting a 4xx error
         self.assertTrue(retry.called)
@@ -119,7 +119,7 @@ class TestEmailErrors(ModuleStoreTestCase):
             'message': 'test message for all'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEquals(json.loads(response.content.decode('utf-8')), self.success_content)
 
         # We shouldn't retry when hitting a 5xx error
         self.assertFalse(retry.called)
@@ -144,7 +144,7 @@ class TestEmailErrors(ModuleStoreTestCase):
             'message': 'test message for myself'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEquals(json.loads(response.content.decode('utf-8')), self.success_content)
 
         self.assertTrue(retry.called)
         (__, kwargs) = retry.call_args
@@ -166,7 +166,7 @@ class TestEmailErrors(ModuleStoreTestCase):
             'message': 'test message for myself'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEquals(json.loads(response.content.decode('utf-8')), self.success_content)
 
         self.assertTrue(retry.called)
         (__, kwargs) = retry.call_args

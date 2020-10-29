@@ -1,6 +1,8 @@
 """
 Base classes used by studio tests.
 """
+from __future__ import absolute_import
+
 from bok_choy.page_object import XSS_INJECTION
 
 from common.test.acceptance.fixtures.course import CourseFixture

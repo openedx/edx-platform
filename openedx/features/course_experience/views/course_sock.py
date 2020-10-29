@@ -6,9 +6,9 @@ from __future__ import absolute_import
 from django.template.loader import render_to_string
 from web_fragments.fragment import Fragment
 
-from course_modes.models import get_cosmetic_verified_display_price
 from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
+from openedx.features.discounts.utils import format_strikeout_price
 from student.models import CourseEnrollment
 
 
@@ -30,7 +30,7 @@ class CourseSockFragmentView(EdxFragmentView):
         show_course_sock = verified_upgrade_link_is_valid(enrollment)
         if show_course_sock:
             upgrade_url = verified_upgrade_deadline_link(request.user, course=course)
-            course_price = get_cosmetic_verified_display_price(course)
+            course_price, _ = format_strikeout_price(request.user, course)
         else:
             upgrade_url = ''
             course_price = ''

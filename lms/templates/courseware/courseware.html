@@ -3,6 +3,7 @@
 <%namespace name='static' file='/static_content.html'/>
 <%def name="online_help_token()"><% return "courseware" %></%def>
 <%!
+import six
 import waffle
 
 from django.conf import settings
@@ -178,13 +179,13 @@ ${HTML(fragment.foot_html())}
                             % endif
                             % if chapter:
                                 <span class="nav-item nav-item-chapter" data-course-position="${course.position}" data-chapter-position="${chapter.position}">
-                                    <a href="${course_url}#${unicode(chapter.location)}">${chapter.display_name_with_default}</a>
+                                    <a href="${course_url}#${six.text_type(chapter.location)}">${chapter.display_name_with_default}</a>
                                 </span>
                                 <span class="icon fa fa-angle-right" aria-hidden="true"></span>
                             % endif
                             % if section:
                                 <span class="nav-item nav-item-section">
-                                    <a href="${course_url}#${unicode(section.location)}">${section.display_name_with_default}</a>
+                                    <a href="${course_url}#${six.text_type(section.location)}">${section.display_name_with_default}</a>
                                 </span>
                                 <span class="icon fa fa-angle-right" aria-hidden="true"></span>
                             % endif

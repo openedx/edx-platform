@@ -1,7 +1,10 @@
 """HTTP endpoints for the Teams API."""
 
+from __future__ import absolute_import
+
 import logging
 
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
@@ -11,6 +14,7 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
 from django_countries import countries
+from edx_rest_framework_extensions.paginators import DefaultPagination, paginate_search_results
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions, status
@@ -24,7 +28,6 @@ from rest_framework_oauth.authentication import OAuth2Authentication
 from courseware.courses import get_course_with_access, has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
-from edx_rest_framework_extensions.paginators import DefaultPagination, paginate_search_results
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.permissions import IsStaffOrReadOnly
 from openedx.core.lib.api.view_utils import (
@@ -66,7 +69,10 @@ def team_post_save_callback(sender, instance, **kwargs):  # pylint: disable=unus
     if not kwargs['created']:
         for field in changed_fields:
             if field not in instance.FIELD_BLACKLIST:
-                truncated_fields = truncate_fields(unicode(changed_fields[field]), unicode(getattr(instance, field)))
+                truncated_fields = truncate_fields(
+                    six.text_type(changed_fields[field]),
+                    six.text_type(getattr(instance, field))
+                )
                 truncated_fields['team_id'] = instance.team_id
                 truncated_fields['field'] = field
 
@@ -499,7 +505,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         data = request.data.copy()
-        data['course_id'] = unicode(course_key)
+        data['course_id'] = six.text_type(course_key)
 
         serializer = CourseTeamCreationSerializer(data=data)
         add_serializer_errors(serializer, data, field_errors)

@@ -110,7 +110,7 @@ class AccessTokenView(RatelimitMixin, _DispatchingView):
 
     def _build_jwt_response_from_access_token_response(self, request, response):
         """ Builds the content of the response, including the JWT token. """
-        token_dict = json.loads(response.content)
+        token_dict = json.loads(response.content.decode('utf-8'))
         jwt = create_jwt_from_token(token_dict, self.get_adapter(request))
         token_dict.update({
             'access_token': jwt,

@@ -36,12 +36,14 @@ def getTargetBranch(job_name) {
 
 def qualityTestCleanup() {
     archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/**/*,test_root/log/**/*.log,*.log'
+    sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
     junit 'reports/quality_junitxml/*.xml'
 }
 
 pipeline {
     agent { label "jenkins-worker" }
     options {
+        sendSplunkConsoleLog()
         timestamps()
         timeout(60)
     }
@@ -191,10 +193,7 @@ pipeline {
                     unstash 'quality-3-reports'
                     unstash 'quality-4-reports'
                     // Check for warnings
-                    warnings canComputeNew: false, canResolveRelativePaths: false, canRunOnFailed: true, categoriesPattern: '',
-                        defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', messagesPattern: '',
-                        parserConfigurations: [[parserName: 'Pep8', pattern: 'reports/pep8/pep8.report'], [parserName: 'PyLint', pattern: 'reports/**/pylint.report']],
-                        unHealthy: ''
+                    recordIssues enabledForFailure: true, tools: [pep8(pattern: 'reports/pep8/pep8.report'), pyLint(pattern: 'reports/**/pylint.report')]
                     // Publish Quality report
                     publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, keepAll: true,
                         reportDir: 'reports/metrics/',

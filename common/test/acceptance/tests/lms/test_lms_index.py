@@ -4,6 +4,7 @@ End-to-end tests for the LMS Index page (aka, Home page).  Note that this is dif
 what students see @ edx.org because we redirect requests to a separate web application.
 """
 from __future__ import absolute_import
+
 import datetime
 
 from common.test.acceptance.pages.lms.index import IndexPage

@@ -15,6 +15,7 @@ from mock import ANY, Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from sailthru.sailthru_error import SailthruClientError
 from sailthru.sailthru_response import SailthruResponse
+import six
 from testfixtures import LogCapture
 
 from email_marketing.models import EmailMarketingConfiguration
@@ -114,7 +115,7 @@ class EmailMarketingTests(TestCase):
                     'Started at {start} and ended at {end}, time spent:{delta} milliseconds'.format(
                         start=datetime.datetime.now().isoformat(' '),
                         end=datetime.datetime.now().isoformat(' '),
-                        delta=0)
+                        delta=0 if six.PY2 else 0.0)
                  ),
                 (LOGGER_NAME, 'INFO',
                     'sailthru_hid cookie:{cookies[cookie]} successfully retrieved for user {user}'.format(

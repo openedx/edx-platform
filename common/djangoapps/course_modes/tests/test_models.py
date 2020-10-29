@@ -15,6 +15,7 @@ from django.test import TestCase, override_settings
 from django.utils.timezone import now
 from mock import patch
 from opaque_keys.edx.locator import CourseLocator
+import six
 from six.moves import zip
 
 from course_modes.helpers import enrollment_mode_display
@@ -399,11 +400,11 @@ class CourseModeModelTest(TestCase):
 
         # Check the selectable modes, which should exclude credit
         selectable_modes = CourseMode.modes_for_course_dict(self.course_key)
-        self.assertItemsEqual(list(selectable_modes.keys()), expected_selectable_modes)
+        six.assertCountEqual(self, list(selectable_modes.keys()), expected_selectable_modes)
 
         # When we get all unexpired modes, we should see credit as well
         all_modes = CourseMode.modes_for_course_dict(self.course_key, only_selectable=False)
-        self.assertItemsEqual(list(all_modes.keys()), available_modes)
+        six.assertCountEqual(self, list(all_modes.keys()), available_modes)
 
     def _enrollment_display_modes_dicts(self, dict_type):
         """

@@ -2,6 +2,8 @@
 API related to providing field overrides for individual students.  This is used
 by the individual due dates feature.
 """
+from __future__ import absolute_import
+
 import json
 
 from courseware.models import StudentFieldOverride

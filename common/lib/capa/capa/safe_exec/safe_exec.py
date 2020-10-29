@@ -1,18 +1,22 @@
 """Capa's specialized use of codejail.safe_exec."""
 
-from codejail.safe_exec import safe_exec as codejail_safe_exec
-from codejail.safe_exec import not_safe_exec as codejail_not_safe_exec
-from codejail.safe_exec import json_safe, SafeExecException
-from . import lazymod
-from six import text_type
+from __future__ import absolute_import
 
 import hashlib
+
+from codejail.safe_exec import SafeExecException, json_safe
+from codejail.safe_exec import not_safe_exec as codejail_not_safe_exec
+from codejail.safe_exec import safe_exec as codejail_safe_exec
+import six
+from six import text_type
+
+from . import lazymod
 
 # Establish the Python environment for Capa.
 # Capa assumes float-friendly division always.
 # The name "random" is a properly-seeded stand-in for the random module.
 CODE_PROLOG = """\
-from __future__ import division
+from __future__ import absolute_import, division
 
 import os
 os.environ["OPENBLAS_NUM_THREADS"] = "1"    # See TNL-6456
@@ -61,7 +65,7 @@ def update_hash(hasher, obj):
     `obj` in the process.  Only primitive JSON-safe types are supported.
 
     """
-    hasher.update(str(type(obj)))
+    hasher.update(six.b(str(type(obj))))
     if isinstance(obj, (tuple, list)):
         for e in obj:
             update_hash(hasher, e)
@@ -70,7 +74,7 @@ def update_hash(hasher, obj):
             update_hash(hasher, k)
             update_hash(hasher, obj[k])
     else:
-        hasher.update(repr(obj))
+        hasher.update(six.b(repr(obj)))
 
 
 def safe_exec(
@@ -113,7 +117,7 @@ def safe_exec(
     if cache:
         safe_globals = json_safe(globals_dict)
         md5er = hashlib.md5()
-        md5er.update(repr(code))
+        md5er.update(six.b(repr(code)))
         update_hash(md5er, safe_globals)
         key = "safe_exec.%r.%s" % (random_seed, md5er.hexdigest())
         cached = cache.get(key)

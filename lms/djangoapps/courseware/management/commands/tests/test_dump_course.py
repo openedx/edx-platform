@@ -7,7 +7,7 @@ Tests for Django management commands
 from __future__ import absolute_import
 
 import json
-from StringIO import StringIO
+from six import StringIO
 
 import factory
 import six
@@ -133,11 +133,12 @@ class CommandsTestBase(SharedModuleStoreTestCase):
 
         video_id = text_type(test_course_key.make_usage_key('video', 'Welcome'))
         self.assertEqual(dump[video_id]['category'], 'video')
-        course_metadata = dump[video_id]['metadata']
-        course_metadata.pop('edx_video_id', None)
-        self.assertItemsEqual(
-            list(course_metadata.keys()),
-            ['download_video', 'youtube_id_0_75', 'youtube_id_1_0', 'youtube_id_1_25', 'youtube_id_1_5']
+        video_metadata = dump[video_id]['metadata']
+        video_metadata.pop('edx_video_id', None)
+        six.assertCountEqual(
+            self,
+            list(video_metadata.keys()),
+            ['youtube_id_0_75', 'youtube_id_1_0', 'youtube_id_1_25', 'youtube_id_1_5']
         )
         self.assertIn('youtube_id_1_0', dump[video_id]['metadata'])
 

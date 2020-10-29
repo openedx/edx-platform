@@ -3,17 +3,18 @@
 End-to-end tests for the Account Settings page.
 """
 from __future__ import absolute_import
+
 from datetime import datetime
 from unittest import skip
 
+import six
 from bok_choy.page_object import XSS_INJECTION
 from pytz import timezone, utc
 
-from common.test.acceptance.pages.common.auto_auth import AutoAuthPage, FULL_NAME
+from common.test.acceptance.pages.common.auto_auth import FULL_NAME, AutoAuthPage
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.tests.helpers import AcceptanceTest, EventsTestMixin
-import six
 
 
 class AccountSettingsTestMixin(EventsTestMixin, AcceptanceTest):
@@ -291,7 +292,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             u'name',
             u'Full Name',
             self.full_name,
-            u'@',
+            u' ',
             [u'<h1>another name<h1>', u'<script>'],
             'Full Name cannot contain the following characters: < >',
             False

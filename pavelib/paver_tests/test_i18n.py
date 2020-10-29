@@ -2,6 +2,8 @@
 Tests for pavelib/i18n.py.
 """
 
+from __future__ import absolute_import
+
 import os
 import textwrap
 import unittest
@@ -12,7 +14,6 @@ from paver.easy import call_task, task
 import pavelib.i18n
 from pavelib.paver_tests.utils import PaverTestCase
 from pavelib.utils.envs import Env
-
 
 TX_CONFIG_SIMPLE = """\
 [main]
@@ -31,7 +32,7 @@ source_lang = en
 type = PO
 
 """
-
+# xss-lint: disable=python-concat-html
 TX_CONFIG_RELEASE = TX_CONFIG_SIMPLE + """\
 [edx-platform.release-zebrawood]
 file_filter = conf/locale/<lang>/LC_MESSAGES/django.po

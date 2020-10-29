@@ -1836,7 +1836,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
         with check_mongo_calls(max_find, max_send):
             found_orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID].course_key)
-        self.assertItemsEqual(found_orphans, orphan_locations)
+        six.assertCountEqual(self, found_orphans, orphan_locations)
 
     @ddt.data(ModuleStoreEnum.Type.mongo)
     def test_get_non_orphan_parents(self, default_ms):

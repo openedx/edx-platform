@@ -6,7 +6,7 @@
                 <span><%= HtmlUtils.ensureHtml(message) %></span>
                 <div class="alert-actions">
                     <button class="btn-alert-primary" data-old-lang-code="<%- oldLangCode %>"><%- gettext('Switch Language Back') %></button>
-                    <a href="<%- helpTranslateLink %>" target="_blank" class="btn-alert-secondary"><%= HtmlUtils.ensureHtml(helpTranslateText) %></a>
+                    <a href="<%- helpTranslateLink %>" rel="noopener" target="_blank" class="btn-alert-secondary"><%= HtmlUtils.ensureHtml(helpTranslateText) %></a>
                 </div>
             </div>
         </div>

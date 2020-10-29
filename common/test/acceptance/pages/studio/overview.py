@@ -1,6 +1,8 @@
 """
 Course Outline page in Studio.
 """
+from __future__ import absolute_import
+
 import datetime
 
 from bok_choy.javascript import js_defined, wait_for_js
@@ -9,6 +11,7 @@ from bok_choy.promise import EmptyPromise
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
+from six.moves import map, range
 
 from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
 from common.test.acceptance.pages.studio.container import ContainerPage
@@ -1000,15 +1003,15 @@ class CourseOutlineModal(object):
         """
         Set `date` value to input pointed by `selector` and `property_name`.
         """
-        month, day, year = map(int, date.split('/'))
+        month, day, year = list(map(int, date.split('/')))
         self.click(input_selector)
         if getattr(self, property_name):
-            current_month, current_year = map(int, getattr(self, property_name).split('/')[1:])
+            current_month, current_year = list(map(int, getattr(self, property_name).split('/')[1:]))
         else:  # Use default timepicker values, which are current month and year.
             current_month, current_year = datetime.datetime.today().month, datetime.datetime.today().year
         date_diff = 12 * (year - current_year) + month - current_month
         selector = u"a.ui-datepicker-{}".format('next' if date_diff > 0 else 'prev')
-        for __ in xrange(abs(date_diff)):
+        for __ in range(abs(date_diff)):
             self.page.q(css=selector).click()
         self.page.q(css="a.ui-state-default").nth(day - 1).click()  # set day
         self.page.wait_for_element_invisibility("#ui-datepicker-div", "datepicker should be closed")

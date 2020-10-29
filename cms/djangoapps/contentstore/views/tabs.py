@@ -1,6 +1,9 @@
 """
 Views related to course tabs
 """
+from __future__ import absolute_import
+
+import six
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseNotFound
@@ -197,7 +200,7 @@ def primitive_delete(course, num):
 def primitive_insert(course, num, tab_type, name):
     "Inserts a new tab at the given number (0 based)."
     validate_args(num, tab_type)
-    new_tab = CourseTab.from_json({u'type': unicode(tab_type), u'name': unicode(name)})
+    new_tab = CourseTab.from_json({u'type': six.text_type(tab_type), u'name': six.text_type(name)})
     tabs = course.tabs
     tabs.insert(num, new_tab)
     modulestore().update_item(course, ModuleStoreEnum.UserID.primitive_command)

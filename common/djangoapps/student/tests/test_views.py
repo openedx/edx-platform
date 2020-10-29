@@ -141,13 +141,13 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
         with patch('student.models.CourseEnrollment.refundable', return_value=True):
             response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
 
-        self.assertEquals(json.loads(response.content), {'course_refundable_status': True})
+        self.assertEquals(json.loads(response.content.decode('utf-8')), {'course_refundable_status': True})
         self.assertEqual(response.status_code, 200)
 
         with patch('student.models.CourseEnrollment.refundable', return_value=False):
             response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
 
-        self.assertEquals(json.loads(response.content), {'course_refundable_status': False})
+        self.assertEquals(json.loads(response.content.decode('utf-8')), {'course_refundable_status': False})
         self.assertEqual(response.status_code, 200)
 
     def test_course_run_refund_status_invalid_course_key(self):
@@ -157,7 +157,7 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
                                                         InvalidKeyError during look up.')
             response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
 
-        self.assertEquals(json.loads(response.content), {'course_refundable_status': ''})
+        self.assertEquals(json.loads(response.content.decode('utf-8')), {'course_refundable_status': ''})
         self.assertEqual(response.status_code, 406)
 
 
@@ -213,19 +213,6 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             course_overview.social_sharing_url = 'http://www.testurl.com/social/url/'
 
         course_overview.save()
-
-    def test_user_info_cookie(self):
-        """
-        Verify visiting the learner dashboard sets the user info cookie.
-        """
-        self.assertNotIn(settings.EDXMKTG_USER_INFO_COOKIE_NAME, self.client.cookies)
-
-        request = RequestFactory().get(self.path)
-        request.user = self.user
-        expected = json.dumps(_get_user_info_cookie_data(request, self.user))
-        self.client.get(self.path)
-        actual = self.client.cookies[settings.EDXMKTG_USER_INFO_COOKIE_NAME].value
-        self.assertEqual(actual, expected)
 
     def test_redirect_account_settings(self):
         """
@@ -516,7 +503,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         course_overview = CourseOverviewFactory(
             start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
         )
-        course_enrollment = CourseEnrollmentFactory(user=self.user)
+        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=course_overview.id)
         entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment)
         course_runs = [{
             'key': six.text_type(course_overview.id),
@@ -573,6 +560,23 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             response = self.client.get(reverse('dashboard'))
             self.assertIn('You are not enrolled in any courses yet.', response.content)
             self.assertIn(empty_dashboard_message, response.content)
+
+    @patch('django.conf.settings.DASHBOARD_COURSE_LIMIT', 1)
+    def test_course_limit_on_dashboard(self):
+        course = CourseFactory.create()
+        CourseEnrollmentFactory(
+            user=self.user,
+            course_id=course.id
+        )
+
+        course_v1 = CourseFactory.create()
+        CourseEnrollmentFactory(
+            user=self.user,
+            course_id=course_v1.id
+        )
+
+        response = self.client.get(reverse('dashboard'))
+        self.assertIn('1 results successfully populated', response.content)
 
     @staticmethod
     def _remove_whitespace_from_html_string(html):

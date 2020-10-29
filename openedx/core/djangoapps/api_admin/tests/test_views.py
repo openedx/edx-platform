@@ -403,9 +403,12 @@ class CatalogPreviewViewTest(CatalogTest):
         )
         response = self.client.get(self.url, {'q': '*'})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content), data)
+        self.assertEqual(json.loads(response.content.decode('utf-8')), data)
 
     def test_get_without_query(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content), {'count': 0, 'results': [], 'next': None, 'prev': None})
+        self.assertEqual(
+            json.loads(response.content.decode('utf-8')),
+            {'count': 0, 'results': [], 'next': None, 'prev': None}
+        )

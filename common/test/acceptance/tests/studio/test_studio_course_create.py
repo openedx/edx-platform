@@ -1,9 +1,13 @@
 """
 Acceptance tests for course creation.
 """
-import uuid
+from __future__ import absolute_import
+
 import random
 import string
+import uuid
+
+from six.moves import range
 
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.index import DashboardPage

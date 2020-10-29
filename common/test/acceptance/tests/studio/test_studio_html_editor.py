@@ -1,12 +1,13 @@
 """
 Acceptance tests for HTML component in studio
 """
-from common.test.acceptance.pages.studio.utils import type_in_codemirror
-from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
+from __future__ import absolute_import
+
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.studio.container import ContainerPage, XBlockWrapper
-from common.test.acceptance.pages.studio.utils import add_component
-from common.test.acceptance.pages.studio.html_component_editor import HtmlXBlockEditorView, HTMLEditorIframe
+from common.test.acceptance.pages.studio.html_component_editor import HTMLEditorIframe, HtmlXBlockEditorView
+from common.test.acceptance.pages.studio.utils import add_component, type_in_codemirror
+from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
 
 
 class HTMLComponentEditorTests(ContainerBase):

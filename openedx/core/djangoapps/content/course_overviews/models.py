@@ -19,6 +19,7 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from six import text_type  # pylint: disable=ungrouped-imports
 from six.moves.urllib.parse import urlparse, urlunparse  # pylint: disable=import-error
+from simple_history.models import HistoricalRecords
 
 from lms.djangoapps.discussion import django_comment_client
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
@@ -110,6 +111,8 @@ class CourseOverview(TimeStampedModel):
     eligible_for_financial_aid = BooleanField(default=True)
 
     language = TextField(null=True)
+
+    history = HistoricalRecords()
 
     @classmethod
     def _create_or_update(cls, course):
@@ -914,3 +917,25 @@ class CourseOverviewImageConfig(ConfigurationModel):
         return u"CourseOverviewImageConfig(enabled={}, small={}, large={})".format(
             self.enabled, self.small, self.large
         )
+
+
+class SimulateCoursePublishConfig(ConfigurationModel):
+    """
+    Manages configuration for a run of the simulate_publish management command.
+
+    .. no_pii:
+    """
+
+    class Meta(object):
+        app_label = 'course_overviews'
+        verbose_name = 'simulate_publish argument'
+
+    arguments = models.TextField(
+        blank=True,
+        help_text='Useful for manually running a Jenkins job. Specify like "--delay 10 --receivers A B C \
+        --courses X Y Z".',
+        default='',
+    )
+
+    def __unicode__(self):
+        return six.text_type(self.arguments)

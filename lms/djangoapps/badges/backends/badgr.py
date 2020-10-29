@@ -67,7 +67,7 @@ class BadgrBackend(BadgeBackend):
         if badge_class.issuing_component and badge_class.course_id:
             # Make this unique to the course, and down to 64 characters.
             # We don't do this to badges without issuing_component set for backwards compatibility.
-            slug = hashlib.sha256(slug + six.text_type(badge_class.course_id)).hexdigest()
+            slug = hashlib.sha256((slug + six.text_type(badge_class.course_id)).encode('utf-8')).hexdigest()
         if len(slug) > MAX_SLUG_LENGTH:
             # Will be 64 characters.
             slug = hashlib.sha256(slug).hexdigest()

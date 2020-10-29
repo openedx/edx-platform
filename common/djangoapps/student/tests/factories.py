@@ -69,7 +69,7 @@ class RegistrationFactory(DjangoModelFactory):
         model = Registration
 
     user = None
-    activation_key = uuid4().hex.decode('ascii')
+    activation_key = six.text_type(uuid4().hex)
 
 
 class UserFactory(DjangoModelFactory):
@@ -135,7 +135,7 @@ class CourseEnrollmentFactory(DjangoModelFactory):
     def _create(cls, model_class, *args, **kwargs):
         manager = cls._get_manager(model_class)
         course_kwargs = {}
-        for key in kwargs.keys():
+        for key in list(kwargs):
             if key.startswith('course__'):
                 course_kwargs[key.split('__')[1]] = kwargs.pop(key)
 

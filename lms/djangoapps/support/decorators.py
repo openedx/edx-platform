@@ -1,6 +1,8 @@
 """
 Decorators used by the support app.
 """
+from __future__ import absolute_import
+
 from functools import wraps
 
 from django.contrib.auth.decorators import login_required

@@ -1,12 +1,13 @@
 """
 Common utility functions useful throughout the contentstore
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import logging
 import re
 from datetime import datetime
 
+import six
 from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import ugettext as _
@@ -137,7 +138,7 @@ def get_lms_link_for_certificate_web_view(user_id, course_key, mode):
     return u"//{certificate_web_base}/certificates/user/{user_id}/course/{course_id}?preview={mode}".format(
         certificate_web_base=get_lms_link_from_course_key(settings.LMS_BASE, course_key),
         user_id=user_id,
-        course_id=unicode(course_key),
+        course_id=six.text_type(course_key),
         mode=mode
     )
 
@@ -261,7 +262,7 @@ def reverse_url(handler_name, key_name=None, key_value=None, kwargs=None):
     Creates the URL for the given handler.
     The optional key_name and key_value are passed in as kwargs to the handler.
     """
-    kwargs_for_reverse = {key_name: unicode(key_value)} if key_name else None
+    kwargs_for_reverse = {key_name: six.text_type(key_value)} if key_name else None
     if kwargs:
         kwargs_for_reverse.update(kwargs)
     return reverse(handler_name, kwargs=kwargs_for_reverse)
@@ -414,7 +415,7 @@ def get_user_partition_info(xblock, schemes=None, course=None):
             # Put together the entire partition dictionary
             partitions.append({
                 "id": p.id,
-                "name": unicode(p.name),  # Convert into a string in case ugettext_lazy was used
+                "name": six.text_type(p.name),  # Convert into a string in case ugettext_lazy was used
                 "scheme": p.scheme.name,
                 "groups": groups,
             })

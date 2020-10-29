@@ -17,6 +17,7 @@ from django.test import TestCase
 from django.utils.timezone import now
 from freezegun import freeze_time
 from mock import patch
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from lms.djangoapps.grades.constants import GradeOverrideFeatureEnum
@@ -165,7 +166,7 @@ class VisibleBlocksTest(GradesModelTestCase):
             'version': BLOCK_RECORD_LIST_VERSION,
         }
         expected_json = json.dumps(expected_data, separators=(',', ':'), sort_keys=True)
-        expected_hash = b64encode(sha1(expected_json).digest())
+        expected_hash = b64encode(sha1(expected_json.encode('utf-8')).digest()).decode('utf-8')
         self.assertEqual(expected_data, json.loads(vblocks.blocks_json))
         self.assertEqual(expected_json, vblocks.blocks_json)
         self.assertEqual(expected_hash, vblocks.hashed)
@@ -457,7 +458,7 @@ class PersistentCourseGradesTest(GradesModelTestCase):
         ("percent_grade", "Not a float at all", ValueError),
         ("percent_grade", None, IntegrityError),
         ("letter_grade", None, IntegrityError),
-        ("course_id", "Not a course key at all", AssertionError),
+        ("course_id", "Not a course key at all", InvalidKeyError),
         ("user_id", None, IntegrityError),
         ("grading_policy_hash", None, IntegrityError),
     )

@@ -144,7 +144,10 @@ class TrackMiddleware(object):
             # HTTP headers may contain Latin1 characters. Decoding using Latin1 encoding here
             # avoids encountering UnicodeDecodeError exceptions when these header strings are
             # output to tracking logs.
-            context[context_key] = request.META.get(header_name, '').decode('latin1')
+            context_value = request.META.get(header_name, '')
+            if isinstance(context_value, six.binary_type):
+                context_value = context_value.decode('latin1')
+            context[context_key] = context_value
 
         # Google Analytics uses the clientId to keep track of unique visitors. A GA cookie looks like
         # this: _ga=GA1.2.1033501218.1368477899. The clientId is this part: 1033501218.1368477899.
@@ -183,8 +186,9 @@ class TrackMiddleware(object):
         # Using a known-insecure hash to shorten is silly.
         # Also, why do we need same length?
         key_salt = "common.djangoapps.track" + self.__class__.__name__
-        key = hashlib.md5(key_salt + settings.SECRET_KEY).digest()
-        encrypted_session_key = hmac.new(key, msg=session_key, digestmod=hashlib.md5).hexdigest()
+        key_bytes = (key_salt + settings.SECRET_KEY).encode('utf-8')
+        key = hashlib.md5(key_bytes).digest()
+        encrypted_session_key = hmac.new(key, msg=session_key.encode('utf-8'), digestmod=hashlib.md5).hexdigest()
         return encrypted_session_key
 
     def get_user_primary_key(self, request):

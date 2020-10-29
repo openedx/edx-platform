@@ -40,7 +40,8 @@ self_paced = context.get('self_paced', False)
                         <span class="fa fa-chevron-right ${ 'fa-rotate-90' if section_is_auto_opened else '' }" aria-hidden="true"></span>
                         <h3 class="section-title">${ section['display_name'] }</h3>
             % if section.get('complete'):
-                            <span class="complete-checkmark fa fa-check"></span>
+                            <span class="complete-checkmark fa fa-check" aria-hidden="true"></span>
+                            <span class="sr">${_("Completed")}</span>
             % endif
                     </button>
                     <ol class="outline-item accordion-panel ${ '' if section_is_auto_opened else 'is-hidden' }"
@@ -82,7 +83,8 @@ self_paced = context.get('self_paced', False)
                                             ${ subsection['display_name'] }
                                         </h4>
                     % if subsection.get('complete'):
-                                        <span class="complete-checkmark fa fa-check"></span>
+                                        <span class="complete-checkmark fa fa-check" aria-hidden="true"></span>
+                                        <span class="sr">${_("Completed")}</span>
                     % endif
                 % endif
                                         <div class="details">
@@ -173,7 +175,9 @@ self_paced = context.get('self_paced', False)
                                               </div>
                                             </div>
                         % if vertical.get('complete'):
-                                                <span class="complete-checkmark fa fa-check"></span>
+                                                <span class="complete-checkmark fa fa-check" aria-hidden="true"></span>
+                                                <span class="sr">${_("Completed")}</span>
+
                         % endif
                                         </a>
                                     </li>

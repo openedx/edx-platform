@@ -112,7 +112,7 @@ class EnrollmentTestMixin(object):
                 self.assertEqual(response.status_code, expected_status)
 
                 if expected_status == status.HTTP_200_OK:
-                    data = json.loads(response.content)
+                    data = json.loads(response.content.decode('utf-8'))
                     self.assertEqual(course_id, data['course_details']['course_id'])
 
                     if mode is not None:
@@ -149,7 +149,7 @@ class EnrollmentTestMixin(object):
     def _get_enrollments(self):
         """Retrieve the enrollment list for the current user. """
         resp = self.client.get(reverse("courseenrollments"))
-        return json.loads(resp.content)
+        return json.loads(resp.content.decode('utf-8'))
 
 
 @override_settings(EDX_API_KEY="i am a key")
@@ -220,7 +220,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         resp = self.assert_enrollment_status()
 
         # Verify that the response contains the correct course_name
-        data = json.loads(resp.content)
+        data = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(self.course.display_name_with_default, data['course_details']['course_name'])
 
         # Verify that the enrollment was created correctly
@@ -244,7 +244,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             )
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = json.loads(resp.content)
+        data = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(six.text_type(self.course.id), data['course_details']['course_id'])
         self.assertEqual(self.course.display_name_with_default, data['course_details']['course_name'])
         self.assertEqual(CourseMode.DEFAULT_MODE_SLUG, data['mode'])
@@ -288,7 +288,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
 
         # While the enrollment wrong is invalid, the response content should have
         # all the valid enrollment modes.
-        data = json.loads(resp.content)
+        data = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(six.text_type(self.course.id), data['course_details']['course_id'])
         self.assertEqual(1, len(data['course_details']['course_modes']))
         self.assertEqual('professional', data['course_details']['course_modes'][0]['slug'])
@@ -305,7 +305,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             reverse('courseenrollment', kwargs={"course_id": six.text_type(self.course.id)})
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = json.loads(resp.content)
+        data = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(six.text_type(self.course.id), data['course_details']['course_id'])
         self.assertEqual(CourseMode.DEFAULT_MODE_SLUG, data['mode'])
         self.assertTrue(data['is_active'])
@@ -362,8 +362,9 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             kwargs.update(HTTP_X_EDX_API_KEY=self.API_KEY)
         response = self.client.get(reverse('courseenrollments'), {'user': self.user.username}, **kwargs)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = json.loads(response.content)
-        self.assertItemsEqual(
+        data = json.loads(response.content.decode('utf-8'))
+        six.assertCountEqual(
+            self,
             [(datum['course_details']['course_id'], datum['course_details']['course_name']) for datum in data],
             [(six.text_type(course.id), course.display_name_with_default) for course in courses]
         )
@@ -444,7 +445,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-        data = json.loads(resp.content)
+        data = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(six.text_type(self.course.id), data['course_id'])
         self.assertEqual(self.course.display_name_with_default, data['course_name'])
         mode = data['course_modes'][0]
@@ -464,7 +465,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-        data = json.loads(resp.content)
+        data = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(six.text_type(self.course.id), data['course_id'])
         mode = data['course_modes'][0]
         self.assertEqual(mode['slug'], CourseMode.CREDIT_MODE)
@@ -498,7 +499,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-        data = json.loads(resp.content)
+        data = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(data['course_start'], expected_start)
         self.assertEqual(data['course_end'], expected_end)
 
@@ -507,7 +508,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-        data = json.loads(resp.content)
+        data = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(data['course_details']['course_start'], expected_start)
         self.assertEqual(data['course_details']['course_end'], expected_end)
 
@@ -515,7 +516,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         resp = self.client.get(reverse('courseenrollments'))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-        data = json.loads(resp.content)
+        data = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(data[0]['course_details']['course_start'], expected_start)
         self.assertEqual(data[0]['course_details']['course_end'], expected_end)
 
@@ -547,7 +548,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
     def test_enrollment_already_enrolled(self):
         response = self.assert_enrollment_status()
         repeat_response = self.assert_enrollment_status(expected_status=status.HTTP_200_OK)
-        self.assertEqual(json.loads(response.content), json.loads(repeat_response.content))
+        self.assertEqual(json.loads(response.content.decode('utf-8')), json.loads(repeat_response.content))
 
     def test_get_enrollment_with_invalid_key(self):
         resp = self.client.post(
@@ -942,7 +943,10 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             self.assertEqual(is_active, old_is_active)
             self.assertEqual(course_mode, old_mode)
             # error message should contain specific text.  Otto checks for this text in the message.
-            self.assertRegexpMatches(json.loads(response.content)['message'], 'Enrollment mode mismatch')
+            self.assertRegexpMatches(
+                json.loads(response.content.decode('utf-8'))['message'],
+                'Enrollment mode mismatch'
+            )
         else:
             # call should have succeeded
             self.assertEqual(is_active, new_is_active)
@@ -1126,7 +1130,7 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
         self.assertEqual(response.status_code, 403)
 
         # Expect that the redirect URL is included in the response
-        resp_data = json.loads(response.content)
+        resp_data = json.loads(response.content.decode('utf-8'))
         user_message_url = get_absolute_url(user_message_path)
         self.assertEqual(resp_data['user_message_url'], user_message_url)
 
@@ -1348,7 +1352,7 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
         self._create_test_retirement(self.user)
         response = self._submit_unenroll(self.superuser, self.user.username)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         # order doesn't matter so compare sets
         self.assertEqual(set(data), self.orgs)
         self._assert_inactive()
@@ -1368,7 +1372,7 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
         self._assert_active()
         response = self._submit_unenroll(self.superuser, None)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data, u"Username not specified.")
         self._assert_active()
 
@@ -1393,7 +1397,7 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         response = self._submit_unenroll(self.superuser, self.user.username)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(response.content, "")
+        self.assertEqual(response.content.decode('utf-8'), "")
         self._assert_inactive()
 
     def _assert_active(self):
@@ -1464,7 +1468,7 @@ class UserRoleTest(ModuleStoreTestCase):
         else:
             response = self.client.get(reverse('roles'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         sort_by_role_id = lambda r: r['course_id']
         response_data['roles'] = sorted(response_data['roles'], key=sort_by_role_id)
         expected_roles = sorted(expected_roles, key=sort_by_role_id)
@@ -1521,7 +1525,7 @@ class UserRoleTest(ModuleStoreTestCase):
                     u"An error occurred while retrieving roles for user '{username}"
                 ).format(username=self.user.username)
             }
-            response_data = json.loads(response.content)
+            response_data = json.loads(response.content.decode('utf-8'))
             self.assertEqual(response_data, expected_response)
 
 
@@ -1622,7 +1626,7 @@ class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
         """
         response = self._make_request(query_params)
         self.assertEqual(response.status_code, expected_status)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         if error_fields is not None:
             self.assertIn('field_errors', content)
             for error_field in error_fields:
@@ -1680,4 +1684,4 @@ class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
         content = self._assert_list_of_enrollments(query_params, status.HTTP_200_OK)
         results = content['results']
 
-        self.assertItemsEqual(results, expected_results)
+        six.assertCountEqual(self, results, expected_results)

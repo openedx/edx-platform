@@ -6,6 +6,8 @@ These tags do not have state, so they just get passed the system (for access to 
 and the xml element.
 """
 
+from __future__ import absolute_import
+
 import logging
 import re
 import xml.sax.saxutils as saxutils
@@ -19,7 +21,8 @@ log = logging.getLogger(__name__)
 
 registry = TagRegistry()
 
-#-----------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
 
 
 class MathRenderer(object):
@@ -54,16 +57,19 @@ class MathRenderer(object):
         Return the contents of this tag, rendered to html, as an etree element.
         """
         # TODO: why are there nested html tags here??  Why are there html tags at all, in fact?
+        # xss-lint: disable=python-interpolate-html
         html = '<html><html>%s</html><html>%s</html></html>' % (
             self.mathstr, saxutils.escape(self.xml.tail))
         try:
             xhtml = etree.XML(html)
         except Exception as err:
             if self.system.DEBUG:
+                # xss-lint: disable=python-interpolate-html
                 msg = '<html><div class="inline-error"><p>Error %s</p>' % (
-                    str(err).replace('<', '&lt;'))
+                    str(err).replace('<', '&lt;'))  # xss-lint: disable=python-custom-escape
+                # xss-lint: disable=python-interpolate-html
                 msg += ('<p>Failed to construct math expression from <pre>%s</pre></p>' %
-                        html.replace('<', '&lt;'))
+                        html.replace('<', '&lt;'))  # xss-lint: disable=python-custom-escape
                 msg += "</div></html>"
                 log.error(msg)
                 return etree.XML(msg)
@@ -74,7 +80,8 @@ class MathRenderer(object):
 
 registry.register(MathRenderer)
 
-#-----------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
 
 
 class SolutionRenderer(object):
@@ -96,9 +103,11 @@ class SolutionRenderer(object):
         html = self.system.render_template("solutionspan.html", context)
         return etree.XML(html)
 
+
 registry.register(SolutionRenderer)
 
-#-----------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
 
 
 class TargetedFeedbackRenderer(object):
@@ -116,11 +125,14 @@ class TargetedFeedbackRenderer(object):
         """
         Return the contents of this tag, rendered to html, as an etree element.
         """
+        # xss-lint: disable=python-wrap-html
         html = '<section class="targeted-feedback-span"><span>{}</span></section>'.format(etree.tostring(self.xml))
         try:
             xhtml = etree.XML(html)
+
         except Exception as err:  # pylint: disable=broad-except
             if self.system.DEBUG:
+                # xss-lint: disable=python-wrap-html
                 msg = """
                     <html>
                       <div class="inline-error">
@@ -135,9 +147,11 @@ class TargetedFeedbackRenderer(object):
                 raise
         return xhtml
 
+
 registry.register(TargetedFeedbackRenderer)
 
-#-----------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
 
 
 class ClarificationRenderer(object):
@@ -166,5 +180,6 @@ class ClarificationRenderer(object):
         # We must include any text that was following our original <clarification>...</clarification> XML node.:
         xml.tail = self.tail
         return xml
+
 
 registry.register(ClarificationRenderer)

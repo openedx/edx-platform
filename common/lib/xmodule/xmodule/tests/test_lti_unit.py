@@ -1,19 +1,24 @@
 # -*- coding: utf-8 -*-
 """Test for LTI Xmodule functional logic."""
 
+from __future__ import absolute_import
+
 import datetime
-from pytz import UTC
-from mock import Mock, patch, PropertyMock
 import textwrap
-from lxml import etree
-from webob.request import Request
 from copy import copy
+
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
+from lxml import etree
+from mock import Mock, PropertyMock, patch
+from pytz import UTC
 from six import text_type
-import urllib
+from webob.request import Request
 
 from xmodule.fields import Timedelta
-from xmodule.lti_module import LTIDescriptor
 from xmodule.lti_2_util import LTIError
+from xmodule.lti_module import LTIDescriptor
 
 from . import LogicTest
 
@@ -61,7 +66,7 @@ class LTIModuleTest(LogicTest):
             self.xmodule.runtime.hostname
         )
 
-        sourced_id = u':'.join(urllib.quote(i) for i in (self.lti_id, self.unquoted_resource_link_id, self.user_id))
+        sourced_id = u':'.join(six.moves.urllib.parse.quote(i) for i in (self.lti_id, self.unquoted_resource_link_id, self.user_id))
 
         self.defaults = {
             'namespace': "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0",
@@ -277,7 +282,7 @@ class LTIModuleTest(LogicTest):
         self.assertEqual(self.xmodule.module_score, float(self.defaults['grade']))
 
     def test_user_id(self):
-        expected_user_id = text_type(urllib.quote(self.xmodule.runtime.anonymous_student_id))
+        expected_user_id = text_type(six.moves.urllib.parse.quote(self.xmodule.runtime.anonymous_student_id))
         real_user_id = self.xmodule.get_user_id()
         self.assertEqual(real_user_id, expected_user_id)
 
@@ -296,12 +301,12 @@ class LTIModuleTest(LogicTest):
     def test_resource_link_id(self):
         with patch('xmodule.lti_module.LTIModule.location', new_callable=PropertyMock):
             self.xmodule.location.html_id = lambda: 'i4x-2-3-lti-31de800015cf4afb973356dbe81496df'
-            expected_resource_link_id = text_type(urllib.quote(self.unquoted_resource_link_id))
+            expected_resource_link_id = text_type(six.moves.urllib.parse.quote(self.unquoted_resource_link_id))
             real_resource_link_id = self.xmodule.get_resource_link_id()
             self.assertEqual(real_resource_link_id, expected_resource_link_id)
 
     def test_lis_result_sourcedid(self):
-        expected_sourced_id = u':'.join(urllib.quote(i) for i in (
+        expected_sourced_id = u':'.join(six.moves.urllib.parse.quote(i) for i in (
             text_type(self.system.course_id),
             self.xmodule.get_resource_link_id(),
             self.user_id

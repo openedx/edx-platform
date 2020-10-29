@@ -216,7 +216,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertItemsEqual(response.redirect_chain, [])
+        six.assertCountEqual(self, response.redirect_chain, [])
         banner_text = 'You lose all access to this course, including your progress,'
         if show_expiration_banner:
             self.assertIn(banner_text, response.content)
@@ -281,7 +281,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertItemsEqual(response.redirect_chain, [])
+        six.assertCountEqual(self, response.redirect_chain, [])
         banner_text = 'You lose all access to this course, including your progress,'
         self.assertNotIn(banner_text, response.content)
 
@@ -317,7 +317,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertItemsEqual(response.redirect_chain, [])
+        six.assertCountEqual(self, response.redirect_chain, [])
         banner_text = 'This learner does not have access to this course. Their access expired on'
         self.assertIn(banner_text, response.content)
 
@@ -368,7 +368,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertItemsEqual(response.redirect_chain, [])
+        six.assertCountEqual(self, response.redirect_chain, [])
         banner_text = 'This learner does not have access to this course. Their access expired on'
         self.assertNotIn(banner_text, response.content)
 
@@ -417,6 +417,6 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertItemsEqual(response.redirect_chain, [])
+        six.assertCountEqual(self, response.redirect_chain, [])
         banner_text = 'This learner does not have access to this course. Their access expired on'
         self.assertNotIn(banner_text, response.content)

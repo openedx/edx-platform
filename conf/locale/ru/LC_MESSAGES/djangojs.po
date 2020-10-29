@@ -6,6 +6,8 @@
 # Translators:
 # dfxedx <ah532@ya.ru>, 2014
 # Alena Koneva <alenakoneva@ya.ru>, 2014
+# Alexander Eroshkin <gjrfytne@gmail.com>, 2019
+# Alexander Kireev <alexx6x@gmail.com>, 2019
 # Alexandr Kosharny <acosarnii@gmail.com>, 2016
 # Alexey Yuriev <yurievac@gmail.com>, 2018
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
@@ -82,6 +84,7 @@
 # Evgeniya <eugenia000@gmail.com>, 2013
 # Elena Freundorfer <e_freundorfer@gmx.de>, 2014
 # Evgeniya <eugenia000@gmail.com>, 2013
+# Ivan Morozov <xmorozov@gmail.com>, 2019
 # Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2017
 # Madina Kanlybaeva <madika.kanlybaeva@mail.ru>, 2016
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
@@ -102,6 +105,17 @@
 # Андрей Сандлер <inactive+asandler@transifex.com>, 2013
 # Ничик Дмитрий Валерьевич <dmi.nichik@gmail.com>, 2013
 # Павел Жилкин, 2018-2019
+# #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
+# edX community translations have been downloaded from Russian (https://www.transifex.com/open-edx/teams/6205/ru/).
+# Copyright (C) 2019 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2019.
+#
+# Translators:
+# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2019
+# YummyTranslations Edx <yummytranslations.edx@gmail.com>, 2019
+# Валентина Пицик <lushalusha007@gmail.com>, 2019
+#
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)
 # Copyright (C) 2019 edX
@@ -162,8 +176,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-02-17 20:42+0000\n"
-"PO-Revision-Date: 2019-02-10 20:45+0000\n"
+"POT-Creation-Date: 2019-09-15 20:42+0000\n"
+"PO-Revision-Date: 2019-07-28 20:42+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "Language: ru\n"
@@ -192,29 +206,12 @@ msgstr "Сохранение"
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/show_textbook.js
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
-#: cms/templates/js/certificate-details.underscore
-#: cms/templates/js/certificate-editor.underscore
-#: cms/templates/js/content-group-editor.underscore
-#: cms/templates/js/course-instructor-details.underscore
-#: cms/templates/js/course-outline.underscore
-#: cms/templates/js/course-settings-learning-fields.underscore
-#: cms/templates/js/course_grade_policy.underscore
-#: cms/templates/js/course_info_update.underscore
-#: cms/templates/js/group-configuration-details.underscore
-#: cms/templates/js/group-configuration-editor.underscore
-#: cms/templates/js/partition-group-details.underscore
-#: cms/templates/js/show-textbook.underscore
-#: cms/templates/js/signatory-editor.underscore
-#: cms/templates/js/video-transcripts.underscore
-#: cms/templates/js/xblock-outline.underscore
-#: common/static/common/templates/discussion/forum-action-delete.underscore
 msgid "Delete"
 msgstr "Удалить"
 
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/asset.js cms/static/js/views/course_info_update.js
 #: cms/static/js/views/export.js cms/static/js/views/manage_users_and_roles.js
@@ -225,6 +222,7 @@ msgstr "Удалить"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/common/js/components/utils/view_utils.js
 #: lms/static/js/Markdown.Editor.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -236,10 +234,6 @@ msgstr "Удалить"
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/signatory-actions.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
-#: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/response-comment-edit.underscore
-#: common/static/common/templates/discussion/thread-edit.underscore
-#: common/static/common/templates/discussion/thread-response-edit.underscore
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
@@ -247,6 +241,7 @@ msgstr "Удалить"
 msgid "Cancel"
 msgstr "Отмена"
 
+#. Translators: This is the status of an active video upload
 #: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
 #: cms/static/js/views/video_thumbnail.js lms/static/js/views/image_field.js
 msgid "Uploading"
@@ -255,7 +250,6 @@ msgstr "Загрузка"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: cms/static/js/views/active_video_upload.js
 #: cms/static/js/views/modals/edit_xblock.js
 #: cms/static/js/views/video_transcripts.js
@@ -263,9 +257,6 @@ msgstr "Загрузка"
 #: lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
 #: common/static/common/templates/image-modal.underscore
-#: common/static/common/templates/discussion/alert-popup.underscore
-#: common/static/common/templates/discussion/forum-action-close.underscore
-#: common/static/common/templates/discussion/search-alert.underscore
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Close"
 msgstr "Закрыть"
@@ -273,7 +264,6 @@ msgstr "Закрыть"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: cms/static/js/views/assets.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/asset-library.underscore
@@ -292,11 +282,9 @@ msgstr "Выберите файл"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: cms/static/js/views/course_info_update.js cms/static/js/views/tabs.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/js/Markdown.Editor.js
-#: common/static/common/templates/discussion/alert-popup.underscore
 #: lms/templates/learner_dashboard/verification_popover.underscore
 msgid "OK"
 msgstr "ОК"
@@ -304,7 +292,6 @@ msgstr "ОК"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: cms/static/js/views/course_video_settings.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/timed-examination-preference-editor.underscore
@@ -324,7 +311,6 @@ msgstr "Удалить"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: cms/static/js/views/manage_users_and_roles.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Ok"
@@ -347,7 +333,6 @@ msgstr "Загрузить файл"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
@@ -369,7 +354,6 @@ msgstr "Сохранить"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: cms/static/js/views/modals/course_outline_modals.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
@@ -389,6 +373,9 @@ msgstr "Удаление"
 msgid "Your changes have been saved."
 msgstr "Изменения сохранены."
 
+#. Translators: This message will be added to the front of messages of type
+#. error,
+#. e.g. "Error: required field is missing".
 #: cms/static/js/views/xblock_validation.js
 #: common/static/common/js/discussion/utils.js
 #: common/static/common/js/discussion/views/discussion_inline_view.js
@@ -452,49 +439,65 @@ msgstr "Комментарий"
 msgid "Reply to Annotation"
 msgstr "Ответить на пояснение"
 
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (graded, results hidden)"
-msgid_plural "%(num_points)s points possible (graded, results hidden)"
+msgid "{num_points} point possible (graded, results hidden)"
+msgid_plural "{num_points} points possible (graded, results hidden)"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (ungraded, results hidden)"
-msgid_plural "%(num_points)s points possible (ungraded, results hidden)"
+msgid "{num_points} point possible (ungraded, results hidden)"
+msgid_plural "{num_points} points possible (ungraded, results hidden)"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (graded)"
-msgid_plural "%(num_points)s points possible (graded)"
+msgid "{num_points} point possible (graded)"
+msgid_plural "{num_points} points possible (graded)"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (ungraded)"
-msgid_plural "%(num_points)s points possible (ungraded)"
+msgid "{num_points} point possible (ungraded)"
+msgid_plural "{num_points} points possible (ungraded)"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
+#. Translators: {earned} is the number of points earned. {possible} is the
+#. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
+#. points will always be at least 1. We pluralize based on the total number of
+#. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(earned)s/%(possible)s point (graded)"
-msgid_plural "%(earned)s/%(possible)s points (graded)"
+msgid "{earned}/{possible} point (graded)"
+msgid_plural "{earned}/{possible} points (graded)"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
+#. Translators: {earned} is the number of points earned. {possible} is the
+#. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
+#. points will always be at least 1. We pluralize based on the total number of
+#. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(earned)s/%(possible)s point (ungraded)"
-msgid_plural "%(earned)s/%(possible)s points (ungraded)"
+msgid "{earned}/{possible} point (ungraded)"
+msgid_plural "{earned}/{possible} points (ungraded)"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
@@ -538,6 +541,8 @@ msgstr "Вы не отправили необходимые файлы: {require
 msgid "You did not select any files to submit."
 msgstr "Вы не выбрали ни одного файла для отправки."
 
+#. Translators: This is only translated to allow for reordering of label and
+#. associated status.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{label}: {status}"
 msgstr "{label}: {status}"
@@ -552,7 +557,6 @@ msgstr "не отправлено"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paragraph"
 msgstr "Абзац"
@@ -563,105 +567,90 @@ msgstr "Шаблон форматирования"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 3"
 msgstr "Заголовок 3"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 4"
 msgstr "Заголовок 4"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 5"
 msgstr "Заголовок 5"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 6"
 msgstr "Заголовок 6"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Add to Dictionary"
 msgstr "Добавить в словарь"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Align center"
 msgstr "По центру"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Align left"
 msgstr "По левому краю"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Align right"
 msgstr "По правому краю"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Alignment"
 msgstr "Выравнивание"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Alternative source"
 msgstr "Альтернативный источник"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Anchor"
 msgstr "Якорь"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Anchors"
 msgstr "Якоря"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Author"
 msgstr "Автор"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Background color"
 msgstr "Цвет фона"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/js/Markdown.Editor.js
 msgid "Blockquote"
@@ -669,122 +658,104 @@ msgstr "Цитата"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Blocks"
 msgstr "Блоки"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Body"
 msgstr "Основной текст"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Bold"
 msgstr "Жирный"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Border color"
 msgstr "Цвет границы"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Border"
 msgstr "Граница"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Bottom"
 msgstr "По нижнему краю"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Bullet list"
 msgstr "Маркированный список"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Caption"
 msgstr "Титр"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cell padding"
 msgstr "Границы ячейки"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cell properties"
 msgstr "Свойства ячейки"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cell spacing"
 msgstr "Интервал между ячейками"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cell type"
 msgstr "Тип ячейки"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cell"
 msgstr "Ячейка"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Center"
 msgstr "По центру"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Circle"
 msgstr "По кругу"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Clear formatting"
 msgstr "Удалить форматирование"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #. Translators: this is a toolbar button tooltip from the raw HTML editor
 #. displayed in the browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Code block"
 msgstr "Блок программного кода"
@@ -792,7 +763,6 @@ msgstr "Блок программного кода"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Code"
@@ -800,119 +770,102 @@ msgstr "Код"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Color"
 msgstr "Цвет"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cols"
 msgstr "атрибут"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Column group"
 msgstr "Группа столбцов"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Column"
 msgstr "Столбец"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Constrain proportions"
 msgstr "Сохранять пропорции"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Copy row"
 msgstr "Копировать строку"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Copy"
 msgstr "Копировать"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Could not find the specified string."
 msgstr "Не удалось обнаружить заданную строку"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Custom color"
 msgstr "Пользовательский цвет"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Custom..."
 msgstr "Настройки пользователя..."
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cut row"
 msgstr "Вырезать ряд"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cut"
 msgstr "Вырезать"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Decrease indent"
 msgstr "Уменьшить отступ"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Default"
 msgstr "По умолчанию"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Delete column"
 msgstr "Удалить столбец"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Delete row"
 msgstr "Удалить ряд"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Delete table"
 msgstr "Удалить таблицу"
@@ -920,7 +873,6 @@ msgstr "Удалить таблицу"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/group-configuration-editor.underscore
@@ -931,150 +883,120 @@ msgstr "Описание"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Dimensions"
 msgstr "Размеры"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Disc"
 msgstr "диск"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Div"
 msgstr "Div"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Document properties"
 msgstr "Свойства документа"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Edit HTML"
 msgstr "Редактировать HTML"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/certificate-details.underscore
-#: cms/templates/js/course_info_handouts.underscore
-#: cms/templates/js/course_info_update.underscore
-#: cms/templates/js/group-configuration-details.underscore
-#: cms/templates/js/partition-group-details.underscore
-#: cms/templates/js/show-textbook.underscore
-#: cms/templates/js/signatory-details.underscore
-#: cms/templates/js/xblock-string-field-editor.underscore
-#: common/static/common/templates/discussion/forum-action-edit.underscore
 msgid "Edit"
 msgstr "Редактировать"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Embed"
 msgstr "Вставить"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Emoticons"
 msgstr "Смайлы"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Encoding"
 msgstr "Кодировка"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "File"
 msgstr "Файл"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Find and replace"
 msgstr "Найти и заменить"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Find next"
 msgstr "Найти следующее"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Find previous"
 msgstr "Найти предыдущее"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Find"
 msgstr "Найти"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Finish"
 msgstr "Закончить"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Font Family"
 msgstr "Группа шрифтов"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Font Sizes"
 msgstr "Размеры шрифтов"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Footer"
 msgstr "Нижний колонтитул"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Format"
 msgstr "Форматировать"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Formats"
 msgstr "Виды форматирования"
@@ -1082,7 +1004,6 @@ msgstr "Виды форматирования"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/common/templates/image-modal.underscore
 msgid "Fullscreen"
@@ -1090,70 +1011,60 @@ msgstr "Во весь экран"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "General"
 msgstr "Общий"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "H Align"
 msgstr "Выравнивание по горизонтали"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header 1"
 msgstr "Заголовок 1"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header 2"
 msgstr "Заголовок 2"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header 3"
 msgstr "Заголовок 3"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header 4"
 msgstr "Заголовок 4"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header 5"
 msgstr "Заголовок 5"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header 6"
 msgstr "Заголовок 6"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header cell"
 msgstr "Ячейка заголовка"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "Header"
@@ -1161,280 +1072,240 @@ msgstr "Верхний колонтитул"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Headers"
 msgstr "Верхние колонтитулы"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 1"
 msgstr "Заголовок 1"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 2"
 msgstr "Заголовок 2"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Headings"
 msgstr "Заголовки"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Height"
 msgstr "Высота"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Horizontal line"
 msgstr "Горизонтальная линия"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Horizontal space"
 msgstr "Отступ по ширине"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "HTML source code"
 msgstr "Исходный код HTML"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Ignore all"
 msgstr "Пропустить все"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Ignore"
 msgstr "Пропустить"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Image description"
 msgstr "Описание изображения"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Increase indent"
 msgstr "Увеличить отступ"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Inline"
 msgstr "В тексте"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert column after"
 msgstr "Вставить столбец справа"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert column before"
 msgstr "Вставить столбец слева"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert date/time"
 msgstr "Вставить дату/время"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert image"
 msgstr "Вставить изображение"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert link"
 msgstr "Вставить ссылку"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert row after"
 msgstr "Вставить строку ниже"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert row before"
 msgstr "Вставить строку выше"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert table"
 msgstr "Вставить таблицу"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert template"
 msgstr "Вставить шаблон"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert video"
 msgstr "Вставить видео"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert"
 msgstr "Вставить"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert/edit image"
 msgstr "Вставить/редактировать изображение"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert/edit link"
 msgstr "Вставить/редактировать ссылку"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert/edit video"
 msgstr "Вставить/редактировать видео"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Italic"
 msgstr "Курсив"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Justify"
 msgstr "Выровнять по ширине"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Keywords"
 msgstr "Ключевые слова"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Left to right"
 msgstr "Слева направо"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Left"
 msgstr "По левому краю"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Lower Alpha"
 msgstr "Строчные латинские буквы"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Lower Greek"
 msgstr "Строчные греческие буквы"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Lower Roman"
 msgstr "Римские числа в нижнем регистре"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Match case"
 msgstr "Учитывать регистр"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Merge cells"
 msgstr "Объединить ячейки"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Middle"
 msgstr "Средний"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "New document"
 msgstr "Новый документ"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "New window"
 msgstr "Новое окно"
@@ -1442,52 +1313,44 @@ msgstr "Новое окно"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
-#: common/static/common/templates/discussion/pagination.underscore
 msgid "Next"
 msgstr "Вперёд"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "No color"
 msgstr "Бесцветный"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Nonbreaking space"
 msgstr "Неразрывный пробел"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Numbered list"
 msgstr "Нумерованный список"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Page break"
 msgstr "Конец страницы"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paste as text"
 msgstr "Вставить как текст"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid ""
 "Paste is now in plain text mode. Contents will now be pasted as plain text "
@@ -1498,49 +1361,42 @@ msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paste row after"
 msgstr "Вставить строку ниже"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paste row before"
 msgstr "Вставить строку выше"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paste your embed code below:"
 msgstr "Вставьте код ниже"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paste"
 msgstr "Вставить"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Poster"
 msgstr "плакат"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Pre"
 msgstr "тег"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Prev"
 msgstr "Пред"
@@ -1548,7 +1404,6 @@ msgstr "Пред"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js lms/static/js/customwmd.js
 #: cms/templates/js/asset-library.underscore
 msgid "Preview"
@@ -1556,35 +1411,30 @@ msgstr "Предварительный просмотр"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Print"
 msgstr "Печать"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Redo"
 msgstr "Вернуть"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Remove link"
 msgstr "Убрать ссылку"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Replace all"
 msgstr "Заменить всё"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Replace with"
 msgstr "Заменить на"
@@ -1592,7 +1442,6 @@ msgstr "Заменить на"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video-transcripts.underscore
@@ -1602,14 +1451,12 @@ msgstr "Заменить"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Restore last draft"
 msgstr "Восстановить последний черновик"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid ""
 "Rich Text Area. Press ALT-F9 for menu. Press ALT-F10 for toolbar. Press "
@@ -1620,210 +1467,180 @@ msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Right to left"
 msgstr "Справа налево"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Right"
 msgstr "По правому краю"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Robots"
 msgstr "роботы"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Row group"
 msgstr "Группа строк"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Row properties"
 msgstr "Свойства строки"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Row type"
 msgstr "Тип строки"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Row"
 msgstr "Строка"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Rows"
 msgstr "Строки"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Scope"
 msgstr "Scope"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Select all"
 msgstr "Выбрать всё"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Show blocks"
 msgstr "Показать блоки"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Show invisible characters"
 msgstr "Показать скрытые символы"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Source code"
 msgstr "Исходный код"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Source"
 msgstr "Источник"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Special character"
 msgstr "Специальный символ"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Spellcheck"
 msgstr "Проверка орфографии"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Split cell"
 msgstr "Разбить ячейку"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Square"
 msgstr "Квадрат"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Start search"
 msgstr "Начать поиск"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Strikethrough"
 msgstr "Зачёркнутый"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Style"
 msgstr "Стиль"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Subscript"
 msgstr "индекс"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Superscript"
 msgstr "верхний индекс"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Table properties"
 msgstr "Свойства таблицы"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Table"
 msgstr "Таблица"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Target"
 msgstr "Цель"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Templates"
 msgstr "Шаблоны"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Text color"
 msgstr "Цвет текста"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Text to display"
 msgstr "Отображаемый текст"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid ""
 "The URL you entered seems to be an email address. Do you want to add the "
@@ -1834,7 +1651,6 @@ msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid ""
 "The URL you entered seems to be an external link. Do you want to add the "
@@ -1843,77 +1659,62 @@ msgstr ""
 "Адрес URL, введённый вами, похож на внешнюю ссылку.  Добавить обязательный "
 "префикс «http://»?"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/course-instructor-details.underscore
-#: cms/templates/js/signatory-details.underscore
-#: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Title"
 msgstr "Заголовок"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Tools"
 msgstr "Инструменты"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Top"
 msgstr "верхушка"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Underline"
 msgstr "Подчёркнутый"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Undo"
 msgstr "Отмена"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Upper Alpha"
 msgstr "выше альфа"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Upper Roman"
 msgstr "выше римский"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Url"
 msgstr "URL"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "V Align"
 msgstr "Выравнивание по вертикали"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Vertical space"
 msgstr "Отступ по высоте"
@@ -1921,7 +1722,6 @@ msgstr "Отступ по высоте"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
 #: openedx/features/course_search/static/course_search/templates/course_search_item.underscore
@@ -1931,42 +1731,36 @@ msgstr "Просмотреть"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Visual aids"
 msgstr "Наглядные подсказки"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Whole words"
 msgstr "Слова целиком"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Width"
 msgstr "Ширина"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Words: {0}"
 msgstr "Слова: {0}"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "You have unsaved changes are you sure you want to navigate away?"
 msgstr "У вас есть несохранённые изменения. Вы действительно хотите уйти?"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid ""
 "Your browser doesn't support direct access to the clipboard. Please use the "
@@ -1977,7 +1771,6 @@ msgstr ""
 
 #. Translators: this is a toolbar button tooltip from the raw HTML editor
 #. displayed in the browser when a user needs to edit HTML
-#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert/Edit Image"
 msgstr "Вставить/редактировать изображение"
@@ -2100,30 +1893,37 @@ msgstr ""
 msgid "Volume"
 msgstr "Громкость"
 
+#. Translators: Volume level equals 0%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Muted"
 msgstr "Без звука"
 
+#. Translators: Volume level in range ]0,20]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Very low"
 msgstr "Очень тихо"
 
+#. Translators: Volume level in range ]20,40]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Low"
 msgstr "Тихо"
 
+#. Translators: Volume level in range ]40,60]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Average"
 msgstr "Средняя громкость"
 
+#. Translators: Volume level in range ]60,80]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Loud"
 msgstr "Громко"
 
+#. Translators: Volume level in range ]80,99]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Very loud"
 msgstr "Очень громко"
 
+#. Translators: Volume level equals 100%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Maximum"
 msgstr "Максимальная громкость"
@@ -2292,6 +2092,18 @@ msgstr "Отключить встроенные субтитры"
 msgid "View child items"
 msgstr "Просмотр дочерних элементов"
 
+#: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
+msgid "Navigate up"
+msgstr ""
+
+#: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
+msgid "Browsing"
+msgstr ""
+
+#: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
+msgid "Select"
+msgstr ""
+
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
 msgstr "Обязательное поле."
@@ -2336,7 +2148,6 @@ msgstr ""
 "Не удалось обработать ваш запрос. Обновите страницу и повторите попытку."
 
 #: common/static/common/js/discussion/utils.js
-#: common/static/common/templates/discussion/pagination.underscore
 msgid "…"
 msgstr "..."
 
@@ -2551,8 +2362,6 @@ msgid "Your post will be discarded."
 msgstr "Ваше сообщение будет удалено."
 
 #: common/static/common/js/discussion/views/response_comment_show_view.js
-#: common/static/common/templates/discussion/post-user-display.underscore
-#: common/static/common/templates/discussion/profile-thread.underscore
 msgid "anonymous"
 msgstr "аноним"
 
@@ -2605,11 +2414,13 @@ msgstr "перемещено на ленту"
 msgid "dropped on target"
 msgstr "перемещено на цель"
 
+#. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%s ago"
 msgstr "%s назад"
 
+#. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%s from now"
@@ -2739,22 +2550,86 @@ msgstr "Добавить вложение"
 msgid "(Optional)"
 msgstr "(необязательно)"
 
+#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
+msgid "Remove file"
+msgstr ""
+
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Course Name"
 msgstr "Название курса"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid ""
+"For inquiries regarding assignments, grades, or structure of a specific "
+"course, please post in the discussion forums for that course directly."
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Not specific to a course"
 msgstr "Курс не определен"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
+msgstr "Тема"
+
+#: lms/templates/student_account/account_settings.underscore
+msgid "Account Settings"
+msgstr "Настройки учётной записи"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Billing/Payment Options"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Certificates"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Course Content"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Deadlines"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Errors/Technical Issues"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Financial Aid"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Masters"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Photo Verification"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Proctoring"
+msgstr ""
+
+#: cms/templates/js/asset-library.underscore
+msgid "Other"
+msgstr "Другое"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "What can we help you with, {username}?"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
 msgstr "Подробности"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-response.underscore
-#: common/static/common/templates/discussion/thread.underscore
+msgid "The more you tell us, the more quickly and helpfully we can respond!"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Submit"
 msgstr "Отправить"
@@ -2764,13 +2639,8 @@ msgid "Sign in to {platform} so we can help you better."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
-#: lms/templates/student_account/hinted_login.underscore
-#: lms/templates/student_account/login.underscore
-msgid "Sign in"
-msgstr "Вход"
-
-#: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
-msgid "Create an {platform} account"
+msgid ""
+"If you are unable to access your account contact us via email using {email}."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -2782,7 +2652,7 @@ msgstr ""
 "поддержке."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Enter a subject for your support request."
+msgid "Select a subject for your support request."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -2790,8 +2660,17 @@ msgid "Enter some details for your support request."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+#: lms/djangoapps/support/static/support/jsx/success.jsx
+msgid "Contact Us"
+msgstr "Свяжитесь с нами"
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Find answers to the top questions asked by learners."
 msgstr "Найдите ответы на главные вопросы, заданные слушателями."
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid "Search the {platform} Help Center"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid "Go to my Dashboard"
@@ -2802,8 +2681,13 @@ msgid "Go to {platform} Home"
 msgstr "Перейти {platform} Домой"
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid "Contact Us"
-msgstr "Свяжитесь с нами"
+msgid ""
+"Thank you for submitting a request! We will contact you within 24 hours."
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
+msgid "Cancel upload"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/collections/team.js
 msgid "last activity"
@@ -2817,6 +2701,8 @@ msgstr "вакантные места"
 msgid "name"
 msgstr "имя"
 
+#. Translators: This refers to the number of teams (a count of how many teams
+#. there are)
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 msgid "team count"
 msgstr "количество команд"
@@ -2914,10 +2800,14 @@ msgstr ""
 msgid "This team does not have any members."
 msgstr "В этой команде нет участников."
 
+#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
+#. https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Joined %(date)s"
 msgstr "Дата присоединения %(date)s"
 
+#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
+#. https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Last Activity %(date)s"
 msgstr "Последняя активность %(date)s"
@@ -2955,10 +2845,14 @@ msgstr "Команда «{team}» успешно удалена."
 msgid "You are not currently a member of any team."
 msgstr "В настоящий момент вы не входите в состав ни одной команды."
 
+#. Translators: "and others" refers to fact that additional members of a team
+#. exist that are not displayed.
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "and others"
 msgstr "и другие"
 
+#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
+#. http://momentjs.com/)
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "Last activity %(date)s"
 msgstr "Последняя активность %(date)s"
@@ -3133,6 +3027,14 @@ msgstr "Тема"
 msgid "View Teams in the %(topic_name)s Topic"
 msgstr "Просмотреть команды, изучающие тему %(topic_name)s"
 
+#. Translators: this string is shown at the bottom of the teams page
+#. to find a team to join or else to create a new one. There are three
+#. links that need to be included in the message:
+#. 1. Browse teams in other topics
+#. 2. search teams
+#. 3. create a new team
+#. Be careful to start each link with the appropriate start indicator
+#. (e.g. {browse_span_start} for #1) and finish it with {span_end}.
 #: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
 msgid ""
 "{browse_span_start}Browse teams in other topics{span_end} or "
@@ -3223,6 +3125,7 @@ msgstr "URL"
 msgid "Please provide a valid URL."
 msgstr "Пожалуйста, укажите корректный URL."
 
+#. Translators: 'errorCount' is the number of errors found in the form.
 #: lms/static/js/Markdown.Editor.js
 msgid "%(errorCount)s error found in form."
 msgid_plural "%(errorCount)s errors found in form."
@@ -3490,7 +3393,6 @@ msgid "There has been an error processing your survey."
 msgstr "Произошла ошибка при обработке обзора"
 
 #: lms/static/js/courseware/credit_progress.js
-#: common/static/common/templates/discussion/forum-actions.underscore
 #: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
 msgid "More"
@@ -3507,7 +3409,6 @@ msgid "HTML preview of post"
 msgstr "Предпросмотр сообщения в HTML"
 
 #: lms/static/js/customwmd.js
-#: common/static/common/templates/discussion/new-post.underscore
 msgid "Your question or idea (required)"
 msgstr "Ваш вопрос или предложение (обязательно)"
 
@@ -3529,29 +3430,24 @@ msgstr "Вам не будет возвращена сумма, которую �
 
 #: lms/static/js/dashboard/legacy.js
 msgid ""
-"Are you sure you want to unenroll from the purchased course %(courseName)s "
-"(%(courseNumber)s)?"
+"Are you sure you want to unenroll from the purchased course {courseName} "
+"({courseNumber})?"
 msgstr ""
-"Вы уверены, что хотите отменить запись на оплаченный вами курс "
-"%(courseName)s (%(courseNumber)s)?"
 
 #: lms/static/js/dashboard/legacy.js
-msgid ""
-"Are you sure you want to unenroll from %(courseName)s (%(courseNumber)s)?"
-msgstr ""
-"Вы уверены, что хотите отменить запись на курс%(courseName)s "
-"(%(courseNumber)s)?"
-
-#: lms/static/js/dashboard/legacy.js
-msgid ""
-"Are you sure you want to unenroll from the verified %(certNameLong)s  track "
-"of %(courseName)s  (%(courseNumber)s)?"
+msgid "Are you sure you want to unenroll from {courseName} ({courseNumber})?"
 msgstr ""
 
 #: lms/static/js/dashboard/legacy.js
 msgid ""
-"Are you sure you want to unenroll from the verified %(certNameLong)s track "
-"of %(courseName)s (%(courseNumber)s)?"
+"Are you sure you want to unenroll from the verified {certNameLong}  track of"
+" {courseName}  ({courseNumber})?"
+msgstr ""
+
+#: lms/static/js/dashboard/legacy.js
+msgid ""
+"Are you sure you want to unenroll from the verified {certNameLong} track of "
+"{courseName} ({courseNumber})?"
 msgstr ""
 
 #: lms/static/js/dashboard/legacy.js
@@ -3711,10 +3607,21 @@ msgstr ""
 msgid "Search Results"
 msgstr "Результаты поиска"
 
+#. Translators: this is a title shown before all Notes that have no associated
+#. tags. It is put within
+#. brackets to differentiate it from user-defined tags, but it should still be
+#. translated.
 #: lms/static/js/edxnotes/views/tabs/tags.js
 msgid "[no tags]"
 msgstr "[нет тегов]"
 
+#. Translators: 'Tags' is the name of the view (noun) within the Student Notes
+#. page that shows all
+#. notes organized by the tags the student has associated with them (if any).
+#. When defining a
+#. note in the courseware, the student can choose to associate 1 or more tags
+#. with the note
+#. in order to group similar notes together and help with search.
 #: lms/static/js/edxnotes/views/tabs/tags.js
 msgid "Tags"
 msgstr "Теги"
@@ -4105,6 +4012,7 @@ msgstr "Все учётные записи успешно созданы."
 msgid "Error adding/removing users as beta testers."
 msgstr "Ошибка добавления/удаления пользователей в команду бета-тестеров."
 
+#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "These users were successfully added as beta testers:"
 msgstr ""
@@ -4118,14 +4026,17 @@ msgstr ""
 "Следующие слушатели не добавлены в список бета-тестеров, поскольку их "
 "учётные записи ещё не активированы:"
 
+#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "These users were successfully removed as beta testers:"
 msgstr "Следующие пользователи были успешно удалены из команды бета-тестеров:"
 
+#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "These users were not added as beta testers:"
 msgstr "Следующие пользователи не были добавлены в команду бета-тестеров:"
 
+#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "These users were not removed as beta testers:"
 msgstr "Следующие пользователи не были удалены из команды бета-тестеров:"
@@ -4166,10 +4077,12 @@ msgstr ""
 "Следующие пользователи успешно записаны на курс, им на электронную почту "
 "высланы уведомления:"
 
+#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "Successfully enrolled the following users:"
 msgstr "Следующие пользователи успешно записаны на курс:"
 
+#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "Successfully sent enrollment emails to the following users. They will be "
@@ -4179,12 +4092,14 @@ msgstr ""
 "пользователям. Они смогут зарегистрироваться, как только создадут свои "
 "учётные записи:"
 
+#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "These users will be allowed to enroll once they register:"
 msgstr ""
 "Эти пользователи смогут записаться на курс, как только создадут свои учётные"
 " записи:"
 
+#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "Successfully sent enrollment emails to the following users. They will be "
@@ -4194,12 +4109,14 @@ msgstr ""
 "пользователям. Они будут зарегистрированы, как только создадут свои учётные "
 "записи."
 
+#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "These users will be enrolled once they register:"
 msgstr ""
 "Эти пользователи будут записаны на курс, как только создадут свои учётные "
 "записи."
 
+#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "Emails successfully sent. The following users are no longer enrolled in the "
@@ -4208,6 +4125,7 @@ msgstr ""
 "Электронные сообщения успешно отправлены. Следующие пользователи отчислены с"
 " курса:"
 
+#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "The following users are no longer enrolled in the course:"
 msgstr "Следующие пользователи отчислены с курса:"
@@ -4537,63 +4455,54 @@ msgstr ""
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
-#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Task Type"
 msgstr "Тип задания"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
-#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Task inputs"
 msgstr "Ввод задания"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
-#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Task ID"
 msgstr "Идентификатор задачи"
 
 #. Translators: a "Requester" is a username that requested a task such as
 #. sending email
-#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Requester"
 msgstr "Запрашивающий"
 
 #. Translators: A timestamp of when a task (eg, sending email) was submitted
 #. appears after this
-#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Submitted"
 msgstr "Присланное на расмотрение"
 
 #. Translators: The length of a task (eg, sending email) in seconds appears
 #. this
-#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Duration (sec)"
 msgstr "Продолжительность (сек.)"
 
 #. Translators: The state (eg, "In progress") of a task (eg, sending email)
 #. appears after this.
-#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "State"
 msgstr "Состояние"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
-#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Task Status"
 msgstr "Состояние процесса"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
-#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Task Progress"
 msgstr "Прогресс задания"
@@ -4605,10 +4514,6 @@ msgid ""
 msgstr ""
 "Произошла ошибка при поиске вашего письма. Пожалуйста, попытайтесь позже;  "
 "свяжитесь с тех. поддержкой, если проблема сохранится."
-
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr "Тема"
 
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By"
@@ -4796,8 +4701,29 @@ msgid "Could not override problem score for {user}."
 msgstr ""
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+msgid "Enter and confirm your new password."
+msgstr ""
+
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "New Password"
 msgstr "Новый пароль"
+
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+msgid "Confirm Password"
+msgstr ""
+
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+msgid "Passwords do not match."
+msgstr ""
+
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+msgid "Reset My Password"
+msgstr ""
+
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Reset Your Password"
+msgstr "Сбросить пароль"
 
 #: lms/static/js/student_account/components/PasswordResetInput.jsx
 msgid "Error: "
@@ -4837,6 +4763,13 @@ msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "We’re sorry to see you go!"
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"Please note: Deletion of your account and personal data is permanent and "
+"cannot be undone. EdX will not be able to recover your account or the data "
+"that is deleted."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
@@ -4884,8 +4817,21 @@ msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
+"If you proceed, you will be unable to use this account to take courses on "
+"the edX app, edx.org, or any other site hosted by edX. This includes access "
+"to edx.org from your employer’s or university’s system and access to private"
+" sites offered by MIT Open Learning, Wharton Executive Education, and "
+"Harvard Medical School."
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
 "If you still wish to continue and delete your account, please enter your "
 "account password:"
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "Yes, Delete"
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
@@ -4927,7 +4873,6 @@ msgstr "Произошла ошибка"
 #. Translators: This string is appended to optional field labels on the
 #. student login, registration, and
 #. profile forms.
-#. */
 #: lms/static/js/student_account/views/FormView.js
 msgid "(optional)"
 msgstr "(необязательно)"
@@ -4952,9 +4897,9 @@ msgid ""
 "address is associated with your {platform_name} account, we will send a "
 "message with password recovery instructions to this email "
 "address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
-" message, verify that you entered the correct email address, or check your "
-"spam folder.{paragraphEnd}{paragraphStart}If you need further assistance, "
-"{anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
+" message after 1 minute, verify that you entered the correct email address, "
+"or check your spam folder.{paragraphEnd}{paragraphStart}If you need further "
+"assistance, {anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
 msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
@@ -5061,10 +5006,6 @@ msgstr ""
 #: lms/templates/student_account/account.underscore
 msgid "Password"
 msgstr "Пароль"
-
-#: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Reset Your Password"
-msgstr "Сбросить пароль"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Check your email account for instructions to reset your password."
@@ -5256,26 +5197,6 @@ msgstr "Привязка к учётной записи"
 msgid "Successfully unlinked."
 msgstr "Удалено."
 
-#: lms/static/js/student_account/views/account_settings_view.js
-msgid "Account Information"
-msgstr "Информация об учётной записи"
-
-#: lms/static/js/student_account/views/account_settings_view.js
-msgid "Order History"
-msgstr "История заказов"
-
-#: lms/static/js/student_account/views/account_settings_view.js
-msgid ""
-"You have set your language to {beta_language}, which is currently not fully "
-"translated. You can help us translate this language fully by joining the "
-"Transifex community and adding translations from English for learners that "
-"speak {beta_language}."
-msgstr ""
-
-#: lms/static/js/student_account/views/account_settings_view.js
-msgid "Help Translate into {beta_language}"
-msgstr ""
-
 #: lms/static/js/verify_student/views/image_input_view.js
 msgid "Image Upload Error"
 msgstr "Ошибка загрузки изображения"
@@ -5320,6 +5241,8 @@ msgstr "Оплатить"
 msgid "Checkout with PayPal"
 msgstr "Оплатить с помощью PayPal"
 
+#. Translators: 'processor' is the name of a third-party payment processing
+#. vendor (example: "PayPal")
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Checkout with {processor}"
 msgstr "Оплатить с помощью {processor}"
@@ -5689,6 +5612,8 @@ msgstr ""
 msgid "Yes, allow edits to the active Certificate"
 msgstr "Да, разрешить редактирование активного сертификата"
 
+#. Translators: This field pertains to the custom label for a certificate.
+#. Translators: this refers to a collection of certificates.
 #: cms/static/js/certificates/views/certificate_item.js
 #: cms/static/js/certificates/views/certificates_list.js
 msgid "certificate"
@@ -5698,6 +5623,8 @@ msgstr "сертификат"
 msgid "Set up your certificate"
 msgstr "Настройте свой сертификат"
 
+#. Translators: This line refers to the initial state of the form when no data
+#. has been inserted
 #: cms/static/js/certificates/views/certificates_list.js
 msgid "You have not created any certificates yet."
 msgstr "Вы ещё не создали ни одного сертификата."
@@ -5734,7 +5661,6 @@ msgstr "Группа %s"
 #. Translators: Dictionary used for creation ids that are used in
 #. default group names. For example: A, B, AA in Group A,
 #. Group B, ..., Group AA, etc.
-#. */
 #: cms/static/js/collections/group.js
 msgid "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 msgstr "АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЩЭЮЯ"
@@ -5756,7 +5682,6 @@ msgstr ""
 
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
-#: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Staff"
 msgstr "Сотрудник"
 
@@ -5839,25 +5764,46 @@ msgid "There was an error with the upload"
 msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+msgid "Organization:"
+msgstr ""
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Number:"
+msgstr ""
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+msgid "Course Run:"
 msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "(Read-only)"
 msgstr ""
 
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+msgid "Re-run Course"
+msgstr ""
+
+#: cms/templates/js/show-textbook.underscore
+msgid "View Live"
+msgstr "Просмотр курса"
+
 #: cms/static/js/maintenance/force_publish_course.js
 msgid "Internal Server Error."
 msgstr "Внутренняя ошибка сервера."
 
+#. Translators: This is the status of a video upload that is queued
+#. waiting for other uploads to complete
 #: cms/static/js/models/active_video_upload.js
 msgid "Queued"
 msgstr "Ожидание"
 
+#. Translators: This is the status of a video upload that has
+#. completed successfully
 #: cms/static/js/models/active_video_upload.js
 msgid "Upload completed"
 msgstr "Загрузка завершена"
 
+#. Translators: This is the status of a video upload that has failed
 #: cms/static/js/models/active_video_upload.js
 msgid "Upload failed"
 msgstr "Загрузка не удалась"
@@ -6250,7 +6196,6 @@ msgstr "Произошла ошибка с вашим экспортом"
 
 #. Translators: 'count' is number of groups that the group
 #. configuration contains.
-#. */
 #: cms/static/js/views/group_configuration_details.js
 msgid "Contains {count} group"
 msgid_plural "Contains {count} groups"
@@ -6266,10 +6211,8 @@ msgstr "Не используется"
 
 #. Translators: 'count' is number of units that the group
 #. configuration is used in.
-#. */
 #. Translators: 'count' is number of locations that the group
 #. configuration is used in.
-#. */
 #: cms/static/js/views/group_configuration_details.js
 #: cms/static/js/views/partition_group_details.js
 msgid "Used in {count} location"
@@ -6279,6 +6222,7 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
+#. Translators: this refers to a collection of groups.
 #: cms/static/js/views/group_configuration_item.js
 #: cms/static/js/views/group_configurations_list.js
 msgid "group configuration"
@@ -6363,10 +6307,12 @@ msgid ""
 " Derivatives\"."
 msgstr ""
 
+#. Translators: "item_display_name" is the name of the item to be deleted.
 #: cms/static/js/views/list_item.js
 msgid "Delete this %(item_display_name)s?"
 msgstr "Удалить %(item_display_name)s?"
 
+#. Translators: "item_display_name" is the name of the item to be deleted.
 #: cms/static/js/views/list_item.js
 msgid "Deleting this %(item_display_name)s is permanent and cannot be undone."
 msgstr "Удаление %(item_display_name)s невозможно будет отменить."
@@ -6463,6 +6409,7 @@ msgstr "Основное"
 msgid "Visibility"
 msgstr "Видимость"
 
+#. Translators: "title" is the name of the current component being edited.
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: {title}"
 msgstr ""
@@ -6536,6 +6483,8 @@ msgstr "Структура курса"
 msgid "Date added"
 msgstr ""
 
+#. Translators: "title" is the name of the current component or unit being
+#. edited.
 #: cms/static/js/views/pages/container.js
 msgid "Editing access for: %(title)s"
 msgstr ""
@@ -6603,34 +6552,48 @@ msgstr ""
 msgid "Show Previews"
 msgstr ""
 
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
+#. ascending"
 #: cms/static/js/views/paging_header.js
 msgid ""
 "Showing {currentItemRange} out of {totalItemsCount}, filtered by "
 "{assetType}, sorted by {sortName} ascending"
 msgstr ""
 
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
+#. descending"
 #: cms/static/js/views/paging_header.js
 msgid ""
 "Showing {currentItemRange} out of {totalItemsCount}, filtered by "
 "{assetType}, sorted by {sortName} descending"
 msgstr ""
 
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, sorted by Date Added ascending"
 #: cms/static/js/views/paging_header.js
 msgid ""
 "Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
 "ascending"
 msgstr ""
 
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, sorted by Date Added descending"
 #: cms/static/js/views/paging_header.js
 msgid ""
 "Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
 "descending"
 msgstr ""
 
+#. Translators: turns into "25 total" to be used in other sentences, e.g.
+#. "Showing 0-9 out of 25 total".
 #: cms/static/js/views/paging_header.js
 msgid "{totalItems} total"
 msgstr ""
 
+#. Translators: This refers to a content group that can be linked to a student
+#. cohort.
 #: cms/static/js/views/partition_group_item.js
 #: cms/static/js/views/partition_group_list.js
 msgid "content group"
@@ -6713,7 +6676,7 @@ msgid "Upload your video thumbnail image."
 msgstr "Загрузите миниатюру видео."
 
 #: cms/static/js/views/show_textbook.js
-msgid "Delete “<%= name %>”?"
+msgid "Delete “<%- name %>”?"
 msgstr ""
 
 #: cms/static/js/views/show_textbook.js
@@ -6911,6 +6874,7 @@ msgstr ""
 msgid "Edit Thumbnail"
 msgstr ""
 
+#. Translators: This is a 2 part text which tells the image requirements.
 #: cms/static/js/views/video_thumbnail.js
 msgid ""
 "{InstructionsSpanStart}{videoImageResoultion}{lineBreak} "
@@ -6921,24 +6885,30 @@ msgstr ""
 msgid "Image upload failed"
 msgstr ""
 
+#. Translators: This is a 3 part text which tells the image requirements.
 #: cms/static/js/views/video_thumbnail.js
 msgid ""
 "{ReqTextSpanStart}Requirements{spanEnd}{lineBreak}{InstructionsSpanStart}{videoImageResoultion}{lineBreak}"
 " {videoImageSupportedFileFormats}{spanEnd}"
 msgstr ""
 
+#. Translators: message will be like 1280x720 pixels
 #: cms/static/js/views/video_thumbnail.js
 msgid "{maxWidth}x{maxHeight} pixels"
 msgstr ""
 
+#. Translators: message will be like Thumbnail for Arrow.mp4
 #: cms/static/js/views/video_thumbnail.js
 msgid "Thumbnail for {videoName}"
 msgstr ""
 
+#. Translators: message will be like Add Thumbnail - Arrow.mp4
 #: cms/static/js/views/video_thumbnail.js
 msgid "Add Thumbnail - {videoName}"
 msgstr ""
 
+#. Translators: humanizeDuration will be like 10 minutes, an hour and 20
+#. minutes etc
 #: cms/static/js/views/video_thumbnail.js
 msgid "Video duration is {humanizeDuration}"
 msgstr ""
@@ -6951,6 +6921,7 @@ msgstr "минут"
 msgid "minute"
 msgstr ""
 
+#. Translators: message will be like 15 minutes, 1 minute
 #: cms/static/js/views/video_thumbnail.js
 msgid "{minutes} {unit}"
 msgstr ""
@@ -6963,10 +6934,13 @@ msgstr ""
 msgid "second"
 msgstr ""
 
+#. Translators: message will be like 20 seconds, 1 second
 #: cms/static/js/views/video_thumbnail.js
 msgid "{seconds} {unit}"
 msgstr ""
 
+#. Translators: `and` will be used to combine both miuntes and seconds like
+#. `13 minutes and 45 seconds`
 #: cms/static/js/views/video_thumbnail.js
 msgid " and "
 msgstr "» и «"
@@ -6985,10 +6959,12 @@ msgid ""
 "{supportedFileFormats}."
 msgstr ""
 
+#. Translators: maxFileSizeInMB will be like 2 MB.
 #: cms/static/js/views/video_thumbnail.js
 msgid "The selected image must be smaller than {maxFileSizeInMB}."
 msgstr ""
 
+#. Translators: minFileSizeInKB will be like 2 KB.
 #: cms/static/js/views/video_thumbnail.js
 msgid "The selected image must be larger than {minFileSizeInKB}."
 msgstr ""
@@ -7042,6 +7018,9 @@ msgstr "Настройки"
 msgid "New {component_type}"
 msgstr ""
 
+#. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
 #: cms/static/js/views/xblock_validation.js
 msgid "Warning"
 msgstr ""
@@ -7049,6 +7028,30 @@ msgstr ""
 #: cms/static/js/xblock_asides/structured_tags.js
 msgid "Updating Tags"
 msgstr "Обновление тегов"
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Account Information"
+msgstr "Информация об учётной записи"
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Order History"
+msgstr "История заказов"
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid ""
+"You have set your language to {beta_language}, which is currently not fully "
+"translated. You can help us translate this language fully by joining the "
+"Transifex community and adding translations from English for learners that "
+"speak {beta_language}."
+msgstr ""
+"Вы установили для языка значение {beta_language}, которое в настоящее время "
+"не полностью переведено. Вы можете помочь нам полностью перевести этот язык,"
+" присоединившись к сообществу Transifex и добавив переводы с английского "
+"языка для тех, кто говорит на {beta_language}."
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Help Translate into {beta_language}"
+msgstr "Помощь в переводе {beta_language}"
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
@@ -7070,7 +7073,6 @@ msgstr "Дата"
 
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
-#: common/static/common/templates/discussion/pagination.underscore
 msgid "Previous"
 msgstr "Назад"
 
@@ -7117,314 +7119,6 @@ msgstr "Очистить поиск"
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 msgid "Search"
 msgstr "Поиск"
-
-#: common/static/common/templates/discussion/forum-action-answer.underscore
-msgid "Mark as Answer"
-msgstr "Отметить как ответ"
-
-#: common/static/common/templates/discussion/forum-action-answer.underscore
-msgid "Unmark as Answer"
-msgstr "Снять пометку ответа"
-
-#: common/static/common/templates/discussion/forum-action-close.underscore
-msgid "Open"
-msgstr "Открыть"
-
-#: common/static/common/templates/discussion/forum-action-endorse.underscore
-msgid "Endorse"
-msgstr "Подтвердить"
-
-#: common/static/common/templates/discussion/forum-action-endorse.underscore
-msgid "Unendorse"
-msgstr "Снять подтверждение"
-
-#: common/static/common/templates/discussion/forum-action-follow.underscore
-msgid "Follow"
-msgstr "Отслеживать"
-
-#: common/static/common/templates/discussion/forum-action-follow.underscore
-msgid "Unfollow"
-msgstr "Не отслеживать"
-
-#: common/static/common/templates/discussion/forum-action-pin.underscore
-msgid "Pin"
-msgstr "Закрепить"
-
-#: common/static/common/templates/discussion/forum-action-pin.underscore
-msgid "Unpin"
-msgstr "Открепить"
-
-#: common/static/common/templates/discussion/forum-action-report.underscore
-msgid "Report abuse"
-msgstr "Сообщить о нарушении правил"
-
-#: common/static/common/templates/discussion/forum-action-report.underscore
-msgid "Report"
-msgstr "Пожаловаться"
-
-#: common/static/common/templates/discussion/forum-action-report.underscore
-msgid "Unreport"
-msgstr "Отозвать жалобу"
-
-#: common/static/common/templates/discussion/forum-action-vote.underscore
-msgid "Vote for this post,"
-msgstr "Голосовать за это сообщениие"
-
-#: common/static/common/templates/discussion/nav-load-more-link.underscore
-msgid "Load more"
-msgstr "Загрузить ещё"
-
-#: common/static/common/templates/discussion/new-post-alert.underscore
-msgid "Error posting your message."
-msgstr "Ошибка при отправке сообщения."
-
-#: common/static/common/templates/discussion/new-post-visibility.underscore
-#, python-format
-msgid "This post will be visible only to %(group_name)s."
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post-visibility.underscore
-msgid "This post will be visible to everyone."
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "Add a Post"
-msgstr "Добавить тему"
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "Visible to"
-msgstr "Видимость:"
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid ""
-"Discussion admins, moderators, and TAs can make their posts visible to all "
-"students or specify a single group."
-msgstr ""
-"Администраторы обуждений, модераторы и старосты сообщества могут либо "
-"сделать свои сообщения видимыми для всех студентов, либо задать отдельную "
-"группу."
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "All Groups"
-msgstr "Все группы"
-
-#: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid ""
-"Add a clear and descriptive title to encourage participation. (Required)"
-msgstr ""
-"Добавьте чётко сформулированный, содержательный заголовок, чтобы побудить "
-"других к участию (обязательно)."
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "follow this post"
-msgstr "отслеживать это сообщение"
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "post anonymously"
-msgstr "оставить анонимное сообщение"
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "post anonymously to classmates"
-msgstr "Оставить анонимное сообщение для одноклассников"
-
-#: common/static/common/templates/discussion/post-user-display.underscore
-msgid "(Community TA)"
-msgstr "(Староста сообщества)"
-
-#: common/static/common/templates/discussion/post-user-display.underscore
-msgid "(Staff)"
-msgstr "(Сотрудник курса)"
-
-#: common/static/common/templates/discussion/profile-thread.underscore
-#: common/static/common/templates/discussion/thread.underscore
-msgid "This thread is closed."
-msgstr "Эта тема закрыта."
-
-#: common/static/common/templates/discussion/profile-thread.underscore
-msgid "View discussion"
-msgstr "Просмотреть тему"
-
-#: common/static/common/templates/discussion/response-comment-edit.underscore
-msgid "Editing comment"
-msgstr "Редактирование комментария"
-
-#: common/static/common/templates/discussion/response-comment-edit.underscore
-msgid "Update comment"
-msgstr "Обновить комментарий"
-
-#: common/static/common/templates/discussion/response-comment-show.underscore
-#, python-format
-msgid "posted %(time_ago)s by %(author)s"
-msgstr "опубликовано %(time_ago)s пользователем %(author)s"
-
-#: common/static/common/templates/discussion/response-comment-show.underscore
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#: common/static/common/templates/discussion/thread-show.underscore
-msgid "Reported"
-msgstr "Жалоба отправлена"
-
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Editing post"
-msgstr "Редактирование сообщения"
-
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Edit your post below."
-msgstr "Отредактируйте своё сообщение ниже."
-
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Update post"
-msgstr "Обновить сообщение"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "discussion"
-msgstr "обсуждение"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "answered question"
-msgstr "отвеченный вопрос"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "unanswered question"
-msgstr "вопрос без ответа"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-#: common/static/common/templates/discussion/thread-show.underscore
-msgid "Pinned"
-msgstr "Закреплено"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "Following"
-msgstr "Отслеживаемые"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "Community TA"
-msgstr "Староста сообщества"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "{unread_comments_count} new"
-msgstr "{unread_comments_count} новых"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-#, python-format
-msgid ""
-"%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
-"unread comments)%(span_close)s"
-msgstr ""
-"%(comments_count)s %(span_sr_open)sкомментариев (%(unread_comments_count)s "
-"непрочитанных комментариев)%(span_close)s"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-#, python-format
-msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
-msgstr "%(comments_count)s %(span_sr_open)sкомментариев %(span_close)s"
-
-#: common/static/common/templates/discussion/thread-response-edit.underscore
-msgid "Editing response"
-msgstr "Редактирование ответа"
-
-#: common/static/common/templates/discussion/thread-response-edit.underscore
-msgid "Update response"
-msgstr "Обновить ответ"
-
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#, python-format
-msgid "marked as answer %(time_ago)s by %(user)s"
-msgstr "отмечено как ответ %(time_ago)s пользователем %(user)s"
-
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#, python-format
-msgid "marked as answer %(time_ago)s"
-msgstr "отмечено как ответ %(time_ago)s"
-
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#, python-format
-msgid "endorsed %(time_ago)s by %(user)s"
-msgstr "подтверждено %(time_ago)s пользователем %(user)s"
-
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#, python-format
-msgid "endorsed %(time_ago)s"
-msgstr "подтверждено %(time_ago)s"
-
-#: common/static/common/templates/discussion/thread-response.underscore
-#, python-format
-msgid "Show Comment (%(num_comments)s)"
-msgid_plural "Show Comments (%(num_comments)s)"
-msgstr[0] "Показать комментарий (%(num_comments)s)"
-msgstr[1] "Показать комментарии (%(num_comments)s)"
-msgstr[2] "Показать комментарии (%(num_comments)s)"
-msgstr[3] "Показать комментарии (%(num_comments)s)"
-
-#: common/static/common/templates/discussion/thread-response.underscore
-msgid "Add a comment"
-msgstr "Добавить комментарий"
-
-#: common/static/common/templates/discussion/thread-show.underscore
-#, python-format
-msgid "discussion posted %(time_ago)s by %(author)s"
-msgstr "обсуждение опубликовано %(time_ago)s пользователем %(author)s"
-
-#: common/static/common/templates/discussion/thread-show.underscore
-#, python-format
-msgid "question posted %(time_ago)s by %(author)s"
-msgstr "вопрос опубликован %(time_ago)s пользователем %(author)s"
-
-#: common/static/common/templates/discussion/thread-show.underscore
-msgid "Closed"
-msgstr "Закрыт"
-
-#: common/static/common/templates/discussion/thread-show.underscore
-#, python-format
-msgid "Related to: %(courseware_title_linked)s"
-msgstr "Связано с: %(courseware_title_linked)s"
-
-#: common/static/common/templates/discussion/thread-show.underscore
-#, python-format
-msgid "This post is visible only to %(group_name)s."
-msgstr "Данный пост виден только %(group_name)s."
-
-#: common/static/common/templates/discussion/thread-show.underscore
-msgid "This post is visible to everyone."
-msgstr "Данное сообщение видно всем."
-
-#: common/static/common/templates/discussion/thread-type.underscore
-msgid "Post type"
-msgstr "Тип сообщения"
-
-#: common/static/common/templates/discussion/thread-type.underscore
-msgid ""
-"Questions raise issues that need answers. Discussions share ideas and start "
-"conversations. (Required)"
-msgstr ""
-"В вопросах поднимаются проблемы, требующие ответа. Обсуждения позволяют "
-"делиться идеями и участвовать в дискуссиях (обязательно)."
-
-#: common/static/common/templates/discussion/thread-type.underscore
-msgid "Question"
-msgstr "Вопрос"
-
-#: common/static/common/templates/discussion/thread-type.underscore
-msgid "Discussion"
-msgstr "Обсуждение"
-
-#: common/static/common/templates/discussion/thread.underscore
-msgid "Add a Response"
-msgstr "Ответить"
-
-#: common/static/common/templates/discussion/thread.underscore
-msgid "Add a response:"
-msgstr "Добавить ответ:"
-
-#: common/static/common/templates/discussion/topic.underscore
-msgid "Topic area"
-msgstr "Предмет обсуждения"
-
-#: common/static/common/templates/discussion/topic.underscore
-msgid "Add your post to a relevant topic to help others find it. (Required)"
-msgstr ""
-"Поместите Ваше сообщение в подходящую тему, чтобы упростить другим "
-"пользователям его поиск (обязательно)."
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Discussion Home"
@@ -7891,6 +7585,10 @@ msgstr "Подтвердить"
 #: lms/templates/courseware/proctored-exam-controls.underscore
 msgid "Mark Exam As Completed"
 msgstr "Отметить экзамен, как завершённый"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "You are taking \"{exam_link}\" as {exam_type}. "
+msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "a timed exam"
@@ -8658,10 +8356,6 @@ msgstr "Изменить пароль"
 msgid "Switch Language Back"
 msgstr ""
 
-#: lms/templates/student_account/account_settings.underscore
-msgid "Account Settings"
-msgstr "Настройки учётной записи"
-
 #: lms/templates/student_account/account_settings_section.underscore
 msgid "An error occurred. Please reload the page."
 msgstr "Произошла ошибка. Перезагрузите страницу."
@@ -8669,6 +8363,11 @@ msgstr "Произошла ошибка. Перезагрузите страни
 #: lms/templates/student_account/form_field.underscore
 msgid "Need help logging in?"
 msgstr ""
+
+#: lms/templates/student_account/hinted_login.underscore
+#: lms/templates/student_account/login.underscore
+msgid "Sign in"
+msgstr "Вход"
 
 #: lms/templates/student_account/hinted_login.underscore
 #, python-format
@@ -8703,8 +8402,9 @@ msgstr ""
 "Зарегистрироваться, используя логин и пароль слушателя или преподавателя"
 
 #: lms/templates/student_account/institution_register.underscore
-msgid "Register through edX"
-msgstr "Зарегистрироваться через edX"
+#: lms/templates/student_account/register.underscore
+msgid "Create an Account"
+msgstr "Создать учётную запись"
 
 #: lms/templates/student_account/login.underscore
 msgid "First time here?"
@@ -8764,6 +8464,10 @@ msgid "If you do not yet have an account, use the button below to register."
 msgstr "Ещё не зарегистрированы? Нажмите кнопку ниже."
 
 #: lms/templates/student_account/login.underscore
+msgid "Use my university info"
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
 msgid "or sign in with"
 msgstr "или с помощью"
 
@@ -8771,11 +8475,6 @@ msgstr "или с помощью"
 #, python-format
 msgid "Sign in with %(providerName)s"
 msgstr "Войти через %(providerName)s"
-
-#: lms/templates/student_account/login.underscore
-#: lms/templates/student_account/register.underscore
-msgid "Use my institution/campus credentials"
-msgstr "Использовать мой логин и пароль"
 
 #: lms/templates/student_account/password_reset.underscore
 msgid "Password assistance"
@@ -8809,12 +8508,12 @@ msgid "Create account using %(providerName)s."
 msgstr "Создать учётную запись в %(providerName)s."
 
 #: lms/templates/student_account/register.underscore
-msgid "or create a new one here"
-msgstr "или создать новую в этом сервисе"
+msgid "Use my institution/campus credentials"
+msgstr "Использовать мой логин и пароль"
 
 #: lms/templates/student_account/register.underscore
-msgid "Create an Account"
-msgstr "Создать учётную запись"
+msgid "or create a new one here"
+msgstr "или создать новую в этом сервисе"
 
 #: lms/templates/student_account/register.underscore
 msgid "Support education research by providing additional information"
@@ -9476,25 +9175,17 @@ msgstr ""
 "свой сертификат на Backpack."
 
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-#, python-format
 msgid ""
-"Create a %(link_start)sMozilla Backpack%(link_end)s account, or log in to "
-"your existing account"
+"Create a {link_start}Mozilla Backpack{link_end} account, or log in to your "
+"existing account"
 msgstr ""
-"Создайте учётную запись %(link_start)sMozilla Backpack%(link_end)s или "
-"войдите со своими учётными данными"
 
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-#, python-format
 msgid ""
-"%(download_link_start)sDownload this image (right-click or option-click, "
-"save as)%(link_end)s and then %(upload_link_start)supload%(link_end)s it to "
-"your backpack.</li>"
+"{download_link_start}Download this image (right-click or option-click, save "
+"as){link_end} and then {upload_link_start}upload{link_end} it to your "
+"backpack."
 msgstr ""
-"%(download_link_start)sСкачайте изображение (кликните правой кнопкой мыши "
-"или используйте клавишу выбора опции, выберите сохранить как)%(link_end)s, "
-"затем %(upload_link_start)sзагрузите%(link_end)s изображение в свой "
-"Backpack.</li>"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"
@@ -9610,10 +9301,6 @@ msgstr "– сортируемый столбец"
 #: cms/templates/js/asset-library.underscore
 msgid "Show All"
 msgstr "Показать всё"
-
-#: cms/templates/js/asset-library.underscore
-msgid "Other"
-msgstr "Другое"
 
 #: cms/templates/js/asset-library.underscore
 msgid "You haven't added any assets to this course yet."
@@ -10218,14 +9905,6 @@ msgstr ""
 "Неверный код в содержимом. Пожалуйста, убедитесь в верности HTML-кода."
 
 #: cms/templates/js/course_info_update.underscore
-msgid "Send push notification to mobile apps"
-msgstr "Отправить уведомление по продвижению для мобильных приложений"
-
-#: cms/templates/js/course_info_update.underscore
-msgid "Send notification to mobile apps"
-msgstr "Отправить уведомление для мобильных приложений"
-
-#: cms/templates/js/course_info_update.underscore
 msgid "Post"
 msgstr "Опубликовать"
 
@@ -10724,10 +10403,6 @@ msgstr ""
 #: cms/templates/js/show-textbook.underscore
 msgid "PDF Chapters"
 msgstr ""
-
-#: cms/templates/js/show-textbook.underscore
-msgid "View Live"
-msgstr "Просмотр курса"
 
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/signatory-editor.underscore

@@ -7,23 +7,31 @@
     <tr>
         <td>
             <h1>
+                {% filter force_escape %}
                 {% blocktrans %}
                     You have been unenrolled from {{ course_name }}
                 {% endblocktrans %}
+                {% endfilter %}
             </h1>
 
             <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
                 {% blocktrans %}You have been unenrolled from {{ course_name }} at {{ site_name }} by a member of the course staff. This course will no longer appear on your {{ site_name }} dashboard.{% endblocktrans %}
+                {% endfilter %}
                 <br />
             </p>
 
             <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
                 {% blocktrans %}Your other courses have not been affected.{% endblocktrans %}
+                {% endfilter %}
                 <br />
             </p>
 
             <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
                 {% blocktrans %}This email was automatically sent from {{ site_name }} to {{ full_name }}{% endblocktrans %}
+                {% endfilter %}
                 <br />
             </p>
         </td>

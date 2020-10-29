@@ -1,8 +1,10 @@
 """
 Acceptance tests for Studio related to the Pages.
 """
-from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
+from __future__ import absolute_import
+
 from common.test.acceptance.pages.studio.edit_tabs import PagesPage
+from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
 
 
 class PagesTest(StudioCourseTest):

@@ -52,7 +52,7 @@ def send_password_reset_email_for_user(user, request, preferred_email=None):
         'request': request,  # Used by google_analytics_tracking_pixel
         # TODO: This overrides `platform_name` from `get_base_template_context` to make the tests passes
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
-        'reset_link': '{protocol}://{site}{link}'.format(
+        'reset_link': '{protocol}://{site}{link}?track=pwreset'.format(
             protocol='https' if request.is_secure() else 'http',
             site=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
             link=reverse('password_reset_confirm', kwargs={
@@ -259,7 +259,7 @@ class AccountCreationForm(forms.Form):
     """
 
     _EMAIL_INVALID_MSG = _("A properly formatted e-mail is required")
-    _NAME_TOO_SHORT_MSG = _("Your legal name must be a minimum of two characters long")
+    _NAME_TOO_SHORT_MSG = _("Your legal name must be a minimum of one character long")
 
     # TODO: Resolve repetition
 

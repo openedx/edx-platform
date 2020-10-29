@@ -45,7 +45,7 @@ class BlockStructureModelTestCase(TestCase):
         for field_name, field_value in six.iteritems(self.params):
             self.assertEqual(field_value, getattr(bsm, field_name))
 
-        self.assertEqual(bsm.get_serialized_data(), expected_serialized_data)
+        self.assertEqual(bsm.get_serialized_data().decode('utf-8'), expected_serialized_data)
         self.assertIn(_directory_name(self.usage_key), bsm.data.name)
 
     def _assert_file_count_equal(self, expected_count):

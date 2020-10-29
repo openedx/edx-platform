@@ -1,18 +1,19 @@
 """Management command to migrate a course's xblock's group_access from Verified Track Cohorts to Enrollment Tracks"""
 from __future__ import absolute_import, print_function
 
-from contentstore.course_group_config import GroupConfiguration
+from textwrap import dedent
+
 from django.conf import settings
-from course_modes.models import CourseMode
 from django.core.management.base import BaseCommand, CommandError
 
+from contentstore.course_group_config import GroupConfiguration
+from course_modes.models import CourseMode
 from openedx.core.djangoapps.course_groups.cohorts import CourseCohort
-from openedx.core.djangoapps.course_groups.models import (CourseUserGroup, CourseUserGroupPartitionGroup)
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup, CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.verified_track_content.models import (
     MigrateVerifiedTrackCohortsSetting,
     VerifiedTrackCohortedCourse
 )
-
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
@@ -23,6 +24,7 @@ class Command(BaseCommand):
     """
     Migrates a course's xblock's group_access from Verified Track Cohorts to Enrollment Tracks
     """
+    help = dedent(__doc__).strip()
 
     def handle(self, *args, **options):
 

@@ -14,6 +14,8 @@ At present, it differs from Studio exports in several ways:
 * It only supports the export of courses.  It does not export libraries.
 """
 
+from __future__ import absolute_import
+
 import os
 import re
 import shutil

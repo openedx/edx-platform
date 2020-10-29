@@ -10,6 +10,7 @@ from unittest import skipUnless
 
 import ddt
 import jwt
+import six
 from six import text_type
 from six.moves.urllib.parse import urlparse, parse_qs  # pylint: disable=import-error
 from django.conf import settings
@@ -169,6 +170,13 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         Tests that get_html is not wrapped when problem is rendered in Studio.
         """
         self.problem.system.is_author_mode = True
+        self.assertEqual("original_get_html", self.problem.get_html())
+
+    def test_edxnotes_blockstore_runtime(self):
+        """
+        Tests that get_html is not wrapped when problem is rendered by Blockstore runtime.
+        """
+        del self.problem.descriptor.runtime.modulestore
         self.assertEqual("original_get_html", self.problem.get_html())
 
     def test_edxnotes_harvard_notes_enabled(self):
@@ -334,7 +342,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             }
         )
 
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             {
                 "count": 2,
                 "current_page": 1,
@@ -440,7 +449,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             ]
         })
 
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             {
                 "count": 2,
                 "current_page": 1,
@@ -524,7 +534,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         Tests no results.
         """
         mock_get.return_value.content = json.dumps(NOTES_API_EMPTY_RESPONSE)
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             NOTES_VIEW_EMPTY_RESPONSE,
             helpers.get_notes(self.request, self.course)
         )
@@ -571,7 +582,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             },
         ]
 
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             [{
                 u"quote": u"quote text",
                 u"text": u"text",
@@ -617,7 +629,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         ]
         self.html_module_2.visible_to_staff_only = True
         self.store.update_item(self.html_module_2, self.user.id)
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             [{
                 u"quote": u"quote text",
                 u"text": u"text",
@@ -660,8 +673,10 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat(),
         }]
 
-        self.assertItemsEqual(
-            [], helpers.preprocess_collection(self.user, self.course, initial_collection)
+        six.assertCountEqual(
+            self,
+            [],
+            helpers.preprocess_collection(self.user, self.course, initial_collection)
         )
 
     @override_settings(NOTES_DISABLED_TABS=['course_structure', 'tags'])
@@ -684,7 +699,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             },
         ]
 
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             [
                 {
 
@@ -1045,7 +1061,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         mock_search.return_value = NOTES_VIEW_EMPTY_RESPONSE
         enable_edxnotes_for_the_course(self.course, self.user.id)
         response = self.client.get(self.notes_url, {"text": "test"})
-        self.assertEqual(json.loads(response.content), NOTES_VIEW_EMPTY_RESPONSE)
+        self.assertEqual(json.loads(response.content.decode('utf-8')), NOTES_VIEW_EMPTY_RESPONSE)
         self.assertEqual(response.status_code, 200)
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": False})

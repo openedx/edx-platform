@@ -1,6 +1,8 @@
 """
 Badges related signal handlers.
 """
+from __future__ import absolute_import
+
 from django.dispatch import receiver
 
 from lms.djangoapps.badges.events.course_meta import award_enrollment_badge

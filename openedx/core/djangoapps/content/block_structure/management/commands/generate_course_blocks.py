@@ -111,14 +111,16 @@ class Command(BaseCommand):
         Sets logging levels for this module and the block structure
         cache module, based on the given the options.
         """
-        if options.get('verbosity') == 0:
+        verbosity = options.get('verbosity')
+
+        if verbosity == 0:
             log_level = logging.CRITICAL
-        elif options.get('verbosity') == 1:
+        elif verbosity == 1:
             log_level = logging.WARNING
         else:
             log_level = logging.INFO
 
-        if options.get('verbosity') < 3:
+        if verbosity is not None and verbosity < 3:
             cache_log_level = logging.CRITICAL
         else:
             cache_log_level = logging.INFO
