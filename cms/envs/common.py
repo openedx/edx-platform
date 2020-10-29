@@ -1485,7 +1485,7 @@ INSTALLED_APPS = [
     'csrf.apps.CsrfAppConfig',  # Enables frontend apps to retrieve CSRF tokens.
 
     # Entitlements, used in openedx tests
-    'entitlements',
+    'common.djangoapps.entitlements',
 
     # Asset management for mako templates
     'pipeline_mako',

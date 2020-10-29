@@ -26,7 +26,7 @@ from pyquery import PyQuery as pq
 from six.moves import range
 
 from common.djangoapps.course_modes.models import CourseMode
-from entitlements.tests.factories import CourseEntitlementFactory
+from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -389,7 +389,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         response = self.client.get(self.path)
         self.assertNotContains(response, '<li class="course-item">')
 
-    @patch('entitlements.rest_api.v1.views.get_course_runs_for_course')
+    @patch('common.djangoapps.entitlements.rest_api.v1.views.get_course_runs_for_course')
     @patch.object(CourseOverview, 'get_from_id')
     def test_sessions_for_entitlement_course_runs(self, mock_course_overview, mock_course_runs):
         """

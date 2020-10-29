@@ -17,7 +17,7 @@ from six import text_type
 
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware import courses
-from entitlements.models import CourseEntitlement
+from common.djangoapps.entitlements.models import CourseEntitlement
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.enrollments.api import add_enrollment

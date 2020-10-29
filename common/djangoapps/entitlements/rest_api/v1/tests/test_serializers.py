@@ -11,8 +11,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
-    from entitlements.rest_api.v1.serializers import CourseEntitlementSerializer
-    from entitlements.tests.factories import CourseEntitlementFactory
+    from common.djangoapps.entitlements.rest_api.v1.serializers import CourseEntitlementSerializer
+    from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

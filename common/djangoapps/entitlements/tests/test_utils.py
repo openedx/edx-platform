@@ -17,8 +17,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
-    from entitlements.tests.factories import CourseEntitlementFactory
-    from entitlements.utils import is_course_run_entitlement_fulfillable
+    from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
+    from common.djangoapps.entitlements.utils import is_course_run_entitlement_fulfillable
 
 
 @skip_unless_lms

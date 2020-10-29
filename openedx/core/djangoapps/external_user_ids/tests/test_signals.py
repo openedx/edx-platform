@@ -6,7 +6,7 @@ from opaque_keys.edx.keys import CourseKey
 from django.core.cache import cache
 from edx_django_utils.cache import RequestCache
 
-from entitlements.models import CourseEntitlement
+from common.djangoapps.entitlements.models import CourseEntitlement
 from openedx.core.djangoapps.catalog.tests.factories import (
     CourseFactory,
     ProgramFactory,

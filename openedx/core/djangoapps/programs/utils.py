@@ -24,8 +24,8 @@ from six.moves.urllib.parse import urljoin, urlparse, urlunparse  # pylint: disa
 
 from common.djangoapps.course_modes.api import get_paid_modes_for_course
 from common.djangoapps.course_modes.models import CourseMode
-from entitlements.api import get_active_entitlement_list_for_user
-from entitlements.models import CourseEntitlement
+from common.djangoapps.entitlements.api import get_active_entitlement_list_for_user
+from common.djangoapps.entitlements.models import CourseEntitlement
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.commerce.utils import EcommerceService
