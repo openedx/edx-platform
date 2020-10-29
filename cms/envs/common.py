@@ -1460,7 +1460,7 @@ INSTALLED_APPS = [
     'cms.djangoapps.cms_user_tasks.apps.CmsUserTasksConfig',
 
     # Unusual migrations
-    'database_fixups',
+    'common.djangoapps.database_fixups',
 
     # Customized celery tasks, including persisting failed tasks so they can
     # be retried
