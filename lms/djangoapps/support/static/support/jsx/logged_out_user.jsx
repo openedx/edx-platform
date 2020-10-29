@@ -18,26 +18,19 @@ function LoggedOutUser({ platformName, loginQuery, supportEmail }) {
       </div>
 
       <div className="row">
-        <div className="col-sm-12">
+        <div className="col-sm-6">
           <a href={`/login${loginQuery}`} className="btn btn-primary btn-signin">{gettext('Sign in')}</a>
+        </div>
+        <div className="col-sm-6">
+          <a className="btn btn-secondary" href={`/register${loginQuery}`}>
+            {gettext('Create an Account')}
+          </a>
         </div>
       </div>
 
       <div className="row">
         <div className="col-sm-12">
-          <a className="create-account" href={`/register${loginQuery}`}>
-            {StringUtils.interpolate(
-              // FIXME: not all platforms start with a vowel
-              gettext('Create an {platform} account'),
-              { platform: platformName },
-            )}
-          </a>
-          <p className="create-account-note">
-            {StringUtils.interpolate(
-              gettext('If you are unable to access your account contact us via email using {email}.'),
-              { email: supportEmail },
-            )}
-          </p>
+          <a href="/password_assistance" type="button" class="forgot-password field-link">{gettext('Need help logging in?')}</a>
         </div>
       </div>
     </div>

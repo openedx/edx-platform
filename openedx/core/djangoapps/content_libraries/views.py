@@ -1,31 +1,38 @@
 """
 REST API for Blockstore-based content libraries
 """
-
 from functools import wraps
 import logging
 
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
+from django.shortcuts import get_object_or_404
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from organizations.models import Organization
 from rest_framework import status
-from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from openedx.core.lib.api.view_utils import view_auth_classes
-from . import api
-from .serializers import (
+from openedx.core.djangoapps.content_libraries import api, permissions
+from openedx.core.djangoapps.content_libraries.serializers import (
     ContentLibraryMetadataSerializer,
     ContentLibraryUpdateSerializer,
+    ContentLibraryPermissionLevelSerializer,
+    ContentLibraryPermissionSerializer,
     LibraryXBlockCreationSerializer,
     LibraryXBlockMetadataSerializer,
     LibraryXBlockTypeSerializer,
+    LibraryBundleLinkSerializer,
+    LibraryBundleLinkUpdateSerializer,
     LibraryXBlockOlxSerializer,
     LibraryXBlockStaticFileSerializer,
     LibraryXBlockStaticFilesSerializer,
 )
+from openedx.core.lib.api.view_utils import view_auth_classes
 
+User = get_user_model()
 log = logging.getLogger(__name__)
 
 
@@ -62,16 +69,19 @@ class LibraryRootView(APIView):
 
     def get(self, request):
         """
-        Return a list of all content libraries. This is a temporary view for
-        development.
+        Return a list of all content libraries that the user has permission to
+        view. This is a temporary view for development and returns at most 50
+        libraries.
         """
-        result = api.list_libraries()
+        result = api.list_libraries_for_user(request.user)
         return Response(ContentLibraryMetadataSerializer(result, many=True).data)
 
     def post(self, request):
         """
         Create a new content library.
         """
+        if not request.user.has_perm(permissions.CAN_CREATE_CONTENT_LIBRARY):
+            raise PermissionDenied
         serializer = ContentLibraryMetadataSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
@@ -103,6 +113,7 @@ class LibraryDetailsView(APIView):
         Get a specific content library
         """
         key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
         result = api.get_library(key)
         return Response(ContentLibraryMetadataSerializer(result).data)
 
@@ -112,6 +123,7 @@ class LibraryDetailsView(APIView):
         Update a content library
         """
         key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
         serializer = ContentLibraryUpdateSerializer(data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         api.update_library(key, **serializer.validated_data)
@@ -124,7 +136,94 @@ class LibraryDetailsView(APIView):
         Delete a content library
         """
         key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(key, request.user, permissions.CAN_DELETE_THIS_CONTENT_LIBRARY)
         api.delete_library(key)
+        return Response({})
+
+
+@view_auth_classes()
+class LibraryTeamView(APIView):
+    """
+    View to get the list of users/groups who can access and edit the content
+    library.
+
+    Note also the 'allow_public_' settings which can be edited by PATCHing the
+    library itself (LibraryDetailsView.patch).
+    """
+    @convert_exceptions
+    def get(self, request, lib_key_str):
+        """
+        Get the list of users and groups who have permissions to view and edit
+        this library.
+        """
+        key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY_TEAM)
+        team = api.get_library_team(key)
+        return Response(ContentLibraryPermissionSerializer(team, many=True).data)
+
+
+@view_auth_classes()
+class LibraryTeamUserView(APIView):
+    """
+    View to add/remove/edit an individual user's permissions for a content
+    library.
+    """
+    @convert_exceptions
+    def put(self, request, lib_key_str, user_id):
+        """
+        Add a user to this content library, with permissions specified in the
+        request body.
+        """
+        key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY_TEAM)
+        serializer = ContentLibraryPermissionLevelSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = get_object_or_404(User, pk=int(user_id))
+        api.set_library_user_permissions(key, user, access_level=serializer.validated_data["access_level"])
+        return Response({})
+
+    @convert_exceptions
+    def delete(self, request, lib_key_str, user_id):
+        """
+        Remove the specified user's permission to access or edit this content
+        library.
+        """
+        key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY_TEAM)
+        user = get_object_or_404(User, pk=int(user_id))
+        api.set_library_user_permissions(key, user, access_level=None)
+        return Response({})
+
+
+@view_auth_classes()
+class LibraryTeamGroupView(APIView):
+    """
+    View to add/remove/edit a group's permissions for a content library.
+    """
+    @convert_exceptions
+    def put(self, request, lib_key_str, group_name):
+        """
+        Add a group to this content library, with permissions specified in the
+        request body.
+        """
+        key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY_TEAM)
+        serializer = ContentLibraryPermissionLevelSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        group = get_object_or_404(Group, name=group_name)
+        api.set_library_group_permissions(key, group, access_level=serializer.validated_data["access_level"])
+        return Response({})
+
+    @convert_exceptions
+    def delete(self, request, lib_key_str, user_id):
+        """
+        Remove the specified user's permission to access or edit this content
+        library.
+        """
+        key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY_TEAM)
+        group = get_object_or_404(Group, pk=int(user_id))
+        api.set_library_group_permissions(key, group, access_level=None)
         return Response({})
 
 
@@ -139,8 +238,83 @@ class LibraryBlockTypesView(APIView):
         Get the list of XBlock types that can be added to this library
         """
         key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
         result = api.get_allowed_block_types(key)
         return Response(LibraryXBlockTypeSerializer(result, many=True).data)
+
+
+@view_auth_classes()
+class LibraryLinksView(APIView):
+    """
+    View to get the list of bundles/libraries linked to this content library.
+
+    Because every content library is a blockstore bundle, it can have "links" to
+    other bundles, which may or may not be content libraries. This allows using
+    XBlocks (or perhaps even static assets etc.) from another bundle without
+    needing to duplicate/copy the data.
+
+    Links always point to a specific published version of the target bundle.
+    Links are identified by a slug-like ID, e.g. "link1"
+    """
+    @convert_exceptions
+    def get(self, request, lib_key_str):
+        """
+        Get the list of bundles that this library links to, if any
+        """
+        key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
+        result = api.get_bundle_links(key)
+        return Response(LibraryBundleLinkSerializer(result, many=True).data)
+
+    @convert_exceptions
+    def post(self, request, lib_key_str):
+        """
+        Create a new link in this library.
+        """
+        key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
+        serializer = LibraryBundleLinkSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        target_key = LibraryLocatorV2.from_string(serializer.validated_data['opaque_key'])
+        api.create_bundle_link(
+            library_key=key,
+            link_id=serializer.validated_data['id'],
+            target_opaque_key=target_key,
+            version=serializer.validated_data['version'],  # a number, or None for "use latest version"
+        )
+        return Response({})
+
+
+@view_auth_classes()
+class LibraryLinkDetailView(APIView):
+    """
+    View to update/delete an existing library link
+    """
+    @convert_exceptions
+    def patch(self, request, lib_key_str, link_id):
+        """
+        Update the specified link to point to a different version of its
+        target bundle.
+
+        Pass e.g. {"version": 40} or pass {"version": None} to update to the
+        latest published version.
+        """
+        key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
+        serializer = LibraryBundleLinkUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        api.update_bundle_link(key, link_id, version=serializer.validated_data['version'])
+        return Response({})
+
+    @convert_exceptions
+    def delete(self, request, lib_key_str, link_id):  # pylint: disable=unused-argument
+        """
+        Delete a link from this library.
+        """
+        key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
+        api.update_bundle_link(key, link_id, delete=True)
+        return Response({})
 
 
 @view_auth_classes()
@@ -155,6 +329,7 @@ class LibraryCommitView(APIView):
         descendants.
         """
         key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
         api.publish_changes(key)
         return Response({})
 
@@ -165,6 +340,7 @@ class LibraryCommitView(APIView):
         descendants. Restore it to the last published version
         """
         key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
         api.revert_changes(key)
         return Response({})
 
@@ -180,6 +356,7 @@ class LibraryBlocksView(APIView):
         Get the list of all top-level blocks in this content library
         """
         key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
         result = api.get_library_blocks(key)
         return Response(LibraryXBlockMetadataSerializer(result, many=True).data)
 
@@ -189,6 +366,7 @@ class LibraryBlocksView(APIView):
         Add a new XBlock to this content library
         """
         library_key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(library_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
         serializer = LibraryXBlockCreationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         parent_block_usage_str = serializer.validated_data.pop("parent_block", None)
@@ -215,6 +393,7 @@ class LibraryBlockView(APIView):
         Get metadata about an existing XBlock in the content library
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
+        api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
         result = api.get_library_block(key)
         return Response(LibraryXBlockMetadataSerializer(result).data)
 
@@ -232,6 +411,7 @@ class LibraryBlockView(APIView):
         be deleted but the link and the linked bundle will be unaffected.
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
+        api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
         api.delete_library_block(key)
         return Response({})
 
@@ -247,6 +427,7 @@ class LibraryBlockOlxView(APIView):
         Get the block's OLX
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
+        api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
         xml_str = api.get_library_block_olx(key)
         return Response(LibraryXBlockOlxSerializer({"olx": xml_str}).data)
 
@@ -259,6 +440,7 @@ class LibraryBlockOlxView(APIView):
         Very little validation is done.
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
+        api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
         serializer = LibraryXBlockOlxSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         new_olx_str = serializer.validated_data["olx"]
@@ -280,6 +462,7 @@ class LibraryBlockAssetListView(APIView):
         List the static asset files belonging to this block.
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
+        api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
         files = api.get_library_block_static_asset_files(key)
         return Response(LibraryXBlockStaticFilesSerializer({"files": files}).data)
 
@@ -297,6 +480,7 @@ class LibraryBlockAssetView(APIView):
         Get a static asset file belonging to this block.
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
+        api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
         files = api.get_library_block_static_asset_files(key)
         for f in files:
             if f.path == file_path:
@@ -309,6 +493,9 @@ class LibraryBlockAssetView(APIView):
         Replace a static asset file belonging to this block.
         """
         usage_key = LibraryUsageLocatorV2.from_string(usage_key_str)
+        api.require_permission_for_library_key(
+            usage_key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+        )
         file_wrapper = request.data['content']
         if file_wrapper.size > 20 * 1024 * 1024:  # > 20 MiB
             # In the future, we need a way to use file_wrapper.chunks() to read
@@ -323,11 +510,14 @@ class LibraryBlockAssetView(APIView):
         return Response(LibraryXBlockStaticFileSerializer(result).data)
 
     @convert_exceptions
-    def delete(self, request, usage_key_str, file_path):  # pylint: disable=unused-argument
+    def delete(self, request, usage_key_str, file_path):
         """
         Delete a static asset file belonging to this block.
         """
         usage_key = LibraryUsageLocatorV2.from_string(usage_key_str)
+        api.require_permission_for_library_key(
+            usage_key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+        )
         try:
             api.delete_library_block_static_asset_file(usage_key, file_path)
         except ValueError:

@@ -2,7 +2,6 @@
 """
 Tests of the Capa XModule
 """
-# pylint: disable=missing-docstring
 # pylint: disable=invalid-name
 
 
@@ -861,7 +860,7 @@ class ProblemBlockTest(unittest.TestCase):
         # pylint: enable=line-too-long
 
         self.assertEqual(xqueue_interface._http_post.call_count, 1)
-        _, kwargs = xqueue_interface._http_post.call_args  # pylint: disable=unpacking-non-sequence
+        _, kwargs = xqueue_interface._http_post.call_args
         six.assertCountEqual(self, fpaths, list(kwargs['files'].keys()))
         for fpath, fileobj in six.iteritems(kwargs['files']):
             self.assertEqual(fpath, fileobj.name)
@@ -894,7 +893,7 @@ class ProblemBlockTest(unittest.TestCase):
         module.handle('xmodule_handler', request, 'problem_check')
 
         self.assertEqual(xqueue_interface._http_post.call_count, 1)
-        _, kwargs = xqueue_interface._http_post.call_args  # pylint: disable=unpacking-non-sequence
+        _, kwargs = xqueue_interface._http_post.call_args
         six.assertCountEqual(self, fnames, list(kwargs['files'].keys()))
         for fpath, fileobj in six.iteritems(kwargs['files']):
             self.assertEqual(fpath, fileobj.name)
@@ -1598,6 +1597,37 @@ class ProblemBlockTest(unittest.TestCase):
             </multiplechoiceresponse>
             <demandhint>
               <hint>Only demand hint</hint>
+            </demandhint>
+            </problem>"""
+        module = CapaFactory.create(xml=test_xml)
+        module.get_problem_html()  # ignoring html result
+        context = module.system.render_template.call_args[0][1]
+        self.assertTrue(context['demand_hint_possible'])
+        self.assertTrue(context['should_enable_next_hint'])
+
+        # Check the AJAX call that gets the hint by index
+        result = module.get_demand_hint(0)
+        self.assertEqual(result['hint_index'], 0)
+        self.assertFalse(result['should_enable_next_hint'])
+
+    def test_image_hint(self):
+        """
+        Test the hint button shows an image without the static url.
+        """
+        test_xml = """
+            <problem>
+            <p>That is the question</p>
+            <multiplechoiceresponse>
+              <choicegroup type="MultipleChoice">
+                <choice correct="false">Alpha <choicehint>A hint</choicehint>
+                </choice>
+                <choice correct="true">Beta</choice>
+              </choicegroup>
+            </multiplechoiceresponse>
+            <demandhint>
+              <hint>
+                <img src="/static/7b1d74b2383b7d25a70ae4991190c222_28-collection-of-dark-souls-bonfire-clipart-high-quality-free-_1200-1386.jpeg"> </img>
+                You can add an optional hint like this. Problems that have a hint include a hint button, and this text appears the first time learners select the button.</hint>
             </demandhint>
             </problem>"""
         module = CapaFactory.create(xml=test_xml)
@@ -2870,6 +2900,27 @@ class ProblemBlockXMLTest(unittest.TestCase):
         """)
         with self.assertRaises(etree.XMLSyntaxError):
             self._create_descriptor(sample_invalid_xml, name="Invalid XML")
+
+    def test_invalid_dropdown_xml(self):
+        """
+        Verify the capa problem cannot be created from dropdown xml with multiple correct answers.
+        """
+        problem_xml = textwrap.dedent("""
+        <problem>
+            <optionresponse>
+              <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for dropdown problems. Edit this component to replace this template with your own assessment.</p>
+            <label>Add the question text, or prompt, here. This text is required.</label>
+            <description>You can add an optional tip or note related to the prompt like this. </description>
+            <optioninput>
+                <option correct="False">an incorrect answer</option>
+                <option correct="True">the correct answer</option>
+                <option correct="True">an incorrect answer</option>
+              </optioninput>
+            </optionresponse>
+        </problem>
+        """)
+        with self.assertRaises(Exception):
+            CapaFactory.create(xml=problem_xml)
 
 
 class ComplexEncoderTest(unittest.TestCase):

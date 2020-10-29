@@ -21,6 +21,8 @@ from django.http import HttpResponse
 from django.template import engines
 from django.urls import reverse
 from six.moves.urllib.parse import urljoin
+from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
@@ -50,6 +52,20 @@ def marketing_link(name):
         'MKTG_URLS',
         settings.MKTG_URLS
     )
+    marketing_url_overrides = configuration_helpers.get_value(
+        'MKTG_URL_OVERRIDES',
+        settings.MKTG_URL_OVERRIDES
+    )
+
+    if name in marketing_url_overrides:
+        validate = URLValidator()
+        url = marketing_url_overrides.get(name)
+        try:
+            validate(url)
+            return url
+        except ValidationError as err:
+            log.debug("Invalid link set for link %s: %s", name, err)
+            return '#'
 
     if enable_mktg_site and name in marketing_urls:
         # special case for when we only want the root marketing URL

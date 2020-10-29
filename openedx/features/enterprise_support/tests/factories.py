@@ -31,6 +31,7 @@ class EnterpriseCustomerFactory(factory.django.DjangoModelFactory):
 
     uuid = factory.LazyAttribute(lambda x: UUID(FAKER.uuid4()))  # pylint: disable=no-member
     name = factory.LazyAttribute(lambda x: FAKER.company())  # pylint: disable=no-member
+    slug = factory.LazyAttribute(lambda x: FAKER.slug())  # pylint: disable=no-member
     active = True
     site = factory.SubFactory(SiteFactory)
     enable_data_sharing_consent = True
@@ -70,6 +71,5 @@ class EnterpriseCourseEnrollmentFactory(factory.django.DjangoModelFactory):
 
         model = EnterpriseCourseEnrollment
 
-    id = factory.LazyAttribute(lambda x: FAKER.random_int(min=1))  # pylint: disable=no-member
     course_id = factory.LazyAttribute(lambda x: FAKER.slug())  # pylint: disable=no-member
     enterprise_customer_user = factory.SubFactory(EnterpriseCustomerUserFactory)

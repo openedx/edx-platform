@@ -122,7 +122,7 @@ class TestGoogleAnalyticsTrackingPixel(QueryStringAssertionMixin, CacheIsolation
     @override_settings(GOOGLE_ANALYTICS_TRACKING_ID='UA-123456-1')
     def test_site_config_override(self):
         site_config = SiteConfigurationFactory.create(
-            values=dict(
+            site_values=dict(
                 GOOGLE_ANALYTICS_ACCOUNT='UA-654321-1'
             )
         )

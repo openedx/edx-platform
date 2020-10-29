@@ -8,17 +8,20 @@ from `lms.djangoapps.program_enrollments.api`.
 
 import logging
 
+from simple_history.utils import bulk_create_with_history
+
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment, NonExistentCourseError
+from student.roles import CourseStaffRole
 
-from ..constants import ProgramCourseEnrollmentStatuses
+from ..constants import ProgramCourseEnrollmentRoles, ProgramCourseEnrollmentStatuses
 from ..constants import ProgramCourseOperationStatuses as ProgramCourseOpStatuses
 from ..constants import ProgramEnrollmentStatuses
 from ..constants import ProgramOperationStatuses as ProgramOpStatuses
 from ..exceptions import ProviderDoesNotExistException
-from ..models import ProgramCourseEnrollment, ProgramEnrollment
-from .reading import fetch_program_course_enrollments, fetch_program_enrollments, get_users_by_external_keys
+from ..models import CourseAccessRoleAssignment, ProgramCourseEnrollment, ProgramEnrollment
+from .reading import fetch_program_course_enrollments_by_students, fetch_program_enrollments, get_users_by_external_keys
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +70,6 @@ def write_program_enrollments(program_uuid, enrollment_requests, create, update)
     # For each enrollment request, try to create/update:
     # * For creates, build up list `to_save`, which we will bulk-create afterwards.
     # * For updates, do them in place.
-    #     (TODO: Django 2.2 will add bulk-update support, which we could use here)
     # Update `results` with the new status or an error status for each operation.
     results = {}
     to_save = []
@@ -100,11 +102,11 @@ def write_program_enrollments(program_uuid, enrollment_requests, create, update)
             to_save.append(new_enrollment)
             results[external_key] = new_enrollment.status
 
-    # Bulk-create all new program enrollments.
+    # Bulk-create all new program enrollments and corresponding history records
     # Note: this will NOT invoke `save()` or `pre_save`/`post_save` signals!
     # See https://docs.djangoproject.com/en/1.11/ref/models/querysets/#bulk-create.
     if to_save:
-        ProgramEnrollment.objects.bulk_create(to_save)
+        bulk_create_with_history(to_save, ProgramEnrollment)
 
     results.update({key: ProgramOpStatuses.DUPLICATED for key in duplicated_keys})
     return results
@@ -180,6 +182,7 @@ def write_program_course_enrollments(
         enrollment_requests (list[dict]): dicts in the form:
             * 'external_user_key': str
             * 'status': str from ProgramCourseEnrollmentStatuses
+            * 'course_staff': Boolean if the user should have the CourseStaff role
         create (bool): non-existent enrollments will be created iff `create`,
             otherwise they will be skipped as 'duplicate'.
         update (bool): existing enrollments will be updated iff `update`,
@@ -193,32 +196,65 @@ def write_program_course_enrollments(
     if not (create or update):
         raise ValueError("At least one of (create, update) must be True")
     requests_by_key, duplicated_keys = _organize_requests_by_external_key(enrollment_requests)
-    external_keys = set(requests_by_key)
+    processable_external_keys = set(requests_by_key)
+
+    results = {}
+    results.update({
+        key: ProgramCourseOpStatuses.DUPLICATED for key in duplicated_keys
+    })
+
+    if not processable_external_keys:
+        return results
+
     program_enrollments = fetch_program_enrollments(
         program_uuid=program_uuid,
-        external_user_keys=external_keys,
+        external_user_keys=processable_external_keys,
     ).prefetch_related('program_course_enrollments')
     program_enrollments_by_key = {
         enrollment.external_user_key: enrollment for enrollment in program_enrollments
     }
 
-    # Fetch existing program-course enrollments.
-    existing_course_enrollments = fetch_program_course_enrollments(
-        program_uuid, course_key, program_enrollments=program_enrollments,
+    # Fetch enrollments regardless of anchored Program Enrollments
+    existing_course_enrollments = fetch_program_course_enrollments_by_students(
+        external_user_keys=processable_external_keys,
+        course_keys=[course_key],
+    ).select_related('program_enrollment')
+
+    conflicting_user_key_and_status = _get_conflicting_active_course_enrollments(
+        requests_by_key,
+        existing_course_enrollments,
+        program_uuid,
+        course_key
     )
-    existing_course_enrollments_by_key = {key: None for key in external_keys}
+
+    # Remove the conflicted items from the requests dictionary,
+    # so we can continue our processing below
+    for conflicting_user_key in conflicting_user_key_and_status:
+        del requests_by_key[conflicting_user_key]
+
+    results.update(conflicting_user_key_and_status)
+
+    # Now, limit the course enrollments to the same program uuid
+    existing_course_enrollments_of_program_enrollment = existing_course_enrollments.filter(
+        program_enrollment__program_uuid=program_uuid
+    )
+
+    existing_course_enrollments_by_key = {key: None for key in processable_external_keys}
     existing_course_enrollments_by_key.update({
         enrollment.program_enrollment.external_user_key: enrollment
-        for enrollment in existing_course_enrollments
+        for enrollment in existing_course_enrollments_of_program_enrollment
     })
 
     # For each enrollment request, try to create/update.
     # For creates, build up list `to_save`, which we will bulk-create afterwards.
-    # For updates, do them in place (Django 2.2 will add bulk-update support).
+    # For updates, do them in place in order to preserve history records.
     # For each operation, update `results` with the new status or an error status.
-    results = {}
-    to_save = []
+    enrollments_to_save = []
+    created_enrollments = []
+    updated_enrollments = []
+    staff_assignments_by_user_key = {}
     for external_key, request in requests_by_key.items():
+        course_staff = request['course_staff']
         status = request['status']
         if status not in ProgramCourseEnrollmentStatuses.__ALL__:
             results[external_key] = ProgramCourseOpStatuses.INVALID_STATUS
@@ -235,6 +271,7 @@ def write_program_course_enrollments(
             results[external_key] = change_program_course_enrollment_status(
                 existing_course_enrollment, status
             )
+            updated_enrollments.append(existing_course_enrollment)
         else:
             if not create:
                 results[external_key] = ProgramCourseOpStatuses.NOT_FOUND
@@ -242,18 +279,28 @@ def write_program_course_enrollments(
             new_course_enrollment = create_program_course_enrollment(
                 program_enrollment, course_key, status, save=False
             )
-            to_save.append(new_course_enrollment)
+            enrollments_to_save.append(new_course_enrollment)
             results[external_key] = new_course_enrollment.status
 
-    # Bulk-create all new program-course enrollments.
+        if course_staff is not None:
+            staff_assignments_by_user_key[external_key] = course_staff
+
+    # Bulk-create all new program-course enrollments and corresponding history records.
     # Note: this will NOT invoke `save()` or `pre_save`/`post_save` signals!
     # See https://docs.djangoproject.com/en/1.11/ref/models/querysets/#bulk-create.
-    if to_save:
-        ProgramCourseEnrollment.objects.bulk_create(to_save)
+    if enrollments_to_save:
+        created_enrollments = bulk_create_with_history(enrollments_to_save, ProgramCourseEnrollment)
 
-    results.update({
-        key: ProgramCourseOpStatuses.DUPLICATED for key in duplicated_keys
-    })
+    # For every created/updated enrollment, check if the user should be course staff.
+    # If that enrollment has a linked user, assign the user the course staff role
+    # If that enrollment does not have a linked user, create a CourseAccessRoleAssignment
+    # for that enrollment.
+    written_enrollments = ProgramCourseEnrollment.objects.filter(
+        id__in=[enrollment.id for enrollment in created_enrollments + updated_enrollments]
+    ).select_related('program_enrollment')
+
+    _assign_course_staff_role(course_key, written_enrollments, staff_assignments_by_user_key)
+
     return results
 
 
@@ -335,7 +382,7 @@ def enroll_in_masters_track(user, course_key, status):
     Arguments:
         user (User)
         course_key (CourseKey|str)
-        status (str): from ProgramCourseEnrollmenStatuses
+        status (str): from ProgramCourseEnrollmentStatuses
 
     Returns: CourseEnrollment
 
@@ -343,7 +390,7 @@ def enroll_in_masters_track(user, course_key, status):
     """
     _ensure_course_exists(course_key, user.id)
     if status not in ProgramCourseEnrollmentStatuses.__ALL__:
-        raise ValueError("invalid ProgramCourseEnrollmenStatus: {}".format(status))
+        raise ValueError("invalid ProgramCourseEnrollmentStatus: {}".format(status))
     if CourseEnrollment.is_enrolled(user, course_key):
         course_enrollment = CourseEnrollment.objects.get(
             user=user,
@@ -378,6 +425,45 @@ def enroll_in_masters_track(user, course_key, status):
         if status == ProgramCourseEnrollmentStatuses.INACTIVE:
             course_enrollment.deactivate()
     return course_enrollment
+
+
+def _assign_course_staff_role(course_key, enrollments, staff_assignments):
+    """
+    Grant or remove the course staff role for a set of enrollments on a course.
+    For enrollment without a linked user, a CourseAccessRoleAssignment will be
+    created (or removed) for that enrollment.
+
+    Arguments:
+        enrollments (list): ProgramCourseEnrollments to update
+        staff_assignments (dict): Maps an enrollment's external key to a course staff value
+    """
+    enrollment_role_assignments_to_delete = []
+    for enrollment in enrollments:
+        if enrollment.course_key != course_key:
+            continue
+
+        external_key = enrollment.program_enrollment.external_user_key
+        user = enrollment.program_enrollment.user
+        course_staff = staff_assignments.get(external_key)
+
+        if user:
+            if course_staff is True:
+                CourseStaffRole(course_key).add_users(user)
+            elif course_staff is False:
+                CourseStaffRole(course_key).remove_users(user)
+        else:
+            if course_staff is True:
+                CourseAccessRoleAssignment.objects.update_or_create(
+                    enrollment=enrollment,
+                    role=ProgramCourseEnrollmentRoles.COURSE_STAFF
+                )
+            elif course_staff is False:
+                enrollment_role_assignments_to_delete.append(enrollment)
+
+    if enrollment_role_assignments_to_delete:
+        CourseAccessRoleAssignment.objects.filter(
+            enrollment__in=enrollment_role_assignments_to_delete
+        ).delete()
 
 
 def _ensure_course_exists(course_key, user_key_or_id):
@@ -424,3 +510,53 @@ def _organize_requests_by_external_key(enrollment_requests):
             continue
         requests_by_key[key] = request
     return requests_by_key, duplicated_keys
+
+
+def _get_conflicting_active_course_enrollments(
+    requests_by_key,
+    existing_course_enrollments,
+    program_uuid,
+    course_key
+):
+    """
+    Process the list of existing course enrollments together with
+    the enrollment request list stored in 'requests_by_key'. Detect
+    whether we have conflicting ACTIVE ProgramCourseEnrollment entries.
+    When detected, log about it and return the conflicting entry with
+    duplicated status.
+
+    Arguments:
+        requests_by_key (dict)
+        existing_course_enrollments (queryset[ProgramCourseEnrollment]),
+        program_uuid (UUID|str),
+        course_key (str)
+
+    Returns:
+        results (dict) with detected conflict entry, or empty dict.
+    """
+    conflicted_by_user_key = {}
+
+    requested_statuses_by_user_key = {
+        key: request.get('status') for key, request in requests_by_key.items()
+    }
+
+    for existing_enrollment in existing_course_enrollments:
+        external_user_key = existing_enrollment.program_enrollment.external_user_key
+        requested_status = requested_statuses_by_user_key.get(
+            existing_enrollment.program_enrollment.external_user_key
+        )
+        if (
+            requested_status
+            and requested_status == ProgramCourseEnrollmentStatuses.ACTIVE
+            and existing_enrollment.is_active
+            and str(existing_enrollment.program_enrollment.program_uuid) != str(program_uuid)
+        ):
+            logger.error(
+                u'Detected conflicting active ProgramCourseEnrollment. This is happening on'
+                u' The program_uuid [{}] with course_key [{}] for external_user_key [{}]'.format(
+                    program_uuid,
+                    course_key,
+                    external_user_key
+                ))
+            conflicted_by_user_key[external_user_key] = ProgramCourseOpStatuses.CONFLICT
+    return conflicted_by_user_key

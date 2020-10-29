@@ -1091,7 +1091,7 @@ class CertificateItemTest(ModuleStoreTestCase):
         self.assertEqual('Order Payment Confirmation', email.subject)
         self.assertNotIn("If you haven't verified your identity yet, please start the verification process", email.body)
         self.assertIn(
-            "You can unenroll in the course and receive a full refund for 2 days after the course start date. ",
+            "You can unenroll in the course and receive a full refund for 2 days after the course start date.\n",
             email.body
         )
 

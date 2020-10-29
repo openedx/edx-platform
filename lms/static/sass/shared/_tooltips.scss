@@ -57,7 +57,8 @@
     }
   }
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     p {
       display: block;
       margin-top: $margin-top;

@@ -23,7 +23,8 @@
   // ====================
 
   // basic layout
-  .wrapper-l, .wrapper-r {
+  .wrapper-l,
+  .wrapper-r {
     background: $white;
   }
 
@@ -36,7 +37,11 @@
     @include text-align(right);
   }
 
-  .branding, .info-course, .nav-course, .nav-account, .nav-pitch {
+  .branding,
+  .info-course,
+  .nav-course,
+  .nav-account,
+  .nav-pitch {
     box-sizing: border-box;
     display: inline-block;
     vertical-align: middle;
@@ -67,7 +72,7 @@
         margin-right: 0;
       }
 
-      .title{
+      .title {
         @extend %ui-btn-dd-nav-primary;
 
         @include transition(all $tmg-f2 ease-in-out 0s);
@@ -132,7 +137,6 @@
 
     .nav-account-user {
       .title {
-        max-width: ($baseline*6.5);
         display: inline-block;
         max-width: 84%;
         overflow: hidden;

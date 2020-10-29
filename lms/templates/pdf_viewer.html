@@ -44,12 +44,13 @@ http://sourceforge.net/adobe/cmap/wiki/License/
     <script type="text/javascript">
         PDFJS.imageResourcesPath = "${static.url('css/vendor/pdfjs/images/') | n, js_escaped_string}";
         PDFJS.workerSrc = "${static.url('js/vendor/pdfjs/pdf.worker.js') | n, js_escaped_string}";
+        PDFJS.disableWorker = true;
         PDFJS.cMapUrl = "${static.url('css/vendor/pdfjs/cmaps/') | n, js_escaped_string}";
         PDF_URL = '${current_url | n, js_escaped_string}';
     </script>
 
     <script ${static.url('js/vendor/pdfjs/debugger.js')}></script>
-    
+
     <%static:js group='main_vendor'/>
     <%static:js group='application'/>
     <%static:js group='courseware'/>
@@ -147,7 +148,7 @@ http://sourceforge.net/adobe/cmap/wiki/License/
             <button id="toggleHandTool" class="secondaryToolbarButton handTool" title="Enable hand tool" data-l10n-id="hand_tool_enable">
               <span data-l10n-id="hand_tool_enable_label">Enable hand tool</span>
             </button>
-            
+
             <div class="horizontalToolbarSeparator"></div>
 
             <button id="documentProperties" class="secondaryToolbarButton documentProperties" title="Document Properties…" data-l10n-id="document_properties">
@@ -202,10 +203,10 @@ http://sourceforge.net/adobe/cmap/wiki/License/
                 </a>
 
                 <div class="verticalToolbarSeparator hiddenSmallView"></div>
-                
+
                 <button id="secondaryToolbarToggle" class="toolbarButton" title="Tools" data-l10n-id="tools">
                   <span data-l10n-id="tools_label">Tools</span>
-                </button> 
+                </button>
               </div>
               <div class="outerCenter">
                 <div class="innerCenter" id="toolbarViewerMiddle">

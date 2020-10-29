@@ -11,7 +11,6 @@ import ddt
 import pytest
 import six
 from bok_choy.promise import BrokenPromise
-from selenium.webdriver import ActionChains
 from six.moves import range
 
 from capa.tests.response_xml_factory import (
@@ -21,7 +20,6 @@ from capa.tests.response_xml_factory import (
     CodeResponseXMLFactory,
     CustomResponseXMLFactory,
     FormulaResponseXMLFactory,
-    ImageResponseXMLFactory,
     JSInputXMLFactory,
     MultipleChoiceResponseXMLFactory,
     NumericalResponseXMLFactory,
@@ -621,7 +619,7 @@ class AnnotationProblemTypeTest(AnnotationProblemTypeBase, ProblemTypeTestMixin)
     """
     Standard tests for the Annotation Problem Type
     """
-    shard = 24
+    shard = 20
     pass
 
 
@@ -670,7 +668,7 @@ class CheckboxProblemTypeTest(CheckboxProblemTypeBase, ProblemTypeTestMixin, Cha
     """
     Standard tests for the Checkbox Problem Type
     """
-    shard = 24
+    shard = 18
 
     def test_can_show_answer(self):
         """
@@ -805,7 +803,7 @@ class MultipleChoiceProblemResetCorrectnessAfterChangingAnswerTest(MultipleChoic
     """
     Tests for Multiple choice problem with changing answers
     """
-    shard = 24
+    shard = 18
 
     @ddt.data(['correct', '1/1 point (ungraded)'], ['incorrect', '0/1 point (ungraded)'])
     @ddt.unpack
@@ -1107,7 +1105,7 @@ class RadioProblemTypeTestNonRandomized(RadioProblemTypeBase, NonRandomizedProbl
     """
     Tests for non-randomized radio problem
     """
-    shard = 24
+    shard = 8
 
     def get_problem(self):
         """
@@ -1161,7 +1159,7 @@ class DropdownProblemTypeTest(DropDownProblemTypeBase, ProblemTypeTestMixin, Cha
     """
     Standard tests for the Dropdown Problem Type
     """
-    shard = 24
+    shard = 8
     pass
 
 
@@ -1170,7 +1168,7 @@ class DropDownProblemTypeTestNonRandomized(DropDownProblemTypeBase, NonRandomize
     """
     Tests for non-randomized Dropdown problem
     """
-    shard = 24
+    shard = 8
 
     def get_problem(self):
         """
@@ -1245,7 +1243,7 @@ class StringProblemTypeTest(StringProblemTypeBase, ProblemTypeTestMixin):
     """
     Standard tests for the String Problem Type
     """
-    shard = 24
+    shard = 8
     pass
 
 
@@ -1452,34 +1450,6 @@ class FormulaProblemTypeBase(ProblemTypeTestBase):
         self.problem_page.fill_answer(textvalue)
 
 
-@ddt.ddt
-class FormulaProblemTypeTest(FormulaProblemTypeBase, ProblemTypeTestMixin, ChangingAnswerOfProblemTestMixin):
-    """
-    Standard tests for the Formula Problem Type
-    """
-    shard = 24
-    pass
-
-
-class FormulaProblemTypeTestNonRandomized(FormulaProblemTypeBase, NonRandomizedProblemTypeTestMixin):
-    """
-    Tests for non-randomized Formula problem
-    """
-    shard = 24
-
-    def get_problem(self):
-        """
-        Creates a {problem_type} problem
-        """
-        # Generate the problem XML using capa.tests.response_xml_factory
-        return XBlockFixtureDesc(
-            'problem',
-            self.problem_name,
-            data=self.factory.build_xml(**self.factory_kwargs),
-            metadata={'rerandomize': 'never', 'show_reset_button': True}
-        )
-
-
 class FormulaProblemTypeNeverShowCorrectnessTest(FormulaProblemTypeBase, ProblemNeverShowCorrectnessMixin):
     """
     Ensure that correctness can be withheld for Formula Problem Type problems.
@@ -1561,7 +1531,7 @@ class ScriptProblemTypeTest(ScriptProblemTypeBase, ProblemTypeTestMixin):
     """
     Standard tests for the Script Problem Type
     """
-    shard = 24
+    shard = 20
     pass
 
 
@@ -1570,7 +1540,7 @@ class ScriptProblemResetAfterAnswerTest(ScriptProblemTypeBase):
     """
     Test Script problem by resetting answers
     """
-    shard = 24
+    shard = 8
 
     @ddt.data(['correct', 'incorrect'], ['incorrect', 'correct'])
     @ddt.unpack
@@ -1593,30 +1563,12 @@ class ScriptProblemResetAfterAnswerTest(ScriptProblemTypeBase):
         self.answer_problem(other_correctness)
         self.assertTrue(self.problem_status('unanswered'))
 
-    @ddt.data(['correct', '2/2 points (ungraded)'], ['incorrect', '0/2 points (ungraded)'])
-    @ddt.unpack
-    def test_script_score_after_answer_and_reset(self, correctness, score):
-        """
-        Scenario: I can see my score on a script problem when I answer it and after I reset it
-
-        Given I am viewing a script problem
-        When I answer a script problem correct/incorrect
-        Then I should see a score
-        When I reset the problem
-        Then I should see a score of points possible: 0/2 points (ungraded)
-        """
-        self.answer_problem(correctness)
-        self.problem_page.click_submit()
-        self.assertEqual(self.problem_page.problem_progress_graded_value, score)
-        self.problem_page.click_reset()
-        self.assertEqual(self.problem_page.problem_progress_graded_value, '0/2 points (ungraded)')
-
 
 class ScriptProblemTypeTestNonRandomized(ScriptProblemTypeBase, NonRandomizedProblemTypeTestMixin):
     """
     Tests for non-randomized Script problem
     """
-    shard = 24
+    shard = 8
 
     def get_problem(self):
         """
@@ -1843,7 +1795,7 @@ class RadioTextProblemTypeTest(RadioTextProblemTypeBase, ProblemTypeTestMixin):
     """
     Standard tests for the Radio Text Problem Type
     """
-    shard = 24
+    shard = 8
     pass
 
 
@@ -1852,7 +1804,7 @@ class RadioTextProblemResetCorrectnessAfterChangingAnswerTest(RadioTextProblemTy
     """
     Tests for Radio Text problem with changing answers
     """
-    shard = 24
+    shard = 18
 
     @ddt.data(['correct', '1/1 point (ungraded)'], ['incorrect', '0/1 point (ungraded)'])
     @ddt.unpack
@@ -1985,79 +1937,6 @@ class CheckboxTextProblemTypeTestNonRandomized(CheckboxTextProblemTypeBase, NonR
 class CheckboxTextProblemTypeNeverShowCorrectnessTest(CheckboxTextProblemTypeBase, ProblemNeverShowCorrectnessMixin):
     """
     Ensure that correctness can be withheld for Checkbox + Text Problem Type problems.
-    """
-    pass
-
-
-class ImageProblemTypeBase(ProblemTypeTestBase):
-    """
-    ProblemTypeTestBase specialization for Image Problem Type
-    """
-    problem_name = 'IMAGE TEST PROBLEM'
-    problem_type = 'image'
-    partially_correct = False
-
-    factory = ImageResponseXMLFactory()
-
-    can_submit_blank = True
-    can_update_save_notification = False
-
-    factory_kwargs = {
-        'src': '/static/images/placeholder-image.png',
-        'rectangle': '(0,0)-(50,50)',
-    }
-
-    def answer_problem(self, correctness):
-        """
-        Answer image problem.
-        """
-        offset = 25 if correctness == 'correct' else -25
-        input_selector = ".imageinput [id^='imageinput_'] img"
-        input_element = self.problem_page.q(css=input_selector)[0]
-
-        chain = ActionChains(self.browser)
-        chain.move_to_element(input_element)
-        chain.move_by_offset(offset, offset)
-        chain.click()
-        chain.perform()
-
-
-@ddt.ddt
-class ImageProblemTypeTest(ImageProblemTypeBase, ProblemTypeTestMixin):
-    """
-    Standard tests for the Image Problem Type
-    """
-    def test_image_problem_score_with_blank_answer(self):
-        """
-        Scenario: I can see my score on a problem to which I submit a blank answer
-        Given I am viewing aN image problem
-        When I submit a problem
-        Then I should see a score of Points Possible: 0/1 point (ungraded)
-        """
-        self.problem_page.click_submit()
-        self.assertEqual(self.problem_page.problem_progress_graded_value, '0/1 point (ungraded)')
-
-
-class ImageProblemTypeTestNonRandomized(ImageProblemTypeBase, NonRandomizedProblemTypeTestMixin):
-    """
-    Tests for non-randomized Image problem
-    """
-    def get_problem(self):
-        """
-        Creates a {problem_type} problem
-        """
-        # Generate the problem XML using capa.tests.response_xml_factory
-        return XBlockFixtureDesc(
-            'problem',
-            self.problem_name,
-            data=self.factory.build_xml(**self.factory_kwargs),
-            metadata={'rerandomize': 'never', 'show_reset_button': True}
-        )
-
-
-class ImageProblemTypeNeverShowCorrectnessTest(ImageProblemTypeBase, ProblemNeverShowCorrectnessMixin):
-    """
-    Ensure that correctness can be withheld for Image Problem Type problems.
     """
     pass
 

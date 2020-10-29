@@ -42,7 +42,7 @@ class TestManageGroupCommand(TestCase):
             group = Group.objects.create(name=group_name)
             for codename in permission_codenames:
                 group.permissions.add(
-                    Permission.objects.get(content_type=content_type, codename=codename)  # pylint: disable=no-member
+                    Permission.objects.get(content_type=content_type, codename=codename)
                 )
 
     def check_group_permissions(self, group_permissions):
@@ -58,7 +58,7 @@ class TestManageGroupCommand(TestCase):
         """
         DRY helper.
         """
-        self.assertEqual(set(group_names), {g.name for g in Group.objects.all()})  # pylint: disable=no-member
+        self.assertEqual(set(group_names), {g.name for g in Group.objects.all()})
 
     def check_permissions(self, group_name, permission_codenames):
         """
@@ -66,7 +66,7 @@ class TestManageGroupCommand(TestCase):
         """
         self.assertEqual(
             set(permission_codenames),
-            {p.codename for p in Group.objects.get(name=group_name).permissions.all()}  # pylint: disable=no-member
+            {p.codename for p in Group.objects.get(name=group_name).permissions.all()}
         )
 
     @ddt.data(
@@ -75,7 +75,7 @@ class TestManageGroupCommand(TestCase):
             for data in TEST_DATA
             for args, exception in (
                 ((), 'too few arguments' if sys.version_info.major == 2 else 'required: group_name'),  # no group name
-                (('x' * 81,), 'invalid group name'),  # invalid group name
+                (('x' * 151,), 'invalid group name'),  # invalid group name
                 ((TEST_GROUP, 'some-other-group'), 'unrecognized arguments'),  # multiple arguments
                 ((TEST_GROUP, '--some-option', 'dummy'), 'unrecognized arguments')  # unexpected option name
             )

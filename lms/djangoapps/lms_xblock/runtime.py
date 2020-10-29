@@ -28,7 +28,13 @@ def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
     """
     This method matches the signature for `xblock.runtime:Runtime.handler_url()`
 
-    See :method:`xblock.runtime:Runtime.handler_url`
+    :param block: The block to generate the url for
+    :param handler_name: The handler on that block that the url should resolve to
+    :param suffix: Any path suffix that should be added to the handler url
+    :param query: Any query string that should be added to the handler url
+        (which should not include an initial ? or &)
+    :param thirdparty: If true, return a fully-qualified URL instead of relative
+        URL. This is useful for URLs to be used by third-party services.
     """
     view_name = 'xblock_handler'
     if handler_name:

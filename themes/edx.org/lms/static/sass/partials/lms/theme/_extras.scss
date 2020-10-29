@@ -14,7 +14,7 @@
   @include media-breakpoint-down(md) {
     margin-left: calc(50% - 30px) !important;
 
-    .logo{
+    .logo {
       margin-left: 0 !important;
       width: $header-logo-width;
       height: auto !important;

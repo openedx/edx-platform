@@ -2,9 +2,10 @@
 A pytest plugin that reports test contexts to coverage running in another process.
 """
 
-from pavelib.utils.envs import Env
 import pytest
 import requests
+
+from pavelib.utils.envs import Env
 
 
 class RemoteContextPlugin(object):

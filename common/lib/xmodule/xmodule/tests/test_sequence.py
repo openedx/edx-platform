@@ -88,7 +88,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
             return_value=Mock(vertical_is_complete=Mock(return_value=True))
         )
         block.xmodule_runtime._services['user'] = StubUserService()  # pylint: disable=protected-access
-        block.xmodule_runtime.xmodule_instance = getattr(block, '_xmodule', None)  # pylint: disable=protected-access
+        block.xmodule_runtime.xmodule_instance = getattr(block, '_xmodule', None)
         block.parent = parent.location
         return block
 
@@ -348,6 +348,9 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         Test that the sequence metadata is returned from the
         metadata ajax handler.
         """
+        # rather than dealing with json serialization of the Mock object,
+        # let's just disable the bookmarks service
+        self.sequence_3_1.xmodule_runtime._services['bookmarks'] = None
         metadata = json.loads(self.sequence_3_1.handle_ajax('metadata', {}))
         self.assertEqual(len(metadata['items']), 3)
         self.assertEqual(metadata['tag'], 'sequential')

@@ -14,6 +14,7 @@ from oauth2_provider.scopes import get_scopes_backend
 from pytz import utc
 
 from ..models import RestrictedApplication
+# pylint: disable=W0223
 
 
 @receiver(pre_save, sender=AccessToken)

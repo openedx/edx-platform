@@ -2,7 +2,6 @@
 URLs for LMS
 """
 
-
 from config_models.views import ConfigurationModelCurrentAPIView
 from django.conf import settings
 from django.conf.urls import include, url
@@ -10,26 +9,29 @@ from django.conf.urls.static import static
 from django.contrib.admin import autodiscover as django_autodiscover
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import RedirectView
+from edx_api_doc_tools import make_docs_urls
 from ratelimitbackend import admin
 
-from edx_api_doc_tools import make_docs_urls
-
 from branding import views as branding_views
-from lms.djangoapps.courseware.masquerade import handle_ajax as courseware_masquerade_handle_ajax
+from debug import views as debug_views
+from lms.djangoapps.certificates import views as certificates_views
+from lms.djangoapps.courseware.masquerade import MasqueradeView
 from lms.djangoapps.courseware.module_render import (
-    handle_xblock_callback, handle_xblock_callback_noauth, xblock_view, xqueue_callback,
+    handle_xblock_callback,
+    handle_xblock_callback_noauth,
+    xblock_view,
+    xqueue_callback
 )
 from lms.djangoapps.courseware.views import views as courseware_views
 from lms.djangoapps.courseware.views.index import CoursewareIndex
 from lms.djangoapps.courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
-from debug import views as debug_views
-from lms.djangoapps.certificates import views as certificates_views
 from lms.djangoapps.discussion import views as discussion_views
 from lms.djangoapps.discussion.notification_prefs import views as notification_prefs_views
 from lms.djangoapps.instructor.views import coupons as instructor_coupons_views
 from lms.djangoapps.instructor.views import instructor_dashboard as instructor_dashboard_views
 from lms.djangoapps.instructor.views import registration_codes as instructor_registration_codes_views
 from lms.djangoapps.instructor_task import views as instructor_task_views
+from openedx.core.apidocs import api_info
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.common_views.xblock import xblock_resource
@@ -45,14 +47,17 @@ from openedx.core.djangoapps.plugins import plugin_urls
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_authn.views.login import redirect_to_lms_login
 from openedx.core.djangoapps.verified_track_content import views as verified_track_content_views
-from openedx.core.apidocs import api_info
 from openedx.features.enterprise_support.api import enterprise_enabled
 from static_template_view import views as static_template_view_views
 from staticbook import views as staticbook_views
 from student import views as student_views
-from track import views as track_views
 from util import views as util_views
+
+RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
+RENDER_XBLOCK_NAME = 'render_xblock'
+COURSE_DATES_NAME = 'dates'
 
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     django_autodiscover()
@@ -68,8 +73,28 @@ if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
 handler404 = static_template_view_views.render_404
 handler500 = static_template_view_views.render_500
 
+notification_prefs_urls = [
+    url(r'^notification_prefs/enable/', notification_prefs_views.ajax_enable),
+    url(r'^notification_prefs/disable/', notification_prefs_views.ajax_disable),
+    url(r'^notification_prefs/status/', notification_prefs_views.ajax_status),
+
+    url(
+        r'^notification_prefs/unsubscribe/(?P<token>[a-zA-Z0-9-_=]+)/',
+        notification_prefs_views.set_subscription,
+        {'subscribe': False},
+        name='unsubscribe_forum_update',
+    ),
+    url(
+        r'^notification_prefs/resubscribe/(?P<token>[a-zA-Z0-9-_=]+)/',
+        notification_prefs_views.set_subscription,
+        {'subscribe': True},
+        name='resubscribe_forum_update',
+    ),
+]
+
+
 urlpatterns = [
-    url(r'^$', branding_views.index, name='root'),   # Main marketing page, or redirect to courseware
+    url(r'^$', branding_views.index, name='root'),  # Main marketing page, or redirect to courseware
 
     url(r'', include('student.urls')),
     # TODO: Move lms specific student views out of common code
@@ -107,7 +132,6 @@ urlpatterns = [
     # Note: these are older versions of the User API that will eventually be
     # subsumed by api/user listed above.
     url(r'', include('openedx.core.djangoapps.user_api.legacy_urls')),
-
 
     # Profile Images API endpoints
     url(r'^api/profile_images/', include('openedx.core.djangoapps.profile_images.urls')),
@@ -164,7 +188,6 @@ urlpatterns += [
     url(r'^openassessment/fileupload/', include('openassessment.fileupload.urls')),
 ]
 
-
 # sysadmin dashboard, to see what courses are loaded, to delete & load courses
 if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'):
     urlpatterns += [
@@ -218,6 +241,7 @@ COURSE_URLS = [
         name='registration_code_details',
     ),
 ]
+
 urlpatterns += [
     # jump_to URLs for direct access to a location in the course
     url(
@@ -272,7 +296,7 @@ urlpatterns += [
     url(
         r'^xblock/{usage_key_string}$'.format(usage_key_string=settings.USAGE_KEY_PATTERN),
         courseware_views.render_xblock,
-        name='render_xblock',
+        name=RENDER_XBLOCK_NAME,
     ),
 
     # xblock Resource URL
@@ -297,9 +321,15 @@ urlpatterns += [
     # TODO: These views need to be updated before they work
     url(r'^calculate$', util_views.calculate),
 
+    url(
+        r'^reset_deadlines$',
+        util_views.reset_course_deadlines,
+        name=RESET_COURSE_DEADLINES_NAME,
+    ),
+
     url(r'^courses/?$', branding_views.courses, name='courses'),
 
-    #About the course
+    # About the course
     url(
         r'^courses/{}/about$'.format(
             settings.COURSE_ID_PATTERN,
@@ -320,7 +350,7 @@ urlpatterns += [
         name='enroll_staff',
     ),
 
-    #Inside the course
+    # Inside the course
     url(
         r'^courses/{}/$'.format(
             settings.COURSE_ID_PATTERN,
@@ -451,6 +481,15 @@ urlpatterns += [
         name='progress',
     ),
 
+    # dates page
+    url(
+        r'^courses/{}/dates'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        courseware_views.dates,
+        name=COURSE_DATES_NAME,
+    ),
+
     # Takes optional student_id for instructor use--shows profile as that student sees it.
     url(
         r'^courses/{}/progress/(?P<student_id>[^/]*)/$'.format(
@@ -476,7 +515,6 @@ urlpatterns += [
         instructor_dashboard_views.instructor_dashboard_2,
         name='instructor_dashboard',
     ),
-
 
     url(
         r'^courses/{}/set_course_mode_price$'.format(
@@ -639,6 +677,12 @@ urlpatterns += [
         include('openedx.features.course_bookmarks.urls'),
     ),
 
+    # Calendar Sync UI in LMS
+    url(
+        r'^courses/{}/'.format(settings.COURSE_ID_PATTERN,),
+        include('openedx.features.calendar_sync.urls'),
+    ),
+
     # Course search
     url(
         r'^courses/{}/search/'.format(
@@ -677,7 +721,7 @@ if settings.FEATURES.get('ENABLE_MASQUERADE'):
             r'^courses/{}/masquerade$'.format(
                 settings.COURSE_KEY_PATTERN,
             ),
-            courseware_masquerade_handle_ajax,
+            MasqueradeView.as_view(),
             name='masquerade_update',
         ),
     ]
@@ -705,35 +749,10 @@ if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
             ),
             include('lms.djangoapps.discussion.django_comment_client.urls')
         ),
-        url(
-            r'^notification_prefs/enable/',
-            notification_prefs_views.ajax_enable
-        ),
-        url(
-            r'^notification_prefs/disable/',
-            notification_prefs_views.ajax_disable
-        ),
-        url(
-            r'^notification_prefs/status/',
-            notification_prefs_views.ajax_status
-        ),
-        url(
-            r'^notification_prefs/unsubscribe/(?P<token>[a-zA-Z0-9-_=]+)/',
-            notification_prefs_views.set_subscription,
-            {
-                'subscribe': False,
-            },
-            name='unsubscribe_forum_update',
-        ),
-        url(
-            r'^notification_prefs/resubscribe/(?P<token>[a-zA-Z0-9-_=]+)/',
-            notification_prefs_views.set_subscription,
-            {
-                'subscribe': True,
-            },
-            name='resubscribe_forum_update',
-        ),
     ]
+
+if settings.FEATURES.get('ENABLE_FORUM_DAILY_DIGEST'):
+    urlpatterns += notification_prefs_urls
 
 urlpatterns += [
     url(r'^bulk_email/', include('bulk_email.urls')),
@@ -771,18 +790,22 @@ if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW'):
         ),
     ]
 
-if settings.FEATURES.get('CLASS_DASHBOARD'):
-    urlpatterns += [
-        url(r'^class_dashboard/', include('class_dashboard.urls')),
-    ]
-
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     # Jasmine and admin
+
+    # The password pages in the admin tool are disabled so that all password
+    # changes go through our user portal and follow complexity requirements.
+    # The form to change another user's password is conditionally enabled
+    # for backwards compatibility.
+    if not settings.FEATURES.get('ENABLE_CHANGE_USER_PASSWORD_ADMIN'):
+        urlpatterns += [
+            url(r'^admin/auth/user/\d+/password/$', handler404),
+        ]
     urlpatterns += [
-        # The password pages in the admin tool are disabled so that all password
-        # changes go through our user portal and follow complexity requirements.
         url(r'^admin/password_change/$', handler404),
-        url(r'^admin/auth/user/\d+/password/$', handler404),
+        # We are enforcing users to login through third party auth in site's
+        # login page so we are disabling the admin panel's login page.
+        url(r'^admin/login/$', redirect_to_lms_login),
         url(r'^admin/', admin.site.urls),
     ]
 
@@ -790,7 +813,6 @@ if configuration_helpers.get_value('ENABLE_BULK_ENROLLMENT_VIEW', settings.FEATU
     urlpatterns += [
         url(r'^api/bulk_enroll/v1/', include('bulk_enroll.urls')),
     ]
-
 
 # Shopping cart
 urlpatterns += [
@@ -823,20 +845,10 @@ if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
         # These URLs dispatch to django-oauth-toolkit or django-oauth2-provider as appropriate.
         # Developers should use these routes, to maintain compatibility for existing client code
         url(r'^oauth2/', include('openedx.core.djangoapps.oauth_dispatch.urls')),
-        # These URLs contain the django-oauth2-provider default behavior.  It exists to provide
-        # URLs for django-oauth2-provider to call using reverse() with the oauth2 namespace, and
-        # also to maintain support for views that have not yet been wrapped in dispatch views.
-        url(r'^oauth2/', include(('edx_oauth2_provider.urls', 'edx_oauth2_provider'), namespace='oauth2')),
         # The /_o/ prefix exists to provide a target for code in django-oauth-toolkit that
         # uses reverse() with the 'oauth2_provider' namespace.  Developers should not access these
         # views directly, but should rather use the wrapped views at /oauth2/
-        url(r'^_o/', include(('oauth2_provider.urls', 'edx_oauth2_provider'), namespace='oauth2_provider')),
-    ]
-
-if settings.FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
-    urlpatterns += [
-        url(r'^event_logs$', track_views.view_tracking_log),
-        url(r'^event_logs/(?P<args>.+)$', track_views.view_tracking_log),
+        url(r'^_o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     ]
 
 if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
@@ -861,7 +873,6 @@ if settings.FEATURES.get('ENABLE_DEBUG_RUN_PYTHON'):
 urlpatterns += [
     url(r'^debug/show_parameters$', debug_views.show_parameters),
 ]
-
 
 # Third-party auth.
 if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
@@ -944,6 +955,7 @@ urlpatterns += [
 
 if 'debug_toolbar' in settings.INSTALLED_APPS:
     import debug_toolbar
+
     urlpatterns += [
         url(r'^__debug__/', include(debug_toolbar.urls)),
     ]
@@ -1010,4 +1022,7 @@ urlpatterns += (
 
 urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.LMS))
 
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Course Home API urls
+urlpatterns += [
+    url(r'^api/course_home/', include('lms.djangoapps.course_home_api.urls')),
+]

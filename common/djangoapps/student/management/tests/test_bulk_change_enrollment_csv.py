@@ -1,9 +1,9 @@
 
 
-import six
 import unittest
 from tempfile import NamedTemporaryFile
 
+import six
 from django.conf import settings
 from django.core.management import call_command
 from testfixtures import LogCapture

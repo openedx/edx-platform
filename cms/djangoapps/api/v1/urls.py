@@ -10,5 +10,5 @@ from .views.course_runs import CourseRunViewSet
 app_name = 'cms.djangoapps.api.v1'
 
 router = DefaultRouter()
-router.register(r'course_runs', CourseRunViewSet, base_name='course_run')
+router.register(r'course_runs', CourseRunViewSet, basename='course_run')
 urlpatterns = router.urls

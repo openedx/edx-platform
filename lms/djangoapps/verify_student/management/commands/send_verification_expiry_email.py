@@ -101,6 +101,7 @@ class Command(BaseCommand):
 
         # Adding an order_by() clause will override the class meta ordering as we don't need ordering here
         query = SoftwareSecurePhotoVerification.objects.filter(Q(status='approved') &
+                                                               Q(expiry_date__isnull=False) &
                                                                (Q(expiry_date__gte=start_date,
                                                                   expiry_date__lt=end_date) |
                                                                 Q(expiry_email_date__lte=date_resend_days_ago)
@@ -124,18 +125,22 @@ class Command(BaseCommand):
             'default_emails': default_emails
         }
 
+        success = True
         for verification in sspv:
             if not verification.expiry_email_date or verification.expiry_email_date <= date_resend_days_ago:
                 batch_verifications.append(verification)
 
                 if len(batch_verifications) == batch_size:
-                    self.send_verification_expiry_email(batch_verifications, email_config)
+                    success = self.send_verification_expiry_email(batch_verifications, email_config) and success
                     time.sleep(sleep_time)
                     batch_verifications = []
 
         # If selected verification in batch are less than batch_size
         if batch_verifications:
-            self.send_verification_expiry_email(batch_verifications, email_config)
+            success = self.send_verification_expiry_email(batch_verifications, email_config) and success
+
+        if not success:
+            raise CommandError('One or more email attempts failed. Search for "Could not send" above.')
 
     def send_verification_expiry_email(self, batch_verifications, email_config):
         """
@@ -152,7 +157,7 @@ class Command(BaseCommand):
                 u"This was a dry run, no email was sent. For the actual run email would have been sent "
                 u"to {} learner(s)".format(len(batch_verifications))
             )
-            return
+            return True
 
         site = Site.objects.get_current()
         message_context = get_base_template_context(site)
@@ -165,18 +170,25 @@ class Command(BaseCommand):
         expiry_email = VerificationExpiry(context=message_context)
         users = User.objects.filter(pk__in=[verification.user_id for verification in batch_verifications])
 
+        success = True
         for verification in batch_verifications:
-            user = users.get(pk=verification.user_id)
-            with emulate_http_request(site=site, user=user):
-                msg = expiry_email.personalize(
-                    recipient=Recipient(user.username, user.email),
-                    language=get_user_preference(user, LANGUAGE_KEY),
-                    user_context={
-                        'full_name': user.profile.name,
-                    }
-                )
-                ace.send(msg)
-                self._set_email_expiry_date(verification, user, email_config)
+            try:
+                user = users.get(pk=verification.user_id)
+                with emulate_http_request(site=site, user=user):
+                    msg = expiry_email.personalize(
+                        recipient=Recipient(user.username, user.email),
+                        language=get_user_preference(user, LANGUAGE_KEY),
+                        user_context={
+                            'full_name': user.profile.name,
+                        }
+                    )
+                    ace.send(msg)
+                    self._set_email_expiry_date(verification, user, email_config)
+            except Exception:  # pylint: disable=broad-except
+                logger.exception('Could not send email for verification id %d', verification.id)
+                success = False
+
+        return success
 
     def _set_email_expiry_date(self, verification, user, email_config):
         """

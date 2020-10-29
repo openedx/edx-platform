@@ -27,7 +27,7 @@ from openedx.core.djangoapps.enrollments.errors import (
 from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentSerializer
 from openedx.core.lib.exceptions import CourseNotFoundError
 from student.models import AlreadyEnrolledError, CourseEnrollment, CourseFullError, EnrollmentClosedError
-from student.tests.factories import CourseAccessRoleFactory, UserFactory
+from student.tests.factories import CourseAccessRoleFactory, UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -145,12 +145,15 @@ class EnrollmentDataTest(ModuleStoreTestCase):
         # not exist in database) for the user and check that the method
         # 'get_course_enrollments' ignores course enrollments for invalid
         # or deleted courses
-        CourseEnrollment.objects.create(
+        non_existent_course_id = 'InvalidOrg/InvalidCourse/InvalidRun'
+        enrollement = CourseEnrollmentFactory.create(
             user=self.user,
-            course_id='InvalidOrg/InvalidCourse/InvalidRun',
+            course_id=non_existent_course_id,
             mode='honor',
             is_active=True
         )
+        enrollement.course.delete()
+
         updated_results = data.get_course_enrollments(self.user.username)
         self.assertEqual(results, updated_results)
 

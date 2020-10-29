@@ -25,7 +25,7 @@ from experiments.models import ExperimentData
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.api import add_course_goal, remove_course_goal
-from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
+from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
     GlobalStaffFactory,
@@ -51,6 +51,7 @@ from openedx.core.djangolib.markup import HTML
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
+    RELATIVE_DATES_FLAG,
     SHOW_REVIEWS_TOOL_FLAG,
     SHOW_UPGRADE_MSG_ON_COURSE_HOME,
     UNIFIED_COURSE_TAB_FLAG
@@ -218,7 +219,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
 
         # Fetch the view and verify the query counts
         # TODO: decrease query count as part of REVO-28
-        with self.assertNumQueries(74, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(77, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
@@ -465,7 +466,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
         user = UserFactory.create(password=self.TEST_PASSWORD)
         ScheduleFactory(
-            start=THREE_YEARS_AGO,
+            start_date=THREE_YEARS_AGO,
             enrollment__mode=CourseMode.VERIFIED,
             enrollment__course_id=course.id,
             enrollment__user=user
@@ -499,7 +500,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
         user = role_factory.create(password=self.TEST_PASSWORD, course_key=course.id)
         ScheduleFactory(
-            start=THREE_YEARS_AGO,
+            start_date=THREE_YEARS_AGO,
             enrollment__mode=CourseMode.AUDIT,
             enrollment__course_id=course.id,
             enrollment__user=user
@@ -555,7 +556,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
         user = role_factory.create(password=self.TEST_PASSWORD)
         ScheduleFactory(
-            start=THREE_YEARS_AGO,
+            start_date=THREE_YEARS_AGO,
             enrollment__mode=CourseMode.AUDIT,
             enrollment__course_id=course.id,
             enrollment__user=user
@@ -587,7 +588,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         audit_user = UserFactory(password=self.TEST_PASSWORD)
         self.client.login(username=audit_user.username, password=self.TEST_PASSWORD)
         audit_enrollment = CourseEnrollment.enroll(audit_user, course.id, mode=CourseMode.AUDIT)
-        ScheduleFactory(start=THREE_YEARS_AGO + timedelta(days=1), enrollment=audit_enrollment)
+        ScheduleFactory(start_date=THREE_YEARS_AGO + timedelta(days=1), enrollment=audit_enrollment)
 
         response = self.client.get(url)
 
@@ -657,7 +658,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         audit_user = UserFactory(password=self.TEST_PASSWORD)
         self.client.login(username=audit_user.username, password=self.TEST_PASSWORD)
         audit_enrollment = CourseEnrollment.enroll(audit_user, course.id, mode=CourseMode.AUDIT)
-        ScheduleFactory(start=THREE_YEARS_AGO, enrollment=audit_enrollment)
+        ScheduleFactory(start_date=THREE_YEARS_AGO, enrollment=audit_enrollment)
         FBEEnrollmentExclusion.objects.create(
             enrollment=audit_enrollment
         )
@@ -948,6 +949,7 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         self.course = CourseFactory(
             start=now() - timedelta(days=30),
             end=end,
+            self_paced=True,
         )
         self.url = course_home_url(self.course)
 

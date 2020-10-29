@@ -1747,7 +1747,7 @@ class CourseRegCodeItem(OrderItem):
         # file, but there's also a shared dependency on a random string generator which
         # is in another PR (for another feature)
         from lms.djangoapps.instructor.views.api import save_registration_code
-        for i in range(total_registration_codes):  # pylint: disable=unused-variable
+        for i in range(total_registration_codes):
             save_registration_code(self.user, self.course_id, self.mode, order=self.order)
 
         log.info(u"Enrolled {0} in paid course {1}, paid ${2}"
@@ -1964,32 +1964,36 @@ class CertificateItem(OrderItem):
 
     def additional_instruction_text(self):
         verification_reminder = ""
-        refund_reminder_msg = _("You can unenroll in the course and receive a full refund for 14 days after the course "
-                                "start date. ")
+        domain = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
+
+        dashboard_path = reverse('dashboard')
+        scheme = u"https" if settings.HTTPS == "on" else u"http"
+        dashboard_url = "{scheme}://{domain}{path}".format(scheme=scheme, domain=domain, path=dashboard_path)
+        refund_reminder_msg = _("To receive a refund you may unenroll from the course on your edX Dashboard "
+                                "({dashboard_url}) up to 14 days after your payment or 14 days after your"
+                                " course starts (up to six months after your payment).\n"
+                                ).format(dashboard_url=dashboard_url)
+
         is_enrollment_mode_verified = self.course_enrollment.is_verified_enrollment()
         is_professional_mode_verified = self.course_enrollment.is_professional_enrollment()
 
         if is_enrollment_mode_verified:
-            domain = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
             path = reverse('verify_student_verify_now', kwargs={'course_id': six.text_type(self.course_id)})
             verification_url = "http://{domain}{path}".format(domain=domain, path=path)
 
             verification_reminder = _(
-                u"If you haven't verified your identity yet, please start the verification process ({verification_url})."
-            ).format(verification_url=verification_url)
+                u"If you haven't verified your identity yet, please start the verification process"
+                u" ({verification_url}).").format(verification_url=verification_url)
 
         if is_professional_mode_verified:
             refund_reminder_msg = _("You can unenroll in the course and receive a full refund for 2 days after the "
-                                    "course start date. ")
-
+                                    "course start date.\n")
         refund_reminder = _(
-            u"{refund_reminder_msg}"
-            u"To receive your refund, contact {billing_email}. "
-            u"Please include your order number in your email. "
-            u"Please do NOT include your credit card information."
-        ).format(
+            "{refund_reminder_msg}"
+            "For help unenrolling, Please see How do I unenroll from a course? "
+            "({how_to_unenroll_link}) in our edX HelpCenter.").format(
             refund_reminder_msg=refund_reminder_msg,
-            billing_email=settings.PAYMENT_SUPPORT_EMAIL
+            how_to_unenroll_link=settings.SUPPORT_HOW_TO_UNENROLL_LINK
         )
 
         # Need this to be unicode in case the reminder strings

@@ -169,19 +169,24 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         from .models import SAMLProviderConfig
         if SAMLProviderConfig.current(idp.name).debug_mode:
 
-            def wrap_with_logging(method_name, action_description, xml_getter):
+            def wrap_with_logging(method_name, action_description, xml_getter, request_data, next_url):
                 """ Wrap the request and response handlers to add debug mode logging """
                 method = getattr(auth_inst, method_name)
 
                 def wrapped_method(*args, **kwargs):
                     """ Wrapped login or process_response method """
                     result = method(*args, **kwargs)
-                    log.info(u"SAML login %s for IdP %s. XML is:\n%s", action_description, idp.name, xml_getter())
+                    log.info(
+                        u"SAML login %s for IdP %s. Data: %s. Next url %s. XML is:\n%s",
+                        action_description, idp.name, request_data, next_url, xml_getter()
+                    )
                     return result
                 setattr(auth_inst, method_name, wrapped_method)
 
-            wrap_with_logging("login", "request", auth_inst.get_last_request_xml)
-            wrap_with_logging("process_response", "response", auth_inst.get_last_response_xml)
+            request_data = self.strategy.request_data()
+            next_url = self.strategy.session_get('next')
+            wrap_with_logging("login", "request", auth_inst.get_last_request_xml, request_data, next_url)
+            wrap_with_logging("process_response", "response", auth_inst.get_last_response_xml, request_data, next_url)
 
         return auth_inst
 
@@ -249,8 +254,7 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
 
     # Define the relationships between SAPSF record fields and Open edX logistration fields.
     default_field_mapping = {
-        'username': 'username',
-        'firstName': 'first_name',
+        'firstName': ['username', 'first_name'],
         'lastName': 'last_name',
         'defaultFullName': 'fullname',
         'email': 'email',
@@ -285,10 +289,14 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         field_mapping = self.field_mappings
         value_defaults = self.conf.get('attr_defaults', {})
         value_defaults = {key: value_defaults.get(value, '') for key, value in self.defaults_value_mapping.items()}
-        registration_fields = {
-            edx_name: response['d'].get(odata_name, value_defaults.get(odata_name, ''))
-            for odata_name, edx_name in field_mapping.items()
-        }
+        registration_fields = {}
+        for odata_name, edx_name in field_mapping.items():
+            if isinstance(edx_name, list):
+                for value in edx_name:
+                    registration_fields[value] = response['d'].get(odata_name, value_defaults.get(odata_name, ''))
+            else:
+                registration_fields[edx_name] = response['d'].get(odata_name, value_defaults.get(odata_name, ''))
+
         value_mapping = self.value_mappings
         for field, value in registration_fields.items():
             if field in value_mapping and value in value_mapping[field]:
@@ -488,6 +496,8 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         if self.invalid_configuration():
             return basic_details
         user_id = basic_details['username']
+        # endpoint_url is constructed from field_mappings setting of SAML Provider config.
+        # We convert field_mappings to make comma separated list of the fields which needs to be pulled from BizX
         fields = ','.join(self.field_mappings)
         endpoint_url = '{root_url}User(userId=\'{user_id}\')?$select={fields}'.format(
             root_url=self.odata_api_root_url,
@@ -497,9 +507,7 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         client = self.get_bizx_odata_api_client(user_id=user_id)
         if not client:
             return basic_details
-        transaction_data = {
-            'token_data': client.token_data
-        }
+
         try:
             response = client.get(
                 endpoint_url,
@@ -517,14 +525,9 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
             }
             self.log_bizx_api_exception(transaction_data, err)
             return basic_details
-        registration_fields = self.get_registration_fields(response)
-        # This statement is here for debugging purposes and should be removed when ENT-1500 is resolved.
-        if user_id != registration_fields.get('username'):
-            log.info(u'loggedinuser_id %s is different from BizX username %s',
-                     user_id,
-                     registration_fields.get('username'))
 
-        return registration_fields
+        log.info(u'[THIRD_PARTY_AUTH] BizX Odata response for user [%s] %s', user_id, response)
+        return self.get_registration_fields(response)
 
 
 def get_saml_idp_choices():

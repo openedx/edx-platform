@@ -1,4 +1,3 @@
-# pylint: disable=unicode-format-string
 # coding=utf-8
 
 """
@@ -669,6 +668,7 @@ def _get_report_contents(filename, report_name, last_line_only=False):
                 for line in reversed(lines):
                     if line != '\n':
                         return line
+                return None
             else:
                 return report_file.read()
     else:
@@ -681,7 +681,12 @@ def _get_count_from_last_line(filename, file_type):
     This will return the number in the last line of a file.
     It is returning only the value (as a floating number).
     """
-    last_line = _get_report_contents(filename, file_type, last_line_only=True).strip()
+    report_contents = _get_report_contents(filename, file_type, last_line_only=True)
+
+    if report_contents is None:
+        return 0
+
+    last_line = report_contents.strip()
 
     if file_type == "python_complexity":
         # Example of the last line of a complexity report: "Average complexity: A (1.93953443446)"
@@ -860,6 +865,43 @@ def run_pii_check(options):
 
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
+@timed
+def check_keywords():
+    """
+    Check Django model fields for names that conflict with a list of reserved keywords
+    """
+    report_path = os.path.join(Env.REPORT_DIR, 'reserved_keywords')
+    sh("mkdir -p {}".format(report_path))
+
+    overall_status = True
+    for env, env_settings_file in [('lms', 'lms.envs.test'), ('cms', 'cms.envs.test')]:
+        report_file = "{}_reserved_keyword_report.csv".format(env)
+        override_file = os.path.join(Env.REPO_ROOT, "db_keyword_overrides.yml")
+        try:
+            sh(
+                "export DJANGO_SETTINGS_MODULE={settings_file}; "
+                "python manage.py {app} check_reserved_keywords "
+                "--override_file {override_file} "
+                "--report_path {report_path} "
+                "--report_file {report_file}".format(
+                    settings_file=env_settings_file, app=env, override_file=override_file,
+                    report_path=report_path, report_file=report_file
+                )
+            )
+        except BuildFailure:
+            overall_status = False
+
+    if not overall_status:
+        fail_quality(
+            'keywords',
+            'Failure: reserved keyword checker failed. Reports can be found here: {}'.format(
+                report_path
+            )
+        )
+
+
+@task
+@needs('pavelib.prereqs.install_python_prereqs')
 @cmdopts([
     ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
     ("percentage=", "p", "fail if diff-quality is below this percentage"),
@@ -995,11 +1037,14 @@ def run_diff_quality(
             )
         )
         return True
-    except BuildFailure as error_message:
-        if is_percentage_failure(error_message):
+    except BuildFailure as failure:
+        if is_percentage_failure(failure.args):
             return False
         else:
-            fail_quality('diff_quality', 'FAILURE: {}'.format(error_message))
+            fail_quality(
+                'diff_quality',
+                'FAILURE: See "Diff Quality Report" in Jenkins left-sidebar for details. {}'.format(failure)
+            )
 
 
 def is_percentage_failure(error_message):

@@ -6,7 +6,6 @@ Helper classes and methods for running modulestore tests without Django.
 import io
 import os
 from contextlib import contextmanager
-from contextlib2 import ExitStack
 from importlib import import_module
 from shutil import rmtree
 from tempfile import mkdtemp
@@ -14,6 +13,7 @@ from unittest import TestCase
 from uuid import uuid4
 
 import six
+from contextlib2 import ExitStack
 from path import Path as path
 from six.moves import range, zip
 
@@ -171,9 +171,9 @@ class ProceduralCourseTestMixin(object):
         Add k chapters, k^2 sections, k^3 verticals, k^4 problems to self.course (where k = branching)
         """
         user_id = self.user.id
-        self.populated_usage_keys = {}  # pylint: disable=attribute-defined-outside-init
+        self.populated_usage_keys = {}
 
-        def descend(parent, stack):  # pylint: disable=missing-docstring
+        def descend(parent, stack):
             if not stack:
                 return
 

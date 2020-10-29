@@ -53,6 +53,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
 from openedx.core.djangoapps.django_comment_common.utils import ThreadContext, seed_permissions_roles
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
+from openedx.core.lib.teams_config import TeamsConfig
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from student.roles import CourseStaffRole, UserBasedRole
@@ -70,8 +71,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 log = logging.getLogger(__name__)
 
 QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
-
-# pylint: disable=missing-docstring
 
 
 class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
@@ -697,7 +696,7 @@ class SingleThreadAccessTestCase(CohortedTestCase):
                 mock_request,
                 'non_cohorted_topic',
                 user_not_in_team,
-                None
+                ''
             )
             self.assertEqual(403, response.status_code)
             self.assertEqual(
@@ -768,8 +767,10 @@ class ForumFormDiscussionContentGroupTestCase(ForumsEnableMixin, ContentGroupTes
         self.thread_list = [
             {"thread_id": "test_general_thread_id"},
             {"thread_id": "test_global_group_thread_id", "commentable_id": self.global_module.discussion_id},
-            {"thread_id": "test_alpha_group_thread_id", "group_id": self.alpha_module.group_access[0][0], "commentable_id": self.alpha_module.discussion_id},  # pylint: disable=line-too-long
-            {"thread_id": "test_beta_group_thread_id", "group_id": self.beta_module.group_access[0][0], "commentable_id": self.beta_module.discussion_id}  # pylint: disable=line-too-long
+            {"thread_id": "test_alpha_group_thread_id", "group_id": self.alpha_module.group_access[0][0],
+             "commentable_id": self.alpha_module.discussion_id},
+            {"thread_id": "test_beta_group_thread_id", "group_id": self.beta_module.group_access[0][0],
+             "commentable_id": self.beta_module.discussion_id}
         ]
 
     def assert_has_access(self, response, expected_discussion_threads):
@@ -1305,7 +1306,18 @@ class InlineDiscussionTestCase(ForumsEnableMixin, ModuleStoreTestCase):
     def setUp(self):
         super(InlineDiscussionTestCase, self).setUp()
 
-        self.course = CourseFactory.create(org="TestX", number="101", display_name="Test Course")
+        self.course = CourseFactory.create(
+            org="TestX",
+            number="101",
+            display_name="Test Course",
+            teams_configuration=TeamsConfig({
+                'topics': [{
+                    'id': 'topic_id',
+                    'name': 'A topic',
+                    'description': 'A topic',
+                }]
+            })
+        )
         self.student = UserFactory.create()
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
         self.discussion1 = ItemFactory.create(
@@ -1334,7 +1346,7 @@ class InlineDiscussionTestCase(ForumsEnableMixin, ModuleStoreTestCase):
     def test_context(self, mock_request):
         team = CourseTeamFactory(
             name='Team Name',
-            topic_id='A topic',
+            topic_id='topic_id',
             course_id=self.course.id,
             discussion_topic_id=self.discussion1.discussion_id
         )
@@ -1621,7 +1633,7 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
 
     @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
     @patch('student.models.cc.User.from_django_user')
-    def test_forum_discussion_xss_prevent(self, malicious_code, mock_user, mock_req):  # pylint: disable=unused-argument
+    def test_forum_discussion_xss_prevent(self, malicious_code, mock_user, mock_req):
         """
         Test that XSS attack is prevented
         """
@@ -2148,7 +2160,15 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
     def setUp(self):  # pylint: disable=arguments-differ
         super(ThreadViewedEventTestCase, self).setUp('eventtracking.tracker')
 
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(
+            teams_configuration=TeamsConfig({
+                'topics': [{
+                    'id': 'arbitrary-topic-id',
+                    'name': 'arbitrary-topic-name',
+                    'description': 'arbitrary-topic-desc'
+                }]
+            })
+        )
         seed_permissions_roles(self.course.id)
 
         PASSWORD = 'test'

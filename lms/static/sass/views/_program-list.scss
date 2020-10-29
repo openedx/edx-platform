@@ -1,4 +1,9 @@
 .program-list-wrapper {
+  @include make-row();
+
+  max-width: 73.125rem;
+  margin: 0 auto;
+
   @include media-breakpoint-up(sm) {
     padding: $baseline;
   }
@@ -6,28 +11,31 @@
 
 .program-cards-container {
   @include grid-container();
-  @include span(12);
+  @include make-col(12);
+
+  padding: 0 8px;
 
   @include media-breakpoint-up(sm) {
-    @include span(9);
+    @include make-col(9);
   }
 }
 
 .sidebar {
-  @include span(12);
+  @include make-col(12);
   @include float(right);
 
   margin-bottom: $baseline;
+  padding: 0 8px;
 
   @include media-breakpoint-up(sm) {
-    @include span(3);
+    @include make-col(3);
   }
 
   .aside {
     padding: $baseline;
     margin-bottom: $baseline;
     box-sizing: border-box;
-    border: 1px solid $border-color-l3;
+    border: 1px solid $gray-500;
   }
 
   .program-advertise {
@@ -37,22 +45,32 @@
       width: 100%;
       text-align: center;
       padding: 10px;
+      white-space: normal;
+      border-color: theme-color("primary");
+      color: theme-color("primary");
+      font-weight: 600;
 
+      &:hover,
+      &:active,
+      &:focus {
+        background: theme-color("primary");
+        color: $white;
+      }
     }
 
     .advertise-message {
-      font-size: font-size(x-small);
-      color: palette(grayscale, black);
+      font-size: 0.75rem;
+      color: $gray-dark;
       margin-bottom: $baseline;
     }
   }
 }
 
 .empty-programs-message {
-  @include span(12);
+  @include make-col(12);
 
-  border: 3px solid $gray-l4;
-  background: $gray-l6;
+  background: $gray-light4;
+  border: 3px solid $gray-light3;
   padding: ($baseline*2) 0;
   text-align: center;
   margin-bottom: 20px;

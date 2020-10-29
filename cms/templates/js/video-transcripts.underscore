@@ -1,4 +1,14 @@
 <div class='video-transcripts-header'>
+<% if (transcription_status) { %>
+    <span class='transcripts-empty-text'><%- transcription_status %></span>
+    <% if (error_description) { %>
+        </br>
+        <span class='message-error'><%- error_description %></span>
+    <% }%>
+<% } else if (!transcripts.length){ %>
+    <span class='transcripts-empty-text'><%- gettext('No transcript uploaded.') %></span>
+<% }%>
+</br>
 <% if (transcripts.length) { %>
     <button class="button-link toggle-show-transcripts-button">
         <strong>
@@ -8,10 +18,6 @@
         </span>
         </strong>
     </button>
-<% } else if (transcription_status) { %>
-    <span class='transcripts-empty-text'><%- transcription_status %></span>
-<% } else { %>
-    <span class='transcripts-empty-text'><%- gettext('No transcript uploaded.') %></span>
 <% }%>
 <div class='video-transcripts-wrapper'>
 <% _.each(transcripts, function(transcriptLanguageCode){ %>

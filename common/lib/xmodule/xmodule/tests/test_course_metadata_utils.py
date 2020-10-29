@@ -112,8 +112,8 @@ class CourseMetadataUtilsTestCase(TestCase):
         test_datetime = datetime(1945, 2, 6, 4, 20, 00, tzinfo=utc)
         advertised_start_parsable = "2038-01-19 03:14:07"
 
-        FunctionTest = namedtuple('FunctionTest', 'function scenarios')  # pylint: disable=invalid-name
-        TestScenario = namedtuple('TestScenario', 'arguments expected_return')  # pylint: disable=invalid-name
+        FunctionTest = namedtuple('FunctionTest', 'function scenarios')
+        TestScenario = namedtuple('TestScenario', 'arguments expected_return')
 
         function_tests = [
             FunctionTest(clean_course_key, [

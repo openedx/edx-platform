@@ -200,6 +200,18 @@ class TestContentstore(unittest.TestCase):
         self.assertEqual(count, len(self.course1_files))
 
     @ddt.data(True, False)
+    def test_copy_assets_with_duplicates(self, deprecated):
+        """
+        Copy all assets even if the destination has some duplicate assets
+        """
+        self.set_up_assets(deprecated)
+        dest_course = self.course2_key
+        self.contentstore.copy_all_course_assets(self.course1_key, dest_course)
+
+        __, count = self.contentstore.get_all_content_for_course(dest_course)
+        self.assertEqual(count, 5)
+
+    @ddt.data(True, False)
     def test_delete_assets(self, deprecated):
         """
         delete_all_course_assets

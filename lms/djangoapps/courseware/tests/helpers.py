@@ -21,8 +21,9 @@ from xblock.field_data import DictFieldData
 
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
-from lms.djangoapps.courseware.masquerade import handle_ajax, setup_masquerade
+from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
+from lms.djangoapps.courseware.masquerade import MasqueradeView
+from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.url_utils import quote_slashes
@@ -348,7 +349,7 @@ def masquerade_as_group_member(user, course, partition_id, group_id):
         user,
         data={"role": "student", "user_partition_id": partition_id, "group_id": group_id}
     )
-    response = handle_ajax(request, six.text_type(course.id))
+    response = MasqueradeView.as_view()(request, six.text_type(course.id))
     setup_masquerade(request, course.id, True)
     return response.status_code
 
@@ -413,7 +414,7 @@ def get_context_dict_from_string(data):
     Retrieve dictionary from string.
     """
     # Replace tuple and un-necessary info from inside string and get the dictionary.
-    cleaned_data = ast.literal_eval(data.split('((\'video.html\',')[1].replace("),\n {})", '').strip())  # pylint: disable=unicode-format-string
+    cleaned_data = ast.literal_eval(data.split('((\'video.html\',')[1].replace("),\n {})", '').strip())
     cleaned_data['metadata'] = OrderedDict(
         sorted(json.loads(cleaned_data['metadata']).items(), key=lambda t: t[0])
     )

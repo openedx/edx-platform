@@ -56,6 +56,7 @@ from openedx.core.djangoapps.user_authn.views.registration_form import (
     AccountCreationForm,
     RegistrationFormFactory
 )
+from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from student.helpers import (
     authenticate_new_user,
     create_or_set_user_attribute_created_on_site,
@@ -92,6 +93,24 @@ REGISTRATION_UTM_PARAMETERS = {
 REGISTRATION_UTM_CREATED_AT = 'registration_utm_created_at'
 # used to announce a registration
 REGISTER_USER = Signal(providing_args=["user", "registration"])
+
+
+# .. feature_toggle_name: registration.enable_failure_logging
+# .. feature_toggle_type: flag
+# .. feature_toggle_default: False
+# .. feature_toggle_description: Enable verbose logging of registration failure messages
+# .. feature_toggle_category: registration
+# .. feature_toggle_use_cases: monitored_rollout
+# .. feature_toggle_creation_date: 2020-04-30
+# .. feature_toggle_expiration_date: 2020-06-01
+# .. feature_toggle_warnings: None
+# .. feature_toggle_tickets: None
+# .. feature_toggle_status: supported
+REGISTRATION_FAILURE_LOGGING_FLAG = WaffleFlag(
+    waffle_namespace=WaffleFlagNamespace(name=u'registration'),
+    flag_name=u'enable_failure_logging',
+    flag_undefined_default=False
+)
 
 
 @transaction.non_atomic_requests
@@ -186,7 +205,7 @@ def create_account_with_params(request, params):
             is_third_party_auth_enabled, third_party_auth_credentials_in_api, user, request, params,
         )
 
-        new_user = authenticate_new_user(request, user.username, params['password'])
+        new_user = authenticate_new_user(request, user.username, form.cleaned_data['password'])
         django_login(request, new_user)
         request.session.set_expiry(0)
 
@@ -463,7 +482,7 @@ class RegistrationView(APIView):
         data = request.POST.copy()
         self._handle_terms_of_service(data)
 
-        response = self._handle_duplicate_email_username(data)
+        response = self._handle_duplicate_email_username(request, data)
         if response:
             return response
 
@@ -471,11 +490,11 @@ class RegistrationView(APIView):
         if response:
             return response
 
-        response = self._create_response({}, status_code=200)
+        response = self._create_response(request, {}, status_code=200)
         set_logged_in_cookies(request, response, user)
         return response
 
-    def _handle_duplicate_email_username(self, data):
+    def _handle_duplicate_email_username(self, request, data):
         # pylint: disable=no-member
         # TODO Verify whether this check is needed here - it may be duplicated in user_api.
         email = data.get('email')
@@ -489,7 +508,7 @@ class RegistrationView(APIView):
             errors["username"] = [{"user_message": accounts_settings.USERNAME_CONFLICT_MSG.format(username=username)}]
 
         if errors:
-            return self._create_response(errors, status_code=409)
+            return self._create_response(request, errors, status_code=409)
 
     def _handle_terms_of_service(self, data):
         # Backwards compatibility: the student view expects both
@@ -510,7 +529,7 @@ class RegistrationView(APIView):
             errors = {
                 err.field: [{"user_message": text_type(err)}]
             }
-            response = self._create_response(errors, status_code=409)
+            response = self._create_response(request, errors, status_code=409)
         except ValidationError as err:
             # Should only get field errors from this exception
             assert NON_FIELD_ERRORS not in err.message_dict
@@ -519,17 +538,38 @@ class RegistrationView(APIView):
                 field: [{"user_message": error} for error in error_list]
                 for field, error_list in err.message_dict.items()
             }
-            response = self._create_response(errors, status_code=400)
+            response = self._create_response(request, errors, status_code=400)
         except PermissionDenied:
             response = HttpResponseForbidden(_("Account creation not allowed."))
 
         return response, user
 
-    def _create_response(self, response_dict, status_code):
+    def _create_response(self, request, response_dict, status_code):
         if status_code == 200:
             # keeping this `success` field in for now, as we have outstanding clients expecting this
             response_dict['success'] = True
+        else:
+            self._log_validation_errors(request, response_dict, status_code)
+
         return JsonResponse(response_dict, status=status_code)
+
+    def _log_validation_errors(self, request, errors, status_code):
+        if not REGISTRATION_FAILURE_LOGGING_FLAG.is_enabled():
+            return
+
+        try:
+            for field_key, errors in errors.items():
+                for error in errors:
+                    log.info(
+                        'message=registration_failed, status_code=%d, agent="%s", field="%s", error="%s"',
+                        status_code,
+                        request.META.get('HTTP_USER_AGENT', ''),
+                        field_key,
+                        error['user_message']
+                    )
+        except:  # pylint: disable=bare-except
+            log.exception("Failed to log registration validation error")
+            pass
 
 
 class RegistrationValidationThrottle(AnonRateThrottle):
@@ -687,14 +727,16 @@ class RegistrationValidationView(APIView):
         POST /api/user/v1/validation/registration/
 
         Expects request of the form
-        >>> {
-        >>>     "name": "Dan the Validator",
-        >>>     "username": "mslm",
-        >>>     "email": "mslm@gmail.com",
-        >>>     "confirm_email": "mslm@gmail.com",
-        >>>     "password": "password123",
-        >>>     "country": "PK"
-        >>> }
+        ```
+        {
+            "name": "Dan the Validator",
+            "username": "mslm",
+            "email": "mslm@gmail.com",
+            "confirm_email": "mslm@gmail.com",
+            "password": "password123",
+            "country": "PK"
+        }
+        ```
         where each key is the appropriate form field name and the value is
         user input. One may enter individual inputs if needed. Some inputs
         can get extra verification checks if entered along with others,

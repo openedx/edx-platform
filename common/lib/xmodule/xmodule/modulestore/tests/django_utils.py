@@ -18,7 +18,7 @@ from mock import patch
 from six.moves import range
 
 from lms.djangoapps.courseware.tests.factories import StaffFactory
-from lms.djangoapps.courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
+from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase, FilteredQueryCountMixin
 from openedx.core.lib.tempdir import mkdtemp_clean
 from student.models import CourseEnrollment

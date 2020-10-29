@@ -16,7 +16,7 @@ class CmsFieldData(SplitFieldData):
     def __init__(self, authored_data, student_data):
         # Make sure that we don't repeatedly nest CmsFieldData instances
         if isinstance(authored_data, CmsFieldData):
-            authored_data = authored_data._authored_data  # pylint: disable=protected-access
+            authored_data = authored_data._authored_data
 
         self._authored_data = authored_data
         self._student_data = student_data

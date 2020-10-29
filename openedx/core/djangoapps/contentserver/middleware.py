@@ -3,31 +3,40 @@ Middleware to serve assets.
 """
 
 
-import logging
 import datetime
+import logging
+
 import six
+from django.http import (
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    HttpResponseNotFound,
+    HttpResponseNotModified,
+    HttpResponsePermanentRedirect
+)
+from django.utils.deprecation import MiddlewareMixin
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.locator import AssetLocator
+from six import text_type
+
+from openedx.core.djangoapps.header_control import force_header_for_response
+from student.models import CourseEnrollment
+from xmodule.assetstore.assetmgr import AssetManager
+from xmodule.contentstore.content import XASSET_LOCATION_TAG, StaticContent
+from xmodule.exceptions import NotFoundError
+from xmodule.modulestore import InvalidLocationError
+from xmodule.modulestore.exceptions import ItemNotFoundError
+
+from .caching import get_cached_content, set_cached_content
+from .models import CdnUserAgentsConfig, CourseAssetCacheTtlConfig
+
 log = logging.getLogger(__name__)
 try:
     import newrelic.agent
 except ImportError:
     newrelic = None  # pylint: disable=invalid-name
-from django.http import (
-    HttpResponse, HttpResponseNotModified, HttpResponseForbidden,
-    HttpResponseBadRequest, HttpResponseNotFound, HttpResponsePermanentRedirect)
-from six import text_type
-from student.models import CourseEnrollment
 
-from xmodule.assetstore.assetmgr import AssetManager
-from xmodule.contentstore.content import StaticContent, XASSET_LOCATION_TAG
-from xmodule.modulestore import InvalidLocationError
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locator import AssetLocator
-from openedx.core.djangoapps.header_control import force_header_for_response
-from .caching import get_cached_content, set_cached_content
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.exceptions import NotFoundError
-
-from .models import CourseAssetCacheTtlConfig, CdnUserAgentsConfig
 
 # TODO: Soon as we have a reasonable way to serialize/deserialize AssetKeys, we need
 # to change this file so instead of using course_id_partial, we're just using asset keys
@@ -35,7 +44,7 @@ from .models import CourseAssetCacheTtlConfig, CdnUserAgentsConfig
 HTTP_DATE_FORMAT = u"%a, %d %b %Y %H:%M:%S GMT"
 
 
-class StaticContentServer(object):
+class StaticContentServer(MiddlewareMixin):
     """
     Serves course assets to end users.  Colloquially referred to as "contentserver."
     """

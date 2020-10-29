@@ -96,5 +96,17 @@ export class CourseOutline {  // eslint-disable-line import/prefer-default-expor
       });
       event.stopImmediatePropagation();
     });
+
+    const urlHash = window.location.hash;
+
+    if (urlHash !== '') {
+      const button = document.getElementById(urlHash.substr(1, urlHash.length));
+      if (button.classList.contains('subsection-text')) {
+        const parentLi = button.closest('.section');
+        const parentButton = parentLi.querySelector('.section-name');
+        expandSection(parentButton);
+      }
+      expandSection(button);
+    }
   }
 }

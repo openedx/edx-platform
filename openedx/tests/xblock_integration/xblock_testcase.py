@@ -45,7 +45,6 @@ from datetime import datetime, timedelta
 import mock
 import pytz
 import six
-import six.moves.html_parser  # pylint: disable=import-error
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.urls import reverse

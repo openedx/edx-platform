@@ -2,7 +2,8 @@
 // ====================
 
 %btn {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
+
   @include transition(color $tmg-f2 ease-in-out, background $tmg-f2 ease-in-out, box-shadow $tmg-f2 ease-in-out);
 
   display: inline-block;
@@ -266,7 +267,6 @@
   color: $white-t3;
   pointer-events: none;
   cursor: default;
-  pointer-events: none;
   box-shadow: none;
 
   &:hover,
@@ -337,7 +337,7 @@
 // imitating the pattern library
 // starts with overrides
 %btn-pl-default-base {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
 
   @extend %t-copy-base;
 
@@ -364,7 +364,7 @@
 %btn-pl-primary-base {
   @extend %btn-pl-default-base;
 
-  background-color: darken($action-primary-bg,10%);
+  background-color: darken($action-primary-bg, 10%);
   color: $action-primary-fg;
 }
 

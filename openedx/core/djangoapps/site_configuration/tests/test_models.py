@@ -1,17 +1,18 @@
 """
 Tests for site configuration's django models.
 """
-
-
-from mock import patch
 import six
 import unittest
 
-from django.test import TestCase
-from django.db import IntegrityError, transaction
 from django.contrib.sites.models import Site
-
-from openedx.core.djangoapps.site_configuration.models import SiteConfigurationHistory, SiteConfiguration
+from django.db import IntegrityError, transaction
+from django.test import TestCase
+from mock import patch
+from openedx.core.djangoapps.site_configuration.models import (
+    SiteConfiguration,
+    SiteConfigurationHistory,
+    save_siteconfig_without_historical_record
+)
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 
 
@@ -83,7 +84,7 @@ class SiteConfigurationTests(TestCase):
             site=self.site,
         )
 
-        site_configuration.values = {'test': 'test'}
+        site_configuration.site_values = {'test': 'test'}
         site_configuration.save()
 
         # Verify an entry to SiteConfigurationHistory was added.
@@ -91,8 +92,32 @@ class SiteConfigurationTests(TestCase):
             site=site_configuration.site,
         ).all()
 
-        # Make sure two entries (one for save and one for update) are saved for SiteConfiguration
+        # Make sure two entries (one for create and one for update) are saved for SiteConfiguration
         self.assertEqual(len(site_configuration_history), 2)
+
+    def test_site_configuration_post_update_receiver_with_skip(self):
+        """
+        Test that and entry is NOT added to SiteConfigurationHistory each time a
+        SiteConfiguration is updated with save_siteconfig_without_historical_record().
+        """
+        # Add SiteConfiguration to database.  By default, the site_valutes field contains only "{}".
+        site_configuration = SiteConfigurationFactory.create(
+            site=self.site,
+        )
+
+        # Update the SiteConfiguration we just created.
+        site_configuration.site_values = {"test": "test"}
+        save_siteconfig_without_historical_record(site_configuration)  # Instead of .save().
+
+        # Verify that the SiteConfiguration has been updated.
+        self.assertEqual(site_configuration.get_value("test"), "test")
+
+        # Verify an entry to SiteConfigurationHistory was NOT added.
+        # Make sure one entry (one for create and NONE for update) is saved for SiteConfiguration.
+        site_configuration_history = SiteConfigurationHistory.objects.filter(
+            site=site_configuration.site,
+        ).all()
+        self.assertEqual(len(site_configuration_history), 1)
 
     def test_no_entry_is_saved_for_errors(self):
         """
@@ -132,7 +157,7 @@ class SiteConfigurationTests(TestCase):
         # add SiteConfiguration to database
         site_configuration = SiteConfigurationFactory.create(
             site=self.site,
-            values=self.test_config1,
+            site_values=self.test_config1
         )
 
         # Make sure entry is saved and retrieved correctly
@@ -181,7 +206,7 @@ class SiteConfigurationTests(TestCase):
         # add SiteConfiguration to database
         site_configuration = SiteConfigurationFactory.create(
             site=self.site,
-            values=invalid_data,
+            site_values=invalid_data
         )
 
         # make sure get_value logs an error for invalid json data
@@ -202,11 +227,11 @@ class SiteConfigurationTests(TestCase):
         # add SiteConfiguration to database
         SiteConfigurationFactory.create(
             site=self.site,
-            values=self.test_config1,
+            site_values=self.test_config1
         )
         SiteConfigurationFactory.create(
             site=self.site2,
-            values=self.test_config2,
+            site_values=self.test_config2
         )
 
         # Make sure entry is saved and retrieved correctly
@@ -287,11 +312,11 @@ class SiteConfigurationTests(TestCase):
         # add SiteConfiguration to database
         config1 = SiteConfigurationFactory.create(
             site=self.site,
-            values=self.test_config1,
+            site_values=self.test_config1
         )
         config2 = SiteConfigurationFactory.create(
             site=self.site2,
-            values=self.test_config2,
+            site_values=self.test_config2
         )
 
         # Make sure entry is saved and retrieved correctly
@@ -316,11 +341,11 @@ class SiteConfigurationTests(TestCase):
         # add SiteConfiguration to database
         SiteConfigurationFactory.create(
             site=self.site,
-            values=self.test_config1,
+            site_values=self.test_config1
         )
         SiteConfigurationFactory.create(
             site=self.site2,
-            values=self.test_config2,
+            site_values=self.test_config2
         )
 
         # Test that the default value is returned if the value for the given key is not found in the configuration
@@ -334,12 +359,12 @@ class SiteConfigurationTests(TestCase):
         # add SiteConfiguration to database
         SiteConfigurationFactory.create(
             site=self.site,
-            values=self.test_config1,
+            site_values=self.test_config1,
             enabled=False,
         )
         SiteConfigurationFactory.create(
             site=self.site2,
-            values=self.test_config2,
+            site_values=self.test_config2
         )
 
         # Test that the default value is returned if the value for the given key is not found in the configuration

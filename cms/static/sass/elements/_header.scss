@@ -12,7 +12,8 @@
   background: $white;
 
   header.primary {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
+
     @include clearfix();
 
     max-width: $fg-max-width;
@@ -48,8 +49,7 @@
   .nav-course,
   .nav-account,
   .nav-pitch {
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     display: inline-block;
     vertical-align: middle;
   }
@@ -213,7 +213,7 @@
 
     .nav-account-user {
       .title {
-        max-width: ($baseline*6.5);
+        max-width: ($baseline*10.5);
 
         > .label {
           display: inline-block;

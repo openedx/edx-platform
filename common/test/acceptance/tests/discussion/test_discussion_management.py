@@ -103,7 +103,7 @@ class BaseDividedDiscussionTest(UniqueCourseTest, CohortTestMixin):
         self.assertIn("Your changes have been saved.", confirmation_message)
 
 
-@attr(shard=6)
+@attr(shard=15)
 class DividedDiscussionTopicsTest(BaseDividedDiscussionTest):
     """
     Tests for dividing the inline and course-wide discussion topics.

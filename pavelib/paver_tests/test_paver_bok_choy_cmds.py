@@ -11,7 +11,7 @@ import six
 if six.PY2:
     from test.test_support import EnvironmentVarGuard
 else:
-    from test.support import EnvironmentVarGuard   # pylint: disable=import-error,no-name-in-module
+    from test.support import EnvironmentVarGuard
 
 from pavelib.utils.test.suites import BokChoyTestSuite
 

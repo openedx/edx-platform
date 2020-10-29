@@ -52,16 +52,15 @@ import html5lib
 import pyparsing
 import six
 from calc.preview import latex_preview
+from chem import chemcalc
+from django.utils.encoding import python_2_unicode_compatible
 from lxml import etree
 from six import text_type
 
 from capa.xqueue_interface import XQUEUE_TIMEOUT
-from chem import chemcalc
-from django.utils.encoding import python_2_unicode_compatible
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib import edx_six
 from xmodule.stringify import stringify_children
-from openedx.core.lib import edx_six
 
 from . import xqueue_interface
 from .registry import TagRegistry

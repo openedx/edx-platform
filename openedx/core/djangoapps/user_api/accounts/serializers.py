@@ -5,6 +5,7 @@ Django REST Framework serializers for the User API Accounts sub-application
 
 import json
 import logging
+import re
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -16,7 +17,7 @@ from six import text_type
 from lms.djangoapps.badges.utils import badges_enabled
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import errors
-from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled_for_user
+from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.user_api.models import RetirementState, UserPreference, UserRetirementStatus
 from openedx.core.djangoapps.user_api.serializers import ReadOnlyFieldsSerializerMixin
 from student.models import LanguageProficiency, SocialLink, UserProfile
@@ -35,6 +36,15 @@ from .utils import format_social_link, validate_social_link
 
 PROFILE_IMAGE_KEY_PREFIX = 'image_url'
 LOGGER = logging.getLogger(__name__)
+
+
+class PhoneNumberSerializer(serializers.BaseSerializer):
+    """
+    Class to serialize phone number into a digit only representation
+    """
+    def to_internal_value(self, data):
+        """Remove all non numeric characters in phone number"""
+        return re.sub("[^0-9]", "", data) or None
 
 
 class LanguageProficiencySerializer(serializers.ModelSerializer):
@@ -127,6 +137,7 @@ class UserReadOnlySerializer(serializers.Serializer):
             "is_active": user.is_active,
             "bio": None,
             "country": None,
+            "state": None,
             "profile_image": None,
             "language_proficiencies": None,
             "name": None,
@@ -140,6 +151,7 @@ class UserReadOnlySerializer(serializers.Serializer):
             "account_privacy": self.configuration.get('default_visibility'),
             "social_links": None,
             "extended_profile_fields": None,
+            "phone_number": None,
         }
 
         if user_profile:
@@ -147,6 +159,7 @@ class UserReadOnlySerializer(serializers.Serializer):
                 {
                     "bio": AccountLegacyProfileSerializer.convert_empty_to_None(user_profile.bio),
                     "country": AccountLegacyProfileSerializer.convert_empty_to_None(user_profile.country.code),
+                    "state": AccountLegacyProfileSerializer.convert_empty_to_None(user_profile.state),
                     "profile_image": AccountLegacyProfileSerializer.get_profile_image(
                         user_profile, user, self.context.get('request')
                     ),
@@ -167,16 +180,17 @@ class UserReadOnlySerializer(serializers.Serializer):
                         user_profile.social_links.all().order_by('platform'), many=True
                     ).data,
                     "extended_profile": get_extended_profile(user_profile),
+                    "phone_number": user_profile.phone_number,
                 }
             )
 
-        if account_recovery:
-            if is_secondary_email_feature_enabled_for_user(user):
-                data.update(
-                    {
-                        "secondary_email": account_recovery.secondary_email,
-                    }
-                )
+        if is_secondary_email_feature_enabled():
+            data.update(
+                {
+                    "secondary_email": account_recovery.secondary_email if account_recovery else None,
+                    "secondary_email_enabled": True,
+                }
+            )
 
         if self.custom_fields:
             fields = self.custom_fields
@@ -221,12 +235,14 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
     requires_parental_consent = serializers.SerializerMethodField()
     language_proficiencies = LanguageProficiencySerializer(many=True, required=False)
     social_links = SocialLinkSerializer(many=True, required=False)
+    phone_number = PhoneNumberSerializer(required=False)
 
     class Meta(object):
         model = UserProfile
         fields = (
-            "name", "gender", "goals", "year_of_birth", "level_of_education", "country", "social_links",
-            "mailing_address", "bio", "profile_image", "requires_parental_consent", "language_proficiencies"
+            "name", "gender", "goals", "year_of_birth", "level_of_education", "country", "state", "social_links",
+            "mailing_address", "bio", "profile_image", "requires_parental_consent", "language_proficiencies",
+            "phone_number"
         )
         # Currently no read-only field, but keep this so view code doesn't need to know.
         read_only_fields = ()
@@ -287,6 +303,12 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         return AccountLegacyProfileSerializer.convert_empty_to_None(value)
 
     def transform_bio(self, user_profile, value):  # pylint: disable=unused-argument
+        """
+        Converts empty string to None, to indicate not set. Replaced by to_representation in version 3.
+        """
+        return AccountLegacyProfileSerializer.convert_empty_to_None(value)
+
+    def transform_phone_number(self, user_profile, value):  # pylint: disable=unused-argument
         """
         Converts empty string to None, to indicate not set. Replaced by to_representation in version 3.
         """

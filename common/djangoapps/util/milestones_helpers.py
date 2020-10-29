@@ -1,4 +1,3 @@
-# pylint: disable=invalid-name
 """
 Utility library for working with the edx-milestones app
 """
@@ -107,7 +106,7 @@ def set_prerequisite_courses(course_key, prerequisite_course_keys):
             add_prerequisite_course(course_key, prerequisite_course_key)
 
 
-def get_pre_requisite_courses_not_completed(user, enrolled_courses):  # pylint: disable=invalid-name
+def get_pre_requisite_courses_not_completed(user, enrolled_courses):
     """
     Makes a dict mapping courses to their unfulfilled milestones using the
     fulfillment API of the milestones app.

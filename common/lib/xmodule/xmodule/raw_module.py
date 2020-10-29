@@ -1,5 +1,3 @@
-
-
 import logging
 import re
 
@@ -12,7 +10,7 @@ from .exceptions import SerializationError
 
 log = logging.getLogger(__name__)
 
-PRE_TAG_REGEX = re.compile(r'<pre>[\s\S]*?</pre>')
+PRE_TAG_REGEX = re.compile(r'<pre\b[^>]*>(?:(?=([^<]+))\1|<(?!pre\b[^>]*>))*?</pre>')
 
 
 class RawMixin(object):
@@ -25,12 +23,21 @@ class RawMixin(object):
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
-        pre_tag_data = [etree.tostring(pre_tag_info) for pre_tag_info in xml_object.findall('pre')]
-        data = etree.tostring(xml_object, pretty_print=True, encoding='unicode')
-        if pre_tag_data:
-            for index, pre_tag in enumerate(re.findall(PRE_TAG_REGEX, data)):
-                data = re.sub(re.escape(pre_tag), pre_tag_data[index].decode(), data)
-        return {'data': data}, []
+        try:
+            data = etree.tostring(xml_object, pretty_print=True, encoding='unicode')
+            pre_tag_data = []
+            for pre_tag_info in xml_object.findall('.//pre'):
+                if len(pre_tag_info.findall('.//pre')) == 0:
+                    pre_tag_data.append(etree.tostring(pre_tag_info))
+
+            if pre_tag_data:
+                matches = re.finditer(PRE_TAG_REGEX, data)
+                for match_num, match in enumerate(matches):
+                    data = re.sub(match.group(), pre_tag_data[match_num].decode(), data)
+            etree.XML(data)  # it just checks if generated string is valid xml
+            return {'data': data}, []
+        except etree.XMLSyntaxError:
+            return {'data': etree.tostring(xml_object, pretty_print=True, encoding='unicode')}, []
 
     def definition_to_xml(self, resource_fs):
         """

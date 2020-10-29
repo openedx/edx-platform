@@ -3,7 +3,6 @@
 Tests for Python APIs of the Teams app
 """
 
-import unittest
 from uuid import uuid4
 
 import ddt
@@ -14,15 +13,18 @@ from course_modes.models import CourseMode
 from lms.djangoapps.teams import api as teams_api
 from lms.djangoapps.teams.models import CourseTeam
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
+from openedx.core.lib.teams_config import TeamsConfig, TeamsetType
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 COURSE_KEY1 = CourseKey.from_string('edx/history/1')
-COURSE_KEY2 = CourseKey.from_string('edx/history/2')
+COURSE_KEY2 = CourseKey.from_string('edx/math/1')
 TOPIC1 = 'topic-1'
 TOPIC2 = 'topic-2'
+TOPIC3 = 'topic-3'
 
 DISCUSSION_TOPIC_ID = uuid4().hex
 
@@ -39,6 +41,34 @@ class PythonAPITests(SharedModuleStoreTestCase):
         cls.user2 = UserFactory.create(username='user2')
         cls.user3 = UserFactory.create(username='user3')
         cls.user4 = UserFactory.create(username='user4')
+
+        topic_data = [
+            (TOPIC1, TeamsetType.private_managed.value),
+            (TOPIC2, TeamsetType.open.value),
+            (TOPIC3, TeamsetType.public_managed.value)
+        ]
+        topics = [
+            {
+                'id': topic_id,
+                'name': 'name-' + topic_id,
+                'description': 'desc-' + topic_id,
+                'type': teamset_type
+            } for topic_id, teamset_type in topic_data
+        ]
+        teams_config_1 = TeamsConfig({'topics': [topics[0]]})
+        teams_config_2 = TeamsConfig({'topics': [topics[1], topics[2]]})
+        cls.course1 = CourseFactory(
+            org=COURSE_KEY1.org,
+            course=COURSE_KEY1.course,
+            run=COURSE_KEY1.run,
+            teams_configuration=teams_config_1,
+        )
+        cls.course2 = CourseFactory(
+            org=COURSE_KEY2.org,
+            course=COURSE_KEY2.course,
+            run=COURSE_KEY2.run,
+            teams_configuration=teams_config_2,
+        )
 
         for user in (cls.user1, cls.user2, cls.user3, cls.user4):
             CourseEnrollmentFactory.create(user=user, course_id=COURSE_KEY1)
@@ -63,6 +93,7 @@ class PythonAPITests(SharedModuleStoreTestCase):
             team_id='team2a',
             topic_id=TOPIC2
         )
+        cls.team3 = CourseTeamFactory(course_id=COURSE_KEY2, team_id='team3', topic_id=TOPIC3)
 
         cls.team1.add_user(cls.user1)
         cls.team1.add_user(cls.user2)
@@ -78,13 +109,23 @@ class PythonAPITests(SharedModuleStoreTestCase):
         team = teams_api.get_team_by_discussion(DISCUSSION_TOPIC_ID)
         self.assertEqual(team, self.team1)
 
-    @unittest.skip("This functionality is not yet implemented")
     def test_is_team_discussion_private_is_private(self):
         self.assertTrue(teams_api.is_team_discussion_private(self.team1))
 
     def test_is_team_discussion_private_is_public(self):
         self.assertFalse(teams_api.is_team_discussion_private(None))
         self.assertFalse(teams_api.is_team_discussion_private(self.team2))
+        self.assertFalse(teams_api.is_team_discussion_private(self.team3))
+
+    def test_is_instructor_managed_team(self):
+        self.assertTrue(teams_api.is_instructor_managed_team(self.team1))
+        self.assertFalse(teams_api.is_instructor_managed_team(self.team2))
+        self.assertTrue(teams_api.is_instructor_managed_team(self.team3))
+
+    def test_is_instructor_managed_topic(self):
+        self.assertTrue(teams_api.is_instructor_managed_topic(COURSE_KEY1, TOPIC1))
+        self.assertFalse(teams_api.is_instructor_managed_topic(COURSE_KEY2, TOPIC2))
+        self.assertTrue(teams_api.is_instructor_managed_topic(COURSE_KEY2, TOPIC3))
 
     def test_user_is_a_team_member(self):
         self.assertTrue(teams_api.user_is_a_team_member(self.user1, self.team1))
@@ -144,6 +185,36 @@ class PythonAPITests(SharedModuleStoreTestCase):
         with self.assertRaisesMessage(ValueError, message):
             teams_api.get_team_for_user_course_topic(self.user1, invalid_course_id, 'who-cares')
 
+    def test_anonymous_user_ids_for_team(self):
+        """
+        A learner should be able to get the anonymous user IDs of their team members
+        """
+        team_anonymous_user_ids = teams_api.anonymous_user_ids_for_team(self.user1, self.team1)
+        self.assertEqual(len(self.team1.users.all()), len(team_anonymous_user_ids))
+
+    def test_anonymous_user_ids_for_team_not_on_team(self):
+        """
+        A learner should not be able to get IDs from members of a team they are not a member of
+        """
+        self.assertRaises(Exception, teams_api.anonymous_user_ids_for_team, self.user1, self.team2)
+
+    def test_anonymous_user_ids_for_team_bad_user_or_team(self):
+        """
+        An exception should be thrown when a bad user or team are passed to the endpoint
+        """
+        self.assertRaises(Exception, teams_api.anonymous_user_ids_for_team, None, self.team1)
+
+    def test_anonymous_user_ids_for_team_staff(self):
+        """
+        Course staff should be able to get anonymous IDs for teams in their course
+        """
+        user_staff = UserFactory.create(username='user_staff')
+        CourseEnrollmentFactory.create(user=user_staff, course_id=COURSE_KEY1)
+        CourseStaffRole(COURSE_KEY1).add_users(user_staff)
+
+        team_anonymous_user_ids = teams_api.anonymous_user_ids_for_team(user_staff, self.team1)
+        self.assertEqual(len(self.team1.users.all()), len(team_anonymous_user_ids))
+
 
 @ddt.ddt
 class TeamAccessTests(SharedModuleStoreTestCase):
@@ -164,13 +235,22 @@ class TeamAccessTests(SharedModuleStoreTestCase):
             'user_unenrolled': cls.user_unenrolled,
         }
 
+        cls.topic_id = 'RANDOM TOPIC'
+        cls.course_1 = CourseFactory.create(
+            teams_configuration=TeamsConfig({
+                'team_sets': [{'id': cls.topic_id, 'name': cls.topic_id, 'description': cls.topic_id}]
+            }),
+            org=COURSE_KEY1.org,
+            course=COURSE_KEY1.course,
+            run=COURSE_KEY1.run
+        )
+
         for user in (cls.user_audit, cls.user_staff):
             CourseEnrollmentFactory.create(user=user, course_id=COURSE_KEY1)
         CourseEnrollmentFactory.create(user=cls.user_masters, course_id=COURSE_KEY1, mode=CourseMode.MASTERS)
 
         CourseStaffRole(COURSE_KEY1).add_users(cls.user_staff)
 
-        cls.topic_id = 'RANDOM TOPIC'
         cls.team_unprotected_1 = CourseTeamFactory(
             course_id=COURSE_KEY1,
             topic_id=cls.topic_id,

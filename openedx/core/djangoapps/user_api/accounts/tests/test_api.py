@@ -6,26 +6,31 @@ Most of the functionality is covered in test_views.py.
 
 
 import itertools
-import re
 import unicodedata
 
 import ddt
-import pytest
-from dateutil.parser import parse as parse_datetime
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
-from django.core import mail
+from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
 from mock import Mock, patch
 from six import iteritems
 from social_django.models import UserSocialAuth
+from student.models import (
+    AccountRecovery,
+    PendingEmailChange,
+    PendingSecondaryEmailChange,
+    UserProfile
+)
+from student.tests.factories import UserFactory
+from student.tests.tests import UserSettingsEventTestMixin
+from student.views.management import activate_secondary_email
 
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from openedx.core.djangoapps.user_api.accounts import PRIVATE_VISIBILITY, USERNAME_MAX_LENGTH
+from openedx.core.djangoapps.user_api.accounts import PRIVATE_VISIBILITY
 from openedx.core.djangoapps.user_api.accounts.api import (
     get_account_settings,
     update_account_settings
@@ -35,35 +40,28 @@ from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (
     fake_requested_retirement,
     setup_retirement_states
 )
-from openedx.core.djangoapps.user_api.accounts.tests.testutils import (
-    INVALID_EMAILS,
-    INVALID_PASSWORDS,
-    INVALID_USERNAMES,
-    VALID_USERNAMES_UNICODE
-)
-from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangoapps.user_api.errors import (
-    AccountEmailInvalid,
-    AccountPasswordInvalid,
-    AccountRequestError,
     AccountUpdateError,
-    AccountUserAlreadyExists,
-    AccountUsernameInvalid,
     AccountValidationError,
-    UserAPIInternalError,
     UserNotAuthorized,
     UserNotFound
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerUserFactory
-from student.models import PendingEmailChange, Registration
-from student.tests.factories import UserFactory
-from student.tests.tests import UserSettingsEventTestMixin
 
 
 def mock_render_to_string(template_name, context):
     """Return a string that encodes template_name and context"""
     return str((template_name, sorted(iteritems(context))))
+
+
+def mock_render_to_response(template_name):
+    """
+    Return an HttpResponse with content that encodes template_name and context
+    """
+    # This simulates any db access in the templates.
+    UserProfile.objects.exists()
+    return HttpResponse(template_name)
 
 
 class CreateAccountMixin(object):
@@ -82,6 +80,7 @@ class CreateAccountMixin(object):
 
 @skip_unless_lms
 @ddt.ddt
+@patch('student.views.management.render_to_response', Mock(side_effect=mock_render_to_response, autospec=True))
 class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAccountMixin, RetirementTestCase):
     """
     These tests specifically cover the parts of the API methods that are not covered by test_views.py.
@@ -457,6 +456,48 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         verify_event_emitted([{"code": "en"}, {"code": "fr"}], [{"code": "en"}, {"code": "fr"}])
         verify_event_emitted([], [{"code": "en"}, {"code": "fr"}])
 
+    def test_add_account_recovery(self):
+        test_email = "test@example.com"
+        pending_secondary_email_changes = PendingSecondaryEmailChange.objects.filter(user=self.user)
+        self.assertEqual(0, len(pending_secondary_email_changes))
+
+        account_recovery_objects = AccountRecovery.objects.filter(user=self.user)
+        self.assertEqual(0, len(account_recovery_objects))
+
+        with patch('crum.get_current_request', return_value=self.fake_request):
+            update = {"secondary_email": test_email}
+            update_account_settings(self.user, update)
+
+        pending_secondary_email_change = PendingSecondaryEmailChange.objects.get(user=self.user)
+        self.assertIsNot(pending_secondary_email_change, None)
+        self.assertEqual(pending_secondary_email_change.new_secondary_email, test_email)
+
+        activate_secondary_email(self.fake_request, pending_secondary_email_change.activation_key)
+
+        pending_secondary_email_changes = PendingSecondaryEmailChange.objects.filter(user=self.user)
+        self.assertEqual(0, len(pending_secondary_email_changes))
+
+        account_recovery = AccountRecovery.objects.get(user=self.user)
+        self.assertIsNot(account_recovery, None)
+        self.assertEqual(account_recovery.secondary_email, test_email)
+
+    def test_change_country_removes_state(self):
+        '''
+        Test that changing the country (to something other than a country with
+        states) removes the state
+        '''
+        # First set the country and state
+        update_account_settings(self.user, {"country": UserProfile.COUNTRY_WITH_STATES, "state": "MA"})
+        account_settings = get_account_settings(self.default_request)[0]
+        self.assertEqual(account_settings['country'], UserProfile.COUNTRY_WITH_STATES)
+        self.assertEqual(account_settings['state'], 'MA')
+
+        # Change the country and check that state is removed
+        update_account_settings(self.user, {"country": ""})
+        account_settings = get_account_settings(self.default_request)[0]
+        self.assertEqual(account_settings['country'], None)
+        self.assertEqual(account_settings['state'], None)
+
 
 @patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
 @patch.dict(
@@ -497,6 +538,7 @@ class AccountSettingsOnCreationTest(CreateAccountMixin, TestCase):
             'mailing_address': u'',
             'year_of_birth': None,
             'country': None,
+            'state': None,
             'social_links': [],
             'bio': None,
             'profile_image': {
@@ -510,8 +552,10 @@ class AccountSettingsOnCreationTest(CreateAccountMixin, TestCase):
             'accomplishments_shared': False,
             'extended_profile': [],
             'secondary_email': None,
+            'secondary_email_enabled': None,
             'time_zone': None,
             'course_certificates': None,
+            'phone_number': None,
         })
 
     def test_normalize_password(self):

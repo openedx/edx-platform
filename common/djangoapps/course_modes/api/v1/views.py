@@ -16,7 +16,7 @@ from rest_framework.response import Response
 
 from course_modes.api.serializers import CourseModeSerializer
 from course_modes.models import CourseMode
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
 
 log = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ class CourseModesMixin(object):
     """
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     # When not considering JWT conditions, this permission class grants access

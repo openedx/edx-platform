@@ -26,7 +26,7 @@ from mock import Mock, patch
 from pytz import UTC
 from six import text_type
 from six.moves import range
-from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
+from six.moves.urllib.parse import urlparse
 
 from common.test.utils import XssTestMixin
 from course_modes.models import CourseMode
@@ -750,7 +750,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(self.cart.orderitem_set.count(), 1)
         info_log.assert_called_with(
-            'Coupon "%s" redemption entry removed for user "%s" for order item "%s"',  # pylint: disable=unicode-format-string
+            'Coupon "%s" redemption entry removed for user "%s" for order item "%s"',
             self.coupon_code,
             self.user,
             str(reg_item.id)

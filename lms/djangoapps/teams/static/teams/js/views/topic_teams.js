@@ -30,8 +30,8 @@
                     // that they create. This means that if multiple team membership is
                     // disabled that they cannot create a new team when they already
                     // belong to one.
-                return this.context.staff
-                    || this.context.privileged
+                return this.context.userInfo.staff
+                    || this.context.userInfo.privileged
                     || (!TeamUtils.isInstructorManagedTopic(this.model.attributes.type)
                         && this.myTeamsCollection.length === 0);
             },
@@ -102,6 +102,12 @@
                     srInfo: this.srInfo,
                     showSortControls: this.showSortControls
                 });
+            },
+
+            getTopic: function(topicId) { // eslint-disable-line no-unused-vars
+                var deferred = $.Deferred();
+                deferred.resolve(this.model);
+                return deferred.promise();
             }
         });
 

@@ -106,7 +106,7 @@ class::
 
     from django.apps import AppConfig
     from openedx.core.djangoapps.plugins.constants import (
-        ProjectType, SettingsType, PluginURLs, PluginSettings
+        ProjectType, SettingsType, PluginURLs, PluginSettings, PluginContexts
     )
     class MyAppConfig(AppConfig):
         name = u'full_python_path.my_app'
@@ -184,6 +184,19 @@ class::
                         PluginSignals.SENDER_PATH: u'full_path_to_sender_app.ModelZ',
                     }],
                 }
+            },
+
+            # Configuration setting for Plugin Contexts for this app.
+            PluginContexts.CONFIG: {
+
+                # Configure the Plugin Signals for each Project Type, as needed.
+                ProjectType.LMS: {
+
+                    # Key is the view that the app wishes to add context to and the value
+                    # is the function within the app that will return additional context
+                    # when called with the original context
+                    u'course_dashboard': u'my_app.context_api.get_dashboard_context'
+                }
             }
         }
 
@@ -216,6 +229,11 @@ OR use string constants when they cannot import from djangoapps.plugins::
                         u'dispatch_uid': u'my_app.my_signals.on_signal_x',
                         u'sender_path': u'full_path_to_sender_app.ModelZ',
                     }],
+                }
+            },
+            u'view_context_config': {
+                u'lms.djangoapp': {
+                    'course_dashboard': u'my_app.context_api.get_dashboard_context'
                 }
             }
         }

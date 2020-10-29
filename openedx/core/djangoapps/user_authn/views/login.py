@@ -5,7 +5,6 @@ Much of this file was broken out from views.py, previous history can be found th
 """
 
 
-from functools import wraps
 import json
 import logging
 
@@ -15,7 +14,9 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib import admin
 from django.http import HttpRequest, HttpResponse
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
@@ -37,6 +38,7 @@ from openedx.core.djangoapps.user_authn.views.password_reset import send_passwor
 from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.view_utils import require_post_params
+from student.helpers import get_next_url_for_login_page
 from student.models import LoginFailures, AllowedAuthUser, UserProfile
 from student.views import compose_and_send_activation_email
 from third_party_auth import pipeline, provider
@@ -428,6 +430,8 @@ def login_user(request):
         if is_user_third_party_authenticated:
             running_pipeline = pipeline.get(request)
             redirect_url = pipeline.get_complete_url(backend_name=running_pipeline['backend'])
+        elif settings.FEATURES.get('ENABLE_LOGIN_MICROFRONTEND'):
+            redirect_url = get_next_url_for_login_page(request)
 
         response = JsonResponse({
             'success': True,
@@ -465,6 +469,17 @@ def login_refresh(request):
     except AuthFailedError as error:
         log.exception(error.get_response())
         return JsonResponse(error.get_response(), status=400)
+
+
+def redirect_to_lms_login(request):
+    """
+    This view redirect the admin/login url to the site's login page if
+    waffle switch is on otherwise returns the admin site's login view.
+    """
+    if ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY.is_enabled():
+        return redirect('/login?next=/admin')
+    else:
+        return admin.site.login(request)
 
 
 class LoginSessionView(APIView):

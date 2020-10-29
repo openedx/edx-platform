@@ -3,31 +3,17 @@ Tests for the migrate_saml_uids management command.
 """
 
 
+import six
 from django.core.management import call_command
 from django.test import TestCase
-
-import six
-from factory import LazyAttributeSequence, SubFactory
-from factory.django import DjangoModelFactory
-from lms.djangoapps.program_enrollments.management.commands import migrate_saml_uids
 from mock import mock_open, patch
 from social_django.models import UserSocialAuth
+
+from lms.djangoapps.program_enrollments.management.commands import migrate_saml_uids
+from lms.djangoapps.program_enrollments.management.commands.tests.utils import UserSocialAuthFactory
 from student.tests.factories import UserFactory
 
 _COMMAND_PATH = 'lms.djangoapps.program_enrollments.management.commands.migrate_saml_uids'
-
-
-class UserSocialAuthFactory(DjangoModelFactory):
-    """
-    Factory for UserSocialAuth records.
-    """
-    class Meta(object):
-        model = UserSocialAuth
-    user = SubFactory(UserFactory)
-    uid = LazyAttributeSequence(lambda o, n: '%s:%d' % (o.slug, n))
-
-    class Params(object):
-        slug = 'gatech'
 
 
 class TestMigrateSamlUids(TestCase):
@@ -50,6 +36,9 @@ class TestMigrateSamlUids(TestCase):
         )
 
     def _call_command(self, data):
+        """
+        Call management command with `data` as contents of input file.
+        """
         with patch(
                 _COMMAND_PATH + '.py3_open',
                 mock_open(read_data=data)
@@ -132,7 +121,7 @@ class TestMigrateSamlUids(TestCase):
     def test_learner_missed_by_mapping_file(self, mock_log):
         auth = UserSocialAuthFactory()
         # pylint disable required b/c this lint rule is confused about subfactories
-        email = auth.user.email  # pylint: disable=no-member
+        email = auth.user.email
         new_urn = '9001'
 
         mock_info = mock_log.info
@@ -156,7 +145,7 @@ class TestMigrateSamlUids(TestCase):
             ','.join(
                 [
                     self._format_email_uid_pair(
-                        auth.user.email,  # pylint disable=no-member
+                        auth.user.email,
                         new_urn + six.text_type(ind)
                     )
                     for ind, auth
@@ -173,7 +162,7 @@ class TestMigrateSamlUids(TestCase):
     @patch(_COMMAND_PATH + '.log')
     def test_learner_duplicated_in_mapping(self, mock_log):
         auth = UserSocialAuthFactory()
-        email = auth.user.email  # pylint: disable=no-member
+        email = auth.user.email
         new_urn = '9001'
 
         mock_info = mock_log.info

@@ -354,10 +354,6 @@ class UploadTestCase(AssetsTestCase):
         resp = self.upload_asset("test_image", asset_type="image")
         self.assertEqual(resp.status_code, 200)
 
-    def test_no_file(self):
-        resp = self.client.post(self.url, {"name": "file.txt"}, "application/json")
-        self.assertEqual(resp.status_code, 400)
-
     @data(
         (int(MAX_FILE_SIZE / 2.0), "small.file.test", 200),
         (MAX_FILE_SIZE, "justequals.file.test", 200),

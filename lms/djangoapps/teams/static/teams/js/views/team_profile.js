@@ -41,7 +41,8 @@
                         discussionTopicID = this.model.get('discussion_topic_id'),
                         isMember = TeamUtils.isUserMemberOfTeam(memberships, this.context.userInfo.username),
                         isAdminOrStaff = this.context.userInfo.privileged || this.context.userInfo.staff,
-                        isInstructorManagedTopic = TeamUtils.isInstructorManagedTopic(this.topic.attributes.type);
+                        isInstructorManagedTopic = TeamUtils.isInstructorManagedTopic(this.topic.attributes.type),
+                        maxTeamSize = this.topic.getMaxTeamSize(this.context.courseMaxTeamSize);
 
                     var showLeaveLink = isMember && (isAdminOrStaff || !isInstructorManagedTopic);
 
@@ -53,10 +54,10 @@
                             readOnly: !(this.context.userInfo.privileged || isMember),
                             country: this.countries[this.model.get('country')],
                             language: this.languages[this.model.get('language')],
-                            membershipText: TeamUtils.teamCapacityText(memberships.length, this.context.maxTeamSize),
+                            membershipText: TeamUtils.teamCapacityText(memberships.length, maxTeamSize),
                             isMember: isMember,
                             showLeaveLink: showLeaveLink,
-                            hasCapacity: memberships.length < this.context.maxTeamSize,
+                            hasCapacity: maxTeamSize && (memberships.length < maxTeamSize),
                             hasMembers: memberships.length >= 1
                         })
                     );

@@ -28,7 +28,7 @@ from rest_framework.serializers import Serializer
 from lms.djangoapps.courseware.courses import get_course, get_course_with_access
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.course_groups.models import CohortMembership
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from student.auth import has_course_author_access
 from util.json_request import JsonResponse, expect_json
@@ -429,7 +429,7 @@ class APIPermissions(GenericAPIView):
     """
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)

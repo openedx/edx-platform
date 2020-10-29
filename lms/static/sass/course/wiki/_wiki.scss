@@ -7,7 +7,7 @@
     float: right;
   }
 
-  .form-search .input-prepend>label {
+  .form-search .input-prepend > label {
     display: inline-block;
     vertical-align: bottom;
   }
@@ -23,11 +23,11 @@
   }
 
 
-  /*-----------------
+  // -----------------
 
-    Breadcrumbs
+  // Breadcrumbs
 
-  -----------------*/
+  // -----------------
 
   .breadcrumb {
     list-style: none;
@@ -43,7 +43,6 @@
         float: left;
         display: block;
         overflow: hidden;
-        height: 30px;
         line-height: 31px;
         max-width: 200px;
         height: 100%;
@@ -69,11 +68,11 @@
 
 
 
-  /*-----------------
+  // -----------------
 
-    Global Functions
+  // Global Functions
 
-  -----------------*/
+  // -----------------
 
   .global-functions {
     display: block;
@@ -89,7 +88,8 @@
     font-size: 0.72em;
     font-weight: 600;
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       text-decoration: none;
     }
   }
@@ -122,11 +122,11 @@
 
 
 
-  /*-----------------
+  // -----------------
 
-    Article
+  // Article
 
-  -----------------*/
+  // -----------------
 
   h1 {
     font-weight: bold;
@@ -150,8 +150,7 @@
     width: flex-grid(9);
     padding: 40px 0 40px 40px;
     color: $body-color;
-
-    @include box-sizing(border-box);
+    box-sizing: border-box;
   }
 
   &.view .main-article {
@@ -228,18 +227,17 @@
 
 
 
-  /*-----------------
+  // -----------------
 
-    Sidebar
+  // Sidebar
 
-  -----------------*/
+  // -----------------
 
   .article-functions {
     float: left;
     width: flex-grid(3);
     padding: 40px;
-
-    @include box-sizing(border-box);
+    box-sizing: border-box;
 
     .timestamp {
       margin-top: ($baseline*0.75);
@@ -254,7 +252,6 @@
       .date {
         font-size: 0.9em;
       }
-
     }
 
     .see-children {
@@ -269,7 +266,8 @@
         font-size: 0.9em;
         line-height: 25px;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           color: $uxpl-blue-hover-active;
           font-weight: bold;
         }
@@ -289,7 +287,7 @@
           font-weight: bold;
           background-color: $light-gray1;
           border-color: $uxpl-blue-hover-active;
-          border-left: 4px solid
+          border-left: 4px solid;
         }
       }
     }
@@ -311,7 +309,8 @@
         padding-right: ($baseline/4);
       }
 
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         color: $uxpl-blue-hover-active;
         font-weight: bold;
       }
@@ -321,11 +320,11 @@
 
 
 
-  /*-----------------
+  // -----------------
 
-    Edit
+  // Edit
 
-  -----------------*/
+  // -----------------
 
   label {
     font-family: $font-family-sans-serif;
@@ -362,7 +361,7 @@
     top: 10px;
     right: 0%;
     font-size: 12px;
-    text-align:right;
+    text-align: right;
   }
 
   .CodeMirror {
@@ -428,7 +427,8 @@
     text-transform: none !important;
     letter-spacing: 0 !important;
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       color: $body-color;
       text-decoration: none;
     }
@@ -507,7 +507,8 @@
       padding: ($baseline/2) ($baseline/2) 0 ($baseline/2);
       margin-bottom: ($baseline/2);
 
-      h1, p {
+      h1,
+      p {
         color: $body-color;
       }
 
@@ -601,11 +602,11 @@
     font-size: 12px;
   }
 
-  /*-----------------
+  // -----------------
 
-    Changes
+  // Changes
 
-  -----------------*/
+  // -----------------
 
   &.history {
     .accordion {
@@ -615,7 +616,8 @@
       background: #f9f9f9;
       border-radius: 5px;
 
-      a:hover, a:focus {
+      a:hover,
+      a:focus {
         text-decoration: none;
       }
     }
@@ -663,11 +665,11 @@
 
 
 
-  /*-----------------
+  // -----------------
 
-    Settings
+  // Settings
 
-  -----------------*/
+  // -----------------
 
   #settings_form {
     .well {
@@ -699,11 +701,11 @@
 
 
 
-  /*-----------------
+  // -----------------
 
-    New
+  // New
 
-  -----------------*/
+  // -----------------
 
   .new-article {
     margin: auto;
@@ -744,11 +746,11 @@
 
 
 
-  /*-----------------
+  // -----------------
 
-    Directory
+  // Directory
 
-  -----------------*/
+  // -----------------
   .directory-toolbar {
     background-color: $sidebar-color;
     padding: 9px;
@@ -779,7 +781,8 @@
     width: 100%;
     margin-top: $baseline;
 
-    th, td {
+    th,
+    td {
       border-bottom: 1px solid $light-gray;
       padding: 8px;
       overflow: hidden;
@@ -790,7 +793,8 @@
     }
 
     a {
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         font-weight: bold;
       }
     }
@@ -803,11 +807,11 @@
 
 
 
-  /*-----------------
+  // -----------------
 
-    Attachments
+  // Attachments
 
-  -----------------*/
+  // -----------------
 
   .attachment-options {
     height: 40px;
@@ -873,11 +877,11 @@
 
 
 
-  /*-----------------
+  // -----------------
 
-    Delete
+  // Delete
 
-  -----------------*/
+  // -----------------
 
   #div_id_confirm {
     position: relative;
@@ -904,11 +908,11 @@
 
 
 
-  /*-----------------
+  // -----------------
 
-    Alerts
+  // Alerts
 
-  -----------------*/
+  // -----------------
 
   .alert {
     position: relative;
@@ -964,7 +968,8 @@
         text-align: center;
         -webkit-font-smoothing: antialiased;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           background: darken($pink, 12%);
         }
       }

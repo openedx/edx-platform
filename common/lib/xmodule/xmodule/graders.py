@@ -15,7 +15,7 @@ import six
 from contracts import contract
 from pytz import UTC
 from django.utils.translation import ugettext_lazy as _
-from six.moves import range  # pylint: disable=ungrouped-imports
+from six.moves import range
 
 from xmodule.util.misc import get_short_labeler
 
@@ -151,7 +151,7 @@ def invalid_args(func, argdict):
     Given a function and a dictionary of arguments, returns a set of arguments
     from argdict that aren't accepted by func
     """
-    args, _, keywords, _ = inspect.getargspec(func)
+    args, _, keywords, _, _, _, _ = inspect.getfullargspec(func)
     if keywords:
         return set()  # All accepted
     return set(argdict) - set(args)
@@ -380,7 +380,7 @@ class AssignmentFormatGrader(CourseGrader):
         scores = list(grade_sheet.get(self.type, {}).values())
         breakdown = []
         labeler = get_short_labeler(self.short_label)
-        for i in range(max(self.min_count, len(scores))):
+        for i in range(max(int(float(self.min_count)), len(scores))):
             if i < len(scores) or generate_random_scores:
                 if generate_random_scores:  	# for debugging!
                     earned = random.randint(2, 15)

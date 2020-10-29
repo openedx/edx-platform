@@ -1,6 +1,7 @@
 """ Program Enrollments API v1 URLs. """
 
 
+from django.conf import settings
 from django.conf.urls import url
 
 from openedx.core.constants import COURSE_ID_PATTERN
@@ -12,6 +13,7 @@ from .views import (
     ProgramCourseEnrollmentsView,
     ProgramCourseGradesView,
     ProgramEnrollmentsView,
+    UserProgramCourseEnrollmentView,
     UserProgramReadOnlyAccessView
 )
 
@@ -55,6 +57,14 @@ urlpatterns = [
         ),
         ProgramCourseEnrollmentOverviewView.as_view(),
         name="program_course_enrollments_overview"
+    ),
+    url(
+        r'^users/{username}/programs/{program_uuid}/courses'.format(
+            username=settings.USERNAME_PATTERN,
+            program_uuid=PROGRAM_UUID_PATTERN,
+        ),
+        UserProgramCourseEnrollmentView.as_view(),
+        name="user_program_course_enrollments"
     ),
     url(
         r'^integration-reset',

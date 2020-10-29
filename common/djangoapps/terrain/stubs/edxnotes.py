@@ -11,7 +11,7 @@ from math import ceil
 from uuid import uuid4
 
 import six
-from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
+from six.moves.urllib.parse import urlencode
 
 from .http import StubHttpRequestHandler, StubHttpService
 

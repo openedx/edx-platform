@@ -21,9 +21,6 @@ import mock
 import oauthlib.oauth1
 import requests
 import six
-import six.moves.urllib.error  # pylint: disable=import-error
-import six.moves.urllib.parse  # pylint: disable=import-error
-import six.moves.urllib.request  # pylint: disable=import-error
 from oauthlib.oauth1.rfc5849 import parameters, signature
 
 from openedx.core.djangolib.markup import HTML

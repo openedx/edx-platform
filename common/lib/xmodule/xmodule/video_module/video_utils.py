@@ -12,7 +12,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from six.moves import zip
-from six.moves.urllib.parse import parse_qs, urlencode, urlparse, urlsplit, urlunsplit  # pylint: disable=import-error
+from six.moves.urllib.parse import parse_qs, urlencode, urlparse, urlsplit, urlunsplit
 
 log = logging.getLogger(__name__)
 
@@ -69,7 +69,7 @@ def rewrite_video_url(cdn_base_url, original_video_url):
         validator(rewritten_url)
         return rewritten_url
     except ValidationError:
-        log.warn("Invalid CDN rewrite URL encountered, %s", rewritten_url)
+        log.warning("Invalid CDN rewrite URL encountered, %s", rewritten_url)
 
     # Mimic the behavior of removed get_video_from_cdn in this regard and
     # return None causing the caller to use the original URL.

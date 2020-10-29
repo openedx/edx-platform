@@ -155,7 +155,6 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
 
         self.user_id = ModuleStoreEnum.UserID.test
 
-    # pylint: disable=invalid-name
     def _create_course(self, course_key, asides=None):
         """
         Create a course w/ one item in the persistence store using the given course & item location.
@@ -249,7 +248,6 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         """
         return self.store.has_changes(self.store.get_item(location))
 
-    # pylint: disable=dangerous-default-value
     def _initialize_mixed(self, mappings=None, contentstore=None):
         """
         initializes the mixed modulestore.
@@ -1624,7 +1622,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
         mongo_store = self.store._get_modulestore_for_courselike(course_id)  # pylint: disable=protected-access
         # add another parent (unit) "vertical_x1b" for problem "problem_x1a_1"
-        mongo_store.collection.update(
+        mongo_store.collection.update_one(
             self.vertical_x1b.to_deprecated_son('_id.'),
             {'$push': {'definition.children': six.text_type(self.problem_x1a_1)}}
         )
@@ -1874,11 +1872,11 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self.assertEqual(len(set(found_orphans)), 2)
 
         # add orphan vertical and sequential as another parents of problem "problem_x1a_1"
-        mongo_store.collection.update(
+        mongo_store.collection.update_one(
             orphan_sequential.to_deprecated_son('_id.'),
             {'$push': {'definition.children': six.text_type(self.problem_x1a_1)}}
         )
-        mongo_store.collection.update(
+        mongo_store.collection.update_one(
             orphan_vertical.to_deprecated_son('_id.'),
             {'$push': {'definition.children': six.text_type(self.problem_x1a_1)}}
         )
@@ -1889,7 +1887,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             self.assertEqual(parent, self.vertical_x1a)
 
         # now add valid published vertical as another parent of problem
-        mongo_store.collection.update(
+        mongo_store.collection.update_one(
             self.sequential_x1.to_deprecated_son('_id.'),
             {'$push': {'definition.children': six.text_type(self.problem_x1a_1)}}
         )
@@ -3571,7 +3569,7 @@ class TestAsidesWithMixedModuleStore(CommonMixedModuleStoreSetup):
         super(TestAsidesWithMixedModuleStore, self).setUp()
         key_store = DictKeyValueStore()
         field_data = KvsFieldData(key_store)
-        self.runtime = TestRuntime(services={'field-data': field_data})  # pylint: disable=abstract-class-instantiated
+        self.runtime = TestRuntime(services={'field-data': field_data})
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     @XBlockAside.register_temp_plugin(AsideFoo, 'test_aside1')

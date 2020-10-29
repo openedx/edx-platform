@@ -181,7 +181,6 @@ class AccountCreationForm(forms.Form):
                 error_messages={"required": _("You must accept the terms of service.")}
             )
 
-        # TODO: These messages don't say anything about minimum length
         error_message_dict = {
             "level_of_education": _("A level of education is required"),
             "gender": _("Your gender is required"),
@@ -202,7 +201,7 @@ class AccountCreationForm(forms.Form):
                         )
                 else:
                     required = field_value == "required"
-                    min_length = 1 if field_name in ("gender", "level_of_education") else 2
+                    min_length = 1
                     error_message = error_message_dict.get(
                         field_name,
                         _("You are missing one or more required fields")
@@ -351,10 +350,11 @@ class RegistrationFormFactory(object):
         field_order = configuration_helpers.get_value('REGISTRATION_FIELD_ORDER')
         if not field_order:
             field_order = settings.REGISTRATION_FIELD_ORDER or valid_fields
-
-        # Check that all of the valid_fields are in the field order and vice versa, if not set to the default order
+        # Check that all of the valid_fields are in the field order and vice versa,
+        # if not append missing fields at end of field order
         if set(valid_fields) != set(field_order):
-            field_order = valid_fields
+            difference = set(valid_fields).difference(set(field_order))
+            field_order.extend(difference)
 
         self.field_order = field_order
 

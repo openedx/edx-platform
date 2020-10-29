@@ -27,7 +27,7 @@ class HelpersTestCase(CourseTestCase):
                                      display_name="Week 1")
         self.assertEqual(
             xblock_studio_url(chapter),
-            u'{}?show={}'.format(course_url, http.urlquote(chapter.location))
+            u'{}?show={}'.format(course_url, http.urlquote(str(chapter.location).encode()))
         )
 
         # Verify sequential URL
@@ -35,7 +35,7 @@ class HelpersTestCase(CourseTestCase):
                                         display_name="Lesson 1")
         self.assertEqual(
             xblock_studio_url(sequential),
-            u'{}?show={}'.format(course_url, http.urlquote(sequential.location))
+            u'{}?show={}'.format(course_url, http.urlquote(str(sequential.location).encode()))
         )
 
         # Verify unit URL

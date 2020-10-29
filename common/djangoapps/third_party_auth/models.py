@@ -17,8 +17,6 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from organizations.models import Organization
-from provider.oauth2.models import Client
-from provider.utils import long_token
 from social_core.backends.base import BaseAuth
 from social_core.backends.oauth import OAuthAuth
 from social_core.backends.saml import SAMLAuth
@@ -27,6 +25,7 @@ from social_core.utils import module_member
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_request
+from openedx.core.lib.hash_utils import create_hash256
 
 from .lti import LTI_PARAMS_KEY, LTIAuthBackend
 from .saml import STANDARD_SAML_PROVIDER_KEY, get_saml_idp_choices, get_saml_idp_class
@@ -333,7 +332,7 @@ class ProviderConfig(ConfigurationModel):
         """
         Determines if the provider is able to be used with the current site.
         """
-        return self.enabled and self.site == Site.objects.get_current(get_current_request())
+        return self.enabled and self.site_id == Site.objects.get_current(get_current_request()).id
 
 
 class OAuth2ProviderConfig(ProviderConfig):
@@ -367,7 +366,7 @@ class OAuth2ProviderConfig(ProviderConfig):
         help_text=(
             u'For increased security, you can avoid storing this in your database by leaving '
             ' this field blank and setting '
-            'SOCIAL_AUTH_OAUTH_SECRETS = {"(backend name)": "secret", ...} '  # pylint: disable=unicode-format-string
+            'SOCIAL_AUTH_OAUTH_SECRETS = {"(backend name)": "secret", ...} '
             'in your instance\'s Django settings (or lms.auth.json)'
         )
     )
@@ -623,9 +622,9 @@ class SAMLProviderConfig(ProviderConfig):
         verbose_name=u"Advanced settings", blank=True,
         help_text=(
             u'For advanced use cases, enter a JSON object with addtional configuration. '
-            'The tpa-saml backend supports {"requiredEntitlements": ["urn:..."]}, '  # pylint: disable=unicode-format-string
+            'The tpa-saml backend supports {"requiredEntitlements": ["urn:..."]}, '
             'which can be used to require the presence of a specific eduPersonEntitlement, '
-            'and {"extra_field_definitions": [{"name": "...", "urn": "..."},...]}, which can be '  # pylint: disable=unicode-format-string
+            'and {"extra_field_definitions": [{"name": "...", "urn": "..."},...]}, which can be '
             'used to define registration form fields and the URNs that can be used to retrieve '
             'the relevant values from the SAML response. Custom provider types, as selected '
             'in the "Identity Provider Type" field, may make use of the information stored '
@@ -673,6 +672,13 @@ class SAMLProviderConfig(ProviderConfig):
         """ Get social auth uid from remote id by prepending idp_slug to the remote id """
         return '{}:{}'.format(self.slug, remote_id)
 
+    def get_setting(self, name):
+        """ Get the value of a setting, or raise KeyError """
+        if self.other_settings:
+            other_settings = json.loads(self.other_settings)
+            return other_settings[name]
+        raise KeyError
+
     def get_config(self):
         """
         Return a SAMLIdentityProvider instance for use by SAMLAuthBackend.
@@ -712,7 +718,7 @@ class SAMLProviderConfig(ProviderConfig):
         data = SAMLProviderData.current(self.entity_id)
         if not data or not data.is_valid():
             log.error(
-                'No SAMLProviderData found for provider "%s" with entity id "%s" and IdP slug "%s". '  # pylint: disable=unicode-format-string
+                'No SAMLProviderData found for provider "%s" with entity id "%s" and IdP slug "%s". '
                 'Run "manage.py saml pull" to fix or debug.',
                 self.name, self.entity_id, self.slug
             )
@@ -819,7 +825,7 @@ class LTIProviderConfig(ProviderConfig):
     )
 
     lti_consumer_secret = models.CharField(
-        default=long_token,
+        default=create_hash256,
         max_length=255,
         help_text=(
             u'The shared secret that the LTI Tool Consumer will use to '
@@ -827,7 +833,7 @@ class LTIProviderConfig(ProviderConfig):
             'tool consumer instance should know this value. '
             'For increased security, you can avoid storing this in '
             'your database by leaving this field blank and setting '
-            'SOCIAL_AUTH_LTI_CONSUMER_SECRETS = {"consumer key": "secret", ...} '  # pylint: disable=unicode-format-string
+            'SOCIAL_AUTH_LTI_CONSUMER_SECRETS = {"consumer key": "secret", ...} '
             'in your instance\'s Django setttigs (or lms.auth.json)'
         ),
         blank=True,
@@ -871,25 +877,3 @@ class LTIProviderConfig(ProviderConfig):
         app_label = "third_party_auth"
         verbose_name = u"Provider Configuration (LTI)"
         verbose_name_plural = verbose_name
-
-
-class ProviderApiPermissions(models.Model):
-    """
-    This model links OAuth2 client with provider Id.
-
-    It gives permission for a OAuth2 client to access the information under certain IdPs.
-
-    .. no_pii:
-    """
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    provider_id = models.CharField(
-        max_length=255,
-        help_text=(
-            u'Uniquely identify a provider. This is different from backend_name.'
-        )
-    )
-
-    class Meta(object):
-        app_label = "third_party_auth"
-        verbose_name = u"Provider API Permission"
-        verbose_name_plural = verbose_name + 's'
