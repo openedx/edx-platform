@@ -42,6 +42,7 @@ def get_initial_page_elements():
     from openedx.core.djangoapps.appsembler.sites import utils
     return utils.get_initial_page_elements()
 
+
 @python_2_unicode_compatible
 class SiteConfiguration(models.Model):
     """

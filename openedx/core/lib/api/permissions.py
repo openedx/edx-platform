@@ -38,7 +38,7 @@ class ApiKeyHeaderPermission(permissions.BasePermission):
                     dependency.
         """
         set_custom_metric('deprecated_api_key_header', True)
-            return is_request_has_valid_api_key(request)
+        return is_request_has_valid_api_key(request)
 
 
 class ApiKeyHeaderPermissionIsAuthenticated(ApiKeyHeaderPermission, permissions.IsAuthenticated):
