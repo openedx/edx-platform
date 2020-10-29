@@ -2572,6 +2572,7 @@ ADG_INSTALLED_APPS = [
 
     # ADG Features app
     'openedx.adg.lms.applications',
+    'openedx.adg.lms.registration_extension',
 ]
 
 INSTALLED_APPS.extend(ADG_INSTALLED_APPS)

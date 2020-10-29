@@ -1,0 +1,82 @@
+"""
+Constants related to ADG.
+"""
+from django.utils.translation import ugettext_lazy as _
+
+# TODO: Move this setting to model
+BUSINESS_LINES = {
+    ('Tanmiah', _('Tanmiah Food Group')),
+    ('Petromin', _('Petromin')),
+    ('RSI', _('Red Sea International')),
+    ('Dukan', _('Dukan')),
+    ('SAED', _('SAED')),
+    ('BARQ', _('BARQ System')),
+    ('PPC', _('Premium Paints Company')),
+    ('IPD', _('International Project Developers')),
+    ('ADG', _('Al-Dabbagh Group'))
+}
+
+CITIES = {
+    'KSA': [
+        ('Yanbu', _('Yanbu')),
+        ('Umm Lajj', _('Umm Lajj')),
+        ('Ţurayf', _('Ţurayf')),
+        ('Turabah', _('Turabah')),
+        ('Tārūt', _('Tārūt')),
+        ('Tabuk', _('Tabuk')),
+        ('Ţubarjal', _('Ţubarjal')),
+        ('Sulţānah', _('Sulţānah')),
+        ('Sayhāt', _('Sayhāt')),
+        ('Şāmitah', _('Şāmitah')),
+        ('Sakakah', _('Sakakah')),
+        ('Şafwá', _('Şafwá')),
+        ('Şabyā', _('Şabyā')),
+        ('Raḩīmah', _('Raḩīmah')),
+        ('Rābigh', _('Rābigh')),
+        ('Qal‘at Bīshah', _('Qal‘at Bīshah')),
+        ('Najrān', _('Najrān')),
+        ('Mecca', _('Mecca')),
+        ('Khamis Mushait', _('Khamis Mushait')),
+        ('Jizan', _('Jizan')),
+        ('Jeddah', _('Jeddah')),
+        ('Ha‘il', _('Ha‘il')),
+        ('Duba', _('Duba')),
+        ('Buraydah', _('Buraydah')),
+        ('Abqaiq', _('Abqaiq')),
+        ('Badr Ḩunayn', _('Badr Ḩunayn')),
+        ('Az Zulfi', _('Az Zulfi')),
+        ('Dhahran', _('Dhahran')),
+        ('Aţ Ţaraf', _('Aţ Ţaraf')),
+        ('Ta’if', _('Ta’if')),
+        ('As Sulayyil', _('As Sulayyil')),
+        ('Riyadh', _('Riyadh')),
+        ('Ar Rass', _('Ar Rass')),
+        ('‘Ar‘ar', _('‘Ar‘ar')),
+        ('An Nimāş', _('An Nimāş')),
+        ('Qurayyat', _('Qurayyat')),
+        ('Al Wajh', _('Al Wajh')),
+        ('Al ‘Ulá', _('Al ‘Ulá')),
+        ('Al Qayşūmah', _('Al Qayşūmah')),
+        ('Al Qaţīf', _('Al Qaţīf')),
+        ('Al Munayzilah', _('Al Munayzilah')),
+        ('Al Mubarraz', _('Al Mubarraz')),
+        ('Al Mithnab', _('Al Mithnab')),
+        ('Medina', _('Medina')),
+        ('Khobar', _('Khobar')),
+        ('Al Khafjī', _('Al Khafjī')),
+        ('Al Jumūm', _('Al Jumūm')),
+        ('Al Jubayl', _('Al Jubayl')),
+        ('Al Hufūf', _('Al Hufūf')),
+        ('Al Bukayrīyah', _('Al Bukayrīyah')),
+        ('Al Baţţālīyah', _('Al Baţţālīyah')),
+        ('Al Bāḩah', _('Al Bāḩah')),
+        ('‘Afīf', _('‘Afīf')),
+        ('Ad Dilam', _('Ad Dilam')),
+        ('Ad Dawādimī', _('Ad Dawādimī')),
+        ('Dammam', _('Dammam')),
+        ('Abū ‘Arīsh', _('Abū ‘Arīsh')),
+        ('Abha', _('Abha')),
+        ('Ash Shafā', _('Ash Shafā')),
+        ('Unaizah', _('Unaizah'))
+    ]
+}
