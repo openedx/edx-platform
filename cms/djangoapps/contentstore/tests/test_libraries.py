@@ -27,7 +27,7 @@ from common.djangoapps.student.roles import (
     OrgStaffRole
 )
 from common.djangoapps.student.tests.factories import UserFactory
-from xblock_django.user_service import DjangoXBlockUserService
+from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

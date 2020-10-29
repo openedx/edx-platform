@@ -17,7 +17,7 @@ from xblock.fields import Scope
 from openedx.core.lib.teams_config import TeamsetType
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from common.djangoapps.student.roles import GlobalStaff
-from xblock_django.models import XBlockStudioConfigurationFlag
+from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.modulestore.django import modulestore
 
 

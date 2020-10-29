@@ -35,7 +35,7 @@ from openedx.core.djangoapps.models.course_details import CourseDetails
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util import milestones_helpers
-from xblock_django.models import XBlockStudioConfigurationFlag
+from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

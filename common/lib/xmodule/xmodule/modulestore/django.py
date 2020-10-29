@@ -32,7 +32,7 @@ from xmodule.util.xmodule_django import get_current_request_hostname
 
 # We also may not always have the current request user (crum) module available
 try:
-    from xblock_django.user_service import DjangoXBlockUserService
+    from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
     from crum import get_current_user
 
     HAS_USER_SERVICE = True
@@ -40,7 +40,7 @@ except ImportError:
     HAS_USER_SERVICE = False
 
 try:
-    from xblock_django.api import disabled_xblocks
+    from common.djangoapps.xblock_django.api import disabled_xblocks
 except ImportError:
     disabled_xblocks = None
 
