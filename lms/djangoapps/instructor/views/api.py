@@ -48,7 +48,7 @@ from lms.djangoapps.instructor_analytics import csvs as instructor_analytics_csv
 from lms.djangoapps.instructor_analytics import distributions as instructor_analytics_distributions
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models import CourseEmail
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateInvalidation,

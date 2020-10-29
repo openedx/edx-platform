@@ -14,7 +14,7 @@ from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import CourseKey
 from six.moves.urllib.parse import urlencode, urljoin
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, is_commerce_service_configured
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers

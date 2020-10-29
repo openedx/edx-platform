@@ -39,7 +39,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, CourseKey
 from six import text_type
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
 from student.auth import has_studio_write_access
 from student.roles import GlobalStaff

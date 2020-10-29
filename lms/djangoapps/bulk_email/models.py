@@ -15,7 +15,7 @@ from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
 from six.moves import zip
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.enrollments.api import validate_course_mode

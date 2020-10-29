@@ -23,7 +23,7 @@ from mock import Mock, patch
 
 from ..models import BulkEmailFlag, Optout
 from lms.djangoapps.bulk_email.tasks import _get_course_email_context, _get_source_address
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 
 from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory
 from lms.djangoapps.instructor_task.subtasks import update_subtask_status

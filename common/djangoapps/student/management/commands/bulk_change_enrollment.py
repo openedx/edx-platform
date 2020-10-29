@@ -9,7 +9,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore

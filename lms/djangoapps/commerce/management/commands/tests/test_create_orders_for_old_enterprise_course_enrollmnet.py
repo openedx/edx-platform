@@ -10,7 +10,7 @@ from django.utils.six import StringIO
 from mock import patch
 from six.moves import range
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from openedx.core.djangoapps.credit.tests.test_api import TEST_ECOMMERCE_WORKER
 from openedx.core.djangolib.testing.utils import skip_unless_lms

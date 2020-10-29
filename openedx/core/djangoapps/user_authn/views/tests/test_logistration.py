@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 from freezegun import freeze_time
 from pytz import UTC
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.branding.api import get_privacy_url
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context

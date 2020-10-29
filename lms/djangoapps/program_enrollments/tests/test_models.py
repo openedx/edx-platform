@@ -11,7 +11,7 @@ from django.test import TestCase
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 

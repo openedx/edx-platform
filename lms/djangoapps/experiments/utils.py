@@ -11,7 +11,7 @@ from django.utils.timezone import now
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode, format_course_price, get_cosmetic_verified_display_price
+from common.djangoapps.course_modes.models import format_course_price, get_cosmetic_verified_display_price, CourseMode
 from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService

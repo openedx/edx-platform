@@ -18,7 +18,7 @@ from six.moves import range
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import get_lms_link_for_certificate_web_view, reverse_course_url
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from student.models import CourseEnrollment
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory

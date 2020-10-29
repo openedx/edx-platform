@@ -20,7 +20,7 @@ from pytz import utc
 from web_fragments.fragment import Fragment
 from xblock.runtime import KeyValueStore
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID

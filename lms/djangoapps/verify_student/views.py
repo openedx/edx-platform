@@ -29,7 +29,7 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.commerce.utils import EcommerceService, is_account_activation_requirement_disabled
 from lms.djangoapps.verify_student.emails import send_verification_approved_email, send_verification_confirmation_email

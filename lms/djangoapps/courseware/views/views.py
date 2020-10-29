@@ -48,7 +48,7 @@ from six import text_type
 from web_fragments.fragment import Fragment
 
 from lms.djangoapps.survey import views as survey_views
-from course_modes.models import CourseMode, get_course_prices
+from common.djangoapps.course_modes.models import CourseMode, get_course_prices
 from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
 from lms.djangoapps.edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException

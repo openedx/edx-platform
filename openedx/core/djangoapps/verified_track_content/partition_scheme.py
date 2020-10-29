@@ -9,7 +9,7 @@ import six
 from django.conf import settings
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.masquerade import (
     get_course_masquerade,
     get_masquerading_user_group,

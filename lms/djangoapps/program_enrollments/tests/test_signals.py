@@ -12,7 +12,7 @@ from organizations.tests.factories import OrganizationFactory
 from social_django.models import UserSocialAuth
 from testfixtures import LogCapture
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.program_enrollments.signals import _listen_for_lms_retire, logger
 from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL

@@ -9,7 +9,7 @@ import six
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import (
     CertificateGenerationCourseSetting,
     CertificateStatuses,

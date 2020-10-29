@@ -4,7 +4,7 @@
 import ddt
 from django.test import TestCase
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 
 from ..models import Course
 

@@ -72,7 +72,7 @@ INSTALLED_APPS = (
     'lms.djangoapps.grades.apps.GradesConfig',
     'lms.djangoapps.certificates.apps.CertificatesConfig',
     'openedx.core.djangoapps.user_api',
-    'course_modes.apps.CourseModesConfig',
+    'common.djangoapps.course_modes.apps.CourseModesConfig',
     'lms.djangoapps.verify_student.apps.VerifyStudentConfig',
     'openedx.core.djangoapps.content_libraries',
     'openedx.core.djangoapps.dark_lang',

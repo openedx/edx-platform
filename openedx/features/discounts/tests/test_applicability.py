@@ -13,8 +13,8 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from enterprise.models import EnterpriseCustomer, EnterpriseCustomerUser
 from mock import Mock, patch
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from entitlements.tests.factories import CourseEntitlementFactory
 from lms.djangoapps.experiments.models import ExperimentData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview

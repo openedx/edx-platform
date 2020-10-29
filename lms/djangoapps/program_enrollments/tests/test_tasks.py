@@ -12,7 +12,7 @@ from freezegun import freeze_time
 from opaque_keys.edx.keys import CourseKey
 from testfixtures import LogCapture
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 from lms.djangoapps.program_enrollments.tasks import expire_waiting_enrollments, log
 from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory

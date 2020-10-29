@@ -14,7 +14,7 @@ import six
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.teams import TEAM_DISCUSSION_CONTEXT
 from lms.djangoapps.teams.errors import AddToIncompatibleTeamError
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership

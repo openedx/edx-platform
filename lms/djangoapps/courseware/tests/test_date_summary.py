@@ -14,8 +14,8 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from mock import patch
 from pytz import utc
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from freezegun import freeze_time
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND, COURSE_HOME_MICROFRONTEND_DATES_TAB

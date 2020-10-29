@@ -30,7 +30,7 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
-from course_modes.models import CourseMode, CourseModesArchive
+from common.djangoapps.course_modes.models import CourseMode, CourseModesArchive
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (

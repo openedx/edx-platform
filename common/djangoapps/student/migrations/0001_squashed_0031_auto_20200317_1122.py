@@ -4,7 +4,6 @@
 
 import uuid
 
-import course_modes.models
 import django.utils.timezone
 import django_countries.fields
 import model_utils.fields
@@ -16,6 +15,7 @@ from lms.djangoapps.experiments.models import ExperimentData
 from student.models import CourseEnrollment, FBEEnrollmentExclusion
 
 import openedx.core.djangolib.model_mixins
+from common.djangoapps.course_modes import models as course_modes_models
 from openedx.features.course_duration_limits.config import EXPERIMENT_DATA_HOLDBACK_KEY, EXPERIMENT_ID
 
 
@@ -465,12 +465,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='courseenrollment',
             name='mode',
-            field=models.CharField(default=course_modes.models.CourseMode.get_default_mode_slug, max_length=100),
+            field=models.CharField(default=course_modes_models.CourseMode.get_default_mode_slug, max_length=100),
         ),
         migrations.AlterField(
             model_name='historicalcourseenrollment',
             name='mode',
-            field=models.CharField(default=course_modes.models.CourseMode.get_default_mode_slug, max_length=100),
+            field=models.CharField(default=course_modes_models.CourseMode.get_default_mode_slug, max_length=100),
         ),
         migrations.CreateModel(
             name='HistoricalManualEnrollmentAudit',

@@ -56,7 +56,7 @@ from slumber.exceptions import HttpClientError, HttpServerError
 from user_util import user_util
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
-from course_modes.models import CourseMode, get_cosmetic_verified_display_price
+from common.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,

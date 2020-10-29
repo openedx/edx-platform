@@ -6,7 +6,7 @@ Tests for the Credit xBlock service
 import ddt
 import six
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.credit.api.eligibility import set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.djangoapps.credit.services import CreditService

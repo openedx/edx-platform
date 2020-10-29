@@ -17,7 +17,7 @@ from rest_framework.response import Response
 
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.course_goals.api import (add_course_goal, get_course_goal, get_course_goal_text,
                                              has_course_goal_permission, valid_course_goals_ordered)
 from lms.djangoapps.course_home_api.outline.v1.serializers import OutlineTabSerializer

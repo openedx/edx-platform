@@ -8,7 +8,7 @@ import six
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
 
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 

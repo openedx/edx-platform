@@ -25,7 +25,7 @@ from ipware.ip import get_ip
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.helpers import get_course_final_price
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.commerce.utils import EcommerceService

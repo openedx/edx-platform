@@ -11,7 +11,7 @@ from django.urls import reverse
 from mock import patch
 from pytz import UTC
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import get_certificate_url
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import (
