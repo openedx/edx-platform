@@ -1480,7 +1480,7 @@ INSTALLED_APPS = [
     'common.djangoapps.entitlements',
 
     # Asset management for mako templates
-    'pipeline_mako',
+    'common.djangoapps.pipeline_mako',
 
     # API Documentation
     'drf_yasg',
