@@ -33,6 +33,7 @@ class TestNotifyCredentials(TestCase):
     def setUp(self):
         super(TestNotifyCredentials, self).setUp()
         self.user = UserFactory.create()
+        self.user2 = UserFactory.create()
 
         with freeze_time(datetime(2017, 1, 1)):
             self.cert1 = GeneratedCertificateFactory(user=self.user, course_id='course-v1:edX+Test+1')
@@ -42,7 +43,7 @@ class TestNotifyCredentials(TestCase):
             self.cert3 = GeneratedCertificateFactory(user=self.user, course_id='course-v1:testX+Test+3')
         with freeze_time(datetime(2017, 2, 1, 5)):
             self.cert4 = GeneratedCertificateFactory(
-                user=self.user, course_id='course-v1:edX+Test+4', status=CertificateStatuses.downloadable
+                user=self.user2, course_id='course-v1:edX+Test+4', status=CertificateStatuses.downloadable
             )
         print(('self.cert1.modified_date', self.cert1.modified_date))
 
@@ -57,7 +58,7 @@ class TestNotifyCredentials(TestCase):
             self.grade3 = PersistentCourseGrade.objects.create(user_id=self.user.id, course_id='course-v1:testX+Test+3',
                                                                percent_grade=1)
         with freeze_time(datetime(2017, 2, 1, 5)):
-            self.grade4 = PersistentCourseGrade.objects.create(user_id=self.user.id, course_id='course-v1:edX+Test+4',
+            self.grade4 = PersistentCourseGrade.objects.create(user_id=self.user2.id, course_id='course-v1:edX+Test+4',
                                                                percent_grade=1)
         print(('self.grade1.modified', self.grade1.modified))
 
@@ -121,6 +122,40 @@ class TestNotifyCredentials(TestCase):
         self.assertTrue(mock_send.called)
         self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert2])
         self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade2])
+
+    @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
+    def test_username_arg(self, mock_send):
+        call_command(
+            Command(), '--start-date', '2017-02-01', '--end-date', '2017-02-02', '--username', self.user2.username
+        )
+        self.assertTrue(mock_send.called)
+        self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert4])
+        self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade4])
+        mock_send.reset_mock()
+
+        call_command(
+            Command(), '--username', self.user2.username
+        )
+        self.assertTrue(mock_send.called)
+        self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert4])
+        self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade4])
+        mock_send.reset_mock()
+
+        call_command(
+            Command(), '--start-date', '2017-02-01', '--end-date', '2017-02-02', '--username', self.user.username
+        )
+        self.assertTrue(mock_send.called)
+        self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert2])
+        self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade2])
+        mock_send.reset_mock()
+
+        call_command(
+            Command(), '--username', self.user2.username
+        )
+        self.assertTrue(mock_send.called)
+        self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert4])
+        self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade4])
+        mock_send.reset_mock()
 
     @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
     def test_no_args(self, mock_send):

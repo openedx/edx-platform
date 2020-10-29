@@ -155,7 +155,7 @@ def get_certificates_for_user_by_course_keys(user, course_keys):
     }
 
 
-def get_recently_modified_certificates(course_keys=None, start_date=None, end_date=None):
+def get_recently_modified_certificates(course_keys=None, start_date=None, end_date=None, username=None):
     """
     Returns a QuerySet of GeneratedCertificate objects filtered by the input
     parameters and ordered by modified_date.
@@ -170,6 +170,9 @@ def get_recently_modified_certificates(course_keys=None, start_date=None, end_da
 
     if end_date:
         cert_filter_args['modified_date__lte'] = end_date
+
+    if username:
+        cert_filter_args['user__username'] = username
 
     return GeneratedCertificate.objects.filter(**cert_filter_args).order_by('modified_date')
 

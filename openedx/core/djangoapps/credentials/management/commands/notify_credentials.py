@@ -19,7 +19,7 @@ import time
 
 from datetime import datetime, timedelta
 import dateutil.parser
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -34,6 +34,7 @@ from openedx.core.djangoapps.credentials.signals import handle_cert_change, send
 from openedx.core.djangoapps.programs.signals import handle_course_cert_changed, handle_course_cert_awarded
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
+User = get_user_model()
 log = logging.getLogger(__name__)
 
 
@@ -160,6 +161,11 @@ class Command(BaseCommand):
             action='store_true',
             help='Send program award notifications with course notification tasks',
         )
+        parser.add_argument(
+            '--username',
+            default=None,
+            help='Run the command for a single user',
+        )
 
     def get_args_from_database(self):
         """ Returns an options dictionary from the current NotifyCredentialsConfig model. """
@@ -183,7 +189,7 @@ class Command(BaseCommand):
 
         log.info(
             u"notify_credentials starting, dry-run=%s, site=%s, delay=%d seconds, page_size=%d, "
-            u"from=%s, to=%s, notify_programs=%s, execution=%s",
+            u"from=%s, to=%s, notify_programs=%s, username=%s, execution=%s",
             options['dry_run'],
             options['site'],
             options['delay'],
@@ -191,6 +197,7 @@ class Command(BaseCommand):
             options['start_date'] if options['start_date'] else 'NA',
             options['end_date'] if options['end_date'] else 'NA',
             options['notify_programs'],
+            options['username'],
             'auto' if options['auto'] else 'manual',
         )
 
@@ -200,11 +207,19 @@ class Command(BaseCommand):
             log.error(u'No site configuration found for site %s', options['site'])
 
         course_keys = self.get_course_keys(options['courses'])
-        if not (course_keys or options['start_date'] or options['end_date']):
-            raise CommandError('You must specify a filter (e.g. --courses= or --start-date)')
+        if not (course_keys or options['start_date'] or options['end_date'] or options['username']):
+            raise CommandError('You must specify a filter (e.g. --courses= or --start-date or --username)')
 
-        certs = get_recently_modified_certificates(course_keys, options['start_date'], options['end_date'])
-        grades = get_recently_modified_grades(course_keys, options['start_date'], options['end_date'])
+        certs = get_recently_modified_certificates(
+            course_keys, options['start_date'], options['end_date'], options['username']
+        )
+
+        user = None
+        if options['username']:
+            user = User.objects.get(username=options['username'])
+        grades = get_recently_modified_grades(
+            course_keys, options['start_date'], options['end_date'], user
+        )
 
         log.info('notify_credentials Sending notifications for {certs} certificates and {grades} grades'.format(
             certs=certs.count(),
