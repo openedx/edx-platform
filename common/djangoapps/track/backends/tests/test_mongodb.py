@@ -3,13 +3,13 @@
 from django.test import TestCase
 from mock import patch
 
-from track.backends.mongodb import MongoBackend
+from common.djangoapps.track.backends.mongodb import MongoBackend
 
 
 class TestMongoBackend(TestCase):
     def setUp(self):
         super(TestMongoBackend, self).setUp()
-        self.mongo_patcher = patch('track.backends.mongodb.MongoClient')
+        self.mongo_patcher = patch('common.djangoapps.track.backends.mongodb.MongoClient')
         self.mongo_patcher.start()
         self.addCleanup(self.mongo_patcher.stop)
 

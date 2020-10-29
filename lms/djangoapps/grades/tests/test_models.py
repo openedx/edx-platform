@@ -31,7 +31,7 @@ from lms.djangoapps.grades.models import (
     VisibleBlocks
 )
 from common.djangoapps.student.tests.factories import UserFactory
-from track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
+from common.djangoapps.track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 
 
 class BlockRecordListTestCase(TestCase):

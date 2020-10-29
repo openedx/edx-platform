@@ -148,7 +148,7 @@ THIRD_PARTY_AUTH_BACKENDS: [social_core.backends.google.GoogleOAuth2, social_cor
 TIME_ZONE: America/New_York
 TRACKING_BACKENDS:
   mongo:
-    ENGINE: track.backends.mongodb.MongoBackend
+    ENGINE: common.djangoapps.track.backends.mongodb.MongoBackend
     OPTIONS:
       collection: events
       database: test

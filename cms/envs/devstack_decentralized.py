@@ -24,7 +24,7 @@ CMS_BASE = 'localhost:8010'
 
 
 # Disable noisy loggers
-for pkg_name in ['track.contexts', 'track.middleware']:
+for pkg_name in ['common.djangoapps.track.contexts', 'common.djangoapps.track.middleware']:
     logging.getLogger(pkg_name).setLevel(logging.CRITICAL)
 
 # Docker does not support the syslog socket at /dev/log. Rely on the console.

@@ -50,9 +50,9 @@ from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.lib.teams_config import TeamsConfig
 from common.djangoapps.student.roles import CourseStaffRole, UserBasedRole
 from common.djangoapps.student.tests.factories import CourseAccessRoleFactory, CourseEnrollmentFactory, UserFactory
-from track.middleware import TrackMiddleware
-from track.views import segmentio
-from track.views.tests.base import SEGMENTIO_TEST_USER_ID, SegmentIOTrackingTestCaseBase
+from common.djangoapps.track.middleware import TrackMiddleware
+from common.djangoapps.track.views import segmentio
+from common.djangoapps.track.views.tests.base import SEGMENTIO_TEST_USER_ID, SegmentIOTrackingTestCaseBase
 from util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

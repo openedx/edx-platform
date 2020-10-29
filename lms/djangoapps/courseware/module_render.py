@@ -90,7 +90,7 @@ from openedx.features.discounts.utils import offer_banner_wrapper
 from openedx.features.content_type_gating.services import ContentTypeGatingService
 from common.djangoapps.student.models import anonymous_id_for_user, user_by_anonymous_id
 from common.djangoapps.student.roles import CourseBetaTesterRole
-from track import contexts
+from common.djangoapps.track import contexts
 from util import milestones_helpers
 from util.json_request import JsonResponse
 from xblock_django.user_service import DjangoXBlockUserService
@@ -133,10 +133,10 @@ def make_track_function(request):
     Make a tracking function that logs what happened.
     For use in ModuleSystem.
     '''
-    import track.views
+    from common.djangoapps.track import views as track_views
 
     def function(event_type, event):
-        return track.views.server_track(request, event_type, event, page='x_module')
+        return track_views.server_track(request, event_type, event, page='x_module')
     return function
 
 

@@ -26,7 +26,7 @@ from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiv
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermissionIsAuthenticated
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from common.djangoapps.student.models import CourseEnrollment
-from track import segment
+from common.djangoapps.track import segment
 
 # .. toggle_name: experiments.mobile_upsell_rev934
 # .. toggle_type: flag

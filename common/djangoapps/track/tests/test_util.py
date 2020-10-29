@@ -6,7 +6,7 @@ from datetime import datetime
 from django.test import TestCase
 from pytz import UTC
 
-from track.utils import DateTimeJSONEncoder
+from common.djangoapps.track.utils import DateTimeJSONEncoder
 
 
 class TestDateTimeJSONEncoder(TestCase):

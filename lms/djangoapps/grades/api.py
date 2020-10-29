@@ -27,7 +27,7 @@ from lms.djangoapps.grades.subsection_grade_factory import SubsectionGradeFactor
 from lms.djangoapps.grades.tasks import compute_all_grades_for_course as task_compute_all_grades_for_course
 from lms.djangoapps.grades.util_services import GradesUtilService
 from lms.djangoapps.utils import _get_key
-from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
+from common.djangoapps.track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
 
 
 def graded_subsections_for_course_id(course_id):

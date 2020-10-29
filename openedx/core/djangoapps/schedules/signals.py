@@ -24,7 +24,7 @@ from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 from openedx.core.djangoapps.theming.helpers import get_current_site
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.signals import ENROLLMENT_TRACK_UPDATED
-from track import segment
+from common.djangoapps.track import segment
 
 from .config import CREATE_SCHEDULE_WAFFLE_FLAG
 from .models import Schedule, ScheduleConfig

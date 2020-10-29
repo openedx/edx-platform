@@ -2018,7 +2018,7 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         )
 
 
-@patch('track.views.eventtracker', autospec=True)
+@patch('common.djangoapps.track.views.eventtracker', autospec=True)
 class TestModuleTrackingContext(SharedModuleStoreTestCase):
     """
     Ensure correct tracking information is included in events emitted during XBlock callback handling.

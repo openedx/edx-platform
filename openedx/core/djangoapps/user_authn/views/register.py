@@ -72,7 +72,7 @@ from common.djangoapps.student.models import (
 from common.djangoapps.student.views import compose_and_send_activation_email
 from common.djangoapps.third_party_auth import pipeline, provider
 from common.djangoapps.third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
-from track import segment
+from common.djangoapps.track import segment
 from util.db import outer_atomic
 from util.json_request import JsonResponse
 
