@@ -15,7 +15,7 @@ from model_utils.models import TimeStampedModel
 from simple_history.models import HistoricalRecords
 
 from common.djangoapps.course_modes.models import CourseMode
-from entitlements.utils import is_course_run_entitlement_fulfillable
+from common.djangoapps.entitlements.utils import is_course_run_entitlement_fulfillable
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.commerce.utils import refund_entitlement
 from openedx.core.djangoapps.catalog.utils import get_course_uuid_for_course

@@ -39,7 +39,7 @@ from social_django.models import UserSocialAuth
 from wiki.models import ArticleRevision
 from wiki.models.pluginbase import RevisionPluginRevision
 
-from entitlements.models import CourseEntitlement
+from common.djangoapps.entitlements.models import CourseEntitlement
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
 from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments

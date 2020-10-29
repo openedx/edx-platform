@@ -5,7 +5,7 @@ Entitlements related signal handlers.
 
 from django.dispatch import receiver
 
-from entitlements.models import CourseEntitlement
+from common.djangoapps.entitlements.models import CourseEntitlement
 from student.signals import UNENROLL_DONE
 
 
