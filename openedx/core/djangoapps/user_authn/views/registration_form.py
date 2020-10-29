@@ -31,7 +31,7 @@ from common.djangoapps.student.models import (
     UserProfile,
     email_exists_or_retired,
 )
-from util.password_policy_validators import (
+from common.djangoapps.util.password_policy_validators import (
     password_validators_instruction_texts,
     password_validators_restrictions,
     validate_password,

@@ -18,7 +18,7 @@ from cms.djangoapps.contentstore.utils import reverse_url
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from common.djangoapps.student.tests.factories import UserFactory
-from util import milestones_helpers
+from common.djangoapps.util import milestones_helpers
 from xmodule.modulestore.django import modulestore
 
 from ..entrance_exam import (

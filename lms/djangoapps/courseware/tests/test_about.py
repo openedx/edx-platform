@@ -27,7 +27,7 @@ from openedx.features.course_experience.waffle import WAFFLE_NAMESPACE as COURSE
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentAllowedFactory, UserFactory
 from common.djangoapps.track.tests import EventTrackingTestCase
-from util.milestones_helpers import get_prerequisite_courses_display, set_prerequisite_courses
+from common.djangoapps.util.milestones_helpers import get_prerequisite_courses_display, set_prerequisite_courses
 from xmodule.course_module import (
     CATALOG_VISIBILITY_ABOUT,
     CATALOG_VISIBILITY_NONE,

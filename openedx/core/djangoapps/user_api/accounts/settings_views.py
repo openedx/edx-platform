@@ -34,7 +34,7 @@ from openedx.features.enterprise_support.api import enterprise_customer_for_requ
 from openedx.features.enterprise_support.utils import update_account_settings_context_for_enterprise
 from common.djangoapps.student.models import UserProfile
 from common.djangoapps.third_party_auth import pipeline
-from util.date_utils import strftime_localized
+from common.djangoapps.util.date_utils import strftime_localized
 
 log = logging.getLogger(__name__)
 

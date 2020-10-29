@@ -36,7 +36,7 @@ from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
-from util.testing import EventTestMixin
+from common.djangoapps.util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

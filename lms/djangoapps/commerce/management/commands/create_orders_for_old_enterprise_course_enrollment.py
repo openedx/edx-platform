@@ -21,7 +21,7 @@ from enterprise.models import EnterpriseCourseEnrollment
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 
-from util.query import use_read_replica_if_available
+from common.djangoapps.util.query import use_read_replica_if_available
 
 User = get_user_model()
 

@@ -22,7 +22,7 @@ from lms.djangoapps.certificates.models import (
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.milestones_helpers import milestones_achieved_by_user, set_prerequisite_courses
+from common.djangoapps.util.milestones_helpers import milestones_achieved_by_user, set_prerequisite_courses
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

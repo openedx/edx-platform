@@ -67,7 +67,7 @@ from common.djangoapps.track.event_transaction_utils import (
     get_event_transaction_type,
     set_event_transaction_type
 )
-from util.date_utils import to_timestamp
+from common.djangoapps.util.date_utils import to_timestamp
 from xmodule.modulestore.django import modulestore
 from xmodule.util.misc import get_default_short_labeler
 

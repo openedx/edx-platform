@@ -47,8 +47,8 @@ from openedx.core.djangoapps.user_api.errors import AccountValidationError, User
 from openedx.core.lib.log_utils import audit_log
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.track import segment
-from util.db import outer_atomic
-from util.json_request import JsonResponse
+from common.djangoapps.util.db import outer_atomic
+from common.djangoapps.util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
 
 from .services import IDVerificationService

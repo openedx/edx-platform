@@ -10,7 +10,7 @@
   from django.utils.translation import ugettext as _
   from openedx.core.djangolib.markup import HTML, Text
   from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_json
-  from util.course import has_certificates_enabled
+  from common.djangoapps.util.course import has_certificates_enabled
 %>
 <%block name="title">${_("Checklists")}</%block>
 <%block name="bodyclass">is-signedin course view-checklists</%block>

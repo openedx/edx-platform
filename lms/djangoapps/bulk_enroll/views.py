@@ -20,7 +20,7 @@ from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.enrollments.views import EnrollmentUserThrottle
 from openedx.core.lib.api.authentication import BearerAuthentication
 from openedx.core.lib.api.permissions import IsStaff
-from util.disable_rate_limit import can_disable_rate_limit
+from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
 
 
 @can_disable_rate_limit

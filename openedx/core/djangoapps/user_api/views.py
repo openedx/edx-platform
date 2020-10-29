@@ -31,7 +31,7 @@ from openedx.core.djangoapps.user_api.serializers import (
 )
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from common.djangoapps.student.helpers import AccountValidationError
-from util.json_request import JsonResponse
+from common.djangoapps.util.json_request import JsonResponse
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):

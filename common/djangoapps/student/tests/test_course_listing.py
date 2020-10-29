@@ -17,7 +17,7 @@ from common.djangoapps.student.models import CourseEnrollment, DashboardConfigur
 from common.djangoapps.student.roles import GlobalStaff
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.student.views import get_course_enrollments
-from util.milestones_helpers import get_pre_requisite_courses_not_completed, set_prerequisite_courses
+from common.djangoapps.util.milestones_helpers import get_pre_requisite_courses_not_completed, set_prerequisite_courses
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

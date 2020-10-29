@@ -20,7 +20,7 @@ from lms.djangoapps.branding.views import index
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
-from util.milestones_helpers import set_prerequisite_courses
+from common.djangoapps.util.milestones_helpers import set_prerequisite_courses
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

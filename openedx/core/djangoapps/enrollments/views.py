@@ -49,7 +49,7 @@ from rest_framework.views import APIView
 from common.djangoapps.student.auth import user_has_role
 from common.djangoapps.student.models import CourseEnrollment, User
 from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
-from util.disable_rate_limit import can_disable_rate_limit
+from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
 
 log = logging.getLogger(__name__)
 REQUIRED_ATTRIBUTES = {

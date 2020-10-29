@@ -32,7 +32,7 @@ from lms.djangoapps.email_marketing.tasks import (
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from common.djangoapps.student.models import Registration
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory, UserProfileFactory
-from util.json_request import JsonResponse
+from common.djangoapps.util.json_request import JsonResponse
 
 from ..models import EmailMarketingConfiguration
 from ..signals import (

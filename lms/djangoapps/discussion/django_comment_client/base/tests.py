@@ -53,7 +53,7 @@ from common.djangoapps.student.tests.factories import CourseAccessRoleFactory, C
 from common.djangoapps.track.middleware import TrackMiddleware
 from common.djangoapps.track.views import segmentio
 from common.djangoapps.track.views.tests.base import SEGMENTIO_TEST_USER_ID, SegmentIOTrackingTestCaseBase
-from util.testing import UrlResetMixin
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase

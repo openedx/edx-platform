@@ -15,7 +15,7 @@ from lms.djangoapps.course_api.tests.mixins import CourseApiFactoryMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from common.djangoapps.student.tests.factories import UserFactory
-from util.testing import UrlResetMixin
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 

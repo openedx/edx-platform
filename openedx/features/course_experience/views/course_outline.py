@@ -34,7 +34,7 @@ from openedx.features.course_experience import RELATIVE_DATES_FLAG
 from openedx.features.course_experience.utils import dates_banner_should_display
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from common.djangoapps.student.models import CourseEnrollment
-from util.milestones_helpers import get_course_content_milestones
+from common.djangoapps.util.milestones_helpers import get_course_content_milestones
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 from xmodule.modulestore.django import modulestore
 

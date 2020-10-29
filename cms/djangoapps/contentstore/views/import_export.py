@@ -32,8 +32,8 @@ from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.auth import has_course_author_access
-from util.json_request import JsonResponse
-from util.views import ensure_valid_course_key
+from common.djangoapps.util.json_request import JsonResponse
+from common.djangoapps.util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
 
 from ..storage import course_import_export_storage

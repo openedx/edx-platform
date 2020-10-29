@@ -58,8 +58,8 @@ from common.djangoapps.student.roles import (
     OrgStaffRole,
     SupportStaffRole
 )
-from util import milestones_helpers as milestones_helpers
-from util.milestones_helpers import (
+from common.djangoapps.util import milestones_helpers as milestones_helpers
+from common.djangoapps.util.milestones_helpers import (
     any_unfulfilled_milestones,
     get_pre_requisite_courses_not_completed,
     is_prerequisite_courses_enabled

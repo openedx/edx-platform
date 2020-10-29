@@ -44,8 +44,8 @@ from openedx.features.enterprise_support.tests.mixins.enterprise import Enterpri
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import AdminFactory, SuperuserFactory, UserFactory
-from util.models import RateLimitConfiguration
-from util.testing import UrlResetMixin
+from common.djangoapps.util.models import RateLimitConfiguration
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 

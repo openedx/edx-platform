@@ -14,7 +14,7 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from util.json_request import JsonResponse
+from common.djangoapps.util.json_request import JsonResponse
 
 from lms.djangoapps.experiments import filters, serializers
 from lms.djangoapps.experiments.models import ExperimentData, ExperimentKeyValue

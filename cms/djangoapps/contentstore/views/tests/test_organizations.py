@@ -8,7 +8,7 @@ from django.urls import reverse
 from mock import patch
 
 from common.djangoapps.student.tests.factories import UserFactory
-from util.organizations_helpers import add_organization
+from common.djangoapps.util.organizations_helpers import add_organization
 
 
 @patch.dict('django.conf.settings.FEATURES', {'ORGANIZATIONS_APP': True})

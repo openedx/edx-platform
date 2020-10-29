@@ -18,7 +18,7 @@ from lms.djangoapps.grades.events import PROBLEM_SUBMITTED_EVENT_TYPE
 from lms.djangoapps.grades.tasks import recalculate_subsection_grade_v3
 from common.djangoapps.student.models import user_by_anonymous_id
 from common.djangoapps.track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
-from util.date_utils import to_timestamp
+from common.djangoapps.util.date_utils import to_timestamp
 
 log = logging.getLogger(__name__)
 

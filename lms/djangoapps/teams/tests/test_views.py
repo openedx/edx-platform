@@ -32,7 +32,7 @@ from openedx.core.lib.teams_config import TeamsConfig
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
-from util.testing import EventTestMixin
+from common.djangoapps.util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 

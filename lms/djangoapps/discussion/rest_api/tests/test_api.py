@@ -57,7 +57,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
 )
 from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.testing import UrlResetMixin
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase

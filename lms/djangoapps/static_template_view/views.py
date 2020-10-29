@@ -18,8 +18,8 @@ from mako.exceptions import TopLevelLookupException
 
 from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from util.cache import cache_if_anonymous
-from util.views import fix_crum_request
+from common.djangoapps.util.cache import cache_if_anonymous
+from common.djangoapps.util.views import fix_crum_request
 
 valid_templates = []
 

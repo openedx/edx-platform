@@ -18,7 +18,7 @@ from lms.djangoapps.instructor_analytics.basic import enrolled_students_features
 from lms.djangoapps.instructor_analytics.csvs import format_dictlist
 from lms.djangoapps.instructor_task.models import ReportStore
 from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
-from util.file import course_filename_prefix_generator
+from common.djangoapps.util.file import course_filename_prefix_generator
 
 from .runner import TaskProgress
 from .utils import tracker_emit, upload_csv_to_report_store

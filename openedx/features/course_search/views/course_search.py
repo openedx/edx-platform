@@ -18,7 +18,7 @@ from lms.djangoapps.courseware.courses import get_course_overview_with_access
 from lms.djangoapps.courseware.views.views import CourseTabView
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience import default_course_url_name
-from util.views import ensure_valid_course_key
+from common.djangoapps.util.views import ensure_valid_course_key
 
 
 class CourseSearchView(CourseTabView):

@@ -34,7 +34,7 @@ from common.djangoapps.student.views import (
     validate_new_email
 )
 from common.djangoapps.third_party_auth.views import inactive_user_view
-from util.testing import EventTestMixin
+from common.djangoapps.util.testing import EventTestMixin
 
 
 class TestException(Exception):

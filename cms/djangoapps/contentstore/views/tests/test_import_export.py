@@ -33,7 +33,7 @@ from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from openedx.core.lib.extract_tar import safetar_extractall
 from common.djangoapps.student import auth
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
-from util import milestones_helpers
+from common.djangoapps.util import milestones_helpers
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import LIBRARY_ROOT, ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

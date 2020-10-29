@@ -37,7 +37,7 @@ from openedx.core.djangoapps.user_authn.views.login import (
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.lib.api.test_utils import ApiTestCase
-from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
+from common.djangoapps.util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 
 
 @ddt.ddt

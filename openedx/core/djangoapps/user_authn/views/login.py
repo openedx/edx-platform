@@ -46,8 +46,8 @@ from common.djangoapps.student.views import compose_and_send_activation_email
 from common.djangoapps.third_party_auth import pipeline, provider
 from common.djangoapps import third_party_auth
 from common.djangoapps.track import segment
-from util.json_request import JsonResponse
-from util.password_policy_validators import normalize_password
+from common.djangoapps.util.json_request import JsonResponse
+from common.djangoapps.util.password_policy_validators import normalize_password
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
