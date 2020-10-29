@@ -7,7 +7,7 @@ import ddt
 import mock
 from edx_toggles.toggles.testutils import override_waffle_flag
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG

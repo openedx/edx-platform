@@ -17,7 +17,7 @@ from bson import ObjectId
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from completion import waffle as completion_waffle
 from completion.models import BlockCompletion
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404, HttpResponse
@@ -47,6 +47,8 @@ from xblock.fields import ScopeIds
 from xblock.runtime import DictKeyValueStore, KvsFieldData, Runtime
 from xblock.test.tools import TestRuntime
 
+from capa.tests.response_xml_factory import OptionResponseXMLFactory
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware import module_render as render
 from lms.djangoapps.courseware.access_response import AccessResponse
 from lms.djangoapps.courseware.courses import get_course_info_section, get_course_with_access

@@ -30,7 +30,7 @@ from cms.djangoapps.models.settings.course_grading import (
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from cms.djangoapps.models.settings.encoder import CourseSettingsEncoder
 from cms.djangoapps.models.settings.waffle import MATERIAL_RECOMPUTE_ONLY_FLAG
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory

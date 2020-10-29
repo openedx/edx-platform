@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from requests.exceptions import ConnectionError, Timeout  # pylint: disable=redefined-builtin
 from slumber.exceptions import SlumberBaseException
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from student.helpers import VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 

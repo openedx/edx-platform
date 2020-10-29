@@ -19,7 +19,7 @@ from six import text_type
 from six.moves import range
 
 from common.test.utils import XssTestMixin
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from edx_toggles.toggles.testutils import override_waffle_flag
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.courseware.tabs import get_course_tab_list

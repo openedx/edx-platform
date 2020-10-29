@@ -10,7 +10,7 @@ from crum import get_current_request
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.urls import reverse
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from openedx.features.course_experience.course_tools import CourseTool
 from student.models import CourseEnrollment

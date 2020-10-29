@@ -8,8 +8,8 @@ import ddt
 from django.utils import timezone
 from pytz import UTC
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase

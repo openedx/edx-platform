@@ -20,8 +20,8 @@ from search.tests.tests import TEST_INDEX_NAME
 from search.tests.utils import SearcherMixin
 from waffle.testutils import override_switch
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from opaque_keys.edx.locator import LibraryLocator
 from openedx.core.lib.api.view_utils import LazySequence
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig

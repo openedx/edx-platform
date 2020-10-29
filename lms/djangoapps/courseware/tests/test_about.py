@@ -18,7 +18,7 @@ from mock import patch
 from six import text_type
 from waffle.testutils import override_switch
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG

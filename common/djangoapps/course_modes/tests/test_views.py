@@ -16,8 +16,8 @@ from django.conf import settings
 from django.urls import reverse
 from mock import patch
 
-from course_modes.models import CourseMode, Mode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode, Mode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.commerce.tests import test_utils as ecomm_test_utils
 from lms.djangoapps.commerce.tests.mocks import mock_payment_processors
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
@@ -38,7 +38,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
     """
     Course Mode View tests
     """
-    URLCONF_MODULES = ['course_modes.urls']
+    URLCONF_MODULES = ['common.djangoapps.course_modes.urls']
 
     @patch.dict(settings.FEATURES, {'MODE_CREATION_FOR_TESTING': True})
     def setUp(self):
@@ -200,8 +200,8 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
             self.assertNotContains(response, "Credit")
 
     @httpretty.activate
-    @patch('course_modes.views.enterprise_customer_for_request')
-    @patch('course_modes.views.get_course_final_price')
+    @patch('common.djangoapps.course_modes.views.enterprise_customer_for_request')
+    @patch('common.djangoapps.course_modes.views.get_course_final_price')
     @ddt.data(
         (1.0, True),
         (50.0, False),

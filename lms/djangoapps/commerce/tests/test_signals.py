@@ -18,7 +18,7 @@ from opaque_keys.edx.keys import CourseKey
 from requests import Timeout
 from six.moves.urllib.parse import urljoin
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from student.signals import REFUND_ORDER
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 

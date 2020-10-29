@@ -25,7 +25,7 @@ from opaque_keys.edx.keys import CourseKey
 from pyquery import PyQuery as pq
 from six.moves import range
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from entitlements.tests.factories import CourseEntitlementFactory
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory

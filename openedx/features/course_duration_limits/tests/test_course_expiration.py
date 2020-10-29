@@ -11,7 +11,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.timezone import now
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
     GlobalStaffFactory,

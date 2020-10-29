@@ -15,8 +15,8 @@ from mock import patch
 from opaque_keys.edx.locator import CourseKey
 from pytz import UTC
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory

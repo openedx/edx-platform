@@ -33,8 +33,8 @@ from waffle.testutils import override_switch
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory

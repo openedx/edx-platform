@@ -19,7 +19,7 @@ from django.utils.translation import ugettext_lazy
 from lazy import lazy
 from pytz import utc
 
-from course_modes.models import CourseMode, get_cosmetic_verified_display_price
+from common.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from lms.djangoapps.certificates.api import get_active_web_certificate
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link, can_show_verified_upgrade
 from lms.djangoapps.verify_student.models import VerificationDeadline

@@ -7,7 +7,7 @@ from django.conf import settings
 from lms.djangoapps.commerce.utils import EcommerceService
 from pytz import utc
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 from xmodule.partitions.partitions_service import PartitionService
 

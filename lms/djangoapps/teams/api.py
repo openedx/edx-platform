@@ -10,7 +10,7 @@ from django.db.models import Count, Q
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.courses import has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership

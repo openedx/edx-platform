@@ -22,8 +22,8 @@ from pytz import utc
 from requests.exceptions import ConnectionError, Timeout
 from six.moves.urllib.parse import urljoin, urlparse, urlunparse  # pylint: disable=import-error
 
-from course_modes.api import get_paid_modes_for_course
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.api import get_paid_modes_for_course
+from common.djangoapps.course_modes.models import CourseMode
 from entitlements.api import get_active_entitlement_list_for_user
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.certificates import api as certificate_api

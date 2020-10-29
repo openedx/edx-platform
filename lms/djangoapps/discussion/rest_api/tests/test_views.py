@@ -19,8 +19,8 @@ from six.moves import range
 from six.moves.urllib.parse import urlparse
 
 from common.test.utils import disable_signal
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
     ForumsEnableMixin,
     config_course_discussions,

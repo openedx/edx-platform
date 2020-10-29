@@ -19,7 +19,7 @@ from pytz import UTC
 from six import text_type
 from six.moves import zip, zip_longest
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import CertificateWhitelist, GeneratedCertificate, certificate_info_for_user
 from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient

@@ -9,7 +9,7 @@ import ddt
 import mock
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.teams import api as teams_api
 from lms.djangoapps.teams.models import CourseTeam
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory

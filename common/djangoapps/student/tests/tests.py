@@ -23,8 +23,8 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import CourseLocator
 from pyquery import PyQuery as pq
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.verify_student.tests import TestVerificationBase

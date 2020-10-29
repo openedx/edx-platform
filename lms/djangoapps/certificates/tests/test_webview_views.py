@@ -16,7 +16,7 @@ from django.urls import reverse
 from mock import patch
 from urllib.parse import urlencode
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from edx_toggles.toggles import WaffleSwitch
 from edx_toggles.toggles.testutils import override_waffle_switch
 from lms.djangoapps.badges.events.course_complete import get_completion_badge

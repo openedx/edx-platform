@@ -22,7 +22,7 @@ from pytz import UTC
 from waffle.models import Switch
 from web_fragments.fragment import Fragment
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_overview_with_access
 from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
