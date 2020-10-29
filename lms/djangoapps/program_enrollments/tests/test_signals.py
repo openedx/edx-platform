@@ -24,8 +24,8 @@ from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import f
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from common.djangoapps.student.models import CourseEnrollmentException
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from third_party_auth.models import SAMLProviderConfig
-from third_party_auth.tests.factories import SAMLProviderConfigFactory
+from common.djangoapps.third_party_auth.models import SAMLProviderConfig
+from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 

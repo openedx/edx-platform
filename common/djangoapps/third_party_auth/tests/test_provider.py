@@ -10,9 +10,9 @@ from django.test.utils import CaptureQueriesContext
 from mock import Mock, patch
 
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
-from third_party_auth import provider
-from third_party_auth.tests import testutil
-from third_party_auth.tests.utils import skip_unless_thirdpartyauth
+from common.djangoapps.third_party_auth import provider
+from common.djangoapps.third_party_auth.tests import testutil
+from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
 SITE_DOMAIN_A = 'professionalx.example.com'
 SITE_DOMAIN_B = 'somethingelse.example.com'
 
@@ -75,7 +75,7 @@ class RegistryTest(testutil.TestCase):
             backend_names.append(backend_name)
             self.configure_oauth_provider(enabled=True, name=name, backend_name=backend_name)
 
-        with patch('third_party_auth.provider._PSA_OAUTH2_BACKENDS', backend_names):
+        with patch('common.djangoapps.third_party_auth.provider._PSA_OAUTH2_BACKENDS', backend_names):
             self.assertEqual(sorted(provider_names), [prov.name for prov in provider.Registry.enabled()])
 
     def test_enabled_doesnt_query_site(self):

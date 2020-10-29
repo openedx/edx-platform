@@ -54,8 +54,8 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_un
 from openedx.core.lib.api import test_utils
 from common.djangoapps.student.helpers import authenticate_new_user
 from common.djangoapps.student.tests.factories import UserFactory
-from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
-from third_party_auth.tests.utils import (
+from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
+from common.djangoapps.third_party_auth.tests.utils import (
     ThirdPartyOAuthTestMixin,
     ThirdPartyOAuthTestMixinFacebook,
     ThirdPartyOAuthTestMixinGoogle

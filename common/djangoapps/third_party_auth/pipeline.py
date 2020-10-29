@@ -80,14 +80,14 @@ from social_core.pipeline import partial
 from social_core.pipeline.social_auth import associate_by_email
 from social_core.utils import module_member, slugify
 
-import third_party_auth
+from common.djangoapps import third_party_auth
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from lms.djangoapps.verify_student.models import SSOVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
-from third_party_auth.utils import user_exists
+from common.djangoapps.third_party_auth.utils import user_exists
 from track import segment
 from util.json_request import JsonResponse
 

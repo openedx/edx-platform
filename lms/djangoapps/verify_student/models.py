@@ -190,9 +190,9 @@ class SSOVerification(IDVerificationAttempt):
     .. no_pii:
     """
 
-    OAUTH2 = u'third_party_auth.models.OAuth2ProviderConfig'
-    SAML = u'third_party_auth.models.SAMLProviderConfig'
-    LTI = u'third_party_auth.models.LTIProviderConfig'
+    OAUTH2 = u'common.djangoapps.third_party_auth.models.OAuth2ProviderConfig'
+    SAML = u'common.djangoapps.third_party_auth.models.SAMLProviderConfig'
+    LTI = u'common.djangoapps.third_party_auth.models.LTIProviderConfig'
     IDENTITY_PROVIDER_TYPE_CHOICES = (
         (OAUTH2, u'OAuth2 Provider'),
         (SAML, u'SAML Provider'),

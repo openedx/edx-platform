@@ -14,7 +14,7 @@ from django.dispatch import receiver
 from sailthru.sailthru_error import SailthruClientError
 from six import text_type
 
-import third_party_auth
+from common.djangoapps import third_party_auth
 from common.djangoapps.course_modes.models import CourseMode
 from edx_toggles.toggles import WaffleSwitchNamespace
 from lms.djangoapps.email_marketing.tasks import (

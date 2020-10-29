@@ -29,8 +29,8 @@ from openedx.core.djangoapps.user_api.accounts.settings_views import account_set
 from common.djangoapps.student import models as student_models
 from common.djangoapps.student.tests.factories import UserFactory
 
-from third_party_auth import middleware, pipeline
-from third_party_auth.tests import testutil
+from common.djangoapps.third_party_auth import middleware, pipeline
+from common.djangoapps.third_party_auth.tests import testutil
 
 
 def create_account(request):
@@ -547,7 +547,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
     def test_canceling_authentication_redirects_to_root_when_auth_entry_not_set(self):
         self.assert_exception_redirect_looks_correct('/')
 
-    @mock.patch('third_party_auth.pipeline.segment.track')
+    @mock.patch('common.djangoapps.third_party_auth.pipeline.segment.track')
     def test_full_pipeline_succeeds_for_linking_account(self, _mock_segment_track):
         # First, create, the GET request and strategy that store pipeline state,
         # configure the backend, and mock out wire traffic.
@@ -699,7 +699,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         self.assert_account_settings_context_looks_correct(
             account_settings_context(post_request), duplicate=True, linked=True)
 
-    @mock.patch('third_party_auth.pipeline.segment.track')
+    @mock.patch('common.djangoapps.third_party_auth.pipeline.segment.track')
     def test_full_pipeline_succeeds_for_signing_in_to_existing_active_account(self, _mock_segment_track):
         # First, create, the GET request and strategy that store pipeline state,
         # configure the backend, and mock out wire traffic.

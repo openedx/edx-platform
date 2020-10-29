@@ -29,7 +29,7 @@ from lms.djangoapps.support.serializers import (
     serialize_user_info
 )
 from lms.djangoapps.verify_student.services import IDVerificationService
-from third_party_auth.models import SAMLProviderConfig
+from common.djangoapps.third_party_auth.models import SAMLProviderConfig
 
 TEMPLATE_PATH = 'support/link_program_enrollments.html'
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
