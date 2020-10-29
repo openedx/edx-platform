@@ -876,7 +876,7 @@ CONTEXT_PROCESSORS = [
     'sekizai.context_processors.sekizai',
 
     # Hack to get required link URLs to password reset templates
-    'edxmako.shortcuts.marketing_link_context_processor',
+    'common.djangoapps.edxmako.shortcuts.marketing_link_context_processor',
 
     # Timezone processor (sends language and time_zone preference)
     'lms.djangoapps.courseware.context_processor.user_timezone_locale_prefs',
@@ -910,8 +910,8 @@ TEMPLATES = [
                 # We have to use mako-aware template loaders to be able to include
                 # mako templates inside django templates (such as main_django.html).
                 'openedx.core.djangoapps.theming.template_loaders.ThemeTemplateLoader',
-                'edxmako.makoloader.MakoFilesystemLoader',
-                'edxmako.makoloader.MakoAppDirectoriesLoader',
+                'common.djangoapps.edxmako.makoloader.MakoFilesystemLoader',
+                'common.djangoapps.edxmako.makoloader.MakoAppDirectoriesLoader',
             ],
             'context_processors': CONTEXT_PROCESSORS,
             # Change 'debug' in your environment settings files - not here.
@@ -920,7 +920,7 @@ TEMPLATES = [
     },
     {
         'NAME': 'mako',
-        'BACKEND': 'edxmako.backend.Mako',
+        'BACKEND': 'common.djangoapps.edxmako.backend.Mako',
         # Don't look for template source files inside installed applications.
         'APP_DIRS': False,
         # Instead, look for template source files in these dirs.
@@ -1206,7 +1206,7 @@ MODULESTORE = {
                     'OPTIONS': {
                         'default_class': 'xmodule.hidden_module.HiddenDescriptor',
                         'fs_root': DATA_DIR,
-                        'render_template': 'edxmako.shortcuts.render_to_string',
+                        'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
                 },
                 {
@@ -1216,7 +1216,7 @@ MODULESTORE = {
                     'OPTIONS': {
                         'default_class': 'xmodule.hidden_module.HiddenDescriptor',
                         'fs_root': DATA_DIR,
-                        'render_template': 'edxmako.shortcuts.render_to_string',
+                        'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
                 }
             ]
@@ -2422,7 +2422,7 @@ INSTALLED_APPS = [
     'status',
 
     # For asset pipelining
-    'edxmako.apps.EdxMakoConfig',
+    'common.djangoapps.edxmako.apps.EdxMakoConfig',
     'pipeline',
     'static_replace',
     'webpack_loader',

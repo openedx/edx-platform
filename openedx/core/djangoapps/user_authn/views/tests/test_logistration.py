@@ -367,7 +367,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         }
         pipeline_target = 'openedx.core.djangoapps.user_authn.views.login_form.third_party_auth.pipeline'
         with simulate_running_pipeline(pipeline_target, current_backend, **pipeline_response):
-            with mock.patch('edxmako.request_context.get_current_request', return_value=request):
+            with mock.patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=request):
                 response = login_and_registration_form(request)
 
         expected_error_message = Text(_(

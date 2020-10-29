@@ -27,7 +27,7 @@ from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.courseware.testutils import FieldOverrideTestMixin
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import get_override_for_ccx, override_field_for_ccx
 from lms.djangoapps.ccx.tests.factories import CcxFactory

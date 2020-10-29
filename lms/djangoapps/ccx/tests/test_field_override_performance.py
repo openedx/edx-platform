@@ -76,7 +76,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
         messages = FallbackStorage(self.request)
         self.request._messages = messages  # pylint: disable=protected-access
 
-        patcher = mock.patch('edxmako.request_context.get_current_request', return_value=self.request)
+        patcher = mock.patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=self.request)
         patcher.start()
         self.addCleanup(patcher.stop)
         self.course = None

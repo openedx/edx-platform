@@ -19,7 +19,7 @@ from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
 from cms.djangoapps.contentstore.management.commands.utils import get_course_versions
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.features.announcements.forms import AnnouncementForm
 from openedx.features.announcements.models import Announcement
 from util.json_request import JsonResponse

@@ -507,8 +507,8 @@ TEMPLATES = [
                 # We have to use mako-aware template loaders to be able to include
                 # mako templates inside django templates (such as main_django.html).
                 'openedx.core.djangoapps.theming.template_loaders.ThemeTemplateLoader',
-                'edxmako.makoloader.MakoFilesystemLoader',
-                'edxmako.makoloader.MakoAppDirectoriesLoader',
+                'common.djangoapps.edxmako.makoloader.MakoFilesystemLoader',
+                'common.djangoapps.edxmako.makoloader.MakoAppDirectoriesLoader',
             ),
             'context_processors': CONTEXT_PROCESSORS,
             # Change 'debug' in your environment settings files - not here.
@@ -517,7 +517,7 @@ TEMPLATES = [
     },
     {
         'NAME': 'mako',
-        'BACKEND': 'edxmako.backend.Mako',
+        'BACKEND': 'common.djangoapps.edxmako.backend.Mako',
         'APP_DIRS': False,
         'DIRS': _make_mako_template_dirs,
         'OPTIONS': {
@@ -528,7 +528,7 @@ TEMPLATES = [
     {
         # This separate copy of the Mako backend is used to render previews using the LMS templates
         'NAME': 'preview',
-        'BACKEND': 'edxmako.backend.Mako',
+        'BACKEND': 'common.djangoapps.edxmako.backend.Mako',
         'APP_DIRS': False,
         'DIRS': lms.envs.common.MAKO_TEMPLATE_DIRS_BASE,
         'OPTIONS': {
@@ -828,7 +828,7 @@ MODULESTORE = {
                     'OPTIONS': {
                         'default_class': 'xmodule.hidden_module.HiddenDescriptor',
                         'fs_root': DATA_DIR,
-                        'render_template': 'edxmako.shortcuts.render_to_string',
+                        'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
                 },
                 {
@@ -838,7 +838,7 @@ MODULESTORE = {
                     'OPTIONS': {
                         'default_class': 'xmodule.hidden_module.HiddenDescriptor',
                         'fs_root': DATA_DIR,
-                        'render_template': 'edxmako.shortcuts.render_to_string',
+                        'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
                 }
             ]
@@ -1353,7 +1353,7 @@ INSTALLED_APPS = [
     'eventtracking.django.apps.EventTrackingConfig',
 
     # For asset pipelining
-    'edxmako.apps.EdxMakoConfig',
+    'common.djangoapps.edxmako.apps.EdxMakoConfig',
     'pipeline',
     'static_replace',
     'require',

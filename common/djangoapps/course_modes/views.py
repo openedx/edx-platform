@@ -27,7 +27,7 @@ from six import text_type
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.helpers import get_course_final_price
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from openedx.core.djangoapps.catalog.utils import get_currency_data

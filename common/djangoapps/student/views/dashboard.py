@@ -25,7 +25,7 @@ import track.views
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models import Optout
 from common.djangoapps.course_modes.models import CourseMode
-from edxmako.shortcuts import render_to_response, render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access

@@ -21,7 +21,7 @@ from six.moves import range
 from common.test.utils import XssTestMixin
 from common.djangoapps.course_modes.models import CourseMode
 from edx_toggles.toggles.testutils import override_waffle_flag
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.tests.factories import StaffFactory, StudentModuleFactory, UserFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase

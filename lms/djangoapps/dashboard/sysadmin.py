@@ -32,7 +32,7 @@ import lms.djangoapps.dashboard.git_import as git_import
 import track.views
 from lms.djangoapps.dashboard.git_import import GitImportError
 from lms.djangoapps.dashboard.models import CourseImportLog
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.courseware.courses import get_course_by_id
 from openedx.core.djangolib.markup import HTML
 from student.models import CourseEnrollment, Registration, UserProfile

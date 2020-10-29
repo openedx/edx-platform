@@ -21,7 +21,7 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.lib.xblock_utils import get_aside_from_xblock, is_xblock_aside
 from student.auth import has_course_author_access
 from xblock_django.api import authorable_xblocks, disabled_xblocks

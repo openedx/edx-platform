@@ -3,7 +3,7 @@ from django.core.exceptions import PermissionDenied
 from django.views.decorators.csrf import ensure_csrf_cookie
 from opaque_keys.edx.keys import CourseKey
 
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from student.auth import has_course_author_access
 from xmodule.modulestore.django import modulestore
 

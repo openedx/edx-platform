@@ -18,7 +18,7 @@ from cms.djangoapps.course_creators.models import (
     update_creator_state
 )
 from cms.djangoapps.course_creators.views import update_course_creator_group
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 
 log = logging.getLogger("studio.coursecreatoradmin")
 
