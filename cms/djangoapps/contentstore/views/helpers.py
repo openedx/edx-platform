@@ -12,8 +12,8 @@ from opaque_keys.edx.keys import UsageKey
 from xblock.core import XBlock
 
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
-from edxmako.shortcuts import render_to_string
 from openedx.core.toggles import ENTRANCE_EXAMS
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import StaticTab
 

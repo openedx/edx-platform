@@ -12,7 +12,7 @@ from celery.states import FAILURE
 from django.conf import settings
 from django.core.mail import EmailMessage
 
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 ACE_ROUTING_KEY = getattr(settings, 'ACE_ROUTING_KEY', None)

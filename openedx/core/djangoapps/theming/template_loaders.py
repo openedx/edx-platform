@@ -5,7 +5,7 @@ Theming aware template loaders.
 
 from django.template.loaders.filesystem import Loader as FilesystemLoader
 
-from edxmako.makoloader import MakoLoader
+from common.djangoapps.edxmako.makoloader import MakoLoader
 from openedx.core.djangoapps.theming.helpers import get_all_theme_template_dirs, get_current_request, get_current_theme
 
 

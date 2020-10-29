@@ -6,7 +6,7 @@ Support tool for changing and granting course entitlements
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from entitlements.models import CourseEntitlementSupportDetail
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.support.decorators import require_support_permission

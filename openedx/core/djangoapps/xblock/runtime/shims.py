@@ -14,7 +14,7 @@ from fs.memoryfs import MemoryFS
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 import six
 
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 
 
 class RuntimeShim(object):

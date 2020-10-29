@@ -6,7 +6,7 @@ from pipeline.conf import settings
 from pipeline.packager import Packager
 from pipeline.utils import guess_type
 
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from static_replace import try_staticfiles_lookup
 
 

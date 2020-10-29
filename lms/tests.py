@@ -7,7 +7,7 @@ import mimetypes
 from django.conf import settings
 from django.test import TestCase
 
-from edxmako import LOOKUP, add_lookup
+from common.djangoapps.edxmako import LOOKUP, add_lookup
 
 log = logging.getLogger(__name__)
 
