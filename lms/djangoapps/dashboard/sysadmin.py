@@ -10,13 +10,12 @@ import os
 import subprocess
 
 import mongoengine
-import unicodecsv as csv
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import IntegrityError
-from django.http import Http404, HttpResponse
+from django.http import Http404
 from django.utils.decorators import method_decorator
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
@@ -70,38 +69,6 @@ class SysadminDashboardView(TemplateView):
         """ Get an iterable list of courses."""
 
         return self.def_ms.get_courses()
-
-    def return_csv(self, filename, header, data):
-        """
-        Convenient function for handling the http response of a csv.
-        data should be iterable and is used to stream object over http
-        """
-
-        csv_file = StringIO()
-        writer = csv.writer(csv_file, dialect='excel', quotechar='"',
-                            quoting=csv.QUOTE_ALL)
-
-        writer.writerow(header)
-
-        # Setup streaming of the data
-        def read_and_flush():
-            """Read and clear buffer for optimization"""
-            csv_file.seek(0)
-            csv_data = csv_file.read()
-            csv_file.seek(0)
-            csv_file.truncate()
-            return csv_data
-
-        def csv_data():
-            """Generator for handling potentially large CSVs"""
-            for row in data:
-                writer.writerow(row)
-            csv_data = read_and_flush()
-            yield csv_data
-        response = HttpResponse(csv_data(), content_type='text/csv')
-        response['Content-Disposition'] = u'attachment; filename={0}'.format(
-            filename)
-        return response
 
 
 class Users(SysadminDashboardView):
@@ -211,13 +178,7 @@ class Users(SysadminDashboardView):
         action = request.POST.get('action', '')
         track.views.server_track(request, action, {}, page='user_sysdashboard')
 
-        if action == 'download_users':
-            header = [_('username'), _('email'), ]
-            data = ([u.username, u.email] for u in
-                    (User.objects.all().iterator()))
-            return self.return_csv('users_{0}.csv'.format(
-                request.META['SERVER_NAME']), header, data)
-        elif action == 'create_user':
+        if action == 'create_user':
             uname = request.POST.get('student_uname', '').strip()
             name = request.POST.get('student_fullname', '').strip()
             password = request.POST.get('student_password', '').strip()
@@ -419,7 +380,7 @@ class Courses(SysadminDashboardView):
 class Staffing(SysadminDashboardView):
     """
     The status view provides a view of staffing and enrollment in
-    courses that include an option to download the data as a csv.
+    courses.
     """
 
     def get(self, request):
@@ -450,31 +411,6 @@ class Staffing(SysadminDashboardView):
             'modeflag': {'staffing': 'active-section'},
         }
         return render_to_response(self.template_name, context)
-
-    def post(self, request):
-        """Handle all actions from staffing and enrollment view"""
-
-        action = request.POST.get('action', '')
-        track.views.server_track(request, action, {},
-                                 page='staffing_sysdashboard')
-
-        if action == 'get_staff_csv':
-            data = []
-            roles = [CourseInstructorRole, CourseStaffRole, ]
-
-            for course in self.get_courses():
-                for role in roles:
-                    for user in role(course.id).users_with_role():
-                        datum = [course.id, role, user.username, user.email,
-                                 user.profile.name.encode('utf-8')]
-                        data.append(datum)
-            header = [_('course_id'),
-                      _('role'), _('username'),
-                      _('email'), _('full_name'), ]
-            return self.return_csv('staff_{0}.csv'.format(
-                request.META['SERVER_NAME']), header, data)
-
-        return self.get(request)
 
 
 class GitLogs(TemplateView):
