@@ -127,7 +127,3 @@ pymongo<3.11
 
 # vulture 2.0 requires Python >= 3.6
 vulture<2.0
-
-
-# edx-sga==0.12.0 is breaking one test
-edx-sga==0.11.1
