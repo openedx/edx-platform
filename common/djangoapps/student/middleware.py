@@ -10,7 +10,7 @@ from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import ugettext as _
 
 from openedx.core.djangolib.markup import HTML, Text
-from student.models import UserStanding
+from common.djangoapps.student.models import UserStanding
 
 
 class UserStandingMiddleware(MiddlewareMixin):

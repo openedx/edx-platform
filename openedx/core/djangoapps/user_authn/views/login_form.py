@@ -33,7 +33,7 @@ from openedx.features.enterprise_support.utils import (
     get_enterprise_slug_login_url,
     update_logistration_context_for_enterprise,
 )
-from student.helpers import get_next_url_for_login_page
+from common.djangoapps.student.helpers import get_next_url_for_login_page
 from third_party_auth import pipeline
 from third_party_auth.decorators import xframe_allow_whitelisted
 from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH

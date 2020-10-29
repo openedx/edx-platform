@@ -9,7 +9,7 @@ from requests.exceptions import ConnectionError, Timeout  # pylint: disable=rede
 from slumber.exceptions import SlumberBaseException
 
 from common.djangoapps.course_modes.models import CourseMode
-from student.helpers import VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED
+from common.djangoapps.student.helpers import VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 
 DISPLAY_VERIFIED = "verified"

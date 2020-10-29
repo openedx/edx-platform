@@ -10,7 +10,7 @@ from django.db import transaction
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from track.management.tracked_command import TrackedCommand
 
 

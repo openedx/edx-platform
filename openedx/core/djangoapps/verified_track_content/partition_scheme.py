@@ -16,7 +16,7 @@ from lms.djangoapps.courseware.masquerade import (
     is_masquerading_as_specific_student
 )
 from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from xmodule.partitions.partitions import Group, UserPartition
 
 LOGGER = logging.getLogger(__name__)

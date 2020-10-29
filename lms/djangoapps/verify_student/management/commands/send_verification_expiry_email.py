@@ -17,7 +17,7 @@ from django.urls import reverse
 from django.utils.timezone import now
 from edx_ace import ace
 from edx_ace.recipient import Recipient
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from util.query import use_read_replica_if_available
 
 from lms.djangoapps.verify_student.message_types import VerificationExpiry

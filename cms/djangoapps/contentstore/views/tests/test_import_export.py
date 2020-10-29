@@ -31,8 +31,8 @@ from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from openedx.core.lib.extract_tar import safetar_extractall
-from student import auth
-from student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student import auth
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from util import milestones_helpers
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import LIBRARY_ROOT, ModuleStoreEnum

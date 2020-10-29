@@ -21,7 +21,7 @@ from openedx.features.course_experience.utils import dates_banner_should_display
 
 import track.views
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from student.roles import GlobalStaff
+from common.djangoapps.student.roles import GlobalStaff
 
 log = logging.getLogger(__name__)
 

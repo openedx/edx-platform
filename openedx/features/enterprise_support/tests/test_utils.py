@@ -17,7 +17,7 @@ from openedx.features.enterprise_support.tests.factories import (
     EnterpriseCustomerUserFactory
 )
 from openedx.features.enterprise_support.utils import ENTERPRISE_HEADER_LINKS, get_enterprise_learner_portal
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 @ddt.ddt

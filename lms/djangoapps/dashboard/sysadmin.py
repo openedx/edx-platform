@@ -35,8 +35,8 @@ from lms.djangoapps.dashboard.models import CourseImportLog
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.courseware.courses import get_course_by_id
 from openedx.core.djangolib.markup import HTML
-from student.models import CourseEnrollment, Registration, UserProfile
-from student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.models import CourseEnrollment, Registration, UserProfile
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)

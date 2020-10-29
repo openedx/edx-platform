@@ -18,8 +18,8 @@ from six import text_type
 
 from lms.djangoapps.bulk_email.models import BulkEmailFlag
 from lms.djangoapps.bulk_email.policies import CourseEmailOptout
-from student.models import CourseEnrollment
-from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

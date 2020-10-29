@@ -10,7 +10,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import models
 from django.urls import reverse
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from third_party_auth.admin import OAuth2ProviderConfigAdmin
 from third_party_auth.models import OAuth2ProviderConfig
 from third_party_auth.tests import testutil

@@ -37,10 +37,10 @@ from openedx.core.djangoapps.user_authn.views.password_reset import (
     SETTING_CHANGE_INITIATED, password_reset, password_reset_logistration,
     PasswordResetConfirmWrapper)
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from student.tests.factories import TEST_PASSWORD, UserFactory
-from student.tests.test_configuration_overrides import fake_get_value
-from student.tests.test_email import mock_render_to_string
-from student.models import AccountRecovery
+from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory
+from common.djangoapps.student.tests.test_configuration_overrides import fake_get_value
+from common.djangoapps.student.tests.test_email import mock_render_to_string
+from common.djangoapps.student.models import AccountRecovery
 
 from util.password_policy_validators import create_validator_config
 from util.testing import EventTestMixin

@@ -12,7 +12,7 @@ from openedx.core.djangoapps.password_policy.compliance import (
     NonCompliantPasswordException, NonCompliantPasswordWarning
 )
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class PasswordPolicyAwareAdminAuthFormTests(TestCase):

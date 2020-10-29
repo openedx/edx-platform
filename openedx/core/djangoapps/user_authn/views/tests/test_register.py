@@ -52,8 +52,8 @@ from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
 from openedx.core.djangoapps.user_authn.views.register import REGISTRATION_FAILURE_LOGGING_FLAG
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.api import test_utils
-from student.helpers import authenticate_new_user
-from student.tests.factories import UserFactory
+from common.djangoapps.student.helpers import authenticate_new_user
+from common.djangoapps.student.tests.factories import UserFactory
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
 from third_party_auth.tests.utils import (
     ThirdPartyOAuthTestMixin,

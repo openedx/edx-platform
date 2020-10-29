@@ -41,9 +41,9 @@ from openedx.core.djangoapps.user_api.models import RetirementState, UserOrgTag,
 from openedx.core.lib.django_test_client_utils import get_absolute_url
 from openedx.features.enterprise_support.tests import FAKE_ENTERPRISE_CUSTOMER
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
-from student.models import CourseEnrollment
-from student.roles import CourseStaffRole
-from student.tests.factories import AdminFactory, SuperuserFactory, UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import AdminFactory, SuperuserFactory, UserFactory
 from util.models import RateLimitConfiguration
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

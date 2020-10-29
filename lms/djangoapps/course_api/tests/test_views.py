@@ -26,9 +26,9 @@ from opaque_keys.edx.locator import LibraryLocator
 from openedx.core.lib.api.view_utils import LazySequence
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from student.auth import add_users
-from student.roles import CourseInstructorRole, CourseStaffRole
-from student.tests.factories import AdminFactory
+from common.djangoapps.student.auth import add_users
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

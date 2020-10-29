@@ -13,8 +13,8 @@ from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
 
 from common.djangoapps.course_modes.models import CourseMode
-from student.api import get_access_role_by_role_name
-from student.models import CourseEnrollmentException
+from common.djangoapps.student.api import get_access_role_by_role_name
+from common.djangoapps.student.models import CourseEnrollmentException
 
 from .reading import fetch_program_enrollments
 from .writing import enroll_in_masters_track

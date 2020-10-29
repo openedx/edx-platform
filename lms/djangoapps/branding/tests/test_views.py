@@ -18,7 +18,7 @@ from openedx.core.djangoapps.lang_pref.api import released_languages
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 @ddt.ddt
@@ -280,7 +280,7 @@ class TestIndex(SiteMixin, TestCase):
         """ Set up a user """
         super(TestIndex, self).setUp()
 
-        patcher = mock.patch("student.models.tracker")
+        patcher = mock.patch("common.djangoapps.student.models.tracker")
         self.mock_tracker = patcher.start()
         self.user = UserFactory.create()
         self.user.set_password("password")

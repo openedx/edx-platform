@@ -40,7 +40,7 @@ from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.xblock_utils import hash_resource, request_token, wrap_xblock, wrap_xblock_aside
 from common.djangoapps.static_replace import replace_static_urls
-from student.auth import has_studio_read_access, has_studio_write_access
+from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
 from util.date_utils import get_default_time_display
 from util.json_request import JsonResponse, expect_json
 from openedx.core.toggles import ENTRANCE_EXAMS

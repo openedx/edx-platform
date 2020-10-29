@@ -650,7 +650,7 @@ def certificate_info_for_user(user, course_id, grade, user_is_whitelisted, user_
     """
     Returns the certificate info for a user for grade report.
     """
-    from student.models import CourseEnrollment
+    from common.djangoapps.student.models import CourseEnrollment
 
     certificate_is_delivered = 'N'
     certificate_type = 'N/A'

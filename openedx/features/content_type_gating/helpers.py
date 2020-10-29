@@ -8,8 +8,8 @@ from django.utils import timezone
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.config_model_utils.utils import is_in_holdback
-from student.models import CourseEnrollment
-from student.role_helpers import has_staff_roles
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.role_helpers import has_staff_roles
 from xmodule.partitions.partitions import Group
 
 # Studio generates partition IDs starting at 100. There is already a manually generated

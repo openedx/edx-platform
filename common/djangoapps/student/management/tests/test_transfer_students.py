@@ -13,14 +13,14 @@ from opaque_keys.edx import locator
 from six import text_type
 
 from common.djangoapps.course_modes.models import CourseMode
-from student.models import (
+from common.djangoapps.student.models import (
     EVENT_NAME_ENROLLMENT_ACTIVATED,
     EVENT_NAME_ENROLLMENT_DEACTIVATED,
     EVENT_NAME_ENROLLMENT_MODE_CHANGED,
     CourseEnrollment
 )
-from student.signals import UNENROLL_DONE
-from student.tests.factories import UserFactory
+from common.djangoapps.student.signals import UNENROLL_DONE
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -42,7 +42,7 @@ class TestTransferStudents(ModuleStoreTestCase):
         super(TestTransferStudents, self).setUp()
 
         UNENROLL_DONE.connect(self.assert_unenroll_signal)
-        patcher = patch('student.models.tracker')
+        patcher = patch('common.djangoapps.student.models.tracker')
         self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
         self.addCleanup(UNENROLL_DONE.disconnect, self.assert_unenroll_signal)

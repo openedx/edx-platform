@@ -56,20 +56,20 @@ from openedx.core.djangoapps.user_authn.views.registration_form import (
     RegistrationFormFactory,
     get_registration_extension_form
 )
-from student.helpers import (
+from common.djangoapps.student.helpers import (
     AccountValidationError,
     authenticate_new_user,
     create_or_set_user_attribute_created_on_site,
     do_create_account
 )
-from student.models import (
+from common.djangoapps.student.models import (
     RegistrationCookieConfiguration,
     UserAttribute,
     create_comments_service_user,
     email_exists_or_retired,
     username_exists_or_retired
 )
-from student.views import compose_and_send_activation_email
+from common.djangoapps.student.views import compose_and_send_activation_email
 from third_party_auth import pipeline, provider
 from third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
 from track import segment

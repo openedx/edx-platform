@@ -8,8 +8,8 @@ from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.external_user_ids.models import ExternalIdType
-from student.models import anonymous_id_for_user
-from student.tests.factories import AnonymousUserFactory, UserFactory
+from common.djangoapps.student.models import anonymous_id_for_user
+from common.djangoapps.student.tests.factories import AnonymousUserFactory, UserFactory
 from xblock_django.user_service import (
     ATTR_KEY_IS_AUTHENTICATED,
     ATTR_KEY_USER_ID,

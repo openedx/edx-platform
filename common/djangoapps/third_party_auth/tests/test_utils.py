@@ -7,7 +7,7 @@ import unittest
 
 from django.conf import settings
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from third_party_auth.tests.testutil import TestCase
 from third_party_auth.utils import user_exists, convert_saml_slug_provider_id
 

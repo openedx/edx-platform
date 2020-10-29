@@ -24,7 +24,7 @@ from lms.djangoapps.courseware.views.index import save_positions_recursively_up
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
 from lms.djangoapps.mobile_api.utils import API_V05
 from openedx.features.course_duration_limits.access import check_course_expired
-from student.models import CourseEnrollment, User
+from common.djangoapps.student.models import CourseEnrollment, User
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 

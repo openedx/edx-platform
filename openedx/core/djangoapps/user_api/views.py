@@ -30,7 +30,7 @@ from openedx.core.djangoapps.user_api.serializers import (
     UserSerializer
 )
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
-from student.helpers import AccountValidationError
+from common.djangoapps.student.helpers import AccountValidationError
 from util.json_request import JsonResponse
 
 

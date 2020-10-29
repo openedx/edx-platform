@@ -18,7 +18,7 @@ from requests import Timeout
 from slumber.exceptions import HttpServerError, SlumberBaseException
 
 from enterprise.models import EnterpriseCourseEnrollment
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 
 from util.query import use_read_replica_if_available

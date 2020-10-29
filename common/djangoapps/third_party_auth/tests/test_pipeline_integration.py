@@ -13,7 +13,7 @@ from django.core import mail
 from social_django import models as social_models
 
 from lms.djangoapps.verify_student.models import SSOVerification
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from third_party_auth import pipeline, provider
 from third_party_auth.tests import testutil
 from third_party_auth.tests.utils import skip_unless_thirdpartyauth

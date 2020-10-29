@@ -8,8 +8,8 @@ from django.core.cache import cache
 from django.core.exceptions import ValidationError
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from student.models import UserProfile
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import UserProfile
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 @ddt.ddt

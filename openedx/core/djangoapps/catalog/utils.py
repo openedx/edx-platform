@@ -30,7 +30,7 @@ from openedx.core.djangoapps.catalog.cache import (
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.lib.edx_api_utils import get_edx_api_data
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 
 logger = logging.getLogger(__name__)
 

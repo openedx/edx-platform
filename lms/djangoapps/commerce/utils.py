@@ -18,7 +18,7 @@ from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, is_commerce_service_configured
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 
 from .models import CommerceConfiguration
 

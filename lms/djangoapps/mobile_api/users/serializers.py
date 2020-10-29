@@ -10,7 +10,7 @@ from rest_framework.reverse import reverse
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.certificates.api import certificate_downloadable_status
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
-from student.models import CourseEnrollment, User
+from common.djangoapps.student.models import CourseEnrollment, User
 from util.course import get_encoded_course_sharing_utm_params, get_link_for_about_page
 
 

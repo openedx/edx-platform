@@ -13,10 +13,10 @@ from opaque_keys.edx.locator import LibraryLocator
 
 from cms.djangoapps.course_creators.views import user_requested_access
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from student import auth
-from student.auth import STUDIO_EDIT_ROLES, STUDIO_VIEW_USERS, get_user_permissions
-from student.models import CourseEnrollment
-from student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
+from common.djangoapps.student import auth
+from common.djangoapps.student.auth import STUDIO_EDIT_ROLES, STUDIO_VIEW_USERS, get_user_permissions
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
 from util.json_request import JsonResponse, expect_json
 from xmodule.modulestore.django import modulestore
 

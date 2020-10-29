@@ -190,7 +190,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         )
         self.factory = RequestFactory()
 
-    @patch('student.views.management.render_to_response', RENDER_MOCK)
+    @patch('common.djangoapps.student.views.management.render_to_response', RENDER_MOCK)
     @patch('lms.djangoapps.courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     def test_course_discovery_off(self):
@@ -214,7 +214,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         # make sure we have the special css class on the section
         self.assertContains(response, '<div class="courses no-course-discovery"')
 
-    @patch('student.views.management.render_to_response', RENDER_MOCK)
+    @patch('common.djangoapps.student.views.management.render_to_response', RENDER_MOCK)
     @patch('lms.djangoapps.courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': True})
     def test_course_discovery_on(self):
@@ -236,7 +236,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertContains(response, '<aside aria-label="Refine Your Search" class="search-facets phone-menu">')
         self.assertContains(response, '<div class="courses"')
 
-    @patch('student.views.management.render_to_response', RENDER_MOCK)
+    @patch('common.djangoapps.student.views.management.render_to_response', RENDER_MOCK)
     @patch('lms.djangoapps.courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     def test_course_cards_sorted_by_default_sorting(self):
@@ -261,7 +261,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertEqual(context['courses'][1].id, self.starting_later.id)
         self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
 
-    @patch('student.views.management.render_to_response', RENDER_MOCK)
+    @patch('common.djangoapps.student.views.management.render_to_response', RENDER_MOCK)
     @patch('lms.djangoapps.courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_SORTING_BY_START_DATE': False})
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
@@ -294,7 +294,7 @@ class IndexPageProgramsTests(SiteMixin, ModuleStoreTestCase):
     """
     def test_get_programs_with_type_called(self):
         views = [
-            (reverse('root'), 'student.views.management.get_programs_with_type'),
+            (reverse('root'), 'common.djangoapps.student.views.management.get_programs_with_type'),
             (reverse('courses'), 'lms.djangoapps.courseware.views.views.get_programs_with_type'),
         ]
         for url, dotted_path in views:

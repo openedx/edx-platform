@@ -20,8 +20,8 @@ from lms.djangoapps.program_enrollments.api import fetch_program_enrollments
 from lms.djangoapps.program_enrollments.constants import ProgramEnrollmentStatuses
 from openedx.core.djangoapps.catalog.utils import course_run_keys_for_program, get_programs, is_course_run_in_program
 from openedx.core.lib.api.view_utils import verify_course_exists
-from student.helpers import get_resume_urls_for_enrollments
-from student.models import CourseEnrollment
+from common.djangoapps.student.helpers import get_resume_urls_for_enrollments
+from common.djangoapps.student.models import CourseEnrollment
 
 from .constants import CourseRunProgressStatuses
 

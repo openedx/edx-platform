@@ -17,9 +17,9 @@ from lms.djangoapps.program_enrollments.tests.factories import (
     ProgramEnrollmentFactory
 )
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from student.api import get_course_access_role
-from student.roles import CourseStaffRole
-from student.tests.factories import CourseAccessRoleFactory, UserFactory
+from common.djangoapps.student.api import get_course_access_role
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import CourseAccessRoleFactory, UserFactory
 
 from ..linking import (
     NO_LMS_USER_TEMPLATE,

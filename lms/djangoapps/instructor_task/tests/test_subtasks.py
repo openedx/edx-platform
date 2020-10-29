@@ -11,7 +11,7 @@ from six.moves import range
 from lms.djangoapps.instructor_task.subtasks import queue_subtasks_for_query
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskCourseTestCase
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 
 
 class TestSubtasks(InstructorTaskCourseTestCase):

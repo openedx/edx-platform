@@ -12,7 +12,7 @@ from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (
     setup_retirement_states
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 pytestmark = pytest.mark.django_db

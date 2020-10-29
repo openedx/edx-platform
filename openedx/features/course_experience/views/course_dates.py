@@ -18,7 +18,7 @@ from lms.djangoapps.courseware.tabs import DatesTab
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
 from lms.djangoapps.course_home_api.utils import get_microfrontend_url
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 
 
 class CourseDatesFragmentView(EdxFragmentView):

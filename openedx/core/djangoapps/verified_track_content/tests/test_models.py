@@ -18,8 +18,8 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     set_course_cohorted
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.models import CourseMode
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.models import CourseMode
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

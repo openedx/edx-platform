@@ -17,7 +17,7 @@ from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, Cours
 from cms.djangoapps.contentstore.utils import reverse_url
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from util import milestones_helpers
 from xmodule.modulestore.django import modulestore
 

@@ -23,7 +23,7 @@ from common.djangoapps.entitlements.models import CourseEntitlement
 from lms.djangoapps.experiments.models import ExperimentData
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
 from openedx.features.discounts.models import DiscountPercentageConfig, DiscountRestrictionConfig
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from track import segment
 
 # .. toggle_name: discounts.enable_discounting

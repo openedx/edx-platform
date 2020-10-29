@@ -1654,7 +1654,7 @@ MIDDLEWARE = [
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
     'openedx.core.djangoapps.cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
 
-    'student.middleware.UserStandingMiddleware',
+    'common.djangoapps.student.middleware.UserStandingMiddleware',
     'openedx.core.djangoapps.contentserver.middleware.StaticContentServer',
 
     # Adds user tags to tracking events
@@ -2419,7 +2419,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.service_status',
 
     # Display status message to students
-    'status',
+    'common.djangoapps.status',
 
     # For asset pipelining
     'common.djangoapps.edxmako.apps.EdxMakoConfig',
@@ -2446,7 +2446,7 @@ INSTALLED_APPS = [
     # Our courseware
     'lms.djangoapps.courseware',
     'lms.djangoapps.coursewarehistoryextended',
-    'student.apps.StudentConfig',
+    'common.djangoapps.student.apps.StudentConfig',
 
     'lms.djangoapps.static_template_view',
     'lms.djangoapps.staticbook',

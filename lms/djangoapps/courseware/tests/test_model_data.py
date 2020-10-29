@@ -23,7 +23,7 @@ from lms.djangoapps.courseware.models import (
 from lms.djangoapps.courseware.tests.factories import StudentInfoFactory
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory as cmfStudentModuleFactory
 from lms.djangoapps.courseware.tests.factories import StudentPrefsFactory, UserStateSummaryFactory, course_id, location
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 def mock_field(scope, name):
