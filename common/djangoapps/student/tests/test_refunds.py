@@ -25,8 +25,8 @@ from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.commerce.utils import ECOMMERCE_DATE_FORMAT
-from student.models import CourseEnrollment, CourseEnrollmentAttribute, EnrollmentRefundConfiguration
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAttribute, EnrollmentRefundConfiguration
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -65,13 +65,13 @@ class RefundableTest(SharedModuleStoreTestCase):
         self.client = Client()
         cache.clear()
 
-    @patch('student.models.CourseEnrollment.refund_cutoff_date')
+    @patch('common.djangoapps.student.models.CourseEnrollment.refund_cutoff_date')
     def test_refundable(self, cutoff_date):
         """ Assert base case is refundable"""
         cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(days=1)
         self.assertTrue(self.enrollment.refundable())
 
-    @patch('student.models.CourseEnrollment.refund_cutoff_date')
+    @patch('common.djangoapps.student.models.CourseEnrollment.refund_cutoff_date')
     def test_refundable_expired_verification(self, cutoff_date):
         """ Assert that enrollment is refundable if course mode has expired."""
         cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(days=1)
@@ -79,7 +79,7 @@ class RefundableTest(SharedModuleStoreTestCase):
         self.verified_mode.save()
         self.assertTrue(self.enrollment.refundable())
 
-    @patch('student.models.CourseEnrollment.refund_cutoff_date')
+    @patch('common.djangoapps.student.models.CourseEnrollment.refund_cutoff_date')
     def test_refundable_when_certificate_exists(self, cutoff_date):
         """ Assert that enrollment is not refundable once a certificat has been generated."""
 
@@ -110,7 +110,7 @@ class RefundableTest(SharedModuleStoreTestCase):
             )
         )
 
-    @patch('student.models.CourseEnrollment.refund_cutoff_date')
+    @patch('common.djangoapps.student.models.CourseEnrollment.refund_cutoff_date')
     def test_refundable_with_cutoff_date(self, cutoff_date):
         """ Assert enrollment is refundable before cutoff and not refundable after."""
         cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(days=1)
@@ -158,7 +158,7 @@ class RefundableTest(SharedModuleStoreTestCase):
             value=self.ORDER_NUMBER
         )
 
-        with patch('student.models.EnrollmentRefundConfiguration.current') as config:
+        with patch('common.djangoapps.student.models.EnrollmentRefundConfiguration.current') as config:
             instance = config.return_value
             instance.refund_window = refund_period
             self.assertEqual(

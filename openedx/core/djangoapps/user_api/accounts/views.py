@@ -52,7 +52,7 @@ from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
-from student.models import (
+from common.djangoapps.student.models import (
     AccountRecovery,
     CourseEnrollment,
     CourseEnrollmentAllowed,

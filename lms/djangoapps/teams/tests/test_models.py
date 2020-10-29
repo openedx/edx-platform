@@ -31,7 +31,7 @@ from openedx.core.djangoapps.django_comment_common.signals import (
     thread_voted
 )
 from openedx.core.lib.teams_config import TeamsConfig
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import EventTestMixin
 
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase

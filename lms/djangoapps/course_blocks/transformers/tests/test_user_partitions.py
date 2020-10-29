@@ -20,7 +20,7 @@ from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, c
 from openedx.core.djangoapps.course_groups.views import link_cohort_to_partition_group
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import create_content_gating_partition
-from student.tests.factories import CourseEnrollmentFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.partitions.partitions import Group, UserPartition
 

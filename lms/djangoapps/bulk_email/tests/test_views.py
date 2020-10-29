@@ -15,7 +15,7 @@ from six import text_type
 
 from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher
 from openedx.core.lib.tests import attr
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 

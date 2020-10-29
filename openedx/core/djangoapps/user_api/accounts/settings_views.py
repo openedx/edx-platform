@@ -32,7 +32,7 @@ from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from openedx.features.enterprise_support.utils import update_account_settings_context_for_enterprise
-from student.models import UserProfile
+from common.djangoapps.student.models import UserProfile
 from third_party_auth import pipeline
 from util.date_utils import strftime_localized
 

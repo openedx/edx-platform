@@ -12,8 +12,8 @@ from six.moves import range
 from lms.djangoapps.ccx.overrides import override_field_for_ccx
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
-from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
-from student.tests.factories import UserFactory
+from common.djangoapps.student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

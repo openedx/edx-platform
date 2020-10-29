@@ -41,8 +41,8 @@ from six import text_type
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from student.auth import has_studio_write_access
-from student.roles import GlobalStaff
+from common.djangoapps.student.auth import has_studio_write_access
+from common.djangoapps.student.roles import GlobalStaff
 from util.db import MYSQL_MAX_INT, generate_int_id
 from util.json_request import JsonResponse
 from xmodule.modulestore import EdxJSONEncoder

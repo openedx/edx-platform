@@ -16,9 +16,9 @@ from cms.djangoapps.contentstore.views.item import _duplicate_item
 from cms.djangoapps.contentstore.views.preview import _load_preview_module
 from cms.djangoapps.contentstore.views.tests.test_library import LIBRARY_REST_URL
 from cms.djangoapps.course_creators.views import add_user_with_status_granted
-from student import auth
-from student.auth import has_studio_read_access, has_studio_write_access
-from student.roles import (
+from common.djangoapps.student import auth
+from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
+from common.djangoapps.student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
     LibraryUserRole,
@@ -26,7 +26,7 @@ from student.roles import (
     OrgLibraryUserRole,
     OrgStaffRole
 )
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

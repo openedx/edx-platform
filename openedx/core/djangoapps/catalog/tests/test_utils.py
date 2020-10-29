@@ -59,7 +59,7 @@ from openedx.core.djangoapps.catalog.utils import (
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 
 UTILS_MODULE = 'openedx.core.djangoapps.catalog.utils'

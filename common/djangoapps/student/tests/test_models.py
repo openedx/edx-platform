@@ -18,7 +18,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.models import (
+from common.djangoapps.student.models import (
     ALLOWEDTOENROLL_TO_ENROLLED,
     AccountRecovery,
     CourseEnrollment,
@@ -27,7 +27,7 @@ from student.models import (
     PendingEmailChange,
     PendingNameChange
 )
-from student.tests.factories import AccountRecoveryFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import AccountRecoveryFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

@@ -48,9 +48,9 @@ from openedx.features.enterprise_support.api import (
     get_dashboard_consent_notification,
     get_enterprise_learner_portal_enabled_message
 )
-from student.api import COURSE_DASHBOARD_PLUGIN_VIEW_NAME
-from student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
-from student.models import (
+from common.djangoapps.student.api import COURSE_DASHBOARD_PLUGIN_VIEW_NAME
+from common.djangoapps.student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
+from common.djangoapps.student.models import (
     AccountRecovery,
     CourseEnrollment,
     CourseEnrollmentAttribute,

@@ -40,9 +40,9 @@ from openedx.core.djangoapps.user_authn.views.password_reset import send_passwor
 from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.view_utils import require_post_params
-from student.helpers import get_next_url_for_login_page
-from student.models import LoginFailures, AllowedAuthUser, UserProfile
-from student.views import compose_and_send_activation_email
+from common.djangoapps.student.helpers import get_next_url_for_login_page
+from common.djangoapps.student.models import LoginFailures, AllowedAuthUser, UserProfile
+from common.djangoapps.student.views import compose_and_send_activation_email
 from third_party_auth import pipeline, provider
 import third_party_auth
 from track import segment

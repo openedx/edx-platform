@@ -10,7 +10,7 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 
 from lms.djangoapps.course_goals.models import CourseGoal
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from track.tests import EventTrackingTestCase
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

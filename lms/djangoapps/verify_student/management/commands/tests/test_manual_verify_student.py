@@ -15,7 +15,7 @@ from testfixtures import LogCapture
 
 from lms.djangoapps.verify_student.models import ManualVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 LOGGER_NAME = 'lms.djangoapps.verify_student.management.commands.manual_verifications'
 

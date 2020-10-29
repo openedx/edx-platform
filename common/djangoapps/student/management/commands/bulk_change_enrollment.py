@@ -11,7 +11,7 @@ from six import text_type
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name

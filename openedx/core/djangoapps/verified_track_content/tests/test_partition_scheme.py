@@ -9,8 +9,8 @@ import pytz
 import six
 
 from common.djangoapps.course_modes.models import CourseMode
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, UserPartition, ReadOnlyUserPartitionError

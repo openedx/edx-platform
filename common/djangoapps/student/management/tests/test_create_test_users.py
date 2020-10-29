@@ -11,9 +11,9 @@ from django.core.management.base import CommandError
 from opaque_keys import InvalidKeyError
 from six import text_type
 
-from student.helpers import AccountValidationError
-from student.models import CourseAccessRole, CourseEnrollment
-from student.roles import CourseStaffRole
+from common.djangoapps.student.helpers import AccountValidationError
+from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
+from common.djangoapps.student.roles import CourseStaffRole
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

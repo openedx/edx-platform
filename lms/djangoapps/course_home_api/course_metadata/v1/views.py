@@ -7,7 +7,7 @@ from rest_framework.response import Response
 
 from opaque_keys.edx.keys import CourseKey
 
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.tabs import get_course_tab_list

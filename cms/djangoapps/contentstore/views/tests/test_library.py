@@ -17,7 +17,7 @@ from six.moves import range
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, parse_json
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_library_url
 from cms.djangoapps.course_creators.views import add_user_with_status_granted as grant_course_creator_status
-from student.roles import LibraryUserRole
+from common.djangoapps.student.roles import LibraryUserRole
 from xmodule.modulestore.tests.factories import LibraryFactory
 
 from ..component import get_component_templates

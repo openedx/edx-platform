@@ -22,7 +22,7 @@ from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_from_token
 from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 
 log = logging.getLogger(__name__)
 

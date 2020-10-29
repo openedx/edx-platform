@@ -19,8 +19,8 @@ from lms.djangoapps.certificates.tests.factories import (
 from lms.djangoapps.courseware.access_utils import ACCESS_DENIED, ACCESS_GRANTED
 from lms.djangoapps.courseware.tabs import ExternalLinkCourseTab
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
-from student.models import CourseEnrollment, CourseEnrollmentCelebration
-from student.tests.factories import CourseEnrollmentCelebrationFactory, UserFactory
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentCelebration
+from common.djangoapps.student.tests.factories import CourseEnrollmentCelebrationFactory, UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory

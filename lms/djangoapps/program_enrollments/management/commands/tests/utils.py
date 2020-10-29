@@ -6,7 +6,7 @@ from factory import LazyAttributeSequence, SubFactory
 from factory.django import DjangoModelFactory
 from social_django.models import UserSocialAuth
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class UserSocialAuthFactory(DjangoModelFactory):

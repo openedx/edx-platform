@@ -6,8 +6,8 @@ Delete course tests.
 import mock
 from django.core.management import CommandError, call_command
 
-from student.roles import CourseInstructorRole
-from student.tests.factories import UserFactory
+from common.djangoapps.student.roles import CourseInstructorRole
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore

@@ -11,8 +11,8 @@ from django.test import TestCase
 from six.moves import range
 
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
-from student.models import Registration, UserAttribute
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import Registration, UserAttribute
+from common.djangoapps.student.tests.factories import UserFactory
 
 CREATED_ON_SITE = 'created_on_site'
 

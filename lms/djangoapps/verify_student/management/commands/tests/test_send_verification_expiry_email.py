@@ -13,7 +13,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.timezone import now
 from mock import patch
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from testfixtures import LogCapture
 
 from common.test.utils import MockS3BotoMixin

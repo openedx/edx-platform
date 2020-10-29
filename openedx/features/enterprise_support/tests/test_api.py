@@ -45,7 +45,7 @@ from openedx.features.enterprise_support.tests.factories import (
 )
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from openedx.features.enterprise_support.utils import clear_data_consent_share_cache
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class MockEnrollment(mock.MagicMock):

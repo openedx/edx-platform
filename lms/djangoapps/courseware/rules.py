@@ -18,8 +18,8 @@ from xblock.core import XBlock
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.models import CourseAccessRole, CourseEnrollment
-from student.roles import CourseRole, OrgRole
+from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
+from common.djangoapps.student.roles import CourseRole, OrgRole
 from xmodule.course_module import CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
 from xmodule.x_module import XModule

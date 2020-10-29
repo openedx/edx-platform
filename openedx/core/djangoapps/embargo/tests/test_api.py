@@ -17,12 +17,12 @@ from django.core.cache import cache
 from django.db import connection
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase, mixed_store_config
 )
-from student.roles import (
+from common.djangoapps.student.roles import (
     GlobalStaff, CourseRole, OrgRole,
     CourseStaffRole, CourseInstructorRole,
     OrgStaffRole, OrgInstructorRole

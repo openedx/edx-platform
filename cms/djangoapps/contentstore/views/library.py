@@ -21,14 +21,14 @@ from six import text_type
 
 from cms.djangoapps.course_creators.views import get_course_creator_status
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from student.auth import (
+from common.djangoapps.student.auth import (
     STUDIO_EDIT_ROLES,
     STUDIO_VIEW_USERS,
     get_user_permissions,
     has_studio_read_access,
     has_studio_write_access
 )
-from student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
 from util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

@@ -22,8 +22,8 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import fake_completed_retirement
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from student.models import CourseEnrollmentException
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.models import CourseEnrollmentException
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from third_party_auth.models import SAMLProviderConfig
 from third_party_auth.tests.factories import SAMLProviderConfigFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -370,7 +370,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
         program_enrollment = self._create_waiting_program_enrollment()
         self._create_waiting_course_enrollments(program_enrollment)
 
-        with mock.patch('student.models.CourseEnrollment.enroll') as enrollMock:
+        with mock.patch('common.djangoapps.student.models.CourseEnrollment.enroll') as enrollMock:
             enrollMock.side_effect = CourseEnrollmentException('something has gone wrong')
             with pytest.raises(CourseEnrollmentException):
                 UserSocialAuth.objects.create(

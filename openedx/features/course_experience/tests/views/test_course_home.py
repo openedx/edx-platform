@@ -56,8 +56,8 @@ from openedx.features.course_experience import (
 )
 from openedx.features.discounts.applicability import get_discount_expiration_date
 from openedx.features.discounts.utils import REV1008_EXPERIMENT_ID, format_strikeout_price
-from student.models import CourseEnrollment, FBEEnrollmentExclusion
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import CourseEnrollment, FBEEnrollmentExclusion
+from common.djangoapps.student.tests.factories import UserFactory
 from util.date_utils import strftime_localized
 from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore import ModuleStoreEnum

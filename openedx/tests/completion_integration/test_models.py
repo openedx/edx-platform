@@ -14,7 +14,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from six.moves import range, zip
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 SELECT = 1
 UPDATE = 1

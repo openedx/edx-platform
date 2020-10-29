@@ -19,7 +19,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     Role
 )
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
-from student.models import CourseAccessRole, CourseEnrollment, UserProfile, anonymous_id_for_user
+from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment, UserProfile, anonymous_id_for_user
 from util.testing import UrlResetMixin
 
 

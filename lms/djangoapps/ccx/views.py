@@ -54,8 +54,8 @@ from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
 from lms.djangoapps.instructor.views.gradebook_api import get_grade_book_page
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, assign_role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
-from student.models import CourseEnrollment
-from student.roles import CourseCcxCoachRole
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseCcxCoachRole
 from xmodule.modulestore.django import SignalHandler
 
 log = logging.getLogger(__name__)

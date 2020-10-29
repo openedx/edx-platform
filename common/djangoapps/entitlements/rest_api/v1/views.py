@@ -26,7 +26,7 @@ from openedx.core.djangoapps.catalog.utils import get_course_runs_for_course, ge
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
-from student.models import AlreadyEnrolledError, CourseEnrollment, CourseEnrollmentException
+from common.djangoapps.student.models import AlreadyEnrolledError, CourseEnrollment, CourseEnrollmentException
 
 log = logging.getLogger(__name__)
 

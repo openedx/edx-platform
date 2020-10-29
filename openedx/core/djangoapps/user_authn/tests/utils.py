@@ -13,7 +13,7 @@ from rest_framework import status
 
 from openedx.core.djangoapps.oauth_dispatch.adapters.dot import DOTAdapter
 from openedx.core.djangoapps.oauth_dispatch.jwt import _create_jwt
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class AuthType(Enum):

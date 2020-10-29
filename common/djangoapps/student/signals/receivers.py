@@ -11,8 +11,8 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
 from lms.djangoapps.courseware.toggles import courseware_mfe_first_section_celebration_is_active
-from student.helpers import EMAIL_EXISTS_MSG_FMT, USERNAME_EXISTS_MSG_FMT, AccountValidationError
-from student.models import CourseEnrollment, CourseEnrollmentCelebration, is_email_retired, is_username_retired
+from common.djangoapps.student.helpers import EMAIL_EXISTS_MSG_FMT, USERNAME_EXISTS_MSG_FMT, AccountValidationError
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentCelebration, is_email_retired, is_username_retired
 
 
 @receiver(pre_save, sender=get_user_model())

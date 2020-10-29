@@ -27,7 +27,7 @@ from lms.djangoapps.grades.api import context as grades_context
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import HTML, Text
-from student.models import CourseEnrollment, CourseEnrollmentAllowed
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
 
 log = logging.getLogger(__name__)
 

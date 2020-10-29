@@ -13,10 +13,10 @@ from django.test.client import Client
 from milestones.tests.utils import MilestonesTestCaseMixin
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.models import CourseEnrollment, DashboardConfiguration
-from student.roles import GlobalStaff
-from student.tests.factories import UserFactory
-from student.views import get_course_enrollments
+from common.djangoapps.student.models import CourseEnrollment, DashboardConfiguration
+from common.djangoapps.student.roles import GlobalStaff
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.views import get_course_enrollments
 from util.milestones_helpers import get_pre_requisite_courses_not_completed, set_prerequisite_courses
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum

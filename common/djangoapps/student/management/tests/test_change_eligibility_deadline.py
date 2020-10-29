@@ -10,12 +10,12 @@ from testfixtures import LogCapture
 
 from common.djangoapps.course_modes.tests.factories import CourseMode
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditEligibility
-from student.models import CourseEnrollment, User
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import CourseEnrollment, User
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-LOGGER_NAME = 'student.management.commands.change_eligibility_deadline'
+LOGGER_NAME = 'common.djangoapps.student.management.commands.change_eligibility_deadline'
 command_args = '--username {username} --course {course} --date {date}'
 
 

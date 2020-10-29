@@ -14,8 +14,8 @@ import lms.djangoapps.instructor.enrollment as enrollment
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.commerce.utils import create_zendesk_ticket
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
-from student import auth
-from student.roles import CourseStaffRole
+from common.djangoapps.student import auth
+from common.djangoapps.student.roles import CourseStaffRole
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)

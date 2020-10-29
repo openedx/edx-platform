@@ -48,8 +48,8 @@ from openedx.core.djangoapps.django_comment_common.utils import (
 )
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.lib.teams_config import TeamsConfig
-from student.roles import CourseStaffRole, UserBasedRole
-from student.tests.factories import CourseAccessRoleFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.roles import CourseStaffRole, UserBasedRole
+from common.djangoapps.student.tests.factories import CourseAccessRoleFactory, CourseEnrollmentFactory, UserFactory
 from track.middleware import TrackMiddleware
 from track.views import segmentio
 from track.views.tests.base import SEGMENTIO_TEST_USER_ID, SegmentIOTrackingTestCaseBase
@@ -239,7 +239,7 @@ class ViewsTestCaseMixin(object):
 
         # Patch the comment client user save method so it does not try
         # to create a new cc user when creating a django user
-        with patch('student.models.cc.User.save'):
+        with patch('common.djangoapps.student.models.cc.User.save'):
             uname = 'student'
             email = 'student@edx.org'
             self.password = 'test'
@@ -462,7 +462,7 @@ class ViewsTestCase(
 
         # Patch the comment client user save method so it does not try
         # to create a new cc user when creating a django user
-        with patch('student.models.cc.User.save'):
+        with patch('common.djangoapps.student.models.cc.User.save'):
             uname = 'student'
             email = 'student@edx.org'
             self.password = 'test'
@@ -2050,7 +2050,7 @@ class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin
     DUMMY_CATEGORY_ID = 'i4x-edx-dummy-commentable-id'
     DUMMY_THREAD_ID = 'dummy_thread_id'
 
-    @mock.patch.dict("student.models.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @mock.patch.dict("common.djangoapps.student.models.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(ForumThreadViewedEventTransformerTestCase, self).setUp()
         self.courses_by_store = {

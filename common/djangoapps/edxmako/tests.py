@@ -20,7 +20,7 @@ from common.djangoapps.edxmako.shortcuts import (
     marketing_link,
     render_to_string
 )
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from util.testing import UrlResetMixin
 
 

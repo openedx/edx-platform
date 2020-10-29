@@ -19,8 +19,8 @@ from requests import Timeout
 from six.moves.urllib.parse import urljoin
 
 from common.djangoapps.course_modes.models import CourseMode
-from student.signals import REFUND_ORDER
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.signals import REFUND_ORDER
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 from ..models import CommerceConfiguration
 from ..utils import _generate_refund_notification_body, _send_refund_notification, create_zendesk_ticket

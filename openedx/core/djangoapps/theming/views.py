@@ -19,7 +19,7 @@ from openedx.core.djangoapps.user_api.preferences.api import (
     set_user_preference
 )
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
-from student.roles import GlobalStaff
+from common.djangoapps.student.roles import GlobalStaff
 
 from .helpers import theme_exists
 from .models import SiteTheme

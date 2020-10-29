@@ -22,7 +22,7 @@ from opaque_keys.edx.django.models import CourseKeyField
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
 from openedx.core.lib.cache_utils import request_cached
 # pylint: disable=unused-import
-from student.models import (
+from common.djangoapps.student.models import (
     PendingEmailChange,
     Registration,
     UserProfile,

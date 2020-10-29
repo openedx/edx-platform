@@ -14,7 +14,7 @@ from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITIO
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import ContentTypeGatingPartition, create_content_gating_partition
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from student.tests.factories import GroupFactory
+from common.djangoapps.student.tests.factories import GroupFactory
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, UserPartitionError
 
 

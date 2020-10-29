@@ -17,7 +17,7 @@ from lms.djangoapps.experiments.utils import (
     get_unenrolled_courses,
     is_enrolled_in_course_run
 )
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 
 

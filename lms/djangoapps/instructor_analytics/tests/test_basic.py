@@ -35,9 +35,9 @@ from lms.djangoapps.instructor_analytics.basic import (
     list_problem_responses,
 )
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
-from student.models import CourseEnrollment, CourseEnrollmentAllowed
-from student.roles import CourseSalesAdminRole
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
+from common.djangoapps.student.roles import CourseSalesAdminRole
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -194,7 +194,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             self.assertIn(userreport['verification_status'], ["N/A"])
         # make sure that the user report respects whatever value
         # is returned by verification and enrollment code
-        with patch("student.models.CourseEnrollment.enrollment_mode_for_user") as enrollment_patch:
+        with patch("common.djangoapps.student.models.CourseEnrollment.enrollment_mode_for_user") as enrollment_patch:
             with patch(
                 "lms.djangoapps.verify_student.services.IDVerificationService.verification_status_for_user"
             ) as verify_patch:

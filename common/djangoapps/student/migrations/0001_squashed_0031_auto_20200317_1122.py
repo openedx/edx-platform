@@ -12,7 +12,7 @@ import simple_history.models
 from django.conf import settings
 from django.db import migrations, models
 from lms.djangoapps.experiments.models import ExperimentData
-from student.models import CourseEnrollment, FBEEnrollmentExclusion
+from common.djangoapps.student.models import CourseEnrollment, FBEEnrollmentExclusion
 
 import openedx.core.djangolib.model_mixins
 from common.djangoapps.course_modes import models as course_modes_models
