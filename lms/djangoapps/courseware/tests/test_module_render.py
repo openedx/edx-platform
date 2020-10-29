@@ -75,7 +75,7 @@ from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.url_utils import quote_slashes
 from common.djangoapps.student.models import CourseEnrollment, anonymous_id_for_user
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
-from xblock_django.models import XBlockConfiguration
+from common.djangoapps.xblock_django.models import XBlockConfiguration
 from xmodule.capa_module import ProblemBlock
 from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
 from xmodule.lti_module import LTIDescriptor

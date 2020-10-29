@@ -30,7 +30,7 @@ from openedx.core.lib.xblock_utils import (
     wrap_xblock_aside,
     xblock_local_resource_url
 )
-from xblock_django.user_service import DjangoXBlockUserService
+from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError

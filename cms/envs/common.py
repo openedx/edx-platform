@@ -1413,7 +1413,7 @@ INSTALLED_APPS = [
     # Credit courses
     'openedx.core.djangoapps.credit.apps.CreditConfig',
 
-    'xblock_django',
+    'common.djangoapps.xblock_django',
 
     # Catalog integration
     'openedx.core.djangoapps.catalog',

@@ -93,7 +93,7 @@ from common.djangoapps.student.roles import CourseBetaTesterRole
 from common.djangoapps.track import contexts
 from common.djangoapps.util import milestones_helpers
 from common.djangoapps.util.json_request import JsonResponse
-from xblock_django.user_service import DjangoXBlockUserService
+from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
