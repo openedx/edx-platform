@@ -37,8 +37,8 @@ from openedx.features.course_duration_limits.models import CourseDurationLimitCo
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
-from util.milestones_helpers import set_prerequisite_courses
-from util.testing import UrlResetMixin
+from common.djangoapps.util.milestones_helpers import set_prerequisite_courses
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 

@@ -20,7 +20,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
 )
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment, UserProfile, anonymous_id_for_user
-from util.testing import UrlResetMixin
+from common.djangoapps.util.testing import UrlResetMixin
 
 
 class AutoAuthTestCase(UrlResetMixin, TestCase):

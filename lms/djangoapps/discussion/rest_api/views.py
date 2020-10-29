@@ -60,7 +60,7 @@ from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiv
 
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
-from util.json_request import JsonResponse
+from common.djangoapps.util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)

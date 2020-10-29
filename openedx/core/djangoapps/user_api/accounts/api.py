@@ -23,8 +23,8 @@ from common.djangoapps.student.models import (
     email_exists_or_retired,
     username_exists_or_retired
 )
-from util.model_utils import emit_setting_changed_event
-from util.password_policy_validators import validate_password
+from common.djangoapps.util.model_utils import emit_setting_changed_event
+from common.djangoapps.util.password_policy_validators import validate_password
 
 from openedx.core.djangoapps.user_api import accounts, errors, helpers
 from openedx.core.djangoapps.user_api.errors import (

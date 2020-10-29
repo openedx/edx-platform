@@ -91,9 +91,9 @@ from openedx.features.enterprise_support.tests.mixins.enterprise import Enterpri
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, AdminFactory, CourseEnrollmentFactory, UserFactory
-from util.tests.test_date_utils import fake_pgettext, fake_ugettext
-from util.url import reload_django_url_config
-from util.views import ensure_valid_course_key
+from common.djangoapps.util.tests.test_date_utils import fake_pgettext, fake_ugettext
+from common.djangoapps.util.url import reload_django_url_config
+from common.djangoapps.util.views import ensure_valid_course_key
 from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.graders import ShowCorrectness
 from xmodule.modulestore import ModuleStoreEnum
@@ -1134,10 +1134,10 @@ class StartDateTests(ModuleStoreTestCase):
         """
         return self.client.get(reverse('about_course', args=[six.text_type(course_key)]))
 
-    @patch('util.date_utils.pgettext', fake_pgettext(translations={
+    @patch('common.djangoapps.util.date_utils.pgettext', fake_pgettext(translations={
         ("abbreviated month name", "Sep"): "SEPTEMBER",
     }))
-    @patch('util.date_utils.ugettext', fake_ugettext(translations={
+    @patch('common.djangoapps.util.date_utils.ugettext', fake_ugettext(translations={
         "SHORT_DATE_FORMAT": "%Y-%b-%d",
     }))
     def test_format_localized_in_studio_course(self):

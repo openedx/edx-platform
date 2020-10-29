@@ -12,7 +12,7 @@ from edx_proctoring.exceptions import ProctoredExamNotFoundException
 
 from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 from common.djangoapps.student.models import EntranceExamConfiguration
-from util import milestones_helpers
+from common.djangoapps.util import milestones_helpers
 
 log = logging.getLogger(__name__)
 

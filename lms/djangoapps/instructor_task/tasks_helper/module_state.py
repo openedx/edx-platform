@@ -22,7 +22,7 @@ from lms.djangoapps.grades.api import events as grades_events
 from common.djangoapps.student.models import get_user_by_username_or_email
 from common.djangoapps.track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
 from common.djangoapps.track.views import task_track
-from util.db import outer_atomic
+from common.djangoapps.util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
 
 from ..exceptions import UpdateProblemModuleStateError

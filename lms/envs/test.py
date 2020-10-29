@@ -34,7 +34,7 @@ from xmodule.modulestore.modulestore_settings import update_module_store_setting
 
 from .common import *
 
-from util.testing import patch_sessions, patch_testcase  # pylint: disable=wrong-import-order
+from common.djangoapps.util.testing import patch_sessions, patch_testcase  # pylint: disable=wrong-import-order
 
 # This patch disables the commit_on_success decorator during tests
 # in TestCase subclasses.
@@ -220,7 +220,7 @@ CACHES = {
     # Blockstore caching tests require a cache that actually works:
     'blockstore': {
         'KEY_PREFIX': 'blockstore',
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
         'LOCATION': 'edx_loc_mem_cache',
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     },

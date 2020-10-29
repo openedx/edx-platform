@@ -19,7 +19,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from common.djangoapps.student.auth import has_course_author_access
-from util import milestones_helpers
+from common.djangoapps.util import milestones_helpers
 from openedx.core import toggles as core_toggles
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError

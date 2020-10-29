@@ -12,7 +12,7 @@ from django.core.management.base import BaseCommand
 from django.db.models import F
 
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from util.query import use_read_replica_if_available
+from common.djangoapps.util.query import use_read_replica_if_available
 
 logger = logging.getLogger(__name__)
 

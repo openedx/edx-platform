@@ -58,7 +58,7 @@ from common.djangoapps.student.roles import (
     CourseFinanceAdminRole, CourseInstructorRole,
     CourseSalesAdminRole, CourseStaffRole
 )
-from util.json_request import JsonResponse
+from common.djangoapps.util.json_request import JsonResponse
 from xmodule.html_module import HtmlBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab

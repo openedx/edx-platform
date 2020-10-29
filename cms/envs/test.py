@@ -146,7 +146,7 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'edx_loc_mem_cache',
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
     },
 
     # The general cache is what you get if you use our util.cache. It's used for
@@ -158,14 +158,14 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
         'KEY_PREFIX': 'general',
         'VERSION': 4,
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
     },
 
     'mongo_metadata_inheritance': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': os.path.join(tempfile.gettempdir(), 'mongo_metadata_inheritance'),
         'TIMEOUT': 300,
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
     },
     'loc_cache': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',

@@ -1593,13 +1593,13 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        "NAME": "util.password_policy_validators.MinimumLengthValidator",
+        "NAME": "common.djangoapps.util.password_policy_validators.MinimumLengthValidator",
         "OPTIONS": {
             "min_length": 2
         }
     },
     {
-        "NAME": "util.password_policy_validators.MaximumLengthValidator",
+        "NAME": "common.djangoapps.util.password_policy_validators.MaximumLengthValidator",
         "OPTIONS": {
             "max_length": 75
         }
@@ -1848,53 +1848,53 @@ DATABASE_ROUTERS = [
 CACHES = {
     'blockstore': {
         'KEY_PREFIX': 'blockstore',
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'TIMEOUT': '86400',  # This data should be long-lived for performance, BundleCache handles invalidation
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
     },
     'course_structure_cache': {
         'KEY_PREFIX': 'course_structure',
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'TIMEOUT': '7200',
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
     },
     'celery': {
         'KEY_PREFIX': 'celery',
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'TIMEOUT': '7200',
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
     },
     'mongo_metadata_inheritance': {
         'KEY_PREFIX': 'mongo_metadata_inheritance',
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'TIMEOUT': 300,
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
     },
     'staticfiles': {
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'KEY_PREFIX': 'staticfiles_general',
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
     },
     'default': {
         'VERSION': '1',
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'KEY_PREFIX': 'default',
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
     },
     'configuration': {
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'KEY_PREFIX': 'configuration',
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
     },
     'general': {
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'KEY_PREFIX': 'general',
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',

@@ -42,8 +42,8 @@ from common.djangoapps.student.tests.test_configuration_overrides import fake_ge
 from common.djangoapps.student.tests.test_email import mock_render_to_string
 from common.djangoapps.student.models import AccountRecovery
 
-from util.password_policy_validators import create_validator_config
-from util.testing import EventTestMixin
+from common.djangoapps.util.password_policy_validators import create_validator_config
+from common.djangoapps.util.testing import EventTestMixin
 
 
 ENABLE_LOGISTRATION_MICROFRONTEND = settings.FEATURES.copy()
@@ -541,8 +541,8 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         })
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        create_validator_config('util.password_policy_validators.MinimumLengthValidator', {'min_length': 2}),
-        create_validator_config('util.password_policy_validators.MaximumLengthValidator', {'max_length': 10})
+        create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 2}),
+        create_validator_config('common.djangoapps.util.password_policy_validators.MaximumLengthValidator', {'max_length': 10})
     ])
     @ddt.data(
         {

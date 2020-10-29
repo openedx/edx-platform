@@ -6,7 +6,7 @@ from social_django.models import UserSocialAuth
 
 from lms.djangoapps.support.decorators import require_support_permission
 from lms.djangoapps.support.serializers import serialize_sso_records
-from util.json_request import JsonResponse
+from common.djangoapps.util.json_request import JsonResponse
 
 
 class SsoView(GenericAPIView):

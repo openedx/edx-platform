@@ -43,7 +43,7 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
 from common.djangoapps.student.models import get_retired_username_by_username
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
-from util.testing import PatchMediaTypeMixin, UrlResetMixin
+from common.djangoapps.util.testing import PatchMediaTypeMixin, UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

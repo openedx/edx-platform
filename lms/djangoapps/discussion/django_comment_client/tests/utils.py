@@ -14,7 +14,7 @@ from openedx.core.djangoapps.django_comment_common.utils import (
 )
 from openedx.core.lib.teams_config import TeamsConfig
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.testing import UrlResetMixin
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase

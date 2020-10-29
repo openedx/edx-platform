@@ -50,7 +50,7 @@ from openedx.core.djangoapps.programs.utils import (
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import AnonymousUserFactory, CourseEnrollmentFactory, UserFactory
-from util.date_utils import strftime_localized
+from common.djangoapps.util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase, SharedModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE

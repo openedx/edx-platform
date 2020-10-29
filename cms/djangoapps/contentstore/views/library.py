@@ -29,7 +29,7 @@ from common.djangoapps.student.auth import (
     has_studio_write_access
 )
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
-from util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
+from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import DuplicateCourseError

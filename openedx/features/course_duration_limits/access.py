@@ -25,7 +25,7 @@ from openedx.core.djangoapps.course_date_signals.utils import get_expected_durat
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from common.djangoapps.student.models import CourseEnrollment
-from util.date_utils import strftime_localized
+from common.djangoapps.util.date_utils import strftime_localized
 
 EXPIRATION_DATE_FORMAT_STR = u'%b %-d, %Y'
 

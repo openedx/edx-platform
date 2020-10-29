@@ -24,10 +24,10 @@ AUDIT_CERT_CUTOFF_DATE: null
 AUTH_DOCUMENTATION_URL: http://course-catalog-api-guide.readthedocs.io/en/latest/authentication/index.html
 AUTH_PASSWORD_VALIDATORS:
 -   NAME: django.contrib.auth.password_validation.UserAttributeSimilarityValidator
--   NAME: util.password_policy_validators.MinimumLengthValidator
+-   NAME: common.djangoapps.util.password_policy_validators.MinimumLengthValidator
     OPTIONS:
         min_length: 2
--   NAME: util.password_policy_validators.MaximumLengthValidator
+-   NAME: common.djangoapps.util.password_policy_validators.MaximumLengthValidator
     OPTIONS:
         max_length: 75
 AWS_ACCESS_KEY_ID: null
@@ -54,47 +54,47 @@ BULK_EMAIL_ROUTING_KEY_SMALL_JOBS: edx.lms.core.default
 CACHES:
     celery:
         BACKEND: django.core.cache.backends.memcached.MemcachedCache
-        KEY_FUNCTION: util.memcache.safe_key
+        KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: celery
         LOCATION:
         - edx.devstack.memcached:11211
         TIMEOUT: '7200'
     configuration:
         BACKEND: django.core.cache.backends.memcached.MemcachedCache
-        KEY_FUNCTION: util.memcache.safe_key
+        KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: 1001c6274ca4
         LOCATION:
         - edx.devstack.memcached:11211
     course_structure_cache:
         BACKEND: django.core.cache.backends.memcached.MemcachedCache
-        KEY_FUNCTION: util.memcache.safe_key
+        KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: course_structure
         LOCATION:
         - edx.devstack.memcached:11211
         TIMEOUT: '7200'
     default:
         BACKEND: django.core.cache.backends.memcached.MemcachedCache
-        KEY_FUNCTION: util.memcache.safe_key
+        KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: default
         LOCATION:
         - edx.devstack.memcached:11211
         VERSION: '1'
     general:
         BACKEND: django.core.cache.backends.memcached.MemcachedCache
-        KEY_FUNCTION: util.memcache.safe_key
+        KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: general
         LOCATION:
         - edx.devstack.memcached:11211
     mongo_metadata_inheritance:
         BACKEND: django.core.cache.backends.memcached.MemcachedCache
-        KEY_FUNCTION: util.memcache.safe_key
+        KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: mongo_metadata_inheritance
         LOCATION:
         - edx.devstack.memcached:11211
         TIMEOUT: 300
     staticfiles:
         BACKEND: django.core.cache.backends.memcached.MemcachedCache
-        KEY_FUNCTION: util.memcache.safe_key
+        KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: 1001c6274ca4_general
         LOCATION:
         - edx.devstack.memcached:11211

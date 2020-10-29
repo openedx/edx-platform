@@ -16,7 +16,7 @@ from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.management.commands import recalculate_subsection_grades
 from lms.djangoapps.grades.tests.test_tasks import HasCourseWithProblemsMixin
 from common.djangoapps.track.event_transaction_utils import get_event_transaction_id
-from util.date_utils import to_timestamp
+from common.djangoapps.util.date_utils import to_timestamp
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 DATE_FORMAT = u"%Y-%m-%d %H:%M"

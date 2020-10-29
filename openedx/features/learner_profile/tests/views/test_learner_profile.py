@@ -22,7 +22,7 @@ from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.features.learner_profile.toggles import REDIRECT_TO_PROFILE_MICROFRONTEND
 from openedx.features.learner_profile.views.learner_profile import learner_profile_context
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.testing import UrlResetMixin
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

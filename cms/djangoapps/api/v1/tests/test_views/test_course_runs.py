@@ -15,7 +15,7 @@ from rest_framework.test import APIClient
 from openedx.core.lib.courses import course_image_url
 from common.djangoapps.student.models import CourseAccessRole
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, AdminFactory, UserFactory
-from util.organizations_helpers import add_organization, get_course_organizations
+from common.djangoapps.util.organizations_helpers import add_organization, get_course_organizations
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError

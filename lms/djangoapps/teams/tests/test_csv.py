@@ -10,7 +10,7 @@ from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from openedx.core.lib.teams_config import TeamsConfig
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.testing import EventTestMixin
+from common.djangoapps.util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

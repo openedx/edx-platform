@@ -23,8 +23,8 @@ from openedx.core.djangoapps.enrollments.errors import CourseModeNotFoundError
 from openedx.core.lib.html_to_text import html_to_text
 from openedx.core.lib.mail_utils import wrap_message
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
-from util.keyword_substitution import substitute_keywords_with_data
-from util.query import use_read_replica_if_available
+from common.djangoapps.util.keyword_substitution import substitute_keywords_with_data
+from common.djangoapps.util.query import use_read_replica_if_available
 
 log = logging.getLogger(__name__)
 

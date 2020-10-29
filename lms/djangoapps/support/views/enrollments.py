@@ -26,7 +26,7 @@ from openedx.core.djangoapps.enrollments.api import get_enrollments, update_enro
 from openedx.core.djangoapps.enrollments.errors import CourseModeNotFoundError
 from openedx.core.djangoapps.enrollments.serializers import ModeSerializer
 from common.djangoapps.student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAttribute, ManualEnrollmentAudit
-from util.json_request import JsonResponse
+from common.djangoapps.util.json_request import JsonResponse
 
 
 class EnrollmentSupportView(View):

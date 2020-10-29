@@ -43,7 +43,7 @@ from common.djangoapps.course_action_state.models import CourseRerunState
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
 from openedx.core.lib.extract_tar import safetar_extractall
 from common.djangoapps.student.auth import has_course_author_access
-from util.organizations_helpers import add_organization_course, get_organization_by_short_name
+from common.djangoapps.util.organizations_helpers import add_organization_course, get_organization_by_short_name
 from xmodule.contentstore.django import contentstore
 from xmodule.course_module import CourseFields
 from xmodule.exceptions import SerializationError

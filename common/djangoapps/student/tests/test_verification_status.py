@@ -25,7 +25,7 @@ from common.djangoapps.student.helpers import (
     VERIFY_STATUS_SUBMITTED
 )
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.testing import UrlResetMixin
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

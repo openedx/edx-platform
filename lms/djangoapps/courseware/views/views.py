@@ -120,10 +120,10 @@ from openedx.features.course_experience.waffle import waffle as course_experienc
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from common.djangoapps.student.models import CourseEnrollment, UserTestGroup
 from common.djangoapps.track import segment
-from util.cache import cache, cache_if_anonymous
-from util.db import outer_atomic
-from util.milestones_helpers import get_prerequisite_courses_display
-from util.views import ensure_valid_course_key, ensure_valid_usage_key
+from common.djangoapps.util.cache import cache, cache_if_anonymous
+from common.djangoapps.util.db import outer_atomic
+from common.djangoapps.util.milestones_helpers import get_prerequisite_courses_display
+from common.djangoapps.util.views import ensure_valid_course_key, ensure_valid_usage_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem

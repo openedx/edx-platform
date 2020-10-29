@@ -17,7 +17,7 @@ from lms.djangoapps.lti_provider.outcomes import store_outcome_parameters
 from lms.djangoapps.lti_provider.signature_validator import SignatureValidator
 from lms.djangoapps.lti_provider.users import authenticate_lti_user
 from openedx.core.lib.url_utils import unquote_slashes
-from util.views import add_p3p_header
+from common.djangoapps.util.views import add_p3p_header
 
 log = logging.getLogger("edx.lti_provider")
 

@@ -116,14 +116,14 @@ from common.djangoapps.student.models import (
     unique_id_for_user
 )
 from common.djangoapps.student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
-from util.file import (
+from common.djangoapps.util.file import (
     FileValidationException,
     UniversalNewlineIterator,
     course_and_time_based_filename_generator,
     store_uploaded_file
 )
-from util.json_request import JsonResponse, JsonResponseBadRequest
-from util.views import require_global_staff
+from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
+from common.djangoapps.util.views import require_global_staff
 from xmodule.modulestore.django import modulestore
 
 from .. import permissions

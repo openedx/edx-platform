@@ -48,9 +48,9 @@ from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.courses import course_image_url
 from common.djangoapps.student.models import LinkedInAddToProfileConfiguration
-from util import organizations_helpers as organization_api
-from util.date_utils import strftime_localized
-from util.views import handle_500
+from common.djangoapps.util import organizations_helpers as organization_api
+from common.djangoapps.util.date_utils import strftime_localized
+from common.djangoapps.util.views import handle_500
 
 log = logging.getLogger(__name__)
 _ = translation.ugettext

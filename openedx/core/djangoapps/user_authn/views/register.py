@@ -73,8 +73,8 @@ from common.djangoapps.student.views import compose_and_send_activation_email
 from common.djangoapps.third_party_auth import pipeline, provider
 from common.djangoapps.third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
 from common.djangoapps.track import segment
-from util.db import outer_atomic
-from util.json_request import JsonResponse
+from common.djangoapps.util.db import outer_atomic
+from common.djangoapps.util.json_request import JsonResponse
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")

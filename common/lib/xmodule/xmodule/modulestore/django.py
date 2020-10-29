@@ -398,7 +398,7 @@ class ModuleI18nService(object):
         # refactored to a place that will be right, and the code can be made
         # right there.  If you are reading this comment after April 1, 2014,
         # then Cale was a liar.
-        from util.date_utils import strftime_localized
+        from common.djangoapps.util.date_utils import strftime_localized
 
         return strftime_localized(*args, **kwargs)
 

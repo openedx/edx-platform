@@ -28,7 +28,7 @@ from common.djangoapps.student.roles import (
     OrgStaffRole, OrgInstructorRole
 )
 
-from util.testing import UrlResetMixin
+from common.djangoapps.util.testing import UrlResetMixin
 from ..models import (
     RestrictedCourse, Country, CountryAccessRule,
 )

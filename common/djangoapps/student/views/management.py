@@ -70,8 +70,8 @@ from common.djangoapps.student.models import (
 from common.djangoapps.student.signals import REFUND_ORDER
 from common.djangoapps.student.tasks import send_activation_email
 from common.djangoapps.student.text_me_the_app import TextMeTheAppFragmentView
-from util.db import outer_atomic
-from util.json_request import JsonResponse
+from common.djangoapps.util.db import outer_atomic
+from common.djangoapps.util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.student")

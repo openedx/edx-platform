@@ -89,7 +89,7 @@ from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
 from common.djangoapps.third_party_auth.utils import user_exists
 from common.djangoapps.track import segment
-from util.json_request import JsonResponse
+from common.djangoapps.util.json_request import JsonResponse
 
 from . import provider
 

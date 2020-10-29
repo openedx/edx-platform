@@ -50,7 +50,7 @@ from openedx.core.djangoapps.video_pipeline.config.waffle import (
     waffle_flags
 )
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
-from util.json_request import JsonResponse, expect_json
+from common.djangoapps.util.json_request import JsonResponse, expect_json
 from xmodule.video_module.transcripts_utils import Transcript
 
 from ..models import VideoUploadConfig
