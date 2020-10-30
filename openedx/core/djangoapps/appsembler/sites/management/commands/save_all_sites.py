@@ -11,7 +11,7 @@ class Command(BaseCommand):
         if not settings.ROOT_URLCONF == 'lms.urls':
             raise CommandError('This command can only be run from within the LMS')
         for sc in SiteConfiguration.objects.all():
-            print(('On:', sc.site.domain))
+            print('On:', sc.site.domain)
             try:
                 sc.save()
                 print('OK')

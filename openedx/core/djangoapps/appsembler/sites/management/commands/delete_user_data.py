@@ -31,7 +31,7 @@ class Command(BaseCommand):
             try:
                 user = User.objects.get(email=email)
             except:
-                print(('User "{0}" does not exist'.format(email)))
+                print('User "{0}" does not exist'.format(email))
                 return
 
             # delete course creator permissions

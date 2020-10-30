@@ -20,5 +20,5 @@ class Command(BaseCommand):
                 reindex_course_and_check_access(c.id, amc_admin)
             except Exception as e:
                 print('Error indexing course')
-                print((c.id))
+                print(c.id)
                 print(e)

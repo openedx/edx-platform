@@ -27,5 +27,5 @@ class Command(BaseCommand):
                 sc.save()
                 print("Created default SiteConfiguration.")
         except Exception as e:
-            print(("Failed to create default configuration. Error: {0}".format(str(e))))
+            print("Failed to create default configuration. Error: {0}".format(str(e)))
             sys.exit(-1)
