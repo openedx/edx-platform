@@ -29,7 +29,7 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.experiments.utils import get_dashboard_course_info
+from lms.djangoapps.experiments.utils import get_dashboard_course_info, get_experiment_user_metadata_context
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.utils import (
     get_programs,
@@ -805,6 +805,13 @@ def student_dashboard(request):
     )
     context.update(context_from_plugins)
 
+    course = None
+    context.update(
+        get_experiment_user_metadata_context(
+            course,
+            user,
+        )
+    )
     if ecommerce_service.is_enabled(request.user):
         context.update({
             'use_ecommerce_payment_flow': True,

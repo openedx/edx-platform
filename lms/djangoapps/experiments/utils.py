@@ -265,45 +265,48 @@ def get_dashboard_course_info(user, dashboard_enrollments):
 def get_experiment_user_metadata_context(course, user):
     """
     Return a context dictionary with the keys used for Optimizely experiments, exposed via user_metadata.html
+    Most views call this function with both parameters, but student dashboard has only a user
     """
     enrollment = None
     # TODO: clean up as part of REVO-28 (START)
     user_enrollments = None
     audit_enrollments = None
     has_non_audit_enrollments = False
-    try:
-        user_enrollments = CourseEnrollment.objects.select_related('course', 'schedule').filter(user_id=user.id)
-        has_non_audit_enrollments = user_enrollments.exclude(mode__in=CourseMode.UPSELL_TO_VERIFIED_MODES).exists()
+    context = {}
+    if course is not None:
+        try:
+            user_enrollments = CourseEnrollment.objects.select_related('course', 'schedule').filter(user_id=user.id)
+            has_non_audit_enrollments = user_enrollments.exclude(mode__in=CourseMode.UPSELL_TO_VERIFIED_MODES).exists()
+            # TODO: clean up as part of REVO-28 (END)
+            enrollment = CourseEnrollment.objects.select_related(
+                'course', 'schedule'
+            ).get(user_id=user.id, course_id=course.id)
+        except CourseEnrollment.DoesNotExist:
+            pass  # Not enrolled, use the default values
+
+        has_entitlements = False
+        if user.is_authenticated:
+            has_entitlements = CourseEntitlement.objects.filter(user=user).exists()
+
+        context = get_base_experiment_metadata_context(course, user, enrollment, user_enrollments)
+        has_staff_access = has_staff_access_to_preview_mode(user, course.id)
+        forum_roles = []
+        if user.is_authenticated:
+            forum_roles = list(Role.objects.filter(users=user, course_id=course.id).values_list('name').distinct())
+
+        # get user partition data
+        if user.is_authenticated:
+            partition_groups = get_all_partitions_for_course(course)
+            user_partitions = get_user_partition_groups(course.id, partition_groups, user, 'name')
+        else:
+            user_partitions = {}
+
+        # TODO: clean up as part of REVO-28 (START)
+        context['has_non_audit_enrollments'] = has_non_audit_enrollments or has_entitlements
         # TODO: clean up as part of REVO-28 (END)
-        enrollment = CourseEnrollment.objects.select_related(
-            'course', 'schedule'
-        ).get(user_id=user.id, course_id=course.id)
-    except CourseEnrollment.DoesNotExist:
-        pass  # Not enrolled, use the default values
-
-    has_entitlements = False
-    if user.is_authenticated:
-        has_entitlements = CourseEntitlement.objects.filter(user=user).exists()
-
-    context = get_base_experiment_metadata_context(course, user, enrollment, user_enrollments)
-    has_staff_access = has_staff_access_to_preview_mode(user, course.id)
-    forum_roles = []
-    if user.is_authenticated:
-        forum_roles = list(Role.objects.filter(users=user, course_id=course.id).values_list('name').distinct())
-
-    # get user partition data
-    if user.is_authenticated:
-        partition_groups = get_all_partitions_for_course(course)
-        user_partitions = get_user_partition_groups(course.id, partition_groups, user, 'name')
-    else:
-        user_partitions = {}
-
-    # TODO: clean up as part of REVO-28 (START)
-    context['has_non_audit_enrollments'] = has_non_audit_enrollments or has_entitlements
-    # TODO: clean up as part of REVO-28 (END)
-    context['has_staff_access'] = has_staff_access
-    context['forum_roles'] = forum_roles
-    context['partition_groups'] = user_partitions
+        context['has_staff_access'] = has_staff_access
+        context['forum_roles'] = forum_roles
+        context['partition_groups'] = user_partitions
 
     user_metadata = {
         key: context.get(key)
