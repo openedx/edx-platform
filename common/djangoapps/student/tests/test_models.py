@@ -4,7 +4,7 @@ import hashlib
 import ddt
 import factory
 import pytz
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import AnonymousUser, User
 from django.core.cache import cache
 from django.db.models import signals
 from django.db.models.functions import Lower
@@ -403,3 +403,59 @@ class TestAccountRecovery(TestCase):
 
         # Assert that there is no longer an AccountRecovery record for this user
         assert len(AccountRecovery.objects.filter(user_id=user.id)) == 0
+
+class TestUserPostSaveCallback(SharedModuleStoreTestCase):
+    def setUp(self):
+        # self.client.login(username=self.instructor.username, password='test')
+        self.course = CourseFactory.create()
+
+        self.enrolled_student = UserFactory(
+            username='EnrolledStudent',
+            first_name='Enrolled',
+            last_name='Student',
+            email='robot-allowed@robot.org',
+            is_active = False
+        )
+        CourseEnrollment.enroll(
+            self.enrolled_student,
+            self.course.id
+        )
+        self.notenrolled_student = UserFactory(username='NotEnrolledStudent', first_name='NotEnrolled',
+                                               last_name='Student')
+
+        # Create invited, but not registered, user
+        cea = CourseEnrollmentAllowed(email='robot-allowed@robot.org', course_id=self.course.id, auto_enroll=True)
+        cea.save()
+        self.allowed_email = 'robot-allowed@robot.org'
+
+        self.notregistered_email = 'robot-not-an-email-yet@robot.org'
+        self.assertEqual(User.objects.filter(email=self.notregistered_email).count(), 0)
+
+    def test_verified_user_not_downgraded_on_activation(self):
+        # setup the test state
+        course_enrollment = CourseEnrollment.objects.get(
+            user=self.enrolled_student, course_id=self.course.id
+        )
+        # make this enrollment "verified"
+        course_enrollment.mode = u'verified'
+        course_enrollment.save()
+        self.assertEqual(course_enrollment.mode, u'verified')
+
+        # run the change
+        self.enrolled_student.is_active = True
+        self.enrolled_student.save()
+
+        # reload values from the database + make sure they are in the expected state
+        course_enrollment = CourseEnrollment.objects.get(
+            user=self.enrolled_student, course_id=self.course.id
+        )
+        student = User.objects.get(email=self.enrolled_student.email)
+        cea = CourseEnrollmentAllowed.objects.get(email=self.enrolled_student.email)
+
+        self.assertEqual(course_enrollment.mode, u"verified")
+        self.assertEqual(student.is_active, True)
+        self.assertEqual(cea.user, self.enrolled_student)
+
+# TODO: test case for adding additional course modes
+# TODO: test case for not enrolled
+# TODO: test case for changed email
