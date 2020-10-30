@@ -2,8 +2,6 @@
 Test cases to cover Accounts change email related to APPSEMBLER_MULTI_TENANT_EMAILS.
 """
 
-
-
 from unittest import skipUnless
 import json
 
