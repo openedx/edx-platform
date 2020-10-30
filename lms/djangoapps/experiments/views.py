@@ -18,7 +18,7 @@ from util.json_request import JsonResponse
 
 from experiments import filters, serializers
 from experiments.models import ExperimentData, ExperimentKeyValue
-from experiments.permissions import IsStaffOrOwner, IsStaffOrReadOnly
+from experiments.permissions import IsStaffOrOwner, IsStaffOrReadOnly, IsStaffOrReadOnlyForSelf
 from experiments.utils import get_experiment_user_metadata_context
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from student.models import get_user_by_username_or_email
@@ -95,7 +95,7 @@ class ExperimentKeyValueViewSet(viewsets.ModelViewSet):
 
 class UserMetaDataView(APIView):
     authentication_classes = (JwtAuthentication, ExperimentCrossDomainSessionAuth,)
-    permission_classes = (IsStaffOrReadOnly,)
+    permission_classes = (IsStaffOrReadOnlyForSelf,)
 
     def get(self, request, course_id=None, username=None):
         """ Return user-metadata for the given course and user """

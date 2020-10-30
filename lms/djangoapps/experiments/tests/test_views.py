@@ -296,21 +296,47 @@ class ExperimentKeyValueViewSetTests(APITestCase):
 
 
 class ExperimentUserMetaDataViewTests(APITestCase, ModuleStoreTestCase):
+    """ Internal user_metadata view/API for use in Optimizely experiments """
 
-    def test_UserMetaDataView_get(self):
-        """ Internal user_metadata view/API for use in Optimizely experiments """
-        user = UserFactory()
-        course = CourseFactory.create(start=now() - timedelta(days=30))
-        call_args = [user.username, course.id]
+    def test_UserMetaDataView_get_success_same_user(self):
+        """ Request succeeds when logged-in user makes request for self """
+        lookup_user = UserFactory()
+        lookup_course = CourseFactory.create(start=now() - timedelta(days=30))
+        call_args = [lookup_user.username, lookup_course.id]
+        self.client.login(username=lookup_user.username, password=UserFactory._DEFAULT_PASSWORD)
+
         response = self.client.get(reverse('api_experiments:user_metadata', args=call_args))
         self.assertEqual(response.status_code, 200)
 
-        call_args_with_bogus_user = ['bugsbunny', course.id]
-        response = self.client.get(reverse('api_experiments:user_metadata', args=call_args_with_bogus_user))
-        self.assertEqual(response.status_code, 404)
-        self.assertEqual(response.json()['message'], 'Provided user is not found')
+    def test_UserMetaDataView_get_success_staff_user(self):
+        """ Request succeeds when logged-in staff user makes request for different user """
+        lookup_user = UserFactory()
+        lookup_course = CourseFactory.create(start=now() - timedelta(days=30))
+        call_args = [lookup_user.username, lookup_course.id]
+        staff_user = UserFactory(is_staff=True)
 
-        call_args_with_bogus_course = [user.username, 'course-v1:edX+DemoX+Demo_BOGUS']
+        self.client.login(username=staff_user.username, password=UserFactory._DEFAULT_PASSWORD)
+
+        response = self.client.get(reverse('api_experiments:user_metadata', args=call_args))
+        self.assertEqual(response.status_code, 200)
+
+    def test_UserMetaDataView_get_different_user(self):
+        """ Request fails when not logged in for requested user or staff  """
+        lookup_user = UserFactory()
+        lookup_course = CourseFactory.create(start=now() - timedelta(days=30))
+        call_args = [lookup_user.username, lookup_course.id]
+
+        response = self.client.get(reverse('api_experiments:user_metadata', args=call_args))
+        self.assertEqual(response.status_code, 401)
+
+    def test_UserMetaDataView_get_missing_course(self):
+        """ Request fails when not course not found  """
+        lookup_user = UserFactory()
+        lookup_course = CourseFactory.create(start=now() - timedelta(days=30))
+        call_args = [lookup_user.username, lookup_course.id]
+        self.client.login(username=lookup_user.username, password=UserFactory._DEFAULT_PASSWORD)
+
+        call_args_with_bogus_course = [lookup_user.username, 'course-v1:edX+DemoX+Demo_BOGUS']
         response = self.client.get(reverse('api_experiments:user_metadata', args=call_args_with_bogus_course))
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json()['message'], 'Provided course is not found')
