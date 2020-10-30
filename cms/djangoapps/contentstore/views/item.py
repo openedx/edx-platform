@@ -43,7 +43,7 @@ from static_replace import replace_static_urls
 from student.auth import has_studio_read_access, has_studio_write_access
 from util.date_utils import get_default_time_display
 from util.json_request import JsonResponse, expect_json
-from util.milestones_helpers import is_entrance_exams_enabled
+from openedx.core.toggles import ENTRANCE_EXAMS
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.library_tools import LibraryToolsService
@@ -100,7 +100,7 @@ def _filter_entrance_exam_grader(graders):
     views/controls like the 'Grade as' dropdown that allows a course author to select
     the grader type for a given section of a course
     """
-    if is_entrance_exams_enabled():
+    if ENTRANCE_EXAMS.is_enabled():
         graders = [grader for grader in graders if grader.get('type') != u'Entrance Exam']
     return graders
 

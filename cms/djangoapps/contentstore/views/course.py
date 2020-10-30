@@ -58,7 +58,6 @@ from util.course import get_link_for_about_page
 from util.date_utils import get_default_time_display
 from util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
 from util.milestones_helpers import (
-    is_entrance_exams_enabled,
     is_prerequisite_courses_enabled,
     is_valid_course_key,
     remove_prerequisite_course,
@@ -66,6 +65,7 @@ from util.milestones_helpers import (
 )
 from util.organizations_helpers import add_organization_course, get_organization_by_short_name, organizations_enabled
 from util.string_utils import _has_non_ascii_characters
+from openedx.core import toggles as core_toggles
 from xblock_django.api import deprecated_xblocks
 from xmodule.contentstore.content import StaticContent
 from xmodule.course_module import DEFAULT_START_DATE, CourseFields
@@ -1121,7 +1121,7 @@ def settings_handler(request, course_key_string):
                 'show_min_grade_warning': False,
                 'enrollment_end_editable': enrollment_end_editable,
                 'is_prerequisite_courses_enabled': is_prerequisite_courses_enabled(),
-                'is_entrance_exams_enabled': is_entrance_exams_enabled(),
+                'is_entrance_exams_enabled': core_toggles.ENTRANCE_EXAMS.is_enabled(),
                 'enable_extended_course_details': enable_extended_course_details,
                 'upgrade_deadline': upgrade_deadline,
                 'course_authoring_microfrontend_url': course_authoring_microfrontend_url,
@@ -1183,7 +1183,7 @@ def settings_handler(request, course_key_string):
                 # feature-specific settings and handle them accordingly
                 # We have to be careful that we're only executing the following logic if we actually
                 # need to create or delete an entrance exam from the specified course
-                if is_entrance_exams_enabled():
+                if core_toggles.ENTRANCE_EXAMS.is_enabled():
                     course_entrance_exam_present = course_module.entrance_exam_enabled
                     entrance_exam_enabled = request.json.get('entrance_exam_enabled', '') == 'true'
                     ee_min_score_pct = request.json.get('entrance_exam_minimum_score_pct', None)
