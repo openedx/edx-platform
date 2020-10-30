@@ -77,7 +77,7 @@ class SegmentTopLevelPropertiesProcessor(object):
             return event
 
         try:
-            for key, val in event['data'].items():
+            for key, val in list(event['data'].items()):
                 if key in event:
                     try:
                         event[key].update(event['data'][key])  # dict
