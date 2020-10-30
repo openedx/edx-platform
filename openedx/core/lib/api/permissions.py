@@ -33,7 +33,6 @@ class ApiKeyHeaderPermission(permissions.BasePermission):
         the X-Edx-Api-Key HTTP header is present in the request and
         matches the setting.
 
-        """
         Appsembler: Actual implementation is now moved to
                     `is_request_has_valid_api_key` to break circular
                     dependency.
