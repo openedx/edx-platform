@@ -1,7 +1,7 @@
 import beeline
 import json
-from itertools import izip
-from urlparse import urlparse
+
+from urllib.parse import urlparse
 
 import cssutils
 import os
@@ -284,7 +284,7 @@ def get_initial_sass_variables():
     """
     values = get_branding_values_from_file()
     labels = get_branding_labels_from_file()
-    return [(val[0], (val[1], lab[1])) for val, lab in izip(values, labels)]
+    return [(val[0], (val[1], lab[1])) for val, lab in zip(values, labels)]
 
 
 @beeline.traced(name="get_branding_values_from_file")
@@ -436,18 +436,18 @@ def migrate_page_element(element):
     Translate the `content` in the page element, apply the same for all children elements.
     """
     if not isinstance(element, dict):
-        print 'DEBUG:', element
+        print('DEBUG:', element)
         raise Exception('An element should be a dict')
 
     if 'options' not in element:
-        print 'DEBUG:', element
+        print('DEBUG:', element)
         raise Exception('Unknown element type')
 
     options = element['options']
 
     if 'content' in options or 'text-content' in options:
         if 'content' in options and 'text-content' in options:
-            print 'DEBUG:', options
+            print('DEBUG:', options)
             raise Exception(
                 'Both `content` and `text-content` are there, but which one to translate?'
             )
@@ -462,7 +462,7 @@ def migrate_page_element(element):
                 'en': options['text-content']
             }
 
-    for _column_name, children in element.get('children', {}).iteritems():
+    for _column_name, children in element.get('children', {}).items():
         for child_element in children:
             migrate_page_element(child_element)
 
@@ -471,8 +471,8 @@ def to_new_page_elements(page_elements):
     """
     Migrate the page elements of a site.
     """
-    for page_id, page_obj in page_elements.iteritems():
-        if isinstance(page_obj, (unicode, str)):
+    for page_id, page_obj in page_elements.items():
+        if isinstance(page_obj, str):
             continue  # Skip pages like `"course-card": "course-tile-01"`
 
         for element in page_obj.get('content', []):
@@ -890,7 +890,7 @@ def _get_initial_page_elements():
                                                 "margin-top": "marg-t-5",
                                                 "margin-left": "marg-l-20",
                                                 "text-content": {
-                                                    "en": "You\u2019ll get to see how the Sample course is built and create your own courses."
+                                                    "en": "You\\u2019ll get to see how the Sample course is built and create your own courses."
                                                 },
                                                 "font-family": "font--primary--regular",
                                                 "text-alignment": "text-align--center"
@@ -966,7 +966,7 @@ def _get_initial_page_elements():
                                                 "margin-top": "marg-t-5",
                                                 "margin-left": "marg-l-20",
                                                 "text-content": {
-                                                    "en": "In the Management Console, you\u2019ll define your site's look and feel and manage site-wide content (e.g. certificates, SSO, custom domain)."
+                                                    "en": "In the Management Console, you\\u2019ll define your site's look and feel and manage site-wide content (e.g. certificates, SSO, custom domain)."
                                                 },
                                                 "font-family": "font--primary--regular",
                                                 "text-alignment": "text-align--center"
