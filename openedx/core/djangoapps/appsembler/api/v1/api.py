@@ -79,7 +79,7 @@ def enroll_learners_in_course(course_id, identifiers, enroll_func, **kwargs):
         - email notification is a seperate method or class
     """
 
-    reason = kwargs.get('reason', u'')
+    reason = kwargs.get('reason', '')
     request_user = kwargs.get('request_user')
     role = kwargs.get('role')
 
@@ -129,7 +129,7 @@ def enroll_learners_in_course(course_id, identifiers, enroll_func, **kwargs):
         except Exception as exc:  # pylint: disable=broad-except
             # catch and log any exceptions
             # so that one error doesn't cause a 500.
-            log.exception(u"Error while enrolling student")
+            log.exception("Error while enrolling student")
             results.append({
                 'identifier': identifier,
                 'error': True,
@@ -165,7 +165,7 @@ def unenroll_learners_in_course(course_id, identifiers, unenroll_func, **kwargs)
           We need to refactor both of our and edX's functions to avoid having
           the `appsembler/api/v1/api.py` module altogether.
     """
-    reason = kwargs.get('reason', u'')
+    reason = kwargs.get('reason', '')
     request_user = kwargs.get('request_user')
     role = kwargs.get('role')
     results = []
@@ -202,7 +202,7 @@ def unenroll_learners_in_course(course_id, identifiers, unenroll_func, **kwargs)
         except Exception as exc:  # pylint: disable=broad-except
             # catch and log any exceptions
             # so that one error doesn't cause a 500.
-            log.exception(u"Error while unenrolling student")
+            log.exception("Error while unenrolling student")
             results.append({
                 'identifier': identifier,
                 'error': True,

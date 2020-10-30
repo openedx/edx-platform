@@ -12,7 +12,7 @@ def as_course_key(course_id):
     '''
     if isinstance(course_id, CourseKey):
         return course_id
-    elif isinstance(course_id, basestring):
+    elif isinstance(course_id, str):
         return CourseKey.from_string(course_id)
     else:
         raise TypeError('Unable to convert course id with type "{}"'.format(
