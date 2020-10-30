@@ -1,9 +1,14 @@
+"""
+Database routers for Tiers app.
+"""
+
 
 class TiersDbRouter(object):
     """
     A router to control all database operations on models in the
     tiers application.
     """
+
     def db_for_read(self, model, **hints):
         """
         Attempts to read tiers models go to tiers db.
@@ -24,8 +29,7 @@ class TiersDbRouter(object):
         """
         Allow relations if a model in the tiers app is involved.
         """
-        if obj1._meta.app_label == 'tiers' or \
-           obj2._meta.app_label == 'tiers':
+        if obj1._meta.app_label == 'tiers' or obj2._meta.app_label == 'tiers':
             return True
         return None
 
