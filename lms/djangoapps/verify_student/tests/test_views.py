@@ -815,7 +815,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
 
         if status == "expired":
             days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
-            attempt.created_at = now() - timedelta(days=(days_good_for + 1))
+            attempt.expiration_date = now() - timedelta(days=1)
             attempt.save()
 
     def _set_deadlines(self, course_key, upgrade_deadline=None, verification_deadline=None, mode_slug="verified"):
@@ -1546,12 +1546,12 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         """
         Test for verification passed.
         """
-        expiry_date = now() + timedelta(
+        expiration_datetime = now() + timedelta(
             days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
         )
         verification = self.create_and_submit_attempt_for_user(self.user)
         verification.approve()
-        verification.expiry_date = now()
+        verification.expiration_date = now()
         verification.expiry_email_date = now()
         verification.save()
 
@@ -1571,8 +1571,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
         old_verification = SoftwareSecurePhotoVerification.objects.get(pk=verification.pk)
         self.assertEqual(attempt.status, u'approved')
-        self.assertEqual(attempt.expiry_date.date(), expiry_date.date())
-        self.assertIsNone(old_verification.expiry_date)
+        self.assertEqual(attempt.expiration_datetime.date(), expiration_datetime.date())
         self.assertIsNone(old_verification.expiry_email_date)
         self.assertEqual(response.content.decode('utf-8'), 'OK!')
         self._assert_verification_approved_email()
@@ -1587,7 +1586,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         """
         Test for verification passed if the learner does not have any previous verification
         """
-        expiry_date = now() + timedelta(
+        expiration_datetime = now() + timedelta(
             days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
         )
 
@@ -1607,7 +1606,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
 
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
         self.assertEqual(attempt.status, u'approved')
-        self.assertEqual(attempt.expiry_date.date(), expiry_date.date())
+        self.assertEqual(attempt.expiration_datetime.date(), expiration_datetime.date())
         self.assertEqual(response.content.decode('utf-8'), 'OK!')
         self._assert_verification_approved_email()
 
@@ -1728,7 +1727,7 @@ class TestReverifyView(TestVerificationBase):
         attempt.approve()
 
         days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
-        attempt.created_at = now() - timedelta(days=(days_good_for + 1))
+        attempt.expiration_date = now() - timedelta(days=(days_good_for + 1))
         attempt.save()
 
         # Allow the student to re-verify
