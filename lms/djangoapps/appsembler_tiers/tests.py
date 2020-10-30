@@ -2,7 +2,7 @@
 Tests for the tiers integration in the LMS.
 """
 
-from __future__ import unicode_literals
+
 
 from django.urls import reverse
 from django.test import TestCase
