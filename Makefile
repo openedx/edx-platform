@@ -63,8 +63,10 @@ detect_changed_source_translations: ## check if translation files are up-to-date
 pull: ## update the Docker image used by "make shell"
 	docker pull edxops/edxapp:latest
 
-requirements: ## install development environment requirements
+pre-requirements: ## install Python requirements for running pip-tools
 	pip install -qr requirements/edx/pip-tools.txt
+
+requirements: pre-requirements ## install development environment requirements
 	pip-sync -q requirements/edx/development.txt requirements/edx/private.*
 
 shell: ## launch a bash shell in a Docker container with all edx-platform dependencies installed
@@ -87,15 +89,14 @@ REQ_FILES = \
 	requirements/edx/development \
 	scripts/xblock/requirements
 
-upgrade: export CUSTOM_COMPILE_COMMAND=make upgrade
-upgrade: ## update the pip requirements files to use the latest releases satisfying our constraints
-	pip install -qr requirements/edx/pip-tools.txt
+compile-requirements: export CUSTOM_COMPILE_COMMAND=make upgrade
+compile-requirements: ## Re-compile *.in requirements to *.txt
 	@ export REBUILD='--rebuild'; \
 	for f in $(REQ_FILES); do \
 		echo ; \
 		echo "== $$f ===============================" ; \
-		echo "pip-compile -v --no-emit-trusted-host --no-index $$REBUILD --upgrade -o $$f.txt $$f.in"; \
-		pip-compile -v --no-emit-trusted-host --no-index $$REBUILD --upgrade -o $$f.txt $$f.in || exit 1; \
+		echo "pip-compile -v --no-emit-trusted-host --no-index $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in"; \
+		pip-compile -v --no-emit-trusted-host --no-index $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in || exit 1; \
 		export REBUILD=''; \
 	done
 	# Post process all of the files generated above to work around open pip-tools issues
@@ -104,6 +105,9 @@ upgrade: ## update the pip requirements files to use the latest releases satisfy
 	grep -e "^django==" requirements/edx/base.txt > requirements/edx/django.txt
 	sed '/^[dD]jango==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
 	mv requirements/edx/testing.tmp requirements/edx/testing.txt
+
+upgrade: pre-requirements ## update the pip requirements files to use the latest releases satisfying our constraints
+	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade"
 
 # These make targets currently only build LMS images.
 docker_build:

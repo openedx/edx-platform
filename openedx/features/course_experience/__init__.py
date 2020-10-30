@@ -8,7 +8,8 @@ from waffle import flag_is_active
 
 from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
 from openedx.core.djangoapps.util.user_messages import UserMessageCollection
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlag, WaffleFlagNamespace
+from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 # Namespace for course experience waffle flags.
 WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='course_experience')
