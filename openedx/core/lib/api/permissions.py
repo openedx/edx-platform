@@ -37,7 +37,6 @@ class ApiKeyHeaderPermission(permissions.BasePermission):
                     `is_request_has_valid_api_key` to break circular
                     dependency.
         """
-        set_custom_metric('deprecated_api_key_header', True)
         return is_request_has_valid_api_key(request)
 
 
