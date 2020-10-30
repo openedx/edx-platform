@@ -23,6 +23,7 @@ from courseware.tests.helpers import LoginEnrollmentTestCase
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from pyquery import PyQuery as pq
 from shoppingcart.models import CourseRegCodeItem, Order, PaidCourseRegistration
 from student.models import CourseEnrollment
@@ -448,6 +449,77 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(self.url)
         # assert we don't get a 500 error
         self.assertEqual(200, response.status_code)
+
+
+@attr(shard=3)
+@ddt.ddt
+class TestInstructorDashboardMenu(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Tests for the instructor dashboard menu option tabs
+    """
+    def setUp(self):
+        """
+        Set up tests
+        """
+        super(TestInstructorDashboardMenu, self).setUp()
+        self.course = CourseFactory.create()
+        self.course_mode = CourseMode(
+            course_id=self.course.id,
+            mode_slug=CourseMode.DEFAULT_MODE_SLUG,
+            mode_display_name=CourseMode.DEFAULT_MODE.name,
+            min_price=40
+        )
+        self.course_info = CourseFactory.create(
+            org="ACME",
+            number="001",
+            run="2017",
+            name="How to defeat the Road Runner"
+        )
+        self.course_mode.save()
+        # Create instructor account
+        self.instructor = AdminFactory.create()
+        self.client.login(username=self.instructor.username, password="test")
+
+        # URL for instructor dash
+        self.url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
+
+    @with_site_configuration(configuration={
+        'INDIVIDUAL_DUE_DATES': False,  # site configuration override
+    })
+    def test_extensions_tab_not_present(self):
+        """
+        Verify that if INDIVIDUAL_DUE_DATES setting is False in site
+        configuration the Extensions tabs isn't displayed despite is True in the
+        global configuration.
+        """
+        url = reverse(
+            'instructor_dashboard',
+            kwargs={
+                'course_id': str(self.course_info.id)
+            }
+        )
+
+        response = self.client.get(url)
+        self.assertNotIn('data-section="extensions"', response.content)
+
+    @with_site_configuration(configuration={
+        'INDIVIDUAL_DUE_DATES': True,  # site configuration override
+    })
+    def test_extensions_tab_present(self):
+        """
+        Verify that if INDIVIDUAL_DUE_DATES setting is True in site
+        configuration the Extensions tabs is displayed despite is False in the
+        global configuration.
+        """
+        url = reverse(
+            'instructor_dashboard',
+            kwargs={
+                'course_id': str(self.course_info.id)
+            }
+        )
+
+        response = self.client.get(url)
+        self.assertIn('data-section="extensions"', response.content)
 
 
 @ddt.ddt
