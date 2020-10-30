@@ -49,5 +49,5 @@ def plugin_settings(settings):
     settings.CELERY_QUEUES.update({
         alternate: {}
         for alternate in settings.ALTERNATE_QUEUES
-        if alternate not in list(settings.CELERY_QUEUES.keys())
+        if alternate not in settings.CELERY_QUEUES.keys()
     })
