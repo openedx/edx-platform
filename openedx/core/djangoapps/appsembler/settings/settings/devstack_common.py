@@ -1,7 +1,7 @@
 """
 Settings for Appsembler on devstack, both LMS and CMS.
 """
-from __future__ import print_function
+
 import sys
 
 
@@ -20,7 +20,7 @@ def plugin_settings(settings):
     # Disable caching in dev environment
     if not settings.FEATURES.get('ENABLE_DEVSTACK_CACHES', False):
         print('\nAppsembler: disabling devstack caches\n', file=sys.stderr)
-        for cache_key in settings.CACHES.keys():
+        for cache_key in list(settings.CACHES.keys()):
             if cache_key != 'celery':  # NOTE: Disabling cache breaks things like Celery subtasks
                 settings.CACHES[cache_key]['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
 

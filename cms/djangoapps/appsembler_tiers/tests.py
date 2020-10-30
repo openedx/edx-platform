@@ -2,8 +2,6 @@
 Tests for the tiers integration in Studio.
 """
 
-from __future__ import unicode_literals
-
 from django.urls import reverse
 from django.test import TestCase, override_settings
 from rest_framework import status

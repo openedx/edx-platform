@@ -48,9 +48,7 @@ class RedirectMiddleware(object):
         site = request.site
         try:
             beeline.add_trace_field("site_id", site.id)
-            in_whitelist = any(map(
-                lambda p: p in request.path,
-                settings.MAIN_SITE_REDIRECT_WHITELIST))
+            in_whitelist = any([p in request.path for p in settings.MAIN_SITE_REDIRECT_WHITELIST])
             if (site.id == settings.SITE_ID) and not in_whitelist:
                 return redirect("https://appsembler.com/tahoe/")
         except Exception:

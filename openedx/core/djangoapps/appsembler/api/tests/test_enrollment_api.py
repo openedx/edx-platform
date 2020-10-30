@@ -376,7 +376,7 @@ class EnrollmentApiPostTest(BaseEnrollmentApiTestCase):
             },
         })
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data['action'] == [u'"{}" is not a valid choice.'.format(
+        assert response.data['action'] == ['"{}" is not a valid choice.'.format(
             'None' if not action else action)]
 
     def test_enroll_learner_by_username(self):

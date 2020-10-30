@@ -69,9 +69,9 @@ class OrganizationFactory(factory.DjangoModelFactory):
     class Meta(object):
         model = organizations.models.Organization
 
-    name = factory.Sequence(u'organization name {}'.format)
-    short_name = factory.Sequence(u'name{}'.format)
-    description = factory.Sequence(u'description{}'.format)
+    name = factory.Sequence('organization name {}'.format)
+    short_name = factory.Sequence('name{}'.format)
+    description = factory.Sequence('description{}'.format)
     logo = None
     active = True
 

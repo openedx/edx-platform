@@ -107,7 +107,7 @@ class MultiTenantLoginTest(CacheIsolationTestCase):
         """
         with with_organization_context(self.RED) as org:
             self.create_user(org)
-            nonexistent_email = u'not_a_user@edx.org'
+            nonexistent_email = 'not_a_user@edx.org'
             response = self.client.post(self.url, {'email': nonexistent_email, 'password': self.PASSWORD})
             assert not response.json()['success'], response.content
             assert response.json()['value'], 'Email or password is incorrect'
