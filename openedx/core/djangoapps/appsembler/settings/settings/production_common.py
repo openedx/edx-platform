@@ -64,7 +64,7 @@ def plugin_settings(settings):
         settings.DATABASES['tiers'] = dj_database_url.parse(settings.TIERS_DATABASE_URL)
         settings.DATABASE_ROUTERS += ['openedx.core.djangoapps.appsembler.sites.routers.TiersDbRouter']
 
-        settings.MIDDLEWARE_CLASSES += (
+        settings.MIDDLEWARE += (
             'tiers.middleware.TierMiddleware',
         )
         settings.INSTALLED_APPS += (

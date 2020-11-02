@@ -5,7 +5,7 @@ from rest_framework import serializers
 from organizations import api as organizations_api
 from organizations.models import Organization
 
-from student.forms import validate_username
+from openedx.core.djangoapps.user_authn.views.registration_form import validate_username
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.appsembler.sites.tasks import (
     import_course_on_site_creation_apply_async,

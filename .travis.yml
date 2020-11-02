@@ -27,6 +27,7 @@ env:
     - TRAVIS_FIXES="pip install -r requirements/edx/local.in"
   jobs:
     - TOXENV=pep8
+    - TOXENV=common-minimal
     # - TOXENV=common
     # - TOXENV=lms-1
     # - TOXENV=lms-2

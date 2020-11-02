@@ -33,9 +33,19 @@ from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentSeri
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.views.register import create_account_with_params
-from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
-from student.forms import PasswordResetFormNoActive
+from openedx.core.djangoapps.user_authn.views.password_reset import PasswordResetFormNoActive
 from student.models import CourseEnrollment
+
+
+if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
+    def check_account_exists(**kwargs):
+        """
+        from openedx.core.djangoapps.user_api.accounts.api import check_account_exists import is broken,
+        this helper silent the error.
+        """
+else:
+    from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
+
 
 from lms.djangoapps.instructor.enrollment import (
     enroll_email,

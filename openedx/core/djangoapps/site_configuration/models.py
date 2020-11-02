@@ -19,6 +19,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
 
+from .exceptions import TahoeConfigurationException
 
 logger = getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -79,20 +80,19 @@ class SiteConfiguration(models.Model):
         # When creating a new object, save default microsite values. Not implemented as a default method on the field
         # because it depends on other fields that should be already filled.
         if not self.id:
-            self.values = self.get_initial_microsite_values()
+            self.site_values = self.get_initial_microsite_values()
 
         # fix for a bug with some pages requiring uppercase platform_name variable
-        self.values['PLATFORM_NAME'] = self.values.get('platform_name', '')
+        self.site_values['PLATFORM_NAME'] = self.site_values.get('platform_name', '')
 
         # Set the default language code for new sites if missing
         # TODO: Move it to somewhere else like in AMC
-        self.values['LANGUAGE_CODE'] = self.values.get('LANGUAGE_CODE', 'en')
+        self.site_values['LANGUAGE_CODE'] = self.site_values.get('LANGUAGE_CODE', 'en')
 
         super(SiteConfiguration, self).save(**kwargs)
 
         # recompile SASS on every save
         self.compile_microsite_sass()
-        #self.collect_css_file()
         return self
 
     def get_value(self, name, default=None):
@@ -199,18 +199,30 @@ class SiteConfiguration(models.Model):
         from openedx.core.djangoapps.appsembler.sites.utils import compile_sass
         css_output = compile_sass('main.scss', custom_branding=self._sass_var_override)
         file_name = self.get_value('css_overrides_file')
+
+        if not file_name:
+            if settings.TAHOE_SILENT_MISSING_CSS_CONFIG:
+                return  # Silent the exception below on during testing
+            else:
+                raise TahoeConfigurationException(
+                    'Missing `css_overrides_file` from SiteConfiguration for `{site}` config_id=`{id}`'.format(
+                        site=self.site.domain,
+                        id=self.id,
+                    )
+                )
+
         if settings.USE_S3_FOR_CUSTOMER_THEMES:
             storage_class = get_storage_class(settings.DEFAULT_FILE_STORAGE)
             storage = storage_class(
                 location="customer_themes",
             )
             with storage.open(file_name, 'w') as f:
-                f.write(css_output.encode('utf-8'))
+                f.write(css_output)
         else:
             theme_folder = os.path.join(settings.COMPREHENSIVE_THEME_DIRS[0], 'customer_themes')
             theme_file = os.path.join(theme_folder, file_name)
             with open(theme_file, 'w') as f:
-                f.write(css_output.encode('utf-8'))
+                f.write(css_output)
 
     def get_css_url(self):
         if settings.USE_S3_FOR_CUSTOMER_THEMES:

@@ -33,10 +33,6 @@ def plugin_settings(settings):
     settings.LMS_ROOT_URL = settings.ENV_TOKENS.get('LMS_ROOT_URL')
     settings.FEATURES['ENABLE_CREATOR_GROUP'] = settings.ENV_TOKENS['FEATURES'].get('ENABLE_CREATOR_GROUP', False)
 
-    settings.MIDDLEWARE_CLASSES += (
-        'organizations.middleware.OrganizationMiddleware',
-    )
-
     settings.COURSE_TO_CLONE = "course-v1:Appsembler+CC101+2017"
 
     settings.CELERY_ALWAYS_EAGER = True

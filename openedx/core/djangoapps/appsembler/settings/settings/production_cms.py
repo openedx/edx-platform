@@ -32,10 +32,6 @@ def plugin_settings(settings):
     if settings.SENTRY_DSN:
         settings.RAVEN_CONFIG['tags']['app'] = 'cms'
 
-    settings.MIDDLEWARE_CLASSES += (
-        'organizations.middleware.OrganizationMiddleware',
-    )
-
     settings.SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
     settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5
