@@ -2,8 +2,6 @@
 Tests for waffle utils views.
 """
 from django.test import TestCase
-from edx_django_utils.monitoring.code_owner import utils as code_owner_utils
-from mock import patch
 from rest_framework.test import APIRequestFactory
 from waffle.testutils import override_switch
 
@@ -50,8 +48,7 @@ class ToggleStateViewTests(TestCase):
     def test_code_owners_without_module_information(self):
         # Create a waffle flag without any associated module_name
         waffle_flag = WaffleFlag(TEST_WAFFLE_FLAG_NAMESPACE, "flag2", module_name=None)
-        with patch.object(code_owner_utils, "get_code_owner_mappings", return_value={}):
-            response = self._get_toggle_state_response(is_staff=True)
+        response = self._get_toggle_state_response(is_staff=True)
 
         result = [
             flag for flag in response.data["waffle_flags"] if flag["name"] == waffle_flag.name
