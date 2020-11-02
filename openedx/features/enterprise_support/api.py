@@ -574,7 +574,7 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
         client = ConsentApiClient(user=request.user)
         current_enterprise_uuid = enterprise_customer_uuid_for_request(request)
         consent_needed = any(
-            current_enterprise_uuid == learner['enterprise_customer']['uuid']
+            str(current_enterprise_uuid) == str(learner['enterprise_customer']['uuid'])
             and Site.objects.get(domain=learner['enterprise_customer']['site']['domain']) == request.site
             and client.consent_required(
                 username=user.username,
@@ -587,7 +587,7 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
 
         if not consent_needed:
             for learner in enterprise_learner_details:
-                if current_enterprise_uuid != learner['enterprise_customer']['uuid']:
+                if str(current_enterprise_uuid) != str(learner['enterprise_customer']['uuid']):
                     LOGGER.info(
                         '[ENTERPRISE DSC] Consent requirement failed due to enterprise mismatch. '
                         'USER: [%s], CurrentEnterprise: [%s], LearnerEnterprise: [%s]',
