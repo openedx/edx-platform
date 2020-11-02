@@ -42,6 +42,12 @@ from course_modes.models import CourseMode
 from lms.djangoapps.courseware.courses import get_courses, sort_by_announcement, sort_by_start_date
 from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
+from openedx.adg.lms.student.helpers import (
+    compose_and_send_adg_course_enrollment_confirmation_email,
+    compose_and_send_adg_update_email_confirmation,
+    compose_and_send_adg_update_email_verification
+)
+from openedx.adg.lms.utils.env_utils import is_testing_environment
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.catalog.utils import get_programs_with_type
 from openedx.core.djangoapps.embargo import api as embargo_api
@@ -360,6 +366,8 @@ def change_enrollment(request, check_access=True):
                 enroll_mode = CourseMode.auto_enroll_mode(course_id, available_modes)
                 if enroll_mode:
                     CourseEnrollment.enroll(user, course_id, check_access=check_access, mode=enroll_mode)
+                    if not is_testing_environment():
+                        compose_and_send_adg_course_enrollment_confirmation_email(user, course_id)
             except Exception:  # pylint: disable=broad-except
                 return HttpResponseBadRequest(_("Could not enroll"))
 
@@ -670,7 +678,10 @@ def do_email_change_request(user, new_email, activation_key=None, secondary_emai
         )
 
     try:
-        ace.send(msg)
+        if is_testing_environment():
+            ace.send(msg)
+        else:
+            compose_and_send_adg_update_email_verification(user, use_https, confirm_link)
     except Exception:
         from_address = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
         log.error(u'Unable to send email activation link to user from "%s"', from_address, exc_info=True)
@@ -778,7 +789,10 @@ def confirm_email_change(request, key):
         u_prof.save()
         # Send it to the old email...
         try:
-            ace.send(msg)
+            if is_testing_environment():
+                ace.send(msg)
+            else:
+                compose_and_send_adg_update_email_confirmation(user, message_context)
         except Exception:  # pylint: disable=broad-except
             log.warning('Unable to send confirmation email to old address', exc_info=True)
             response = render_to_response("email_change_failed.html", {'email': user.email})
@@ -791,7 +805,10 @@ def confirm_email_change(request, key):
         # And send it to the new email...
         msg.recipient = Recipient(user.username, pec.new_email)
         try:
-            ace.send(msg)
+            if is_testing_environment():
+                ace.send(msg)
+            else:
+                compose_and_send_adg_update_email_confirmation(user, message_context)
         except Exception:  # pylint: disable=broad-except
             log.warning('Unable to send confirmation email to new address', exc_info=True)
             response = render_to_response("email_change_failed.html", {'email': pec.new_email})

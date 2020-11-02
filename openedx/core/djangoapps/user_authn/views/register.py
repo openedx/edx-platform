@@ -35,6 +35,8 @@ import third_party_auth
 # Note that this lives in LMS, so this dependency should be refactored.
 # TODO Have the discussions code subscribe to the REGISTER_USER signal instead.
 from lms.djangoapps.discussion.notification_prefs.views import enable_notifications
+from openedx.adg.lms.student.helpers import compose_and_send_adg_activation_email
+from openedx.adg.lms.utils.env_utils import is_testing_environment
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
@@ -217,7 +219,10 @@ def create_account_with_params(request, params):
     if skip_email:
         registration.activate()
     else:
-        compose_and_send_activation_email(user, profile, registration)
+        if is_testing_environment():
+            compose_and_send_activation_email(user, profile, registration)
+        else:
+            compose_and_send_adg_activation_email(user, registration.activation_key)
 
     # Perform operations that are non-critical parts of account creation
     create_or_set_user_attribute_created_on_site(user, request.site)
