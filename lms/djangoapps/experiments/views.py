@@ -102,6 +102,7 @@ class UserMetaDataView(APIView):
         try:
             user = get_user_by_username_or_email(username)
         except User.DoesNotExist:
+            # Note: this will only be seen by staff, for administrative de-bugging purposes
             message = "Provided user is not found"
             return JsonResponse({'message': message}, status=404)
 

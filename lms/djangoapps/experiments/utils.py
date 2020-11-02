@@ -264,7 +264,8 @@ def get_dashboard_course_info(user, dashboard_enrollments):
 
 def get_experiment_user_metadata_context(course, user):
     """
-    Return a context dictionary with the keys used for Optimizely experiments, exposed via user_metadata.html
+    Return a context dictionary with the keys used for Optimizely experiments, exposed via user_metadata.html:
+    view from the DOM in those calling views using: JSON.parse($("#user-metadata").text());
     Most views call this function with both parameters, but student dashboard has only a user
     """
     enrollment = None
