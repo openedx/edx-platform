@@ -628,7 +628,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         Returns a list for the currently logged in user, or for the user named by the 'user' GET
         parameter. If the username does not match that of the currently logged in user, only
         courses for which the currently logged in user has the Staff or Admin role are listed.
-        As a result, a course team member can find out which of his or her own courses a particular
+        As a result, a course team member can find out which of their own courses a particular
         learner is enrolled in.
 
         Only the Staff or Admin role (granted on the Django administrative console as the staff

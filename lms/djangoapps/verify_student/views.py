@@ -508,7 +508,7 @@ class PayAndVerifyView(View):
 
         if user_is_trying_to_pay and self._get_user_active_status(user) and not already_paid:
             # If the user is trying to pay, has activated their account, and the ecommerce service
-            # is enabled redirect him to the ecommerce checkout page.
+            # is enabled redirect them to the ecommerce checkout page.
             ecommerce_service = EcommerceService()
             if ecommerce_service.is_enabled(user):
                 url = ecommerce_service.get_checkout_page_url(

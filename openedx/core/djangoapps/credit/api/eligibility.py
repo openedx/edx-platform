@@ -260,7 +260,7 @@ def set_credit_requirement_status(user, course_key, req_namespace, req_name, sta
                 u'Could not update credit requirement in course "%s" '
                 u'with namespace "%s" and name "%s" '
                 u'because the requirement does not exist. '
-                u'The user "%s" should have had his/her status updated to "%s".'
+                u'The user "%s" should have had their status updated to "%s".'
             ),
             six.text_type(course_key), req_namespace, req_name, user.username, status
         )

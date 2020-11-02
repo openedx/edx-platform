@@ -20,8 +20,8 @@ class CertificatesSupportView(View):
     such as:
 
     * The user's name was spelled incorrectly.
-    * The user later earned a higher grade and wants it on his/her certificate and dashboard.
-    * The user accidentally received an honor code certificate because his/her
+    * The user later earned a higher grade and wants it on their certificate and dashboard.
+    * The user accidentally received an honor code certificate because their
         verification expired before certs were generated.
 
     Most of the heavy lifting is performed client-side through API

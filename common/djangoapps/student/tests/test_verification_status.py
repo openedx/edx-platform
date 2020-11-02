@@ -249,7 +249,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         attempt.mark_ready()
         attempt.submit()
 
-        # Expect that learner has submitted photos for reverfication and his/her
+        # Expect that learner has submitted photos for reverfication and their
         # previous verification is set to expired soon.
         self._assert_course_verification_status(VERIFY_STATUS_RESUBMITTED)
 

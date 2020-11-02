@@ -161,7 +161,7 @@ def _course_team_user(request, course_key, email):
     # can't modify an inactive user but can remove it
     if not (user.is_active or new_role is None):
         msg = {
-            "error": _(u'User {email} has registered but has not yet activated his/her account.').format(email=email),
+            "error": _(u'User {email} has registered but has not yet activated their account.').format(email=email),
         }
         return JsonResponse(msg, 400)
 

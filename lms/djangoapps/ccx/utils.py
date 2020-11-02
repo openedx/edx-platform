@@ -293,7 +293,7 @@ def ccx_course(ccx_locator):
 
 def assign_staff_role_to_ccx(ccx_locator, user, master_course_id):
     """
-    Check if user has ccx_coach role on master course then assign him staff role on ccx only
+    Check if user has ccx_coach role on master course then assign them staff role on ccx only
     if role is not already assigned. Because of this coach can open dashboard from master course
     as well as ccx.
     :param ccx_locator: CCX key
