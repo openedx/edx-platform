@@ -90,7 +90,7 @@ def get_footer(is_secure=True, language=settings.LANGUAGE_CODE):
             # ...
         ],
         "openedx_link": {
-            "url": "http://open.edx.org",
+            "url": "https://open.edx.org",
             "title": "Powered by Open edX",
             "image": "http://example.com/openedx.png"
         }
