@@ -103,14 +103,15 @@ class ConsentApiClient(object):
         # Call the endpoint with the given kwargs, and check the value that it provides.
         response = self.consent_endpoint.get(**kwargs)
 
+        LOGGER.info(
+            '[ENTERPRISE DSC] Consent Requirement Info. APIParams: [%s], APIResponse: [%s], EnrollmentExists: [%s]',
+            kwargs,
+            response,
+            enrollment_exists,
+        )
+
         # No Enterprise record exists, but we're already enrolled in a course. So, go ahead and proceed.
         if enrollment_exists and not response.get('exists', False):
-            LOGGER.info(
-                '[ENTERPRISE DSC] No Consent Required. APIParams: [%s], APIResponse: [%s], EnrollmentExists: [%s]',
-                kwargs,
-                response,
-                enrollment_exists,
-            )
             return False
 
         # In all other cases, just trust the Consent API.
@@ -584,6 +585,27 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
             for learner in enterprise_learner_details
         )
 
+        if not consent_needed:
+            for learner in enterprise_learner_details:
+                if current_enterprise_uuid != learner['enterprise_customer']['uuid']:
+                    LOGGER.info(
+                        '[ENTERPRISE DSC] Consent requirement failed due to enterprise mismatch. '
+                        'USER: [%s], CurrentEnterprise: [%s], LearnerEnterprise: [%s]',
+                        user.username,
+                        current_enterprise_uuid,
+                        learner['enterprise_customer']['uuid']
+                    )
+
+                learner_enterprise_site = Site.objects.get(domain=learner['enterprise_customer']['site']['domain'])
+                if learner_enterprise_site != request.site:
+                    LOGGER.info(
+                        '[ENTERPRISE DSC] Consent requirement failed due to site mismatch. '
+                        'USER: [%s], RequestSite: [%s], LearnerEnterpriseSite: [%s]',
+                        user.username,
+                        request.site,
+                        learner_enterprise_site
+                    )
+
         if consent_needed:
             LOGGER.info(
                 u"Consent from user [{username}] is needed for course [{course_id}]. The user's current enterprise"
@@ -594,7 +616,7 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
             )
         else:
             LOGGER.info(
-                u"Consent from user [{username}] is not needed for course [{course_id}]. The user's current enterprise"
+                u"Consent from user [{username}] is not needed for course [{course_id}]. The user's current enterprise "
                 u"does not require data sharing consent.".format(
                     username=user.username,
                     course_id=course_id
