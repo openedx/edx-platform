@@ -11,7 +11,11 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.db.models.query import Q
-from provider.oauth2.models import AccessToken, RefreshToken, Client
+
+if not settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
+    # TODO: Fix broken imports
+    from provider.oauth2.models import AccessToken, RefreshToken, Client
+
 from django.utils.text import slugify
 
 from organizations import api as org_api

@@ -15,16 +15,20 @@ from mock import Mock
 from testfixtures import LogCapture
 
 from student.tests.factories import UserFactory
-from edx_oauth2_provider.models import TrustedClient
-from edx_oauth2_provider.tests.factories import (
-    TrustedClientFactory,
-    AccessTokenFactory,
-    ClientFactory,
-    RefreshTokenFactory,
-)
-from provider.constants import CONFIDENTIAL, PUBLIC
-from provider.oauth2.models import AccessToken, RefreshToken
-from openedx.core.djangoapps.oauth_dispatch.api import destroy_oauth_tokens
+
+if not settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
+    # TODO: Fix broken imports See https://openedx.atlassian.net/browse/DEPR-47
+    from edx_oauth2_provider.models import TrustedClient
+    from edx_oauth2_provider.tests.factories import (
+        TrustedClientFactory,
+        AccessTokenFactory,
+        ClientFactory,
+        RefreshTokenFactory,
+    )
+
+    from provider.constants import CONFIDENTIAL, PUBLIC
+    from oauth2_provider.models import AccessToken, RefreshToken
+    from openedx.core.djangoapps.oauth_dispatch.api import destroy_oauth_tokens
 
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from student.helpers import get_next_url_for_login_page
@@ -33,7 +37,6 @@ LOGGER_NAME = "student.helpers"
 
 
 @ddt.ddt
-@override_settings(DEFAULT_SITE_THEME='edx-theme-codebase')
 class TestLoginHelper(TestCase):
     """Test login helper methods."""
     static_url = settings.STATIC_URL
@@ -158,7 +161,7 @@ class TestLoginHelper(TestCase):
 
         Appsembler: This is specific to Tahoe and mostly not suitable for contribution to upstream.
         """
-        request = Mock(GET={})
+        request = Mock(GET={}, POST={})
         assert '/dashboard' == get_next_url_for_login_page(request), 'Default should be /dashboard'
 
         with with_site_configuration_context(configuration={
@@ -172,6 +175,10 @@ class TestLoginHelper(TestCase):
             assert '/dashboard' == get_next_url_for_login_page(request), 'Falsy url should default to dashboard'
 
 
+@unittest.skipIf(
+    settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,
+    'edX removed TrustedClient See https://openedx.atlassian.net/browse/DEPR-47'
+)
 class TestDestroyOAuthTokensHelper(TestCase):
     def setUp(self):
         super(TestDestroyOAuthTokensHelper, self).setUp()
@@ -180,7 +187,6 @@ class TestDestroyOAuthTokensHelper(TestCase):
         access_token = AccessTokenFactory.create(user=self.user, client=self.client)
         RefreshTokenFactory.create(user=self.user, client=self.client, access_token=access_token)
 
-    @unittest.skip('TODO: Appsembler fix in Juniper')
     def assert_destroy_behaviour(self, should_be_kept, message):
         """
         Helper to test the `destroy_oauth_tokens` behaviour.

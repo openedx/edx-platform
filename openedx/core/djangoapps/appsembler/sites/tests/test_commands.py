@@ -47,7 +47,7 @@ from student.tests.factories import (
 
 from organizations.models import Organization, OrganizationCourse
 from provider.constants import CONFIDENTIAL
-from provider.oauth2.models import AccessToken, RefreshToken, Client
+from oauth2_provider.models import AccessToken, RefreshToken, Client
 from student.roles import CourseCreatorRole
 
 

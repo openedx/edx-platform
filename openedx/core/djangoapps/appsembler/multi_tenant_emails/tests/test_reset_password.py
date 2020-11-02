@@ -21,7 +21,7 @@ from django.utils.http import int_to_base36
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory, RefreshTokenFactory
 from mock import Mock, patch
 from oauth2_provider import models as dot_models
-from provider.oauth2 import models as dop_models
+from oauth2_provider import models as dop_models
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers

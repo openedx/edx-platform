@@ -2,7 +2,7 @@
 Tests throttling (rate limiting) for the Tahoe API
 """
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.utils import override_settings
 
 from rest_framework import status

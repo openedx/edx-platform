@@ -4,7 +4,7 @@ Tests for openedx.core.djangoapps.appsembler.api.views.RegistrationViewSet
 These tests adapted from Appsembler enterprise `appsembler_api` tests
 
 """
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
 from rest_framework.permissions import AllowAny

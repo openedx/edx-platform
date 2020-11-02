@@ -14,19 +14,17 @@ def plugin_settings(settings):
 
     settings.INSTALLED_APPS += (
         'hijack',
-        'compat',
         'hijack_admin',
 
         'openedx.core.djangoapps.appsembler.sites',
         'openedx.core.djangoapps.appsembler.html_certificates',
         'openedx.core.djangoapps.appsembler.api',
-        'openedx.core.djangoapps.appsembler.honeycomb',  # legacy honeycomb middleware
     )
 
     # insert at beginning because it needs to be earlier in the list than various
     # redirect middleware which will cause later `process_request()` methods to be skipped
-    settings.MIDDLEWARE_CLASSES.insert(
-        0, 'openedx.core.djangoapps.appsembler.honeycomb.middleware.HoneycombLegacyMiddleware'
+    settings.MIDDLEWARE.insert(
+        0, 'beeline.middleware.django.HoneyMiddleware'
     )
 
     settings.DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += (
@@ -41,6 +39,14 @@ def plugin_settings(settings):
     settings.CLONE_COURSE_FOR_NEW_SIGNUPS = False
     settings.HIJACK_ALLOW_GET_REQUESTS = True
     settings.HIJACK_LOGOUT_REDIRECT_URL = '/admin/auth/user'
+
+    # This flag helps to avoid throwing useless exceptions during testing
+    settings.TAHOE_SILENT_MISSING_CSS_CONFIG = False
+
+    # This flag should be removed when we fully migrate all of Tahoe fork to Juniper
+    # until then, instead of commenting out code, this flag should be used so we can easily find
+    # and fix test issues
+    settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS = True
 
     settings.CUSTOM_DOMAINS_REDIRECT_CACHE_TIMEOUT = None  # The length of time we cache Redirect model data
     settings.CUSTOM_DOMAINS_REDIRECT_CACHE_KEY_PREFIX = 'custom_domains_redirects'

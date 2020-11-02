@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.models import PendingEmailChange
