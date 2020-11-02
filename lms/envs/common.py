@@ -1515,10 +1515,6 @@ MIDDLEWARE = [
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
     'edx_rest_framework_extensions.auth.jwt.middleware.JwtAuthCookieMiddleware',
 
-    # Allows us to define redirects via Django admin
-    'openedx.core.djangoapps.appsembler.sites.middleware.CustomDomainsRedirectMiddleware',
-    'openedx.core.djangoapps.appsembler.sites.middleware.RedirectMiddleware',
-
     # Instead of SessionMiddleware, we use a more secure version
     # 'django.contrib.sessions.middleware.SessionMiddleware',
     'openedx.core.djangoapps.safe_sessions.middleware.SafeSessionMiddleware',

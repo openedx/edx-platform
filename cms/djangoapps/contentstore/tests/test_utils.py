@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import unittest
 
 import six
+from django.conf import settings
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
 from pytz import UTC

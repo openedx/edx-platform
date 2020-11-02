@@ -79,9 +79,7 @@ from openedx.core.release import RELEASE_LINE
 
   <body class="${static.dir_rtl()} <%block name='bodyclass'></%block> lang_${LANGUAGE_CODE}">
 
-    <% is_anonymous = user.is_anonymous() %>
-
-    % if not is_anonymous:
+    % if not user.is_anonymous:
 
         <% tier_has_expired = request.session.get('TIER_EXPIRED', False) %>
         <% tier_display_warning = request.session.get('DISPLAY_EXPIRATION_WARNING', False) %>

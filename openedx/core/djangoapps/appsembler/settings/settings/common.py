@@ -48,6 +48,16 @@ def plugin_settings(settings):
     # and fix test issues
     settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS = True
 
+    if not settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
+        # TODO: Fix middlewares
+        _middleware_list = list(settings.MIDDLEWARE)
+        _after_site_mdlwr = _middleware_list.index('django.contrib.sites.middleware.CurrentSiteMiddleware') + 1
+        settings.MIDDLEWARE = tuple(_middleware_list[:_after_site_mdlwr]) + (
+            # Allows us to define redirects via Django admin
+            'openedx.core.djangoapps.appsembler.sites.middleware.CustomDomainsRedirectMiddleware',
+            'openedx.core.djangoapps.appsembler.sites.middleware.RedirectMiddleware',
+        ) + tuple(_middleware_list[_after_site_mdlwr:])
+
     settings.CUSTOM_DOMAINS_REDIRECT_CACHE_TIMEOUT = None  # The length of time we cache Redirect model data
     settings.CUSTOM_DOMAINS_REDIRECT_CACHE_KEY_PREFIX = 'custom_domains_redirects'
 

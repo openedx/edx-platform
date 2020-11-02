@@ -8,6 +8,7 @@ import unittest
 
 import ddt
 import six
+from django.conf import settings
 from django.test.client import RequestFactory
 from django.urls import reverse
 from mock import patch
