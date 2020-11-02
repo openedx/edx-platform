@@ -28,11 +28,11 @@ env:
   jobs:
     - TOXENV=pep8
     - TOXENV=common-minimal
-    # - TOXENV=common
-    # - TOXENV=lms-1
-    # - TOXENV=lms-2
-    # - TOXENV=mte
-    # - TOXENV=studio
+    - TOXENV=common
+    - TOXENV=lms-1
+    - TOXENV=lms-2
+    - TOXENV=mte
+    - TOXENV=studio
 
 script:
   - tox $ARGS
