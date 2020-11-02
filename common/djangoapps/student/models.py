@@ -740,7 +740,7 @@ def user_post_save_callback(sender, **kwargs):
     """
     When a user is modified and either its `is_active` state or email address
     is changed, and the user is, in fact, active, then check to see if there
-    are any courses that it needs to be automatically enrolled in.
+    are any courses that it needs to be automatically enrolled in and enroll them if needed.
 
     Additionally, emit analytics events after saving the User.
     """
@@ -755,8 +755,10 @@ def user_post_save_callback(sender, **kwargs):
             for cea in ceas:
                 # skip enrolling already enrolled users
                 if CourseEnrollment.is_enrolled(user, cea.course_id):
-                    # link the CEA to the user if the user didn't exist at the time the email address
-                    # was sent to the user
+                    # Link the CEA to the user if the CEA isn't already linked to the user
+                    # (e.g. the user was invited to a course but hadn't activated the account yet)
+                    # This is to prevent students from changing e-mails and
+                    # enrolling many accounts through the same e-mail.
                     if not cea.user:
                         cea.user = user
                         cea.save()
