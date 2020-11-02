@@ -24,14 +24,17 @@ from openedx.core.djangoapps.user_api.accounts.utils import (
 )
 from openedx.core.djangoapps.user_api.helpers import FormDescription
 from openedx.core.djangoapps.user_authn.cookies import are_logged_in_cookies_set
-from openedx.core.djangoapps.user_authn.utils import should_redirect_to_logistration_mircrofrontend
+from openedx.core.djangoapps.user_authn.utils import (
+    should_redirect_to_logistration_mircrofrontend,
+    third_party_auth_context
+)
 from openedx.core.djangoapps.user_authn.views.password_reset import get_password_reset_form
 from openedx.core.djangoapps.user_authn.views.registration_form import RegistrationFormFactory
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from openedx.features.enterprise_support.utils import (
-    handle_enterprise_cookies_for_logistration,
     get_enterprise_slug_login_url,
-    update_logistration_context_for_enterprise,
+    handle_enterprise_cookies_for_logistration,
+    update_logistration_context_for_enterprise
 )
 from student.helpers import get_next_url_for_login_page
 from third_party_auth import pipeline
@@ -209,7 +212,7 @@ def login_and_registration_form(request, initial_mode="login"):
         'data': {
             'login_redirect_url': redirect_to,
             'initial_mode': initial_mode,
-            'third_party_auth': _third_party_auth_context(request, redirect_to, third_party_auth_hint),
+            'third_party_auth': third_party_auth_context(request, redirect_to, third_party_auth_hint),
             'third_party_auth_hint': third_party_auth_hint or '',
             'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
             'support_link': configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
@@ -268,75 +271,3 @@ def _get_form_descriptions(request):
         'login': get_login_session_form(request).to_json(),
         'registration': RegistrationFormFactory().get_registration_form(request).to_json()
     }
-
-
-def _third_party_auth_context(request, redirect_to, tpa_hint=None):
-    """Context for third party auth providers and the currently running pipeline.
-
-    Arguments:
-        request (HttpRequest): The request, used to determine if a pipeline
-            is currently running.
-        redirect_to: The URL to send the user to following successful
-            authentication.
-        tpa_hint (string): An override flag that will return a matching provider
-            as long as its configuration has been enabled
-
-    Returns:
-        dict
-
-    """
-    context = {
-        "currentProvider": None,
-        "providers": [],
-        "secondaryProviders": [],
-        "finishAuthUrl": None,
-        "errorMessage": None,
-        "registerFormSubmitButtonText": _("Create Account"),
-        "syncLearnerProfileData": False,
-        "pipeline_user_details": {}
-    }
-
-    if third_party_auth.is_enabled():
-        for enabled in third_party_auth.provider.Registry.displayed_for_login(tpa_hint=tpa_hint):
-            info = {
-                "id": enabled.provider_id,
-                "name": enabled.name,
-                "iconClass": enabled.icon_class or None,
-                "iconImage": enabled.icon_image.url if enabled.icon_image else None,
-                "loginUrl": pipeline.get_login_url(
-                    enabled.provider_id,
-                    pipeline.AUTH_ENTRY_LOGIN,
-                    redirect_url=redirect_to,
-                ),
-                "registerUrl": pipeline.get_login_url(
-                    enabled.provider_id,
-                    pipeline.AUTH_ENTRY_REGISTER,
-                    redirect_url=redirect_to,
-                ),
-            }
-            context["providers" if not enabled.secondary else "secondaryProviders"].append(info)
-
-        running_pipeline = pipeline.get(request)
-        if running_pipeline is not None:
-            current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
-            user_details = running_pipeline['kwargs']['details']
-            if user_details:
-                context['pipeline_user_details'] = user_details
-
-            if current_provider is not None:
-                context["currentProvider"] = current_provider.name
-                context["finishAuthUrl"] = pipeline.get_complete_url(current_provider.backend_name)
-                context["syncLearnerProfileData"] = current_provider.sync_learner_profile_data
-
-                if current_provider.skip_registration_form:
-                    # As a reliable way of "skipping" the registration form, we just submit it automatically
-                    context["autoSubmitRegForm"] = True
-
-        # Check for any error messages we may want to display:
-        for msg in messages.get_messages(request):
-            if msg.extra_tags.split()[0] == "social-auth":
-                # msg may or may not be translated. Try translating [again] in case we are able to:
-                context["errorMessage"] = _(six.text_type(msg))  # pylint: disable=E7610
-                break
-
-    return context
