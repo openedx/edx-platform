@@ -60,6 +60,14 @@ class SegmentIOTrackingTestCaseBase(EventTrackingTestCase):
         )
         segmentio.track_segmentio_event(request)
 
+    def post_modified_segmentio_event(self, event):
+        """Post an externally-defined fake Segment event to the view that processes it"""
+        request = self.create_request(
+            data=json.dumps(event),
+            content_type='application/json'
+        )
+        segmentio.track_segmentio_event(request)
+
     def create_segmentio_event(self, **kwargs):
         """Populate a fake Segment event with data of interest"""
         action = kwargs.get('action', 'Track')

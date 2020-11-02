@@ -123,16 +123,16 @@ def track_segmentio_event(request):  # pylint: disable=too-many-statements
     full_segment_event = request.json
 
     # We mostly care about the properties
-    segment_properties = full_segment_event.get('properties', {})
+    segment_properties = _get_dict_value_with_default(full_segment_event, 'properties', {})
 
     # Start with the context provided by Segment in the "client" field if it exists
     # We should tightly control which fields actually get included in the event emitted.
-    segment_context = full_segment_event.get('context', {})
+    segment_context = _get_dict_value_with_default(full_segment_event, 'context', {})
 
     # Build up the event context by parsing fields out of the event received from Segment
     context = {}
 
-    library_name = segment_context.get('library', {}).get('name')
+    library_name = _get_dict_value_with_default(segment_context, 'library', {}).get('name')
     source_map = getattr(settings, 'TRACKING_SEGMENTIO_SOURCE_MAP', {})
     event_source = source_map.get(library_name)
     if not event_source:
@@ -268,3 +268,12 @@ def _get_segmentio_event_name(event_properties):
 def parse_iso8601_timestamp(timestamp):
     """Parse a particular type of ISO8601 formatted timestamp"""
     return parser.parse(timestamp)
+
+
+def _get_dict_value_with_default(dict_object, key, default):
+    """
+    Returns default if the dict doesn't have the key or if the value is Falsey.
+    Otherwise, returns the dict's value for the key.
+    """
+    value = dict_object.get(key, None)
+    return value if value else default
