@@ -245,7 +245,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         CertificateGenerationConfiguration.objects.create(enabled=True)
 
     @ddt.data('generate_example_certificates', 'enable_certificate_generation')
-    @unittest.skip('TODO: Appsembler - fix require_level("staff") check for certificates after Juniper')
+    @unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'TODO: fix require_level("staff")')
     def test_allow_course_staff(self, url_name):
         url = reverse(url_name, kwargs={'course_id': self.course.id})
 

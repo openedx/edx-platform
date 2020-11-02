@@ -6,7 +6,7 @@ Testing indexing of the courseware as it is changed
 import json
 import time
 from datetime import datetime
-from unittest import skip
+from unittest import skip, skipIf
 from uuid import uuid4
 
 import ddt
@@ -565,7 +565,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         self._perform_test_using_store(store_type, self._test_not_indexable)
 
     @ddt.data(*WORKS_WITH_STORES)
-    @skip('TODO: Appsembler fix date failures after Juniper')
+    @skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'TODO: fix date failures')
     def test_start_date_propagation(self, store_type):
         self._perform_test_using_store(store_type, self._test_start_date_propagation)
 

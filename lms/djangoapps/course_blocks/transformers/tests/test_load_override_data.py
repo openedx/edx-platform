@@ -9,6 +9,7 @@ import unittest
 import ddt
 import pytz
 
+from django.conf import settings
 from lms.djangoapps.course_blocks.transformers.load_override_data import REQUESTED_FIELDS, OverrideDataTransformer
 from lms.djangoapps.courseware.student_field_overrides import get_override_for_user, override_field_for_user
 from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
@@ -29,7 +30,7 @@ expected_overrides = {
 
 
 @ddt.ddt
-@unittest.skip('TODO: Appsembler fix course blocks tests failures after Juniper')
+@unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'TODO: fix course blocks tests')
 class TestOverrideDataTransformer(ModuleStoreTestCase):
     """
     Test proper behavior for OverrideDataTransformer

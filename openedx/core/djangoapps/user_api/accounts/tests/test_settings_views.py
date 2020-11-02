@@ -253,7 +253,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
 
         self.assertEqual(len(order_detail), 1)
 
-    @unittest.skip('Appsembler: Failed test in Juniper, to be fixed but low priority')
+    @unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'TODO: fix in Juniper')
     def test_redirect_view(self):
         with override_waffle_flag(REDIRECT_TO_ACCOUNT_MICROFRONTEND, active=True):
             old_url_path = reverse('account_settings')
