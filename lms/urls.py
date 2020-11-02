@@ -101,6 +101,7 @@ urlpatterns = [
     url(r'^communityhub/', include('openedx.features.marketplace.urls')),
     url(r'^idea/', include('openedx.features.idea.urls')),
     url(r'^referral/', include('openedx.features.smart_referral.urls')),
+    url(r'msp/', include('msp_assessment.msp_dashboard.urls')),
 
     # temporary experiment urls block start.
     url(r'^organizations/', TemplateView.as_view(template_name='main_django.html'),
