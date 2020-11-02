@@ -1585,8 +1585,8 @@ PARENTAL_CONSENT_AGE_LIMIT = 13
 # Constants for the footer used on the site and shared with other sites
 # (such as marketing and the blog) via the branding API.
 
-# URL for OpenEdX displayed in the footer
-FOOTER_OPENEDX_URL = "http://open.edx.org"
+# URL for Open edX displayed in the footer
+FOOTER_OPENEDX_URL = "https://open.edx.org"
 
 # URL for the OpenEdX logo image
 # We use logo images served from files.edx.org so we can (roughly) track
