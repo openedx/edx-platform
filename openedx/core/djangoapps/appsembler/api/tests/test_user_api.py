@@ -2,7 +2,7 @@
 from unittest import skip
 
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import resolve, reverse
+from django.urls import resolve, reverse
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory, force_authenticate
 

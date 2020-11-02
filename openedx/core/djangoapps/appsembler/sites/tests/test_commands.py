@@ -46,8 +46,11 @@ from student.tests.factories import (
 )
 
 from organizations.models import Organization, OrganizationCourse
-from provider.constants import CONFIDENTIAL
-from oauth2_provider.models import AccessToken, RefreshToken, Client
+
+if not settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
+    from provider.constants import CONFIDENTIAL
+    from oauth2_provider.models import AccessToken, RefreshToken, Client
+
 from student.roles import CourseCreatorRole
 
 

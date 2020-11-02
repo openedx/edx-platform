@@ -6,7 +6,7 @@ These tests adapted from Appsembler enterprise `appsembler_api` tests
 """
 
 # from django.contrib.sites.models import Site
-from django.core.urlresolvers import resolve, reverse
+from django.urls import resolve, reverse
 
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings

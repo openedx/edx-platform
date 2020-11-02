@@ -18,12 +18,12 @@ class AnalyticsHelpersTests(TestCase):
         self.org = self.mapping.organization
 
     def test_happy_scenario(self, _is_authd):
-        assert self.user.is_authenticated()
+        assert self.user.is_authenticated
         assert should_show_hubspot(self.user)
 
     def test_disable_for_non_auth(self, is_authd):
         is_authd.return_value = False
-        assert not self.user.is_authenticated()
+        assert not self.user.is_authenticated
         assert not should_show_hubspot(self.user)
 
     def test_disable_for_none(self, _is_authd):
