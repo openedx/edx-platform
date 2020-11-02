@@ -26,6 +26,8 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 import unittest
 if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
     raise unittest.SkipTest('fix broken tests')
+
+
 class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that navigation state is saved properly.
