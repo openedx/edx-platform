@@ -43,10 +43,13 @@ class MultiTenantStudioCourseTeamTestCase(ModuleStoreTestCase):
 
     def setUp(self):
         super(MultiTenantStudioCourseTeamTestCase, self).setUp()
-        self.blue_customer = UserFactory.create(email=self.EMAIL, password=self.PASSWORD)
-        self.blue_course = CourseOverviewFactory.create()  # TODO: mark as a Blue site course
+        with with_organization_context(site_color=self.BLUE) as blue_org:
+            self.blue_customer = create_org_user(blue_org, email=self.EMAIL, password=self.PASSWORD)
+        self.blue_course = CourseOverviewFactory.create()
         self.blue_course_key = self.blue_course.id
+        self.blue_library = LibraryFactory.create()
         CourseInstructorRole(self.blue_course_key).add_users(self.blue_customer)
+        CourseInstructorRole(self.blue_library.location.library_key).add_users(self.blue_customer)
 
         self.blue_learner_email = 'learner1@example.com'
         with with_organization_context(site_color=self.BLUE) as blue_org:
@@ -91,6 +94,21 @@ class MultiTenantStudioCourseTeamTestCase(ModuleStoreTestCase):
         assert response.status_code == status.HTTP_204_NO_CONTENT, response.content
         roles_after = CourseAccessRole.objects.filter(role=self.ROLE, course_id=self.blue_course_key, user=learner)
         assert roles_after.exists(), 'Should be added'
+
+    def test_invite_library_staff(self):
+        """
+        Ensure the invite works for library regardless of the APPSEMBLER_MULTI_TENANT_EMAILS feature.
+        """
+        learner = self.blue_learner
+        library_key = self.blue_library.location.library_key
+        roles_before = CourseAccessRole.objects.filter(role=self.ROLE, course_id=library_key, user=learner)
+        assert not roles_before.exists(), 'should not be added yet to library team'
+        response = self.add_to_team(self.blue_learner_email, library_key)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT, response.content
+
+        roles_after = CourseAccessRole.objects.filter(role=self.ROLE, course_id=library_key, user=learner)
+        assert roles_after.exists(), 'Should be added to library team'
 
     def test_invite_course_staff_registered_twice(self):
         """
