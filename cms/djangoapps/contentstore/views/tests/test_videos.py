@@ -206,12 +206,138 @@ class VideoUploadTestMixin(VideoUploadTestBase):
         self.assertEqual(self.client.get(self.url).status_code, 404)
 
 
+class VideoUploadPostTestsMixin(object):
+    """
+    Shared test cases for video post tests.
+    """
+    @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
+    @patch('boto.s3.key.Key')
+    @patch('boto.s3.connection.S3Connection')
+    def test_post_success(self, mock_conn, mock_key):
+        files = [
+            {
+                'file_name': 'first.mp4',
+                'content_type': 'video/mp4',
+            },
+            {
+                'file_name': 'second.mp4',
+                'content_type': 'video/mp4',
+            },
+            {
+                'file_name': 'third.mov',
+                'content_type': 'video/quicktime',
+            },
+            {
+                'file_name': 'fourth.mp4',
+                'content_type': 'video/mp4',
+            },
+        ]
+
+        bucket = Mock()
+        mock_conn.return_value = Mock(get_bucket=Mock(return_value=bucket))
+        mock_key_instances = [
+            Mock(
+                generate_url=Mock(
+                    return_value='http://example.com/url_{}'.format(file_info['file_name'])
+                )
+            )
+            for file_info in files
+        ]
+        # If extra calls are made, return a dummy
+        mock_key.side_effect = mock_key_instances + [Mock()]
+
+        response = self.client.post(
+            self.url,
+            json.dumps({'files': files}),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        response_obj = json.loads(response.content.decode('utf-8'))
+
+        mock_conn.assert_called_once_with(
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY
+        )
+        self.assertEqual(len(response_obj['files']), len(files))
+        self.assertEqual(mock_key.call_count, len(files))
+        for i, file_info in enumerate(files):
+            # Ensure Key was set up correctly and extract id
+            key_call_args, __ = mock_key.call_args_list[i]
+            self.assertEqual(key_call_args[0], bucket)
+            path_match = re.match(
+                (
+                    settings.VIDEO_UPLOAD_PIPELINE['ROOT_PATH'] +
+                    '/([a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12})$'
+                ),
+                key_call_args[1]
+            )
+            self.assertIsNotNone(path_match)
+            video_id = path_match.group(1)
+            mock_key_instance = mock_key_instances[i]
+
+            mock_key_instance.set_metadata.assert_any_call(
+                'course_video_upload_token',
+                self.test_token
+            )
+
+            mock_key_instance.set_metadata.assert_any_call(
+                'client_video_id',
+                file_info['file_name']
+            )
+            mock_key_instance.set_metadata.assert_any_call('course_key', six.text_type(self.course.id))
+            mock_key_instance.generate_url.assert_called_once_with(
+                KEY_EXPIRATION_IN_SECONDS,
+                'PUT',
+                headers={'Content-Type': file_info['content_type']}
+            )
+
+            # Ensure VAL was updated
+            val_info = get_video_info(video_id)
+            self.assertEqual(val_info['status'], 'upload')
+            self.assertEqual(val_info['client_video_id'], file_info['file_name'])
+            self.assertEqual(val_info['status'], 'upload')
+            self.assertEqual(val_info['duration'], 0)
+            self.assertEqual(val_info['courses'], [{six.text_type(self.course.id): None}])
+
+            # Ensure response is correct
+            response_file = response_obj['files'][i]
+            self.assertEqual(response_file['file_name'], file_info['file_name'])
+            self.assertEqual(response_file['upload_url'], mock_key_instance.generate_url())
+
+    def test_post_non_json(self):
+        response = self.client.post(self.url, {"files": []})
+        self.assertEqual(response.status_code, 400)
+
+    def test_post_malformed_json(self):
+        response = self.client.post(self.url, "{", content_type="application/json")
+        self.assertEqual(response.status_code, 400)
+
+    def test_post_invalid_json(self):
+        def assert_bad(content):
+            """Make request with content and assert that response is 400"""
+            response = self.client.post(
+                self.url,
+                json.dumps(content),
+                content_type="application/json"
+            )
+            self.assertEqual(response.status_code, 400)
+
+        # Top level missing files key
+        assert_bad({})
+
+        # Entry missing file_name
+        assert_bad({"files": [{"content_type": "video/mp4"}]})
+
+        # Entry missing content_type
+        assert_bad({"files": [{"file_name": "test.mp4"}]})
+
+
 @ddt.ddt
 @patch.dict("django.conf.settings.FEATURES", {"ENABLE_VIDEO_UPLOAD_PIPELINE": True})
 @override_settings(VIDEO_UPLOAD_PIPELINE={
     "VEM_S3_BUCKET": "vem_test_bucket", "BUCKET": "test_bucket", "ROOT_PATH": "test_root"
 })
-class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
+class VideosHandlerTestCase(VideoUploadTestMixin, VideoUploadPostTestsMixin, CourseTestCase):
     """Test cases for the main video upload endpoint"""
 
     VIEW_NAME = 'videos_handler'
@@ -333,33 +459,6 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'video_upload_pagination')
-
-    def test_post_non_json(self):
-        response = self.client.post(self.url, {"files": []})
-        self.assertEqual(response.status_code, 400)
-
-    def test_post_malformed_json(self):
-        response = self.client.post(self.url, "{", content_type="application/json")
-        self.assertEqual(response.status_code, 400)
-
-    def test_post_invalid_json(self):
-        def assert_bad(content):
-            """Make request with content and assert that response is 400"""
-            response = self.client.post(
-                self.url,
-                json.dumps(content),
-                content_type="application/json"
-            )
-            self.assertEqual(response.status_code, 400)
-
-        # Top level missing files key
-        assert_bad({})
-
-        # Entry missing file_name
-        assert_bad({"files": [{"content_type": "video/mp4"}]})
-
-        # Entry missing content_type
-        assert_bad({"files": [{"file_name": "test.mp4"}]})
 
     @override_settings(AWS_ACCESS_KEY_ID="test_key_id", AWS_SECRET_ACCESS_KEY="test_secret")
     @patch("boto.s3.key.Key")
@@ -501,100 +600,6 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         mock_conn.return_value.get_bucket.assert_called_once_with(
             settings.VIDEO_UPLOAD_PIPELINE['VEM_S3_BUCKET'], validate=False  # pylint: disable=unsubscriptable-object
         )
-
-    @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
-    @patch('boto.s3.key.Key')
-    @patch('boto.s3.connection.S3Connection')
-    def test_post_success(self, mock_conn, mock_key):
-        files = [
-            {
-                'file_name': 'first.mp4',
-                'content_type': 'video/mp4',
-            },
-            {
-                'file_name': 'second.mp4',
-                'content_type': 'video/mp4',
-            },
-            {
-                'file_name': 'third.mov',
-                'content_type': 'video/quicktime',
-            },
-            {
-                'file_name': 'fourth.mp4',
-                'content_type': 'video/mp4',
-            },
-        ]
-
-        bucket = Mock()
-        mock_conn.return_value = Mock(get_bucket=Mock(return_value=bucket))
-        mock_key_instances = [
-            Mock(
-                generate_url=Mock(
-                    return_value='http://example.com/url_{}'.format(file_info['file_name'])
-                )
-            )
-            for file_info in files
-        ]
-        # If extra calls are made, return a dummy
-        mock_key.side_effect = mock_key_instances + [Mock()]
-
-        response = self.client.post(
-            self.url,
-            json.dumps({'files': files}),
-            content_type='application/json'
-        )
-        self.assertEqual(response.status_code, 200)
-        response_obj = json.loads(response.content.decode('utf-8'))
-
-        mock_conn.assert_called_once_with(
-            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY
-        )
-        self.assertEqual(len(response_obj['files']), len(files))
-        self.assertEqual(mock_key.call_count, len(files))
-        for i, file_info in enumerate(files):
-            # Ensure Key was set up correctly and extract id
-            key_call_args, __ = mock_key.call_args_list[i]
-            self.assertEqual(key_call_args[0], bucket)
-            path_match = re.match(
-                (
-                    settings.VIDEO_UPLOAD_PIPELINE['ROOT_PATH'] +
-                    '/([a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12})$'
-                ),
-                key_call_args[1]
-            )
-            self.assertIsNotNone(path_match)
-            video_id = path_match.group(1)
-            mock_key_instance = mock_key_instances[i]
-
-            mock_key_instance.set_metadata.assert_any_call(
-                'course_video_upload_token',
-                self.test_token
-            )
-
-            mock_key_instance.set_metadata.assert_any_call(
-                'client_video_id',
-                file_info['file_name']
-            )
-            mock_key_instance.set_metadata.assert_any_call('course_key', six.text_type(self.course.id))
-            mock_key_instance.generate_url.assert_called_once_with(
-                KEY_EXPIRATION_IN_SECONDS,
-                'PUT',
-                headers={'Content-Type': file_info['content_type']}
-            )
-
-            # Ensure VAL was updated
-            val_info = get_video_info(video_id)
-            self.assertEqual(val_info['status'], 'upload')
-            self.assertEqual(val_info['client_video_id'], file_info['file_name'])
-            self.assertEqual(val_info['status'], 'upload')
-            self.assertEqual(val_info['duration'], 0)
-            self.assertEqual(val_info['courses'], [{six.text_type(self.course.id): None}])
-
-            # Ensure response is correct
-            response_file = response_obj['files'][i]
-            self.assertEqual(response_file['file_name'], file_info['file_name'])
-            self.assertEqual(response_file['upload_url'], mock_key_instance.generate_url())
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
     @patch('boto.s3.key.Key')
@@ -838,6 +843,32 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             self.assertContains(response, button_html)
         else:
             self.assertNotContains(response, button_html)
+
+
+@ddt.ddt
+@patch.dict("django.conf.settings.FEATURES", {"ENABLE_VIDEO_UPLOAD_PIPELINE": True})
+@override_settings(VIDEO_UPLOAD_PIPELINE={
+    "VEM_S3_BUCKET": "vem_test_bucket", "BUCKET": "test_bucket", "ROOT_PATH": "test_root"
+})
+class GenerateVideoUploadLinkTestCase(VideoUploadTestBase, VideoUploadPostTestsMixin, CourseTestCase):
+    """
+    Test cases for the main video upload endpoint
+    """
+
+    VIEW_NAME = 'generate_video_upload_link'
+
+    def test_unsupported_requests_fail(self):
+        """
+        The API only supports post, make sure other requests fail
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 405)
+
+        response = self.client.put(self.url)
+        self.assertEqual(response.status_code, 405)
+
+        response = self.client.patch(self.url)
+        self.assertEqual(response.status_code, 405)
 
 
 @ddt.ddt
