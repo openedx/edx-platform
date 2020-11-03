@@ -68,9 +68,45 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
         self.post_segmentio_event(action=action)
         self.assert_no_events_emitted()
 
+    def test_segmentio_ignore_missing_context_entry(self):
+        sample_event_raw = self.create_segmentio_event()
+        del sample_event_raw['context']
+        self.post_modified_segmentio_event(sample_event_raw)
+        self.assert_no_events_emitted()
+
+    def test_segmentio_ignore_null_context_entry(self):
+        sample_event_raw = self.create_segmentio_event()
+        sample_event_raw['context'] = None
+        self.post_modified_segmentio_event(sample_event_raw)
+        self.assert_no_events_emitted()
+
+    def test_segmentio_ignore_missing_library_entry(self):
+        sample_event_raw = self.create_segmentio_event()
+        del sample_event_raw['context']['library']
+        self.post_modified_segmentio_event(sample_event_raw)
+        self.assert_no_events_emitted()
+
+    def test_segmentio_ignore_null_library_entry(self):
+        sample_event_raw = self.create_segmentio_event()
+        sample_event_raw['context']['library'] = None
+        self.post_modified_segmentio_event(sample_event_raw)
+        self.assert_no_events_emitted()
+
     def test_segmentio_ignore_unknown_libraries(self):
         self.post_segmentio_event(library_name='foo')
         self.assert_no_events_emitted()
+
+    @expect_failure_with_message(segmentio.ERROR_MISSING_NAME)
+    def test_segmentio_ignore_missing_properties_entry(self):
+        sample_event_raw = self.create_segmentio_event()
+        del sample_event_raw['properties']
+        self.post_modified_segmentio_event(sample_event_raw)
+
+    @expect_failure_with_message(segmentio.ERROR_MISSING_NAME)
+    def test_segmentio_ignore_null_properties_entry(self):
+        sample_event_raw = self.create_segmentio_event()
+        sample_event_raw['properties'] = None
+        self.post_modified_segmentio_event(sample_event_raw)
 
     @expect_failure_with_message(segmentio.ERROR_USER_NOT_EXIST)
     def test_no_user_for_user_id(self):
@@ -148,43 +184,23 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
     def test_missing_name(self):
         sample_event_raw = self.create_segmentio_event()
         del sample_event_raw['properties']['name']
-        request = self.create_request(
-            data=json.dumps(sample_event_raw),
-            content_type='application/json'
-        )
-
-        segmentio.track_segmentio_event(request)
+        self.post_modified_segmentio_event(sample_event_raw)
 
     @expect_failure_with_message(segmentio.ERROR_MISSING_DATA)
     def test_missing_data(self):
         sample_event_raw = self.create_segmentio_event()
         del sample_event_raw['properties']['data']
-        request = self.create_request(
-            data=json.dumps(sample_event_raw),
-            content_type='application/json'
-        )
-
-        segmentio.track_segmentio_event(request)
+        self.post_modified_segmentio_event(sample_event_raw)
 
     @expect_failure_with_message(segmentio.ERROR_MISSING_TIMESTAMP)
     def test_missing_timestamp(self):
         sample_event_raw = self.create_event_without_fields('timestamp')
-        request = self.create_request(
-            data=json.dumps(sample_event_raw),
-            content_type='application/json'
-        )
-
-        segmentio.track_segmentio_event(request)
+        self.post_modified_segmentio_event(sample_event_raw)
 
     @expect_failure_with_message(segmentio.ERROR_MISSING_RECEIVED_AT)
     def test_missing_received_at(self):
         sample_event_raw = self.create_event_without_fields('receivedAt')
-        request = self.create_request(
-            data=json.dumps(sample_event_raw),
-            content_type='application/json'
-        )
-
-        segmentio.track_segmentio_event(request)
+        self.post_modified_segmentio_event(sample_event_raw)
 
     def create_event_without_fields(self, *fields):
         """Create a fake event and remove some fields from it"""
