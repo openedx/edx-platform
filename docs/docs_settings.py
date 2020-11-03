@@ -12,6 +12,7 @@ if os.environ['EDX_PLATFORM_SETTINGS'] == 'devstack_docker':
     from cms.envs.devstack_docker import (
         ADVANCED_PROBLEM_TYPES,
         COURSE_IMPORT_EXPORT_STORAGE,
+        LIBRARY_AUTHORING_MICROFRONTEND_URL,
         SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE,
         VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE,
         UPDATE_SEARCH_INDEX_JOB_QUEUE,
@@ -21,6 +22,7 @@ else:
     from cms.envs.devstack import (
         ADVANCED_PROBLEM_TYPES,
         COURSE_IMPORT_EXPORT_STORAGE,
+        LIBRARY_AUTHORING_MICROFRONTEND_URL,
         SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE,
         VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE,
         UPDATE_SEARCH_INDEX_JOB_QUEUE,
@@ -37,7 +39,7 @@ FEATURES['RUN_AS_ANALYTICS_SERVER_ENABLED'] = False
 
 INSTALLED_APPS.extend([
     'contentstore.apps.ContentstoreConfig',
-    'course_creators',
+    'cms.djangoapps.course_creators',
     'xblock_config.apps.XBlockConfig',
     'user_tasks',
     'lms.djangoapps.lti_provider'
