@@ -10,7 +10,11 @@ from django.core.cache import cache
 from django.dispatch import receiver
 from pytz import UTC
 
-from cms.djangoapps.contentstore.courseware_index import CoursewareSearchIndexer, CourseAboutSearchIndexer, LibrarySearchIndexer
+from cms.djangoapps.contentstore.courseware_index import (
+    CoursewareSearchIndexer,
+    CourseAboutSearchIndexer,
+    LibrarySearchIndexer
+)
 from cms.djangoapps.contentstore.proctoring import register_special_exams
 from lms.djangoapps.grades.api import task_compute_all_grades_for_course
 from openedx.core.djangoapps.credit.signals import on_course_publish
