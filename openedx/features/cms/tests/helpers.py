@@ -1,14 +1,18 @@
+"""
+Helpers for CMS application unit tests
+"""
 import time
-
 from datetime import datetime
+
 from pytz import UTC
 
-from .factories import CourseRerunFactory
-from openedx.features.cms import helpers
-from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from cms.djangoapps.contentstore.tests.test_courseware_index import COURSE_CHILD_STRUCTURE
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from lms.djangoapps.courseware.courses import get_course_by_id
+from openedx.features.cms import helpers
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+
+from .factories import CourseRerunFactory
 
 RUBRIC_ASSESSMENTS = [
     {
@@ -98,20 +102,6 @@ def create_source_course(store, user, course_start_date):
     ora1_vertical1_sequential1_chapter2.rubric_assessments = RUBRIC_ASSESSMENTS
     helpers.component_update(ora1_vertical1_sequential1_chapter2, user)
 
-    # Ora 2 in Vertical 1 of sequential 1 of chapter 2
-    ora2_vertical1_sequential1_chapter2 = ItemFactory.create(
-        parent_location=vertical1_sequential1_chapter2.location,
-        category="openassessment",
-        display_name="ORA - default assessment dates",
-        name="ora2",
-        modulestore=store,
-        publish_item=True,
-        metadata={
-            'submission_start': '2019-01-01T00:00',
-            'submission_due': '2019-02-01T00:00',
-        }
-    )
-
     # Chapter 3 having no sequential
     ItemFactory.create(
         parent_location=course.location,
@@ -187,13 +177,7 @@ def create_course(store, user):
         emit_signals=True
     )
 
-    result, parent_1_course_1 = CourseRerunFactory.create(
-        run='{}_{}'.format(2, run_suffix_1),
-        source_course_id=parent_1.id,
-        user=user
-    )
-
-    result, parent_1_course_2 = CourseRerunFactory.create(
+    parent_1_course_2 = CourseRerunFactory.create(
         run='{}_{}'.format(3, run_suffix_1),
         source_course_id=parent_1.id,
         user=user
@@ -215,19 +199,13 @@ def create_course(store, user):
         emit_signals=True
     )
 
-    result, parent_2_course_1 = CourseRerunFactory.create(
-        run='{}_{}'.format(2, run_suffix_2),
-        source_course_id=parent_2.id,
-        user=user
-    )
-
-    result, parent_2_course_2 = CourseRerunFactory.create(
+    parent_2_course_2 = CourseRerunFactory.create(
         run='{}_{}'.format(3, run_suffix_2),
         source_course_id=parent_2.id,
         user=user
     )
 
-    result, parent_2_course_3 = CourseRerunFactory.create(
+    parent_2_course_3 = CourseRerunFactory.create(
         run='{}_{}'.format(4, run_suffix_2),
         source_course_id=parent_2_course_2,
         start=datetime(2009, 10, 1, tzinfo=UTC),
@@ -243,12 +221,6 @@ def create_course(store, user):
         run='1_{}'.format(run_suffix_3),
         modulestore=store,
         emit_signals=False
-    )
-
-    result, parent_3_course_1 = CourseRerunFactory.create(
-        run='{}_{}'.format(2, run_suffix_3),
-        source_course_id=parent_3.id,
-        user=user
     )
 
     # Group 4: Parent course without any rerun
@@ -279,9 +251,7 @@ def create_course(store, user):
     # get_course_summaries() only return successful course summaries
     # Hence we have added parent_3 id instead of parent_3_course_1 id
 
-    return list(
-        filter(lambda summary: summary.id in latest_course_keys, store.get_course_summaries())
-    )
+    return [summary.id for summary in latest_course_keys, store.get_course_summaries()]
 
 
 def create_course_and_two_rerun(store, user, emit_signals=True):
@@ -300,13 +270,13 @@ def create_course_and_two_rerun(store, user, emit_signals=True):
         emit_signals=emit_signals
     )
 
-    result, parent_1_course_1 = CourseRerunFactory.create(
+    parent_1_course_1 = CourseRerunFactory.create(
         run='run_id_2',
         source_course_id=parent_1.id,
         user=user
     )
 
-    result, parent_1_course_2 = CourseRerunFactory.create(
+    parent_1_course_2 = CourseRerunFactory.create(
         run='run_id_3',
         source_course_id=parent_1.id,
         user=user

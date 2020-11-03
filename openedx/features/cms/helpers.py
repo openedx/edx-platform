@@ -1,3 +1,6 @@
+"""
+Helper methods for CMS application
+"""
 from dateutil.parser import parse
 from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey
@@ -318,7 +321,6 @@ def create_new_run_id(run_dict, course, run_number):
     """
     if not run_dict.get('release_number'):
         raise_rerun_creation_exception(run_dict, ERROR_MESSAGES['release_number_missing'], exception_class=Exception)
-
 
     course_end_date = calculate_date_by_delta(run_dict['start'], course.start, course.end)
 

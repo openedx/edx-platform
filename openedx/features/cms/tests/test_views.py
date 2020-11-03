@@ -1,21 +1,24 @@
-import mock
-from pytz import UTC
+"""
+Unit tests for CMS application views
+"""
 from datetime import datetime
 
+import mock
+from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory
 from django.test.client import Client
-from django.contrib.auth.models import AnonymousUser
+from opaque_keys.edx.locator import CourseLocator
+from pytz import UTC
 
+from cms.djangoapps.contentstore.views.course import get_in_process_course_actions
 from openedx.core.djangolib.testing.philu_utils import configure_philu_theme
 from openedx.features.cms import views as rerun_views
-from opaque_keys.edx.locator import CourseLocator
-from cms.djangoapps.contentstore.views.course import get_in_process_course_actions
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.exceptions import DuplicateCourseError
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.course_module import CourseFields
+from xmodule.modulestore.exceptions import DuplicateCourseError
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from . import helpers as test_helpers
 from ..constants import ERROR_MESSAGES
@@ -53,7 +56,7 @@ class CourseRerunAutomationViewTestCase(ModuleStoreTestCase):
     @mock.patch('openedx.features.cms.views.create_multiple_reruns')
     @mock.patch('openedx.features.cms.views.get_courses_accessible_to_user')
     def test_course_multiple_rerun_handler_listing(
-            self, mock_get_courses_accessible_to_user, mock_create_multiple_reruns,
+        self, mock_get_courses_accessible_to_user, mock_create_multiple_reruns,
             mock_latest_course_reruns, mock_render_to_response):
         """
         Testing get call to API, for latest course listing, to create rerun from
@@ -86,7 +89,7 @@ class CourseRerunAutomationViewTestCase(ModuleStoreTestCase):
     @mock.patch('openedx.features.cms.views.create_multiple_reruns')
     @mock.patch('openedx.features.cms.views.get_courses_accessible_to_user')
     def test_course_multiple_rerun_handler_create_rerun(
-            self, mock_get_courses_accessible_to_user, mock_create_multiple_reruns,
+        self, mock_get_courses_accessible_to_user, mock_create_multiple_reruns,
             mock_latest_course_reruns, mock_render_to_response):
         """
         Testing post call to API, for creating rerun from json data
@@ -115,15 +118,13 @@ class CourseRerunAutomationViewTestCase(ModuleStoreTestCase):
         assert not mock_latest_course_reruns.called
         assert not mock_render_to_response.called
 
-
     @mock.patch('openedx.features.cms.views.render_to_response')
     @mock.patch('openedx.features.cms.views.helpers.latest_course_reruns')
     @mock.patch('openedx.features.cms.views.create_multiple_reruns')
     @mock.patch('openedx.features.cms.views.get_courses_accessible_to_user')
     def test_course_multiple_rerun_handler_raise_rerun_exception(
-            self, mock_get_courses_accessible_to_user, mock_create_multiple_reruns,
+        self, mock_get_courses_accessible_to_user, mock_create_multiple_reruns,
             mock_latest_course_reruns, mock_render_to_response):
-
         request = self.factory.post(self.rerun_path, data='{"dummy":"data"}',
                                     content_type='application/json')
         request.user = self.user
@@ -146,7 +147,6 @@ class CourseRerunAutomationViewTestCase(ModuleStoreTestCase):
     @mock.patch('openedx.features.cms.views._rerun_course')
     @mock.patch('openedx.features.cms.views.helpers.update_course_re_run_details')
     def test_create_multiple_reruns(self, mock_update_course_re_run_details, mock_rerun_course):
-
         # Input dictionary for the method (as param), which we are testing
         course_rerun_details = [
             {
@@ -223,18 +223,19 @@ class CourseRerunAutomationViewTestCase(ModuleStoreTestCase):
                                                         '2_1.33_20191001_20200101'),
                 'user': self.user
             },
-            {'source_course_key': CourseLocator('organization', 'CS101',
-                                                '4_1.31_20091001_20100101'),
-             'fields': {
-                 'start': datetime(2019, 10, 1, tzinfo=UTC),
-                 'advertised_start': None,
-                 'display_name': 'Computer Science',
-                 'wiki_slug': 'organization.CS101.5_1.33_20191001_20200101'
-             },
-             'destination_course_key': CourseLocator('organization', 'CS101',
-                                                     '5_1.33_20191001_20200101'),
-             'user': self.user
-             },
+            {
+                'source_course_key': CourseLocator('organization', 'CS101',
+                                                   '4_1.31_20091001_20100101'),
+                'fields': {
+                    'start': datetime(2019, 10, 1, tzinfo=UTC),
+                    'advertised_start': None,
+                    'display_name': 'Computer Science',
+                    'wiki_slug': 'organization.CS101.5_1.33_20191001_20200101'
+                },
+                'destination_course_key': CourseLocator('organization', 'CS101',
+                                                        '5_1.33_20191001_20200101'),
+                'user': self.user
+            },
             {
                 'source_course_key': CourseLocator('organization', 'CS101',
                                                    '4_1.31_20091001_20100101'),
@@ -255,7 +256,6 @@ class CourseRerunAutomationViewTestCase(ModuleStoreTestCase):
         mock_rerun_course.assert_has_calls(all_rerun_mock_calls)
 
     def test_create_multiple_reruns_invalid_start_date(self):
-
         course_re_run_details = [
             {
                 "runs": [
@@ -277,7 +277,6 @@ class CourseRerunAutomationViewTestCase(ModuleStoreTestCase):
         self.assertEqual(expected_error_message, runs_0_data['error'])
 
     def test_create_multiple_reruns_from_unknown_course(self):
-
         # Input dictionary for the method (as param), which we are testing
         course_re_run_details = [
             {
@@ -303,7 +302,6 @@ class CourseRerunAutomationViewTestCase(ModuleStoreTestCase):
     @mock.patch('openedx.features.cms.views.helpers.update_course_re_run_details')
     def test_create_multiple_reruns_user_has_no_access_to_course(
             self, mock_update_course_re_run_details):
-
         # Input dictionary for the method (as param), which we are testing
         course_re_run_details = [
             {
@@ -406,6 +404,8 @@ class CourseRerunAutomationViewTestCase(ModuleStoreTestCase):
         destination_course_key = CourseLocator(
             org='TesOrg', course='Test101', run='TestKey_1.1_100'
         )
+
+        # pylint: disable=protected-access
         rerun_views._rerun_course(source_course.id, destination_course_key, self.user, fields)
 
         # Get all course summaries from the store

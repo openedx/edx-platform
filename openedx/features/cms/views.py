@@ -1,25 +1,29 @@
+"""
+Views for CMS application
+"""
 import json
-from pytz import utc
 from copy import deepcopy
 from datetime import datetime
+from logging import getLogger
 
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from logging import getLogger
+from django.views.decorators.csrf import ensure_csrf_cookie
+from pytz import utc
 
 from cms.djangoapps.contentstore.views.course import get_courses_accessible_to_user
 from contentstore.tasks import rerun_course
 from contentstore.utils import add_instructor
-from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
+from course_action_state.models import CourseRerunState
 from edxmako.shortcuts import render_to_response
 from openedx.features.course_card.helpers import get_related_card_id
 from student.auth import has_studio_write_access
-from util.json_request import expect_json, JsonResponse
+from util.json_request import JsonResponse, expect_json
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import EdxJSONEncoder
-from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import DuplicateCourseError
+
 from . import helpers
 from .constants import ERROR_MESSAGES
 
@@ -30,6 +34,16 @@ logger = getLogger(__name__)  # pylint: disable=invalid-name
 @login_required
 @ensure_csrf_cookie
 def course_multiple_rerun_handler(request):
+    """
+    View that handles a creation of multiple course reruns
+
+    Arguments:
+        request(HTTPRequest): user request
+
+    Returns:
+        create_multiple_rerun (html): view for creating multiple course reruns
+
+    """
     courses, in_process_course_actions = get_courses_accessible_to_user(request)
     in_process_action_course_keys = [uca.course_key for uca in in_process_course_actions]
     courses = [
@@ -44,7 +58,7 @@ def course_multiple_rerun_handler(request):
 
         try:
             create_multiple_reruns(course_re_run_details, course_ids, request.user)
-        except Exception as e:
+        except (ValueError, PermissionDenied) as e:
             logger.error('Multiple rerun creation failed with exception: %s', str(e))
             return JsonResponse(course_re_run_details, encoder=EdxJSONEncoder, status=400)
 
@@ -60,6 +74,18 @@ def course_multiple_rerun_handler(request):
 
 
 def create_multiple_reruns(course_re_run_details, course_ids, user):
+    """
+    Create multiple reruns of a requested course ids
+
+    Arguments:
+        course_re_run_details (JSON): A json data of course reruns
+        course_ids (list(int)): list of course ids
+        user (request.user): user entity object
+
+    Returns:
+        ValueError,PermissionDenied: In case of error.
+    """
+
     for course in course_re_run_details:
         for re_run in course['runs']:
             start = '{}-{}'.format(re_run['start_date'], re_run['start_time'])
