@@ -6,12 +6,15 @@ from mock import patch
 import json
 
 from django.contrib.auth.models import User
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import LibraryFactory
+
 from contentstore.views import course_team_handler
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
 from django.test.utils import override_settings
-from student.roles import CourseInstructorRole
+from student.roles import CourseInstructorRole, LibraryUserRole
 from organizations.models import OrganizationCourse
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.appsembler.multi_tenant_emails.tests.test_utils import (
@@ -27,7 +30,7 @@ from student.tests.factories import UserFactory
 
 @patch.dict('django.conf.settings.FEATURES', {'APPSEMBLER_MULTI_TENANT_EMAILS': True})
 @override_settings(DEFAULT_SITE_THEME='edx-theme-codebase')
-class MultiTenantStudioCourseTeamTestCase(TestCase):
+class MultiTenantStudioCourseTeamTestCase(ModuleStoreTestCase):
     """
     Testing the Course Team management when the APPSEMBLER_MULTI_TENANT_EMAILS feature is enabled in Studio.
     """
@@ -51,19 +54,22 @@ class MultiTenantStudioCourseTeamTestCase(TestCase):
 
         OrganizationCourse.objects.create(organization=blue_org, course_id=str(self.blue_course_key))
 
-    def url(self, email):
+    def url(self, email, key):
         self.url = reverse('course_team_handler', kwargs={
             # URL to add team member to a course
-            'course_key_string': str(self.blue_course.id),
+            'course_key_string': str(key),
             'email': email,
         })
 
-    def add_to_course_team(self, email):
-        url = self.url(email)
+    def add_to_team(self, email, key):
+        """
+        Invite a user to the team of a course (or a library).
+        """
+        url = self.url(email, key)
         body = json.dumps({'role': self.ROLE})
         request = RequestFactory().post(url, content_type='application/json', data=body)
         request.user = self.blue_customer
-        response = course_team_handler(request, course_key_string=str(self.blue_course_key), email=email)
+        response = course_team_handler(request, course_key_string=str(key), email=email)
         return response
 
     def test_invite_course_staff_not_found(self):
@@ -71,7 +77,7 @@ class MultiTenantStudioCourseTeamTestCase(TestCase):
         Ensure the invite works regardless of the APPSEMBLER_MULTI_TENANT_EMAILS feature.
         """
         non_existent_email = 'non_existent_email@example.com'
-        response = self.add_to_course_team(non_existent_email)
+        response = self.add_to_team(non_existent_email, self.blue_course.id)
         assert response.status_code == status.HTTP_404_NOT_FOUND, response.content
 
     def test_invite_course_staff(self):
@@ -81,10 +87,8 @@ class MultiTenantStudioCourseTeamTestCase(TestCase):
         learner = self.blue_learner
         roles_before = CourseAccessRole.objects.filter(role=self.ROLE, course_id=self.blue_course_key, user=learner)
         assert not roles_before.exists(), 'Not added yet'
-        response = self.add_to_course_team(self.blue_learner_email)
-
+        response = self.add_to_team(self.blue_learner_email, self.blue_course.id)
         assert response.status_code == status.HTTP_204_NO_CONTENT, response.content
-
         roles_after = CourseAccessRole.objects.filter(role=self.ROLE, course_id=self.blue_course_key, user=learner)
         assert roles_after.exists(), 'Should be added'
 
@@ -98,7 +102,7 @@ class MultiTenantStudioCourseTeamTestCase(TestCase):
             # Register in Red site with the same email as the Blue site
             _red_learner = create_org_user(org, email=self.blue_learner_email)
 
-        response = self.add_to_course_team(self.blue_learner_email)
+        response = self.add_to_team(self.blue_learner_email, self.blue_course.id)
         assert response.status_code == status.HTTP_204_NO_CONTENT, response.content
         roles_after = CourseAccessRole.objects.filter(
             role=self.ROLE,
@@ -118,5 +122,5 @@ class MultiTenantStudioCourseTeamTestCase(TestCase):
             # Register in Red site with the same email as the Blue site
             _red_learner = create_org_user(org, email=red_learner_email)
 
-        response = self.add_to_course_team(red_learner_email)
+        response = self.add_to_team(red_learner_email, self.blue_course.id)
         assert response.status_code == status.HTTP_404_NOT_FOUND, response.content
