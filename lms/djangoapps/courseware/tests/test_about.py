@@ -485,7 +485,7 @@ class CourseAboutTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
     def test_redirect_to_dashboard_unenrolled_ccx(self):
         """
         Assert that when unenrolled user tries to access CCX do not allow the user to self-register.
-        Redirect him to his student dashboard
+        Redirect them to their student dashboard
         """
 
         # create ccx

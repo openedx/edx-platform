@@ -155,7 +155,7 @@ def _create_recent_enrollment_message(course_enrollments, course_modes):
 
 def get_course_enrollments(user, org_whitelist, org_blacklist, course_limit=None):
     """
-    Given a user, return a filtered set of his or her course enrollments.
+    Given a user, return a filtered set of their course enrollments.
 
     Arguments:
         user (User): the user in question.
@@ -194,7 +194,7 @@ def get_course_enrollments(user, org_whitelist, org_blacklist, course_limit=None
 
 def get_filtered_course_entitlements(user, org_whitelist, org_blacklist):
     """
-    Given a user, return a filtered set of his or her course entitlements.
+    Given a user, return a filtered set of their course entitlements.
 
     Arguments:
         user (User): the user in question.
@@ -427,7 +427,7 @@ def _credit_statuses(user, course_enrollments):
                 status["error"] = True
                 log.error(
                     u"Could not find credit provider associated with credit enrollment "
-                    u"for user %s in course %s.  The user will not be able to see his or her "
+                    u"for user %s in course %s.  The user will not be able to see their "
                     u"credit request status on the student dashboard.  This attribute should "
                     u"have been set when the user purchased credit in the course.",
                     user.id, course_key
@@ -442,7 +442,7 @@ def _credit_statuses(user, course_enrollments):
                     status["error"] = True
                     log.error(
                         u"Could not find credit provider info for [%s] in [%s]. The user will not "
-                        u"be able to see his or her credit request status on the student dashboard.",
+                        u"be able to see their credit request status on the student dashboard.",
                         provider_id, provider_info_by_id
                     )
 

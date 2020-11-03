@@ -78,7 +78,7 @@ class XQueueCertInterface(object):
 
        del_cert:   Delete an existing certificate
                    For a user that already has a certificate
-                   this will delete his cert.
+                   this will delete their cert.
 
     """
 

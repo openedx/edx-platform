@@ -338,8 +338,8 @@ class CourseInfoTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_redirect_to_dashboard_unenrolled_ccx(self):
         """
-        Assert that when unenroll student tries to access ccx do not allow him self-register.
-        Redirect him to his student dashboard
+        Assert that when unenroll student tries to access ccx do not allow them self-register.
+        Redirect them to their student dashboard
         """
         # create ccx
         ccx = CcxFactory(course_id=self.course.id, coach=self.coach)

@@ -85,7 +85,7 @@ class TestActivateAccount(TestCase):
         """
         Verify that account correct activation message is displayed.
 
-        If logged in user has not activated his/her account, make sure that an
+        If logged in user has not activated their account, make sure that an
         account activation message is displayed on dashboard sidebar.
         """
         # Log in with test user.

@@ -37,7 +37,7 @@ def index(request):
     """
     if request.user.is_authenticated:
         # Only redirect to dashboard if user has
-        # courses in his/her dashboard. Otherwise UX is a bit cryptic.
+        # courses in their dashboard. Otherwise UX is a bit cryptic.
         # In this case, we want to have the user stay on a course catalog
         # page to make it easier to browse for courses (and register)
         if configuration_helpers.get_value(
