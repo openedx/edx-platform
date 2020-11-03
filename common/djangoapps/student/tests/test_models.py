@@ -407,7 +407,13 @@ class TestAccountRecovery(TestCase):
 
 @ddt.ddt
 class TestUserPostSaveCallback(SharedModuleStoreTestCase):
+    """
+    Tests for the user post save callback.
+    These tests are to ensure that user activation auto-enrolls invited users into courses without
+    changing any existing course mode states.
+    """
     def setUp(self):
+        super(TestUserPostSaveCallback, self).setUp()
         self.course = CourseFactory.create()
 
     @ddt.data(*(set(CourseMode.ALL_MODES) - set(CourseMode.AUDIT_MODES)))
