@@ -14,18 +14,17 @@ from django.http import QueryDict
 from django.urls import reverse
 from django.utils.http import urlquote_plus
 from django.utils.timezone import now
+from edx_toggles.toggles.testutils import override_waffle_flag
 from pytz import UTC
 from waffle.models import Flag
 from waffle.testutils import override_flag
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from lms.djangoapps.courseware.tests.helpers import get_expiration_banner_text
 from experiments.models import ExperimentData
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.api import add_course_goal, remove_course_goal
-from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
     GlobalStaffFactory,
@@ -34,9 +33,9 @@ from lms.djangoapps.courseware.tests.factories import (
     OrgStaffFactory,
     StaffFactory
 )
+from lms.djangoapps.courseware.tests.helpers import get_expiration_banner_text
+from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
-from openedx.features.discounts.applicability import get_discount_expiration_date
-from openedx.features.discounts.utils import format_strikeout_price, REV1008_EXPERIMENT_ID
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.django_comment_common.models import (
@@ -46,7 +45,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_MODERATOR
 )
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
-from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
@@ -55,6 +54,8 @@ from openedx.features.course_experience import (
     SHOW_REVIEWS_TOOL_FLAG,
     SHOW_UPGRADE_MSG_ON_COURSE_HOME
 )
+from openedx.features.discounts.applicability import get_discount_expiration_date
+from openedx.features.discounts.utils import REV1008_EXPERIMENT_ID, format_strikeout_price
 from student.models import CourseEnrollment, FBEEnrollmentExclusion
 from student.tests.factories import UserFactory
 from util.date_utils import strftime_localized
@@ -1019,9 +1020,10 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         mock.Mock(return_value=(HTML("<span>DISCOUNT_PRICE</span>"), True))
     )
     def test_upgrade_message_discount(self):
+        # pylint: disable=no-member
         CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
 
-        with SHOW_UPGRADE_MSG_ON_COURSE_HOME.override(True):
+        with override_waffle_flag(SHOW_UPGRADE_MSG_ON_COURSE_HOME, True):
             response = self.client.get(self.url)
 
         self.assertContains(response, "<span>DISCOUNT_PRICE</span>")

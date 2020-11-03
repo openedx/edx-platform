@@ -11,17 +11,10 @@ import unittest
 from datetime import datetime, timedelta
 from uuid import uuid4
 
+import ddt
 import six
-from markupsafe import escape
-from mock import MagicMock, PropertyMock, call, create_autospec, patch
-from pytz import UTC, utc
-from six import text_type
-from six.moves import range
-from six.moves.urllib.parse import quote, urlencode
-
 from completion.test_utils import CompletionWaffleTestMixin
 from crum import set_current_request
-import ddt
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404, HttpResponseBadRequest
@@ -29,18 +22,25 @@ from django.test import RequestFactory, TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import reverse, reverse_lazy
-from freezegun import freeze_time
+from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
+from markupsafe import escape
 from milestones.tests.utils import MilestonesTestCaseMixin
+from mock import MagicMock, PropertyMock, call, create_autospec, patch
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from pytz import UTC, utc
+from six import text_type
+from six.moves import range
+from six.moves.urllib.parse import quote, urlencode
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, String
-import lms.djangoapps.courseware.views.views as views
 
+import lms.djangoapps.courseware.views.views as views
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from freezegun import freeze_time
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -63,8 +63,9 @@ from lms.djangoapps.courseware.toggles import (
 from lms.djangoapps.courseware.url_helpers import get_microfrontend_url, get_redirect_url
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.courseware.views.index import show_courseware_mfe_link
+from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
-from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
+from lms.djangoapps.grades.config.waffle import waffle_switch as grades_waffle_switch
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
@@ -73,7 +74,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
-from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.url_utils import quote_slashes
@@ -1445,7 +1446,7 @@ class ProgressPageTests(ProgressPageBaseTests):
     def test_progress_queries(self, enable_waffle, initial, subsequent):
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.setup_course()
-        with grades_waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=enable_waffle):
+        with override_waffle_switch(grades_waffle_switch(ASSUME_ZERO_GRADE_IF_ABSENT), active=enable_waffle):
             with self.assertNumQueries(
                 initial, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST
             ), check_mongo_calls(1):
@@ -3135,7 +3136,7 @@ class DatesTabTestCase(ModuleStoreTestCase):
         response = self._get_response(self.course)
         self.assertEqual(response.status_code, 200)
 
-    @RELATIVE_DATES_FLAG.override(active=True)
+    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     @patch('edx_django_utils.monitoring.set_custom_attribute')
     def test_defaults(self, mock_set_custom_attribute):
         enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.VERIFIED)
@@ -3196,7 +3197,7 @@ class DatesTabTestCase(ModuleStoreTestCase):
             # Make sure the assignment type is rendered
             self.assertContains(response, 'Homework:')
 
-    @RELATIVE_DATES_FLAG.override(active=True)
+    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_reset_deadlines_banner_displays(self):
         CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.VERIFIED)
         now = datetime.now(utc)
@@ -3250,7 +3251,7 @@ class TestShowCoursewareMFE(TestCase):
         )
         for user, course_key, is_course_staff, preview_active, redirect_active in combos:
             with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, preview_active):
-                with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=redirect_active):
+                with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=redirect_active):
                     assert show_courseware_mfe_link(user, is_course_staff, course_key) is False
 
     @patch.dict(settings.FEATURES, {'ENABLE_COURSEWARE_MICROFRONTEND': True})
@@ -3270,14 +3271,14 @@ class TestShowCoursewareMFE(TestCase):
         )
         for user, is_course_staff, preview_active, redirect_active in old_mongo_combos:
             with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, preview_active):
-                with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=redirect_active):
+                with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=redirect_active):
                     assert show_courseware_mfe_link(user, is_course_staff, old_course_key) is False
 
         # We've checked all old-style course keys now, so we can test only the
         # new ones going forward. Now we check combinations of waffle flags and
         # user permissions...
         with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, True):
-            with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=True):
+            with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
                 # (preview=on, redirect=on)
                 # Global and Course Staff can see the link.
                 self.assertTrue(show_courseware_mfe_link(global_staff_user, True, new_course_key))
@@ -3286,7 +3287,7 @@ class TestShowCoursewareMFE(TestCase):
 
                 # Regular users don't see the link.
                 self.assertFalse(show_courseware_mfe_link(regular_user, False, new_course_key))
-            with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=False):
+            with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=False):
                 # (preview=on, redirect=off)
                 # Global and Course Staff can see the link.
                 self.assertTrue(show_courseware_mfe_link(global_staff_user, True, new_course_key))
@@ -3297,7 +3298,7 @@ class TestShowCoursewareMFE(TestCase):
                 self.assertFalse(show_courseware_mfe_link(regular_user, False, new_course_key))
 
         with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, False):
-            with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=True):
+            with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
                 # (preview=off, redirect=on)
                 # Global staff see the link anyway
                 self.assertTrue(show_courseware_mfe_link(global_staff_user, True, new_course_key))
@@ -3309,7 +3310,7 @@ class TestShowCoursewareMFE(TestCase):
 
                 # Regular users don't see the link.
                 self.assertFalse(show_courseware_mfe_link(regular_user, False, new_course_key))
-            with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=False):
+            with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=False):
                 # (preview=off, redirect=off)
                 # Global staff see the link anyway
                 self.assertTrue(show_courseware_mfe_link(global_staff_user, True, new_course_key))
@@ -3368,7 +3369,7 @@ class MFERedirectTests(BaseViewsTestCase):
         # learners will be redirected when the waffle flag is set
         lms_url, mfe_url = self._get_urls()
 
-        with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=True):
+        with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
             assert self.client.get(lms_url).url == mfe_url
 
     def test_staff_no_redirect(self):
@@ -3380,14 +3381,14 @@ class MFERedirectTests(BaseViewsTestCase):
         self.client.login(username=course_staff.username, password='test')
 
         assert self.client.get(lms_url).status_code == 200
-        with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=True):
+        with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
             assert self.client.get(lms_url).status_code == 200
 
         # global staff will never be redirected
         self._create_global_staff_user()
         assert self.client.get(lms_url).status_code == 200
 
-        with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=True):
+        with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
             assert self.client.get(lms_url).status_code == 200
 
     def test_exam_no_redirect(self):
@@ -3397,5 +3398,5 @@ class MFERedirectTests(BaseViewsTestCase):
 
         lms_url, mfe_url = self._get_urls()
 
-        with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=True):
+        with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
             assert self.client.get(lms_url).status_code == 200

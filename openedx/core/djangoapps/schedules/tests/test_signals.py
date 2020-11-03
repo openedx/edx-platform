@@ -7,23 +7,24 @@ import datetime
 
 import ddt
 import pytest
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from edx_toggles.toggles.testutils import override_waffle_flag
 from mock import patch
 from pytz import utc
-from student.models import CourseEnrollment
-from student.tests.factories import CourseEnrollmentFactory
 from testfixtures import LogCapture
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.schedules.models import ScheduleExperience
 from openedx.core.djangoapps.schedules.signals import CREATE_SCHEDULE_WAFFLE_FLAG, log
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from student.models import CourseEnrollment
+from student.tests.factories import CourseEnrollmentFactory
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+
 from ..models import Schedule
 from ..tests.factories import ScheduleConfigFactory
 

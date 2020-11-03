@@ -2,8 +2,9 @@
 Toggles for course home experience.
 """
 
+from edx_toggles.toggles import WaffleFlagNamespace
 from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='course_home')
 

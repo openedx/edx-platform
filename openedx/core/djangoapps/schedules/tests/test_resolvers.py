@@ -12,17 +12,17 @@ from django.test.utils import override_settings
 from testfixtures import LogCapture
 from waffle.testutils import override_switch
 
+from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.resolvers import (
     LOG,
     BinnedSchedulesBaseResolver,
-    CourseUpdateResolver,
     CourseNextSectionUpdate,
+    CourseUpdateResolver
 )
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, skip_unless_lms
 from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

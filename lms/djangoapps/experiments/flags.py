@@ -49,18 +49,18 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
 
     When writing tests involving an ExperimentWaffleFlag you must not use the
     override_waffle_flag utility. That will only turn the experiment on or off and won't
-    override bucketing. Instead use ExperimentWaffleFlag's override method which
+    override bucketing. Instead use override_experiment_waffle_flag function which
     will do both. Example:
 
-        with MY_EXPERIMENT_WAFFLE_FLAG.override(active=True, bucket=1):
+        from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
+        with @override_experiment_waffle_flag(MY_EXPERIMENT_WAFFLE_FLAG, active=True, bucket=1):
             ...
 
     or as a decorator:
 
-        @MY_EXPERIMENT_WAFFLE_FLAG.override(active=True, bucket=1)
+        @override_experiment_waffle_flag(MY_EXPERIMENT_WAFFLE_FLAG, active=True, bucket=1)
         def test_my_experiment(self):
             ...
-
     """
     def __init__(
             self,
@@ -259,14 +259,3 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         This disregards `.bucket_flags`.
         """
         return super().is_enabled(course_key)
-
-    @contextmanager
-    def override(self, active=True, bucket=1):  # pylint: disable=arguments-differ
-        # Let CourseWaffleFlag override the base waffle flag value
-        with super().override(active=active):
-            # Now override the experiment bucket value
-            from mock import patch
-            if not active:
-                bucket = 0
-            with patch.object(self, 'get_bucket', return_value=bucket):
-                yield

@@ -17,6 +17,8 @@ from mock import patch
 from urllib.parse import urlencode
 
 from course_modes.models import CourseMode
+from edx_toggles.toggles import WaffleSwitch
+from edx_toggles.toggles.testutils import override_waffle_switch
 from lms.djangoapps.badges.events.course_complete import get_completion_badge
 from lms.djangoapps.badges.tests.factories import (
     BadgeAssertionFactory,
@@ -56,6 +58,7 @@ from util.date_utils import strftime_localized
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+AUTO_CERTIFICATE_GENERATION_SWITCH = WaffleSwitch(waffle.waffle(), waffle.AUTO_CERTIFICATE_GENERATION)
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 FEATURES_WITH_BADGES_ENABLED = FEATURES_WITH_CERTS_ENABLED.copy()
@@ -938,7 +941,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             expected_date = today
         else:
             expected_date = self.course.certificate_available_date
-        with waffle.waffle().override(waffle.AUTO_CERTIFICATE_GENERATION, active=True):
+        with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
             response = self.client.get(test_url)
         date = u'{month} {day}, {year}'.format(
             month=strftime_localized(expected_date, "%B"),

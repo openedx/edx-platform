@@ -23,7 +23,6 @@ from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import add_instructor, reverse_course_url, reverse_usage_url
 from course_action_state.managers import CourseRerunUIStateManager
 from course_action_state.models import CourseRerunState
-from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from student.auth import has_course_author_access
 from student.roles import CourseStaffRole, GlobalStaff, LibraryUserRole

@@ -3,13 +3,12 @@ Tests for course verification sock
 """
 
 
-import mock
-
 import ddt
+import mock
+from edx_toggles.toggles.testutils import override_waffle_flag
 
 from course_modes.models import CourseMode
 from lms.djangoapps.commerce.models import CommerceConfiguration
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from student.tests.factories import CourseEnrollmentFactory, UserFactory

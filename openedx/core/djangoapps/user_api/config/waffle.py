@@ -5,7 +5,7 @@ Waffle flags and switches to change user API functionality.
 
 from django.utils.translation import ugettext_lazy as _
 
-from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
+from edx_toggles.toggles import WaffleSwitchNamespace
 
 SYSTEM_MAINTENANCE_MSG = _(u'System maintenance in progress. Please try again later.')
 WAFFLE_NAMESPACE = u'user_api'

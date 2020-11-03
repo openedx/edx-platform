@@ -19,13 +19,12 @@ from pkg_resources import resource_string
 from pytz import UTC
 from six import text_type
 from web_fragments.fragment import Fragment
-
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Boolean, Integer, List, Scope, String
 
-from openedx.core.djangoapps.waffle_utils import WaffleFlag
+from edx_toggles.toggles import WaffleFlag
 from openedx.core.lib.graph_traversals import traverse_pre_order
 
 from .exceptions import NotFoundError

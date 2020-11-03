@@ -11,8 +11,10 @@ from django.urls import reverse
 from mock import Mock, patch
 
 from course_modes.models import CourseMode
+from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND, COURSE_HOME_MICROFRONTEND_OUTLINE_TAB
+from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, ENABLE_COURSE_GOALS
@@ -32,9 +34,9 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         super().setUp()
         self.url = reverse('course-home-outline-tab', args=[self.course.id])
 
-    @ENABLE_COURSE_GOALS.override(active=True)
-    @COURSE_HOME_MICROFRONTEND.override(active=True)
-    @COURSE_HOME_MICROFRONTEND_OUTLINE_TAB.override(active=True)
+    @override_waffle_flag(ENABLE_COURSE_GOALS, active=True)
+    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_OUTLINE_TAB, active=True)
     @ddt.data(CourseMode.AUDIT, CourseMode.VERIFIED)
     def test_get_authenticated_enrolled_user(self, enrollment_mode):
         CourseEnrollment.enroll(self.user, self.course.id, enrollment_mode)
@@ -66,8 +68,8 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         if resume_course_url:
             self.assertIn('http://', resume_course_url)
 
-    @COURSE_HOME_MICROFRONTEND.override(active=True)
-    @COURSE_HOME_MICROFRONTEND_OUTLINE_TAB.override(active=True)
+    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_OUTLINE_TAB, active=True)
     def test_get_authenticated_user_not_enrolled(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -84,15 +86,15 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         self.assertTrue(all((block.get('title') != "") for block in date_blocks))
         self.assertTrue(all(block.get('date') for block in date_blocks))
 
-    @COURSE_HOME_MICROFRONTEND.override(active=True)
-    @COURSE_HOME_MICROFRONTEND_OUTLINE_TAB.override(active=True)
+    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_OUTLINE_TAB, active=True)
     def test_get_unauthenticated_user(self):
         self.client.logout()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
 
-    @COURSE_HOME_MICROFRONTEND.override(active=True)
-    @COURSE_HOME_MICROFRONTEND_OUTLINE_TAB.override(active=True)
+    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_OUTLINE_TAB, active=True)
     def test_masquerade(self):
         user = UserFactory()
         set_user_preference(user, 'time_zone', 'Asia/Tokyo')
@@ -107,31 +109,31 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         self.update_masquerade(username=user.username)
         self.assertEqual(self.client.get(self.url).data['dates_widget']['user_timezone'], 'Asia/Tokyo')
 
-    @COURSE_HOME_MICROFRONTEND.override(active=True)
-    @COURSE_HOME_MICROFRONTEND_OUTLINE_TAB.override(active=True)
-    @COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.override()
+    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_OUTLINE_TAB, active=True)
+    @override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, active=True)
     def test_handouts(self):
         CourseEnrollment.enroll(self.user, self.course.id)
         self.store.create_item(self.user.id, self.course.id, 'course_info', 'handouts', fields={'data': '<p>Hi</p>'})
         self.assertEqual(self.client.get(self.url).data['handouts_html'], '<p>Hi</p>')
 
-    @COURSE_HOME_MICROFRONTEND.override(active=True)
-    @COURSE_HOME_MICROFRONTEND_OUTLINE_TAB.override(active=True)
+    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_OUTLINE_TAB, active=True)
     def test_get_unknown_course(self):
         url = reverse('course-home-outline-tab', args=['course-v1:unknown+course+2T2020'])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    @COURSE_HOME_MICROFRONTEND.override(active=True)
-    @COURSE_HOME_MICROFRONTEND_OUTLINE_TAB.override(active=False)
+    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_OUTLINE_TAB, active=False)
     @ddt.data(CourseMode.AUDIT, CourseMode.VERIFIED)
     def test_waffle_flag_disabled(self, enrollment_mode):
         CourseEnrollment.enroll(self.user, self.course.id, enrollment_mode)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
 
-    @COURSE_HOME_MICROFRONTEND.override(active=True)
-    @COURSE_HOME_MICROFRONTEND_OUTLINE_TAB.override(active=True)
+    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_OUTLINE_TAB, active=True)
     @ddt.data(True, False)
     def test_welcome_message(self, welcome_message_is_dismissed):
         CourseEnrollment.enroll(self.user, self.course.id)
@@ -157,23 +159,23 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         welcome_message_html = self.client.get(self.url).data['welcome_message_html']
         self.assertEqual(welcome_message_html, None if welcome_message_is_dismissed else '<p>Welcome</p>')
 
-    @COURSE_HOME_MICROFRONTEND.override(active=True)
-    @COURSE_HOME_MICROFRONTEND_OUTLINE_TAB.override(active=True)
+    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_OUTLINE_TAB, active=True)
     @patch('lms.djangoapps.course_home_api.outline.v1.views.generate_offer_html', new=Mock(return_value='<p>Offer</p>'))
     def test_offer_html(self):
         CourseEnrollment.enroll(self.user, self.course.id)
         self.assertEqual(self.client.get(self.url).data['offer_html'], '<p>Offer</p>')
 
-    @COURSE_HOME_MICROFRONTEND.override(active=True)
-    @COURSE_HOME_MICROFRONTEND_OUTLINE_TAB.override(active=True)
+    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_OUTLINE_TAB, active=True)
     @patch('lms.djangoapps.course_home_api.outline.v1.views.generate_course_expired_message', new=Mock(return_value='<p>Expired</p>'))
     def test_course_expired_html(self):
         CourseEnrollment.enroll(self.user, self.course.id)
         self.assertEqual(self.client.get(self.url).data['course_expired_html'], '<p>Expired</p>')
 
-    @ENABLE_COURSE_GOALS.override(active=True)
-    @COURSE_HOME_MICROFRONTEND.override(active=True)
-    @COURSE_HOME_MICROFRONTEND_OUTLINE_TAB.override(active=True)
+    @override_waffle_flag(ENABLE_COURSE_GOALS, active=True)
+    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_OUTLINE_TAB, active=True)
     def test_post_course_goal(self):
         CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
 
@@ -192,8 +194,8 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         self.assertIsNotNone(selected_goal)
         self.assertEqual(selected_goal['key'], 'certify')
 
-    @COURSE_HOME_MICROFRONTEND.override(active=True)
-    @COURSE_HOME_MICROFRONTEND_OUTLINE_TAB.override(active=True)
+    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_OUTLINE_TAB, active=True)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
     @patch('lms.djangoapps.course_api.blocks.transformers.milestones.get_attempt_status_summary')
     def test_proctored_exam(self, mock_summary):
@@ -236,8 +238,8 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         self.assertIsNotNone(exam_data['due'])
         self.assertEqual(exam_data['icon'], 'fa-foo-bar')
 
-    @COURSE_HOME_MICROFRONTEND.override(active=True)
-    @COURSE_HOME_MICROFRONTEND_OUTLINE_TAB.override(active=True)
+    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_OUTLINE_TAB, active=True)
     def test_assignment(self):
         course = CourseFactory.create()
         with self.store.bulk_operations(course.id):
@@ -267,9 +269,9 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         self.assertEqual(ungraded_data['display_name'], 'Ungraded')
         self.assertIsNone(ungraded_data['icon'])
 
-    @COURSE_HOME_MICROFRONTEND.override()
-    @COURSE_HOME_MICROFRONTEND_OUTLINE_TAB.override()
-    @COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.override()
+    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_OUTLINE_TAB, active=True)
+    @override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, active=True)
     @patch('lms.djangoapps.course_home_api.outline.v1.views.generate_offer_html', new=Mock(return_value='<p>Offer</p>'))
     @patch('lms.djangoapps.course_home_api.outline.v1.views.generate_course_expired_message', new=Mock(return_value='<p>Expired</p>'))
     @ddt.data(*itertools.product([True, False], [True, False],

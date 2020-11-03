@@ -2,13 +2,13 @@
 Tests for waffle utils views.
 """
 from django.test import TestCase
+from edx_toggles.toggles.testutils import override_waffle_flag
 from rest_framework.test import APIRequestFactory
 from waffle.testutils import override_switch
 
 from student.tests.factories import UserFactory
 
-from .. import WaffleFlag, WaffleFlagNamespace, WaffleSwitch, WaffleSwitchNamespace
-from ..testutils import override_waffle_flag
+from .. import WaffleFlag, WaffleFlagNamespace
 from ..views import ToggleStateView
 
 TEST_WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace('test')

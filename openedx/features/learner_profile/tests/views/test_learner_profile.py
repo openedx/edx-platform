@@ -10,6 +10,7 @@ from django.conf import settings
 from django.test import override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.locator import CourseLocator
 
 from course_modes.models import CourseMode
@@ -18,7 +19,6 @@ from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFact
 from lms.envs.test import CREDENTIALS_PUBLIC_SERVICE_URL
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.learner_profile.toggles import REDIRECT_TO_PROFILE_MICROFRONTEND
 from openedx.features.learner_profile.views.learner_profile import learner_profile_context
 from student.tests.factories import CourseEnrollmentFactory, UserFactory

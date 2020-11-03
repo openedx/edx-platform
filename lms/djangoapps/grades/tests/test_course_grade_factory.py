@@ -9,7 +9,7 @@ import ddt
 from django.conf import settings
 from mock import patch
 from six import text_type
-
+from edx_toggles.toggles.testutils import override_waffle_switch
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
@@ -17,7 +17,7 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT, waffle
+from ..config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT, waffle_switch
 from ..course_grade import CourseGrade, ZeroCourseGrade
 from ..course_grade_factory import CourseGradeFactory
 from ..subsection_grade import ReadSubsectionGrade, ZeroSubsectionGrade
@@ -132,7 +132,7 @@ class TestCourseGradeFactory(GradeTestBase):
     @ddt.data(*itertools.product((True, False), (True, False)))
     @ddt.unpack
     def test_read_zero(self, assume_zero_enabled, create_if_needed):
-        with waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=assume_zero_enabled):
+        with override_waffle_switch(waffle_switch(ASSUME_ZERO_GRADE_IF_ABSENT), active=assume_zero_enabled):
             grade_factory = CourseGradeFactory()
             course_grade = grade_factory.read(self.request.user, self.course, create_if_needed=create_if_needed)
             if create_if_needed or assume_zero_enabled:

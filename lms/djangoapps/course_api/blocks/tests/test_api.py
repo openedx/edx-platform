@@ -8,16 +8,16 @@ from itertools import product
 import ddt
 import six
 from django.test.client import RequestFactory
+from edx_toggles.toggles.testutils import override_waffle_switch
 from mock import patch
-
-from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
-from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, waffle
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import SampleCourseFactory, check_mongo_calls
 from xmodule.modulestore.tests.sample_courses import BlockInfo
+
+from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
+from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, waffle_switch
 
 from ..api import get_blocks
 
@@ -230,7 +230,7 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
     )
     @ddt.unpack
     def test_query_counts_cached(self, store_type, with_storage_backing):
-        with waffle().override(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
+        with override_waffle_switch(waffle_switch(STORAGE_BACKING_FOR_CACHE), active=with_storage_backing):
             course = self._create_course(store_type)
             self._get_blocks(
                 course,
@@ -247,7 +247,7 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
     @ddt.unpack
     def test_query_counts_uncached(self, store_type_tuple, with_storage_backing):
         store_type, expected_mongo_queries = store_type_tuple
-        with waffle().override(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
+        with override_waffle_switch(waffle_switch(STORAGE_BACKING_FOR_CACHE), active=with_storage_backing):
             course = self._create_course(store_type)
             clear_course_from_cache(course.id)
 

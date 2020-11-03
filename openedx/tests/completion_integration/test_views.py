@@ -5,11 +5,11 @@ Test models, managers, and validators.
 
 
 import ddt
+import six
 from completion import waffle
 from completion.test_utils import CompletionWaffleTestMixin
 from django.urls import reverse
 from rest_framework.test import APIClient
-import six
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import CourseEnrollmentFactory, UserFactory

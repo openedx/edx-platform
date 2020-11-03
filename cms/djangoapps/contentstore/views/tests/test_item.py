@@ -13,6 +13,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
+from edx_toggles.toggles.testutils import override_waffle_switch
 from mock import Mock, PropertyMock, patch
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.asides import AsideUsageKeyV2
@@ -2666,7 +2667,7 @@ class TestXBlockInfo(ItemTest):
         self.course.highlights_enabled_for_messaging = True
         self.store.update_item(self.course, None)
         chapter = self.store.get_item(self.chapter.location)
-        with highlights_setting.override():
+        with override_waffle_switch(highlights_setting, active=True):
             chapter_xblock_info = create_xblock_info(chapter)
             course_xblock_info = create_xblock_info(self.course)
             self.assertTrue(chapter_xblock_info['highlights_enabled'])

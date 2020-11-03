@@ -13,6 +13,7 @@ from mock import MagicMock, Mock, patch
 from six import text_type
 from six.moves import range
 
+from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.courseware.tabs import (
     CourseInfoTab,
@@ -26,7 +27,6 @@ from lms.djangoapps.courseware.tabs import (
 from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.courseware.views.views import StaticCourseTabView, get_static_tab_fragment
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG
 from student.models import CourseEnrollment

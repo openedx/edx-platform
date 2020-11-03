@@ -4,6 +4,7 @@
 
 from datetime import datetime, timedelta
 from http.cookies import SimpleCookie
+from urllib.parse import urlencode
 
 import ddt
 import mock
@@ -20,11 +21,9 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from freezegun import freeze_time
 from pytz import UTC
-from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
 
 from course_modes.models import CourseMode
 from lms.djangoapps.branding.api import get_privacy_url
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
 from openedx.core.djangoapps.user_authn.views.login_form import login_and_registration_form
@@ -124,7 +123,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         Test that rate limiting for logistration enpoints works as expected.
         """
         login_url = reverse('signin_user')
-        for i in range(5):
+        for _ in range(5):
             response = self.client.get(login_url)
             self.assertEqual(response.status_code, 200)
 

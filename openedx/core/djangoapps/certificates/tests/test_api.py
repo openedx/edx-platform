@@ -7,13 +7,15 @@ from datetime import datetime, timedelta
 import ddt
 import pytz
 import waffle
-from django.test import TestCase
-
 from course_modes.models import CourseMode
+from django.test import TestCase
+from edx_toggles.toggles import WaffleSwitch
+from edx_toggles.toggles.testutils import override_waffle_switch
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+
 from openedx.core.djangoapps.certificates import api
 from openedx.core.djangoapps.certificates.config import waffle as certs_waffle
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 
 # TODO: Copied from lms.djangoapps.certificates.models,
@@ -66,8 +68,8 @@ class MockGeneratedCertificate(object):
 @contextmanager
 def configure_waffle_namespace(feature_enabled):
     namespace = certs_waffle.waffle()
-
-    with namespace.override(certs_waffle.AUTO_CERTIFICATE_GENERATION, active=feature_enabled):
+    auto_certificate_generation_switch = WaffleSwitch(namespace, certs_waffle.AUTO_CERTIFICATE_GENERATION)
+    with override_waffle_switch(auto_certificate_generation_switch, active=feature_enabled):
         yield
 
 

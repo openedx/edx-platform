@@ -3,7 +3,7 @@ Waffle flags and switches for user authn.
 """
 
 
-from openedx.core.djangoapps.waffle_utils import WaffleSwitch, WaffleSwitchNamespace
+from edx_toggles.toggles import WaffleSwitch, WaffleSwitchNamespace
 
 _WAFFLE_NAMESPACE = u'user_authn'
 _WAFFLE_SWITCH_NAMESPACE = WaffleSwitchNamespace(name=_WAFFLE_NAMESPACE, log_prefix=u'UserAuthN: ')

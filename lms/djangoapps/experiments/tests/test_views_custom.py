@@ -5,21 +5,19 @@ Tests for experimentation views
 
 from datetime import timedelta
 from uuid import uuid4
-import six
 
+import six
 from django.urls import reverse
 from django.utils.timezone import now
 from rest_framework.test import APITestCase
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.course_blocks.transformers.tests.helpers import ModuleStoreTestCase
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from xmodule.modulestore.tests.factories import CourseFactory
-
 from lms.djangoapps.experiments.views_custom import MOBILE_UPSELL_FLAG
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.factories import CourseFactory
 
 CROSS_DOMAIN_REFERER = 'https://ecommerce.edx.org'
 

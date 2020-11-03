@@ -7,7 +7,8 @@ import ddt
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-# Note that we really shouldn't import from edx_toggles' internal API
+# TODO: we really shouldn't import from edx_toggles' internal API, but that's currently the only way to mock the
+# monitoring functions.
 import edx_toggles.toggles.internal.waffle
 from edx_django_utils.cache import RequestCache
 from mock import call, patch
@@ -17,6 +18,7 @@ from waffle.testutils import override_flag
 from .. import (
     CourseWaffleFlag,
     WaffleFlagNamespace,
+    WaffleSwitchNamespace,
 )
 from ..models import WaffleFlagCourseOverrideModel
 
@@ -174,3 +176,14 @@ class TestCourseWaffleFlag(TestCase):
             self.assertEqual(mock_set_custom_attribute.call_count, 1)
         else:
             self.assertEqual(mock_set_custom_attribute.call_count, 0)
+
+
+class DeprecatedWaffleFlagTests(TestCase):
+    """
+    Tests for the deprecated waffle methods, including override and import paths.
+    """
+
+    def test_waffle_switch_namespace_override(self):
+        namespace = WaffleSwitchNamespace("namespace")
+        with namespace.override("waffle_switch1", True):
+            self.assertTrue(namespace.is_enabled("waffle_switch1"))

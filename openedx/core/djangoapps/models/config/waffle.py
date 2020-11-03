@@ -4,11 +4,8 @@ waffle switches for the course_details view.
 """
 
 
-from openedx.core.djangoapps.waffle_utils import (
-    CourseWaffleFlag,
-    WaffleFlagNamespace,
-    WaffleSwitchNamespace
-)
+from edx_toggles.toggles import WaffleFlagNamespace, WaffleSwitchNamespace
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 COURSE_DETAIL_WAFFLE_NAMESPACE = 'course_detail'
 COURSE_DETAIL_WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name=COURSE_DETAIL_WAFFLE_NAMESPACE)

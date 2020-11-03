@@ -3,7 +3,7 @@ Miscellaneous waffle switches that both LMS and Studio need to access
 """
 
 
-from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
+from edx_toggles.toggles import WaffleSwitchNamespace
 
 # Namespace
 WAFFLE_NAMESPACE = u'course_experience'

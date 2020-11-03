@@ -15,14 +15,15 @@ from django.forms import ValidationError
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.timezone import now
+from edx_toggles.toggles.testutils import override_waffle_switch
 from mock import Mock
 from pytz import UTC
-
-from student.admin import AllowedAuthUserForm, COURSE_ENROLLMENT_ADMIN_SWITCH, UserAdmin, CourseEnrollmentForm
+from student.admin import COURSE_ENROLLMENT_ADMIN_SWITCH, AllowedAuthUserForm, CourseEnrollmentForm, UserAdmin
 from student.models import AllowedAuthUser, CourseEnrollment, LoginFailures
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 
@@ -243,7 +244,7 @@ class CourseEnrollmentAdminTest(SharedModuleStoreTestCase):
         """
         Ensure CourseEnrollmentAdmin views can be enabled with the waffle switch.
         """
-        with COURSE_ENROLLMENT_ADMIN_SWITCH.override(active=True):
+        with override_waffle_switch(COURSE_ENROLLMENT_ADMIN_SWITCH, active=True):
             response = getattr(self.client, method)(url)
         self.assertEqual(response.status_code, 200)
 
@@ -257,7 +258,7 @@ class CourseEnrollmentAdminTest(SharedModuleStoreTestCase):
             course_id=self.course.id,  # pylint: disable=no-member
         )
         search_url = '{}?q={}'.format(reverse('admin:student_courseenrollment_changelist'), self.user.username)
-        with COURSE_ENROLLMENT_ADMIN_SWITCH.override(active=True):
+        with override_waffle_switch(COURSE_ENROLLMENT_ADMIN_SWITCH, active=True):
             response = self.client.get(search_url)
         self.assertEqual(response.status_code, 200)
 
@@ -283,7 +284,7 @@ class CourseEnrollmentAdminTest(SharedModuleStoreTestCase):
             'mode': self.course_enrollment.mode,
         }
 
-        with COURSE_ENROLLMENT_ADMIN_SWITCH.override(active=True):
+        with override_waffle_switch(COURSE_ENROLLMENT_ADMIN_SWITCH, active=True):
             response = self.client.post(
                 reverse('admin:student_courseenrollment_change', args=(self.course_enrollment.id, )),
                 data=data,
@@ -304,7 +305,7 @@ class CourseEnrollmentAdminTest(SharedModuleStoreTestCase):
             'mode': self.course_enrollment.mode,
         }
 
-        with COURSE_ENROLLMENT_ADMIN_SWITCH.override(active=True):
+        with override_waffle_switch(COURSE_ENROLLMENT_ADMIN_SWITCH, active=True):
             with self.assertRaises(ValidationError):
                 self.client.post(
                     reverse('admin:student_courseenrollment_change', args=(self.course_enrollment.id, )),

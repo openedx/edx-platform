@@ -18,7 +18,10 @@ from django.http import HttpResponse
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, reverse
+from edx_toggles.toggles.testutils import override_waffle_switch
 from mock import patch
+from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
+from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 
 from openedx.core.djangoapps.password_policy.compliance import (
     NonCompliantPasswordException,
@@ -26,17 +29,15 @@ from openedx.core.djangoapps.password_policy.compliance import (
 )
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH
 from openedx.core.djangoapps.user_authn.cookies import jwt_cookies
+from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
 from openedx.core.djangoapps.user_authn.views.login import (
-    AllowedAuthUser,
     ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY,
+    AllowedAuthUser,
     _check_user_auth_flow
 )
-from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.lib.api.test_utils import ApiTestCase
-from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
-from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 
 
 @ddt.ddt
@@ -725,7 +726,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             'THIRD_PARTY_AUTH_ONLY_HINT': provider_tpa_hint,
         }
 
-        with ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY.override(switch_enabled):
+        with override_waffle_switch(ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY, switch_enabled):
             if not is_third_party_authenticated:
                 site = self.set_up_site(allowed_domain, default_site_configuration_values)
 
@@ -778,7 +779,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             'THIRD_PARTY_AUTH_ONLY_HINT': provider_tpa_hint,
         }
 
-        with ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY.override(True):
+        with override_waffle_switch(ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY, True):
             site = self.set_up_site(allowed_domain, default_site_configuration_values)
 
             with self.assertLogs(level='WARN') as log:

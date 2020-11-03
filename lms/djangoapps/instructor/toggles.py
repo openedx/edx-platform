@@ -2,7 +2,8 @@
 Waffle flags for instructor dashboard.
 """
 
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace, WaffleFlag
+from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 WAFFLE_NAMESPACE = 'instructor'
 # Namespace for instructor waffle flags.

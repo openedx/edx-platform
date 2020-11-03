@@ -4,9 +4,11 @@ Tests that verify that the admin view loads.
 This is not inside a django app because it is a global property of the system.
 """
 
-from django.test import TestCase, Client
+from django.test import Client, TestCase
 from django.urls import reverse
-from student.tests.factories import UserFactory, TEST_PASSWORD
+from edx_toggles.toggles.testutils import override_waffle_switch
+from student.tests.factories import TEST_PASSWORD, UserFactory
+
 from openedx.core.djangoapps.user_authn.views.login import ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 
 
@@ -37,10 +39,10 @@ class TestAdminView(TestCase):
         assert response.status_code == 302
 
     def test_admin_login_redirect(self):
-        with ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY.override(True):
+        with override_waffle_switch(ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY, True):
             response = self.client.get(reverse('admin:login'))
             assert response.url == '/login?next=/admin'
             assert response.status_code == 302
-        with ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY.override(False):
+        with override_waffle_switch(ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY, False):
             response = self.client.get(reverse('admin:login'))
             assert response.template_name == ['admin/login.html']

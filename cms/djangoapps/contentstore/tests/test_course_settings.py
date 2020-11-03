@@ -15,6 +15,7 @@ from crum import set_current_request
 from django.conf import settings
 from django.test import RequestFactory
 from django.test.utils import override_settings
+from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.models import MilestoneRelationshipType
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
@@ -31,7 +32,6 @@ from cms.djangoapps.models.settings.encoder import CourseSettingsEncoder
 from cms.djangoapps.models.settings.waffle import MATERIAL_RECOMPUTE_ONLY_FLAG
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.models.course_details import CourseDetails
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
 from util import milestones_helpers

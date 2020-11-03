@@ -20,15 +20,15 @@ from six.moves import range
 
 from common.test.utils import XssTestMixin
 from course_modes.models import CourseMode
+from edx_toggles.toggles.testutils import override_waffle_flag
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.tests.factories import StaffFactory, StudentModuleFactory, UserFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
-from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
 from lms.djangoapps.instructor.toggles import DATA_DOWNLOAD_V2
+from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.models import CourseEnrollment
 from student.roles import CourseFinanceAdminRole
 from student.tests.factories import AdminFactory, CourseAccessRoleFactory, CourseEnrollmentFactory

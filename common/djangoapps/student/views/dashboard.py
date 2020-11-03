@@ -16,6 +16,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from edx_django_utils import monitoring as monitoring_utils
 from edx_django_utils.plugins import get_plugins_view_context
+from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import iteritems, text_type
@@ -42,12 +43,10 @@ from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramP
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
-from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.features.enterprise_support.api import get_dashboard_consent_notification
 from openedx.features.enterprise_support.api import (
     get_dashboard_consent_notification,
-    get_enterprise_learner_portal_enabled_message,
+    get_enterprise_learner_portal_enabled_message
 )
 from student.api import COURSE_DASHBOARD_PLUGIN_VIEW_NAME
 from student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
