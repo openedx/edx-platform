@@ -26,7 +26,6 @@ from freezegun import freeze_time
 from mock import Mock, patch
 from oauth2_provider import models as dot_models
 from pytz import UTC
-from six.moves import range
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -45,6 +44,10 @@ from student.models import AccountRecovery
 
 from util.password_policy_validators import create_validator_config
 from util.testing import EventTestMixin
+
+
+ENABLE_LOGISTRATION_MICROFRONTEND = settings.FEATURES.copy()
+ENABLE_LOGISTRATION_MICROFRONTEND['ENABLE_LOGISTRATION_MICROFRONTEND'] = True
 
 
 def process_request(request):
@@ -327,6 +330,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
             SETTING_CHANGE_INITIATED, user_id=self.user.id, setting=u'password', old=None, new=None
         )
 
+    @override_settings(FEATURES=ENABLE_LOGISTRATION_MICROFRONTEND)
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     @ddt.data(('Crazy Awesome Site', 'Crazy Awesome Site'), ('edX', 'edX'))
     @ddt.unpack
@@ -350,6 +354,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
                 reset_msg = reset_msg.format(site_name)
 
                 self.assertIn(reset_msg, msg)
+                self.assertIn(settings.LOGISTRATION_MICROFRONTEND_URL, msg)
 
                 sign_off = u"The {} Team".format(platform_name)
                 self.assertIn(sign_off, msg)
