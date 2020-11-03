@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import unittest
 
 import six
+from django.conf import settings
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
 from pytz import UTC
@@ -198,25 +199,25 @@ class ReleaseDateSourceTest(CourseTestCase):
         self.assertEqual(source.location, expected_source.location)
         self.assertEqual(source.start, expected_source.start)
 
-    @unittest.skip('TODO: Appsembler fix date failures after Juniper')
+    @unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'TODO: fix date failures')
     def test_chapter_source_for_vertical(self):
         """Tests a vertical's release date being set by its chapter"""
         self._update_release_dates(self.date_one, self.date_one, self.date_one)
         self._verify_release_date_source(self.vertical, self.chapter)
 
-    @unittest.skip('TODO: Appsembler fix date failures after Juniper')
+    @unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'TODO: fix date failures')
     def test_sequential_source_for_vertical(self):
         """Tests a vertical's release date being set by its sequential"""
         self._update_release_dates(self.date_one, self.date_two, self.date_two)
         self._verify_release_date_source(self.vertical, self.sequential)
 
-    @unittest.skip('TODO: Appsembler fix date failures after Juniper')
+    @unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'TODO: fix date failures')
     def test_chapter_source_for_sequential(self):
         """Tests a sequential's release date being set by its chapter"""
         self._update_release_dates(self.date_one, self.date_one, self.date_one)
         self._verify_release_date_source(self.sequential, self.chapter)
 
-    @unittest.skip('TODO: Appsembler fix date failures after Juniper')
+    @unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'TODO: fix date failures')
     def test_sequential_source_for_sequential(self):
         """Tests a sequential's release date being set by itself"""
         self._update_release_dates(self.date_one, self.date_two, self.date_two)

@@ -105,7 +105,6 @@ def show_analytics_dashboard_message(course_key):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@beeline.traced(name='instructor.views.instructor_dashboard_2')  # TODO: RED-1242: Remove traced after debugging
 def instructor_dashboard_2(request, course_id):
     """ Display the instructor dashboard for a course. """
     try:
@@ -114,7 +113,6 @@ def instructor_dashboard_2(request, course_id):
         log.error(u"Unable to find course with course key %s while loading the Instructor Dashboard.", course_id)
         return HttpResponseServerError()
 
-    beeline.add_context_field("course_id", course_id)
     course = get_course_by_id(course_key, depth=0)
 
     access = {
@@ -126,10 +124,7 @@ def instructor_dashboard_2(request, course_id):
         'forum_admin': has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR),
         'data_researcher': request.user.has_perm(permissions.CAN_RESEARCH, course_key),
     }
-    beeline.add_context({
-        'access_{name}'.format(name=name): bool(val)
-        for name, val in access.iteritems()
-    })
+
     if not request.user.has_perm(permissions.VIEW_DASHBOARD, course_key):
         raise Http404()
 
@@ -210,17 +205,13 @@ def instructor_dashboard_2(request, course_id):
     if certs_enabled and (access['admin'] or access['staff']) and configuration_helpers.get_value('CERTIFICATES_HTML_VIEW', False):
         sections.append(_section_certificates(course))
 
-    with beeline.tracer(name='instructor.views.instructor_dashboard_2.openassessment_blocks_query'):
-        openassessment_blocks = modulestore().get_items(
-            course_key, qualifiers={'category': 'openassessment'}
-        )
-
-    with beeline.tracer(name='instructor.views.instructor_dashboard_2.openassessment_blocks_list'):
-        # filter out orphaned openassessment blocks
-        openassessment_blocks = [
-            block for block in openassessment_blocks if block.parent is not None
-        ]
-
+    openassessment_blocks = modulestore().get_items(
+        course_key, qualifiers={'category': 'openassessment'}
+    )
+    # filter out orphaned openassessment blocks
+    openassessment_blocks = [
+        block for block in openassessment_blocks if block.parent is not None
+    ]
     if len(openassessment_blocks) > 0 and access['staff']:
         sections.append(_section_open_response_assessment(request, course, openassessment_blocks, access))
 
@@ -245,26 +236,24 @@ def instructor_dashboard_2(request, course_id):
         kwargs={'course_id': six.text_type(course_key)}
     )
 
-    with beeline.tracer(name='instructor.views.instructor_dashboard_2.get_certificate_invalidations'):
-        certificate_invalidations = CertificateInvalidation.get_certificate_invalidations(course_key)
+    certificate_invalidations = CertificateInvalidation.get_certificate_invalidations(course_key)
 
-    with beeline.tracer(name='instructor.views.instructor_dashboard_2.render'):
-        context = {
-            'course': course,
-            'studio_url': get_studio_url(course, 'course'),
-            'sections': sections,
-            'disable_buttons': disable_buttons,
-            'analytics_dashboard_message': analytics_dashboard_message,
-            'certificate_white_list': certificate_white_list,
-            'certificate_invalidations': certificate_invalidations,
-            'generate_certificate_exceptions_url': generate_certificate_exceptions_url,
-            'generate_bulk_certificate_exceptions_url': generate_bulk_certificate_exceptions_url,
-            'certificate_exception_view_url': certificate_exception_view_url,
-            'certificate_invalidation_view_url': certificate_invalidation_view_url,
-            'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
-        }
+    context = {
+        'course': course,
+        'studio_url': get_studio_url(course, 'course'),
+        'sections': sections,
+        'disable_buttons': disable_buttons,
+        'analytics_dashboard_message': analytics_dashboard_message,
+        'certificate_white_list': certificate_white_list,
+        'certificate_invalidations': certificate_invalidations,
+        'generate_certificate_exceptions_url': generate_certificate_exceptions_url,
+        'generate_bulk_certificate_exceptions_url': generate_bulk_certificate_exceptions_url,
+        'certificate_exception_view_url': certificate_exception_view_url,
+        'certificate_invalidation_view_url': certificate_invalidation_view_url,
+        'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
+    }
 
-        return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)
+    return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)
 
 
 ## Section functions starting with _section return a dictionary of section data.

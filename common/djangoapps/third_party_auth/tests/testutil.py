@@ -299,10 +299,3 @@ def simulate_running_pipeline(pipeline_target, backend, email=None, fullname=Non
     finally:
         pipeline_get.stop()
         pipeline_running.stop()
-
-
-class OverwriteStorage(FileSystemStorage):
-
-    def get_available_name(self, name, max_length=None):
-        self.delete(name)
-        return name

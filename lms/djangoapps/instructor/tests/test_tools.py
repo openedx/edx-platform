@@ -11,6 +11,7 @@ import mock
 import six
 from django.contrib.auth.models import User
 from django.core.exceptions import MultipleObjectsReturned
+from django.conf import settings
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
@@ -260,7 +261,7 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         with self.assertRaises(tools.DashboardError):
             tools.set_due_date_extension(self.course, self.week3, self.user, extended)
 
-    @unittest.skip('TODO: Appsembler - fix individual due dates after Juniper')
+    @unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'fix individual due dates')
     def test_reset_due_date_extension(self):
         extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=UTC)
         tools.set_due_date_extension(self.course, self.week1, self.user, extended)

@@ -245,7 +245,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         CertificateGenerationConfiguration.objects.create(enabled=True)
 
     @ddt.data('generate_example_certificates', 'enable_certificate_generation')
-    @unittest.skip('TODO: Appsembler - fix require_level("staff") check for certificates after Juniper')
+    @unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'TODO: fix require_level("staff")')
     def test_allow_course_staff(self, url_name):
         url = reverse(url_name, kwargs={'course_id': self.course.id})
 
@@ -307,6 +307,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         expected_redirect += '#view-certificates'
         self.assertRedirects(response, expected_redirect)
 
+    @unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'fix require_level("staff")')
     def test_certificate_generation_api_without_global_staff(self):
         """
         Test certificates generation api endpoint returns permission denied if

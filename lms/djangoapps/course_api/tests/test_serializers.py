@@ -12,6 +12,7 @@ from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 from xblock.core import XBlock
 from opaque_keys.edx.locator import CourseLocator
+from django.conf import settings
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.models.course_details import CourseDetails
@@ -95,7 +96,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
         course_overview = CourseOverview.get_from_id(course.id)
         return self.serializer_class(course_overview, context={'request': self._get_request()}).data
 
-    @unittest.skip('TODO: Appsembler fix date failures after Juniper')
+    @unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'TODO: fix date failures')
     def test_basic(self):
         course = self.create_course()
         CourseDetails.update_about_video(course, 'test_youtube_id', self.staff_user.id)
@@ -123,7 +124,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
         self.assertEqual(result['start_type'], u'string')
         self.assertEqual(result['start_display'], u'The Ides of March')
 
-    @unittest.skip('TODO: Appsembler fix date failures after Juniper')
+    @unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'TODO: fix date failures')
     def test_empty_start(self):
         course = self.create_course(start=DEFAULT_START_DATE, course=u'custom')
         result = self._get_result(course)

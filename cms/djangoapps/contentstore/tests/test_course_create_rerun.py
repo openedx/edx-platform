@@ -8,6 +8,7 @@ import unittest
 
 import ddt
 import six
+from django.conf import settings
 from django.test.client import RequestFactory
 from django.urls import reverse
 from mock import patch
@@ -68,7 +69,7 @@ class TestCourseListing(ModuleStoreTestCase):
         ModuleStoreTestCase.tearDown(self)
 
     @patch.dict('django.conf.settings.FEATURES', {'ORGANIZATIONS_APP': True})
-    @unittest.skip('TODO: Appsembler fix date failures after Juniper')
+    @unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'TODO: fix date failures')
     def test_rerun(self):
         """
         Just testing the functionality the view handler adds over the tasks tested in test_clone_course
