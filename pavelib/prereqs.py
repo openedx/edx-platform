@@ -20,9 +20,6 @@ NO_PREREQ_MESSAGE = "NO_PREREQ_INSTALL is set, not installing prereqs"
 NO_PYTHON_UNINSTALL_MESSAGE = 'NO_PYTHON_UNINSTALL is set. No attempts will be made to uninstall old Python libs.'
 COVERAGE_REQ_FILE = 'requirements/edx/coverage.txt'
 
-# If you make any changes to this list you also need to make
-# a corresponding change to circle.yml, which is how the python
-# prerequisites are installed for builds on circleci.com
 if 'TOXENV' in os.environ:
     PYTHON_REQ_FILES = ['requirements/edx/testing.txt']
 else:
