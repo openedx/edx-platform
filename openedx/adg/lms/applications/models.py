@@ -60,6 +60,9 @@ class UserApplication(TimeStampedModel):
 
 
 class UserStartAndEndDates(TimeStampedModel):
+    """
+    An abstract model for start and end dates.
+    """
     month_choices = month_choices(default_title='Month')
     year_choices = year_choices(default_title='Year')
 
