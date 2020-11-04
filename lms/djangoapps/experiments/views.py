@@ -21,7 +21,7 @@ from experiments.models import ExperimentData, ExperimentKeyValue
 from experiments.permissions import IsStaffOrOwner, IsStaffOrReadOnly, IsStaffOrReadOnlyForSelf
 from experiments.utils import get_experiment_user_metadata_context
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
-from student.models import get_user_by_username_or_email
+from common.djangoapps.student.models import get_user_by_username_or_email
 
 User = get_user_model()  # pylint: disable=invalid-name
 
