@@ -8,4 +8,4 @@ psycopg2-binary==2.8.3
 django-hijack==2.1.10
 django-hijack-admin==2.1.10
 backports.tempfile==1.0
-honeycomb-beeline==2.13.1
+honeycomb-beeline==2.12.1
