@@ -86,7 +86,19 @@ class BaseEnrollmentApiTestCase(ModuleStoreTestCase):
         force_authenticate(request, user=caller)
 
         import unittest
-        raise unittest.SkipTest('TODO: Appsembler - to be fixed in Juniper')
+        from django.conf import settings
+        if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
+            # Those tests are broken bcuz they're expecting `get_current_request` so edx-ace emails work
+            # Consider using `with_organization_context` to fix the `get_current_request` issue
+            #     exception log
+            #     File "/home/omar/work/juniper/merge/openedx/core/djangoapps/ace_common/templatetags/ace.py",
+            #     line 61, in _get_variables_from_context
+            #     u'"emulate_http_request" if you are rendering the template in a celery task.'.format(tag_name)
+            #     VariableDoesNotExist: The google_analytics_tracking_pixel template tag requires a "request" to
+            #     be present
+            #     in the template context. Consider using "emulate_http_request" if you are rendering the template in
+            #     a celery task.
+            raise unittest.SkipTest('TODO: Appsembler - to be fixed in Juniper')
 
         with mock.patch('lms.djangoapps.instructor.sites.get_current_site', return_value=site):
             with mock.patch('student.models.get_current_site', return_value=site):
