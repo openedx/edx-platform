@@ -17,7 +17,7 @@ from bson import ObjectId
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from completion import waffle as completion_waffle
 from completion.models import BlockCompletion
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404, HttpResponse
