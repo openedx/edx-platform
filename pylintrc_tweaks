@@ -1,6 +1,6 @@
 # pylintrc tweaks for use with edx_lint.
 [MASTER]
-ignore+ = ,.git,.tox,migrations,node_modules,.pycharm_helpers
+ignore+ = ,.git,.tox,migrations,node_modules,.pycharm_helpers,import_shims
 # TODO: This path modification exists as temporary support for deprecated import patterns.
 # It will be removed in an upcoming Open edX release.
 # See docs/decisions/0007-sys-path-modification-removal.rst
