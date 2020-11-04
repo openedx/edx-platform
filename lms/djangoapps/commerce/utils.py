@@ -141,7 +141,7 @@ class EcommerceService(object):
             if self.is_enabled(user):
                 return self.get_checkout_page_url(verified_mode.sku)
             else:
-                return reverse('verify_student_upgrade_and_verify', args=(course_key,))
+                return reverse('dashboard')
         return None
 
 

@@ -30,6 +30,7 @@ from common.djangoapps.course_modes.helpers import get_course_final_price
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
+from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.utils import get_currency_data
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
@@ -111,7 +112,7 @@ class ChooseModeView(View):
         has_enrolled_professional = (CourseMode.is_professional_slug(enrollment_mode) and is_active)
         if CourseMode.has_professional_mode(modes) and not has_enrolled_professional:
             purchase_workflow = request.GET.get("purchase_workflow", "single")
-            verify_url = reverse('verify_student_start_flow', kwargs={'course_id': six.text_type(course_key)})
+            verify_url = IDVerificationService.get_verify_location('verify_student_start_flow', course_id=course_key)
             redirect_url = "{url}?purchase_workflow={workflow}".format(url=verify_url, workflow=purchase_workflow)
             if ecommerce_service.is_enabled(request.user):
                 professional_mode = modes.get(CourseMode.NO_ID_PROFESSIONAL_MODE) or modes.get(CourseMode.PROFESSIONAL)
@@ -310,12 +311,8 @@ class ChooseModeView(View):
             donation_for_course[six.text_type(course_key)] = amount_value
             request.session["donation_for_course"] = donation_for_course
 
-            return redirect(
-                reverse(
-                    'verify_student_start_flow',
-                    kwargs={'course_id': six.text_type(course_key)}
-                )
-            )
+            verify_url = IDVerificationService.get_verify_location('verify_student_start_flow', course_id=course_key)
+            return redirect(verify_url)
 
     def _get_requested_mode(self, request_dict):
         """Get the user's requested mode
