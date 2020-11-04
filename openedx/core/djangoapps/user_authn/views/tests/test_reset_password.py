@@ -541,8 +541,12 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         })
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 2}),
-        create_validator_config('common.djangoapps.util.password_policy_validators.MaximumLengthValidator', {'max_length': 10})
+        create_validator_config(
+            'common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 2}
+        ),
+        create_validator_config(
+            'common.djangoapps.util.password_policy_validators.MaximumLengthValidator', {'max_length': 10}
+        ),
     ])
     @ddt.data(
         {
