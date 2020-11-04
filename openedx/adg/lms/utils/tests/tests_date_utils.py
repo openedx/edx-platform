@@ -6,7 +6,8 @@ from datetime import datetime
 import pytest
 from mock import patch
 
-from openedx.adg.common.util.date_utils import month_choices, year_choices
+from openedx.adg.lms.utils.date_utils import month_choices, year_choices
+
 
 @pytest.mark.parametrize('default_title', [None, 'Month'])
 def test_month_choices(default_title):
@@ -25,7 +26,7 @@ def test_month_choices(default_title):
 
 
 @pytest.mark.parametrize('default_title', [None, 'Year'])
-@patch('openedx.adg.common.util.date_utils.datetime')
+@patch('openedx.adg.lms.utils.date_utils.datetime')
 def test_year_choices(mock_current_year, default_title):
     """
     Test year choice list between the range of 2017 to 2019.
@@ -39,7 +40,7 @@ def test_year_choices(mock_current_year, default_title):
     assert choices == year_choices(from_year=2017, default_title=default_title)
 
 
-@patch('openedx.adg.common.util.date_utils.datetime')
+@patch('openedx.adg.lms.utils.date_utils.datetime')
 def test_year_choices_raise_value_error(mock_current_year):
     """
     Test year choice list and assert that exception is raised if from year is greater than current year.

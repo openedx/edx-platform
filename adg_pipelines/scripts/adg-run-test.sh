@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -e
+set -o pipefail
 
 function show_help() {
     echo ""
@@ -49,11 +51,14 @@ function generate_diff_cover_report() {
 BRANCH="${1:-origin/master}"
 [[ "$BRANCH" != origin/* ]] && echo "Invalid branch name. It must start with origin/..." && exit 1
 
-rm -rf reports                   # First delete previous reports
-run_adg_test $LMS                # Run test for LMS and LMS common
-run_adg_test $CMS "--cov-append" # Run test for CMS and CMS common
+EXIT_CODE=0
+rm -rf reports                                   # First delete previous reports
+run_adg_test $LMS || EXIT_CODE=$?                # Run test for LMS and LMS common
+run_adg_test $CMS "--cov-append" || EXIT_CODE=$? # Run test for CMS and CMS common
 
 if [[ -z "$CIRCLECI" || ("$CIRCLECI" && ("$BRANCH" != "origin/master")) ]]; then
     # Generate report only if we are running test and coverage for ADG only
-    generate_diff_cover_report "$BRANCH" $FAIL_UNDER
+    generate_diff_cover_report "$BRANCH" $FAIL_UNDER || EXIT_CODE=$?
 fi
+
+exit "$EXIT_CODE"
