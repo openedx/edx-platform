@@ -586,24 +586,25 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
         )
 
         if not consent_needed:
-            for learner in enterprise_learner_details:
-                if str(current_enterprise_uuid) != str(learner['enterprise_customer']['uuid']):
-                    LOGGER.info(
-                        '[ENTERPRISE DSC] Consent requirement failed due to enterprise mismatch. '
-                        'USER: [%s], CurrentEnterprise: [%s], LearnerEnterprise: [%s]',
-                        user.username,
-                        current_enterprise_uuid,
-                        learner['enterprise_customer']['uuid']
-                    )
+            enterprises = [str(learner['enterprise_customer']['uuid']) for learner in enterprise_learner_details]
 
-                learner_enterprise_site = Site.objects.get(domain=learner['enterprise_customer']['site']['domain'])
-                if learner_enterprise_site != request.site:
+            if str(current_enterprise_uuid) not in enterprises:
+                LOGGER.info(
+                    '[ENTERPRISE DSC] Consent requirement failed due to enterprise mismatch. '
+                    'USER: [%s], CurrentEnterprise: [%s], LearnerEnterprises: [%s]',
+                    user.username,
+                    current_enterprise_uuid,
+                    enterprises
+                )
+            else:
+                domains = [learner['enterprise_customer']['site']['domain'] for learner in enterprise_learner_details]
+                if not Site.objects.filter(domain__in=domains).filter(id=request.site.id).exists():
                     LOGGER.info(
                         '[ENTERPRISE DSC] Consent requirement failed due to site mismatch. '
-                        'USER: [%s], RequestSite: [%s], LearnerEnterpriseSite: [%s]',
+                        'USER: [%s], RequestSite: [%s], LearnerEnterpriseDomains: [%s]',
                         user.username,
                         request.site,
-                        learner_enterprise_site
+                        domains
                     )
 
         if consent_needed:
