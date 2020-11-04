@@ -16,10 +16,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from util.json_request import JsonResponse
 
-from experiments import filters, serializers
-from experiments.models import ExperimentData, ExperimentKeyValue
-from experiments.permissions import IsStaffOrOwner, IsStaffOrReadOnly, IsStaffOrReadOnlyForSelf
-from experiments.utils import get_experiment_user_metadata_context
+from lms.djangoapps.experiments import filters, serializers
+from lms.djangoapps.experiments.models import ExperimentData, ExperimentKeyValue
+from lms.djangoapps.experiments.permissions import IsStaffOrOwner, IsStaffOrReadOnly, IsStaffOrReadOnlyForSelf
+from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from common.djangoapps.student.models import get_user_by_username_or_email
 
