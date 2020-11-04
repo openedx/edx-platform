@@ -957,7 +957,7 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
         self._perform_test_using_store(store_type, self._test_exception)
 
 
-@skip('TODO: Appsembler broken tests in Studio for no reason')
+@skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'broken tests in Studio for no reason')
 class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
     """
     Tests indexing of content groups on course modules using mongo modulestore.
