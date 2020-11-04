@@ -16,7 +16,7 @@ from django.utils.translation.trans_real import get_supported_language_variant
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 
-import branding.api as branding_api
+import lms.djangoapps.branding.api as branding_api
 import lms.djangoapps.courseware.views.views as courseware_views
 import student.views
 from edxmako.shortcuts import marketing_link, render_to_response

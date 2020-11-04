@@ -32,7 +32,6 @@ Longer TODO:
 import importlib.util
 import sys
 import os
-import warnings
 
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from path import Path as path
@@ -46,7 +45,6 @@ from enterprise.constants import (
     ENTERPRISE_OPERATOR_ROLE
 )
 
-from import_shims.warn import DeprecatedEdxPlatformImportWarning
 from openedx.core.constants import COURSE_KEY_REGEX, COURSE_KEY_PATTERN, COURSE_ID_PATTERN
 from openedx.core.djangoapps.theming.helpers_dirs import (
     get_themes_unchecked,
@@ -55,13 +53,6 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
 from openedx.core.lib.derived import derived, derived_collection_entry
 from openedx.core.release import doc_version
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
-
-# Filter out DeprecatedEdxPlatformImportWarning instances for now.
-# We will want these to be generally visible eventually, but while there
-# are still a very high number of them, silencing them will be better for
-# developer experience.
-# See /docs/decisions/0007-sys-path-modification-removal.rst for details.
-warnings.filterwarnings("ignore", category=DeprecatedEdxPlatformImportWarning)
 
 ################################### FEATURES ###################################
 # .. setting_name: PLATFORM_NAME
@@ -509,8 +500,8 @@ FEATURES = {
     #   student activities to MySQL, in a separate database.
     # .. toggle_use_cases: open_edx
     # .. toggle_warnings: Even though most Open edX instances run with a separate CSMH database, it may not always be
-    #   the case. When disabling this feature flag, remember to remove "coursewarehistoryextended" from the
-    #   INSTALLED_APPS and the "StudentModuleHistoryExtendedRouter" from the DATABASE_ROUTERS.
+    #   the case. When disabling this feature flag, remember to remove "lms.djangoapps.coursewarehistoryextended"
+    #   from the INSTALLED_APPS and the "StudentModuleHistoryExtendedRouter" from the DATABASE_ROUTERS.
     'ENABLE_CSMH_EXTENDED': True,
 
     # Read from both the CSMH and CSMHE history tables.
@@ -847,7 +838,7 @@ TPA_PROVIDER_SUSTAINED_THROTTLE = '50/hr'
 
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating
-import tempfile  # pylint: disable=wrong-import-order
+import tempfile  # pylint: disable=wrong-import-position,wrong-import-order
 MAKO_MODULE_DIR = os.path.join(tempfile.gettempdir(), 'mako_lms')
 MAKO_TEMPLATE_DIRS_BASE = [
     PROJECT_ROOT / 'templates',
@@ -897,7 +888,7 @@ CONTEXT_PROCESSORS = [
     'openedx.core.djangoapps.site_configuration.context_processors.configuration_context',
 
     # Mobile App processor (Detects if request is from the mobile app)
-    'mobile_api.context_processor.is_from_mobile_app'
+    'lms.djangoapps.mobile_api.context_processor.is_from_mobile_app'
 ]
 
 # Django templating
@@ -1529,10 +1520,10 @@ SIMPLE_WIKI_REQUIRE_LOGIN_EDIT = True
 SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 
 ################################# WIKI ###################################
-from course_wiki import settings as course_wiki_settings
+from lms.djangoapps.course_wiki import settings as course_wiki_settings  # pylint: disable=wrong-import-position
 
 WIKI_ACCOUNT_HANDLING = False
-WIKI_EDITOR = 'course_wiki.editors.CodeMirror'
+WIKI_EDITOR = 'lms.djangoapps.course_wiki.editors.CodeMirror'
 WIKI_SHOW_MAX_CHILDREN = 0  # We don't use the little menu that shows children of an article in the breadcrumb
 WIKI_ANONYMOUS = False  # Don't allow anonymous access until the styling is figured out
 
@@ -1646,7 +1637,7 @@ MIDDLEWARE = [
     # Cookie monitoring
     'openedx.core.lib.request_utils.CookieMonitoringMiddleware',
 
-    'mobile_api.middleware.AppVersionUpgrade',
+    'lms.djangoapps.mobile_api.middleware.AppVersionUpgrade',
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'lms.djangoapps.discussion.django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -1718,7 +1709,7 @@ MIDDLEWARE = [
     'lms.djangoapps.courseware.middleware.CacheCourseIdMiddleware',
     'lms.djangoapps.courseware.middleware.RedirectMiddleware',
 
-    'course_wiki.middleware.WikiAccessMiddleware',
+    'lms.djangoapps.course_wiki.middleware.WikiAccessMiddleware',
 
     'openedx.core.djangoapps.theming.middleware.CurrentSiteThemeMiddleware',
 
@@ -1770,7 +1761,7 @@ STATICFILES_FINDERS = [
     'pipeline.finders.PipelineFinder',
 ]
 
-from openedx.core.lib.rooted_paths import rooted_glob
+from openedx.core.lib.rooted_paths import rooted_glob  # pylint: disable=wrong-import-position
 
 courseware_js = [
     'js/ajax-error.js',
@@ -2562,7 +2553,7 @@ INSTALLED_APPS = [
     'social_django',
 
     # Surveys
-    'survey.apps.SurveyConfig',
+    'lms.djangoapps.survey.apps.SurveyConfig',
 
     'lms.djangoapps.lms_xblock.apps.LMSXBlockConfig',
 
@@ -2576,7 +2567,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.coursegraph.apps.CoursegraphConfig',
 
     # Mailchimp Syncing
-    'mailing',
+    'lms.djangoapps.mailing',
 
     # CORS and cross-domain CSRF
     'corsheaders',
@@ -2607,7 +2598,7 @@ INSTALLED_APPS = [
     'milestones',
 
     # Gating of course content
-    'gating.apps.GatingConfig',
+    'lms.djangoapps.gating.apps.GatingConfig',
 
     # Static i18n support
     'statici18n',
@@ -2619,7 +2610,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.verified_track_content',
 
     # Learner's dashboard
-    'learner_dashboard',
+    'lms.djangoapps.learner_dashboard',
 
     # Needed whether or not enabled, due to migrations
     'lms.djangoapps.badges.apps.BadgesConfig',
@@ -2628,7 +2619,7 @@ INSTALLED_APPS = [
     'django_sites_extensions',
 
     # Email marketing integration
-    'email_marketing.apps.EmailMarketingConfig',
+    'lms.djangoapps.email_marketing.apps.EmailMarketingConfig',
 
     # additional release utilities to ease automation
     'release_util',
@@ -2980,7 +2971,7 @@ CERT_NAME_LONG = "Certificate of Achievement"
 
 #################### OpenBadges Settings #######################
 
-BADGING_BACKEND = 'badges.backends.badgr.BadgrBackend'
+BADGING_BACKEND = 'lms.djangoapps.badges.backends.badgr.BadgrBackend'
 
 # Be sure to set up images for course modes using the BadgeImageConfiguration model in the certificates app.
 BADGR_API_TOKEN = None
@@ -4043,9 +4034,8 @@ SYSTEM_WIDE_ROLE_CLASSES = []
 
 ############## Plugin Django Apps #########################
 
-from edx_django_utils.plugins import get_plugin_apps, add_plugins
-# pylint: disable=wrong-import-position, wrong-import-order
-from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
+from edx_django_utils.plugins import get_plugin_apps, add_plugins  # pylint: disable=wrong-import-position,wrong-import-order
+from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType  # pylint: disable=wrong-import-position
 INSTALLED_APPS.extend(get_plugin_apps(ProjectType.LMS))
 add_plugins(__name__, ProjectType.LMS, SettingsType.COMMON)
 

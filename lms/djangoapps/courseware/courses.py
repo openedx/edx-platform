@@ -23,7 +23,7 @@ from six import text_type
 
 from openedx.core.lib.cache_utils import request_cached
 
-import branding
+from lms.djangoapps import branding
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access_response import (
     AuthenticationRequiredAccessError,
@@ -60,7 +60,7 @@ from openedx.features.course_duration_limits.access import AuditExpiredError
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
 from openedx.features.course_experience.utils import is_block_structure_complete_for_assignments
 from static_replace import replace_static_urls
-from survey.utils import SurveyRequiredAccessError, check_survey_required_and_unanswered
+from lms.djangoapps.survey.utils import SurveyRequiredAccessError, check_survey_required_and_unanswered
 from util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError

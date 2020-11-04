@@ -1316,7 +1316,7 @@ class DiscussionTabTestCase(ModuleStoreTestCase):
             self.assertTrue(self.discussion_tab_present(self.enrolled_user))
             self.assertFalse(self.discussion_tab_present(self.unenrolled_user))
 
-    @mock.patch('ccx.overrides.get_current_ccx')
+    @mock.patch('lms.djangoapps.ccx.overrides.get_current_ccx')
     def test_tab_settings(self, mock_get_ccx):
         mock_get_ccx.return_value = True
         with self.settings(FEATURES={'ENABLE_DISCUSSION_SERVICE': False}):

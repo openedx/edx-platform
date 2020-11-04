@@ -8,8 +8,8 @@ from collections import OrderedDict
 from django.contrib.auth.models import User
 from django.test.client import Client
 
-from survey.models import SurveyForm
-from survey.utils import check_survey_required_and_unanswered, is_survey_required_for_course
+from lms.djangoapps.survey.models import SurveyForm
+from lms.djangoapps.survey.utils import check_survey_required_and_unanswered, is_survey_required_for_course
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

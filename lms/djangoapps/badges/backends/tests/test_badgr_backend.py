@@ -12,9 +12,9 @@ from django.test.utils import override_settings
 from lazy.lazy import lazy
 from mock import Mock, call, patch
 
-from badges.backends.badgr import BadgrBackend
-from badges.models import BadgeAssertion
-from badges.tests.factories import BadgeClassFactory
+from lms.djangoapps.badges.backends.badgr import BadgrBackend
+from lms.djangoapps.badges.models import BadgeAssertion
+from lms.djangoapps.badges.tests.factories import BadgeClassFactory
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from track.tests import EventTrackingTestCase

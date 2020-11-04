@@ -4,7 +4,7 @@ Tests for the course completion helper functions.
 from datetime import datetime
 from uuid import uuid4
 
-from badges.events import course_complete
+from lms.djangoapps.badges.events import course_complete
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

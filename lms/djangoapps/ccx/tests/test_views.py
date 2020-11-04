@@ -171,7 +171,7 @@ class TestAdminAccessCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
 
 @override_settings(
     XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
-    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['ccx.overrides.CustomCoursesForEdxOverrideProvider'],
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider'],
 )
 class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
     """
@@ -236,7 +236,7 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
         progress_page_due_date = section.due.strftime(u"%Y-%m-%d %H:%M")
         self.assertEqual(progress_page_due_date, due)
 
-    @patch('ccx.views.render_to_response', intercept_renderer)
+    @patch('lms.djangoapps.ccx.views.render_to_response', intercept_renderer)
     @patch('lms.djangoapps.courseware.views.views.render_to_response', intercept_renderer)
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
     def test_edit_schedule(self):
@@ -285,7 +285,7 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
 
 @override_settings(
     XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
-    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['ccx.overrides.CustomCoursesForEdxOverrideProvider'],
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider'],
 )
 @ddt.ddt
 class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
@@ -471,8 +471,8 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
                     self.assertEqual(get_date(ccx, unit, 'start', parent_node=subsection), self.mooc_start)
                     self.assertEqual(get_date(ccx, unit, 'due', parent_node=subsection), self.mooc_due)
 
-    @patch('ccx.views.render_to_response', intercept_renderer)
-    @patch('ccx.views.TODAY')
+    @patch('lms.djangoapps.ccx.views.render_to_response', intercept_renderer)
+    @patch('lms.djangoapps.ccx.views.TODAY')
     def test_edit_schedule(self, today):
         """
         Get CCX schedule, modify it, save it.
@@ -550,7 +550,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.assertEqual(policy['GRADER'][3]['type'], 'Final Exam')
         self.assertEqual(policy['GRADER'][3]['min_count'], 0)
 
-    @patch('ccx.views.render_to_response', intercept_renderer)
+    @patch('lms.djangoapps.ccx.views.render_to_response', intercept_renderer)
     def test_save_without_min_count(self):
         """
         POST grading policy without min_count field.
@@ -929,8 +929,8 @@ class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleSto
         node.visible_to_staff_only = True
         self.mstore.update_item(node, self.coach.id)
 
-    @patch('ccx.views.render_to_response', intercept_renderer)
-    @patch('ccx.views.TODAY')
+    @patch('lms.djangoapps.ccx.views.render_to_response', intercept_renderer)
+    @patch('lms.djangoapps.ccx.views.TODAY')
     def test_get_ccx_schedule(self, today):
         """
         Gets CCX schedule and checks number of blocks in it.
@@ -982,7 +982,7 @@ def patched_get_children(self, usage_key_filter=None):
 
 @override_settings(
     XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
-    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['ccx.overrides.CustomCoursesForEdxOverrideProvider'],
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider'],
 )
 @patch('xmodule.x_module.XModuleMixin.get_children', patched_get_children, spec=True)
 class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -1069,7 +1069,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
             course_key=self.ccx_key
         )
 
-    @patch('ccx.views.render_to_response', intercept_renderer)
+    @patch('lms.djangoapps.ccx.views.render_to_response', intercept_renderer)
     @patch('lms.djangoapps.instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
     def test_gradebook(self):
         self.course.enable_ccx = True

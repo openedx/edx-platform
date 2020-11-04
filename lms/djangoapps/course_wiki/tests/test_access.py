@@ -6,9 +6,9 @@ Tests for wiki permissions
 from django.contrib.auth.models import Group
 from wiki.models import URLPath
 
-from course_wiki import settings
-from course_wiki.utils import course_wiki_slug, user_is_article_course_staff
-from course_wiki.views import get_or_create_root
+from lms.djangoapps.course_wiki import settings
+from lms.djangoapps.course_wiki.utils import course_wiki_slug, user_is_article_course_staff
+from lms.djangoapps.course_wiki.views import get_or_create_root
 from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

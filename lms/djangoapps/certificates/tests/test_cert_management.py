@@ -10,9 +10,9 @@ from opaque_keys.edx.locator import CourseLocator
 from six import text_type
 from six.moves import range
 
-from badges.events.course_complete import get_completion_badge
-from badges.models import BadgeAssertion
-from badges.tests.factories import BadgeAssertionFactory, CourseCompleteImageConfigurationFactory
+from lms.djangoapps.badges.events.course_complete import get_completion_badge
+from lms.djangoapps.badges.models import BadgeAssertion
+from lms.djangoapps.badges.tests.factories import BadgeAssertionFactory, CourseCompleteImageConfigurationFactory
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.grades.tests.utils import mock_passing_grade

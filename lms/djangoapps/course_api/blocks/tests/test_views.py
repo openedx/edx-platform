@@ -181,7 +181,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         self.query_params['username'] = ''
         self.verify_response(403)
 
-    @mock.patch("course_api.blocks.forms.permissions.is_course_public", Mock(return_value=True))
+    @mock.patch("lms.djangoapps.course_api.blocks.forms.permissions.is_course_public", Mock(return_value=True))
     def test_not_authenticated_public_course_with_other_username(self):
         """
         Verify behaviour when accessing course blocks of a public course for another user anonymously.
@@ -189,7 +189,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         self.client.logout()
         self.verify_response(403)
 
-    @mock.patch("course_api.blocks.forms.permissions.is_course_public", Mock(return_value=True))
+    @mock.patch("lms.djangoapps.course_api.blocks.forms.permissions.is_course_public", Mock(return_value=True))
     def test_not_authenticated_public_course_with_all_blocks(self):
         """
         Verify behaviour when accessing all course blocks of a public course anonymously.
@@ -199,7 +199,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         self.query_params['all_blocks'] = True
         self.verify_response(403)
 
-    @mock.patch("course_api.blocks.forms.permissions.is_course_public", Mock(return_value=True))
+    @mock.patch("lms.djangoapps.course_api.blocks.forms.permissions.is_course_public", Mock(return_value=True))
     def test_not_authenticated_public_course_with_blank_username(self):
         """
         Verify behaviour when accessing course blocks of a public course for anonymous user anonymously.
@@ -215,7 +215,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         CourseEnrollment.unenroll(self.user, self.course_key)
         self.verify_response(403)
 
-    @mock.patch("course_api.blocks.forms.permissions.is_course_public", Mock(return_value=True))
+    @mock.patch("lms.djangoapps.course_api.blocks.forms.permissions.is_course_public", Mock(return_value=True))
     def test_not_enrolled_public_course(self):
         """
         Verify behaviour when accessing course blocks for a public course as a user not enrolled in course.
@@ -224,7 +224,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         CourseEnrollment.unenroll(self.user, self.course_key)
         self.verify_response(cacheable=True)
 
-    @mock.patch("course_api.blocks.forms.permissions.is_course_public", Mock(return_value=True))
+    @mock.patch("lms.djangoapps.course_api.blocks.forms.permissions.is_course_public", Mock(return_value=True))
     def test_public_course_all_blocks_and_empty_username(self):
         """
         Verify behaviour when specifying both all_blocks and username='', and ensure the response is not cached.

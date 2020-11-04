@@ -12,7 +12,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
 
-from badges.utils import badges_enabled
+from lms.djangoapps.badges.utils import badges_enabled
 from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.credentials.utils import get_credentials_records_url
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig

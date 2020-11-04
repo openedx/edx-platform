@@ -10,7 +10,7 @@ from celery import task
 from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from gating import api as gating_api
+from lms.djangoapps.gating import api as gating_api
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from xmodule.modulestore.django import modulestore
 

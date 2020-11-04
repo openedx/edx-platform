@@ -10,7 +10,7 @@ from time import time
 
 import re
 import six
-from course_blocks.api import get_course_blocks
+from lms.djangoapps.course_blocks.api import get_course_blocks
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from lazy import lazy

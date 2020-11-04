@@ -39,8 +39,6 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from pyquery import PyQuery
 from six import text_type
 from six.moves import range
-from student.models import CourseEnrollment, anonymous_id_for_user
-from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from web_fragments.fragment import Fragment
 from xblock.completable import CompletableXBlockMixin
 from xblock.core import XBlock, XBlockAside
@@ -48,21 +46,6 @@ from xblock.field_data import FieldData
 from xblock.fields import ScopeIds
 from xblock.runtime import DictKeyValueStore, KvsFieldData, Runtime
 from xblock.test.tools import TestRuntime
-from xblock_django.models import XBlockConfiguration
-from xmodule.capa_module import ProblemBlock
-from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
-from xmodule.lti_module import LTIDescriptor
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MIXED_MODULESTORE,
-    ModuleStoreTestCase,
-    SharedModuleStoreTestCase
-)
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory, check_mongo_calls
-from xmodule.modulestore.tests.test_asides import AsideTestType
-from xmodule.video_module import VideoBlock
-from xmodule.x_module import STUDENT_VIEW, CombinedSystem, XModule, XModuleDescriptor
 
 from lms.djangoapps.courseware import module_render as render
 from lms.djangoapps.courseware.access_response import AccessResponse
@@ -88,6 +71,24 @@ from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFa
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.url_utils import quote_slashes
+from student.models import CourseEnrollment, anonymous_id_for_user
+from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from xblock_django.models import XBlockConfiguration
+from xmodule.capa_module import ProblemBlock
+from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
+from xmodule.lti_module import LTIDescriptor
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MIXED_MODULESTORE,
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase
+)
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory, check_mongo_calls
+from xmodule.modulestore.tests.test_asides import AsideTestType
+from xmodule.video_module import VideoBlock
+from xmodule.x_module import STUDENT_VIEW, CombinedSystem, XModule, XModuleDescriptor
+
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -859,7 +860,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         request.user = self.mock_user
 
         with patch(
-            'courseware.module_render.is_xblock_aside',
+            'lms.djangoapps.courseware.module_render.is_xblock_aside',
             return_value=True
         ), self.assertRaises(Http404):
             render.handle_xblock_callback(

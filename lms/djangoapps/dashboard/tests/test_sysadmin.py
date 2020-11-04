@@ -21,8 +21,8 @@ from pytz import UTC
 from six import text_type
 from six.moves import range
 
-from dashboard.git_import import GitImportErrorNoDir
-from dashboard.models import CourseImportLog
+from lms.djangoapps.dashboard.git_import import GitImportErrorNoDir
+from lms.djangoapps.dashboard.models import CourseImportLog
 from openedx.core.djangolib.markup import Text
 from student.roles import CourseStaffRole, GlobalStaff
 from student.tests.factories import UserFactory

@@ -26,8 +26,8 @@ from waffle.testutils import override_switch
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from gating import api as lms_gating_api
 from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesAndSpecialExamsTransformer
+from lms.djangoapps.gating import api as lms_gating_api
 from lms.djangoapps.courseware.tests.factories import StaffFactory
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag

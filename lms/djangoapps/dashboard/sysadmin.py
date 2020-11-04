@@ -28,10 +28,10 @@ from opaque_keys.edx.keys import CourseKey
 from path import Path as path
 from six import StringIO, text_type
 
-import dashboard.git_import as git_import
+import lms.djangoapps.dashboard.git_import as git_import
 import track.views
-from dashboard.git_import import GitImportError
-from dashboard.models import CourseImportLog
+from lms.djangoapps.dashboard.git_import import GitImportError
+from lms.djangoapps.dashboard.models import CourseImportLog
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.courseware.courses import get_course_by_id
 from openedx.core.djangolib.markup import HTML
@@ -297,7 +297,7 @@ class Courses(SysadminDashboardView):
         import_log_handler.setLevel(logging.DEBUG)
 
         logger_names = ['xmodule.modulestore.xml_importer',
-                        'dashboard.git_import',
+                        'lms.djangoapps.dashboard.git_import',
                         'xmodule.modulestore.xml',
                         'xmodule.seq_module', ]
         loggers = []

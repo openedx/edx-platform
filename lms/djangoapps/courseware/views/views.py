@@ -47,7 +47,7 @@ from rest_framework.throttling import UserRateThrottle
 from six import text_type
 from web_fragments.fragment import Fragment
 
-import survey.views
+from lms.djangoapps.survey import views as survey_views
 from course_modes.models import CourseMode, get_course_prices
 from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
 from lms.djangoapps.edxnotes.helpers import is_feature_enabled
@@ -1516,7 +1516,7 @@ def course_survey(request, course_id):
     if not course.course_survey_name:
         return redirect(redirect_url)
 
-    return survey.views.view_student_survey(
+    return survey_views.view_student_survey(
         request.user,
         course.course_survey_name,
         course=course,

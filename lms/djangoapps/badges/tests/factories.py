@@ -10,7 +10,7 @@ from django.core.files.base import ContentFile
 from factory import DjangoModelFactory
 from factory.django import ImageField
 
-from badges.models import BadgeAssertion, BadgeClass, CourseCompleteImageConfiguration, CourseEventBadgesConfiguration
+from lms.djangoapps.badges.models import BadgeAssertion, BadgeClass, CourseCompleteImageConfiguration, CourseEventBadgesConfiguration
 from student.tests.factories import UserFactory
 
 

@@ -40,8 +40,8 @@ from django.utils.translation import ugettext as _
 from markupsafe import escape
 from six import text_type
 
-from bulk_email.models import CourseEmail, Optout
-from bulk_email.api import get_unsubscribed_link
+from lms.djangoapps.bulk_email.models import CourseEmail, Optout
+from lms.djangoapps.bulk_email.api import get_unsubscribed_link
 from lms.djangoapps.courseware.courses import get_course
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.subtasks import (

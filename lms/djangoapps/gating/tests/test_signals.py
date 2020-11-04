@@ -5,7 +5,7 @@ Unit tests for gating.signals module
 
 from mock import Mock, patch
 
-from gating.signals import evaluate_subsection_gated_milestones
+from lms.djangoapps.gating.signals import evaluate_subsection_gated_milestones
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

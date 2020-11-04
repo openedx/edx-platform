@@ -33,7 +33,7 @@ from six import text_type, unichr
 from six.moves import range, zip
 from testfixtures import LogCapture
 
-from bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
+from lms.djangoapps.bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from edx_toggles.toggles.testutils import override_waffle_flag

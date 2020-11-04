@@ -15,7 +15,7 @@
 <% online_help_token = self.online_help_token() if hasattr(self, 'online_help_token') else None %>
 <%!
 import six
-from branding import api as branding_api
+from lms.djangoapps.branding import api as branding_api
 from django.urls import reverse
 from django.utils.http import urlquote_plus
 from django.utils.translation import ugettext as _

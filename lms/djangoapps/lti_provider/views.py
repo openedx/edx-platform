@@ -12,10 +12,10 @@ from django.views.decorators.csrf import csrf_exempt
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from lti_provider.models import LtiConsumer
-from lti_provider.outcomes import store_outcome_parameters
-from lti_provider.signature_validator import SignatureValidator
-from lti_provider.users import authenticate_lti_user
+from lms.djangoapps.lti_provider.models import LtiConsumer
+from lms.djangoapps.lti_provider.outcomes import store_outcome_parameters
+from lms.djangoapps.lti_provider.signature_validator import SignatureValidator
+from lms.djangoapps.lti_provider.users import authenticate_lti_user
 from openedx.core.lib.url_utils import unquote_slashes
 from util.views import add_p3p_header
 

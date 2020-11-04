@@ -11,7 +11,7 @@ import pytz
 from crum import get_current_request
 from edx_django_utils.cache import RequestCache
 
-from experiments.stable_bucketing import stable_bucketing_hash_group
+from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from track import segment
 
@@ -155,7 +155,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         """
         # Keep some imports in here, because this class is commonly used at a module level, and we want to avoid
         # circular imports for any models.
-        from experiments.models import ExperimentKeyValue
+        from lms.djangoapps.experiments.models import ExperimentKeyValue
         from lms.djangoapps.courseware.masquerade import get_specific_masquerading_user
 
         request = get_current_request()

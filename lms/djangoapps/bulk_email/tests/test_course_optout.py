@@ -16,8 +16,8 @@ from edx_ace.recipient import Recipient
 from mock import Mock, patch
 from six import text_type
 
-from bulk_email.models import BulkEmailFlag
-from bulk_email.policies import CourseEmailOptout
+from lms.djangoapps.bulk_email.models import BulkEmailFlag
+from lms.djangoapps.bulk_email.policies import CourseEmailOptout
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
