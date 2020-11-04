@@ -29,3 +29,13 @@ class IsStaffOrOwner(permissions.IsStaffOrOwner):
 class IsStaffOrReadOnly(BasePermission):
     def has_permission(self, request, view):
         return request.user.is_staff or request.method in SAFE_METHODS
+
+
+class IsStaffOrReadOnlyForSelf(BasePermission):
+    """
+    Grants access to staff or to user reading info about their own user
+    """
+    def has_permission(self, request, view):
+        username = request.user.username
+        return request.user.is_staff or (request.method in SAFE_METHODS and (
+            username == request.parser_context['kwargs']['username']))

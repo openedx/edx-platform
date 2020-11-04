@@ -264,46 +264,119 @@ def get_dashboard_course_info(user, dashboard_enrollments):
 
 def get_experiment_user_metadata_context(course, user):
     """
-    Return a context dictionary with the keys used by the user_metadata.html.
+    Return a context dictionary with the keys used for Optimizely experiments, exposed via user_metadata.html:
+    view from the DOM in those calling views using: JSON.parse($("#user-metadata").text());
+    Most views call this function with both parameters, but student dashboard has only a user
     """
     enrollment = None
     # TODO: clean up as part of REVO-28 (START)
     user_enrollments = None
     audit_enrollments = None
     has_non_audit_enrollments = False
-    try:
-        user_enrollments = CourseEnrollment.objects.select_related('course', 'schedule').filter(user_id=user.id)
-        has_non_audit_enrollments = user_enrollments.exclude(mode__in=CourseMode.UPSELL_TO_VERIFIED_MODES).exists()
+    context = {}
+    if course is not None:
+        try:
+            user_enrollments = CourseEnrollment.objects.select_related('course', 'schedule').filter(user_id=user.id)
+            has_non_audit_enrollments = user_enrollments.exclude(mode__in=CourseMode.UPSELL_TO_VERIFIED_MODES).exists()
+            # TODO: clean up as part of REVO-28 (END)
+            enrollment = CourseEnrollment.objects.select_related(
+                'course', 'schedule'
+            ).get(user_id=user.id, course_id=course.id)
+        except CourseEnrollment.DoesNotExist:
+            pass  # Not enrolled, use the default values
+
+        has_entitlements = False
+        if user.is_authenticated:
+            has_entitlements = CourseEntitlement.objects.filter(user=user).exists()
+
+        context = get_base_experiment_metadata_context(course, user, enrollment, user_enrollments)
+        has_staff_access = has_staff_access_to_preview_mode(user, course.id)
+        forum_roles = []
+        if user.is_authenticated:
+            forum_roles = list(Role.objects.filter(users=user, course_id=course.id).values_list('name').distinct())
+
+        # get user partition data
+        if user.is_authenticated:
+            partition_groups = get_all_partitions_for_course(course)
+            user_partitions = get_user_partition_groups(course.id, partition_groups, user, 'name')
+        else:
+            user_partitions = {}
+
+        # TODO: clean up as part of REVO-28 (START)
+        context['has_non_audit_enrollments'] = has_non_audit_enrollments or has_entitlements
         # TODO: clean up as part of REVO-28 (END)
-        enrollment = CourseEnrollment.objects.select_related(
-            'course', 'schedule'
-        ).get(user_id=user.id, course_id=course.id)
-    except CourseEnrollment.DoesNotExist:
-        pass  # Not enrolled, use the default values
+        context['has_staff_access'] = has_staff_access
+        context['forum_roles'] = forum_roles
+        context['partition_groups'] = user_partitions
 
-    has_entitlements = False
-    if user.is_authenticated:
-        has_entitlements = CourseEntitlement.objects.filter(user=user).exists()
+    user_metadata = {
+        key: context.get(key)
+        for key in (
+            'username',
+            'user_id',
+            'course_id',
+            'enrollment_mode',
+            'upgrade_link',
+            'upgrade_price',
+            'audit_access_deadline',
+            'course_duration',
+            'pacing_type',
+            'has_staff_access',
+            'forum_roles',
+            'partition_groups',
+            # TODO: clean up as part of REVO-28 (START)
+            'has_non_audit_enrollments',
+            # TODO: clean up as part of REVO-28 (END)
+            # TODO: clean up as part of REVEM-199 (START)
+            'program_key_fields',
+            # TODO: clean up as part of REVEM-199 (END)
+        )
+    }
 
-    context = get_base_experiment_metadata_context(course, user, enrollment, user_enrollments)
-    has_staff_access = has_staff_access_to_preview_mode(user, course.id)
-    forum_roles = []
-    if user.is_authenticated:
-        forum_roles = list(Role.objects.filter(users=user, course_id=course.id).values_list('name').distinct())
+    if user:
+        user_metadata['username'] = user.username
+        user_metadata['user_id'] = user.id
+        if hasattr(user, 'email'):
+            user_metadata['email'] = user.email
 
-    # get user partition data
-    if user.is_authenticated:
-        partition_groups = get_all_partitions_for_course(course)
-        user_partitions = get_user_partition_groups(course.id, partition_groups, user, 'name')
-    else:
-        user_partitions = {}
+    for datekey in (
+            'schedule_start',
+            'enrollment_time',
+            'course_start',
+            'course_end',
+            'dynamic_upgrade_deadline',
+            'course_upgrade_deadline',
+            'audit_access_deadline',
+    ):
+        user_metadata[datekey] = (
+            context.get(datekey).isoformat() if context.get(datekey) else None
+        )
 
-    # TODO: clean up as part of REVO-28 (START)
-    context['has_non_audit_enrollments'] = has_non_audit_enrollments or has_entitlements
-    # TODO: clean up as part of REVO-28 (END)
-    context['has_staff_access'] = has_staff_access
-    context['forum_roles'] = forum_roles
-    context['partition_groups'] = user_partitions
+    for timedeltakey in (
+        'course_duration',
+    ):
+        user_metadata[timedeltakey] = (
+            context.get(timedeltakey).total_seconds() if context.get(timedeltakey) else None
+        )
+
+    course_key = context.get('course_key')
+    if course and not course_key:
+        course_key = course.id
+
+    if course_key:
+        if isinstance(course_key, CourseKey):
+            user_metadata['course_key_fields'] = {
+                'org': course_key.org,
+                'course': course_key.course,
+                'run': course_key.run,
+            }
+
+            if not context.get('course_id'):
+                user_metadata['course_id'] = six.text_type(course_key)
+        elif isinstance(course_key, six.string_types):
+            user_metadata['course_id'] = course_key
+
+    context['user_metadata'] = user_metadata
     return context
 
 
