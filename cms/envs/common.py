@@ -445,11 +445,6 @@ COURSES_ROOT = ENV_ROOT / "data"
 
 GITHUB_REPO_ROOT = ENV_ROOT / "data"
 
-# TODO: This path modification exists as temporary support for deprecated import patterns.
-# It will be removed in an upcoming Open edX release.
-# See docs/decisions/0007-sys-path-modification-removal.rst
-sys.path.append(REPO_ROOT / 'import_shims' / 'studio')
-
 # For geolocation ip database
 GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoLite2-Country.mmdb"
 
