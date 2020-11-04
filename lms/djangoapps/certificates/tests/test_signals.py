@@ -311,7 +311,7 @@ class CertificateGenerationTaskTest(ModuleStoreTestCase):
         ('no-id-professional', True),
         ('credit', True),
         ('audit', False),
-        ('honor', False),
+        ('honor', True),
     )
     @ddt.unpack
     def test_fire_ungenerated_certificate_task_allowed_modes(self, enrollment_mode, should_create):
