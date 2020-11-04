@@ -755,11 +755,6 @@ NODE_MODULES_ROOT = REPO_ROOT / "node_modules"
 
 DATA_DIR = COURSES_ROOT
 
-# TODO: This path modification exists as temporary support for deprecated import patterns.
-# It will be removed in an upcoming Open edX release.
-# See docs/decisions/0007-sys-path-modification-removal.rst
-sys.path.append(REPO_ROOT / 'import_shims' / 'lms')
-
 # For Node.js
 
 system_node_path = os.environ.get("NODE_PATH", NODE_MODULES_ROOT)
