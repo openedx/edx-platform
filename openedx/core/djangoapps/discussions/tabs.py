@@ -8,9 +8,9 @@ from django.utils.translation import ugettext_noop
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
+from common.lib.xmodule.xmodule.course_module import CourseDescriptor
+from common.lib.xmodule.xmodule.tabs import TabFragmentViewMixin
 from lms.djangoapps.courseware.tabs import EnrolledTab
-from xmodule.course_module import CourseDescriptor
-from xmodule.tabs import TabFragmentViewMixin
 from .api.providers import get_discussion_provider
 from .discussions_apps import DiscussionApp
 

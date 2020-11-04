@@ -8,7 +8,7 @@ from ..discussions_apps import DiscussionApp, DiscussionAppsPluginManager
 from ..models import DiscussionProviderConfig
 
 
-def get_discussion_provider(context_key: LearningContextKey) -> Optional[Type[DiscussionApp]]:
+def get_discussion_provider(context_key: LearningContextKey) -> 'Optional[Type[DiscussionApp]]':
     """
     Returns the discussion app provider associated with the provided context key.
 
@@ -32,7 +32,7 @@ def get_discussion_provider(context_key: LearningContextKey) -> Optional[Type[Di
         return DiscussionAppsPluginManager.get_plugin(config.provider)
 
 
-def get_configured_discussion_providers() -> List[Type[DiscussionApp]]:
+def get_configured_discussion_providers() -> 'List[Type[DiscussionApp]]':
     """
     Returns a list of discussion providers that have a usable configuration.
     """

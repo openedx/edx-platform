@@ -13,7 +13,6 @@ from ..api.config import (
 )
 from ..api.data import CourseDiscussionConfigData, DiscussionPluginConfigData
 from ..models import DiscussionProviderConfig, LearningContextDiscussionConfig
-from ...config_model_utils.models import site_from_org
 from ...site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 
 
