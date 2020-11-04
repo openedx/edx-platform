@@ -15,11 +15,8 @@ from student.models import Registration
 from student.tests.factories import UserFactory
 
 
-if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-    raise unittest.SkipTest('fix broken tests')
-
-
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'fix broken tests')
 class TestActivateAccount(TestCase):
     """Tests for account creation"""
 
