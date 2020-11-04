@@ -53,7 +53,9 @@ from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBA
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from common.djangoapps.student import auth
 from common.djangoapps.student.auth import has_course_author_access, has_studio_read_access, has_studio_write_access
-from common.djangoapps.student.roles import CourseCreatorRole, CourseInstructorRole, CourseStaffRole, GlobalStaff, UserBasedRole
+from common.djangoapps.student.roles import (
+    CourseCreatorRole, CourseInstructorRole, CourseStaffRole, GlobalStaff, UserBasedRole
+)
 from common.djangoapps.util.course import get_link_for_about_page
 from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
@@ -64,7 +66,9 @@ from common.djangoapps.util.milestones_helpers import (
     set_prerequisite_courses
 )
 from openedx.core import toggles as core_toggles
-from common.djangoapps.util.organizations_helpers import add_organization_course, get_organization_by_short_name, organizations_enabled
+from common.djangoapps.util.organizations_helpers import (
+    add_organization_course, get_organization_by_short_name, organizations_enabled
+)
 from common.djangoapps.util.string_utils import _has_non_ascii_characters
 from common.djangoapps.xblock_django.api import deprecated_xblocks
 from xmodule.contentstore.content import StaticContent

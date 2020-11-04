@@ -11,7 +11,6 @@ from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 from six.moves import range
 
-from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
