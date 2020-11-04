@@ -357,7 +357,7 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
 
     @skipIf(
         settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,
-        'fails bcuz of https://github.com/appsembler/edx-search/commit/3192723d13c4183a80663b38a6851c9992dc770f '
+        'fails due to https://github.com/appsembler/edx-search/commit/3192723d13c4183a80663b38a6851c9992dc770f '
         'need to revert it'
     )
     def test_list_all_with_search_term(self):
