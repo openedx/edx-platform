@@ -22,6 +22,10 @@ class ApplicationHub(TimeStampedModel):
     class Meta:
         app_label = 'applications'
 
+    def set_is_prerequisite_courses_passed(self):
+        self.is_prerequisite_courses_passed = True
+        self.save()
+
     def __str__(self):
         return 'User {user_id}, application status id={id}'.format(user_id=self.user.id, id=self.id)
 
@@ -56,6 +60,9 @@ class UserApplication(TimeStampedModel):
 
 
 class UserStartAndEndDates(TimeStampedModel):
+    """
+    An abstract model for start and end dates.
+    """
     month_choices = month_choices(default_title='Month')
     year_choices = year_choices(default_title='Year')
 
