@@ -355,11 +355,6 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
         self.assertNotEqual(res.data['results'], [])
         self.assertEqual(res.data['pagination']['count'], 3)  # Should list all of the 3 courses
 
-    @skipIf(
-        settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,
-        'fails due to https://github.com/appsembler/edx-search/commit/3192723d13c4183a80663b38a6851c9992dc770f '
-        'need to revert it'
-    )
     def test_list_all_with_search_term(self):
         """
         Test with search, should list only the course that matches the search term.

@@ -82,7 +82,7 @@ https://github.com/appsembler/edx-organizations/archive/5.2.0-appsembler11.tar.g
 edx-proctoring>=2.0.1
 edx-proctoring-proctortrack==1.0.5  # Intentionally and permanently pinned to ensure code changes are reviewed
 edx-rest-api-client
-https://github.com/appsembler/edx-search/archive/1.3.4-appsembler2.tar.gz  # edx-search
+https://github.com/appsembler/edx-search/archive/1.3.4-appsembler3.tar.gz  # edx-search
 edx-sga
 edx-submissions
 edx-user-state-client
