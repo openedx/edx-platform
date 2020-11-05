@@ -121,7 +121,7 @@ class WaffleFlag(BaseWaffleFlag):
             yield
 
 
-class CourseWaffleFlag(WaffleFlag):
+class CourseWaffleFlag(BaseWaffleFlag):
     """
     Represents a single waffle flag that can be forced on/off for a course. This class should be used instead of
     WaffleFlag when in the context of a course.
