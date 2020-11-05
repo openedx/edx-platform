@@ -21,8 +21,8 @@ class WaffleSwitchNamespace(BaseWaffleSwitchNamespace):
     Deprecated class: instead, use edx_toggles.toggles.WaffleSwitchNamespace.
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, name, log_prefix=None):
+        super().__init__(name, log_prefix=log_prefix)
         warnings.warn(
             (
                 "Importing WaffleSwitchNamespace from waffle_utils is deprecated. Instead, import from"
@@ -31,7 +31,7 @@ class WaffleSwitchNamespace(BaseWaffleSwitchNamespace):
             DeprecationWarning,
             stacklevel=2,
         )
-        set_custom_attribute("deprecated_waffle_utils", "WaffleSwitchNamespace")
+        set_custom_attribute("deprecated_waffle_utils", "WaffleSwitchNamespace[{}]".format(name))
 
     @contextmanager
     def override(self, switch_name, active=True):
@@ -62,14 +62,14 @@ class WaffleSwitch(BaseWaffleSwitch):
     Deprecated class: instead, use edx_toggles.toggles.WaffleSwitch.
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, waffle_namespace, switch_name, module_name=None):
+        super().__init__(waffle_namespace, switch_name, module_name=module_name)
         warnings.warn(
             "Importing WaffleSwitch from waffle_utils is deprecated. Instead, import from edx_toggles.toggles.",
             DeprecationWarning,
             stacklevel=2,
         )
-        set_custom_attribute("deprecated_waffle_utils", "WaffleSwitch")
+        set_custom_attribute("deprecated_waffle_utils", "WaffleSwitch[{}]".format(self.name))
 
 
 class WaffleFlagNamespace(BaseWaffleFlagNamespace):
@@ -77,14 +77,14 @@ class WaffleFlagNamespace(BaseWaffleFlagNamespace):
     Deprecated class: instead, use edx_toggles.toggles.WaffleFlagNamespace.
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, name, log_prefix=None):
+        super().__init__(name, log_prefix=log_prefix)
         warnings.warn(
             "Importing WaffleFlagNamespace from waffle_utils is deprecated. Instead, import from edx_toggles.toggles.",
             DeprecationWarning,
             stacklevel=2,
         )
-        set_custom_attribute("deprecated_waffle_utils", "WaffleFlagNamespace")
+        set_custom_attribute("deprecated_waffle_utils", "WaffleFlagNamespace[{}]".format(name))
 
 
 class WaffleFlag(BaseWaffleFlag):
@@ -92,14 +92,14 @@ class WaffleFlag(BaseWaffleFlag):
     Deprecated class: instead, use edx_toggles.toggles.WaffleFlag.
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, waffle_namespace, flag_name, module_name=None):
+        super().__init__(waffle_namespace, flag_name, module_name=module_name)
         warnings.warn(
             "Importing WaffleFlag from waffle_utils is deprecated. Instead, import from edx_toggles.toggles.",
             DeprecationWarning,
             stacklevel=2,
         )
-        set_custom_attribute("deprecated_waffle_utils", "WaffleFlag")
+        set_custom_attribute("deprecated_waffle_utils", "WaffleFlag[{}]".format(self.name))
 
     @contextmanager
     def override(self, active=True):
