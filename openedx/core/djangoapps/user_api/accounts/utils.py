@@ -6,7 +6,7 @@ Utility methods for the account settings.
 import re
 
 import waffle
-from completion import waffle as completion_waffle
+from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from completion.models import BlockCompletion
 from django.conf import settings
 from django.utils.translation import ugettext as _
@@ -118,7 +118,7 @@ def retrieve_last_sitewide_block_completed(user):
     :return: block_lms_url
 
     """
-    if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+    if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():
         return
 
     latest_completions_by_course = BlockCompletion.latest_blocks_completed_all_courses(user)

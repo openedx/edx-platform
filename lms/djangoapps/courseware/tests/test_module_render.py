@@ -15,7 +15,7 @@ import pytz
 import six
 from bson import ObjectId
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
-from completion import waffle as completion_waffle
+from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from completion.models import BlockCompletion
 from common.djangoapps.course_modes.models import CourseMode
 from django.conf import settings
@@ -82,7 +82,6 @@ from xmodule.lti_module import LTIDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MIXED_MODULESTORE,
     ModuleStoreTestCase,
     SharedModuleStoreTestCase
 )
@@ -93,11 +92,6 @@ from xmodule.x_module import STUDENT_VIEW, CombinedSystem, XModule, XModuleDescr
 
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
-
-# pylint: disable=feature-toggle-needs-doc
-ENABLE_COMPLETION_TRACKING_SWITCH = LegacyWaffleSwitch(
-    completion_waffle.waffle(), completion_waffle.ENABLE_COMPLETION_TRACKING, __name__
-)
 
 
 @XBlock.needs("field-data")
