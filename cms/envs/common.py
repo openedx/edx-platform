@@ -554,6 +554,7 @@ AWS_SES_REGION_NAME = 'us-east-1'
 AWS_SES_REGION_ENDPOINT = 'email.us-east-1.amazonaws.com'
 AWS_ACCESS_KEY_ID = None
 AWS_SECRET_ACCESS_KEY = None
+AWS_SECURITY_TOKEN = None
 AWS_QUERYSTRING_AUTH = False
 AWS_STORAGE_BUCKET_NAME = 'SET-ME-PLEASE (ex. bucket-name)'
 AWS_S3_CUSTOM_DOMAIN = 'SET-ME-PLEASE (ex. bucket-name.s3.amazonaws.com)'

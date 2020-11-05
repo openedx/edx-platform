@@ -98,38 +98,6 @@ MAX_UPLOAD_HOURS = 24
 VIDEOS_PER_PAGE = 100
 
 
-class AssumeRole(object):
-    """ Singleton class to establish connection to aws using mfa and assume role """
-    __instance = None
-
-    @staticmethod
-    def get_instance():
-        """ Static access method. """
-        if not AssumeRole.__instance:
-            AssumeRole()
-
-        return AssumeRole.__instance
-
-    def __init__(self):
-        """ Virtually private constructor. """
-        if AssumeRole.__instance:
-            raise Exception("This is a singleton class!")
-
-        sts = STSConnection(
-            settings.AWS_ACCESS_KEY_ID,
-            settings.AWS_SECRET_ACCESS_KEY
-        )
-        self.credentials = sts.assume_role(
-            role_arn=settings.ROLE_ARN,
-            role_session_name='vem',
-            duration_seconds=3600,
-            mfa_serial_number=settings.MFA_SERIAL_NUMBER,
-            mfa_token=settings.MFA_TOKEN
-        ).credentials.to_dict()
-
-        AssumeRole.__instance = self
-
-
 class TranscriptProvider(object):
     """
     Transcription Provider Enumeration
@@ -808,15 +776,14 @@ def videos_post(course, request):
 
 def storage_service_bucket(course_key=None):
     """
-    Returns an S3 bucket for video upload. The S3 bucket returned depends on
-    which pipeline, VEDA or VEM, is enabled.
+    Returns an S3 bucket for video upload.
     """
     if waffle_flags()[ENABLE_DEVSTACK_VIDEO_UPLOADS].is_enabled():
-        credentials = AssumeRole.get_instance().credentials
         params = {
-            'aws_access_key_id': credentials['access_key'],
-            'aws_secret_access_key': credentials['secret_key'],
-            'security_token': credentials['session_token']
+            'aws_access_key_id': settings.AWS_ACCESS_KEY_ID,
+            'aws_secret_access_key': settings.AWS_SECRET_ACCESS_KEY,
+            'security_token': settings.AWS_SECURITY_TOKEN
+
         }
     else:
         params = {

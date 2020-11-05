@@ -48,7 +48,6 @@ from ..videos import (
     KEY_EXPIRATION_IN_SECONDS,
     VIDEO_IMAGE_UPLOAD_ENABLED,
     WAFFLE_SWITCHES,
-    AssumeRole,
     StatusDisplayStrings,
     TranscriptProvider,
     _get_default_video_image_url,
@@ -447,16 +446,12 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         response = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response['error'], u'The file name for %s must contain only ASCII characters.' % file_name)
 
+    @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret', AWS_SECURITY_TOKEN='token')
     @patch('boto.s3.key.Key')
     @patch('boto.s3.connection.S3Connection')
     @override_flag(waffle_flags()[ENABLE_DEVSTACK_VIDEO_UPLOADS].namespaced_flag_name, active=True)
-    def test_assume_role_connection(self, mock_conn, mock_key):
+    def test_devstack_upload_connection(self, mock_conn, mock_key):
         files = [{'file_name': 'first.mp4', 'content_type': 'video/mp4'}]
-        credentials = {
-            'access_key': 'test_key',
-            'secret_key': 'test_secret',
-            'session_token': 'test_session_token'
-        }
         mock_key_instances = [
             Mock(
                 generate_url=Mock(
@@ -466,22 +461,18 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             for file_info in files
         ]
         mock_key.side_effect = mock_key_instances
+        response = self.client.post(
+            self.url,
+            json.dumps({'files': files}),
+            content_type='application/json'
+        )
 
-        with patch.object(AssumeRole, 'get_instance') as assume_role:
-            assume_role.return_value.credentials = credentials
-
-            response = self.client.post(
-                self.url,
-                json.dumps({'files': files}),
-                content_type='application/json'
-            )
-
-            self.assertEqual(response.status_code, 200)
-            mock_conn.assert_called_once_with(
-                aws_access_key_id=credentials['access_key'],
-                aws_secret_access_key=credentials['secret_key'],
-                security_token=credentials['session_token']
-            )
+        self.assertEqual(response.status_code, 200)
+        mock_conn.assert_called_once_with(
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            security_token=settings.AWS_SECURITY_TOKEN
+        )
 
     @patch('boto.s3.key.Key')
     @patch('boto.s3.connection.S3Connection')
