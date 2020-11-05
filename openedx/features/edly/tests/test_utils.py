@@ -23,6 +23,7 @@ from openedx.features.edly.tests.factories import (
 )
 from openedx.features.edly.utils import (
     create_user_link_with_edly_sub_organization,
+    create_learner_link_with_permission_groups,
     decode_edly_user_info_cookie,
     edly_panel_user_has_edly_org_access,
     encode_edly_user_info_cookie,
@@ -335,3 +336,13 @@ class UtilsTests(ModuleStoreTestCase):
         edx_orgs_of_filterd_courses = [course.org for course in filtered_courses]
         for org in edx_orgs_of_filterd_courses:
             assert org == edx_org_1.short_name
+
+    def test_create_learner_link_with_permission_groups(self):
+        """
+        Test that "create_learner_link_with_permission_groups" method create learner groups permissions.
+        """
+        edly_user = UserFactory()
+        edly_user_group = GroupFactory(name=settings.EDLY_USER_ROLES.get('subscriber', None))
+
+        edly_user = create_learner_link_with_permission_groups(edly_user)
+        assert edly_user.groups.filter(name=edly_user_group).exists()

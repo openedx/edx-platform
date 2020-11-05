@@ -3,6 +3,7 @@ import logging
 import jwt
 import waffle
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.forms.models import model_to_dict
@@ -313,3 +314,22 @@ def filter_courses_based_on_org(request, all_courses):
     filtered_courses = [course for course in list(all_courses) if course.org == edx_org]
 
     return filtered_courses
+
+
+def create_learner_link_with_permission_groups(user):
+    """
+    Create Edly Learner Link with Learners Permission Groups.
+
+    Arguments:
+        user (object): User object.
+
+    Returns:
+        object: User object.
+
+    """
+    groups = [settings.EDLY_USER_ROLES.get('subscriber', None), settings.EDLY_USER_ROLES.get('panel_restricted', None)]
+    groups_info = Group.objects.filter(name__in=groups)
+    for new_group in groups_info:
+        user.groups.add(new_group)
+
+    return user
