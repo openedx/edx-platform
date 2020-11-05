@@ -63,7 +63,7 @@ git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752
 git+https://github.com/edx/django-ratelimit-backend.git@v2.0.1a5#egg=django-ratelimit-backend==2.0.1a5
 
 # Our libraries:
--e git+https://github.com/edx/codejail.git@3.1.0#egg=codejail==3.1.0
+-e git+https://github.com/edx/codejail.git@3.1.1#egg=codejail==3.1.1
 -e git+https://github.com/edx/acid-block.git@758855a67d2f12bd74db4d5e7a0862d6e65f079c#egg=acid-xblock
 -e git+https://github.com/edx/RateXBlock.git@2.0.1#egg=rate-xblock
 -e git+https://github.com/edx/DoneXBlock.git@2.0.3#egg=done-xblock
