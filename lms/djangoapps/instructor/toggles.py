@@ -2,12 +2,12 @@
 Waffle flags for instructor dashboard.
 """
 
-from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
+from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 WAFFLE_NAMESPACE = 'instructor'
 # Namespace for instructor waffle flags.
-WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name=WAFFLE_NAMESPACE)
+WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE)
 
 # Waffle flag enable new data download UI on specific course.
 # .. toggle_name: instructor.enable_data_download_v2
@@ -20,7 +20,7 @@ WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name=WAFFLE_NAMESPACE)
 # .. toggle_warnings: ??
 # .. toggle_tickets: PROD-1309
 DATA_DOWNLOAD_V2 = CourseWaffleFlag(
-    waffle_namespace=WaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix='instructor_dashboard: '),
+    waffle_namespace=LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix='instructor_dashboard: '),
     flag_name='enable_data_download_v2',
 )
 
@@ -36,7 +36,7 @@ DATA_DOWNLOAD_V2 = CourseWaffleFlag(
 # .. toggle_warnings: n/a
 # .. toggle_tickets: PROD-1740
 # .. toggle_status: supported
-OPTIMISED_IS_SMALL_COURSE = WaffleFlag(
+OPTIMISED_IS_SMALL_COURSE = LegacyWaffleFlag(
     waffle_namespace=WAFFLE_FLAG_NAMESPACE,
     flag_name='optimised_is_small_course',
 )

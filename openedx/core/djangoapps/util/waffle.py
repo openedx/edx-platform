@@ -3,7 +3,7 @@ Waffle flags and switches
 """
 
 
-from edx_toggles.toggles import WaffleSwitchNamespace
+from edx_toggles.toggles import LegacyWaffleSwitchNamespace
 
 WAFFLE_NAMESPACE = u'open_edx_util'
 
@@ -15,4 +15,4 @@ def waffle():
     """
     Returns the namespaced, cached, audited Waffle class for open_edx_util.
     """
-    return WaffleSwitchNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'OpenEdX Util: ')
+    return LegacyWaffleSwitchNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'OpenEdX Util: ')

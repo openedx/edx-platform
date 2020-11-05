@@ -6,15 +6,15 @@ from django.utils.translation import ugettext as _
 from edx_django_utils.monitoring import set_custom_attribute
 from waffle import flag_is_active
 
-from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
+from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
 from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
 from openedx.core.djangoapps.util.user_messages import UserMessageCollection
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 # Namespace for course experience waffle flags.
-WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='course_experience')
+WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='course_experience')
 
-COURSE_EXPERIENCE_WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='course_experience')
+COURSE_EXPERIENCE_WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='course_experience')
 
 # Waffle flag to disable the separate course outline page and full width content.
 DISABLE_COURSE_OUTLINE_PAGE_FLAG = CourseWaffleFlag(
@@ -30,7 +30,7 @@ DISABLE_UNIFIED_COURSE_TAB_FLAG = CourseWaffleFlag(
 DISPLAY_COURSE_SOCK_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'display_course_sock', __name__)
 
 # Waffle flag to let learners access a course before its start date.
-COURSE_PRE_START_ACCESS_FLAG = WaffleFlag(WAFFLE_FLAG_NAMESPACE, 'pre_start_access', __name__)
+COURSE_PRE_START_ACCESS_FLAG = LegacyWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'pre_start_access', __name__)
 
 # Waffle flag to enable the setting of course goals.
 # .. toggle_name: course_experience.enable_course_goals
@@ -65,7 +65,7 @@ UPGRADE_DEADLINE_MESSAGE = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'upgrade_dead
 LATEST_UPDATE_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'latest_update', __name__)
 
 # Waffle flag to enable anonymous access to a course
-SEO_WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='seo')
+SEO_WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='seo')
 COURSE_ENABLE_UNENROLLED_ACCESS_FLAG = CourseWaffleFlag(
     SEO_WAFFLE_FLAG_NAMESPACE,
     'enable_anonymous_courseware_access',

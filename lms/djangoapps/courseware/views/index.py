@@ -21,7 +21,7 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
 from edx_django_utils.monitoring import set_custom_attributes_for_course_key
-from edx_toggles.toggles import WaffleSwitchNamespace
+from edx_toggles.toggles import LegacyWaffleSwitchNamespace
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from six.moves import urllib
@@ -441,7 +441,7 @@ class CoursewareIndex(View):
             'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
             'bookmarks_api_url': reverse('bookmarks'),
             'language_preference': self._get_language_preference(),
-            'disable_optimizely': not WaffleSwitchNamespace('RET').is_enabled('enable_optimizely_in_courseware'),
+            'disable_optimizely': not LegacyWaffleSwitchNamespace('RET').is_enabled('enable_optimizely_in_courseware'),
             'section_title': None,
             'sequence_title': None,
             'disable_accordion': not DISABLE_COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id),

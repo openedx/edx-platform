@@ -28,7 +28,7 @@ from django.urls import reverse
 from edx_proctoring.api import create_exam, create_exam_attempt, update_attempt_status
 from edx_proctoring.runtime import set_runtime_service
 from edx_proctoring.tests.test_services import MockCertificateService, MockCreditService, MockGradesService
-from edx_toggles.toggles import WaffleSwitch
+from edx_toggles.toggles import LegacyWaffleSwitch
 from edx_toggles.toggles.testutils import override_waffle_switch
 from edx_when.field_data import DateLookupFieldData
 from freezegun import freeze_time
@@ -95,7 +95,7 @@ from xmodule.x_module import STUDENT_VIEW, CombinedSystem, XModule, XModuleDescr
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 # pylint: disable=feature-toggle-needs-doc
-ENABLE_COMPLETION_TRACKING_SWITCH = WaffleSwitch(
+ENABLE_COMPLETION_TRACKING_SWITCH = LegacyWaffleSwitch(
     completion_waffle.waffle(), completion_waffle.ENABLE_COMPLETION_TRACKING, __name__
 )
 

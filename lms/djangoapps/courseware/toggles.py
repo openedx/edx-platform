@@ -2,12 +2,12 @@
 Toggles for courseware in-course experience.
 """
 
-from edx_toggles.toggles import WaffleFlagNamespace
+from edx_toggles.toggles import LegacyWaffleFlagNamespace
 from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 # Namespace for courseware waffle flags.
-WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='courseware')
+WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='courseware')
 
 # .. toggle_name: courseware.courseware_mfe
 # .. toggle_implementation: ExperimentWaffleFlag

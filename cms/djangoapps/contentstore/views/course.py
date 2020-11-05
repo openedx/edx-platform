@@ -23,7 +23,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
-from edx_toggles.toggles import WaffleSwitchNamespace
+from edx_toggles.toggles import LegacyWaffleSwitchNamespace
 from milestones import api as milestones_api
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -511,7 +511,7 @@ def course_listing(request):
     """
 
     optimization_enabled = GlobalStaff().has_user(request.user) and \
-        WaffleSwitchNamespace(name=WAFFLE_NAMESPACE).is_enabled(u'enable_global_staff_optimization')
+        LegacyWaffleSwitchNamespace(name=WAFFLE_NAMESPACE).is_enabled(u'enable_global_staff_optimization')
 
     org = request.GET.get('org', '') if optimization_enabled else None
     courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
