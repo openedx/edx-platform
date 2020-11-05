@@ -166,10 +166,8 @@ class CourseOutlineFragmentView(EdxFragmentView):
         """
         Returns the date that the ENABLE_COMPLETION_TRACKING waffle switch was enabled.
         """
-        # pylint: disable=protected-access
-        switch_name = completion_waffle.ENABLE_COMPLETION_TRACKING_SWITCH.name
         try:
-            return Switch.objects.get(name=switch_name).created
+            return Switch.objects.get(name=ENABLE_COMPLETION_TRACKING_SWITCH.name).created
         except Switch.DoesNotExist:
             return DEFAULT_COMPLETION_TRACKING_START
 

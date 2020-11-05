@@ -131,7 +131,7 @@ class WaffleFlag(LegacyWaffleFlag):
             yield
 
 
-class CourseWaffleFlag(BaseWaffleFlag):
+class CourseWaffleFlag(LegacyWaffleFlag):
     """
     Represents a single waffle flag that can be forced on/off for a course. This class should be used instead of
     WaffleFlag when in the context of a course.
@@ -165,13 +165,13 @@ class CourseWaffleFlag(BaseWaffleFlag):
         from .models import WaffleFlagCourseOverrideModel
 
         cache_key = "{}.{}".format(self.namespaced_flag_name, str(course_key))
-        course_override = self._cached_flags.get(cache_key)
+        course_override = self.cached_flags().get(cache_key)
 
         if course_override is None:
             course_override = WaffleFlagCourseOverrideModel.override_value(
                 self.namespaced_flag_name, course_key
             )
-            self._cached_flags[cache_key] = course_override
+            self.cached_flags()[cache_key] = course_override
 
         if course_override == WaffleFlagCourseOverrideModel.ALL_CHOICES.on:
             return True
@@ -196,7 +196,6 @@ class CourseWaffleFlag(BaseWaffleFlag):
             )
         is_enabled_for_course = self._get_course_override_value(course_key)
         if is_enabled_for_course is not None:
-            # pylint: disable=protected-access
-            self.waffle_namespace._monitor_value(self.flag_name, is_enabled_for_course)
+            self.set_monitor_value(is_enabled_for_course)
             return is_enabled_for_course
         return super().is_enabled()

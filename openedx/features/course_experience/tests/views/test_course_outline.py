@@ -720,6 +720,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         switch_name = ENABLE_COMPLETION_TRACKING_SWITCH.name
         switch, _ = Switch.objects.get_or_create(name=switch_name)
 
+        # pylint: disable=protected-access
         self.assertEqual(switch.created, view._completion_data_collection_start())
 
         switch.delete()
