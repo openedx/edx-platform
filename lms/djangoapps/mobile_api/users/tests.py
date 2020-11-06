@@ -8,6 +8,7 @@ import datetime
 import ddt
 import pytz
 import six
+from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
 from django.template import defaultfilters
 from django.test import RequestFactory, override_settings
@@ -449,14 +450,14 @@ class CourseStatusAPITestCase(MobileAPITestCase):
 
 
 class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
-                          MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
+                          MobileCourseAccessTestMixin, MilestonesTestCaseMixin, CompletionWaffleTestMixin):
     """
-    Tests for GET of /api/mobile/v0.5/users/<user_name>/course_status_info/{course_id}
+    Tests for GET of /api/mobile/v<version_number>/users/<user_name>/course_status_info/{course_id}
     """
-    def test_success(self):
+    def test_success_v0(self):
         self.login_and_enroll()
 
-        response = self.api_response()
+        response = self.api_response(api_version=API_V05)
         self.assertEqual(
             response.data["last_visited_module_id"],
             six.text_type(self.sub_section.location)
@@ -464,6 +465,16 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         self.assertEqual(
             response.data["last_visited_module_path"],
             [six.text_type(module.location) for module in [self.sub_section, self.section, self.course]]
+        )
+
+    def test_success_v1(self):
+        self.override_waffle_switch(True)
+        self.login_and_enroll()
+        submit_completions_for_testing(self.user, [self.unit.location])
+        response = self.api_response(api_version=API_V1)
+        self.assertEqual(
+            response.data["last_visited_block_id"],
+            six.text_type(self.unit.location)
         )
 
 
