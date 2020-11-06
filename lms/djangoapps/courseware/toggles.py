@@ -47,7 +47,7 @@ COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW = CourseWaffleFlag(
 # .. toggle_default: False
 # .. toggle_description: Supports staged rollout of the new micro-frontend-based implementation of the course exit page.
 # .. toggle_category: micro-frontend
-# .. toggle_use_cases: open_edx, incremental_release
+# .. toggle_use_cases: open_edx, temporary
 # .. toggle_creation_date: 2020-10-02
 # .. toggle_target_removal_date: None
 # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and ENABLE_COURSEWARE_MICROFRONTEND.
