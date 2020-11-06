@@ -14,7 +14,7 @@ WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name=WAFFLE_NAMESPACE)
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: instructor
-# .. toggle_use_cases: open_edx, temporary
+# .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2020-07-8
 # .. toggle_target_removal_date: None
 # .. toggle_warnings: ??
@@ -30,7 +30,7 @@ DATA_DOWNLOAD_V2 = CourseWaffleFlag(
 # .. toggle_default: False
 # .. toggle_description: Supports staged rollout to improved is_small_course method.
 # .. toggle_category: instructor
-# .. toggle_use_cases: temporary, open_edx
+# .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2020-07-02
 # .. toggle_target_removal_date: None
 # .. toggle_warnings: n/a

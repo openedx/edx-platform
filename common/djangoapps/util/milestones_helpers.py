@@ -25,6 +25,7 @@ NAMESPACE_CHOICES = {
 
 REQUEST_CACHE_NAME = "milestones"
 
+# TODO this should be moved to edx/edx-milestones
 # .. toggle_name: FEATURES['ENABLE_MILESTONES_APP']
 # .. toggle_implementation: SettingDictToggle
 # .. toggle_default: False
@@ -33,7 +34,7 @@ REQUEST_CACHE_NAME = "milestones"
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2014-11-21
 # .. toggle_target_removal_date: None
-# .. toggle_warnings: TODO this should be moved to edx/edx-milestones
+# .. toggle_warnings: None
 # .. toggle_tickets: None
 ENABLE_MILESTONES_APP = SettingDictToggle("FEATURES", "MILESTONES_APP", default=False, module_name=__name__)
 
