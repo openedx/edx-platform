@@ -6,7 +6,6 @@ For more, see https://celery.readthedocs.io/en/latest/userguide/routing.html#rou
 
 import logging
 
-from django.conf import settings
 
 log = logging.getLogger(__name__)
 
@@ -17,6 +16,8 @@ def route_task_queue(name):
 
     If None is returned from this method, default routing logic is used.
     """
+    from django.conf import settings  # pylint: disable=import-outside-toplevel
+
     if name in settings.EXPLICIT_QUEUES:
         return settings.EXPLICIT_QUEUES[name]
 
@@ -31,6 +32,8 @@ def ensure_queue_env(desired_env):
 
     If no such queue is defined, default routing logic is used.
     """
+    from django.conf import settings  # pylint: disable=import-outside-toplevel
+
     queues = getattr(settings, 'CELERY_QUEUES', None)
     return next(
         (
