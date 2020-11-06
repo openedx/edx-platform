@@ -32,7 +32,9 @@ REQUEST_CACHE_NAME = "milestones"
 #   the Open edX platform. (see https://github.com/edx/edx-milestones)
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2014-11-21
-# TODO this should be moved to edx/edx-milestones
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: TODO this should be moved to edx/edx-milestones
+# .. toggle_tickets: None
 ENABLE_MILESTONES_APP = SettingDictToggle("FEATURES", "MILESTONES_APP", default=False, module_name=__name__)
 
 

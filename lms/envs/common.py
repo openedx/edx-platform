@@ -90,6 +90,8 @@ FEATURES = {
     #   by course staff.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-09-04
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2425
     'DISPLAY_DEBUG_INFO_TO_STAFF': True,
     'DISPLAY_HISTOGRAMS_TO_STAFF': False,  # For large courses this slows down courseware access for staff.
@@ -102,6 +104,8 @@ FEATURES = {
     # .. toggle_description: When True, all courses will be active, regardless of start
     #   date.
     # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2012-07-24
+    # .. toggle_target_removal_date: None
     # .. toggle_warnings: This will cause ALL courses to be immediately visible.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/17913
     ## DO NOT SET TO True IN THIS FILE
@@ -118,6 +122,8 @@ FEATURES = {
     # .. toggle_description: Add PDF and HTML textbook tabs to the courseware.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-03-27
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/3064
     'ENABLE_TEXTBOOK': True,
 
@@ -133,6 +139,7 @@ FEATURES = {
     #   registrations.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-08-19
+    # .. toggle_target_removal_date: None
     # .. toggle_warnings: It is not recommended to enable this feature if ENABLE_DISCUSSION_HOME_PANEL is not enabled,
     #   since subscribers who receive digests in that case will only be able to unsubscribe via links embedded in
     #   their emails, and they will have no way to resubscribe.
@@ -147,6 +154,8 @@ FEATURES = {
     #   regular expression defined by USERNAME_REGEX_PARTIAL.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2017-06-27
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/14729
     'ENABLE_UNICODE_USERNAME': False,
 
@@ -156,8 +165,12 @@ FEATURES = {
     # .. toggle_name: ENABLE_MASQUERADE
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: True
+    # .. toggle_description: None
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2013-04-13
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: None
+    # .. toggle_tickets: None
     'ENABLE_MASQUERADE': True,
 
     # .. toggle_name: ENABLE_SYSADMIN_DASHBOARD
@@ -169,6 +182,7 @@ FEATURES = {
     # .. toggle_creation_date: 2013-12-12
     # .. toggle_target_removal_date: None
     # .. toggle_warnings: This feature is not supported anymore and should have a target removal date.
+    # .. toggle_tickets: None
     'ENABLE_SYSADMIN_DASHBOARD': False,  # sysadmin dashboard, to see what courses are loaded, to delete & load courses
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
@@ -182,6 +196,7 @@ FEATURES = {
     # .. toggle_creation_date: 2014-09-09
     # .. toggle_target_removal_date: None
     # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
+    # .. toggle_tickets: None
     'ENABLE_OAUTH2_PROVIDER': False,
 
     # .. toggle_name: ENABLE_XBLOCK_VIEW_ENDPOINT
@@ -192,6 +207,8 @@ FEATURES = {
     #   https://github.com/edx-solutions/jquery-xblock
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-03-14
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2968
     'ENABLE_XBLOCK_VIEW_ENDPOINT': False,
 
@@ -247,6 +264,8 @@ FEATURES = {
     #   allows verified certificates, like courses.edx.org.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2019-05-14
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/PROD-269
     'DISABLE_HONOR_CERTIFICATES': False,  # Toggle to disable honor certificates
 
@@ -264,6 +283,8 @@ FEATURES = {
     #   querystring parameters.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2018-05-07
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/TE-2545
     'RESTRICT_AUTOMATIC_AUTH': True,
 
@@ -273,7 +294,9 @@ FEATURES = {
     # .. toggle_description: Enable the login micro frontend.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2018-05-07
+    # .. toggle_target_removal_date: None
     # .. toggle_warnings: The login MFE domain name should be listed in LOGIN_REDIRECT_WHITELIST.
+    # .. toggle_tickets: None
     'ENABLE_LOGIN_MICROFRONTEND': False,
 
     # .. toggle_name: SKIP_EMAIL_VALIDATION
@@ -282,7 +305,10 @@ FEATURES = {
     # .. toggle_description: Turn this on to skip sending emails for user validation.
     #   Beware, as this leaves the door open to potential spam abuse.
     # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2018-05-07
+    # .. toggle_target_removal_date: None
     # .. toggle_warnings: The login MFE domain name should be listed in LOGIN_REDIRECT_WHITELIST.
+    # .. toggle_tickets: None
     'SKIP_EMAIL_VALIDATION': False,
 
     # .. toggle_name: ENABLE_COSMETIC_DISPLAY_PRICE
@@ -292,6 +318,7 @@ FEATURES = {
     #   cosmetic price is used when there is no registration price associated to the course.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-10-10
+    # .. toggle_target_removal_date: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6876
     # .. toggle_warnings: The use case of this feature toggle is uncertain.
     'ENABLE_COSMETIC_DISPLAY_PRICE': False,
@@ -333,6 +360,9 @@ FEATURES = {
     #   backends with the AUTHENTICATION_BACKENDS setting.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-09-15
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: None
+    # .. toggle_tickets: None
     'ENABLE_THIRD_PARTY_AUTH': False,
 
     # .. toggle_name: ENABLE_MKTG_SITE
@@ -341,8 +371,10 @@ FEATURES = {
     # .. toggle_description: Toggle to enable alternate urls for marketing links.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-03-24
+    # .. toggle_target_removal_date: None
     # .. toggle_warnings: When this is enabled, the MKTG_URLS setting should be defined. The use case of this feature
     #   toggle is uncertain.
+    # .. toggle_tickets: None
     'ENABLE_MKTG_SITE': False,
 
     # Prevent concurrent logins per user
@@ -361,6 +393,8 @@ FEATURES = {
     #   by their start dates, latest first.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-03-27
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/7548
     'ENABLE_COURSE_SORTING_BY_START_DATE': True,
 
@@ -372,6 +406,8 @@ FEATURES = {
     #   unified course tab (when the DISABLE_UNIFIED_COURSE_TAB_FLAG waffle is not enabled).
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2019-01-15
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/19604
     'ENABLE_COURSE_HOME_REDIRECT': True,
 
@@ -386,6 +422,8 @@ FEATURES = {
     #   specific configuration.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2016-06-24
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1320
     'ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER': False,
 
@@ -434,6 +472,8 @@ FEATURES = {
     #   license information to the courseware.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-05-14
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/7315
     'LICENSING': False,
 
@@ -448,6 +488,7 @@ FEATURES = {
     #   navbar.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-04-23
+    # .. toggle_target_removal_date: None
     # .. toggle_warnings: The COURSE_DISCOVERY_MEANINGS setting should be properly defined.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/7845
     'ENABLE_COURSE_DISCOVERY': False,
@@ -473,6 +514,8 @@ FEATURES = {
     # .. toggle_description: Enable to use special exams, aka timed and proctored exams.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-09-04
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/9744
     'ENABLE_SPECIAL_EXAMS': False,
 
@@ -499,9 +542,12 @@ FEATURES = {
     # .. toggle_description: Write Courseware Student Module History (CSMH) to the extended table: this logs all
     #   student activities to MySQL, in a separate database.
     # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2020-11-05
+    # .. toggle_target_removal_date: None
     # .. toggle_warnings: Even though most Open edX instances run with a separate CSMH database, it may not always be
     #   the case. When disabling this feature flag, remember to remove "lms.djangoapps.coursewarehistoryextended"
     #   from the INSTALLED_APPS and the "StudentModuleHistoryExtendedRouter" from the DATABASE_ROUTERS.
+    # .. toggle_tickets: None
     'ENABLE_CSMH_EXTENDED': True,
 
     # Read from both the CSMH and CSMHE history tables.
@@ -520,6 +566,8 @@ FEATURES = {
     #   the signup page.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2017-04-12
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/YONK-513
     'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
 
@@ -558,6 +606,8 @@ FEATURES = {
     #   with. This setting can be overridden by a site-specific configuration.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2017-07-20
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1832
     'ENABLE_PASSWORD_RESET_FAILURE_EMAIL': False,
 
@@ -578,6 +628,8 @@ FEATURES = {
     #   default because enabling allows a method to bypass password policy.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2020-02-21
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: None
     # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/21616'
     'ENABLE_CHANGE_USER_PASSWORD_ADMIN': False,
 
@@ -588,6 +640,7 @@ FEATURES = {
     #   REDIRECT_TO_COURSEWARE_MICROFRONTEND for course rollout)
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2020-03-05
+    # .. toggle_target_removal_date: None
     # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/23317'
     # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and see REDIRECT_TO_COURSEWARE_MICROFRONTEND for
     #   rollout.
@@ -2902,6 +2955,8 @@ ENABLE_CREDIT_ELIGIBILITY = True
 #   Eligibility" section then appears for those courses in the LMS.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2015-06-17
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: None
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/8550
 FEATURES['ENABLE_CREDIT_ELIGIBILITY'] = ENABLE_CREDIT_ELIGIBILITY
 

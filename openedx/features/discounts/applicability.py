@@ -27,7 +27,7 @@ from student.models import CourseEnrollment
 from track import segment
 
 # .. toggle_name: discounts.enable_discounting
-# .. toggle_type: flag
+# .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Toggle discounts always being disabled
 # .. toggle_use_cases: temporary

@@ -16,6 +16,8 @@ WAFFLE_NAMESPACE = 'videos'
 #   to YouTube as part of the video pipeline.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2018-08-03
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: None
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/18765
 DEPRECATE_YOUTUBE = 'deprecate_youtube'
 # .. toggle_name: videos.enable_devstack_video_uploads
@@ -26,6 +28,7 @@ DEPRECATE_YOUTUBE = 'deprecate_youtube'
 #   of enabling this feature toggle are uncertain.]
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2020-03-12
+# .. toggle_target_removal_date: None
 # .. toggle_warnings: Enabling this feature requires that the ROLE_ARN, MFA_SERIAL_NUMBER, MFA_TOKEN settings are
 #   properly defined.
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/23375

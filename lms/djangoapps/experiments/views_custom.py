@@ -29,7 +29,7 @@ from student.models import CourseEnrollment
 from track import segment
 
 # .. toggle_name: experiments.mobile_upsell_rev934
-# .. toggle_type: flag
+# .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Toggle mobile upsell enabled
 # .. toggle_use_cases: temporary
