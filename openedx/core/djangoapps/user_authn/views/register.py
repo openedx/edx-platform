@@ -34,6 +34,7 @@ from social_django import utils as social_utils
 import third_party_auth
 # Note that this lives in LMS, so this dependency should be refactored.
 # TODO Have the discussions code subscribe to the REGISTER_USER signal instead.
+from common.djangoapps.student.helpers import get_next_url_for_login_page
 from lms.djangoapps.discussion.notification_prefs.views import enable_notifications
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -491,7 +492,8 @@ class RegistrationView(APIView):
         if response:
             return response
 
-        response = self._create_response(request, {}, status_code=200)
+        redirect_url = get_next_url_for_login_page(request, include_host=True)
+        response = self._create_response(request, {}, status_code=200, redirect_url=redirect_url)
         set_logged_in_cookies(request, response, user)
         return response
 
@@ -545,13 +547,14 @@ class RegistrationView(APIView):
 
         return response, user
 
-    def _create_response(self, request, response_dict, status_code):
+    def _create_response(self, request, response_dict, status_code, redirect_url=None):
         if status_code == 200:
             # keeping this `success` field in for now, as we have outstanding clients expecting this
             response_dict['success'] = True
         else:
             self._log_validation_errors(request, response_dict, status_code)
-
+        if redirect_url:
+            response_dict['redirect_url'] = redirect_url
         return JsonResponse(response_dict, status=status_code)
 
     def _log_validation_errors(self, request, errors, status_code):
