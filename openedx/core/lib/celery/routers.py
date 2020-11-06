@@ -5,24 +5,22 @@ For more, see https://celery.readthedocs.io/en/latest/userguide/routing.html#rou
 """
 
 import logging
-from abc import ABCMeta, abstractproperty
 
 from django.conf import settings
-import six
 
 log = logging.getLogger(__name__)
 
 
-def route_task_queue(name, explicit_queues, alternate_env_tasks):
+def route_task_queue(name):
     """
     Helper method allowing for custom routing logic.
 
     If None is returned from this method, default routing logic is used.
     """
-    if name in explicit_queues:
-        return explicit_queues[name]
+    if name in settings.EXPLICIT_QUEUES:
+        return settings.EXPLICIT_QUEUES[name]
 
-    alternate_env = alternate_env_tasks.get(name, None)
+    alternate_env = settings.ALTERNATE_ENV_TASKS.get(name, None)
     if alternate_env:
         return ensure_queue_env(alternate_env)
 

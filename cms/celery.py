@@ -23,10 +23,6 @@ APP.conf.task_protocol = 1
 APP.config_from_object('django.conf:settings')
 APP.autodiscover_tasks()
 
-# Import after autodiscovery has had a chance to connect to the import_module signal
-# so celery doesn't miss any apps getting installed.
-from django.conf import settings  # pylint: disable=wrong-import-position,wrong-import-order
-
 
 def route_task(name, args, kwargs, options, task=None, **kw):  # pylint: disable=unused-argument
     """
@@ -35,4 +31,4 @@ def route_task(name, args, kwargs, options, task=None, **kw):  # pylint: disable
     If None is returned from this method, default routing logic is used.
     """
 
-    return route_task_queue(name, settings.EXPLICIT_QUEUES, settings.ALTERNATE_ENV_TASKS)
+    return route_task_queue(name)
