@@ -20,6 +20,7 @@ WAFFLE_NAMESPACE = u'grades'
 #   for all courses.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2017-04-11
+# .. toggle_target_removal_date: None
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/14771
 # .. toggle_warnings: This requires the PersistentGradesEnabledFlag to be enabled.
 ASSUME_ZERO_GRADE_IF_ABSENT = u'assume_zero_grade_if_absent'
@@ -29,6 +30,8 @@ ASSUME_ZERO_GRADE_IF_ABSENT = u'assume_zero_grade_if_absent'
 # .. toggle_description: When enabled, a change in grading policy will not trigger re-grading.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2017-08-03
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: None
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/15733
 DISABLE_REGRADE_ON_POLICY_CHANGE = u'disable_regrade_on_policy_change'
 
@@ -41,6 +44,8 @@ DISABLE_REGRADE_ON_POLICY_CHANGE = u'disable_regrade_on_policy_change'
 #   in edx-platform, but only in edx-proctoring.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2019-05-29
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: None
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/20719
 REJECTED_EXAM_OVERRIDES_GRADE = u'rejected_exam_overrides_grade'
 # .. toggle_name: grades.rejected_exam_overrides_grade
@@ -50,6 +55,8 @@ REJECTED_EXAM_OVERRIDES_GRADE = u'rejected_exam_overrides_grade'
 #   is only valid for courses which actually have an end date.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2018-10-01
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: None
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/19026
 ENFORCE_FREEZE_GRADE_AFTER_COURSE_END = u'enforce_freeze_grade_after_course_end'
 
@@ -60,6 +67,7 @@ ENFORCE_FREEZE_GRADE_AFTER_COURSE_END = u'enforce_freeze_grade_after_course_end'
 #   the writable gradebook is added to the instructor dashboard.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2018-10-03
+# .. toggle_target_removal_date: None
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/19054
 # .. toggle_warnings: Enabling this requires that the `WRITABLE_GRADEBOOK_URL` setting be properly defined.
 WRITABLE_GRADEBOOK = u'writable_gradebook'
@@ -71,6 +79,8 @@ WRITABLE_GRADEBOOK = u'writable_gradebook'
 #   as we understand, this feature is now unused and obsolete.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2019-08-20
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: None
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/21389
 BULK_MANAGEMENT = u'bulk_management'
 

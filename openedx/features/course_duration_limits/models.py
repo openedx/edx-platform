@@ -27,6 +27,9 @@ class CourseDurationLimitConfig(StackedConfigurationModel):
        "enabled_as_of" flag: only enrollments created after this date will be affected.
     .. toggle_use_cases: opt_in
     .. toggle_creation_date: 2018-11-02
+    .. toggle_target_removal_date: None
+    .. toggle_warnings: None
+    .. toggle_tickets: None
     """
 
     STACKABLE_FIELDS = ('enabled', 'enabled_as_of')

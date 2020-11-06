@@ -487,6 +487,9 @@ class BulkEmailFlag(ConfigurationModel):
       is not available.
     .. toggle_use_cases:  open_edx
     .. toggle_creation_date: 2016-05-05
+    .. toggle_target_removal_date: None
+    .. toggle_warnings: None
+    .. toggle_tickets: None
     """
     # boolean field 'enabled' inherited from parent ConfigurationModel
     require_course_email_auth = models.BooleanField(default=True)
