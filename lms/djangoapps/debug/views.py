@@ -34,7 +34,12 @@ def run_python(request):
         py_code = c['code'] = request.POST.get('code')
         g = {}
         try:
-            safe_exec(py_code, g, limit_overrides_context="debug_run_python")
+            safe_exec(
+                code=py_code,
+                globals_dict=g,
+                slug="debug_run_python",
+                limit_overrides_context="debug_run_python",
+            )
         except Exception:   # pylint: disable=broad-except
             c['results'] = traceback.format_exc()
         else:
