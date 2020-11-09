@@ -31,12 +31,12 @@ class ProgramEnrollment(TimeStampedModel):
     class Meta(object):
         app_label = "program_enrollments"
 
-        # A student enrolled in a given (program, curriculum) should always
-        # have a non-null ``user`` or ``external_user_key`` field (or both).
-        unique_together = (
-            ('user', 'program_uuid', 'curriculum_uuid'),
-            ('external_user_key', 'program_uuid', 'curriculum_uuid'),
-        )
+        constraints = [
+            # A student enrolled in a given (program, curriculum) should always
+            # have a non-null ``user`` or ``external_user_key`` field (or both).
+            models.UniqueConstraint(fields=['user', 'program_uuid', 'curriculum_uuid'], name='unique_user_program_curriculum_triple'),
+            models.UniqueConstraint(fields=['external_user_key', 'program_uuid', 'curriculum_uuid'], name='unique_ext_user_program_curriculum_triple'),
+        ]
 
     user = models.ForeignKey(
         User,
@@ -109,20 +109,17 @@ class ProgramCourseEnrollment(TimeStampedModel):
     class Meta(object):
         app_label = "program_enrollments"
 
-        # For each program enrollment, there may be only one
-        # waiting program-course enrollment per course key.
-        unique_together = (
-            ('program_enrollment', 'course_key'),
-        )
+        constraints = [
+            # For each program enrollment, there may be only one
+            # waiting program-course enrollment per course key.
+            models.UniqueConstraint(fields=['program_enrollment', 'course_key'], name='unique_program_enrollment_course_pair')
+        ]
 
     program_enrollment = models.ForeignKey(
         ProgramEnrollment,
         on_delete=models.CASCADE,
         related_name="program_course_enrollments"
     )
-    # In Django 2.x, we should add a conditional unique constraint to this field so
-    # no duplicated tuple of (course_enrollment_id, status=active) exists
-    # MST-168 is the Jira ticket to accomplish this once Django is upgraded
     course_enrollment = models.ForeignKey(
         CourseEnrollment,
         null=True,
@@ -159,7 +156,9 @@ class CourseAccessRoleAssignment(TimeStampedModel):
     .. no_pii:
     """
     class Meta(object):
-        unique_together = ('role', 'enrollment')
+        constraints = [
+            models.UniqueConstraint(fields=['role', 'enrollment'], name='unique_role_enrollment_pair'),
+        ]
 
     role = models.CharField(max_length=64, choices=ProgramCourseEnrollmentRoles.__MODEL_CHOICES__)
     enrollment = models.ForeignKey(ProgramCourseEnrollment, on_delete=models.CASCADE)
