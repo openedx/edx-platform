@@ -28,7 +28,7 @@ def get_discussion_provider(context_key: LearningContextKey) -> 'Optional[Type[D
 
     # If the configuration associated with this context is disabled,
     # then we return nothing, and discussion integration will be disabled.
-    if config.enabled:
+    if config.enabled and config.provider:
         return DiscussionAppsPluginManager.get_plugin(config.provider)
 
 
