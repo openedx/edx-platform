@@ -74,9 +74,9 @@ from openedx.core.djangoapps.signals.signals import USER_ACCOUNT_ACTIVATED
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
+from openedx.core.toggles import ENTRANCE_EXAMS
 from student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
 from track import contexts, segment
-from openedx.core.toggles import ENTRANCE_EXAMS
 from util.model_utils import emit_field_changed_events, get_changed_fields_dict
 from util.query import use_read_replica_if_available
 
@@ -740,7 +740,7 @@ def user_post_save_callback(sender, **kwargs):
     """
     When a user is modified and either its `is_active` state or email address
     is changed, and the user is, in fact, active, then check to see if there
-    are any courses that it needs to be automatically enrolled in.
+    are any courses that it needs to be automatically enrolled in and enroll them if needed.
 
     Additionally, emit analytics events after saving the User.
     """
@@ -753,6 +753,17 @@ def user_post_save_callback(sender, **kwargs):
             ceas = CourseEnrollmentAllowed.for_user(user).filter(auto_enroll=True)
 
             for cea in ceas:
+                # skip enrolling already enrolled users
+                if CourseEnrollment.is_enrolled(user, cea.course_id):
+                    # Link the CEA to the user if the CEA isn't already linked to the user
+                    # (e.g. the user was invited to a course but hadn't activated the account yet)
+                    # This is to prevent students from changing e-mails and
+                    # enrolling many accounts through the same e-mail.
+                    if not cea.user:
+                        cea.user = user
+                        cea.save()
+                    continue
+
                 enrollment = CourseEnrollment.enroll(user, cea.course_id)
 
                 manual_enrollment_audit = ManualEnrollmentAudit.get_manual_enrollment_by_email(user.email)
