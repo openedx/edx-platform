@@ -7,6 +7,7 @@ import ddt
 from completion import waffle as completion_waffle
 from crum import set_current_request
 from edx_django_utils.cache import RequestCache
+from edx_toggles.toggles.testutils import override_waffle_switch
 from milestones import api as milestones_api
 from milestones.tests.utils import MilestonesTestCaseMixin
 
@@ -181,7 +182,7 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
         self.assert_access_to_gated_content(self.staff_user)
 
     def test_gated_content_always_in_grades(self):
-        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, True):
+        with override_waffle_switch(completion_waffle.ENABLE_COMPLETION_TRACKING_SWITCH, True):
             # start with a grade from a non-gated subsection
             answer_problem(self.course, self.request, self.prob3, 10, 10)
 
@@ -203,7 +204,7 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
     def test_ungating_when_fulfilled(self, earned, max_possible, result):
         self.assert_user_has_prereq_milestone(self.non_staff_user, expected_has_milestone=False)
         self.assert_access_to_gated_content(self.non_staff_user)
-        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, True):
+        with override_waffle_switch(completion_waffle.ENABLE_COMPLETION_TRACKING_SWITCH, True):
             answer_problem(self.course, self.request, self.gating_prob1, earned, max_possible)
 
             self.assert_user_has_prereq_milestone(self.non_staff_user, expected_has_milestone=result)
