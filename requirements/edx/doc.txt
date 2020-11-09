@@ -6,7 +6,7 @@
 #
 alabaster==0.7.12         # via sphinx
 babel==2.8.0              # via sphinx
-certifi==2020.6.20        # via requests
+certifi==2020.11.8        # via requests
 chardet==3.0.4            # via requests
 click==7.1.2              # via code-annotations
 code-annotations==0.10.0  # via -r requirements/edx/doc.in
