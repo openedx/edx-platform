@@ -80,7 +80,7 @@ edx-django-release-util             # Release utils for the edx release pipeline
 edx-django-sites-extensions
 edx-django-utils>=3.8.0             # Utilities for cache, monitoring, and plugins; 3.8.0+ for set_custom_attribute method
 edx-drf-extensions
-edx-enterprise
+# edx-enterprise
 edx-milestones
 edx-organizations
 edx-proctoring>=2.0.1
