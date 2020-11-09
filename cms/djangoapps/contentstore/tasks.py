@@ -168,7 +168,7 @@ def _parse_time(time_isoformat):
     ).replace(tzinfo=UTC)
 
 
-@task(routing_key=settings.UPDATE_SEARCH_INDEX_JOB_QUEUE)
+@task
 def update_search_index(course_id, triggered_time_isoformat):
     """ Updates course search index. """
     try:
