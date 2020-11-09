@@ -144,7 +144,7 @@ def enterprise_fields_only(fields):
 
 def update_third_party_auth_context_for_enterprise(request, context, enterprise_customer=None):
     """
-    Return updated context of third party auth with modified for enterprise.
+    Return updated context of third party auth with modified data for the given enterprise customer.
 
     Arguments:
         request (HttpRequest): The request for the logistration page.
