@@ -104,7 +104,7 @@ edx-api-doc-tools==1.4.0  # via -r requirements/edx/testing.txt
 edx-bulk-grades==0.8.2    # via -r requirements/edx/testing.txt, staff-graded-xblock
 edx-ccx-keys==1.1.0       # via -r requirements/edx/testing.txt
 edx-celeryutils==0.5.2    # via -r requirements/edx/testing.txt, super-csv
-edx-completion==3.2.4     # via -r requirements/edx/testing.txt
+edx-completion==3.2.5     # via -r requirements/edx/testing.txt
 edx-django-release-util==0.4.4  # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==2.5.1  # via -r requirements/edx/testing.txt
 edx-django-utils==3.11.0  # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-toggles, edx-when
