@@ -2,7 +2,7 @@ from typing import Callable, Optional, Type
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.http import HttpRequest
+from django.http import Http404, HttpRequest
 from django.utils.module_loading import import_string
 from django.utils.translation import ugettext_noop
 from opaque_keys.edx.keys import CourseKey
@@ -38,7 +38,10 @@ class DiscussionTab(TabFragmentViewMixin, EnrolledTab):
         return self._discussion_provider
 
     def _get_tab_view(self, course_key):
-        tab_view = self._get_discussion_provider(course_key).course_tab_view
+        provider = self._get_discussion_provider(course_key)
+        if not provider:
+            raise Http404
+        tab_view = provider.course_tab_view
         if isinstance(tab_view, str):
             tab_view = import_string(tab_view)
         return tab_view()
