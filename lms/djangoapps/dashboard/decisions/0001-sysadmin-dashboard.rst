@@ -24,8 +24,7 @@ Decision
 --------
 
 The users tab provides Web based user management (create and delete user accounts), a listing of courses loaded,
-and user statistics. There is also a button to repair the external authentication map, a task relevant to open
-edX installations using Shibboleth and certificate-based authentication.
+and user statistics.
 
 The courses tabs manages adding/updating courses from git, deleting courses, and provides course listing information,
 including commit hash, date and author for course imported from git.
