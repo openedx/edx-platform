@@ -72,7 +72,8 @@ UPGRADE_DEADLINE_MESSAGE = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'upgrade_dead
 # .. toggle_creation_date: 2017-09-11
 # .. toggle_target_removal_date: None
 # .. toggle_warnings: This is meant to be configured using waffle_utils course override only. Either do not create the
-#   actual waffle flag, or be sure to unset the flag even for Superusers.
+#   actual waffle flag, or be sure to unset the flag even for Superusers. This is no longer used in the learning MFE
+#   and can be removed when the outline tab is fully moved to the learning MFE.
 # .. toggle_tickets: None
 LATEST_UPDATE_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'latest_update', __name__)
 

@@ -30,13 +30,13 @@ from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course
 from lms.djangoapps.courseware.date_summary import TodaysDate
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.user_api.course_tag.api import get_course_tag, set_course_tag
 from openedx.features.course_duration_limits.access import generate_course_expired_message
-from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, LATEST_UPDATE_FLAG
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
+from openedx.features.course_experience.course_updates import (
+    dismiss_current_update_for_user, get_current_update_for_user,
+)
 from openedx.features.course_experience.utils import get_course_outline_block_tree
-from openedx.features.course_experience.views.latest_update import LatestUpdateFragmentView
-from openedx.features.course_experience.views.welcome_message import PREFERENCE_KEY, WelcomeMessageFragmentView
 from openedx.features.discounts.utils import generate_offer_html
 from common.djangoapps.student.models import CourseEnrollment
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
@@ -168,12 +168,7 @@ class OutlineTabView(RetrieveAPIView):
         offer_html = show_enrolled and generate_offer_html(request.user, course_overview)
         course_expired_html = show_enrolled and generate_course_expired_message(request.user, course_overview)
 
-        welcome_message_html = None
-        if show_enrolled:
-            if LATEST_UPDATE_FLAG.is_enabled(course_key):
-                welcome_message_html = LatestUpdateFragmentView().latest_update_html(request, course)
-            elif get_course_tag(request.user, course_key, PREFERENCE_KEY) != 'False':
-                welcome_message_html = WelcomeMessageFragmentView().welcome_message_html(request, course)
+        welcome_message_html = show_enrolled and get_current_update_for_user(request, course)
 
         enroll_alert = {
             'can_enroll': True,
@@ -284,7 +279,8 @@ def dismiss_welcome_message(request):
 
     try:
         course_key = CourseKey.from_string(course_id)
-        set_course_tag(request.user, course_key, PREFERENCE_KEY, 'False')
+        course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+        dismiss_current_update_for_user(request, course)
         return Response({'message': _('Welcome message successfully dismissed.')})
     except Exception:
         raise UnableToDismissWelcomeMessage
