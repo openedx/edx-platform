@@ -13,11 +13,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='discussionproviderconfig',
             name='provider',
-            field=models.CharField(choices=[('cs_comments', 'Inbuilt Discussion Forums')], db_index=True, help_text='The discussion tool/provider.', max_length=100, verbose_name='Discussion provider'),
+            field=models.CharField(choices=[('cs_comments', 'edX Discussions')], db_index=True, help_text='The discussion tool/provider.', max_length=100, verbose_name='Discussion provider'),
         ),
         migrations.AlterField(
             model_name='historicaldiscussionproviderconfig',
             name='provider',
-            field=models.CharField(choices=[('cs_comments', 'Inbuilt Discussion Forums')], db_index=True, help_text='The discussion tool/provider.', max_length=100, verbose_name='Discussion provider'),
+            field=models.CharField(choices=[('cs_comments', 'edX Discussions')], db_index=True, help_text='The discussion tool/provider.', max_length=100, verbose_name='Discussion provider'),
         ),
     ]

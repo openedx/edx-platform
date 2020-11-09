@@ -12,7 +12,7 @@ class CommentServiceDiscussionApp(DiscussionApp):
     Discussion Plugin app for cs_comments_service.
     """
     name = "cs_comments"
-    friendly_name = _("Inbuilt Discussion Forums")
+    friendly_name = _("edX Discussions")
 
     capabilities = [
 
