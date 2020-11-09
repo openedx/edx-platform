@@ -30,8 +30,7 @@ edX installations using Shibboleth and certificate-based authentication.
 The courses tabs manages adding/updating courses from git, deleting courses, and provides course listing information,
 including commit hash, date and author for course imported from git.
 
-The Staffing tab provides a view of staffing and enrollment in courses that include an option to download the data
-as a csv.
+The Staffing tab provides a view of staffing and enrollment in courses.
 
 The Gitlogs tab provides a view into the import log of courses from git repositories. It is convenient for allowing
 course teams to see what may be wrong wit their xml. This is the only view that allows permits access by course

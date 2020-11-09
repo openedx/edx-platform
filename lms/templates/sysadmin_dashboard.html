@@ -102,11 +102,6 @@ textarea {
     </div>
 
 	<hr />
-    <p>
-      <button type="submit" name="action" value="download_users" style="width: 350px;">
-		${_('Download list of all users (csv file)')}
-	  </button>
-    </p>
 
     <p>
     <button type="submit" name="action" value="repair_eamap" style="width: 350px;">
@@ -122,12 +117,6 @@ textarea {
 
 <p>${_("Go to each individual course's Instructor dashboard to manage course enrollment.")}</p>
 <hr />
-
-<h3>${_('Manage course staff and instructors')}</h3><br/>
-<form name="action" method="POST">
-  <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }" />
-  <button type="submit" name="action" value="get_staff_csv">${_('Download staff and instructor list (csv file)')}</button>
-</form>
 
 %endif
 
