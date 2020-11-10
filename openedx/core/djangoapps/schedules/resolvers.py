@@ -473,6 +473,10 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
         template_context = get_base_template_context(self.site)
         for schedule in schedules:
             course = schedule.enrollment.course
+            # We don't want to show any updates if the course has ended so we short circuit here.
+            if course.end and course.end.date() <= target_date:
+                return
+
             user = schedule.enrollment.user
             start_date = max(filter(None, (schedule.start_date, course.start)))
             LOG.info('Received a schedule for user {} in course {} for date {}'.format(
