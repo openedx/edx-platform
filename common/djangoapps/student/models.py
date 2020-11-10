@@ -34,6 +34,7 @@ from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.core.validators import FileExtensionValidator, RegexValidator
 from django.db import IntegrityError, models
 from django.db.models import Count, Index, Q
+from django.db.models.fields import NullBooleanField
 from django.db.models.signals import post_save, pre_save
 from django.db.utils import ProgrammingError
 from django.dispatch import receiver
@@ -65,6 +66,8 @@ from lms.djangoapps.courseware.models import (
 )
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.django_comment_common.comment_client.utils import perform_request as perform_forums_request
+from openedx.core.djangoapps.django_comment_common.comment_client.settings import PREFIX as forums_api_prefix
 from openedx.core.djangoapps.enrollments.api import (
     _default_course_mode,
     get_enrollment_attributes,
@@ -3084,6 +3087,59 @@ class CourseEnrollmentCelebration(TimeStampedModel):
             return enrollment.celebration.celebrate_first_section
         except CourseEnrollmentCelebration.DoesNotExist:
             return False
+
+
+class UserCelebration(TimeStampedModel):
+    """
+    Keeps track of how we've celebrated a user's progress.
+
+    An example of a celebration is a dialog that pops up after you post for the first time in the
+    discussion forums.
+
+    In general, learners should only see these celebrations once during their time on the platform.
+    For celebrations that can be repeated with each enrollment, see CourseEnrollmentCelebration
+
+    .. no_pii:
+    """
+    user = models.OneToOneField(User, models.CASCADE, related_name='celebrations')
+    # Use a NullBooleanField in case another celebration creates the row.
+    celebrate_first_discussion_post = NullBooleanField(default=None)
+
+    def __str__(self):
+        return (
+            "[UserCelebration] user: {}; first_discussion_post: {}"
+        ).format(self.user.username, self.celebrate_first_discussion_post)
+
+    @staticmethod
+    def should_celebrate_first_discussion(user):
+        """
+        Returns the celebration value for first_discussion.
+
+        If the model does not exist or the value is None (i.e. we don't yet know if the learner has
+        posted their first discussion), we will send a request to the forums service to see if they
+        have ever posted.
+        """
+        if not user:
+            return False
+        try:
+            should_celebrate = user.celebrations.celebrate_first_discussion_post
+            # should_celebrate will be None if a different celebration type created the row for this
+            # user. In that case, we will query the forums service (outside of try-except) to find
+            # out what the value should be and fill it in.
+            if should_celebrate is not None:
+                return should_celebrate
+        except UserCelebration.DoesNotExist:
+            # If UserCelebration does not exist for this user, we will create it below with the
+            # correct value from the forums service
+            pass
+
+        # ask forums and create or update row with value
+        url = forums_api_prefix + '/users/{}/content_exists'.format(user.id)
+        # Returns a bool
+        has_posted_before = perform_forums_request('get', url)
+        defaults = {'celebrate_first_discussion_post': (not has_posted_before)}
+        UserCelebration.objects.update_or_create(user=user, defaults=defaults)
+        return (not has_posted_before)
 
 
 class UserPasswordToggleHistory(TimeStampedModel):

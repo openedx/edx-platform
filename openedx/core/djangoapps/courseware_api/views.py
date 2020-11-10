@@ -46,8 +46,8 @@ from openedx.features.course_duration_limits.access import (
     get_user_course_expiration_date, generate_course_expired_message
 )
 from openedx.features.discounts.utils import generate_offer_html
-from common.djangoapps.student.models import (
-    CourseEnrollment, CourseEnrollmentCelebration, LinkedInAddToProfileConfiguration
+from student.models import (
+    CourseEnrollment, CourseEnrollmentCelebration, LinkedInAddToProfileConfiguration, UserCelebration
 )
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import path_to_location
@@ -216,6 +216,7 @@ class CoursewareMeta:
         """
         return {
             'first_section': CourseEnrollmentCelebration.should_celebrate_first_section(self.enrollment_object),
+            'first_discussion': UserCelebration.should_celebrate_first_discussion(self.effective_user),
         }
 
     @property
