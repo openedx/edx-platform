@@ -36,7 +36,6 @@ log = logging.getLogger(__name__)
 
 
 DEFAULT_LANGUAGE = 'en'
-ROUTING_KEY = getattr(settings, 'ACE_ROUTING_KEY', None)
 
 
 @task(base=LoggedTask)
@@ -62,7 +61,7 @@ class ResponseNotification(BaseMessageType):
     pass
 
 
-@task(base=LoggedTask, routing_key=ROUTING_KEY)
+@task(base=LoggedTask)
 @set_code_owner_attribute
 def send_ace_message(context):
     context['course_id'] = CourseKey.from_string(context['course_id'])
