@@ -1105,13 +1105,13 @@ def results_callback(request):
         'platform_name': settings.PLATFORM_NAME,
     }
     if result == "PASS":
-        # If this verification is not an outdated version then make expiry date of previous approved verification NULL
-        # Setting expiry date to NULL is important so that it does not get filtered in the management command
+        # If this verification is not an outdated version then make expiry email date of previous approved verification NULL
+        # Setting expiry email date to NULL is important so that it does not get filtered in the management command
         # that sends email when verification expires : verify_student/send_verification_expiry_email
         if attempt.status != 'approved':
             verification = SoftwareSecurePhotoVerification.objects.filter(status='approved', user_id=attempt.user_id)
             if verification:
-                log.info(u'Making expiry date of previous approved verification NULL for {}'.format(attempt.user_id))
+                log.info(u'Making expiry email date of previous approved verification NULL for {}'.format(attempt.user_id))
                 # The updated_at field in sspv model has auto_now set to True, which means any time save() is called on
                 # the model instance, `updated_at` will change. Some of the existing functionality of verification
                 # (showing your verification has expired on dashboard) relies on updated_at.
@@ -1119,7 +1119,7 @@ def results_callback(request):
                 # functionality update() is called instead of save()
                 previous_verification = verification.latest('updated_at')
                 SoftwareSecurePhotoVerification.objects.filter(pk=previous_verification.pk
-                                                               ).update(expiry_date=None, expiry_email_date=None)
+                                                               ).update(expiry_email_date=None)
         log.debug(u'Approving verification for {}'.format(receipt_id))
         attempt.approve()
 
