@@ -252,3 +252,11 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
             log_message = ('Next Section Course Update: Last section was reached. '
                            'There are no more highlights for {}'.format(self.course.id))
             log_capture.check_present((LOG.name, 'WARNING', log_message))
+
+    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
+    def test_no_updates_if_course_ended(self):
+        self.course.end = self.yesterday
+        self.course = self.update_course(self.course, self.user.id)
+        resolver = self.create_resolver()
+        schedules = list(resolver.get_schedules())
+        self.assertListEqual(schedules, [])
