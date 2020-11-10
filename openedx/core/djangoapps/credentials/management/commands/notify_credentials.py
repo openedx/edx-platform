@@ -184,8 +184,8 @@ class Command(BaseCommand):
             options = self.get_args_from_database()
 
         if options['auto']:
-            options['end_date'] = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-            options['start_date'] = options['end_date'] - timedelta(days=1)
+            options['end_date'] = datetime.now().replace(minute=0, second=0, microsecond=0)
+            options['start_date'] = options['end_date'] - timedelta(hours=4)
 
         log.info(
             u"notify_credentials starting, dry-run=%s, site=%s, delay=%d seconds, page_size=%d, "
