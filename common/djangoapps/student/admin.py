@@ -5,10 +5,18 @@ from django.contrib import admin
 from django.contrib.admin.sites import NotRegistered
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.urls import reverse
+from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
+from organizations.models import Organization
+
+from openedx.core.djangoapps.appsembler.sites.utils import (
+    get_single_user_organization,
+    get_site_by_organization,
+)
 from openedx.core.djangoapps.waffle_utils import WaffleSwitch
 from openedx.core.lib.courses import clean_course_id
 from student import STUDENT_WAFFLE_NAMESPACE
@@ -261,8 +269,59 @@ class CourseEnrollmentAllowedAdmin(admin.ModelAdmin):
         model = CourseEnrollmentAllowed
 
 
+@admin.register(Registration)
+class RegistrationAdmin(admin.ModelAdmin):
+    """ Admin interface for the Registration model. """
+    list_display = ('username', 'email', 'organization', 'activation_link',)
+    search_fields = ('user__email', 'user__username', 'user__organizations__name',)
+
+    def username(self, obj):
+        """ Show the username. """
+        return obj.user.username
+
+    def email(self, obj):
+        """ Show the user email. """
+        return obj.user.email
+
+    def organization(self, obj):
+        """ Show the organization name. """
+        try:
+            org = get_single_user_organization(obj.user)
+        except Organization.DoesNotExist:
+            return None
+
+        return org.short_name
+
+    def activation_link(self, obj):
+        """ Display the activation link and allow copying it. """
+        if obj.user.is_active:
+            return 'Learner is active.'
+
+        try:
+            organization = get_single_user_organization(obj.user)
+            site = get_site_by_organization(organization)
+        except Organization.DoesNotExist:
+            return 'Error: missing organization.'
+
+        link = reverse('activate', kwargs={'key': obj.activation_key})
+
+        return format_html(
+            """ <a href="//{domain}{link}"
+                   onclick="alert('Do not click on the link. {title}'); return false;"
+                   title="{title}">
+                   Email confirmation link (copy it)
+                </a>
+            """,
+            domain=site.domain,
+            link=link,
+            title='Copy the link and send it to learner.'
+        )
+
+    class Meta(object):
+        model = Registration
+
+
 admin.site.register(UserTestGroup)
-admin.site.register(Registration)
 admin.site.register(PendingNameChange)
 admin.site.register(DashboardConfiguration, ConfigurationModelAdmin)
 admin.site.register(RegistrationCookieConfiguration, ConfigurationModelAdmin)
