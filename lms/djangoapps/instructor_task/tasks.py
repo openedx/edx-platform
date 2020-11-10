@@ -162,7 +162,6 @@ def send_bulk_course_email(entry_id, _xmodule_instance_args):
 @task(
     name='lms.djangoapps.instructor_task.tasks.calculate_problem_responses_csv.v2',
     base=BaseInstructorTask,
-    routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY,
 )
 def calculate_problem_responses_csv(entry_id, xmodule_instance_args):
     """
@@ -175,7 +174,7 @@ def calculate_problem_responses_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)
+@task(base=BaseInstructorTask)
 def calculate_grades_csv(entry_id, xmodule_instance_args):
     """
     Grade a course and push the results to an S3 bucket for download.
@@ -191,7 +190,7 @@ def calculate_grades_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)
+@task(base=BaseInstructorTask)
 def calculate_problem_grade_report(entry_id, xmodule_instance_args):
     """
     Generate a CSV for a course containing all students' problem
@@ -256,7 +255,7 @@ def calculate_may_enroll_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)
+@task(base=BaseInstructorTask)
 def generate_certificates(entry_id, xmodule_instance_args):
     """
     Grade students and generate certificates.

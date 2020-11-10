@@ -5,62 +5,41 @@ For more, see https://celery.readthedocs.io/en/latest/userguide/routing.html#rou
 """
 
 import logging
-from abc import ABCMeta, abstractproperty
 
-from django.conf import settings
-import six
 
 log = logging.getLogger(__name__)
 
 
-class AlternateEnvironmentRouter(six.with_metaclass(ABCMeta, object)):
+def route_task_queue(name):
     """
-    A custom Router class for use in routing celery tasks to non-default queues.
+    Helper method allowing for custom routing logic.
+
+    If None is returned from this method, default routing logic is used.
     """
+    from django.conf import settings  # pylint: disable=import-outside-toplevel
 
-    @abstractproperty
-    def alternate_env_tasks(self):
-        """
-        Defines the task -> alternate worker environment to be used when routing.
+    if name in settings.EXPLICIT_QUEUES:
+        return settings.EXPLICIT_QUEUES[name]
 
-        Subclasses must override this property with their own specific mappings.
-        """
-        return {}
+    alternate_env = settings.ALTERNATE_ENV_TASKS.get(name, None)
+    if alternate_env:
+        return ensure_queue_env(alternate_env)
 
-    @property
-    def explicit_queues(self):
-        """
-        Defines the task -> alternate worker queue to be used when routing.
-        """
-        return {}
 
-    def route_for_task(self, task, args=None, kwargs=None):  # pylint: disable=unused-argument
-        """
-        Celery-defined method allowing for custom routing logic.
+def ensure_queue_env(desired_env):
+    """
+    Helper method to get the desired type of queue.
 
-        If None is returned from this method, default routing logic is used.
-        """
-        if task in self.explicit_queues:
-            return self.explicit_queues[task]
+    If no such queue is defined, default routing logic is used.
+    """
+    from django.conf import settings  # pylint: disable=import-outside-toplevel
 
-        alternate_env = self.alternate_env_tasks.get(task, None)
-        if alternate_env:
-            return self.ensure_queue_env(alternate_env)
-
-        return None
-
-    def ensure_queue_env(self, desired_env):
-        """
-        Helper method to get the desired type of queue.
-
-        If no such queue is defined, default routing logic is used.
-        """
-        queues = getattr(settings, 'CELERY_QUEUES', None)
-        return next(
-            (
-                queue
-                for queue in queues
-                if '.{}.'.format(desired_env) in queue
-            ),
-            None
-        )
+    queues = getattr(settings, 'CELERY_QUEUES', None)
+    return next(
+        (
+            queue
+            for queue in queues
+            if '.{}.'.format(desired_env) in queue
+        ),
+        None
+    )
