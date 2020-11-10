@@ -86,6 +86,11 @@ urlpatterns = [
         name="verification_status_api"
     ),
 
+    url(
+        r'^enrollment_status/{course}/$'.format(course=settings.COURSE_ID_PATTERN),
+        views.EnrollmentStatusAPIView.as_view(),
+        name='enrollment_status_api'
+    ),
 
     # End-point for reverification
     # Reverification occurs when a user's initial verification attempt

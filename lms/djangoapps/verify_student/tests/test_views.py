@@ -1692,6 +1692,66 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         self.assertContains(response, 'Result Unknown not understood', status_code=400)
 
 
+@ddt.ddt
+class TestEnrollmentStatusAPIView(TestVerificationBase, ModuleStoreTestCase):
+    """
+    Tests for the enrollment status API.
+    """
+
+    USERNAME = "test"
+    PASSWORD = "test"
+
+    NON_VERIFIED_MODES = CourseMode.NON_VERIFIED_MODES + CourseMode.CREDIT_MODES
+
+    def setUp(self):
+        super(TestEnrollmentStatusAPIView, self).setUp()
+        self.course = self._create_course(CourseMode.ALL_MODES)
+        self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
+        success = self.client.login(username=self.USERNAME, password=self.PASSWORD)
+        self.assertTrue(success, msg="Could not log in")
+
+    @ddt.data(*CourseMode.VERIFIED_MODES)
+    def test_verified_course_mode(self, course_mode):
+        CourseEnrollment.enroll(self.user, self.course.id, mode=course_mode)
+        url = reverse('enrollment_status_api', kwargs={'course_id': six.text_type(self.course.id)})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.data['requires_verification'], True)
+        self.assertEqual(response.data['is_active'], True)
+
+    @ddt.data(*NON_VERIFIED_MODES)
+    def test_nonverified_course_mode(self, course_mode):
+        CourseEnrollment.enroll(self.user, self.course.id, mode=course_mode)
+        url = reverse('enrollment_status_api', kwargs={'course_id': six.text_type(self.course.id)})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.data['requires_verification'], False)
+        self.assertEqual(response.data['is_active'], True)
+
+    def test_learner_unenrolled(self):
+        CourseEnrollment.enroll(self.user, self.course.id, mode=CourseMode.VERIFIED)
+        CourseEnrollment.unenroll(self.user, self.course.id)
+        url = reverse('enrollment_status_api', kwargs={'course_id': six.text_type(self.course.id)})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.data['is_active'], False)
+
+    def test_learner_never_enrolled(self):
+        url = reverse('enrollment_status_api', kwargs={'course_id': six.text_type(self.course.id)})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.data['is_active'], False)
+
+    def _create_course(self, course_modes):
+        """Create a new course with the specified course modes. """
+        course = CourseFactory.create(display_name='<script>alert("XSS")</script>')
+        for course_mode in course_modes:
+            min_price = (0 if course_mode in ['honor', 'audit'] else 1)
+            CourseModeFactory.create(
+                course_id=course.id,
+                mode_slug=course_mode,
+                mode_display_name=course_mode,
+                min_price=min_price
+            )
+        return course
+
+
 class TestReverifyView(TestVerificationBase):
     """
     Tests for the re-verification view.

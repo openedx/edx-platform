@@ -1195,6 +1195,43 @@ class VerificationStatusAPIView(APIView):
         return Response(data)
 
 
+class EnrollmentStatusAPIView(APIView):
+    """
+    GET /verify_student/enrollment_status/{course_id}/
+
+    Endpoint which returns the status of the learner's enrollment in a given course and
+    whether it requires verification.
+
+    Parameters:
+        * 'course_id' (String): Course run key.
+
+    Returns:
+        200 OK
+        {
+            "requires_verification": Boolean,
+            "is_active": Boolean
+        }
+
+    """
+    @method_decorator(login_required)
+    def get(self, request, course_id):
+        """
+        Handle the GET request.
+        """
+        data = {
+            'requires_verification': False,
+            'is_active': False,
+        }
+        enrollment = CourseEnrollment.enrollment_mode_for_user(request.user, course_id)
+        mode = enrollment[0]
+        is_active = enrollment[1]
+        if mode in CourseMode.VERIFIED_MODES:
+            data['requires_verification'] = True
+        if is_active:
+            data['is_active'] = True
+        return Response(data)
+
+
 class ReverifyView(View):
     """
     Reverification occurs when a user's initial verification is denied
