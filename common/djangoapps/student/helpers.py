@@ -23,8 +23,8 @@ from django.utils.translation import ugettext as _
 from pytz import UTC
 from six import iteritems, text_type
 
-import third_party_auth
-from course_modes.models import CourseMode
+from common.djangoapps import third_party_auth
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import get_certificate_url, has_html_certificates_enabled
 from lms.djangoapps.certificates.models import CertificateStatuses, certificate_status_for_student
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -35,7 +35,7 @@ from openedx.core.djangoapps.certificates.api import certificates_viewable_for_c
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_themes
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
-from student.models import (
+from common.djangoapps.student.models import (
     CourseEnrollment,
     LinkedInAddToProfileConfiguration,
     Registration,
@@ -45,7 +45,7 @@ from student.models import (
     unique_id_for_user,
     username_exists_or_retired
 )
-from util.password_policy_validators import normalize_password
+from common.djangoapps.util.password_policy_validators import normalize_password
 
 # Enumeration of per-course verification statuses
 # we display on the student dashboard.

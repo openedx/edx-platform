@@ -11,8 +11,8 @@ from rest_framework.exceptions import Throttled
 from rest_framework.throttling import BaseThrottle
 from rest_framework.views import APIView
 
-from util.disable_rate_limit import can_disable_rate_limit
-from util.models import RateLimitConfiguration
+from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
+from common.djangoapps.util.models import RateLimitConfiguration
 
 
 class FakeThrottle(BaseThrottle):

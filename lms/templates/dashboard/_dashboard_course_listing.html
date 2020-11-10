@@ -9,13 +9,13 @@ from django.utils.http import urlencode, urlquote_plus
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 from django.urls import reverse
-from course_modes.models import CourseMode
-from course_modes.helpers import enrollment_mode_display
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.helpers import enrollment_mode_display
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import course_home_url_name
-from student.helpers import (
+from common.djangoapps.student.helpers import (
   VERIFY_STATUS_NEED_TO_VERIFY,
   VERIFY_STATUS_SUBMITTED,
   VERIFY_STATUS_RESUBMITTED,
@@ -24,7 +24,7 @@ from student.helpers import (
   VERIFY_STATUS_NEED_TO_REVERIFY,
   DISABLE_UNENROLL_CERT_STATES,
 )
-from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_params
+from common.djangoapps.util.course import get_link_for_about_page, get_encoded_course_sharing_utm_params
 from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
 %>
 
@@ -420,7 +420,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                 % if use_ecommerce_payment_flow and course_mode_info['verified_sku']:
                   <a class="action action-upgrade track_course_dashboard_green_button" href="${ecommerce_payment_page}?sku=${course_mode_info['verified_sku']}">
                 % else:
-                  <a class="action action-upgrade track_course_dashboard_green_button" href="${reverse('verify_student_upgrade_and_verify', kwargs={'course_id': six.text_type(course_overview.id)})}" data-course-id="${course_overview.id}" data-user="${user.username}">
+                  <a class="action action-upgrade track_course_dashboard_green_button" href="${IDVerificationService.get_verify_location('verify_student_upgrade_and_verify', course_id=course_overview.id)}" data-course-id="${course_overview.id}" data-user="${user.username}">
                 % endif
                     <span class="action-upgrade-icon" aria-hidden="true"></span>
                   <span class="wrapper-copy">

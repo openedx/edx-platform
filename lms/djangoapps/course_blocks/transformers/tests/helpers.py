@@ -7,11 +7,11 @@ import six
 from six.moves import range
 from mock import patch
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.content.block_structure.tests.helpers import clear_registered_transformers_cache
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

@@ -2,7 +2,7 @@
 Python APIs exposed by the course_modes app to other in-process apps.
 """
 
-from course_modes.models import CourseMode as _CourseMode
+from common.djangoapps.course_modes.models import CourseMode as _CourseMode
 
 
 def get_paid_modes_for_course(course_run_id):

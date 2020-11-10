@@ -14,9 +14,9 @@ from django.utils.timezone import now
 from mock import patch
 from pytz import UTC
 
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
-from student.helpers import (
+from common.djangoapps.student.helpers import (
     VERIFY_STATUS_APPROVED,
     VERIFY_STATUS_MISSED_DEADLINE,
     VERIFY_STATUS_NEED_TO_REVERIFY,
@@ -24,8 +24,8 @@ from student.helpers import (
     VERIFY_STATUS_RESUBMITTED,
     VERIFY_STATUS_SUBMITTED
 )
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.testing import UrlResetMixin
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -249,7 +249,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         attempt.mark_ready()
         attempt.submit()
 
-        # Expect that learner has submitted photos for reverfication and his/her
+        # Expect that learner has submitted photos for reverfication and their
         # previous verification is set to expired soon.
         self._assert_course_verification_status(VERIFY_STATUS_RESUBMITTED)
 

@@ -21,8 +21,8 @@ from lms.djangoapps.courseware.courses import (
 from opaque_keys.edx.django.models import CourseKeyField
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.view_utils import LazySequence
-from student.models import CourseAccessRole
-from student.roles import GlobalStaff
+from common.djangoapps.student.models import CourseAccessRole
+from common.djangoapps.student.roles import GlobalStaff
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 

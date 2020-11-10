@@ -3,10 +3,10 @@ Provides Python APIs exposed from Student models.
 """
 import logging
 
-from student.models import CourseAccessRole as _CourseAccessRole
-from student.models import CourseEnrollment as _CourseEnrollment
-from student.models import ManualEnrollmentAudit as _ManualEnrollmentAudit
-from student.models import (
+from common.djangoapps.student.models import CourseAccessRole as _CourseAccessRole
+from common.djangoapps.student.models import CourseEnrollment as _CourseEnrollment
+from common.djangoapps.student.models import ManualEnrollmentAudit as _ManualEnrollmentAudit
+from common.djangoapps.student.models import (
     ENROLLED_TO_ENROLLED as _ENROLLED_TO_ENROLLED,
     ENROLLED_TO_UNENROLLED as _ENROLLED_TO_UNENROLLED,
     UNENROLLED_TO_ENROLLED as _UNENROLLED_TO_ENROLLED,
@@ -16,7 +16,7 @@ from student.models import (
     ALLOWEDTOENROLL_TO_UNENROLLED as _ALLOWEDTOENROLL_TO_UNENROLLED,
     DEFAULT_TRANSITION_STATE as _DEFAULT_TRANSITION_STATE,
 )
-from student.models import UserProfile as _UserProfile
+from common.djangoapps.student.models import UserProfile as _UserProfile
 
 # This is done so that if these strings change within the app, we can keep exported constants the same
 ENROLLED_TO_ENROLLED = _ENROLLED_TO_ENROLLED

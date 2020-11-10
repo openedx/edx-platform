@@ -19,7 +19,7 @@ from six import text_type
 from six.moves import range
 from xblock.field_data import DictFieldData
 
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from lms.djangoapps.courseware.masquerade import MasqueradeView
@@ -28,9 +28,9 @@ from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.features.course_duration_limits.access import EXPIRATION_DATE_FORMAT_STR
-from student.models import CourseEnrollment, Registration
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.date_utils import strftime_localized
+from common.djangoapps.student.models import CourseEnrollment, Registration
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

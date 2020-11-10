@@ -20,7 +20,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework.test import APITestCase, APIClient
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 from ..api import replace_course_outline
 from ..data import CourseOutlineData, CourseVisibility

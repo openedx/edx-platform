@@ -14,7 +14,7 @@ from xblock.fields import Scope
 from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.xblock.api import load_block
 from openedx.core.lib import blockstore_api
-from student.auth import has_studio_write_access
+from common.djangoapps.student.auth import has_studio_write_access
 from xmodule.capa_module import ProblemBlock
 from xmodule.library_content_module import ANY_CAPA_TYPE_VALUE
 from xmodule.modulestore import ModuleStoreEnum

@@ -11,7 +11,7 @@ from opaque_keys.edx.locator import BlockUsageLocator
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.search import path_to_location
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range

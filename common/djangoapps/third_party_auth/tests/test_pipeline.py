@@ -7,12 +7,12 @@ import unittest
 import ddt
 import mock
 
-from third_party_auth import pipeline
-from third_party_auth.tests import testutil
-from third_party_auth.tests.specs.base import IntegrationTestMixin
-from third_party_auth.tests.specs.test_testshib import SamlIntegrationTestUtilities
-from third_party_auth.tests.testutil import simulate_running_pipeline
-from third_party_auth.tests.utils import skip_unless_thirdpartyauth
+from common.djangoapps.third_party_auth import pipeline
+from common.djangoapps.third_party_auth.tests import testutil
+from common.djangoapps.third_party_auth.tests.specs.base import IntegrationTestMixin
+from common.djangoapps.third_party_auth.tests.specs.test_testshib import SamlIntegrationTestUtilities
+from common.djangoapps.third_party_auth.tests.testutil import simulate_running_pipeline
+from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
 
 
 @skip_unless_thirdpartyauth()
@@ -50,7 +50,7 @@ class ProviderUserStateTestCase(testutil.TestCase):
                 "idp_name": idp_slug
             }
         }
-        with simulate_running_pipeline("third_party_auth.pipeline", backend_name, **kwargs):
+        with simulate_running_pipeline("common.djangoapps.third_party_auth.pipeline", backend_name, **kwargs):
             logout_url = pipeline.get_idp_logout_url_from_running_pipeline(request)
             self.assertEqual(idp_config['logout_url'], logout_url)
 
@@ -82,7 +82,7 @@ class PipelineOverridesTest(SamlIntegrationTestUtilities, IntegrationTestMixin, 
         ('usernamewithcharacterlengthofmorethan30chars', 'usernamewithcharacterlengt9fe2', True),
     )
     @ddt.unpack
-    @mock.patch('third_party_auth.pipeline.user_exists')
+    @mock.patch('common.djangoapps.third_party_auth.pipeline.user_exists')
     def test_get_username_in_pipeline(self, idp_username, expected_username, already_exists, mock_user_exists):
         """
         Test get_username method of running pipeline
@@ -93,7 +93,7 @@ class PipelineOverridesTest(SamlIntegrationTestUtilities, IntegrationTestMixin, 
         }
         mock_user_exists.side_effect = [already_exists, False]
         __, strategy = self.get_request_and_strategy()
-        with mock.patch('third_party_auth.pipeline.uuid4') as mock_uuid:
+        with mock.patch('common.djangoapps.third_party_auth.pipeline.uuid4') as mock_uuid:
             uuid4 = mock.Mock()
             type(uuid4).hex = mock.PropertyMock(return_value='9fe2c4e93f654fdbb24c02b15259716c')
             mock_uuid.return_value = uuid4

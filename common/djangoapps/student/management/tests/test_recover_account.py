@@ -12,11 +12,11 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, RequestFactory
 
 from testfixtures import LogCapture
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
-from student.models import AccountRecoveryConfiguration
+from common.djangoapps.student.models import AccountRecoveryConfiguration
 
-LOGGER_NAME = 'student.management.commands.recover_account'
+LOGGER_NAME = 'common.djangoapps.student.management.commands.recover_account'
 
 
 class RecoverAccountTests(TestCase):

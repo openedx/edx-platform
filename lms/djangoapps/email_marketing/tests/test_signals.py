@@ -7,6 +7,7 @@ import datetime
 import logging
 
 import ddt
+import six
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
@@ -17,16 +18,8 @@ from mock import ANY, Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from sailthru.sailthru_error import SailthruClientError
 from sailthru.sailthru_response import SailthruResponse
-import six
 from testfixtures import LogCapture
 
-from ..models import EmailMarketingConfiguration
-from ..signals import (
-    add_email_marketing_cookies,
-    email_marketing_register_user,
-    email_marketing_user_field_changed,
-    update_sailthru
-)
 from lms.djangoapps.email_marketing.tasks import (
     _create_user_list,
     _get_list_from_email_marketing_provider,
@@ -37,9 +30,17 @@ from lms.djangoapps.email_marketing.tasks import (
     update_user_email
 )
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
-from student.models import Registration
-from student.tests.factories import CourseEnrollmentFactory, UserFactory, UserProfileFactory
-from util.json_request import JsonResponse
+from common.djangoapps.student.models import Registration
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory, UserProfileFactory
+from common.djangoapps.util.json_request import JsonResponse
+
+from ..models import EmailMarketingConfiguration
+from ..signals import (
+    add_email_marketing_cookies,
+    email_marketing_register_user,
+    email_marketing_user_field_changed,
+    update_sailthru
+)
 
 log = logging.getLogger(__name__)
 
@@ -620,7 +621,7 @@ class SailthruTests(TestCase):
     @patch('sailthru.sailthru_client.SailthruClient.purchase')
     @patch('sailthru.sailthru_client.SailthruClient.api_get')
     @patch('sailthru.sailthru_client.SailthruClient.api_post')
-    @patch('openedx.core.djangoapps.waffle_utils.WaffleSwitchNamespace.is_enabled')
+    @patch('edx_toggles.toggles.WaffleSwitchNamespace.is_enabled')
     def test_update_course_enrollment_whitelabel(
             self,
             switch,
@@ -645,7 +646,7 @@ class SailthruTests(TestCase):
         update_sailthru(None, self.user, 'verified', self.course_id)
         self.assertFalse(mock_sailthru_purchase.called)
 
-    @patch('openedx.core.djangoapps.waffle_utils.WaffleSwitchNamespace.is_enabled')
+    @patch('edx_toggles.toggles.WaffleSwitchNamespace.is_enabled')
     @patch('sailthru.sailthru_client.SailthruClient.purchase')
     def test_purchase_is_not_invoked(self, mock_sailthru_purchase, switch):
         """Make sure purchase is not called in the following condition:
@@ -655,7 +656,7 @@ class SailthruTests(TestCase):
         update_sailthru(None, self.user, 'verified', self.course_id)
         self.assertFalse(mock_sailthru_purchase.called)
 
-    @patch('openedx.core.djangoapps.waffle_utils.WaffleSwitchNamespace.is_enabled')
+    @patch('edx_toggles.toggles.WaffleSwitchNamespace.is_enabled')
     @patch('sailthru.sailthru_client.SailthruClient.purchase')
     def test_encoding_is_working_for_email_contains_unicode(self, mock_sailthru_purchase, switch):
         """Make sure encoding is working for emails contains unicode characters

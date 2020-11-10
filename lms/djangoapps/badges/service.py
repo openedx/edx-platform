@@ -3,7 +3,7 @@ Badging service for XBlocks
 """
 
 
-from badges.models import BadgeClass
+from lms.djangoapps.badges.models import BadgeClass
 
 
 class BadgingService(object):

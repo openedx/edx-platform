@@ -57,7 +57,7 @@ from openedx.core.djangoapps.django_comment_common.signals import (
     thread_voted
 )
 from openedx.core.djangoapps.django_comment_common.utils import ThreadContext
-from util.file import store_uploaded_file
+from common.djangoapps.util.file import store_uploaded_file
 
 log = logging.getLogger(__name__)
 

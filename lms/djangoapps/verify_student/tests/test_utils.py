@@ -20,7 +20,7 @@ from lms.djangoapps.verify_student.utils import (
     submit_request_to_ss,
     verification_for_datetime
 )
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 FAKE_SETTINGS = {
     "DAYS_GOOD_FOR": 10,

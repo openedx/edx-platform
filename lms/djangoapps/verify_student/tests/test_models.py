@@ -21,8 +21,8 @@ from lms.djangoapps.verify_student.models import (
     SSOVerification,
     VerificationException
 )
-from student.tests.factories import UserFactory
-from verify_student.tests import TestVerificationBase
+from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.verify_student.tests import TestVerificationBase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 FAKE_SETTINGS = {

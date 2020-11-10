@@ -20,7 +20,6 @@ of the query for traversing StudentModule objects.
 
 """
 
-
 import logging
 from functools import partial
 

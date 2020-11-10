@@ -11,6 +11,9 @@ from django.conf import settings
 #   for daily digest. This setting enables deprecation of daily digest.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2020-03-09
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: None
+# .. toggle_tickets: None
 ENABLE_FORUM_DAILY_DIGEST = 'enable_forum_daily_digest'
 
 

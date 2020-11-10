@@ -2,7 +2,6 @@
 Helper methods for Studio views.
 """
 
-import hashlib
 from uuid import uuid4
 
 import six
@@ -13,11 +12,10 @@ from opaque_keys.edx.keys import UsageKey
 from xblock.core import XBlock
 
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
-from edxmako.shortcuts import render_to_string
 from openedx.core.toggles import ENTRANCE_EXAMS
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import StaticTab
-from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
 
 from ..utils import reverse_course_url, reverse_library_url, reverse_usage_url
 

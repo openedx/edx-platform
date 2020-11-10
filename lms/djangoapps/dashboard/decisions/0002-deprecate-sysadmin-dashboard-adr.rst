@@ -31,7 +31,7 @@ would need to be added and/or moved into the cms application
 
 3. Delete a course
 
-   https://github.com/edx/edx-platform/blob/master/lms/djangoapps/dashboard/sysadmin.py#L383-L408
+   https://github.com/edx/edx-platform/blob/b4556a4bec/lms/djangoapps/dashboard/sysadmin.py#L344-L369
 
 
 These APIs can be removed entirely, as they are adequately covered by existing functionality:
@@ -43,7 +43,7 @@ These APIs can be removed entirely, as they are adequately covered by existing f
 
 2. Staffing and Enrollment
 
-   https://github.com/edx/edx-platform/blob/master/lms/djangoapps/dashboard/sysadmin.py#L419-L477
+   https://github.com/edx/edx-platform/blob/b4556a4bec/lms/djangoapps/dashboard/sysadmin.py#L380-L413
 
    This functionality may be redundant to features in the Insights application.
 

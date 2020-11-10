@@ -10,16 +10,16 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from testfixtures import LogCapture
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from student.models import BulkChangeEnrollmentConfiguration
+from common.djangoapps.student.models import BulkChangeEnrollmentConfiguration
 
-LOGGER_NAME = 'student.management.commands.bulk_change_enrollment_csv'
+LOGGER_NAME = 'common.djangoapps.student.management.commands.bulk_change_enrollment_csv'
 
 
 class BulkChangeEnrollmentCSVTests(SharedModuleStoreTestCase):

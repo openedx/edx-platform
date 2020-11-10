@@ -13,7 +13,7 @@ from django.views.decorators.cache import cache_control
 from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.courseware.courses import get_course_with_access
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.instructor.views.api import require_course_permission
 from xmodule.modulestore.django import modulestore

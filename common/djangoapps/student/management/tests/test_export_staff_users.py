@@ -9,7 +9,7 @@ from django.test import TestCase
 from django.utils.timezone import now
 
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from student.tests.factories import CourseAccessRoleFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseAccessRoleFactory, UserFactory
 
 
 class TestExportStaffUsers(TestCase):

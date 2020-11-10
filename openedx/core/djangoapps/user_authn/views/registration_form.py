@@ -18,20 +18,20 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django_countries import countries
 
-import third_party_auth
-from edxmako.shortcuts import marketing_link
+from common.djangoapps import third_party_auth
+from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.helpers import FormDescription
 from openedx.core.djangoapps.user_authn.utils import is_registration_api_v1 as is_api_v1
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
-from student.models import (
+from common.djangoapps.student.models import (
     CourseEnrollmentAllowed,
     UserProfile,
     email_exists_or_retired,
 )
-from util.password_policy_validators import (
+from common.djangoapps.util.password_policy_validators import (
     password_validators_instruction_texts,
     password_validators_restrictions,
     validate_password,

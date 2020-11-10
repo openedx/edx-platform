@@ -18,9 +18,9 @@ from opaque_keys.edx.locator import CourseLocator
 import six
 from six.moves import zip
 
-from course_modes.helpers import enrollment_mode_display
-from course_modes.models import CourseMode, Mode, get_cosmetic_display_price, invalidate_course_mode_cache
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.helpers import enrollment_mode_display
+from common.djangoapps.course_modes.models import CourseMode, Mode, get_cosmetic_display_price, invalidate_course_mode_cache
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -546,12 +546,18 @@ class TestDisplayPrices(ModuleStoreTestCase):
         course = CourseFactory.create()
         registration_price = 99
         course.cosmetic_display_price = 10
-        with patch('course_modes.models.CourseMode.min_course_price_for_currency', return_value=registration_price):
+        with patch(
+                'common.djangoapps.course_modes.models.CourseMode.min_course_price_for_currency',
+                return_value=registration_price,
+        ):
             # Since registration_price is set, it overrides the cosmetic_display_price and should be returned
             self.assertEqual(get_cosmetic_display_price(course), "$99")
 
         registration_price = 0
-        with patch('course_modes.models.CourseMode.min_course_price_for_currency', return_value=registration_price):
+        with patch(
+                'common.djangoapps.course_modes.models.CourseMode.min_course_price_for_currency',
+                return_value=registration_price,
+        ):
             # Since registration_price is not set, cosmetic_display_price should be returned
             self.assertEqual(get_cosmetic_display_price(course), "$10")
 

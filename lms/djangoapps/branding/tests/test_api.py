@@ -31,7 +31,7 @@ class TestHeader(TestCase):
         # load, which can cause other tests to fail.  To ensure that this change
         # doesn't affect other tests, we patch the `url()` method directly instead.
         cdn_url = "http://cdn.example.com/static/image.png"
-        with mock.patch('branding.api.staticfiles_storage.url', return_value=cdn_url):
+        with mock.patch('lms.djangoapps.branding.api.staticfiles_storage.url', return_value=cdn_url):
             logo_url = get_logo_url()
 
         self.assertEqual(logo_url, cdn_url)

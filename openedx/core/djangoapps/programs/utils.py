@@ -22,10 +22,10 @@ from pytz import utc
 from requests.exceptions import ConnectionError, Timeout
 from six.moves.urllib.parse import urljoin, urlparse, urlunparse  # pylint: disable=import-error
 
-from course_modes.api import get_paid_modes_for_course
-from course_modes.models import CourseMode
-from entitlements.api import get_active_entitlement_list_for_user
-from entitlements.models import CourseEntitlement
+from common.djangoapps.course_modes.api import get_paid_modes_for_course
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.entitlements.api import get_active_entitlement_list_for_user
+from common.djangoapps.entitlements.models import CourseEntitlement
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.commerce.utils import EcommerceService
@@ -42,8 +42,8 @@ from openedx.core.djangoapps.enrollments.api import get_enrollments
 from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.core.djangoapps.programs import ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from student.models import CourseEnrollment
-from util.date_utils import strftime_localized
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
 
 # The datetime module's strftime() methods require a year >= 1900.

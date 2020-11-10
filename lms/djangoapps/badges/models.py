@@ -20,7 +20,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey
 
-from badges.utils import deserialize_count_specs
+from lms.djangoapps.badges.utils import deserialize_count_specs
 from openedx.core.djangolib.markup import HTML, Text
 from xmodule.modulestore.django import modulestore
 

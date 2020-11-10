@@ -18,7 +18,7 @@ from django.db import DatabaseError, transaction
 from django.utils.encoding import python_2_unicode_compatible
 from six.moves import range, zip
 
-from util.db import outer_atomic
+from common.djangoapps.util.db import outer_atomic
 
 from .exceptions import DuplicateTaskException
 from .models import PROGRESS, QUEUING, InstructorTask

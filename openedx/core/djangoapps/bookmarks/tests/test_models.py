@@ -16,7 +16,7 @@ from six import text_type
 from six.moves import range
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import AdminFactory, UserFactory
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

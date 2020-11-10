@@ -13,13 +13,16 @@ import six
 from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from mock import patch
 from pytz import UTC
 from xblock.runtime import DictKeyValueStore
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from lms.djangoapps.courseware.masquerade import (
-    CourseMasquerade, MasqueradingKeyValueStore, get_masquerading_user_group,
+    CourseMasquerade,
+    MasqueradingKeyValueStore,
+    get_masquerading_user_group
 )
 from lms.djangoapps.courseware.tests.factories import StaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase, MasqueradeMixin, masquerade_as_group_member
@@ -27,10 +30,9 @@ from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubm
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

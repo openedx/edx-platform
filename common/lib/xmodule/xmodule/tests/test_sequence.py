@@ -16,8 +16,8 @@ from mock import Mock, patch
 from six.moves import range
 from web_fragments.fragment import Fragment
 
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from student.tests.factories import UserFactory
+from edx_toggles.toggles.testutils import override_waffle_flag
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.seq_module import TIMED_EXAM_GATING_WAFFLE_FLAG, SequenceModule
 from xmodule.tests import get_test_system
 from xmodule.tests.helpers import StubUserService

@@ -13,7 +13,7 @@ from six.moves import range
 
 from common.test.utils import XssTestMixin
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
-from survey.models import SurveyAnswer, SurveyForm
+from lms.djangoapps.survey.models import SurveyAnswer, SurveyForm
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

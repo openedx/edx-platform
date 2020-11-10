@@ -14,7 +14,7 @@ from collections import Counter
 import six
 from celery.states import READY_STATES
 
-from bulk_email.models import CourseEmail
+from lms.djangoapps.bulk_email.models import CourseEmail
 from lms.djangoapps.certificates.models import CertificateGenerationHistory
 from lms.djangoapps.instructor_task.api_helper import (
     check_arguments_for_overriding,
@@ -43,7 +43,7 @@ from lms.djangoapps.instructor_task.tasks import (
     reset_problem_attempts,
     send_bulk_course_email
 )
-from util import milestones_helpers
+from common.djangoapps.util import milestones_helpers
 from xmodule.modulestore.django import modulestore
 
 

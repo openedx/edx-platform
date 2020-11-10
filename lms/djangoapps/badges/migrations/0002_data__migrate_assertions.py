@@ -16,7 +16,7 @@ def forwards(apps, schema_editor):
     """
     from django.core.files.base import ContentFile
     from xmodule.modulestore.django import modulestore
-    from badges.events import course_complete
+    from lms.djangoapps.badges.events import course_complete
     db_alias = schema_editor.connection.alias
     # This will need to be changed if badges/certificates get moved out of the default db for some reason.
     if db_alias != 'default':

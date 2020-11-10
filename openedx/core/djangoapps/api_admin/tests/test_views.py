@@ -19,7 +19,7 @@ from openedx.core.djangoapps.api_admin.tests.factories import (
 )
 from openedx.core.djangoapps.api_admin.tests.utils import VALID_DATA
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 Application = get_application_model()  # pylint: disable=invalid-name
 

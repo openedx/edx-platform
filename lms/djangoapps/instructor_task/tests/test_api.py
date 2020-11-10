@@ -8,7 +8,7 @@ from celery.states import FAILURE
 from mock import MagicMock, Mock, patch
 from six.moves import range
 
-from bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail
+from lms.djangoapps.bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail
 from common.test.utils import normalize_repr
 from lms.djangoapps.courseware.tests.factories import UserFactory
 from lms.djangoapps.certificates.models import CertificateGenerationHistory, CertificateStatuses

@@ -18,7 +18,7 @@ from six import string_types, text_type
 from six.moves import zip
 
 from openedx.core.djangoapps.schedules.models import Schedule
-from student.models import get_user_by_username_or_email, CourseEnrollment
+from common.djangoapps.student.models import get_user_by_username_or_email, CourseEnrollment
 
 
 class DashboardError(Exception):

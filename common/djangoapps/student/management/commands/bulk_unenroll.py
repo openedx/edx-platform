@@ -8,7 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from student.models import CourseEnrollment, BulkUnenrollConfiguration
+from common.djangoapps.student.models import CourseEnrollment, BulkUnenrollConfiguration
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 

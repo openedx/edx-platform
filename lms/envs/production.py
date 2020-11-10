@@ -605,6 +605,7 @@ MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = ENV_TOKENS.get(
 
 ##### LOGISTRATION RATE LIMIT SETTINGS #####
 LOGISTRATION_RATELIMIT_RATE = ENV_TOKENS.get('LOGISTRATION_RATELIMIT_RATE', LOGISTRATION_RATELIMIT_RATE)
+LOGISTRATION_API_RATELIMIT = ENV_TOKENS.get('LOGISTRATION_API_RATELIMIT', LOGISTRATION_API_RATELIMIT)
 
 ##### REGISTRATION RATE LIMIT SETTINGS #####
 REGISTRATION_VALIDATION_RATELIMIT = ENV_TOKENS.get(
@@ -628,10 +629,10 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
         'social_core.backends.linkedin.LinkedinOAuth2',
         'social_core.backends.facebook.FacebookOAuth2',
         'social_core.backends.azuread.AzureADOAuth2',
-        'third_party_auth.appleid.AppleIdAuth',  # vendored 'social_core.backends.apple.AppleIdAuth'
-        'third_party_auth.identityserver3.IdentityServer3',
-        'third_party_auth.saml.SAMLAuthBackend',
-        'third_party_auth.lti.LTIAuthBackend',
+        'common.djangoapps.third_party_auth.appleid.AppleIdAuth',  # vendored 'social_core.backends.apple.AppleIdAuth'
+        'common.djangoapps.third_party_auth.identityserver3.IdentityServer3',
+        'common.djangoapps.third_party_auth.saml.SAMLAuthBackend',
+        'common.djangoapps.third_party_auth.lti.LTIAuthBackend',
     ])
 
     AUTHENTICATION_BACKENDS = list(tmp_backends) + list(AUTHENTICATION_BACKENDS)
@@ -657,7 +658,7 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
 
     if ENV_TOKENS.get('THIRD_PARTY_AUTH_SAML_FETCH_PERIOD_HOURS', 24) is not None:
         CELERYBEAT_SCHEDULE['refresh-saml-metadata'] = {
-            'task': 'third_party_auth.fetch_saml_metadata',
+            'task': 'common.djangoapps.third_party_auth.fetch_saml_metadata',
             'schedule': datetime.timedelta(hours=ENV_TOKENS.get('THIRD_PARTY_AUTH_SAML_FETCH_PERIOD_HOURS', 24)),
         }
 

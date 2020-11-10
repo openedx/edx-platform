@@ -14,7 +14,7 @@ from search.search_engine_base import SearchEngine
 from six import add_metaclass, string_types, text_type
 
 from cms.djangoapps.contentstore.course_group_config import GroupConfiguration
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.lib.courses import course_image_url
 from xmodule.annotator_mixin import html_to_text
 from xmodule.library_tools import normalize_key_for_search

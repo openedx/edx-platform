@@ -9,16 +9,16 @@ from django.conf import settings
 from django.utils.timezone import now
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, CourseOverviewFactory, UserFactory
+from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, CourseOverviewFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
-    from entitlements.tests.factories import CourseEntitlementFactory
-    from entitlements.utils import is_course_run_entitlement_fulfillable
+    from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
+    from common.djangoapps.entitlements.utils import is_course_run_entitlement_fulfillable
 
 
 @skip_unless_lms

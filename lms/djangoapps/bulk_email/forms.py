@@ -8,7 +8,7 @@ import logging
 from django import forms
 from django.core.exceptions import ValidationError
 
-from bulk_email.models import COURSE_EMAIL_MESSAGE_BODY_TAG, CourseAuthorization, CourseEmailTemplate
+from lms.djangoapps.bulk_email.models import COURSE_EMAIL_MESSAGE_BODY_TAG, CourseAuthorization, CourseEmailTemplate
 from openedx.core.lib.courses import clean_course_id
 
 log = logging.getLogger(__name__)

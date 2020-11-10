@@ -11,8 +11,8 @@ from mock import MagicMock, patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
-from lti_provider import models, views
-from student.tests.factories import UserFactory
+from lms.djangoapps.lti_provider import models, views
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 LTI_DEFAULT_PARAMS = {

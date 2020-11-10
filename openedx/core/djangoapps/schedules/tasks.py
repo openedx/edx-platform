@@ -24,7 +24,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.schedules import message_types, resolvers
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
 from openedx.core.lib.celery.task_utils import emulate_http_request
-from track import segment
+from common.djangoapps.track import segment
 
 LOG = logging.getLogger(__name__)
 
