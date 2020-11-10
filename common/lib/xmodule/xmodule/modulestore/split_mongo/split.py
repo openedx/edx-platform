@@ -83,7 +83,7 @@ from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope
 
 from xmodule.assetstore import AssetMetadata
 from xmodule.course_module import CourseSummary
-from xmodule.error_module import ErrorDescriptor
+from xmodule.error_module import ErrorBlock
 from xmodule.errortracker import null_error_tracker
 from xmodule.library_content_module import LibrarySummary
 from xmodule.modulestore import (
@@ -988,7 +988,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             envelope = CourseEnvelope(locator, entry)
             root = entry['root']
             structures_list = self._load_items(envelope, [root], depth=0, **kwargs)
-            if not isinstance(structures_list[0], ErrorDescriptor):
+            if not isinstance(structures_list[0], ErrorBlock):
                 result.append(structures_list[0])
         return result
 

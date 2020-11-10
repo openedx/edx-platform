@@ -38,7 +38,7 @@ from xblock.runtime import KvsFieldData
 
 from xmodule.assetstore import AssetMetadata, CourseAssetsFromStorage
 from xmodule.course_module import CourseSummary
-from xmodule.error_module import ErrorDescriptor
+from xmodule.error_module import ErrorBlock
 from xmodule.errortracker import exc_info_to_str, null_error_tracker
 from xmodule.exceptions import HeartbeatFailure
 from xmodule.mako_module import MakoDescriptorSystem
@@ -330,7 +330,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                 return module
             except Exception:                   # pylint: disable=broad-except
                 log.warning("Failed to load descriptor from %s", json_data, exc_info=True)
-                return ErrorDescriptor.from_json(
+                return ErrorBlock.from_json(
                     json_data,
                     self,
                     location,
@@ -1071,7 +1071,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             ],
             []
         )
-        return [course for course in base_list if not isinstance(course, ErrorDescriptor)]
+        return [course for course in base_list if not isinstance(course, ErrorBlock)]
 
     @autoretry_read()
     def _find_one(self, location):

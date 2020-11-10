@@ -15,7 +15,7 @@ from lazy import lazy
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from pytz import utc
 
-from xmodule.error_module import ErrorDescriptor
+from xmodule.error_module import ErrorBlock
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.ccx")
@@ -43,7 +43,7 @@ class CustomCourseForEdX(models.Model):
         store = modulestore()
         with store.bulk_operations(self.course_id):
             course = store.get_course(self.course_id)
-            if not course or isinstance(course, ErrorDescriptor):
+            if not course or isinstance(course, ErrorBlock):
                 log.error("CCX {0} from {2} course {1}".format(  # pylint: disable=logging-format-interpolation
                     self.display_name, self.course_id, "broken" if course else "non-existent"
                 ))

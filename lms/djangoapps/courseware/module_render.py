@@ -95,7 +95,7 @@ from common.djangoapps.util import milestones_helpers
 from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
-from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
+from xmodule.error_module import ErrorBlock, NonStaffErrorBlock
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.lti_module import LTIModule
 from xmodule.modulestore.django import modulestore
@@ -323,7 +323,7 @@ def get_module(user, request, usage_key, field_data_cache,
                                 to the user.
 
     Returns: xmodule instance, or None if the user does not have access to the
-    module.  If there's an error, will try to return an instance of ErrorModule
+    module.  If there's an error, will try to return an instance of ErrorBlock
     if possible.  If not possible, return None.
     """
     try:
@@ -846,11 +846,11 @@ def get_module_system_for_user(
     system.set(u'user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
     system.set(u'days_early_for_beta', descriptor.days_early_for_beta)
 
-    # make an ErrorDescriptor -- assuming that the descriptor's system is ok
+    # make an ErrorBlock -- assuming that the descriptor's system is ok
     if has_access(user, u'staff', descriptor.location, course_id):
-        system.error_descriptor_class = ErrorDescriptor
+        system.error_descriptor_class = ErrorBlock
     else:
-        system.error_descriptor_class = NonStaffErrorDescriptor
+        system.error_descriptor_class = NonStaffErrorBlock
 
     return system, field_data
 

@@ -32,7 +32,7 @@ from openedx.core.lib.cache_utils import request_cached, RequestCache
 from common.djangoapps.static_replace.models import AssetBaseUrlConfig
 from xmodule import block_metadata_utils, course_metadata_utils
 from xmodule.course_module import DEFAULT_START_DATE, CourseDescriptor
-from xmodule.error_module import ErrorDescriptor
+from xmodule.error_module import ErrorBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab
 
@@ -310,7 +310,7 @@ class CourseOverview(TimeStampedModel):
                     "Error while loading CourseOverview for course {} "
                     "from the module store: {}",
                     six.text_type(course_id),
-                    course.error_msg if isinstance(course, ErrorDescriptor) else six.text_type(course)
+                    course.error_msg if isinstance(course, ErrorBlock) else six.text_type(course)
                 )
             else:
                 log.info(

@@ -72,7 +72,7 @@ from common.djangoapps.util.string_utils import _has_non_ascii_characters
 from common.djangoapps.xblock_django.api import deprecated_xblocks
 from xmodule.contentstore.content import StaticContent
 from xmodule.course_module import DEFAULT_START_DATE, CourseFields
-from xmodule.error_module import ErrorDescriptor
+from xmodule.error_module import ErrorBlock
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
@@ -412,7 +412,7 @@ def _accessible_courses_iter(request):
         """
         Filter out unusable and inaccessible courses
         """
-        if isinstance(course, ErrorDescriptor):
+        if isinstance(course, ErrorBlock):
             return False
 
         # Custom Courses for edX (CCX) is an edX feature for re-using course content.
@@ -499,7 +499,7 @@ def _accessible_libraries_iter(user, org=None):
         libraries = [] if org == '' else modulestore().get_libraries(org=org)
     else:
         libraries = modulestore().get_library_summaries()
-    # No need to worry about ErrorDescriptors - split's get_libraries() never returns them.
+    # No need to worry about ErrorBlocks - split's get_libraries() never returns them.
     return (lib for lib in libraries if has_studio_read_access(user, lib.location.library_key))
 
 
@@ -751,7 +751,7 @@ def _process_courses_list(courses_iter, in_process_course_actions, split_archive
     archived_courses = []
 
     for course in courses_iter:
-        if isinstance(course, ErrorDescriptor) or (course.id in in_process_action_course_keys):
+        if isinstance(course, ErrorBlock) or (course.id in in_process_action_course_keys):
             continue
 
         formatted_course = format_course_for_view(course)
