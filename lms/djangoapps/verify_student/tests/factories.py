@@ -20,6 +20,8 @@ class SoftwareSecurePhotoVerificationFactory(DjangoModelFactory):
         model = SoftwareSecurePhotoVerification
 
     status = 'approved'
+    if hasattr(settings, 'VERIFY_STUDENT'):
+        expiry_date = now() + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
 
 
 class SSOVerificationFactory(DjangoModelFactory):
