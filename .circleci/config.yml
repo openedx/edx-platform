@@ -1,7 +1,7 @@
 version: 2.1
 
 executors:
-  docker-executor: # a reusable executor
+  adg-edx-executor:
     docker:
       - image: cimg/python:3.5-node
         auth:
@@ -14,7 +14,7 @@ executors:
     working_directory: ~/edx-platform
 
 commands:
-  common-steps: # a reusable command
+  run-tests:
     steps:
       - checkout
       - restore_cache:
@@ -63,9 +63,9 @@ commands:
 
 jobs:
   adg-test:
-    executor: docker-executor
+    executor: adg-edx-executor
     steps:
-      - common-steps
+      - run-tests
       - run:
           name: Upload report to Codecov
           command: |

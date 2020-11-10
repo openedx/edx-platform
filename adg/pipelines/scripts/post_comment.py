@@ -8,7 +8,7 @@ import os
 import requests
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--type', '-t', help='Report type i.e. AAG, Edx')
+parser.add_argument('--type', '-t', help='Report type i.e. ADG, Edx')
 parser.add_argument('--status', '-s', help='Test coverage status; 0 of cover is a success')
 args = parser.parse_args()
 
@@ -71,14 +71,14 @@ def _create_comment_on_pr(message):
         None
     """
     pr_number = CIRCLE_PULL_REQUEST.split('/')[-1]
-    url = "https://api.github.com/repos/{username}/{repo}/issues/{pr}/comments".format(
+    url = 'https://api.github.com/repos/{username}/{repo}/issues/{pr}/comments'.format(
         pr=pr_number,
         username=CIRCLE_PROJECT_USERNAME,
         repo=CIRCLE_PROJECT_REPONAME,
     )
     headers = {'Authorization': 'token {token}'.format(token=GITHUB_BOT_TOKEN)}
     response = requests.post(url, json={'body': message}, headers=headers)
-    print("Comment status: ", response.status_code, response.reason)
+    print('Comment status: ', response.status_code, response.reason)
 
 
 post_coverage_stats()
