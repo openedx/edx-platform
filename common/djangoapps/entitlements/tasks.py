@@ -19,7 +19,12 @@ ROUTING_KEY = getattr(settings, 'ENTITLEMENTS_EXPIRATION_ROUTING_KEY', None)
 MAX_RETRIES = 11
 
 
-@task(bind=True, ignore_result=True, routing_key=ROUTING_KEY)
+@task(
+    bind=True,
+    ignore_result=True,
+    routing_key=ROUTING_KEY,
+    name='entitlements.expire_old_entitlements',
+)
 def expire_old_entitlements(self, start, end, logid='...'):
     """
     This task is designed to be called to process a bundle of entitlements
