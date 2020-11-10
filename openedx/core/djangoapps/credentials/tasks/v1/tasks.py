@@ -13,11 +13,6 @@ from openedx.core.djangoapps.credentials.utils import get_credentials_api_client
 
 logger = get_task_logger(__name__)
 
-# Under cms the following setting is not defined, leading to errors during tests.
-# These tasks aren't strictly credentials generation, but are similar in the sense
-# that they generate records on the credentials side. And have a similar SLA.
-ROUTING_KEY = getattr(settings, 'CREDENTIALS_GENERATION_ROUTING_KEY', None)
-
 # Maximum number of retries before giving up.
 # For reference, 11 retries with exponential backoff yields a maximum waiting
 # time of 2047 seconds (about 30 minutes). Setting this to None could yield
@@ -25,7 +20,7 @@ ROUTING_KEY = getattr(settings, 'CREDENTIALS_GENERATION_ROUTING_KEY', None)
 MAX_RETRIES = 11
 
 
-@task(bind=True, ignore_result=True, routing_key=ROUTING_KEY)
+@task(bind=True, ignore_result=True)
 def send_grade_to_credentials(self, username, course_run_key, verified, letter_grade, percent_grade):
     """ Celery task to notify the Credentials IDA of a grade change via POST. """
     logger.info(u'Running task send_grade_to_credentials for username %s and course %s', username, course_run_key)
