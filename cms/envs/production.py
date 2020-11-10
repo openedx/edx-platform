@@ -136,7 +136,7 @@ CELERY_QUEUES = {
     DEFAULT_PRIORITY_QUEUE: {}
 }
 
-CELERY_ROUTES = "{}celery.Router".format(QUEUE_VARIANT)
+CELERY_ROUTES = "{}celery.route_task".format(QUEUE_VARIANT)
 
 # STATIC_URL_BASE specifies the base url to use for static files
 STATIC_URL_BASE = ENV_TOKENS.get('STATIC_URL_BASE', None)
@@ -574,3 +574,20 @@ LOGO_URL = ENV_TOKENS.get('LOGO_URL', LOGO_URL)
 LOGO_URL_PNG = ENV_TOKENS.get('LOGO_URL_PNG', LOGO_URL_PNG)
 LOGO_TRADEMARK_URL = ENV_TOKENS.get('LOGO_TRADEMARK_URL', LOGO_TRADEMARK_URL)
 FAVICON_URL = ENV_TOKENS.get('FAVICON_URL', FAVICON_URL)
+
+######################## CELERY ROTUING ########################
+
+# Defines alternate environment tasks, as a dict of form { task_name: alternate_queue }
+ALTERNATE_ENV_TASKS = {
+    'completion_aggregator.tasks.update_aggregators': 'lms',
+    'openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache': 'lms',
+    'openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache_v2': 'lms',
+}
+
+# Defines the task -> alternate worker queue to be used when routing.
+EXPLICIT_QUEUES = {
+    'lms.djangoapps.grades.tasks.compute_all_grades_for_course': {
+        'queue': POLICY_CHANGE_GRADES_ROUTING_KEY},
+    'cms.djangoapps.contentstore.tasks.update_search_index': {
+        'queue': UPDATE_SEARCH_INDEX_JOB_QUEUE},
+}

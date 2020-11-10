@@ -247,7 +247,7 @@ def should_dump_course(course_key, graph):
     return last_this_command_was_run < course_last_published_date
 
 
-@task(routing_key=settings.COURSEGRAPH_JOB_QUEUE)
+@task
 @set_code_owner_attribute
 def dump_course_to_neo4j(course_key_string, credentials):
     """

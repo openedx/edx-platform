@@ -5,10 +5,11 @@ and auto discover tasks in all installed django apps.
 Taken from: https://celery.readthedocs.org/en/latest/django/first-steps-with-django.html
 """
 
-
 import os
 
-from openedx.core.lib.celery.routers import AlternateEnvironmentRouter
+from celery import Celery
+
+from openedx.core.lib.celery.routers import route_task_queue
 
 # Set the default Django settings module for the 'celery' program
 # and then instantiate the Celery singleton.
@@ -16,14 +17,11 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'lms.envs.production')
 from openedx.core.lib.celery import APP  # pylint: disable=wrong-import-position,unused-import
 
 
-class Router(AlternateEnvironmentRouter):
+def route_task(name, args, kwargs, options, task=None, **kw):  # pylint: disable=unused-argument
     """
-    An implementation of AlternateEnvironmentRouter, for routing tasks to non-cms queues.
+    Celery-defined method allowing for custom routing logic.
+
+    If None is returned from this method, default routing logic is used.
     """
 
-    @property
-    def alternate_env_tasks(self):
-        """
-        Defines alternate environment tasks, as a dict of form { task_name: alternate_queue }
-        """
-        return {}
+    return route_task_queue(name)
