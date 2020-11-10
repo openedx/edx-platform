@@ -30,7 +30,7 @@ class MetadataParseError(Exception):
     pass
 
 
-@task(name='common.djangoapps.third_party_auth.fetch_saml_metadata')
+@task(name='third_party_auth.fetch_saml_metadata')
 def fetch_saml_metadata():
     """
     Fetch and store/update the metadata of all IdPs
