@@ -51,7 +51,6 @@ from openedx.features.course_duration_limits.models import CourseDurationLimitCo
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
     DISABLE_UNIFIED_COURSE_TAB_FLAG,
-    SHOW_REVIEWS_TOOL_FLAG,
     SHOW_UPGRADE_MSG_ON_COURSE_HOME
 )
 from openedx.features.course_experience.tests import BaseCourseUpdatesTestCase
@@ -249,7 +248,6 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         # Add a welcome message
         self.create_course_update(TEST_WELCOME_MESSAGE)
 
-    @override_waffle_flag(SHOW_REVIEWS_TOOL_FLAG, active=True)
     @ddt.data(
         [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.ANONYMOUS, True, False],
         [False, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.ANONYMOUS, True, False],
@@ -297,14 +295,14 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
                 private_url = course_home_url(self.private_course)
                 private_response = self.client.get(private_url)
 
-        # Verify that the course tools and dates are always shown
-        self.assertContains(response, TEST_COURSE_TOOLS)
-
         is_anonymous = user_type is CourseUserType.ANONYMOUS
         is_enrolled = user_type is CourseUserType.ENROLLED
         is_enrolled_or_staff = is_enrolled or user_type in (
             CourseUserType.UNENROLLED_STAFF, CourseUserType.GLOBAL_STAFF
         )
+
+        # Verify that the course tools and dates are shown for enrolled users & staff
+        self.assertContains(response, TEST_COURSE_TOOLS, count=(1 if is_enrolled_or_staff else 0))
 
         self.assertContains(response, 'Learn About Verified Certificate', count=(1 if is_enrolled else 0))
 
@@ -332,7 +330,6 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
                                         'You must be enrolled in the course to see course content.')
 
     @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
-    @override_waffle_flag(SHOW_REVIEWS_TOOL_FLAG, active=True)
     @ddt.data(
         [CourseUserType.ANONYMOUS, 'To see course content'],
         [CourseUserType.ENROLLED, None],
@@ -350,19 +347,17 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         url = course_home_url(self.course)
         response = self.client.get(url)
 
-        # Verify that the course tools and dates are always shown
-        self.assertContains(response, TEST_COURSE_TOOLS)
-
         # Verify that welcome messages are never shown
         self.assertNotContains(response, TEST_WELCOME_MESSAGE)
 
-        # Verify that the outline, start button, course sock, and welcome message
-        # are only shown to enrolled users.
+        # Verify that the outline, start button, course sock, course tools, and welcome message
+        # are only shown to enrolled users or unenrolled staff.
         is_enrolled = user_type is CourseUserType.ENROLLED
         is_unenrolled_staff = user_type is CourseUserType.UNENROLLED_STAFF
         expected_count = 1 if (is_enrolled or is_unenrolled_staff) else 0
         self.assertContains(response, TEST_CHAPTER_NAME, count=expected_count)
         self.assertContains(response, 'Start Course', count=expected_count)
+        self.assertContains(response, TEST_COURSE_TOOLS, count=expected_count)
         self.assertContains(response, 'Learn About Verified Certificate', count=(1 if is_enrolled else 0))
 
         # Verify that the expected message is shown to the user

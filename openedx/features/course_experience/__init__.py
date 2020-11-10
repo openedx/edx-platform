@@ -32,19 +32,6 @@ DISPLAY_COURSE_SOCK_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'display_cour
 # Waffle flag to let learners access a course before its start date.
 COURSE_PRE_START_ACCESS_FLAG = WaffleFlag(WAFFLE_FLAG_NAMESPACE, 'pre_start_access', __name__)
 
-# Waffle flag to enable a review page link from the unified home page.
-# .. toggle_name: course_experience.show_reviews_tool
-# .. toggle_implementation: CourseWaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Used with our integration with CourseTalk to display reviews for a course.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2017-06-19
-# .. toggle_target_removal_date: None
-# .. toggle_warnings: We are no longer integrating with CourseTalk, so this probably should be deprecated and the code
-#   for reviews should be removed. This temporary feature toggle should have a target removal date.
-# .. toggle_tickets: DEPR-48
-SHOW_REVIEWS_TOOL_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'show_reviews_tool', __name__)
-
 # Waffle flag to enable the setting of course goals.
 # .. toggle_name: course_experience.enable_course_goals
 # .. toggle_implementation: CourseWaffleFlag
