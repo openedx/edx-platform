@@ -1,6 +1,5 @@
 """
-(DEPRECATED) Django admin command to populate expiry_date for
-approved verifications in SoftwareSecurePhotoVerification
+Django admin command to populate expiration_date for approved verifications in SoftwareSecurePhotoVerification
 """
 
 
@@ -13,25 +12,25 @@ from django.core.management.base import BaseCommand
 from django.db.models import F
 
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from common.djangoapps.util.query import use_read_replica_if_available
+from util.query import use_read_replica_if_available
 
 logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
     """
-    This command sets the expiry_date for users for which the verification is approved
+    This command sets the `expiration_date` for users for which the deprecated field `expiry_date` is set
     The task is performed in batches with maximum number of rows to process given in argument `batch_size`
     and a sleep time between each batch given by `sleep_time`
     Default values:
         `batch_size` = 1000 rows
         `sleep_time` = 10 seconds
     Example usage:
-        $ ./manage.py lms populate_expiry_date --batch_size=1000 --sleep_time=5
+        $ ./manage.py lms populate_expiration_date --batch_size=1000 --sleep_time=5
     OR
-        $ ./manage.py lms populate_expiry_date
+        $ ./manage.py lms populate_expiration_date
     """
-    help = 'Populate expiry_date for approved verifications'
+    help = 'Populate expiration_date for approved verifications'
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -54,7 +53,7 @@ class Command(BaseCommand):
         """
         Handler for the command
         It filters approved Software Secure Photo Verification and then for each distinct user it finds the most
-        recent approved verification and set its expiry_date
+        recent approved verification and set its expiration_date
         """
         batch_size = options['batch_size']
         sleep_time = options['sleep_time']
@@ -75,7 +74,7 @@ class Command(BaseCommand):
                 distinct_user_ids.add(verification.user_id)
 
                 recent_verification = self.find_recent_verification(sspv, verification.user_id)
-                if not recent_verification.expiry_date:
+                if recent_verification.expiry_date:
                     update_verification_ids.append(recent_verification.pk)
                     update_verification_count += 1
 
@@ -90,11 +89,12 @@ class Command(BaseCommand):
 
     def bulk_update(self, verification_ids):
         """
-        It updates the expiry_date for all the verification whose ids lie in verification_ids
+        It updates the expiration_date and sets the expiry_date to NULL for all the
+        verifications whose ids lie in verification_ids
         """
         recent_verification_qs = SoftwareSecurePhotoVerification.objects.filter(pk__in=verification_ids)
-        recent_verification_qs.update(expiry_date=F('updated_at') + timedelta(
-            days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]))
+        recent_verification_qs.update(expiration_date=F('expiry_date'))
+        recent_verification_qs.update(expiry_date=None)
 
     def find_recent_verification(self, model, user_id):
         """
