@@ -7,9 +7,9 @@ from django.test import TestCase
 from opaque_keys.edx.locations import CourseLocator
 from six import text_type
 
-from course_action_state.managers import CourseRerunUIStateManager
-from course_action_state.models import CourseRerunState
-from student.tests.factories import UserFactory
+from common.djangoapps.course_action_state.managers import CourseRerunUIStateManager
+from common.djangoapps.course_action_state.models import CourseRerunState
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class TestCourseRerunStateManager(TestCase):

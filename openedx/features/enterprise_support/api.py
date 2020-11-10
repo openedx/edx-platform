@@ -25,8 +25,8 @@ from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.utils import get_data_consent_share_cache_key
-from third_party_auth.pipeline import get as get_partial_pipeline
-from third_party_auth.provider import Registry
+from common.djangoapps.third_party_auth.pipeline import get as get_partial_pipeline
+from common.djangoapps.third_party_auth.provider import Registry
 
 try:
     from enterprise.models import (

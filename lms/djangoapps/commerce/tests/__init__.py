@@ -10,7 +10,7 @@ from freezegun import freeze_time
 
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 JSON = 'application/json'
 TEST_PUBLIC_URL_ROOT = 'http://www.example.com'

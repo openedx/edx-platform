@@ -10,7 +10,7 @@ from django.utils.html import escape
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from codejail.safe_exec import safe_exec
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangolib.markup import HTML
 
 

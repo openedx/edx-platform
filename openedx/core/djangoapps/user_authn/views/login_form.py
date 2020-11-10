@@ -14,8 +14,8 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from ratelimit.decorators import ratelimit
 
-import third_party_auth
-from edxmako.shortcuts import render_to_response
+from common.djangoapps import third_party_auth
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.accounts.utils import (
@@ -36,10 +36,10 @@ from openedx.features.enterprise_support.utils import (
     handle_enterprise_cookies_for_logistration,
     update_logistration_context_for_enterprise
 )
-from student.helpers import get_next_url_for_login_page
-from third_party_auth import pipeline
-from third_party_auth.decorators import xframe_allow_whitelisted
-from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
+from common.djangoapps.student.helpers import get_next_url_for_login_page
+from common.djangoapps.third_party_auth import pipeline
+from common.djangoapps.third_party_auth.decorators import xframe_allow_whitelisted
+from common.djangoapps.util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 
 log = logging.getLogger(__name__)
 

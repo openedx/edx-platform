@@ -11,7 +11,7 @@ from django.utils.translation import ugettext as _
 from edx_django_utils.cache import RequestCache
 from web_fragments.fragment import Fragment
 
-from course_modes.models import format_course_price, get_course_prices
+from common.djangoapps.course_modes.models import format_course_price, get_course_prices
 from lms.djangoapps.experiments.models import ExperimentData
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview

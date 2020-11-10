@@ -17,7 +17,7 @@ from rest_framework.response import Response
 
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.course_goals.api import (add_course_goal, get_course_goal, get_course_goal_text,
                                              has_course_goal_permission, valid_course_goals_ordered)
 from lms.djangoapps.course_home_api.outline.v1.serializers import OutlineTabSerializer
@@ -38,7 +38,7 @@ from openedx.features.course_experience.utils import get_course_outline_block_tr
 from openedx.features.course_experience.views.latest_update import LatestUpdateFragmentView
 from openedx.features.course_experience.views.welcome_message import PREFERENCE_KEY, WelcomeMessageFragmentView
 from openedx.features.discounts.utils import generate_offer_html
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore.django import modulestore
 

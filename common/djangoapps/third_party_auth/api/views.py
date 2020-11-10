@@ -23,10 +23,10 @@ from openedx.core.lib.api.authentication import (
     BearerAuthenticationAllowInactiveUser
 )
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
-from third_party_auth import pipeline
-from third_party_auth.api import serializers
-from third_party_auth.api.permissions import TPA_PERMISSIONS
-from third_party_auth.provider import Registry
+from common.djangoapps.third_party_auth import pipeline
+from common.djangoapps.third_party_auth.api import serializers
+from common.djangoapps.third_party_auth.api.permissions import TPA_PERMISSIONS
+from common.djangoapps.third_party_auth.provider import Registry
 from common.djangoapps.third_party_auth.api.utils import filter_user_social_auth_queryset_by_provider
 
 

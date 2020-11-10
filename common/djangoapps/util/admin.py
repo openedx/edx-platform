@@ -3,6 +3,6 @@
 
 from django.contrib import admin
 
-from util.models import RateLimitConfiguration
+from common.djangoapps.util.models import RateLimitConfiguration
 
 admin.site.register(RateLimitConfiguration)

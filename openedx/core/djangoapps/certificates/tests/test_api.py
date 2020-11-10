@@ -7,15 +7,15 @@ from datetime import datetime, timedelta
 import ddt
 import pytz
 import waffle
-from course_modes.models import CourseMode
 from django.test import TestCase
 from edx_toggles.toggles import WaffleSwitch
 from edx_toggles.toggles.testutils import override_waffle_switch
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.certificates import api
 from openedx.core.djangoapps.certificates.config import waffle as certs_waffle
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 
 # TODO: Copied from lms.djangoapps.certificates.models,

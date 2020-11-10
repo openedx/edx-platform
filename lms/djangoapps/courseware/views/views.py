@@ -48,8 +48,8 @@ from six import text_type
 from web_fragments.fragment import Fragment
 
 from lms.djangoapps.survey import views as survey_views
-from course_modes.models import CourseMode, get_course_prices
-from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
+from common.djangoapps.course_modes.models import CourseMode, get_course_prices
+from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_response, render_to_string
 from lms.djangoapps.edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.certificates import api as certs_api
@@ -118,12 +118,12 @@ from openedx.features.course_experience.views.course_dates import CourseDatesFra
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.enterprise_support.api import data_sharing_consent_required
-from student.models import CourseEnrollment, UserTestGroup
-from track import segment
-from util.cache import cache, cache_if_anonymous
-from util.db import outer_atomic
-from util.milestones_helpers import get_prerequisite_courses_display
-from util.views import ensure_valid_course_key, ensure_valid_usage_key
+from common.djangoapps.student.models import CourseEnrollment, UserTestGroup
+from common.djangoapps.track import segment
+from common.djangoapps.util.cache import cache, cache_if_anonymous
+from common.djangoapps.util.db import outer_atomic
+from common.djangoapps.util.milestones_helpers import get_prerequisite_courses_display
+from common.djangoapps.util.views import ensure_valid_course_key, ensure_valid_usage_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem

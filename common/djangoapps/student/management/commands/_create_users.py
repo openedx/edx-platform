@@ -3,8 +3,8 @@ from xmodule.modulestore.django import modulestore
 
 from lms.djangoapps.instructor.access import allow_access
 from openedx.core.djangoapps.user_authn.views.registration_form import AccountCreationForm
-from student.helpers import do_create_account
-from student.models import CourseEnrollment
+from common.djangoapps.student.helpers import do_create_account
+from common.djangoapps.student.models import CourseEnrollment
 
 
 def create_users(

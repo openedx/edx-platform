@@ -36,12 +36,12 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import text_type
 
-import track.views
+from common.djangoapps.track import views as track_views
 from lms.djangoapps.bulk_email.models import Optout
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.courses import get_courses, sort_by_announcement, sort_by_start_date
-from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
-from entitlements.models import CourseEntitlement
+from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_response, render_to_string
+from common.djangoapps.entitlements.models import CourseEntitlement
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.catalog.utils import get_programs_with_type
 from openedx.core.djangoapps.embargo import api as embargo_api
@@ -51,9 +51,9 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangolib.markup import HTML, Text
-from student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info, generate_activation_email_context
-from student.message_types import AccountActivation, EmailChange, EmailChangeConfirmation, RecoveryEmailCreate
-from student.models import (
+from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info, generate_activation_email_context
+from common.djangoapps.student.message_types import AccountActivation, EmailChange, EmailChangeConfirmation, RecoveryEmailCreate
+from common.djangoapps.student.models import (
     AccountRecovery,
     CourseEnrollment,
     PendingEmailChange,
@@ -67,11 +67,11 @@ from student.models import (
     create_comments_service_user,
     email_exists_or_retired
 )
-from student.signals import REFUND_ORDER
-from student.tasks import send_activation_email
-from student.text_me_the_app import TextMeTheAppFragmentView
-from util.db import outer_atomic
-from util.json_request import JsonResponse
+from common.djangoapps.student.signals import REFUND_ORDER
+from common.djangoapps.student.tasks import send_activation_email
+from common.djangoapps.student.text_me_the_app import TextMeTheAppFragmentView
+from common.djangoapps.util.db import outer_atomic
+from common.djangoapps.util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.student")
@@ -824,7 +824,7 @@ def change_email_settings(request):
             user.email,
             course_id,
         )
-        track.views.server_track(
+        track_views.server_track(
             request,
             "change-email-settings",
             {"receive_emails": "yes", "course": course_id},
@@ -838,7 +838,7 @@ def change_email_settings(request):
             user.email,
             course_id,
         )
-        track.views.server_track(
+        track_views.server_track(
             request,
             "change-email-settings",
             {"receive_emails": "no", "course": course_id},

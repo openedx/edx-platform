@@ -13,7 +13,7 @@ from edx_django_utils.cache import RequestCache
 
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
-from track import segment
+from common.djangoapps.track import segment
 
 log = logging.getLogger(__name__)
 
@@ -88,7 +88,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
 
     def _is_enrollment_inside_date_bounds(self, experiment_values, user, course_key):
         """ Returns True if the user's enrollment (if any) is valid for the configured experiment date range """
-        from student.models import CourseEnrollment
+        from common.djangoapps.student.models import CourseEnrollment
 
         enrollment_start = experiment_values.get('enrollment_start')
         enrollment_end = experiment_values.get('enrollment_end')

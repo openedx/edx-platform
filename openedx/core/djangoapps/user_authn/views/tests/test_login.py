@@ -20,8 +20,7 @@ from django.test.utils import override_settings
 from django.urls import NoReverseMatch, reverse
 from edx_toggles.toggles.testutils import override_waffle_switch
 from mock import patch
-from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
-from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
+from common.djangoapps.student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
 
 from openedx.core.djangoapps.password_policy.compliance import (
     NonCompliantPasswordException,
@@ -38,6 +37,7 @@ from openedx.core.djangoapps.user_authn.views.login import (
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.lib.api.test_utils import ApiTestCase
+from common.djangoapps.util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 
 
 @ddt.ddt
@@ -74,7 +74,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
 
     def test_login_success(self):
         response, mock_audit_log = self._login_response(
-            self.user_email, self.password, patched_audit_log='student.models.AUDIT_LOG'
+            self.user_email, self.password, patched_audit_log='common.djangoapps.student.models.AUDIT_LOG'
         )
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success', self.user_email])
@@ -160,7 +160,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_success_no_pii(self):
         response, mock_audit_log = self._login_response(
-            self.user_email, self.password, patched_audit_log='student.models.AUDIT_LOG'
+            self.user_email, self.password, patched_audit_log='common.djangoapps.student.models.AUDIT_LOG'
         )
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success'])
@@ -172,7 +172,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         self.user.save()
 
         response, mock_audit_log = self._login_response(
-            unicode_email, self.password, patched_audit_log='student.models.AUDIT_LOG'
+            unicode_email, self.password, patched_audit_log='common.djangoapps.student.models.AUDIT_LOG'
         )
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success', unicode_email])
@@ -283,7 +283,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         response, _ = self._login_response(self.user_email, self.password)
         self._assert_response(response, success=True)
         logout_url = reverse('logout')
-        with patch('student.models.AUDIT_LOG') as mock_audit_log:
+        with patch('common.djangoapps.student.models.AUDIT_LOG') as mock_audit_log:
             response = self.client.post(logout_url)
         self.assertEqual(response.status_code, 200)
         self._assert_audit_log(mock_audit_log, 'info', [u'Logout', u'test'])
@@ -343,7 +343,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         response, _ = self._login_response(self.user_email, self.password)
         self._assert_response(response, success=True)
         logout_url = reverse('logout')
-        with patch('student.models.AUDIT_LOG') as mock_audit_log:
+        with patch('common.djangoapps.student.models.AUDIT_LOG') as mock_audit_log:
             response = self.client.post(logout_url)
         self.assertEqual(response.status_code, 200)
         self._assert_audit_log(mock_audit_log, 'info', [u'Logout'])

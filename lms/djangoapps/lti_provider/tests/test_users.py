@@ -14,7 +14,7 @@ from six.moves import range
 
 from .. import users
 from ..models import LtiConsumer, LtiUser
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class UserManagementHelperTest(TestCase):

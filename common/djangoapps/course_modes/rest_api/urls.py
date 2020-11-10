@@ -8,5 +8,5 @@ from django.conf.urls import include, url
 app_name = 'common.djangoapps.course_modes.rest_api'
 
 urlpatterns = [
-    url(r'^v1/', include('course_modes.rest_api.v1.urls', namespace='v1')),
+    url(r'^v1/', include('common.djangoapps.course_modes.rest_api.v1.urls', namespace='v1')),
 ]

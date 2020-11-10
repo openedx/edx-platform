@@ -12,7 +12,7 @@ from lms.djangoapps.certificates.models import (
     CertificateWhitelist,
     GeneratedCertificate
 )
-from student.models import LinkedInAddToProfileConfiguration
+from common.djangoapps.student.models import LinkedInAddToProfileConfiguration
 
 
 class GeneratedCertificateFactory(DjangoModelFactory):

@@ -30,7 +30,7 @@ from lms.djangoapps.instructor_task.subtasks import (
     initialize_subtask_info,
     update_subtask_status
 )
-from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

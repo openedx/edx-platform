@@ -21,12 +21,11 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import iteritems, text_type
 
-import track.views
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models import Optout
-from course_modes.models import CourseMode
-from edxmako.shortcuts import render_to_response, render_to_string
-from entitlements.models import CourseEntitlement
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
+from common.djangoapps.entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.experiments.utils import get_dashboard_course_info, get_experiment_user_metadata_context
@@ -48,9 +47,9 @@ from openedx.features.enterprise_support.api import (
     get_dashboard_consent_notification,
     get_enterprise_learner_portal_enabled_message
 )
-from student.api import COURSE_DASHBOARD_PLUGIN_VIEW_NAME
-from student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
-from student.models import (
+from common.djangoapps.student.api import COURSE_DASHBOARD_PLUGIN_VIEW_NAME
+from common.djangoapps.student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
+from common.djangoapps.student.models import (
     AccountRecovery,
     CourseEnrollment,
     CourseEnrollmentAttribute,
@@ -58,7 +57,7 @@ from student.models import (
     PendingSecondaryEmailChange,
     UserProfile
 )
-from util.milestones_helpers import get_pre_requisite_courses_not_completed
+from common.djangoapps.util.milestones_helpers import get_pre_requisite_courses_not_completed
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.student")

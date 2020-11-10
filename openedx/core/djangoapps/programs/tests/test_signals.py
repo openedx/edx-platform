@@ -20,7 +20,7 @@ from openedx.core.djangoapps.signals.signals import (
 )
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 TEST_USERNAME = 'test-user'
 TEST_COURSE_KEY = CourseKey.from_string('course-v1:edX+test_course+1')

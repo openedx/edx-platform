@@ -14,14 +14,14 @@ from django.urls import reverse
 from rest_framework import serializers
 from six import text_type
 
-from student.models import UserPasswordToggleHistory
+from common.djangoapps.student.models import UserPasswordToggleHistory
 from lms.djangoapps.badges.utils import badges_enabled
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import errors
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.user_api.models import RetirementState, UserPreference, UserRetirementStatus
 from openedx.core.djangoapps.user_api.serializers import ReadOnlyFieldsSerializerMixin
-from student.models import LanguageProficiency, SocialLink, UserProfile
+from common.djangoapps.student.models import LanguageProficiency, SocialLink, UserProfile
 
 from . import (
     ACCOUNT_VISIBILITY_PREF_KEY,

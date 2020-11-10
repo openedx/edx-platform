@@ -18,13 +18,13 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
 
-from course_modes.models import CourseMode
-from entitlements.models import CourseEntitlement
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.entitlements.models import CourseEntitlement
 from lms.djangoapps.experiments.models import ExperimentData
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
 from openedx.features.discounts.models import DiscountPercentageConfig, DiscountRestrictionConfig
-from student.models import CourseEnrollment
-from track import segment
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.track import segment
 
 # .. toggle_name: discounts.enable_discounting
 # .. toggle_implementation: WaffleFlag

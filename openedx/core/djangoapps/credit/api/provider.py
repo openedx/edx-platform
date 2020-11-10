@@ -26,9 +26,9 @@ from openedx.core.djangoapps.credit.models import (
     CreditRequirementStatus
 )
 from openedx.core.djangoapps.credit.signature import get_shared_secret_key, signature
-from student.models import CourseEnrollment, User
-from util.date_utils import to_timestamp
-from util.json_request import JsonResponse
+from common.djangoapps.student.models import CourseEnrollment, User
+from common.djangoapps.util.date_utils import to_timestamp
+from common.djangoapps.util.json_request import JsonResponse
 
 # TODO: Cleanup this mess! ECOM-2908
 

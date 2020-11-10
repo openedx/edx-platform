@@ -51,8 +51,8 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_authn.views.login import redirect_to_lms_login
 from openedx.core.djangoapps.verified_track_content import views as verified_track_content_views
 from openedx.features.enterprise_support.api import enterprise_enabled
-from student import views as student_views
-from util import views as util_views
+from common.djangoapps.student import views as student_views
+from common.djangoapps.util import views as util_views
 
 RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
 RENDER_XBLOCK_NAME = 'render_xblock'
@@ -95,13 +95,13 @@ notification_prefs_urls = [
 urlpatterns = [
     url(r'^$', branding_views.index, name='root'),  # Main marketing page, or redirect to courseware
 
-    url(r'', include('student.urls')),
+    url(r'', include('common.djangoapps.student.urls')),
     # TODO: Move lms specific student views out of common code
     url(r'^dashboard/?$', student_views.student_dashboard, name='dashboard'),
     url(r'^change_enrollment$', student_views.change_enrollment, name='change_enrollment'),
 
     # Event tracking endpoints
-    url(r'', include('track.urls')),
+    url(r'', include('common.djangoapps.track.urls')),
 
     # Static template view endpoints like blog, faq, etc.
     url(r'', include('lms.djangoapps.static_template_view.urls')),
@@ -114,8 +114,13 @@ urlpatterns = [
     url(r'^api/enrollment/v1/', include('openedx.core.djangoapps.enrollments.urls')),
 
     # Entitlement API RESTful endpoints
-    url(r'^api/entitlements/', include(('entitlements.rest_api.urls', 'common.djangoapps.entitlements'),
-                                       namespace='entitlements_api')),
+    url(
+        r'^api/entitlements/',
+        include(
+            ('common.djangoapps.entitlements.rest_api.urls', 'common.djangoapps.entitlements'),
+            namespace='entitlements_api',
+        ),
+    ),
 
     # Demographics API RESTful endpoints
     url(r'^api/demographics/', include('openedx.core.djangoapps.demographics.rest_api.urls')),
@@ -158,9 +163,17 @@ urlpatterns = [
     url(r'^lang_pref/session_language', lang_pref_views.update_session_language, name='session_language'),
 
     # Multiple course modes and identity verification
-    url(r'^course_modes/', include('course_modes.urls')),
-    url(r'^api/course_modes/', include(('course_modes.rest_api.urls', 'common.djangoapps.course_mods'),
-                                       namespace='course_modes_api')),
+    url(
+        r'^course_modes/',
+        include('common.djangoapps.course_modes.urls'),
+    ),
+    url(
+        r'^api/course_modes/',
+        include(
+            ('common.djangoapps.course_modes.rest_api.urls', 'common.djangoapps.course_mods'),
+            namespace='course_modes_api',
+        )
+    ),
 
     url(r'^verify_student/', include('lms.djangoapps.verify_student.urls')),
 
@@ -836,8 +849,8 @@ urlpatterns += [
 # Third-party auth.
 if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     urlpatterns += [
-        url(r'', include('third_party_auth.urls')),
-        url(r'^api/third_party_auth/', include('third_party_auth.api.urls')),
+        url(r'', include('common.djangoapps.third_party_auth.urls')),
+        url(r'^api/third_party_auth/', include('common.djangoapps.third_party_auth.api.urls')),
     ]
 
 # Enterprise

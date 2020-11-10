@@ -33,7 +33,7 @@ from openedx.core.djangoapps.django_comment_common.signals import (
     thread_unfollowed,
     thread_voted
 )
-from student.models import CourseEnrollment, LanguageField
+from common.djangoapps.student.models import CourseEnrollment, LanguageField
 
 from .errors import (
     AlreadyOnTeamInTeamset,

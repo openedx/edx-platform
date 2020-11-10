@@ -28,14 +28,14 @@ from path import Path as path
 from six import StringIO, text_type
 
 import lms.djangoapps.dashboard.git_import as git_import
-import track.views
+from common.djangoapps.track import views as track_views
 from lms.djangoapps.dashboard.git_import import GitImportError
 from lms.djangoapps.dashboard.models import CourseImportLog
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.courseware.courses import get_course_by_id
 from openedx.core.djangolib.markup import HTML
-from student.models import CourseEnrollment, Registration, UserProfile
-from student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.models import CourseEnrollment, Registration, UserProfile
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
@@ -176,7 +176,7 @@ class Users(SysadminDashboardView):
         if not request.user.is_staff:
             raise Http404
         action = request.POST.get('action', '')
-        track.views.server_track(request, action, {}, page='user_sysdashboard')
+        track_views.server_track(request, action, {}, page='user_sysdashboard')
 
         if action == 'create_user':
             uname = request.POST.get('student_uname', '').strip()
@@ -332,7 +332,7 @@ class Courses(SysadminDashboardView):
             raise Http404
 
         action = request.POST.get('action', '')
-        track.views.server_track(request, action, {},
+        track_views.server_track(request, action, {},
                                  page='courses_sysdashboard')
 
         courses = {course.id: course for course in self.get_courses()}

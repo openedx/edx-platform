@@ -12,7 +12,7 @@ from django.http import Http404
 
 from lms.djangoapps.bulk_email.models import Optout
 from lms.djangoapps.courseware.courses import get_course_by_id
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.discussion.notification_prefs.views import (
     UsernameCipher,
     UsernameDecryptionException,

@@ -24,9 +24,9 @@ from six.moves import range
 from lms.djangoapps.dashboard.git_import import GitImportErrorNoDir
 from lms.djangoapps.dashboard.models import CourseImportLog
 from openedx.core.djangolib.markup import Text
-from student.roles import CourseStaffRole, GlobalStaff
-from student.tests.factories import UserFactory
-from util.date_utils import DEFAULT_DATE_TIME_FORMAT, get_time_display
+from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.util.date_utils import DEFAULT_DATE_TIME_FORMAT, get_time_display
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM

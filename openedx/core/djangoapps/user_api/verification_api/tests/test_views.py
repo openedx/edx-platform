@@ -12,7 +12,7 @@ from django.urls import reverse
 
 from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 from lms.djangoapps.verify_student.tests.factories import SSOVerificationFactory
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 FROZEN_TIME = '2015-01-01'
 VERIFY_STUDENT = {'DAYS_GOOD_FOR': 365}

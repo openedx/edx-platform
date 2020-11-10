@@ -27,7 +27,7 @@ from eventtracking import tracker
 from ratelimit.decorators import ratelimit
 from rest_framework.views import APIView
 
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.oauth_dispatch.api import destroy_oauth_tokens
@@ -41,10 +41,10 @@ from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangoapps.user_authn.message_types import PasswordReset, PasswordResetSuccess
 from openedx.core.djangolib.markup import HTML
-from student.forms import send_account_recovery_email_for_user
-from student.models import AccountRecovery
-from util.json_request import JsonResponse
-from util.password_policy_validators import normalize_password, validate_password
+from common.djangoapps.student.forms import send_account_recovery_email_for_user
+from common.djangoapps.student.models import AccountRecovery
+from common.djangoapps.util.json_request import JsonResponse
+from common.djangoapps.util.password_policy_validators import normalize_password, validate_password
 
 POST_EMAIL_KEY = 'post:email'
 REAL_IP_KEY = 'openedx.core.djangoapps.util.ratelimit.real_ip'

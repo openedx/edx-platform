@@ -8,7 +8,7 @@ import ddt
 from django.test.testcases import TestCase
 from mock import Mock, patch
 from slumber.exceptions import HttpClientError
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 from openedx.core.djangoapps.video_pipeline.api import update_3rd_party_transcription_service_credentials
 from openedx.core.djangoapps.video_pipeline.tests.mixins import VideoPipelineMixin

@@ -30,8 +30,8 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
-from course_modes.models import CourseMode, CourseModesArchive
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.course_modes.models import CourseMode, CourseModesArchive
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -53,12 +53,12 @@ from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackC
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_utils import wrap_xblock
-from student.models import CourseEnrollment
-from student.roles import (
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import (
     CourseFinanceAdminRole, CourseInstructorRole,
     CourseSalesAdminRole, CourseStaffRole
 )
-from util.json_request import JsonResponse
+from common.djangoapps.util.json_request import JsonResponse
 from xmodule.html_module import HtmlBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab
