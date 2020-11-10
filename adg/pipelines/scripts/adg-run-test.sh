@@ -59,6 +59,5 @@ run_adg_test $CMS "--cov-append" || EXIT_CODE=$? # Run test for CMS and CMS comm
 if [[ -z "$CIRCLECI" || ("$CIRCLECI" && ("$BRANCH" != "origin/master")) ]]; then
     # Generate report only if we are running test and coverage for ADG only
     generate_diff_cover_report "$BRANCH" $FAIL_UNDER || EXIT_CODE=$?
+    exit "$EXIT_CODE"
 fi
-
-exit "$EXIT_CODE"
