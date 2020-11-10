@@ -5,7 +5,7 @@ Utility methods related to teams.
 
 from eventtracking import tracker
 
-from common.djangoapps.track import contexts
+from track import contexts
 
 
 def emit_team_event(event_name, course_key, event_data):

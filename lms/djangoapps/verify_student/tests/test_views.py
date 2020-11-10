@@ -25,8 +25,8 @@ from six.moves import zip
 from waffle.testutils import override_switch
 
 from common.test.utils import MockS3BotoMixin, XssTestMixin
-from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.tests import TEST_API_URL, TEST_PAYMENT_DATA, TEST_PUBLIC_URL_ROOT
 from lms.djangoapps.commerce.tests.mocks import mock_payment_processors
@@ -36,9 +36,9 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView, checkout_with_
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.util.testing import UrlResetMixin
+from student.models import CourseEnrollment
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from util.testing import UrlResetMixin
 from lms.djangoapps.verify_student.tests import TestVerificationBase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

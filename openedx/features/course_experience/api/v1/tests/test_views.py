@@ -5,9 +5,9 @@ import ddt
 
 from django.urls import reverse
 
-from common.djangoapps.course_modes.models import CourseMode
+from course_modes.models import CourseMode
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
-from common.djangoapps.student.models import CourseEnrollment
+from student.models import CourseEnrollment
 
 
 @ddt.ddt

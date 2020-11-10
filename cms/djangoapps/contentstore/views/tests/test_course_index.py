@@ -21,12 +21,12 @@ from search.api import perform_search
 from cms.djangoapps.contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import add_instructor, reverse_course_url, reverse_usage_url
-from common.djangoapps.course_action_state.managers import CourseRerunUIStateManager
-from common.djangoapps.course_action_state.models import CourseRerunState
+from course_action_state.managers import CourseRerunUIStateManager
+from course_action_state.models import CourseRerunState
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
-from common.djangoapps.student.auth import has_course_author_access
-from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff, LibraryUserRole
-from common.djangoapps.student.tests.factories import UserFactory
+from student.auth import has_course_author_access
+from student.roles import CourseStaffRole, GlobalStaff, LibraryUserRole
+from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls

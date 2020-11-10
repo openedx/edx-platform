@@ -87,7 +87,7 @@ when nested within each other::
         },
         {
             'NAME': 'mako',
-            'BACKEND': 'common.djangoapps.edxmako.backend.Mako',
+            'BACKEND': 'edxmako.backend.Mako',
             'APP_DIRS': False,
             'DIRS': _make_mako_template_dirs,
         },

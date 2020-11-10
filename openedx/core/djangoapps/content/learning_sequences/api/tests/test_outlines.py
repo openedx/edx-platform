@@ -14,9 +14,9 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.courseware.tests.factories import BetaTesterFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
-from common.djangoapps.student.auth import user_has_role
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.roles import CourseBetaTesterRole
+from student.auth import user_has_role
+from student.models import CourseEnrollment
+from student.roles import CourseBetaTesterRole
 
 from ...data import CourseLearningSequenceData, CourseOutlineData, CourseSectionData, CourseVisibility, VisibilityData
 from ..outlines import (

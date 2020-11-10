@@ -15,9 +15,9 @@ from django.test.utils import override_settings
 from django.urls import reverse, reverse_lazy
 from rest_framework.utils.encoders import JSONEncoder
 
-from common.djangoapps.course_modes.models import CourseMode
+from course_modes.models import CourseMode
 from lms.djangoapps.verify_student.models import VerificationDeadline
-from common.djangoapps.student.tests.factories import UserFactory
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

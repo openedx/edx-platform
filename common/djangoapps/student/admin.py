@@ -24,8 +24,8 @@ from opaque_keys.edx.keys import CourseKey
 
 from edx_toggles.toggles import WaffleSwitch
 from openedx.core.lib.courses import clean_course_id
-from common.djangoapps.student import STUDENT_WAFFLE_NAMESPACE
-from common.djangoapps.student.models import (
+from student import STUDENT_WAFFLE_NAMESPACE
+from student.models import (
     AccountRecovery,
     AccountRecoveryConfiguration,
     AllowedAuthUser,
@@ -45,7 +45,7 @@ from common.djangoapps.student.models import (
     UserProfile,
     UserTestGroup
 )
-from common.djangoapps.student.roles import REGISTERED_ACCESS_ROLES
+from student.roles import REGISTERED_ACCESS_ROLES
 from xmodule.modulestore.django import modulestore
 
 User = get_user_model()  # pylint:disable=invalid-name

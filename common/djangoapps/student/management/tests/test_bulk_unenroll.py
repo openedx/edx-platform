@@ -7,13 +7,13 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from testfixtures import LogCapture
 
-from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models import BulkUnenrollConfiguration, CourseEnrollment
-from common.djangoapps.student.tests.factories import UserFactory
+from course_modes.tests.factories import CourseModeFactory
+from student.models import BulkUnenrollConfiguration, CourseEnrollment
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-LOGGER_NAME = 'common.djangoapps.student.management.commands.bulk_unenroll'
+LOGGER_NAME = 'student.management.commands.bulk_unenroll'
 
 
 class BulkUnenrollTests(SharedModuleStoreTestCase):

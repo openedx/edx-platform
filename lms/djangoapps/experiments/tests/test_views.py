@@ -21,7 +21,7 @@ from rest_framework.test import APITestCase
 from lms.djangoapps.experiments.factories import ExperimentDataFactory, ExperimentKeyValueFactory
 from lms.djangoapps.experiments.models import ExperimentData, ExperimentKeyValue
 from lms.djangoapps.experiments.serializers import ExperimentDataSerializer
-from common.djangoapps.student.tests.factories import UserFactory
+from student.tests.factories import UserFactory
 
 from xmodule.modulestore.tests.factories import CourseFactory
 

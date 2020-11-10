@@ -7,8 +7,8 @@ from lms.djangoapps.courseware.toggles import (
     REDIRECT_TO_COURSEWARE_MICROFRONTEND
 )
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
-from common.djangoapps.student.models import CourseEnrollmentCelebration
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
+from student.models import CourseEnrollmentCelebration
+from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 

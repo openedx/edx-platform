@@ -28,7 +28,7 @@ from ratelimit.decorators import ratelimit
 from ratelimitbackend.exceptions import RateLimitException
 from rest_framework.views import APIView
 
-from common.djangoapps.edxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.views.login_form import get_login_session_form
@@ -40,14 +40,14 @@ from openedx.core.djangoapps.user_authn.views.password_reset import send_passwor
 from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.view_utils import require_post_params
-from common.djangoapps.student.helpers import get_next_url_for_login_page
-from common.djangoapps.student.models import LoginFailures, AllowedAuthUser, UserProfile
-from common.djangoapps.student.views import compose_and_send_activation_email
-from common.djangoapps.third_party_auth import pipeline, provider
-from common.djangoapps import third_party_auth
-from common.djangoapps.track import segment
-from common.djangoapps.util.json_request import JsonResponse
-from common.djangoapps.util.password_policy_validators import normalize_password
+from student.helpers import get_next_url_for_login_page
+from student.models import LoginFailures, AllowedAuthUser, UserProfile
+from student.views import compose_and_send_activation_email
+from third_party_auth import pipeline, provider
+import third_party_auth
+from track import segment
+from util.json_request import JsonResponse
+from util.password_policy_validators import normalize_password
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")

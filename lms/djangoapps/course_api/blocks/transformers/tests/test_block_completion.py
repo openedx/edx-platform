@@ -11,7 +11,7 @@ from xblock.core import XBlock
 from lms.djangoapps.course_api.blocks.transformers.block_completion import BlockCompletionTransformer
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import ModuleStoreTestCase, TransformerRegistryTestMixin
-from common.djangoapps.student.tests.factories import UserFactory
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 

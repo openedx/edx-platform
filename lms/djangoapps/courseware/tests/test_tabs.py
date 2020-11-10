@@ -29,9 +29,9 @@ from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.courseware.views.views import StaticCourseTabView, get_static_tab_fragment
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import UserFactory
-from common.djangoapps.util.milestones_helpers import (
+from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
+from util.milestones_helpers import (
     add_course_content_milestone,
     add_course_milestone,
     add_milestone,
@@ -734,7 +734,7 @@ class ProgressTestCase(TabTestCase):
             invalid_dict_tab=None,
         )
 
-    @patch('common.djangoapps.student.models.CourseEnrollment.is_enrolled')
+    @patch('student.models.CourseEnrollment.is_enrolled')
     def test_progress(self, is_enrolled):
         is_enrolled.return_value = True
         self.course.hide_progress_tab = False
@@ -834,7 +834,7 @@ class DiscussionLinkTestCase(TabTestCase):
         self.course.discussion_link = discussion_link_in_course
         discussion_tab = xmodule_tabs.CourseTabList.get_discussion(self.course)
         user = self.create_mock_user(is_staff=is_staff, is_enrolled=is_enrolled)
-        with patch('common.djangoapps.student.models.CourseEnrollment.is_enrolled') as check_is_enrolled:
+        with patch('student.models.CourseEnrollment.is_enrolled') as check_is_enrolled:
             check_is_enrolled.return_value = is_enrolled
             self.assertEqual(
                 (
@@ -910,7 +910,7 @@ class DatesTabTestCase(TabListTestCase):
     """Test cases for dates tab"""
 
     @patch('lms.djangoapps.courseware.tabs.RELATIVE_DATES_FLAG')
-    @patch('common.djangoapps.student.models.CourseEnrollment.is_enrolled')
+    @patch('student.models.CourseEnrollment.is_enrolled')
     def test_dates_tab_disabled_if_unenrolled(self, is_enrolled, mock_flag):
         mock_flag.is_enabled().return_value = True
         tab = DatesTab({'type': DatesTab.type, 'name': 'dates'})

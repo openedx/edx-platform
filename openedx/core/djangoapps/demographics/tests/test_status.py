@@ -7,10 +7,10 @@ from django.conf import settings
 from pytest import mark
 from unittest import TestCase
 
-from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from opaque_keys.edx.keys import CourseKey
-from common.djangoapps.student.tests.factories import UserFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory

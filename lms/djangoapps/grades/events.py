@@ -7,8 +7,8 @@ import six
 from crum import get_current_user
 from eventtracking import tracker
 
-from common.djangoapps.track import contexts
-from common.djangoapps.track.event_transaction_utils import (
+from track import contexts
+from track.event_transaction_utils import (
     create_new_event_transaction_id,
     get_event_transaction_id,
     get_event_transaction_type,

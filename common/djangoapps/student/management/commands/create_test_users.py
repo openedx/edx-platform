@@ -2,7 +2,7 @@
 from django.core.management.base import BaseCommand
 from opaque_keys.edx.keys import CourseKey
 
-from common.djangoapps.course_modes.models import CourseMode
+from course_modes.models import CourseMode
 from common.djangoapps.student.management.commands._create_users import create_users
 
 

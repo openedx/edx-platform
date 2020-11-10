@@ -9,13 +9,13 @@ from django.utils.http import urlencode, urlquote_plus
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 from django.urls import reverse
-from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.course_modes.helpers import enrollment_mode_display
+from course_modes.models import CourseMode
+from course_modes.helpers import enrollment_mode_display
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import course_home_url_name
-from common.djangoapps.student.helpers import (
+from student.helpers import (
   VERIFY_STATUS_NEED_TO_VERIFY,
   VERIFY_STATUS_SUBMITTED,
   VERIFY_STATUS_RESUBMITTED,
@@ -24,7 +24,7 @@ from common.djangoapps.student.helpers import (
   VERIFY_STATUS_NEED_TO_REVERIFY,
   DISABLE_UNENROLL_CERT_STATES,
 )
-from common.djangoapps.util.course import get_link_for_about_page, get_encoded_course_sharing_utm_params
+from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_params
 from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
 %>
 

@@ -45,8 +45,8 @@ IDA_LOGOUT_URI_LIST = [
 ################################ LOGGERS ######################################
 
 LOG_OVERRIDES = [
-    ('common.djangoapps.track.contexts', logging.CRITICAL),
-    ('common.djangoapps.track.middleware', logging.CRITICAL),
+    ('track.contexts', logging.CRITICAL),
+    ('track.middleware', logging.CRITICAL),
     ('lms.djangoapps.discussion.django_comment_client.utils', logging.CRITICAL),
 ]
 for log_name, log_level in LOG_OVERRIDES:
@@ -188,10 +188,8 @@ FEATURES['ENABLE_COURSEWARE_MICROFRONTEND'] = True
 
 ########################## Third Party Auth #######################
 
-if FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and (
-        'common.djangoapps.third_party_auth.dummy.DummyBackend' not in AUTHENTICATION_BACKENDS
-):
-    AUTHENTICATION_BACKENDS = ['common.djangoapps.third_party_auth.dummy.DummyBackend'] + list(AUTHENTICATION_BACKENDS)
+if FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and 'third_party_auth.dummy.DummyBackend' not in AUTHENTICATION_BACKENDS:
+    AUTHENTICATION_BACKENDS = ['third_party_auth.dummy.DummyBackend'] + list(AUTHENTICATION_BACKENDS)
 
 ############## ECOMMERCE API CONFIGURATION SETTINGS ###############
 ECOMMERCE_PUBLIC_URL_ROOT = 'http://localhost:18130'

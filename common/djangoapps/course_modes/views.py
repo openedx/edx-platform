@@ -25,9 +25,9 @@ from ipware.ip import get_ip
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-from common.djangoapps.course_modes.models import CourseMode
+from course_modes.models import CourseMode
 from common.djangoapps.course_modes.helpers import get_course_final_price
-from common.djangoapps.edxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -37,8 +37,8 @@ from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.util.db import outer_atomic
+from student.models import CourseEnrollment
+from util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
 
 LOG = logging.getLogger(__name__)

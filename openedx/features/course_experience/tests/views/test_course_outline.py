@@ -24,8 +24,8 @@ from six import text_type
 from waffle.models import Switch
 from waffle.testutils import override_switch
 
-from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesAndSpecialExamsTransformer
 from lms.djangoapps.gating import api as lms_gating_api
 from lms.djangoapps.courseware.tests.factories import StaffFactory
@@ -42,8 +42,8 @@ from openedx.features.course_experience.views.course_outline import (
     DEFAULT_COMPLETION_TRACKING_START,
     CourseOutlineFragmentView
 )
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import UserFactory
+from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

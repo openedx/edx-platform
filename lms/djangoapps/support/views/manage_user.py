@@ -11,12 +11,12 @@ from django.utils.translation import ugettext as _
 from django.views.generic import View
 from rest_framework.generics import GenericAPIView
 
-from common.djangoapps.student.models import UserPasswordToggleHistory
-from common.djangoapps.edxmako.shortcuts import render_to_response
+from student.models import UserPasswordToggleHistory
+from edxmako.shortcuts import render_to_response
 from lms.djangoapps.support.decorators import require_support_permission
 from openedx.core.djangoapps.user_api.accounts.serializers import AccountUserSerializer
 from openedx.core.djangoapps.user_authn.utils import generate_password
-from common.djangoapps.util.json_request import JsonResponse
+from util.json_request import JsonResponse
 
 
 class ManageUserSupportView(View):

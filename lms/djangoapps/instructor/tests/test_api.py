@@ -34,8 +34,8 @@ from six.moves import range, zip
 from testfixtures import LogCapture
 
 from lms.djangoapps.bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
-from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses
@@ -72,7 +72,7 @@ from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.lib.teams_config import TeamsConfig
 from openedx.core.lib.xblock_utils import grade_histogram
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
-from common.djangoapps.student.models import (
+from student.models import (
     ALLOWEDTOENROLL_TO_ENROLLED,
     ALLOWEDTOENROLL_TO_UNENROLLED,
     ENROLLED_TO_ENROLLED,
@@ -87,14 +87,14 @@ from common.djangoapps.student.models import (
     get_retired_email_by_email,
     get_retired_username_by_username
 )
-from common.djangoapps.student.roles import (
+from student.roles import (
     CourseBetaTesterRole,
     CourseDataResearcherRole,
     CourseFinanceAdminRole,
     CourseInstructorRole,
     CourseSalesAdminRole
 )
-from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
+from student.tests.factories import AdminFactory, UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase

@@ -38,8 +38,8 @@ from xblock.fields import Scope, String
 
 import lms.djangoapps.courseware.views.views as views
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from freezegun import freeze_time
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
@@ -88,12 +88,12 @@ from openedx.features.course_experience import (
 )
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.roles import CourseStaffRole
-from common.djangoapps.student.tests.factories import TEST_PASSWORD, AdminFactory, CourseEnrollmentFactory, UserFactory
-from common.djangoapps.util.tests.test_date_utils import fake_pgettext, fake_ugettext
-from common.djangoapps.util.url import reload_django_url_config
-from common.djangoapps.util.views import ensure_valid_course_key
+from student.models import CourseEnrollment
+from student.roles import CourseStaffRole
+from student.tests.factories import TEST_PASSWORD, AdminFactory, CourseEnrollmentFactory, UserFactory
+from util.tests.test_date_utils import fake_pgettext, fake_ugettext
+from util.url import reload_django_url_config
+from util.views import ensure_valid_course_key
 from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.graders import ShowCorrectness
 from xmodule.modulestore import ModuleStoreEnum
@@ -1134,10 +1134,10 @@ class StartDateTests(ModuleStoreTestCase):
         """
         return self.client.get(reverse('about_course', args=[six.text_type(course_key)]))
 
-    @patch('common.djangoapps.util.date_utils.pgettext', fake_pgettext(translations={
+    @patch('util.date_utils.pgettext', fake_pgettext(translations={
         ("abbreviated month name", "Sep"): "SEPTEMBER",
     }))
-    @patch('common.djangoapps.util.date_utils.ugettext', fake_ugettext(translations={
+    @patch('util.date_utils.ugettext', fake_ugettext(translations={
         "SHORT_DATE_FORMAT": "%Y-%b-%d",
     }))
     def test_format_localized_in_studio_course(self):

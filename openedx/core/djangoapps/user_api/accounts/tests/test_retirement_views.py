@@ -35,8 +35,8 @@ from social_django.models import UserSocialAuth
 from wiki.models import Article, ArticleRevision
 from wiki.models.pluginbase import RevisionPlugin, RevisionPluginRevision
 
-from common.djangoapps.entitlements.models import CourseEntitlementSupportDetail
-from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
+from entitlements.models import CourseEntitlementSupportDetail
+from entitlements.tests.factories import CourseEntitlementFactory
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup, UnregisteredLearnerCohortAssignments
 from openedx.core.djangoapps.credit.models import (
@@ -56,7 +56,7 @@ from openedx.core.djangoapps.user_api.models import (
     UserRetirementPartnerReportingStatus,
     UserRetirementStatus
 )
-from common.djangoapps.student.models import (
+from student.models import (
     AccountRecovery,
     CourseEnrollment,
     CourseEnrollmentAllowed,
@@ -69,7 +69,7 @@ from common.djangoapps.student.models import (
     get_retired_email_by_email,
     get_retired_username_by_username
 )
-from common.djangoapps.student.tests.factories import (
+from student.tests.factories import (
     AccountRecoveryFactory,
     ContentTypeFactory,
     CourseEnrollmentAllowedFactory,

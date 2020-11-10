@@ -19,7 +19,7 @@ from django.utils.translation import ugettext_lazy
 from lazy import lazy
 from pytz import utc
 
-from common.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
+from course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from lms.djangoapps.certificates.api import get_active_web_certificate
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link, can_show_verified_upgrade
 from lms.djangoapps.verify_student.models import VerificationDeadline
@@ -29,7 +29,7 @@ from openedx.core.djangoapps.certificates.api import can_show_certificate_availa
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.course_experience import RELATIVE_DATES_FLAG, UPGRADE_DEADLINE_MESSAGE, CourseHomeMessages
-from common.djangoapps.student.models import CourseEnrollment
+from student.models import CourseEnrollment
 
 from .context_processor import user_timezone_locale_prefs
 

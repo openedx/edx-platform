@@ -21,7 +21,7 @@ from six import text_type
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor
-from common.djangoapps.edxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 from lms.djangoapps.edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from lms.djangoapps.edxnotes.helpers import (
     DEFAULT_PAGE,
@@ -35,7 +35,7 @@ from lms.djangoapps.edxnotes.helpers import (
 )
 from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
 from openedx.core.djangoapps.user_api.models import RetirementStateError, UserRetirementStatus
-from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
+from util.json_request import JsonResponse, JsonResponseBadRequest
 
 log = logging.getLogger(__name__)
 

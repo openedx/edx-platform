@@ -15,7 +15,7 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from common.djangoapps.course_modes.models import get_cosmetic_verified_display_price
+from course_modes.models import get_cosmetic_verified_display_price
 from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.utils import can_show_verified_upgrade
@@ -25,8 +25,8 @@ from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cros
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermissionIsAuthenticated
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.track import segment
+from student.models import CourseEnrollment
+from track import segment
 
 # .. toggle_name: experiments.mobile_upsell_rev934
 # .. toggle_implementation: WaffleFlag

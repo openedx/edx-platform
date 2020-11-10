@@ -7,13 +7,13 @@ from datetime import datetime
 import ddt
 from django.urls import reverse
 
-from common.djangoapps.course_modes.models import CourseMode
+from course_modes.models import CourseMode
 from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND, COURSE_HOME_MICROFRONTEND_DATES_TAB
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from common.djangoapps.student.models import CourseEnrollment
+from student.models import CourseEnrollment
 
 
 @ddt.ddt

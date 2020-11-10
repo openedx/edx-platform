@@ -13,7 +13,7 @@ from milestones.exceptions import InvalidCourseKeyException, InvalidUserExceptio
 from milestones.models import MilestoneRelationshipType
 from mock import patch
 
-from common.djangoapps.util import milestones_helpers
+from util import milestones_helpers
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

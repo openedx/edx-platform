@@ -16,10 +16,10 @@ from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from xblock.core import XBlock
 
-from common.djangoapps.course_modes.models import CourseMode
+from course_modes.models import CourseMode
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
-from common.djangoapps.student.roles import CourseRole, OrgRole
+from student.models import CourseAccessRole, CourseEnrollment
+from student.roles import CourseRole, OrgRole
 from xmodule.course_module import CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
 from xmodule.x_module import XModule

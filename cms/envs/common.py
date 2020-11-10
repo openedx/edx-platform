@@ -447,10 +447,12 @@ COURSES_ROOT = ENV_ROOT / "data"
 
 GITHUB_REPO_ROOT = ENV_ROOT / "data"
 
-# TODO: This path modification exists as temporary support for deprecated import patterns.
-# It will be removed in an upcoming Open edX release.
+# TODO: Is this next line necessary?
+sys.path.append(REPO_ROOT)
+# TODO: The next two path modifications will be removed in an upcoming Open edX release.
 # See docs/decisions/0007-sys-path-modification-removal.rst
 sys.path.append(REPO_ROOT / 'import_shims' / 'studio')
+sys.path.append(COMMON_ROOT / 'djangoapps')
 
 # For geolocation ip database
 GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoLite2-Country.mmdb"
@@ -509,8 +511,8 @@ TEMPLATES = [
                 # We have to use mako-aware template loaders to be able to include
                 # mako templates inside django templates (such as main_django.html).
                 'openedx.core.djangoapps.theming.template_loaders.ThemeTemplateLoader',
-                'common.djangoapps.edxmako.makoloader.MakoFilesystemLoader',
-                'common.djangoapps.edxmako.makoloader.MakoAppDirectoriesLoader',
+                'edxmako.makoloader.MakoFilesystemLoader',
+                'edxmako.makoloader.MakoAppDirectoriesLoader',
             ),
             'context_processors': CONTEXT_PROCESSORS,
             # Change 'debug' in your environment settings files - not here.
@@ -519,7 +521,7 @@ TEMPLATES = [
     },
     {
         'NAME': 'mako',
-        'BACKEND': 'common.djangoapps.edxmako.backend.Mako',
+        'BACKEND': 'edxmako.backend.Mako',
         'APP_DIRS': False,
         'DIRS': _make_mako_template_dirs,
         'OPTIONS': {
@@ -530,7 +532,7 @@ TEMPLATES = [
     {
         # This separate copy of the Mako backend is used to render previews using the LMS templates
         'NAME': 'preview',
-        'BACKEND': 'common.djangoapps.edxmako.backend.Mako',
+        'BACKEND': 'edxmako.backend.Mako',
         'APP_DIRS': False,
         'DIRS': lms.envs.common.MAKO_TEMPLATE_DIRS_BASE,
         'OPTIONS': {
@@ -689,11 +691,11 @@ MIDDLEWARE = [
     # Instead of AuthenticationMiddleware, we use a cache-backed version
     'openedx.core.djangoapps.cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
 
-    'common.djangoapps.student.middleware.UserStandingMiddleware',
+    'student.middleware.UserStandingMiddleware',
     'openedx.core.djangoapps.contentserver.middleware.StaticContentServer',
 
     'django.contrib.messages.middleware.MessageMiddleware',
-    'common.djangoapps.track.middleware.TrackMiddleware',
+    'track.middleware.TrackMiddleware',
 
     # This is used to set or update the user language preferences.
     'openedx.core.djangoapps.lang_pref.middleware.LanguagePreferenceMiddleware',
@@ -831,7 +833,7 @@ MODULESTORE = {
                     'OPTIONS': {
                         'default_class': 'xmodule.hidden_module.HiddenDescriptor',
                         'fs_root': DATA_DIR,
-                        'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
+                        'render_template': 'edxmako.shortcuts.render_to_string',
                     }
                 },
                 {
@@ -841,7 +843,7 @@ MODULESTORE = {
                     'OPTIONS': {
                         'default_class': 'xmodule.hidden_module.HiddenDescriptor',
                         'fs_root': DATA_DIR,
-                        'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
+                        'render_template': 'edxmako.shortcuts.render_to_string',
                     }
                 }
             ]
@@ -1345,7 +1347,7 @@ INSTALLED_APPS = [
 
     'openedx.core.djangoapps.contentserver',
     'cms.djangoapps.course_creators',
-    'common.djangoapps.student.apps.StudentConfig',  # misleading name due to sharing with lms
+    'student.apps.StudentConfig',  # misleading name due to sharing with lms
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
     'cms.djangoapps.xblock_config.apps.XBlockConfig',
 
@@ -1357,13 +1359,13 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.util.apps.UtilConfig',
 
     # Tracking
-    'common.djangoapps.track',
+    'track',
     'eventtracking.django.apps.EventTrackingConfig',
 
     # For asset pipelining
-    'common.djangoapps.edxmako.apps.EdxMakoConfig',
+    'edxmako.apps.EdxMakoConfig',
     'pipeline',
-    'common.djangoapps.static_replace',
+    'static_replace',
     'require',
     'webpack_loader',
 
@@ -1380,7 +1382,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
 
     # for managing course modes
-    'common.djangoapps.course_modes.apps.CourseModesConfig',
+    'course_modes.apps.CourseModesConfig',
 
     # Verified Track Content Cohorting (Beta feature that will hopefully be removed)
     'openedx.core.djangoapps.verified_track_content',
@@ -1401,7 +1403,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.embargo',
 
     # Course action state
-    'common.djangoapps.course_action_state',
+    'course_action_state',
 
     # Additional problem types
     'edx_jsme',    # Molecular Structure
@@ -1421,7 +1423,7 @@ INSTALLED_APPS = [
     # Credit courses
     'openedx.core.djangoapps.credit.apps.CreditConfig',
 
-    'common.djangoapps.xblock_django',
+    'xblock_django',
 
     # Catalog integration
     'openedx.core.djangoapps.catalog',
@@ -1468,7 +1470,7 @@ INSTALLED_APPS = [
     'cms.djangoapps.cms_user_tasks.apps.CmsUserTasksConfig',
 
     # Unusual migrations
-    'common.djangoapps.database_fixups',
+    'database_fixups',
 
     # Customized celery tasks, including persisting failed tasks so they can
     # be retried
@@ -1485,10 +1487,10 @@ INSTALLED_APPS = [
     'csrf.apps.CsrfAppConfig',  # Enables frontend apps to retrieve CSRF tokens.
 
     # Entitlements, used in openedx tests
-    'common.djangoapps.entitlements',
+    'entitlements',
 
     # Asset management for mako templates
-    'common.djangoapps.pipeline_mako',
+    'pipeline_mako',
 
     # API Documentation
     'drf_yasg',
@@ -1540,7 +1542,7 @@ TRACK_MAX_EVENT = 50000
 
 TRACKING_BACKENDS = {
     'logger': {
-        'ENGINE': 'common.djangoapps.track.backends.logger.LoggerBackend',
+        'ENGINE': 'track.backends.logger.LoggerBackend',
         'OPTIONS': {
             'name': 'tracking'
         }
@@ -1566,8 +1568,8 @@ EVENT_TRACKING_BACKENDS = {
                 }
             },
             'processors': [
-                {'ENGINE': 'common.djangoapps.track.shim.LegacyFieldMappingProcessor'},
-                {'ENGINE': 'common.djangoapps.track.shim.PrefixedEventProcessor'}
+                {'ENGINE': 'track.shim.LegacyFieldMappingProcessor'},
+                {'ENGINE': 'track.shim.PrefixedEventProcessor'}
             ]
         }
     },
@@ -1585,7 +1587,7 @@ EVENT_TRACKING_BACKENDS = {
                     }
                 },
                 {
-                    'ENGINE': 'common.djangoapps.track.shim.GoogleAnalyticsProcessor'
+                    'ENGINE': 'track.shim.GoogleAnalyticsProcessor'
                 }
             ]
         }
@@ -1601,13 +1603,13 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        "NAME": "common.djangoapps.util.password_policy_validators.MinimumLengthValidator",
+        "NAME": "util.password_policy_validators.MinimumLengthValidator",
         "OPTIONS": {
             "min_length": 2
         }
     },
     {
-        "NAME": "common.djangoapps.util.password_policy_validators.MaximumLengthValidator",
+        "NAME": "util.password_policy_validators.MaximumLengthValidator",
         "OPTIONS": {
             "max_length": 75
         }
@@ -1856,53 +1858,53 @@ DATABASE_ROUTERS = [
 CACHES = {
     'blockstore': {
         'KEY_PREFIX': 'blockstore',
-        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
+        'KEY_FUNCTION': 'util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'TIMEOUT': '86400',  # This data should be long-lived for performance, BundleCache handles invalidation
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
     },
     'course_structure_cache': {
         'KEY_PREFIX': 'course_structure',
-        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
+        'KEY_FUNCTION': 'util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'TIMEOUT': '7200',
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
     },
     'celery': {
         'KEY_PREFIX': 'celery',
-        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
+        'KEY_FUNCTION': 'util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'TIMEOUT': '7200',
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
     },
     'mongo_metadata_inheritance': {
         'KEY_PREFIX': 'mongo_metadata_inheritance',
-        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
+        'KEY_FUNCTION': 'util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'TIMEOUT': 300,
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
     },
     'staticfiles': {
-        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
+        'KEY_FUNCTION': 'util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'KEY_PREFIX': 'staticfiles_general',
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
     },
     'default': {
         'VERSION': '1',
-        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
+        'KEY_FUNCTION': 'util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'KEY_PREFIX': 'default',
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
     },
     'configuration': {
-        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
+        'KEY_FUNCTION': 'util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'KEY_PREFIX': 'configuration',
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
     },
     'general': {
-        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
+        'KEY_FUNCTION': 'util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'KEY_PREFIX': 'general',
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',

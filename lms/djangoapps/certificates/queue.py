@@ -16,7 +16,7 @@ from lxml.etree import ParserError, XMLSyntaxError
 from requests.auth import HTTPBasicAuth
 
 from capa.xqueue_interface import XQueueInterface, make_hashkey, make_xheader
-from common.djangoapps.course_modes.models import CourseMode
+from course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import CertificateStatuses as status
 from lms.djangoapps.certificates.models import (
     CertificateWhitelist,
@@ -26,7 +26,7 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
-from common.djangoapps.student.models import CourseEnrollment, UserProfile
+from student.models import CourseEnrollment, UserProfile
 from xmodule.modulestore.django import modulestore
 
 LOGGER = logging.getLogger(__name__)

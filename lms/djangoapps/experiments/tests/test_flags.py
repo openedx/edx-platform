@@ -18,7 +18,7 @@ from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 

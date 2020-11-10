@@ -13,7 +13,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from social_django.models import Partial
 
-from common.djangoapps.third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
+from third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 
 from ..forms import AccessTokenExchangeForm
 from .mixins import DOTAdapterMixin

@@ -19,7 +19,7 @@ from mock import patch, Mock
 from pyquery import PyQuery as pq
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
-from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.module_render import load_single_xblock
 from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
@@ -46,9 +46,9 @@ from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITIO
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import ContentTypeGatingPartition
 from openedx.features.content_type_gating.services import ContentTypeGatingService
-from common.djangoapps.student.models import CourseEnrollment, FBEEnrollmentExclusion
-from common.djangoapps.student.roles import CourseInstructorRole
-from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
+from student.models import CourseEnrollment, FBEEnrollmentExclusion
+from student.roles import CourseInstructorRole
+from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID

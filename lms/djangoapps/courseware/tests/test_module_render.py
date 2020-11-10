@@ -17,7 +17,7 @@ from bson import ObjectId
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from completion import waffle as completion_waffle
 from completion.models import BlockCompletion
-from common.djangoapps.course_modes.models import CourseMode
+from course_modes.models import CourseMode
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404, HttpResponse
@@ -47,8 +47,6 @@ from xblock.fields import ScopeIds
 from xblock.runtime import DictKeyValueStore, KvsFieldData, Runtime
 from xblock.test.tools import TestRuntime
 
-from capa.tests.response_xml_factory import OptionResponseXMLFactory
-from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware import module_render as render
 from lms.djangoapps.courseware.access_response import AccessResponse
 from lms.djangoapps.courseware.courses import get_course_info_section, get_course_with_access
@@ -73,9 +71,9 @@ from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFa
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.url_utils import quote_slashes
-from common.djangoapps.student.models import CourseEnrollment, anonymous_id_for_user
+from student.models import CourseEnrollment, anonymous_id_for_user
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
-from common.djangoapps.xblock_django.models import XBlockConfiguration
+from xblock_django.models import XBlockConfiguration
 from xmodule.capa_module import ProblemBlock
 from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
 from xmodule.lti_module import LTIDescriptor
@@ -2018,7 +2016,7 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         )
 
 
-@patch('common.djangoapps.track.views.eventtracker', autospec=True)
+@patch('track.views.eventtracker', autospec=True)
 class TestModuleTrackingContext(SharedModuleStoreTestCase):
     """
     Ensure correct tracking information is included in events emitted during XBlock callback handling.

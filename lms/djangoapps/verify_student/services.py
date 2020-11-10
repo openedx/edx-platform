@@ -10,10 +10,10 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 
-from common.djangoapps.course_modes.models import CourseMode
+from course_modes.models import CourseMode
 from lms.djangoapps.verify_student.utils import is_verification_expiring_soon
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from common.djangoapps.student.models import User
+from student.models import User
 
 from .models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 from .toggles import redirect_to_idv_microfrontend

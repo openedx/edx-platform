@@ -14,8 +14,8 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from mock import patch
 from pytz import utc
 
-from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from freezegun import freeze_time
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND, COURSE_HOME_MICROFRONTEND_DATES_TAB
@@ -50,7 +50,7 @@ from openedx.features.course_experience import (
     UPGRADE_DEADLINE_MESSAGE,
     CourseHomeMessages
 )
-from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
+from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

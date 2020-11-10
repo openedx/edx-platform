@@ -23,8 +23,8 @@ from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.badges.events.course_complete import get_completion_badge
 from lms.djangoapps.badges.utils import badges_enabled
-from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.edxmako.template import Template
+from edxmako.shortcuts import render_to_response
+from edxmako.template import Template
 from lms.djangoapps.certificates.api import (
     emit_certificate_event,
     get_active_web_certificate,
@@ -47,10 +47,10 @@ from openedx.core.djangoapps.certificates.api import certificates_viewable_for_c
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.courses import course_image_url
-from common.djangoapps.student.models import LinkedInAddToProfileConfiguration
-from common.djangoapps.util import organizations_helpers as organization_api
-from common.djangoapps.util.date_utils import strftime_localized
-from common.djangoapps.util.views import handle_500
+from student.models import LinkedInAddToProfileConfiguration
+from util import organizations_helpers as organization_api
+from util.date_utils import strftime_localized
+from util.views import handle_500
 
 log = logging.getLogger(__name__)
 _ = translation.ugettext

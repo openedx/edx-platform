@@ -10,16 +10,16 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import sentinel
 
-from common.djangoapps.track.tests import EventTrackingTestCase
-from common.djangoapps.track.views import segmentio
+from track.tests import EventTrackingTestCase
+from track.views import segmentio
 
 SEGMENTIO_TEST_SECRET = 'anything'
 SEGMENTIO_TEST_ENDPOINT = '/segmentio/test/event'
 SEGMENTIO_TEST_USER_ID = 10
 
 _MOBILE_SHIM_PROCESSOR = [
-    {'ENGINE': 'common.djangoapps.track.shim.LegacyFieldMappingProcessor'},
-    {'ENGINE': 'common.djangoapps.track.shim.PrefixedEventProcessor'},
+    {'ENGINE': 'track.shim.LegacyFieldMappingProcessor'},
+    {'ENGINE': 'track.shim.PrefixedEventProcessor'},
 ]
 
 

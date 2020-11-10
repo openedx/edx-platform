@@ -8,7 +8,7 @@ from django.test import TestCase
 from six import unichr
 from six.moves import range
 
-from common.djangoapps.util.memcache import safe_key
+from util.memcache import safe_key
 
 
 class MemcacheTest(TestCase):

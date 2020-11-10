@@ -44,7 +44,7 @@ from lms.djangoapps.courseware.date_summary import (
 from lms.djangoapps.courseware.masquerade import check_content_start_date_for_masquerade_user
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module
-from common.djangoapps.edxmako.shortcuts import render_to_string
+from edxmako.shortcuts import render_to_string
 from lms.djangoapps.courseware.access_utils import (
     check_authentication,
     check_enrollment,
@@ -59,9 +59,9 @@ from openedx.core.lib.api.view_utils import LazySequence
 from openedx.features.course_duration_limits.access import AuditExpiredError
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
 from openedx.features.course_experience.utils import is_block_structure_complete_for_assignments
-from common.djangoapps.static_replace import replace_static_urls
+from static_replace import replace_static_urls
 from lms.djangoapps.survey.utils import SurveyRequiredAccessError, check_survey_required_and_unanswered
-from common.djangoapps.util.date_utils import strftime_localized
+from util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import STUDENT_VIEW

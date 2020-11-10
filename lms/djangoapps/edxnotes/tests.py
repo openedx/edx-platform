@@ -25,7 +25,7 @@ from oauth2_provider.models import Application
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor
 from lms.djangoapps.courseware.tabs import get_course_tab_list
-from common.djangoapps.edxmako.shortcuts import render_to_string
+from edxmako.shortcuts import render_to_string
 from . import helpers
 from .decorators import edxnotes
 from .exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
@@ -33,7 +33,7 @@ from .plugins import EdxNotesTab
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
+from student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

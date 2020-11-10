@@ -10,13 +10,13 @@ from django.db.models import Count, Q
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from common.djangoapps.course_modes.models import CourseMode
+from course_modes.models import CourseMode
 from lms.djangoapps.courseware.courses import has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.lib.teams_config import TeamsetType
-from common.djangoapps.student.models import CourseEnrollment, anonymous_id_for_user
-from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
+from student.models import CourseEnrollment, anonymous_id_for_user
+from student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore.django import modulestore
 
 logger = logging.getLogger(__name__)

@@ -9,7 +9,7 @@ import mock
 import six
 from edx_toggles.toggles import WaffleSwitch
 from edx_toggles.toggles.testutils import override_waffle_switch
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

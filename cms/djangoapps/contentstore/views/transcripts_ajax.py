@@ -25,8 +25,8 @@ from opaque_keys.edx.keys import UsageKey
 from six import text_type
 
 from cms.djangoapps.contentstore.views.videos import TranscriptProvider
-from common.djangoapps.student.auth import has_course_author_access
-from common.djangoapps.util.json_request import JsonResponse
+from student.auth import has_course_author_access
+from util.json_request import JsonResponse
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError

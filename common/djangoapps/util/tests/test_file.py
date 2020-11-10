@@ -20,8 +20,8 @@ from opaque_keys.edx.locations import CourseLocator
 from pytz import UTC
 from six import text_type
 
-import common.djangoapps.util.file
-from common.djangoapps.util.file import (
+import util.file
+from util.file import (
     FileValidationException,
     UniversalNewlineIterator,
     course_and_time_based_filename_generator,
@@ -54,7 +54,7 @@ class FilenameGeneratorTestCase(TestCase):
     def setUp(self):
         super(FilenameGeneratorTestCase, self).setUp()
         datetime_patcher = patch.object(
-            common.djangoapps.util.file, 'datetime',
+            util.file, 'datetime',
             Mock(wraps=datetime)
         )
         mocked_datetime = datetime_patcher.start()

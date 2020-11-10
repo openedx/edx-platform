@@ -30,8 +30,8 @@ from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import UserFactory
+from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MONGO_MODULESTORE,
     TEST_DATA_SPLIT_MODULESTORE,
@@ -76,7 +76,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
         messages = FallbackStorage(self.request)
         self.request._messages = messages  # pylint: disable=protected-access
 
-        patcher = mock.patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=self.request)
+        patcher = mock.patch('edxmako.request_context.get_current_request', return_value=self.request)
         patcher.start()
         self.addCleanup(patcher.stop)
         self.course = None

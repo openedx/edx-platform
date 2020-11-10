@@ -23,8 +23,8 @@ from cms.djangoapps.contentstore.views.course import (
     _accessible_courses_summary_iter,
     get_courses_accessible_to_user
 )
-from common.djangoapps.course_action_state.models import CourseRerunState
-from common.djangoapps.student.roles import (
+from course_action_state.models import CourseRerunState
+from student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
     GlobalStaff,
@@ -32,7 +32,7 @@ from common.djangoapps.student.roles import (
     OrgStaffRole,
     UserBasedRole
 )
-from common.djangoapps.student.tests.factories import UserFactory
+from student.tests.factories import UserFactory
 from xmodule.course_module import CourseSummary
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

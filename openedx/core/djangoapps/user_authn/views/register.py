@@ -31,7 +31,7 @@ from six import text_type
 from social_core.exceptions import AuthAlreadyAssociated, AuthException
 from social_django import utils as social_utils
 
-from common.djangoapps import third_party_auth
+import third_party_auth
 # Note that this lives in LMS, so this dependency should be refactored.
 # TODO Have the discussions code subscribe to the REGISTER_USER signal instead.
 from common.djangoapps.student.helpers import get_next_url_for_login_page
@@ -57,25 +57,25 @@ from openedx.core.djangoapps.user_authn.views.registration_form import (
     RegistrationFormFactory,
     get_registration_extension_form
 )
-from common.djangoapps.student.helpers import (
+from student.helpers import (
     AccountValidationError,
     authenticate_new_user,
     create_or_set_user_attribute_created_on_site,
     do_create_account
 )
-from common.djangoapps.student.models import (
+from student.models import (
     RegistrationCookieConfiguration,
     UserAttribute,
     create_comments_service_user,
     email_exists_or_retired,
     username_exists_or_retired
 )
-from common.djangoapps.student.views import compose_and_send_activation_email
-from common.djangoapps.third_party_auth import pipeline, provider
-from common.djangoapps.third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
-from common.djangoapps.track import segment
-from common.djangoapps.util.db import outer_atomic
-from common.djangoapps.util.json_request import JsonResponse
+from student.views import compose_and_send_activation_email
+from third_party_auth import pipeline, provider
+from third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
+from track import segment
+from util.db import outer_atomic
+from util.json_request import JsonResponse
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")

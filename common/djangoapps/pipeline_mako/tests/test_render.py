@@ -9,7 +9,7 @@ from django.test import TestCase
 from mock import patch
 from six.moves import map
 
-from common.djangoapps.pipeline_mako import compressed_css, compressed_js, render_require_js_path_overrides
+from pipeline_mako import compressed_css, compressed_js, render_require_js_path_overrides
 
 
 class RequireJSPathOverridesTest(TestCase):
@@ -50,7 +50,7 @@ class PipelineRenderTest(TestCase):
     def mock_staticfiles_lookup(path):
         return '/static/' + path
 
-    @patch('common.djangoapps.static_replace.try_staticfiles_lookup', side_effect=mock_staticfiles_lookup)
+    @patch('static_replace.try_staticfiles_lookup', side_effect=mock_staticfiles_lookup)
     @ddt.data(
         (True,),
         (False,),
@@ -72,7 +72,7 @@ class PipelineRenderTest(TestCase):
             self.assertIn(u'lms-main-v1.css?raw', css_include)
 
     @patch('django.contrib.staticfiles.storage.staticfiles_storage.exists', return_value=True)
-    @patch('common.djangoapps.static_replace.try_staticfiles_lookup', side_effect=mock_staticfiles_lookup)
+    @patch('static_replace.try_staticfiles_lookup', side_effect=mock_staticfiles_lookup)
     def test_compressed_js(self, mock_staticfiles_lookup, mock_staticfiles_exists):
         """
         Verify the behavior of compressed_css, with the pipeline

@@ -13,7 +13,7 @@ from django.views.decorators.http import require_http_methods
 from django_countries import countries
 
 from lms.djangoapps.badges.utils import badges_enabled
-from common.djangoapps.edxmako.shortcuts import marketing_link
+from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.credentials.utils import get_credentials_records_url
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -23,7 +23,7 @@ from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.learner_profile.toggles import should_redirect_to_profile_microfrontend
 from openedx.features.learner_profile.views.learner_achievements import LearnerAchievementsFragmentView
-from common.djangoapps.student.models import User
+from student.models import User
 
 
 @login_required

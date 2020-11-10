@@ -1,6 +1,6 @@
 """ Tests for commerce views. """
 
-from common.djangoapps.student.tests.factories import UserFactory
+from student.tests.factories import UserFactory
 
 
 class UserMixin(object):

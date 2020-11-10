@@ -15,16 +15,16 @@ from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
 from six.moves import zip
 
-from common.djangoapps.course_modes.models import CourseMode
+from course_modes.models import CourseMode
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.enrollments.api import validate_course_mode
 from openedx.core.djangoapps.enrollments.errors import CourseModeNotFoundError
 from openedx.core.lib.html_to_text import html_to_text
 from openedx.core.lib.mail_utils import wrap_message
-from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
-from common.djangoapps.util.keyword_substitution import substitute_keywords_with_data
-from common.djangoapps.util.query import use_read_replica_if_available
+from student.roles import CourseInstructorRole, CourseStaffRole
+from util.keyword_substitution import substitute_keywords_with_data
+from util.query import use_read_replica_if_available
 
 log = logging.getLogger(__name__)
 

@@ -16,7 +16,7 @@ from lms.djangoapps.courseware.models import (
     XModuleStudentPrefsField,
     XModuleUserStateSummaryField
 )
-from common.djangoapps.student.roles import (
+from student.roles import (
     CourseBetaTesterRole,
     CourseInstructorRole,
     CourseStaffRole,
@@ -25,8 +25,8 @@ from common.djangoapps.student.roles import (
     OrgStaffRole
 )
 # Imported to re-export
-from common.djangoapps.student.tests.factories import UserFactory  # Imported to re-export
-from common.djangoapps.student.tests.factories import UserProfileFactory as StudentUserProfileFactory
+from student.tests.factories import UserFactory  # Imported to re-export
+from student.tests.factories import UserProfileFactory as StudentUserProfileFactory
 
 # TODO fix this (course_id and location are invalid names as constants, and course_id should really be COURSE_KEY)
 # pylint: disable=invalid-name

@@ -48,7 +48,7 @@ from lms.djangoapps.instructor_analytics import csvs as instructor_analytics_csv
 from lms.djangoapps.instructor_analytics import distributions as instructor_analytics_distributions
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models import CourseEmail
-from common.djangoapps.course_modes.models import CourseMode
+from course_modes.models import CourseMode
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateInvalidation,
@@ -94,8 +94,8 @@ from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
-from common.djangoapps.student import auth
-from common.djangoapps.student.models import (
+from student import auth
+from student.models import (
     ALLOWEDTOENROLL_TO_ENROLLED,
     ALLOWEDTOENROLL_TO_UNENROLLED,
     DEFAULT_TRANSITION_STATE,
@@ -115,15 +115,15 @@ from common.djangoapps.student.models import (
     is_email_retired,
     unique_id_for_user
 )
-from common.djangoapps.student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
-from common.djangoapps.util.file import (
+from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
+from util.file import (
     FileValidationException,
     UniversalNewlineIterator,
     course_and_time_based_filename_generator,
     store_uploaded_file
 )
-from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
-from common.djangoapps.util.views import require_global_staff
+from util.json_request import JsonResponse, JsonResponseBadRequest
+from util.views import require_global_staff
 from xmodule.modulestore.django import modulestore
 
 from .. import permissions

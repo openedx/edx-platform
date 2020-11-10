@@ -9,8 +9,8 @@ from rest_framework.test import APITestCase
 from six.moves.urllib.parse import urlencode
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from common.djangoapps.third_party_auth import pipeline
-from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
+from third_party_auth import pipeline
+from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
 
 
 @skip_unless_lms

@@ -11,8 +11,8 @@ from six.moves import range
 
 from lms.djangoapps.badges.tests.factories import BadgeAssertionFactory, BadgeClassFactory, RandomBadgeClassFactory
 from openedx.core.lib.api.test_utils import ApiTestCase
-from common.djangoapps.student.tests.factories import UserFactory
-from common.djangoapps.util.testing import UrlResetMixin
+from student.tests.factories import UserFactory
+from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

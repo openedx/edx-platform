@@ -4,7 +4,7 @@ Filters for the Entitlements API.
 
 from django_filters import rest_framework as filters
 
-from common.djangoapps.entitlements.models import CourseEntitlement
+from entitlements.models import CourseEntitlement
 
 
 class CharListFilter(filters.CharFilter):

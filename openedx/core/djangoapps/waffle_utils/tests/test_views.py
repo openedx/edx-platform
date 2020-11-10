@@ -9,7 +9,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from rest_framework.test import APIRequestFactory
 from waffle.testutils import override_switch
 
-from common.djangoapps.student.tests.factories import UserFactory
+from student.tests.factories import UserFactory
 
 from .. import WaffleFlag, WaffleFlagNamespace
 from ..views import ToggleStateView
@@ -69,7 +69,7 @@ class ToggleStateViewTests(TestCase):
             {
                 "name": "FEATURES['MILESTONES_APP']",
                 "is_active": True,
-                "module": "common.djangoapps.util.milestones_helpers",
+                "module": "util.milestones_helpers",
                 "class": "SettingDictToggle",
             },
             response.data["django_settings"],

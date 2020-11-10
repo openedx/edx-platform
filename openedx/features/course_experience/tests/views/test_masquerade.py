@@ -5,8 +5,8 @@ Tests for masquerading functionality on course_experience
 from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG, SHOW_UPGRADE_MSG_ON_COURSE_HOME
-from common.djangoapps.student.roles import CourseStaffRole
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from student.roles import CourseStaffRole
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID

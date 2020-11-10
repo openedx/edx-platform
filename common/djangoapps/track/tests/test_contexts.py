@@ -2,7 +2,7 @@ from unittest import TestCase
 
 import ddt
 
-from common.djangoapps.track import contexts
+from track import contexts
 
 
 @ddt.ddt

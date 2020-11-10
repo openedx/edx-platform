@@ -9,7 +9,7 @@ import unittest
 import requests
 import six
 
-from common.djangoapps.terrain.stubs.http import StubHttpRequestHandler, StubHttpService, require_params
+from terrain.stubs.http import StubHttpRequestHandler, StubHttpService, require_params
 
 
 class StubHttpServiceTest(unittest.TestCase):

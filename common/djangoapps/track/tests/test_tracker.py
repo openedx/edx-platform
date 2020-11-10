@@ -5,12 +5,12 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from six.moves import range
 
-from common.djangoapps.track import tracker
-from common.djangoapps.track.backends import BaseBackend
+import track.tracker as tracker
+from track.backends import BaseBackend
 
 SIMPLE_SETTINGS = {
     'default': {
-        'ENGINE': 'common.djangoapps.track.tests.test_tracker.DummyBackend',
+        'ENGINE': 'track.tests.test_tracker.DummyBackend',
         'OPTIONS': {
             'flag': True
         }
@@ -19,10 +19,10 @@ SIMPLE_SETTINGS = {
 
 MULTI_SETTINGS = {
     'first': {
-        'ENGINE': 'common.djangoapps.track.tests.test_tracker.DummyBackend',
+        'ENGINE': 'track.tests.test_tracker.DummyBackend',
     },
     'second': {
-        'ENGINE': 'common.djangoapps.track.tests.test_tracker.DummyBackend',
+        'ENGINE': 'track.tests.test_tracker.DummyBackend',
     }
 }
 
@@ -35,7 +35,7 @@ class TestTrackerInstantiation(TestCase):
         self.get_backend = tracker._instantiate_backend_from_name
 
     def test_instatiate_backend(self):
-        name = 'common.djangoapps.track.tests.test_tracker.DummyBackend'
+        name = 'track.tests.test_tracker.DummyBackend'
         options = {'flag': True}
         backend = self.get_backend(name, options)
 
@@ -47,10 +47,10 @@ class TestTrackerInstantiation(TestCase):
             return self.get_backend(name, parameters)
 
         options = {}
-        name = 'common.djangoapps.track.backends.logger'
+        name = 'track.backends.logger'
         self.assertRaises(ValueError, get_invalid_backend, name, options)
 
-        name = 'common.djangoapps.track.backends.logger.Foo'
+        name = 'track.backends.logger.Foo'
         self.assertRaises(ValueError, get_invalid_backend, name, options)
 
         name = 'this.package.does.not.exists'

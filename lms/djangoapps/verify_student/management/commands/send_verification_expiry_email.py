@@ -7,7 +7,7 @@ import logging
 import time
 from datetime import timedelta
 
-from common.djangoapps.course_modes.models import CourseMode
+from course_modes.models import CourseMode
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
@@ -17,8 +17,8 @@ from django.urls import reverse
 from django.utils.timezone import now
 from edx_ace import ace
 from edx_ace.recipient import Recipient
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.util.query import use_read_replica_if_available
+from student.models import CourseEnrollment
+from util.query import use_read_replica_if_available
 
 from lms.djangoapps.verify_student.message_types import VerificationExpiry
 from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification

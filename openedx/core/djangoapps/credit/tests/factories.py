@@ -18,7 +18,7 @@ from openedx.core.djangoapps.credit.models import (
     CreditRequirement,
     CreditRequirementStatus
 )
-from common.djangoapps.util.date_utils import to_timestamp
+from util.date_utils import to_timestamp
 
 
 class CreditCourseFactory(factory.DjangoModelFactory):

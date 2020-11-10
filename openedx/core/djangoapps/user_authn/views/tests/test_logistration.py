@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 from freezegun import freeze_time
 from pytz import UTC
 
-from common.djangoapps.course_modes.models import CourseMode
+from course_modes.models import CourseMode
 from lms.djangoapps.branding.api import get_privacy_url
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
@@ -30,8 +30,8 @@ from openedx.core.djangoapps.user_authn.views.login_form import login_and_regist
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
-from common.djangoapps.util.testing import UrlResetMixin
+from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
+from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
@@ -367,7 +367,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         }
         pipeline_target = 'openedx.core.djangoapps.user_authn.views.login_form.third_party_auth.pipeline'
         with simulate_running_pipeline(pipeline_target, current_backend, **pipeline_response):
-            with mock.patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=request):
+            with mock.patch('edxmako.request_context.get_current_request', return_value=request):
                 response = login_and_registration_form(request)
 
         expected_error_message = Text(_(

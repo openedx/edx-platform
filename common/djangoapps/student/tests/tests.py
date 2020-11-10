@@ -23,8 +23,8 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import CourseLocator
 from pyquery import PyQuery as pq
 
-from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.verify_student.tests import TestVerificationBase
@@ -34,8 +34,8 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
-from common.djangoapps.student.helpers import _cert_info, process_survey_link
-from common.djangoapps.student.models import (
+from student.helpers import _cert_info, process_survey_link
+from student.models import (
     CourseEnrollment,
     LinkedInAddToProfileConfiguration,
     UserAttribute,
@@ -43,10 +43,10 @@ from common.djangoapps.student.models import (
     unique_id_for_user,
     user_by_anonymous_id
 )
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.student.views import complete_course_mode_info
-from common.djangoapps.util.model_utils import USER_SETTINGS_CHANGED_EVENT_NAME
-from common.djangoapps.util.testing import EventTestMixin
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from student.views import complete_course_mode_info
+from util.model_utils import USER_SETTINGS_CHANGED_EVENT_NAME
+from util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreEnum, ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 
@@ -624,7 +624,7 @@ class UserSettingsEventTestMixin(EventTestMixin):
     Mixin for verifying that user setting events were emitted during a test.
     """
     def setUp(self):
-        super(UserSettingsEventTestMixin, self).setUp('common.djangoapps.util.model_utils.tracker')
+        super(UserSettingsEventTestMixin, self).setUp('util.model_utils.tracker')
 
     def assert_user_setting_event_emitted(self, **kwargs):
         """
@@ -651,7 +651,7 @@ class UserSettingsEventTestMixin(EventTestMixin):
 class EnrollmentEventTestMixin(EventTestMixin):
     """ Mixin with assertions for validating enrollment events. """
     def setUp(self):
-        super(EnrollmentEventTestMixin, self).setUp('common.djangoapps.student.models.tracker')
+        super(EnrollmentEventTestMixin, self).setUp('student.models.tracker')
 
     def assert_enrollment_mode_change_event_was_emitted(self, user, course_key, mode):
         """Ensures an enrollment mode change event was emitted"""
@@ -969,7 +969,7 @@ class AnonymousLookupTable(ModuleStoreTestCase):
             mode_slug='honor',
             mode_display_name='Honor Code',
         )
-        patcher = patch('common.djangoapps.student.models.tracker')
+        patcher = patch('student.models.tracker')
         patcher.start()
         self.addCleanup(patcher.stop)
 

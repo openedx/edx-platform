@@ -9,7 +9,7 @@ import six
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from common.djangoapps.course_modes.models import CourseMode
+from course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import (
     CertificateGenerationCourseSetting,
     CertificateStatuses,
@@ -27,7 +27,7 @@ from openedx.core.djangoapps.signals.signals import (
     COURSE_GRADE_NOW_PASSED,
     LEARNER_NOW_VERIFIED
 )
-from common.djangoapps.student.models import CourseEnrollment
+from student.models import CourseEnrollment
 
 log = logging.getLogger(__name__)
 CERTIFICATE_DELAY_SECONDS = 2

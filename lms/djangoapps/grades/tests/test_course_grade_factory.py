@@ -13,7 +13,7 @@ from edx_toggles.toggles.testutils import override_waffle_switch
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
-from common.djangoapps.student.tests.factories import UserFactory
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

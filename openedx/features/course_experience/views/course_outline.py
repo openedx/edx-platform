@@ -22,6 +22,7 @@ from pytz import UTC
 from waffle.models import Switch
 from web_fragments.fragment import Fragment
 
+from course_modes.models import CourseMode
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_overview_with_access
 from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
@@ -32,8 +33,8 @@ from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
 from openedx.features.course_experience.utils import dates_banner_should_display
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.util.milestones_helpers import get_course_content_milestones
+from student.models import CourseEnrollment
+from util.milestones_helpers import get_course_content_milestones
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 from xmodule.modulestore.django import modulestore
 

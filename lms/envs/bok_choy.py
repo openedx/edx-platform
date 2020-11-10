@@ -90,7 +90,7 @@ GRADES_DOWNLOAD = {
 
 LOG_OVERRIDES = [
     ('track.middleware', logging.CRITICAL),
-    ('common.djangoapps.edxmako.shortcuts', logging.ERROR),
+    ('edxmako.shortcuts', logging.ERROR),
     ('edx.discussion', logging.CRITICAL),
 ]
 for log_name, log_level in LOG_OVERRIDES:

@@ -12,7 +12,7 @@ class EntitlementsConfig(AppConfig):
     """
     Application Configuration for Entitlements.
     """
-    name = 'common.djangoapps.entitlements'
+    name = u'entitlements'
 
     def ready(self):
         """

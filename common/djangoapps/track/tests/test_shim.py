@@ -15,13 +15,13 @@ from . import FROZEN_TIME, EventTrackingTestCase
 
 LEGACY_SHIM_PROCESSOR = [
     {
-        'ENGINE': 'common.djangoapps.track.shim.LegacyFieldMappingProcessor'
+        'ENGINE': 'track.shim.LegacyFieldMappingProcessor'
     }
 ]
 
 GOOGLE_ANALYTICS_PROCESSOR = [
     {
-        'ENGINE': 'common.djangoapps.track.shim.GoogleAnalyticsProcessor'
+        'ENGINE': 'track.shim.GoogleAnalyticsProcessor'
     }
 ]
 
@@ -163,11 +163,11 @@ class GoogleAnalyticsProcessorTestCase(EventTrackingTestCase):
             'ENGINE': 'eventtracking.backends.routing.RoutingBackend',
             'OPTIONS': {
                 'backends': {
-                    'first': {'ENGINE': 'common.djangoapps.track.tests.InMemoryBackend'}
+                    'first': {'ENGINE': 'track.tests.InMemoryBackend'}
                 },
                 'processors': [
                     {
-                        'ENGINE': 'common.djangoapps.track.shim.GoogleAnalyticsProcessor'
+                        'ENGINE': 'track.shim.GoogleAnalyticsProcessor'
                     }
                 ]
             }
@@ -177,7 +177,7 @@ class GoogleAnalyticsProcessorTestCase(EventTrackingTestCase):
             'OPTIONS': {
                 'backends': {
                     'second': {
-                        'ENGINE': 'common.djangoapps.track.tests.InMemoryBackend'
+                        'ENGINE': 'track.tests.InMemoryBackend'
                     }
                 }
             }

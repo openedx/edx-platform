@@ -5,8 +5,8 @@ from django.apps import AppConfig
 
 
 class CourseModesConfig(AppConfig):
-    name = 'common.djangoapps.course_modes'
+    name = 'course_modes'
     verbose_name = "Course Modes"
 
     def ready(self):
-        from . import signals  # pylint: disable=unused-import
+        import course_modes.signals  # pylint: disable=unused-import

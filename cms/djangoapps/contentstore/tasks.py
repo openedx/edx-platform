@@ -39,11 +39,11 @@ from cms.djangoapps.contentstore.courseware_index import (
 from cms.djangoapps.contentstore.storage import course_import_export_storage
 from cms.djangoapps.contentstore.utils import initialize_permissions, reverse_usage_url, translation_language
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
-from common.djangoapps.course_action_state.models import CourseRerunState
+from course_action_state.models import CourseRerunState
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
 from openedx.core.lib.extract_tar import safetar_extractall
-from common.djangoapps.student.auth import has_course_author_access
-from common.djangoapps.util.organizations_helpers import add_organization_course, get_organization_by_short_name
+from student.auth import has_course_author_access
+from util.organizations_helpers import add_organization_course, get_organization_by_short_name
 from xmodule.contentstore.django import contentstore
 from xmodule.course_module import CourseFields
 from xmodule.exceptions import SerializationError

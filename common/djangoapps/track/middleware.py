@@ -19,7 +19,7 @@ from django.utils.deprecation import MiddlewareMixin
 from eventtracking import tracker
 from ipware.ip import get_ip
 
-from common.djangoapps.track import contexts, views
+from track import contexts, views
 
 log = logging.getLogger(__name__)
 

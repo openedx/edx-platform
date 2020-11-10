@@ -14,7 +14,7 @@ import six
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 
-from common.djangoapps.course_modes.models import CourseMode
+from course_modes.models import CourseMode
 from lms.djangoapps.teams import TEAM_DISCUSSION_CONTEXT
 from lms.djangoapps.teams.errors import AddToIncompatibleTeamError
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
@@ -31,8 +31,8 @@ from openedx.core.djangoapps.django_comment_common.signals import (
     thread_voted
 )
 from openedx.core.lib.teams_config import TeamsConfig
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.util.testing import EventTestMixin
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from util.testing import EventTestMixin
 
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
