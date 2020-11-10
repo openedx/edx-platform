@@ -1,3 +1,6 @@
+"""
+Piazza Discussion provider plugin.
+"""
 from django.utils.translation import ugettext as _
 from openedx.core.djangoapps.discussions.discussions_apps import (
     DiscussionApp,
