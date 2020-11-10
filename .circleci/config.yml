@@ -41,10 +41,10 @@ commands:
             BASE_BRANCH="origin/${BASE_BRANCH}"
 
             echo "Base branch is ${BASE_BRANCH}"
-            source adg_pipelines/scripts/adg-run-test.sh "$BASE_BRANCH"
+            source adg/pipelines/scripts/adg-run-test.sh "$BASE_BRANCH"
 
             if [ "$BASE_BRANCH" == "origin/master" ]; then
-              source adg_pipelines/scripts/edx-run-test.sh "$BASE_BRANCH"
+              source adg/pipelines/scripts/edx-run-test.sh "$BASE_BRANCH"
             fi
       - save_cache:
           key: cache-{{ checksum "requirements/edx/testing.txt" }}-{{ checksum "requirements/adg/base.txt"

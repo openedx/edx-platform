@@ -5,12 +5,12 @@ function show_help() {
     echo "Run all Edx tests including CMS, LMS and lib. Generate coverage reports"
     echo "in XML and HTML format. Create junit-xml and diff-cover reports as well."
     echo "Usage:"
-    echo "      ./adg_pipelines/scripts/edx-run-test.sh [branch-name]"
+    echo "      ./adg/pipelines/scripts/edx-run-test.sh [branch-name]"
     echo "Options:"
     echo "      -h,     help                Print usage information"
     echo "              branch-name         Branch name for diff-cover [default: origin/master]"
     echo "Example:"
-    echo "      ./adg_pipelines/scripts/edx-run-test.sh origin/develop"
+    echo "      ./adg/pipelines/scripts/edx-run-test.sh origin/develop"
     echo ""
 }
 
@@ -47,5 +47,5 @@ DIFF_COVER_REPORT=$(diff-cover reports/coverage.xml --compare-branch="${branch=o
     --html-report reports/diff_coverage.html --fail-under="$FAIL_UNDER") || EXIT_CODE=$?
 export DIFF_COVER_REPORT
 # post comment to PR only from circleci
-[[ "$CIRCLECI" ]] && python3 adg_pipelines/scripts/post_comment.py -t Edx -s $EXIT_CODE
+[[ "$CIRCLECI" ]] && python3 adg/pipelines/scripts/post_comment.py -t Edx -s $EXIT_CODE
 exit "$EXIT_CODE"

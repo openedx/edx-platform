@@ -6,7 +6,7 @@ from unittest import TestCase
 
 import pytest
 
-from adg_pipelines.skip_tests import TEST_SKIP_LIST
+from adg.pipelines.skip_tests import TEST_SKIP_LIST
 
 # Import hooks and fixture overrides from the cms package to
 # avoid duplicating the implementation
