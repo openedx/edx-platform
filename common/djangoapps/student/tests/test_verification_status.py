@@ -136,11 +136,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
     @patch("lms.djangoapps.verify_student.services.is_verification_expiring_soon")
     def test_verify_resubmit_button_on_dashboard(self, mock_expiry):
         mock_expiry.return_value = True
-        SoftwareSecurePhotoVerification.objects.create(
-            user=self.user,
-            status='approved',
-            expiration_date=now() + timedelta(days=1)
-        )
+        SoftwareSecurePhotoVerification.objects.create(user=self.user, status='approved', expiry_date=now())
         response = self.client.get(self.dashboard_url)
         self.assertContains(response, "Resubmit Verification")
 
@@ -166,7 +162,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         attempt.mark_ready()
         attempt.submit()
         attempt.approve()
-        attempt.expiration_date = self.DATES[self.PAST] - timedelta(days=900)
+        attempt.created_at = self.DATES[self.PAST] - timedelta(days=900)
         attempt.save()
 
         # The student didn't have an approved verification at the deadline,
@@ -182,7 +178,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         attempt.mark_ready()
         attempt.submit()
         attempt.approve()
-        attempt.expiration_date = self.DATES[self.PAST] - timedelta(days=900)
+        attempt.created_at = self.DATES[self.PAST] - timedelta(days=900)
         attempt.save()
 
         # The student didn't have an approved verification at the deadline,
