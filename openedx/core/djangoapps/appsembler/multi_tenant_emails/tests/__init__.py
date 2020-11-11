@@ -6,6 +6,3 @@ This app exists solely to rollback what the `common/djangoapps/database_fixups` 
 
 from django.conf import settings
 from unittest import SkipTest
-
-if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-    raise SkipTest('Fix MTE tests')

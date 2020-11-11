@@ -3,10 +3,12 @@ Tests for the Account Deletion (Retirement) view.
 """
 
 from mock import patch
+from unittest import skipIf
 import pytest
 
 from django.urls import reverse
 from django.core import mail
+from django.conf import settings
 from rest_framework.test import APITestCase
 from rest_framework import status
 
@@ -24,6 +26,7 @@ from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (
 @lms_multi_tenant_test
 @patch.dict('django.conf.settings.FEATURES', {'SKIP_EMAIL_VALIDATION': True})
 @pytest.mark.usefixtures("setup_retirement_states")
+@skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'fix in Juniper')
 class MultiTenantDeactivateLogoutViewTest(APITestCase):
     """
     Tests to ensure the DeactivateLogoutView works well with multi-tenant emails.
