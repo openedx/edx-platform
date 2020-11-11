@@ -32,14 +32,15 @@ env:
     - TRAVIS_FIXES="pip install -r requirements/edx/local.in"
     - BOTO_CONFIG="/etc/nonexistent.cfg"
 
-  jobs:
-    - name=pep8
-    - name=common-minimal
-    - name=common
-    - name=lms-1
-    - name=lms-2
-    - name=mte
-    - name=studio
+jobs:
+  include:
+    - name: pep8
+    - name: common-minimal
+    - name: common
+    - name: lms-1
+    - name: lms-2
+    - name: mte
+    - name: studio
 
 script: tox -e $TRAVIS_JOB_NAME
 
