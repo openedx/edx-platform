@@ -1,22 +1,27 @@
+dist: focal
 language: python
+
+addons:
+  apt:
+    packages:
+      - python-dev
+      - libxml2-dev
+      - libxmlsec1-dev
+
 python:
-  - "3.5"
+  - 3.5
+
+git:
+  depth: false
+
 
 services:
   - mongodb
-
-node_js: 6
 
 cache:
   directories:
     - $HOME/edxapp_toxenv/
   pip: true
-  npm: true
-
-before_install:
-  - sudo rm -f /etc/boto.cfg
-  - travis_retry sudo apt-get update
-  - travis_retry sudo apt-get install python-dev libxml2-dev libxmlsec1-dev
 
 install:
   - pip install tox
@@ -25,6 +30,7 @@ env:
   global:
     # Avoid caching edx-platform's entry_points
     - TRAVIS_FIXES="pip install -r requirements/edx/local.in"
+    - BOTO_CONFIG="/etc/nonexistent.cfg"
 
   jobs:
     - name=pep8
