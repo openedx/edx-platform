@@ -15,3 +15,14 @@ jobs:
           BRANCH_PREFIX: "appsembler/tahoe/develop"
           PULL_REQUEST_BRANCH: "appsembler/tahoe/master"
           PULL_REQUEST_REVIEWERS: "johnbaldwin melvinsoft OmarIthawi thraxil"
+  hawthorn-to-juniper-sync:
+    name: PullRequestAction
+    runs-on: ubuntu-latest
+    steps:
+      - name: pull-request-action
+        uses: vsoch/pull-request-action@1.0.6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_PREFIX: "appsembler/tahoe/develop"
+          PULL_REQUEST_BRANCH: "appsembler/juniper-upgrade"
+          PULL_REQUEST_REVIEWERS: "johnbaldwin melvinsoft OmarIthawi thraxil"

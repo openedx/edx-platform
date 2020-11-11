@@ -894,7 +894,7 @@ def _get_initial_page_elements():
                                                 "margin-top": "marg-t-5",
                                                 "margin-left": "marg-l-20",
                                                 "text-content": {
-                                                    "en": "You\'ll get to see how the Sample course is built and create your own courses."
+                                                    "en": "You'll get to see how the Sample course is built and create your own courses."
                                                 },
                                                 "font-family": "font--primary--regular",
                                                 "text-alignment": "text-align--center"
@@ -970,7 +970,7 @@ def _get_initial_page_elements():
                                                 "margin-top": "marg-t-5",
                                                 "margin-left": "marg-l-20",
                                                 "text-content": {
-                                                    "en": "In the Management Console, you\'ll define your site's look and feel and manage site-wide content (e.g. certificates, SSO, custom domain)."
+                                                    "en": "In the Management Console, you'll define your site's look and feel and manage site-wide content (e.g. certificates, SSO, custom domain)."
                                                 },
                                                 "font-family": "font--primary--regular",
                                                 "text-alignment": "text-align--center"
