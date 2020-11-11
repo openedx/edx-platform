@@ -25,5 +25,6 @@ class SiteUnavailableViewTest(TestCase):
         """
         with with_organization_context(self.BLUE):
             response = self.client.get(self.url)
+            body = response.content.decode(response.charset)
             message = 'The trial site of {} has expired.'.format(self.BLUE)
-            assert message in response.content, 'Trial page works.'
+            assert message in body, 'Trial page works.'
