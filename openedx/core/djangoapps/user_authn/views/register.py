@@ -215,7 +215,10 @@ def create_account_with_params(request, params):
     # Sites using multiple languages need to record the language used during registration.
     # If not, compose_and_send_activation_email will be sent in site's default language only.
     create_or_set_user_attribute_created_on_site(user, request.site)
-    preferences_api.set_user_preference(user, LANGUAGE_KEY, get_language())
+
+    # Only add a default user preference if user does not already has one.
+    if not preferences_api.has_user_preference(user, LANGUAGE_KEY):
+        preferences_api.set_user_preference(user, LANGUAGE_KEY, get_language())
 
     # Check if system is configured to skip activation email for the current user.
     skip_email = _skip_activation_email(
