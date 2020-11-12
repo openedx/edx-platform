@@ -54,6 +54,7 @@ from openedx.features.course_experience import (
     SHOW_REVIEWS_TOOL_FLAG,
     SHOW_UPGRADE_MSG_ON_COURSE_HOME
 )
+from openedx.features.course_experience.tests import BaseCourseUpdatesTestCase
 from openedx.features.discounts.applicability import get_discount_expiration_date
 from openedx.features.discounts.utils import REV1008_EXPERIMENT_ID, format_strikeout_price
 from common.djangoapps.student.models import CourseEnrollment, FBEEnrollmentExclusion
@@ -61,12 +62,11 @@ from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.date_utils import strftime_localized
 from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 from ... import COURSE_PRE_START_ACCESS_FLAG, ENABLE_COURSE_GOALS
 from .helpers import add_course_mode, remove_course_mode
-from .test_course_updates import create_course_update, remove_course_updates
 
 TEST_PASSWORD = 'test'
 TEST_CHAPTER_NAME = 'Test Chapter'
@@ -113,7 +113,7 @@ def course_home_url_from_string(course_key_string):
     )
 
 
-class CourseHomePageTestCase(SharedModuleStoreTestCase):
+class CourseHomePageTestCase(BaseCourseUpdatesTestCase):
     """
     Base class for testing the course home page.
     """
@@ -154,10 +154,8 @@ class CourseHomePageTestCase(SharedModuleStoreTestCase):
     @classmethod
     def setUpTestData(cls):
         """Set up and enroll our fake user in the course."""
-        super(CourseHomePageTestCase, cls).setUpTestData()
+        super().setUpTestData()
         cls.staff_user = StaffFactory(course_key=cls.course.id, password=TEST_PASSWORD)
-        cls.user = UserFactory(password=TEST_PASSWORD)
-        CourseEnrollment.enroll(cls.user, cls.course.id)
 
     def create_future_course(self, specific_date=None):
         """
@@ -170,17 +168,9 @@ class CourseHomePageTestCase(SharedModuleStoreTestCase):
 
 
 class TestCourseHomePage(CourseHomePageTestCase):
-    def setUp(self):
-        super(TestCourseHomePage, self).setUp()
-        self.client.login(username=self.user.username, password=TEST_PASSWORD)
-
-    def tearDown(self):
-        remove_course_updates(self.user, self.course)
-        super(TestCourseHomePage, self).tearDown()
-
     def test_welcome_message_when_unified(self):
         # Create a welcome message
-        create_course_update(self.course, self.user, TEST_WELCOME_MESSAGE)
+        self.create_course_update(TEST_WELCOME_MESSAGE)
 
         url = course_home_url(self.course)
         response = self.client.get(url)
@@ -189,7 +179,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
     @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_welcome_message_when_not_unified(self):
         # Create a welcome message
-        create_course_update(self.course, self.user, TEST_WELCOME_MESSAGE)
+        self.create_course_update(TEST_WELCOME_MESSAGE)
 
         url = course_home_url(self.course)
         response = self.client.get(url)
@@ -204,7 +194,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
         response = self.client.get(url)
         self.assertNotContains(response, TEST_COURSE_UPDATES_TOOL, status_code=200)
 
-        create_course_update(self.course, self.user, TEST_UPDATE_MESSAGE)
+        self.create_course_update(TEST_UPDATE_MESSAGE)
         url = course_home_url(self.course)
         response = self.client.get(url)
         self.assertContains(response, TEST_COURSE_UPDATES_TOOL, status_code=200)
@@ -249,18 +239,15 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
     """
 
     def setUp(self):
-        super(TestCourseHomePageAccess, self).setUp()
+        super().setUp()
+        self.client.logout()  # start with least access and add access back in the various test cases
 
         # Make this a verified course so that an upgrade message might be shown
         add_course_mode(self.course, mode_slug=CourseMode.AUDIT)
         add_course_mode(self.course)
 
         # Add a welcome message
-        create_course_update(self.course, self.staff_user, TEST_WELCOME_MESSAGE)
-
-    def tearDown(self):
-        remove_course_updates(self.staff_user, self.course)
-        super(TestCourseHomePageAccess, self).tearDown()
+        self.create_course_update(TEST_WELCOME_MESSAGE)
 
     @override_waffle_flag(SHOW_REVIEWS_TOOL_FLAG, active=True)
     @ddt.data(
