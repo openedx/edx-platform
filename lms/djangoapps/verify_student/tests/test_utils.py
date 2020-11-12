@@ -70,14 +70,14 @@ class TestVerifyStudentUtils(unittest.TestCase):
         self.assertEqual(result, attempt)
 
         # Immediately before the expiration date, should get the attempt
-        expiration = attempt.created_at + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+        expiration = attempt.expiration_datetime + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
         before_expiration = expiration - timedelta(seconds=1)
         query = SoftwareSecurePhotoVerification.objects.filter(user=user)
         result = verification_for_datetime(before_expiration, query)
         self.assertEqual(result, attempt)
 
         # Immediately after the expiration date, should not get the attempt
-        attempt.created_at = attempt.created_at - timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+        attempt.expiration_date = now - timedelta(seconds=1)
         attempt.save()
         after = now + timedelta(days=1)
         query = SoftwareSecurePhotoVerification.objects.filter(user=user)
