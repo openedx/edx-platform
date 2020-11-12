@@ -1,26 +1,21 @@
 import json
-from unittest import skipUnless, skipIf
 from mock import patch, Mock
 import uuid
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from openedx.core.djangolib.testing.utils import skip_unless_lms
 from organizations.models import UserOrganizationMapping
 
-from .test_utils import with_organization_context
+from .test_utils import lms_multi_tenant_test, with_organization_context
 
 
-@skip_unless_lms
-@skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'fix in Juniper')
-@skipUnless(settings.FEATURES['APPSEMBLER_MULTI_TENANT_EMAILS'], 'This only tests multi-tenancy')
+@lms_multi_tenant_test
 @patch(
     # Patch to avoids error when importing from CMS
-    'student.views.management.add_course_creator_role'
+    'openedx.core.djangoapps.user_authn.views.register.add_course_creator_role'
 )
 @patch(
     # Imitate a proper `X_EDX_API_KEY` header being passed
@@ -126,7 +121,7 @@ class MultiTenantAMCSignupTest(APITestCase):
         self.register_new_amc_admin(color='blue', email=learner)
         assert mock_add_creator.call_count == 1
 
-    def test_learner_invited_for_existing_organization(self, mock_add_creator):
+    def test_learner_invited_for_existing_organization(self, _mock_add_creator):
         red_site = 'red1'
         learner_email = 'learner@example.com'
         queryset = UserOrganizationMapping.objects.filter(user__email=learner_email)

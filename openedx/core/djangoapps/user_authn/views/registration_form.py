@@ -38,6 +38,10 @@ from util.password_policy_validators import (
 )
 
 
+from openedx.core.djangoapps.appsembler.sites.utils import is_request_for_new_amc_site
+from openedx.core.djangoapps.theming.helpers import get_current_request
+
+
 class TrueCheckbox(widgets.CheckboxInput):
     """
     A checkbox widget that only accepts "true" (case-insensitive) as true.
@@ -245,7 +249,8 @@ class AccountCreationForm(forms.Form):
                 # reject the registration.
                 if not CourseEnrollmentAllowed.objects.filter(email=email).exists():
                     raise ValidationError(_(u"Unauthorized email address."))
-        if email_exists_or_retired(email):
+        check_for_new_site = is_request_for_new_amc_site(get_current_request())
+        if email_exists_or_retired(email, check_for_new_site=check_for_new_site):
             raise ValidationError(
                 _(
                     u"It looks like {email} belongs to an existing account. Try again with a different email address."

@@ -78,6 +78,7 @@ from util.db import outer_atomic
 from util.json_request import JsonResponse
 
 from openedx.core.djangoapps.appsembler.sites.utils import (
+    add_course_creator_role,
     get_current_organization,
     is_request_for_amc_admin,
     is_request_for_new_amc_site,
@@ -215,6 +216,9 @@ def create_account_with_params(request, params):
         new_user = authenticate_new_user(request, user.username, form.cleaned_data['password'])
         django_login(request, new_user)
         request.session.set_expiry(0)
+
+        if is_request_for_amc_admin(request):  # Appsembler specific
+            add_course_creator_role(user)
 
     # Check if system is configured to skip activation email for the current user.
     skip_email = _skip_activation_email(
@@ -522,7 +526,31 @@ class RegistrationView(APIView):
         username = data.get('username')
         errors = {}
 
-        if email is not None and email_exists_or_retired(email):
+        if is_request_for_amc_admin(request) and not is_request_for_new_amc_site(request):
+            # Check for invitation for existing learner to an AMC admin.
+            current_org = get_current_organization()
+            if username and email:
+                # Being a bit defensive and requiring checking for both email and username to avoid possible
+                # account collision.
+                mapping_query = UserOrganizationMapping.objects.filter(
+                    user__email=email,
+                    user__username=username,
+                    organization=current_org,
+                )
+                if mapping_query.exists():
+                    # If the user already exists in the organization, we just
+                    # return ok. Since the user already exists, the next steps
+                    # will be to set the user as is_amc_admin=Ture and create
+                    # the OAuth tokens only.
+                    # TODO: In the AMC side, make sure to verify the user email
+                    #       before allowing to register it.
+                    mapping = mapping_query.get()
+                    mapping.is_amc_admin = True
+                    mapping.save()
+                    return self._create_response(request, {}, status_code=200)
+
+        check_for_new_site = is_request_for_new_amc_site(request)
+        if email is not None and email_exists_or_retired(email, check_for_new_site=check_for_new_site):
             errors["email"] = [{"user_message": accounts_settings.EMAIL_CONFLICT_MSG.format(email_address=email)}]
 
         if username is not None and username_exists_or_retired(username):
