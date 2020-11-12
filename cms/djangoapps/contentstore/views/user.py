@@ -16,6 +16,7 @@ from opaque_keys.edx.locator import LibraryLocator
 
 from course_creators.views import user_requested_access
 from edxmako.shortcuts import render_to_response
+from openedx.core.djangoapps.appsembler.sites.utils import get_single_user_organization
 from student import auth
 from student.auth import STUDIO_EDIT_ROLES, STUDIO_VIEW_USERS, get_user_permissions
 from student.models import CourseEnrollment
@@ -121,9 +122,18 @@ def _course_team_user(request, course_key, email):
         # This user is not even allowed to know who the authorized users are.
         return permissions_error_response
 
+    is_library = isinstance(course_key, LibraryLocator)
+
     try:
         if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
-            organization = Organization.objects.get(organizationcourse__course_id=course_key)
+            if is_library:
+                # Note: `OrganizationCourse` don't exist for libraries so we have to get the
+                #   organization from the requesting user. This is secure given the
+                #   `get_user_permissions` check above. Still we're not using this softer
+                #   check for courses because security isn't fully reviewed.
+                organization = get_single_user_organization(request.user)
+            else:
+                organization = Organization.objects.get(organizationcourse__course_id=course_key)
             user = organization.userorganizationmapping_set.get(user__email=email).user
         else:
             user = User.objects.get(email=email)
@@ -134,7 +144,6 @@ def _course_team_user(request, course_key, email):
         }
         return JsonResponse(msg, 404)
 
-    is_library = isinstance(course_key, LibraryLocator)
     # Ordered list of roles: can always move self to the right, but need STUDIO_EDIT_ROLES to move any user left
     if is_library:
         role_hierarchy = (CourseInstructorRole, CourseStaffRole, LibraryUserRole)
