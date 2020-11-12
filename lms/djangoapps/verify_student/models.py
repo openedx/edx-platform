@@ -647,6 +647,13 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
     # to notify for expired verification is already sent.
     expiry_email_date = models.DateTimeField(null=True, blank=True, db_index=True)
 
+    @property
+    def expiration_datetime(self):
+        """Use expiry_date for older entries if it still exists."""
+        if self.expiry_date:
+            return self.expiry_date
+        return super(SoftwareSecurePhotoVerification, self).expiration_datetime
+
     @classmethod
     def get_initial_verification(cls, user, earliest_allowed_date=None):
         """Get initial verification for a user with the 'photo_id_key'.
