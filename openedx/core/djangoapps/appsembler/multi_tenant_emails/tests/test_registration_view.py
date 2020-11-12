@@ -1,27 +1,21 @@
-import json
-from unittest import skipUnless, skipIf
+"""
+Tests for MTE changes related to the `user_api_registration` view.
+"""
 
-from django.conf import settings
-from django.test.utils import override_settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from openedx.core.djangolib.testing.utils import skip_unless_lms
-
-from .test_utils import with_organization_context
+from .test_utils import lms_multi_tenant_test, with_organization_context
 
 
-@skip_unless_lms
-@override_settings(DEFAULT_SITE_THEME='edx-theme-codebase')
-@skipUnless(settings.FEATURES['APPSEMBLER_MULTI_TENANT_EMAILS'], 'This only tests multi-tenancy')
-@skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'fix in Juniper')
+@lms_multi_tenant_test
 class MultiTenantRegistrationViewTest(APITestCase):
     """
     Tests to ensure the registration end-point allow multi-tenant emails.
     """
 
-    EMAIL = 'ali@example.com'
+    EMAIL = 'ali_register@example.com'
     PASSWORD = 'zzz'
 
     def setUp(self):
@@ -37,7 +31,10 @@ class MultiTenantRegistrationViewTest(APITestCase):
             'password': self.PASSWORD,
             'honor_code': 'true',
         })
-        assert response.status_code == status.HTTP_200_OK, '{}: {}'.format(color, response.content)
+        assert response.status_code == status.HTTP_200_OK, 'Should register first one ({}): {}'.format(
+            color,
+            response.content
+        )
 
         # Try to create a second user with the same email address
         response = self.client.post(self.url, {
@@ -47,8 +44,11 @@ class MultiTenantRegistrationViewTest(APITestCase):
             'password': self.PASSWORD,
             'honor_code': 'true',
         })
-        assert response.status_code == status.HTTP_409_CONFLICT, '{}: {}'.format(color, response.content)
-        response_json = json.loads(response.content)
+        assert response.status_code == status.HTTP_409_CONFLICT, 'Should prevent duplicates ({}): {}'.format(
+            color,
+            response.content
+        )
+        response_json = response.json()
         assert response_json == {
             'email': [{
                 'user_message': (

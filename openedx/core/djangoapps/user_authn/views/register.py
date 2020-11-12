@@ -77,6 +77,13 @@ from track import segment
 from util.db import outer_atomic
 from util.json_request import JsonResponse
 
+from openedx.core.djangoapps.appsembler.sites.utils import (
+    get_current_organization,
+    is_request_for_amc_admin,
+    is_request_for_new_amc_site,
+)
+from organizations.models import UserOrganizationMapping
+
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
 
@@ -236,6 +243,20 @@ def create_account_with_params(request, params):
     REGISTER_USER.send(sender=None, user=user, registration=registration)
 
     create_comments_service_user(user)
+
+    if not is_request_for_new_amc_site(request):
+        # When _new_ trial is requested, we register the user first, then the
+        # Organization and SiteConfiguration.
+        # So UserOrganizationMapping for new AMC admin sites is deferred later
+        # until `bootstrap_site()` is called.
+        # Tech Debt: This is a weird logic in my opinion that we should simplify into a single API call -- Omar
+        current_org = get_current_organization(failure_return_none=True)
+        if current_org:
+            UserOrganizationMapping.objects.get_or_create(
+                user=user,
+                organization=current_org,
+                is_amc_admin=is_request_for_amc_admin(request),
+            )
 
     try:
         _record_registration_attributions(request, new_user)

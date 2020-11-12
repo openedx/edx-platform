@@ -3,6 +3,7 @@ Tests utils for multi-tenant emails.
 """
 
 import contextlib
+from unittest.mock import patch, Mock
 
 from django.conf import settings
 from unittest import skipUnless
@@ -41,7 +42,10 @@ def with_organization_context(site_color, configs=None):
                 short_name=site_color,
             )
             org.sites.add(site)
-        yield org
+
+        current_request = Mock(POST={}, GET={}, site=site)
+        with patch('crum.get_current_request', return_value=current_request):
+            yield org
 
 
 def create_org_user(organization, **kwargs):
