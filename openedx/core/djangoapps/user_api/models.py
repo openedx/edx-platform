@@ -83,6 +83,24 @@ class UserPreference(models.Model):
         except cls.DoesNotExist:
             return default
 
+    @classmethod
+    def has_value(cls, user, preference_key):
+        """Checks if the user has preference value for a given key.
+
+        Note:
+            This method provides no authorization of access to the user preference.
+            Consider using user_api.preferences.api.has_user_preference instead if
+            this is part of a REST API request.
+
+        Arguments:
+            user (User): The user whose preference should be checked.
+            preference_key (str): The key for the user preference.
+
+        Returns:
+            (bool): True if user preference for the given key is set and False otherwise.
+        """
+        return cls.objects.filter(user=user, key=preference_key).exists()
+
 
 @receiver(pre_save, sender=UserPreference)
 def pre_save_callback(sender, **kwargs):
