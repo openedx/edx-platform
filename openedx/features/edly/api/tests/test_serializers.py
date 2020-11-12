@@ -1,6 +1,10 @@
 """
 Tests for Edly API serializers.
 """
+import json
+
+from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
 from django.test import TestCase, RequestFactory
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
@@ -23,6 +27,7 @@ class UserSiteSerializerTests(TestCase):
         }
         self.serializer = UserSiteSerializer
         self.test_site_configuration = {
+            'MOBILE_ENABLED': True,
             'MOBILE_APP_CONFIG': {
                 'COURSE_SHARING_ENABLED': True,
                 'COURSE_VIDEOS_ENABLED': False,
@@ -40,11 +45,35 @@ class UserSiteSerializerTests(TestCase):
             'SITE_NAME': self.edly_sub_org_of_user.lms_site.domain,
             'course_org_filter': self.edly_sub_org_of_user.edx_organization.short_name,
         }
-        SiteConfigurationFactory(
+        self.site_configuration = SiteConfigurationFactory(
             site=self.edly_sub_org_of_user.lms_site,
             enabled=True,
             values=self.test_site_configuration,
         )
+
+    def validate_url(self, url):
+        """
+        Validates a given string as url
+        """
+        validate = URLValidator()
+        try:
+            validate(url)
+        except ValidationError:
+            return False
+        return True
+
+    def get_expected_url(self):
+        """
+        Returns expected url of a site with protocol scheme if url is valid
+        """
+        protocol = 'https' if self.request.is_secure() else 'http'
+        url = self.test_site_configuration['SITE_NAME']
+        expected_url = '{}://{}'.format(protocol, url) if url else ''
+
+        if self.validate_url(expected_url):
+            return expected_url
+
+        return ''
 
     def test_get_app_config(self):
         """
@@ -52,15 +81,21 @@ class UserSiteSerializerTests(TestCase):
         """
         serializer = self.serializer({}, context=self.context)
 
+        app_config = json.loads(serializer.data['app_config'])
+
         for mobile_app_config_key, mobile_app_config_value in self.test_site_configuration['MOBILE_APP_CONFIG'].items():
-            assert mobile_app_config_value == serializer.data['app_config'].get(mobile_app_config_key)
+            assert mobile_app_config_value == app_config.get(mobile_app_config_key)
 
-        assert self.edly_sub_org_of_user.edx_organization.short_name == serializer.data['app_config'].get('ORGANIZATION_CODE')
+        assert self.edly_sub_org_of_user.edx_organization.short_name == app_config.get('ORGANIZATION_CODE')
 
-        protocol = 'https' if self.request.is_secure() else 'http'
-        url = self.test_site_configuration['SITE_NAME']
-        expected_api_host_url = '{}://{}'.format(protocol, url) if url else ''
-        assert expected_api_host_url == serializer.data['app_config'].get('API_HOST_URL')
+        expected_api_host_url = self.get_expected_url()
+        assert expected_api_host_url == app_config.get('API_HOST_URL')
+
+        self.site_configuration.values['MOBILE_ENABLED'] = False
+        self.site_configuration.save()
+        serializer = self.serializer({}, context=self.context)
+
+        assert not serializer.data['app_config']
 
     def test_site_data(self):
         """
@@ -75,3 +110,20 @@ class UserSiteSerializerTests(TestCase):
             assert color_value == serializer.data['site_data'].get(color_key)
 
         assert self.edly_sub_org_of_user.lms_site.name == serializer.data['site_data'].get('display_name')
+
+        expected_site_url = self.get_expected_url()
+        assert expected_site_url == serializer.data['site_data'].get('site_url')
+
+    def test_mobile_enabled(self):
+        """
+        Verify that `mobile_enabled` returns correct value.
+        """
+        serializer = self.serializer({}, context=self.context)
+
+        assert serializer.data['mobile_enabled']
+
+        self.site_configuration.values['MOBILE_ENABLED'] = False
+        self.site_configuration.save()
+        serializer = self.serializer({}, context=self.context)
+
+        assert not serializer.data['mobile_enabled']

@@ -1,6 +1,8 @@
 """
 Tests for Edly API ViewSets.
 """
+import json
+
 from django.test import TestCase, RequestFactory, Client
 from django.urls import reverse
 
@@ -24,7 +26,7 @@ class TestUserSitesViewSet(TestCase):
         self.user.edly_profile.edly_sub_organizations.add(self.edly_sub_org)
         self.client = Client(SERVER_NAME=self.request_site.domain)
         self.client.login(username=self.user.username, password='test')
-        self.user_sites_list_url = reverse('user-sites-list')
+        self.user_sites_list_url = reverse('user_sites-list')
 
     def test_list_with_logged_in_user(self):
         """
@@ -36,7 +38,7 @@ class TestUserSitesViewSet(TestCase):
 
         data = response.data[0]
         assert data.get('site_data', {}).get('display_name') == self.request_site.name
-        assert data.get('app_config', {}).get('ORGANIZATION_CODE') == self.edly_sub_org.edx_organization.short_name
+        assert not data.get('app_config')
 
     def test_list_without_logged_in_user(self):
         """
