@@ -8,6 +8,7 @@ import json
 import logging
 import os
 import subprocess
+import warnings
 
 import mongoengine
 from django.conf import settings
@@ -51,6 +52,8 @@ class SysadminDashboardView(TemplateView):
         Initialize base sysadmin dashboard class with modulestore,
         modulestore_type and return msg
         """
+        # Deprecation log for Sysadmin Dashboard
+        warnings.warn("Sysadmin Dashboard is deprecated. See DEPR-118.", DeprecationWarning)
 
         self.def_ms = modulestore()
         self.msg = u''
