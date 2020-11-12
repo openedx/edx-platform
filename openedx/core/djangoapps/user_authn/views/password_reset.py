@@ -168,7 +168,6 @@ class PasswordResetFormNoActive(PasswordResetForm):
         else:
             self.users_cache = User.objects.filter(email__iexact=email)
 
-
         if not self.users_cache and is_secondary_email_feature_enabled():
             # Check if user has entered the secondary email.
             self.users_cache = User.objects.filter(
