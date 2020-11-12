@@ -1,5 +1,5 @@
 import json
-from unittest import skipUnless
+from unittest import skipUnless, skipIf
 
 from django.conf import settings
 from django.test.utils import override_settings
@@ -15,6 +15,7 @@ from .test_utils import with_organization_context
 @skip_unless_lms
 @override_settings(DEFAULT_SITE_THEME='edx-theme-codebase')
 @skipUnless(settings.FEATURES['APPSEMBLER_MULTI_TENANT_EMAILS'], 'This only tests multi-tenancy')
+@skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'fix in Juniper')
 class MultiTenantRegistrationViewTest(APITestCase):
     """
     Tests to ensure the registration end-point allow multi-tenant emails.

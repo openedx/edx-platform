@@ -19,7 +19,7 @@ from .test_utils import with_organization_context, create_org_user
 @skip_unless_lms
 @override_settings(
     AUTHENTICATION_BACKENDS=(
-        # Match the Appsembler configuration in appsembler.settings..aws_common
+        # Match the Appsembler configuration in appsembler.settings..production_common
         'organizations.backends.DefaultSiteBackend',
         'organizations.backends.SiteMemberBackend',
         'organizations.backends.OrganizationMemberBackend',
@@ -28,9 +28,9 @@ from .test_utils import with_organization_context, create_org_user
 @skipUnless(settings.FEATURES['APPSEMBLER_MULTI_TENANT_EMAILS'], 'This only tests multi-tenancy')
 class MultiTenantLoginTest(CacheIsolationTestCase):
     """
-    Test student.views.login_user() view.
+    Test user_authn's login_user() view.
 
-    This is similar to student.tests.test_login.LoginTest focuses on our multi-tenant tests including but not
+    This is similar to user_authn's LoginTest focuses on our multi-tenant tests including but not
     limited to `APPSEMBLER_MULTI_TENANT_EMAILS` i.e. these tests test
     the `organizations.backends.OrganizationMemberBackend` backend we rely on for Tahoe security.
     """
@@ -48,7 +48,7 @@ class MultiTenantLoginTest(CacheIsolationTestCase):
         self.client = Client()
         cache.clear()
         # Store the login url
-        self.url = reverse('login')
+        self.url = reverse('login_api')
 
     def test_auth_backends(self):
         """

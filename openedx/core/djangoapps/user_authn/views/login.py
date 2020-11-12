@@ -47,6 +47,11 @@ from track import segment
 from util.json_request import JsonResponse
 from util.password_policy_validators import normalize_password
 
+from django.core.exceptions import MultipleObjectsReturned
+from organizations.models import UserOrganizationMapping
+from openedx.core.djangoapps.appsembler.sites.utils import get_current_organization
+
+
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
 
@@ -89,6 +94,16 @@ def _do_third_party_auth(request):
         raise AuthFailedError(message)
 
 
+def _log_failed_get_user_by_email(email):
+    """
+    Log a failed login attempt.
+    """
+    if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+        AUDIT_LOG.warning(u"Login failed - Unknown user email")
+    else:
+        AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))
+
+
 def _get_user_by_email(request):
     """
     Finds a user object in the database based on the given request, ignores all fields except for email.
@@ -98,13 +113,30 @@ def _get_user_by_email(request):
 
     email = request.POST['email']
 
-    try:
-        return User.objects.get(email=email)
-    except User.DoesNotExist:
-        if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-            AUDIT_LOG.warning(u"Login failed - Unknown user email")
-        else:
-            AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))
+    if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
+        # In this case database-level email constraint is removed, so the search is done at the organization
+        # level.
+        try:
+            current_org = get_current_organization()
+            return current_org.userorganizationmapping_set.get(user__email=email).user
+        except UserOrganizationMapping.DoesNotExist:
+            _log_failed_get_user_by_email(email)
+        except MultipleObjectsReturned:
+            log.exception(
+                u'Studio Multi-Tenant Emails error: More than one user were found with the same email. '
+                u'Please change to a different email on either one of the accounts: {email}'.format(
+                    email='' if settings.FEATURES['SQUELCH_PII_IN_LOGS'] else email,
+                )
+            )
+            # Raise the exception again.
+            # Not very friendly but allows us to identify properly if enough issues were reported
+            # instead of a silent error
+            raise
+    else:
+        try:
+            return User.objects.get(email=email)
+        except User.DoesNotExist:
+            _log_failed_get_user_by_email(email)
 
 
 def _check_excessive_login_attempts(user):
@@ -409,6 +441,7 @@ def login_user(request):
                 response_content['error_code'] = 'third-party-auth-with-no-linked-account'
                 return JsonResponse(response_content, status=403)
         else:
+            # Appsembler: _get_user_by_email makes sure to return the correct user object, from the right organization.
             user = _get_user_by_email(request)
 
         _check_excessive_login_attempts(user)

@@ -1,5 +1,5 @@
 import json
-from unittest import skipUnless
+from unittest import skipUnless, skipIf
 from mock import patch, Mock
 import uuid
 
@@ -16,6 +16,7 @@ from .test_utils import with_organization_context
 
 
 @skip_unless_lms
+@skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'fix in Juniper')
 @skipUnless(settings.FEATURES['APPSEMBLER_MULTI_TENANT_EMAILS'], 'This only tests multi-tenancy')
 @patch(
     # Patch to avoids error when importing from CMS
