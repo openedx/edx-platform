@@ -35,7 +35,7 @@ boto3==1.4.8              # via -r requirements/edx/testing.txt, django-ses, fs-
 boto==2.39.0              # via -r requirements/edx/testing.txt, edxval
 botocore==1.8.17          # via -r requirements/edx/testing.txt, boto3, s3transfer
 bridgekeeper==0.9         # via -r requirements/edx/testing.txt
-celery==4.4.7             # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, django-celery-results, django-user-tasks, edx-celeryutils, edx-enterprise, event-tracking
+-e git+https://github.com/edx/celery.git@iamsobanjaved/celery-logs#egg=celery             # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, django-celery-results, django-user-tasks, edx-celeryutils, edx-enterprise, event-tracking
 certifi==2020.11.8        # via -r requirements/edx/testing.txt, requests
 cffi==1.14.3              # via -r requirements/edx/testing.txt, cryptography
 chardet==3.0.4            # via -r requirements/edx/testing.txt, pysrt, requests
