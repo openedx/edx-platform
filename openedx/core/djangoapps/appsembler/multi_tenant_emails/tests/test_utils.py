@@ -3,7 +3,7 @@ Tests utils for multi-tenant emails.
 """
 
 import contextlib
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 
 from django.conf import settings
 from unittest import skipUnless
@@ -13,6 +13,16 @@ from organizations.models import Organization, UserOrganizationMapping
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 
 from student.tests.factories import UserFactory
+
+
+class FakeSiteAwareRequest:
+    """
+    Fake site-aware request.
+    """
+    GET = {}
+    POST = {}
+    method = 'GET'
+    site = None
 
 
 @contextlib.contextmanager
@@ -43,8 +53,9 @@ def with_organization_context(site_color, configs=None):
             )
             org.sites.add(site)
 
-        current_request = Mock(POST={}, GET={}, site=site)
-        with patch('crum.get_current_request', return_value=current_request):
+        request = FakeSiteAwareRequest()
+        request.site = site
+        with patch('crum.get_current_request', return_value=request):
             yield org
 
 
