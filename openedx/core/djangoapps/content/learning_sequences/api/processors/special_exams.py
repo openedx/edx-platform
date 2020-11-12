@@ -11,14 +11,11 @@ https://github.com/edx/edx-platform/pull/24545#discussion_r501738511
 """
 
 import logging
-from datetime import datetime
 
 from edx_proctoring.api import get_attempt_status_summary
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from opaque_keys.edx.keys import CourseKey
-from util import milestones_helpers
 
 from ...data import SpecialExamAttemptData, UserCourseOutlineData
 from .base import OutlineProcessor
@@ -37,26 +34,11 @@ class SpecialExamsOutlineProcessor(OutlineProcessor):
         """
         self.special_exams_enabled = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False)
 
-    def usage_keys_to_remove(self, full_course_outline):
-        """
-        Remove sections that are exams if special exams are not enabled
-        """
-        keys_to_remove = set()
-        if not self.special_exams_enabled:
-            for section in full_course_outline.sections:
-                keys_to_remove |= {
-                    seq.usage_key
-                    for seq in section.sequences
-                    if bool(seq.exam)
-                }
-
-        return keys_to_remove
-
     def exam_data(self, pruned_course_outline: UserCourseOutlineData) -> SpecialExamAttemptData:
         """
         Return supplementary special exam information for this outline.
 
-        Be careful to pass in a UserCourseOutlineData–i.e. an outline that has
+        Be careful to pass in a UserCourseOutlineData - i.e. an outline that has
         already been pruned to what a user is allowed to see. That way, we can
         use this to make sure that we're not returning data about
         LearningSequences that the user can't see because it was hidden by a

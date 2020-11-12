@@ -979,7 +979,7 @@ class SpecialExamsTestCase(OutlineProcessorTestCase):
         assert len(student_details.outline.sequences) == 4
 
     @patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': False})
-    def test_special_exams_disabled_entirely_removes_exam_sequences(self):
+    def test_special_exams_disabled_preserves_exam_sequences(self):
         at_time = datetime(2020, 5, 22, tzinfo=timezone.utc)
 
         staff_details, student_details, _ = self.get_details(
@@ -991,11 +991,11 @@ class SpecialExamsTestCase(OutlineProcessorTestCase):
         assert len(staff_details.outline.sequences) == 4
 
         # Ensure the exams have been completely removed
-        assert len(student_details.outline.accessible_sequences) == 1
-        assert len(student_details.outline.sequences) == 1
+        assert len(student_details.outline.accessible_sequences) == 4
+        assert len(student_details.outline.sequences) == 4
         for key in self.get_sequence_keys(exclude=[self.seq_normal_key]):
-            assert key not in student_details.outline.accessible_sequences
-            assert key not in student_details.outline.sequences
+            assert key in student_details.outline.accessible_sequences
+            assert key in student_details.outline.sequences
 
     @patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': True})
     @patch('openedx.core.djangoapps.content.learning_sequences.api.processors.special_exams.get_attempt_status_summary')
