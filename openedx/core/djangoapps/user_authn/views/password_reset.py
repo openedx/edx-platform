@@ -45,6 +45,8 @@ from util.json_request import JsonResponse
 from util.password_policy_validators import normalize_password, validate_password
 from util.request_rate_limiter import PasswordResetEmailRateLimiter
 
+from organizations.models import UserOrganizationMapping
+
 SETTING_CHANGE_INITIATED = 'edx.user.settings.change_initiated'
 
 # Maintaining this naming for backwards compatibility.
@@ -154,7 +156,18 @@ class PasswordResetFormNoActive(PasswordResetForm):
         """
         email = self.cleaned_data["email"]
         # The line below contains the only change, removing is_active=True
-        self.users_cache = User.objects.filter(email__iexact=email)
+        if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
+            from openedx.core.djangoapps.appsembler.sites.utils import get_current_organization
+            current_org = get_current_organization()
+            found_mappings = UserOrganizationMapping.objects.filter(
+                user__email__iexact=email,
+                organization=current_org,
+                is_active=True,
+            )
+            self.users_cache = [mapping.user for mapping in found_mappings]
+        else:
+            self.users_cache = User.objects.filter(email__iexact=email)
+
 
         if not self.users_cache and is_secondary_email_feature_enabled():
             # Check if user has entered the secondary email.
