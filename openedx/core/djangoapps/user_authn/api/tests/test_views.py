@@ -77,6 +77,7 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         """
         return {
             'currentProvider': current_provider,
+            'platformName': settings.PLATFORM_NAME,
             'providers': self.get_provider_data(params) if params else [],
             'secondaryProviders': [],
             'finishAuthUrl': pipeline.get_complete_url(backend_name) if backend_name else None,

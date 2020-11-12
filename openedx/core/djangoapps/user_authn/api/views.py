@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
 
-from openedx.core.djangoapps.user_authn.utils import third_party_auth_context
+from openedx.core.djangoapps.user_authn.views.utils import third_party_auth_context
 
 REDIRECT_KEY = 'redirect_to'
 

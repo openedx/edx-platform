@@ -87,6 +87,7 @@ from lms.djangoapps.verify_student.utils import earliest_allowed_verification_da
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
+from openedx.core.djangoapps.user_authn.utils import should_redirect_to_logistration_mircrofrontend
 from common.djangoapps.third_party_auth.utils import user_exists
 from common.djangoapps.track import segment
 from common.djangoapps.util.json_request import JsonResponse
@@ -126,6 +127,9 @@ AUTH_ENTRY_REGISTER_API = 'register_api'
 # URL specified with this setting, rather than to the built-in
 # registration/login form/logic.
 AUTH_ENTRY_CUSTOM = getattr(settings, 'THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS', {})
+
+# If logistration MFE is enabled, the redirect should be to MFE instead of FE
+BASE_URL = settings.LOGISTRATION_MICROFRONTEND_URL if should_redirect_to_logistration_mircrofrontend() else ''
 
 
 def is_api(auth_entry):
@@ -559,11 +563,11 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
     # invariants have been violated and future misbehavior is likely.
     def dispatch_to_login():
         """Redirects to the login page."""
-        return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN])
+        return redirect(BASE_URL + AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN])
 
     def dispatch_to_register():
         """Redirects to the registration page."""
-        return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER])
+        return redirect(BASE_URL + AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER])
 
     def should_force_account_creation():
         """ For some third party providers, we auto-create user accounts """

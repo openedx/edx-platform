@@ -566,6 +566,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
 
         auth_info = {
             "currentProvider": current_provider,
+            "platformName": settings.PLATFORM_NAME,
             "providers": providers,
             "secondaryProviders": [],
             "finishAuthUrl": finish_auth_url,
@@ -596,6 +597,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
 
         auth_info = {
             'currentProvider': current_provider,
+            'platformName': settings.PLATFORM_NAME,
             'providers': [],
             'secondaryProviders': [],
             'finishAuthUrl': finish_auth_url,
