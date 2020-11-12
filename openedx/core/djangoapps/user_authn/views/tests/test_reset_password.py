@@ -55,7 +55,6 @@ def process_request(request):
     "reset password tests should only run in LMS"
 )
 @ddt.ddt
-@patch('student.forms.get_current_site', Mock(return_value=Mock(domain='example.com')))  # Appsembler: Fix broken tests.
 class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
     """
     Tests that clicking reset password sends email, and doesn't activate the user
