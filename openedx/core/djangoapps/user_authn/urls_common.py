@@ -65,13 +65,13 @@ urlpatterns = [
     url(r'^account/password$', password_reset.password_change_request_handler, name='password_change_request'),
 
     # logistration MFE flow
-    url(r'^user_api/v1/account/password_reset/token/validate/$', password_reset.password_reset_token_validate,
+    url(r'^user_api/v1/account/password_reset/token/validate/$', password_reset.PasswordResetTokenValidation.as_view(),
         name="user_api_password_reset_token_validate"),
 
     # logistration MFE reset flow
     url(
         r'^password/reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
-        password_reset.password_reset_logistration,
+        password_reset.LogistrationPasswordReset.as_view(),
         name='logistration_password_reset',
     ),
 ]
