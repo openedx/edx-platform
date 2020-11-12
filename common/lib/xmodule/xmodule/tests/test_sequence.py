@@ -160,7 +160,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         self.assertIn("'prev_url': 'PrevSequential'", html)
         self.assertNotIn("fa fa-check-circle check-circle is-hidden", html)
 
-    @patch('xmodule.seq_module.User.objects.get', return_value=UserFactory.build())
+    @patch('xmodule.seq_module.SequenceModule._get_user', return_value=UserFactory.build())
     def test_timed_exam_gating_waffle_flag(self, mocked_user):
         """
         Verify the code inside the waffle flag is not executed with the flag off
@@ -185,7 +185,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
             mocked_user.assert_called_once()
 
     @override_waffle_flag(TIMED_EXAM_GATING_WAFFLE_FLAG, active=True)
-    @patch('xmodule.seq_module.User.objects.get', return_value=UserFactory.build())
+    @patch('xmodule.seq_module.SequenceModule._get_user', return_value=UserFactory.build())
     def test_that_timed_sequence_gating_respects_access_configurations(self, mocked_user):  # pylint: disable=unused-argument
         """
         Verify that if a time limited sequence contains content type gated problems, we gate the sequence
