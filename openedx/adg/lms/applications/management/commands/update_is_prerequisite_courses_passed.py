@@ -7,8 +7,8 @@ from django.core.management.base import BaseCommand
 from django.db.models import Count, Q
 
 from lms.djangoapps.grades.api import CourseGradeFactory
+from openedx.adg.common.course_meta.models import CourseMeta
 from openedx.adg.lms.applications.models import ApplicationHub
-from openedx.adg.lms.course_meta.models import CourseMeta
 
 logger = logging.getLogger(__name__)
 

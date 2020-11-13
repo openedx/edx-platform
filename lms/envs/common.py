@@ -2567,14 +2567,14 @@ INSTALLED_APPS = [
 ######################### ADG APPS #####################################
 
 ADG_INSTALLED_APPS = [
-
-    'openedx.adg.lms.course_meta',
-
     # ADG Features app
     'openedx.adg.lms.applications',
 ]
 
 INSTALLED_APPS.extend(ADG_INSTALLED_APPS)
+
+from openedx.adg.common.installed_apps import ADG_COMMON_INSTALLED_APPS
+INSTALLED_APPS.extend(ADG_COMMON_INSTALLED_APPS)
 
 ######################### CSRF #########################################
 
@@ -3933,3 +3933,4 @@ SUPPORT_HOW_TO_UNENROLL_LINK = ''
 
 # Notification email settings
 NOTIFICATION_FROM_EMAIL = 'info@omnipreneurshipacademy.com'
+SUSPEND_RECEIVERS = False

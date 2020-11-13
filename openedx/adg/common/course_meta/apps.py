@@ -5,4 +5,4 @@ from django.apps import AppConfig
 
 
 class CourseMetaConfig(AppConfig):
-    name = 'openedx.adg.lms.course_meta'
+    name = 'openedx.adg.common.course_meta'

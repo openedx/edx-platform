@@ -1497,6 +1497,10 @@ INSTALLED_APPS = [
     'rest_framework_jwt',
 ]
 
+######################### ADG APPS #####################################
+
+from openedx.adg.common.installed_apps import ADG_COMMON_INSTALLED_APPS
+INSTALLED_APPS.extend(ADG_COMMON_INSTALLED_APPS)
 
 ################# EDX MARKETING SITE ##################################
 
@@ -2258,3 +2262,7 @@ DISABLE_DEPRECATED_SIGNIN_URL = False
 # .. toggle_tickets: ARCH-1253
 # .. toggle_status: supported
 DISABLE_DEPRECATED_SIGNUP_URL = False
+
+############### ADG #####################
+
+SUSPEND_RECEIVERS = False
