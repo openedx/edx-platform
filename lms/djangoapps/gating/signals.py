@@ -42,7 +42,7 @@ def evaluate_subsection_completion_milestones(**kwargs):
         return  # Content in a library or some other thing that doesn't support milestones
     block_id = six.text_type(instance.block_key)
     user_id = instance.user_id
-    task_evaluate_subsection_completion_milestones(course_id, block_id, user_id)
+    task_evaluate_subsection_completion_milestones.delay(course_id, block_id, user_id)
 
 
 @receiver(COURSE_GRADE_CHANGED)
