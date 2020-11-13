@@ -291,9 +291,14 @@ def get_component_templates(courselike, library=False):
             # add the default template with localized display name
             # TODO: Once mixins are defined per-application, rather than per-runtime,
             # this should use a cms mixed-in class. (cpennington)
+            template_id = None
             display_name = xblock_type_display_name(category, _('Blank'))  # this is the Blank Advanced problem
+            # The first template that is given should be Blank Assessment Template
+            if category == 'openassessment':
+                display_name = _("Blank Open Response Assessment")
+                template_id = "blank-assessment"
             templates_for_category.append(
-                create_template_dict(display_name, category, support_level_without_template, None, 'advanced')
+                create_template_dict(display_name, category, support_level_without_template, template_id, 'advanced')
             )
             categories.add(category)
 

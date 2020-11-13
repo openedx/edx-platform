@@ -2296,7 +2296,7 @@ class TestComponentTemplates(CourseTestCase):
         """
         self._verify_basic_component("discussion", "Discussion")
         self._verify_basic_component("video", "Video")
-        self._verify_basic_component("openassessment", "Open Response Assessment")
+        self._verify_basic_component("openassessment", "Blank Open Response Assessment")
         self._verify_basic_component_display_name("discussion", "Discussion")
         self._verify_basic_component_display_name("video", "Video")
         self._verify_basic_component_display_name("openassessment", "Open Response")
