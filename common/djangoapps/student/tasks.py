@@ -13,6 +13,7 @@ from django.contrib.sites.models import Site
 from edx_ace import ace
 from edx_ace.errors import RecoverableChannelDeliveryError
 from edx_ace.message import Message
+from edx_django_utils.monitoring import set_code_owner_attribute
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.celery.task_utils import emulate_http_request
 
@@ -20,6 +21,7 @@ log = logging.getLogger('edx.celery.task')
 
 
 @task(bind=True, name='student.send_activation_email')
+@set_code_owner_attribute
 def send_activation_email(self, msg_string, from_address=None):
     """
     Sending an activation email to the user.

@@ -78,7 +78,7 @@ edx-celeryutils
 edx-completion
 edx-django-release-util             # Release utils for the edx release pipeline
 edx-django-sites-extensions
-edx-django-utils>=3.8.0             # Utilities for cache, monitoring, and plugins; 3.8.0+ for set_custom_attribute method
+edx-django-utils>=3.12.0            # Utilities for cache, monitoring, and plugins; 3.12.0+ for set_code_owner_attribute method
 edx-drf-extensions
 edx-enterprise
 edx-milestones

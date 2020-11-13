@@ -8,6 +8,7 @@ import logging
 import six
 from celery import task
 from django.contrib.auth.models import User
+from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from lms.djangoapps.gating import api as gating_api
@@ -18,6 +19,7 @@ log = logging.getLogger(__name__)
 
 
 @task()
+@set_code_owner_attribute
 def task_evaluate_subsection_completion_milestones(course_id, block_id, user_id):
     """
     Updates users' milestones related to completion of a subsection.

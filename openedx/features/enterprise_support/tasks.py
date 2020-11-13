@@ -6,6 +6,7 @@ Tasks for Enterprise.
 import logging
 
 from celery import task
+from edx_django_utils.monitoring import set_code_owner_attribute
 
 from enterprise.models import EnterpriseCourseEnrollment
 from openedx.features.enterprise_support.utils import clear_data_consent_share_cache
@@ -14,6 +15,7 @@ log = logging.getLogger('edx.celery.task')
 
 
 @task(name=u'openedx.features.enterprise_support.tasks.clear_enterprise_customer_data_consent_share_cache')
+@set_code_owner_attribute
 def clear_enterprise_customer_data_consent_share_cache(enterprise_customer_uuid):
     """
         clears data_sharing_consent_needed cache for whole enterprise

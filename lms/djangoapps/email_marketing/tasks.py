@@ -11,6 +11,7 @@ import six
 from celery import task
 from django.conf import settings
 from django.core.cache import cache
+from edx_django_utils.monitoring import set_code_owner_attribute
 from sailthru.sailthru_client import SailthruClient
 from sailthru.sailthru_error import SailthruClientError
 
@@ -22,6 +23,7 @@ ACE_ROUTING_KEY = getattr(settings, 'ACE_ROUTING_KEY', None)
 
 
 @task(bind=True, routing_key=ACE_ROUTING_KEY)
+@set_code_owner_attribute
 def get_email_cookies_via_sailthru(self, user_email, post_parms):
     """
     Adds/updates Sailthru cookie information for a new user.
@@ -62,6 +64,7 @@ def get_email_cookies_via_sailthru(self, user_email, post_parms):
 
 
 @task(bind=True, default_retry_delay=3600, max_retries=24, routing_key=ACE_ROUTING_KEY)
+@set_code_owner_attribute
 def update_user(self, sailthru_vars, email, site=None, new_user=False, activation=False):
     """
     Adds/updates Sailthru profile information for a user.
@@ -144,6 +147,7 @@ def is_default_site(site):
 
 
 @task(bind=True, default_retry_delay=3600, max_retries=24, routing_key=ACE_ROUTING_KEY)
+@set_code_owner_attribute
 def update_user_email(self, new_email, old_email):
     """
     Adds/updates Sailthru when a user email address is changed
@@ -304,6 +308,7 @@ def _retryable_sailthru_error(error):
 
 
 @task(bind=True, routing_key=ACE_ROUTING_KEY)
+@set_code_owner_attribute
 def update_course_enrollment(self, email, course_key, mode, site=None):
     """Adds/updates Sailthru when a user adds to cart/purchases/upgrades a course
          Args:
