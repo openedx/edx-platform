@@ -73,7 +73,7 @@ from .toggles import are_team_submissions_enabled
 
 TEAM_MEMBERSHIPS_PER_PAGE = 5
 TOPICS_PER_PAGE = 12
-MAXIMUM_SEARCH_SIZE = 100000
+MAXIMUM_SEARCH_SIZE = 10000
 
 log = logging.getLogger(__name__)
 

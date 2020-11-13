@@ -286,7 +286,7 @@ class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase
     'enrollment_end': {'type': 'date'}
 })
 @override_settings(SEARCH_ENGINE="search.tests.mock_search_engine.MockSearchEngine")
-@override_settings(COURSEWARE_INDEX_NAME=TEST_INDEX_NAME)
+@override_settings(COURSEWARE_INFO_INDEX_NAME=TEST_INDEX_NAME)
 class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, SearcherMixin):
     """
     Tests the search functionality of the courses API.
