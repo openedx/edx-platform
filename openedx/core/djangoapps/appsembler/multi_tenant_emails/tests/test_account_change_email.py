@@ -2,24 +2,28 @@
 Test cases to cover Accounts change email related to APPSEMBLER_MULTI_TENANT_EMAILS.
 """
 
-from unittest import skipUnless, skipIf
 import json
+from unittest.mock import patch, Mock
 
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from django.conf import settings
 from django.urls import reverse
 
-from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.models import PendingEmailChange
 
-from .test_utils import with_organization_context, create_org_user
+from .test_utils import lms_multi_tenant_test, with_organization_context, create_org_user
 
 
-@skip_unless_lms
-@skipUnless(settings.FEATURES['APPSEMBLER_MULTI_TENANT_EMAILS'], 'This tests multi-tenancy')
-@skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'fix in Juniper')
+@lms_multi_tenant_test
+@patch(
+    'openedx.core.djangoapps.user_authn.views.password_reset.get_current_site',
+    Mock(return_value=Mock(domain='example.com'))
+)
+@patch(
+    'openedx.core.djangoapps.ace_common.templatetags.ace._get_google_analytics_tracking_url',
+    Mock(return_value='http://url.com/')
+)
 class TestAccountsAPI(APITestCase):
     """
     Unit tests for the Accounts views.
@@ -92,10 +96,13 @@ class TestAccountsAPI(APITestCase):
             red_ahmed = create_org_user(org, email=self.AHMED_EMAIL, password=self.PASSWORD)
             red_john = create_org_user(org, email=self.JOHN_EMAIL, password=self.PASSWORD)
             response = self.send_patch_email(red_ahmed, red_john.email)
-            disallow_reuse_msg = 'Email reuse within the same organization should be disallowed'
-            assert response.status_code == status.HTTP_400_BAD_REQUEST, disallow_reuse_msg
+            assert response.status_code == status.HTTP_200_OK, '{}: {}'.format(
+                'Email reuse within the same organization should be disallowed',
+                response.content
+            )
             pending_changes = PendingEmailChange.objects.filter(user=red_ahmed)
-            assert not pending_changes.count(), disallow_reuse_msg
+            assert not pending_changes.count(), 'Email reuse within the same organization should be disallowed'
+            assert response.json()['email'] == self.AHMED_EMAIL, 'Should not change the email'
 
     def test_change_email_success_multi_tenant(self):
         """
