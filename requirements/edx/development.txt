@@ -26,7 +26,7 @@ apipkg==1.5               # via -r requirements/edx/testing.txt, execnet
 appdirs==1.4.4            # via -r requirements/edx/testing.txt, fs, virtualenv
 astroid==2.3.3            # via -r requirements/edx/testing.txt, pylint, pylint-celery
 attrs==20.3.0             # via -r requirements/edx/testing.txt, edx-ace, jsonschema, pytest
-babel==2.8.1              # via -r requirements/edx/testing.txt, enmerkar, enmerkar-underscore, sphinx
+babel==2.9.0              # via -r requirements/edx/testing.txt, enmerkar, enmerkar-underscore, sphinx
 beautifulsoup4==4.9.3     # via -r requirements/edx/testing.txt, pynliner
 billiard==3.6.3.0         # via -r requirements/edx/testing.txt, celery
 bleach==3.2.1             # via -r requirements/edx/testing.txt, django-wiki, edx-enterprise, lti-consumer-xblock, ora2, xblock-poll
@@ -196,7 +196,7 @@ nodeenv==1.5.0            # via -r requirements/edx/testing.txt
 numpy==1.18.5             # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, chem, openedx-calc, scipy
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
 openedx-calc==1.0.9       # via -r requirements/edx/testing.txt
-ora2==2.11.5              # via -r requirements/edx/testing.txt
+ora2==2.11.6              # via -r requirements/edx/testing.txt
 packaging==20.4           # via -r requirements/edx/testing.txt, bleach, drf-yasg, pytest, sphinx, tox
 path.py==12.5.0           # via -r requirements/edx/testing.txt, edx-enterprise, edx-i18n-tools, ora2, staff-graded-xblock, xmodule
 path==13.1.0              # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, path.py
@@ -253,7 +253,7 @@ pyyaml==5.3.1             # via -r requirements/edx/testing.txt, code-annotation
 random2==1.0.1            # via -r requirements/edx/testing.txt
 recommender-xblock==1.4.9  # via -r requirements/edx/testing.txt
 redis==3.5.3              # via -r requirements/edx/testing.txt
-regex==2020.11.11         # via -r requirements/edx/testing.txt, nltk
+regex==2020.11.13         # via -r requirements/edx/testing.txt, nltk
 requests-oauthlib==1.3.0  # via -r requirements/edx/testing.txt, social-auth-core
 requests==2.25.0          # via -r requirements/edx/testing.txt, analytics-python, coreapi, django-oauth-toolkit, edx-analytics-data-api-client, edx-bulk-grades, edx-drf-extensions, edx-enterprise, edx-rest-api-client, geoip2, mailsnake, pyjwkest, python-swiftclient, requests-oauthlib, sailthru-client, slumber, social-auth-core, sphinx, tableauserverclient, transifex-client
 rest-condition==1.0.3     # via -r requirements/edx/testing.txt, edx-drf-extensions
@@ -277,7 +277,7 @@ social-auth-core==3.3.3   # via -r requirements/edx/testing.txt, social-auth-app
 sorl-thumbnail==12.6.3    # via -r requirements/edx/testing.txt, django-wiki
 sortedcontainers==2.3.0   # via -r requirements/edx/testing.txt
 soupsieve==2.0.1          # via -r requirements/edx/testing.txt, beautifulsoup4
-sphinx==3.3.0             # via edx-sphinx-theme, sphinxcontrib-httpdomain
+sphinx==3.3.1             # via edx-sphinx-theme, sphinxcontrib-httpdomain
 sphinxcontrib-applehelp==1.0.2  # via sphinx
 sphinxcontrib-devhelp==1.0.2  # via sphinx
 sphinxcontrib-htmlhelp==1.0.3  # via sphinx
@@ -304,7 +304,7 @@ ua-parser==0.10.0         # via -r requirements/edx/testing.txt, django-cookies-
 unicodecsv==0.14.1        # via -r requirements/edx/testing.txt, edx-enterprise
 unidiff==0.6.0            # via -r requirements/edx/testing.txt, coverage-pytest-plugin
 uritemplate==3.0.1        # via -r requirements/edx/testing.txt, coreapi, drf-yasg
-urllib3==1.26.1           # via -r requirements/edx/testing.txt, elasticsearch, geoip2, requests, selenium, transifex-client
+urllib3==1.26.2           # via -r requirements/edx/testing.txt, elasticsearch, geoip2, requests, selenium, transifex-client
 user-util==0.3.1          # via -r requirements/edx/testing.txt
 vine==1.3.0               # via -r requirements/edx/testing.txt, amqp, celery
 virtualenv==20.1.0        # via -r requirements/edx/testing.txt, tox
