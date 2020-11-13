@@ -49,9 +49,9 @@ class CourseKeyHelperTest(TestCase):
             as_course_key(dict(foo='bar'))
 
 
-class TestAPISkipActivationEmail(TestCase):
+class TestAPISendActivationEmail(TestCase):
     """
-    Tests for _skip_activation_email for Tahoe Registration API.
+    Tests for _skip_activation_email for Tahoe Registration API and the related helpers.
     """
 
     @patch.dict('django.conf.settings.FEATURES', {'SKIP_EMAIL_VALIDATION': False})

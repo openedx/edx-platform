@@ -30,15 +30,7 @@ def skip_registration_email_for_registration_api(request):
     """
     skip_email = False
     if request and request.method == 'POST':
+        # TODO: RED-1647 add TahoeAuthMixin permission checks
         skip_email = not request.POST.get('send_activation_email', True)
-
-    if skip_email:
-        # Double check if the callee is a site-admin and they're allowed to skip emails.
-        if request.user.is_authenticated:
-            perm_classes = TahoeAuthMixin.permission_classes
-            for perm_class in perm_classes:
-                perm_checker = perm_class()
-                if not perm_checker.has_permission(request, None):
-                    skip_email = False
 
     return skip_email
