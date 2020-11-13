@@ -103,8 +103,13 @@ upgrade: ## update the pip requirements files to use the latest releases satisfy
 
 .PHONY: docker-tox
 docker-tox:
-	docker build . -t edx-platform-tox
-	docker run edx-platform-tox
+	docker build .  -f Dockerfile.tox -t edx-platform-tox
+	docker run -it -e "NO_PYTHON_UNINSTALL=1" -e "PIP_INDEX_URL=https://pypi.python.org/simple" -e TERM \
+	-v `pwd`:/edx/app/edxapp/edx-platform:cached \
+	-v edxapp_lms_assets:/edx/var/edxapp/staticfiles/ \
+	-v edxapp_node_modules:/edx/app/edxapp/edx-platform/node_modules \
+	-v edxapp_toxenv:/root/edxapp_toxenv \
+	edx-platform-tox /edx/app/edxapp/devstack.sh /bin/bash /edx/app/edxapp/edx-platform/scripts/docker_tox.sh
 
 .PHONY: cloudbuild
 cloudbuild:
