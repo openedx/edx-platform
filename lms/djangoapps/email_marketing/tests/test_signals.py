@@ -30,7 +30,7 @@ from lms.djangoapps.email_marketing.tasks import (
     update_user_email
 )
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
-from common.djangoapps.student.models import Registration
+from common.djangoapps.student.models import Registration, User
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory, UserProfileFactory
 from common.djangoapps.util.json_request import JsonResponse
 
@@ -334,6 +334,10 @@ class EmailMarketingTests(TestCase):
         self.assertFalse(mock_log_error.called)
 
         email_marketing_user_field_changed(None, user=anon)
+        self.assertFalse(mock_log_error.called)
+
+        user = User(username='test', email='test@example.com')
+        email_marketing_user_field_changed(None, user=user)
         self.assertFalse(mock_log_error.called)
 
     @patch('lms.djangoapps.email_marketing.tasks.SailthruClient.api_post')
