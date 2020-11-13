@@ -12,7 +12,7 @@ from opaque_keys.edx.locator import CourseLocator
 from search.search_engine_base import SearchEngine
 from six.moves import map
 
-from cms.djangoapps.contentstore.courseware_index import CoursewareSearchIndexer
+from cms.djangoapps.contentstore.courseware_index import CoursewareSearchIndexer, CourseAboutSearchIndexer
 from xmodule.modulestore.django import modulestore
 
 from .prompt import query_yes_no
@@ -71,29 +71,23 @@ class Command(BaseCommand):
         store = modulestore()
 
         if index_all_courses_option:
-            index_name = CoursewareSearchIndexer.INDEX_NAME
-            doc_type = CoursewareSearchIndexer.DOCUMENT_TYPE
+            index_names = (CoursewareSearchIndexer.INDEX_NAME, CourseAboutSearchIndexer.INDEX_NAME)
             if setup_option:
-                try:
-                    # try getting the ElasticSearch engine
-                    searcher = SearchEngine.get_search_engine(index_name)
-                except exceptions.ElasticsearchException as exc:
-                    logging.exception(u'Search Engine error - %s', exc)
-                    return
+                for index_name in index_names:
+                    try:
+                        searcher = SearchEngine.get_search_engine(index_name)
+                    except exceptions.ElasticsearchException as exc:
+                        logging.exception(u'Search Engine error - %s', exc)
+                        return
 
-                index_exists = searcher._es.indices.exists(index=index_name)  # pylint: disable=protected-access
-                doc_type_exists = searcher._es.indices.exists_type(  # pylint: disable=protected-access
-                    index=index_name,
-                    doc_type=doc_type
-                )
+                    index_exists = searcher._es.indices.exists(index=index_name)  # pylint: disable=protected-access
 
-                index_mapping = searcher._es.indices.get_mapping(  # pylint: disable=protected-access
-                    index=index_name,
-                    doc_type=doc_type
-                ) if index_exists and doc_type_exists else {}
+                    index_mapping = searcher._es.indices.get_mapping(  # pylint: disable=protected-access
+                        index=index_name,
+                    ) if index_exists else {}
 
-                if index_exists and index_mapping:
-                    return
+                    if index_exists and index_mapping:
+                        return
 
             # if reindexing is done during devstack setup step, don't prompt the user
             if setup_option or query_yes_no(self.CONFIRMATION_PROMPT, default="no"):
