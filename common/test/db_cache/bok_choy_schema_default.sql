@@ -2835,7 +2835,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=793 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=794 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5208,8 +5208,8 @@ CREATE TABLE `organizations_organization` (
   `logo` varchar(255) DEFAULT NULL,
   `active` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `organizations_organization_name_71edc74b` (`name`),
-  KEY `organizations_organization_short_name_ef338963` (`short_name`)
+  UNIQUE KEY `organizations_organization_short_name_ef338963_uniq` (`short_name`),
+  KEY `organizations_organization_name_71edc74b` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `organizations_organizationcourse`;
@@ -7486,7 +7486,7 @@ CREATE TABLE `verify_student_manualverification` (
   `updated_at` datetime(6) NOT NULL,
   `reason` varchar(255) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `expiration_date` datetime(6),
+  `expiration_date` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `verify_student_manua_user_id_f38b72b4_fk_auth_user` (`user_id`),
   KEY `verify_student_manualverification_created_at_e4e3731a` (`created_at`),
@@ -7519,7 +7519,7 @@ CREATE TABLE `verify_student_softwaresecurephotoverification` (
   `user_id` int(11) NOT NULL,
   `expiry_date` datetime(6) DEFAULT NULL,
   `expiry_email_date` datetime(6) DEFAULT NULL,
-  `expiration_date` datetime(6),
+  `expiration_date` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `verify_student_softw_copy_id_photo_from_i_059e40b6_fk_verify_st` (`copy_id_photo_from_id`),
   KEY `verify_student_softw_reviewing_user_id_55fd003a_fk_auth_user` (`reviewing_user_id`),
@@ -7550,7 +7550,7 @@ CREATE TABLE `verify_student_ssoverification` (
   `identity_provider_type` varchar(100) NOT NULL,
   `identity_provider_slug` varchar(30) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `expiration_date` datetime(6),
+  `expiration_date` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `verify_student_ssoverification_user_id_5e6186eb_fk_auth_user_id` (`user_id`),
   KEY `verify_student_ssoverification_created_at_6381e5a4` (`created_at`),
