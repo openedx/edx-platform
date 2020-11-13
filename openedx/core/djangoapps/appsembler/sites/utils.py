@@ -208,6 +208,15 @@ def is_request_for_amc_admin(request):
 def get_current_organization(failure_return_none=False):
     """
     Get current organization from request using multiple strategies.
+
+    The split is made to enable global patching of the function.
+    """
+    return _get_current_organization(failure_return_none)
+
+
+def _get_current_organization(failure_return_none=False):
+    """
+    Implements get_current_organization.
     """
     request = get_current_request()
     organization_name = None

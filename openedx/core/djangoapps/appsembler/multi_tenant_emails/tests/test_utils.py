@@ -15,16 +15,6 @@ from openedx.core.djangoapps.site_configuration.tests.test_util import with_site
 from student.tests.factories import UserFactory
 
 
-class FakeSiteAwareRequest:
-    """
-    Fake site-aware request.
-    """
-    GET = {}
-    POST = {}
-    method = 'GET'
-    site = None
-
-
 @contextlib.contextmanager
 def with_organization_context(site_color, configs=None):
     """
@@ -53,9 +43,8 @@ def with_organization_context(site_color, configs=None):
             )
             org.sites.add(site)
 
-        request = FakeSiteAwareRequest()
-        request.site = site
-        with patch('crum.get_current_request', return_value=request):
+        with patch('openedx.core.djangoapps.appsembler.sites.utils._get_current_organization', return_value=org):
+            # Avoids having `get_current_organization` freak out due to missing request.
             yield org
 
 
