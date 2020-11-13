@@ -3,7 +3,6 @@
 Only include view classes here. See the tests/test_permissions.py:get_api_classes()
 method.
 """
-from distutils.util import strtobool
 from functools import partial
 import logging
 import random
@@ -19,13 +18,9 @@ import django.contrib.sites.shortcuts
 
 
 from rest_framework import status, viewsets
-from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.exceptions import NotFound
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
-from organizations.models import OrganizationCourse
 
 from courseware.courses import get_course_by_id
 
@@ -35,6 +30,8 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_authn.views.register import create_account_with_params
 from openedx.core.djangoapps.user_authn.views.password_reset import PasswordResetFormNoActive
 from student.models import CourseEnrollment
+
+from .mixins import TahoeAuthMixin
 
 
 if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
@@ -75,7 +72,7 @@ from openedx.core.djangoapps.appsembler.api.v1.waffle import FIX_ENROLLMENT_RESU
 
 # TODO: Just move into v1 directory
 from openedx.core.djangoapps.appsembler.api.permissions import (
-    IsSiteAdminUser, TahoeAPIUserThrottle
+    TahoeAPIUserThrottle
 )
 from openedx.core.djangoapps.appsembler.api.sites import (
     get_courses_for_site,
@@ -120,24 +117,6 @@ def send_password_reset_email(request):
         return True
     else:
         return False
-
-
-#
-# Mixins for API views
-#
-
-
-class TahoeAuthMixin(object):
-    """Provides a common authorization base for the Tahoe multi-site aware API views
-    """
-    authentication_classes = (
-        SessionAuthentication,
-        TokenAuthentication,
-    )
-    permission_classes = (
-        IsAuthenticated,
-        IsSiteAdminUser,
-    )
 
 
 class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):

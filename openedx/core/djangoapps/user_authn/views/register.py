@@ -77,6 +77,8 @@ from track import segment
 from util.db import outer_atomic
 from util.json_request import JsonResponse
 
+from openedx.core.djangoapps.appsembler.api.helpers import skip_registration_email_for_registration_api
+from openedx.core.djangoapps.theming.helpers import get_current_request
 from openedx.core.djangoapps.appsembler.sites.utils import (
     add_course_creator_role,
     get_current_organization,
@@ -415,6 +417,8 @@ def _skip_activation_email(user, running_pipeline, third_party_provider):
     return (
         settings.FEATURES.get('SKIP_EMAIL_VALIDATION', None) or
         settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING') or
+        skip_registration_email_for_registration_api(get_current_request()) or
+        is_request_for_amc_admin(get_current_request()) or
         (third_party_provider and third_party_provider.skip_email_verification and valid_email)
     )
 
