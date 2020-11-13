@@ -38,11 +38,12 @@ class MandrillClient(object):
     REFERRAL_FOLLOW_UP_EMAIL = 'referred-learner-follow-up'
     REFERRAL_SOCIAL_IMPACT_TOOLKIT = 'social-impact-toolkit'
     MINI_COURSE_ENROLMENT = 'mini-course-enrolment'
+    SEND_ACTION_PLAN = 'send-action-plan'
 
     def __init__(self):
         self.mandrill_client = mandrill.Mandrill(settings.MANDRILL_API_KEY)
 
-    def send_mail(self, template_name, user_email, context, attachments=[], subject=None):
+    def send_mail(self, template_name, user_email, context, attachments=[], subject=None, receiver_emails=[], sender_email=None, images=[]):
         """
         calls the mandrill API for the specific template and email
 
@@ -63,6 +64,15 @@ class MandrillClient(object):
         if subject:
             message.update({'subject': subject})
 
+        if receiver_emails:
+            message.update({'to': receiver_emails})
+
+        if sender_email:
+            message.update({'headers': {'Reply-To': sender_email}})
+
+        if images:
+            message.update({'images': images})
+
         try:
             result = self.mandrill_client.messages.send_template(
                 template_name=template_name,
@@ -70,7 +80,7 @@ class MandrillClient(object):
                 message=message,
             )
             log.info(result)
-        except mandrill.Error, e:
+        except mandrill.Error as e:
             # Mandrill errors are thrown as exceptions
             log.error('A mandrill error occurred: %s - %s' % (e.__class__, e))
             raise
