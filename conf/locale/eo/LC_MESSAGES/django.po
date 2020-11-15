@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-10-25 20:51+0000\n"
-"PO-Revision-Date: 2020-10-25 20:51:22.874682\n"
+"POT-Creation-Date: 2020-11-15 20:54+0000\n"
+"PO-Revision-Date: 2020-11-15 20:54:51.134554\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -7837,15 +7837,6 @@ msgid "Total number of users"
 msgstr "Tötäl nümßér öf üsérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/support/views/manage_user.py lms/templates/tracking_log.html
-msgid "username"
-msgstr "üsérnämé Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "email"
-msgstr "émäïl Ⱡ'σяєм ιρѕ#"
-
-#: lms/djangoapps/dashboard/sysadmin.py
 msgid "Create User Results"
 msgstr "Çréäté Ûsér Résülts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
@@ -7916,14 +7907,6 @@ msgid "Enrollment information for all courses"
 msgstr ""
 "Énröllmént ïnförmätïön för äll çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "role"
-msgstr "rölé Ⱡ'σяєм ι#"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "full_name"
-msgstr "füll_nämé Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Title can't be empty"
@@ -9405,6 +9388,10 @@ msgstr ""
 "Fïnd ïnförmätïön rélätéd tö ä léärnér's prögräm énröllménts Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
+#: lms/djangoapps/support/views/manage_user.py lms/templates/tracking_log.html
+msgid "username"
+msgstr "üsérnämé Ⱡ'σяєм ιρѕυм ∂#"
+
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
 msgstr "üsér_süppört_ürl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
@@ -10234,10 +10221,10 @@ msgstr ""
 #, python-format
 msgid ""
 "Your approval status remains valid for one year, and it will expire "
-"%(expiry_date)s."
+"%(expiration_datetime)s."
 msgstr ""
 "Ýöür äppröväl stätüs rémäïns välïd för öné ýéär, änd ït wïll éxpïré "
-"%(expiry_date)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+"%(expiration_datetime)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
@@ -12809,6 +12796,16 @@ msgstr ""
 "ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢#"
 
 #: openedx/core/djangoapps/user_authn/views/login.py
+#, python-brace-format
+msgid ""
+"To protect your account, it’s been temporarily locked. Try again in {locked_out_period} minutes.\n"
+"To be on the safe side, you can reset your password {link_start}here{link_end} before you try again.\n"
+msgstr ""
+"Tö prötéçt ýöür äççöünt, ït’s ßéén témpörärïlý löçkéd. Trý ägäïn ïn {locked_out_period} mïnütés.\n"
+"Tö ßé ön thé säfé sïdé, ýöü çän rését ýöür pässwörd {link_start}héré{link_end} ßéföré ýöü trý ägäïn.\n"
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ι#\n"
+
+#: openedx/core/djangoapps/user_authn/views/login.py
 msgid "Too many failed login attempts. Try again later."
 msgstr ""
 "Töö mäný fäïléd lögïn ättémpts. Trý ägäïn lätér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
@@ -12835,6 +12832,18 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
 msgid ""
+"Email or password is incorrect.\n"
+"You have {remaining_attempts} more sign-in attempts before your account is temporarily locked.\n"
+"If you{quote}ve forgotten your password, click {link_start}here{link_end} to reset.\n"
+msgstr ""
+"Émäïl ör pässwörd ïs ïnçörréçt.\n"
+"Ýöü hävé {remaining_attempts} möré sïgn-ïn ättémpts ßéföré ýöür äççöünt ïs témpörärïlý löçkéd.\n"
+"Ìf ýöü{quote}vé förgöttén ýöür pässwörd, çlïçk {link_start}héré{link_end} tö rését.\n"
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα#\n"
+
+#: openedx/core/djangoapps/user_authn/views/login.py
+#, python-brace-format
+msgid ""
 "As {allowed_domain} user, You must login with your {allowed_domain} "
 "{link_start}{provider} account{link_end}."
 msgstr ""
@@ -12854,10 +12863,6 @@ msgid "The email address you used to register with {platform_name}"
 msgstr ""
 "Thé émäïl äddréss ýöü üséd tö régïstér wïth {platform_name} Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: openedx/core/djangoapps/user_authn/views/login_form.py
-msgid "Create Account"
-msgstr "Çréäté Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #. Translators: This example email address is used as a placeholder in
 #. a field on the password reset form meant to hold the user's email address.
@@ -13162,6 +13167,10 @@ msgstr ""
 "Ì ägréé tö thé {platform_name} "
 "{tos_link_start}{terms_of_service}{tos_link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢#"
+
+#: openedx/core/djangoapps/user_authn/views/utils.py
+msgid "Create Account"
+msgstr "Çréäté Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: openedx/core/djangoapps/util/user_messages.py
 #, python-brace-format
@@ -14445,10 +14454,10 @@ msgstr "Nö `rölé` spéçïfïéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт 
 
 #: cms/djangoapps/contentstore/views/user.py
 #, python-brace-format
-msgid "User {email} has registered but has not yet activated his/her account."
+msgid "User {email} has registered but has not yet activated their account."
 msgstr ""
-"Ûsér {email} häs régïstéréd ßüt häs nöt ýét äçtïvätéd hïs/hér äççöünt. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+"Ûsér {email} häs régïstéréd ßüt häs nöt ýét äçtïvätéd théïr äççöünt. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Invalid `role` specified."
@@ -15486,7 +15495,7 @@ msgid "Welcome to {platform_name}"
 msgstr "Wélçömé tö {platform_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See http://open.edx.org for more information.
+#. untranslated. See https://open.edx.org for more information.
 #: lms/templates/index_overlay.html
 msgid "It works! Powered by Open edX{registered_trademark}"
 msgstr ""
@@ -16078,6 +16087,12 @@ msgid "Git Logs"
 msgstr "Gït Lögs Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/sysadmin_dashboard.html
+msgid "Note: Sysadmin panel will be deprecated in the next release."
+msgstr ""
+"Nöté: Sýsädmïn pänél wïll ßé dépréçätéd ïn thé néxt réléäsé. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/sysadmin_dashboard.html
 msgid "User Management"
 msgstr "Ûsér Mänägémént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
@@ -16094,35 +16109,12 @@ msgid "Create user"
 msgstr "Çréäté üsér Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/sysadmin_dashboard.html
-msgid "Download list of all users (csv file)"
-msgstr ""
-"Döwnlöäd lïst öf äll üsérs (çsv fïlé) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Check and repair external authentication map"
-msgstr ""
-"Çhéçk änd répäïr éxtérnäl äüthéntïçätïön mäp Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: lms/templates/sysadmin_dashboard.html
 msgid ""
 "Go to each individual course's Instructor dashboard to manage course "
 "enrollment."
 msgstr ""
 "Gö tö éäçh ïndïvïdüäl çöürsé's Ìnstrüçtör däshßöärd tö mänägé çöürsé "
 "énröllmént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Manage course staff and instructors"
-msgstr ""
-"Mänägé çöürsé stäff änd ïnstrüçtörs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Download staff and instructor list (csv file)"
-msgstr ""
-"Döwnlöäd stäff änd ïnstrüçtör lïst (çsv fïlé) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Administer Courses"
@@ -20026,10 +20018,11 @@ msgstr ""
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid ""
-"Your verification is effective for one year. It will expire on {expiry_date}"
+"Your verification is effective for one year. It will expire on "
+"{expiration_datetime}"
 msgstr ""
-"Ýöür vérïfïçätïön ïs éfféçtïvé för öné ýéär. Ìt wïll éxpïré ön {expiry_date}"
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+"Ýöür vérïfïçätïön ïs éfféçtïvé för öné ýéär. Ìt wïll éxpïré ön "
+"{expiration_datetime} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 msgid "Hi {full_name},"
@@ -20604,6 +20597,10 @@ msgstr "Hönör Ⱡ'σяєм ιρѕ#"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Professional"
 msgstr "Pröféssïönäl Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Executive Education"
+msgstr "Éxéçütïvé Édüçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Master's"
@@ -23113,16 +23110,6 @@ msgstr ""
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "edX Partner Portal"
 msgstr "édX Pärtnér Pörtäl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: themes/edx.org/lms/templates/dashboard.html
-msgid "Want to make edX better for everyone?"
-msgstr ""
-"Wänt tö mäké édX ßéttér för évérýöné? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
-
-#: themes/edx.org/lms/templates/dashboard.html
-msgid "Get started"
-msgstr "Gét stärtéd Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: themes/edx.org/lms/templates/dashboard.html
 msgid ""
