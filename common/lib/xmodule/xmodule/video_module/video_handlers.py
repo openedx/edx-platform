@@ -384,6 +384,17 @@ class VideoStudentViewHandlers(object):
         return response
 
     @XBlock.handler
+    def v1_student_view_data(self, request, suffix=''):
+        """
+        Add description here
+        """
+        return Response(
+            json.dumps(self.student_view_data()),
+            content_type='application/json',
+            charset='UTF-8'
+        )
+
+    @XBlock.handler
     def yt_video_metadata(self, request, suffix=''):
         """
         Endpoint to get YouTube metadata.
