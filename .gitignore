@@ -147,8 +147,5 @@ dist
 # Locally generated PII reports
 pii_report
 
-# transifex configurations
-.transifexrc
-
 # adg edx-theme
 themes/adg-edx-theme/
