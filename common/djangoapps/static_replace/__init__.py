@@ -23,8 +23,7 @@ def _url_replace_regex(prefix):
     To anyone contemplating making this more complicated:
     http://xkcd.com/1171/
     """
-    return u"""
-        (?x)                      # flags=re.VERBOSE
+    return """(?x)                # flags=re.VERBOSE
         (?P<quote>\\\\?['"])      # the opening quotes
         (?P<prefix>{prefix})      # the prefix
         (?P<rest>.*?)             # everything else in the url
