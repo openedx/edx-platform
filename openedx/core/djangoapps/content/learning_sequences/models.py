@@ -82,6 +82,7 @@ class CourseContext(TimeStampedModel):
     )
     days_early_for_beta = models.IntegerField(null=True, blank=True)
     self_paced = models.BooleanField(default=False)
+    entrance_exam_id = models.CharField(max_length=255, null=True)
 
 
 class LearningSequence(TimeStampedModel):
@@ -196,3 +197,15 @@ class CourseSectionSequence(CourseContentVisibilityMixin, TimeStampedModel):
         unique_together = [
             ['course_context', 'ordering'],
         ]
+
+
+class CourseSequenceExam(TimeStampedModel):
+    """
+    This model stores XBlock information that affects outline level information
+    pertaining to special exams
+    """
+    course_section_sequence = models.OneToOneField(CourseSectionSequence, on_delete=models.CASCADE, related_name='exam')
+
+    is_practice_exam = models.BooleanField(default=False)
+    is_proctored_enabled = models.BooleanField(default=False)
+    is_time_limited = models.BooleanField(default=False)

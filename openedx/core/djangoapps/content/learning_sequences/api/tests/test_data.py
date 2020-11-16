@@ -32,6 +32,7 @@ class TestCourseOutlineData(TestCase):
             title="Exciting Test Course!",
             published_at=datetime(2020, 5, 19, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2014",
+            entrance_exam_id=None,
             days_early_for_beta=None,
             sections=generate_sections(cls.course_key, [3, 2]),
             self_paced=False,

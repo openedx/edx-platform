@@ -16,15 +16,28 @@ from edx_django_utils.monitoring import function_trace
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from ..data import (
-    CourseOutlineData, CourseSectionData, CourseLearningSequenceData,
-    UserCourseOutlineData, UserCourseOutlineDetailsData, VisibilityData,
-    CourseVisibility
+    CourseLearningSequenceData,
+    CourseOutlineData,
+    CourseSectionData,
+    CourseVisibility,
+    ExamData,
+    UserCourseOutlineData,
+    UserCourseOutlineDetailsData,
+    VisibilityData,
 )
 from ..models import (
-    CourseSection, CourseSectionSequence, CourseContext, LearningContext, LearningSequence
+    CourseSection,
+    CourseSectionSequence,
+    CourseContext,
+    CourseSequenceExam,
+    LearningContext,
+    LearningSequence
 )
 from .permissions import can_see_all_content
+from .processors.content_gating import ContentGatingOutlineProcessor
+from .processors.milestones import MilestonesOutlineProcessor
 from .processors.schedule import ScheduleOutlineProcessor
+from .processors.special_exams import SpecialExamsOutlineProcessor
 from .processors.visibility import VisibilityOutlineProcessor
 from .processors.enrollment import EnrollmentOutlineProcessor
 
@@ -67,13 +80,23 @@ def get_course_outline(course_key: CourseKey) -> CourseOutlineData:
     section_sequence_models = CourseSectionSequence.objects \
         .filter(course_context=course_context) \
         .order_by('ordering') \
-        .select_related('sequence')
+        .select_related('sequence', 'exam')
 
     # Build mapping of section.id keys to sequence lists.
     sec_ids_to_sequence_list = defaultdict(list)
 
     for sec_seq_model in section_sequence_models:
         sequence_model = sec_seq_model.sequence
+
+        try:
+            exam_data = ExamData(
+                is_practice_exam=sec_seq_model.exam.is_practice_exam,
+                is_proctored_enabled=sec_seq_model.exam.is_proctored_enabled,
+                is_time_limited=sec_seq_model.exam.is_time_limited
+            )
+        except CourseSequenceExam.DoesNotExist:
+            exam_data = ExamData()
+
         sequence_data = CourseLearningSequenceData(
             usage_key=sequence_model.usage_key,
             title=sequence_model.title,
@@ -81,7 +104,8 @@ def get_course_outline(course_key: CourseKey) -> CourseOutlineData:
             visibility=VisibilityData(
                 hide_from_toc=sec_seq_model.hide_from_toc,
                 visible_to_staff_only=sec_seq_model.visible_to_staff_only,
-            )
+            ),
+            exam=exam_data
         )
         sec_ids_to_sequence_list[sec_seq_model.section_id].append(sequence_data)
 
@@ -104,6 +128,7 @@ def get_course_outline(course_key: CourseKey) -> CourseOutlineData:
         published_at=course_context.learning_context.published_at,
         published_version=course_context.learning_context.published_version,
         days_early_for_beta=course_context.days_early_for_beta,
+        entrance_exam_id=course_context.entrance_exam_id,
         sections=sections_data,
         self_paced=course_context.self_paced,
         course_visibility=CourseVisibility(course_context.course_visibility),
@@ -163,10 +188,12 @@ def get_user_course_outline_details(course_key: CourseKey,
         course_key, user, at_time
     )
     schedule_processor = processors['schedule']
+    special_exams_processor = processors['special_exams']
 
     return UserCourseOutlineDetailsData(
         outline=user_course_outline,
-        schedule=schedule_processor.schedule_data(user_course_outline)
+        schedule=schedule_processor.schedule_data(user_course_outline),
+        special_exam_attempts=special_exams_processor.exam_data(user_course_outline)
     )
 
 
@@ -181,12 +208,13 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,
     # released. These do not need to be run for staff users. This is where we
     # would add in pluggability for OutlineProcessors down the road.
     processor_classes = [
+        ('content_gating', ContentGatingOutlineProcessor),
+        ('milestones', MilestonesOutlineProcessor),
         ('schedule', ScheduleOutlineProcessor),
+        ('special_exams', SpecialExamsOutlineProcessor),
         ('visibility', VisibilityOutlineProcessor),
         ('enrollment', EnrollmentOutlineProcessor),
         # Future:
-        # ('content_gating', ContentGatingOutlineProcessor),
-        # ('milestones', MilestonesOutlineProcessor),
         # ('user_partitions', UserPartitionsOutlineProcessor),
     ]
 
@@ -225,6 +253,7 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,
                 'title',
                 'published_at',
                 'published_version',
+                'entrance_exam_id',
                 'sections',
                 'self_paced',
                 'course_visibility',
@@ -279,6 +308,7 @@ def _update_course_context(course_outline: CourseOutlineData):
             'course_visibility': course_outline.course_visibility.value,
             'days_early_for_beta': course_outline.days_early_for_beta,
             'self_paced': course_outline.self_paced,
+            'entrance_exam_id': course_outline.entrance_exam_id,
         }
     )
     if created:
@@ -349,7 +379,7 @@ def _update_course_section_sequences(course_outline: CourseOutlineData, course_c
     ordering = 0
     for section_data in course_outline.sections:
         for sequence_data in section_data.sequences:
-            CourseSectionSequence.objects.update_or_create(
+            course_section_sequence, _ = CourseSectionSequence.objects.update_or_create(
                 course_context=course_context,
                 section=section_models[section_data.usage_key],
                 sequence=sequence_models[sequence_data.usage_key],
@@ -361,3 +391,17 @@ def _update_course_section_sequences(course_outline: CourseOutlineData, course_c
                 },
             )
             ordering += 1
+
+            # If a sequence is an exam, update or create an exam record
+            if bool(sequence_data.exam):
+                CourseSequenceExam.objects.update_or_create(
+                    course_section_sequence=course_section_sequence,
+                    defaults={
+                        'is_practice_exam': sequence_data.exam.is_practice_exam,
+                        'is_proctored_enabled': sequence_data.exam.is_proctored_enabled,
+                        'is_time_limited': sequence_data.exam.is_time_limited,
+                    },
+                )
+            else:
+                # Otherwise, delete any exams associated with it
+                CourseSequenceExam.objects.filter(course_section_sequence=course_section_sequence).delete()
