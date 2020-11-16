@@ -39,6 +39,7 @@ from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
+from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import (
@@ -282,6 +283,37 @@ class CoursewareMeta:
                 self.overview.display_name, user_certificate.mode, cert_url, certificate=user_certificate,
             )
 
+    @property
+    def related_programs(self):
+        """
+        Returns related program data if the effective_user is enrolled.
+        Note: related programs can be None depending on the course.
+        """
+        if self.effective_user.is_anonymous:
+            return
+
+        meter = ProgramProgressMeter(self.request.site, self.effective_user)
+        inverted_programs = meter.invert_programs()
+        related_programs = inverted_programs.get(str(self.course_key))
+
+        if related_programs is None:
+            return
+
+        related_progress = meter.progress(programs=related_programs)
+        progress_by_program = {
+            progress['uuid']: progress for progress in related_progress
+        }
+
+        programs = [{
+            'progress': progress_by_program[program['uuid']],
+            'title': program['title'],
+            'slug': program['type_attrs']['slug'],
+            'url': program['detail_url'],
+            'uuid': program['uuid']
+        } for program in related_programs]
+
+        return programs
+
 
 class CoursewareInformation(RetrieveAPIView):
     """
@@ -311,6 +343,17 @@ class CoursewareInformation(RetrieveAPIView):
         * name: Name of the course
         * number: Catalog number of the course
         * org: Name of the organization that owns the course
+        * related_programs: A list of objects that contains program data related to the given course including:
+            * progress: An object containing program progress:
+                * complete: (int) Number of complete courses in the program (a course is completed if the user has
+                    earned a certificate for any of the nested course runs)
+                * in_progress: (int) Number of courses in the program that are in progress (a course is in progress if
+                    the user has enrolled in any of the nested course runs)
+                * not_started: (int) Number of courses in the program that have not been started
+            * slug: (str) The program type
+            * title: (str) The title of the program
+            * url: (str) The link to the program's landing page
+            * uuid: (str) A unique identifier of the program
         * short_description: A textual description of the course
         * start: Date the course begins, in ISO 8601 notation
         * start_display: Readably formatted start of the course
