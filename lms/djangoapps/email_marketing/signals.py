@@ -173,6 +173,10 @@ def email_marketing_user_field_changed(sender, user=None, table=None, setting=No
     if user.is_anonymous:
         return
 
+    # Ignore users that do not yet have a profile
+    if not hasattr(user, 'profile'):
+        return
+
     # ignore anything but User, Profile or UserPreference tables
     if table not in {'auth_user', 'auth_userprofile', 'user_api_userpreference'}:
         return
