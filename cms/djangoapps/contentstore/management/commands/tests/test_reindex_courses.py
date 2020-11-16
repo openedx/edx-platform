@@ -119,11 +119,3 @@ class TestReindexCourse(ModuleStoreTestCase):
 
                 patched_yes_no.assert_called_once_with(ReindexCommand.CONFIRMATION_PROMPT, default='no')
                 patched_index.assert_not_called()
-
-    def test_fail_fast_if_reindex_fails(self):
-        """ Test that fails on first reindexing exception """
-        with mock.patch(self.REINDEX_PATH_LOCATION) as patched_index:
-            patched_index.side_effect = SearchIndexingError("message", [])
-
-            with self.assertRaises(SearchIndexingError):
-                call_command('reindex_course', text_type(self.second_course.id))

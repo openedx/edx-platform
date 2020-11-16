@@ -101,4 +101,7 @@ class Command(BaseCommand):
             course_keys = list(map(self._parse_course_key, course_ids))
 
         for course_key in course_keys:
-            CoursewareSearchIndexer.do_course_reindex(store, course_key)
+            try:
+                CoursewareSearchIndexer.do_course_reindex(store, course_key)
+            except Exception as exc:
+                logging.exception('Error indexing course %s due to the error: %s', course_key, exc)
