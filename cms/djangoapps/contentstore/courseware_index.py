@@ -27,6 +27,10 @@ from xmodule.modulestore import ModuleStoreEnum
 # how far back from the trigger point to look back in order to index
 REINDEX_AGE = timedelta(0, 60)  # 60 seconds
 
+# INDEXING_REQUEST_TIMEOUT is the number of seconds before a request is considered
+# timed out for courseware indexing.
+INDEXING_REQUEST_TIMEOUT = 60
+
 log = logging.getLogger('edx.modulestore')
 
 
@@ -112,7 +116,7 @@ class SearchIndexerBase(object, metaclass=ABCMeta):
         searcher.remove(result_ids)
 
     @classmethod
-    def index(cls, modulestore, structure_key, triggered_at=None, reindex_age=REINDEX_AGE):
+    def index(cls, modulestore, structure_key, triggered_at=None, reindex_age=REINDEX_AGE, timeout=INDEXING_REQUEST_TIMEOUT):
         """
         Process course for indexing
 
@@ -254,7 +258,7 @@ class SearchIndexerBase(object, metaclass=ABCMeta):
                 # Now index the content
                 for item in structure.get_children():
                     prepare_item_index(item, groups_usage_info=groups_usage_info)
-                searcher.index(items_index)
+                searcher.index(items_index, request_timeout=timeout)
                 cls.remove_deleted_items(searcher, structure_key, indexed_items)
         except Exception as err:  # pylint: disable=broad-except
             # broad exception so that index operation does not prevent the rest of the application from working
