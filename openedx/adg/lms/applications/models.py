@@ -50,6 +50,20 @@ class UserApplication(TimeStampedModel):
     )
     cover_letter = models.TextField(blank=True, )
 
+    OPEN = 'open'
+    ACCEPTED = 'accepted'
+    WAITLIST = 'waitlist'
+
+    STATUS_CHOICES = (
+        (OPEN, _('Open')),
+        (ACCEPTED, _('Accepted')),
+        (WAITLIST, _('Waitlist')),
+    )
+    status = models.CharField(
+        verbose_name=_('Application Status'), choices=STATUS_CHOICES, max_length=8, default=OPEN,
+    )
+    reviewed_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE, )
+
     class Meta:
         app_label = 'applications'
         verbose_name = _('User Application')
@@ -123,3 +137,18 @@ class WorkExperience(UserStartAndEndDates):
 
     def __str__(self):
         return 'WorkExperience {id}, for {organization}'.format(id=self.id, organization=self.name_of_organization)
+
+
+class AdminNote(TimeStampedModel):
+    """
+    Model to save the notes of admin on the user application.
+    """
+    user_application = models.ForeignKey(UserApplication, on_delete=models.CASCADE, )
+    admin = models.ForeignKey(User,  on_delete=models.CASCADE, )
+    admin_note = models.TextField(verbose_name=_('Admin Note'), blank=True, )
+
+    class Meta:
+        app_label = 'applications'
+
+    def __str__(self):
+        return 'Application {id}, Admin note {note} '.format(id=self.user_application.id, note=self.admin_note)
