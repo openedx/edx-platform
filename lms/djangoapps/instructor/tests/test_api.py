@@ -1967,7 +1967,8 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
         with LogCapture() as capture:
             message = u'Cancelling course certificate generation for user [{}] against course [{}], ' \
                       u'user is a Beta Tester.'
-            message = message.format(self.course.id, self.beta_tester.username)
+            message = message.format(self.beta_tester.username, self.course.id)
+
             generate_user_certificates(self.beta_tester, self.course.id, self.course)
             capture.check_present(('edx.certificate', 'INFO', message))
 
