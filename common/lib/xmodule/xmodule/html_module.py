@@ -42,14 +42,14 @@ log = logging.getLogger("edx.courseware")
 _ = lambda text: text
 
 
-@edxnotes
 @XBlock.needs("i18n")
-class HtmlBlock(
+class HtmlBlockMixin(
     XmlMixin, EditingMixin,
     XModuleDescriptorToXBlockMixin, XModuleToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin,
 ):
     """
-    The HTML XBlock.
+    The HTML XBlock mixin.
+    This provides the base class for all Html-ish blocks (including the HTML XBlock).
     """
     display_name = String(
         display_name=_("Display Name"),
@@ -116,7 +116,13 @@ class HtmlBlock(
 
     def get_html(self):
         """ Returns html required for rendering the block. """
-        return get_html(self)
+        if self.data:
+            data = self.data
+            if getattr(self.runtime, 'anonymous_student_id', None):
+                data = data.replace("%%USER_ID%%", self.runtime.anonymous_student_id)
+            data = data.replace("%%COURSE_ID%%", str(self.scope_ids.usage_id.context_key))
+            return data
+        return self.data
 
     def studio_view(self, _context):
         """
@@ -335,12 +341,12 @@ class HtmlBlock(
         """
         `use_latex_compiler` should not be editable in the Studio settings editor.
         """
-        non_editable_fields = super(HtmlBlock, self).non_editable_metadata_fields
-        non_editable_fields.append(HtmlBlock.use_latex_compiler)
+        non_editable_fields = super(HtmlBlockMixin, self).non_editable_metadata_fields
+        non_editable_fields.append(HtmlBlockMixin.use_latex_compiler)
         return non_editable_fields
 
     def index_dictionary(self):
-        xblock_body = super(HtmlBlock, self).index_dictionary()
+        xblock_body = super(HtmlBlockMixin, self).index_dictionary()
         # Removing script and style
         html_content = re.sub(
             re.compile(
@@ -366,17 +372,14 @@ class HtmlBlock(
         return xblock_body
 
 
-def get_html(block: HtmlBlock):
+@edxnotes
+class HtmlBlock(HtmlBlockMixin):
     """
-    Common function to get html content from an HtmlBlock.
+    This is the actual HTML XBlock.
+    Nothing extra is required, but this has the edxnotes decorator so that
+    it can have edxnotes used with it.
     """
-    if block.data:
-        data = block.data
-        if getattr(block.runtime, 'anonymous_student_id', None):
-            data = data.replace("%%USER_ID%%", block.runtime.anonymous_student_id)
-        data = data.replace("%%COURSE_ID%%", str(block.scope_ids.usage_id.context_key))
-        return data
-    return block.data
+    pass
 
 
 class AboutFields(object):
@@ -393,20 +396,12 @@ class AboutFields(object):
 
 
 @XBlock.tag("detached")
-class AboutBlock(AboutFields, HtmlBlock):
+class AboutBlock(AboutFields, HtmlBlockMixin):
     """
     These pieces of course content are treated as HtmlBlocks but we need to overload where the templates are located
     in order to be able to create new ones
     """
     template_dir_name = "about"
-
-    def get_html(self):
-        """
-        Returns html required for rendering the block.
-        This is required because HtmlBlock.get_html is overridden with the edxnotes,
-        and we don't want edxnotes injected into the about course sections.
-        """
-        return get_html(self)
 
 
 class StaticTabFields(object):
@@ -461,7 +456,7 @@ class CourseInfoFields(object):
 
 
 @XBlock.tag("detached")
-class CourseInfoBlock(CourseInfoFields, HtmlBlock):
+class CourseInfoBlock(CourseInfoFields, HtmlBlockMixin):
     """
     These pieces of course content are treated as HtmlBlock but we need to overload where the templates are located
     in order to be able to create new ones
