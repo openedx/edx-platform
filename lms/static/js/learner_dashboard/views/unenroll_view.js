@@ -47,7 +47,7 @@ class UnenrollView extends Backbone.View {
         category: 'user-engagement',
         label: reason,
         displayName: 'v1',
-        courserunKey,
+        course_id: courserunKey,
       });
     }
     this.$('.slide1').addClass('hidden');
