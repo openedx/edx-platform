@@ -664,11 +664,11 @@ class VerificationDeadlineDate(DateSummary):
             'verification-deadline-passed': (_('Learn More'), ''),
             'verification-deadline-retry': (
                 _('Retry Verification'),
-                IDVerificationService.get_verify_location('verify_student_reverify'),
+                IDVerificationService.get_verify_location(),
             ),
             'verification-deadline-upcoming': (
                 _('Verify My Identity'),
-                IDVerificationService.get_verify_location('verify_student_verify_now', self.course_id),
+                IDVerificationService.get_verify_location(self.course_id),
             )
         }
 
