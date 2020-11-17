@@ -24,5 +24,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_PREFIX: "appsembler/tahoe/develop"
-          PULL_REQUEST_BRANCH: "appsembler/juniper-upgrade"
+          PULL_REQUEST_BRANCH: "main"
           PULL_REQUEST_REVIEWERS: "johnbaldwin melvinsoft OmarIthawi thraxil"
+
