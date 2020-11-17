@@ -208,7 +208,7 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
 
     if beta_testers_queryset.filter(username=student.username):
         message = u'Cancelling course certificate generation for user [{}] against course [{}], user is a Beta Tester.'
-        log.info(message.format(course_key, student.username))
+        log.info(message.format(student.username, course_key))
         return
 
     xqueue = XQueueCertInterface()
