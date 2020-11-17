@@ -25,8 +25,8 @@ from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.utils import get_data_consent_share_cache_key
-from third_party_auth.pipeline import get as get_partial_pipeline
-from third_party_auth.provider import Registry
+from common.djangoapps.third_party_auth.pipeline import get as get_partial_pipeline
+from common.djangoapps.third_party_auth.provider import Registry
 
 try:
     from enterprise.models import (
@@ -103,14 +103,15 @@ class ConsentApiClient(object):
         # Call the endpoint with the given kwargs, and check the value that it provides.
         response = self.consent_endpoint.get(**kwargs)
 
+        LOGGER.info(
+            '[ENTERPRISE DSC] Consent Requirement Info. APIParams: [%s], APIResponse: [%s], EnrollmentExists: [%s]',
+            kwargs,
+            response,
+            enrollment_exists,
+        )
+
         # No Enterprise record exists, but we're already enrolled in a course. So, go ahead and proceed.
         if enrollment_exists and not response.get('exists', False):
-            LOGGER.info(
-                '[ENTERPRISE DSC] No Consent Required. APIParams: [%s], APIResponse: [%s], EnrollmentExists: [%s]',
-                kwargs,
-                response,
-                enrollment_exists,
-            )
             return False
 
         # In all other cases, just trust the Consent API.
@@ -573,7 +574,7 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
         client = ConsentApiClient(user=request.user)
         current_enterprise_uuid = enterprise_customer_uuid_for_request(request)
         consent_needed = any(
-            current_enterprise_uuid == learner['enterprise_customer']['uuid']
+            str(current_enterprise_uuid) == str(learner['enterprise_customer']['uuid'])
             and Site.objects.get(domain=learner['enterprise_customer']['site']['domain']) == request.site
             and client.consent_required(
                 username=user.username,
@@ -583,6 +584,28 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
             )
             for learner in enterprise_learner_details
         )
+
+        if not consent_needed:
+            enterprises = [str(learner['enterprise_customer']['uuid']) for learner in enterprise_learner_details]
+
+            if str(current_enterprise_uuid) not in enterprises:
+                LOGGER.info(
+                    '[ENTERPRISE DSC] Consent requirement failed due to enterprise mismatch. '
+                    'USER: [%s], CurrentEnterprise: [%s], LearnerEnterprises: [%s]',
+                    user.username,
+                    current_enterprise_uuid,
+                    enterprises
+                )
+            else:
+                domains = [learner['enterprise_customer']['site']['domain'] for learner in enterprise_learner_details]
+                if not Site.objects.filter(domain__in=domains).filter(id=request.site.id).exists():
+                    LOGGER.info(
+                        '[ENTERPRISE DSC] Consent requirement failed due to site mismatch. '
+                        'USER: [%s], RequestSite: [%s], LearnerEnterpriseDomains: [%s]',
+                        user.username,
+                        request.site,
+                        domains
+                    )
 
         if consent_needed:
             LOGGER.info(
@@ -594,7 +617,7 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
             )
         else:
             LOGGER.info(
-                u"Consent from user [{username}] is not needed for course [{course_id}]. The user's current enterprise"
+                u"Consent from user [{username}] is not needed for course [{course_id}]. The user's current enterprise "
                 u"does not require data sharing consent.".format(
                     username=user.username,
                     course_id=course_id

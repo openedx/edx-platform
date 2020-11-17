@@ -30,6 +30,8 @@ class HLSPlaybackEnabledFlag(ConfigurationModel):
     .. toggle_description: Add the "hls" profile to all displayed videos on the platform.
     .. toggle_use_cases:  open_edx
     .. toggle_creation_date: 2017-04-19
+    .. toggle_target_removal_date: None
+    .. toggle_warnings: None
     .. toggle_tickets: https://github.com/edx/edx-platform/pull/14924
     """
     # this field overrides course-specific settings
@@ -80,6 +82,8 @@ class CourseHLSPlaybackEnabledFlag(ConfigurationModel):
     .. toggle_description: Add the "hls" profile to all displayed videos for a single course.
     .. toggle_use_cases:  open_edx
     .. toggle_creation_date: 2017-04-19
+    .. toggle_target_removal_date: None
+    .. toggle_warnings: None
     .. toggle_tickets: https://github.com/edx/edx-platform/pull/14924
     """
     KEY_FIELDS = ('course_id',)

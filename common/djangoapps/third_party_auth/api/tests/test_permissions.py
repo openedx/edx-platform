@@ -14,9 +14,9 @@ from mock import patch
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
-from third_party_auth.api.permissions import TPA_PERMISSIONS
+from common.djangoapps.third_party_auth.api.permissions import TPA_PERMISSIONS
 
 IDP_SLUG_TESTSHIB = 'testshib'
 PROVIDER_ID_TESTSHIB = 'saml-' + IDP_SLUG_TESTSHIB

@@ -10,6 +10,7 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.courseware.entrance_exams import (
     course_has_entrance_exam,
     get_entrance_exam_content,
@@ -20,12 +21,11 @@ from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module, handle_xblock_callback, toc_for_course
 from lms.djangoapps.courseware.tests.factories import InstructorFactory, RequestFactoryNoCsrf, StaffFactory, UserFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.features.course_experience import DISABLE_COURSE_OUTLINE_PAGE_FLAG, DISABLE_UNIFIED_COURSE_TAB_FLAG
-from student.models import CourseEnrollment
-from student.tests.factories import AnonymousUserFactory, CourseEnrollmentFactory
-from util.milestones_helpers import (
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import AnonymousUserFactory, CourseEnrollmentFactory
+from common.djangoapps.util.milestones_helpers import (
     add_course_content_milestone,
     add_course_milestone,
     add_milestone,
@@ -476,7 +476,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         self._assert_chapter_loaded(self.course, self.chapter)
 
-    @patch('util.milestones_helpers.get_required_content', Mock(return_value=['a value']))
+    @patch('common.djangoapps.util.milestones_helpers.get_required_content', Mock(return_value=['a value']))
     def test_courseware_page_access_with_staff_user_without_passing_entrance_exam(self):
         """
         Test courseware access page without passing entrance exam but with staff user

@@ -8,7 +8,7 @@ from rest_framework.exceptions import PermissionDenied
 
 from openedx.core.djangoapps.credit import serializers, signature
 from openedx.core.djangoapps.credit.tests.factories import CreditEligibilityFactory, CreditProviderFactory
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class CreditProviderSerializerTests(TestCase):

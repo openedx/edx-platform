@@ -4,7 +4,7 @@ Serializer for SAMLProviderConfig
 
 from rest_framework import serializers
 
-from third_party_auth.models import SAMLProviderConfig, SAMLConfiguration
+from common.djangoapps.third_party_auth.models import SAMLProviderConfig, SAMLConfiguration
 
 
 class SAMLProviderConfigSerializer(serializers.ModelSerializer):

@@ -13,6 +13,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
+from edx_toggles.toggles.testutils import override_waffle_switch
 from mock import Mock, PropertyMock, patch
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.asides import AsideUsageKeyV2
@@ -34,10 +35,12 @@ from xblock.validation import ValidationMessage
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
 from cms.djangoapps.contentstore.views import item as item_module
-from lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
-from student.tests.factories import UserFactory
-from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
-from xblock_django.user_service import DjangoXBlockUserService
+from lms.djangoapps.lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.xblock_django.models import (
+    XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
+)
+from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from xmodule.capa_module import ProblemBlock
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore import ModuleStoreEnum
@@ -2666,7 +2669,7 @@ class TestXBlockInfo(ItemTest):
         self.course.highlights_enabled_for_messaging = True
         self.store.update_item(self.course, None)
         chapter = self.store.get_item(self.chapter.location)
-        with highlights_setting.override():
+        with override_waffle_switch(highlights_setting, active=True):
             chapter_xblock_info = create_xblock_info(chapter)
             course_xblock_info = create_xblock_info(self.course)
             self.assertTrue(chapter_xblock_info['highlights_enabled'])

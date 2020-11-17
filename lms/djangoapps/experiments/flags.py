@@ -11,9 +11,9 @@ import pytz
 from crum import get_current_request
 from edx_django_utils.cache import RequestCache
 
-from experiments.stable_bucketing import stable_bucketing_hash_group
+from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
-from track import segment
+from common.djangoapps.track import segment
 
 log = logging.getLogger(__name__)
 
@@ -49,18 +49,18 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
 
     When writing tests involving an ExperimentWaffleFlag you must not use the
     override_waffle_flag utility. That will only turn the experiment on or off and won't
-    override bucketing. Instead use ExperimentWaffleFlag's override method which
+    override bucketing. Instead use override_experiment_waffle_flag function which
     will do both. Example:
 
-        with MY_EXPERIMENT_WAFFLE_FLAG.override(active=True, bucket=1):
+        from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
+        with @override_experiment_waffle_flag(MY_EXPERIMENT_WAFFLE_FLAG, active=True, bucket=1):
             ...
 
     or as a decorator:
 
-        @MY_EXPERIMENT_WAFFLE_FLAG.override(active=True, bucket=1)
+        @override_experiment_waffle_flag(MY_EXPERIMENT_WAFFLE_FLAG, active=True, bucket=1)
         def test_my_experiment(self):
             ...
-
     """
     def __init__(
             self,
@@ -88,7 +88,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
 
     def _is_enrollment_inside_date_bounds(self, experiment_values, user, course_key):
         """ Returns True if the user's enrollment (if any) is valid for the configured experiment date range """
-        from student.models import CourseEnrollment
+        from common.djangoapps.student.models import CourseEnrollment
 
         enrollment_start = experiment_values.get('enrollment_start')
         enrollment_end = experiment_values.get('enrollment_end')
@@ -155,7 +155,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         """
         # Keep some imports in here, because this class is commonly used at a module level, and we want to avoid
         # circular imports for any models.
-        from experiments.models import ExperimentKeyValue
+        from lms.djangoapps.experiments.models import ExperimentKeyValue
         from lms.djangoapps.courseware.masquerade import get_specific_masquerading_user
 
         request = get_current_request()
@@ -259,14 +259,3 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         This disregards `.bucket_flags`.
         """
         return super().is_enabled(course_key)
-
-    @contextmanager
-    def override(self, active=True, bucket=1):  # pylint: disable=arguments-differ
-        # Let CourseWaffleFlag override the base waffle flag value
-        with super().override(active=active):
-            # Now override the experiment bucket value
-            from mock import patch
-            if not active:
-                bucket = 0
-            with patch.object(self, 'get_bucket', return_value=bucket):
-                yield

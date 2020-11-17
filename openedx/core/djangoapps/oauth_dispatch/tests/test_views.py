@@ -16,8 +16,8 @@ from jwkest import jwk
 from mock import call, patch
 from oauth2_provider import models as dot_models
 
-from student.tests.factories import UserFactory
-from third_party_auth.tests.utils import ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinGoogle
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.third_party_auth.tests.utils import ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinGoogle
 
 from . import mixins
 

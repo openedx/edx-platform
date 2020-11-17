@@ -27,23 +27,24 @@ from eventtracking import tracker
 from ratelimit.decorators import ratelimit
 from rest_framework.views import APIView
 
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.oauth_dispatch.api import destroy_oauth_tokens
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_request, get_current_site
 from openedx.core.djangoapps.user_api import accounts, errors, helpers
+from openedx.core.djangoapps.user_authn.utils import should_redirect_to_logistration_mircrofrontend
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.user_api.helpers import FormDescription
 from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangoapps.user_authn.message_types import PasswordReset, PasswordResetSuccess
 from openedx.core.djangolib.markup import HTML
-from student.forms import send_account_recovery_email_for_user
-from student.models import AccountRecovery
-from util.json_request import JsonResponse
-from util.password_policy_validators import normalize_password, validate_password
+from common.djangoapps.student.forms import send_account_recovery_email_for_user
+from common.djangoapps.student.models import AccountRecovery
+from common.djangoapps.util.json_request import JsonResponse
+from common.djangoapps.util.password_policy_validators import normalize_password, validate_password
 
 POST_EMAIL_KEY = 'post:email'
 REAL_IP_KEY = 'openedx.core.djangoapps.util.ratelimit.real_ip'
@@ -145,13 +146,15 @@ def send_password_reset_email_for_user(user, request, preferred_email=None):
         preferred_email (str): Send email to this address if present, otherwise fallback to user's email address.
     """
     message_context, user_language_preference = get_user_default_email_params(user)
+    site_name = settings.LOGISTRATION_MICROFRONTEND_DOMAIN if should_redirect_to_logistration_mircrofrontend() \
+        else configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
     message_context.update({
         'request': request,  # Used by google_analytics_tracking_pixel
         # TODO: This overrides `platform_name` from `get_base_template_context` to make the tests passes
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         'reset_link': '{protocol}://{site}{link}?track=pwreset'.format(
             protocol='https' if request.is_secure() else 'http',
-            site=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
+            site=site_name,
             link=reverse('password_reset_confirm', kwargs={
                 'uidb36': int_to_base36(user.id),
                 'token': default_token_generator.make_token(user),

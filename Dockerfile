@@ -1,11 +1,9 @@
-FROM ubuntu:xenial as base
+FROM ubuntu:focal as base
 
 # Warning: This file is experimental.
 
 # Install system requirements
 RUN apt-get update && \
-    apt-get install -y software-properties-common && \
-    apt-add-repository -y ppa:deadsnakes/ppa && apt-get update && \
     # Global requirements
     DEBIAN_FRONTEND=noninteractive apt-get install --yes \
     build-essential \
@@ -38,10 +36,12 @@ RUN apt-get update && \
     libxml2-dev \
     libxmlsec1-dev \
     libxslt1-dev \
+    # lynx: Required by https://github.com/edx/edx-platform/blob/b489a4ecb122/openedx/core/lib/html_to_text.py#L16
+    lynx \
     ntp \
     pkg-config \
-    python3.8-dev \
-    python3.8-venv \
+    python3-dev \
+    python3-venv \
     && rm -rf /var/lib/apt/lists/*
 
 RUN locale-gen en_US.UTF-8

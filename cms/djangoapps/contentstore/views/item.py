@@ -21,6 +21,7 @@ from edx_proctoring.api import (
     get_exam_configuration_dashboard_url
 )
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
+from edx_toggles.toggles import WaffleSwitch
 from help_tokens.core import HelpUrlExpert
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
@@ -34,17 +35,16 @@ from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.xblock_config.models import CourseEditLTIFieldsEnabledFlag
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
-from openedx.core.djangoapps.waffle_utils import WaffleSwitch
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.xblock_utils import hash_resource, request_token, wrap_xblock, wrap_xblock_aside
-from static_replace import replace_static_urls
-from student.auth import has_studio_read_access, has_studio_write_access
-from util.date_utils import get_default_time_display
-from util.json_request import JsonResponse, expect_json
-from util.milestones_helpers import is_entrance_exams_enabled
-from xblock_django.user_service import DjangoXBlockUserService
+from common.djangoapps.static_replace import replace_static_urls
+from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
+from openedx.core.toggles import ENTRANCE_EXAMS
+from common.djangoapps.util.date_utils import get_default_time_display
+from common.djangoapps.util.json_request import JsonResponse, expect_json
+from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
@@ -100,7 +100,7 @@ def _filter_entrance_exam_grader(graders):
     views/controls like the 'Grade as' dropdown that allows a course author to select
     the grader type for a given section of a course
     """
-    if is_entrance_exams_enabled():
+    if ENTRANCE_EXAMS.is_enabled():
         graders = [grader for grader in graders if grader.get('type') != u'Entrance Exam']
     return graders
 

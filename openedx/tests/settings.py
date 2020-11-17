@@ -10,11 +10,6 @@ import tempfile
 from django.utils.translation import ugettext_lazy as _
 from path import Path
 
-# TODO: Remove the rest of the sys.path modification here and in (cms|lms)/envs/common.py
-REPO_ROOT = Path(__file__).abspath().dirname().dirname().dirname()  # /edx-platform/
-sys.path.append(REPO_ROOT / 'common' / 'djangoapps')
-sys.path.append(REPO_ROOT / 'sys_path_hacks' / 'lms')
-
 ALL_LANGUAGES = []
 
 BLOCK_STRUCTURES_SETTINGS = dict(
@@ -72,12 +67,12 @@ INSTALLED_APPS = (
     'edxval',
     'lms.djangoapps.courseware',
     'lms.djangoapps.instructor_task',
-    'student',
+    'common.djangoapps.student',
     'openedx.core.djangoapps.site_configuration',
     'lms.djangoapps.grades.apps.GradesConfig',
     'lms.djangoapps.certificates.apps.CertificatesConfig',
     'openedx.core.djangoapps.user_api',
-    'course_modes.apps.CourseModesConfig',
+    'common.djangoapps.course_modes.apps.CourseModesConfig',
     'lms.djangoapps.verify_student.apps.VerifyStudentConfig',
     'openedx.core.djangoapps.content_libraries',
     'openedx.core.djangoapps.dark_lang',
@@ -102,7 +97,7 @@ INSTALLED_APPS = (
 
     # Django 1.11 demands to have imported models supported by installed apps.
     'completion',
-    'entitlements',
+    'common.djangoapps.entitlements',
     'organizations',
 )
 

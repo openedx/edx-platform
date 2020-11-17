@@ -10,7 +10,7 @@ from factory.django import DjangoModelFactory
 from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.program_enrollments import models
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 
 class ProgramEnrollmentFactory(DjangoModelFactory):

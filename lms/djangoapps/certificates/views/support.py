@@ -24,8 +24,8 @@ from lms.djangoapps.certificates.models import CertificateInvalidation
 from lms.djangoapps.certificates.permissions import GENERATE_ALL_CERTIFICATES, VIEW_ALL_CERTIFICATES
 from lms.djangoapps.instructor_task.api import generate_certificates_for_students
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.models import CourseEnrollment, User
-from util.json_request import JsonResponse
+from common.djangoapps.student.models import CourseEnrollment, User
+from common.djangoapps.util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)

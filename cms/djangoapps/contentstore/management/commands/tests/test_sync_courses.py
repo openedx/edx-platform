@@ -9,7 +9,7 @@ from testfixtures import LogCapture
 from cms.djangoapps.contentstore.views.course import create_new_course_in_store
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

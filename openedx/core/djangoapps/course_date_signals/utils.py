@@ -13,7 +13,7 @@ MIN_DURATION = timedelta(weeks=4)
 MAX_DURATION = timedelta(weeks=18)
 
 
-def get_expected_duration(course):
+def get_expected_duration(course_id):
     """
     Return a `datetime.timedelta` defining the expected length of the supplied course.
     """
@@ -22,7 +22,7 @@ def get_expected_duration(course):
 
     # The user course expiration date is the content availability date
     # plus the weeks_to_complete field from course-discovery.
-    discovery_course_details = get_course_run_details(course.id, ['weeks_to_complete'])
+    discovery_course_details = get_course_run_details(course_id, ['weeks_to_complete'])
     expected_weeks = discovery_course_details.get('weeks_to_complete')
     if expected_weeks:
         access_duration = timedelta(weeks=expected_weeks)
@@ -42,7 +42,7 @@ def spaced_out_sections(course):
         section (block): a section block of the course
         relative time (timedelta): the amount of weeks to complete the section, since start of course
     """
-    duration = get_expected_duration(course)
+    duration = get_expected_duration(course.id)
     sections = [
         section
         for section

@@ -9,7 +9,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Q
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.programs.tasks import award_program_certificates

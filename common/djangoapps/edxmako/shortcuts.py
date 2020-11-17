@@ -81,7 +81,7 @@ def marketing_link(name):
         # Using urljoin here allows us to enable a marketing site and set
         # a site ROOT, but still specify absolute URLs for other marketing
         # URLs in the MKTG_URLS setting
-        # e.g. urljoin('http://marketing.com', 'http://open-edx.org/about') >>> 'http://open-edx.org/about'
+        # e.g. urljoin('https://marketing.com', 'https://open-edx.org/about') >>> 'https://open-edx.org/about'
         return urljoin(marketing_urls.get('ROOT'), marketing_urls.get(name))
     # only link to the old pages when the marketing site isn't on
     elif not enable_mktg_site and name in link_map:

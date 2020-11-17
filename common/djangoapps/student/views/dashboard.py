@@ -16,19 +16,19 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from edx_django_utils import monitoring as monitoring_utils
 from edx_django_utils.plugins import get_plugins_view_context
+from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import iteritems, text_type
 
-import track.views
-from bulk_email.api import is_bulk_email_feature_enabled
-from bulk_email.models import Optout
-from course_modes.models import CourseMode
-from edxmako.shortcuts import render_to_response, render_to_string
-from entitlements.models import CourseEntitlement
+from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
+from lms.djangoapps.bulk_email.models import Optout
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
+from common.djangoapps.entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.experiments.utils import get_dashboard_course_info
+from lms.djangoapps.experiments.utils import get_dashboard_course_info, get_experiment_user_metadata_context
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.utils import (
     get_programs,
@@ -42,16 +42,14 @@ from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramP
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
-from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.features.enterprise_support.api import get_dashboard_consent_notification
 from openedx.features.enterprise_support.api import (
     get_dashboard_consent_notification,
-    get_enterprise_learner_portal_enabled_message,
+    get_enterprise_learner_portal_enabled_message
 )
-from student.api import COURSE_DASHBOARD_PLUGIN_VIEW_NAME
-from student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
-from student.models import (
+from common.djangoapps.student.api import COURSE_DASHBOARD_PLUGIN_VIEW_NAME
+from common.djangoapps.student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
+from common.djangoapps.student.models import (
     AccountRecovery,
     CourseEnrollment,
     CourseEnrollmentAttribute,
@@ -59,7 +57,7 @@ from student.models import (
     PendingSecondaryEmailChange,
     UserProfile
 )
-from util.milestones_helpers import get_pre_requisite_courses_not_completed
+from common.djangoapps.util.milestones_helpers import get_pre_requisite_courses_not_completed
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.student")
@@ -156,7 +154,7 @@ def _create_recent_enrollment_message(course_enrollments, course_modes):
 
 def get_course_enrollments(user, org_whitelist, org_blacklist, course_limit=None):
     """
-    Given a user, return a filtered set of his or her course enrollments.
+    Given a user, return a filtered set of their course enrollments.
 
     Arguments:
         user (User): the user in question.
@@ -195,7 +193,7 @@ def get_course_enrollments(user, org_whitelist, org_blacklist, course_limit=None
 
 def get_filtered_course_entitlements(user, org_whitelist, org_blacklist):
     """
-    Given a user, return a filtered set of his or her course entitlements.
+    Given a user, return a filtered set of their course entitlements.
 
     Arguments:
         user (User): the user in question.
@@ -428,7 +426,7 @@ def _credit_statuses(user, course_enrollments):
                 status["error"] = True
                 log.error(
                     u"Could not find credit provider associated with credit enrollment "
-                    u"for user %s in course %s.  The user will not be able to see his or her "
+                    u"for user %s in course %s.  The user will not be able to see their "
                     u"credit request status on the student dashboard.  This attribute should "
                     u"have been set when the user purchased credit in the course.",
                     user.id, course_key
@@ -443,7 +441,7 @@ def _credit_statuses(user, course_enrollments):
                     status["error"] = True
                     log.error(
                         u"Could not find credit provider info for [%s] in [%s]. The user will not "
-                        u"be able to see his or her credit request status on the student dashboard.",
+                        u"be able to see their credit request status on the student dashboard.",
                         provider_id, provider_info_by_id
                     )
 
@@ -806,6 +804,13 @@ def student_dashboard(request):
     )
     context.update(context_from_plugins)
 
+    course = None
+    context.update(
+        get_experiment_user_metadata_context(
+            course,
+            user,
+        )
+    )
     if ecommerce_service.is_enabled(request.user):
         context.update({
             'use_ecommerce_payment_flow': True,

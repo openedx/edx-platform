@@ -5,7 +5,7 @@ Course modes API serializers.
 
 from rest_framework import serializers
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 

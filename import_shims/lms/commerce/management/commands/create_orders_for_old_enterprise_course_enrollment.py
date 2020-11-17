@@ -1,0 +1,5 @@
+from import_shims.warn import warn_deprecated_import
+
+warn_deprecated_import('commerce.management.commands.create_orders_for_old_enterprise_course_enrollment', 'lms.djangoapps.commerce.management.commands.create_orders_for_old_enterprise_course_enrollment')
+
+from lms.djangoapps.commerce.management.commands.create_orders_for_old_enterprise_course_enrollment import *

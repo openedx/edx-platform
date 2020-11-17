@@ -51,10 +51,10 @@ def get_logger_config(log_dir,
                 '()': 'django.utils.log.RequireDebugFalse',
             },
             'userid_context': {
-                '()': 'openedx.core.djangoapps.util.log_utils.UserIdFilter',
+                '()': 'edx_django_utils.logging.UserIdFilter',
             },
             'remoteip_context': {
-                '()': 'openedx.core.djangoapps.util.log_utils.RemoteIpFilter',
+                '()': 'edx_django_utils.logging.RemoteIpFilter',
             }
         },
         'handlers': {

@@ -7,7 +7,7 @@ from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
 from openedx.core.djangoapps.xblock.api import load_block
-from student.roles import CourseInstructorRole
+from common.djangoapps.student.roles import CourseInstructorRole
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase

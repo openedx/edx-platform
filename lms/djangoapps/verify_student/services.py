@@ -3,17 +3,18 @@ Implementation of abstraction layer for other parts of the system to make querie
 """
 
 import logging
+from datetime import timedelta
 from itertools import chain
 
 from django.conf import settings
 from django.urls import reverse
-from django.utils import timezone
+from django.utils.timezone import now
 from django.utils.translation import ugettext as _
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.verify_student.utils import is_verification_expiring_soon
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from student.models import User
+from common.djangoapps.student.models import User
 
 from .models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 from .toggles import redirect_to_idv_microfrontend
@@ -57,23 +58,16 @@ class IDVerificationService(object):
     """
 
     @classmethod
-    def user_is_verified(cls, user, earliest_allowed_date=None):
+    def user_is_verified(cls, user):
         """
         Return whether or not a user has satisfactorily proved their identity.
         Depending on the policy, this can expire after some period of time, so
         a user might have to renew periodically.
-
-        This will check for the user's *initial* verification.
         """
-        filter_kwargs = {
-            'user': user,
-            'status': 'approved',
-            'created_at__gte': (earliest_allowed_date or earliest_allowed_verification_date())
-        }
-
-        return (SoftwareSecurePhotoVerification.objects.filter(**filter_kwargs).exists() or
-                SSOVerification.objects.filter(**filter_kwargs).exists() or
-                ManualVerification.objects.filter(**filter_kwargs).exists())
+        expiration_datetime = cls.get_expiration_datetime(user, ['approved'])
+        if expiration_datetime:
+            return expiration_datetime >= now()
+        return False
 
     @classmethod
     def verifications_for_user(cls, user):
@@ -95,7 +89,7 @@ class IDVerificationService(object):
         filter_kwargs = {
             'user__in': users,
             'status': 'approved',
-            'created_at__gte': (earliest_allowed_verification_date())
+            'created_at__gt': now() - timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
         }
         return chain(
             SoftwareSecurePhotoVerification.objects.filter(**filter_kwargs).values_list('user_id', flat=True),
@@ -143,17 +137,10 @@ class IDVerificationService(object):
         Returns:
             bool: True or False according to existence of valid verifications
         """
-        filter_kwargs = {
-            'user': user,
-            'status__in': ['submitted', 'approved', 'must_retry'],
-            'created_at__gte': earliest_allowed_verification_date()
-        }
-
-        return (
-            SoftwareSecurePhotoVerification.objects.filter(**filter_kwargs).exists() or
-            SSOVerification.objects.filter(**filter_kwargs).exists() or
-            ManualVerification.objects.filter(**filter_kwargs).exists()
-        )
+        expiration_datetime = cls.get_expiration_datetime(user, ['submitted', 'approved', 'must_retry'])
+        if expiration_datetime:
+            return expiration_datetime >= now()
+        return False
 
     @classmethod
     def user_status(cls, user):
@@ -180,15 +167,12 @@ class IDVerificationService(object):
 
         attempt = None
 
-        verifications = active_verifications(
-            cls.verifications_for_user(user),
-            timezone.now(),
-        )
+        verifications = cls.verifications_for_user(user)
 
         if verifications:
             attempt = verifications[0]
             for verification in verifications:
-                if verification.status == 'approved':
+                if verification.expiration_datetime > now() and verification.status == 'approved':
                     # Always select the LATEST non-expired approved verification if there is such
                     if attempt.status != 'approved' or (
                         attempt.expiration_datetime < verification.expiration_datetime
@@ -199,7 +183,8 @@ class IDVerificationService(object):
             return user_status
 
         user_status['should_display'] = attempt.should_display_status_to_user()
-        if attempt.created_at < earliest_allowed_verification_date():
+
+        if attempt.expiration_datetime < now() and attempt.status == 'approved':
             if user_status['should_display']:
                 user_status['status'] = 'expired'
                 user_status['error'] = _(u"Your {platform_name} verification has expired.").format(
@@ -219,8 +204,8 @@ class IDVerificationService(object):
         elif attempt.status == 'approved':
             user_status['status'] = 'approved'
             expiration_datetime = cls.get_expiration_datetime(user, ['approved'])
-            if getattr(attempt, 'expiry_date', None) and is_verification_expiring_soon(expiration_datetime):
-                user_status['verification_expiry'] = attempt.expiry_date.date().strftime("%m/%d/%Y")
+            if is_verification_expiring_soon(expiration_datetime):
+                user_status['verification_expiry'] = attempt.expiration_datetime.date().strftime("%m/%d/%Y")
             user_status['status_date'] = attempt.status_changed
 
         elif attempt.status in ['submitted', 'approved', 'must_retry']:

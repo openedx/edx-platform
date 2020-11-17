@@ -14,8 +14,10 @@ import ddt
 import pytz
 import six
 from bson import ObjectId
+from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from completion import waffle as completion_waffle
 from completion.models import BlockCompletion
+from common.djangoapps.course_modes.models import CourseMode
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404, HttpResponse
@@ -26,6 +28,8 @@ from django.urls import reverse
 from edx_proctoring.api import create_exam, create_exam_attempt, update_attempt_status
 from edx_proctoring.runtime import set_runtime_service
 from edx_proctoring.tests.test_services import MockCertificateService, MockCreditService, MockGradesService
+from edx_toggles.toggles import WaffleSwitch
+from edx_toggles.toggles.testutils import override_waffle_switch
 from edx_when.field_data import DateLookupFieldData
 from freezegun import freeze_time
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -44,31 +48,34 @@ from xblock.runtime import DictKeyValueStore, KvsFieldData, Runtime
 from xblock.test.tools import TestRuntime
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware import module_render as render
 from lms.djangoapps.courseware.access_response import AccessResponse
 from lms.djangoapps.courseware.courses import get_course_info_section, get_course_with_access
+from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.courseware.masquerade import CourseMasquerade
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor, hash_resource
 from lms.djangoapps.courseware.tests.factories import (
-    GlobalStaffFactory, RequestFactoryNoCsrf, StudentModuleFactory, UserFactory,
+    GlobalStaffFactory,
+    RequestFactoryNoCsrf,
+    StudentModuleFactory,
+    UserFactory
 )
 from lms.djangoapps.courseware.tests.test_submitting_problems import TestSubmittingProblems
 from lms.djangoapps.courseware.tests.tests import LoginEnrollmentTestCase
-from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.credit.api import set_credit_requirement_status, set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
-from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory, AccessTokenFactory
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFactory, ApplicationFactory
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.url_utils import quote_slashes
-from student.models import CourseEnrollment, anonymous_id_for_user
-from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
-from xblock_django.models import XBlockConfiguration
+from common.djangoapps.student.models import CourseEnrollment, anonymous_id_for_user
+from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from common.djangoapps.xblock_django.models import XBlockConfiguration
 from xmodule.capa_module import ProblemBlock
 from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
 from xmodule.lti_module import LTIDescriptor
@@ -84,7 +91,13 @@ from xmodule.modulestore.tests.test_asides import AsideTestType
 from xmodule.video_module import VideoBlock
 from xmodule.x_module import STUDENT_VIEW, CombinedSystem, XModule, XModuleDescriptor
 
+
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
+
+# pylint: disable=feature-toggle-needs-doc
+ENABLE_COMPLETION_TRACKING_SWITCH = WaffleSwitch(
+    completion_waffle.waffle(), completion_waffle.ENABLE_COMPLETION_TRACKING, __name__
+)
 
 
 @XBlock.needs("field-data")
@@ -760,7 +773,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
     @ddt.unpack
     @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
     def test_completion_events_with_completion_disabled(self, signal, data):
-        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, False):
+        with override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, False):
             course = CourseFactory.create()
             block = ItemFactory.create(category='comp', parent=course)
             request = self.request_factory.post(
@@ -782,7 +795,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
 
     @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
     def test_completion_signal_for_completable_xblock(self):
-        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, True):
+        with override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, True):
             course = CourseFactory.create()
             block = ItemFactory.create(category='comp', parent=course)
 
@@ -849,7 +862,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         request.user = self.mock_user
 
         with patch(
-            'courseware.module_render.is_xblock_aside',
+            'lms.djangoapps.courseware.module_render.is_xblock_aside',
             return_value=True
         ), self.assertRaises(Http404):
             render.handle_xblock_callback(
@@ -862,7 +875,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
 
     @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
     def test_progress_signal_ignored_for_completable_xblock(self):
-        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, True):
+        with override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, True):
             course = CourseFactory.create()
             block = ItemFactory.create(category='comp', parent=course)
 
@@ -875,7 +888,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
 
     @XBlock.register_temp_plugin(XBlockWithoutCompletionAPI, identifier='no_comp')
     def test_progress_signal_processed_for_xblock_without_completion_api(self):
-        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, True):
+        with override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, True):
             course = CourseFactory.create()
             block = ItemFactory.create(category='no_comp', parent=course)
 
@@ -889,7 +902,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
 
     @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
     def test_skip_handlers_for_masquerading_staff(self):
-        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, True):
+        with override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, True):
             course = CourseFactory.create()
             block = ItemFactory.create(category='comp', parent=course)
             request = self.request_factory.post(
@@ -2005,7 +2018,7 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         )
 
 
-@patch('track.views.eventtracker', autospec=True)
+@patch('common.djangoapps.track.views.eventtracker', autospec=True)
 class TestModuleTrackingContext(SharedModuleStoreTestCase):
     """
     Ensure correct tracking information is included in events emitted during XBlock callback handling.

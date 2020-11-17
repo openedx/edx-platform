@@ -26,7 +26,6 @@ from freezegun import freeze_time
 from mock import Mock, patch
 from oauth2_provider import models as dot_models
 from pytz import UTC
-from six.moves import range
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -38,13 +37,17 @@ from openedx.core.djangoapps.user_authn.views.password_reset import (
     SETTING_CHANGE_INITIATED, password_reset, password_reset_logistration,
     PasswordResetConfirmWrapper)
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from student.tests.factories import TEST_PASSWORD, UserFactory
-from student.tests.test_configuration_overrides import fake_get_value
-from student.tests.test_email import mock_render_to_string
-from student.models import AccountRecovery
+from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory
+from common.djangoapps.student.tests.test_configuration_overrides import fake_get_value
+from common.djangoapps.student.tests.test_email import mock_render_to_string
+from common.djangoapps.student.models import AccountRecovery
 
-from util.password_policy_validators import create_validator_config
-from util.testing import EventTestMixin
+from common.djangoapps.util.password_policy_validators import create_validator_config
+from common.djangoapps.util.testing import EventTestMixin
+
+
+ENABLE_LOGISTRATION_MICROFRONTEND = settings.FEATURES.copy()
+ENABLE_LOGISTRATION_MICROFRONTEND['ENABLE_LOGISTRATION_MICROFRONTEND'] = True
 
 
 def process_request(request):
@@ -327,6 +330,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
             SETTING_CHANGE_INITIATED, user_id=self.user.id, setting=u'password', old=None, new=None
         )
 
+    @override_settings(FEATURES=ENABLE_LOGISTRATION_MICROFRONTEND)
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     @ddt.data(('Crazy Awesome Site', 'Crazy Awesome Site'), ('edX', 'edX'))
     @ddt.unpack
@@ -350,6 +354,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
                 reset_msg = reset_msg.format(site_name)
 
                 self.assertIn(reset_msg, msg)
+                self.assertIn(settings.LOGISTRATION_MICROFRONTEND_URL, msg)
 
                 sign_off = u"The {} Team".format(platform_name)
                 self.assertIn(sign_off, msg)
@@ -536,8 +541,12 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         })
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        create_validator_config('util.password_policy_validators.MinimumLengthValidator', {'min_length': 2}),
-        create_validator_config('util.password_policy_validators.MaximumLengthValidator', {'max_length': 10})
+        create_validator_config(
+            'common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 2}
+        ),
+        create_validator_config(
+            'common.djangoapps.util.password_policy_validators.MaximumLengthValidator', {'max_length': 10}
+        ),
     ])
     @ddt.data(
         {

@@ -2,13 +2,14 @@
 Views that we will use to view toggle state in edx-platform.
 """
 from collections import OrderedDict
-from django.conf import settings
 
-from edx_django_utils.monitoring.code_owner.utils import get_code_owner_from_module, is_code_owner_mappings_configured
+from django.conf import settings
+from edx_django_utils.monitoring import get_code_owner_from_module
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.permissions import IsStaff
-from rest_framework.authentication import SessionAuthentication
+from edx_toggles.toggles import SettingDictToggle, SettingToggle
 from rest_framework import permissions, views
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from waffle.models import Flag, Switch
 
@@ -107,7 +108,7 @@ class ToggleStateView(views.APIView):
         """
         toggle['class'] = toggle_instance.__class__.__name__
         toggle['module'] = toggle_instance.module_name
-        if is_code_owner_mappings_configured():
+        if toggle_instance.module_name:
             code_owner = get_code_owner_from_module(toggle_instance.module_name)
             if code_owner:
                 toggle['code_owner'] = code_owner
@@ -214,20 +215,52 @@ class ToggleStateView(views.APIView):
 
     def _get_settings_state(self):
         """
-        Returns a dictionary of settings values. Will only return values that are set to true or false.
+        Return a list of setting-based toggles: Django settings, SettingToggle and SettingDictToggle instances.
+        SettingToggle and SettingDictToggle override the settings with identical names (if any).
         """
+        settings_dict = {}
+        self._add_settings(settings_dict)
+        self._add_setting_toggles(settings_dict)
+        self._add_setting_dict_toggles(settings_dict)
+        return sorted(settings_dict.values(), key=(lambda toggle: toggle['name']))
 
-        bool_settings = list()
+    def _add_settings(self, settings_dict):
+        """
+        Fill the `settings_dict`: will only include values that are set to true or false.
+        """
         for setting_name, setting_value in vars(settings).items():
             if isinstance(setting_value, dict):
                 for dict_name, dict_value in setting_value.items():
                     if isinstance(dict_value, bool):
-                        bool_settings.append(
-                            {
-                                'name': "{setting_name}['{dict_name}']".format(setting_name=setting_name, dict_name=dict_name),
-                                'is_active': dict_value,
-                            }
-                        )
+                        name = setting_dict_name(setting_name, dict_name)
+                        toggle_response = self._get_or_create_toggle_response(settings_dict, name)
+                        toggle_response['is_active'] = dict_value
             elif isinstance(setting_value, bool):
-                bool_settings.append({'name': setting_name, 'is_active': setting_value})
-        return bool_settings
+                toggle_response = self._get_or_create_toggle_response(settings_dict, setting_name)
+                toggle_response['is_active'] = setting_value
+
+    def _add_setting_toggles(self, settings_dict):
+        """
+        Fill the `settings_dict` with values from the list of SettingToggle instances.
+        """
+        for toggle in SettingToggle.get_instances():
+            toggle_response = self._get_or_create_toggle_response(settings_dict, toggle.name)
+            toggle_response["is_active"] = toggle.is_enabled()
+            self._add_toggle_instance_details(toggle_response, toggle)
+
+    def _add_setting_dict_toggles(self, settings_dict):
+        """
+        Fill the `settings_dict` with values from the list of SettingDictToggle instances.
+        """
+        for toggle in SettingDictToggle.get_instances():
+            name = setting_dict_name(toggle.name, toggle.key)
+            toggle_response = self._get_or_create_toggle_response(settings_dict, name)
+            toggle_response["is_active"] = toggle.is_enabled()
+            self._add_toggle_instance_details(toggle_response, toggle)
+
+
+def setting_dict_name(dict_name, key):
+    """
+    Return the name associated to a `dict_name[key]` setting.
+    """
+    return "{dict_name}['{key}']".format(dict_name=dict_name, key=key)

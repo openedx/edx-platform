@@ -12,20 +12,18 @@ from datetime import datetime
 from functools import reduce
 
 import six
-from django.contrib.auth.models import User
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
 from pkg_resources import resource_string
 from pytz import UTC
 from six import text_type
 from web_fragments.fragment import Fragment
-
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Boolean, Integer, List, Scope, String
 
-from openedx.core.djangoapps.waffle_utils import WaffleFlag
+from edx_toggles.toggles import WaffleFlag
 from openedx.core.lib.graph_traversals import traverse_pre_order
 
 from .exceptions import NotFoundError
@@ -282,6 +280,13 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             datetime.now(UTC) < date
         )
 
+    def _get_user(self):
+        """
+        Return the current runtime Django user.
+        """
+        from django.contrib.auth.models import User
+        return User.objects.get(id=self.runtime.user_id)
+
     def gate_sequence_if_it_is_a_timed_exam_and_contains_content_type_gated_problems(self):
         """
         Problem:
@@ -317,7 +322,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             return
 
         try:
-            user = User.objects.get(id=self.runtime.user_id)
+            user = self._get_user()
             course_id = self.runtime.course_id
             content_type_gating_service = self.runtime.service(self, 'content_type_gating')
             if not (content_type_gating_service and
@@ -807,7 +812,46 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         return new_class
 
 
-class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor, XmlDescriptor):
+class SequenceMixin(SequenceFields):
+    """
+    A mixin of shared code between the SequenceDescriptor and XBlocks
+    converted from XModules which inherited from SequenceDescriptor.
+    """
+    @classmethod
+    def definition_from_xml(cls, xml_object, system):
+        children = []
+        for child in xml_object:
+            try:
+                child_block = system.process_xml(etree.tostring(child, encoding='unicode'))
+                children.append(child_block.scope_ids.usage_id)
+            except Exception as e:
+                log.exception("Unable to load child when parsing Sequence. Continuing...")
+                if system.error_tracker is not None:
+                    system.error_tracker(u"ERROR: {0}".format(e))
+                continue
+        return {}, children
+
+    def index_dictionary(self):
+        """
+        Return dictionary prepared with module content and type for indexing.
+        """
+        # return key/value fields in a Python dict object
+        # values may be numeric / string or dict
+        # default implementation is an empty dict
+        xblock_body = super(SequenceMixin, self).index_dictionary()
+        html_body = {
+            "display_name": self.display_name,
+        }
+        if "content" in xblock_body:
+            xblock_body["content"].update(html_body)
+        else:
+            xblock_body["content"] = html_body
+        xblock_body["content_type"] = "Sequence"
+
+        return xblock_body
+
+
+class SequenceDescriptor(SequenceMixin, ProctoringFields, MakoModuleDescriptor, XmlDescriptor):
     """
     A Sequence's Descriptor object
     """
@@ -823,20 +867,6 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
     }
     js_module_name = "SequenceDescriptor"
 
-    @classmethod
-    def definition_from_xml(cls, xml_object, system):
-        children = []
-        for child in xml_object:
-            try:
-                child_block = system.process_xml(etree.tostring(child, encoding='unicode'))
-                children.append(child_block.scope_ids.usage_id)
-            except Exception as e:
-                log.exception("Unable to load child when parsing Sequence. Continuing...")
-                if system.error_tracker is not None:
-                    system.error_tracker(u"ERROR: {0}".format(e))
-                continue
-        return {}, children
-
     def definition_to_xml(self, resource_fs):
         xml_object = etree.Element('sequential')
         for child in self.get_children():
@@ -849,27 +879,8 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
         `is_entrance_exam` should not be editable in the Studio settings editor.
         """
         non_editable_fields = super(SequenceDescriptor, self).non_editable_metadata_fields
-        non_editable_fields.append(self.fields['is_entrance_exam'])
+        non_editable_fields.append(self.fields['is_entrance_exam'])  # pylint:disable=unsubscriptable-object
         return non_editable_fields
-
-    def index_dictionary(self):
-        """
-        Return dictionary prepared with module content and type for indexing.
-        """
-        # return key/value fields in a Python dict object
-        # values may be numeric / string or dict
-        # default implementation is an empty dict
-        xblock_body = super(SequenceDescriptor, self).index_dictionary()
-        html_body = {
-            "display_name": self.display_name,
-        }
-        if "content" in xblock_body:
-            xblock_body["content"].update(html_body)
-        else:
-            xblock_body["content"] = html_body
-        xblock_body["content_type"] = "Sequence"
-
-        return xblock_body
 
 
 class HighlightsFields(object):

@@ -16,8 +16,8 @@ from cms.djangoapps.course_creators.views import (
     update_course_creator_group,
     user_requested_access
 )
-from student import auth
-from student.roles import CourseCreatorRole
+from common.djangoapps.student import auth
+from common.djangoapps.student.roles import CourseCreatorRole
 
 
 class CourseCreatorView(TestCase):

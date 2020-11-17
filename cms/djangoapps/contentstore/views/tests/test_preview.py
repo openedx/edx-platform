@@ -13,7 +13,7 @@ from xblock.core import XBlock, XBlockAside
 
 from cms.djangoapps.contentstore.utils import reverse_usage_url
 from cms.djangoapps.xblock_config.models import StudioConfig
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -110,10 +110,10 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
         self.assertNotRegex(html, r"data-block-type=[\"\']test_aside[\"\']")
         self.assertNotRegex(html, "Aside rendered")
 
-    @mock.patch('xmodule.conditional_module.ConditionalModule.is_condition_satisfied')
+    @mock.patch('xmodule.conditional_module.ConditionalBlock.is_condition_satisfied')
     def test_preview_conditional_module_children_context(self, mock_is_condition_satisfied):
         """
-        Testst that when empty context is pass to children of ConditionalModule it will not raise KeyError.
+        Tests that when empty context is pass to children of ConditionalBlock it will not raise KeyError.
         """
         mock_is_condition_satisfied.return_value = True
         client = Client()

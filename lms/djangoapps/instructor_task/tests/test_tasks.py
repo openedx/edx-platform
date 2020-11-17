@@ -17,7 +17,7 @@ from mock import MagicMock, Mock, patch
 from opaque_keys.edx.keys import i4xEncoder
 from six.moves import range
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.instructor_task.exceptions import UpdateProblemModuleStateError

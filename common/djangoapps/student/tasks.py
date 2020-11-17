@@ -19,7 +19,7 @@ from openedx.core.lib.celery.task_utils import emulate_http_request
 log = logging.getLogger('edx.celery.task')
 
 
-@task(bind=True)
+@task(bind=True, name='student.send_activation_email')
 def send_activation_email(self, msg_string, from_address=None):
     """
     Sending an activation email to the user.

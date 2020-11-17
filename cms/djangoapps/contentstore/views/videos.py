@@ -40,16 +40,21 @@ from edxval.api import (
 )
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
+from rest_framework import status as rest_status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
-from edxmako.shortcuts import render_to_response
+from edx_toggles.toggles import WaffleFlagNamespace, WaffleSwitchNamespace
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_pipeline.config.waffle import (
     DEPRECATE_YOUTUBE,
     ENABLE_DEVSTACK_VIDEO_UPLOADS,
     waffle_flags
 )
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace, WaffleSwitchNamespace
-from util.json_request import JsonResponse, expect_json
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
+from openedx.core.lib.api.view_utils import view_auth_classes
+from common.djangoapps.util.json_request import JsonResponse, expect_json
 from xmodule.video_module.transcripts_utils import Transcript
 
 from ..models import VideoUploadConfig
@@ -62,6 +67,7 @@ __all__ = [
     'video_encodings_download',
     'video_images_handler',
     'transcript_preferences_handler',
+    'generate_video_upload_link_handler',
 ]
 
 LOGGER = logging.getLogger(__name__)
@@ -95,38 +101,6 @@ VIDEO_UPLOAD_MAX_FILE_SIZE_GB = 5
 MAX_UPLOAD_HOURS = 24
 
 VIDEOS_PER_PAGE = 100
-
-
-class AssumeRole(object):
-    """ Singleton class to establish connection to aws using mfa and assume role """
-    __instance = None
-
-    @staticmethod
-    def get_instance():
-        """ Static access method. """
-        if not AssumeRole.__instance:
-            AssumeRole()
-
-        return AssumeRole.__instance
-
-    def __init__(self):
-        """ Virtually private constructor. """
-        if AssumeRole.__instance:
-            raise Exception("This is a singleton class!")
-
-        sts = STSConnection(
-            settings.AWS_ACCESS_KEY_ID,
-            settings.AWS_SECRET_ACCESS_KEY
-        )
-        self.credentials = sts.assume_role(
-            role_arn=settings.ROLE_ARN,
-            role_session_name='vem',
-            duration_seconds=3600,
-            mfa_serial_number=settings.MFA_SERIAL_NUMBER,
-            mfa_token=settings.MFA_TOKEN
-        ).credentials.to_dict()
-
-        AssumeRole.__instance = self
 
 
 class TranscriptProvider(object):
@@ -246,7 +220,24 @@ def videos_handler(request, course_key_string, edx_video_id=None):
         elif _is_pagination_context_update_request(request):
             return _update_pagination_context(request)
 
-        return videos_post(course, request)
+        data, status = videos_post(course, request)
+        return JsonResponse(data, status=status)
+
+
+@api_view(['POST'])
+@view_auth_classes()
+@expect_json
+def generate_video_upload_link_handler(request, course_key_string):
+    """
+    API for creating a video upload.  Returns an edx_video_id and a presigned URL that can be used
+    to upload the video to AWS S3.
+    """
+    course = _get_and_validate_course(course_key_string, request.user)
+    if not course:
+        return Response(data='Course Not Found', status=rest_status.HTTP_400_BAD_REQUEST)
+
+    data, status = videos_post(course, request)
+    return Response(data, status=status)
 
 
 @expect_json
@@ -745,9 +736,9 @@ def videos_post(course, request):
         error = "Request 'files' entry contain unsupported content_type"
 
     if error:
-        return JsonResponse({'error': error}, status=400)
+        return {'error': error}, 400
 
-    bucket = storage_service_bucket(course.id)
+    bucket = storage_service_bucket()
     req_files = data['files']
     resp_files = []
 
@@ -758,7 +749,7 @@ def videos_post(course, request):
             file_name.encode('ascii')
         except UnicodeEncodeError:
             error_msg = u'The file name for %s must contain only ASCII characters.' % file_name
-            return JsonResponse({'error': error_msg}, status=400)
+            return {'error': error_msg}, 400
 
         edx_video_id = six.text_type(uuid4())
         key = storage_service_key(bucket, file_name=edx_video_id)
@@ -802,20 +793,19 @@ def videos_post(course, request):
 
         resp_files.append({'file_name': file_name, 'upload_url': upload_url, 'edx_video_id': edx_video_id})
 
-    return JsonResponse({'files': resp_files}, status=200)
+    return {'files': resp_files}, 200
 
 
-def storage_service_bucket(course_key=None):
+def storage_service_bucket():
     """
-    Returns an S3 bucket for video upload. The S3 bucket returned depends on
-    which pipeline, VEDA or VEM, is enabled.
+    Returns an S3 bucket for video upload.
     """
     if waffle_flags()[ENABLE_DEVSTACK_VIDEO_UPLOADS].is_enabled():
-        credentials = AssumeRole.get_instance().credentials
         params = {
-            'aws_access_key_id': credentials['access_key'],
-            'aws_secret_access_key': credentials['secret_key'],
-            'security_token': credentials['session_token']
+            'aws_access_key_id': settings.AWS_ACCESS_KEY_ID,
+            'aws_secret_access_key': settings.AWS_SECRET_ACCESS_KEY,
+            'security_token': settings.AWS_SECURITY_TOKEN
+
         }
     else:
         params = {

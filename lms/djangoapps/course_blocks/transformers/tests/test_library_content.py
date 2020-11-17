@@ -8,7 +8,7 @@ import mock
 
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
-from student.tests.factories import CourseEnrollmentFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 
 from ...api import get_course_blocks
 from ..library_content import ContentLibraryTransformer, ContentLibraryOrderTransformer

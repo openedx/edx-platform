@@ -71,7 +71,8 @@
 ignore = ,.git,.tox,migrations,node_modules,.pycharm_helpers
 persistent = yes
 load-plugins = edx_lint.pylint,pylint_django,pylint_celery
-init-hook = "import sys; sys.path.extend(['sys_path_hacks/lms', 'sys_path_hacks/studio', 'common/djangoapps'])"
+init-hook = "import sys; sys.path.extend(['import_shims/lms', 'import_shims/studio'])"
+ignore-patterns = **/import_shims/**/*.py
 
 [MESSAGES CONTROL]
 enable = 
@@ -464,4 +465,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# 0981d49b0645874588dcf4423195239dd9e414b7
+# 09e2946a83274f8dccbac8e284d7b1cf381fa31b

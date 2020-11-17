@@ -6,7 +6,7 @@ Tests for the organizations helpers library, which is the integration point for 
 import six
 from mock import patch
 
-from util import organizations_helpers
+from common.djangoapps.util import organizations_helpers
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

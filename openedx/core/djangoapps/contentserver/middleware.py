@@ -21,7 +21,7 @@ from opaque_keys.edx.locator import AssetLocator
 from six import text_type
 
 from openedx.core.djangoapps.header_control import force_header_for_response
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.content import XASSET_LOCATION_TAG, StaticContent
 from xmodule.exceptions import NotFoundError

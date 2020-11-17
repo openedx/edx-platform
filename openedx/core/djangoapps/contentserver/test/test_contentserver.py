@@ -27,8 +27,8 @@ from xmodule.assetstore.assetmgr import AssetManager
 from opaque_keys import InvalidKeyError
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory, AdminFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory, AdminFactory
 
 from ..middleware import parse_range_header, HTTP_DATE_FORMAT, StaticContentServer
 

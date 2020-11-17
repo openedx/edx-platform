@@ -2,7 +2,6 @@
 Utility functions used during user authentication.
 """
 
-
 import random
 import string
 

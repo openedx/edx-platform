@@ -13,7 +13,7 @@ from requests import HTTPError
 from social_core.backends import oauth as social_oauth
 from social_core.exceptions import AuthException
 
-from third_party_auth import pipeline
+from common.djangoapps.third_party_auth import pipeline
 
 
 class OAuthValidationError(Exception):

@@ -8,7 +8,7 @@ from django.test import TestCase
 from oauth2_provider.models import AccessToken, Application, RefreshToken
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")

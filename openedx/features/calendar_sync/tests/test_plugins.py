@@ -7,12 +7,12 @@ import crum
 import ddt
 from django.test import RequestFactory
 
-from xmodule.modulestore.tests.django_utils import CourseUserType, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from edx_toggles.toggles.testutils import override_waffle_flag
+from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from openedx.features.calendar_sync.plugins import CalendarSyncToggleTool
 from openedx.features.course_experience import CALENDAR_SYNC_FLAG, RELATIVE_DATES_FLAG
+from xmodule.modulestore.tests.django_utils import CourseUserType, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
@@ -35,7 +35,7 @@ class TestCalendarSyncToggleTool(SharedModuleStoreTestCase):
     )
     @ddt.unpack
     @override_waffle_flag(CALENDAR_SYNC_FLAG, active=True)
-    @RELATIVE_DATES_FLAG.override(active=True)
+    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_calendar_sync_toggle_tool_is_enabled(self, user_type, should_be_enabled):
         request = RequestFactory().request()
         request.user = self.create_user_for_course(self.course, user_type)

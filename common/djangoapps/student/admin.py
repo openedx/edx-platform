@@ -22,12 +22,15 @@ from django.utils.translation import ugettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.waffle_utils import WaffleSwitch
+from edx_toggles.toggles import WaffleSwitch
 from openedx.core.lib.courses import clean_course_id
-from student import STUDENT_WAFFLE_NAMESPACE
-from student.models import (
+from common.djangoapps.student import STUDENT_WAFFLE_NAMESPACE
+from common.djangoapps.student.models import (
     AccountRecovery,
+    AccountRecoveryConfiguration,
     AllowedAuthUser,
+    BulkChangeEnrollmentConfiguration,
+    BulkUnenrollConfiguration,
     CourseAccessRole,
     CourseEnrollment,
     CourseEnrollmentAllowed,
@@ -40,12 +43,9 @@ from student.models import (
     RegistrationCookieConfiguration,
     UserAttribute,
     UserProfile,
-    UserTestGroup,
-    BulkUnenrollConfiguration,
-    AccountRecoveryConfiguration,
-    BulkChangeEnrollmentConfiguration
+    UserTestGroup
 )
-from student.roles import REGISTERED_ACCESS_ROLES
+from common.djangoapps.student.roles import REGISTERED_ACCESS_ROLES
 from xmodule.modulestore.django import modulestore
 
 User = get_user_model()  # pylint:disable=invalid-name
@@ -224,11 +224,9 @@ class LinkedInAddToProfileConfigurationAdmin(admin.ModelAdmin):
     class Meta(object):
         model = LinkedInAddToProfileConfiguration
 
-    # Exclude deprecated fields
-    exclude = ('dashboard_tracking_code',)
-
 
 class CourseEnrollmentForm(forms.ModelForm):
+    """ Form for Course Enrollments in the Django Admin Panel. """
     def __init__(self, *args, **kwargs):
         # If args is a QueryDict, then the ModelForm addition request came in as a POST with a course ID string.
         # Change the course ID string to a CourseLocator object by copying the QueryDict to make it mutable.

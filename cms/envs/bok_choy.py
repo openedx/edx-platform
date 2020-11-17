@@ -90,7 +90,7 @@ MEDIA_ROOT = TEST_ROOT / "uploads"
 WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = TEST_ROOT / "staticfiles" / "cms" / "webpack-stats.json"
 
 LOG_OVERRIDES = [
-    ('track.middleware', logging.CRITICAL),
+    ('common.djangoapps.track.middleware', logging.CRITICAL),
     ('edx.discussion', logging.CRITICAL),
 ]
 for log_name, log_level in LOG_OVERRIDES:

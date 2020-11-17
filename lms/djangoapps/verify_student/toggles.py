@@ -2,7 +2,7 @@
 Toggles for verify_student app
 """
 
-from openedx.core.djangoapps.waffle_utils import WaffleFlagNamespace, WaffleFlag
+from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
 
 # Namespace for verify_students waffle flags.
 WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='verify_student')

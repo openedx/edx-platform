@@ -18,7 +18,7 @@ from rest_framework import status
 from openedx.features.calendar_sync.api import (
     SUBSCRIBE, UNSUBSCRIBE, subscribe_user_to_calendar, unsubscribe_user_to_calendar
 )
-from util.views import ensure_valid_course_key
+from common.djangoapps.util.views import ensure_valid_course_key
 
 
 class CalendarSyncView(View):

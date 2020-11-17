@@ -6,9 +6,10 @@ from django.utils.translation import ugettext as _
 from edx_django_utils.monitoring import set_custom_attribute
 from waffle import flag_is_active
 
+from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
 from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
 from openedx.core.djangoapps.util.user_messages import UserMessageCollection
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlag, WaffleFlagNamespace
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 # Namespace for course experience waffle flags.
 WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='course_experience')
@@ -53,6 +54,7 @@ SHOW_REVIEWS_TOOL_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'show_reviews_t
 # .. toggle_creation_date: 2017-09-11
 # .. toggle_target_removal_date: None
 # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
+# .. toggle_tickets: None
 ENABLE_COURSE_GOALS = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'enable_course_goals', __name__)
 
 # Waffle flag to control the display of the hero
@@ -68,8 +70,11 @@ UPGRADE_DEADLINE_MESSAGE = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'upgrade_dead
 # .. toggle_description: Used to switch between 'welcome message' and 'latest update' on the course home page.
 # .. toggle_use_cases: opt_out
 # .. toggle_creation_date: 2017-09-11
+# .. toggle_target_removal_date: None
 # .. toggle_warnings: This is meant to be configured using waffle_utils course override only. Either do not create the
-#   actual waffle flag, or be sure to unset the flag even for Superusers.
+#   actual waffle flag, or be sure to unset the flag even for Superusers. This is no longer used in the learning MFE
+#   and can be removed when the outline tab is fully moved to the learning MFE.
+# .. toggle_tickets: None
 LATEST_UPDATE_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'latest_update', __name__)
 
 # Waffle flag to enable anonymous access to a course

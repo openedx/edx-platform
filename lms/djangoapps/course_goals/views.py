@@ -15,7 +15,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 
 from openedx.core.lib.api.permissions import IsStaffOrOwner
-from track import segment
+from common.djangoapps.track import segment
 
 from .api import get_course_goal_options
 from .models import GOAL_KEY_CHOICES, CourseGoal

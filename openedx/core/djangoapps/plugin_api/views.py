@@ -11,7 +11,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from web_fragments.views import FragmentView
 
-from edxmako.shortcuts import is_any_marketing_link_set, is_marketing_link_set, marketing_link
+from common.djangoapps.edxmako.shortcuts import is_any_marketing_link_set, is_marketing_link_set, marketing_link
 
 log = logging.getLogger('plugin_api')
 

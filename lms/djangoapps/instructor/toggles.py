@@ -2,7 +2,8 @@
 Waffle flags for instructor dashboard.
 """
 
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace, WaffleFlag
+from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 WAFFLE_NAMESPACE = 'instructor'
 # Namespace for instructor waffle flags.
@@ -13,13 +14,11 @@ WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name=WAFFLE_NAMESPACE)
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: instructor
-# .. toggle_category: Instructor dashboard
-# .. toggle_use_cases: incremental_release, open_edx
+# .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2020-07-8
-# .. toggle_expiration_date: ??
+# .. toggle_target_removal_date: None
 # .. toggle_warnings: ??
 # .. toggle_tickets: PROD-1309
-# .. toggle_status: supported
 DATA_DOWNLOAD_V2 = CourseWaffleFlag(
     waffle_namespace=WaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix='instructor_dashboard: '),
     flag_name='enable_data_download_v2',
@@ -31,9 +30,9 @@ DATA_DOWNLOAD_V2 = CourseWaffleFlag(
 # .. toggle_default: False
 # .. toggle_description: Supports staged rollout to improved is_small_course method.
 # .. toggle_category: instructor
-# .. toggle_use_cases: incremental_release, open_edx
+# .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2020-07-02
-# .. toggle_expiration_date: n/a
+# .. toggle_target_removal_date: None
 # .. toggle_warnings: n/a
 # .. toggle_tickets: PROD-1740
 # .. toggle_status: supported
