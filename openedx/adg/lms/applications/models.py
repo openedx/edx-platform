@@ -144,7 +144,7 @@ class AdminNote(TimeStampedModel):
     Model to save the notes of admin on the user application.
     """
     user_application = models.ForeignKey(UserApplication, on_delete=models.CASCADE, )
-    admin = models.ForeignKey(User,  on_delete=models.CASCADE, )
+    admin = models.ForeignKey(User, on_delete=models.CASCADE, )
     admin_note = models.TextField(verbose_name=_('Admin Note'), blank=True, )
 
     class Meta:
