@@ -376,10 +376,8 @@ class HtmlBlockMixin(
 class HtmlBlock(HtmlBlockMixin):
     """
     This is the actual HTML XBlock.
-    Nothing extra is required, but this has the edxnotes decorator so that
-    it can have edxnotes used with it.
+    Nothing extra is required; this is just a wrapper to include edxnotes support.
     """
-    pass
 
 
 class AboutFields(object):
@@ -430,8 +428,9 @@ class StaticTabFields(object):
     )
 
 
+@edxnotes
 @XBlock.tag("detached")
-class StaticTabBlock(StaticTabFields, HtmlBlock):
+class StaticTabBlock(StaticTabFields, HtmlBlockMixin):
     """
     These pieces of course content are treated as HtmlBlocks but we need to overload where the templates are located
     in order to be able to create new ones
