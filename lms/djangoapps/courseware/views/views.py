@@ -478,11 +478,6 @@ def course_info(request, course_id):
                 # Shared code with the new Course Home (DONE)
                 dates_fragment = CourseDatesFragmentView().render_to_fragment(request, course_id=course_id)
 
-        # This local import is due to the circularity of lms and openedx references.
-        # This may be resolved by using stevedore to allow web fragments to be used
-        # as plugins, and to avoid the direct import.
-        from openedx.features.course_experience.views.course_reviews import CourseReviewsModuleFragmentView
-
         # Shared code with the new Course Home (DONE)
         # Get the course tools enabled for this user and course
         course_tools = CourseToolsPluginManager.get_enabled_course_tools(request, course_key)
@@ -947,14 +942,6 @@ def course_about(request, course_id):
 
         allow_anonymous = check_public_access(course, [COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE])
 
-        # This local import is due to the circularity of lms and openedx references.
-        # This may be resolved by using stevedore to allow web fragments to be used
-        # as plugins, and to avoid the direct import.
-        from openedx.features.course_experience.views.course_reviews import CourseReviewsModuleFragmentView
-
-        # Embed the course reviews tool
-        reviews_fragment_view = CourseReviewsModuleFragmentView().render_to_fragment(request, course=course)
-
         context = {
             'course': course,
             'course_details': course_details,
@@ -979,7 +966,6 @@ def course_about(request, course_id):
             'disable_courseware_header': True,
             'pre_requisite_courses': pre_requisite_courses,
             'course_image_urls': overview.image_urls,
-            'reviews_fragment_view': reviews_fragment_view,
             'sidebar_html_enabled': sidebar_html_enabled,
             'allow_anonymous': allow_anonymous,
         }
