@@ -213,7 +213,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
         """
         Verify that the view's query count doesn't regress.
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=UTC))
         # Pre-fetch the view to populate any caches
         course_home_url(self.course)
 
@@ -578,7 +578,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         Ensure that a user accessing an expired course sees a redirect to
         the student dashboard, not a 404.
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2010, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2010, 1, 1, tzinfo=UTC))
         course = CourseFactory.create(start=THREE_YEARS_AGO)
         url = course_home_url(course)
 
@@ -614,7 +614,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         Ensure that a user accessing a course with an expired upgrade deadline
         will still see the course expiration banner without the upgrade related text.
         """
-        past = datetime(2010, 1, 1)
+        past = datetime(2010, 1, 1, tzinfo=UTC)
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=past)
         course = CourseFactory.create(start=now() - timedelta(days=10))
         CourseModeFactory.create(course_id=course.id, mode_slug=CourseMode.AUDIT)
@@ -634,7 +634,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         Verify that enrolled users are NOT shown the course expiration banner and can
         access the course home page if course audit only
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2010, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2010, 1, 1, tzinfo=UTC))
         audit_only_course = CourseFactory.create()
         self.create_user_for_course(audit_only_course, CourseUserType.ENROLLED)
         response = self.client.get(course_home_url(audit_only_course))
@@ -648,7 +648,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         Ensure that a user accessing an expired course that is in the holdback
         does not get redirected to the student dashboard, not a 404.
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2010, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2010, 1, 1, tzinfo=UTC))
 
         course = CourseFactory.create(start=THREE_YEARS_AGO)
         url = course_home_url(course)
@@ -775,7 +775,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         config = CourseDurationLimitConfig(
             course=CourseOverview.get_from_id(self.course.id),
             enabled=True,
-            enabled_as_of=datetime(2018, 1, 1)
+            enabled_as_of=datetime(2018, 1, 1, tzinfo=UTC)
         )
         config.save()
 
@@ -808,7 +808,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         config = CourseDurationLimitConfig(
             course=CourseOverview.get_from_id(self.course.id),
             enabled=True,
-            enabled_as_of=datetime(2018, 1, 1)
+            enabled_as_of=datetime(2018, 1, 1, tzinfo=UTC)
         )
         config.save()
         url = course_home_url(self.course)
@@ -833,7 +833,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         config = CourseDurationLimitConfig(
             course=CourseOverview.get_from_id(self.course.id),
             enabled=True,
-            enabled_as_of=datetime(2018, 1, 1)
+            enabled_as_of=datetime(2018, 1, 1, tzinfo=UTC)
         )
         config.save()
         url = course_home_url(self.course)
