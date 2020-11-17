@@ -39,6 +39,8 @@ from lms.djangoapps.instructor.message_types import (
     EnrollEnrolled,
     RemoveBetaTester
 )
+from openedx.adg.lms.student.helpers import compose_and_send_adg_course_enrollment_invitation_email
+from openedx.adg.lms.utils.env_utils import is_testing_environment
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.models import UserPreference
@@ -158,7 +160,10 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
             email_params['message_type'] = 'enrolled_enroll'
             email_params['email_address'] = student_email
             email_params['full_name'] = previous_state.full_name
-            send_mail_to_student(student_email, email_params, language=language)
+            if is_testing_environment():
+                send_mail_to_student(student_email, email_params, language=language)
+            else:
+                compose_and_send_adg_course_enrollment_invitation_email(student_email, email_params)
 
     elif not is_email_retired(student_email):
         cea, _ = CourseEnrollmentAllowed.objects.get_or_create(course_id=course_id, email=student_email)
@@ -167,7 +172,10 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
         if email_students:
             email_params['message_type'] = 'allowed_enroll'
             email_params['email_address'] = student_email
-            send_mail_to_student(student_email, email_params, language=language)
+            if is_testing_environment():
+                send_mail_to_student(student_email, email_params, language=language)
+            else:
+                compose_and_send_adg_course_enrollment_invitation_email(student_email, email_params)
 
     after_state = EmailEnrollmentState(course_id, student_email)
 

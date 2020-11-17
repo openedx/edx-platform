@@ -27,6 +27,8 @@ from eventtracking import tracker
 from rest_framework.views import APIView
 
 from edxmako.shortcuts import render_to_string
+from openedx.adg.lms.student.helpers import compose_and_send_adg_password_reset_email
+from openedx.adg.lms.utils.env_utils import is_testing_environment
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.oauth_dispatch.api import destroy_oauth_tokens
@@ -181,7 +183,10 @@ class PasswordResetFormNoActive(PasswordResetForm):
         """
         for user in self.users_cache:
             if self.is_account_recovery:
-                send_password_reset_email_for_user(user, request)
+                if is_testing_environment():
+                    send_password_reset_email_for_user(user, request)
+                else:
+                    compose_and_send_adg_password_reset_email(user, request)
             else:
                 send_account_recovery_email_for_user(user, request, user.account_recovery.secondary_email)
 

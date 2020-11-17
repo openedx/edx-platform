@@ -320,7 +320,7 @@ ACCOUNT_MICROFRONTEND_URL = 'http://localhost:1997'
 ############## Docker based devstack settings #######################
 
 FEATURES.update({
-    'AUTOMATIC_AUTH_FOR_TESTING': True,
+    'AUTOMATIC_AUTH_FOR_TESTING': False,
     'ENABLE_DISCUSSION_SERVICE': True,
     'SHOW_HEADER_LANGUAGE_SELECTOR': True,
     'ENABLE_ENTERPRISE_INTEGRATION': False,
