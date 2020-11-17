@@ -145,10 +145,10 @@ class AdminNote(TimeStampedModel):
     """
     user_application = models.ForeignKey(UserApplication, on_delete=models.CASCADE, )
     admin = models.ForeignKey(User, on_delete=models.CASCADE, )
-    admin_note = models.TextField(verbose_name=_('Admin Note'), blank=True, )
+    note = models.TextField()
 
     class Meta:
         app_label = 'applications'
 
     def __str__(self):
-        return 'Application {id}, Admin note {note} '.format(id=self.user_application.id, note=self.admin_note)
+        return 'Application {id}, Admin note {note} '.format(id=self.user_application.id, note=self.note)
