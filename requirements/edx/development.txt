@@ -119,7 +119,7 @@ edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/testing.txt
 edx-proctoring==2.4.8     # via -r requirements/edx/testing.txt, edx-proctoring-proctortrack
 edx-rbac==1.3.3           # via -r requirements/edx/testing.txt, edx-enterprise
 edx-rest-api-client==5.2.1  # via -r requirements/edx/testing.txt, edx-enterprise, edx-proctoring
-edx-search==2.0.0         # via -r requirements/edx/testing.txt
+edx-search==2.0.1         # via -r requirements/edx/testing.txt
 edx-sga==0.13.0           # via -r requirements/edx/testing.txt
 edx-sphinx-theme==1.5.0   # via -r requirements/edx/development.in
 edx-submissions==3.2.2    # via -r requirements/edx/testing.txt, ora2
