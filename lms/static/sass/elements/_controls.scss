@@ -345,17 +345,17 @@
 
   @extend %btn-primary;
 
-  border: 1px solid darken($action-primary-bg, 10%);
+  border: 1px solid darken($primary, 10%);
   border-radius: 3px;
   padding: 8px $baseline;
   background-color: transparent;
-  color: darken($action-primary-bg, 10%);
+  color: darken($primary, 10%);
   text-align: center;
 
   &:hover,
   &:focus {
     border: 1px solid transparent;
-    background-color: $action-primary-bg;
+    background-color: $primary;
     color: $action-primary-fg;
     text-decoration: none;
   }
@@ -372,7 +372,7 @@
   @extend %btn-pl-default-base;
 
   background-color: $action-primary-fg;
-  color: $action-primary-bg;
+  color: $primary;
 }
 
 %btn-pl-green-base {
