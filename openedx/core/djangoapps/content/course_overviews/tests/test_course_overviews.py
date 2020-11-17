@@ -382,7 +382,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         course_overview = CourseOverview._create_or_update(course)  # pylint: disable=protected-access
         self.assertEqual(course_overview.lowest_passing_grade, None)
 
-    @ddt.data((ModuleStoreEnum.Type.mongo, 4, 4), (ModuleStoreEnum.Type.split, 3, 4))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 4, 4), (ModuleStoreEnum.Type.split, 3, 3))
     @ddt.unpack
     def test_versioning(self, modulestore_type, min_mongo_calls, max_mongo_calls):
         """
@@ -788,6 +788,28 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
             self.assertNotEqual(modified_urls['small'], start_urls['small'])
             self.assertTrue(modified_urls['small'].startswith(expected_cdn_url))
             self.assertEqual(modified_urls['large'], start_urls['large'])
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_cdn_with_a_single_external_image(self, modulestore_type):
+        """
+        Test CDN is applied for a URL when apply_cdn_to_url called directly.
+
+        Apply CDN/base URL to the given URL if CDN configuration is enabled
+        and the URL is not absolute.
+        """
+        with self.store.default_store(modulestore_type):
+            course = CourseFactory.create(default_store=modulestore_type)
+            overview = CourseOverview.get_from_id(course.id)
+
+            # Now enable the CDN...
+            AssetBaseUrlConfig.objects.create(enabled=True, base_url='fakecdn.edx.org')
+            expected_cdn_url = "//fakecdn.edx.org"
+
+            start_url = "/static/overview.png"
+            modified_url = overview.apply_cdn_to_url(start_url)
+
+            self.assertNotEqual(start_url, modified_url)
+            self.assertTrue(modified_url.startswith(expected_cdn_url))
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_error_generating_thumbnails(self, modulestore_type):
