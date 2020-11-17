@@ -49,4 +49,5 @@ branches:
   # so `continuous-integration/travis-ci/push` shouldn't be built anymore.
   only:
     - /^appsembler\/(tahoe|hawthorn)\/(develop|master)$/
-    - appsembler/juniper-upgrade
+    - main
+
