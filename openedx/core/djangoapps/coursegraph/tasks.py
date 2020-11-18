@@ -10,6 +10,7 @@ from celery import task
 from django.conf import settings
 from django.utils import six, timezone
 from edx_django_utils.cache import RequestCache
+from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
 from py2neo import Graph, Node, Relationship, authenticate, NodeSelector
 from py2neo.compat import integer, string
@@ -247,6 +248,7 @@ def should_dump_course(course_key, graph):
 
 
 @task(routing_key=settings.COURSEGRAPH_JOB_QUEUE)
+@set_code_owner_attribute
 def dump_course_to_neo4j(course_key_string, credentials):
     """
     Serializes a course and writes it to neo4j.

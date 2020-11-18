@@ -9,6 +9,7 @@ from celery.task import task
 from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.core import mail
+from edx_django_utils.monitoring import set_code_owner_attribute
 
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -19,6 +20,7 @@ TASK_COMPLETE_EMAIL_TIMEOUT = 60
 
 
 @task(bind=True)
+@set_code_owner_attribute
 def send_task_complete_email(self, task_name, task_state_text, dest_addr, detail_url):
     """
     Sending an email to the users when an async task completes.

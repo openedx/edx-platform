@@ -26,6 +26,7 @@ from functools import partial
 from celery import task
 from django.conf import settings
 from django.utils.translation import ugettext_noop
+from edx_django_utils.monitoring import set_code_owner_attribute
 
 from lms.djangoapps.bulk_email.tasks import perform_delegate_email_batches
 from lms.djangoapps.instructor_task.tasks_base import BaseInstructorTask
@@ -55,6 +56,7 @@ TASK_LOG = logging.getLogger('edx.celery.task')
 
 
 @task(base=BaseInstructorTask)
+@set_code_owner_attribute
 def rescore_problem(entry_id, xmodule_instance_args):
     """Rescores a problem in a course, for all students or one specific student.
 
@@ -82,6 +84,7 @@ def rescore_problem(entry_id, xmodule_instance_args):
 
 
 @task(base=BaseInstructorTask)
+@set_code_owner_attribute
 def override_problem_score(entry_id, xmodule_instance_args):
     """
     Overrides a specific learner's score on a problem.
@@ -95,6 +98,7 @@ def override_problem_score(entry_id, xmodule_instance_args):
 
 
 @task(base=BaseInstructorTask)
+@set_code_owner_attribute
 def reset_problem_attempts(entry_id, xmodule_instance_args):
     """Resets problem attempts to zero for a particular problem for all students in a course.
 
@@ -117,6 +121,7 @@ def reset_problem_attempts(entry_id, xmodule_instance_args):
 
 
 @task(base=BaseInstructorTask)
+@set_code_owner_attribute
 def delete_problem_state(entry_id, xmodule_instance_args):
     """Deletes problem state entirely for all students on a particular problem in a course.
 
@@ -139,6 +144,7 @@ def delete_problem_state(entry_id, xmodule_instance_args):
 
 
 @task(base=BaseInstructorTask)
+@set_code_owner_attribute
 def send_bulk_course_email(entry_id, _xmodule_instance_args):
     """Sends emails to recipients enrolled in a course.
 
@@ -164,6 +170,7 @@ def send_bulk_course_email(entry_id, _xmodule_instance_args):
     base=BaseInstructorTask,
     routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY,
 )
+@set_code_owner_attribute
 def calculate_problem_responses_csv(entry_id, xmodule_instance_args):
     """
     Compute student answers to a given problem and upload the CSV to
@@ -176,6 +183,7 @@ def calculate_problem_responses_csv(entry_id, xmodule_instance_args):
 
 
 @task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)
+@set_code_owner_attribute
 def calculate_grades_csv(entry_id, xmodule_instance_args):
     """
     Grade a course and push the results to an S3 bucket for download.
@@ -192,6 +200,7 @@ def calculate_grades_csv(entry_id, xmodule_instance_args):
 
 
 @task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)
+@set_code_owner_attribute
 def calculate_problem_grade_report(entry_id, xmodule_instance_args):
     """
     Generate a CSV for a course containing all students' problem
@@ -209,6 +218,7 @@ def calculate_problem_grade_report(entry_id, xmodule_instance_args):
 
 
 @task(base=BaseInstructorTask)
+@set_code_owner_attribute
 def calculate_students_features_csv(entry_id, xmodule_instance_args):
     """
     Compute student profile information for a course and upload the
@@ -221,6 +231,7 @@ def calculate_students_features_csv(entry_id, xmodule_instance_args):
 
 
 @task(base=BaseInstructorTask)
+@set_code_owner_attribute
 def course_survey_report_csv(entry_id, xmodule_instance_args):
     """
     Compute the survey report for a course and upload the
@@ -233,6 +244,7 @@ def course_survey_report_csv(entry_id, xmodule_instance_args):
 
 
 @task(base=BaseInstructorTask)
+@set_code_owner_attribute
 def proctored_exam_results_csv(entry_id, xmodule_instance_args):
     """
     Compute proctored exam results report for a course and upload the
@@ -244,6 +256,7 @@ def proctored_exam_results_csv(entry_id, xmodule_instance_args):
 
 
 @task(base=BaseInstructorTask)
+@set_code_owner_attribute
 def calculate_may_enroll_csv(entry_id, xmodule_instance_args):
     """
     Compute information about invited students who have not enrolled
@@ -257,6 +270,7 @@ def calculate_may_enroll_csv(entry_id, xmodule_instance_args):
 
 
 @task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)
+@set_code_owner_attribute
 def generate_certificates(entry_id, xmodule_instance_args):
     """
     Grade students and generate certificates.
@@ -273,6 +287,7 @@ def generate_certificates(entry_id, xmodule_instance_args):
 
 
 @task(base=BaseInstructorTask)
+@set_code_owner_attribute
 def cohort_students(entry_id, xmodule_instance_args):
     """
     Cohort students in bulk, and upload the results.
@@ -285,6 +300,7 @@ def cohort_students(entry_id, xmodule_instance_args):
 
 
 @task(base=BaseInstructorTask)
+@set_code_owner_attribute
 def export_ora2_data(entry_id, xmodule_instance_args):
     """
     Generate a CSV of ora2 responses and push it to S3.
@@ -295,6 +311,7 @@ def export_ora2_data(entry_id, xmodule_instance_args):
 
 
 @task(base=BaseInstructorTask)
+@set_code_owner_attribute
 def export_ora2_submission_files(entry_id, xmodule_instance_args):
     """
     Download all submission files, generate csv downloads list,

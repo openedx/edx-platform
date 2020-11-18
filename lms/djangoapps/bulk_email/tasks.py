@@ -37,6 +37,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import override as override_language
 from django.utils.translation import ugettext as _
+from edx_django_utils.monitoring import set_code_owner_attribute
 from markupsafe import escape
 from six import text_type
 
@@ -240,6 +241,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
 
 
 @task(default_retry_delay=settings.BULK_EMAIL_DEFAULT_RETRY_DELAY, max_retries=settings.BULK_EMAIL_MAX_RETRIES)
+@set_code_owner_attribute
 def send_course_email(entry_id, email_id, to_list, global_email_context, subtask_status_dict):
     """
     Sends an email to a list of recipients.
