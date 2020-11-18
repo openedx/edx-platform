@@ -43,29 +43,27 @@ class MandrillClient(object):
     def __init__(self):
         self.mandrill_client = mandrill.Mandrill(settings.MANDRILL_API_KEY)
 
-    def attach_emails(self, user_emails):
-        email_tokens = user_emails.split(',')
-        receiver_emails = []
-        for email in email_tokens:
-            receiver_emails.append({'email': email})
+    def get_email_to(self, receiver_emails_string):
+        email_list = receiver_emails_string.split(',')
+        receiver_emails = [{'email': email} for email in email_list]
         return receiver_emails
 
-    def send_mail(self, template_name, user_email, context, attachments=[], subject=None, sender_email=None, images=[]):
+    def send_mail(self, template_name, receiver_emails_string, context, attachments=[], subject=None, reply_to_email=None , images=[]):
         """
         calls the mandrill API for the specific template and email
 
         arguments:
         template_name: the slug/identifier of the mandrill email template
-        user_email: the email of the receiver
+        user_email: the email or comma separated emails of the receiver's
         context: the data which is passed to the template. must be a dict
-        sender_email:  email for sender
+        reply_to_email:  email for reply_to
         images: images attachments for referring it from content of email template
         """
         global_merge_vars = [{'name': key, 'content': context[key]} for key in context]
 
         message = {
             'from_email': settings.NOTIFICATION_FROM_EMAIL,
-            'to': self.attach_emails(user_email),
+            'to': self.get_email_to(receiver_emails_string),
             'global_merge_vars': global_merge_vars,
             'attachments': attachments,
             'images': images,
@@ -74,8 +72,8 @@ class MandrillClient(object):
         if subject:
             message.update({'subject': subject})
 
-        if sender_email:
-            message.update({'headers': {'Reply-To': sender_email}})
+        if reply_to_email:
+            message.update({'headers': {'Reply-To': reply_to_email}})
 
         try:
             result = self.mandrill_client.messages.send_template(
