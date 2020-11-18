@@ -26,6 +26,22 @@ class Partner(TimeStampedModel):
     slug = models.CharField(max_length=100, unique=True, help_text="A unique identifier for an organization")
     email = models.EmailField(help_text="Contact email of an organization")
     configuration = JSONField(null=False, blank=True, default=dumps({"USER_LIMIT": ""}))
+    main_title = models.CharField(blank=True, max_length=100, help_text="Display on partners landing page as main title.")
+    main_description = models.TextField(blank=True, help_text='Brief description of partners landing page.')
+    main_bg_image = models.ImageField(
+        blank=True, storage=CustomS3Storage(), max_length=500, help_text="Background image under main title and description.",
+        upload_to=UploadToPathAndRename(path='images', name_prefix='main_bg_image', add_path_prefix=True)
+    )
+    parallax_bg_image = models.ImageField(
+        blank=True, storage=CustomS3Storage(), max_length=500, help_text="Background image of parallax.",
+        upload_to=UploadToPathAndRename(path='images', name_prefix='parallax_bg_image', add_path_prefix=True)
+    )
+    heading1 = models.CharField(blank=True, max_length=100, help_text="Heading 1")
+    heading1_description = models.TextField(blank=True)
+    heading2 = models.CharField(blank=True, max_length=100, help_text="Heading 2")
+    heading2_description = models.TextField(blank=True)
+    testimonials1 = JSONField(blank=True, default=dumps({"description": "", "qoute_by": "", "address": ""}))
+    testimonials2 = JSONField(blank=True, default=dumps({"description": "", "qoute_by": "", "address": ""}))
 
     def __unicode__(self):
         return '{}'.format(self.label)
