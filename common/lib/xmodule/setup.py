@@ -20,13 +20,13 @@ XMODULES = [
     "videodev = xmodule.backcompat_module:TranslateCustomTagDescriptor",
     "videosequence = xmodule.seq_module:SequenceDescriptor",
     "custom_tag_template = xmodule.raw_module:RawDescriptor",
-    "annotatable = xmodule.annotatable_module:AnnotatableDescriptor",
     "hidden = xmodule.hidden_module:HiddenDescriptor",
     "raw = xmodule.raw_module:RawDescriptor",
     "lti = xmodule.lti_module:LTIDescriptor",
 ]
 XBLOCKS = [
     "about = xmodule.html_module:AboutBlock",
+    "annotatable = xmodule.annotatable_module:AnnotatableBlock",
     "conditional = xmodule.conditional_module:ConditionalBlock",
     "course_info = xmodule.html_module:CourseInfoBlock",
     "html = xmodule.html_module:HtmlBlock",
