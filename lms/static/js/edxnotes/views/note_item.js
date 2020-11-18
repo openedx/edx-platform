@@ -2,8 +2,8 @@
     'use strict';
     define([
         'jquery', 'underscore', 'backbone', 'js/edxnotes/utils/template',
-        'js/edxnotes/utils/logger'
-    ], function($, _, Backbone, templateUtils, NotesLogger) {
+        'js/edxnotes/utils/logger', 'edx-ui-toolkit/js/utils/html-utils'
+    ], function($, _, Backbone, templateUtils, NotesLogger, HtmlUtils) {
         var NoteItemView = Backbone.View.extend({
             tagName: 'article',
             className: 'note',
@@ -25,8 +25,7 @@
 
             render: function() {
                 var context = this.getContext();
-                this.$el.html(this.template(context));
-
+                this.$el.html(HtmlUtils.HTML(this.template(context)).toString());
                 return this;
             },
 
