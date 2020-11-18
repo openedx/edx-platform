@@ -43,7 +43,7 @@ class MandrillClient(object):
     def __init__(self):
         self.mandrill_client = mandrill.Mandrill(settings.MANDRILL_API_KEY)
 
-    def send_mail(self, template_name, user_email, context, attachments=[], subject=None, receiver_emails=[], sender_email=None, images=[]):
+    def send_mail(self, template_name, user_email, context, attachments=[], subject=None):
         """
         calls the mandrill API for the specific template and email
 
@@ -64,14 +64,44 @@ class MandrillClient(object):
         if subject:
             message.update({'subject': subject})
 
-        if receiver_emails:
-            message.update({'to': receiver_emails})
+        try:
+            result = self.mandrill_client.messages.send_template(
+                template_name=template_name,
+                template_content=[],
+                message=message,
+            )
+            log.info(result)
+        except mandrill.Error as e:
+            # Mandrill errors are thrown as exceptions
+            log.error('A mandrill error occurred: %s - %s' % (e.__class__, e))
+            raise
+        return result
 
-        if sender_email:
-            message.update({'headers': {'Reply-To': sender_email}})
+    def send_action_plan_mail(self, template_name, context, attachments=[], receiver_emails=[], sender_email=None,
+                              images=[]):
+        """
+        calls the mandrill API for the action planner  template and email
 
-        if images:
-            message.update({'images': images})
+        arguments:
+        template_name: the slug/identifier of the mandrill email template
+        user_email: the email of the receiver
+        context: the data which is passed to the template. must be a dict
+        attachments: the data which is passed to the template. must be a dict
+        receiver_emails: A list of recipients emails
+        sender_email:  email for sender
+        images: images attachments for referring it from content of email template
+        """
+
+        global_merge_vars = [{'name': key, 'content': context[key]} for key in context]
+
+        message = {
+            'from_email': settings.NOTIFICATION_FROM_EMAIL,
+            'to': receiver_emails,
+            'global_merge_vars': global_merge_vars,
+            'attachments': attachments,
+            'images': images,
+            'headers': {'Reply-To': sender_email}
+        }
 
         try:
             result = self.mandrill_client.messages.send_template(
