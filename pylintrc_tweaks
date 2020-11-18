@@ -5,7 +5,6 @@ ignore+ = ,.git,.tox,migrations,node_modules,.pycharm_helpers
 # It will be removed in an upcoming Open edX release.
 # See docs/decisions/0007-sys-path-modification-removal.rst
 init-hook="import sys; sys.path.extend(['import_shims/lms', 'import_shims/studio'])"
-ignore-patterns=**/import_shims/**/*.py
 
 [MESSAGES CONTROL]
 disable+ =
