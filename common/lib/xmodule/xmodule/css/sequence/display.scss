@@ -322,7 +322,7 @@ $seq-nav-height: 50px;
     }
 
     @include media-breakpoint-up(sm) {
-      border-bottom: 3px solid $seq-nav-link-color;
+      border-bottom: 3px solid $primary;
       background-color: theme-color("inverse");
 
       .icon {
