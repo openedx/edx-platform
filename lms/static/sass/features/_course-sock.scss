@@ -16,25 +16,7 @@
 
     position: absolute;
     top: (-1 * $baseline);
-    width: ($baseline * 15);
-    color: theme-color("inverse");
-    background-color: theme-color("success");
-    border-color: theme-color("success");
-    background-image: none;
-    box-shadow: none;
-    -webkit-transition: background-color 0.5s;
-    transition: background-color 0.5s;
-    cursor: pointer;
-
-    &.active,
-    &:focus,
-    &:hover {
-      color: theme-color("success");
-      background-color: theme-color("inverse");
-      border-color: theme-color("success");
-      background-image: none;
-      box-shadow: none;
-    }
+    min-width: ($baseline * 15);
   }
 
   .verification-main-panel {
@@ -149,17 +131,6 @@
 
     .action-toggle-verification-sock {
       top: (-1 * $baseline * 5/4);
-
-      &:not(.active) {
-        color: theme-color("inverse");
-        background-color: theme-color("success");
-        box-shadow: none;
-        border: 1px solid theme-color("success");
-
-        &:hover {
-          background-color: $success-color-hover;
-        }
-      }
     }
 
     .verification-main-panel {
