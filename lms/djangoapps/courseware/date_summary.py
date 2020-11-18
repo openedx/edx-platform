@@ -430,7 +430,7 @@ class CourseAssignmentDate(DateSummary):
         """ Used to set the title_html and title properties for the assignment date block """
         if link:
             self.assignment_title_html = HTML(
-                '<a href="{assignment_link}">{assignment_title}</a>'
+                '<a href="{assignment_link}" class="btn btn-outline-primary">{assignment_title}</a>'
             ).format(assignment_link=link, assignment_title=title)
         self.assignment_title = title
 

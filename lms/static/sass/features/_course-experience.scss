@@ -482,9 +482,9 @@
 
       .date-summary-link {
         font-weight: $font-semibold;
+        padding-top: 12px;
 
         a {
-          color: $link-color;
           font-size: 0.9rem;
         }
       }
@@ -498,10 +498,10 @@
 }
 
 .dates-tab-link {
-  padding: 16px 0 0 24px;
+  padding: 12px 0 0 24px;
 
   a {
-    font-weight: bold;
+    font-size: 0.9rem;
   }
 }
 
