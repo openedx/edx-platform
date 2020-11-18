@@ -33,6 +33,10 @@ class SendActivationEmailTestCase(TestCase):
         """
         Tests that attributes of the message are being filled correctly in compose_activation_email
         """
+        # Check that variables used by the base template are present in generated context
+        self.assertIn('platform_name', self.msg.context)
+        self.assertIn('contact_mailing_address', self.msg.context)
+        # Verify the presence of the activation-email specific attributes
         self.assertEqual(self.msg.recipient.username, self.student.username)
         self.assertEqual(self.msg.recipient.email_address, self.student.email)
         self.assertEqual(self.msg.context['routed_user'], self.student.username)

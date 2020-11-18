@@ -31,6 +31,7 @@ from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.utils import is_verification_expiring_soon, verification_for_datetime
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_themes
@@ -392,7 +393,8 @@ def generate_activation_email_context(user, registration):
         user (User): Currently logged-in user
         registration (Registration): Registration object for the currently logged-in user
     """
-    return {
+    context = get_base_template_context(None)
+    context.update({
         'name': user.profile.name,
         'key': registration.activation_key,
         'lms_url': configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
@@ -401,7 +403,8 @@ def generate_activation_email_context(user, registration):
             'ACTIVATION_EMAIL_SUPPORT_LINK', settings.ACTIVATION_EMAIL_SUPPORT_LINK
         ) or settings.SUPPORT_SITE_LINK,
         'support_email': configuration_helpers.get_value('CONTACT_EMAIL', settings.CONTACT_EMAIL),
-    }
+    })
+    return context
 
 
 def create_or_set_user_attribute_created_on_site(user, site):
