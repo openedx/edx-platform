@@ -35,6 +35,7 @@ import third_party_auth
 # Note that this lives in LMS, so this dependency should be refactored.
 # TODO Have the discussions code subscribe to the REGISTER_USER signal instead.
 from lms.djangoapps.discussion.notification_prefs.views import enable_notifications
+from openedx.adg.lms.registration_extension.forms import RegistrationFormFactory
 from openedx.adg.lms.student.helpers import compose_and_send_adg_activation_email
 from openedx.adg.lms.utils.env_utils import is_testing_environment
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
@@ -55,8 +56,7 @@ from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.views.registration_form import (
     get_registration_extension_form,
-    AccountCreationForm,
-    RegistrationFormFactory
+    AccountCreationForm
 )
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from student.helpers import (

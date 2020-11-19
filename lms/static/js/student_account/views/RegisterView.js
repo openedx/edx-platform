@@ -239,7 +239,6 @@
                         };
 
                     FormView.prototype.postRender.call(this);
-                    $('.optional-fields').addClass('hidden');
                     $('#toggle_optional_fields').change(function() {
                         window.analytics.track('edx.bi.user.register.optional_fields_selected');
                         $('.optional-fields').toggleClass('hidden');
