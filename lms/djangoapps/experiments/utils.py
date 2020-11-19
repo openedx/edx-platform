@@ -315,6 +315,7 @@ def get_experiment_user_metadata_context(course, user):
             'username',
             'user_id',
             'course_id',
+            'course_display_name',
             'enrollment_mode',
             'upgrade_link',
             'upgrade_price',
@@ -420,6 +421,7 @@ def get_base_experiment_metadata_context(course, user, enrollment, user_enrollme
         'audit_access_deadline': deadline,
         'course_duration': duration,
         'course_key': course.id,
+        'course_display_name': course.display_name_with_default,
         'course_start': course.start,
         'course_end': course.end,
         # TODO: clean up as part of REVEM-199 (START)
