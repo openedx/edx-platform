@@ -59,7 +59,7 @@ pipeline {
     environment {
         XDIST_GIT_BRANCH = xdist_git_branch()
         XDIST_GIT_REFSPEC = xdist_git_refspec()
-        XDIST_INSTANCE_TYPE = "c5d.large"
+        XDIST_INSTANCE_TYPE = "c5ad.large"
         XDIST_WORKER_AMI = credentials('XDIST_WORKER_AMI')
         XDIST_WORKER_IAM_PROFILE_ARN = credentials('XDIST_WORKER_IAM_PROFILE_ARN')
         XDIST_WORKER_KEY_NAME = "jenkins-worker"
