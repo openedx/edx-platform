@@ -12,6 +12,7 @@ from enum import Enum
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User
+from django.db import connections
 from django.test import TestCase
 from django.test.utils import override_settings
 from mock import patch
@@ -397,7 +398,7 @@ class SharedModuleStoreTestCase(
     for Django ORM models that will get cleaned up properly.
     """
     # Tell Django to clean out all databases, not just default
-    multi_db = True
+    databases = {alias for alias in connections}
 
     @classmethod
     @contextmanager
@@ -486,7 +487,7 @@ class ModuleStoreTestCase(
     CREATE_USER = True
 
     # Tell Django to clean out all databases, not just default
-    multi_db = True
+    databases = {alias for alias in connections}
 
     @classmethod
     def setUpClass(cls):
