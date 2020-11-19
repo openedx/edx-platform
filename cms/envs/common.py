@@ -658,7 +658,7 @@ MIDDLEWARE = [
 
     # A newer and safer request cache.
     'edx_django_utils.cache.middleware.RequestCacheMiddleware',
-    'edx_django_utils.monitoring.middleware.MonitoringMemoryMiddleware',
+    'edx_django_utils.monitoring.MonitoringMemoryMiddleware',
 
     # Cookie monitoring
     'openedx.core.lib.request_utils.CookieMonitoringMiddleware',
