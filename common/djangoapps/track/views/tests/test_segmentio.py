@@ -180,6 +180,28 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
         segmentio.track_segmentio_event(request)
         self.assert_events_emitted()
 
+    @data(
+        None,
+        'a string',
+        ['a', 'list'],
+    )
+    @expect_failure_with_message(segmentio.ERROR_INVALID_CONTEXT_FIELD_TYPE)
+    def test_invalid_context_field_type(self, invalid_value):
+        sample_event_raw = self.create_segmentio_event()
+        sample_event_raw['properties']['context'] = invalid_value
+        self.post_modified_segmentio_event(sample_event_raw)
+
+    @data(
+        None,
+        'a string',
+        ['a', 'list'],
+    )
+    @expect_failure_with_message(segmentio.ERROR_INVALID_DATA_FIELD_TYPE)
+    def test_invalid_data_field_type(self, invalid_value):
+        sample_event_raw = self.create_segmentio_event()
+        sample_event_raw['properties']['data'] = invalid_value
+        self.post_modified_segmentio_event(sample_event_raw)
+
     @expect_failure_with_message(segmentio.ERROR_MISSING_NAME)
     def test_missing_name(self):
         sample_event_raw = self.create_segmentio_event()

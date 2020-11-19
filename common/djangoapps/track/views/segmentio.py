@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from edx_django_utils.monitoring import set_custom_attribute
 from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -23,6 +24,8 @@ ERROR_UNAUTHORIZED = 'Unauthorized'
 ERROR_MISSING_USER_ID = 'Required user_id missing from context'
 ERROR_USER_NOT_EXIST = 'Specified user does not exist'
 ERROR_INVALID_USER_ID = 'Unable to parse userId as an integer'
+ERROR_INVALID_CONTEXT_FIELD_TYPE = 'The properties.context field is not a dict.'
+ERROR_INVALID_DATA_FIELD_TYPE = 'The properties.data field is not a dict.'
 ERROR_MISSING_DATA = 'The data field must be specified in the properties dictionary'
 ERROR_MISSING_NAME = 'The name field must be specified in the properties dictionary'
 ERROR_MISSING_TIMESTAMP = 'Required timestamp field not found'
@@ -155,11 +158,22 @@ def track_segmentio_event(request):  # pylint: disable=too-many-statements
     if any(disallowed_subs_name in segment_event_name.lower() for disallowed_subs_name in disallowed_substring_names):
         return
 
+    set_custom_attribute('segment_event_name', segment_event_name)
+    set_custom_attribute('segment_event_source', event_source)
+
+    # Attempt to extract and validate the data field.
     if 'data' not in segment_properties:
         raise EventValidationError(ERROR_MISSING_DATA)
+    segment_event_data = segment_properties.get('data', {})
+    if type(segment_event_data) is not dict:
+        set_custom_attribute('segment_unexpected_data', str(segment_event_data))
+        raise EventValidationError(ERROR_INVALID_DATA_FIELD_TYPE)
 
     # create and populate application field if it doesn't exist
     app_context = segment_properties.get('context', {})
+    if type(app_context) is not dict:
+        set_custom_attribute('segment_unexpected_context', str(app_context))
+        raise EventValidationError(ERROR_INVALID_CONTEXT_FIELD_TYPE)
     if 'application' not in app_context:
         context['application'] = {
             'name': app_context.get('app_name', ''),
@@ -231,7 +245,7 @@ def track_segmentio_event(request):  # pylint: disable=too-many-statements
         context['course_id'] = segment_properties['course_id']
 
     with tracker.get_tracker().context('edx.segmentio', context):
-        tracker.emit(segment_event_name, segment_properties.get('data', {}))
+        tracker.emit(segment_event_name, segment_event_data)
 
 
 def _get_segmentio_event_name(event_properties):
