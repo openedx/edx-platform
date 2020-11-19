@@ -4,7 +4,7 @@ Constants related to ADG.
 from django.utils.translation import ugettext_lazy as _
 
 # TODO: Move this setting to model
-BUSINESS_LINES = {
+BUSINESS_LINES = (
     ('Tanmiah', _('Tanmiah Food Group')),
     ('Petromin', _('Petromin')),
     ('RSI', _('Red Sea International')),
@@ -14,7 +14,7 @@ BUSINESS_LINES = {
     ('PPC', _('Premium Paints Company')),
     ('IPD', _('International Project Developers')),
     ('ADG', _('Al-Dabbagh Group'))
-}
+)
 
 CITIES = {
     'KSA': [
