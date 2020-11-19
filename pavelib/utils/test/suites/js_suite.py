@@ -77,7 +77,7 @@ class JsTestSubSuite(TestSuite):
         Run the tests using karma runner.
         """
         cmd = [
-            "nodejs",
+            "node",
             "--max_old_space_size=4096",
             "node_modules/.bin/karma",
             "start",

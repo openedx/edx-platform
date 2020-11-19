@@ -119,7 +119,7 @@ class TestPaverJavaScriptTestTasks(PaverTestCase):
         expected_messages.append(self.EXPECTED_INSTALL_NPM_ASSETS_COMMAND)
 
         command_template = (
-            'nodejs --max_old_space_size=4096 node_modules/.bin/karma start {options}'
+            'node --max_old_space_size=4096 node_modules/.bin/karma start {options}'
         )
 
         for suite in suites:
