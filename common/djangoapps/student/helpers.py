@@ -15,9 +15,9 @@ from completion.utilities import get_key_to_last_completed_block
 from django.conf import settings
 from django.contrib.auth import load_backend
 from django.contrib.auth.models import User
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.validators import ValidationError
-from django.db import IntegrityError, transaction
+from django.db import IntegrityError, transaction, ProgrammingError
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext as _
 from pytz import UTC
@@ -726,3 +726,14 @@ def get_resume_urls_for_enrollments(user, enrollments):
             url_to_block = ''
         resume_course_urls[enrollment.course_id] = url_to_block
     return resume_course_urls
+
+
+def does_user_profile_exist(user):
+    """
+    Check if user has an associated profile.
+    Ignore errors and return False in case of errors.
+    """
+    try:
+        return hasattr(user, 'profile')
+    except (ProgrammingError, ObjectDoesNotExist):
+        return False

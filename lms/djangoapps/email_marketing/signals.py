@@ -26,6 +26,7 @@ from lms.djangoapps.email_marketing.tasks import (
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_authn.cookies import CREATE_LOGON_COOKIE
 from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER
+from common.djangoapps.student.helpers import does_user_profile_exist
 from common.djangoapps.student.signals import SAILTHRU_AUDIT_PURCHASE
 from common.djangoapps.util.model_utils import USER_FIELD_CHANGED
 
@@ -174,7 +175,7 @@ def email_marketing_user_field_changed(sender, user=None, table=None, setting=No
         return
 
     # Ignore users that do not yet have a profile
-    if not hasattr(user, 'profile'):
+    if not does_user_profile_exist(user):
         return
 
     # ignore anything but User, Profile or UserPreference tables

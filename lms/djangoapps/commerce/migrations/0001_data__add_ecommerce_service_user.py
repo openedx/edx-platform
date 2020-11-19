@@ -26,7 +26,6 @@ class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('user_api', '0002_retirementstate_userretirementstatus'),
-        ('student', '0033_userprofile_state'),
     ]
 
     operations = [
