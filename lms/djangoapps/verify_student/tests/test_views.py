@@ -1713,13 +1713,13 @@ class TestReverifyView(TestVerificationBase):
         """
         Test that a User can use re-verify link for initial verification.
         """
-        self._assert_can_reverify()
+        self._assert_reverify()
 
     def test_reverify_view_can_reverify_denied(self):
         # User has a denied attempt, so can re-verify
         attempt = self.create_and_submit_attempt_for_user(self.user)
         attempt.deny("error")
-        self._assert_can_reverify()
+        self._assert_reverify()
 
     def test_reverify_view_can_reverify_expired(self):
         # User has a verification attempt, but it's expired
@@ -1731,7 +1731,7 @@ class TestReverifyView(TestVerificationBase):
         attempt.save()
 
         # Allow the student to re-verify
-        self._assert_can_reverify()
+        self._assert_reverify()
 
     def test_reverify_view_can_reverify_pending(self):
         """ Test that the user can still re-verify even if the previous photo
@@ -1746,7 +1746,7 @@ class TestReverifyView(TestVerificationBase):
         self.create_and_submit_attempt_for_user(self.user)
 
         # Can re-verify because an attempt has already been submitted.
-        self._assert_can_reverify()
+        self._assert_reverify()
 
     def test_reverify_view_cannot_reverify_approved(self):
         # Submitted attempt has been approved
@@ -1754,7 +1754,7 @@ class TestReverifyView(TestVerificationBase):
         attempt.approve()
 
         # Cannot re-verify because the user is already verified.
-        self._assert_cannot_reverify()
+        self._assert_reverify()
 
     @override_settings(VERIFY_STUDENT={"DAYS_GOOD_FOR": 5, "EXPIRING_SOON_WINDOW": 10})
     def test_reverify_view_can_reverify_approved_expired_soon(self):
@@ -1768,25 +1768,10 @@ class TestReverifyView(TestVerificationBase):
         attempt.approve()
 
         # Can re-verify because verification is set to expired soon.
-        self._assert_can_reverify()
+        self._assert_reverify()
 
-    def _get_reverify_page(self):
-        """
-        Retrieve the re-verification page and return the response.
-        """
+    def _assert_reverify(self):
         url = reverse("verify_student_reverify")
-        return self.client.get(url)
-
-    def _assert_can_reverify(self):
-        """
-        Check that the re-verification flow is rendered.
-        """
-        response = self._get_reverify_page()
-        self.assertContains(response, "reverify-container")
-
-    def _assert_cannot_reverify(self):
-        """
-        Check that the user is blocked from re-verifying.
-        """
-        response = self._get_reverify_page()
-        self.assertContains(response, "reverify-blocked")
+        response = self.client.get(url)
+        verification_start_url = IDVerificationService.get_verify_location()
+        self.assertRedirects(response, verification_start_url, fetch_redirect_response=False)
