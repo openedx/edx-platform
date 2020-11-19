@@ -5,6 +5,7 @@ Test the Blockstore-based XBlock runtime and content libraries together.
 import json
 
 from completion.test_utils import CompletionWaffleTestMixin
+from django.db import connections
 from django.test import TestCase, override_settings
 from organizations.models import Organization
 from rest_framework.test import APIClient
@@ -183,7 +184,7 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
     if the library allows direct learning.
     """
 
-    multi_db = True
+    databases = {alias for alias in connections}
 
     @XBlock.register_temp_plugin(UserStateTestBlock, UserStateTestBlock.BLOCK_TYPE)
     def test_default_values(self):
