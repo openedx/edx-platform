@@ -190,7 +190,7 @@ class CourseWaffleFlag(BaseWaffleFlag):
         if is_enabled_for_course is not None:
             # pylint: disable=protected-access
             self.waffle_namespace._monitor_value(
-                self.namespaced_flag_name, is_enabled_for_course
+                self.flag_name, is_enabled_for_course
             )
             return is_enabled_for_course
         return super().is_enabled()
