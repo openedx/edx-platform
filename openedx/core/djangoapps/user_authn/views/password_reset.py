@@ -718,8 +718,8 @@ class LogistrationPasswordReset(APIView):
                         user.save()
                         send_password_reset_success_email(user, request)
                     except ObjectDoesNotExist:
-                        error ='Account recovery process initiated without AccountRecovery instance for user {username}'
-                        log.error(error.format(username=user.username))
+                        msg = 'Account recovery process initiated without AccountRecovery instance for user {username}'
+                        log.error(msg.format(username=user.username))
         except ValidationError as err:
             AUDIT_LOG.exception("Password validation failed")
             error_status = {
