@@ -143,3 +143,6 @@ class ExtendedProfileForm(ModelForm):
     class Meta(object):
         model = ExtendedUserProfile
         fields = ('company',)
+        labels = {
+            'company': _('Al-Dabbagh Group Company'),
+        }
