@@ -3,8 +3,8 @@ from datetime import datetime
 
 from django.contrib.auth import get_user_model
 from opaque_keys.edx.keys import CourseKey
-from student.models import EntranceExamConfiguration
-from util import milestones_helpers
+from common.djangoapps.student.models import EntranceExamConfiguration
+from common.djangoapps.util import milestones_helpers
 
 from .base import OutlineProcessor
 
