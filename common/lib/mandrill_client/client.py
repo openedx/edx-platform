@@ -1,12 +1,18 @@
-import logging
+"""
+Client for Sending email via mandrill
+"""
 
-import mandrill
 from django.conf import settings
+import logging
+import mandrill
 
 log = logging.getLogger(__name__)
 
 
 class MandrillClient(object):
+    """
+    Mandrill Client for handling the basic send mail feature
+    """
     ACUMEN_DATA_TEMPLATE = 'acumen-data'
     PASSWORD_RESET_TEMPLATE = 'template-60'
     USER_ACCOUNT_ACTIVATION_TEMPLATE = 'template-61'
@@ -44,11 +50,21 @@ class MandrillClient(object):
         self.mandrill_client = mandrill.Mandrill(settings.MANDRILL_API_KEY)
 
     def get_email_to(self, receiver_emails_string):
+        """
+        parsing the comma separated email to a list of emails
+
+        Arguments:
+            receiver_emails_string: String contains a comma separated emails
+
+        Returns:
+            receiver_emails (List): A List of receiver email
+        """
         email_list = receiver_emails_string.split(',')
         receiver_emails = [{'email': email} for email in email_list]
         return receiver_emails
 
-    def send_mail(self, template_name, receiver_emails_string, context, attachments=[], subject=None, reply_to_email=None , images=[]):
+    def send_mail(self, template_name, receiver_emails_string, context, attachments=None, subject=None,
+                  reply_to_email=None, images=None):
         """
         calls the mandrill API for the specific template and email
 
@@ -59,6 +75,10 @@ class MandrillClient(object):
         reply_to_email:  email for reply_to
         images: images attachments for referring it from content of email template
         """
+        if images is None:
+            images = []
+        if attachments is None:
+            attachments = []
         global_merge_vars = [{'name': key, 'content': context[key]} for key in context]
 
         message = {
@@ -81,10 +101,9 @@ class MandrillClient(object):
                 template_content=[],
                 message=message,
             )
-            log.info(result)
+            log.info("A mandrill info:  %s", result)
         except mandrill.Error as e:
             # Mandrill errors are thrown as exceptions
             log.error('A mandrill error occurred: %s - %s' % (e.__class__, e))
             raise
         return result
-
