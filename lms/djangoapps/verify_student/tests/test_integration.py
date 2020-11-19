@@ -50,7 +50,7 @@ class TestProfEdVerification(ModuleStoreTestCase):
         # would have the option to choose their track.
         resp = self.client.get(self.urls['course_modes_choose'])
         self.assertRedirects(
-            resp, 
+            resp,
             self.urls['verify_student_start_flow'],
             fetch_redirect_response=False,
         )

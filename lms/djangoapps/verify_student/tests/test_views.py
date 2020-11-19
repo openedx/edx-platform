@@ -32,6 +32,7 @@ from lms.djangoapps.commerce.tests import TEST_API_URL, TEST_PAYMENT_DATA, TEST_
 from lms.djangoapps.commerce.tests.mocks import mock_payment_processors
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
+from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.views import PayAndVerifyView, checkout_with_ecommerce_service, render_to_response
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
@@ -959,9 +960,8 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
 
     def _assert_redirects_to_verify_start(self, response, course_id, status_code=302):
         """Check that the page redirects to the "verify later" part of the flow. """
-        url = reverse('verify_student_verify_now', kwargs={'course_id': six.text_type(course_id)})
-        with mock_payment_processors():
-            self.assertRedirects(response, url, status_code)
+        url = IDVerificationService.get_verify_location(course_id=course_id)
+        self.assertRedirects(response, url, status_code, fetch_redirect_response=False)
 
     def _assert_redirects_to_upgrade(self, response, course_id):
         """Check that the page redirects to the "upgrade" part of the flow. """
