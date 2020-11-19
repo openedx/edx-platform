@@ -1,3 +1,7 @@
+"""
+Utility functions for handling cookies.
+"""
+from crum import get_current_request
 from django.conf import settings
 
 from openedx.features.edly.models import EdlySubOrganization
@@ -42,10 +46,14 @@ def delete_logged_in_edly_cookies(response):
     Returns:
         HttpResponse
     """
-    response.delete_cookie(
+    request = get_current_request()
+    response.set_cookie(
         settings.EDLY_USER_INFO_COOKIE_NAME,
         path='/',
-        domain=settings.SESSION_COOKIE_DOMAIN
+        domain=settings.SESSION_COOKIE_DOMAIN,
+        max_age=0,
+        expires='Thu, 01-Jan-1970 00:00:00 GMT',
+        secure=request.is_secure() if request else False
     )
 
     return response
