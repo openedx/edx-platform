@@ -203,11 +203,35 @@ def get_course(request, course_key):
         CourseNotFoundError: if the course does not exist or is not accessible
         to the requesting user
     """
+    def _format_datetime(dt):
+        """
+        Provide backwards compatible datetime formatting.
+
+        Technically, both "2020-10-20T23:59:00Z" and "2020-10-20T23:59:00+00:00"
+        are ISO-8601 compliant, though the latter is preferred. We've always
+        just passed back whatever datetime.isoformat() generated for the
+        blackout dates in the get_course function (the "+00:00" format). At some
+        point, this broke the expectation of the mobile app code, which expects
+        these dates to be formatted in the same way that DRF formats the other
+        datetimes in this API (the "Z" format).
+
+        For the sake of compatibility, we're doing a manual substitution back to
+        the old format here. This is done with a replacement because it's
+        possible (though really not recommended) to enter blackout dates in
+        something other than the UTC timezone, in which case we should not do
+        the substitution... though really, that would probably break mobile
+        client parsing of the dates as well. :-P
+        """
+        return dt.isoformat().replace('+00:00', 'Z')
+
     course = _get_course(course_key, request.user)
     return {
         "id": six.text_type(course_key),
         "blackouts": [
-            {"start": blackout["start"].isoformat(), "end": blackout["end"].isoformat()}
+            {
+                "start": _format_datetime(blackout["start"]),
+                "end": _format_datetime(blackout["end"]),
+            }
             for blackout in course.get_discussion_blackout_datetimes()
         ],
         "thread_list_url": get_thread_list_url(request, course_key),

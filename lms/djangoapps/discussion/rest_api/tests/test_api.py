@@ -179,8 +179,8 @@ class GetCourseTestBlackouts(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCa
         self.assertEqual(
             result["blackouts"],
             [
-                {"start": "2015-06-09T00:00:00+00:00", "end": "2015-06-10T00:00:00+00:00"},
-                {"start": "2015-06-11T00:00:00+00:00", "end": "2015-06-12T00:00:00+00:00"},
+                {"start": "2015-06-09T00:00:00Z", "end": "2015-06-10T00:00:00Z"},
+                {"start": "2015-06-11T00:00:00Z", "end": "2015-06-12T00:00:00Z"},
             ]
         )
 
