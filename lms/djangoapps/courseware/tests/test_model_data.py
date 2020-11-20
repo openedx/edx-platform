@@ -6,7 +6,7 @@ Test for lms courseware app, module data (runtime data storage for XBlocks)
 import json
 from functools import partial
 
-from django.db import DatabaseError
+from django.db import connections, DatabaseError
 from django.test import TestCase
 from mock import Mock, patch
 from xblock.core import XBlock
@@ -105,7 +105,7 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
     other_key_factory = partial(DjangoKeyValueStore.Key, Scope.user_state, 2, location('usage_id'))  # user_id=2, not 1
     existing_field_name = "a_field"
     # Tell Django to clean out all databases, not just default
-    multi_db = True
+    databases = {alias for alias in connections}
 
     def setUp(self):
         super(TestStudentModuleStorage, self).setUp()
@@ -230,7 +230,7 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
 
 class TestMissingStudentModule(TestCase):
     # Tell Django to clean out all databases, not just default
-    multi_db = True
+    databases = {alias for alias in connections}
 
     def setUp(self):
         super(TestMissingStudentModule, self).setUp()
