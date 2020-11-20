@@ -15,6 +15,7 @@ from django.views.decorators.http import require_http_methods
 
 import third_party_auth
 from edxmako.shortcuts import render_to_response
+from openedx.adg.lms.registration_extension.forms import RegistrationFormFactory
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.accounts.utils import (
@@ -24,7 +25,6 @@ from openedx.core.djangoapps.user_api.accounts.utils import (
 from openedx.core.djangoapps.user_api.helpers import FormDescription
 from openedx.core.djangoapps.user_authn.cookies import are_logged_in_cookies_set
 from openedx.core.djangoapps.user_authn.views.password_reset import get_password_reset_form
-from openedx.core.djangoapps.user_authn.views.registration_form import RegistrationFormFactory
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from openedx.features.enterprise_support.utils import (
     handle_enterprise_cookies_for_logistration,
