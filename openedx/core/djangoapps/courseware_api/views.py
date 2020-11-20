@@ -32,7 +32,10 @@ from lms.djangoapps.courseware.courses import check_course_access, get_course_by
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.courseware.tabs import get_course_tab_list
-from lms.djangoapps.courseware.toggles import REDIRECT_TO_COURSEWARE_MICROFRONTEND, course_exit_page_is_active
+from lms.djangoapps.courseware.toggles import (
+    COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_FIRST_DISCUSSION_POST, REDIRECT_TO_COURSEWARE_MICROFRONTEND,
+    course_exit_page_is_active
+)
 from lms.djangoapps.courseware.utils import can_show_verified_upgrade
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from lms.djangoapps.courseware.views.views import get_cert_data
@@ -216,7 +219,8 @@ class CoursewareMeta:
         """
         return {
             'first_section': CourseEnrollmentCelebration.should_celebrate_first_section(self.enrollment_object),
-            'first_discussion': UserCelebration.should_celebrate_first_discussion(self.effective_user),
+            'first_discussion': UserCelebration.should_celebrate_first_discussion(self.effective_user, self.course_key),
+            'first_discussion_user_bucket': COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_FIRST_DISCUSSION_POST.get_bucket(),
         }
 
     @property
@@ -579,19 +583,31 @@ class Celebration(DeveloperErrorViewMixin, APIView):
 
         data = dict(request.data)
         first_section = data.pop('first_section', None)
+        first_discussion = data.pop('first_discussion', None)
         if data:
             return Response(status=400)  # there were parameters we didn't recognize
 
-        enrollment = CourseEnrollment.get_enrollment(request.user, course_key)
-        if not enrollment:
-            return Response(status=404)
-
+        object_created = False
+        user_celebration = False
+        enrollment_celebration = False
         defaults = {}
         if first_section is not None:
+            enrollment = CourseEnrollment.get_enrollment(request.user, course_key)
+            if not enrollment:
+                return Response(status=404)
             defaults['celebrate_first_section'] = first_section
+            enrollment_celebration = True
+
+        if first_discussion is not None:
+            defaults['celebrate_first_discussion_post'] = first_discussion
+            user_celebration = True
 
         if defaults:
-            _, created = CourseEnrollmentCelebration.objects.update_or_create(enrollment=enrollment, defaults=defaults)
-            return Response(status=201 if created else 200)
-        else:
-            return Response(status=200)  # just silently allow it
+            created = False
+            if enrollment_celebration:
+                # _, created = CourseEnrollmentCelebration.objects.update_or_create(enrollment=enrollment, defaults=defaults)
+                object_created = object_created or created
+            if user_celebration:
+                # _, created = UserCelebration.objects.update_or_create(user=request.user, defaults=defaults)
+                object_created = object_created or created
+        return Response(status=201 if object_created else 200)

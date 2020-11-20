@@ -116,7 +116,8 @@
                 threads: '/courses/' + $$course_id + '/discussion/forum',
                 enable_notifications: '/notification_prefs/enable/',
                 disable_notifications: '/notification_prefs/disable/',
-                notifications_status: '/notification_prefs/status/'
+                notifications_status: '/notification_prefs/status/',
+                discussion_celebration: '/api/courseware/celebration/' + $$course_id,
             }[name];
         };
 

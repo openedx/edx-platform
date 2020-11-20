@@ -64,8 +64,10 @@ from lms.djangoapps.courseware.models import (
     DynamicUpgradeDeadlineConfiguration,
     OrgDynamicUpgradeDeadlineConfiguration
 )
+from lms.djangoapps.courseware.toggles import courseware_mfe_first_discussion_celebration_is_active
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientError
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import perform_request as perform_forums_request
 from openedx.core.djangoapps.django_comment_common.comment_client.settings import PREFIX as forums_api_prefix
 from openedx.core.djangoapps.enrollments.api import (
@@ -3096,7 +3098,9 @@ class UserCelebration(TimeStampedModel):
     An example of a celebration is a dialog that pops up after you post for the first time in the
     discussion forums.
 
-    In general, learners should only see these celebrations once during their time on the platform.
+    In general, these celebrations should be course agnostic and could show up at any point for
+    a learner. Some will be one-off celebrations (like first discussion post) while others could
+    be repeated for a user (like streaks).
     For celebrations that can be repeated with each enrollment, see CourseEnrollmentCelebration
 
     .. no_pii:
@@ -3111,7 +3115,7 @@ class UserCelebration(TimeStampedModel):
         ).format(self.user.username, self.celebrate_first_discussion_post)
 
     @staticmethod
-    def should_celebrate_first_discussion(user):
+    def should_celebrate_first_discussion(user, course_key):
         """
         Returns the celebration value for first_discussion.
 
@@ -3119,7 +3123,8 @@ class UserCelebration(TimeStampedModel):
         posted their first discussion), we will send a request to the forums service to see if they
         have ever posted.
         """
-        if not user:
+        # if not user or user.is_anonymous or not courseware_mfe_first_discussion_celebration_is_active(course_key):
+        if not user or user.is_anonymous:
             return False
         try:
             should_celebrate = user.celebrations.celebrate_first_discussion_post
@@ -3136,9 +3141,14 @@ class UserCelebration(TimeStampedModel):
         # ask forums and create or update row with value
         url = forums_api_prefix + '/users/{}/content_exists'.format(user.id)
         # Returns a bool
-        has_posted_before = perform_forums_request('get', url)
+        try:
+            has_posted_before = perform_forums_request('get', url)
+        # Can be raised if the Forums service does not return a 200 response.
+        # Just return False and we can try the request the next time this function is called
+        except CommentClientError:
+            return False
         defaults = {'celebrate_first_discussion_post': (not has_posted_before)}
-        UserCelebration.objects.update_or_create(user=user, defaults=defaults)
+        # UserCelebration.objects.update_or_create(user=user, defaults=defaults)
         return (not has_posted_before)
 
 
