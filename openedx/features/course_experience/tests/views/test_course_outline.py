@@ -20,6 +20,7 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from pyquery import PyQuery as pq
+from pytz import UTC
 from six import text_type
 from waffle.models import Switch
 from waffle.testutils import override_switch
@@ -214,7 +215,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
     ):
         ContentTypeGatingConfig.objects.create(
             enabled=True,
-            enabled_as_of=datetime.datetime(2017, 1, 1),
+            enabled_as_of=datetime.datetime(2017, 1, 1, tzinfo=UTC),
         )
         course = self.courses[0]
         for mode in course_modes:
