@@ -47,7 +47,7 @@ locales:
     # - hr  # Croatian
     # - hu  # Hungarian
     # - hy_AM  # Armenian (Armenia)
-    # - id  # Indonesian
+    - id  # Indonesian (not supported in Tahoe SaaS, don't add to dark langs)
     # - it_IT  # Italian (Italy)
     - ja_JP  # Japanese (Japan)
     # - ka  # Georgian
