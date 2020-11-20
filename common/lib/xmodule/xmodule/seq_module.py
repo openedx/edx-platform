@@ -224,7 +224,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         progress = reduce(Progress.add_counts, progresses, None)
         return progress
 
-    def handle_ajax(self, dispatch, data):  # TODO: bounds checking
+    def handle_ajax(self, dispatch, data, view=STUDENT_VIEW):  # TODO: bounds checking
         ''' get = request.POST instance '''
         if dispatch == 'goto_position':
             # set position to default value if either 'position' argument not
@@ -263,7 +263,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 else:
                     # check if prerequisite has been met
                     prereq_met, prereq_meta_info = self._compute_is_prereq_met(True)
-            meta = self._get_render_metadata(context, display_items, prereq_met, prereq_meta_info, banner_text, STUDENT_VIEW)
+            meta = self._get_render_metadata(context, display_items, prereq_met, prereq_meta_info, banner_text, view)
             meta['display_name'] = self.display_name_with_default
             meta['format'] = getattr(self, 'format', '')
             return json.dumps(meta)

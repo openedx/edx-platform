@@ -14,16 +14,17 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
+from lms.djangoapps.course_home_api.toggles import course_home_mfe_outline_tab_is_active
+from lms.djangoapps.course_home_api.utils import get_microfrontend_url
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import can_self_enroll_in_course, get_course_info_section, get_course_with_access
-from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.api import (
     get_course_goal,
     get_course_goal_options,
     get_goal_api_url,
     has_course_goal_permission
 )
-from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
 from lms.djangoapps.courseware.utils import can_show_verified_upgrade, verified_upgrade_deadline_link
 from lms.djangoapps.courseware.views.views import CourseTabView
 from lms.djangoapps.courseware.toggles import COURSEWARE_PROCTORING_IMPROVEMENTS
@@ -70,6 +71,9 @@ class CourseHomeView(CourseTabView):
 
     def render_to_fragment(self, request, course=None, tab=None, **kwargs):
         course_id = six.text_type(course.id)
+        if course_home_mfe_outline_tab_is_active(course.id) and not request.user.is_staff:
+            microfrontend_url = get_microfrontend_url(course_key=course_id, view_name="home")
+            raise Redirect(microfrontend_url)
         home_fragment_view = CourseHomeFragmentView()
         return home_fragment_view.render_to_fragment(request, course_id=course_id, **kwargs)
 

@@ -47,6 +47,7 @@ from common.djangoapps.student.models import (
 )
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import path_to_location
+from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
 from .serializers import CourseInfoSerializer
 from .utils import serialize_upgrade_info
@@ -483,7 +484,12 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
             str(usage_key.course_key),
             str(usage_key),
             disable_staff_debug_info=True)
-        return Response(json.loads(sequence.handle_ajax('metadata', None)))
+
+        view = STUDENT_VIEW
+        if request.user.is_anonymous:
+            view = PUBLIC_VIEW
+
+        return Response(json.loads(sequence.handle_ajax('metadata', None, view=view)))
 
 
 class Resume(DeveloperErrorViewMixin, APIView):

@@ -12,7 +12,6 @@ from django.utils.translation import get_language_bidi
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
-from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_with_access
 from lms.djangoapps.courseware.tabs import DatesTab
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active

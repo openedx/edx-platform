@@ -96,7 +96,18 @@ class OutlineTabTestViews(BaseCourseHomeTests):
     def test_get_unauthenticated_user(self):
         self.client.logout()
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
+
+        course_blocks = response.data.get('course_blocks')
+        self.assertEqual(course_blocks, None)
+
+        course_tools = response.data.get('course_tools')
+        self.assertEqual(len(course_tools), 0)
+
+        dates_widget = response.data.get('dates_widget')
+        self.assertTrue(dates_widget)
+        date_blocks = dates_widget.get('course_date_blocks')
+        self.assertEqual(len(date_blocks), 0)
 
     @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_OUTLINE_TAB, active=True)
