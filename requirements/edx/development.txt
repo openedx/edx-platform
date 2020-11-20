@@ -134,7 +134,7 @@ enmerkar==0.7.1           # via -r requirements/edx/testing.txt, enmerkar-unders
 event-tracking==1.0.0     # via -r requirements/edx/testing.txt, edx-proctoring, edx-search
 execnet==1.7.1            # via -r requirements/edx/testing.txt, pytest-xdist
 factory-boy==2.8.1        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
-faker==4.17.0             # via -r requirements/edx/testing.txt, factory-boy
+faker==4.17.1             # via -r requirements/edx/testing.txt, factory-boy
 filelock==3.0.12          # via -r requirements/edx/testing.txt, tox, virtualenv
 freezegun==0.3.12         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 fs-s3fs==0.1.8            # via -r requirements/edx/testing.txt, django-pyfs
