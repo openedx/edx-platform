@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-06-02 20:41+0000\n"
-"PO-Revision-Date: 2020-06-02 20:41:03.431676\n"
+"POT-Creation-Date: 2020-10-27 18:46+0000\n"
+"PO-Revision-Date: 2020-10-27 18:46:05.616826\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -5116,6 +5116,7 @@ msgstr ""
 
 #: lms/djangoapps/certificates/views/webview.py
 #: lms/templates/certificates/invalid.html
+#: lms/templates/certificates/url_unsupported.html
 #, python-brace-format
 msgid "About {platform_name} Certificates"
 msgstr ""
@@ -12117,6 +12118,7 @@ msgid "Course Outline"
 msgstr ""
 
 #: cms/templates/course_outline.html
+#: cms/templates/widgets/deprecated-course-key-warning.html
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Warning"
 msgstr ""
@@ -13409,6 +13411,7 @@ msgstr ""
 
 #: lms/templates/header/header.html lms/templates/header/user_dropdown.html
 #: lms/templates/user_dropdown.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/header.html
 msgid "More Options"
 msgstr ""
 
@@ -14578,6 +14581,18 @@ msgstr ""
 msgid ""
 "If all of the information is correct and the problem persists, contact "
 "technical support."
+msgstr ""
+
+#: lms/templates/certificates/url_unsupported.html
+msgid "URL Not Supported"
+msgstr ""
+
+#: lms/templates/certificates/url_unsupported.html
+msgid ""
+"This link is no longer valid. But don’t worry—this Verified Certificate is "
+"still valid and available to share. If this is your certificate, please "
+"visit your dashboard to get a new shareable link. If you're viewing someone "
+"else's certificate, please contact them to get an updated link."
 msgstr ""
 
 #: lms/templates/certificates/valid.html
@@ -16622,10 +16637,12 @@ msgid "{platform_name} Home Page"
 msgstr ""
 
 #: lms/templates/header/header.html lms/templates/header/user_dropdown.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/header.html
 msgid "Options Menu"
 msgstr ""
 
 #: lms/templates/header/header.html lms/templates/navigation/navigation.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/header.html
 msgid ""
 "{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
 "strongly recommend using {chrome_link} or {ff_link}."
@@ -19448,6 +19465,10 @@ msgstr ""
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "An error occurred. Try loading the page again."
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/header.html
+msgid "you know what?"
 msgstr ""
 
 #: themes/edx.org/cms/templates/widgets/sock.html
@@ -22663,6 +22684,24 @@ msgstr ""
 
 #: cms/templates/registration/activation_invalid.html
 msgid "Return to the {link_start}home page{link_end}."
+msgstr ""
+
+#: cms/templates/widgets/deprecated-course-key-warning.html
+msgid "Support will be removed in an upcoming release."
+msgstr ""
+
+#: cms/templates/widgets/deprecated-course-key-warning.html
+msgid "Support will be removed on {expiration_date}."
+msgstr ""
+
+#: cms/templates/widgets/deprecated-course-key-warning.html
+msgid "This course uses a legacy storage format."
+msgstr ""
+
+#: cms/templates/widgets/deprecated-course-key-warning.html
+msgid ""
+"Please reach out to your support team contact, if you have any additional "
+"questions or concerns."
 msgstr ""
 
 #: cms/templates/widgets/footer.html

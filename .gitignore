@@ -146,3 +146,6 @@ dist
 
 # Locally generated PII reports
 pii_report
+
+# adg edx-theme
+themes/adg-edx-theme/
