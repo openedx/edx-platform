@@ -25,6 +25,7 @@ from edx_ace import ace
 from edx_ace.recipient import Recipient
 from eventtracking import tracker
 from ratelimit.decorators import ratelimit
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.djangoapps.edxmako.shortcuts import render_to_string
@@ -652,11 +653,11 @@ class PasswordResetTokenValidation(APIView):
             token = token.split('-', 1)
             uid_int = base36_to_int(token[0])
             if request.user.is_authenticated and request.user.id != uid_int:
-                return JsonResponse({'is_valid': is_valid})
+                return Response({'is_valid': is_valid})
 
             user = User.objects.get(id=uid_int)
             if UserRetirementRequest.has_user_requested_retirement(user):
-                return JsonResponse({'is_valid': is_valid})
+                return Response({'is_valid': is_valid})
 
             is_valid = default_token_generator.check_token(user, token[1])
             if is_valid and not user.is_active:
@@ -665,10 +666,10 @@ class PasswordResetTokenValidation(APIView):
         except Exception:   # pylint: disable=broad-except
             AUDIT_LOG.exception("Invalid password reset confirm token")
 
-        return JsonResponse({'is_valid': is_valid})
+        return Response({'is_valid': is_valid})
 
 
-class LogistrationPasswordReset(APIView):
+class LogistrationPasswordResetView(APIView):
 
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, **kwargs):
@@ -681,7 +682,7 @@ class LogistrationPasswordReset(APIView):
         has_required_values, uid_int = self._check_token_has_required_values(uidb36, token)
         if not has_required_values:
             AUDIT_LOG.exception("Invalid password reset confirm token")
-            return JsonResponse({'reset_status': reset_status})
+            return Response({'reset_status': reset_status})
 
         request.data._mutable = True
         request.data['new_password1'] = normalize_password(request.data['new_password1'])
@@ -692,7 +693,7 @@ class LogistrationPasswordReset(APIView):
             user = User.objects.get(id=uid_int)
             if not default_token_generator.check_token(user, token):
                 AUDIT_LOG.exception("Token validation failed")
-                return JsonResponse({'reset_status': reset_status})
+                return Response({'reset_status': reset_status})
 
             validate_password(password, user=user)
             form = SetPasswordForm(user, request.data)
@@ -726,11 +727,11 @@ class LogistrationPasswordReset(APIView):
                 'reset_status': reset_status,
                 'err_msg': ' '.join(err.messages)
             }
-            return JsonResponse(error_status)
+            return Response(error_status)
         except Exception:   # pylint: disable=broad-except
             AUDIT_LOG.exception("Setting new password failed")
 
-        return JsonResponse({'reset_status': reset_status})
+        return Response({'reset_status': reset_status})
 
     def _check_token_has_required_values(self, uidb36, token):
         """

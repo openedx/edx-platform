@@ -71,7 +71,7 @@ urlpatterns = [
     # logistration MFE reset flow
     url(
         r'^password/reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
-        password_reset.LogistrationPasswordReset.as_view(),
+        password_reset.LogistrationPasswordResetView.as_view(),
         name='logistration_password_reset',
     ),
 ]
