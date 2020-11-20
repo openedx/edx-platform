@@ -302,5 +302,5 @@ PROCTORING_SETTINGS = {}
 ############### ADG #####################
 
 MAILCHIMP_API_KEY = 'test'
-MAILCHIMP_LEARNERS_LIST_ID = 'test'
+MAILCHIMP_LIST_ID = 'test'
 SUSPEND_RECEIVERS = True

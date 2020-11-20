@@ -45,7 +45,7 @@ class MailchimpClient(object):
     """
 
     def __init__(self):
-        self._learners_list_id = settings.MAILCHIMP_LEARNERS_LIST_ID
+        self._learners_list_id = settings.MAILCHIMP_LIST_ID
         self._client = MailChimp(mc_api=settings.MAILCHIMP_API_KEY)
 
     def create_or_update_list_member(self, email, data):
