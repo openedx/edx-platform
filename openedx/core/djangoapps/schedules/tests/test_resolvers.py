@@ -12,19 +12,19 @@ from django.test.utils import override_settings
 from testfixtures import LogCapture
 from waffle.testutils import override_switch
 
+from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.resolvers import (
     LOG,
     BinnedSchedulesBaseResolver,
-    CourseUpdateResolver,
     CourseNextSectionUpdate,
+    CourseUpdateResolver
 )
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, skip_unless_lms
-from student.tests.factories import CourseEnrollmentFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -252,3 +252,11 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
             log_message = ('Next Section Course Update: Last section was reached. '
                            'There are no more highlights for {}'.format(self.course.id))
             log_capture.check_present((LOG.name, 'WARNING', log_message))
+
+    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
+    def test_no_updates_if_course_ended(self):
+        self.course.end = self.yesterday
+        self.course = self.update_course(self.course, self.user.id)
+        resolver = self.create_resolver()
+        schedules = list(resolver.get_schedules())
+        self.assertListEqual(schedules, [])

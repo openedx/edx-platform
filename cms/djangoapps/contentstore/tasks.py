@@ -9,30 +9,26 @@ import os
 import shutil
 import tarfile
 from datetime import datetime
-from math import ceil
 from tempfile import NamedTemporaryFile, mkdtemp
 
 from ccx_keys.locator import CCXLocator
-from celery import group
 from celery.task import task
 from celery.utils.log import get_task_logger
-from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.core.exceptions import SuspiciousOperation
 from django.core.files import File
-from django.core.files.base import ContentFile
 from django.test import RequestFactory
 from django.utils.text import get_valid_filename
 from django.utils.translation import ugettext as _
+from edx_django_utils.monitoring import set_code_owner_attribute, set_code_owner_attribute_from_module
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from organizations.models import OrganizationCourse
 from path import Path as path
 from pytz import UTC
 from six import iteritems, text_type
-from six.moves import range
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.tasks import UserTask
 
@@ -44,11 +40,11 @@ from cms.djangoapps.contentstore.courseware_index import (
 from cms.djangoapps.contentstore.storage import course_import_export_storage
 from cms.djangoapps.contentstore.utils import initialize_permissions, reverse_usage_url, translation_language
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
-from course_action_state.models import CourseRerunState
+from common.djangoapps.course_action_state.models import CourseRerunState
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
 from openedx.core.lib.extract_tar import safetar_extractall
-from student.auth import has_course_author_access
-from util.organizations_helpers import add_organization_course, get_organization_by_short_name
+from common.djangoapps.student.auth import has_course_author_access
+from common.djangoapps.util.organizations_helpers import add_organization_course, get_organization_by_short_name
 from xmodule.contentstore.django import contentstore
 from xmodule.course_module import CourseFields
 from xmodule.exceptions import SerializationError
@@ -57,12 +53,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
 from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml, import_library_from_xml
-from xmodule.video_module.transcripts_utils import (
-    Transcript,
-    TranscriptsGenerationException,
-    clean_video_id,
-    get_transcript_from_contentstore
-)
 
 User = get_user_model()
 
@@ -94,6 +84,7 @@ def clone_instance(instance, field_values):
 
 
 @task()
+@set_code_owner_attribute
 def rerun_course(source_course_key_string, destination_course_key_string, user_id, fields=None):
     """
     Reruns a course in a new celery task.
@@ -180,6 +171,7 @@ def _parse_time(time_isoformat):
 
 
 @task(routing_key=settings.UPDATE_SEARCH_INDEX_JOB_QUEUE)
+@set_code_owner_attribute
 def update_search_index(course_id, triggered_time_isoformat):
     """ Updates course search index. """
     try:
@@ -204,6 +196,7 @@ def update_search_index(course_id, triggered_time_isoformat):
 
 
 @task()
+@set_code_owner_attribute
 def update_library_index(library_id, triggered_time_isoformat):
     """ Updates course search index. """
     try:
@@ -249,10 +242,13 @@ class CourseExportTask(UserTask):  # pylint: disable=abstract-method
 
 
 @task(base=CourseExportTask, bind=True)
+# Note: The decorator @set_code_owner_attribute could not be used because
+#   the implementation of this task breaks with any additional decorators.
 def export_olx(self, user_id, course_key_string, language):
     """
     Export a course or library to an OLX .tar.gz archive and prepare it for download.
     """
+    set_code_owner_attribute_from_module(__name__)
     courselike_key = CourseKey.from_string(course_key_string)
 
     try:
@@ -381,10 +377,13 @@ class CourseImportTask(UserTask):  # pylint: disable=abstract-method
 
 
 @task(base=CourseImportTask, bind=True)
+# Note: The decorator @set_code_owner_attribute could not be used because
+#   the implementation of this task breaks with any additional decorators.
 def import_olx(self, user_id, course_key_string, archive_path, archive_name, language):
     """
     Import a course or library from a provided OLX .tar.gz archive.
     """
+    set_code_owner_attribute_from_module(__name__)
     courselike_key = CourseKey.from_string(course_key_string)
     try:
         user = User.objects.get(pk=user_id)

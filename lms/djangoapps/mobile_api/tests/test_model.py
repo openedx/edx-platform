@@ -9,7 +9,7 @@ import ddt
 from django.test import TestCase
 from pytz import UTC
 
-from mobile_api.models import AppVersionConfig, MobileApiConfig
+from lms.djangoapps.mobile_api.models import AppVersionConfig, MobileApiConfig
 
 
 @ddt.ddt

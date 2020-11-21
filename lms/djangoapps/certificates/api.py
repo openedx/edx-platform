@@ -16,7 +16,7 @@ from eventtracking import tracker
 from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey
 
-from branding import api as branding_api
+from lms.djangoapps.branding import api as branding_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateGenerationCourseSetting,
@@ -32,7 +32,7 @@ from lms.djangoapps.certificates.queue import XQueueCertInterface
 from lms.djangoapps.instructor.access import list_with_level
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from util.organizations_helpers import get_course_organization_id
+from common.djangoapps.util.organizations_helpers import get_course_organization_id
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.certificate")
@@ -208,7 +208,7 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
 
     if beta_testers_queryset.filter(username=student.username):
         message = u'Cancelling course certificate generation for user [{}] against course [{}], user is a Beta Tester.'
-        log.info(message.format(course_key, student.username))
+        log.info(message.format(student.username, course_key))
         return
 
     xqueue = XQueueCertInterface()

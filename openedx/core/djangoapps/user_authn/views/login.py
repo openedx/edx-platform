@@ -4,7 +4,6 @@ Views for login / logout and associated functionality
 Much of this file was broken out from views.py, previous history can be found there.
 """
 
-
 import json
 import logging
 
@@ -28,11 +27,11 @@ from ratelimit.decorators import ratelimit
 from ratelimitbackend.exceptions import RateLimitException
 from rest_framework.views import APIView
 
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.views.login_form import get_login_session_form
-from openedx.core.djangoapps.user_authn.cookies import refresh_jwt_cookies, set_logged_in_cookies
+from openedx.core.djangoapps.user_authn.cookies import get_response_with_refreshed_jwt_cookies, set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from openedx.core.djangoapps.user_authn.utils import should_redirect_to_logistration_mircrofrontend
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
@@ -40,14 +39,14 @@ from openedx.core.djangoapps.user_authn.views.password_reset import send_passwor
 from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.view_utils import require_post_params
-from student.helpers import get_next_url_for_login_page
-from student.models import LoginFailures, AllowedAuthUser, UserProfile
-from student.views import compose_and_send_activation_email
-from third_party_auth import pipeline, provider
-import third_party_auth
-from track import segment
-from util.json_request import JsonResponse
-from util.password_policy_validators import normalize_password
+from common.djangoapps.student.helpers import get_next_url_for_login_page
+from common.djangoapps.student.models import LoginFailures, AllowedAuthUser, UserProfile
+from common.djangoapps.student.views import compose_and_send_activation_email
+from common.djangoapps.third_party_auth import pipeline, provider
+from common.djangoapps import third_party_auth
+from common.djangoapps.track import segment
+from common.djangoapps.util.json_request import JsonResponse
+from common.djangoapps.util.password_policy_validators import normalize_password
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -119,17 +118,30 @@ def _check_excessive_login_attempts(user):
 
 
 def _generate_locked_out_error_message():
+    """
+    Helper function to generate error message for users consumed all
+    login attempts.
+    """
 
     locked_out_period_in_sec = settings.MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS
-    raise AuthFailedError(Text(_('To protect your account, it’s been temporarily '
-                                 'locked. Try again in {locked_out_period} minutes.'
-                                 '{li_start}To be on the safe side, you can reset your '
-                                 'password {link_start}here{link_end} before you try again.')).format(
-        link_start=HTML('<a "#login" class="form-toggle" data-type="password-reset">'),
-        link_end=HTML('</a>'),
-        li_start=HTML('<li>'),
-        li_end=HTML('</li>'),
-        locked_out_period=int(locked_out_period_in_sec / 60)))
+    if not should_redirect_to_logistration_mircrofrontend:   # pylint: disable=no-else-raise
+        raise AuthFailedError(Text(_('To protect your account, it’s been temporarily '
+                                     'locked. Try again in {locked_out_period} minutes.'
+                                     '{li_start}To be on the safe side, you can reset your '
+                                     'password {link_start}here{link_end} before you try again.')).format(
+            link_start=HTML('<a http="#login" class="form-toggle" data-type="password-reset">'),
+            link_end=HTML('</a>'),
+            li_start=HTML('<li>'),
+            li_end=HTML('</li>'),
+            locked_out_period=int(locked_out_period_in_sec / 60)))
+    else:
+        raise AuthFailedError(Text(_('To protect your account, it’s been temporarily '
+                                     'locked. Try again in {locked_out_period} minutes.\n'
+                                     'To be on the safe side, you can reset your '
+                                     'password {link_start}here{link_end} before you try again.\n')).format(
+            link_start=HTML('<a href="/reset" >'),
+            link_end=HTML('</a>'),
+            locked_out_period=int(locked_out_period_in_sec / 60)))
 
 
 def _enforce_password_policy_compliance(request, user):
@@ -218,18 +230,31 @@ def _handle_failed_authentication(user, authenticated_user):
             if not LoginFailures.is_user_locked_out(user):
                 max_failures_allowed = settings.MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED
                 remaining_attempts = max_failures_allowed - failure_count
-                raise AuthFailedError(Text(_('Email or password is incorrect.'
-                                             '{li_start}You have {remaining_attempts} more sign-in '
-                                             'attempts before your account is temporarily locked.{li_end}'
-                                             '{li_start}If you\'ve forgotten your password, click '
-                                             '{link_start}here{link_end} to reset.{li_end}'
-                                             ))
-                                      .format(
-                    link_start=HTML('<a http="#login" class="form-toggle" data-type="password-reset">'),
-                    link_end=HTML('</a>'),
-                    li_start=HTML('<li>'),
-                    li_end=HTML('</li>'),
-                    remaining_attempts=remaining_attempts))
+                if not should_redirect_to_logistration_mircrofrontend:  # pylint: disable=no-else-raise
+                    raise AuthFailedError(Text(_('Email or password is incorrect.'
+                                                 '{li_start}You have {remaining_attempts} more sign-in '
+                                                 'attempts before your account is temporarily locked.{li_end}'
+                                                 '{li_start}If you\'ve forgotten your password, click '
+                                                 '{link_start}here{link_end} to reset.{li_end}'
+                                                 ))
+                                          .format(
+                        link_start=HTML('<a http="#login" class="form-toggle" data-type="password-reset">'),
+                        link_end=HTML('</a>'),
+                        li_start=HTML('<li>'),
+                        li_end=HTML('</li>'),
+                        remaining_attempts=remaining_attempts))
+                else:
+                    raise AuthFailedError(Text(_('Email or password is incorrect.\n'
+                                                 'You have {remaining_attempts} more sign-in '
+                                                 'attempts before your account is temporarily locked.\n'
+                                                 'If you{quote}ve forgotten your password, click '
+                                                 '{link_start}here{link_end} to reset.\n'
+                                                 ))
+                                          .format(
+                        quote=HTML("'"),
+                        link_start=HTML('<a href="/reset" >'),
+                        link_end=HTML('</a>'),
+                        remaining_attempts=remaining_attempts))
             else:
                 _generate_locked_out_error_message()
 
@@ -287,6 +312,30 @@ def _track_user_login(user, request):
     )
 
 
+def _create_message(site, root_url, allowed_domain):
+    """
+    Helper function to create error message for those users that belongs
+    to an allowed domain and not whitelisted then ask such users to login
+    through allowed domain SSO provider.
+    """
+    msg = Text(_(
+        u'As {allowed_domain} user, You must login with your {allowed_domain} '
+        u'{link_start}{provider} account{link_end}.'
+    )).format(
+        allowed_domain=allowed_domain,
+        link_start=HTML("<a href='{root_url}{tpa_provider_link}'>").format(
+            root_url=root_url if root_url else '',
+            tpa_provider_link='{dashboard_url}?tpa_hint={tpa_hint}'.format(
+                dashboard_url=reverse('dashboard'),
+                tpa_hint=site.configuration.get_value('THIRD_PARTY_AUTH_ONLY_HINT'),
+            )
+        ),
+        provider=site.configuration.get_value('THIRD_PARTY_AUTH_ONLY_PROVIDER'),
+        link_end=HTML("</a>")
+    )
+    return msg
+
+
 def _check_user_auth_flow(site, user):
     """
     Check if user belongs to an allowed domain and not whitelisted
@@ -306,20 +355,11 @@ def _check_user_auth_flow(site, user):
 
         # If user belongs to allowed domain and not whitelisted then user must login through allowed domain SSO
         if user_domain == allowed_domain and not AllowedAuthUser.objects.filter(site=site, email=user.email).exists():
-            msg = Text(_(
-                u'As {allowed_domain} user, You must login with your {allowed_domain} '
-                u'{link_start}{provider} account{link_end}.'
-            )).format(
-                allowed_domain=allowed_domain,
-                link_start=HTML("<a href='{tpa_provider_link}'>").format(
-                    tpa_provider_link='{dashboard_url}?tpa_hint={tpa_hint}'.format(
-                        dashboard_url=reverse('dashboard'),
-                        tpa_hint=site.configuration.get_value('THIRD_PARTY_AUTH_ONLY_HINT'),
-                    )
-                ),
-                provider=site.configuration.get_value('THIRD_PARTY_AUTH_ONLY_PROVIDER'),
-                link_end=HTML("</a>")
-            )
+            if not should_redirect_to_logistration_mircrofrontend():
+                msg = _create_message(site, None, allowed_domain)
+            else:
+                root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
+                msg = _create_message(site, root_url, allowed_domain)
             raise AuthFailedError(msg)
 
 
@@ -485,8 +525,7 @@ def login_refresh(request):
         return JsonResponse('Unauthorized', status=401)
 
     try:
-        response = JsonResponse({'success': True})
-        return refresh_jwt_cookies(request, response, request.user)
+        return get_response_with_refreshed_jwt_cookies(request, request.user)
     except AuthFailedError as error:
         log.exception(error.get_response())
         return JsonResponse(error.get_response(), status=400)

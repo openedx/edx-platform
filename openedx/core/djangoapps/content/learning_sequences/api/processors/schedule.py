@@ -5,8 +5,8 @@ from datetime import datetime, timedelta
 from django.contrib.auth import get_user_model
 from edx_when.api import get_dates_for_course
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from student.auth import user_has_role
-from student.roles import CourseBetaTesterRole
+from common.djangoapps.student.auth import user_has_role
+from common.djangoapps.student.roles import CourseBetaTesterRole
 
 from ...data import ScheduleData, ScheduleItemData, UserCourseOutlineData
 from .base import OutlineProcessor

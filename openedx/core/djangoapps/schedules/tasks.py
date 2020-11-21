@@ -16,7 +16,7 @@ from django.db.utils import DatabaseError
 from edx_ace import ace
 from edx_ace.message import Message
 from edx_ace.utils.date import deserialize, serialize
-from edx_django_utils.monitoring import set_custom_attribute
+from edx_django_utils.monitoring import set_code_owner_attribute, set_custom_attribute
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 
@@ -24,7 +24,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.schedules import message_types, resolvers
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
 from openedx.core.lib.celery.task_utils import emulate_http_request
-from track import segment
+from common.djangoapps.track import segment
 
 LOG = logging.getLogger(__name__)
 
@@ -43,6 +43,7 @@ COURSE_NEXT_SECTION_UPDATE_LOG_PREFIX = 'Course Next Section Update'
 
 
 @task(base=LoggedPersistOnFailureTask, bind=True, default_retry_delay=30)
+@set_code_owner_attribute
 def update_course_schedules(self, **kwargs):
     course_key = CourseKey.from_string(kwargs['course_id'])
     new_start_date = deserialize(kwargs['new_start_date_str'])
@@ -144,6 +145,7 @@ class BinnedScheduleMessageBaseTask(ScheduleMessageBaseTask):
 
 
 @task(base=LoggedTask, ignore_result=True, routing_key=ROUTING_KEY)
+@set_code_owner_attribute
 def _recurring_nudge_schedule_send(site_id, msg_str):
     _schedule_send(
         msg_str,
@@ -154,6 +156,7 @@ def _recurring_nudge_schedule_send(site_id, msg_str):
 
 
 @task(base=LoggedTask, ignore_result=True, routing_key=ROUTING_KEY)
+@set_code_owner_attribute
 def _upgrade_reminder_schedule_send(site_id, msg_str):
     _schedule_send(
         msg_str,
@@ -164,6 +167,7 @@ def _upgrade_reminder_schedule_send(site_id, msg_str):
 
 
 @task(base=LoggedTask, ignore_result=True, routing_key=ROUTING_KEY)
+@set_code_owner_attribute
 def _course_update_schedule_send(site_id, msg_str):
     _schedule_send(
         msg_str,

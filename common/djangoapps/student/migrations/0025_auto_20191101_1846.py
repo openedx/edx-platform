@@ -4,9 +4,9 @@
 
 from django.db import migrations
 
-from experiments.models import ExperimentData
+from lms.djangoapps.experiments.models import ExperimentData
 from openedx.features.course_duration_limits.config import EXPERIMENT_DATA_HOLDBACK_KEY, EXPERIMENT_ID
-from student.models import CourseEnrollment, FBEEnrollmentExclusion
+from common.djangoapps.student.models import CourseEnrollment, FBEEnrollmentExclusion
 
 
 def populate_fbeenrollmentexclusion(apps, schema_editor):

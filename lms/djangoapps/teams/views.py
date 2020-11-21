@@ -41,8 +41,8 @@ from openedx.core.lib.api.view_utils import (
     add_serializer_errors,
     build_api_error
 )
-from student.models import CourseAccessRole, CourseEnrollment
-from util.model_utils import truncate_fields
+from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
+from common.djangoapps.util.model_utils import truncate_fields
 from xmodule.modulestore.django import modulestore
 
 from . import is_feature_enabled
@@ -73,7 +73,7 @@ from .toggles import are_team_submissions_enabled
 
 TEAM_MEMBERSHIPS_PER_PAGE = 5
 TOPICS_PER_PAGE = 12
-MAXIMUM_SEARCH_SIZE = 100000
+MAXIMUM_SEARCH_SIZE = 10000
 
 log = logging.getLogger(__name__)
 

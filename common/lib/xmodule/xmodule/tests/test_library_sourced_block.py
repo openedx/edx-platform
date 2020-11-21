@@ -4,7 +4,7 @@ Tests for Source from Library XBlock
 from xblockutils.resources import ResourceLoader
 
 from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
-from student.roles import CourseInstructorRole
+from common.djangoapps.student.roles import CourseInstructorRole
 from cms.lib.xblock.runtime import handler_url
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

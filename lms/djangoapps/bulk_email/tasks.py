@@ -37,11 +37,12 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import override as override_language
 from django.utils.translation import ugettext as _
+from edx_django_utils.monitoring import set_code_owner_attribute
 from markupsafe import escape
 from six import text_type
 
-from bulk_email.models import CourseEmail, Optout
-from bulk_email.api import get_unsubscribed_link
+from lms.djangoapps.bulk_email.models import CourseEmail, Optout
+from lms.djangoapps.bulk_email.api import get_unsubscribed_link
 from lms.djangoapps.courseware.courses import get_course
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.subtasks import (
@@ -52,8 +53,8 @@ from lms.djangoapps.instructor_task.subtasks import (
 )
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.courses import course_image_url
-from util.date_utils import get_default_time_display
-from util.string_utils import _has_non_ascii_characters
+from common.djangoapps.util.date_utils import get_default_time_display
+from common.djangoapps.util.string_utils import _has_non_ascii_characters
 
 log = logging.getLogger('edx.celery.task')
 
@@ -240,6 +241,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
 
 
 @task(default_retry_delay=settings.BULK_EMAIL_DEFAULT_RETRY_DELAY, max_retries=settings.BULK_EMAIL_MAX_RETRIES)
+@set_code_owner_attribute
 def send_course_email(entry_id, email_id, to_list, global_email_context, subtask_status_dict):
     """
     Sends an email to a list of recipients.

@@ -1,6 +1,7 @@
 # pylint: disable=missing-docstring
 
 
+import json
 import six
 from django.conf import settings
 from django.http import HttpResponse
@@ -14,8 +15,7 @@ from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewi
 from openedx.core.djangoapps.user_authn import cookies as cookies_api
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.models import CourseEnrollment
-from student.tests.factories import AnonymousUserFactory, UserFactory
+from common.djangoapps.student.tests.factories import AnonymousUserFactory, UserFactory
 
 
 class CookieTests(TestCase):
@@ -130,7 +130,10 @@ class CookieTests(TestCase):
     def test_refresh_jwt_cookies(self):
         setup_login_oauth_client()
         self._set_use_jwt_cookie_header(self.request)
-        response = cookies_api.refresh_jwt_cookies(self.request, HttpResponse(), self.user)
+        response = cookies_api.get_response_with_refreshed_jwt_cookies(self.request, self.user)
+        data = json.loads(response.content.decode('utf8').replace("'", '"'))
+        self.assertGreater(data['expires_epoch_seconds'], 0)
+        self.assertNotEqual(data['expires'], 'not-found')
         self._assert_cookies_present(response, cookies_api.JWT_COOKIE_NAMES)
         self._assert_consistent_expires(response, num_of_unique_expires=1)
         self._assert_recreate_jwt_from_cookies(response, can_recreate=True)

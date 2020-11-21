@@ -8,8 +8,8 @@ from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access_response import AccessResponse
 from lms.djangoapps.courseware.access_utils import ACCESS_DENIED, ACCESS_GRANTED, check_public_access
 from lms.djangoapps.courseware.courses import get_course
-from student.models import CourseEnrollment
-from student.roles import CourseStaffRole
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseStaffRole
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 
 

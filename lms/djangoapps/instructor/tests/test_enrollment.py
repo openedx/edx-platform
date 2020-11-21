@@ -21,8 +21,8 @@ from submissions import api as sub_api
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from lms.djangoapps.courseware.models import StudentModule
-from grades.subsection_grade_factory import SubsectionGradeFactory
-from grades.tests.utils import answer_problem
+from lms.djangoapps.grades.subsection_grade_factory import SubsectionGradeFactory
+from lms.djangoapps.grades.tests.utils import answer_problem
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.instructor.enrollment import (
@@ -38,9 +38,9 @@ from lms.djangoapps.teams.models import CourseTeamMembership
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, get_mock_request
-from student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
-from student.roles import CourseCcxCoachRole
-from student.tests.factories import AdminFactory, UserFactory
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
+from common.djangoapps.student.roles import CourseCcxCoachRole
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 

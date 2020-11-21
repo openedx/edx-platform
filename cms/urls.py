@@ -44,7 +44,7 @@ LIBRARY_KEY_PATTERN = r'(?P<library_key_string>library-v1:[^/+]+\+[^/+]+)'
 
 urlpatterns = [
     url(r'', include('openedx.core.djangoapps.user_authn.urls_common')),
-    url(r'', include('student.urls')),
+    url(r'', include('common.djangoapps.student.urls')),
     url(r'^transcripts/upload$', contentstore_views.upload_transcripts, name='upload_transcripts'),
     url(r'^transcripts/download$', contentstore_views.download_transcripts, name='download_transcripts'),
     url(r'^transcripts/check$', contentstore_views.check_transcripts, name='check_transcripts'),
@@ -154,6 +154,8 @@ urlpatterns = [
         contentstore_views.textbooks_detail_handler, name='textbooks_detail_handler'),
     url(r'^videos/{}(?:/(?P<edx_video_id>[-\w]+))?$'.format(settings.COURSE_KEY_PATTERN),
         contentstore_views.videos_handler, name='videos_handler'),
+    url(r'^generate_video_upload_link/{}'.format(settings.COURSE_KEY_PATTERN),
+        contentstore_views.generate_video_upload_link_handler, name='generate_video_upload_link'),
     url(r'^video_images/{}(?:/(?P<edx_video_id>[-\w]+))?$'.format(settings.COURSE_KEY_PATTERN),
         contentstore_views.video_images_handler, name='video_images_handler'),
     url(r'^transcript_preferences/{}$'.format(settings.COURSE_KEY_PATTERN),

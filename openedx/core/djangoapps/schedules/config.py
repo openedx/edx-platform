@@ -3,10 +3,8 @@ Contains configuration for schedules app
 """
 
 
-from openedx.core.djangoapps.waffle_utils import (
-    WaffleFlagNamespace, CourseWaffleFlag, WaffleFlag,
-    WaffleSwitch, WaffleSwitchNamespace,
-)
+from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace, WaffleSwitch, WaffleSwitchNamespace
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='schedules')
 WAFFLE_SWITCH_NAMESPACE = WaffleSwitchNamespace(name='schedules')

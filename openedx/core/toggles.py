@@ -11,6 +11,8 @@ from edx_toggles.toggles import SettingDictToggle
 #   of the course.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2015-12-01
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: None
 # .. toggle_tickets: https://openedx.atlassian.net/browse/SOL-40
 ENTRANCE_EXAMS = SettingDictToggle(
     "FEATURES", "ENTRANCE_EXAMS", default=False, module_name=__name__

@@ -16,7 +16,7 @@ from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from web_fragments.fragment import Fragment
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app

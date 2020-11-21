@@ -252,6 +252,7 @@ class TestPaverWatchAssetTasks(TestCase):
         self.expected_sass_directories.extend([
             path(TEST_THEME_DIR) / 'lms/static/sass',
             path(TEST_THEME_DIR) / 'lms/static/sass/partials',
+            path(TEST_THEME_DIR) / 'lms/static/certificates/sass',
             path(TEST_THEME_DIR) / 'cms/static/sass',
             path(TEST_THEME_DIR) / 'cms/static/sass/partials',
         ])

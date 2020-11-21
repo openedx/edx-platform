@@ -20,7 +20,7 @@ from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED
 from openedx.features.enterprise_support.api import enterprise_enabled
 from openedx.features.enterprise_support.tasks import clear_enterprise_customer_data_consent_share_cache
 from openedx.features.enterprise_support.utils import clear_data_consent_share_cache, is_enterprise_learner
-from student.signals import UNENROLL_DONE
+from common.djangoapps.student.signals import UNENROLL_DONE
 
 log = logging.getLogger(__name__)
 

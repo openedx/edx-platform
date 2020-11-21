@@ -20,15 +20,15 @@ from pytz import utc
 from web_fragments.fragment import Fragment
 from xblock.runtime import KeyValueStore
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID
 from openedx.features.content_type_gating.helpers import FULL_ACCESS
 from openedx.features.content_type_gating.helpers import LIMITED_ACCESS
-from student.models import CourseEnrollment
-from student.role_helpers import has_staff_roles
-from util.json_request import JsonResponse, expect_json
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.role_helpers import has_staff_roles
+from common.djangoapps.util.json_request import JsonResponse, expect_json
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 from xmodule.partitions.partitions import NoSuchUserPartitionGroupError

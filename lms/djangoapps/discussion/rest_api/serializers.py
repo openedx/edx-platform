@@ -34,7 +34,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     Role
 )
 from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
-from student.models import get_user_by_username_or_email
+from common.djangoapps.student.models import get_user_by_username_or_email
 
 
 def get_context(course, request, thread=None):

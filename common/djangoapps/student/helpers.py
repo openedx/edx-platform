@@ -15,27 +15,28 @@ from completion.utilities import get_key_to_last_completed_block
 from django.conf import settings
 from django.contrib.auth import load_backend
 from django.contrib.auth.models import User
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.validators import ValidationError
-from django.db import IntegrityError, transaction
+from django.db import IntegrityError, transaction, ProgrammingError
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext as _
 from pytz import UTC
 from six import iteritems, text_type
 
-import third_party_auth
-from course_modes.models import CourseMode
+from common.djangoapps import third_party_auth
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import get_certificate_url, has_html_certificates_enabled
 from lms.djangoapps.certificates.models import CertificateStatuses, certificate_status_for_student
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.utils import is_verification_expiring_soon, verification_for_datetime
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_themes
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
-from student.models import (
+from common.djangoapps.student.models import (
     CourseEnrollment,
     LinkedInAddToProfileConfiguration,
     Registration,
@@ -45,7 +46,7 @@ from student.models import (
     unique_id_for_user,
     username_exists_or_retired
 )
-from util.password_policy_validators import normalize_password
+from common.djangoapps.util.password_policy_validators import normalize_password
 
 # Enumeration of per-course verification statuses
 # we display on the student dashboard.
@@ -392,7 +393,8 @@ def generate_activation_email_context(user, registration):
         user (User): Currently logged-in user
         registration (Registration): Registration object for the currently logged-in user
     """
-    return {
+    context = get_base_template_context(None)
+    context.update({
         'name': user.profile.name,
         'key': registration.activation_key,
         'lms_url': configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
@@ -401,7 +403,8 @@ def generate_activation_email_context(user, registration):
             'ACTIVATION_EMAIL_SUPPORT_LINK', settings.ACTIVATION_EMAIL_SUPPORT_LINK
         ) or settings.SUPPORT_SITE_LINK,
         'support_email': configuration_helpers.get_value('CONTACT_EMAIL', settings.CONTACT_EMAIL),
-    }
+    })
+    return context
 
 
 def create_or_set_user_attribute_created_on_site(user, site):
@@ -723,3 +726,14 @@ def get_resume_urls_for_enrollments(user, enrollments):
             url_to_block = ''
         resume_course_urls[enrollment.course_id] = url_to_block
     return resume_course_urls
+
+
+def does_user_profile_exist(user):
+    """
+    Check if user has an associated profile.
+    Ignore errors and return False in case of errors.
+    """
+    try:
+        return hasattr(user, 'profile')
+    except (ProgrammingError, ObjectDoesNotExist):
+        return False

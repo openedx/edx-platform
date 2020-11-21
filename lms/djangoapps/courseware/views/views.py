@@ -47,9 +47,9 @@ from rest_framework.throttling import UserRateThrottle
 from six import text_type
 from web_fragments.fragment import Fragment
 
-import survey.views
-from course_modes.models import CourseMode, get_course_prices
-from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
+from lms.djangoapps.survey import views as survey_views
+from common.djangoapps.course_modes.models import CourseMode, get_course_prices
+from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_response, render_to_string
 from lms.djangoapps.edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.certificates import api as certs_api
@@ -118,12 +118,12 @@ from openedx.features.course_experience.views.course_dates import CourseDatesFra
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.enterprise_support.api import data_sharing_consent_required
-from student.models import CourseEnrollment, UserTestGroup
-from track import segment
-from util.cache import cache, cache_if_anonymous
-from util.db import outer_atomic
-from util.milestones_helpers import get_prerequisite_courses_display
-from util.views import ensure_valid_course_key, ensure_valid_usage_key
+from common.djangoapps.student.models import CourseEnrollment, UserTestGroup
+from common.djangoapps.track import segment
+from common.djangoapps.util.cache import cache, cache_if_anonymous
+from common.djangoapps.util.db import outer_atomic
+from common.djangoapps.util.milestones_helpers import get_prerequisite_courses_display
+from common.djangoapps.util.views import ensure_valid_course_key, ensure_valid_usage_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
@@ -477,11 +477,6 @@ def course_info(request, course_id):
             if SelfPacedConfiguration.current().enable_course_home_improvements:
                 # Shared code with the new Course Home (DONE)
                 dates_fragment = CourseDatesFragmentView().render_to_fragment(request, course_id=course_id)
-
-        # This local import is due to the circularity of lms and openedx references.
-        # This may be resolved by using stevedore to allow web fragments to be used
-        # as plugins, and to avoid the direct import.
-        from openedx.features.course_experience.views.course_reviews import CourseReviewsModuleFragmentView
 
         # Shared code with the new Course Home (DONE)
         # Get the course tools enabled for this user and course
@@ -947,14 +942,6 @@ def course_about(request, course_id):
 
         allow_anonymous = check_public_access(course, [COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE])
 
-        # This local import is due to the circularity of lms and openedx references.
-        # This may be resolved by using stevedore to allow web fragments to be used
-        # as plugins, and to avoid the direct import.
-        from openedx.features.course_experience.views.course_reviews import CourseReviewsModuleFragmentView
-
-        # Embed the course reviews tool
-        reviews_fragment_view = CourseReviewsModuleFragmentView().render_to_fragment(request, course=course)
-
         context = {
             'course': course,
             'course_details': course_details,
@@ -979,7 +966,6 @@ def course_about(request, course_id):
             'disable_courseware_header': True,
             'pre_requisite_courses': pre_requisite_courses,
             'course_image_urls': overview.image_urls,
-            'reviews_fragment_view': reviews_fragment_view,
             'sidebar_html_enabled': sidebar_html_enabled,
             'allow_anonymous': allow_anonymous,
         }
@@ -1516,7 +1502,7 @@ def course_survey(request, course_id):
     if not course.course_survey_name:
         return redirect(redirect_url)
 
-    return survey.views.view_student_survey(
+    return survey_views.view_student_survey(
         request.user,
         course.course_survey_name,
         course=course,

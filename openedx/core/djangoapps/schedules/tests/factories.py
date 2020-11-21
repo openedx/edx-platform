@@ -8,7 +8,7 @@ import pytz
 
 from openedx.core.djangoapps.schedules import models
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from student.tests.factories import CourseEnrollmentFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 
 
 class ScheduleExperienceFactory(factory.DjangoModelFactory):

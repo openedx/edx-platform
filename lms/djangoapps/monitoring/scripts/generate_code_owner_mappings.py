@@ -34,6 +34,7 @@ EDX_REPO_APPS = {
     'organizations': 'https://github.com/edx/edx-organizations',
     'search': 'https://github.com/edx/edx-search',
     'wiki': 'https://github.com/edx/django-wiki',
+    'lti_consumer': 'https://github.com/edx/xblock-lti-consumer',
 }
 
 # Maps edx-platform installed Django apps to the third-party repo that contains
@@ -45,6 +46,7 @@ THIRD_PARTY_APPS = {
     'lx_pathway_plugin': 'https://github.com/open-craft/lx-pathway-plugin',
     'simple_history': 'https://github.com/treyhunner/django-simple-history',
     'social_django': 'https://github.com/python-social-auth/social-app-django',
+    'corsheaders': 'https://github.com/adamchainz/django-cors-headers',
 }
 
 

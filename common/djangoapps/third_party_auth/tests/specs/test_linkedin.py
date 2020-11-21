@@ -1,7 +1,7 @@
 """Integration tests for LinkedIn providers."""
 
 
-from third_party_auth.tests.specs import base
+from common.djangoapps.third_party_auth.tests.specs import base
 
 
 def get_localized_name(name):

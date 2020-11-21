@@ -31,7 +31,7 @@ class TestHeader(TestCase):
         # load, which can cause other tests to fail.  To ensure that this change
         # doesn't affect other tests, we patch the `url()` method directly instead.
         cdn_url = "http://cdn.example.com/static/image.png"
-        with mock.patch('branding.api.staticfiles_storage.url', return_value=cdn_url):
+        with mock.patch('lms.djangoapps.branding.api.staticfiles_storage.url', return_value=cdn_url):
             logo_url = get_logo_url()
 
         self.assertEqual(logo_url, cdn_url)
@@ -103,7 +103,7 @@ class TestFooter(TestCase):
                 {'url': 'https://edx.org/about-us', 'name': 'about', 'title': 'About'},
                 {'url': business_url, 'name': 'enterprise', 'title': '\xe9dX for Business'},
                 {'url': 'https://edx.org/affiliate-program', 'name': 'affiliates', 'title': 'Affiliates'},
-                {'url': 'http://open.edx.org', 'name': 'openedx', 'title': 'Open edX'},
+                {'url': 'https://open.edx.org', 'name': 'openedx', 'title': 'Open edX'},
                 {'url': 'https://edx.org/careers', 'name': 'careers', 'title': 'Careers'},
                 {'url': 'https://edx.org/news-announcements', 'name': 'news', 'title': 'News'},
 
@@ -156,7 +156,7 @@ class TestFooter(TestCase):
             'mobile_links': [],
             'logo_image': 'https://edx.org/static/images/logo.png',
             'openedx_link': {
-                'url': 'http://open.edx.org',
+                'url': 'https://open.edx.org',
                 'image': 'https://files.edx.org/openedx-logos/edx-openedx-logo-tag.png',
                 'title': 'Powered by Open edX'
             },

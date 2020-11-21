@@ -10,7 +10,7 @@ from time import time
 
 import re
 import six
-from course_blocks.api import get_course_blocks
+from lms.djangoapps.course_blocks.api import get_course_blocks
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from lazy import lazy
@@ -19,7 +19,7 @@ from pytz import UTC
 from six import text_type
 from six.moves import zip, zip_longest
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import CertificateWhitelist, GeneratedCertificate, certificate_info_for_user
 from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
@@ -41,8 +41,8 @@ from openedx.core.djangoapps.content.block_structure.api import get_course_in_ca
 from openedx.core.djangoapps.course_groups.cohorts import bulk_cache_cohorts, get_cohort, is_course_cohorted
 from openedx.core.djangoapps.user_api.course_tag.api import BulkCourseTags
 from openedx.core.lib.cache_utils import get_cache
-from student.models import CourseEnrollment
-from student.roles import BulkRoleCache
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import BulkRoleCache
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions_service import PartitionService
 from xmodule.split_test_module import get_split_user_partitions

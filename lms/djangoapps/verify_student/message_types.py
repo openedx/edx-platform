@@ -16,7 +16,7 @@ class VerificationExpiry(BaseMessageType):
 
 class VerificationApproved(BaseMessageType):
     """
-    A message to the learner when his ID verification has been approved.
+    A message to the learner when their ID verification has been approved.
     """
     APP_LABEL = 'verify_student'
     Name = 'verificationapproved'
@@ -28,7 +28,7 @@ class VerificationApproved(BaseMessageType):
 
 class VerificationSubmitted(BaseMessageType):
     """
-    A confirmation message to the learner when his ID verification has been submitted.
+    A confirmation message to the learner when their ID verification has been submitted.
     """
     APP_LABEL = 'verify_student'
     Name = 'verificationsubmitted'

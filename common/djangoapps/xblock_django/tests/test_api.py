@@ -6,8 +6,8 @@ Tests related to XBlock support API.
 import six
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from xblock_django.api import authorable_xblocks, deprecated_xblocks, disabled_xblocks
-from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
+from common.djangoapps.xblock_django.api import authorable_xblocks, deprecated_xblocks, disabled_xblocks
+from common.djangoapps.xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
 
 
 class XBlockSupportTestCase(CacheIsolationTestCase):

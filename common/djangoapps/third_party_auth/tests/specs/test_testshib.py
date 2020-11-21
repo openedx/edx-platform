@@ -25,10 +25,10 @@ from enterprise.models import EnterpriseCustomerIdentityProvider, EnterpriseCust
 from openedx.core.djangoapps.user_authn.views.login import login_user
 from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerFactory
-from third_party_auth import pipeline
-from third_party_auth.saml import SapSuccessFactorsIdentityProvider, log as saml_log
-from third_party_auth.tasks import fetch_saml_metadata
-from third_party_auth.tests import testutil, utils
+from common.djangoapps.third_party_auth import pipeline
+from common.djangoapps.third_party_auth.saml import SapSuccessFactorsIdentityProvider, log as saml_log
+from common.djangoapps.third_party_auth.tasks import fetch_saml_metadata
+from common.djangoapps.third_party_auth.tests import testutil, utils
 
 from .base import IntegrationTestMixin
 

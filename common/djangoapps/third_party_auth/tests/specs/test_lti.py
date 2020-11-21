@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.urls import reverse
 from oauthlib.oauth1.rfc5849 import Client, SIGNATURE_TYPE_BODY
-from third_party_auth.tests import testutil
+from common.djangoapps.third_party_auth.tests import testutil
 
 FORM_ENCODED = 'application/x-www-form-urlencoded'
 

@@ -8,8 +8,8 @@ from django.db import models
 from django.dispatch import receiver
 
 import six
-from course_modes.models import CourseMode
-from student.models import CourseEnrollment
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.models import CourseEnrollment
 
 from .api import add_course_goal, remove_course_goal
 from .models import GOAL_KEY_CHOICES

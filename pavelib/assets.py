@@ -167,6 +167,8 @@ def get_theme_sass_dirs(system, theme_dir):
     system_sass_dir = path(system) / "static" / "sass"
     sass_dir = theme_dir / system / "static" / "sass"
     css_dir = theme_dir / system / "static" / "css"
+    certs_sass_dir = theme_dir / system / "static" / "certificates" / "sass"
+    certs_css_dir = theme_dir / system / "static" / "certificates" / "css"
 
     dependencies = SASS_LOOKUP_DEPENDENCIES.get(system, [])
     if sass_dir.isdir():
@@ -193,6 +195,17 @@ def get_theme_sass_dirs(system, theme_dir):
                 system_sass_dir,
             ],
         })
+
+        # now compile theme sass files for certificate
+        if system == 'lms':
+            dirs.append({
+                "sass_source_dir": certs_sass_dir,
+                "css_destination_dir": certs_css_dir,
+                "lookup_paths": [
+                    sass_dir / "partials",
+                    sass_dir
+                ],
+            })
 
     return dirs
 

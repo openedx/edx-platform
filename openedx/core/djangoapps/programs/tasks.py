@@ -9,10 +9,11 @@ from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from edx_django_utils.monitoring import set_code_owner_attribute
 from edx_rest_api_client import exceptions
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from openedx.core.djangoapps.certificates.api import available_date_for_certificate
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -124,6 +125,7 @@ def award_program_certificate(client, username, program_uuid, visible_date):
 
 
 @task(bind=True, ignore_result=True, routing_key=PROGRAM_CERTIFICATES_ROUTING_KEY)
+@set_code_owner_attribute
 def award_program_certificates(self, username):
     """
     This task is designed to be called whenever a student's completion status
@@ -286,6 +288,7 @@ def post_course_certificate(client, username, certificate, visible_date):
 
 
 @task(bind=True, ignore_result=True, routing_key=ROUTING_KEY)
+@set_code_owner_attribute
 def award_course_certificate(self, username, course_run_key):
     """
     This task is designed to be called whenever a student GeneratedCertificate is updated.
@@ -400,6 +403,7 @@ def revoke_program_certificate(client, username, program_uuid):
 
 
 @task(bind=True, ignore_result=True, routing_key=PROGRAM_CERTIFICATES_ROUTING_KEY)
+@set_code_owner_attribute
 def revoke_program_certificates(self, username, course_key):
     """
     This task is designed to be called whenever a student's course certificate is
@@ -523,6 +527,7 @@ def revoke_program_certificates(self, username, course_key):
 
 
 @task(bind=True, ignore_result=True, routing_key=PROGRAM_CERTIFICATES_ROUTING_KEY)
+@set_code_owner_attribute
 def update_certificate_visible_date_on_course_update(self, course_key):
     """
     This task is designed to be called whenever a course is updated with

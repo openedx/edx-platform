@@ -6,7 +6,7 @@ Tests for any Teams app services
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 from lms.djangoapps.teams.services import TeamsService
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory

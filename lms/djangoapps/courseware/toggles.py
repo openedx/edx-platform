@@ -2,8 +2,9 @@
 Toggles for courseware in-course experience.
 """
 
+from edx_toggles.toggles import WaffleFlagNamespace
 from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 # Namespace for courseware waffle flags.
 WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='courseware')
@@ -46,9 +47,9 @@ COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW = CourseWaffleFlag(
 # .. toggle_default: False
 # .. toggle_description: Supports staged rollout of the new micro-frontend-based implementation of the course exit page.
 # .. toggle_category: micro-frontend
-# .. toggle_use_cases: incremental_release, open_edx
+# .. toggle_use_cases: open_edx, temporary
 # .. toggle_creation_date: 2020-10-02
-# .. toggle_target_removal_date: n/a
+# .. toggle_target_removal_date: None
 # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and ENABLE_COURSEWARE_MICROFRONTEND.
 # .. toggle_tickets: AA-188
 COURSEWARE_MICROFRONTEND_COURSE_EXIT_PAGE = CourseWaffleFlag(
@@ -77,7 +78,7 @@ COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES = CourseWaffleFlag(
 #   courseware page.
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2020-10-07
-# .. toggle_target_removal_date: none
+# .. toggle_target_removal_date: None
 # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and ENABLE_COURSEWARE_MICROFRONTEND and
 #   COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES.
 # .. toggle_tickets: AA-371
@@ -91,8 +92,10 @@ COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_FIRST_SECTION_CELEBRATION = CourseW
 # .. toggle_description: Waffle flag to toggle various enhancements to the proctoring experience, including but
 #   not limited to the display of learner facing proctoring information on the course outline, changes to the Proctortrack
 #   onboarding flow, changes to IDV (identity verification) requirements, etc.
-# .. toggle_use_cases: beta_testing
+# .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2020-10-07
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: None
 # .. toggle_tickets: MST-432
 COURSEWARE_PROCTORING_IMPROVEMENTS = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'proctoring_improvements', __name__

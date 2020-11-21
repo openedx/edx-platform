@@ -12,7 +12,7 @@ class StudentConfig(AppConfig):
     """
     Default configuration for the ``student`` application.
     """
-    name = 'student'
+    name = 'common.djangoapps.student'
 
     def ready(self):
         # Connect signal handlers.
@@ -21,7 +21,7 @@ class StudentConfig(AppConfig):
         # The django-simple-history model on CourseEnrollment creates performance
         # problems in testing, we mock it here so that the mock impacts all tests.
         if os.environ.get('DISABLE_COURSEENROLLMENT_HISTORY', False):
-            import student.models as student_models
+            import common.djangoapps.student.models as student_models
             from mock import MagicMock
 
             student_models.CourseEnrollment.history = MagicMock()

@@ -18,7 +18,7 @@ from lms.djangoapps.grades.models import PersistentCourseGrade
 from openedx.core.djangoapps.credentials.models import NotifyCredentialsConfig
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 from ..notify_credentials import Command
 
@@ -69,20 +69,20 @@ class TestNotifyCredentials(TestCase):
         self.assertEqual(list(mock_send.call_args[0][0]), [self.cert1, self.cert2])
         self.assertEqual(list(mock_send.call_args[0][1]), [self.grade1, self.grade2])
 
-    @freeze_time(datetime(2017, 5, 2))
+    @freeze_time(datetime(2017, 5, 1, 4))
     @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
     def test_auto_execution(self, mock_send):
         cert_filter_args = {}
 
-        with freeze_time(datetime(2017, 5, 1)):
+        with freeze_time(datetime(2017, 5, 1, 0)):
             cert1 = GeneratedCertificateFactory(user=self.user, course_id='course-v1:edX+Test+11')
-        with freeze_time(datetime(2017, 5, 2)):
+        with freeze_time(datetime(2017, 5, 1, 3)):
             cert2 = GeneratedCertificateFactory(user=self.user, course_id='course-v1:edX+Test+22')
 
-        with freeze_time(datetime(2017, 5, 1)):
+        with freeze_time(datetime(2017, 5, 1, 0)):
             grade1 = PersistentCourseGrade.objects.create(user_id=self.user.id, course_id='course-v1:edX+Test+11',
                                                           percent_grade=1)
-        with freeze_time(datetime(2017, 5, 2)):
+        with freeze_time(datetime(2017, 5, 1, 3)):
             grade2 = PersistentCourseGrade.objects.create(user_id=self.user.id, course_id='course-v1:edX+Test+22',
                                                           percent_grade=1)
 

@@ -7,6 +7,7 @@ from celery import task
 from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.contrib.auth.models import User
+from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.credentials.utils import get_credentials_api_client
@@ -26,6 +27,7 @@ MAX_RETRIES = 11
 
 
 @task(bind=True, ignore_result=True, routing_key=ROUTING_KEY)
+@set_code_owner_attribute
 def send_grade_to_credentials(self, username, course_run_key, verified, letter_grade, percent_grade):
     """ Celery task to notify the Credentials IDA of a grade change via POST. """
     logger.info(u'Running task send_grade_to_credentials for username %s and course %s', username, course_run_key)

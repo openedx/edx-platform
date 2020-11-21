@@ -8,7 +8,7 @@ from django.shortcuts import redirect
 from django.utils.http import urlquote_plus
 from waffle.decorators import waffle_switch
 
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 
 from ..config import waffle
 

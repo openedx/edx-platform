@@ -7,7 +7,7 @@ from django.urls import reverse
 
 from rest_framework import serializers
 
-from student.models import CourseEnrollment, ManualEnrollmentAudit
+from common.djangoapps.student.models import CourseEnrollment, ManualEnrollmentAudit
 from lms.djangoapps.program_enrollments.models import (
     ProgramEnrollment,
     ProgramCourseEnrollment,

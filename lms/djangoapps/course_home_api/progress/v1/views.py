@@ -11,7 +11,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.course_home_api.progress.v1.serializers import ProgressTabSerializer
 
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.course_api.blocks.transformers.blocks_api import BlocksAPITransformer
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import get_course_with_access, get_studio_url

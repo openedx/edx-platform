@@ -34,7 +34,7 @@ from xmodule.modulestore.modulestore_settings import update_module_store_setting
 
 from .common import *
 
-from util.testing import patch_sessions, patch_testcase  # pylint: disable=wrong-import-order
+from common.djangoapps.util.testing import patch_sessions, patch_testcase  # pylint: disable=wrong-import-order
 
 # This patch disables the commit_on_success decorator during tests
 # in TestCase subclasses.
@@ -220,7 +220,7 @@ CACHES = {
     # Blockstore caching tests require a cache that actually works:
     'blockstore': {
         'KEY_PREFIX': 'blockstore',
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
         'LOCATION': 'edx_loc_mem_cache',
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     },
@@ -253,10 +253,10 @@ AUTHENTICATION_BACKENDS = [
     'social_core.backends.facebook.FacebookOAuth2',
     'social_core.backends.azuread.AzureADOAuth2',
     'social_core.backends.twitter.TwitterOAuth',
-    'third_party_auth.identityserver3.IdentityServer3',
-    'third_party_auth.dummy.DummyBackend',
-    'third_party_auth.saml.SAMLAuthBackend',
-    'third_party_auth.lti.LTIAuthBackend',
+    'common.djangoapps.third_party_auth.identityserver3.IdentityServer3',
+    'common.djangoapps.third_party_auth.dummy.DummyBackend',
+    'common.djangoapps.third_party_auth.saml.SAMLAuthBackend',
+    'common.djangoapps.third_party_auth.lti.LTIAuthBackend',
 ] + AUTHENTICATION_BACKENDS
 
 THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = {
@@ -465,8 +465,8 @@ PROFILE_IMAGE_MIN_BYTES = 100
 
 # Enable the LTI provider feature for testing
 FEATURES['ENABLE_LTI_PROVIDER'] = True
-INSTALLED_APPS.append('lti_provider.apps.LtiProviderConfig')
-AUTHENTICATION_BACKENDS.append('lti_provider.users.LtiBackend')
+INSTALLED_APPS.append('lms.djangoapps.lti_provider.apps.LtiProviderConfig')
+AUTHENTICATION_BACKENDS.append('lms.djangoapps.lti_provider.users.LtiBackend')
 
 # ORGANIZATIONS
 FEATURES['ORGANIZATIONS_APP'] = True
@@ -572,6 +572,7 @@ PROFILE_MICROFRONTEND_URL = "http://profile-mfe/abc/"
 ORDER_HISTORY_MICROFRONTEND_URL = "http://order-history-mfe/"
 ACCOUNT_MICROFRONTEND_URL = "http://account-mfe/"
 LOGISTRATION_MICROFRONTEND_URL = "http://logistation-mfe"
+LOGISTRATION_MICROFRONTEND_DOMAIN = "logistation-mfe"
 LEARNING_MICROFRONTEND_URL = "http://learning-mfe"
 
 ########################## limiting dashboard courses ######################
@@ -586,5 +587,6 @@ RATELIMIT_RATE = '2/m'
 
 ##### LOGISTRATION RATE LIMIT SETTINGS #####
 LOGISTRATION_RATELIMIT_RATE = '5/5m'
+LOGISTRATION_API_RATELIMIT = '5/m'
 
 REGISTRATION_VALIDATION_RATELIMIT = '5/minute'

@@ -8,7 +8,7 @@ from textwrap import dedent
 
 from django.core.management import BaseCommand
 
-from entitlements.models import CourseEntitlement
+from common.djangoapps.entitlements.models import CourseEntitlement
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 

@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-certifi==2020.6.20        # via requests
+certifi==2020.11.8        # via requests
 chardet==3.0.4            # via requests
 edx-opaque-keys==2.1.1    # via -r requirements/edx/paver.in
 idna==2.10                # via requests
@@ -21,10 +21,10 @@ pbr==5.5.1                # via stevedore
 psutil==5.7.3             # via -r requirements/edx/paver.in
 pymongo==3.10.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.in, edx-opaque-keys
 python-memcached==1.59    # via -r requirements/edx/paver.in
-requests==2.24.0          # via -r requirements/edx/paver.in
+requests==2.25.0          # via -r requirements/edx/paver.in
 six==1.15.0               # via edx-opaque-keys, libsass, mock, paver, python-memcached, stevedore
 stevedore==1.32.0         # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.in, edx-opaque-keys
-urllib3==1.25.11          # via requests
+urllib3==1.26.2           # via requests
 watchdog==0.10.3          # via -r requirements/edx/paver.in
 wrapt==1.11.2             # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.in
 zipp==1.0.0               # via -c requirements/edx/../constraints.txt, importlib-metadata

@@ -20,7 +20,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework.test import APITestCase, APIClient
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 from ..api import replace_course_outline
 from ..data import CourseOutlineData, CourseVisibility
@@ -44,6 +44,7 @@ class CourseOutlineViewTest(CacheIsolationTestCase, APITestCase):
             title="Views Test Course!",
             published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2020",
+            entrance_exam_id=None,
             days_early_for_beta=None,
             sections=generate_sections(cls.course_key, [2, 2]),
             self_paced=False,

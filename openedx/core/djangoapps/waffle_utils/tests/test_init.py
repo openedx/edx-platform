@@ -7,16 +7,15 @@ import ddt
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-# Note that we really shouldn't import from edx_toggles' internal API
-import edx_toggles.toggles.internal.waffle
 from edx_django_utils.cache import RequestCache
-from mock import call, patch
+from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from waffle.testutils import override_flag
 
 from .. import (
     CourseWaffleFlag,
     WaffleFlagNamespace,
+    WaffleSwitchNamespace,
 )
 from ..models import WaffleFlagCourseOverrideModel
 
@@ -39,21 +38,20 @@ class TestCourseWaffleFlag(TestCase):
     TEST_COURSE_FLAG = CourseWaffleFlag(TEST_NAMESPACE, FLAG_NAME, __name__)
 
     def setUp(self):
-        super(TestCourseWaffleFlag, self).setUp()
+        super().setUp()
         request = RequestFactory().request()
         self.addCleanup(crum.set_current_request, None)
         crum.set_current_request(request)
         RequestCache.clear_all_namespaces()
 
     @override_settings(WAFFLE_FLAG_CUSTOM_ATTRIBUTES=[NAMESPACED_FLAG_NAME])
-    @patch.object(edx_toggles.toggles.internal.waffle, 'set_custom_attribute')
     @ddt.data(
         {'course_override': WaffleFlagCourseOverrideModel.ALL_CHOICES.on, 'waffle_enabled': False, 'result': True},
         {'course_override': WaffleFlagCourseOverrideModel.ALL_CHOICES.off, 'waffle_enabled': True, 'result': False},
         {'course_override': WaffleFlagCourseOverrideModel.ALL_CHOICES.unset, 'waffle_enabled': True, 'result': True},
         {'course_override': WaffleFlagCourseOverrideModel.ALL_CHOICES.unset, 'waffle_enabled': False, 'result': False},
     )
-    def test_course_waffle_flag(self, data, mock_set_custom_attribute):
+    def test_course_waffle_flag(self, data):
         """
         Tests various combinations of a flag being set in waffle and overridden
         for a course.
@@ -70,9 +68,6 @@ class TestCourseWaffleFlag(TestCase):
                     self.TEST_COURSE_KEY
                 )
 
-        self._assert_waffle_flag_attribute(mock_set_custom_attribute, expected_flag_value=str(data['result']))
-        mock_set_custom_attribute.reset_mock()
-
         # check flag for a second course
         if data['course_override'] == WaffleFlagCourseOverrideModel.ALL_CHOICES.unset:
             # When course override wasn't set for the first course, the second course will get the same
@@ -85,12 +80,8 @@ class TestCourseWaffleFlag(TestCase):
             second_value = False
             self.assertEqual(self.TEST_COURSE_FLAG.is_enabled(self.TEST_COURSE_2_KEY), second_value)
 
-        expected_flag_value = None if second_value == data['result'] else 'Both'
-        self._assert_waffle_flag_attribute(mock_set_custom_attribute, expected_flag_value=expected_flag_value)
-
     @override_settings(WAFFLE_FLAG_CUSTOM_ATTRIBUTES=[NAMESPACED_FLAG_NAME])
-    @patch.object(edx_toggles.toggles.internal.waffle, 'set_custom_attribute')
-    def test_undefined_waffle_flag(self, mock_set_custom_attribute):
+    def test_undefined_waffle_flag(self):
         """
         Test flag with undefined waffle flag.
         """
@@ -114,11 +105,6 @@ class TestCourseWaffleFlag(TestCase):
                 self.NAMESPACED_FLAG_NAME,
                 self.TEST_COURSE_KEY
             )
-
-        self._assert_waffle_flag_attribute(
-            mock_set_custom_attribute,
-            expected_flag_value=str(False),
-        )
 
     def test_without_request_and_undefined_waffle(self):
         """
@@ -145,32 +131,13 @@ class TestCourseWaffleFlag(TestCase):
         with override_flag(self.NAMESPACED_FLAG_NAME, active=True):
             self.assertEqual(test_course_flag.is_enabled(self.TEST_COURSE_KEY), True)
 
-    @ddt.data(
-        {'expected_count': 0, 'waffle_flag_attribute_setting': None},
-        {'expected_count': 1, 'waffle_flag_attribute_setting': [NAMESPACED_FLAG_NAME]},
-        {'expected_count': 2, 'waffle_flag_attribute_setting': [NAMESPACED_FLAG_NAME, NAMESPACED_FLAG_2_NAME]},
-    )
-    @patch.object(edx_toggles.toggles.internal.waffle, 'set_custom_attribute')
-    def test_waffle_flag_attribute_for_various_settings(self, data, mock_set_custom_attribute):
-        """
-        Test that custom attributes are recorded when waffle flag accessed.
-        """
-        with override_settings(WAFFLE_FLAG_CUSTOM_ATTRIBUTES=data['waffle_flag_attribute_setting']):
-            test_course_flag = CourseWaffleFlag(self.TEST_NAMESPACE, self.FLAG_NAME, __name__)
-            test_course_flag.is_enabled(self.TEST_COURSE_KEY)
-            test_course_flag_2 = CourseWaffleFlag(self.TEST_NAMESPACE, self.FLAG_2_NAME, __name__)
-            test_course_flag_2.is_enabled(self.TEST_COURSE_KEY)
 
-        self.assertEqual(mock_set_custom_attribute.call_count, data['expected_count'])
+class DeprecatedWaffleFlagTests(TestCase):
+    """
+    Tests for the deprecated waffle methods, including override and import paths.
+    """
 
-    def _assert_waffle_flag_attribute(self, mock_set_custom_attribute, expected_flag_value=None):
-        """
-        Assert that a custom attribute was set as expected on the mock.
-        """
-        if expected_flag_value:
-            expected_flag_name = 'flag_{}'.format(self.NAMESPACED_FLAG_NAME)
-            expected_calls = [call(expected_flag_name, expected_flag_value)]
-            mock_set_custom_attribute.assert_has_calls(expected_calls)
-            self.assertEqual(mock_set_custom_attribute.call_count, 1)
-        else:
-            self.assertEqual(mock_set_custom_attribute.call_count, 0)
+    def test_waffle_switch_namespace_override(self):
+        namespace = WaffleSwitchNamespace("namespace")
+        with namespace.override("waffle_switch1", True):
+            self.assertTrue(namespace.is_enabled("waffle_switch1"))

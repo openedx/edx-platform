@@ -13,6 +13,7 @@ from mock import MagicMock, Mock, patch
 from six import text_type
 from six.moves import range
 
+from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.courseware.tabs import (
     CourseInfoTab,
@@ -26,12 +27,11 @@ from lms.djangoapps.courseware.tabs import (
 from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.courseware.views.views import StaticCourseTabView, get_static_tab_fragment
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
-from util.milestones_helpers import (
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.util.milestones_helpers import (
     add_course_content_milestone,
     add_course_milestone,
     add_milestone,
@@ -734,7 +734,7 @@ class ProgressTestCase(TabTestCase):
             invalid_dict_tab=None,
         )
 
-    @patch('student.models.CourseEnrollment.is_enrolled')
+    @patch('common.djangoapps.student.models.CourseEnrollment.is_enrolled')
     def test_progress(self, is_enrolled):
         is_enrolled.return_value = True
         self.course.hide_progress_tab = False
@@ -834,7 +834,7 @@ class DiscussionLinkTestCase(TabTestCase):
         self.course.discussion_link = discussion_link_in_course
         discussion_tab = xmodule_tabs.CourseTabList.get_discussion(self.course)
         user = self.create_mock_user(is_staff=is_staff, is_enrolled=is_enrolled)
-        with patch('student.models.CourseEnrollment.is_enrolled') as check_is_enrolled:
+        with patch('common.djangoapps.student.models.CourseEnrollment.is_enrolled') as check_is_enrolled:
             check_is_enrolled.return_value = is_enrolled
             self.assertEqual(
                 (
@@ -910,7 +910,7 @@ class DatesTabTestCase(TabListTestCase):
     """Test cases for dates tab"""
 
     @patch('lms.djangoapps.courseware.tabs.RELATIVE_DATES_FLAG')
-    @patch('student.models.CourseEnrollment.is_enrolled')
+    @patch('common.djangoapps.student.models.CourseEnrollment.is_enrolled')
     def test_dates_tab_disabled_if_unenrolled(self, is_enrolled, mock_flag):
         mock_flag.is_enabled().return_value = True
         tab = DatesTab({'type': DatesTab.type, 'name': 'dates'})

@@ -8,7 +8,7 @@ from django.test import TestCase
 from django.utils.timezone import now
 
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class TestVerificationBase(TestCase):
@@ -42,7 +42,7 @@ class TestVerificationBase(TestCase):
         Tests to ensure the Verification is active or inactive at the appropriate datetimes.
         """
         # Not active before the created date
-        before = attempt.created_at - timedelta(seconds=1)
+        before = attempt.created_at - timedelta(minutes=1)
         self.assertFalse(attempt.active_at_datetime(before))
 
         # Active immediately after created date
@@ -50,14 +50,14 @@ class TestVerificationBase(TestCase):
         self.assertTrue(attempt.active_at_datetime(after_created))
 
         # Active immediately before expiration date
-        expiration = attempt.created_at + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+        expiration = attempt.expiration_datetime
         before_expiration = expiration - timedelta(seconds=1)
         self.assertTrue(attempt.active_at_datetime(before_expiration))
 
         # Not active after the expiration date
-        attempt.created_at = attempt.created_at - timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+        attempt.expiration_date = now() - timedelta(days=1)
         attempt.save()
-        self.assertFalse(attempt.active_at_datetime(now() + timedelta(days=1)))
+        self.assertFalse(attempt.active_at_datetime(now()))
 
     def submit_attempt(self, attempt):
         with self.immediate_on_commit():

@@ -20,16 +20,16 @@ from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator
 from six import text_type
 
 from cms.djangoapps.course_creators.views import get_course_creator_status
-from edxmako.shortcuts import render_to_response
-from student.auth import (
+from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.student.auth import (
     STUDIO_EDIT_ROLES,
     STUDIO_VIEW_USERS,
     get_user_permissions,
     has_studio_read_access,
     has_studio_write_access
 )
-from student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
-from util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
+from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import DuplicateCourseError

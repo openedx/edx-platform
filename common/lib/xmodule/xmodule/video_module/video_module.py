@@ -95,7 +95,7 @@ except ImportError:
     edxval_api = None
 
 try:
-    from branding.models import BrandingInfoConfig
+    from lms.djangoapps.branding.models import BrandingInfoConfig
 except ImportError:
     BrandingInfoConfig = None
 

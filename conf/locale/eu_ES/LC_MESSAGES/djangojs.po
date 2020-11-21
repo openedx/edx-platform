@@ -50,8 +50,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-10-18 20:43+0000\n"
-"PO-Revision-Date: 2020-10-04 20:44+0000\n"
+"POT-Creation-Date: 2020-11-13 11:05+0000\n"
+"PO-Revision-Date: 2020-11-10 11:23+0000\n"
 "Last-Translator: Abel Camacho <abelcama@gmail.com>\n"
 "Language-Team: Basque (Spain) (http://www.transifex.com/open-edx/edx-platform/language/eu_ES/)\n"
 "Language: eu_ES\n"
@@ -790,9 +790,12 @@ msgstr "Ezabatu lerroa"
 msgid "Delete table"
 msgstr "Ezabatu taula"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/certificate-editor.underscore
+#: cms/templates/js/group-configuration-editor.underscore
 msgid "Description"
 msgstr "Deskribapena"
 
@@ -2048,7 +2051,7 @@ msgstr ""
 
 #: common/static/common/js/discussion/utils.js
 msgid "Loading content"
-msgstr "Edukia igotzen"
+msgstr "Edukia kargatzen"
 
 #: common/static/common/js/discussion/utils.js
 msgid "Your request could not be processed. Refresh the page and try again."
@@ -3828,7 +3831,7 @@ msgstr ""
 #: cms/templates/js/move-xblock-modal.underscore
 #: openedx/features/course_search/static/course_search/templates/search_loading.underscore
 msgid "Loading"
-msgstr "Igotzen"
+msgstr "Kargatzen"
 
 #: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error getting student list."
@@ -4850,7 +4853,7 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Email Address (Sign In)"
-msgstr "E-posta helbidea (Erregistratzeko)"
+msgstr "Posta elektronikoaren helbidea (Hasi saioa)"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -5466,7 +5469,7 @@ msgstr ""
 
 #: cms/static/js/certificates/views/certificates_list.js
 msgid "Set up your certificate"
-msgstr ""
+msgstr "Konfiguratu ziurtagiria"
 
 #. Translators: This line refers to the initial state of the form when no data
 #. has been inserted
@@ -6942,12 +6945,12 @@ msgstr "Bidali"
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "discussion posted %(time_ago)s by %(author)s"
-msgstr ""
+msgstr "duela %(time_ago)s %(author)sk bidalitako eztabaida"
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "question posted %(time_ago)s by %(author)s"
-msgstr ""
+msgstr "duela %(time_ago)s %(author)sk bidalitako galdera"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Pinned"
@@ -6996,8 +6999,8 @@ msgstr "Eguneratu mezua"
 #, python-format
 msgid "Show Comment (%(num_comments)s)"
 msgid_plural "Show Comments (%(num_comments)s)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Erakutsi iruzkin (%(num_comments)s)"
+msgstr[1] "Erakutsi (%(num_comments)s) iruzkin"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Add a comment"
@@ -8346,7 +8349,7 @@ msgstr "Sortu kontua"
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/login.underscore
 msgid "Sign in"
-msgstr "Erregistratu"
+msgstr "Hasi saioa"
 
 #: lms/templates/student_account/hinted_login.underscore
 #, python-format
@@ -8356,7 +8359,7 @@ msgstr ""
 #: lms/templates/student_account/hinted_login.underscore
 #, python-format
 msgid "Sign in using %(providerName)s"
-msgstr ""
+msgstr "Hasi saioa ondokoa erabiliz: %(providerName)s"
 
 #: lms/templates/student_account/hinted_login.underscore
 msgid "Show me other ways to sign in or register"
@@ -8373,7 +8376,7 @@ msgstr "Aukeratu erakundea beheko zerrendatik:"
 
 #: lms/templates/student_account/institution_login.underscore
 msgid "Back to sign in"
-msgstr ""
+msgstr "Itzuli saioa hasteko orrira"
 
 #: lms/templates/student_account/institution_register.underscore
 msgid "Register with Institution/Campus Credentials"
@@ -8394,11 +8397,11 @@ msgstr "Sortu kontua."
 
 #: lms/templates/student_account/login.underscore
 msgid "Sign in to continue learning as {email}"
-msgstr ""
+msgstr "Hasi saioa ikasten jarraitzeko honela {email}"
 
 #: lms/templates/student_account/login.underscore
 msgid "Sign in to continue learning"
-msgstr ""
+msgstr "Hasi saioa ikasten jarraitzeko"
 
 #: lms/templates/student_account/login.underscore
 msgid ""
@@ -8425,7 +8428,7 @@ msgstr ""
 
 #: lms/templates/student_account/login.underscore
 msgid "Sign In"
-msgstr "Erregistratu"
+msgstr "Hasi saioa"
 
 #: lms/templates/student_account/login.underscore
 msgid ""
@@ -8447,12 +8450,12 @@ msgstr ""
 
 #: lms/templates/student_account/login.underscore
 msgid "or sign in with"
-msgstr ""
+msgstr "edo hasi saioa ondokoarekin"
 
 #: lms/templates/student_account/login.underscore
 #, python-format
 msgid "Sign in with %(providerName)s"
-msgstr ""
+msgstr "Hasi saioa honekin %(providerName)s"
 
 #: lms/templates/student_account/password_reset.underscore
 msgid "Password assistance"
@@ -8476,7 +8479,7 @@ msgstr "Ba al duzu dagoeneko {platformName}-ko kontua?"
 
 #: lms/templates/student_account/register.underscore
 msgid "Sign in."
-msgstr "Erregistratu."
+msgstr "Hasi saioa."
 
 #: lms/templates/student_account/register.underscore
 msgid "Create an account using"
@@ -8485,7 +8488,7 @@ msgstr ""
 #: lms/templates/student_account/register.underscore
 #, python-format
 msgid "Create account using %(providerName)s."
-msgstr ""
+msgstr "Sortu kontua ondokoarekin%(providerName)s."
 
 #: lms/templates/student_account/register.underscore
 msgid "Use my institution/campus credentials"
@@ -9281,7 +9284,7 @@ msgstr "Ikastaroaren izenburua"
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
 msgid "Course Title Override"
-msgstr ""
+msgstr "Aldatu ikastaroaren izenburua"
 
 #: cms/templates/js/certificate-details.underscore
 msgid "Course Number"
@@ -9289,7 +9292,7 @@ msgstr "Ikastaro-zenbakia"
 
 #: cms/templates/js/certificate-details.underscore
 msgid "Course Number Override"
-msgstr ""
+msgstr "Aldatu Ikastaro-zenbakia"
 
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -9303,6 +9306,9 @@ msgid ""
 "you include additional signatories, preview the certificate in Print View to"
 " ensure the certificate will print correctly on one page."
 msgstr ""
+"Biziki gomendatzen da lau sinatzaile baino gehiago ez izatea. Sinatzaile "
+"gehiago gehituz gero, aurreikusi ziurtagiria inprimatzeko aurrebistan, "
+"ziurtagiria orri bakarrean inprimatuko dela ziurtatzeko."
 
 #: cms/templates/js/certificate-editor.underscore
 msgid "Certificate Information"
@@ -9332,11 +9338,11 @@ msgstr ""
 
 #: cms/templates/js/certificate-editor.underscore
 msgid "Add Additional Signatory"
-msgstr "Gehitu bestelako sinatzaile bat"
+msgstr "Gehitu beste sinatzaile bat"
 
 #: cms/templates/js/certificate-editor.underscore
 msgid "(Add signatories for a certificate)"
-msgstr ""
+msgstr "(Gehitu sinatzaileak ziurtagirian)"
 
 #: cms/templates/js/certificate-web-preview.underscore
 msgid "Choose mode"
@@ -9527,7 +9533,7 @@ msgstr "Kargatu argazkia"
 #: cms/templates/js/course-outline.underscore
 #, python-format
 msgid "Prerequisite: %(prereq_display_name)s"
-msgstr ""
+msgstr "Aurre-baldintza: %(prereq_display_name)s"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Contains staff only content"
@@ -9539,11 +9545,11 @@ msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Unpublished units will not be released"
-msgstr ""
+msgstr "Argitaratu gabeko unitateak ez dira erakutsiko"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Unpublished changes to content that will release in the future"
-msgstr ""
+msgstr "Etorkizunean erakutsiko diren argitaratu gabeko edukiaren aldaketak"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Access to this unit is restricted to: {selectedGroupsLabel}"
@@ -9591,7 +9597,7 @@ msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Configure"
-msgstr ""
+msgstr "Ezarri"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Duplicate"
@@ -9623,7 +9629,7 @@ msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Graded as:"
-msgstr ""
+msgstr "Honela kalifikatuta"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Due:"
@@ -9654,7 +9660,7 @@ msgstr "Ikas-emaitza"
 
 #: cms/templates/js/course-settings-learning-fields.underscore
 msgid "Add a learning outcome here"
-msgstr ""
+msgstr "Gehitu ikas-emaitza hemen"
 
 #: cms/templates/js/course-video-settings-update-org-credentials-footer.underscore
 msgid "Press discard changes to discard your changes."
@@ -9794,7 +9800,7 @@ msgstr ""
 
 #: cms/templates/js/course_info_update.underscore
 msgid "Date"
-msgstr ""
+msgstr "Data"
 
 #: cms/templates/js/course_info_update.underscore
 msgid "Post"
@@ -9818,7 +9824,7 @@ msgstr "Kapituluaren izena"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "Chapter {order}"
-msgstr ""
+msgstr "Kapitulua {order}"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "provide the title/name of the chapter that will be used in navigating"
@@ -10186,7 +10192,7 @@ msgstr ""
 #: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "Hide from learners"
-msgstr ""
+msgstr "Ezkutatu ikasleei"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Note: Do not hide graded assignments after they have been released."
@@ -10269,7 +10275,7 @@ msgstr ""
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/signatory-editor.underscore
 msgid "Signatory"
-msgstr ""
+msgstr "Sinatzailea"
 
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/signatory-editor.underscore
@@ -10282,7 +10288,7 @@ msgstr "Ziurtagiriaren sinatzailearen ezarpenak"
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Name "
-msgstr ""
+msgstr "Izena"
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Name of the signatory"
@@ -10290,11 +10296,11 @@ msgstr "Sinatzailearen izena"
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "The name of this signatory as it should appear on certificates."
-msgstr ""
+msgstr "Sinatzailearen izena, ziurtagirietan azaldu behar duen moduan."
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Title "
-msgstr ""
+msgstr "Izenburua"
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Title of the signatory"
@@ -10305,10 +10311,12 @@ msgid ""
 "Titles more than 100 characters may prevent students from printing their "
 "certificate on a single page."
 msgstr ""
+"100 karaktere baino gehiago duten izenburuek ekar dezakete ikasleek "
+"ziurtagiria orri bakarrean ez inprimatzea."
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Organization "
-msgstr ""
+msgstr "Erakundea"
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Organization of the signatory"
@@ -10318,7 +10326,7 @@ msgstr "Sinatzailearen erakundea"
 msgid ""
 "The organization that this signatory belongs to, as it should appear on "
 "certificates."
-msgstr ""
+msgstr "Sinatzailearen erakundea, ziurtagirietan azaldu behar duen moduan."
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Path to Signature Image"

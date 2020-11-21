@@ -13,7 +13,7 @@ from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfi
 from openedx.features.calendar_sync import get_calendar_event_id
 from openedx.features.calendar_sync.ics import generate_ics_files_for_user_course
 from openedx.features.calendar_sync.tests.factories import UserCalendarSyncConfigFactory
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class TestIcsGeneration(TestCase):

@@ -8,8 +8,8 @@ from django.conf import settings
 from milestones.tests.utils import MilestonesTestCaseMixin
 from six.moves import range
 
-from mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
-from mobile_api.utils import API_V1, API_V05
+from lms.djangoapps.mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
+from lms.djangoapps.mobile_api.utils import API_V1, API_V05
 from xmodule.html_module import CourseInfoBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

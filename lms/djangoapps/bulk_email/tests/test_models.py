@@ -12,8 +12,8 @@ from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from bulk_email.api import is_bulk_email_feature_enabled
-from bulk_email.models import (
+from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
+from lms.djangoapps.bulk_email.models import (
     SEND_TO_COHORT,
     SEND_TO_STAFF,
     SEND_TO_TRACK,
@@ -23,9 +23,9 @@ from bulk_email.models import (
     CourseEmailTemplate,
     Optout,
 )
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.course_groups.models import CourseCohort
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

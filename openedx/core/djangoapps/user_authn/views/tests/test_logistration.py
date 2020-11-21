@@ -4,6 +4,7 @@
 
 from datetime import datetime, timedelta
 from http.cookies import SimpleCookie
+from urllib.parse import urlencode
 
 import ddt
 import mock
@@ -20,19 +21,17 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from freezegun import freeze_time
 from pytz import UTC
-from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.branding.api import get_privacy_url
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
 from openedx.core.djangoapps.user_authn.views.login_form import login_and_registration_form
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
-from util.testing import UrlResetMixin
+from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
@@ -124,7 +123,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         Test that rate limiting for logistration enpoints works as expected.
         """
         login_url = reverse('signin_user')
-        for i in range(5):
+        for _ in range(5):
             response = self.client.get(login_url)
             self.assertEqual(response.status_code, 200)
 
@@ -368,7 +367,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         }
         pipeline_target = 'openedx.core.djangoapps.user_authn.views.login_form.third_party_auth.pipeline'
         with simulate_running_pipeline(pipeline_target, current_backend, **pipeline_response):
-            with mock.patch('edxmako.request_context.get_current_request', return_value=request):
+            with mock.patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=request):
                 response = login_and_registration_form(request)
 
         expected_error_message = Text(_(
@@ -567,6 +566,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
 
         auth_info = {
             "currentProvider": current_provider,
+            "platformName": settings.PLATFORM_NAME,
             "providers": providers,
             "secondaryProviders": [],
             "finishAuthUrl": finish_auth_url,
@@ -597,6 +597,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
 
         auth_info = {
             'currentProvider': current_provider,
+            'platformName': settings.PLATFORM_NAME,
             'providers': [],
             'secondaryProviders': [],
             'finishAuthUrl': finish_auth_url,

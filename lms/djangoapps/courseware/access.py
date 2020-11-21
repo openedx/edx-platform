@@ -43,12 +43,12 @@ from lms.djangoapps.courseware.access_utils import (
 from lms.djangoapps.courseware.masquerade import get_masquerade_role, is_masquerading_as_student
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.ccx.models import CustomCourseForEdX
-from mobile_api.models import IgnoreMobileAvailableFlagConfig
+from lms.djangoapps.mobile_api.models import IgnoreMobileAvailableFlagConfig
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_duration_limits.access import check_course_expired
-from student import auth
-from student.models import CourseEnrollmentAllowed
-from student.roles import (
+from common.djangoapps.student import auth
+from common.djangoapps.student.models import CourseEnrollmentAllowed
+from common.djangoapps.student.roles import (
     CourseBetaTesterRole,
     CourseCcxCoachRole,
     CourseInstructorRole,
@@ -58,8 +58,8 @@ from student.roles import (
     OrgStaffRole,
     SupportStaffRole
 )
-from util import milestones_helpers as milestones_helpers
-from util.milestones_helpers import (
+from common.djangoapps.util import milestones_helpers as milestones_helpers
+from common.djangoapps.util.milestones_helpers import (
     any_unfulfilled_milestones,
     get_pre_requisite_courses_not_completed,
     is_prerequisite_courses_enabled

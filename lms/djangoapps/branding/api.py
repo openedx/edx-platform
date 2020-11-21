@@ -23,8 +23,8 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from six.moves.urllib.parse import urljoin
 
-from branding.models import BrandingApiConfig
-from edxmako.shortcuts import marketing_link
+from lms.djangoapps.branding.models import BrandingApiConfig
+from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger("edx.footer")
@@ -90,7 +90,7 @@ def get_footer(is_secure=True, language=settings.LANGUAGE_CODE):
             # ...
         ],
         "openedx_link": {
-            "url": "http://open.edx.org",
+            "url": "https://open.edx.org",
             "title": "Powered by Open edX",
             "image": "http://example.com/openedx.png"
         }

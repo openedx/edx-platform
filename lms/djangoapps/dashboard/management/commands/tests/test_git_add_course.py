@@ -18,8 +18,8 @@ from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
 from six import StringIO
 
-import dashboard.git_import as git_import
-from dashboard.git_import import (
+import lms.djangoapps.dashboard.git_import as git_import
+from lms.djangoapps.dashboard.git_import import (
     GitImportError,
     GitImportErrorBadRepo,
     GitImportErrorCannotPull,

@@ -10,8 +10,12 @@ import unittest
 import pytest
 import random2 as random
 import six
-from codejail.jail_code import is_configured
+from codejail import jail_code
+from codejail.django_integration import ConfigureCodeJailMiddleware
 from codejail.safe_exec import SafeExecException
+from django.conf import settings
+from django.core.exceptions import MiddlewareNotUsed
+from django.test import override_settings
 from six import text_type, unichr
 from six.moves import range
 
@@ -79,7 +83,7 @@ class TestSafeExec(unittest.TestCase):
 class TestSafeOrNot(unittest.TestCase):
     def test_cant_do_something_forbidden(self):
         # Can't test for forbiddenness if CodeJail isn't configured for python.
-        if not is_configured("python"):
+        if not jail_code.is_configured("python"):
             pytest.skip()
 
         g = {}
@@ -92,6 +96,81 @@ class TestSafeOrNot(unittest.TestCase):
         g = {}
         safe_exec("import os; files = os.listdir('/')", g, unsafely=True)
         self.assertEqual(g['files'], os.listdir('/'))
+
+
+class TestLimitConfiguration(unittest.TestCase):
+    """
+    Test that resource limits can be configured and overriden via Django settings.
+
+    We just test that the limits passed to `codejail` as we expect them to be.
+    Actual resource limiting tests are within the `codejail` package itself.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        # Make a copy of codejail settings just for this test class.
+        # Set a global REALTIME limit of 100.
+        # Set a REALTIME limit override of 200 for a special course.
+        cls.test_codejail_settings = (getattr(settings, 'CODE_JAIL', None) or {}).copy()
+        cls.test_codejail_settings['limits'] = {
+            'REALTIME': 100,
+        }
+        cls.test_codejail_settings['limit_overrides'] = {
+            'course-v1:my+special+course': {'REALTIME': 200, 'NPROC': 30},
+        }
+        cls.configure_codejail(cls.test_codejail_settings)
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+
+        # Re-apply original configuration.
+        cls.configure_codejail(getattr(settings, 'CODE_JAIL', None) or {})
+
+    @staticmethod
+    def configure_codejail(codejail_settings):
+        """
+        Given a `settings.CODE_JAIL` dictionary, apply it to the codejail package.
+
+        We use the `ConfigureCodeJailMiddleware` that comes with codejail.
+        """
+        with override_settings(CODE_JAIL=codejail_settings):
+            # To apply `settings.CODE_JAIL`, we just intialize an instance of the
+            # middleware class. We expect it to apply to changes, and then raise
+            # "MiddlewareNotUsed" to indicate that its work is done.
+            # This is exactly how the settings are applied in production (except the
+            # middleware is automatically initialized because it's an element of
+            # `settings.MIDDLEWARE`).
+            try:
+                ConfigureCodeJailMiddleware()
+            except MiddlewareNotUsed:
+                pass
+
+    def test_effective_limits_reflect_configuration(self):
+        """
+        Test that `get_effective_limits` returns configured limits with overrides
+        applied correctly.
+        """
+        # REALTIME has been configured with a global limit.
+        # Check it with no overrides context.
+        assert jail_code.get_effective_limits()['REALTIME'] == 100
+
+        # Now check REALTIME with an overrides context that we haven't configured.
+        # Should be the same.
+        assert jail_code.get_effective_limits('random-context-name')['REALTIME'] == 100
+
+        # Now check REALTIME limit for a special course.
+        # It should be overriden.
+        assert jail_code.get_effective_limits('course-v1:my+special+course')['REALTIME'] == 200
+
+        # We haven't configured a limit for NPROC.
+        # It should use the codejail default.
+        assert jail_code.get_effective_limits()['NPROC'] == 15
+
+        # But we have configured an NPROC limit override for a special course.
+        assert jail_code.get_effective_limits('course-v1:my+special+course')['NPROC'] == 30
 
 
 class DictCache(object):
