@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-11-15 20:54+0000\n"
-"PO-Revision-Date: 2020-11-15 20:54:51.134554\n"
+"POT-Creation-Date: 2020-11-22 20:52+0000\n"
+"PO-Revision-Date: 2020-11-22 20:52:49.849863\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -13532,11 +13532,6 @@ msgstr "Déädlïnés süççéssfüllý rését. Ⱡ'σяєм ιρѕυм ∂σ�
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "Updates"
 msgstr "Ûpdätés Ⱡ'σяєм ιρѕυм #"
-
-#: openedx/features/course_experience/plugins.py
-#: openedx/features/course_experience/templates/course_experience/course-reviews-fragment.html
-msgid "Reviews"
-msgstr "Révïéws Ⱡ'σяєм ιρѕυм #"
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
