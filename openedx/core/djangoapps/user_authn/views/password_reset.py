@@ -68,6 +68,12 @@ def get_password_reset_form():
         HttpResponse
 
     """
+
+    if not is_testing_environment():
+        from openedx.adg.lms.user_authn_override.password_reset import get_password_reset_form_override
+
+        return get_password_reset_form_override()
+
     form_desc = FormDescription("post", reverse("password_change_request"))
 
     # Translators: This label appears above a field on the password reset
