@@ -104,7 +104,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-11-13 11:05+0000\n"
+"POT-Creation-Date: 2020-11-15 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019\n"
 "Language-Team: Indonesian (https://www.transifex.com/open-edx/teams/6205/id/)\n"
@@ -10784,10 +10784,6 @@ msgstr ""
 msgid "Password reset completed on %(platform_name)s"
 msgstr ""
 
-#: openedx/core/djangoapps/user_authn/utils.py
-msgid "Create Account"
-msgstr "Buat Akun"
-
 #: openedx/core/djangoapps/user_authn/views/auto_auth.py
 msgid "Superuser creation not allowed"
 msgstr "Pembuatan Superuser tidak diperbolehkan"
@@ -11130,6 +11126,10 @@ msgid ""
 msgstr ""
 "Saya setuju dengan "
 "{tos_link_start}{terms_of_service}{tos_link_end}{platform_name} "
+
+#: openedx/core/djangoapps/user_authn/views/utils.py
+msgid "Create Account"
+msgstr "Buat Akun"
 
 #: openedx/core/djangoapps/util/user_messages.py
 #, python-brace-format
