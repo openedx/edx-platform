@@ -9,7 +9,7 @@ from openedx.adg.common.mailchimp_pipeline.client import MailchimpClient
 @pytest.fixture
 def mock_mailchimp_client(request, mocker):
     """
-    A fixture to created patched MailChimp client for tests. This client does not need API key or list id. This fixture
+    A fixture to create patched MailChimp client for tests. This client does not need API key or list id. This fixture
     can add new mocked methods and attributes into client, through params.
     """
     mock = mocker.MagicMock()

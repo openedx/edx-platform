@@ -2,25 +2,9 @@
 Mailchimp client
 """
 import hashlib
-import re
 
 from django.conf import settings
 from mailchimp3 import MailChimp
-
-
-def _check_email(email):
-    """
-    Validate that email is a proper email address
-
-    Args:
-        email (str): The email address to check and validate
-
-    Returns:
-        Email address
-    """
-    if not re.match(r".+@.+\..+", email):
-        raise ValueError('String passed is not a valid email address')
-    return email
 
 
 def _get_subscriber_hash(member_email):
@@ -33,7 +17,6 @@ def _get_subscriber_hash(member_email):
     Returns:
         MD5 hash of email
     """
-    _check_email(member_email)
     member_email = member_email.lower().encode()
     md = hashlib.md5(member_email)
     return md.hexdigest()

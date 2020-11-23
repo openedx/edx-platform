@@ -12,6 +12,6 @@ class CourseMetaAdmin(admin.ModelAdmin):
     Django admin customizations for CourseMeta model
     """
 
-    readonly_fields = ('course_short_id',)
-    list_display = ('course_id', 'is_prereq', 'course_short_id')
+    readonly_fields = ('short_id',)
+    list_display = ('course_id', 'is_prereq', 'short_id')
     search_fields = ('course_id',)

@@ -33,7 +33,7 @@ class CourseMeta(models.Model):
         on_delete=models.CASCADE,
     )
     is_prereq = models.BooleanField(default=False)
-    course_short_id = models.IntegerField(unique=True, default=next_course_short_id)
+    short_id = models.PositiveSmallIntegerField(unique=True, default=next_course_short_id)
 
     objects = models.Manager()
     open_pre_req_courses = OpenPreRequisiteCourseManager()
@@ -42,6 +42,6 @@ class CourseMeta(models.Model):
         app_label = 'course_meta'
 
     def __str__(self):
-        return u"CourseMeta ({title}, course_id={cid}, short_id={sid})".format(
-            title=self.course.display_name, cid=self.course.id, sid=self.course_short_id
+        return 'CourseMeta ({title}, course_id={cid}, short_id={sid})'.format(
+            title=self.course.display_name, cid=self.course.id, sid=self.short_id
         )

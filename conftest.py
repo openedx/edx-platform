@@ -82,8 +82,8 @@ def mute_signals(request):
 
     def restore_signals():
         # When the test tears down, restore the signals.
-        for signal_to_restore, receivers in restore.items():
-            signal_to_restore.receivers = receivers
+        for signal_to_restore, stored_receivers in restore.items():
+            signal_to_restore.receivers = stored_receivers
 
     # Called after a test has finished.
     request.addfinalizer(restore_signals)

@@ -16,4 +16,4 @@ class MailchimpPipelineConfig(AppConfig):
         """
         super(MailchimpPipelineConfig, self).ready()
 
-        from . import signals  # pylint: disable=unused-import
+        from . import handlers  # pylint: disable=unused-import

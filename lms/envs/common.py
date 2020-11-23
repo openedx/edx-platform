@@ -3931,6 +3931,7 @@ SUPPORT_HOW_TO_UNENROLL_LINK = ''
 
 ##################### ADG Settings ############################
 
+SUSPEND_RECEIVERS = False
+
 # Notification email settings
 NOTIFICATION_FROM_EMAIL = 'info@omnipreneurshipacademy.com'
-SUSPEND_RECEIVERS = False
