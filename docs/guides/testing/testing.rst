@@ -79,8 +79,6 @@ UI Acceptance Tests
 
 .. _Bok Choy: https://bok-choy.readthedocs.org/en/latest/tutorial.html
 
-Linting
-~~~~~~~~~~~~~~~~~~~
 
 Test Locations
 --------------
@@ -140,6 +138,11 @@ Various ways to run tests using pytest::
     pytest path/test_m­odule.p­y:­:Te­stC­las­s               # Run all tests in a class
     pytest path/test_m­odule.p­y:­:Te­stC­las­s::­tes­t_m­ethod  # Run a specific method of a class.
     pytest path/testing/                                # Run all tests in a directory.
+
+Note -
+edx-platorm having multiple services(lms, cms) in it. The environment for each service is different enough that we run some tests in both environments in jenkins. To make sure tests will pass in both environments(especially for tests in "common" directory), add the following option at end of pytest command::
+
+    pytest test --rootdir <lms or cms>
 
 For example, this command runs a single python unit test file::
 
