@@ -117,6 +117,8 @@ Note -
 
     paver -h
 
+Note -
+Unless otherwise mentioned, all the following commands should be run from inside lms docker container.
 
 Running Python Unit tests
 -------------------------
