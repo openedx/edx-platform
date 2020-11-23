@@ -1,6 +1,8 @@
 """
 Utility functions used by the badging app.
 """
+
+
 from django.conf import settings
 
 

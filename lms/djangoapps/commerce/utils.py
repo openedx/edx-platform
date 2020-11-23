@@ -1,20 +1,25 @@
 """Utilities to assist with commerce tasks."""
+
+
 import json
 import logging
-from urllib import urlencode
-from urlparse import urljoin
 
 import requests
+import six
 import waffle
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+from opaque_keys.edx.keys import CourseKey
+from six.moves.urllib.parse import urlencode, urljoin
 
+from course_modes.models import CourseMode
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, is_commerce_service_configured
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from student.models import CourseEnrollment
+
 from .models import CommerceConfiguration
 
 log = logging.getLogger(__name__)
@@ -111,10 +116,10 @@ class EcommerceService(object):
             http://localhost:8002/basket/add/?sku=5H3HG5&sku=57FHHD&bundle=3bdf1dd1-49be-4a15-9145-38901f578c5a
         """
         program_uuid = kwargs.get('program_uuid')
-        enterprise_catalog_uuid = kwargs.get('enterprise_customer_catalog_uuid')
+        enterprise_catalog_uuid = kwargs.get('catalog')
         query_params = {'sku': skus}
         if enterprise_catalog_uuid:
-            query_params.update({'enterprise_customer_catalog_uuid': enterprise_catalog_uuid})
+            query_params.update({'catalog': enterprise_catalog_uuid})
 
         url = '{checkout_page_path}?{query_params}'.format(
             checkout_page_path=self.get_absolute_ecommerce_url(self.config.basket_checkout_page),
@@ -131,8 +136,7 @@ class EcommerceService(object):
         """
         Returns the URL for the user to upgrade, or None if not applicable.
         """
-        enrollment = CourseEnrollment.get_enrollment(user, course_key)
-        verified_mode = enrollment.verified_mode if enrollment else None
+        verified_mode = CourseMode.verified_mode_for_course(course_key)
         if verified_mode:
             if self.is_enabled(user):
                 return self.get_checkout_page_url(verified_mode.sku)
@@ -154,7 +158,7 @@ def refund_entitlement(course_entitlement):
 
     if not is_commerce_service_configured():
         log.error(
-            'Ecommerce service is not configured, cannot refund for user [%s], course entitlement [%s].',
+            u'Ecommerce service is not configured, cannot refund for user [%s], course entitlement [%s].',
             enrollee.id,
             entitlement_uuid
         )
@@ -164,7 +168,7 @@ def refund_entitlement(course_entitlement):
     api_client = ecommerce_api_client(service_user)
 
     log.info(
-        'Attempting to create a refund for user [%s], course entitlement [%s]...',
+        u'Attempting to create a refund for user [%s], course entitlement [%s]...',
         enrollee.id,
         entitlement_uuid
     )
@@ -180,8 +184,8 @@ def refund_entitlement(course_entitlement):
     except Exception as exc:  # pylint: disable=broad-except
         # Catch any possible exceptions from the Ecommerce service to ensure we fail gracefully
         log.exception(
-            "Unexpected exception while attempting to initiate refund for user [%s], "
-            "course entitlement [%s] message: [%s]",
+            u"Unexpected exception while attempting to initiate refund for user [%s], "
+            u"course entitlement [%s] message: [%s]",
             enrollee.id,
             course_entitlement.uuid,
             str(exc)
@@ -190,7 +194,7 @@ def refund_entitlement(course_entitlement):
 
     if refund_ids:
         log.info(
-            'Refund successfully opened for user [%s], course entitlement [%s]: %r',
+            u'Refund successfully opened for user [%s], course entitlement [%s]: %r',
             enrollee.id,
             entitlement_uuid,
             refund_ids,
@@ -204,17 +208,18 @@ def refund_entitlement(course_entitlement):
             always_notify=True,
         )
     else:
-        log.warn('No refund opened for user [%s], course entitlement [%s]', enrollee.id, entitlement_uuid)
+        log.warning(u'No refund opened for user [%s], course entitlement [%s]', enrollee.id, entitlement_uuid)
         return False
 
 
-def refund_seat(course_enrollment):
+def refund_seat(course_enrollment, change_mode=False):
     """
     Attempt to initiate a refund for any orders associated with the seat being unenrolled,
     using the commerce service.
 
     Arguments:
         course_enrollment (CourseEnrollment): a student enrollment
+        change_mode (Boolean): change the course mode to free mode or not
 
     Returns:
         A list of the external service's IDs for any refunds that were initiated
@@ -225,18 +230,18 @@ def refund_seat(course_enrollment):
         exceptions.Timeout: if the attempt to reach the commerce service timed out.
     """
     User = get_user_model()  # pylint:disable=invalid-name
-    course_key_str = unicode(course_enrollment.course_id)
+    course_key_str = six.text_type(course_enrollment.course_id)
     enrollee = course_enrollment.user
 
     service_user = User.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
     api_client = ecommerce_api_client(service_user)
 
-    log.info('Attempting to create a refund for user [%s], course [%s]...', enrollee.id, course_key_str)
+    log.info(u'Attempting to create a refund for user [%s], course [%s]...', enrollee.id, course_key_str)
 
     refund_ids = api_client.refunds.post({'course_id': course_key_str, 'username': enrollee.username})
 
     if refund_ids:
-        log.info('Refund successfully opened for user [%s], course [%s]: %r', enrollee.id, course_key_str, refund_ids)
+        log.info(u'Refund successfully opened for user [%s], course [%s]: %r', enrollee.id, course_key_str, refund_ids)
 
         _process_refund(
             refund_ids=refund_ids,
@@ -244,8 +249,12 @@ def refund_seat(course_enrollment):
             mode=course_enrollment.mode,
             user=enrollee,
         )
+        if change_mode and CourseMode.can_auto_enroll(course_id=CourseKey.from_string(course_key_str)):
+            course_enrollment.update_enrollment(mode=CourseMode.auto_enroll_mode(course_id=course_key_str),
+                                                is_active=False, skip_refund=True)
+            course_enrollment.save()
     else:
-        log.info('No refund opened for user [%s], course [%s]', enrollee.id, course_key_str)
+        log.info(u'No refund opened for user [%s], course [%s]', enrollee.id, course_key_str)
 
     return refund_ids
 
@@ -277,10 +286,10 @@ def _process_refund(refund_ids, api_client, mode, user, always_notify=False):
                 # We are then able to approve payment. Additionally, this ensures we don't tie up an
                 # additional web worker when the E-Commerce Service tries to unenroll the learner.
                 api_client.refunds(refund_id).process.put({'action': 'approve_payment_only'})
-                log.info('Refund [%d] successfully approved.', refund_id)
+                log.info(u'Refund [%d] successfully approved.', refund_id)
             except:  # pylint: disable=bare-except
                 # Push the refund to Support to process
-                log.exception('Failed to automatically approve refund [%d]!', refund_id)
+                log.exception(u'Failed to automatically approve refund [%d]!', refund_id)
                 refunds_requiring_approval.append(refund_id)
     else:
         refunds_requiring_approval = refund_ids
@@ -295,7 +304,7 @@ def _process_refund(refund_ids, api_client, mode, user, always_notify=False):
             # 'verified' is the only enrollment mode that should presently
             # result in opening a refund request.
             log.info(
-                'Skipping refund support notification for non-verified mode for user [%s], mode: [%s]',
+                u'Skipping refund support notification for non-verified mode for user [%s], mode: [%s]',
                 user.id,
                 mode,
             )
@@ -333,10 +342,10 @@ def _send_refund_notification(user, refund_ids):
     return create_zendesk_ticket(requester_name, student.email, subject, body, tags)
 
 
-def _generate_refund_notification_body(student, refund_ids):  # pylint: disable=invalid-name
+def _generate_refund_notification_body(student, refund_ids):
     """ Returns a refund notification message body. """
     msg = _(
-        'A refund request has been initiated for {username} ({email}). '
+        u'A refund request has been initiated for {username} ({email}). '
         'To process this request, please visit the link(s) below.'
     ).format(username=student.username, email=student.email)
 
@@ -370,7 +379,7 @@ def create_zendesk_ticket(requester_name, requester_email, subject, body, tags=N
         'ticket': {
             'requester': {
                 'name': requester_name,
-                'email': unicode(requester_email)
+                'email': six.text_type(requester_email)
             },
             'subject': subject,
             'comment': {'body': body},
@@ -392,7 +401,7 @@ def create_zendesk_ticket(requester_name, requester_email, subject, body, tags=N
 
         # Check for HTTP codes other than 201 (Created)
         if response.status_code != 201:
-            log.error('Failed to create ticket. Status: [%d], Body: [%s]', response.status_code, response.content)
+            log.error(u'Failed to create ticket. Status: [%d], Body: [%s]', response.status_code, response.content)
             return False
         else:
             log.debug('Successfully created ticket.')

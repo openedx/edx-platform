@@ -1,27 +1,28 @@
+
+
 import json
 import logging
 import unittest
 import uuid
 from datetime import datetime, timedelta
 
-from courseware.models import (
-    DynamicUpgradeDeadlineConfiguration
-)
 from django.conf import settings
 from django.urls import reverse
 from django.utils.timezone import now
 from mock import patch
 from opaque_keys.edx.locator import CourseKey
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
+from openedx.core.djangoapps.user_api.models import UserOrgTag
 from student.models import CourseEnrollment
-from student.tests.factories import (TEST_PASSWORD, CourseEnrollmentFactory, UserFactory)
+from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 log = logging.getLogger(__name__)
 
@@ -139,6 +140,59 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
             course_uuid=course_uuid
         )
         assert results == CourseEntitlementSerializer(course_entitlement).data
+
+    def test_add_duplicate_entitlement(self):
+        """
+        Request with identical course_uuid and order_number should not create duplicate
+        entitlement
+        """
+        course_uuid = uuid.uuid4()
+        entitlement_data = self._get_data_set(self.user, str(course_uuid))
+
+        response = self.client.post(
+            self.entitlements_list_url,
+            data=json.dumps(entitlement_data),
+            content_type='application/json',
+        )
+        assert response.status_code == 201
+        response = self.client.post(
+            self.entitlements_list_url,
+            data=json.dumps(entitlement_data),
+            content_type='application/json',
+        )
+        assert response.status_code == 400
+        course_entitlement = CourseEntitlement.objects.filter(
+            course_uuid=course_uuid,
+            order_number=entitlement_data['order_number']
+        )
+        assert course_entitlement.count() == 1
+
+    def test_order_number_null(self):
+        """
+        Test that for same course_uuid order_number set to null is treated as unique
+        entitlement
+        """
+        course_uuid = uuid.uuid4()
+        entitlement_data = self._get_data_set(self.user, str(course_uuid))
+        entitlement_data['order_number'] = None
+
+        response = self.client.post(
+            self.entitlements_list_url,
+            data=json.dumps(entitlement_data),
+            content_type='application/json',
+        )
+        assert response.status_code == 201
+        response = self.client.post(
+            self.entitlements_list_url,
+            data=json.dumps(entitlement_data),
+            content_type='application/json',
+        )
+        assert response.status_code == 201
+        course_entitlement = CourseEntitlement.objects.filter(
+            course_uuid=course_uuid,
+            order_number=entitlement_data['order_number']
+        )
+        assert course_entitlement.count() == 2
 
     def test_default_no_policy_entry(self):
         """
@@ -309,6 +363,47 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         )
         assert course_entitlement.policy == policy
 
+    @patch("entitlements.api.v1.views.get_owners_for_course")
+    def test_email_opt_in_single_org(self, mock_get_owners):
+        course_uuid = uuid.uuid4()
+        entitlement_data = self._get_data_set(self.user, str(course_uuid))
+        entitlement_data['email_opt_in'] = True
+
+        org = u'particularly'
+        mock_get_owners.return_value = [{'key': org}]
+
+        response = self.client.post(
+            self.entitlements_list_url,
+            data=json.dumps(entitlement_data),
+            content_type='application/json',
+        )
+        assert response.status_code == 201
+
+        result_obj = UserOrgTag.objects.get(user=self.user, org=org, key='email-optin')
+        self.assertEqual(result_obj.value, u"True")
+
+    @patch("entitlements.api.v1.views.get_owners_for_course")
+    def test_email_opt_in_multiple_orgs(self, mock_get_owners):
+        course_uuid = uuid.uuid4()
+        entitlement_data = self._get_data_set(self.user, str(course_uuid))
+        entitlement_data['email_opt_in'] = True
+
+        org_1 = u'particularly'
+        org_2 = u'underwood'
+        mock_get_owners.return_value = [{'key': org_1}, {'key': org_2}]
+
+        response = self.client.post(
+            self.entitlements_list_url,
+            data=json.dumps(entitlement_data),
+            content_type='application/json',
+        )
+        assert response.status_code == 201
+
+        result_obj = UserOrgTag.objects.get(user=self.user, org=org_1, key='email-optin')
+        self.assertEqual(result_obj.value, u"True")
+        result_obj = UserOrgTag.objects.get(user=self.user, org=org_2, key='email-optin')
+        self.assertEqual(result_obj.value, u"True")
+
     def test_add_entitlement_with_support_detail(self):
         """
         Verify that an EntitlementSupportDetail entry is made when the request includes support interaction information.
@@ -459,7 +554,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         )
         assert response.status_code == 200
 
-        results = response.data.get('results', [])  # pylint: disable=no-member
+        results = response.data.get('results', [])
         assert results == CourseEntitlementSerializer([entitlement], many=True).data
 
     def test_staff_get_only_staff_entitlements(self):
@@ -488,7 +583,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
             content_type='application/json',
         )
         assert response.status_code == 200
-        results = response.data.get('results', [])  # pylint: disable=no-member
+        results = response.data.get('results', [])
         # Make sure that the first result isn't expired, and the second one is also not for staff users
         assert results[0].get('expired_at') is None and results[1].get('expired_at') is None
 
@@ -510,7 +605,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         )
         assert response.status_code == 200
 
-        results = response.data.get('results', [])  # pylint: disable=no-member
+        results = response.data.get('results', [])
         assert results[0].get('expired_at') is None and results[1].get('expired_at')
 
     def test_get_user_entitlements(self):
@@ -557,7 +652,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         )
         assert response.status_code == 200
 
-        results = response.data  # pylint: disable=no-member
+        results = response.data
         assert results.get('expired_at')
 
     def test_delete_and_revoke_entitlement(self):
@@ -572,15 +667,12 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         course_entitlement.refresh_from_db()
         assert course_entitlement.expired_at is not None
 
-    def test_revoke_unenroll_entitlement(self):
-        course_entitlement = CourseEntitlementFactory.create()
+    @patch("entitlements.models.get_course_uuid_for_course")
+    def test_revoke_unenroll_entitlement(self, mock_course_uuid):
+        enrollment = CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, is_active=True)
+        course_entitlement = CourseEntitlementFactory.create(user=self.user, enrollment_course_run=enrollment)
+        mock_course_uuid.return_value = course_entitlement.course_uuid
         url = reverse(self.ENTITLEMENTS_DETAILS_PATH, args=[str(course_entitlement.uuid)])
-
-        enrollment = CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
-
-        course_entitlement.refresh_from_db()
-        course_entitlement.enrollment_course_run = enrollment
-        course_entitlement.save()
 
         assert course_entitlement.enrollment_course_run is not None
 
@@ -754,10 +846,12 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
         assert CourseEnrollment.is_enrolled(self.user, self.course.id)
         assert course_entitlement.enrollment_course_run is not None
 
+    @patch("entitlements.models.get_course_uuid_for_course")
     @patch("entitlements.api.v1.views.get_course_runs_for_course")
-    def test_user_can_unenroll(self, mock_get_course_runs):
+    def test_user_can_unenroll(self, mock_get_course_runs, mock_get_course_uuid):
         course_entitlement = CourseEntitlementFactory.create(user=self.user, mode=CourseMode.VERIFIED)
         mock_get_course_runs.return_value = self.return_values
+        mock_get_course_uuid.return_value = course_entitlement.course_uuid
 
         url = reverse(
             self.ENTITLEMENTS_ENROLLMENT_NAMESPACE,
@@ -901,14 +995,16 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
 
         expected_message = 'The Course Run ID is not a match for this Course Entitlement.'
         assert response.status_code == 400
-        assert response.data['message'] == expected_message  # pylint: disable=no-member
+        assert response.data['message'] == expected_message
         assert not CourseEnrollment.is_enrolled(self.user, fake_course_key)
 
-    @patch('entitlements.api.v1.views.refund_entitlement', return_value=True)
+    @patch('entitlements.models.refund_entitlement', return_value=True)
     @patch('entitlements.api.v1.views.get_course_runs_for_course')
-    def test_user_can_revoke_and_refund(self, mock_get_course_runs, mock_refund_entitlement):
+    @patch("entitlements.models.get_course_uuid_for_course")
+    def test_user_can_revoke_and_refund(self, mock_course_uuid, mock_get_course_runs, mock_refund_entitlement):
         course_entitlement = CourseEntitlementFactory.create(user=self.user, mode=CourseMode.VERIFIED)
         mock_get_course_runs.return_value = self.return_values
+        mock_course_uuid.return_value = course_entitlement.course_uuid
 
         url = reverse(
             self.ENTITLEMENTS_ENROLLMENT_NAMESPACE,
@@ -939,14 +1035,13 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
 
         course_entitlement.refresh_from_db()
         assert mock_refund_entitlement.is_called
-        assert (CourseEntitlementSerializer(mock_refund_entitlement.call_args[1]['course_entitlement']).data ==
-                CourseEntitlementSerializer(course_entitlement).data)
+        assert mock_refund_entitlement.call_args[1]['course_entitlement'] == course_entitlement
         assert not CourseEnrollment.is_enrolled(self.user, self.course.id)
         assert course_entitlement.enrollment_course_run is None
         assert course_entitlement.expired_at is not None
 
     @patch('entitlements.api.v1.views.CourseEntitlement.is_entitlement_refundable', return_value=False)
-    @patch('entitlements.api.v1.views.refund_entitlement', return_value=True)
+    @patch('entitlements.models.refund_entitlement', return_value=True)
     @patch('entitlements.api.v1.views.get_course_runs_for_course')
     def test_user_can_revoke_and_no_refund_available(
             self,
@@ -990,7 +1085,7 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
         assert course_entitlement.expired_at is None
 
     @patch('entitlements.api.v1.views.CourseEntitlement.is_entitlement_refundable', return_value=True)
-    @patch('entitlements.api.v1.views.refund_entitlement', return_value=False)
+    @patch('entitlements.models.refund_entitlement', return_value=False)
     @patch("entitlements.api.v1.views.get_course_runs_for_course")
     def test_user_is_not_unenrolled_on_failed_refund(
             self,

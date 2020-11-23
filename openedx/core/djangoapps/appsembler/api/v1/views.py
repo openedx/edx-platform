@@ -3,7 +3,6 @@
 Only include view classes here. See the tests/test_permissions.py:get_api_classes()
 method.
 """
-from distutils.util import strtobool
 from functools import partial
 import logging
 import random
@@ -19,33 +18,36 @@ import django.contrib.sites.shortcuts
 
 
 from rest_framework import status, viewsets
-from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.exceptions import NotFound
-from rest_framework.filters import DjangoFilterBackend
-from rest_framework.permissions import IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 
-from organizations.models import OrganizationCourse
-
-from enrollment.serializers import CourseEnrollmentSerializer
-
-# from courseware.courses import get_course_by_id, get_course_with_access
 from courseware.courses import get_course_by_id
 
+from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentSerializer
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
-from student.forms import PasswordResetFormNoActive
+from openedx.core.djangoapps.user_authn.views.register import create_account_with_params
+from openedx.core.djangoapps.user_authn.views.password_reset import PasswordResetFormNoActive
 from student.models import CourseEnrollment
-from student.views import create_account_with_params
+
+from .mixins import TahoeAuthMixin
+
+
+if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
+    def check_account_exists(**kwargs):
+        """
+        from openedx.core.djangoapps.user_api.accounts.api import check_account_exists import is broken,
+        this helper silent the error.
+        """
+else:
+    from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
+
 
 from lms.djangoapps.instructor.enrollment import (
     enroll_email,
     get_email_params,
     unenroll_email,
-    # get_user_email_language,
-    # send_beta_role_email,
-    # send_mail_to_student,
 )
 
 from openedx.core.djangoapps.appsembler.api.helpers import as_course_key
@@ -70,7 +72,7 @@ from openedx.core.djangoapps.appsembler.api.v1.waffle import FIX_ENROLLMENT_RESU
 
 # TODO: Just move into v1 directory
 from openedx.core.djangoapps.appsembler.api.permissions import (
-    IsSiteAdminUser, TahoeAPIUserThrottle
+    TahoeAPIUserThrottle
 )
 from openedx.core.djangoapps.appsembler.api.sites import (
     get_courses_for_site,
@@ -115,24 +117,6 @@ def send_password_reset_email(request):
         return True
     else:
         return False
-
-
-#
-# Mixins for API views
-#
-
-
-class TahoeAuthMixin(object):
-    """Provides a common authorization base for the Tahoe multi-site aware API views
-    """
-    authentication_classes = (
-        SessionAuthentication,
-        TokenAuthentication,
-    )
-    permission_classes = (
-        IsAuthenticated,
-        IsSiteAdminUser,
-    )
 
 
 class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):

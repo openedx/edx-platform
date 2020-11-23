@@ -1,6 +1,8 @@
 """
 Grades Transformer
 """
+
+
 import json
 from base64 import b64encode
 from functools import reduce as functools_reduce
@@ -91,7 +93,7 @@ class GradesTransformer(BlockStructureTransformer):
             separators=(',', ':'),  # Remove spaces from separators for more compact representation
             sort_keys=True,
         )
-        return b64encode(sha1(ordered_policy).digest())
+        return b64encode(sha1(ordered_policy.encode('utf-8')).digest()).decode('utf-8')
 
     @classmethod
     def _collect_explicit_graded(cls, block_structure):
@@ -150,7 +152,7 @@ class GradesTransformer(BlockStructureTransformer):
         max_score = module.max_score()
         block_structure.set_transformer_block_field(module.location, cls, 'max_score', max_score)
         if max_score is None:
-            log.warning("GradesTransformer: max_score is None for {}".format(module.location))
+            log.warning(u"GradesTransformer: max_score is None for {}".format(module.location))
 
     @classmethod
     def _collect_grading_policy_hash(cls, block_structure):

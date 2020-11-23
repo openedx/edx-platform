@@ -2,7 +2,7 @@
 Tests throttling (rate limiting) for the Tahoe API
 """
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.utils import override_settings
 
 from rest_framework import status
@@ -70,7 +70,7 @@ class TahoeApiThrotteTest(APITestCase):
 
         This needs investigation.
         """
-        for attempt in xrange(self.rate_limit):
+        for attempt in range(self.rate_limit):
             post_data = make_post_data(attempt)
             response = self.client.post(self.url, post_data)
             self.assertEqual(response.status_code, status.HTTP_200_OK)

@@ -1,6 +1,8 @@
 """
 Unittest for generate a test course in an given modulestore
 """
+
+
 import json
 
 import ddt
@@ -41,7 +43,7 @@ class TestGenerateCourses(ModuleStoreTestCase):
         """
         Test that providing an invalid JSON object will result in the appropriate command error
         """
-        with self.assertRaisesRegexp(CommandError, "Invalid JSON object"):
+        with self.assertRaisesRegex(CommandError, "Invalid JSON object"):
             arg = "invalid_json"
             call_command("generate_courses", arg)
 
@@ -49,7 +51,7 @@ class TestGenerateCourses(ModuleStoreTestCase):
         """
         Test that a missing list of courses in json will result in the appropriate command error
         """
-        with self.assertRaisesRegexp(CommandError, "JSON object is missing courses list"):
+        with self.assertRaisesRegex(CommandError, "JSON object is missing courses list"):
             settings = {}
             arg = json.dumps(settings)
             call_command("generate_courses", arg)

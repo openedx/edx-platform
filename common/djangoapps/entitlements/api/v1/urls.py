@@ -1,10 +1,12 @@
-from django.conf.urls import url, include
+
+
+from django.conf.urls import include, url
 from rest_framework.routers import DefaultRouter
 
-from .views import EntitlementViewSet, EntitlementEnrollmentViewSet
+from .views import EntitlementEnrollmentViewSet, EntitlementViewSet
 
 router = DefaultRouter()
-router.register(r'entitlements', EntitlementViewSet, base_name='entitlements')
+router.register(r'entitlements', EntitlementViewSet, basename='entitlements')
 
 ENROLLMENTS_VIEW = EntitlementEnrollmentViewSet.as_view({
     'post': 'create',

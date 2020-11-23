@@ -18,6 +18,18 @@ define([
                 'click .button-toggle-expand-collapse': 'toggleExpandCollapse'
             },
 
+            /**
+             * keep a running timeout counter of 5,000 milliseconds
+             * for finding an element; see afterRender and scrollToElement function
+             */
+            findElementPollingTimeout: 5000,
+
+            /**
+             * used as the delay parameter to setTimeout in scrollToElement
+             * function for polling for an element
+             */
+            pollingDelay: 100,
+
             options: {
                 collapsedClass: 'is-collapsed'
             },
@@ -70,7 +82,7 @@ define([
                 }
 
                 /* globals course */
-                if (this.model.get('highlights_enabled') && course.get('self_paced')) {
+                if (this.model.get('highlights_enabled')) {
                     this.highlightsEnableView = new CourseHighlightsEnableView({
                         el: this.$('.status-highlights-enabled'),
                         model: this.model
@@ -88,6 +100,32 @@ define([
                 this.outlineView.render();
                 this.outlineView.setViewState(this.initialState || {});
                 return $.Deferred().resolve().promise();
+            },
+
+            afterRender: function() {
+                this.scrollToElement();
+            },
+
+            /**
+             * recursively poll for element specified by the URL fragment
+             * at 100 millisecond intervals until element is found or
+             * Polling is reached
+             */
+            scrollToElement: function () {
+                this.findElementPollingTimeout -= this.pollingDelay;
+
+                const elementID = window.location.hash.replace("#", "");
+
+                if (this.findElementPollingTimeout > 0) {
+                    if (elementID) {
+                        const element = document.getElementById(elementID);
+                        if (element) {
+                            element.scrollIntoView();
+                        } else {
+                            setTimeout(this.scrollToElement, this.pollingDelay);
+                        }
+                    }
+                }
             },
 
             hasContent: function() {

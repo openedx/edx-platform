@@ -1,11 +1,18 @@
 """
 Django module for Course Metadata class -- manages advanced settings and related parameters
 """
+
+
+import six
+from crum import get_current_user
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from six import text_type
 from xblock.fields import Scope
 
+from cms.djangoapps.contentstore.config.waffle import ENABLE_PROCTORING_PROVIDER_OVERRIDES
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
+from student.roles import GlobalStaff
 from xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.modulestore.django import modulestore
 
@@ -18,9 +25,9 @@ class CourseMetadata(object):
     editable metadata.
     '''
     # The list of fields that wouldn't be shown in Advanced Settings.
-    # Should not be used directly. Instead the filtered_list method should
+    # Should not be used directly. Instead the get_blacklist_of_fields method should
     # be used if the field needs to be filtered depending on the feature flag.
-    FILTERED_LIST = [
+    FIELDS_BLACK_LIST = [
         'cohort_config',
         'xml_attributes',
         'start',
@@ -60,71 +67,81 @@ class CourseMetadata(object):
         'chrome',
         'default_tab',
         'highlights_enabled_for_messaging',
+        'is_onboarding_exam',
     ]
 
     @classmethod
-    def filtered_list(cls, org=None):
+    def get_blacklist_of_fields(cls, course_key):
         """
-        Filter fields based on feature flag, i.e. enabled, disabled.
+        Returns a list of fields to not include in Studio Advanced settings based on a
+        feature flag (i.e. enabled or disabled).
         """
         # Copy the filtered list to avoid permanently changing the class attribute.
-        filtered_list = list(cls.FILTERED_LIST)
+        black_list = list(cls.FIELDS_BLACK_LIST)
 
         # Do not show giturl if feature is not enabled.
         if not settings.FEATURES.get('ENABLE_EXPORT_GIT'):
-            filtered_list.append('giturl')
+            black_list.append('giturl')
 
         # Do not show edxnotes if the feature is disabled.
         if not settings.FEATURES.get('ENABLE_EDXNOTES'):
-            filtered_list.append('edxnotes')
+            black_list.append('edxnotes')
+
+        # Do not show video auto advance if the feature is disabled
+        if not settings.FEATURES.get('ENABLE_OTHER_COURSE_SETTINGS'):
+            black_list.append('other_course_settings')
 
         # Do not show video_upload_pipeline if the feature is disabled.
         if not settings.FEATURES.get('ENABLE_VIDEO_UPLOAD_PIPELINE'):
-            filtered_list.append('video_upload_pipeline')
+            black_list.append('video_upload_pipeline')
 
         # Do not show video auto advance if the feature is disabled
         if not settings.FEATURES.get('ENABLE_AUTOADVANCE_VIDEOS'):
-            filtered_list.append('video_auto_advance')
+            black_list.append('video_auto_advance')
 
         # Do not show social sharing url field if the feature is disabled.
         if (not hasattr(settings, 'SOCIAL_SHARING_SETTINGS') or
                 not getattr(settings, 'SOCIAL_SHARING_SETTINGS', {}).get("CUSTOM_COURSE_URLS")):
-            filtered_list.append('social_sharing_url')
+            black_list.append('social_sharing_url')
 
         # Do not show teams configuration if feature is disabled.
         if not settings.FEATURES.get('ENABLE_TEAMS'):
-            filtered_list.append('teams_configuration')
+            black_list.append('teams_configuration')
 
         if not settings.FEATURES.get('ENABLE_VIDEO_BUMPER'):
-            filtered_list.append('video_bumper')
+            black_list.append('video_bumper')
 
         # Do not show enable_ccx if feature is not enabled.
         if not settings.FEATURES.get('CUSTOM_COURSES_EDX'):
-            filtered_list.append('enable_ccx')
-            filtered_list.append('ccx_connector')
+            black_list.append('enable_ccx')
+            black_list.append('ccx_connector')
 
         # Do not show "Issue Open Badges" in Studio Advanced Settings
         # if the feature is disabled.
         if not settings.FEATURES.get('ENABLE_OPENBADGES'):
-            filtered_list.append('issue_badges')
+            black_list.append('issue_badges')
 
         # If the XBlockStudioConfiguration table is not being used, there is no need to
         # display the "Allow Unsupported XBlocks" setting.
         if not XBlockStudioConfigurationFlag.is_enabled():
-            filtered_list.append('allow_unsupported_xblocks')
+            black_list.append('allow_unsupported_xblocks')
 
-        # Appsembler specific, we don't display the field if the site doesn't
-        # belong to a MSFT LP
-        # if org and not get_value_for_org(
-        #     org,
-        #     "CUSTOMER_IS_MICROSOFT_LEARNING_PARTNER",
-        #     settings.APPSEMBLER_FEATURES.get(
-        #        "CUSTOMER_IS_MICROSOFT_LEARNING_PARTNER"
-        #    )
-        # ):
-        #     filtered_list.append('is_microsoft_course')
+        # If the ENABLE_PROCTORING_PROVIDER_OVERRIDES waffle flag is not enabled,
+        # do not show "Proctoring Configuration" in Studio Advanced Settings.
+        if not ENABLE_PROCTORING_PROVIDER_OVERRIDES.is_enabled(course_key):
+            black_list.append('proctoring_provider')
 
-        return filtered_list
+        # Do not show "Course Visibility For Unenrolled Learners" in Studio Advanced Settings
+        # if the enable_anonymous_access flag is not enabled
+        if not COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course_key=course_key):
+            black_list.append('course_visibility')
+
+        # Do not show "Create Zendesk Tickets For Suspicious Proctored Exam Attempts" in
+        # Studio Advanced Settings if the user is not edX staff.
+        if not GlobalStaff().has_user(get_current_user()):
+            black_list.append('create_zendesk_tickets')
+
+        return black_list
 
     @classmethod
     def fetch(cls, descriptor):
@@ -134,8 +151,10 @@ class CourseMetadata(object):
         """
         result = {}
         metadata = cls.fetch_all(descriptor)
-        for key, value in metadata.iteritems():
-            if key in cls.filtered_list(org=descriptor.org):
+        black_list_of_fields = cls.get_blacklist_of_fields(descriptor.id)
+
+        for key, value in six.iteritems(metadata):
+            if key in black_list_of_fields:
                 continue
             result[key] = value
         return result
@@ -150,16 +169,17 @@ class CourseMetadata(object):
             if field.scope != Scope.settings:
                 continue
 
-            field_help = _(field.help)                  # pylint: disable=translation-of-non-string
+            field_help = _(field.help)
             help_args = field.runtime_options.get('help_format_args')
             if help_args is not None:
                 field_help = field_help.format(**help_args)
 
             result[field.name] = {
                 'value': field.read_json(descriptor),
-                'display_name': _(field.display_name),    # pylint: disable=translation-of-non-string
+                'display_name': _(field.display_name),
                 'help': field_help,
-                'deprecated': field.runtime_options.get('deprecated', False)
+                'deprecated': field.runtime_options.get('deprecated', False),
+                'hide_on_enabled_publisher': field.runtime_options.get('hide_on_enabled_publisher', False)
             }
         return result
 
@@ -170,24 +190,24 @@ class CourseMetadata(object):
 
         Ensures none of the fields are in the blacklist.
         """
-        filtered_list = cls.filtered_list(org=descriptor.org)
+        blacklist_of_fields = cls.get_blacklist_of_fields(descriptor.id)
         # Don't filter on the tab attribute if filter_tabs is False.
         if not filter_tabs:
-            filtered_list.remove("tabs")
+            blacklist_of_fields.remove("tabs")
 
         # Validate the values before actually setting them.
         key_values = {}
 
-        for key, model in jsondict.iteritems():
+        for key, model in six.iteritems(jsondict):
             # should it be an error if one of the filtered list items is in the payload?
-            if key in filtered_list:
+            if key in blacklist_of_fields:
                 continue
             try:
                 val = model['value']
                 if hasattr(descriptor, key) and getattr(descriptor, key) != val:
                     key_values[key] = descriptor.fields[key].from_json(val)
             except (TypeError, ValueError) as err:
-                raise ValueError(_("Incorrect format for field '{name}'. {detailed_message}").format(
+                raise ValueError(_(u"Incorrect format for field '{name}'. {detailed_message}").format(
                     name=model['display_name'], detailed_message=text_type(err)))
 
         return cls.update_from_dict(key_values, descriptor, user)
@@ -206,17 +226,18 @@ class CourseMetadata(object):
             errors: list of error objects
             result: the updated course metadata or None if error
         """
-        filtered_list = cls.filtered_list(org=descriptor.org)
-        if not filter_tabs:
-            filtered_list.remove("tabs")
+        blacklist_of_fields = cls.get_blacklist_of_fields(descriptor.id)
 
-        filtered_dict = dict((k, v) for k, v in jsondict.iteritems() if k not in filtered_list)
+        if not filter_tabs:
+            blacklist_of_fields.remove("tabs")
+
+        filtered_dict = dict((k, v) for k, v in six.iteritems(jsondict) if k not in blacklist_of_fields)
         did_validate = True
         errors = []
         key_values = {}
         updated_data = None
 
-        for key, model in filtered_dict.iteritems():
+        for key, model in six.iteritems(filtered_dict):
             try:
                 val = model['value']
                 if hasattr(descriptor, key) and getattr(descriptor, key) != val:
@@ -236,10 +257,10 @@ class CourseMetadata(object):
         """
         Update metadata descriptor from key_values. Saves to modulestore if save is true.
         """
-        for key, value in key_values.iteritems():
+        for key, value in six.iteritems(key_values):
             setattr(descriptor, key, value)
 
-        if save and len(key_values):
+        if save and key_values:
             modulestore().update_item(descriptor, user.id)
 
         return cls.fetch(descriptor)

@@ -1,5 +1,5 @@
 [run]
-data_file = reports/bok_choy/.coverage
+data_file = reports/bok_choy/${TEST_SUITE}.coverage
 source =
     lms
     cms

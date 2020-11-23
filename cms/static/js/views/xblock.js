@@ -137,7 +137,12 @@ define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/vie
                 // that at least the rendered HTML will be in place.
                 try {
                     return this.addXBlockFragmentResources(resources).done(function() {
-                        blockView.updateHtml(element, html);
+                        console.log('Updating HTML');
+                        try {
+                            blockView.updateHtml(element, html);
+                        } catch (e) {
+                            console.error(e, e.stack);
+                        }
                     });
                 } catch (e) {
                     console.error(e, e.stack);

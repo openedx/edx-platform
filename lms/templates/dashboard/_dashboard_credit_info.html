@@ -1,20 +1,23 @@
-<%page args="credit_status" />
+<%page args="credit_status" expression_filter="h"/>
 <%!
     from django.utils.translation import ugettext as _
+    from openedx.core.djangolib.markup import HTML, Text
 %>
 <%namespace name='static' file='../static_content.html'/>
 
 
 % if credit_status["eligible"]:
     <%
-        provider_link = '<a href="{href}" target="_blank">{name}</a>'.format(
+        provider_link = HTML('<a href="{href}" rel="noopener" target="_blank">{name}</a>').format(
             href=credit_status["provider_status_url"],
             name=credit_status["provider_name"])
 
         error = credit_status['error']
 
         # Translators: provider_name is the name of a credit provider or university (e.g. State University)
-        credit_msg = _("You have completed this course and are eligible to purchase course credit. Select <strong>Get Credit</strong> to get started.")
+        credit_msg = Text(_("You have completed this course and are eligible to purchase course credit. Select {strong_start}Get Credit{strong_end} to get started.")).format(
+            strong_start=HTML('<strong>'),
+            strong_end=HTML('</strong>>'))
         if credit_status['provider_name']:
             credit_msg = _("You are now eligible for credit from {provider}. Congratulations!").format(provider=credit_status['provider_name'])
 
@@ -32,8 +35,10 @@
                 # Learner must initiate the credit request
 
                 # Translators: link_to_provider_site is a link to an external webpage. The text of the link will be the name of a  credit provider, such as 'State University' or 'Happy Fun Company'.
-                credit_msg = _("Thank you for your payment. To receive course credit, you must now request credit "
-                "at the {link_to_provider_site} website. Select <b>Request Credit</b> to get started.").format(
+                credit_msg = Text(_("Thank you for your payment. To receive course credit, you must now request credit "
+                "at the {link_to_provider_site} website. Select {start_bold}Request Credit{end_bold} to get started.")).format(
+                    start_bold=HTML('<b>'),
+                    end_bold=HTML('</b>'),
                     link_to_provider_site=provider_link,
                 )
                 credit_msg_class = "credit-request-not-started-msg"
@@ -49,7 +54,9 @@
             elif request_status == 'approved':
                 # Credit granted!
                 # Translators: link_to_provider_site is a link to an external webpage. The text of the link will be the name of a credit provider, such as 'State University' or 'Happy Fun Company'. provider_name is the name of credit provider.
-                credit_msg = _("<b>Congratulations!</b> {provider_name} has approved your request for course credit. To see your course credit, visit the {link_to_provider_site} website.").format(
+                credit_msg = Text(_("{start_bold}Congratulations!{end_bold} {provider_name} has approved your request for course credit. To see your course credit, visit the {link_to_provider_site} website.")).format(
+                    start_bold=HTML('<b>'),
+                    end_bold=HTML('</b>'),
                     provider_name=credit_status["provider_name"],
                     link_to_provider_site=provider_link,
                 )
@@ -59,7 +66,7 @@
             elif request_status == 'rejected':
                 # REJECTED (by the credit provider)!
                 ## Translators: link_to_provider_site is a link to an external webpage. The text of the link will be the name of a credit provider, such as 'State University' or 'Happy Fun Company'. provider_name is the name of credit provider.
-                credit_msg = _("{provider_name} did not approve your request for course credit. For more information, contact {link_to_provider_site} directly.").format(
+                credit_msg = Text(_("{provider_name} did not approve your request for course credit. For more information, contact {link_to_provider_site} directly.")).format(
                     provider_name=credit_status["provider_name"],
                     link_to_provider_site=provider_link,
                 )
@@ -70,15 +77,15 @@
     <div class="message message-status is-shown credit-message">
 
         <p class="message-copy is-hidden credit-error-msg" data-credit-error="${credit_status['error']}">
-            ${_("An error occurred with this transaction. For help, contact {support_email}.").format(
-            support_email=u'<a href="mailto:{address}">{address}</a>'.format(
+            ${Text(_("An error occurred with this transaction. For help, contact {support_email}.")).format(
+            support_email=HTML(u'<a href="mailto:{address}">{address}</a>').format(
             address=settings.DEFAULT_FEEDBACK_EMAIL
             )
             )}
         </p>
         <div class="credit-action">
             % if credit_btn_label:
-                <a class="btn credit-btn ${credit_btn_class}" href="${credit_btn_href | h}" target="_blank" data-course-key="${credit_status['course_key'] | h}" data-user="${user.username | h}" data-provider="${credit_status['provider_id'] | h}">
+                <a class="btn credit-btn ${credit_btn_class}" href="${credit_btn_href}" rel="noopener" target="_blank" data-course-key="${credit_status['course_key']}" data-user="${user.username}" data-provider="${credit_status['provider_id']}">
                     ${credit_btn_label}
                 </a>
             % endif

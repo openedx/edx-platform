@@ -1,12 +1,16 @@
 """
 Blocks API Transformer
 """
+
+
 from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 
 from .block_counts import BlockCountsTransformer
 from .block_depth import BlockDepthTransformer
 from .navigation import BlockNavigationTransformer
 from .student_view import StudentViewTransformer
+from .video_urls import VideoBlockURLTransformer
+from ..toggles import ENABLE_VIDEO_URL_REWRITE
 
 
 class BlocksAPITransformer(BlockStructureTransformer):
@@ -20,7 +24,9 @@ class BlocksAPITransformer(BlockStructureTransformer):
         BlockDepthTransformer
         BlockNavigationTransformer
 
-    Note: BlockDepthTransformer must be executed before BlockNavigationTransformer.
+    Note:
+        * BlockDepthTransformer must be executed before BlockNavigationTransformer.
+        * StudentViewTransformer must be executed before VideoBlockURLTransformer.
     """
 
     WRITE_VERSION = 1
@@ -63,3 +69,5 @@ class BlocksAPITransformer(BlockStructureTransformer):
         BlockCountsTransformer(self.block_types_to_count).transform(usage_info, block_structure)
         BlockDepthTransformer(self.depth).transform(usage_info, block_structure)
         BlockNavigationTransformer(self.nav_depth).transform(usage_info, block_structure)
+        if ENABLE_VIDEO_URL_REWRITE.is_enabled(block_structure.root_block_usage_key.course_key):
+            VideoBlockURLTransformer().transform(usage_info, block_structure)

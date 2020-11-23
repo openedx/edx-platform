@@ -1,17 +1,18 @@
 """ Tests for library reindex command """
-import ddt
-from django.core.management import call_command, CommandError
-import mock
 
+
+import ddt
+import mock
+import six
+from django.core.management import CommandError, call_command
+from opaque_keys import InvalidKeyError
+
+from contentstore.courseware_index import SearchIndexingError
+from contentstore.management.commands.reindex_library import Command as ReindexCommand
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
-
-from opaque_keys import InvalidKeyError
-
-from contentstore.management.commands.reindex_library import Command as ReindexCommand
-from contentstore.courseware_index import SearchIndexingError
 
 
 @ddt.ddt
@@ -49,7 +50,7 @@ class TestReindexLibrary(ModuleStoreTestCase):
 
     def test_given_no_arguments_raises_command_error(self):
         """ Test that raises CommandError for incorrect arguments """
-        with self.assertRaisesRegexp(CommandError, ".* requires one or more *"):
+        with self.assertRaisesRegex(CommandError, ".* requires one or more *"):
             call_command('reindex_library')
 
     @ddt.data('qwerty', 'invalid_key', 'xblock-v1:qwe+rty')
@@ -60,35 +61,35 @@ class TestReindexLibrary(ModuleStoreTestCase):
 
     def test_given_course_key_raises_command_error(self):
         """ Test that raises CommandError if course key is passed """
-        with self.assertRaisesRegexp(CommandError, ".* is not a library key"):
-            call_command('reindex_library', unicode(self.first_course.id))
+        with self.assertRaisesRegex(CommandError, ".* is not a library key"):
+            call_command('reindex_library', six.text_type(self.first_course.id))
 
-        with self.assertRaisesRegexp(CommandError, ".* is not a library key"):
-            call_command('reindex_library', unicode(self.second_course.id))
+        with self.assertRaisesRegex(CommandError, ".* is not a library key"):
+            call_command('reindex_library', six.text_type(self.second_course.id))
 
-        with self.assertRaisesRegexp(CommandError, ".* is not a library key"):
+        with self.assertRaisesRegex(CommandError, ".* is not a library key"):
             call_command(
                 'reindex_library',
-                unicode(self.second_course.id),
-                unicode(self._get_lib_key(self.first_lib))
+                six.text_type(self.second_course.id),
+                six.text_type(self._get_lib_key(self.first_lib))
             )
 
     def test_given_id_list_indexes_libraries(self):
         """ Test that reindexes libraries when given single library key or a list of library keys """
         with mock.patch(self.REINDEX_PATH_LOCATION) as patched_index, \
                 mock.patch(self.MODULESTORE_PATCH_LOCATION, mock.Mock(return_value=self.store)):
-            call_command('reindex_library', unicode(self._get_lib_key(self.first_lib)))
+            call_command('reindex_library', six.text_type(self._get_lib_key(self.first_lib)))
             self.assertEqual(patched_index.mock_calls, self._build_calls(self.first_lib))
             patched_index.reset_mock()
 
-            call_command('reindex_library', unicode(self._get_lib_key(self.second_lib)))
+            call_command('reindex_library', six.text_type(self._get_lib_key(self.second_lib)))
             self.assertEqual(patched_index.mock_calls, self._build_calls(self.second_lib))
             patched_index.reset_mock()
 
             call_command(
                 'reindex_library',
-                unicode(self._get_lib_key(self.first_lib)),
-                unicode(self._get_lib_key(self.second_lib))
+                six.text_type(self._get_lib_key(self.first_lib)),
+                six.text_type(self._get_lib_key(self.second_lib))
             )
             expected_calls = self._build_calls(self.first_lib, self.second_lib)
             self.assertEqual(patched_index.mock_calls, expected_calls)
@@ -103,7 +104,7 @@ class TestReindexLibrary(ModuleStoreTestCase):
 
                 patched_yes_no.assert_called_once_with(ReindexCommand.CONFIRMATION_PROMPT, default='no')
                 expected_calls = self._build_calls(self.first_lib, self.second_lib)
-                self.assertItemsEqual(patched_index.mock_calls, expected_calls)
+                six.assertCountEqual(self, patched_index.mock_calls, expected_calls)
 
     def test_given_all_key_prompts_and_reindexes_all_libraries_cancelled(self):
         """ Test that does not reindex anything when --all key is given and cancelled """
@@ -122,4 +123,4 @@ class TestReindexLibrary(ModuleStoreTestCase):
             patched_index.side_effect = SearchIndexingError("message", [])
 
             with self.assertRaises(SearchIndexingError):
-                call_command('reindex_library', unicode(self._get_lib_key(self.second_lib)))
+                call_command('reindex_library', six.text_type(self._get_lib_key(self.second_lib)))

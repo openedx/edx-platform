@@ -1,0 +1,259 @@
+def runQualityTests() {
+    sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+        // Determine git refspec, branch, and clone type
+        git_shallow_clone = true
+        git_extensions = []
+        if (env.ghprbActualCommit) {
+            git_branch = "${ghprbActualCommit}"
+            refspec = "+refs/pull/${ghprbPullId}/*:refs/remotes/origin/pr/${ghprbPullId}/*"
+            if (SHARD == "4") {
+                git_shallow_clone = false
+                git_extensions.add([$class: 'WipeWorkspace'])
+                refspec = refspec + " +refs/heads/${TARGET_BRANCH}:refs/remotes/origin/${TARGET_BRANCH}"
+            }
+        } else {
+            git_branch = "${BRANCH_NAME}"
+            refspec = "+refs/heads/${BRANCH_NAME}:refs/remotes/origin/${BRANCH_NAME}"
+        }
+        git_extensions.add([$class: 'CloneOption', honorRefspec: true, noTags: true, shallow: git_shallow_clone ])
+
+        checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: git_branch]],
+            doGenerateSubmoduleConfigurations: false, extensions: git_extensions, submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+            refspec: refspec, url: "git@github.com:edx/${REPO_NAME}.git"]]]
+
+        sh "bash scripts/all-tests.sh"
+        stash includes: '**/reports/**/*', name: "${TEST_SUITE}-${SHARD}-reports"
+    }
+}
+
+def getTargetBranch(job_name) {
+    if (env.ghprbTargetBranch) {
+        return env.ghprbTargetBranch
+    } else {
+        return "${BRANCH_NAME}"
+    }
+}
+
+def qualityTestCleanup() {
+    archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/**/*,test_root/log/**/*.log,*.log'
+    sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
+    junit 'reports/quality_junitxml/*.xml'
+}
+
+pipeline {
+    agent { label "juniper-worker" }
+    options {
+        sendSplunkConsoleLog()
+        timestamps()
+        timeout(120)
+    }
+    stages {
+        stage('Mark build as pending on Github') {
+            when {
+                 // Only run github-build-status for master builds
+                 expression { env.ghprbActualCommit == null }
+            }
+            steps {
+                script {
+                    commit_sha = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+                    build job: 'github-build-status',
+                        parameters: [
+                            string(name: 'GIT_SHA', value: commit_sha),
+                            string(name: 'GITHUB_ORG', value: 'edx'),
+                            string(name: 'GITHUB_REPO', value: "${REPO_NAME}"),
+                            string(name: 'TARGET_URL', value: "${BUILD_URL}"),
+                            string(name: 'DESCRIPTION', value: 'Pending'),
+                            string(name: 'CONTEXT', value: "${GITHUB_CONTEXT}"),
+                            string(name: 'CREATE_DEPLOYMENT', value: 'false'),
+                            string(name: 'BUILD_STATUS', value: 'pending')
+                        ],
+                        propagate: false, wait: false
+                }
+            }
+        }
+        stage('Run Tests') {
+            parallel {
+                stage("commonlib pylint") {
+                    // "pylint common" requires 5.5 GB of RAM, so use js-worker (8 GB) instead of jenkins-worker (4 GB)
+                    agent { label "juniper-js-worker" }
+                    environment {
+                        TEST_SUITE = "quality"
+                        SHARD = 1
+                    }
+                    steps {
+                        script {
+                            runQualityTests()
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                qualityTestCleanup()
+                            }
+                        }
+                    }
+                }
+                stage("lms pylint") {
+                    agent { label "juniper-worker" }
+                    environment {
+                        TEST_SUITE = "quality"
+                        SHARD = 2
+                    }
+                    steps {
+                        script {
+                            runQualityTests()
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                qualityTestCleanup()
+                            }
+                        }
+                    }
+                }
+                stage("cms/openedx/pavelib pylint") {
+                    agent { label "juniper-worker" }
+                    environment {
+                        TEST_SUITE = "quality"
+                        SHARD = 3
+                    }
+                    steps {
+                        script {
+                            runQualityTests()
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                qualityTestCleanup()
+                            }
+                        }
+                    }
+                }
+                stage("Other quality checks") {
+                    agent { label "juniper-worker" }
+                    environment {
+                        TEST_SUITE = "quality"
+                        SHARD = 4
+                        TARGET_BRANCH = getTargetBranch("${JOB_NAME}")
+                    }
+                    steps {
+                        script {
+                            runQualityTests()
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                qualityTestCleanup()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        stage('Diff quality') {
+            when {
+                // Only run diff quality on PR builds
+                 expression { env.ghprbTargetBranch != null }
+            }
+            environment {
+                TARGET_BRANCH = "origin/${ghprbTargetBranch}"
+            }
+            steps {
+                sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+                    checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: "${ghprbActualCommit}"]],
+                        doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption',
+                        honorRefspec: true, noTags: true, shallow: false], [$class: 'WipeWorkspace']], submoduleCfg: [],
+                        userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                        refspec: "+refs/heads/${ghprbTargetBranch}:refs/remotes/origin/${ghprbTargetBranch} +refs/pull/${ghprbPullId}/*:refs/remotes/origin/pr/${ghprbPullId}/*",
+                        url: "git@github.com:edx/${REPO_NAME}.git"]]]
+                    unstash 'quality-1-reports'
+                    unstash 'quality-2-reports'
+                    unstash 'quality-3-reports'
+                    unstash 'quality-4-reports'
+                    sh "./scripts/jenkins-quality-diff.sh"
+                }
+            }
+            post {
+                always {
+                    qualityTestCleanup()
+                    publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, keepAll: true, reportDir: 'reports/diff_quality',
+                        reportFiles: 'diff_quality_pylint.html, diff_quality_eslint.html', reportName: 'Diff Quality Report', reportTitles: ''])
+                }
+            }
+        }
+    }
+    post {
+        always {
+            script{
+                try {
+                    unstash 'quality-1-reports'
+                    unstash 'quality-2-reports'
+                    unstash 'quality-3-reports'
+                    unstash 'quality-4-reports'
+                    // Check for warnings
+                    recordIssues enabledForFailure: true, tools: [pep8(pattern: 'reports/pep8/pep8.report'), pyLint(pattern: 'reports/**/pylint.report')]
+                    // Publish Quality report
+                    publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, keepAll: true,
+                        reportDir: 'reports/metrics/',
+                        reportFiles: 'pylint/*view*/,pep8/*view*/,python_complexity/*view*/,xsscommitlint/*view*/,xsslint/*view*/,eslint/*view*/,pii/*view*/',
+                        reportName: 'Quality Report', reportTitles: ''])
+                } finally {
+                    if (env.ghprbPullId != null) {
+                        // For PR jobs, run the edx-platform-test-notifier for PR reporting
+                        build job: 'edx-platform-test-notifier', parameters: [string(name: 'REPO', value: "${REPO_NAME}"), string(name: 'PR_NUMBER', value: "${ghprbPullId}")], wait: false
+                    } else {
+                        // For master jobs run github-build-status and report to slack when necessary
+                        if (currentBuild.currentResult == "SUCCESS") {
+                            create_deployment = "true"
+                            build_status = "success"
+                            build_description = "Build Passed"
+                        }
+                        else {
+                            create_deployment = "false"
+                            build_status = "failure"
+                            build_description = "Build Failed"
+                        }
+
+                        commit_sha = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+                        build job: 'github-build-status', parameters: [
+                                string(name: 'GIT_SHA', value: commit_sha),
+                                string(name: 'GITHUB_ORG', value: 'edx'),
+                                string(name: 'GITHUB_REPO', value: "${REPO_NAME}"),
+                                string(name: 'TARGET_URL', value: "${BUILD_URL}"),
+                                string(name: 'DESCRIPTION', value: build_description),
+                                string(name: 'CONTEXT', value: "${GITHUB_CONTEXT}"),
+                                string(name: 'CREATE_DEPLOYMENT', value: create_deployment),
+                                string(name: 'BUILD_STATUS', value: build_status)
+                            ],
+                            propagate: false, wait: false
+
+                        if (currentBuild.currentResult != "SUCCESS"){
+                            slackSend botUser: true,
+                                message: "`${JOB_NAME}` #${BUILD_NUMBER}: ${currentBuild.currentResult} after ${currentBuild.durationString.replace(' and counting', '')}\n${BUILD_URL}"
+
+                            email_body = "See: <${BUILD_URL}>\n\nChanges:\n"
+                            change_sets = currentBuild.changeSets
+                            for (int j = 0; j < change_sets.size(); j++) {
+                                change_set_items = change_sets[j].items
+                                for (int k = 0; k < change_set_items.length; k++) {
+                                    item = change_set_items[k]
+                                    email_body = email_body + "\n Commit: ${item.commitId} by ${item.author}: ${item.msg}"
+                                }
+                            }
+                            emailext body: email_body,
+                                subject: "Build failed in Jenkins: ${JOB_NAME} #${BUILD_NUMBER}", to: 'testeng@edx.org'
+                        } else if (currentBuild.currentResult == "SUCCESS" && currentBuild.previousBuild.currentResult != "SUCCESS") {
+                            slackSend botUser: true,
+                                message: "`${JOB_NAME}` #${BUILD_NUMBER}: Back to normal after ${currentBuild.durationString.replace(' and counting', '')}\n${BUILD_URL}"
+                            emailext body: "See <${BUILD_URL}>",
+                                subject: "Jenkins Build is back to normal: ${JOB_NAME} #${BUILD_NUMBER}", to: 'testeng@edx.org'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

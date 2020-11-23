@@ -1,9 +1,12 @@
 """
 Stub implementation of catalog service for acceptance tests
 """
-# pylint: disable=invalid-name, missing-docstring
+# pylint: disable=invalid-name
+
+
 import re
-import urlparse
+
+import six.moves.urllib.parse
 
 from .http import StubHttpRequestHandler, StubHttpService
 
@@ -15,6 +18,7 @@ class StubCatalogServiceHandler(StubHttpRequestHandler):
             r'/api/v1/programs/$': self.program_list,
             r'/api/v1/programs/([0-9a-f-]+)/$': self.program_detail,
             r'/api/v1/program_types/$': self.program_types,
+            r'/api/v1/pathways/$': self.pathways
         }
 
         if self.match_pattern(pattern_handlers):
@@ -26,7 +30,7 @@ class StubCatalogServiceHandler(StubHttpRequestHandler):
         """
         Find the correct handler method given the path info from the HTTP request.
         """
-        path = urlparse.urlparse(self.path).path
+        path = six.moves.urllib.parse.urlparse(self.path).path
         for pattern, handler in pattern_handlers.items():
             match = re.match(pattern, path)
             if match:
@@ -46,6 +50,10 @@ class StubCatalogServiceHandler(StubHttpRequestHandler):
     def program_types(self):
         program_types = self.server.config.get('catalog.programs_types', [])
         self.send_json_response(program_types)
+
+    def pathways(self):
+        pathways = self.server.config.get('catalog.pathways', [])
+        self.send_json_response(pathways)
 
 
 class StubCatalogService(StubHttpService):

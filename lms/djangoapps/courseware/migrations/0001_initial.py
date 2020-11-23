@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 
-from django.db import migrations, models
-import model_utils.fields
+
 import django.utils.timezone
+import model_utils.fields
 from django.conf import settings
-from opaque_keys.edx.django.models import (
-    BlockTypeKeyField, CourseKeyField, UsageKeyField
-)
+from django.db import migrations, models
+from opaque_keys.edx.django.models import BlockTypeKeyField, CourseKeyField, UsageKeyField
 
 
 class Migration(migrations.Migration):
@@ -51,7 +49,7 @@ class Migration(migrations.Migration):
                 ('course_id', CourseKeyField(max_length=255, db_index=True)),
                 ('location', UsageKeyField(max_length=255, db_index=True)),
                 ('field', models.CharField(max_length=255)),
-                ('value', models.TextField(default=b'null')),
+                ('value', models.TextField(default='null')),
                 ('student', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
@@ -59,13 +57,13 @@ class Migration(migrations.Migration):
             name='StudentModule',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('module_type', models.CharField(default=b'problem', max_length=32, db_index=True, choices=[(b'problem', b'problem'), (b'video', b'video'), (b'html', b'html'), (b'course', b'course'), (b'chapter', b'Section'), (b'sequential', b'Subsection'), (b'library_content', b'Library Content')])),
-                ('module_state_key', UsageKeyField(max_length=255, db_column=b'module_id', db_index=True)),
+                ('module_type', models.CharField(default='problem', max_length=32, db_index=True, choices=[('problem', 'problem'), ('video', 'video'), ('html', 'html'), ('course', 'course'), ('chapter', 'Section'), ('sequential', 'Subsection'), ('library_content', 'Library Content')])),
+                ('module_state_key', UsageKeyField(max_length=255, db_column='module_id', db_index=True)),
                 ('course_id', CourseKeyField(max_length=255, db_index=True)),
                 ('state', models.TextField(null=True, blank=True)),
                 ('grade', models.FloatField(db_index=True, null=True, blank=True)),
                 ('max_grade', models.FloatField(null=True, blank=True)),
-                ('done', models.CharField(default=b'na', max_length=8, db_index=True, choices=[(b'na', b'NOT_APPLICABLE'), (b'f', b'FINISHED'), (b'i', b'INCOMPLETE')])),
+                ('done', models.CharField(default='na', max_length=8, db_index=True, choices=[('na', 'NOT_APPLICABLE'), ('f', 'FINISHED'), ('i', 'INCOMPLETE')])),
                 ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
                 ('modified', models.DateTimeField(auto_now=True, db_index=True)),
                 ('student', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
@@ -91,7 +89,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('field_name', models.CharField(max_length=64, db_index=True)),
-                ('value', models.TextField(default=b'null')),
+                ('value', models.TextField(default='null')),
                 ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
                 ('modified', models.DateTimeField(auto_now=True, db_index=True)),
                 ('student', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
@@ -102,7 +100,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('field_name', models.CharField(max_length=64, db_index=True)),
-                ('value', models.TextField(default=b'null')),
+                ('value', models.TextField(default='null')),
                 ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
                 ('modified', models.DateTimeField(auto_now=True, db_index=True)),
                 ('module_type', BlockTypeKeyField(max_length=64, db_index=True)),
@@ -114,7 +112,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('field_name', models.CharField(max_length=64, db_index=True)),
-                ('value', models.TextField(default=b'null')),
+                ('value', models.TextField(default='null')),
                 ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
                 ('modified', models.DateTimeField(auto_now=True, db_index=True)),
                 ('usage_id', UsageKeyField(max_length=255, db_index=True)),

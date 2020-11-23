@@ -1,9 +1,11 @@
 """
 Acceptance tests for Studio's Settings Details pages
 """
+
+
 from datetime import datetime, timedelta
 
-from nose.plugins.attrib import attr
+import six
 
 from common.test.acceptance.fixtures.config import ConfigModelFixture
 from common.test.acceptance.fixtures.course import CourseFixture
@@ -18,9 +20,9 @@ from common.test.acceptance.tests.helpers import (
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
 
 
-@attr(shard=4)
 class StudioSettingsDetailsTest(StudioCourseTest):
     """Base class for settings and details page tests."""
+    shard = 4
 
     def setUp(self, is_staff=True):
         super(StudioSettingsDetailsTest, self).setUp(is_staff=is_staff)
@@ -35,11 +37,12 @@ class StudioSettingsDetailsTest(StudioCourseTest):
         self.settings_detail.visit()
 
 
-@attr(shard=4)
 class SettingsMilestonesTest(StudioSettingsDetailsTest):
     """
     Tests for milestones feature in Studio's settings tab
     """
+    shard = 4
+
     def test_page_has_prerequisite_field(self):
         """
         Test to make sure page has pre-requisite course field if milestones app is enabled.
@@ -69,7 +72,7 @@ class SettingsMilestonesTest(StudioSettingsDetailsTest):
             number=course_number,
             run='test_run'
         )
-        pre_requisite_course_id = unicode(pre_requisite_course_key)
+        pre_requisite_course_id = six.text_type(pre_requisite_course_key)
 
         # Refresh the page to load the new course fixture and populate the prrequisite course dropdown
         # Then select the prerequisite course and save the changes
@@ -168,9 +171,9 @@ class SettingsMilestonesTest(StudioSettingsDetailsTest):
         ))
 
 
-@attr(shard=4)
 class CoursePacingTest(StudioSettingsDetailsTest):
     """Tests for setting a course to self-paced."""
+    shard = 4
 
     def populate_course_fixture(self, __):
         ConfigModelFixture('/config/self_paced', {'enabled': True}).install()

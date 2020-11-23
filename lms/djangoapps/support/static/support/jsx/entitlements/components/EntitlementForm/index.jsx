@@ -149,7 +149,7 @@ EntitlementForm.propTypes = {
 
 EntitlementForm.defaultProps = {
   entitlement: {
-    uuid:'',
+    uuid: '',
     courseUuid: '',
     created: '',
     modified: '',
@@ -158,7 +158,7 @@ EntitlementForm.defaultProps = {
     orderNumber: '',
     supportDetails: [],
     user: '',
-  }
+  },
 };
 
 export default EntitlementForm;

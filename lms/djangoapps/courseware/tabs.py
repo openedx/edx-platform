@@ -2,13 +2,18 @@
 This module is essentially a broker to xmodule/tabs.py -- it was originally introduced to
 perform some LMS-specific tab display gymnastics for the Entrance Exams feature
 """
-from courseware.access import has_access
-from courseware.entrance_exams import user_can_skip_entrance_exam
+
+
+import six
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
+
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.course_tabs import CourseTabPluginManager
-from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, default_course_url_name
+from openedx.features.course_experience import RELATIVE_DATES_FLAG, UNIFIED_COURSE_TAB_FLAG, default_course_url_name
 from student.models import CourseEnrollment
 from xmodule.tabs import CourseTab, CourseTabList, course_reverse_func_from_name_func, key_checker
 
@@ -291,7 +296,7 @@ class SingleTextbookTab(CourseTab):
     def __init__(self, name, tab_id, view_name, index):
         def link_func(course, reverse_func, index=index):
             """ Constructs a link for textbooks from a view name, a course, and an index. """
-            return reverse_func(view_name, args=[unicode(course.id), index])
+            return reverse_func(view_name, args=[six.text_type(course.id), index])
 
         tab_dict = dict()
         tab_dict['name'] = name
@@ -303,11 +308,26 @@ class SingleTextbookTab(CourseTab):
         raise NotImplementedError('SingleTextbookTab should not be serialized.')
 
 
-def get_course_tab_list(request, course):
+class DatesTab(CourseTab):
+    """
+    A tab representing the relevant dates for a course.
+    """
+    type = "dates"
+    title = ugettext_noop(
+        "Dates")  # We don't have the user in this context, so we don't want to translate it at this level.
+    view_name = "dates"
+    is_dynamic = True
+
+    @classmethod
+    def is_enabled(cls, course, user=None):
+        """Returns true if this tab is enabled."""
+        return RELATIVE_DATES_FLAG.is_enabled(course.id)
+
+
+def get_course_tab_list(user, course):
     """
     Retrieves the course tab list from xmodule.tabs and manipulates the set as necessary
     """
-    user = request.user
     xmodule_tab_list = CourseTabList.iterate_displayable(course, user=user)
 
     # Now that we've loaded the tabs for this course, perform the Entrance Exam work.
@@ -324,9 +344,15 @@ def get_course_tab_list(request, course):
             tab.name = _("Entrance Exam")
         # TODO: LEARNER-611 - once the course_info tab is removed, remove this code
         if UNIFIED_COURSE_TAB_FLAG.is_enabled(course.id) and tab.type == 'course_info':
-                continue
+            continue
         if tab.type == 'static_tab' and tab.course_staff_only and \
                 not bool(user and has_access(user, 'staff', course, course.id)):
+            continue
+        # We had initially created a CourseTab.load() for dates that ended up
+        # persisting the dates tab tomodulestore on Course Run creation, but
+        # ignoring any static dates tab here we can fix forward without
+        # allowing the bug to continue to surface
+        if tab.type == 'dates':
             continue
         course_tab_list.append(tab)
 

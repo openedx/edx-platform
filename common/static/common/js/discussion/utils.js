@@ -31,6 +31,9 @@
             if (_.isUndefined(userId)) {
                 userId = this.user ? this.user.id : void 0;
             }
+            if(_.isUndefined(this.roleIds)) {
+                this.roleIds = {}
+            }
             staff = _.union(this.roleIds.Moderator, this.roleIds.Administrator);
             return _.include(staff, parseInt(userId));
         };
@@ -479,11 +482,10 @@
                 this.postMathJaxProcessor(this.markdownWithHighlight(element.text()))
             );
 
-            this.typesetMathJax(element);
         };
 
         DiscussionUtil.typesetMathJax = function(element) {
-            if (typeof MathJax !== 'undefined' && MathJax !== null) {
+            if (typeof MathJax !== 'undefined' && MathJax !== null && typeof MathJax.Hub !== 'undefined') {
                 MathJax.Hub.Queue(['Typeset', MathJax.Hub, element[0]]);
             }
         };

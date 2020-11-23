@@ -4,42 +4,41 @@ Enrolls the user in the DemoX course.
 Optionally takes in username, email, and course UUID arguments.
 """
 
-from __future__ import unicode_literals
 
 from datetime import datetime
+from textwrap import dedent
 from uuid import uuid4
-from pytz import UTC
 
-from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User
 from consent.models import DataSharingConsent
+from django.contrib.auth.models import User
+from django.core.management.base import BaseCommand
 from enterprise.models import (
     EnterpriseCourseEnrollment,
     EnterpriseCustomer,
     EnterpriseCustomerUser,
-    PendingEnterpriseCustomerUser,
+    PendingEnterpriseCustomerUser
 )
-from entitlements.models import CourseEntitlement, CourseEntitlementSupportDetail
 from integrated_channels.sap_success_factors.models import SapSuccessFactorsLearnerDataTransmissionAudit
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments, CourseUserGroup
+from pytz import UTC
+
+from entitlements.models import CourseEntitlement, CourseEntitlementSupportDetail
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup, UnregisteredLearnerCohortAssignments
 from openedx.core.djangoapps.profile_images.images import create_profile_images
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
-from student.models import (
-    CourseEnrollment,
-    PendingEmailChange,
-    UserProfile,
-    CourseEnrollmentAllowed
-)
+from student.models import CourseEnrollment, CourseEnrollmentAllowed, PendingEmailChange, UserProfile
 
 from ...models import UserOrgTag
 
 
 class Command(BaseCommand):
     """
-    Implementation of the create_user_gdpr_testing command.
+    Create a user with GDPR P1 PII for manual testing.
+    Enrolls the user in the DemoX course.
+    Optionally takes in username, email, and course UUID arguments.
     """
+    help = dedent(__doc__).strip()
 
     def add_arguments(self, parser):
         parser.add_argument(

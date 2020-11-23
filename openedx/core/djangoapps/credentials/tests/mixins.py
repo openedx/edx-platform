@@ -1,5 +1,6 @@
 """Mixins for use during testing."""
 
+
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 
 

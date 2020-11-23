@@ -54,7 +54,7 @@
 
   // reset: box-sizing (making things so right its scary)
   * {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
   }
 
   // reset: typography
@@ -734,7 +734,7 @@
     .wrapper-task {
       @include clearfix();
 
-      width: flex-grid(12,12);
+      width: flex-grid(12, 12);
       margin: $baseline 0;
 
       .wrapper-help {
@@ -1374,7 +1374,8 @@
   }
 
   .content-supplementary {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
+
     @include outer-container;
     @include span-columns(12);
 
@@ -1556,8 +1557,14 @@
         @include text-align(left);
       }
 
-      .action-select input {
+      .action-select input,
+      .action-select button {
         @extend %btn-verify-primary;
+      }
+
+      .action-select button[name="verified_mode"] {
+        font-weight: 600;
+        padding: 10px 15px;
       }
 
       // extra register options/info
@@ -1784,7 +1791,6 @@
           padding: $baseline;
           border-bottom: 1px solid $verified-color-lvl4;
           background: $verified-color-lvl5;
-
         }
 
         .placeholder-art {
@@ -2249,6 +2255,27 @@
       margin-top: 20px;
     }
   }
+
+  // First purchase offer banner
+  .first-purchase-offer-banner {
+    background-color: #dee3f1;
+    font-size: 16px;
+    border-radius: 7px;
+    padding: 20px;
+    line-height: 1.5;
+
+    .first-purchase-offer-banner-bold {
+      font-weight: bold;
+      color: #393f43;
+    }
+
+    a {
+      color: #23419f;
+      text-decoration: underline !important;
+      font-weight: bold;
+      border-bottom: none;
+    }
+  }
 }
 
 .reverify-blocked {
@@ -2448,7 +2475,8 @@
     .progress .progress-step {
 
       // STATE: is completed
-      &#progress-step1, &#progress-step2 {
+      &#progress-step1,
+      &#progress-step2 {
         border-bottom: ($baseline/5) solid $verified-color-lvl3;
 
         .wrapper-step-number {

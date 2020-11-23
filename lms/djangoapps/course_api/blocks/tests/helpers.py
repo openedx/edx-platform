@@ -2,6 +2,7 @@
 Helper functions for unit tests
 """
 
+
 from opaque_keys.edx.keys import UsageKey
 
 

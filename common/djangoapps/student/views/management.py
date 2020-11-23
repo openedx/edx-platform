@@ -2,25 +2,18 @@
 Student Views
 """
 
+
 import datetime
-import json
 import logging
 import uuid
-import warnings
 from collections import namedtuple
 
-import analytics
-import dogstats_wrapper as dog_stats_api
-from bulk_email.models import Optout
-from courseware.courses import get_courses, sort_by_announcement, sort_by_start_date
+import six
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import login as django_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser, User
-from django.contrib.auth.views import password_reset_confirm
-from django.core import mail
-from django.urls import reverse
+from django.contrib.sites.models import Site
 from django.core.validators import ValidationError, validate_email
 from django.db import transaction
 from django.db.models.signals import post_save
@@ -28,36 +21,29 @@ from django.dispatch import Signal, receiver
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect
 from django.template.context_processors import csrf
-from django.template.response import TemplateResponse
-from django.utils.encoding import force_bytes, force_text
-from django.utils.http import base36_to_int, urlsafe_base64_encode
-from django.utils.translation import get_language, ungettext
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
+from edx_ace import ace
+from edx_ace.recipient import Recipient
+from edx_django_utils import monitoring as monitoring_utils
 from eventtracking import tracker
 from ipware.ip import get_ip
 # Note that this lives in LMS, so this dependency should be refactored.
-from notification_prefs.views import enable_notifications
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
-from requests import HTTPError
-from six import text_type, iteritems
-from social_core.exceptions import AuthAlreadyAssociated, AuthException
-from social_django import utils as social_utils
-from xmodule.modulestore.django import modulestore
+from six import text_type
 
-import openedx.core.djangoapps.external_auth.views
-import third_party_auth
 import track.views
+from bulk_email.models import Optout
 from course_modes.models import CourseMode
-from edxmako.shortcuts import render_to_response, render_to_string
+from lms.djangoapps.courseware.courses import get_courses, sort_by_announcement, sort_by_start_date
+from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
-from openedx.core.djangoapps import monitoring_utils
-from openedx.core.djangoapps.catalog.utils import (
-    get_programs_with_type,
-)
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
+from openedx.core.djangoapps.catalog.utils import get_programs_with_type
 from openedx.core.djangoapps.appsembler.sites.utils import (
     get_current_organization,
     is_request_for_amc_admin,
@@ -66,36 +52,21 @@ from openedx.core.djangoapps.appsembler.sites.utils import (
 )
 from openedx.core.djangoapps.theming.helpers import get_current_request
 from openedx.core.djangoapps.embargo import api as embargo_api
-from openedx.core.djangoapps.external_auth.login_and_register import register as external_auth_register
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
-from openedx.core.djangoapps.user_api import accounts as accounts_settings
-from openedx.core.djangoapps.user_api.accounts.utils import generate_password
-from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
-from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangolib.markup import HTML, Text
 from organizations.models import Organization, UserOrganizationMapping
-from student.cookies import set_logged_in_cookies
-from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
-from student.helpers import (
-    DISABLE_UNENROLL_CERT_STATES,
-    AccountValidationError,
-    auth_pipeline_urls,
-    authenticate_new_user,
-    cert_info,
-    create_or_set_user_attribute_created_on_site,
-    destroy_oauth_tokens,
-    do_create_account,
-    generate_activation_email_context,
-    get_next_url_for_login_page
-)
+from organizations.models import Organization, UserOrganizationMapping
+from student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info, generate_activation_email_context
+from student.message_types import AccountActivation, EmailChange, EmailChangeConfirmation, RecoveryEmailCreate
 from student.models import (
+    AccountRecovery,
     CourseEnrollment,
-    PasswordHistory,
     PendingEmailChange,
+    PendingSecondaryEmailChange,
     Registration,
     RegistrationCookieConfiguration,
     UserAttribute,
@@ -103,17 +74,14 @@ from student.models import (
     UserSignupSource,
     UserStanding,
     create_comments_service_user,
-    email_exists_or_retired,
+    email_exists_or_retired
 )
 from student.signals import REFUND_ORDER
 from student.tasks import send_activation_email
 from student.text_me_the_app import TextMeTheAppFragmentView
-from third_party_auth import pipeline, provider
-from third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
-from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.db import outer_atomic
 from util.json_request import JsonResponse
-from util.password_policy_validators import SecurityPolicyError, validate_password
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.student")
 
@@ -133,8 +101,6 @@ REGISTRATION_UTM_PARAMETERS = {
     'utm_content': 'registration_utm_content',
 }
 REGISTRATION_UTM_CREATED_AT = 'registration_utm_created_at'
-# used to announce a registration
-REGISTER_USER = Signal(providing_args=["user", "registration"])
 
 
 def csrf_token(context):
@@ -144,8 +110,8 @@ def csrf_token(context):
     token = context.get('csrf_token', '')
     if token == 'NOTPROVIDED':
         return ''
-    return (u'<div style="display:none"><input type="hidden"'
-            ' name="csrfmiddlewaretoken" value="{}" /></div>'.format(token))
+    return (HTML(u'<div style="display:none"><input type="hidden"'
+                 ' name="csrfmiddlewaretoken" value="{}" /></div>').format(Text(token)))
 
 
 # NOTE: This view is not linked to directly--it is called from
@@ -156,8 +122,7 @@ def index(request, extra_context=None, user=AnonymousUser()):
     """
     Render the edX main page.
 
-    extra_context is used to allow immediate display of certain modal windows, eg signup,
-    as used by external_auth.
+    extra_context is used to allow immediate display of certain modal windows, eg signup.
     """
     if extra_context is None:
         extra_context = {}
@@ -165,8 +130,8 @@ def index(request, extra_context=None, user=AnonymousUser()):
     courses = get_courses(user)
 
     if configuration_helpers.get_value(
-            "ENABLE_COURSE_SORTING_BY_START_DATE",
-            settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"],
+        "ENABLE_COURSE_SORTING_BY_START_DATE",
+        settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"],
     ):
         courses = sort_by_start_date(courses)
     else:
@@ -206,54 +171,38 @@ def index(request, extra_context=None, user=AnonymousUser()):
     return render_to_response('index.html', context)
 
 
-@ensure_csrf_cookie
-def register_user(request, extra_context=None):
+def compose_activation_email(root_url, user, user_registration=None, route_enabled=False, profile_name=''):
     """
-    Deprecated. To be replaced by :class:`student_account.views.login_and_registration_form`.
+    Construct all the required params for the activation email
+    through celery task
     """
-    # Determine the URL to redirect to following login:
-    redirect_to = get_next_url_for_login_page(request)
-    if request.user.is_authenticated:
-        return redirect(redirect_to)
+    if user_registration is None:
+        user_registration = Registration.objects.get(user=user)
 
-    external_auth_response = external_auth_register(request)
-    if external_auth_response is not None:
-        return external_auth_response
-
-    context = {
-        'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in the header
-        'email': '',
-        'name': '',
-        'running_pipeline': None,
-        'pipeline_urls': auth_pipeline_urls(pipeline.AUTH_ENTRY_REGISTER, redirect_url=redirect_to),
-        'platform_name': configuration_helpers.get_value(
-            'platform_name',
-            settings.PLATFORM_NAME
+    message_context = generate_activation_email_context(user, user_registration)
+    message_context.update({
+        'confirm_activation_link': '{root_url}/activate/{activation_key}'.format(
+            root_url=root_url,
+            activation_key=message_context['key']
         ),
-        'selected_provider': '',
-        'username': '',
-    }
+        'route_enabled': route_enabled,
+        'routed_user': user.username,
+        'routed_user_email': user.email,
+        'routed_profile_name': profile_name,
+    })
 
-    if extra_context is not None:
-        context.update(extra_context)
+    if route_enabled:
+        dest_addr = settings.FEATURES['REROUTE_ACTIVATION_EMAIL']
+    else:
+        dest_addr = user.email
 
-    if context.get("extauth_domain", '').startswith(
-            openedx.core.djangoapps.external_auth.views.SHIBBOLETH_DOMAIN_PREFIX
-    ):
-        return render_to_response('register-shib.html', context)
+    msg = AccountActivation().personalize(
+        recipient=Recipient(user.username, dest_addr),
+        language=preferences_api.get_user_preference(user, LANGUAGE_KEY),
+        user_context=message_context,
+    )
 
-    # If third-party auth is enabled, prepopulate the form with data from the
-    # selected provider.
-    if third_party_auth.is_enabled() and pipeline.running(request):
-        running_pipeline = pipeline.get(request)
-        current_provider = provider.Registry.get_from_pipeline(running_pipeline)
-        if current_provider is not None:
-            overrides = current_provider.get_register_form_data(running_pipeline.get('kwargs'))
-            overrides['running_pipeline'] = running_pipeline
-            overrides['selected_provider'] = current_provider.name
-            context.update(overrides)
-
-    return render_to_response('register.html', context)
+    return msg
 
 
 def compose_and_send_activation_email(user, profile, user_registration=None):
@@ -266,21 +215,12 @@ def compose_and_send_activation_email(user, profile, user_registration=None):
         profile: profile object of the current logged-in user
         user_registration: registration of the current logged-in user
     """
-    dest_addr = user.email
-    if user_registration is None:
-        user_registration = Registration.objects.get(user=user)
-    context = generate_activation_email_context(user, user_registration)
-    subject = render_to_string('emails/activation_email_subject.txt', context)
-    # Email subject *must not* contain newlines
-    subject = ''.join(subject.splitlines())
-    message_for_activation = render_to_string('emails/activation_email.txt', context)
-    from_address = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
-    from_address = configuration_helpers.get_value('ACTIVATION_EMAIL_FROM_ADDRESS', from_address)
-    if settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
-        dest_addr = settings.FEATURES['REROUTE_ACTIVATION_EMAIL']
-        message_for_activation = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
-                                  '-' * 80 + '\n\n' + message_for_activation)
-    send_activation_email.delay(subject, message_for_activation, from_address, dest_addr)
+    route_enabled = settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL')
+
+    root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
+    msg = compose_activation_email(root_url, user, user_registration, route_enabled, profile.name)
+
+    send_activation_email.delay(str(msg))
 
 
 @login_required
@@ -414,7 +354,7 @@ def change_enrollment(request, check_access=True):
             return HttpResponse(redirect_url)
 
         if CourseEntitlement.check_for_existing_entitlement_and_enroll(user=user, course_run_key=course_id):
-            return HttpResponse(reverse('courseware', args=[unicode(course_id)]))
+            return HttpResponse(reverse('courseware', args=[six.text_type(course_id)]))
 
         # Check that auto enrollment is allowed for this course
         # (= the course is NOT behind a paywall)
@@ -535,24 +475,6 @@ def disable_account_ajax(request):
     return JsonResponse(context)
 
 
-@login_required
-@ensure_csrf_cookie
-def change_setting(request):
-    """
-    JSON call to change a profile setting: Right now, location
-    """
-    # TODO (vshnayder): location is no longer used
-    u_prof = UserProfile.objects.get(user=request.user)  # request.user.profile_cache
-    if 'location' in request.POST:
-        u_prof.location = request.POST['location']
-    u_prof.save()
-
-    return JsonResponse({
-        "success": True,
-        "location": u_prof.location,
-    })
-
-
 @receiver(post_save, sender=User)
 def user_signup_handler(sender, **kwargs):  # pylint: disable=unused-argument
     """
@@ -566,442 +488,6 @@ def user_signup_handler(sender, **kwargs):  # pylint: disable=unused-argument
             log.info(u'user {} originated from a white labeled "Microsite"'.format(kwargs['instance'].id))
 
 
-@transaction.non_atomic_requests
-def create_account_with_params(request, params):
-    """
-    Given a request and a dict of parameters (which may or may not have come
-    from the request), create an account for the requesting user, including
-    creating a comments service user object and sending an activation email.
-    This also takes external/third-party auth into account, updates that as
-    necessary, and authenticates the user for the request's session.
-
-    Does not return anything.
-
-    Raises AccountValidationError if an account with the username or email
-    specified by params already exists, or ValidationError if any of the given
-    parameters is invalid for any other reason.
-
-    Issues with this code:
-    * It is non-transactional except where explicitly wrapped in atomic to
-      alleviate deadlocks and improve performance. This means failures at
-      different places in registration can leave users in inconsistent
-      states.
-    * Third-party auth passwords are not verified. There is a comment that
-      they are unused, but it would be helpful to have a sanity check that
-      they are sane.
-    * The user-facing text is rather unfriendly (e.g. "Username must be a
-      minimum of two characters long" rather than "Please use a username of
-      at least two characters").
-    * Duplicate email raises a ValidationError (rather than the expected
-      AccountValidationError). Duplicate username returns an inconsistent
-      user message (i.e. "An account with the Public Username '{username}'
-      already exists." rather than "It looks like {username} belongs to an
-      existing account. Try again with a different username.") The two checks
-      occur at different places in the code; as a result, registering with
-      both a duplicate username and email raises only a ValidationError for
-      email only.
-    """
-    # Copy params so we can modify it; we can't just do dict(params) because if
-    # params is request.POST, that results in a dict containing lists of values
-    params = dict(params.items())
-
-    # allow to define custom set of required/optional/hidden fields via configuration
-    extra_fields = configuration_helpers.get_value(
-        'REGISTRATION_EXTRA_FIELDS',
-        getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
-    )
-    # registration via third party (Google, Facebook) using mobile application
-    # doesn't use social auth pipeline (no redirect uri(s) etc involved).
-    # In this case all related info (required for account linking)
-    # is sent in params.
-    # `third_party_auth_credentials_in_api` essentially means 'request
-    # is made from mobile application'
-    third_party_auth_credentials_in_api = 'provider' in params
-
-    is_third_party_auth_enabled = third_party_auth.is_enabled()
-
-    if is_third_party_auth_enabled and (pipeline.running(request) or third_party_auth_credentials_in_api):
-        params["password"] = generate_password()
-
-    # in case user is registering via third party (Google, Facebook) and pipeline has expired, show appropriate
-    # error message
-    if is_third_party_auth_enabled and ('social_auth_provider' in params and not pipeline.running(request)):
-        raise ValidationError(
-            {'session_expired': [
-                _(u"Registration using {provider} has timed out.").format(
-                    provider=params.get('social_auth_provider'))
-            ]}
-        )
-
-    # if doing signup for an external authorization, then get email, password, name from the eamap
-    # don't use the ones from the form, since the user could have hacked those
-    # unless originally we didn't get a valid email or name from the external auth
-    # TODO: We do not check whether these values meet all necessary criteria, such as email length
-    do_external_auth = 'ExternalAuthMap' in request.session
-    if do_external_auth:
-        eamap = request.session['ExternalAuthMap']
-        try:
-            validate_email(eamap.external_email)
-            params["email"] = eamap.external_email
-        except ValidationError:
-            pass
-        if len(eamap.external_name.strip()) >= accounts_settings.NAME_MIN_LENGTH:
-            params["name"] = eamap.external_name
-        params["password"] = eamap.internal_password
-        log.debug(u'In create_account with external_auth: user = %s, email=%s', params["name"], params["email"])
-
-    extended_profile_fields = configuration_helpers.get_value('extended_profile_fields', [])
-    enforce_password_policy = not do_external_auth
-    # Can't have terms of service for certain SHIB users, like at Stanford
-    registration_fields = getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
-    tos_required = (
-        registration_fields.get('terms_of_service') != 'hidden' or
-        registration_fields.get('honor_code') != 'hidden'
-    ) and (
-        not settings.FEATURES.get("AUTH_USE_SHIB") or
-        not settings.FEATURES.get("SHIB_DISABLE_TOS") or
-        not do_external_auth or
-        not eamap.external_domain.startswith(openedx.core.djangoapps.external_auth.views.SHIBBOLETH_DOMAIN_PREFIX)
-    )
-
-    form = AccountCreationForm(
-        data=params,
-        extra_fields=extra_fields,
-        extended_profile_fields=extended_profile_fields,
-        enforce_password_policy=enforce_password_policy,
-        tos_required=tos_required,
-    )
-    custom_form = get_registration_extension_form(data=params)
-
-    third_party_provider = None
-    running_pipeline = None
-    new_user = None
-
-    # Perform operations within a transaction that are critical to account creation
-    with outer_atomic(read_committed=True):
-        # first, create the account
-        (user, profile, registration) = do_create_account(form, custom_form)
-
-        # If a 3rd party auth provider and credentials were provided in the API, link the account with social auth
-        # (If the user is using the normal register page, the social auth pipeline does the linking, not this code)
-
-        # Note: this is orthogonal to the 3rd party authentication pipeline that occurs
-        # when the account is created via the browser and redirect URLs.
-
-        if is_third_party_auth_enabled and third_party_auth_credentials_in_api:
-            backend_name = params['provider']
-            request.social_strategy = social_utils.load_strategy(request)
-            redirect_uri = reverse('social:complete', args=(backend_name, ))
-            request.backend = social_utils.load_backend(request.social_strategy, backend_name, redirect_uri)
-            social_access_token = params.get('access_token')
-            if not social_access_token:
-                raise ValidationError({
-                    'access_token': [
-                        _("An access_token is required when passing value ({}) for provider.").format(
-                            params['provider']
-                        )
-                    ]
-                })
-            request.session[pipeline.AUTH_ENTRY_KEY] = pipeline.AUTH_ENTRY_REGISTER_API
-            pipeline_user = None
-            error_message = ""
-            try:
-                pipeline_user = request.backend.do_auth(social_access_token, user=user)
-            except AuthAlreadyAssociated:
-                error_message = _("The provided access_token is already associated with another user.")
-            except (HTTPError, AuthException):
-                error_message = _("The provided access_token is not valid.")
-            if not pipeline_user or not isinstance(pipeline_user, User):
-                # Ensure user does not re-enter the pipeline
-                request.social_strategy.clean_partial_pipeline(social_access_token)
-                raise ValidationError({'access_token': [error_message]})
-
-        # If the user is registering via 3rd party auth, track which provider they use
-        if is_third_party_auth_enabled and pipeline.running(request):
-            running_pipeline = pipeline.get(request)
-            third_party_provider = provider.Registry.get_from_pipeline(running_pipeline)
-
-        new_user = authenticate_new_user(request, user.username, params['password'])
-        django_login(request, new_user)
-        request.session.set_expiry(0)
-
-        if is_request_for_amc_admin(request):  # Appsembler specific
-            add_course_creator_role(user)
-
-        if do_external_auth:
-            eamap.user = new_user
-            eamap.dtsignup = datetime.datetime.now(UTC)
-            eamap.save()
-            AUDIT_LOG.info(u"User registered with external_auth %s", new_user.username)
-            AUDIT_LOG.info(u'Updated ExternalAuthMap for %s to be %s', new_user.username, eamap)
-
-            if settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'):
-                log.info('bypassing activation email')
-                new_user.is_active = True
-                new_user.save()
-                AUDIT_LOG.info(
-                    u"Login activated on extauth account - {0} ({1})".format(new_user.username, new_user.email))
-
-    # Check if system is configured to skip activation email for the current user.
-    skip_email = skip_activation_email(
-        user, do_external_auth, running_pipeline, third_party_provider, params,
-    )
-
-    if skip_email:
-        registration.activate()
-    else:
-        compose_and_send_activation_email(user, profile, registration)
-
-    # Perform operations that are non-critical parts of account creation
-    create_or_set_user_attribute_created_on_site(user, request.site)
-
-    preferences_api.set_user_preference(user, LANGUAGE_KEY, get_language())
-
-    if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
-        try:
-            enable_notifications(user)
-        except Exception:  # pylint: disable=broad-except
-            log.exception("Enable discussion notifications failed for user {id}.".format(id=user.id))
-
-    dog_stats_api.increment("common.student.account_created")
-
-    # Track the user's registration
-    if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
-        tracking_context = tracker.get_tracker().resolve_context()
-        identity_args = [
-            user.id,
-            {
-                'email': user.email,
-                'username': user.username,
-                'name': profile.name,
-                # Mailchimp requires the age & yearOfBirth to be integers, we send a sane integer default if falsey.
-                'age': profile.age or -1,
-                'yearOfBirth': profile.year_of_birth or datetime.datetime.now(UTC).year,
-                'education': profile.level_of_education_display,
-                'address': profile.mailing_address,
-                'gender': profile.gender_display,
-                'country': text_type(profile.country),
-            }
-        ]
-
-        if hasattr(settings, 'MAILCHIMP_NEW_USER_LIST_ID'):
-            identity_args.append({
-                "MailChimp": {
-                    "listId": settings.MAILCHIMP_NEW_USER_LIST_ID
-                }
-            })
-
-        analytics.identify(*identity_args)
-
-        analytics.track(
-            user.id,
-            "edx.bi.user.account.registered",
-            {
-                'category': 'conversion',
-                'label': params.get('course_id'),
-                'provider': third_party_provider.name if third_party_provider else None
-            },
-            context={
-                'ip': tracking_context.get('ip'),
-                'Google Analytics': {
-                    'clientId': tracking_context.get('client_id')
-                }
-            }
-        )
-
-    # Announce registration
-    REGISTER_USER.send(sender=None, user=user, registration=registration)
-
-    create_comments_service_user(user)
-
-    if not is_request_for_new_amc_site(request):
-        # When _new_ trial is requested, we register the user first, then the
-        # Organization and SiteConfiguration.
-        # So UserOrganizationMapping for new AMC admin sites is deferred later
-        # until `bootstrap_site()` is called.
-        # Tech Debt: This is a weird logic in my opinion that we should simplify into a single API call -- Omar
-        current_org = get_current_organization(failure_return_none=True)
-        if current_org:
-            UserOrganizationMapping.objects.get_or_create(
-                user=user,
-                organization=current_org,
-                is_amc_admin=is_request_for_amc_admin(request),
-            )
-
-    try:
-        record_registration_attributions(request, new_user)
-    # Don't prevent a user from registering due to attribution errors.
-    except Exception:   # pylint: disable=broad-except
-        log.exception('Error while attributing cookies to user registration.')
-
-    # TODO: there is no error checking here to see that the user actually logged in successfully,
-    # and is not yet an active user.
-    if new_user is not None:
-        AUDIT_LOG.info(u"Login success on new account creation - {0}".format(new_user.username))
-
-    return new_user
-
-
-def skip_activation_email(user, do_external_auth, running_pipeline, third_party_provider, params=None):
-    """
-    Return `True` if activation email should be skipped.
-
-    Skip email if we are:
-        1. Doing load testing.
-        2. Random user generation for other forms of testing.
-        3. External auth bypassing activation.
-        4. Have the platform configured to not require e-mail activation.
-        5. Registering a new user using a trusted third party provider (with skip_email_verification=True)
-
-    Note that this feature is only tested as a flag set one way or
-    the other for *new* systems. we need to be careful about
-    changing settings on a running system to make sure no users are
-    left in an inconsistent state (or doing a migration if they are).
-
-    Arguments:
-        user (User): Django User object for the current user.
-        do_external_auth (bool): True if external authentication is in progress.
-        running_pipeline (dict): Dictionary containing user and pipeline data for third party authentication.
-        third_party_provider (ProviderConfig): An instance of third party provider configuration.
-        params (dict): A copy of the request.POST.
-
-    Returns:
-        (bool): `True` if account activation email should be skipped, `False` if account activation email should be
-            sent.
-    """
-    params = params or {}
-    sso_pipeline_email = running_pipeline and running_pipeline['kwargs'].get('details', {}).get('email')
-
-    # Email is valid if the SAML assertion email matches the user account email or
-    # no email was provided in the SAML assertion. Some IdP's use a callback
-    # to retrieve additional user account information (including email) after the
-    # initial account creation.
-    valid_email = (
-        sso_pipeline_email == user.email or (
-            sso_pipeline_email is None and
-            third_party_provider and
-            getattr(third_party_provider, "identity_provider_type", None) == SAP_SUCCESSFACTORS_SAML_KEY
-        )
-    )
-
-    # log the cases where skip activation email flag is set, but email validity check fails
-    if third_party_provider and third_party_provider.skip_email_verification and not valid_email:
-        log.info(
-            '[skip_email_verification=True][user=%s][pipeline-email=%s][identity_provider=%s][provider_type=%s] '
-            'Account activation email sent as user\'s system email differs from SSO email.',
-            user.email,
-            sso_pipeline_email,
-            getattr(third_party_provider, "provider_id", None),
-            getattr(third_party_provider, "identity_provider_type", None)
-        )
-
-    return (
-        settings.FEATURES.get('SKIP_EMAIL_VALIDATION', None) or
-        settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING') or
-        (not params.get('send_activation_email', True)) or  # Appsembler: for Tahoe Registration API
-        (settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH') and do_external_auth) or
-        (third_party_provider and third_party_provider.skip_email_verification and valid_email) or
-        is_request_for_amc_admin(get_current_request())  # Appsembler: Skip activation email for _active_ AMC admin
-    )
-
-
-def record_affiliate_registration_attribution(request, user):
-    """
-    Attribute this user's registration to the referring affiliate, if
-    applicable.
-    """
-    affiliate_id = request.COOKIES.get(settings.AFFILIATE_COOKIE_NAME)
-    if user and affiliate_id:
-        UserAttribute.set_user_attribute(user, REGISTRATION_AFFILIATE_ID, affiliate_id)
-
-
-def record_utm_registration_attribution(request, user):
-    """
-    Attribute this user's registration to the latest UTM referrer, if
-    applicable.
-    """
-    utm_cookie_name = RegistrationCookieConfiguration.current().utm_cookie_name
-    utm_cookie = request.COOKIES.get(utm_cookie_name)
-    if user and utm_cookie:
-        utm = json.loads(utm_cookie)
-        for utm_parameter_name in REGISTRATION_UTM_PARAMETERS:
-            utm_parameter = utm.get(utm_parameter_name)
-            if utm_parameter:
-                UserAttribute.set_user_attribute(
-                    user,
-                    REGISTRATION_UTM_PARAMETERS.get(utm_parameter_name),
-                    utm_parameter
-                )
-        created_at_unixtime = utm.get('created_at')
-        if created_at_unixtime:
-            # We divide by 1000 here because the javascript timestamp generated is in milliseconds not seconds.
-            # PYTHON: time.time()      => 1475590280.823698
-            # JS: new Date().getTime() => 1475590280823
-            created_at_datetime = datetime.datetime.fromtimestamp(int(created_at_unixtime) / float(1000), tz=UTC)
-            UserAttribute.set_user_attribute(
-                user,
-                REGISTRATION_UTM_CREATED_AT,
-                created_at_datetime
-            )
-
-
-def record_registration_attributions(request, user):
-    """
-    Attribute this user's registration based on referrer cookies.
-    """
-    record_affiliate_registration_attribution(request, user)
-    record_utm_registration_attribution(request, user)
-
-
-@csrf_exempt
-@transaction.non_atomic_requests
-def create_account(request, post_override=None):
-    """
-    JSON call to create new edX account.
-    Used by form in signup_modal.html, which is included into header.html
-    """
-    # Check if ALLOW_PUBLIC_ACCOUNT_CREATION flag turned off to restrict user account creation
-    if not configuration_helpers.get_value(
-            'ALLOW_PUBLIC_ACCOUNT_CREATION',
-            settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION', True)
-    ):
-        return HttpResponseForbidden(_("Account creation not allowed."))
-
-    if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
-        return HttpResponseForbidden(SYSTEM_MAINTENANCE_MSG)
-
-    warnings.warn("Please use RegistrationView instead.", DeprecationWarning)
-
-    try:
-        user = create_account_with_params(request, post_override or request.POST)
-    except AccountValidationError as exc:
-        return JsonResponse({'success': False, 'value': text_type(exc), 'field': exc.field}, status=400)
-    except ValidationError as exc:
-        field, error_list = next(iteritems(exc.message_dict))
-        return JsonResponse(
-            {
-                "success": False,
-                "field": field,
-                "value": error_list[0],
-            },
-            status=400
-        )
-
-    redirect_url = None  # The AJAX method calling should know the default destination upon success
-
-    # Resume the third-party-auth pipeline if necessary.
-    if third_party_auth.is_enabled() and pipeline.running(request):
-        running_pipeline = pipeline.get(request)
-        redirect_url = pipeline.get_complete_url(running_pipeline['backend'])
-
-    response = JsonResponse({
-        'success': True,
-        'redirect_url': redirect_url,
-    })
-    set_logged_in_cookies(request, response, user)
-    return response
-
-
 @ensure_csrf_cookie
 def activate_account(request, key):
     """
@@ -1009,8 +495,12 @@ def activate_account(request, key):
     """
     # If request is in Studio call the appropriate view
     if theming_helpers.get_project_root_name().lower() == u'cms':
+        monitoring_utils.set_custom_metric('student_activate_account', 'cms')
         return activate_account_studio(request, key)
 
+    # TODO: Use metric to determine if there are any `activate_account` calls for cms in Production.
+    # If not, the templates wouldn't be needed for cms, but we still need a way to activate for cms tests.
+    monitoring_utils.set_custom_metric('student_activate_account', 'lms')
     try:
         registration = Registration.objects.get(activation_key=key)
     except (Registration.DoesNotExist, Registration.MultipleObjectsReturned):
@@ -1020,7 +510,9 @@ def activate_account(request, key):
                 '{html_start}Your account could not be activated{html_end}'
                 'Something went wrong, please <a href="{support_url}">contact support</a> to resolve this issue.'
             )).format(
-                support_url=configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
+                support_url=configuration_helpers.get_value(
+                    'ACTIVATION_EMAIL_SUPPORT_LINK', settings.ACTIVATION_EMAIL_SUPPORT_LINK
+                ) or settings.SUPPORT_SITE_LINK,
                 html_start=HTML('<p class="message-title">'),
                 html_end=HTML('</p>'),
             ),
@@ -1031,16 +523,6 @@ def activate_account(request, key):
             messages.info(
                 request,
                 HTML(_('{html_start}This account has already been activated.{html_end}')).format(
-                    html_start=HTML('<p class="message-title">'),
-                    html_end=HTML('</p>'),
-                ),
-                extra_tags='account-activation aa-icon',
-            )
-        elif waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
-            messages.error(
-                request,
-                HTML(u'{html_start}{message}{html_end}').format(
-                    message=Text(SYSTEM_MAINTENANCE_MSG),
                     html_start=HTML('<p class="message-title">'),
                     html_end=HTML('</p>'),
                 ),
@@ -1088,9 +570,6 @@ def activate_account_studio(request, key):
         user_logged_in = request.user.is_authenticated
         already_active = True
         if not registration.user.is_active:
-            if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
-                return render_to_response('registration/activation_invalid.html',
-                                          {'csrf': csrf(request)['csrf_token']})
             registration.activate()
             already_active = False
 
@@ -1101,172 +580,6 @@ def activate_account_studio(request, key):
                 'already_active': already_active
             }
         )
-
-
-@csrf_exempt
-@require_POST
-def password_reset(request):
-    """
-    Attempts to send a password reset e-mail.
-    """
-    # Add some rate limiting here by re-using the RateLimitMixin as a helper class
-    limiter = BadRequestRateLimiter()
-    if limiter.is_rate_limit_exceeded(request):
-        AUDIT_LOG.warning("Rate limit exceeded in password_reset")
-        return HttpResponseForbidden()
-
-    form = PasswordResetFormNoActive(request.POST)
-    if form.is_valid():
-        form.save(use_https=request.is_secure(),
-                  from_email=configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
-                  domain_override=request.get_host(),
-                  request=request)
-        # When password change is complete, a "edx.user.settings.changed" event will be emitted.
-        # But because changing the password is multi-step, we also emit an event here so that we can
-        # track where the request was initiated.
-        tracker.emit(
-            SETTING_CHANGE_INITIATED,
-            {
-                "setting": "password",
-                "old": None,
-                "new": None,
-                "user_id": request.user.id,
-            }
-        )
-        destroy_oauth_tokens(request.user)
-    else:
-        # bad user? tick the rate limiter counter
-        AUDIT_LOG.info("Bad password_reset user passed in.")
-        limiter.tick_bad_request_counter(request)
-
-    return JsonResponse({
-        'success': True,
-        'value': render_to_string('registration/password_reset_done.html', {}),
-    })
-
-
-def uidb36_to_uidb64(uidb36):
-    """
-    Needed to support old password reset URLs that use base36-encoded user IDs
-    https://github.com/django/django/commit/1184d077893ff1bc947e45b00a4d565f3df81776#diff-c571286052438b2e3190f8db8331a92bR231
-    Args:
-        uidb36: base36-encoded user ID
-
-    Returns: base64-encoded user ID. Otherwise returns a dummy, invalid ID
-    """
-    try:
-        uidb64 = force_text(urlsafe_base64_encode(force_bytes(base36_to_int(uidb36))))
-    except ValueError:
-        uidb64 = '1'  # dummy invalid ID (incorrect padding for base64)
-    return uidb64
-
-
-def password_reset_confirm_wrapper(request, uidb36=None, token=None):
-    """
-    A wrapper around django.contrib.auth.views.password_reset_confirm.
-    Needed because we want to set the user as active at this step.
-    We also optionally do some additional password policy checks.
-    """
-    # convert old-style base36-encoded user id to base64
-    uidb64 = uidb36_to_uidb64(uidb36)
-    platform_name = {
-        "platform_name": configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
-    }
-    try:
-        uid_int = base36_to_int(uidb36)
-        user = User.objects.get(id=uid_int)
-    except (ValueError, User.DoesNotExist):
-        # if there's any error getting a user, just let django's
-        # password_reset_confirm function handle it.
-        return password_reset_confirm(
-            request, uidb64=uidb64, token=token, extra_context=platform_name
-        )
-
-    if UserRetirementRequest.has_user_requested_retirement(user):
-        # Refuse to reset the password of any user that has requested retirement.
-        context = {
-            'validlink': True,
-            'form': None,
-            'title': _('Password reset unsuccessful'),
-            'err_msg': _('Error in resetting your password.'),
-        }
-        context.update(platform_name)
-        return TemplateResponse(
-            request, 'registration/password_reset_confirm.html', context
-        )
-
-    if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
-        context = {
-            'validlink': False,
-            'form': None,
-            'title': _('Password reset unsuccessful'),
-            'err_msg': SYSTEM_MAINTENANCE_MSG,
-        }
-        context.update(platform_name)
-        return TemplateResponse(
-            request, 'registration/password_reset_confirm.html', context
-        )
-
-    if request.method == 'POST':
-        password = request.POST['new_password1']
-
-        try:
-            validate_password(password, user=user)
-        except ValidationError as err:
-            # We have a password reset attempt which violates some security
-            # policy, or any other validation. Use the existing Django template to communicate that
-            # back to the user.
-            context = {
-                'validlink': True,
-                'form': None,
-                'title': _('Password reset unsuccessful'),
-                'err_msg': err.message,
-            }
-            context.update(platform_name)
-            return TemplateResponse(
-                request, 'registration/password_reset_confirm.html', context
-            )
-
-        # remember what the old password hash is before we call down
-        old_password_hash = user.password
-
-        response = password_reset_confirm(
-            request, uidb64=uidb64, token=token, extra_context=platform_name
-        )
-
-        # If password reset was unsuccessful a template response is returned (status_code 200).
-        # Check if form is invalid then show an error to the user.
-        # Note if password reset was successful we get response redirect (status_code 302).
-        if response.status_code == 200:
-            form_valid = response.context_data['form'].is_valid() if response.context_data['form'] else False
-            if not form_valid:
-                log.warning(
-                    u'Unable to reset password for user [%s] because form is not valid. '
-                    u'A possible cause is that the user had an invalid reset token',
-                    user.username,
-                )
-                response.context_data['err_msg'] = _('Error in resetting your password. Please try again.')
-                return response
-
-        # get the updated user
-        updated_user = User.objects.get(id=uid_int)
-
-        # did the password hash change, if so record it in the PasswordHistory
-        if updated_user.password != old_password_hash:
-            entry = PasswordHistory()
-            entry.create(updated_user)
-
-    else:
-        response = password_reset_confirm(
-            request, uidb64=uidb64, token=token, extra_context=platform_name
-        )
-
-        response_was_successful = response.context_data.get('validlink')
-        if response_was_successful and not user.is_active:
-            user.is_active = True
-            user.save()
-
-    return response
 
 
 def validate_new_email(user, new_email):
@@ -1282,75 +595,145 @@ def validate_new_email(user, new_email):
     if new_email == user.email:
         raise ValueError(_('Old email is the same as the new email.'))
 
-    if email_exists_or_retired(new_email):
-        raise ValueError(_('An account with this e-mail already exists.'))
+
+def validate_secondary_email(user, new_email):
+    """
+    Enforce valid email addresses.
+    """
+
+    from openedx.core.djangoapps.user_api.accounts.api import get_email_validation_error, \
+        get_secondary_email_validation_error
+
+    if get_email_validation_error(new_email):
+        raise ValueError(_('Valid e-mail address required.'))
+
+    # Make sure that if there is an active recovery email address, that is not the same as the new one.
+    if hasattr(user, "account_recovery"):
+        if user.account_recovery.is_active and new_email == user.account_recovery.secondary_email:
+            raise ValueError(_('Old email is the same as the new email.'))
+
+    # Make sure that secondary email address is not same as user's primary email.
+    if new_email == user.email:
+        raise ValueError(_('Cannot be same as your sign in email address.'))
+
+    message = get_secondary_email_validation_error(new_email)
+    if message:
+        raise ValueError(message)
 
 
-def do_email_change_request(user, new_email, activation_key=None):
+def do_email_change_request(user, new_email, activation_key=None, secondary_email_change_request=False):
     """
     Given a new email for a user, does some basic verification of the new address and sends an activation message
     to the new address. If any issues are encountered with verification or sending the message, a ValueError will
     be thrown.
     """
-    pec_list = PendingEmailChange.objects.filter(user=user)
-    if len(pec_list) == 0:
-        pec = PendingEmailChange()
-        pec.user = user
-    else:
-        pec = pec_list[0]
-
     # if activation_key is not passing as an argument, generate a random key
     if not activation_key:
         activation_key = uuid.uuid4().hex
 
-    pec.new_email = new_email
-    pec.activation_key = activation_key
-    pec.save()
+    confirm_link = reverse('confirm_email_change', kwargs={'key': activation_key, })
 
-    context = {
-        'key': pec.activation_key,
+    if secondary_email_change_request:
+        PendingSecondaryEmailChange.objects.update_or_create(
+            user=user,
+            defaults={
+                'new_secondary_email': new_email,
+                'activation_key': activation_key,
+            }
+        )
+        confirm_link = reverse('activate_secondary_email', kwargs={'key': activation_key})
+    else:
+        PendingEmailChange.objects.update_or_create(
+            user=user,
+            defaults={
+                'new_email': new_email,
+                'activation_key': activation_key,
+            }
+        )
+
+    use_https = theming_helpers.get_current_request().is_secure()
+
+    site = Site.objects.get_current()
+    message_context = get_base_template_context(site)
+    message_context.update({
         'old_email': user.email,
-        'new_email': pec.new_email
-    }
+        'new_email': new_email,
+        'confirm_link': '{protocol}://{site}{link}'.format(
+            protocol='https' if use_https else 'http',
+            site=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
+            link=confirm_link,
+        ),
+    })
 
-    subject = render_to_string('emails/email_change_subject.txt', context)
-    subject = ''.join(subject.splitlines())
+    if secondary_email_change_request:
+        msg = RecoveryEmailCreate().personalize(
+            recipient=Recipient(user.username, new_email),
+            language=preferences_api.get_user_preference(user, LANGUAGE_KEY),
+            user_context=message_context,
+        )
+    else:
+        msg = EmailChange().personalize(
+            recipient=Recipient(user.username, new_email),
+            language=preferences_api.get_user_preference(user, LANGUAGE_KEY),
+            user_context=message_context,
+        )
 
-    message = render_to_string('emails/email_change.txt', context)
-
-    from_address = configuration_helpers.get_value(
-        'email_from_address',
-        settings.DEFAULT_FROM_EMAIL
-    )
     try:
-        mail.send_mail(subject, message, from_address, [pec.new_email])
+        ace.send(msg)
     except Exception:
+        from_address = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
         log.error(u'Unable to send email activation link to user from "%s"', from_address, exc_info=True)
         raise ValueError(_('Unable to send email activation link. Please try again later.'))
 
-    # When the email address change is complete, a "edx.user.settings.changed" event will be emitted.
-    # But because changing the email address is multi-step, we also emit an event here so that we can
-    # track where the request was initiated.
-    tracker.emit(
-        SETTING_CHANGE_INITIATED,
-        {
-            "setting": "email",
-            "old": context['old_email'],
-            "new": context['new_email'],
-            "user_id": user.id,
-        }
-    )
+    if not secondary_email_change_request:
+        # When the email address change is complete, a "edx.user.settings.changed" event will be emitted.
+        # But because changing the email address is multi-step, we also emit an event here so that we can
+        # track where the request was initiated.
+        tracker.emit(
+            SETTING_CHANGE_INITIATED,
+            {
+                "setting": "email",
+                "old": message_context['old_email'],
+                "new": message_context['new_email'],
+                "user_id": user.id,
+            }
+        )
 
 
 @ensure_csrf_cookie
-def confirm_email_change(request, key):  # pylint: disable=unused-argument
+def activate_secondary_email(request, key):
+    """
+    This is called when the activation link is clicked. We activate the secondary email
+    for the requested user.
+    """
+    try:
+        pending_secondary_email_change = PendingSecondaryEmailChange.objects.get(activation_key=key)
+    except PendingSecondaryEmailChange.DoesNotExist:
+        return render_to_response("invalid_email_key.html", {})
+
+    try:
+        account_recovery = pending_secondary_email_change.user.account_recovery
+    except AccountRecovery.DoesNotExist:
+        account_recovery = AccountRecovery(user=pending_secondary_email_change.user)
+
+    try:
+        account_recovery.update_recovery_email(pending_secondary_email_change.new_secondary_email)
+    except ValidationError:
+        return render_to_response("secondary_email_change_failed.html", {
+            'secondary_email': pending_secondary_email_change.new_secondary_email
+        })
+
+    pending_secondary_email_change.delete()
+
+    return render_to_response("secondary_email_change_successful.html")
+
+
+@ensure_csrf_cookie
+def confirm_email_change(request, key):
     """
     User requested a new e-mail. This is called when the activation
     link is clicked. We confirm with the old e-mail, and update
     """
-    if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
-        return render_to_response('email_change_failed.html', {'err_msg': SYSTEM_MAINTENANCE_MSG})
-
     with transaction.atomic():
         try:
             pec = PendingEmailChange.objects.get(activation_key=key)
@@ -1376,9 +759,31 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
             transaction.set_rollback(True)
             return response
 
-        subject = render_to_string('emails/email_change_subject.txt', address_context)
-        subject = ''.join(subject.splitlines())
-        message = render_to_string('emails/confirm_email_change.txt', address_context)
+        use_https = request.is_secure()
+        if settings.FEATURES['ENABLE_MKTG_SITE']:
+            contact_link = marketing_link('CONTACT')
+        else:
+            contact_link = '{protocol}://{site}{link}'.format(
+                protocol='https' if use_https else 'http',
+                site=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
+                link=reverse('contact'),
+            )
+
+        site = Site.objects.get_current()
+        message_context = get_base_template_context(site)
+        message_context.update({
+            'old_email': user.email,
+            'new_email': pec.new_email,
+            'contact_link': contact_link,
+            'from_address': configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
+        })
+
+        msg = EmailChangeConfirmation().personalize(
+            recipient=Recipient(user.username, user.email),
+            language=preferences_api.get_user_preference(user, LANGUAGE_KEY),
+            user_context=message_context,
+        )
+
         u_prof = UserProfile.objects.get(user=user)
         meta = u_prof.get_meta()
         if 'old_emails' not in meta:
@@ -1388,12 +793,8 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
         u_prof.save()
         # Send it to the old email...
         try:
-            user.email_user(
-                subject,
-                message,
-                configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
-            )
-        except Exception:    # pylint: disable=broad-except
+            ace.send(msg)
+        except Exception:  # pylint: disable=broad-except
             log.warning('Unable to send confirmation email to old address', exc_info=True)
             response = render_to_response("email_change_failed.html", {'email': user.email})
             transaction.set_rollback(True)
@@ -1403,12 +804,9 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
         user.save()
         pec.delete()
         # And send it to the new email...
+        msg.recipient = Recipient(user.username, pec.new_email)
         try:
-            user.email_user(
-                subject,
-                message,
-                configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
-            )
+            ace.send(msg)
         except Exception:  # pylint: disable=broad-except
             log.warning('Unable to send confirmation email to new address', exc_info=True)
             response = render_to_response("email_change_failed.html", {'email': pec.new_email})

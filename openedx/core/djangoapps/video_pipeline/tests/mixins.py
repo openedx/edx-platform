@@ -1,8 +1,8 @@
 """
 Mixins to test video pipeline integration.
 """
-from provider.constants import CONFIDENTIAL
-from provider.oauth2.models import Client
+
+from oauth2_provider.models import Application
 
 from openedx.core.djangoapps.video_pipeline.models import VideoPipelineIntegration
 
@@ -14,18 +14,18 @@ class VideoPipelineIntegrationMixin(object):
     video_pipeline_integration_defaults = {
         'enabled': True,
         'api_url': 'https://video-pipeline.example.com/api/v1/',
-        'service_username': 'cms_video_pipeline_service_user',
+        'service_username': u'cms_video_pipeline_service_user',
         'client_name': 'video_pipeline'
     }
 
+    request_uris = 'https://video-pipeline.example.com/api/v1/logout'
+    request_uris += ' https://video-pipeline.example.com/api/v1/redirect'
     video_pipelien_oauth_client_defaults = {
         'name': 'video_pipeline',
-        'url': 'https://video-pipeline.example.com/api/v1/',
-        'redirect_uri': 'https://video-pipeline.example.com/api/v1/redirect',
-        'logout_uri': 'https://video-pipeline.example.com/api/v1/logout',
+        'redirect_uris': request_uris,
         'client_id': 'video_pipeline_client_id',
         'client_secret': 'video_pipeline_client_secret',
-        'client_type': CONFIDENTIAL
+        'client_type': Application.CLIENT_CONFIDENTIAL
     }
 
     def create_video_pipeline_integration(self, **kwargs):
@@ -43,4 +43,4 @@ class VideoPipelineIntegrationMixin(object):
         """
         fields = dict(self.video_pipelien_oauth_client_defaults, **kwargs)
         fields['user'] = user
-        return Client.objects.create(**fields)
+        return Application.objects.create(**fields)

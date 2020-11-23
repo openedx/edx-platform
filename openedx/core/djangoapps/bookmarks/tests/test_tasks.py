@@ -1,17 +1,19 @@
 """
 Tests for tasks.
 """
+
+
 import ddt
-from nose.plugins.attrib import attr
+import six
 
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.factories import check_mongo_calls, ItemFactory
+from xmodule.modulestore.tests.factories import ItemFactory, check_mongo_calls
+
 from ..models import XBlockCache
 from ..tasks import _calculate_course_xblocks_data, _update_xblocks_cache
 from .test_models import BookmarksTestsBase
 
 
-@attr(shard=9)
 @ddt.ddt
 class XBlockCacheTaskTests(BookmarksTestsBase):
     """
@@ -63,7 +65,7 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
             ],
         }
 
-        self.other_course_expected_cache_data = {  # pylint: disable=invalid-name
+        self.other_course_expected_cache_data = {
             self.other_course.location: [
                 [],
             ], self.other_chapter_1.location: [
@@ -138,7 +140,7 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
 
         expected_cache_data = getattr(self, course_attr + '_expected_cache_data')
         for usage_key, __ in expected_cache_data.items():
-            for path_index, path in enumerate(blocks_data[unicode(usage_key)]['paths']):
+            for path_index, path in enumerate(blocks_data[six.text_type(usage_key)]['paths']):
                 for path_item_index, path_item in enumerate(path):
                     self.assertEqual(
                         path_item['usage_key'], expected_cache_data[usage_key][path_index][path_item_index]

@@ -6,11 +6,13 @@ this fragment dismisses the message for a limited time so new updates
 will continue to appear, where the welcome message gets permanently
 dismissed.
 """
+
+
 from django.template.loader import render_to_string
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
-from courseware.courses import get_course_with_access
+from lms.djangoapps.courseware.courses import get_course_with_access
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience.views.course_updates import get_ordered_updates
 

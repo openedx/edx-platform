@@ -58,7 +58,7 @@
             DiscussionUtil.safeAjax({
                 $elem: this.$el,
                 $loading: this.$el,
-                takeFocus: true,
+                takeFocus: false,
                 url: url,
                 type: 'GET',
                 dataType: 'json',
@@ -176,9 +176,15 @@
             this.threadListView.$('.is-active').focus();
         },
 
+        hideDiscussion: function() {
+            this.$('section.discussion').addClass('is-hidden');
+            this.toggleDiscussionBtn.removeClass('shown');
+            this.toggleDiscussionBtn.find('.button-text').text(gettext('Show Discussion'));
+            this.showed = false;
+        },
+
         toggleDiscussion: function() {
             var self = this;
-
             if (this.showed) {
                 this.hideDiscussion();
             } else {
@@ -188,23 +194,24 @@
                     this.$('section.discussion').removeClass('is-hidden');
                     this.showed = true;
                 } else {
-                    this.loadDiscussions(this.$el, function() {
-                        self.hideDiscussion();
-                        DiscussionUtil.discussionAlert(
-                            gettext('Error'),
-                            gettext('This discussion could not be loaded. Refresh the page and try again.')
-                        );
+                    this.loadDiscussions(this.$el, function(request) {
+                        if (request.status === 403 && request.responseText) {
+                            DiscussionUtil.discussionAlert(
+                                gettext('Warning'),
+                                request.responseText
+                            );
+                            self.$el.text(request.responseText);
+                            self.showed = true;
+                        } else {
+                            self.hideDiscussion();
+                            DiscussionUtil.discussionAlert(
+                                gettext('Error'),
+                                gettext('This discussion could not be loaded. Refresh the page and try again.')
+                            );
+                        }
                     });
                 }
             }
-            this.toggleDiscussionBtn.focus();
-        },
-
-        hideDiscussion: function() {
-            this.$('section.discussion').addClass('is-hidden');
-            this.toggleDiscussionBtn.removeClass('shown');
-            this.toggleDiscussionBtn.find('.button-text').text(gettext('Show Discussion'));
-            this.showed = false;
         },
 
         toggleNewPost: function(event) {

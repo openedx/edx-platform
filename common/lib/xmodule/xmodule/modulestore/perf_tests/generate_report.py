@@ -5,9 +5,12 @@ report which can be viewed over time to examine the performance effects of code 
 various parts of the system.
 """
 
+
 import sqlite3
-from lxml.builder import E
+
 import lxml.html
+from lxml.builder import E
+
 try:
     import click
 except ImportError:
@@ -47,7 +50,7 @@ class HTMLTable(object):
             th, td {
                 padding: 5px;
             }"""
-                       )  # pylint: disable=bad-continuation
+                       )
 
 
 class HTMLDocument(object):
@@ -286,4 +289,4 @@ if __name__ == '__main__':
     if click is not None:
         cli()  # pylint: disable=no-value-for-parameter
     else:
-        print "Aborted! Module 'click' is not installed."
+        print("Aborted! Module 'click' is not installed.")

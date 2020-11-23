@@ -2,15 +2,20 @@
 Utility Mixins for unit tests
 """
 
+
 import json
 import sys
 
+import six
 from django.conf import settings
-from django.urls import clear_url_caches, resolve
 from django.test import TestCase
+from django.urls import clear_url_caches, resolve
 from mock import patch
 
-from util.db import CommitOnSuccessManager, OuterAtomic
+from util.db import OuterAtomic
+
+if six.PY3:
+    from importlib import reload
 
 
 class UrlResetMixin(object):
@@ -76,8 +81,7 @@ class EventTestMixin(object):
     """
     def setUp(self, tracker):
         super(EventTestMixin, self).setUp()
-        self.tracker = tracker
-        patcher = patch(self.tracker)
+        patcher = patch(tracker)
         self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
 
@@ -85,13 +89,13 @@ class EventTestMixin(object):
         """
         Ensures no events were emitted since the last event related assertion.
         """
-        self.assertFalse(self.mock_tracker.emit.called)  # pylint: disable=maybe-no-member
+        self.assertFalse(self.mock_tracker.emit.called)
 
     def assert_event_emitted(self, event_name, **kwargs):
         """
         Verify that an event was emitted with the given parameters.
         """
-        self.mock_tracker.emit.assert_any_call(  # pylint: disable=maybe-no-member
+        self.mock_tracker.emit.assert_any_call(
             event_name,
             kwargs
         )
@@ -152,7 +156,6 @@ def patch_testcase():
             """
             Method that performs atomic-entering accounting.
             """
-            CommitOnSuccessManager.ENABLED = False
             OuterAtomic.ALLOW_NESTED = True
             if not hasattr(OuterAtomic, 'atomic_for_testcase_calls'):
                 OuterAtomic.atomic_for_testcase_calls = 0
@@ -170,7 +173,6 @@ def patch_testcase():
             """
             Method that performs atomic-rollback accounting.
             """
-            CommitOnSuccessManager.ENABLED = True
             OuterAtomic.ALLOW_NESTED = False
             OuterAtomic.atomic_for_testcase_calls -= 1
             return wrapped_func(*args, **kwargs)

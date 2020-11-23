@@ -1,12 +1,17 @@
 """
 Unit tests for stub EdxNotes implementation.
 """
-import ddt
-import urlparse
+
+
 import json
 import unittest
-import requests
 from uuid import uuid4
+
+import ddt
+import requests
+import six
+from six.moves import range
+
 from ..edxnotes import StubEdxNotesService
 
 
@@ -29,7 +34,7 @@ class StubEdxNotesServiceTest(unittest.TestCase):
         """
         Returns a list of dummy notes.
         """
-        return [self._get_dummy_note(i) for i in xrange(count)]  # pylint: disable=unused-variable
+        return [self._get_dummy_note(i) for i in range(count)]
 
     def _get_dummy_note(self, uid=0):
         """
@@ -157,8 +162,8 @@ class StubEdxNotesServiceTest(unittest.TestCase):
         })
         self.assertTrue(response.ok)
         response = response.json()
-        parsed = urlparse.urlparse(url)
-        query_params = urlparse.parse_qs(parsed.query)
+        parsed = six.moves.urllib.parse.urlparse(url)
+        query_params = six.moves.urllib.parse.parse_qs(parsed.query)
         query_params['usage_id'].reverse()
         self.assertEqual(len(response), len(query_params['usage_id']))
         for index, usage_id in enumerate(query_params['usage_id']):
@@ -187,7 +192,7 @@ class StubEdxNotesServiceTest(unittest.TestCase):
         updated_note = self._get_notes()[0]
         self.assertEqual("new test text", updated_note["text"])
         self.assertEqual(note["id"], updated_note["id"])
-        self.assertItemsEqual(note, updated_note)
+        six.assertCountEqual(self, note, updated_note)
 
         response = requests.get(self._get_url("api/v1/annotations/does_not_exist"))
         self.assertEqual(response.status_code, 404)
@@ -224,8 +229,8 @@ class StubEdxNotesServiceTest(unittest.TestCase):
             if url is None:
                 return None
 
-            parsed = urlparse.urlparse(url)
-            query_params = urlparse.parse_qs(parsed.query)
+            parsed = six.moves.urllib.parse.urlparse(url)
+            query_params = six.moves.urllib.parse.parse_qs(parsed.query)
 
             page = query_params["page"][0]
             return page if page is None else int(page)

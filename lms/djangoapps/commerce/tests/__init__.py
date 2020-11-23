@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """ Commerce app tests package. """
 
+
 import httpretty
 import mock
 from django.conf import settings
@@ -8,7 +9,7 @@ from django.test import TestCase
 from freezegun import freeze_time
 
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
-from openedx.core.lib.token_utils import JwtBuilder
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from student.tests.factories import UserFactory
 
 JSON = 'application/json'
@@ -26,7 +27,11 @@ TEST_PAYMENT_DATA = {
 class EdxRestApiClientTest(TestCase):
     """ Tests to ensure the client is initialized properly. """
 
-    TEST_CLIENT_ID = 'test-client-id'
+    SCOPES = [
+        'user_id',
+        'email',
+        'profile'
+    ]
 
     def setUp(self):
         super(EdxRestApiClientTest, self).setUp()
@@ -48,7 +53,7 @@ class EdxRestApiClientTest(TestCase):
             )
 
             mock_tracker = mock.Mock()
-            mock_tracker.resolve_context = mock.Mock(return_value={'client_id': self.TEST_CLIENT_ID, 'ip': '127.0.0.1'})
+            mock_tracker.resolve_context = mock.Mock(return_value={'ip': '127.0.0.1'})
             with mock.patch('openedx.core.djangoapps.commerce.utils.tracker.get_tracker', return_value=mock_tracker):
                 ecommerce_api_client(self.user).baskets(1).post()
 
@@ -57,13 +62,12 @@ class EdxRestApiClientTest(TestCase):
 
             claims = {
                 'tracking_context': {
-                    'lms_user_id': self.user.id,  # pylint: disable=no-member
-                    'lms_client_id': self.TEST_CLIENT_ID,
+                    'lms_user_id': self.user.id,
                     'lms_ip': '127.0.0.1',
                 }
             }
-            expected_jwt = JwtBuilder(self.user).build_token(['email', 'profile'], additional_claims=claims)
-            expected_header = 'JWT {}'.format(expected_jwt)
+            expected_jwt = create_jwt_for_user(self.user, additional_claims=claims, scopes=self.SCOPES)
+            expected_header = u'JWT {}'.format(expected_jwt)
             self.assertEqual(actual_header, expected_header)
 
     @httpretty.activate

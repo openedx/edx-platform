@@ -1,9 +1,10 @@
 # pylint: disable=missing-docstring
-from urlparse import urlparse
+
 
 from crum import get_current_request
 from django import template
 from django.utils.safestring import mark_safe
+from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
 from openedx.core.djangoapps.ace_common.tracking import CampaignTrackingInfo, GoogleAnalyticsTrackingPixel
 from openedx.core.djangolib.markup import HTML
@@ -56,14 +57,14 @@ def _get_variables_from_context(context, tag_name):
 
     if request is None:
         raise template.VariableDoesNotExist(
-            'The {0} template tag requires a "request" to be present in the template context. Consider using '
-            '"emulate_http_request" if you are rendering the template in a celery task.'.format(tag_name)
+            u'The {0} template tag requires a "request" to be present in the template context. Consider using '
+            u'"emulate_http_request" if you are rendering the template in a celery task.'.format(tag_name)
         )
 
     message = context.get('message')
     if message is None:
         raise template.VariableDoesNotExist(
-            'The {0} template tag requires a "message" to be present in the template context.'.format(tag_name)
+            u'The {0} template tag requires a "message" to be present in the template context.'.format(tag_name)
         )
 
     return request.site, request.user, message
@@ -87,7 +88,7 @@ def google_analytics_tracking_pixel(context):
     image_url = _get_google_analytics_tracking_url(context)
     if image_url is not None:
         return mark_safe(
-            HTML('<img src="{0}" alt="" role="presentation" aria-hidden="true" />').format(HTML(image_url))
+            HTML(u'<img src="{0}" alt="" role="presentation" aria-hidden="true" />').format(HTML(image_url))
         )
     else:
         return ''
@@ -108,6 +109,7 @@ def _get_google_analytics_tracking_url(context):
             message.send_uuid,
             message.uuid,
         ),
+        document_host=site.domain.rstrip('/')
     )
     course_ids = context.get('course_ids')
     if course_ids is not None and len(course_ids) > 0:
@@ -134,7 +136,7 @@ def modify_url_to_track_clicks(url, campaign=None):
     if campaign is None:
         campaign = CampaignTrackingInfo()
     modified_url = parsed_url._replace(query=campaign.to_query_string(parsed_url.query))
-    return modified_url.geturl()  # pylint: disable=no-member
+    return modified_url.geturl()
 
 
 def ensure_url_is_absolute(site, relative_path):

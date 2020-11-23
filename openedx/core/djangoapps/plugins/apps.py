@@ -4,6 +4,7 @@ Plugins Application Configuration
 Signal handlers are connected here.
 """
 
+
 from django.apps import AppConfig
 from django.conf import settings
 from . import constants, plugin_signals

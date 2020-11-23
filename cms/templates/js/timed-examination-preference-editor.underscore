@@ -19,12 +19,23 @@
                     <%- gettext('Proctored') %>
                 </label>
                 <p class='field-message' id='proctored-exam-description'> <%- gettext('Proctored exams are timed and they record video of each learner taking the exam. The videos are then reviewed to ensure that learners follow all examination rules.') %> </p>
-                <label class="label">
-                    <input type="radio" name="exam_type" class="input input-radio practice_exam"
-                        aria-describedby="practice-exam-description"/>
-                    <%- gettext('Practice Proctored') %>
-                </label>
-                <p class='field-message' id='practice-exam-description'> <%- gettext("Use a practice proctored exam to introduce learners to the proctoring tools and processes. Results of a practice exam do not affect a learner's grade.") %> </p>
+                
+                <% var supports_onboarding = xblockInfo.get('supports_onboarding'); %>
+                <% if (supports_onboarding) { %>
+                    <label class="label">
+                        <input type="radio" name="exam_type" class="input input-radio onboarding_exam"
+                            aria-describedby="onboarding-exam-description"/>
+                        <%- gettext('Onboarding') %>
+                    </label>
+                    <p class='field-message' id='onboarding-exam-description'> <%- gettext("Use Onboarding to introduce learners to proctoring, verify their identity, and create an onboarding profile. Learners must complete the onboarding profile step prior to taking a proctored exam. Profile reviews take 2+ business days.") %> </p>
+                <% } else { %>
+                    <label class="label">
+                        <input type="radio" name="exam_type" class="input input-radio practice_exam"
+                            aria-describedby="practice-exam-description"/>
+                        <%- gettext('Practice Proctored') %>
+                    </label>
+                    <p class='field-message' id='practice-exam-description'> <%- gettext("Use a practice proctored exam to introduce learners to the proctoring tools and processes. Results of a practice exam do not affect a learner's grade.") %> </p>
+                <% } %>
             <% } %>
         </div>
         <div class="list-fields list-input exam-options">
@@ -36,29 +47,33 @@
                 </label>
                 <p class='field-message' id='time-limit-description'><%- gettext('Select a time allotment for the exam. If it is over 24 hours, type in the amount of time. You can grant individual learners extra time to complete the exam through the Instructor Dashboard.') %></p>
             </div>
-            <div class="field field-text field-exam-review-rules">
-                <label class="label">
-                    <%- gettext('Review Rules') %>
-                    <textarea cols="50" maxlength="255" aria-describedby="review-rules-description"
-                        class="review-rules input input-text" autocomplete="off" />
-                </label>
-                <% var online_proctoring_rules = xblockInfo.get('online_proctoring_rules'); %>
-                <p class='field-message' id='review-rules-description'>
-                <% if (online_proctoring_rules) { %>
-                    <%= edx.HtmlUtils.interpolateHtml(
-                        gettext('Specify any rules or rule exceptions that the proctoring review team should enforce when reviewing the videos. For example, you could specify that calculators are allowed. These specified rules are visible to learners before the learners start the exam, along with the {linkStart}general proctored exam rules{linkEnd}.'),
-                        {
-                            linkStart: edx.HtmlUtils.interpolateHtml(
-                                edx.HtmlUtils.HTML('<a href="{onlineProctoringUrl}" title="{onlineProctoringTitle}">'),
-                                { onlineProctoringUrl: online_proctoring_rules, onlineProctoringTitle: gettext('General Proctored Exam Rules')}),
-                            linkEnd: edx.HtmlUtils.HTML('</a>')
-                        })
-                    %>
-                <% } else { %>
-                    <%- gettext('Specify any rules or rule exceptions that the proctoring review team should enforce when reviewing the videos. For example, you could specify that calculators are allowed. These specified rules are visible to learners before the learners start the exam.') %>
-                <% } %>
-                </p>
-            </div>
+            <% var show_review_rules = xblockInfo.get('show_review_rules'); %>
+            <% if (show_review_rules) { %>
+                <div class="field field-text field-exam-review-rules">
+                    <label class="label">
+                        <%- gettext('Review Rules') %>
+                        <textarea cols="50" maxlength="255" aria-describedby="review-rules-description"
+                            class="review-rules input input-text" autocomplete="off" />
+                    </label>
+                    <% var online_proctoring_rules = xblockInfo.get('online_proctoring_rules'); %>
+                    <p class='field-message' id='review-rules-description'>
+                    <% if (online_proctoring_rules) { %>
+                        <% // xss-lint: disable=underscore-not-escaped %>
+                        <%= edx.HtmlUtils.interpolateHtml(
+                            gettext('Specify any rules or rule exceptions that the proctoring review team should enforce when reviewing the videos. For example, you could specify that calculators are allowed. These specified rules are visible to learners before the learners start the exam, along with the {linkStart}general proctored exam rules{linkEnd}.'),
+                            {
+                                linkStart: edx.HtmlUtils.interpolateHtml(
+                                    edx.HtmlUtils.HTML('<a href="{onlineProctoringUrl}" title="{onlineProctoringTitle}">'),
+                                    { onlineProctoringUrl: online_proctoring_rules, onlineProctoringTitle: gettext('General Proctored Exam Rules')}),
+                                linkEnd: edx.HtmlUtils.HTML('</a>')
+                            })
+                        %>
+                    <% } else { %>
+                        <%- gettext('Specify any rules or rule exceptions that the proctoring review team should enforce when reviewing the videos. For example, you could specify that calculators are allowed. These specified rules are visible to learners before the learners start the exam.') %>
+                    <% } %>
+                    </p>
+                </div>
+            <% } %>
         </div>
     </div>
 </form>

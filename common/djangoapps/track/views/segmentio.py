@@ -1,20 +1,22 @@
 """Handle events that were forwarded from the Segment webhook integration"""
 
+
 import uuid
 import datetime
 import json
 import logging
 
 import requests
+from dateutil import parser
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from eventtracking import tracker
 from util.json_request import expect_json
 from openedx.core.djangoapps.site_configuration import helpers
 
@@ -269,7 +271,7 @@ def _get_segmentio_event_name(event_properties):
 
 def parse_iso8601_timestamp(timestamp):
     """Parse a particular type of ISO8601 formatted timestamp"""
-    return datetime.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ")
+    return parser.parse(timestamp)
 
 
 @require_POST

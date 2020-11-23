@@ -2,6 +2,7 @@
 Django models related to course groups functionality.
 """
 
+
 import json
 import logging
 
@@ -10,19 +11,22 @@ from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
-from util.db import outer_atomic
-
+from django.utils.encoding import python_2_unicode_compatible
 from opaque_keys.edx.django.models import CourseKeyField
+
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
 
 log = logging.getLogger(__name__)
 
 
+@python_2_unicode_compatible
 class CourseUserGroup(models.Model):
     """
     This model represents groups of users in a course.  Groups may have different types,
     which may be treated specially.  For example, a user can be in at most one cohort per
     course, and cohorts are used to split up the forums by group.
+
+    .. no_pii:
     """
     class Meta(object):
         unique_together = (('name', 'course_id'), )
@@ -63,20 +67,19 @@ class CourseUserGroup(models.Model):
             name=name
         )
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
 class CohortMembership(models.Model):
-    """Used internally to enforce our particular definition of uniqueness"""
+    """
+    Used internally to enforce our particular definition of uniqueness.
 
+    .. no_pii:
+    """
     course_user_group = models.ForeignKey(CourseUserGroup, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course_id = CourseKeyField(max_length=255)
-
-    previous_cohort = None
-    previous_cohort_name = None
-    previous_cohort_id = None
 
     class Meta(object):
         unique_together = (('user', 'course_id'), )
@@ -92,52 +95,46 @@ class CohortMembership(models.Model):
         if self.course_user_group.course_id != self.course_id:
             raise ValidationError("Non-matching course_ids provided")
 
-    def save(self, *args, **kwargs):
+    @classmethod
+    def assign(cls, cohort, user):
+        """
+        Assign user to cohort, switching them to this cohort if they had previously been assigned to another
+        cohort
+        Returns CohortMembership, previous_cohort (if any)
+        """
+        with transaction.atomic():
+            membership, created = cls.objects.select_for_update().get_or_create(
+                user__id=user.id,
+                course_id=cohort.course_id,
+                defaults={
+                    'course_user_group': cohort,
+                    'user': user
+                })
+
+            if created:
+                membership.course_user_group.users.add(user)
+                previous_cohort = None
+            elif membership.course_user_group == cohort:
+                raise ValueError(u"User {user_name} already present in cohort {cohort_name}".format(
+                    user_name=user.username,
+                    cohort_name=cohort.name))
+            else:
+                previous_cohort = membership.course_user_group
+                previous_cohort.users.remove(user)
+
+                membership.course_user_group = cohort
+                membership.course_user_group.users.add(user)
+                membership.save()
+        return membership, previous_cohort
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         self.full_clean(validate_unique=False)
 
-        log.info("Saving CohortMembership for user '%s' in '%s'", self.user.id, self.course_id)
-
-        # Avoid infinite recursion if creating from get_or_create() call below.
-        # This block also allows middleware to use CohortMembership.get_or_create without worrying about outer_atomic
-        if 'force_insert' in kwargs and kwargs['force_insert'] is True:
-            with transaction.atomic():
-                self.course_user_group.users.add(self.user)
-                super(CohortMembership, self).save(*args, **kwargs)
-            return
-
-        # This block will transactionally commit updates to CohortMembership and underlying course_user_groups.
-        # Note the use of outer_atomic, which guarantees that operations are committed to the database on block exit.
-        # If called from a view method, that method must be marked with @transaction.non_atomic_requests.
-        with outer_atomic(read_committed=True):
-
-            saved_membership, created = CohortMembership.objects.select_for_update().get_or_create(
-                user__id=self.user.id,
-                course_id=self.course_id,
-                defaults={
-                    'course_user_group': self.course_user_group,
-                    'user': self.user
-                }
-            )
-
-            # If the membership was newly created, all the validation and course_user_group logic was settled
-            # with a call to self.save(force_insert=True), which gets handled above.
-            if created:
-                return
-
-            if saved_membership.course_user_group == self.course_user_group:
-                raise ValueError("User {user_name} already present in cohort {cohort_name}".format(
-                    user_name=self.user.username,
-                    cohort_name=self.course_user_group.name
-                ))
-            self.previous_cohort = saved_membership.course_user_group
-            self.previous_cohort_name = saved_membership.course_user_group.name
-            self.previous_cohort_id = saved_membership.course_user_group.id
-            self.previous_cohort.users.remove(self.user)
-
-            saved_membership.course_user_group = self.course_user_group
-            self.course_user_group.users.add(self.user)
-
-            super(CohortMembership, saved_membership).save(update_fields=['course_user_group'])
+        log.info(u"Saving CohortMembership for user '%s' in '%s'", self.user.id, self.course_id)
+        return super(CohortMembership, self).save(force_insert=force_insert,
+                                                  force_update=force_update,
+                                                  using=using,
+                                                  update_fields=update_fields)
 
 
 # Needs to exist outside class definition in order to use 'sender=CohortMembership'
@@ -154,6 +151,8 @@ def remove_user_from_cohort(sender, instance, **kwargs):  # pylint: disable=unus
 class CourseUserGroupPartitionGroup(models.Model):
     """
     Create User Partition Info.
+
+    .. no_pii:
     """
     course_user_group = models.OneToOneField(CourseUserGroup, on_delete=models.CASCADE)
     partition_id = models.IntegerField(
@@ -170,6 +169,8 @@ class CourseCohortsSettings(models.Model):
     """
     This model represents cohort settings for courses.
     The only non-deprecated fields are `is_cohorted` and `course_id`.
+
+    .. no_pii:
     """
     is_cohorted = models.BooleanField(default=False)
 
@@ -208,6 +209,8 @@ class CourseCohortsSettings(models.Model):
 class CourseCohort(models.Model):
     """
     This model represents cohort related info.
+
+    .. no_pii:
     """
     course_user_group = models.OneToOneField(CourseUserGroup, unique=True, related_name='cohort',
                                              on_delete=models.CASCADE)
@@ -242,8 +245,12 @@ class CourseCohort(models.Model):
 class UnregisteredLearnerCohortAssignments(DeletableByUserValue, models.Model):
     """
     Tracks the assignment of an unregistered learner to a course's cohort.
+
+    .. pii: The email field stores PII.
+    .. pii_types: email_address
+    .. pii_retirement: local_api
     """
-    #pylint: disable=model-missing-unicode
+    # pylint: disable=model-missing-unicode
     class Meta(object):
         unique_together = (('course_id', 'email'), )
 

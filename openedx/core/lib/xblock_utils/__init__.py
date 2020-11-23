@@ -2,34 +2,38 @@
 Functions that can are used to modify XBlock fragments for use in the LMS and Studio
 """
 
+
 import datetime
+import hashlib
 import json
 import logging
-import markupsafe
 import re
-import static_replace
 import uuid
-from lxml import html, etree
-from contracts import contract
 
+import markupsafe
+import six
+import webpack_loader.utils
+from contracts import contract
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse
-from pytz import UTC
 from django.utils.html import escape
-from django.contrib.auth.models import User
-from edxmako.shortcuts import render_to_string
+from lxml import etree, html
+from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
+from pytz import UTC
 from six import text_type
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
 from xblock.scorable import ScorableXBlockMixin
 
+import static_replace
+from edxmako.shortcuts import render_to_string
 from xmodule.seq_module import SequenceModule
+from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.vertical_block import VerticalBlock
-from xmodule.x_module import shim_xmodule_js, XModuleDescriptor, XModule, PREVIEW_VIEWS, STUDIO_VIEW
-
-import webpack_loader.utils
+from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW, XModule, XModuleDescriptor, shim_xmodule_js
 
 log = logging.getLogger(__name__)
 
@@ -52,7 +56,7 @@ def request_token(request):
     """
     # pylint: disable=protected-access
     if not hasattr(request, '_xblock_token'):
-        request._xblock_token = uuid.uuid1().get_hex()
+        request._xblock_token = uuid.uuid1().hex
 
     return request._xblock_token
 
@@ -62,7 +66,7 @@ def wrap_xblock(
         block,
         view,
         frag,
-        context,                        # pylint: disable=unused-argument
+        context,
         usage_id_serializer,
         request_token,                  # pylint: disable=redefined-outer-name
         display_name_only=False,
@@ -106,7 +110,7 @@ def wrap_xblock(
         )
     ]
 
-    if isinstance(block, (XModule, XModuleDescriptor)):
+    if isinstance(block, (XModule, XModuleDescriptor)) or getattr(block, 'uses_xmodule_styles_setup', False):
         if view in PREVIEW_VIEWS:
             # The block is acting as an XModule
             css_classes.append('xmodule_display')
@@ -118,8 +122,10 @@ def wrap_xblock(
             css_classes.append('is-hidden')
 
         css_classes.append('xmodule_' + markupsafe.escape(class_name))
+
+    if isinstance(block, (XModule, XModuleDescriptor)):
         data['type'] = block.js_module_name
-        shim_xmodule_js(block, frag)
+        shim_xmodule_js(frag, block.js_module_name)
 
     if frag.js_init_fn:
         data['init'] = frag.js_init_fn
@@ -129,6 +135,8 @@ def wrap_xblock(
     data['block-type'] = block.scope_ids.block_type
     data['usage-id'] = usage_id_serializer(block.scope_ids.usage_id)
     data['request-token'] = request_token
+    data['graded'] = getattr(block, 'graded', False)
+    data['has-score'] = getattr(block, 'has_score', False)
 
     if block.name:
         data['name'] = block.name
@@ -136,21 +144,19 @@ def wrap_xblock(
     template_context = {
         'content': block.display_name if display_name_only else frag.content,
         'classes': css_classes,
-        'display_name': block.display_name_with_default_escaped,
+        'display_name': block.display_name_with_default_escaped,  # xss-lint: disable=python-deprecated-display-name
         'data_attributes': u' '.join(u'data-{}="{}"'.format(markupsafe.escape(key), markupsafe.escape(value))
-                                     for key, value in data.iteritems()),
+                                     for key, value in six.iteritems(data)),
     }
 
     if hasattr(frag, 'json_init_args') and frag.json_init_args is not None:
-        # Replace / with \/ so that "</script>" in the data won't break things.
-        template_context['js_init_parameters'] = json.dumps(frag.json_init_args).replace("/", r"\/")
+        template_context['js_init_parameters'] = frag.json_init_args
     else:
         template_context['js_init_parameters'] = ""
 
     if isinstance(block, (XModule, XModuleDescriptor)):
         # Add the webpackified asset tags
-        for tag in webpack_loader.utils.get_as_tags(class_name):
-            frag.add_resource(tag, mimetype='text/html', placement='head')
+        add_webpack_to_fragment(frag, class_name)
 
     return wrap_fragment(frag, render_to_string('xblock_wrapper.html', template_context))
 
@@ -163,7 +169,8 @@ def wrap_xblock_aside(
         context,                        # pylint: disable=unused-argument
         usage_id_serializer,
         request_token,                   # pylint: disable=redefined-outer-name
-        extra_data=None
+        extra_data=None,
+        extra_classes=None
 ):
     """
     Wraps the results of rendering an XBlockAside view in a standard <section> with identifying
@@ -179,6 +186,7 @@ def wrap_xblock_aside(
     :param request_token: An identifier that is unique per-request, so that only xblocks
         rendered as part of this request will have their javascript initialized.
     :param extra_data: A dictionary with extra data values to be set on the wrapper
+    :param extra_classes: A list with extra classes to be set on the wrapper element
     """
 
     if extra_data is None:
@@ -195,6 +203,8 @@ def wrap_xblock_aside(
         ),
         'xblock_asides-v1'
     ]
+    if extra_classes:
+        css_classes.extend(extra_classes)
 
     if frag.js_init_fn:
         data['init'] = frag.js_init_fn
@@ -209,12 +219,11 @@ def wrap_xblock_aside(
         'content': frag.content,
         'classes': css_classes,
         'data_attributes': u' '.join(u'data-{}="{}"'.format(markupsafe.escape(key), markupsafe.escape(value))
-                                     for key, value in data.iteritems()),
+                                     for key, value in six.iteritems(data)),
     }
 
     if hasattr(frag, 'json_init_args') and frag.json_init_args is not None:
-        # Replace / with \/ so that "</script>" in the data won't break things.
-        template_context['js_init_parameters'] = json.dumps(frag.json_init_args).replace("/", r"\/")
+        template_context['js_init_parameters'] = frag.json_init_args
     else:
         template_context['js_init_parameters'] = ""
 
@@ -274,7 +283,7 @@ def grade_histogram(module_id):
     from django.db import connection
     cursor = connection.cursor()
 
-    query = """\
+    query = u"""\
         SELECT courseware_studentmodule.grade,
         COUNT(courseware_studentmodule.student_id)
         FROM courseware_studentmodule
@@ -298,7 +307,7 @@ def sanitize_html_id(html_id):
     return sanitized_html_id
 
 
-@contract(user=User, block=XBlock, view=basestring, frag=Fragment, context="dict|None")
+@contract(user=User, block=XBlock, view=six.string_types[0], frag=Fragment, context="dict|None")
 def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context):  # pylint: disable=unused-argument
     """
     Updates the supplied module with a new get_html function that wraps
@@ -309,6 +318,9 @@ def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context)
 
     Does nothing if module is a SequenceModule.
     """
+    if context and context.get('hide_staff_markup', False):
+        # If hide_staff_markup is passed, don't add the markup
+        return frag
     # TODO: make this more general, eg use an XModule attribute instead
     if isinstance(block, VerticalBlock) and (not context or not context.get('child_of_vertical', False)):
         # check that the course is a mongo backed Studio course before doing work
@@ -422,7 +434,7 @@ def get_course_update_items(course_updates, provided_index=0):
             content = html_parsed[0].tail
         else:
             content = html_parsed[0].tail if html_parsed[0].tail is not None else ""
-            content += "\n".join([html.tostring(ele) for ele in html_parsed[1:]])
+            content += "\n".join([html.tostring(ele).decode('utf-8') for ele in html_parsed[1:]])
         return content
 
     if course_updates and getattr(course_updates, "items", None):
@@ -441,6 +453,7 @@ def get_course_update_items(course_updates, provided_index=0):
         except (etree.XMLSyntaxError, etree.ParserError):
             log.error("Cannot parse: " + course_updates.data)
             escaped = escape(course_updates.data)
+            # xss-lint: disable=python-concat-html
             course_html_parsed = html.fromstring("<ol><li>" + escaped + "</li></ol>")
 
         # confirm that root is <ol>, iterate over <li>, pull out <h2> subs and then rest of val
@@ -472,7 +485,7 @@ def xblock_local_resource_url(block, uri):
     as a static asset which will use a CDN in production.
     """
     xblock_class = getattr(block.__class__, 'unmixed_class', block.__class__)
-    if settings.PIPELINE_ENABLED or not settings.REQUIRE_DEBUG:
+    if settings.PIPELINE['PIPELINE_ENABLED'] or not settings.REQUIRE_DEBUG:
         return staticfiles_storage.url('xblock/resources/{package_name}/{path}'.format(
             package_name=xblock_resource_pkg(xblock_class),
             path=uri
@@ -509,3 +522,48 @@ def xblock_resource_pkg(block):
         return module_name
 
     return module_name.rsplit('.', 1)[0]
+
+
+def is_xblock_aside(usage_key):
+    """
+    Returns True if the given usage key is for an XBlock aside
+
+    Args:
+        usage_key (opaque_keys.edx.keys.UsageKey): A usage key
+
+    Returns:
+        bool: Whether or not the usage key is an aside key type
+    """
+    return isinstance(usage_key, (AsideUsageKeyV1, AsideUsageKeyV2))
+
+
+def get_aside_from_xblock(xblock, aside_type):
+    """
+    Gets an instance of an XBlock aside from the XBlock that it's decorating. This also
+    configures the aside instance with the runtime and fields of the given XBlock.
+
+    Args:
+        xblock (xblock.core.XBlock): The XBlock that the desired aside is decorating
+        aside_type (str): The aside type
+
+    Returns:
+        xblock.core.XBlockAside: Instance of an xblock aside
+    """
+    return xblock.runtime.get_aside_of_type(xblock, aside_type)
+
+
+def hash_resource(resource):
+    """
+    Hash a :class:`web_fragments.fragment.FragmentResource
+    Those hash values are used to avoid loading the resources
+    multiple times.
+    """
+    md5 = hashlib.md5()
+    for data in resource:
+        if isinstance(data, bytes):
+            md5.update(data)
+        elif isinstance(data, six.string_types):
+            md5.update(data.encode('utf-8'))
+        else:
+            md5.update(repr(data).encode('utf-8'))
+    return md5.hexdigest()

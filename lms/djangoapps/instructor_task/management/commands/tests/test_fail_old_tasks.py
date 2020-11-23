@@ -1,3 +1,8 @@
+"""
+Tests for failing old tasks
+"""
+
+
 from datetime import datetime
 
 import ddt
@@ -16,7 +21,6 @@ class TestFailOldQueueingTasksCommand(InstructorTaskTestCase):
     """
     Tests for the `fail_old_tasks` management command
     """
-    shard = 4
 
     def setUp(self):
         super(TestFailOldQueueingTasksCommand, self).setUp()

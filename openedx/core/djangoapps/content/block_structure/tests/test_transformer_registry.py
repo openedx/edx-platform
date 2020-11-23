@@ -2,12 +2,13 @@
 Tests for transformer_registry.py
 """
 
-import ddt
-from nose.plugins.attrib import attr
+
 from unittest import TestCase
 
+import ddt
+
 from ..transformer_registry import TransformerRegistry
-from .helpers import MockTransformer, mock_registered_transformers, clear_registered_transformers_cache
+from .helpers import MockTransformer, clear_registered_transformers_cache, mock_registered_transformers
 
 
 class TestTransformer1(MockTransformer):
@@ -31,12 +32,12 @@ class UnregisteredTestTransformer3(MockTransformer):
     pass
 
 
-@attr(shard=2)
 @ddt.ddt
 class TransformerRegistryTestCase(TestCase):
     """
     Test cases for TransformerRegistry.
     """
+
     def tearDown(self):
         super(TransformerRegistryTestCase, self).tearDown()
         clear_registered_transformers_cache()

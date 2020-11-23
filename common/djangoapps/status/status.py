@@ -2,6 +2,7 @@
 A tiny app that checks for a status message.
 """
 
+
 import logging
 
 from .models import GlobalStatusMessage

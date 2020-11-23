@@ -5,6 +5,7 @@ business logic that is not directly tied to the data itself.
 This API is exposed via the middleware(emabargo/middileware.py) layer but may be used directly in-process.
 
 """
+
 import logging
 
 from django.conf import settings
@@ -13,7 +14,7 @@ from ipware.ip import get_ip
 from rest_framework import status
 from rest_framework.response import Response
 
-import pygeoip
+import geoip2.database
 from student.auth import has_course_author_access
 
 from .models import CountryAccessRule, RestrictedCourse
@@ -170,10 +171,16 @@ def _country_code_from_ip(ip_addr):
         str: A 2-letter country code.
 
     """
-    if ip_addr.find(':') >= 0:
-        return pygeoip.GeoIP(settings.GEOIPV6_PATH).country_code_by_addr(ip_addr)
-    else:
-        return pygeoip.GeoIP(settings.GEOIP_PATH).country_code_by_addr(ip_addr)
+    reader = geoip2.database.Reader(settings.GEOIP_PATH)
+
+    try:
+        response = reader.country(ip_addr)
+        # pylint: disable=no-member
+        country_code = response.country.iso_code
+    except geoip2.errors.AddressNotFoundError:
+        country_code = ""
+    reader.close()
+    return country_code
 
 
 def get_embargo_response(request, course_id, user):

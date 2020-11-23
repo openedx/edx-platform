@@ -1,20 +1,22 @@
 """
 Instructor tasks related to enrollments.
 """
+
+
 import logging
 from datetime import datetime
-from StringIO import StringIO
 from time import time
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from pytz import UTC
+from six import StringIO
 
-from courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_string
-from instructor_analytics.basic import enrolled_students_features, list_may_enroll
-from instructor_analytics.csvs import format_dictlist
+from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.instructor.paidcourse_enrollment_report import PaidCourseEnrollmentReportProvider
+from lms.djangoapps.instructor_analytics.basic import enrolled_students_features, list_may_enroll
+from lms.djangoapps.instructor_analytics.csvs import format_dictlist
 from lms.djangoapps.instructor_task.models import ReportStore
 from shoppingcart.models import (
     CouponRedemption,
@@ -124,14 +126,14 @@ def upload_enrollment_report(_xmodule_instance_args, _entry_id, course_id, _task
         }
 
         if not header:
-            header = user_data.keys() + course_enrollment_data.keys() + payment_data.keys()
+            header = list(user_data.keys()) + list(course_enrollment_data.keys()) + list(payment_data.keys())
             display_headers = []
             for header_element in header:
                 # translate header into a localizable display string
                 display_headers.append(enrollment_report_headers.get(header_element, header_element))
             rows.append(display_headers)
 
-        rows.append(user_data.values() + course_enrollment_data.values() + payment_data.values())
+        rows.append(list(user_data.values()) + list(course_enrollment_data.values()) + list(payment_data.values()))
         task_progress.succeeded += 1
 
     TASK_LOG.info(

@@ -2,13 +2,18 @@
 Install Python and Node prerequisites.
 """
 
+
 import hashlib
+import io
 import os
 import re
+import subprocess
 import sys
 from distutils import sysconfig
 
+import six
 from paver.easy import BuildFailure, sh, task
+from six.moves import range
 
 from .utils.envs import Env
 from .utils.timer import timed
@@ -75,11 +80,11 @@ def compute_fingerprint(path_list):
             for dirname in sorted(os.listdir(path_item)):
                 path_name = os.path.join(path_item, dirname)
                 if os.path.isdir(path_name):
-                    hasher.update(str(os.stat(path_name).st_mtime))
+                    hasher.update(str(os.stat(path_name).st_mtime).encode('utf-8'))
 
         # For files, hash the contents of the file
         if os.path.isfile(path_item):
-            with open(path_item, "rb") as file_handle:
+            with io.open(path_item, "rb") as file_handle:
                 hasher.update(file_handle.read())
 
     return hasher.hexdigest()
@@ -98,7 +103,7 @@ def prereq_cache(cache_name, paths, install_func):
     cache_file_path = os.path.join(PREREQS_STATE_DIR, "{}.sha1".format(cache_filename))
     old_hash = None
     if os.path.isfile(cache_file_path):
-        with open(cache_file_path) as cache_file:
+        with io.open(cache_file_path, "r") as cache_file:
             old_hash = cache_file.read()
 
     # Compare the old hash to the new hash
@@ -112,32 +117,51 @@ def prereq_cache(cache_name, paths, install_func):
         # If the code executed within the context fails (throws an exception),
         # then this step won't get executed.
         create_prereqs_cache_dir()
-        with open(cache_file_path, "w") as cache_file:
+        with io.open(cache_file_path, "wb") as cache_file:
             # Since the pip requirement files are modified during the install
             # process, we need to store the hash generated AFTER the installation
             post_install_hash = compute_fingerprint(paths)
-            cache_file.write(post_install_hash)
+            cache_file.write(post_install_hash.encode('utf-8'))
     else:
-        print '{cache} unchanged, skipping...'.format(cache=cache_name)
+        print(u'{cache} unchanged, skipping...'.format(cache=cache_name))
 
 
 def node_prereqs_installation():
     """
     Configures npm and installs Node prerequisites
     """
+
+    # NPM installs hang sporadically. Log the installation process so that we
+    # determine if any packages are chronic offenders.
+    shard_str = os.getenv('SHARD', None)
+    if shard_str:
+        npm_log_file_path = '{}/npm-install.{}.log'.format(Env.GEN_LOG_DIR, shard_str)
+    else:
+        npm_log_file_path = '{}/npm-install.log'.format(Env.GEN_LOG_DIR)
+    npm_log_file = io.open(npm_log_file_path, 'wb')
+    npm_command = 'npm install --verbose'.split()
+
     cb_error_text = "Subprocess return code: 1"
 
     # Error handling around a race condition that produces "cb() never called" error. This
     # evinces itself as `cb_error_text` and it ought to disappear when we upgrade
     # npm to 3 or higher. TODO: clean this up when we do that.
     try:
-        sh('npm install')
-    except BuildFailure, error_text:
-        if cb_error_text in error_text:
-            print "npm install error detected. Retrying..."
-            sh('npm install')
+        # The implementation of Paver's `sh` function returns before the forked
+        # actually returns. Using a Popen object so that we can ensure that
+        # the forked process has returned
+        proc = subprocess.Popen(npm_command, stderr=npm_log_file)
+        proc.wait()
+    except BuildFailure as error:
+        if cb_error_text in six.text_type(error):
+            print("npm install error detected. Retrying...")
+            proc = subprocess.Popen(npm_command, stderr=npm_log_file)
+            proc.wait()
         else:
-            raise BuildFailure(error_text)
+            raise
+    print(u"Successfully installed NPM packages. Log found at {}".format(
+        npm_log_file_path
+    ))
 
 
 def python_prereqs_installation():
@@ -151,7 +175,7 @@ def python_prereqs_installation():
 def pip_install_req_file(req_file):
     """Pip install the requirements file."""
     pip_cmd = 'pip install --disable-pip-version-check --exists-action w'
-    sh("{pip_cmd} -r {req_file}".format(pip_cmd=pip_cmd, req_file=req_file))
+    sh(u"{pip_cmd} -r {req_file}".format(pip_cmd=pip_cmd, req_file=req_file))
 
 
 @task
@@ -161,7 +185,7 @@ def install_node_prereqs():
     Installs Node prerequisites
     """
     if no_prereq_install():
-        print NO_PREREQ_MESSAGE
+        print(NO_PREREQ_MESSAGE)
         return
 
     prereq_cache("Node prereqs", ["package.json"], node_prereqs_installation)
@@ -170,12 +194,18 @@ def install_node_prereqs():
 # To add a package to the uninstall list, just add it to this list! No need
 # to touch any other part of this file.
 PACKAGES_TO_UNINSTALL = [
+    "MySQL-python",                 # Because mysqlclient shares the same directory name
     "South",                        # Because it interferes with Django 1.8 migrations.
     "edxval",                       # Because it was bork-installed somehow.
     "django-storages",
     "django-oauth2-provider",       # Because now it's called edx-django-oauth2-provider.
     "edx-oauth2-provider",          # Because it moved from github to pypi
     "i18n-tools",                   # Because now it's called edx-i18n-tools
+    "moto",                         # Because we no longer use it and it conflicts with recent jsondiff versions
+    "python-saml",                  # Because python3-saml shares the same directory name
+    "pdfminer",                     # Replaced by pdfminer.six, which shares the same directory name
+    "pytest-faulthandler",          # Because it was bundled into pytest
+    "djangorestframework-jwt",      # Because now its called drf-jwt.
 ]
 
 
@@ -198,16 +228,16 @@ def uninstall_python_packages():
     # So that we don't constantly uninstall things, use a hash of the packages
     # to be uninstalled.  Check it, and skip this if we're up to date.
     hasher = hashlib.sha1()
-    hasher.update(repr(PACKAGES_TO_UNINSTALL))
+    hasher.update(repr(PACKAGES_TO_UNINSTALL).encode('utf-8'))
     expected_version = hasher.hexdigest()
     state_file_path = os.path.join(PREREQS_STATE_DIR, "Python_uninstall.sha1")
     create_prereqs_cache_dir()
 
     if os.path.isfile(state_file_path):
-        with open(state_file_path) as state_file:
+        with io.open(state_file_path) as state_file:
             version = state_file.read()
         if version == expected_version:
-            print 'Python uninstalls unchanged, skipping...'
+            print('Python uninstalls unchanged, skipping...')
             return
 
     # Run pip to find the packages we need to get rid of.  Believe it or not,
@@ -220,18 +250,18 @@ def uninstall_python_packages():
         for package_name in PACKAGES_TO_UNINSTALL:
             if package_in_frozen(package_name, frozen):
                 # Uninstall the pacakge
-                sh("pip uninstall --disable-pip-version-check -y {}".format(package_name))
+                sh(u"pip uninstall --disable-pip-version-check -y {}".format(package_name))
                 uninstalled = True
         if not uninstalled:
             break
     else:
         # We tried three times and didn't manage to get rid of the pests.
-        print "Couldn't uninstall unwanted Python packages!"
+        print("Couldn't uninstall unwanted Python packages!")
         return
 
     # Write our version.
-    with open(state_file_path, "w") as state_file:
-        state_file.write(expected_version)
+    with io.open(state_file_path, "wb") as state_file:
+        state_file.write(expected_version.encode('utf-8'))
 
 
 def package_in_frozen(package_name, frozen_output):
@@ -256,7 +286,7 @@ def package_in_frozen(package_name, frozen_output):
 def install_coverage_prereqs():
     """ Install python prereqs for measuring coverage. """
     if no_prereq_install():
-        print NO_PREREQ_MESSAGE
+        print(NO_PREREQ_MESSAGE)
         return
     pip_install_req_file(COVERAGE_REQ_FILE)
 
@@ -268,7 +298,7 @@ def install_python_prereqs():
     Installs Python prerequisites.
     """
     if no_prereq_install():
-        print NO_PREREQ_MESSAGE
+        print(NO_PREREQ_MESSAGE)
         return
 
     uninstall_python_packages()
@@ -302,16 +332,27 @@ def install_prereqs():
     Installs Node and Python prerequisites
     """
     if no_prereq_install():
-        print NO_PREREQ_MESSAGE
+        print(NO_PREREQ_MESSAGE)
         return
 
     if not str2bool(os.environ.get('SKIP_NPM_INSTALL', 'False')):
         install_node_prereqs()
     install_python_prereqs()
     log_installed_python_prereqs()
+    print_devstack_warning()
 
 
 def log_installed_python_prereqs():
     """  Logs output of pip freeze for debugging. """
-    sh("pip freeze > {}".format(Env.GEN_LOG_DIR + "/pip_freeze.log"))
+    sh(u"pip freeze > {}".format(Env.GEN_LOG_DIR + "/pip_freeze.log"))
     return
+
+
+def print_devstack_warning():
+    if Env.USING_DOCKER:  # pragma: no cover
+        print("********************************************************************************")
+        print("* WARNING: Mac users should run this from both the lms and studio shells")
+        print("* in docker devstack to avoid startup errors that kill your CPU.")
+        print("* For more details, see:")
+        print("* https://github.com/edx/devstack#docker-is-using-lots-of-cpu-time-when-it-should-be-idle")
+        print("********************************************************************************")

@@ -2,7 +2,7 @@
 Tests for the Account Deletion (Retirement) view.
 """
 
-from mock import patch
+from mock import patch, Mock
 import pytest
 
 from django.urls import reverse
@@ -24,6 +24,10 @@ from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (
 @lms_multi_tenant_test
 @patch.dict('django.conf.settings.FEATURES', {'SKIP_EMAIL_VALIDATION': True})
 @pytest.mark.usefixtures("setup_retirement_states")
+@patch(
+    'openedx.core.djangoapps.ace_common.templatetags.ace._get_google_analytics_tracking_url',
+    Mock(return_value='http://url.com/')
+)
 class MultiTenantDeactivateLogoutViewTest(APITestCase):
     """
     Tests to ensure the DeactivateLogoutView works well with multi-tenant emails.

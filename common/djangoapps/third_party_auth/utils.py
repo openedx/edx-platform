@@ -1,6 +1,7 @@
 """
 Utility functions for third_party_auth
 """
+
 import logging
 
 from django.conf import settings
@@ -33,7 +34,7 @@ def user_exists(details):
     if email:
         user_queryset_filter['email'] = email
     elif username:
-        user_queryset_filter['username'] = username
+        user_queryset_filter['username__iexact'] = username
 
     if user_queryset_filter:
         if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):

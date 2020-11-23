@@ -1,7 +1,9 @@
+
+
 import datetime
+
 import ddt
 from mock import patch
-from nose.plugins.attrib import attr
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -11,7 +13,6 @@ from ..models import CourseOverview
 
 
 @ddt.ddt
-@attr(shard=3)
 class CourseOverviewSignalsTestCase(ModuleStoreTestCase):
     """
     Tests for CourseOverview signals.

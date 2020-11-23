@@ -1,6 +1,10 @@
 """
 Celery task for Automatic Verifed Track Cohorting MVP feature.
 """
+
+
+import six
+
 from celery.task import task
 from celery.utils.log import get_task_logger
 from django.contrib.auth.models import User
@@ -34,26 +38,26 @@ def sync_cohort_with_mode(self, course_id, user_id, verified_cohort_name, defaul
         acceptable_modes = {CourseMode.VERIFIED, CourseMode.CREDIT_MODE}
         if enrollment.mode in acceptable_modes and (current_cohort.id != verified_cohort.id):
             LOGGER.info(
-                "MOVING_TO_VERIFIED: Moving user '%s' to the verified cohort '%s' for course '%s'",
+                u"MOVING_TO_VERIFIED: Moving user '%s' to the verified cohort '%s' for course '%s'",
                 user.id, verified_cohort.name, course_id
             )
             add_user_to_cohort(verified_cohort, user.username)
         elif enrollment.mode not in acceptable_modes and current_cohort.id == verified_cohort.id:
             default_cohort = get_cohort_by_name(course_key, default_cohort_name)
             LOGGER.info(
-                "MOVING_TO_DEFAULT: Moving user '%s' to the default cohort '%s' for course '%s'",
+                u"MOVING_TO_DEFAULT: Moving user '%s' to the default cohort '%s' for course '%s'",
                 user.id, default_cohort.name, course_id
             )
             add_user_to_cohort(default_cohort, user.username)
         else:
             LOGGER.info(
-                "NO_ACTION_NECESSARY: No action necessary for user '%s' in course '%s' and enrollment mode '%s'. "
-                "The user is already in cohort '%s'.",
+                u"NO_ACTION_NECESSARY: No action necessary for user '%s' in course '%s' and enrollment mode '%s'. "
+                u"The user is already in cohort '%s'.",
                 user.id, course_id, enrollment.mode, current_cohort.name
             )
     except Exception as exc:
         LOGGER.warning(
-            "SYNC_COHORT_WITH_MODE_RETRY: Exception encountered for course '%s' and user '%s': %s",
-            course_id, user.id, unicode(exc)
+            u"SYNC_COHORT_WITH_MODE_RETRY: Exception encountered for course '%s' and user '%s': %s",
+            course_id, user.id, six.text_type(exc)
         )
         raise self.retry(exc=exc)

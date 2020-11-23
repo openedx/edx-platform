@@ -2,24 +2,24 @@
 Grading tests
 """
 
+
 import unittest
 from datetime import datetime, timedelta
 
 import ddt
 from pytz import UTC
-from lms.djangoapps.grades.scores import compute_percent
+import six
 from six import text_type
+
+from lms.djangoapps.grades.scores import compute_percent
 from xmodule import graders
-from xmodule.graders import (
-    AggregatedScore, ProblemScore, ShowCorrectness, aggregate_scores
-)
+from xmodule.graders import AggregatedScore, ProblemScore, ShowCorrectness, aggregate_scores
 
 
 class GradesheetTest(unittest.TestCase):
     """
     Tests the aggregate_scores method
     """
-    shard = 1
 
     def test_weighted_grading(self):
         scores = []
@@ -82,7 +82,6 @@ class GraderTest(unittest.TestCase):
     """
     Tests grader implementations
     """
-    shard = 1
 
     empty_gradesheet = {
     }
@@ -253,6 +252,40 @@ class GraderTest(unittest.TestCase):
         self.assertEqual(len(graded['section_breakdown']), 0)
         self.assertEqual(len(graded['grade_breakdown']), 0)
 
+    def test_grade_with_string_min_count(self):
+        """
+        Test that the grading succeeds in case the min_count is set to a string
+        """
+        weighted_grader = graders.grader_from_conf([
+            {
+                'type': "Homework",
+                'min_count': '12',
+                'drop_count': 2,
+                'short_label': "HW",
+                'weight': 0.25,
+            },
+            {
+                'type': "Lab",
+                'min_count': '7',
+                'drop_count': 3,
+                'category': "Labs",
+                'weight': 0.25
+            },
+            {
+                'type': "Midterm",
+                'min_count': '0',
+                'drop_count': 0,
+                'name': "Midterm Exam",
+                'short_label': "Midterm",
+                'weight': 0.5,
+            },
+        ])
+
+        graded = weighted_grader.grade(self.test_gradesheet)
+        self.assertAlmostEqual(graded['percent'], 0.50812499999999994)
+        self.assertEqual(len(graded['section_breakdown']), (12 + 1) + (7 + 1) + 1)
+        self.assertEqual(len(graded['grade_breakdown']), 3)
+
     def test_grader_from_conf(self):
 
         # Confs always produce a graders.WeightedSubsectionsGrader, so we test this by repeating the test
@@ -317,7 +350,8 @@ class GraderTest(unittest.TestCase):
         (
             # no drop_count
             {'type': "Homework", 'min_count': 0},
-            u"__init__() takes at least 4 arguments (3 given)"
+            # pylint: disable=line-too-long
+            u"__init__() takes at least 4 arguments (3 given)" if six.PY2 else u"__init__() missing 1 required positional argument: 'drop_count'"
         ),
     )
     @ddt.unpack
@@ -332,7 +366,6 @@ class ShowCorrectnessTest(unittest.TestCase):
     """
     Tests the correctness_available method
     """
-    shard = 1
 
     def setUp(self):
         super(ShowCorrectnessTest, self).setUp()
@@ -406,7 +439,7 @@ class ShowCorrectnessTest(unittest.TestCase):
             due_date = None
         else:
             due_date = getattr(self, due_date_str)
-        self.assertEquals(
+        self.assertEqual(
             ShowCorrectness.correctness_available(ShowCorrectness.PAST_DUE, due_date, has_staff_access),
             expected_result
         )

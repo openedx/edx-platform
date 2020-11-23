@@ -1,7 +1,10 @@
 """
 CMS Video
 """
+
+
 import os
+import os.path
 import time
 
 import requests
@@ -9,6 +12,7 @@ from bok_choy.javascript import js_defined, wait_for_js
 from bok_choy.promise import EmptyPromise, Promise
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
+from six.moves import range
 
 from common.test.acceptance.pages.common.utils import sync_on_notification
 from common.test.acceptance.pages.lms.video.video import VideoPage
@@ -17,7 +21,7 @@ from common.test.acceptance.tests.helpers import YouTubeStubConfig
 CLASS_SELECTORS = {
     'video_container': '.video',
     'video_init': '.is-initialized',
-    'video_xmodule': '.xmodule_VideoModule',
+    'video_xmodule': '.xmodule_VideoBlock',
     'video_spinner': '.video-wrapper .spinner',
     'video_controls': '.video-controls',
     'attach_asset': '.upload-dialog > input[type="file"]',
@@ -222,7 +226,7 @@ class VideoComponentPage(VideoPage):
             filename (str): asset filename
 
         """
-        return os.sep.join(__file__.split(os.sep)[:-5]) + '/data/uploads/' + filename
+        return os.sep.join(os.path.abspath(__file__).split(os.sep)[:-5]) + '/data/uploads/' + filename
 
     def upload_handout(self, handout_filename):
         """
@@ -328,7 +332,7 @@ class VideoComponentPage(VideoPage):
             line_number (int): caption line number
 
         """
-        caption_line_selector = ".subtitles li span[data-index='{index}']".format(index=line_number - 1)
+        caption_line_selector = u".subtitles li span[data-index='{index}']".format(index=line_number - 1)
         self.q(css=caption_line_selector).results[0].send_keys(Keys.ENTER)
 
     def is_caption_line_focused(self, line_number):
@@ -339,7 +343,7 @@ class VideoComponentPage(VideoPage):
             line_number (int): caption line number
 
         """
-        caption_line_selector = ".subtitles li span[data-index='{index}']".format(index=line_number - 1)
+        caption_line_selector = u".subtitles li span[data-index='{index}']".format(index=line_number - 1)
         caption_container = self.q(css=caption_line_selector).results[0].find_element_by_xpath('..')
         return 'focused' in caption_container.get_attribute('class').split()
 
@@ -439,7 +443,7 @@ class VideoComponentPage(VideoPage):
 
             self.q(css='#{}'.format(field_id)).fill(field_value)
         elif field_type == 'select':
-            self.q(css='select[name="{0}"] option[value="{1}"]'.format(field_name, field_value)).first.click()
+            self.q(css=u'select[name="{0}"] option[value="{1}"]'.format(field_name, field_value)).first.click()
 
     def verify_field_value(self, field_name, field_value):
         """
@@ -487,7 +491,7 @@ class VideoComponentPage(VideoPage):
 
         """
         translations_items = '.wrapper-translations-settings .list-settings-item'
-        language_selector = translations_items + ' select option[value="{}"]'.format(language_code)
+        language_selector = translations_items + u' select option[value="{}"]'.format(language_code)
         self.q(css=language_selector).nth(index).click()
 
     def upload_translation(self, transcript_name, language_code):
@@ -575,7 +579,7 @@ class VideoComponentPage(VideoPage):
         As all the captions lines are exactly same so only getting partial lines will work.
         """
         self.wait_for_captions()
-        selector = '.subtitles li:nth-child({})'
+        selector = u'.subtitles li:nth-child({})'
         return ' '.join([self.q(css=selector.format(i)).text[0] for i in range(1, 6)])
 
     def set_url_field(self, url, field_number):
@@ -607,7 +611,7 @@ class VideoComponentPage(VideoPage):
         """
         if message_type == 'status':
             self.wait_for_element_visibility(CLASS_SELECTORS[message_type],
-                                             '{} message is Visible'.format(message_type.title()))
+                                             u'{} message is Visible'.format(message_type.title()))
 
         return self.q(css=CLASS_SELECTORS[message_type]).text[0]
 
@@ -627,7 +631,7 @@ class VideoComponentPage(VideoPage):
         if field_numbers:
             index_list = [number - 1 for number in field_numbers]
         else:
-            index_list = range(3)  # maximum three fields
+            index_list = list(range(3))  # maximum three fields
 
         statuses = {}
         for index in index_list:
@@ -653,7 +657,7 @@ class VideoComponentPage(VideoPage):
         """
         Clear video url fields.
         """
-        script = """
+        script = u"""
         $('{selector}')
             .prop('disabled', false)
             .removeClass('is-disabled')

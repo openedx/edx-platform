@@ -1,4 +1,6 @@
 """ Factories for generating fake commerce-related data. """
+
+
 import factory
 from factory.fuzzy import FuzzyText
 

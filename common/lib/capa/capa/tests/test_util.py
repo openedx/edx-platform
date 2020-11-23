@@ -1,15 +1,28 @@
+# coding=utf-8
 """
 Tests capa util
 """
+
+
 import unittest
+
+import ddt
 from lxml import etree
 
 from capa.tests.helpers import test_capa_system
-from capa.util import compare_with_tolerance, sanitize_html, get_inner_html_from_xpath, remove_markup
+from capa.util import (
+    compare_with_tolerance,
+    contextualize_text,
+    get_inner_html_from_xpath,
+    remove_markup,
+    sanitize_html
+)
 
 
+@ddt.ddt
 class UtilTest(unittest.TestCase):
     """Tests for util"""
+
     def setUp(self):
         super(UtilTest, self).setUp()
         self.system = test_capa_system()
@@ -135,3 +148,24 @@ class UtilTest(unittest.TestCase):
             remove_markup("The <mark>Truth</mark> is <em>Out There</em> & you need to <strong>find</strong> it"),
             "The Truth is Out There &amp; you need to find it"
         )
+
+    @ddt.data(
+        'When the root level failš the whole hierarchy won’t work anymore.',
+        'あなたあなたあなた'
+    )
+    def test_contextualize_text(self, context_value):
+        """Verify that variable substitution works as intended with non-ascii characters."""
+        key = 'answer0'
+        text = '$answer0'
+        context = {key: context_value}
+        contextual_text = contextualize_text(text, context)
+        self.assertEqual(context_value, contextual_text)
+
+    def test_contextualize_text_with_non_ascii_context(self):
+        """Verify that variable substitution works as intended with non-ascii characters."""
+        key = u'あなた$a $b'
+        text = '$' + key
+        context = {'a': u'あなたあなたあなた', 'b': u'あなたhi'}
+        expected_text = '$あなたあなたあなたあなた あなたhi'
+        contextual_text = contextualize_text(text, context)
+        self.assertEqual(expected_text, contextual_text)

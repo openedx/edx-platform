@@ -1,17 +1,18 @@
 """
 Tests for HiddenContentTransformer.
 """
+
+
 from datetime import timedelta
 
 import ddt
+import six
 from django.utils.timezone import now
-from nose.plugins.attrib import attr
 
 from ..hidden_content import HiddenContentTransformer
 from .helpers import BlockParentsMapTestCase, update_block
 
 
-@attr(shard=3)
 @ddt.ddt
 class HiddenContentTransformerTestCase(BlockParentsMapTestCase):
     """
@@ -24,8 +25,8 @@ class HiddenContentTransformerTestCase(BlockParentsMapTestCase):
         """
         Use constant enum types for deterministic ddt test method names (rather than dynamically generated timestamps)
         """
-        none = 1,
-        future = 2,
+        none = 1
+        future = 2
         past = 3
 
         TODAY = now()
@@ -70,7 +71,7 @@ class HiddenContentTransformerTestCase(BlockParentsMapTestCase):
             hide_due_values,
             expected_visible_blocks,
     ):
-        for idx, due_date_type in hide_due_values.iteritems():
+        for idx, due_date_type in six.iteritems(hide_due_values):
             block = self.get_block(idx)
             block.due = self.DueDateType.due(due_date_type)
             block.hide_after_due = True

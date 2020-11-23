@@ -3,17 +3,18 @@ Implementation of abstraction layer for other parts of the system to make querie
 """
 
 import logging
-
 from itertools import chain
+
 from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from course_modes.models import CourseMode
+from lms.djangoapps.verify_student.utils import is_verification_expiring_soon
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from student.models import User
 
-from .models import SoftwareSecurePhotoVerification, SSOVerification, ManualVerification
+from .models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 from .utils import earliest_allowed_verification_date, most_recent_verification
 
 log = logging.getLogger(__name__)
@@ -85,10 +86,9 @@ class IDVerificationService(object):
         return verifications
 
     @classmethod
-    def get_verified_users(cls, users):
+    def get_verified_user_ids(cls, users):
         """
-        Return the list of users that have non-expired verifications of either type from
-        the given list of users.
+        Given a list of users, returns an iterator of user ids that have non-expired verifications of any type.
         """
         filter_kwargs = {
             'user__in': users,
@@ -96,9 +96,9 @@ class IDVerificationService(object):
             'created_at__gte': (earliest_allowed_verification_date())
         }
         return chain(
-            SoftwareSecurePhotoVerification.objects.filter(**filter_kwargs).select_related('user'),
-            SSOVerification.objects.filter(**filter_kwargs).select_related('user'),
-            ManualVerification.objects.filter(**filter_kwargs).select_related('user')
+            SoftwareSecurePhotoVerification.objects.filter(**filter_kwargs).values_list('user_id', flat=True),
+            SSOVerification.objects.filter(**filter_kwargs).values_list('user_id', flat=True),
+            ManualVerification.objects.filter(**filter_kwargs).values_list('user_id', flat=True)
         )
 
     @classmethod
@@ -147,9 +147,11 @@ class IDVerificationService(object):
             'created_at__gte': earliest_allowed_verification_date()
         }
 
-        return (SoftwareSecurePhotoVerification.objects.filter(**filter_kwargs).exists() or
-                SSOVerification.objects.filter(**filter_kwargs).exists() or
-                ManualVerification.objects.filter(**filter_kwargs).exists())
+        return (
+            SoftwareSecurePhotoVerification.objects.filter(**filter_kwargs).exists() or
+            SSOVerification.objects.filter(**filter_kwargs).exists() or
+            ManualVerification.objects.filter(**filter_kwargs).exists()
+        )
 
     @classmethod
     def user_status(cls, user):
@@ -170,6 +172,7 @@ class IDVerificationService(object):
             'status': 'none',
             'error': '',
             'should_display': True,
+            'verification_expiry': '',
         }
 
         # We need to check the user's most recent attempt.
@@ -195,7 +198,7 @@ class IDVerificationService(object):
         if attempt.created_at < earliest_allowed_verification_date():
             if user_status['should_display']:
                 user_status['status'] = 'expired'
-                user_status['error'] = _("Your {platform_name} verification has expired.").format(
+                user_status['error'] = _(u"Your {platform_name} verification has expired.").format(
                     platform_name=configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
                 )
             else:
@@ -211,6 +214,9 @@ class IDVerificationService(object):
 
         elif attempt.status == 'approved':
             user_status['status'] = 'approved'
+            expiration_datetime = cls.get_expiration_datetime(user, ['approved'])
+            if getattr(attempt, 'expiry_date', None) and is_verification_expiring_soon(expiration_datetime):
+                user_status['verification_expiry'] = attempt.expiry_date.date().strftime("%m/%d/%Y")
 
         elif attempt.status in ['submitted', 'approved', 'must_retry']:
             # user_has_valid_or_pending does include 'approved', but if we are

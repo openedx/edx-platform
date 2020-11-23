@@ -50,24 +50,24 @@ except:
   <%
       rtl_group = '{}-rtl'.format(group)
 
-      if get_language_bidi() and rtl_group in settings.PIPELINE_CSS:
+      if get_language_bidi() and rtl_group in settings.PIPELINE['STYLESHEETS']:
         group = rtl_group
   %>
 
-  % if settings.PIPELINE_ENABLED:
+  % if settings.PIPELINE['PIPELINE_ENABLED']:
     ${compressed_css(group, raw=raw) | n, decode.utf8}
   % else:
-    % for filename in settings.PIPELINE_CSS[group]['source_filenames']:
+    % for filename in settings.PIPELINE['STYLESHEETS'][group]['source_filenames']:
       <link rel="stylesheet" href="${staticfiles_storage.url(filename.replace('.scss', '.css'))}${"?raw" if raw else ""}" type="text/css" media="all" / >
     % endfor
   %endif
 </%def>
 
 <%def name='js(group)'>
-  % if settings.PIPELINE_ENABLED:
+  % if settings.PIPELINE['PIPELINE_ENABLED']:
     ${compressed_js(group) | n, decode.utf8}
   % else:
-    % for filename in settings.PIPELINE_JS[group]['source_filenames']:
+    % for filename in settings.PIPELINE['JAVASCRIPT'][group]['source_filenames']:
       <script type="text/javascript" src="${staticfiles_storage.url(filename.replace('.coffee', '.js'))}"></script>
     % endfor
   %endif
@@ -85,9 +85,26 @@ except:
 <%def name="include(path)"><%
 from django.conf import settings
 from django.template.engine import Engine
+from django.template import TemplateDoesNotExist
 from openedx.core.djangoapps.theming.template_loaders import ThemeTemplateLoader
-engine = Engine(dirs=settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
-source, template_path = ThemeTemplateLoader(engine).load_template_source(path)
+from openedx.core.djangoapps.theming.helpers import get_current_theme
+dirs = settings.DEFAULT_TEMPLATE_ENGINE['DIRS']
+theme = get_current_theme()
+if theme:
+    dirs = list(dirs)
+    dirs.append(theme.path / 'templates')
+engine = Engine(dirs=dirs)
+loader = ThemeTemplateLoader(engine)
+
+source = None
+for origin in loader.get_template_sources(path):
+    try:
+        source = loader.get_contents(origin)
+    except TemplateDoesNotExist:
+        pass
+
+if not source:
+    raise TemplateDoesNotExist(path)
 %>${source | n, decode.utf8}</%def>
 
 <%def name="studiofrontend(entry)">

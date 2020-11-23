@@ -9,10 +9,10 @@ file and check it in at the same time as your model changes. To do that,
 3. It adds the migration file to edx-platform/common/djangoapps/course_action_state/migrations/
 
 """
+
 from django.contrib.auth.models import User
 from django.db import models
 from opaque_keys.edx.django.models import CourseKeyField
-
 from course_action_state.managers import CourseActionStateManager, CourseRerunUIStateManager
 
 
@@ -101,6 +101,8 @@ class CourseActionUIState(CourseActionState):
 class CourseRerunState(CourseActionUIState):
     """
     A concrete django model for maintaining state specifically for the Action Course Reruns.
+
+    .. no_pii:
     """
     class Meta(object):
         """
@@ -115,7 +117,7 @@ class CourseRerunState(CourseActionUIState):
     source_course_key = CourseKeyField(max_length=255, db_index=True)
 
     # Display name for destination course
-    display_name = models.CharField(max_length=255, default="", blank=True)
+    display_name = models.CharField(max_length=255, default=u"", blank=True)
 
     # MANAGERS
     # Override the abstract class' manager with a Rerun-specific manager that inherits from the base class' manager.

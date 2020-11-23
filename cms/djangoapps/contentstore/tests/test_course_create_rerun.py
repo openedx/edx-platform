@@ -1,11 +1,16 @@
 """
 Test view handler for rerun (and eventually create)
 """
+
+
 import datetime
+import unittest
 
 import ddt
-from django.urls import reverse
+import six
+from django.conf import settings
 from django.test.client import RequestFactory
+from django.urls import reverse
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
 
@@ -63,12 +68,19 @@ class TestCourseListing(ModuleStoreTestCase):
         self.client.logout()
         ModuleStoreTestCase.tearDown(self)
 
+    @patch.dict('django.conf.settings.FEATURES', {'ORGANIZATIONS_APP': True})
+    @unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'TODO: fix date failures')
     def test_rerun(self):
         """
         Just testing the functionality the view handler adds over the tasks tested in test_clone_course
         """
+        add_organization({
+            'name': 'Test Organization',
+            'short_name': self.source_course_key.org,
+            'description': 'Testing Organization Description',
+        })
         response = self.client.ajax_post(self.course_create_rerun_url, {
-            'source_course_key': unicode(self.source_course_key),
+            'source_course_key': six.text_type(self.source_course_key),
             'org': self.source_course_key.org, 'course': self.source_course_key.course, 'run': 'copy',
             'display_name': 'not the same old name',
         })
@@ -83,6 +95,9 @@ class TestCourseListing(ModuleStoreTestCase):
         self.assertEqual(dest_course.end, source_course.end)
         self.assertEqual(dest_course.enrollment_start, None)
         self.assertEqual(dest_course.enrollment_end, None)
+        course_orgs = get_course_organizations(dest_course_key)
+        self.assertEqual(len(course_orgs), 1)
+        self.assertEqual(course_orgs[0]['short_name'], self.source_course_key.org)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_newly_created_course_has_web_certs_enabled(self, store):

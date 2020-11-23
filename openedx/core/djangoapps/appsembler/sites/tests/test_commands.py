@@ -3,7 +3,7 @@ import os
 import pkg_resources
 import uuid
 from mock import patch, mock_open
-from StringIO import StringIO
+from io import StringIO
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -46,8 +46,11 @@ from student.tests.factories import (
 )
 
 from organizations.models import Organization, OrganizationCourse
-from provider.constants import CONFIDENTIAL
-from provider.oauth2.models import AccessToken, RefreshToken, Client
+
+if not settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
+    from provider.constants import CONFIDENTIAL
+    from oauth2_provider.models import AccessToken, RefreshToken, Client
+
 from student.roles import CourseCreatorRole
 
 
@@ -305,7 +308,7 @@ class TestExportSiteCommand(TestCase):
         }
 
         objects = graph.get(instance, [])
-        for key, value in graph.items():
+        for key, value in list(graph.items()):
             if instance in value:
                 objects.append(key)
 
@@ -796,4 +799,4 @@ class TestOffboardSiteCommand(ModuleStoreTestCase):
     @staticmethod
     def create_org_users(org, new_user_count):
         return [UserOrganizationMappingFactory(
-            organization=org).user for i in xrange(new_user_count)]
+            organization=org).user for i in range(new_user_count)]

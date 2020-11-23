@@ -17,7 +17,9 @@
     box-sizing: border-box;
     margin: 0 auto;
 
-    p, ol, ul {
+    p,
+    ol,
+    ul {
       font-family: $font-family-sans-serif;
 
       // override needed for poorly scoped font-family styling on p a:link {}

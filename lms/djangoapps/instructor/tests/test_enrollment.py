@@ -3,22 +3,25 @@
 Unit tests for instructor.enrollment methods.
 """
 
+
 import json
 from abc import ABCMeta
 
-import mock
+import ddt
+import six
 from ccx_keys.locator import CCXLocator
+from crum import set_current_request
 from django.conf import settings
-from django.utils.translation import override as override_language
 from django.utils.translation import get_language
+from django.utils.translation import override as override_language
 from mock import patch, Mock
-from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
+from submissions import api as sub_api
 import unittest
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 from grades.subsection_grade_factory import SubsectionGradeFactory
 from grades.tests.utils import answer_problem
 from lms.djangoapps.ccx.tests.factories import CcxFactory
@@ -32,16 +35,15 @@ from lms.djangoapps.instructor.enrollment import (
     send_beta_role_email,
     unenroll_email
 )
+from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, get_mock_request
 from student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
 from student.roles import CourseCcxCoachRole
 from student.tests.factories import AdminFactory, UserFactory
-from submissions import api as sub_api
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
-@attr(shard=1)
 class TestSettableEnrollmentState(CacheIsolationTestCase):
     """ Test the basis class for enrollment tests. """
     def setUp(self):
@@ -65,7 +67,7 @@ class TestSettableEnrollmentState(CacheIsolationTestCase):
         self.assertEqual(mes, ees)
 
 
-class TestEnrollmentChangeBase(CacheIsolationTestCase):
+class TestEnrollmentChangeBase(six.with_metaclass(ABCMeta, CacheIsolationTestCase)):
     """
     Test instructor enrollment administration against database effects.
 
@@ -73,8 +75,6 @@ class TestEnrollmentChangeBase(CacheIsolationTestCase):
     `action` is a function which is run
     the test will pass if `action` mutates state from `before_ideal` to `after_ideal`
     """
-
-    __metaclass__ = ABCMeta
 
     def setUp(self):
         super(TestEnrollmentChangeBase, self).setUp()
@@ -91,22 +91,21 @@ class TestEnrollmentChangeBase(CacheIsolationTestCase):
                 `email` is an email string
         """
         # initialize & check before
-        print "checking initialization..."
+        print("checking initialization...")
         eobjs = before_ideal.create_user(self.course_key)
         before = EmailEnrollmentState(self.course_key, eobjs.email)
         self.assertEqual(before, before_ideal)
 
         # do action
-        print "running action..."
+        print("running action...")
         action(eobjs.email)
 
         # check after
-        print "checking effects..."
+        print("checking effects...")
         after = EmailEnrollmentState(self.course_key, eobjs.email)
         self.assertEqual(after, after_ideal)
 
 
-@attr(shard=1)
 @patch('lms.djangoapps.instructor.enrollment.get_organization_for_site', Mock(return_value=object()))
 @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=False))
 class TestInstructorEnrollDB(TestEnrollmentChangeBase):
@@ -228,7 +227,6 @@ class TestInstructorEnrollDB(TestEnrollmentChangeBase):
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
 
-@attr(shard=1)
 @unittest.skip('Appsembler: Skip all tests because they fail without an easy fix -- Omar')
 class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
     """ Test instructor.enrollment.unenroll_email """
@@ -309,7 +307,6 @@ class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
 
-@attr(shard=1)
 class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
     """ Test student module manipulations. """
     @classmethod
@@ -320,7 +317,6 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
             org='course',
             run='id',
         )
-        # pylint: disable=no-member
         cls.course_key = cls.course.location.course_key
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):
             cls.parent = ItemFactory(
@@ -381,7 +377,7 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
         reset_student_attempts(self.course_key, self.user, msk, requesting_user=self.user)
         self.assertEqual(json.loads(module().state)['attempts'], 0)
 
-    @mock.patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
+    @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
     def test_delete_student_attempts(self, _mock_signal):
         msk = self.course_key.make_usage_key('dummy', 'module')
         original_state = json.dumps({'attempts': 32, 'otherstuff': 'alsorobots'})
@@ -407,10 +403,8 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
 
     # Disable the score change signal to prevent other components from being
     # pulled into tests.
-    @mock.patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
-    @mock.patch('lms.djangoapps.grades.signals.handlers.submissions_score_set_handler')
-    @mock.patch('lms.djangoapps.grades.signals.handlers.submissions_score_reset_handler')
-    def test_delete_submission_scores(self, _mock_send_signal, mock_set_receiver, mock_reset_receiver):
+    @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
+    def test_delete_submission_scores(self, mock_send_signal):
         user = UserFactory()
         problem_location = self.course_key.make_usage_key('dummy', 'module')
 
@@ -433,6 +427,7 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
         sub_api.set_score(submission['uuid'], 1, 2)
 
         # Delete student state using the instructor dash
+        mock_send_signal.reset_mock()
         reset_student_attempts(
             self.course_key, user, problem_location,
             requesting_user=user,
@@ -440,8 +435,8 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
         )
 
         # Make sure our grades signal receivers handled the reset properly
-        mock_set_receiver.assert_not_called()
-        mock_reset_receiver.assert_called_once()
+        mock_send_signal.assert_called_once()
+        assert mock_send_signal.call_args[1]['weighted_earned'] == 0
 
         # Verify that the student's scores have been reset in the submissions API
         score = sub_api.get_score(student_item)
@@ -549,6 +544,11 @@ class TestStudentModuleGrading(SharedModuleStoreTestCase):
         cls.user = cls.request.user
         cls.instructor = UserFactory(username='staff', is_staff=True)
 
+    @classmethod
+    def tearDownClass(cls):
+        super(TestStudentModuleGrading, cls).tearDownClass()
+        set_current_request(None)
+
     def _get_subsection_grade_and_verify(self, all_earned, all_possible, graded_earned, graded_possible):
         """
         Retrieves the subsection grade and verifies that
@@ -653,7 +653,6 @@ class SettableEnrollmentState(EmailEnrollmentState):
             return EnrollmentObjects(email, None, None, None)
 
 
-@attr(shard=1)
 class TestSendBetaRoleEmail(CacheIsolationTestCase):
     """
     Test edge cases for `send_beta_role_email`
@@ -666,12 +665,11 @@ class TestSendBetaRoleEmail(CacheIsolationTestCase):
 
     def test_bad_action(self):
         bad_action = 'beta_tester'
-        error_msg = "Unexpected action received '{}' - expected 'add' or 'remove'".format(bad_action)
-        with self.assertRaisesRegexp(ValueError, error_msg):
+        error_msg = u"Unexpected action received '{}' - expected 'add' or 'remove'".format(bad_action)
+        with self.assertRaisesRegex(ValueError, error_msg):
             send_beta_role_email(bad_action, self.user, self.email_params)
 
 
-@attr(shard=1)
 class TestGetEmailParamsCCX(SharedModuleStoreTestCase):
     """
     Test what URLs the function get_email_params for CCX student enrollment.
@@ -720,7 +718,6 @@ class TestGetEmailParamsCCX(SharedModuleStoreTestCase):
         self.assertEqual(result['course_url'], self.course_url)
 
 
-@attr(shard=1)
 class TestGetEmailParams(SharedModuleStoreTestCase):
     """
     Test what URLs the function get_email_params returns under different
@@ -753,7 +750,7 @@ class TestGetEmailParams(SharedModuleStoreTestCase):
     def test_marketing_params(self):
         # For a site with a marketing front end, what do we expect to get for the URLs?
         # Also make sure `auto_enroll` is properly passed through.
-        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
             result = get_email_params(self.course, True)
 
         self.assertEqual(result['auto_enroll'], True)
@@ -763,8 +760,8 @@ class TestGetEmailParams(SharedModuleStoreTestCase):
         self.assertEqual(result['course_url'], self.course_url)
 
 
-@attr(shard=1)
-class TestRenderMessageToString(SharedModuleStoreTestCase):
+@ddt.ddt
+class TestRenderMessageToString(EmailTemplateTagMixin, SharedModuleStoreTestCase):
     """
     Test that email templates can be rendered in a language chosen manually.
     Test CCX enrollmet email.
@@ -775,8 +772,8 @@ class TestRenderMessageToString(SharedModuleStoreTestCase):
     def setUpClass(cls):
         super(TestRenderMessageToString, cls).setUpClass()
         cls.course = CourseFactory.create()
-        cls.subject_template = 'emails/enroll_email_allowedsubject.txt'
-        cls.message_template = 'emails/enroll_email_allowedmessage.txt'
+        cls.subject_template = 'instructor/edx_ace/allowedenroll/email/subject.txt'
+        cls.message_template = 'instructor/edx_ace/allowedenroll/email/body.txt'
 
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
     def setUp(self):
@@ -794,6 +791,7 @@ class TestRenderMessageToString(SharedModuleStoreTestCase):
         email_params = get_email_params(self.course, True)
         email_params["email_address"] = "user@example.com"
         email_params["full_name"] = "Jean Reno"
+        email_params["course_name"] = email_params["display_name"]
 
         return email_params
 
@@ -809,6 +807,8 @@ class TestRenderMessageToString(SharedModuleStoreTestCase):
         )
         email_params["email_address"] = "user@example.com"
         email_params["full_name"] = "Jean Reno"
+        email_params["course_name"] = email_params["display_name"]
+        email_params.update(self.context)
 
         return email_params
 
@@ -834,12 +834,12 @@ class TestRenderMessageToString(SharedModuleStoreTestCase):
         )
 
     def test_subject_and_message_translation(self):
-        subject, message = self.get_subject_and_message('fr')
+        subject, message = self.get_subject_and_message('eo')
         language_after_rendering = get_language()
 
-        you_have_been_invited_in_french = u"Vous avez été invité"
-        self.assertIn(you_have_been_invited_in_french, subject)
-        self.assertIn(you_have_been_invited_in_french, message)
+        you_have_been_invited_in_esperanto = u"Ýöü hävé ßéén"
+        self.assertIn(you_have_been_invited_in_esperanto, subject)
+        self.assertIn(you_have_been_invited_in_esperanto, message)
         self.assertEqual(settings.LANGUAGE_CODE, language_after_rendering)
 
     def test_platform_language_is_used_for_logged_in_user(self):
@@ -849,15 +849,19 @@ class TestRenderMessageToString(SharedModuleStoreTestCase):
             self.assertIn("You have been", message)
 
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
-    def test_render_enrollment_message_ccx_members(self):
+    @ddt.data('body.txt', 'body.html')
+    def test_render_enrollment_message_ccx_members(self, body_file_name):
         """
         Test enrollment email template renders for CCX.
         For EDX members.
         """
-        subject_template = 'emails/enroll_email_enrolledsubject.txt'
-        message_template = 'emails/enroll_email_enrolledmessage.txt'
+        subject_template = 'instructor/edx_ace/enrollenrolled/email/subject.txt'
+        body_template = 'instructor/edx_ace/enrollenrolled/email/{body_file_name}'.format(
+            body_file_name=body_file_name,
+        )
 
-        subject, message = self.get_subject_and_message_ccx(subject_template, message_template)
+        subject, message = self.get_subject_and_message_ccx(subject_template, body_template)
+
         self.assertIn(self.ccx.display_name, subject)
         self.assertIn(self.ccx.display_name, message)
         site = settings.SITE_NAME
@@ -868,28 +872,34 @@ class TestRenderMessageToString(SharedModuleStoreTestCase):
         self.assertIn(course_url, message)
 
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
-    def test_render_unenrollment_message_ccx_members(self):
+    @ddt.data('body.txt', 'body.html')
+    def test_render_unenrollment_message_ccx_members(self, body_file_name):
         """
         Test unenrollment email template renders for CCX.
         For EDX members.
         """
-        subject_template = 'emails/unenroll_email_subject.txt'
-        message_template = 'emails/unenroll_email_enrolledmessage.txt'
+        subject_template = 'instructor/edx_ace/enrolledunenroll/email/subject.txt'
+        body_template = 'instructor/edx_ace/enrolledunenroll/email/{body_file_name}'.format(
+            body_file_name=body_file_name,
+        )
 
-        subject, message = self.get_subject_and_message_ccx(subject_template, message_template)
+        subject, message = self.get_subject_and_message_ccx(subject_template, body_template)
         self.assertIn(self.ccx.display_name, subject)
         self.assertIn(self.ccx.display_name, message)
 
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
-    def test_render_enrollment_message_ccx_non_members(self):
+    @ddt.data('body.txt', 'body.html')
+    def test_render_enrollment_message_ccx_non_members(self, body_file_name):
         """
         Test enrollment email template renders for CCX.
         For non EDX members.
         """
-        subject_template = 'emails/enroll_email_allowedsubject.txt'
-        message_template = 'emails/enroll_email_allowedmessage.txt'
+        subject_template = 'instructor/edx_ace/allowedenroll/email/subject.txt'
+        body_template = 'instructor/edx_ace/allowedenroll/email/{body_file_name}'.format(
+            body_file_name=body_file_name,
+        )
 
-        subject, message = self.get_subject_and_message_ccx(subject_template, message_template)
+        subject, message = self.get_subject_and_message_ccx(subject_template, body_template)
         self.assertIn(self.ccx.display_name, subject)
         self.assertIn(self.ccx.display_name, message)
         site = settings.SITE_NAME
@@ -897,14 +907,17 @@ class TestRenderMessageToString(SharedModuleStoreTestCase):
         self.assertIn(registration_url, message)
 
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
-    def test_render_unenrollment_message_ccx_non_members(self):
+    @ddt.data('body.txt', 'body.html')
+    def test_render_unenrollment_message_ccx_non_members(self, body_file_name):
         """
         Test unenrollment email template renders for CCX.
         For non EDX members.
         """
-        subject_template = 'emails/unenroll_email_subject.txt'
-        message_template = 'emails/unenroll_email_allowedmessage.txt'
+        subject_template = 'instructor/edx_ace/allowedunenroll/email/subject.txt'
+        body_template = 'instructor/edx_ace/allowedunenroll/email/{body_file_name}'.format(
+            body_file_name=body_file_name,
+        )
 
-        subject, message = self.get_subject_and_message_ccx(subject_template, message_template)
+        subject, message = self.get_subject_and_message_ccx(subject_template, body_template)
         self.assertIn(self.ccx.display_name, subject)
         self.assertIn(self.ccx.display_name, message)

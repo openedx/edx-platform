@@ -136,10 +136,11 @@ html.video-fullscreen {
     .xblock {
       overflow-wrap: break-word;
       word-wrap: break-word;
-      word-break: break-word;
       margin: 0 auto;
+      font: -apple-system-body;
 
-      &.xblock-student_view-vertical {
+      &.xblock-student_view-vertical,
+      &.xblock-public_view-vertical {
         max-width: $text-width-readability-max;
       }
     }
@@ -150,6 +151,12 @@ html.video-fullscreen {
     }
 
     div.timed-exam {
+      color: #555353;
+
+      strong {
+        font-weight: 600;
+      }
+
       h3 {
         margin-bottom: 12px;
         font-size: 22px;
@@ -179,14 +186,6 @@ html.video-fullscreen {
         }
       }
 
-      p {
-        color: #797676;
-
-        strong {
-          font-weight: 600;
-        }
-      }
-
       button.gated-sequence {
         background: $transparent;
         color: theme-color("primary");
@@ -205,8 +204,8 @@ html.video-fullscreen {
         }
       }
 
-      span.proctored-exam-code {
-        margin-top: 5px;
+      .proctored-exam-code {
+        margin: 5px 0;
         font-size: 1.3em;
       }
 
@@ -228,8 +227,12 @@ html.video-fullscreen {
         }
       }
 
-      .proctored-exam-select-code {
-        @include margin-left(30px);
+      .copy-exam-code-button {
+        margin: 5px 0;
+        padding: 7.5px 20px;
+        margin-left: -5px;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
       }
 
       .exam-action-button {
@@ -256,7 +259,7 @@ html.video-fullscreen {
       background-color: #f2f8fb;
       padding: 30px;
       font-size: 16px;
-      box-shadow: inset 1px 1px 2px rgba(0, 0, 0, .1);
+      box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.1);
       border: 1px solid #ddd;
 
       &.critical-time {
@@ -320,6 +323,24 @@ html.video-fullscreen {
         }
       }
 
+      &.instructions {
+        p {
+          margin: 0;
+        }
+
+        h4 {
+          margin-top: ($baseline * 3/2);
+        }
+
+        ul {
+          margin: 0;
+        }
+
+        .exam-action-button {
+          margin-top: $baseline / 2;
+        }
+      }
+
       hr {
         border-bottom: 1px solid $uxpl-gray-background;
       }
@@ -330,7 +351,7 @@ html.video-fullscreen {
         position: relative;
 
         &.start-timed-exam {
-          margin-bottom:($baseline/2);
+          margin-bottom: ($baseline/2);
           display: block;
 
           &.action-primary {
@@ -364,7 +385,7 @@ html.video-fullscreen {
 
     .proctored-exam-skip-confirm-wrapper {
       border-left: ($baseline/4) solid $red;
-      padding: $baseline ($baseline*1.5);;
+      padding: $baseline ($baseline*1.5);
       background-color: rgb(242, 244, 245);
 
       .msg-title {
@@ -388,7 +409,7 @@ html.video-fullscreen {
     }
 
     .footer-sequence {
-      padding: 30px 0 20px 0;
+      padding: 30px 0 20px;
       border-bottom: ($baseline/10) solid #cfd9dd;
 
       hr {
@@ -415,7 +436,6 @@ html.video-fullscreen {
         float: left;
         width: 80%;
         margin-bottom: 25px;
-
       }
 
       a.contest-review {
@@ -449,7 +469,7 @@ html.video-fullscreen {
     .faq-proctoring-exam {
       @extend .footer-sequence;
 
-      border-bottom : none;
+      border-bottom: none;
 
       a.footer-link {
         display: block;
@@ -495,6 +515,11 @@ html.video-fullscreen {
         margin-bottom: lh();
         padding-bottom: 0;
         border-bottom: none;
+      }
+
+      code::before,
+      code::after {
+        @include display-left-to-right();
       }
     }
 
@@ -581,7 +606,8 @@ html.video-fullscreen {
         padding: 0 0 15px;
       }
 
-      .vert > .xblock-student_view.is-hidden {
+      .vert > .xblock-student_view.is-hidden,
+      .vert > .xblock-public_view.is-hidden {
         display: none;
         border-bottom: 0;
         margin-bottom: 0;
@@ -594,7 +620,8 @@ html.video-fullscreen {
       }
     }
 
-    section.xblock-student_view-wrapper div.vert-mod > div {
+    section.xblock-student_view-wrapper div.vert-mod > div,
+    section.xblock-public_view-wrapper div.vert-mod > div {
       border-bottom: none;
     }
 
@@ -644,7 +671,9 @@ html.video-fullscreen {
       }
     }
 
-    .xqa-modal, .staff-modal, .history-modal {
+    .xqa-modal,
+    .staff-modal,
+    .history-modal {
       width: 80%;
       height: 80%;
       left: left(20%);
@@ -695,7 +724,7 @@ html.video-fullscreen {
 
   &.closed {
     div.course-index {
-      width: flex-grid(.6);
+      width: flex-grid(0.6);
       overflow: hidden;
 
       header#open_close_accordion {
@@ -729,7 +758,6 @@ html.video-fullscreen {
 
 .xmodule_VideoModule {
   margin-bottom: ($baseline*1.5);
-
 }
 
 textarea.short-form-response {

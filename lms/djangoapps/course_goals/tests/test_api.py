@@ -1,13 +1,15 @@
 """
 Unit tests for course_goals.api methods.
 """
-import mock
 
+
+import mock
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.test.utils import override_settings
-from lms.djangoapps.course_goals.models import CourseGoal
+from django.urls import reverse
 from rest_framework.test import APIClient
+
+from lms.djangoapps.course_goals.models import CourseGoal
 from student.models import CourseEnrollment
 from track.tests import EventTrackingTestCase
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -22,7 +24,6 @@ class TestCourseGoalsAPI(EventTrackingTestCase, SharedModuleStoreTestCase):
     """
     Testing the Course Goals API.
     """
-    shard = 4
 
     def setUp(self):
         # Create a course with a verified track
@@ -38,13 +39,13 @@ class TestCourseGoalsAPI(EventTrackingTestCase, SharedModuleStoreTestCase):
 
         self.apiUrl = reverse('course_goals_api:v0:course_goal-list')
 
-    @mock.patch('lms.djangoapps.course_goals.views.update_google_analytics')
+    @mock.patch('lms.djangoapps.course_goals.views.segment.track')
     @override_settings(LMS_SEGMENT_KEY="foobar")
     def test_add_valid_goal(self, ga_call):
         """ Ensures a correctly formatted post succeeds."""
         response = self.post_course_goal(valid=True, goal_key='certify')
         self.assertEqual(self.get_event(-1)['name'], EVENT_NAME_ADDED)
-        ga_call.assert_called_with(EVENT_NAME_ADDED, self.user.id)
+        ga_call.assert_called_with(self.user.id, EVENT_NAME_ADDED)
         self.assertEqual(response.status_code, 201)
 
         current_goals = CourseGoal.objects.filter(user=self.user, course_key=self.course.id)
@@ -68,7 +69,7 @@ class TestCourseGoalsAPI(EventTrackingTestCase, SharedModuleStoreTestCase):
             status_code=400
         )
 
-    @mock.patch('lms.djangoapps.course_goals.views.update_google_analytics')
+    @mock.patch('lms.djangoapps.course_goals.views.segment.track')
     @override_settings(LMS_SEGMENT_KEY="foobar")
     def test_update_goal(self, ga_call):
         """ Ensures that repeated course goal post events do not create new instances of the goal. """
@@ -77,7 +78,7 @@ class TestCourseGoalsAPI(EventTrackingTestCase, SharedModuleStoreTestCase):
         self.post_course_goal(valid=True, goal_key='unsure')
         self.assertEqual(self.get_event(-1)['name'], EVENT_NAME_UPDATED)
 
-        ga_call.assert_called_with(EVENT_NAME_UPDATED, self.user.id)
+        ga_call.assert_called_with(self.user.id, EVENT_NAME_UPDATED)
         current_goals = CourseGoal.objects.filter(user=self.user, course_key=self.course.id)
         self.assertEqual(len(current_goals), 1)
         self.assertEqual(current_goals[0].goal_key, 'unsure')

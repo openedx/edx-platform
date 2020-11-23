@@ -61,7 +61,7 @@ from openedx.core.release import RELEASE_LINE
     <script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="path_prefix" content="${EDX_ROOT_URL}">
-
+    <link rel="icon" type="image/x-icon" href="${static.url(static.get_value('favicon_path', settings.FAVICON_PATH))}" />
     <%static:css group='style-vendor'/>
     <%static:css group='style-vendor-tinymce-content'/>
     <%static:css group='style-vendor-tinymce-skin'/>
@@ -79,9 +79,7 @@ from openedx.core.release import RELEASE_LINE
 
   <body class="${static.dir_rtl()} <%block name='bodyclass'></%block> lang_${LANGUAGE_CODE}">
 
-    <% is_anonymous = user.is_anonymous() %>
-
-    % if not is_anonymous:
+    % if not user.is_anonymous:
 
         <% tier_has_expired = request.session.get('TIER_EXPIRED', False) %>
         <% tier_display_warning = request.session.get('DISPLAY_EXPIRATION_WARNING', False) %>
@@ -136,6 +134,7 @@ from openedx.core.release import RELEASE_LINE
       % endif
 
       <div id="page-alert">
+        <%include file="widgets/deprecated-course-key-warning.html" args="course=context_course" />
       <%block name="page_alert"></%block>
       </div>
 
@@ -187,7 +186,7 @@ from openedx.core.release import RELEASE_LINE
     <%include file="widgets/segment-io-footer.html" />
     <div class="modal-cover"></div>
     <script>!function(e,o,n){window.HSCW=o,window.HS=n,n.beacon=n.beacon||{};var t=n.beacon;t.userConfig={},t.readyQueue=[],t.config=function(e){this.userConfig=e},t.ready=function(e){this.readyQueue.push(e)},o.config={docs:{enabled:!0,baseUrl:"//appsembler.helpscoutdocs.com/"},contact:{enabled:!0,formId:"fdef890f-fabb-11e5-a329-0ee2467769ff"}};var r=e.getElementsByTagName("script")[0],c=e.createElement("script");c.type="text/javascript",c.async=!0,c.src="https://djtflbt20bdde.cloudfront.net/",r.parentNode.insertBefore(c,r)}(document,window.HSCW||{},window.HS||{});</script>
-      % if user.is_authenticated():
+      % if user.is_authenticated:
         <script>
           HS.beacon.ready(function() {
             HS.beacon.identify({

@@ -2,25 +2,30 @@
 from django.utils.translation import ugettext as _
 %>
 <%page args="course_date" expression_filter="h"/>
+## The date-summary-container div must stay here because it is used in our
+## mobile app javascript code as a selector.
 <div class="date-summary-container">
     <div class="date-summary date-summary-${course_date.css_class}">
-        % if course_date.title:
-            % if course_date.title == 'current_datetime':
-                <span class="hd hd-6 heading localized-datetime" data-datetime="${course_date.date}" data-string="${_(u'Today is {date}')}" data-timezone="${user_timezone}" data-language="${user_language}"></span>
-            % else:
-                <span class="hd hd-6 heading">${course_date.title}</span>
+        <div class="left-column">
+            <span class="icon fa fa-calendar" aria-hidden="true"></span>
+        </div>
+        <div class="right-column">
+            % if course_date.date:
+                <p class="hd hd-6 date localized-datetime" data-format="shortDate" data-datetime="${course_date.date}" data-timezone="${user_timezone}" data-language="${user_language}"></p>
             % endif
-        % endif
-        % if course_date.date and course_date.title != 'current_datetime':
-            <p class="hd hd-6 date localized-datetime" data-format="shortDate" data-datetime="${course_date.date}" data-timezone="${user_timezone}" data-language="${user_language}" data-string="${_(course_date.relative_datestring)}"></p>
-        % endif
-        % if course_date.description:
-            <p class="description">${course_date.description}</p>
-        % endif
-        % if course_date.link and course_date.link_text:
-            <span class="date-summary-link">
-                <a href="${course_date.link}">${course_date.link_text}</a>
-            </span>
-        % endif
+            % if course_date.title_html:
+                <div class="hd hd-6 heading">${course_date.title_html}</div>
+            % elif course_date.title:
+                <div class="hd hd-6 heading">${course_date.title}</div>
+            % endif
+            % if course_date.description:
+                <p class="description">${course_date.description}</p>
+            % endif
+            % if course_date.link and course_date.link_text:
+                <div class="date-summary-link">
+                    <a href="${course_date.link}">${course_date.link_text}</a>
+                </div>
+            % endif
+        </div>
     </div>
 </div>

@@ -1,0 +1,47 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <h1>
+                {% trans "Expired ID Verification" as tmsg %}{{ tmsg | force_escape }}
+            </h1>
+            <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
+                {% blocktrans %}Hello {{full_name}},{% endblocktrans %}
+                {% endfilter %}
+                <br />
+                {% filter force_escape %}
+                {% blocktrans %}Your {{platform_name}} ID verification has expired. {% endblocktrans %}
+                {% endfilter %}
+                <br />
+            </p>
+            <p style="color: rgba(0,0,0,.75);">
+                {% trans "You must have a valid ID verification to take proctored exams and qualify for certificates." as tmsg %}{{ tmsg | force_escape }}
+                {% trans "Follow the link below to submit your photos and renew your ID verification." as tmsg %}{{ tmsg | force_escape }}
+                {% trans "You can also do this from your dashboard." as tmsg %}{{ tmsg | force_escape }}
+            </p>
+            <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
+                {% blocktrans %}Resubmit Verification : {{lms_verification_link}} {% endblocktrans %}
+                {% endfilter %}
+                <br />
+                {% filter force_escape %}
+                {% blocktrans %}ID verification FAQ : {{help_center_link}} {% endblocktrans %}
+                {% endfilter %}
+                <br />
+            </p>
+            <p>
+                {% trans "Thank you," as tmsg %}{{ tmsg | force_escape }}
+                <br />
+                {% filter force_escape %}
+                {% blocktrans %}The {{ platform_name }} Team {% endblocktrans %}
+                {% endfilter %}
+            </p>
+        </td>
+    </tr>
+</table>
+{% endblock %}

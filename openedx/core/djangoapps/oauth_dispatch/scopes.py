@@ -2,6 +2,7 @@
 Custom Django OAuth Toolkit scopes backends.
 """
 
+
 from oauth2_provider.scopes import SettingsScopes
 
 from openedx.core.djangoapps.oauth_dispatch.models import ApplicationAccess
@@ -19,5 +20,5 @@ class ApplicationModelScopes(SettingsScopes):
             application_scopes = []
 
         default_scopes = self.get_default_scopes()
-        all_scopes = self.get_all_scopes().keys()
+        all_scopes = list(self.get_all_scopes().keys())
         return set(application_scopes + default_scopes).intersection(all_scopes)

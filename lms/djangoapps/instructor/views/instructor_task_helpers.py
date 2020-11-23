@@ -2,9 +2,12 @@
 A collection of helper utility functions for working with instructor
 tasks.
 """
+
+
 import json
 import logging
 
+import six
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 
@@ -53,7 +56,7 @@ def extract_email_features(email_task):
     try:
         task_input_information = json.loads(email_task.task_input)
     except ValueError:
-        log.error("Could not parse task input as valid json; task input: %s", email_task.task_input)
+        log.error(u"Could not parse task input as valid json; task input: %s", email_task.task_input)
         return email_error_information()
 
     email = CourseEmail.objects.get(id=task_input_information['email_id'])
@@ -63,7 +66,7 @@ def extract_email_features(email_task):
         'requester': str(email_task.requester),
     }
     features = ['subject', 'html_message', 'id']
-    email_info = {feature: unicode(getattr(email, feature)) for feature in features}
+    email_info = {feature: six.text_type(getattr(email, feature)) for feature in features}
 
     # Pass along email as an object with the information we desire
     email_feature_dict['email'] = email_info
@@ -74,13 +77,13 @@ def extract_email_features(email_task):
         try:
             task_output = json.loads(email_task.task_output)
         except ValueError:
-            log.error("Could not parse task output as valid json; task output: %s", email_task.task_output)
+            log.error(u"Could not parse task output as valid json; task output: %s", email_task.task_output)
         else:
             if 'succeeded' in task_output and task_output['succeeded'] > 0:
                 num_emails = task_output['succeeded']
                 number_sent = ungettext(
-                    "{num_emails} sent",
-                    "{num_emails} sent",
+                    u"{num_emails} sent",
+                    u"{num_emails} sent",
                     num_emails
                 ).format(num_emails=num_emails)
 
@@ -88,8 +91,8 @@ def extract_email_features(email_task):
                 num_emails = task_output['failed']
                 number_sent += ", "
                 number_sent += ungettext(
-                    "{num_emails} failed",
-                    "{num_emails} failed",
+                    u"{num_emails} failed",
+                    u"{num_emails} failed",
                     num_emails
                 ).format(num_emails=num_emails)
 
@@ -121,7 +124,7 @@ def extract_task_features(task):
         try:
             task_output = json.loads(task.task_output)
         except ValueError:
-            log.error("Could not parse task output as valid json; task output: %s", task.task_output)
+            log.error(u"Could not parse task output as valid json; task output: %s", task.task_output)
         else:
             if 'duration_ms' in task_output:
                 duration_sec = int(task_output['duration_ms'] / 1000.0)

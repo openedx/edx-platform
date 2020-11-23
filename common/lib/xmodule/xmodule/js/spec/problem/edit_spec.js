@@ -156,6 +156,9 @@ If first and last symbols are not brackets, or they are not closed, stringrespon
 = (7), 7
 = (1+2
 
+Just input 100 test. Stringresponse will appear:
+= 100 test
+
 [Explanation]
 Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number known to extreme precision. It is value is approximately equal to 3.14.
 
@@ -193,6 +196,10 @@ If you look at your hand, you can count that you have five fingers.
     <textline size="20"/>
   </stringresponse>
   <stringresponse answer="(1+2" type="ci" >
+    <textline size="20"/>
+  </stringresponse>
+  <p>Just input 100 test. Stringresponse will appear:</p>
+  <stringresponse answer="100 test" type="ci" >
     <textline size="20"/>
   </stringresponse>
   <solution>

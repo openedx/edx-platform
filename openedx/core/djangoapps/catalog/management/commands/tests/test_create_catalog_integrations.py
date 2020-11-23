@@ -1,14 +1,17 @@
 """
 Test cases for catalog_integrations command.
 """
+
 from django.test import TestCase
 from django.core.management import call_command, CommandError
+
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 
 
-class TestCreateCatalogIntegrations(CatalogIntegrationMixin, TestCase):
+class TestCreateCatalogIntegrations(CatalogIntegrationMixin, CacheIsolationTestCase):
     """ Test the create_catalog_integrations command """
 
     def test_without_required(self):

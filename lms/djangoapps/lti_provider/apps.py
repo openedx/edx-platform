@@ -1,6 +1,8 @@
 """
 Configuration for the lti_provider Django application.
 """
+
+
 from django.apps import AppConfig
 
 

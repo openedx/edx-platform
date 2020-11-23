@@ -1,19 +1,22 @@
 """
 Badge Awarding backend for Badgr-Server.
 """
+
+
 import hashlib
 import logging
 import mimetypes
 
 import requests
+import six
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from eventtracking import tracker
 from lazy import lazy
 from requests.packages.urllib3.exceptions import HTTPError
 
 from badges.backends.base import BadgeBackend
 from badges.models import BadgeAssertion
-from eventtracking import tracker
 
 MAX_SLUG_LENGTH = 255
 LOGGER = logging.getLogger(__name__)
@@ -64,7 +67,7 @@ class BadgrBackend(BadgeBackend):
         if badge_class.issuing_component and badge_class.course_id:
             # Make this unique to the course, and down to 64 characters.
             # We don't do this to badges without issuing_component set for backwards compatibility.
-            slug = hashlib.sha256(slug + unicode(badge_class.course_id)).hexdigest()
+            slug = hashlib.sha256((slug + six.text_type(badge_class.course_id)).encode('utf-8')).hexdigest()
         if len(slug) > MAX_SLUG_LENGTH:
             # Will be 64 characters.
             slug = hashlib.sha256(slug).hexdigest()
@@ -123,7 +126,7 @@ class BadgrBackend(BadgeBackend):
                 'badge_slug': assertion.badge_class.slug,
                 'badge_name': assertion.badge_class.display_name,
                 'issuing_component': assertion.badge_class.issuing_component,
-                'course_id': unicode(assertion.badge_class.course_id),
+                'course_id': six.text_type(assertion.badge_class.course_id),
                 'enrollment_mode': assertion.badge_class.mode,
                 'assertion_id': assertion.id,
                 'assertion_image_url': assertion.image_url,
@@ -159,7 +162,7 @@ class BadgrBackend(BadgeBackend):
         """
         Headers to send along with the request-- used for authentication.
         """
-        return {'Authorization': 'Token {}'.format(settings.BADGR_API_TOKEN)}
+        return {'Authorization': u'Token {}'.format(settings.BADGR_API_TOKEN)}
 
     def _ensure_badge_created(self, badge_class):
         """

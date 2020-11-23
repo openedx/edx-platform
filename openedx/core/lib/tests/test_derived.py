@@ -2,6 +2,7 @@
 Tests for derived.py
 """
 
+
 import sys
 from unittest import TestCase
 from openedx.core.lib.derived import derived, derived_collection_entry, derive_settings, clear_for_tests

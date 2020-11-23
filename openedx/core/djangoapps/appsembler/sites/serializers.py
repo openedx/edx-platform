@@ -5,7 +5,7 @@ from rest_framework import serializers
 from organizations import api as organizations_api
 from organizations.models import Organization
 
-from student.forms import validate_username
+from openedx.core.djangoapps.user_authn.views.registration_form import validate_username
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.appsembler.sites.tasks import (
     import_course_on_site_creation_apply_async,
@@ -23,7 +23,10 @@ class SASSDictField(serializers.DictField):
 
 
 class SiteConfigurationSerializer(serializers.ModelSerializer):
-    values = serializers.DictField()
+    values = serializers.DictField(
+        # edX have renamed values->site_values. Using `source=site_values` helps to keep AMC working okay.
+        source='site_values'
+    )
     sassVariables = serializers.ListField(source='sass_variables')
     pageElements = serializers.DictField(source='page_elements')
 
@@ -107,13 +110,13 @@ class RegistrationSerializer(serializers.Serializer):
         site_configuration = site.configuration
         initial_values = validated_data.get('initial_values', {})
         if initial_values:
-            site_configuration.values['SITE_NAME'] = site.domain
-            site_configuration.values['platform_name'] = initial_values.get('platform_name')
-            site_configuration.values['logo_positive'] = initial_values.get('logo_positive')
-            site_configuration.values['logo_negative'] = initial_values.get('logo_negative')
-            site_configuration.values['primary-font'] = initial_values.get('font')
-            site_configuration.values['accent-font'] = 'Delius Unicase'
-            site_configuration.values['page_status'] = {
+            site_configuration.site_values['SITE_NAME'] = site.domain
+            site_configuration.site_values['platform_name'] = initial_values.get('platform_name')
+            site_configuration.site_values['logo_positive'] = initial_values.get('logo_positive')
+            site_configuration.site_values['logo_negative'] = initial_values.get('logo_negative')
+            site_configuration.site_values['primary-font'] = initial_values.get('font')
+            site_configuration.site_values['accent-font'] = 'Delius Unicase'
+            site_configuration.site_values['page_status'] = {
                 'about': True,
                 'blog': True,
                 'contact': True,

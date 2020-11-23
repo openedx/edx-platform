@@ -1,4 +1,3 @@
-# pylint:disable=missing-docstring
 import factory
 
 from student.tests.factories import UserFactory

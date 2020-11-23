@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 """Test for Poll Xmodule functional logic."""
+
+
 from mock import Mock
 
 from xmodule.poll_module import PollDescriptor
+
 from . import LogicTest
 from .test_import import DummySystem
 
 
 class PollModuleTest(LogicTest):
     """Logic tests for Poll Xmodule."""
-    shard = 1
     descriptor_class = PollDescriptor
     raw_field_data = {
         'poll_answers': {'Yes': 1, 'Dont_know': 0, 'No': 0},

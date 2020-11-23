@@ -1,7 +1,13 @@
+"""
+Defines grading configuration.
+"""
+
+
 from django.conf import settings
 
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
-from lms.djangoapps.grades.config.waffle import waffle as waffle_func, ASSUME_ZERO_GRADE_IF_ABSENT
+from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
+from lms.djangoapps.grades.config.waffle import waffle as waffle_func
 
 
 def assume_zero_if_absent(course_key):

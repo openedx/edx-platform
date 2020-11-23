@@ -1,20 +1,20 @@
 """
 APIs related to Course Import.
 """
+
+
 import base64
 import logging
 import os
 
-from path import Path as path
-from six import text_type
-
 from django.conf import settings
-
 from django.core.files import File
+from path import Path as path
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
+from six import text_type
 from user_tasks.models import UserTaskStatus
 
 from contentstore.storage import course_import_export_storage
@@ -22,7 +22,6 @@ from contentstore.tasks import CourseImportTask, import_olx
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 
 from .utils import course_author_access_required
-
 
 log = logging.getLogger(__name__)
 
@@ -129,17 +128,19 @@ class CourseImportView(CourseImportExportViewMixin, GenericAPIView):
                     developer_message='Parameter in the wrong format',
                     error_code='internal_error',
                 )
-            course_dir = path(settings.GITHUB_REPO_ROOT) / base64.urlsafe_b64encode(repr(course_key))
+            course_dir = path(settings.GITHUB_REPO_ROOT) / base64.urlsafe_b64encode(
+                repr(course_key).encode('utf-8')
+            ).decode('utf-8')
             temp_filepath = course_dir / filename
             if not course_dir.isdir():
                 os.mkdir(course_dir)
 
-            log.debug('importing course to {0}'.format(temp_filepath))
+            log.debug(u'importing course to {0}'.format(temp_filepath))
             with open(temp_filepath, "wb+") as temp_file:
                 for chunk in request.FILES['course_data'].chunks():
                     temp_file.write(chunk)
 
-            log.info("Course import %s: Upload complete", course_key)
+            log.info(u"Course import %s: Upload complete", course_key)
             with open(temp_filepath, 'rb') as local_file:
                 django_file = File(local_file)
                 storage_path = course_import_export_storage.save(u'olx_import/' + filename, django_file)

@@ -1,9 +1,13 @@
-from django.core.management.base import BaseCommand, CommandError
+"""Management command to restore assets from trash"""
+
+
+from django.core.management.base import BaseCommand
 
 from xmodule.contentstore.utils import restore_asset_from_trashcan
 
 
 class Command(BaseCommand):
+    """Command class to handle asset restore"""
     help = '''Restore a deleted asset from the trashcan back to it's original course'''
 
     def add_arguments(self, parser):

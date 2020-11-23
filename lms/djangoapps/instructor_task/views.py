@@ -1,4 +1,5 @@
 
+
 import json
 import logging
 
@@ -106,13 +107,13 @@ def get_task_completion_info(instructor_task):
 
     # we're more surprised if there is no output for a completed task, but just warn:
     if instructor_task.task_output is None:
-        log.warning(_("No task_output information found for instructor_task {0}").format(instructor_task.task_id))
+        log.warning(_(u"No task_output information found for instructor_task {0}").format(instructor_task.task_id))
         return (succeeded, _("No status information available"))
 
     try:
         task_output = json.loads(instructor_task.task_output)
     except ValueError:
-        fmt = _("No parsable task_output information found for instructor_task {0}: {1}")
+        fmt = _(u"No parsable task_output information found for instructor_task {0}: {1}")
         log.warning(fmt.format(instructor_task.task_id, instructor_task.task_output))
         return (succeeded, _("No parsable status information available"))
 
@@ -120,11 +121,11 @@ def get_task_completion_info(instructor_task):
         return (succeeded, task_output.get('message', _('No message provided')))
 
     if any([key not in task_output for key in ['action_name', 'attempted', 'total']]):
-        fmt = _("Invalid task_output information found for instructor_task {0}: {1}")
+        fmt = _(u"Invalid task_output information found for instructor_task {0}: {1}")
         log.warning(fmt.format(instructor_task.task_id, instructor_task.task_output))
         return (succeeded, _("No progress status information available"))
 
-    action_name = _(task_output['action_name'])    # pylint: disable=translation-of-non-string
+    action_name = _(task_output['action_name'])
     num_attempted = task_output['attempted']
     num_total = task_output['total']
 
@@ -141,7 +142,7 @@ def get_task_completion_info(instructor_task):
     try:
         task_input = json.loads(instructor_task.task_input)
     except ValueError:
-        fmt = _("No parsable task_input information found for instructor_task {0}: {1}")
+        fmt = _(u"No parsable task_input information found for instructor_task {0}: {1}")
         log.warning(fmt.format(instructor_task.task_id, instructor_task.task_input))
     else:
         student = task_input.get('student')
@@ -152,72 +153,72 @@ def get_task_completion_info(instructor_task):
     if instructor_task.task_state == PROGRESS:
         # special message for providing progress updates:
         # Translators: {action} is a past-tense verb that is localized separately. {attempted} and {succeeded} are counts.
-        msg_format = _("Progress: {action} {succeeded} of {attempted} so far")
+        msg_format = _(u"Progress: {action} {succeeded} of {attempted} so far")
     elif student is not None and problem_url is not None:
         # this reports on actions on problems for a particular student:
         if num_attempted == 0:
             # Translators: {action} is a past-tense verb that is localized separately. {student} is a student identifier.
-            msg_format = _("Unable to find submission to be {action} for student '{student}'")
+            msg_format = _(u"Unable to find submission to be {action} for student '{student}'")
         elif num_succeeded == 0:
             # Translators: {action} is a past-tense verb that is localized separately. {student} is a student identifier.
-            msg_format = _("Problem failed to be {action} for student '{student}'")
+            msg_format = _(u"Problem failed to be {action} for student '{student}'")
         else:
             succeeded = True
             # Translators: {action} is a past-tense verb that is localized separately. {student} is a student identifier.
-            msg_format = _("Problem successfully {action} for student '{student}'")
+            msg_format = _(u"Problem successfully {action} for student '{student}'")
     elif student is not None and entrance_exam_url is not None:
         # this reports on actions on entrance exam for a particular student:
         if num_attempted == 0:
             # Translators: {action} is a past-tense verb that is localized separately.
             # {student} is a student identifier.
-            msg_format = _("Unable to find entrance exam submission to be {action} for student '{student}'")
+            msg_format = _(u"Unable to find entrance exam submission to be {action} for student '{student}'")
         else:
             succeeded = True
             # Translators: {action} is a past-tense verb that is localized separately.
             # {student} is a student identifier.
-            msg_format = _("Entrance exam successfully {action} for student '{student}'")
+            msg_format = _(u"Entrance exam successfully {action} for student '{student}'")
     elif student is None and problem_url is not None:
         # this reports on actions on problems for all students:
         if num_attempted == 0:
             # Translators: {action} is a past-tense verb that is localized separately.
-            msg_format = _("Unable to find any students with submissions to be {action}")
+            msg_format = _(u"Unable to find any students with submissions to be {action}")
         elif num_succeeded == 0:
             # Translators: {action} is a past-tense verb that is localized separately. {attempted} is a count.
-            msg_format = _("Problem failed to be {action} for any of {attempted} students")
+            msg_format = _(u"Problem failed to be {action} for any of {attempted} students")
         elif num_succeeded == num_attempted:
             succeeded = True
             # Translators: {action} is a past-tense verb that is localized separately. {attempted} is a count.
-            msg_format = _("Problem successfully {action} for {attempted} students")
+            msg_format = _(u"Problem successfully {action} for {attempted} students")
         else:  # num_succeeded < num_attempted
             # Translators: {action} is a past-tense verb that is localized separately. {succeeded} and {attempted} are counts.
-            msg_format = _("Problem {action} for {succeeded} of {attempted} students")
+            msg_format = _(u"Problem {action} for {succeeded} of {attempted} students")
     elif email_id is not None:
         # this reports on actions on bulk emails
         if num_attempted == 0:
             # Translators: {action} is a past-tense verb that is localized separately.
-            msg_format = _("Unable to find any recipients to be {action}")
+            msg_format = _(u"Unable to find any recipients to be {action}")
         elif num_succeeded == 0:
             # Translators: {action} is a past-tense verb that is localized separately. {attempted} is a count.
-            msg_format = _("Message failed to be {action} for any of {attempted} recipients ")
+            msg_format = _(u"Message failed to be {action} for any of {attempted} recipients ")
         elif num_succeeded == num_attempted:
             succeeded = True
             # Translators: {action} is a past-tense verb that is localized separately. {attempted} is a count.
-            msg_format = _("Message successfully {action} for {attempted} recipients")
+            msg_format = _(u"Message successfully {action} for {attempted} recipients")
         else:  # num_succeeded < num_attempted
             # Translators: {action} is a past-tense verb that is localized separately. {succeeded} and {attempted} are counts.
-            msg_format = _("Message {action} for {succeeded} of {attempted} recipients")
+            msg_format = _(u"Message {action} for {succeeded} of {attempted} recipients")
     else:
         # provide a default:
         # Translators: {action} is a past-tense verb that is localized separately. {succeeded} and {attempted} are counts.
-        msg_format = _("Status: {action} {succeeded} of {attempted}")
+        msg_format = _(u"Status: {action} {succeeded} of {attempted}")
 
     if num_skipped > 0:
         # Translators: {skipped} is a count.  This message is appended to task progress status messages.
-        msg_format += _(" (skipping {skipped})")
+        msg_format += _(u" (skipping {skipped})")
 
     if student is None and num_attempted != num_total:
         # Translators: {total} is a count.  This message is appended to task progress status messages.
-        msg_format += _(" (out of {total})")
+        msg_format += _(u" (out of {total})")
 
     # Update status in task result object itself:
     message = msg_format.format(

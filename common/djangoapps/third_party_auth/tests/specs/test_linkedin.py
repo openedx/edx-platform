@@ -1,6 +1,16 @@
 """Integration tests for LinkedIn providers."""
 
+
 from third_party_auth.tests.specs import base
+
+
+def get_localized_name(name):
+    """Returns the localizedName from the name object"""
+    locale = "{}_{}".format(
+        name["preferredLocale"]["language"],
+        name["preferredLocale"]["country"]
+    )
+    return name['localized'].get(locale, '')
 
 
 class LinkedInOauth2IntegrationTest(base.Oauth2IntegrationTest):
@@ -20,11 +30,29 @@ class LinkedInOauth2IntegrationTest(base.Oauth2IntegrationTest):
         'expires_in': 'expires_in_value',
     }
     USER_RESPONSE_DATA = {
-        'lastName': 'lastName_value',
+        'lastName': {
+            "localized": {
+                "en_US": "Doe"
+            },
+            "preferredLocale": {
+                "country": "US",
+                "language": "en"
+            }
+        },
         'id': 'id_value',
-        'firstName': 'firstName_value',
+        'firstName': {
+            "localized": {
+                "en_US": "Doe"
+            },
+            "preferredLocale": {
+                "country": "US",
+                "language": "en"
+            }
+        },
     }
 
     def get_username(self):
         response_data = self.get_response_data()
-        return response_data.get('firstName') + response_data.get('lastName')
+        first_name = get_localized_name(response_data.get('firstName'))
+        last_name = get_localized_name(response_data.get('lastName'))
+        return first_name + last_name

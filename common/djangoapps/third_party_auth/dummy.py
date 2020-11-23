@@ -1,6 +1,8 @@
 """
 DummyBackend: A fake Third Party Auth provider for testing & development purposes.
 """
+
+
 from social_core.backends.oauth import BaseOAuth2
 from social_core.exceptions import AuthFailed
 

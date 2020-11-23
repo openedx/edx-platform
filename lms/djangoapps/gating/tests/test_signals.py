@@ -1,6 +1,8 @@
 """
 Unit tests for gating.signals module
 """
+
+
 from mock import Mock, patch
 
 from gating.signals import evaluate_subsection_gated_milestones
@@ -14,7 +16,6 @@ class TestHandleScoreChanged(ModuleStoreTestCase):
     """
     Test case for handle_score_changed django signal handler
     """
-    shard = 4
 
     def setUp(self):
         super(TestHandleScoreChanged, self).setUp()

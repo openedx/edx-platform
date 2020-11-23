@@ -1,6 +1,8 @@
 """
 E-commerce Tab Instructor Dashboard Coupons Operations views
 """
+
+
 import datetime
 import logging
 
@@ -20,7 +22,7 @@ log = logging.getLogger(__name__)
 
 @require_POST
 @login_required
-def remove_coupon(request, course_id):  # pylint: disable=unused-argument
+def remove_coupon(request, course_id):
     """
     remove the coupon against the coupon id
     set the coupon is_active flag to false
@@ -35,16 +37,16 @@ def remove_coupon(request, course_id):  # pylint: disable=unused-argument
         coupon = Coupon.objects.get(id=coupon_id)
     except ObjectDoesNotExist:
         return JsonResponse({
-            'message': _('coupon with the coupon id ({coupon_id}) DoesNotExist').format(coupon_id=coupon_id)
+            'message': _(u'coupon with the coupon id ({coupon_id}) DoesNotExist').format(coupon_id=coupon_id)
         }, status=400)  # status code 400: Bad Request
     if not coupon.is_active:
         return JsonResponse({
-            'message': _('coupon with the coupon id ({coupon_id}) is already inactive').format(coupon_id=coupon_id)
+            'message': _(u'coupon with the coupon id ({coupon_id}) is already inactive').format(coupon_id=coupon_id)
         }, status=400)  # status code 400: Bad Request
     coupon.is_active = False
     coupon.save()
     return JsonResponse({
-        'message': _('coupon with the coupon id ({coupon_id}) updated successfully').format(coupon_id=coupon_id)
+        'message': _(u'coupon with the coupon id ({coupon_id}) updated successfully').format(coupon_id=coupon_id)
     })  # status code 200: OK by default
 
 
@@ -65,7 +67,7 @@ def add_coupon(request, course_id):
         course_registration_code = CourseRegistrationCode.objects.filter(code=code)
         if course_registration_code:
             return JsonResponse(
-                {'message': _("The code ({code}) that you have tried to define is already in use as a registration code").format(code=code)},
+                {'message': _(u"The code ({code}) that you have tried to define is already in use as a registration code").format(code=code)},
                 status=400)  # status code 400: Bad Request
 
         description = request.POST.get('description')
@@ -100,18 +102,18 @@ def add_coupon(request, course_id):
         )
         coupon.save()
         return JsonResponse(
-            {'message': _("coupon with the coupon code ({code}) added successfully").format(code=code)}
+            {'message': _(u"coupon with the coupon code ({code}) added successfully").format(code=code)}
         )
 
     if coupon:
         return JsonResponse(
-            {'message': _("coupon with the coupon code ({code}) already exists for this course").format(code=code)},
+            {'message': _(u"coupon with the coupon code ({code}) already exists for this course").format(code=code)},
             status=400)  # status code 400: Bad Request
 
 
 @require_POST
 @login_required
-def update_coupon(request, course_id):  # pylint: disable=unused-argument
+def update_coupon(request, course_id):
     """
     update the coupon object in the database
     """
@@ -123,20 +125,20 @@ def update_coupon(request, course_id):  # pylint: disable=unused-argument
         coupon = Coupon.objects.get(pk=coupon_id)
     except ObjectDoesNotExist:
         return JsonResponse(
-            {'message': _("coupon with the coupon id ({coupon_id}) DoesNotExist").format(coupon_id=coupon_id)},
+            {'message': _(u"coupon with the coupon id ({coupon_id}) DoesNotExist").format(coupon_id=coupon_id)},
             status=400)  # status code 400: Bad Request
 
     description = request.POST.get('description')
     coupon.description = description
     coupon.save()
     return JsonResponse(
-        {'message': _("coupon with the coupon id ({coupon_id}) updated Successfully").format(coupon_id=coupon_id)}
+        {'message': _(u"coupon with the coupon id ({coupon_id}) updated Successfully").format(coupon_id=coupon_id)}
     )
 
 
 @require_POST
 @login_required
-def get_coupon_info(request, course_id):  # pylint: disable=unused-argument
+def get_coupon_info(request, course_id):
     """
     get the coupon information to display in the pop up form
     """
@@ -150,12 +152,12 @@ def get_coupon_info(request, course_id):  # pylint: disable=unused-argument
         coupon = Coupon.objects.get(id=coupon_id)
     except ObjectDoesNotExist:
         return JsonResponse({
-            'message': _("coupon with the coupon id ({coupon_id}) DoesNotExist").format(coupon_id=coupon_id)
+            'message': _(u"coupon with the coupon id ({coupon_id}) DoesNotExist").format(coupon_id=coupon_id)
         }, status=400)  # status code 400: Bad Request
 
     if not coupon.is_active:
         return JsonResponse({
-            'message': _("coupon with the coupon id ({coupon_id}) is already inactive").format(coupon_id=coupon_id)
+            'message': _(u"coupon with the coupon id ({coupon_id}) is already inactive").format(coupon_id=coupon_id)
         }, status=400)  # status code 400: Bad Request
 
     expiry_date = coupon.display_expiry_date
@@ -165,5 +167,5 @@ def get_coupon_info(request, course_id):  # pylint: disable=unused-argument
         'coupon_course_id': text_type(coupon.course_id),
         'coupon_discount': coupon.percentage_discount,
         'expiry_date': expiry_date,
-        'message': _('coupon with the coupon id ({coupon_id}) updated successfully').format(coupon_id=coupon_id)
+        'message': _(u'coupon with the coupon id ({coupon_id}) updated successfully').format(coupon_id=coupon_id)
     })  # status code 200: OK by default

@@ -90,6 +90,7 @@ installEditTemplates = function(append) {
     // Add templates needed by the edit XBlock modal
     TemplateHelpers.installTemplate('edit-xblock-modal');
     TemplateHelpers.installTemplate('editor-mode-button');
+    TemplateHelpers.installTemplate('edit-title-button');
 
     // Add templates needed by the settings editor
     TemplateHelpers.installTemplate('metadata-editor');

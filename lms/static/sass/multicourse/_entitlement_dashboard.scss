@@ -30,6 +30,9 @@
   .entitlement-unenrollment-modal-inner-wrapper {
     @extend .inner-wrapper;
 
+    height: 98%;
+    overflow-y: scroll;
+
     .entitlement-unenrollment-modal-close-btn {
       @extend .close-modal;
     }
@@ -67,3 +70,6 @@
   }
 }
 
+.entitlement-unenrollment-modal-long-survey {
+  height: 70%;
+}

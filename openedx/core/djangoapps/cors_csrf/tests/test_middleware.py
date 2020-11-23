@@ -2,8 +2,10 @@
 Tests for the CORS CSRF middleware
 """
 
+
 from mock import patch, Mock
 import ddt
+import six
 
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -261,15 +263,15 @@ class TestCsrfCrossDomainCookieMiddleware(TestCase):
         """Check that the cross-domain CSRF cookie was sent. """
         if is_set:
             self.assertIn(self.COOKIE_NAME, response.cookies)
-            cookie_header = str(response.cookies[self.COOKIE_NAME])
-
-            expected = 'Set-Cookie: {name}={value}; Domain={domain};'.format(
+            cookie_header = six.text_type(response.cookies[self.COOKIE_NAME])
+            # pylint: disable=unicode-format-string
+            expected = six.u('Set-Cookie: {name}={value}; Domain={domain};').format(
                 name=self.COOKIE_NAME,
                 value=self.COOKIE_VALUE,
                 domain=self.COOKIE_DOMAIN
             )
             self.assertIn(expected, cookie_header)
-            self.assertIn('Max-Age=31449600; Path=/; secure', cookie_header)
-
+            # added lower function because in python 3 the value of cookie_header has Secure and secure in python 2
+            self.assertIn('Max-Age=31449600; Path=/; secure'.lower(), cookie_header.lower())
         else:
             self.assertNotIn(self.COOKIE_NAME, response.cookies)

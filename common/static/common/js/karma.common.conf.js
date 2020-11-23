@@ -54,7 +54,7 @@ var webpackConfig = require(path.join(appRoot, 'webpack.dev.config.js'));
 //     https://github.com/webpack-contrib/karma-webpack/issues/24#issuecomment-257613167
 //
 // This should be fixed in v3 of karma-webpack
-var commonsChunkPluginIndex = webpackConfig.plugins.findIndex(function(plugin) { return plugin.chunkNames; });
+var commonsChunkPluginIndex = webpackConfig[0].plugins.findIndex(function(plugin) { return plugin.chunkNames; });
 
 // Files which are needed by all lms/cms suites.
 var commonFiles = {
@@ -80,9 +80,9 @@ var commonFiles = {
     ]
 };
 
-webpackConfig.plugins.splice(commonsChunkPluginIndex, 1);
+webpackConfig[0].plugins.splice(commonsChunkPluginIndex, 1);
 
-delete webpackConfig.entry;
+delete webpackConfig[0].entry;
 
 /**
  * Customize the name attribute in xml testcase element
@@ -410,7 +410,7 @@ function getBaseConfig(config, useRequireJs) {
             captureConsole: false
         },
 
-        webpack: webpackConfig,
+        webpack: webpackConfig[0],
 
         webpackMiddleware: {
             watchOptions: {

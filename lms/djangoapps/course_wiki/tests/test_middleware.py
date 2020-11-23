@@ -2,17 +2,16 @@
 Tests for wiki middleware.
 """
 
+
 from django.test.client import Client
-from nose.plugins.attrib import attr
 from wiki.models import URLPath
 
 from course_wiki.views import get_or_create_root
-from courseware.tests.factories import InstructorFactory
+from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
 class TestWikiAccessMiddleware(ModuleStoreTestCase):
     """Tests for WikiAccessMiddleware."""
 
@@ -32,5 +31,5 @@ class TestWikiAccessMiddleware(ModuleStoreTestCase):
     def test_url_tranform(self):
         """Test that the correct prefix ('/courses/<course_id>') is added to the urls in the wiki."""
         response = self.client.get('/courses/edx/math101/2014/wiki/math101/')
-        self.assertIn('/courses/edx/math101/2014/wiki/math101/_edit/', response.content)
-        self.assertIn('/courses/edx/math101/2014/wiki/math101/_settings/', response.content)
+        self.assertContains(response, '/courses/edx/math101/2014/wiki/math101/_edit/')
+        self.assertContains(response, '/courses/edx/math101/2014/wiki/math101/_settings/')

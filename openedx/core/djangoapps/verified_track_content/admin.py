@@ -2,6 +2,7 @@
 Django admin page for verified track configuration
 """
 
+
 from django.contrib import admin
 
 from openedx.core.djangoapps.verified_track_content.forms import VerifiedTrackCourseForm

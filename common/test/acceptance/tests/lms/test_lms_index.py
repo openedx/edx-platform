@@ -3,6 +3,8 @@
 End-to-end tests for the LMS Index page (aka, Home page).  Note that this is different than
 what students see @ edx.org because we redirect requests to a separate web application.
 """
+
+
 import datetime
 
 from common.test.acceptance.pages.lms.index import IndexPage
@@ -28,6 +30,7 @@ class BaseLmsIndexTest(AcceptanceTest):
 
 class LmsIndexPageTest(BaseLmsIndexTest):
     """ Test suite for the LMS Index (Home) page """
+    shard = 2
 
     def setUp(self):
         super(LmsIndexPageTest, self).setUp()

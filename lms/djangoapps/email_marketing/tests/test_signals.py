@@ -1,4 +1,8 @@
+# -*- coding: utf-8 -*-
+
 """Tests of email marketing signal handlers."""
+
+
 import datetime
 import logging
 
@@ -13,6 +17,7 @@ from mock import ANY, Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from sailthru.sailthru_error import SailthruClientError
 from sailthru.sailthru_response import SailthruResponse
+import six
 from testfixtures import LogCapture
 
 from email_marketing.models import EmailMarketingConfiguration
@@ -20,21 +25,20 @@ from email_marketing.signals import (
     add_email_marketing_cookies,
     email_marketing_register_user,
     email_marketing_user_field_changed,
-    force_unsubscribe_all,
     update_sailthru
 )
 from email_marketing.tasks import (
     _create_user_list,
     _get_list_from_email_marketing_provider,
     _get_or_create_user_list,
-    update_user,
-    update_user_email,
     get_email_cookies_via_sailthru,
     update_course_enrollment,
+    update_user,
+    update_user_email
 )
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from student.models import Registration
-from student.tests.factories import UserFactory, UserProfileFactory, CourseEnrollmentFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory, UserProfileFactory
 from util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
@@ -69,7 +73,6 @@ class EmailMarketingTests(TestCase):
     """
     Tests for the EmailMarketing signals and tasks classes.
     """
-    shard = 4
 
     def setUp(self):
         update_email_marketing_config(enabled=False)
@@ -87,7 +90,6 @@ class EmailMarketingTests(TestCase):
         self.course_url = 'http://testserver/courses/edX/toy/2012_Fall/info'
 
         self.site = Site.objects.get_current()
-        self.site_domain = self.site.domain
         self.request.site = self.site
         super(EmailMarketingTests, self).setUp()
 
@@ -115,7 +117,7 @@ class EmailMarketingTests(TestCase):
                     'Started at {start} and ended at {end}, time spent:{delta} milliseconds'.format(
                         start=datetime.datetime.now().isoformat(' '),
                         end=datetime.datetime.now().isoformat(' '),
-                        delta=0)
+                        delta=0 if six.PY2 else 0.0)
                  ),
                 (LOGGER_NAME, 'INFO',
                     'sailthru_hid cookie:{cookies[cookie]} successfully retrieved for user {user}'.format(
@@ -129,7 +131,7 @@ class EmailMarketingTests(TestCase):
                                           'id': TEST_EMAIL,
                                           'vars': {'last_login_date': ANY}})
         self.assertTrue('sailthru_hid' in response.cookies)
-        self.assertEquals(response.cookies['sailthru_hid'].value, "test_cookie")
+        self.assertEqual(response.cookies['sailthru_hid'].value, "test_cookie")
 
     @patch('sailthru.sailthru_client.SailthruClient.api_post')
     def test_get_cookies_via_sailthu(self, mock_sailthru):
@@ -188,14 +190,14 @@ class EmailMarketingTests(TestCase):
             {'gender': 'm', 'username': 'test', 'activated': 1}, TEST_EMAIL, site_dict, new_user=True
         )
         self.assertFalse(mock_log_error.called)
-        self.assertEquals(mock_sailthru_post.call_args[0][0], "user")
+        self.assertEqual(mock_sailthru_post.call_args[0][0], "user")
         userparms = mock_sailthru_post.call_args[0][1]
-        self.assertEquals(userparms['key'], "email")
-        self.assertEquals(userparms['id'], TEST_EMAIL)
-        self.assertEquals(userparms['vars']['gender'], "m")
-        self.assertEquals(userparms['vars']['username'], "test")
-        self.assertEquals(userparms['vars']['activated'], 1)
-        self.assertEquals(userparms['lists']['new list'], 1)
+        self.assertEqual(userparms['key'], "email")
+        self.assertEqual(userparms['id'], TEST_EMAIL)
+        self.assertEqual(userparms['vars']['gender'], "m")
+        self.assertEqual(userparms['vars']['username'], "test")
+        self.assertEqual(userparms['vars']['activated'], 1)
+        self.assertEqual(userparms['lists']['new list'], 1)
 
     @patch('lms.djangoapps.email_marketing.signals.get_email_cookies_via_sailthru.delay')
     def test_drop_cookie_task_error(self, mock_email_cookies):
@@ -211,23 +213,6 @@ class EmailMarketingTests(TestCase):
                     self.user.email
                 )
             ))
-
-    @patch('email_marketing.tasks.log.error')
-    @patch('email_marketing.tasks.SailthruClient.api_post')
-    @patch('email_marketing.tasks.SailthruClient.api_get')
-    def test_email_not_sent_to_white_label(self, mock_sailthru_get, mock_sailthru_post, mock_log_error):
-        """
-        tests that welcome email is not sent to the white-label site learner
-        """
-        white_label_site = Site.objects.create(domain='testwhitelabel.com', name='White Label')
-        site_dict = {'id': white_label_site.id, 'domain': white_label_site.domain, 'name': white_label_site.name}
-        mock_sailthru_post.return_value = SailthruResponse(JsonResponse({'ok': True}))
-        mock_sailthru_get.return_value = SailthruResponse(JsonResponse({'lists': [{'name': 'new list'}], 'ok': True}))
-        update_user.delay(
-            {'gender': 'm', 'username': 'test', 'activated': 1}, TEST_EMAIL, site_dict, new_user=True
-        )
-        self.assertFalse(mock_log_error.called)
-        self.assertNotEqual(mock_sailthru_post.call_args[0][0], "send")
 
     @patch('email_marketing.tasks.SailthruClient.api_post')
     def test_email_not_sent_to_enterprise_learners(self, mock_sailthru_post):
@@ -245,23 +230,16 @@ class EmailMarketingTests(TestCase):
         self.assertNotEqual(mock_sailthru_post.call_args[0][0], "send")
 
     @patch('email_marketing.tasks.SailthruClient.api_post')
-    @patch('email_marketing.tasks.SailthruClient.api_get')
-    def test_add_user_list_existing_domain(self, mock_sailthru_get, mock_sailthru_post):
+    def test_add_user_list_not_called_on_white_label_domain(self, mock_sailthru_post):
         """
-        test non existing domain name updates Sailthru user lists with default list
+        test user is not added to Sailthru user lists if registered from a whitel labe site
         """
-        existing_site = Site.objects.create(domain='testing.com', name='testing.com')
+        existing_site = Site.objects.create(domain='testwhitelabel.com', name='White Label')
         site_dict = {'id': existing_site.id, 'domain': existing_site.domain, 'name': existing_site.name}
-        mock_sailthru_post.return_value = SailthruResponse(JsonResponse({'ok': True}))
-        mock_sailthru_get.return_value = SailthruResponse(
-            JsonResponse({'lists': [{'name': 'new list'}, {'name': 'testing_com_user_list'}], 'ok': True})
-        )
         update_user.delay(
             {'gender': 'm', 'username': 'test', 'activated': 1}, TEST_EMAIL, site=site_dict, new_user=True
         )
-        self.assertEquals(mock_sailthru_post.call_args[0][0], "user")
-        userparms = mock_sailthru_post.call_args[0][1]
-        self.assertEquals(userparms['lists']['testing_com_user_list'], 1)
+        self.assertFalse(mock_sailthru_post.called)
 
     @patch('email_marketing.tasks.log.error')
     @patch('email_marketing.tasks.SailthruClient.api_post')
@@ -276,7 +254,7 @@ class EmailMarketingTests(TestCase):
         # force Sailthru API exception
         mock_log_error.reset_mock()
         mock_sailthru.side_effect = SailthruClientError
-        update_user.delay({}, self.user.email, self.site_domain)
+        update_user.delay({}, self.user.email)
         self.assertTrue(mock_log_error.called)
 
         # force Sailthru API exception on 2nd call
@@ -364,11 +342,11 @@ class EmailMarketingTests(TestCase):
         """
         mock_sailthru.return_value = SailthruResponse(JsonResponse({'ok': True}))
         update_user_email.delay(TEST_EMAIL, "old@edx.org")
-        self.assertEquals(mock_sailthru.call_args[0][0], "user")
+        self.assertEqual(mock_sailthru.call_args[0][0], "user")
         userparms = mock_sailthru.call_args[0][1]
-        self.assertEquals(userparms['key'], "email")
-        self.assertEquals(userparms['id'], "old@edx.org")
-        self.assertEquals(userparms['keys']['email'], TEST_EMAIL)
+        self.assertEqual(userparms['key'], "email")
+        self.assertEqual(userparms['id'], "old@edx.org")
+        self.assertEqual(userparms['keys']['email'], TEST_EMAIL)
 
     @patch('email_marketing.tasks.SailthruClient')
     def test_get_or_create_sailthru_list(self, mock_sailthru_client):
@@ -441,7 +419,7 @@ class EmailMarketingTests(TestCase):
         """Test create list in sailthru"""
         mock_sailthru_client.api_post.return_value = SailthruResponse(JsonResponse({'ok': True}))
         self.assertEqual(_create_user_list(mock_sailthru_client, 'test_list_name'), True)
-        self.assertEquals(mock_sailthru_client.api_post.call_args[0][0], "list")
+        self.assertEqual(mock_sailthru_client.api_post.call_args[0][0], "list")
         listparms = mock_sailthru_client.api_post.call_args[0][1]
         self.assertEqual(listparms['list'], 'test_list_name')
         self.assertEqual(listparms['primary'], 0)
@@ -580,53 +558,6 @@ class EmailMarketingTests(TestCase):
         email_marketing_user_field_changed(None, self.user, table='auth_user', setting='email', old_value='new@a.com')
         self.assertFalse(mock_update_user.called)
 
-    @patch('email_marketing.tasks.log.error')
-    @patch('email_marketing.tasks.SailthruClient.api_post')
-    def test_sailthru_on_success(self, mock_sailthru, mock_log_error):
-        """
-        Ensure that a successful unsubscribe does not trigger an error log
-        """
-        mock_sailthru.return_value = SailthruResponse(JsonResponse({'ok': True}))
-        force_unsubscribe_all(sender=self.__class__, email=self.user.email)
-        self.assertTrue(mock_sailthru.called)
-        self.assertFalse(mock_log_error.called)
-
-    @patch('email_marketing.tasks.log.error')
-    @patch('email_marketing.tasks.SailthruClient.api_post')
-    def test_sailthru_on_connection_error(self, mock_sailthru, mock_log_error):
-        mock_sailthru.side_effect = SailthruClientError
-        with self.assertRaises(Exception):
-            force_unsubscribe_all(sender=self.__class__, email=self.user.email)
-            self.assertTrue(mock_log_error.called)
-
-    @patch('email_marketing.tasks.log.error')
-    @patch('email_marketing.tasks.SailthruClient.api_post')
-    def test_sailthru_on_bad_response(self, mock_sailthru, mock_log_error):
-        mock_sailthru.return_value = SailthruResponse(JsonResponse({'error': 100, 'errormsg': 'Got an error'}))
-        with self.assertRaises(Exception):
-            force_unsubscribe_all(sender=self.__class__, email=self.user.email)
-            self.assertTrue(mock_sailthru.called)
-            self.assertTrue(mock_log_error.called)
-
-    @patch('email_marketing.tasks.log.error')
-    @patch('email_marketing.tasks.SailthruClient.api_post')
-    def test_sailthru_with_email_changed(self, mock_sailthru, mock_log_error):
-        mock_sailthru.return_value = SailthruResponse(JsonResponse({'ok': True}))
-        force_unsubscribe_all(sender=self.__class__, email=self.user.email, new_email='email@somewhere.invalid')
-        mock_sailthru.assert_called_with("user", {
-            "id": self.user.email,
-            "optout_email": "all",
-            "keys": {
-                "email": "email@somewhere.invalid"
-            },
-            "fields": {
-                "optout_email": 1,
-                "keys": 1
-            },
-            "keysconflict": "merge"
-        })
-        self.assertFalse(mock_log_error.called)
-
 
 class MockSailthruResponse(object):
     """
@@ -677,7 +608,6 @@ class SailthruTests(TestCase):
     """
     Tests for the Sailthru tasks class.
     """
-    shard = 4
 
     def setUp(self):
         super(SailthruTests, self).setUp()
@@ -690,32 +620,29 @@ class SailthruTests(TestCase):
     @patch('sailthru.sailthru_client.SailthruClient.purchase')
     @patch('sailthru.sailthru_client.SailthruClient.api_get')
     @patch('sailthru.sailthru_client.SailthruClient.api_post')
-    def test_update_course_enrollment(self, mock_sailthru_api_post,
-                                      mock_sailthru_api_get, mock_sailthru_purchase):
-        """test update sailthru user record"""
-
-        # create mocked Sailthru API responses
-        mock_sailthru_api_post.return_value = MockSailthruResponse({'ok': True})
-        mock_sailthru_api_get.return_value = MockSailthruResponse({'user': {"id": TEST_EMAIL, "fields": {"vars": 1}}})
-        mock_sailthru_purchase.return_value = MockSailthruResponse({'ok': True})
-        self.user.email = TEST_EMAIL
-        CourseEnrollmentFactory(user=self.user, course_id=self.course_id)
-        with patch('email_marketing.tasks.build_course_url') as m:
-            m.return_value = self.course_url
-            update_course_enrollment(TEST_EMAIL, self.course_id, 'audit')
-        item = [{
-            'url': self.course_url,
-            'price': 0,
-            'qty': 1,
-            'id': 'edX/toy/2012_Fall-audit',
-            'title': 'Course edX/toy/2012_Fall mode: audit'
-        }]
-        mock_sailthru_purchase.assert_called_with(TEST_EMAIL, item, options={})
+    @patch('openedx.core.djangoapps.waffle_utils.WaffleSwitchNamespace.is_enabled')
+    def test_update_course_enrollment_whitelabel(
+            self,
+            switch,
+            mock_sailthru_api_post,
+            mock_sailthru_api_get,
+            mock_sailthru_purchase
+    ):
+        """test user record not sent to sailthru when enrolled in a course at white label site"""
+        switch.return_value = True
+        white_label_site = Site.objects.create(domain='testwhitelabel.com', name='White Label')
+        site_dict = {'id': white_label_site.id, 'domain': white_label_site.domain, 'name': white_label_site.name}
+        with patch('email_marketing.signals._get_current_site') as mock_site_info:
+            mock_site_info.return_value = site_dict
+            update_sailthru(None, self.user, 'audit', self.course_id)
+            self.assertFalse(mock_sailthru_purchase.called)
+            self.assertFalse(mock_sailthru_api_post.called)
+            self.assertFalse(mock_sailthru_api_get.called)
 
     @patch('sailthru.sailthru_client.SailthruClient.purchase')
     def test_switch_is_disabled(self, mock_sailthru_purchase):
         """Make sure sailthru purchase is not called when waffle switch is disabled"""
-        update_sailthru(None, None, self.user, 'verified', self.course_id)
+        update_sailthru(None, self.user, 'verified', self.course_id)
         self.assertFalse(mock_sailthru_purchase.called)
 
     @patch('openedx.core.djangoapps.waffle_utils.WaffleSwitchNamespace.is_enabled')
@@ -725,5 +652,16 @@ class SailthruTests(TestCase):
             i: waffle switch is True and mode is verified
         """
         switch.return_value = True
-        update_sailthru(None, None, self.user, 'verified', self.course_id)
+        update_sailthru(None, self.user, 'verified', self.course_id)
         self.assertFalse(mock_sailthru_purchase.called)
+
+    @patch('openedx.core.djangoapps.waffle_utils.WaffleSwitchNamespace.is_enabled')
+    @patch('sailthru.sailthru_client.SailthruClient.purchase')
+    def test_encoding_is_working_for_email_contains_unicode(self, mock_sailthru_purchase, switch):
+        """Make sure encoding is working for emails contains unicode characters
+        while sending it to sail through.
+        """
+        switch.return_value = True
+        self.user.email = u'tèst@edx.org'
+        update_sailthru(None, self.user, 'audit', self.course_id)
+        self.assertTrue(mock_sailthru_purchase.called)

@@ -1,5 +1,7 @@
+
+
 import json
-from StringIO import StringIO
+from six import StringIO
 
 from django.core.management import call_command
 from django.test import TestCase
@@ -22,4 +24,4 @@ class CommandsTestBase(TestCase):
         args = ['whee']
         kwargs = {'key1': 'default', 'key2': True}
         json_out = self._run_dummy_command(*args, **kwargs)
-        self.assertEquals(json_out['command'].strip(), 'tracked_dummy_command')
+        self.assertEqual(json_out['command'].strip(), 'tracked_dummy_command')

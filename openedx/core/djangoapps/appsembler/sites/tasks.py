@@ -80,8 +80,8 @@ def import_course_on_site_creation(organization_id):
             course_version,
         )
     except Exception as exc:  # pylint: disable=broad-except
-        logging.exception(u'Course Clone Error')
-        return u'exception: ' + unicode(exc)
+        logging.exception('Course Clone Error')
+        return 'exception: ' + str(exc)
 
     try:
         # Download the course in tar.gz format from github in a temp. file using a random file name
@@ -121,14 +121,14 @@ def import_course_on_site_creation(organization_id):
 
             OrganizationCourse.objects.create(
                 organization=organization,
-                course_id=unicode(course_target_id),
+                course_id=str(course_target_id),
                 active=True
             )
 
     # catch all exceptions so we can update the state and properly cleanup the course.
     except Exception as exc:  # pylint: disable=broad-except
         # update state: Failed
-        logging.exception(u'Course Clone Error')
+        logging.exception('Course Clone Error')
 
         try:
             # cleanup any remnants of the course
@@ -137,7 +137,7 @@ def import_course_on_site_creation(organization_id):
             # it's possible there was an error even before the course module was created
             pass
 
-        return u'exception: ' + unicode(exc)
+        return 'exception: ' + str(exc)
 
     try:
         # enroll the user in the course
@@ -151,5 +151,5 @@ def import_course_on_site_creation(organization_id):
         # Regenerate course overview to properly display it in the home page.
         CourseOverview.update_select_courses([course_target_id], force_update=True)
     except Exception as exc:
-        logging.exception(u'Error enrolling the user in default course')
-        return u'exception: ' + unicode(exc)
+        logging.exception('Error enrolling the user in default course')
+        return 'exception: ' + str(exc)

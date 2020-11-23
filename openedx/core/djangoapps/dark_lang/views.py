@@ -1,22 +1,22 @@
 """
 Views file for the Darklang Django App
 """
+
+
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
-from django.utils.translation import LANGUAGE_SESSION_KEY, ugettext as _
+from django.utils.translation import LANGUAGE_SESSION_KEY
+from django.utils.translation import ugettext as _
+from web_fragments.fragment import Fragment
 
 from openedx.core.djangoapps.dark_lang import DARK_LANGUAGE_KEY
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
-from openedx.core.djangoapps.user_api.preferences.api import (
-    delete_user_preference,
-    set_user_preference
-)
+from openedx.core.djangoapps.user_api.preferences.api import delete_user_preference, set_user_preference
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
-from web_fragments.fragment import Fragment
 
 LANGUAGE_INPUT_FIELD = 'preview_language'
 
@@ -94,7 +94,7 @@ class PreviewLanguageFragmentView(EdxFragmentView):
         set_user_preference(request.user, DARK_LANGUAGE_KEY, preview_language)
         PageLevelMessages.register_success_message(
             request,
-            _('Language set to {preview_language}').format(
+            _(u'Language set to {preview_language}').format(
                 preview_language=preview_language
             )
         )

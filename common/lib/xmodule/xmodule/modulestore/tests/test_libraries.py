@@ -5,13 +5,15 @@ Basic unit tests related to content libraries.
 Higher-level tests are in `cms/djangoapps/contentstore`.
 """
 
-import ddt
 
+import ddt
+import six
 from bson.objectid import ObjectId
 from opaque_keys.edx.locator import LibraryLocator
+from six.moves import range
 
 from xmodule.modulestore.exceptions import DuplicateCourseError
-from xmodule.modulestore.tests.factories import LibraryFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory, check_mongo_calls
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 
 
@@ -21,7 +23,6 @@ class TestLibraries(MixedSplitTestCase):
     Test for libraries.
     Mostly tests code found throughout split mongo, but also tests library_root_xblock.py
     """
-    shard = 2
 
     def test_create_library(self):
         """
@@ -56,8 +57,8 @@ class TestLibraries(MixedSplitTestCase):
         Test __unicode__() and __str__() methods of libraries
         """
         library = LibraryFactory.create(metadata={"display_name": name}, modulestore=self.store)
-        self.assertIn(name, unicode(library))
-        if not isinstance(name, unicode):
+        self.assertIn(name, six.text_type(library))
+        if not isinstance(name, six.text_type):
             self.assertIn(name, str(library))
 
     def test_display_with_default_methods(self):

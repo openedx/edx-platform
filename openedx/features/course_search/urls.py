@@ -2,9 +2,10 @@
 Defines URLs for course search.
 """
 
+
 from django.conf.urls import url
 
-from views.course_search import CourseSearchView, CourseSearchFragmentView
+from .views.course_search import CourseSearchFragmentView, CourseSearchView
 
 urlpatterns = [
     url(

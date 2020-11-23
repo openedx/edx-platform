@@ -1,11 +1,13 @@
 """Admin views for API managment."""
-from __future__ import absolute_import
+
+
 from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from openedx.core.djangoapps.api_admin.models import ApiAccessConfig, ApiAccessRequest
+from openedx.core.djangolib.markup import HTML, Text
 
 
 @admin.register(ApiAccessRequest)
@@ -30,10 +32,10 @@ class ApiAccessRequestAdmin(admin.ModelAdmin):
                 )
             },),
             ('Status', {
-                'description': _(
-                    'Once you have approved this request, go to {catalog_admin_url} to set up a catalog for this user.'
-                ).format(
-                    catalog_admin_url='<a href="{0}">{0}</a>'.format(reverse('api_admin:catalog-search'))
+                'description': Text(_(
+                    u'Once you have approved this request, go to {catalog_admin_url} to set up a catalog for this user.'
+                )).format(
+                    catalog_admin_url=HTML(u'<a href="{0}">{0}</a>').format(reverse('api_admin:catalog-search'))
                 ),
                 'fields': ('status',),
             }),

@@ -2,17 +2,17 @@
 """
 Commandline tool for doing operations on Problems
 """
-from __future__ import unicode_literals
+
 
 import argparse
 import logging
 import sys
-from cStringIO import StringIO
+from io import BytesIO
 
+from calc import UndefinedVariable
 from mako.lookup import TemplateLookup
 from path import Path as path
 
-from calc import UndefinedVariable
 from capa.capa_problem import LoncapaProblem
 
 logging.basicConfig(format="%(levelname)s %(message)s")
@@ -67,15 +67,15 @@ def main():
 
 def command_show(problem):
     """Display the text for this problem"""
-    print problem.get_html()
+    print(problem.get_html())
 
 
 def command_test(problem):
     # We're going to trap stdout/stderr from the problems (yes, some print)
     old_stdout, old_stderr = sys.stdout, sys.stderr
     try:
-        sys.stdout = StringIO()
-        sys.stderr = StringIO()
+        sys.stdout = BytesIO()
+        sys.stderr = BytesIO()
 
         check_that_suggested_answers_work(problem)
         check_that_blanks_fail(problem)

@@ -1,3 +1,5 @@
+
+
 from django_filters import rest_framework as filters
 
 from entitlements.models import CourseEntitlement
@@ -6,7 +8,7 @@ from entitlements.models import CourseEntitlement
 class CharListFilter(filters.CharFilter):
     """ Filters a field via a comma-delimited list of values. """
 
-    def filter(self, qs, value):  # pylint: disable=method-hidden
+    def filter(self, qs, value):
         if value not in (None, ''):
             value = value.split(',')
 
@@ -16,10 +18,10 @@ class CharListFilter(filters.CharFilter):
 class UUIDListFilter(CharListFilter):
     """ Filters a field via a comma-delimited list of UUIDs. """
 
-    def __init__(self, name='uuid', label=None, widget=None, method=None, lookup_expr='in', required=False,
+    def __init__(self, field_name='uuid', label=None, widget=None, method=None, lookup_expr='in', required=False,
                  distinct=False, exclude=False, **kwargs):
         super(UUIDListFilter, self).__init__(
-            name=name,
+            field_name=field_name,
             label=label,
             widget=widget,
             method=method,
@@ -34,7 +36,7 @@ class UUIDListFilter(CharListFilter):
 class CourseEntitlementFilter(filters.FilterSet):
 
     uuid = UUIDListFilter()
-    user = filters.CharFilter(name='user__username')
+    user = filters.CharFilter(field_name='user__username')
 
     class Meta:
         model = CourseEntitlement

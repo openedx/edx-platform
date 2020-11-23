@@ -1,14 +1,16 @@
+
+
 import logging
 
+import six
 from celery import task
 from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from django.conf import settings
-
 from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore.django import modulestore
+from six.moves import range  # pylint: disable=ungrouped-imports
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -21,7 +23,7 @@ DEFAULT_FORCE_UPDATE = False
 
 
 def chunks(sequence, chunk_size):
-    return (sequence[index: index + chunk_size] for index in xrange(0, len(sequence), chunk_size))
+    return (sequence[index: index + chunk_size] for index in range(0, len(sequence), chunk_size))
 
 
 def _task_options(routing_key):
@@ -46,7 +48,7 @@ def enqueue_async_course_overview_update_tasks(
         course_keys = [CourseKey.from_string(id) for id in course_ids]
 
     for course_key_group in chunks(course_keys, chunk_size):
-        course_key_strings = [unicode(key) for key in course_key_group]
+        course_key_strings = [six.text_type(key) for key in course_key_group]
 
         options = _task_options(routing_key)
         async_course_overview_update.apply_async(

@@ -11,20 +11,24 @@ Test utilities for mobile API tests:
 """
 # pylint: disable=no-member
 
-import ddt
+
 import datetime
+
+import ddt
+import pytz
+import six
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
-import pytz
 from rest_framework.test import APITestCase
 
-from courseware.access_response import MobileAvailabilityError, StartDateError, VisibilityError
-from courseware.tests.factories import UserFactory
+from lms.djangoapps.courseware.access_response import MobileAvailabilityError, StartDateError, VisibilityError
+from lms.djangoapps.courseware.tests.factories import UserFactory
 from mobile_api.models import IgnoreMobileAvailableFlagConfig
 from mobile_api.tests.test_milestones import MobileAPIMilestonesMixin
+from mobile_api.utils import API_V1
 from student import auth
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -49,6 +53,7 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
         self.user = UserFactory.create()
         self.password = 'test'
         self.username = self.user.username
+        self.api_version = API_V1
         IgnoreMobileAvailableFlagConfig(enabled=False).save()
 
     def tearDown(self):
@@ -91,9 +96,11 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
         """Base implementation that returns URL for endpoint that's being tested."""
         reverse_args = reverse_args or {}
         if 'course_id' in self.REVERSE_INFO['params']:
-            reverse_args.update({'course_id': unicode(kwargs.get('course_id', self.course.id))})
+            reverse_args.update({'course_id': six.text_type(kwargs.get('course_id', self.course.id))})
         if 'username' in self.REVERSE_INFO['params']:
             reverse_args.update({'username': kwargs.get('username', self.user.username)})
+        if 'api_version' in self.REVERSE_INFO['params']:
+            reverse_args.update({'api_version': kwargs.get('api_version', self.api_version)})
         return reverse(self.REVERSE_INFO['name'], kwargs=reverse_args)
 
     def url_method(self, url, data=None, **kwargs):  # pylint: disable=unused-argument
@@ -141,8 +148,8 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
     Subclasses are expected to inherit from MobileAPITestCase.
     Subclasses can override verify_success, verify_failure, and init_course_access methods.
     """
-    ALLOW_ACCESS_TO_UNRELEASED_COURSE = False  # pylint: disable=invalid-name
-    ALLOW_ACCESS_TO_NON_VISIBLE_COURSE = False  # pylint: disable=invalid-name
+    ALLOW_ACCESS_TO_UNRELEASED_COURSE = False
+    ALLOW_ACCESS_TO_NON_VISIBLE_COURSE = False
 
     def verify_success(self, response):
         """Base implementation of verifying a successful response."""
@@ -175,9 +182,7 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False, 'ENABLE_MKTG_SITE': True})
     def test_unreleased_course(self):
         # ensure the course always starts in the future
-        # pylint: disable=attribute-defined-outside-init
         self.course = CourseFactory.create(mobile_available=True, static_asset_path="needed_for_split")
-        # pylint: disable=attribute-defined-outside-init
         self.course.start = timezone.now() + datetime.timedelta(days=365)
         self.init_course_access()
         self._verify_response(self.ALLOW_ACCESS_TO_UNRELEASED_COURSE, StartDateError(self.course.start))

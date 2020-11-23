@@ -4,6 +4,7 @@ Appsembler: Module to have `is_request_has_valid_api_key` to break circular depe
 
 from django.conf import settings
 
+from edx_django_utils.monitoring import set_custom_metric
 from openedx.core.lib.log_utils import audit_log
 
 
@@ -24,6 +25,7 @@ def is_request_has_valid_api_key(request):
         audit_log("ApiKeyHeaderPermission used",
                   path=request.path,
                   ip=request.META.get("REMOTE_ADDR"))
+        set_custom_metric('deprecated_api_key_header', True)
         return True
 
     return False

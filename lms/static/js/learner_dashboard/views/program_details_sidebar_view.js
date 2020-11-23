@@ -11,12 +11,24 @@ import ProgramProgressView from './progress_circle_view';
 import sidebarTpl from '../../../templates/learner_dashboard/program_details_sidebar.underscore';
 
 class ProgramDetailsSidebarView extends Backbone.View {
+  constructor(options) {
+    const defaults = {
+      events: {
+        'click .pathway-button': 'trackPathwayClicked',
+      },
+    };
+    super(Object.assign({}, defaults, options));
+  }
+
   initialize(options) {
     this.tpl = HtmlUtils.template(sidebarTpl);
     this.courseModel = options.courseModel || {};
     this.certificateCollection = options.certificateCollection || [];
     this.programCertificate = this.getProgramCertificate();
     this.programRecordUrl = options.programRecordUrl;
+    this.industryPathways = options.industryPathways;
+    this.creditPathways = options.creditPathways;
+    this.programModel = options.model;
     this.render();
   }
 
@@ -25,6 +37,8 @@ class ProgramDetailsSidebarView extends Backbone.View {
       programCertificate: this.programCertificate ?
         this.programCertificate.toJSON() : {},
       programRecordUrl: this.programRecordUrl,
+      industryPathways: this.industryPathways,
+      creditPathways: this.creditPathways,
     });
 
     HtmlUtils.setHtml(this.$el, this.tpl(data));
@@ -78,6 +92,19 @@ class ProgramDetailsSidebarView extends Backbone.View {
     const type = this.model.get('type').toLowerCase();
 
     return type.replace(/\s+/g, '-');
+  }
+
+  trackPathwayClicked(event) {
+    const button = event.currentTarget;
+
+    window.analytics.track('edx.bi.dashboard.program.pathway.clicked', {
+      category: 'pathways',
+      // Credentials uses the uuid without dashes so we are converting here for consistency
+      program_uuid: this.programModel.attributes.uuid.replace(/-/g, ''),
+      program_name: this.programModel.attributes.title,
+      pathway_link_uuid: $(button).data('pathwayUuid').replace(/-/g, ''),
+      pathway_name: $(button).data('pathwayName'),
+    });
   }
 }
 

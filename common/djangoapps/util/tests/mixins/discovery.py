@@ -1,6 +1,8 @@
 """
 Mixins for the CourseDiscoveryApiClient.
 """
+
+
 import json
 
 import httpretty

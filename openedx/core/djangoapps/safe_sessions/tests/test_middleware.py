@@ -1,9 +1,11 @@
-# pylint: disable=no-member
-# pylint: disable=protected-access
 """
 Unit tests for SafeSessionMiddleware
 """
+
+
 import ddt
+import six
+from crum import set_current_request
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.models import AnonymousUser
@@ -11,24 +13,23 @@ from django.http import HttpResponse, HttpResponseRedirect, SimpleCookie
 from django.test import TestCase
 from django.test.utils import override_settings
 from mock import patch
-from nose.plugins.attrib import attr
 
 from openedx.core.djangolib.testing.utils import get_mock_request
-
 from student.tests.factories import UserFactory
 
-from ..middleware import SafeSessionMiddleware, SafeCookieData
+from ..middleware import SafeCookieData, SafeSessionMiddleware
 from .test_utils import TestSafeSessionsLogMixin
 
 
-@attr(shard=2)
 class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
     """
     Test class for SafeSessionMiddleware.process_request
     """
+
     def setUp(self):
         super(TestSafeSessionProcessRequest, self).setUp()
         self.user = UserFactory.create()
+        self.addCleanup(set_current_request, None)
         self.request = get_mock_request()
 
     def assert_response(self, safe_cookie_data=None, success=True):
@@ -43,13 +44,13 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
               Else, verifies a failed response with an HTTP redirect.
         """
         if safe_cookie_data:
-            self.request.COOKIES[settings.SESSION_COOKIE_NAME] = unicode(safe_cookie_data)
+            self.request.COOKIES[settings.SESSION_COOKIE_NAME] = six.text_type(safe_cookie_data)
         response = SafeSessionMiddleware().process_request(self.request)
         if success:
             self.assertIsNone(response)
             self.assertIsNone(getattr(self.request, 'need_to_delete_cookie', None))
         else:
-            self.assertEquals(response.status_code, HttpResponseRedirect.status_code)
+            self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
             self.assertTrue(self.request.need_to_delete_cookie)
 
     def assert_no_session(self):
@@ -68,7 +69,7 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
         """
         Asserts that a user object *is* set on the request's session.
         """
-        self.assertEquals(
+        self.assertEqual(
             SafeSessionMiddleware.get_user_id_from_session(self.request),
             self.user.id
         )
@@ -87,13 +88,13 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
         self.assert_user_in_session()
 
         # verify step 2: cookie value is replaced with parsed session_id
-        self.assertEquals(self.request.COOKIES[settings.SESSION_COOKIE_NAME], session_id)
+        self.assertEqual(self.request.COOKIES[settings.SESSION_COOKIE_NAME], session_id)
 
         # verify step 3: session set in request
         self.assertIsNotNone(self.request.session)
 
         # verify steps 4, 5: user_id stored for later verification
-        self.assertEquals(self.request.safe_cookie_verified_user_id, self.user.id)
+        self.assertEqual(self.request.safe_cookie_verified_user_id, self.user.id)
 
     def test_success_no_cookies(self):
         self.assert_response()
@@ -122,15 +123,16 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
         self.assert_user_in_session()
 
 
-@attr(shard=2)
 @ddt.ddt
 class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
     """
     Test class for SafeSessionMiddleware.process_response
     """
+
     def setUp(self):
         super(TestSafeSessionProcessResponse, self).setUp()
         self.user = UserFactory.create()
+        self.addCleanup(set_current_request, None)
         self.request = get_mock_request()
         self.request.session = {}
         self.client.response = HttpResponse()
@@ -154,7 +156,7 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
             self.client.response.cookies[settings.SESSION_COOKIE_NAME] = "some_session_id"
 
         response = SafeSessionMiddleware().process_response(self.request, self.client.response)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def assert_response_with_delete_cookie(
             self,
@@ -172,7 +174,7 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
         """
         with patch('django.http.HttpResponse.set_cookie') as mock_delete_cookie:
             self.assert_response(set_request_user=set_request_user, set_session_cookie=set_session_cookie)
-            self.assertEquals(mock_delete_cookie.called, expect_delete_called)
+            self.assertEqual(mock_delete_cookie.called, expect_delete_called)
 
     def test_success(self):
         with self.assert_not_logged():
@@ -205,8 +207,8 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
 
         serialized_cookie_data = self.client.response.cookies[settings.SESSION_COOKIE_NAME].value
         safe_cookie_data = SafeCookieData.parse(serialized_cookie_data)
-        self.assertEquals(safe_cookie_data.version, SafeCookieData.CURRENT_VERSION)
-        self.assertEquals(safe_cookie_data.session_id, "some_session_id")
+        self.assertEqual(safe_cookie_data.version, SafeCookieData.CURRENT_VERSION)
+        self.assertEqual(safe_cookie_data.session_id, "some_session_id")
         self.assertTrue(safe_cookie_data.verify(self.user.id))
 
     def test_cant_update_cookie_at_step_3_error(self):
@@ -225,16 +227,17 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
         self.assert_response_with_delete_cookie()
 
 
-@attr(shard=2)
 @ddt.ddt
 class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
     """
     Test class for SafeSessionMiddleware, testing both
     process_request and process_response.
     """
+
     def setUp(self):
         super(TestSafeSessionMiddleware, self).setUp()
         self.user = UserFactory.create()
+        self.addCleanup(set_current_request, None)
         self.request = get_mock_request()
         self.client.response = HttpResponse()
         self.client.response.cookies = SimpleCookie()
@@ -258,18 +261,18 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
 
         session_id = self.client.session.session_key
         safe_cookie_data = SafeCookieData.create(session_id, self.user.id)
-        self.request.COOKIES[settings.SESSION_COOKIE_NAME] = unicode(safe_cookie_data)
+        self.request.COOKIES[settings.SESSION_COOKIE_NAME] = six.text_type(safe_cookie_data)
 
         with self.assert_not_logged():
             response = SafeSessionMiddleware().process_request(self.request)
         self.assertIsNone(response)
 
-        self.assertEquals(self.request.safe_cookie_verified_user_id, self.user.id)
+        self.assertEqual(self.request.safe_cookie_verified_user_id, self.user.id)
         self.cookies_from_request_to_response()
 
         with self.assert_not_logged():
             response = SafeSessionMiddleware().process_response(self.request, self.client.response)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_success(self):
         self.verify_success()
@@ -291,7 +294,7 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
 
         with self.assert_parse_error():
             request_response = SafeSessionMiddleware().process_request(self.request)
-            self.assertEquals(request_response.status_code, expected_response_status)
+            self.assertEqual(request_response.status_code, expected_response_status)
 
         self.assertTrue(self.request.need_to_delete_cookie)
         self.cookies_from_request_to_response()

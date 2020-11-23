@@ -1,13 +1,15 @@
 """
 Tests for BlockCompletionTransformer.
 """
+
+
 from completion.models import BlockCompletion
 from completion.test_utils import CompletionWaffleTestMixin
-from xblock.core import XBlock
 from xblock.completable import CompletableXBlockMixin, XBlockCompletionMode
+from xblock.core import XBlock
 
-from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_api.blocks.transformers.block_completion import BlockCompletionTransformer
+from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import ModuleStoreTestCase, TransformerRegistryTestMixin
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -41,7 +43,6 @@ class BlockCompletionTransformerTestCase(TransformerRegistryTestMixin, Completio
     """
     Tests behaviour of BlockCompletionTransformer
     """
-    shard = 4
     TRANSFORMER_CLASS_TO_TEST = BlockCompletionTransformer
     COMPLETION_TEST_VALUE = 0.4
 
@@ -81,7 +82,6 @@ class BlockCompletionTransformerTestCase(TransformerRegistryTestMixin, Completio
         block = ItemFactory.create(category='comp', parent=course)
         BlockCompletion.objects.submit_completion(
             user=self.user,
-            course_key=block.location.course_key,
             block_key=block.location,
             completion=self.COMPLETION_TEST_VALUE,
         )

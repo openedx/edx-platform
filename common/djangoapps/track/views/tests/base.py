@@ -2,15 +2,16 @@
 Base class for tests related to emitted events to one of the tracking 'views'
 (e.g. SegmentIO).
 """
+
+
 import json
-from mock import sentinel
 
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from mock import sentinel
 
-from track.views import segmentio
 from track.tests import EventTrackingTestCase
-
+from track.views import segmentio
 
 SEGMENTIO_TEST_SECRET = 'anything'
 SEGMENTIO_TEST_ENDPOINT = '/segmentio/test/event'

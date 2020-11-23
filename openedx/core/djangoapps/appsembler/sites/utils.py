@@ -1,7 +1,7 @@
 import beeline
 import json
-from itertools import izip
-from urlparse import urlparse
+
+from urllib.parse import urlparse
 
 import cssutils
 import os
@@ -11,7 +11,11 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.db.models.query import Q
-from provider.oauth2.models import AccessToken, RefreshToken, Client
+
+if not settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
+    # TODO: Fix broken imports
+    from provider.oauth2.models import AccessToken, RefreshToken, Client
+
 from django.utils.text import slugify
 
 from organizations import api as org_api
@@ -204,6 +208,15 @@ def is_request_for_amc_admin(request):
 def get_current_organization(failure_return_none=False):
     """
     Get current organization from request using multiple strategies.
+
+    The split is made to enable global patching of the function.
+    """
+    return _get_current_organization(failure_return_none)
+
+
+def _get_current_organization(failure_return_none=False):
+    """
+    Implements get_current_organization.
     """
     request = get_current_request()
     organization_name = None
@@ -284,7 +297,7 @@ def get_initial_sass_variables():
     """
     values = get_branding_values_from_file()
     labels = get_branding_labels_from_file()
-    return [(val[0], (val[1], lab[1])) for val, lab in izip(values, labels)]
+    return [(val[0], (val[1], lab[1])) for val, lab in zip(values, labels)]
 
 
 @beeline.traced(name="get_branding_values_from_file")
@@ -396,7 +409,7 @@ def bootstrap_site(site, org_data=None, username=None):
         })
         organization = org_models.Organization.objects.get(id=organization_data.get('id'))
         organization.sites.add(site)
-        site_config.values['course_org_filter'] = organization_slug
+        site_config.site_values['course_org_filter'] = organization_slug
         site_config.save()
     else:
         organization = {}
@@ -436,18 +449,18 @@ def migrate_page_element(element):
     Translate the `content` in the page element, apply the same for all children elements.
     """
     if not isinstance(element, dict):
-        print 'DEBUG:', element
+        print('DEBUG:', element)
         raise Exception('An element should be a dict')
 
     if 'options' not in element:
-        print 'DEBUG:', element
+        print('DEBUG:', element)
         raise Exception('Unknown element type')
 
     options = element['options']
 
     if 'content' in options or 'text-content' in options:
         if 'content' in options and 'text-content' in options:
-            print 'DEBUG:', options
+            print('DEBUG:', options)
             raise Exception(
                 'Both `content` and `text-content` are there, but which one to translate?'
             )
@@ -462,7 +475,7 @@ def migrate_page_element(element):
                 'en': options['text-content']
             }
 
-    for _column_name, children in element.get('children', {}).iteritems():
+    for _column_name, children in element.get('children', {}).items():
         for child_element in children:
             migrate_page_element(child_element)
 
@@ -471,8 +484,8 @@ def to_new_page_elements(page_elements):
     """
     Migrate the page elements of a site.
     """
-    for page_id, page_obj in page_elements.iteritems():
-        if isinstance(page_obj, (unicode, str)):
+    for page_id, page_obj in page_elements.items():
+        if isinstance(page_obj, str):
             continue  # Skip pages like `"course-card": "course-tile-01"`
 
         for element in page_obj.get('content', []):

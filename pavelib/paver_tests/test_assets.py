@@ -1,12 +1,14 @@
 """Unit tests for the Paver asset tasks."""
 
+
 import os
 from unittest import TestCase
 
 import ddt
+import paver.tasks
+import six
 from mock import patch
 from paver.easy import call_task, path
-import paver.tasks
 from watchdog.observers import Observer
 
 from pavelib.assets import COLLECTSTATIC_LOG_DIR_ARG, collect_assets
@@ -76,7 +78,7 @@ class TestPaverAssetTasks(PaverTestCase):
                 u'rtlcss cms/static/css/bootstrap/studio-main.css cms/static/css/bootstrap/studio-main-rtl.css'
             )
 
-        self.assertItemsEqual(self.task_messages, expected_messages)
+        six.assertCountEqual(self, self.task_messages, expected_messages)
 
 
 @ddt.ddt
@@ -147,7 +149,7 @@ class TestPaverThemeAssetTasks(PaverTestCase):
             )
             if force:
                 expected_messages.append(
-                    'rm -rf {test_theme_dir}/lms/static/css/*.css'.format(test_theme_dir=str(TEST_THEME_DIR))
+                    u'rm -rf {test_theme_dir}/lms/static/css/*.css'.format(test_theme_dir=str(TEST_THEME_DIR))
                 )
             expected_messages.append(
                 u'libsass {test_theme_dir}/lms/static/sass'.format(test_theme_dir=str(TEST_THEME_DIR))
@@ -193,7 +195,7 @@ class TestPaverThemeAssetTasks(PaverTestCase):
                 u'rtlcss cms/static/css/bootstrap/studio-main.css cms/static/css/bootstrap/studio-main-rtl.css'
             )
 
-        self.assertItemsEqual(self.task_messages, expected_messages)
+        six.assertCountEqual(self, self.task_messages, expected_messages)
 
 
 class TestPaverWatchAssetTasks(TestCase):
@@ -243,7 +245,7 @@ class TestPaverWatchAssetTasks(TestCase):
 
                     self.assertIsInstance(sass_watcher_args[0], Observer)
                     self.assertIsInstance(sass_watcher_args[1], list)
-                    self.assertItemsEqual(sass_watcher_args[1], self.expected_sass_directories)
+                    six.assertCountEqual(self, sass_watcher_args[1], self.expected_sass_directories)
 
     def test_watch_theme_assets(self):
         """
@@ -273,7 +275,7 @@ class TestPaverWatchAssetTasks(TestCase):
                     sass_watcher_args = mock_register.call_args_list[0][0]
                     self.assertIsInstance(sass_watcher_args[0], Observer)
                     self.assertIsInstance(sass_watcher_args[1], list)
-                    self.assertItemsEqual(sass_watcher_args[1], self.expected_sass_directories)
+                    six.assertCountEqual(self, sass_watcher_args[1], self.expected_sass_directories)
 
 
 @ddt.ddt
@@ -345,7 +347,7 @@ class TestCollectAssets(PaverTestCase):
         """
         for i, sys in enumerate(systems):
             msg = self.task_messages[i]
-            self.assertTrue(msg.startswith('python manage.py {}'.format(sys)))
+            self.assertTrue(msg.startswith(u'python manage.py {}'.format(sys)))
             self.assertIn(' collectstatic ', msg)
             self.assertIn('--settings={}'.format(Env.DEVSTACK_SETTINGS), msg)
             self.assertTrue(msg.endswith(' {}'.format(log_location)))
@@ -372,7 +374,7 @@ class TestUpdateAssetsTask(PaverTestCase):
         call_task('pavelib.assets.update_assets', args=cmd_args)
         self.assertTrue(
             self._is_substring_in_list(self.task_messages, expected_substring),
-            msg="{substring} not found in messages".format(substring=expected_substring)
+            msg=u"{substring} not found in messages".format(substring=expected_substring)
         )
 
     def _is_substring_in_list(self, messages_list, expected_substring):

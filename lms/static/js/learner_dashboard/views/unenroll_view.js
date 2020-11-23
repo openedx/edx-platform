@@ -101,7 +101,7 @@ class UnenrollView extends Backbone.View {
     this.mainPageSelector = '#dashboard-main';
 
     this.triggerSelector = '.action-unenroll';
-    $(this.triggerSelector).each(function attachTriggerHandler(index, element) {
+    $(this.triggerSelector).each((index, element) => {
       $(element).on('click', view.handleTrigger.bind($(element)));
     });
 

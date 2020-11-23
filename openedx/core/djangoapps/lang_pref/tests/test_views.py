@@ -1,14 +1,16 @@
 """
 Tests: lang pref views
 """
+
+
 import json
+
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
+from django.utils.translation import LANGUAGE_SESSION_KEY, get_language
 from student.tests.factories import UserFactory
-from django.utils.translation import LANGUAGE_SESSION_KEY
-from django.contrib.sessions.middleware import SessionMiddleware
-from django.utils.translation import get_language
 
 
 class TestLangPrefView(TestCase):
@@ -26,13 +28,13 @@ class TestLangPrefView(TestCase):
 
     def test_language_session_update(self):
         # test language session updating correctly.
-        self.request.session[LANGUAGE_SESSION_KEY] = 'ar'  # pylint: disable=no-member
+        self.request.session[LANGUAGE_SESSION_KEY] = 'ar'
         response = self.client.patch(reverse("session_language"), json.dumps({'pref-lang': 'eo'}))
         self.assertEqual(response.status_code, 200)
         self.client.get('/')
-        self.assertEquals(get_language(), 'eo')
+        self.assertEqual(get_language(), 'eo')
 
         response = self.client.patch(reverse("session_language"), json.dumps({'pref-lang': 'en'}))
         self.assertEqual(response.status_code, 200)
         self.client.get('/')
-        self.assertEquals(get_language(), 'en')
+        self.assertEqual(get_language(), 'en')

@@ -5,6 +5,7 @@ when you run "manage.py test".
 Replace this with more appropriate tests for your application.
 """
 
+
 import itertools
 from datetime import timedelta
 
@@ -14,14 +15,15 @@ from django.test import TestCase, override_settings
 from django.utils.timezone import now
 from mock import patch
 from opaque_keys.edx.locator import CourseLocator
+import six
+from six.moves import zip
 
 from course_modes.helpers import enrollment_mode_display
-from course_modes.models import CourseMode, Mode, invalidate_course_mode_cache, get_cosmetic_display_price
+from course_modes.models import CourseMode, Mode, get_cosmetic_display_price, invalidate_course_mode_cache
 from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase,
-)
 
 
 @ddt.ddt
@@ -41,6 +43,7 @@ class CourseModeModelTest(TestCase):
         CourseMode.objects.all().delete()
 
     def tearDown(self):
+        super(CourseModeModelTest, self).tearDown()
         invalidate_course_mode_cache(sender=None)
 
     def create_mode(
@@ -398,11 +401,11 @@ class CourseModeModelTest(TestCase):
 
         # Check the selectable modes, which should exclude credit
         selectable_modes = CourseMode.modes_for_course_dict(self.course_key)
-        self.assertItemsEqual(selectable_modes.keys(), expected_selectable_modes)
+        six.assertCountEqual(self, list(selectable_modes.keys()), expected_selectable_modes)
 
         # When we get all unexpired modes, we should see credit as well
         all_modes = CourseMode.modes_for_course_dict(self.course_key, only_selectable=False)
-        self.assertItemsEqual(all_modes.keys(), available_modes)
+        six.assertCountEqual(self, list(all_modes.keys()), available_modes)
 
     def _enrollment_display_modes_dicts(self, dict_type):
         """
@@ -421,11 +424,11 @@ class CourseModeModelTest(TestCase):
                              'professional']
         }
         if dict_type in ['verify_need_to_verify', 'verify_submitted']:
-            return dict(zip(dict_keys, display_values.get('verify_need_to_verify')))
+            return dict(list(zip(dict_keys, display_values.get('verify_need_to_verify'))))
         elif dict_type is None or dict_type == 'dummy':
-            return dict(zip(dict_keys, display_values.get('verify_none')))
+            return dict(list(zip(dict_keys, display_values.get('verify_none'))))
         else:
-            return dict(zip(dict_keys, display_values.get(dict_type)))
+            return dict(list(zip(dict_keys, display_values.get(dict_type))))
 
     def test_expiration_datetime_explicitly_set(self):
         """ Verify that setting the expiration_date property sets the explicit flag. """
@@ -455,17 +458,24 @@ class CourseModeModelTest(TestCase):
         self.assertIsNone(verified_mode.expiration_datetime)
 
     @ddt.data(
-        (CourseMode.AUDIT, False),
-        (CourseMode.HONOR, True),
-        (CourseMode.VERIFIED, True),
-        (CourseMode.CREDIT_MODE, True),
-        (CourseMode.PROFESSIONAL, True),
-        (CourseMode.NO_ID_PROFESSIONAL_MODE, True),
+        (False, CourseMode.AUDIT, False),
+        (False, CourseMode.HONOR, True),
+        (False, CourseMode.VERIFIED, True),
+        (False, CourseMode.CREDIT_MODE, True),
+        (False, CourseMode.PROFESSIONAL, True),
+        (False, CourseMode.NO_ID_PROFESSIONAL_MODE, True),
+        (True, CourseMode.AUDIT, False),
+        (True, CourseMode.HONOR, False),
+        (True, CourseMode.VERIFIED, True),
+        (True, CourseMode.CREDIT_MODE, True),
+        (True, CourseMode.PROFESSIONAL, True),
+        (True, CourseMode.NO_ID_PROFESSIONAL_MODE, True),
     )
     @ddt.unpack
-    def test_eligible_for_cert(self, mode_slug, expected_eligibility):
+    def test_eligible_for_cert(self, disable_honor_cert, mode_slug, expected_eligibility):
         """Verify that non-audit modes are eligible for a cert."""
-        self.assertEqual(CourseMode.is_eligible_for_certificate(mode_slug), expected_eligibility)
+        with override_settings(FEATURES={'DISABLE_HONOR_CERTIFICATES': disable_honor_cert}):
+            self.assertEqual(CourseMode.is_eligible_for_certificate(mode_slug), expected_eligibility)
 
     @ddt.data(
         (CourseMode.AUDIT, False),
@@ -474,6 +484,7 @@ class CourseModeModelTest(TestCase):
         (CourseMode.CREDIT_MODE, False),
         (CourseMode.PROFESSIONAL, True),
         (CourseMode.NO_ID_PROFESSIONAL_MODE, False),
+        (CourseMode.MASTERS, False),
     )
     @ddt.unpack
     def test_verified_min_price(self, mode_slug, is_error_expected):
@@ -484,6 +495,46 @@ class CourseModeModelTest(TestCase):
             self.assertTrue(is_error_expected, "Did not expect a ValidationError to be thrown.")
         else:
             self.assertFalse(is_error_expected, "Expected a ValidationError to be thrown.")
+
+    @ddt.data(
+        ([], False),
+        ([CourseMode.VERIFIED, CourseMode.AUDIT], False),
+        ([CourseMode.MASTERS], True),
+        ([CourseMode.VERIFIED, CourseMode.AUDIT, CourseMode.MASTERS], True)
+    )
+    @ddt.unpack
+    def test_contains_masters_mode(self, available_modes, expected_contains_masters_mode):
+        for mode in available_modes:
+            self.create_mode(mode, mode, 10)
+
+        modes = CourseMode.modes_for_course_dict(self.course_key)
+        self.assertEqual(CourseMode.contains_masters_mode(modes), expected_contains_masters_mode)
+
+    @ddt.data(
+        ([], False),
+        ([CourseMode.VERIFIED, CourseMode.AUDIT], False),
+        ([CourseMode.MASTERS], True),
+        ([CourseMode.VERIFIED, CourseMode.AUDIT, CourseMode.MASTERS], False)
+    )
+    @ddt.unpack
+    def test_is_masters_only(self, available_modes, expected_is_masters_only):
+        for mode in available_modes:
+            self.create_mode(mode, mode, 10)
+
+        self.assertEqual(CourseMode.is_masters_only(self.course_key), expected_is_masters_only)
+
+
+class TestCourseOverviewIntegration(ModuleStoreTestCase):
+    def test_course_overview_version_update(self):
+        course = CourseFactory.create()
+        course_overview = CourseOverview.get_from_id(course.id)
+        course_overview.version -= 1
+        course_overview.save()
+        course_mode = CourseModeFactory.create(course_id=course_overview.id)
+
+        assert CourseMode.objects.filter(pk=course_mode.pk).exists()
+        CourseOverview.get_from_id(course.id)
+        assert CourseMode.objects.filter(pk=course_mode.pk).exists()
 
 
 class TestDisplayPrices(ModuleStoreTestCase):

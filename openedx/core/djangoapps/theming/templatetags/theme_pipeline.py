@@ -2,11 +2,11 @@
 Theme aware pipeline template tags.
 """
 
+
 from django import template
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
-
-from pipeline.templatetags.pipeline import StylesheetNode, JavascriptNode
+from pipeline.templatetags.pipeline import JavascriptNode, StylesheetNode
 from pipeline.utils import guess_type
 
 from openedx.core.djangoapps.theming.helpers_static import get_static_file_url
@@ -57,7 +57,7 @@ def stylesheet(parser, token):  # pylint: disable=unused-argument
         _, name = token.split_contents()
     except ValueError:
         raise template.TemplateSyntaxError(
-            '%r requires exactly one argument: the name of a group in the PIPELINE_CSS setting' %
+            u'%r requires exactly one argument: the name of a group in the PIPELINE["STYLESHEETS"] setting' %
             token.split_contents()[0]
         )
     return ThemeStylesheetNode(name)
@@ -72,7 +72,7 @@ def javascript(parser, token):  # pylint: disable=unused-argument
         _, name = token.split_contents()
     except ValueError:
         raise template.TemplateSyntaxError(
-            '%r requires exactly one argument: the name of a group in the PIPELINE_JS setting' %
+            u'%r requires exactly one argument: the name of a group in the PIPELINE["JAVASCRIPT"] setting' %
             token.split_contents()[0]
         )
     return ThemeJavascriptNode(name)

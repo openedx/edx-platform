@@ -28,7 +28,7 @@ function Success({ platformName, homepageUrl, dashboardUrl, isLoggedIn }) {
 
     <div className="row">
       <div className="col-sm-12">
-        <p>{gettext('Thank you for submitting a request! We will contact you within 24 hours.')}</p>
+        <p>{gettext('Thank you for submitting a request! We appreciate your patience while we work to review your request.')}</p>
       </div>
     </div>
 

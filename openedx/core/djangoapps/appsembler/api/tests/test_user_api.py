@@ -2,7 +2,7 @@
 from unittest import skip
 
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import resolve, reverse
+from django.urls import resolve, reverse
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory, force_authenticate
 
@@ -50,7 +50,7 @@ class UserIndexViewSetTest(TestCase):
 
         """
         super(UserIndexViewSetTest, self).setUp()
-        self.my_site = Site.objects.get(domain=u'example.com')
+        self.my_site = Site.objects.get(domain='example.com')
         self.other_site = SiteFactory(domain='other-site.test')
         self.other_site_org = OrganizationFactory(sites=[self.other_site])
         self.my_site_org = OrganizationFactory(sites=[self.my_site])

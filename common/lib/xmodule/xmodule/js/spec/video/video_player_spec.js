@@ -714,6 +714,7 @@ function(VideoPlayer, HLS, _) {
             describe('when the video player is not full screen', function() {
                 beforeEach(function() {
                     state = jasmine.initializePlayer();
+                    jasmine.mockFullscreenAPI();
                     state.videoEl = $('video, iframe');
                     spyOn($.fn, 'trigger').and.callThrough();
                     $('.add-fullscreen').click();
@@ -733,12 +734,10 @@ function(VideoPlayer, HLS, _) {
             describe('when the video player already full screen', function() {
                 beforeEach(function() {
                     state = jasmine.initializePlayer();
+                    jasmine.mockFullscreenAPI();
                     state.videoEl = $('video, iframe');
                     spyOn($.fn, 'trigger').and.callThrough();
-                    state.el.addClass('video-fullscreen');
-                    state.videoFullScreen.fullScreenState = true;
-                    state.videoFullScreen.isFullScreen = true;
-                    state.videoFullScreen.fullScreenEl.attr('title', 'Exit-fullscreen');
+                    state.videoFullScreen.enter();
                     $('.add-fullscreen').click();
                 });
 
@@ -1063,6 +1062,37 @@ function(VideoPlayer, HLS, _) {
                 }).then(function() {
                     expect($(playButtonOverlaySelector)).not.toHaveClass('is-hidden');
                 }).always(done);
+            });
+        });
+
+        describe('HLS Primary Playback', function() {
+            beforeEach(function() {
+                spyOn(window.YT, 'Player').and.callThrough();
+            });
+
+            afterEach(function() {
+                YT.Player.calls.reset();
+            });
+
+            it('loads youtube if flag is disabled', function() {
+                state = jasmine.initializePlayer('video_all.html', {
+                    prioritizeHls: false,
+                    streams: '0.5:7tqY6eQzVhE,1.0:cogebirgzzM,1.5:abcdefghijkl'
+                });
+                expect(state.config.prioritizeHls).toBeFalsy();
+                expect(YT.Player).toHaveBeenCalled();
+                expect(state.videoPlayer.player.hls).toBeUndefined();
+            });
+
+            it('does not load youtube if flag is enabled', function() {
+                state = jasmine.initializePlayer('video_all.html', {
+                    prioritizeHls: true,
+                    streams: '0.5:7tqY6eQzVhE,1.0:cogebirgzzM,1.5:abcdefghijkl',
+                    sources: ['/base/fixtures/test.mp4', '/base/fixtures/test.webm', '/base/fixtures/hls/hls.m3u8']
+                });
+                expect(state.config.prioritizeHls).toBeTruthy();
+                expect(YT.Player).not.toHaveBeenCalled();
+                expect(state.videoPlayer.player.hls).toBeDefined();
             });
         });
     });

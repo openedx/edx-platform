@@ -1,12 +1,15 @@
 """
 Tests for third_party_auth utility functions.
 """
+
+
 import unittest
 
 from django.conf import settings
+
+from student.tests.factories import UserFactory
 from third_party_auth.tests.testutil import TestCase
 from third_party_auth.utils import user_exists
-from student.tests.factories import UserFactory
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -31,4 +34,7 @@ class TestUtils(TestCase):
         )
         self.assertFalse(
             user_exists({'username': 'invalid_user'}),
+        )
+        self.assertTrue(
+            user_exists({'username': 'TesT_User'})
         )

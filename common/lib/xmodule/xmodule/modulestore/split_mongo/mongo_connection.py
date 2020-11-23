@@ -1,35 +1,35 @@
 """
 Segregation of pymongo functions from the data modeling mechanisms for split modulestore.
 """
+
+
 import datetime
-import cPickle as pickle
+import logging
 import math
-import zlib
-import pymongo
-import pytz
 import re
+import zlib
 from contextlib import contextmanager
 from time import time
 
+import pymongo
+import pytz
+import six
+from six.moves import cPickle as pickle
+from contracts import check, new_contract
+from mongodb_proxy import autoretry_read
 # Import this just to export it
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
+
+from xmodule.exceptions import HeartbeatFailure
+from xmodule.modulestore import BlockData
+from xmodule.modulestore.split_mongo import BlockKey
+from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
 
 try:
     from django.core.cache import caches, InvalidCacheBackendError
     DJANGO_AVAILABLE = True
 except ImportError:
     DJANGO_AVAILABLE = False
-
-import dogstats_wrapper as dog_stats_api
-import logging
-
-from contracts import check, new_contract
-from mongodb_proxy import autoretry_read
-from xmodule.exceptions import HeartbeatFailure
-from xmodule.modulestore import BlockData
-from xmodule.modulestore.split_mongo import BlockKey
-from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
-
 
 new_contract('BlockData', BlockData)
 log = logging.getLogger(__name__)
@@ -83,7 +83,7 @@ class Tagger(object):
             **kwargs: Each keyword is treated as a tag name, and the
                 value of the argument is the tag value.
         """
-        self.added_tags.extend(kwargs.items())
+        self.added_tags.extend(list(kwargs.items()))
 
     @property
     def tags(self):
@@ -137,27 +137,6 @@ class QueryTimer(object):
             end = time()
             tags = tagger.tags
             tags.append('course:{}'.format(course_context))
-            for name, size in tagger.measures:
-                dog_stats_api.histogram(
-                    '{}.{}'.format(metric_name, name),
-                    size,
-                    timestamp=end,
-                    tags=[tag for tag in tags if not tag.startswith('{}:'.format(metric_name))],
-                    sample_rate=tagger.sample_rate,
-                )
-            dog_stats_api.histogram(
-                '{}.duration'.format(metric_name),
-                end - start,
-                timestamp=end,
-                tags=tags,
-                sample_rate=tagger.sample_rate,
-            )
-            dog_stats_api.increment(
-                metric_name,
-                timestamp=end,
-                tags=tags,
-                sample_rate=tagger.sample_rate,
-            )
 
 
 TIMER = QueryTimer(__name__, 0.01)
@@ -209,14 +188,14 @@ def structure_to_mongo(structure, course_context=None):
 
         check('BlockKey', structure['root'])
         check('dict(BlockKey: BlockData)', structure['blocks'])
-        for block in structure['blocks'].itervalues():
+        for block in six.itervalues(structure['blocks']):
             if 'children' in block.fields:
                 check('list(BlockKey)', block.fields['children'])
 
         new_structure = dict(structure)
         new_structure['blocks'] = []
 
-        for block_key, block in structure['blocks'].iteritems():
+        for block_key, block in six.iteritems(structure['blocks']):
             new_block = dict(block.to_storable())
             new_block.setdefault('block_type', block_key.type)
             new_block['block_id'] = block_key.id
@@ -247,20 +226,29 @@ class CourseStructureCache(object):
             return None
 
         with TIMER.timer("CourseStructureCache.get", course_context) as tagger:
-            compressed_pickled_data = self.cache.get(key)
-            tagger.tag(from_cache=str(compressed_pickled_data is not None).lower())
+            try:
+                compressed_pickled_data = self.cache.get(key)
+                tagger.tag(from_cache=str(compressed_pickled_data is not None).lower())
 
-            if compressed_pickled_data is None:
-                # Always log cache misses, because they are unexpected
-                tagger.sample_rate = 1
+                if compressed_pickled_data is None:
+                    # Always log cache misses, because they are unexpected
+                    tagger.sample_rate = 1
+                    return None
+
+                tagger.measure('compressed_size', len(compressed_pickled_data))
+
+                pickled_data = zlib.decompress(compressed_pickled_data)
+                tagger.measure('uncompressed_size', len(pickled_data))
+
+                if six.PY2:
+                    return pickle.loads(pickled_data)
+                else:
+                    return pickle.loads(pickled_data, encoding='latin-1')
+            except Exception:
+                # The cached data is corrupt in some way, get rid of it.
+                log.warning("CourseStructureCache: Bad data in cache for %s", course_context)
+                self.cache.delete(key)
                 return None
-
-            tagger.measure('compressed_size', len(compressed_pickled_data))
-
-            pickled_data = zlib.decompress(compressed_pickled_data)
-            tagger.measure('uncompressed_size', len(pickled_data))
-
-            return pickle.loads(pickled_data)
 
     def set(self, key, structure, course_context=None):
         """Given a structure, will pickle, compress, and write to cache."""
@@ -268,7 +256,7 @@ class CourseStructureCache(object):
             return None
 
         with TIMER.timer("CourseStructureCache.set", course_context) as tagger:
-            pickled_data = pickle.dumps(structure, pickle.HIGHEST_PROTOCOL)
+            pickled_data = pickle.dumps(structure, 4)  # Protocol can't be incremented until cache is cleared
             tagger.measure('uncompressed_size', len(pickled_data))
 
             # 1 = Fastest (slightly larger results)
@@ -335,7 +323,7 @@ class MongoConnection(object):
                     if doc is None:
                         log.warning(
                             "doc was None when attempting to retrieve structure for item with key %s",
-                            unicode(key)
+                            six.text_type(key)
                         )
                         return None
                     tagger_find_one.measure("blocks", len(doc['blocks']))
@@ -435,7 +423,7 @@ class MongoConnection(object):
         """
         with TIMER.timer("insert_structure", course_context) as tagger:
             tagger.measure("blocks", len(structure["blocks"]))
-            self.structures.insert(structure_to_mongo(structure, course_context))
+            self.structures.insert_one(structure_to_mongo(structure, course_context))
 
     def get_course_index(self, key, ignore_case=False):
         """
@@ -483,7 +471,7 @@ class MongoConnection(object):
                     query['versions.{}'.format(branch)] = {'$exists': True}
 
                 if search_targets:
-                    for key, value in search_targets.iteritems():
+                    for key, value in six.iteritems(search_targets):
                         query['search_targets.{}'.format(key)] = value
 
                 if org_target:
@@ -516,7 +504,7 @@ class MongoConnection(object):
         """
         with TIMER.timer("insert_course_index", course_context):
             course_index['last_update'] = datetime.datetime.now(pytz.utc)
-            self.course_index.insert(course_index)
+            self.course_index.insert_one(course_index)
 
     def update_course_index(self, course_index, from_index=None, course_context=None):
         """
@@ -539,7 +527,7 @@ class MongoConnection(object):
                     'run': course_index['run'],
                 }
             course_index['last_update'] = datetime.datetime.now(pytz.utc)
-            self.course_index.update(query, course_index, upsert=False,)
+            self.course_index.replace_one(query, course_index, upsert=False,)
 
     def delete_course_index(self, course_key):
         """
@@ -578,7 +566,7 @@ class MongoConnection(object):
         with TIMER.timer("insert_definition", course_context) as tagger:
             tagger.measure('fields', len(definition['fields']))
             tagger.tag(block_type=definition['block_type'])
-            self.definitions.insert(definition)
+            self.definitions.insert_one(definition)
 
     def ensure_indexes(self):
         """

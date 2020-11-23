@@ -32,7 +32,8 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
 
     removeLoggedInCookies();
     // Appsembler: Changed this from edx.org to the customer's site.
-    window.location.href = location.protocol + '//' + location.host + '/';
+    redirect_fallback = location.protocol + '//' + location.host + '/';
+    window.location.href = this.props.mktgRootLink || redirect_fallback;
   }
 
   deleteAccount() {
@@ -53,9 +54,8 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
   }
 
   failedSubmission(error) {
-    const { status } = error;
-    const title = status === 403 ? gettext('Password is incorrect') : gettext('Unable to delete account');
-    const body = status === 403 ? gettext('Please re-enter your password.') : gettext('Sorry, there was an error trying to process your request. Please try again later.');
+    const title = error.message === '403' ? gettext('Password is incorrect') : gettext('Unable to delete account');
+    const body = error.message === '403' ? gettext('Please re-enter your password.') : gettext('Sorry, there was an error trying to process your request. Please try again later.');
 
     this.setState({
       passwordSubmitted: false,
@@ -97,10 +97,34 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
     const loseAccessText = StringUtils.interpolate(
       gettext('You may also lose access to verified certificates and other program credentials like MicroMasters certificates. If you want to make a copy of these for your records before proceeding with deletion, follow the instructions for {htmlStart}printing or downloading a certificate{htmlEnd}.'),
       {
-        htmlStart: '<a href="http://edx.readthedocs.io/projects/edx-guide-for-students/en/latest/SFD_certificates.html#printing-a-certificate" target="_blank">',
+        htmlStart: '<a href="https://edx.readthedocs.io/projects/edx-guide-for-students/en/latest/SFD_certificates.html#printing-a-certificate" rel="noopener" target="_blank">',
         htmlEnd: '</a>',
       },
     );
+
+    const noteDeletion = StringUtils.interpolate(
+      gettext('You have selected “Delete my account.” Deletion of your account and personal data is permanent and cannot be undone. {platformName} will not be able to recover your account or the data that is deleted.'),
+      {
+        platformName: this.props.platformName,
+      },
+    );
+
+    const bodyDeletion = StringUtils.interpolate(
+      gettext('If you proceed, you will be unable to use this account to take courses on the {platformName} app, {siteName}, or any other site hosted by {platformName}.'),
+      {
+        platformName: this.props.platformName,
+        siteName: this.props.siteName,
+      },
+    );
+
+    const bodyDeletion2 = StringUtils.interpolate(
+      gettext('This includes access to {siteName} from your employer’s or university’s system{additionalSiteSpecificDeletionText}.'),
+      {
+        siteName: this.props.siteName,
+        additionalSiteSpecificDeletionText: this.props.additionalSiteSpecificDeletionText,
+      },
+    );
+
 
     return (
       <div className="delete-confirmation-wrapper">
@@ -138,8 +162,11 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
                       <Icon id="delete-confirmation-body-warning-icon" className={['fa', 'fa-exclamation-triangle']} />
                     </div>
                     <div className="alert-content">
-                      <h3 className="alert-title">{ gettext('You have selected “Delete my account.” Deletion of your account and personal data is permanent and cannot be undone. We will not be able to recover your account or the data that is deleted.') }</h3>
-                      <p>{ gettext('If you proceed, you will be unable to use this account to take courses on the app. This includes access to the app from your employer’s or university’s system and access to private sites offered.') }</p>
+                      <h3 className="alert-title">{noteDeletion}</h3>
+                      <p>
+                        <span>{bodyDeletion} </span>
+                        <span>{bodyDeletion2}</span>
+                      </p>
                       <p dangerouslySetInnerHTML={{ __html: loseAccessText }} />
                     </div>
                   </div>
@@ -199,10 +226,18 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
 
 StudentAccountDeletionConfirmationModal.propTypes = {
   onClose: PropTypes.func,
+  additionalSiteSpecificDeletionText: PropTypes.string,
+  mktgRootLink: PropTypes.string,
+  platformName: PropTypes.string,
+  siteName: PropTypes.string,
 };
 
 StudentAccountDeletionConfirmationModal.defaultProps = {
   onClose: () => {},
+  additionalSiteSpecificDeletionText: "",
+  mktgRootLink: "",
+  platformName: "",
+  siteName: "",
 };
 
 export default StudentAccountDeletionConfirmationModal;

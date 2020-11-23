@@ -1,11 +1,14 @@
 """
 Tests of student.roles
 """
+
+
 import ddt
+import six
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 
-from courseware.tests.factories import InstructorFactory, StaffFactory, UserFactory
+from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory, UserFactory
 from student.roles import (
     CourseBetaTesterRole,
     CourseInstructorRole,
@@ -69,7 +72,7 @@ class RolesTestCase(TestCase):
         CourseStaffRole(self.course_key).add_users(self.student)
         self.assertTrue(
             CourseStaffRole(self.course_key).has_user(self.student),
-            "Student doesn't have access to {}".format(unicode(self.course_key))
+            "Student doesn't have access to {}".format(six.text_type(self.course_key))
         )
 
         # remove access and confirm
@@ -90,7 +93,7 @@ class RolesTestCase(TestCase):
         OrgStaffRole(self.course_key.org).add_users(self.student)
         self.assertTrue(
             OrgStaffRole(self.course_key.org).has_user(self.student),
-            "Student doesn't have access to {}".format(unicode(self.course_key.org))
+            "Student doesn't have access to {}".format(six.text_type(self.course_key.org))
         )
 
         # remove access and confirm
@@ -110,11 +113,11 @@ class RolesTestCase(TestCase):
         CourseInstructorRole(self.course_key).add_users(self.student)
         self.assertTrue(
             OrgInstructorRole(self.course_key.org).has_user(self.student),
-            "Student doesn't have access to {}".format(unicode(self.course_key.org))
+            "Student doesn't have access to {}".format(six.text_type(self.course_key.org))
         )
         self.assertTrue(
             CourseInstructorRole(self.course_key).has_user(self.student),
-            "Student doesn't have access to {}".format(unicode(self.course_key))
+            "Student doesn't have access to {}".format(six.text_type(self.course_key))
         )
 
         # remove access and confirm
@@ -125,7 +128,7 @@ class RolesTestCase(TestCase):
         )
         self.assertTrue(
             CourseInstructorRole(self.course_key).has_user(self.student),
-            "Student doesn't have access to {}".format(unicode(self.course_key))
+            "Student doesn't have access to {}".format(six.text_type(self.course_key))
         )
 
         # ok now keep org role and get rid of course one
@@ -137,7 +140,7 @@ class RolesTestCase(TestCase):
         )
         self.assertFalse(
             CourseInstructorRole(self.course_key).has_user(self.student),
-            "Student doesn't have access to {}".format(unicode(self.course_key))
+            "Student doesn't have access to {}".format(six.text_type(self.course_key))
         )
 
     def test_get_user_for_role(self):

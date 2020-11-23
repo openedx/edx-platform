@@ -85,7 +85,7 @@ class PasswordResetConfirmation extends React.Component {
           <form id="passwordreset-form" method="post" action="">
             <h2 className="section-title lines">
               <span className="text">
-                {gettext('Reset Your Password')}
+                {this.props.formTitle}
               </span>
             </h2>
 
@@ -121,7 +121,7 @@ class PasswordResetConfirmation extends React.Component {
             <Button
               type="submit"
               className={['action', 'action-primary', 'action-update', 'js-reset']}
-              label={gettext('Reset My Password')}
+              label={this.props.primaryActionButtonLabel}
             />
           </form>
         </div>
@@ -133,10 +133,14 @@ class PasswordResetConfirmation extends React.Component {
 PasswordResetConfirmation.propTypes = {
   csrfToken: PropTypes.string.isRequired,
   errorMessage: PropTypes.string,
+  primaryActionButtonLabel: PropTypes.string,
+  formTitle: PropTypes.string,
 };
 
 PasswordResetConfirmation.defaultProps = {
   errorMessage: '',
+  primaryActionButtonLabel: gettext('Reset My Password'),
+  formTitle: gettext('Reset Your Password'),
 };
 
 export { PasswordResetConfirmation }; // eslint-disable-line import/prefer-default-export

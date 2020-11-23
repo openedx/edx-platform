@@ -3,6 +3,7 @@ Management command `manage_group` is used to idempotently create Django groups
 and set their permissions by name.
 """
 
+
 from django.apps import apps
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
@@ -13,8 +14,6 @@ from django.utils.translation import gettext as _
 
 
 class Command(BaseCommand):
-    # pylint: disable=missing-docstring
-
     help = 'Creates the specified group, if it does not exist, and sets its permissions.'
 
     def add_arguments(self, parser):
@@ -25,7 +24,7 @@ class Command(BaseCommand):
     def _handle_remove(self, group_name):
 
         try:
-            Group.objects.get(name=group_name).delete()  # pylint: disable=no-member
+            Group.objects.get(name=group_name).delete()
             self.stderr.write(_('Removed group: "{}"').format(group_name))
         except Group.DoesNotExist:
             self.stderr.write(_('Did not find a group with name "{}" - skipping.').format(group_name))
@@ -38,7 +37,7 @@ class Command(BaseCommand):
             return
 
         old_permissions = set()
-        group, created = Group.objects.get_or_create(name=group_name)  # pylint: disable=no-member
+        group, created = Group.objects.get_or_create(name=group_name)
 
         if created:
             try:
@@ -83,7 +82,7 @@ class Command(BaseCommand):
             )
         )
 
-        group.permissions = new_permissions
+        group.permissions.set(new_permissions)
 
         group.save()
 
@@ -106,7 +105,7 @@ class Command(BaseCommand):
 
             content_type = ContentType.objects.get_for_model(model_class)
             try:
-                new_permission = Permission.objects.get(  # pylint: disable=no-member
+                new_permission = Permission.objects.get(
                     content_type=content_type,
                     codename=codename,
                 )

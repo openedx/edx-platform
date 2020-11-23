@@ -2,6 +2,7 @@
 Setup for discussion-forum XBlock.
 """
 
+
 import os
 from setuptools import find_packages, setup
 

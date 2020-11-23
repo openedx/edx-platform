@@ -3,9 +3,8 @@
 End-to-end tests related to the divided discussion management on the LMS Instructor Dashboard
 """
 
-import uuid
 
-from nose.plugins.attrib import attr
+import uuid
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -14,6 +13,7 @@ from common.test.acceptance.pages.lms.discussion import DiscussionTabSingleThrea
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
 from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin, CohortTestMixin
 from common.test.acceptance.tests.helpers import UniqueCourseTest
+from openedx.core.lib.tests import attr
 
 
 class BaseDividedDiscussionTest(UniqueCourseTest, CohortTestMixin):
@@ -103,7 +103,7 @@ class BaseDividedDiscussionTest(UniqueCourseTest, CohortTestMixin):
         self.assertIn("Your changes have been saved.", confirmation_message)
 
 
-@attr(shard=6)
+@attr(shard=15)
 class DividedDiscussionTopicsTest(BaseDividedDiscussionTest):
     """
     Tests for dividing the inline and course-wide discussion topics.
@@ -481,9 +481,9 @@ class DivisionSchemeTest(BaseDividedDiscussionTest, BaseDiscussionMixin):
         self.setup_thread(1, group_id=-1)
 
         refresh_thread_page()
-        self.assertEquals(
+        self.assertEqual(
             self.thread_page.get_group_visibility_label(),
-            "This post is visible only to {}.".format("Audit")
+            u"This post is visible only to {}.".format("Audit")
         )
 
         # Disable dividing discussions and verify that the post now shows as visible to everyone.
@@ -492,4 +492,4 @@ class DivisionSchemeTest(BaseDividedDiscussionTest, BaseDiscussionMixin):
         self.verify_save_confirmation_message(self.scheme_key)
 
         self.thread_page.visit()
-        self.assertEquals(self.thread_page.get_group_visibility_label(), "This post is visible to everyone.")
+        self.assertEqual(self.thread_page.get_group_visibility_label(), "This post is visible to everyone.")

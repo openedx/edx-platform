@@ -1,7 +1,7 @@
 """
 Unit tests for course import and export Celery tasks
 """
-from __future__ import absolute_import, division, print_function
+
 
 import copy
 import json
@@ -27,7 +27,7 @@ TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 
-def side_effect_exception(*args, **kwargs):  # pylint: disable=unused-argument
+def side_effect_exception(*args, **kwargs):
     """
     Side effect for mocking which raises an exception
     """
@@ -104,7 +104,7 @@ class ExportLibraryTestCase(LibraryTestCase):
         Verify that a routine library export task succeeds
         """
         key = str(self.lib_key)
-        result = export_olx.delay(self.user.id, key, u'en')  # pylint: disable=no-member
+        result = export_olx.delay(self.user.id, key, u'en')
         status = UserTaskStatus.objects.get(task_id=result.id)
         self.assertEqual(status.state, UserTaskStatus.SUCCEEDED)
         artifacts = UserTaskArtifact.objects.filter(status=status)

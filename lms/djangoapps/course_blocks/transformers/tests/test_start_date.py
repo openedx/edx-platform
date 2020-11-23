@@ -1,20 +1,21 @@
 """
 Tests for StartDateTransformer.
 """
+
+
 from datetime import timedelta
 
 import ddt
+import six
 from django.utils.timezone import now
 from mock import patch
-from nose.plugins.attrib import attr
 
-from courseware.tests.factories import BetaTesterFactory
+from lms.djangoapps.courseware.tests.factories import BetaTesterFactory
 
 from ..start_date import DEFAULT_START_DATE, StartDateTransformer
 from .helpers import BlockParentsMapTestCase, update_block
 
 
-@attr(shard=3)
 @ddt.ddt
 class StartDateTransformerTestCase(BlockParentsMapTestCase):
     """
@@ -28,8 +29,8 @@ class StartDateTransformerTestCase(BlockParentsMapTestCase):
         """
         Use constant enum types for deterministic ddt test method names (rather than dynamically generated timestamps)
         """
-        released = 1,
-        future = 2,
+        released = 1
+        future = 2
         default = 3
 
         TODAY = now()
@@ -48,8 +49,8 @@ class StartDateTransformerTestCase(BlockParentsMapTestCase):
             else:
                 return DEFAULT_START_DATE
 
-    def setUp(self, **kwargs):
-        super(StartDateTransformerTestCase, self).setUp(**kwargs)
+    def setUp(self):
+        super(StartDateTransformerTestCase, self).setUp()
         self.beta_user = BetaTesterFactory(course_key=self.course.id, username='beta_tester', password=self.password)
         course = self.get_block(0)
         course.days_early_for_beta = 33
@@ -102,7 +103,6 @@ class StartDateTransformerTestCase(BlockParentsMapTestCase):
         (BETA_USER, {0: StartDateType.released, 4: StartDateType.default}, {0, 1, 2, 3, 5, 6}, {6}),
     )
     @ddt.unpack
-    # pylint: disable=invalid-name
     def test_block_start_date(
             self,
             user_type,
@@ -110,7 +110,7 @@ class StartDateTransformerTestCase(BlockParentsMapTestCase):
             expected_student_visible_blocks,
             blocks_with_differing_student_access
     ):
-        for idx, start_date_type in start_date_type_values.iteritems():
+        for idx, start_date_type in six.iteritems(start_date_type_values):
             block = self.get_block(idx)
             block.start = self.StartDateType.start(start_date_type)
             update_block(block)

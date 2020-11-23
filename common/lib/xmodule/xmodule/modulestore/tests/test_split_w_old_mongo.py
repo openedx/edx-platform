@@ -1,22 +1,25 @@
+
+
 import datetime
+import os
 import random
 import unittest
-import uuid
 
-from nose.plugins.attrib import attr
 import mock
+import pytest
+import six
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
-from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.mongo import DraftMongoModuleStore
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
-from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
 from xmodule.modulestore.tests.utils import MemoryCache
+from xmodule.x_module import XModuleMixin
 
 
-@attr('mongo')
+@pytest.mark.mongo
 class SplitWMongoCourseBootstrapper(unittest.TestCase):
     """
     Helper for tests which need to construct split mongo & old mongo based courses to get interesting internal structure.
@@ -35,7 +38,8 @@ class SplitWMongoCourseBootstrapper(unittest.TestCase):
     db_config = {
         'host': MONGO_HOST,
         'port': MONGO_PORT_NUM,
-        'db': 'test_xmodule',
+        'db': 'test_xmodule_{}'.format(os.getpid()),
+        'collection': 'modulestore'
     }
 
     modulestore_options = {
@@ -48,8 +52,6 @@ class SplitWMongoCourseBootstrapper(unittest.TestCase):
     split_course_key = CourseLocator('test_org', 'test_course', 'runid', branch=ModuleStoreEnum.BranchName.draft)
 
     def setUp(self):
-        self.db_config['collection'] = 'modulestore{0}'.format(uuid.uuid4().hex[:5])
-
         self.user_id = random.getrandbits(32)
         super(SplitWMongoCourseBootstrapper, self).setUp()
         self.split_mongo = SplitMongoModuleStore(
@@ -88,7 +90,7 @@ class SplitWMongoCourseBootstrapper(unittest.TestCase):
         )
         if not draft:
             self.draft_mongo.publish(location, self.user_id)
-        if isinstance(data, basestring):
+        if isinstance(data, six.string_types):
             fields = {'data': data}
         else:
             fields = data.copy()

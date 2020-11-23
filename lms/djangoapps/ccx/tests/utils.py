@@ -1,13 +1,17 @@
 """
 Test utils for CCX
 """
+
+
 import datetime
 
 import pytz
 from django.conf import settings
+from six.moves import range
 
 from lms.djangoapps.ccx.overrides import override_field_for_ccx
 from lms.djangoapps.ccx.tests.factories import CcxFactory
+from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
@@ -15,7 +19,7 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, 
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
-class CcxTestCase(SharedModuleStoreTestCase):
+class CcxTestCase(EmailTemplateTagMixin, SharedModuleStoreTestCase):
     """
     General test class to be used in other CCX tests classes.
 
@@ -37,18 +41,18 @@ class CcxTestCase(SharedModuleStoreTestCase):
         )
 
         cls.chapters = [
-            ItemFactory.create(start=start, parent=course) for _ in xrange(2)
+            ItemFactory.create(start=start, parent=course) for _ in range(2)
         ]
         cls.sequentials = flatten([
             [
-                ItemFactory.create(parent=chapter) for _ in xrange(2)
+                ItemFactory.create(parent=chapter) for _ in range(2)
             ] for chapter in cls.chapters
         ])
         cls.verticals = flatten([
             [
                 ItemFactory.create(
                     start=start, due=due, parent=sequential, graded=True, format='Homework', category=u'vertical'
-                ) for _ in xrange(2)
+                ) for _ in range(2)
             ] for sequential in cls.sequentials
         ])
 
@@ -57,7 +61,7 @@ class CcxTestCase(SharedModuleStoreTestCase):
         with cls.store.bulk_operations(course.id, emit_signals=False):
             blocks = flatten([  # pylint: disable=unused-variable
                 [
-                    ItemFactory.create(parent=vertical) for _ in xrange(2)
+                    ItemFactory.create(parent=vertical) for _ in range(2)
                 ] for vertical in cls.verticals
             ])
 

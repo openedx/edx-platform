@@ -1,12 +1,18 @@
 """
 Test capa problem.
 """
-import ddt
+
+
 import textwrap
-from lxml import etree
-from mock import patch
 import unittest
 
+import ddt
+import six
+from lxml import etree
+from markupsafe import Markup
+from mock import patch
+
+from capa.responsetypes import LoncapaProblemError
 from capa.tests.helpers import new_loncapa_problem
 from openedx.core.djangolib.markup import HTML
 
@@ -145,7 +151,6 @@ class CAPAProblemTest(unittest.TestCase):
                     'descriptions': {}
                 }
             }
-
         )
         for question in (question1, question2):
             self.assertEqual(
@@ -473,6 +478,37 @@ class CAPAProblemTest(unittest.TestCase):
         self.assert_question_tag(question1, question2, tag='label', label_attr=False)
         self.assert_question_tag(question1, question2, tag='p', label_attr=True)
 
+    def test_optionresponse_xml_compatibility(self):
+        """
+        Verify that an optionresponse problem with multiple correct answers is not instantiated.
+
+        Scenario:
+        Given an optionresponse/Dropdown problem
+        If there are multiple correct answers
+        Then the problem is not instantiated
+        And Loncapa problem error exception is raised
+        If the problem is corrected by including only one correct answer
+        Then the problem is created successfully
+        """
+        xml = """
+        <problem>
+            <optionresponse>
+              <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for dropdown problems. Edit this component to replace this template with your own assessment.</p>
+            <label>Add the question text, or prompt, here. This text is required.</label>
+            <description>You can add an optional tip or note related to the prompt like this. </description>
+            <optioninput>
+                <option correct="False">an incorrect answer</option>
+                <option correct="True">the correct answer</option>
+                <option correct="{correctness}">an incorrect answer</option>
+              </optioninput>
+            </optionresponse>
+        </problem>
+        """
+        with self.assertRaises(LoncapaProblemError):
+            new_loncapa_problem(xml.format(correctness=True))
+        problem = new_loncapa_problem(xml.format(correctness=False))
+        self.assertIsNotNone(problem)
+
 
 @ddt.ddt
 class CAPAMultiInputProblemTest(unittest.TestCase):
@@ -484,16 +520,21 @@ class CAPAMultiInputProblemTest(unittest.TestCase):
         """
         return new_loncapa_problem(xml, use_capa_render_template=True)
 
-    def assert_problem_html(self, problme_html, group_label, *input_labels):
+    def assert_problem_data(self, problem_data):
+        """Verify problem data is in expected state"""
+        for problem_value in six.viewvalues(problem_data):
+            self.assertIsInstance(problem_value['label'], Markup)
+
+    def assert_problem_html(self, problem_html, group_label, *input_labels):
         """
         Verify that correct html is rendered for multiple inputtypes.
 
         Arguments:
-            problme_html (str): problem HTML
+            problem_html (str): problem HTML
             group_label (str or None): multi input group label or None if label is not present
             input_labels (tuple): individual input labels
         """
-        html = etree.XML(problme_html)
+        html = etree.XML(problem_html)
 
         # verify that only one multi input group div is present at correct path
         multi_inputs_group = html.xpath(
@@ -540,6 +581,7 @@ class CAPAMultiInputProblemTest(unittest.TestCase):
         """.format(label_html=label_html, input1_label=input1_label, input2_label=input2_label)
         problem = self.capa_problem(xml)
         self.assert_problem_html(problem.get_html(), group_label, input1_label, input2_label)
+        self.assert_problem_data(problem.problem_data)
 
     @ddt.unpack
     @ddt.data(
@@ -569,6 +611,7 @@ class CAPAMultiInputProblemTest(unittest.TestCase):
         """.format(group_label, input1_label, input2_label, inputtype=inputtype))
         problem = self.capa_problem(xml)
         self.assert_problem_html(problem.get_html(), group_label, input1_label, input2_label)
+        self.assert_problem_data(problem.problem_data)
 
     @ddt.unpack
     @ddt.data(
@@ -674,7 +717,7 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
             </problem>
             """
         )
-        self.assertEquals(problem.find_answer_text(answer_id, choice_id), answer_text)
+        self.assertEqual(problem.find_answer_text(answer_id, choice_id), answer_text)
 
     @ddt.data(
         # Test for ChoiceResponse
@@ -712,7 +755,7 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
             </problem>
             """
         )
-        self.assertEquals(problem.find_correct_answer_text(answer_id), answer_text)
+        self.assertEqual(problem.find_correct_answer_text(answer_id), answer_text)
 
     def test_find_answer_text_textinput(self):
         problem = new_loncapa_problem(
@@ -724,4 +767,25 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
             </problem>
             """
         )
-        self.assertEquals(problem.find_answer_text('1_2_1', 'hide'), 'hide')
+        self.assertEqual(problem.find_answer_text('1_2_1', 'hide'), 'hide')
+
+    def test_get_question_answer(self):
+        problem = new_loncapa_problem(
+            """
+            <problem>
+                <optionresponse>
+                    <optioninput options="('yellow','blue','green')" correct="blue" label="Color_1"/>
+                </optionresponse>
+                <solution>
+                    <div class="detailed-solution">
+                        <p>Explanation</p>
+                        <p>Blue is the answer.</p>
+                    </div>
+                </solution>
+            </problem>
+            """
+        )
+
+        # Ensure that the answer is a string so that the dict returned from this
+        # function can eventualy be serialized to json without issues.
+        self.assertIsInstance(problem.get_question_answers()['1_solution_1'], six.text_type)

@@ -1,10 +1,10 @@
 """
 Template module
 """
-from lxml import etree
-from mako.template import Template
 
-import dogstats_wrapper as dog_stats_api
+from string import Template
+
+from lxml import etree
 from xmodule.raw_module import RawDescriptor
 from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModule
 
@@ -14,8 +14,9 @@ class CustomTagModule(XModule):
     This module supports tags of the form
     <customtag option="val" option2="val2" impl="tagname"/>
 
-    In this case, $tagname should refer to a file in data/custom_tags, which contains
-    a mako template that uses ${option} and ${option2} for the content.
+    In this case, $tagname should refer to a file in data/custom_tags, which
+    contains a Python string.Template formatted template that uses ${option} and
+    ${option2} for the content.
 
     For instance:
 
@@ -48,11 +49,6 @@ class CustomTagDescriptor(RawDescriptor):
             template_name = xmltree.attrib['impl']
         else:
             # VS[compat]  backwards compatibility with old nested customtag structure
-            dog_stats_api.increment(
-                DEPRECATION_VSCOMPAT_EVENT,
-                tags=["location:customtag_descriptor_render_template"]
-            )
-
             child_impl = xmltree.find('impl')
             if child_impl is not None:
                 template_name = child_impl.text
@@ -61,7 +57,7 @@ class CustomTagDescriptor(RawDescriptor):
                 raise Exception("Could not find impl attribute in customtag {0}"
                                 .format(self.location))
 
-        params = dict(xmltree.items())
+        params = dict(list(xmltree.items()))
 
         # cdodge: look up the template as a module
         template_loc = self.location.replace(category='custom_tag_template', name=template_name)
@@ -69,7 +65,7 @@ class CustomTagDescriptor(RawDescriptor):
         template_module = system.load_item(template_loc)
         template_module_data = template_module.data
         template = Template(template_module_data)
-        return template.render(**params)
+        return template.safe_substitute(params)
 
     @property
     def rendered_html(self):

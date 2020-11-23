@@ -2,8 +2,6 @@
 Test cases to cover CourseEnrollmentAllowed models (and its feature) with APPSEMBLER_MULTI_TENANT_EMAILS.
 """
 
-from __future__ import unicode_literals
-
 import json
 from mock import patch
 from rest_framework import status

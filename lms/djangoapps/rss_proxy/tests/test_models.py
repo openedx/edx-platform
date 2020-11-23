@@ -1,6 +1,9 @@
 """
 Tests for the rss_proxy models
 """
+
+
+import six
 from django.test import TestCase
 
 from rss_proxy.models import WhitelistedRssUrl
@@ -8,7 +11,6 @@ from rss_proxy.models import WhitelistedRssUrl
 
 class WhitelistedRssUrlTests(TestCase):
     """ Tests for the rss_proxy.WhitelistedRssUrl model """
-    shard = 4
 
     def setUp(self):
         super(WhitelistedRssUrlTests, self).setUp()
@@ -18,4 +20,4 @@ class WhitelistedRssUrlTests(TestCase):
         """
         Test the unicode function returns the url
         """
-        self.assertEqual(unicode(self.whitelisted_rss_url), self.whitelisted_rss_url.url)
+        self.assertEqual(six.text_type(self.whitelisted_rss_url), self.whitelisted_rss_url.url)

@@ -1,9 +1,12 @@
 """
 Acceptance tests that ensure components with bad content do not break page.
 """
-from base_studio_test import ContainerBase
+
+
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.studio.utils import verify_ordering
+
+from .base_studio_test import ContainerBase
 
 
 class BadComponentTest(ContainerBase):
@@ -55,7 +58,7 @@ class CopiedFromLmsBadContentTest(BadComponentTest):
         Return the "bad" HTML content that has been problematic for Studio.
         """
         return """
-            <div class="xblock xblock-student_view xmodule_display xmodule_HtmlModule xblock-initialized"
+            <div class="xblock xblock-student_view xmodule_display xmodule_HtmlBlock xblock-initialized"
             data-runtime-class="LmsRuntime" data-init="XBlockToXModuleShim" data-block-type="html"
             data-runtime-version="1" data-type="HTMLModule" data-course-id="GeorgetownX/HUMW-421-01"
             data-request-token="thisIsNotARealRequestToken"
@@ -78,7 +81,7 @@ class CopiedFromStudioBadContentTest(BadComponentTest):
             <ol class="components ui-sortable">
             <li class="component" data-locator="i4x://Wellesley_College/100/html/6390f1fd3fe640d49580b8415fe1330b"
             data-course-key="Wellesley_College/100/2014_Summer">
-            <div class="xblock xblock-student_view xmodule_display xmodule_HtmlModule xblock-initialized"
+            <div class="xblock xblock-student_view xmodule_display xmodule_HtmlBlock xblock-initialized"
             data-runtime-class="PreviewRuntime" data-init="XBlockToXModuleShim" data-runtime-version="1"
             data-request-token="thisIsNotARealRequestToken"
             data-usage-id="i4x://Wellesley_College/100/html/6390f1fd3fe640d49580b8415fe1330b"

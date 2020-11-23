@@ -4,16 +4,17 @@
 Tests for import_course_from_xml using the mongo modulestore.
 """
 
+
 import copy
 from uuid import uuid4
 
 import ddt
+import six
 from django.conf import settings
 from django.test.client import Client
 from django.test.utils import override_settings
 from mock import patch
 
-from openedx.core.djangoapps.content.course_structures.tests import SignalDisconnectTestMixin
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import ModuleStoreEnum
@@ -30,7 +31,7 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 @ddt.ddt
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, SEARCH_ENGINE=None)
-class ContentStoreImportTest(SignalDisconnectTestMixin, ModuleStoreTestCase):
+class ContentStoreImportTest(ModuleStoreTestCase):
     """
     Tests that rely on the toy and test_import_course courses.
     NOTE: refactor using CourseFactory so they do not.
@@ -120,7 +121,7 @@ class ContentStoreImportTest(SignalDisconnectTestMixin, ModuleStoreTestCase):
 
         # make sure we have ONE asset in our contentstore ("should_be_imported.html")
         all_assets, count = content_store.get_all_content_for_course(course.id)
-        print "len(all_assets)=%d" % len(all_assets)
+        print("len(all_assets)=%d" % len(all_assets))
         self.assertEqual(len(all_assets), 1)
         self.assertEqual(count, 1)
 
@@ -134,7 +135,7 @@ class ContentStoreImportTest(SignalDisconnectTestMixin, ModuleStoreTestCase):
         self.assertIsNotNone(content)
 
         # make sure course.static_asset_path is correct
-        print "static_asset_path = {0}".format(course.static_asset_path)
+        print(u"static_asset_path = {0}".format(course.static_asset_path))
         self.assertEqual(course.static_asset_path, 'test_import_course')
 
     def test_asset_import_nostatic(self):
@@ -173,7 +174,7 @@ class ContentStoreImportTest(SignalDisconnectTestMixin, ModuleStoreTestCase):
 
     def test_tab_name_imports_correctly(self):
         _module_store, _content_store, course = self.load_test_import_course()
-        print "course tabs = {0}".format(course.tabs)
+        print(u"course tabs = {0}".format(course.tabs))
         self.assertEqual(course.tabs[2]['name'], 'Syllabus')
 
     def test_import_performance_mongo(self):
@@ -268,7 +269,7 @@ class ContentStoreImportTest(SignalDisconnectTestMixin, ModuleStoreTestCase):
         self.assertIsNotNone(split_test_module)
 
         remapped_verticals = {
-            key: target_id.make_usage_key('vertical', value) for key, value in groups_to_verticals.iteritems()
+            key: target_id.make_usage_key('vertical', value) for key, value in six.iteritems(groups_to_verticals)
         }
 
         self.assertEqual(remapped_verticals, split_test_module.group_id_to_child)

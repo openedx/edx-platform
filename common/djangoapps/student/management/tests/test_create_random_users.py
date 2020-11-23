@@ -2,16 +2,16 @@
 Test the create_random_users command line script
 """
 
-from six import text_type
 
 import pytest
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from opaque_keys import InvalidKeyError
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from six import text_type
 
 from student.models import CourseEnrollment
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class CreateRandomUserTests(SharedModuleStoreTestCase):

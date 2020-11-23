@@ -1,18 +1,25 @@
 """
 Course Grade Factory Class
 """
+
+
 from collections import namedtuple
 from logging import getLogger
 
-import dogstats_wrapper as dog_stats_api
+import six
 from six import text_type
 
-from openedx.core.djangoapps.signals.signals import COURSE_GRADE_CHANGED, COURSE_GRADE_NOW_PASSED
+from openedx.core.djangoapps.signals.signals import (
+    COURSE_GRADE_CHANGED,
+    COURSE_GRADE_NOW_FAILED,
+    COURSE_GRADE_NOW_PASSED
+)
 
 from .config import assume_zero_if_absent, should_persist_grades
 from .course_data import CourseData
 from .course_grade import CourseGrade, ZeroCourseGrade
-from .models import PersistentCourseGrade, prefetch
+from .models import PersistentCourseGrade
+from .models_api import prefetch_grade_overrides_and_visible_blocks
 
 log = getLogger(__name__)
 
@@ -103,8 +110,7 @@ class CourseGradeFactory(object):
         )
         stats_tags = [u'action:{}'.format(course_data.course_key)]
         for user in users:
-            with dog_stats_api.timer('lms.grades.CourseGradeFactory.iter', tags=stats_tags):
-                yield self._iter_grade_result(user, course_data, force_update)
+            yield self._iter_grade_result(user, course_data, force_update)
 
     def _iter_grade_result(self, user, course_data, force_update):
         try:
@@ -112,7 +118,7 @@ class CourseGradeFactory(object):
                 'user': user,
                 'course': course_data.course,
                 'collected_block_structure': course_data.collected_structure,
-                'course_key': course_data.course_key
+                'course_key': course_data.course_key,
             }
             if force_update:
                 kwargs['force_update_subsections'] = True
@@ -124,7 +130,7 @@ class CourseGradeFactory(object):
             # Keep marching on even if this student couldn't be graded for
             # some reason, but log it for future reference.
             log.exception(
-                'Cannot grade student %s in course %s because of exception: %s',
+                u'Cannot grade student %s in course %s because of exception: %s',
                 user.id,
                 course_data.course_key,
                 text_type(exc)
@@ -136,7 +142,7 @@ class CourseGradeFactory(object):
         """
         Returns a ZeroCourseGrade object for the given user and course.
         """
-        log.debug(u'Grades: CreateZero, %s, User: %s', unicode(course_data), user.id)
+        log.debug(u'Grades: CreateZero, %s, User: %s', six.text_type(course_data), user.id)
         return ZeroCourseGrade(user, course_data)
 
     @staticmethod
@@ -149,14 +155,14 @@ class CourseGradeFactory(object):
             raise PersistentCourseGrade.DoesNotExist
 
         persistent_grade = PersistentCourseGrade.read(user.id, course_data.course_key)
-        log.debug(u'Grades: Read, %s, User: %s, %s', unicode(course_data), user.id, persistent_grade)
+        log.debug(u'Grades: Read, %s, User: %s, %s', six.text_type(course_data), user.id, persistent_grade)
 
         return CourseGrade(
             user,
             course_data,
             persistent_grade.percent_grade,
             persistent_grade.letter_grade,
-            persistent_grade.letter_grade is not u''
+            persistent_grade.letter_grade != u''
         )
 
     @staticmethod
@@ -164,13 +170,13 @@ class CourseGradeFactory(object):
         """
         Computes, saves, and returns a CourseGrade object for the
         given user and course.
-        Sends a COURSE_GRADE_CHANGED signal to listeners and a
-        COURSE_GRADE_NOW_PASSED if learner has passed course.
+        Sends a COURSE_GRADE_CHANGED signal to listeners and
+        COURSE_GRADE_NOW_PASSED if learner has passed course or
+        COURSE_GRADE_NOW_FAILED if learner is now failing course
         """
         should_persist = should_persist_grades(course_data.course_key)
-
         if should_persist and force_update_subsections:
-            prefetch(user, course_data.course_key)
+            prefetch_grade_overrides_and_visible_blocks(user, course_data.course_key)
 
         course_grade = CourseGrade(
             user,
@@ -205,6 +211,13 @@ class CourseGradeFactory(object):
                 sender=CourseGradeFactory,
                 user=user,
                 course_id=course_data.course_key,
+            )
+        else:
+            COURSE_GRADE_NOW_FAILED.send(
+                sender=CourseGradeFactory,
+                user=user,
+                course_id=course_data.course_key,
+                grade=course_grade,
             )
 
         log.info(

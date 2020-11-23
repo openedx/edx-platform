@@ -1,6 +1,8 @@
 """
 Admin registration for tags models
 """
+
+
 from django.contrib import admin
 
 from .models import TagAvailableValues, TagCategories

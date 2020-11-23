@@ -9,7 +9,7 @@ need to be configurable by open source partners and modifying the
 with a variety of unpleasant follow-on effects for the partner when
 upgrading the model at a later date.
 """
-from __future__ import print_function
+
 
 import copy
 import logging
@@ -19,7 +19,6 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db.models import F
 
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
-
 
 LOGGER = logging.getLogger(__name__)
 
@@ -36,6 +35,13 @@ class Command(BaseCommand):
     """
     help = 'Populates the RetirementState table with the states present in settings.'
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--dry_run',
+            action='store_true',
+            help='Run checks without making any changes'
+        )
+
     def _validate_new_states(self, new_states):
         """
         Check settings for existence of states, required states
@@ -44,17 +50,17 @@ class Command(BaseCommand):
             raise CommandError('settings.RETIREMENT_STATES does not exist or is empty.')
 
         if not set(REQUIRED_STATES).issubset(set(new_states)):
-            raise CommandError('settings.RETIREMENT_STATES ({}) does not contain all required states '
-                               '({})'.format(new_states, REQ_STR))
+            raise CommandError(u'settings.RETIREMENT_STATES ({}) does not contain all required states '
+                               u'({})'.format(new_states, REQ_STR))
 
         # Confirm that the start and end states are in the right places
         if new_states.index(START_STATE) != 0:
-            raise CommandError('{} must be the first state'.format(START_STATE))
+            raise CommandError(u'{} must be the first state'.format(START_STATE))
 
         num_end_states = len(END_STATES)
 
         if new_states[-num_end_states:] != END_STATES:
-            raise CommandError('The last {} states must be these (in this order): '
+            raise CommandError(u'The last {} states must be these (in this order): '
                                '{}'.format(num_end_states, END_STATES))
 
     def _check_current_users(self):
@@ -69,10 +75,10 @@ class Command(BaseCommand):
 
     def _check_users_in_states_to_delete(self, states_to_delete):
         if UserRetirementStatus.objects.filter(current_state__state_name__in=states_to_delete).exists():
-            raise CommandError('Users exist in a state that is marked for deletion! States to delete'
-                               'are: {}'.format(states_to_delete))
+            raise CommandError(u'Users exist in a state that is marked for deletion! States to delete'
+                               u'are: {}'.format(states_to_delete))
 
-    def _delete_old_states_and_create_new(self, new_states):
+    def _delete_old_states_and_create_new(self, new_states, dry_run=False):
         """
         Wipes the RetirementState table and creates new entries based on new_states
         - Note that the state_execution_order is incremented by 10 for each entry
@@ -90,6 +96,10 @@ class Command(BaseCommand):
         states_to_create = set_new_states - set_current_states
         states_remaining = set_current_states.intersection(set_new_states)
         states_to_delete = set_current_states - set_new_states
+
+        # If this is a dry run we have everything we need.
+        if dry_run:
+            return states_to_create, states_remaining, states_to_delete
 
         # In theory this should not happen, this would have failed _check_current_users
         # if the state was not required, and failed _validate_new_states if we're trying
@@ -129,16 +139,21 @@ class Command(BaseCommand):
         """
         Execute the command.
         """
+        dry_run = options['dry_run']
+
+        if dry_run:
+            print("--- Dry run, no changes will be made ---")
+
         new_states = settings.RETIREMENT_STATES
         self._validate_new_states(new_states)
         self._check_current_users()
-        created, existed, deleted = self._delete_old_states_and_create_new(new_states)
+        created, existed, deleted = self._delete_old_states_and_create_new(new_states, dry_run=dry_run)
 
         # Report
-        print("All states removed and new states added. Differences:")
-        print("   Added: {}".format(created))
-        print("   Removed: {}".format(deleted))
-        print("   Remaining: {}".format(existed))
+        print("States have been synchronized. Differences:")
+        print(u"   Added: {}".format(created))
+        print(u"   Removed: {}".format(deleted))
+        print(u"   Remaining: {}".format(existed))
         print("States updated successfully. Current states:")
 
         for state in RetirementState.objects.all():

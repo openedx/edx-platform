@@ -1,5 +1,7 @@
 /* globals $ */
 import 'jquery.cookie';
+import gettext from 'gettext'; // eslint-disable-line
+import { clampHtmlByWords } from 'common/js/utils/clamp-html'; // eslint-disable-line
 
 export class WelcomeMessage {  // eslint-disable-line import/prefer-default-export
 
@@ -35,5 +37,29 @@ export class WelcomeMessage {  // eslint-disable-line import/prefer-default-expo
       }
     }
     $('.dismiss-message button').click(() => WelcomeMessage.dismissWelcomeMessage(options.dismissUrl));
+
+
+    // "Show More" support for welcome messages
+    const messageContent = document.querySelector('#welcome-message-content');
+    const fullText = messageContent.innerHTML;
+    if (clampHtmlByWords(messageContent, 100) < 0) {
+      const showMoreButton = document.querySelector('#welcome-message-show-more');
+      const shortText = messageContent.innerHTML;
+
+      showMoreButton.removeAttribute('hidden');
+
+      showMoreButton.addEventListener('click', (event) => {
+        if (showMoreButton.getAttribute('data-state') === 'less') {
+          showMoreButton.textContent = gettext('Show More');
+          messageContent.innerHTML = shortText;
+          showMoreButton.setAttribute('data-state', 'more');
+        } else {
+          showMoreButton.textContent = gettext('Show Less');
+          messageContent.innerHTML = fullText;
+          showMoreButton.setAttribute('data-state', 'less');
+        }
+        event.stopImmediatePropagation();
+      });
+    }
   }
 }

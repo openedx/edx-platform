@@ -2,6 +2,7 @@
 Tests for comprehensive theme static files finders.
 """
 
+
 from django.conf import settings
 from django.test import TestCase
 

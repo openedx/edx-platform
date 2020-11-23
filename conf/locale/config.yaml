@@ -50,11 +50,13 @@ locales:
     - id  # Indonesian (not supported in Tahoe SaaS, don't add to dark langs)
     # - it_IT  # Italian (Italy)
     - ja_JP  # Japanese (Japan)
+    # - ka  # Georgian
     # - kk_KZ  # Kazakh (Kazakhstan)
     # - km_KH  # Khmer (Cambodia)
     # - kn  # Kannada
     # - ko_KR  # Korean (Korea)
     # - lt_LT  # Lithuanian (Lithuania)
+    # - lv  # Latvian
     # - ml  # Malayalam
     # - mn  # Mongolian
     # - mr  # Marathi
@@ -75,6 +77,8 @@ locales:
     # - sr  # Serbian
     # - sv  # Swedish
     # - sw  # Swahili
+    # - sw_KE  # Swahili (Kenya)
+
     # - ta  # Tamil
     # - te  # Telugu
     # - th  # Thai
@@ -100,6 +104,7 @@ ignore_dirs:
     - common/static/xmodule/descriptors
     # Directories with no user-facing code.
     - '*/migrations'
+    - '*/envs'
     # Directories that are not our code.
     - node_modules
     # Directories containing files that can't have strings in them.
@@ -120,6 +125,18 @@ ignore_dirs:
     # Directories full of auto-generated JS
     - lms/static/js/i18n
     - cms/static/js/i18n
+    # Directories with 3rd party apps.
+    - src/acid-xblock
+    - src/code-block-timer
+    - src/codejail
+    - src/django-wiki
+    - src/done-xblock
+    - src/edx-jsme
+    - src/parse-rest
+    - src/geoip2
+    - src/pystache-custom
+    - src/rate-xblock
+    - src/xblock-google-drive
 
 
 # Third-party installed apps that we also extract strings from.  When adding a
@@ -127,6 +144,7 @@ ignore_dirs:
 # .tx/config file so that it will be pushed to and pulled from transifex.
 third_party:
     - wiki
+    - edx_proctoring_proctortrack
 
 
 # How should .po files be segmented?  See i18n/segment.py for details. Strings
@@ -144,6 +162,10 @@ segment:
     djangojs-partial.po:
         djangojs-studio.po:
             - cms/*
+        djangojs-account-settings-view.po:
+            - lms/static/js/student_account/views/account_settings_view.js
+        # Segregating student account settings view strings, so that beta language message
+        # can be translated for wide set of partially supported languages.
     mako.po:
         mako-studio.po:
             - cms/*
@@ -159,8 +181,10 @@ generate_merge:
         - mako.po
         - mako-studio.po
         - wiki.po
+        - edx_proctoring_proctortrack.po
     djangojs.po:
         - djangojs-partial.po
         - djangojs-studio.po
+        - djangojs-account-settings-view.po
         - underscore.po
         - underscore-studio.po

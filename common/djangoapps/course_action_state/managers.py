@@ -1,8 +1,10 @@
 """
 Model Managers for Course Actions
 """
+
 import traceback
 
+import six
 from django.db import models, transaction
 
 
@@ -20,7 +22,7 @@ class CourseActionStateManager(models.Manager):
         Finds and returns all entries for this action and the given field names-and-values in kwargs.
         The exclude_args dict allows excluding entries with the field names-and-values in exclude_args.
         """
-        return self.filter(action=self.ACTION, **kwargs).exclude(**(exclude_args or {}))  # pylint: disable=no-member
+        return self.filter(action=self.ACTION, **kwargs).exclude(**(exclude_args or {}))
 
     def find_first(self, exclude_args=None, **kwargs):
         """
@@ -35,7 +37,7 @@ class CourseActionStateManager(models.Manager):
         if len(objects) == 0:
             raise CourseActionStateItemNotFoundError(
                 "No entry found for action {action} with filter {filter}, excluding {exclude}".format(
-                    action=self.ACTION,  # pylint: disable=no-member
+                    action=self.ACTION,
                     filter=kwargs,
                     exclude=exclude_args,
                 ))
@@ -66,7 +68,7 @@ class CourseActionUIStateManager(CourseActionStateManager):
         Raises CourseActionStateException if allow_not_found is False and an entry for the given course
             for this Action doesn't exist.
         """
-        state_object, created = self.get_or_create(course_key=course_key, action=self.ACTION)  # pylint: disable=no-member
+        state_object, created = self.get_or_create(course_key=course_key, action=self.ACTION)
 
         if created:
             if allow_not_found:
@@ -74,7 +76,7 @@ class CourseActionUIStateManager(CourseActionStateManager):
             else:
                 raise CourseActionStateItemNotFoundError(
                     "Cannot update non-existent entry for course_key {course_key} and action {action}".format(
-                        action=self.ACTION,  # pylint: disable=no-member
+                        action=self.ACTION,
                         course_key=course_key,
                     ))
 
@@ -88,7 +90,7 @@ class CourseActionUIStateManager(CourseActionStateManager):
 
         # update any additional fields in kwargs
         if kwargs:
-            for key, value in kwargs.iteritems():
+            for key, value in six.iteritems(kwargs):
                 setattr(state_object, key, value)
 
         state_object.save()

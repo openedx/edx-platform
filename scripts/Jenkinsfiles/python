@@ -1,0 +1,272 @@
+def runPythonTests() {
+    // Determine git refspec, branch, and clone type
+    git_branch = xdist_git_branch()
+    git_refspec = xdist_git_refspec()
+    sshagent(credentials: ['jenkins-worker', 'jenkins-worker-pem'], ignoreMissing: true) {
+        checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: git_branch]],
+            doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', honorRefspec: true,
+            noTags: true, shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+            refspec: git_refspec, url: "git@github.com:edx/${REPO_NAME}.git"]]]
+        sh 'bash scripts/all-tests.sh'
+        stash includes: 'reports/**/*coverage*,test_root/log/*.json', name: "${TEST_SUITE}-reports"
+    }
+}
+
+def pythonTestCleanup() {
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/**/*,test_root/log/**/*.log,test_root/log/*.json,**/nosetests.xml,*.log'
+    sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
+    junit '**/nosetests.xml'
+    sh '''source $HOME/edx-venv-$PYTHON_VERSION/edx-venv/bin/activate
+    bash scripts/xdist/terminate_xdist_nodes.sh'''
+}
+
+def createWarningsReport(fileExtension){
+    println "Creating warnings report for ${fileExtension}"
+    warning_filename = "warning_report_${fileExtension}.html"
+    sh """source $HOME/edx-venv-$PYTHON_VERSION/edx-venv/bin/activate
+    python openedx/core/process_warnings.py --dir-path test_root/log --html-path reports/pytest_warnings/${warning_filename}"""
+
+    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
+                            reportDir: 'reports/pytest_warnings', reportFiles: "${warning_filename}",
+                            reportName: "${warning_filename}", reportTitles: ''])
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/pytest_warnings/*.html'
+}
+
+
+def xdist_git_branch() {
+    if (env.ghprbActualCommit) {
+        return "${ghprbActualCommit}"
+    } else {
+        return "${BRANCH_NAME}"
+    }
+}
+
+def xdist_git_refspec() {
+    if (env.ghprbActualCommit) {
+        return "+refs/pull/${ghprbPullId}/*:refs/remotes/origin/pr/${ghprbPullId}/*"
+    } else {
+        return "+refs/heads/${BRANCH_NAME}:refs/remotes/origin/${BRANCH_NAME}"
+    }
+}
+
+pipeline {
+    agent { label "juniper-worker" }
+    options {
+        sendSplunkConsoleLog()
+        timestamps()
+        timeout(60)
+    }
+    environment {
+        XDIST_GIT_BRANCH = xdist_git_branch()
+        XDIST_GIT_REFSPEC = xdist_git_refspec()
+        XDIST_INSTANCE_TYPE = "c5d.large"
+        XDIST_WORKER_AMI = credentials('XDIST_WORKER_AMI')
+        XDIST_WORKER_IAM_PROFILE_ARN = credentials('XDIST_WORKER_IAM_PROFILE_ARN')
+        XDIST_WORKER_KEY_NAME = "jenkins-worker"
+        XDIST_WORKER_SUBNET = credentials('XDIST_WORKER_SUBNET')
+        XDIST_WORKER_SECURITY_GROUP = credentials('XDIST_WORKER_SECURITY_GROUP')
+        WTW_CONTEXT = "python"
+    }
+    stages {
+        stage('Mark build as pending on Github') {
+            when {
+                 // Only run github-build-status for master builds
+                 expression { env.ghprbActualCommit == null }
+            }
+            steps {
+                script {
+                    commit_sha = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+                    build job: 'github-build-status',
+                        parameters: [
+                            string(name: 'GIT_SHA', value: commit_sha),
+                            string(name: 'GITHUB_ORG', value: 'edx'),
+                            string(name: 'GITHUB_REPO', value: "${REPO_NAME}"),
+                            string(name: 'TARGET_URL', value: "${BUILD_URL}"),
+                            string(name: 'DESCRIPTION', value: 'Pending'),
+                            string(name: 'CONTEXT', value: "${GITHUB_CONTEXT}"),
+                            string(name: 'CREATE_DEPLOYMENT', value: 'false'),
+                            string(name: 'BUILD_STATUS', value: 'pending')
+                        ],
+                        propagate: false, wait: false
+                }
+            }
+        }
+        stage('Run Tests') {
+            parallel {
+                stage("lms-unit") {
+                    agent { label "juniper-worker" }
+                    environment {
+                        TEST_SUITE = "lms-unit"
+                        XDIST_NUM_WORKERS = 10
+                        XDIST_REMOTE_NUM_PROCESSES = 1
+                    }
+                    steps {
+                        script {
+                            runPythonTests()
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                pythonTestCleanup()
+                            }
+                        }
+                    }
+                }
+                stage("cms-unit") {
+                    agent { label "juniper-worker" }
+                    environment {
+                        TEST_SUITE = "cms-unit"
+                        XDIST_NUM_WORKERS = 3
+                        XDIST_REMOTE_NUM_PROCESSES = 1
+                    }
+                    steps {
+                        script {
+                            runPythonTests()
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                pythonTestCleanup()
+                            }
+                        }
+                    }
+                }
+                stage("commonlib-unit") {
+                    agent { label "juniper-worker" }
+                    environment {
+                        TEST_SUITE = "commonlib-unit"
+                        XDIST_NUM_WORKERS = 3
+                        XDIST_REMOTE_NUM_PROCESSES = 1
+                    }
+                    steps {
+                        script {
+                            runPythonTests()
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                pythonTestCleanup()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        stage('Run coverage') {
+            environment {
+                CODE_COV_TOKEN = credentials('CODE_COV_TOKEN')
+                SUBSET_JOB = "null" // Keep this variable until we can remove the $SUBSET_JOB path from .coveragerc
+                COLLECT_WHO_TESTS_WHAT = "${COLLECT_WHO_TESTS_WHAT}"
+            }
+            steps {
+                script {
+                    if (env.ghprbActualCommit) {
+                        git_branch = "${ghprbActualCommit}"
+                        git_refspec = "+refs/pull/${ghprbPullId}/*:refs/remotes/origin/pr/${ghprbPullId}/*"
+                        ci_branch = "${ghprbSourceBranch}"
+                        target_branch = "origin/${ghprbTargetBranch}"
+                    } else {
+                        git_branch = "${BRANCH_NAME}"
+                        git_refspec = "+refs/heads/${BRANCH_NAME}:refs/remotes/origin/${BRANCH_NAME}"
+                        ci_branch = "${BRANCH_NAME}"
+                        target_branch =  "origin/${BRANCH_NAME}"
+                    }
+                    sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+                        checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: git_branch]],
+                            doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption',
+                            honorRefspec: true, noTags: true, shallow: true]], submoduleCfg: [],
+                            userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                            refspec: git_refspec, url: "git@github.com:edx/${REPO_NAME}.git"]]]
+                        unstash 'lms-unit-reports'
+                        unstash 'cms-unit-reports'
+                        unstash 'commonlib-unit-reports'
+                        sh """export CI_BRANCH=$ci_branch
+                        export TARGET_BRANCH=$target_branch
+                        ./scripts/jenkins-report.sh"""
+                        createWarningsReport("all")
+                    }
+                }
+            }
+            post {
+                always {
+                    script {
+                        archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.coverage'
+                        sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
+                        publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
+                            reportDir: 'reports/cover', reportFiles: 'index.html',
+                            reportName: 'Coverage.py Report', reportTitles: ''])
+
+                        if (env.ghprbPullId != null) {
+                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
+                                reportDir: 'reports', reportFiles: 'diff_coverage_combined.html',
+                                reportName: 'Diff Coverage Report', reportTitles: ''])
+                        }
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                if (env.ghprbPullId != null) {
+                    // For PR jobs, run the edx-platform-test-notifier for PR reporting
+                    build job: 'edx-platform-test-notifier', parameters: [string(name: 'REPO', value: "${REPO_NAME}"), string(name: 'PR_NUMBER', value: "${ghprbPullId}")], wait: false
+                } else {
+                    // For master jobs run github-build-status and report to slack when necessary
+                    if (currentBuild.currentResult == "SUCCESS") {
+                        create_deployment = "true"
+                        build_status = "success"
+                        build_description = "Build Passed"
+                    }
+                    else {
+                        create_deployment = "false"
+                        build_status = "failure"
+                        build_description = "Build Failed"
+                    }
+
+                    commit_sha = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+                    build job: 'github-build-status',
+                        parameters: [
+                            string(name: 'GIT_SHA', value: commit_sha),
+                            string(name: 'GITHUB_ORG', value: 'edx'),
+                            string(name: 'GITHUB_REPO', value: "${REPO_NAME}"),
+                            string(name: 'TARGET_URL', value: "${BUILD_URL}"),
+                            string(name: 'DESCRIPTION', value: build_description),
+                            string(name: 'CONTEXT', value: "${GITHUB_CONTEXT}"),
+                            string(name: 'CREATE_DEPLOYMENT', value: create_deployment),
+                            string(name: 'BUILD_STATUS', value: build_status)
+                        ],
+                        propagate: false, wait: false
+
+                    if (currentBuild.currentResult != "SUCCESS"){
+                        slackSend botUser: true,
+                            message: "`${JOB_NAME}` #${BUILD_NUMBER}: ${currentBuild.currentResult} after ${currentBuild.durationString.replace(' and counting', '')}\n${BUILD_URL}"
+
+                        email_body = "See: <${BUILD_URL}>\n\nChanges:\n"
+                        change_sets = currentBuild.changeSets
+                        for (int j = 0; j < change_sets.size(); j++) {
+                            change_set_items = change_sets[j].items
+                            for (int k = 0; k < change_set_items.length; k++) {
+                                item = change_set_items[k]
+                                email_body = email_body + "\n Commit: ${item.commitId} by ${item.author}: ${item.msg}"
+                            }
+                        }
+                        emailext body: email_body,
+                            subject: "Build failed in Jenkins: ${JOB_NAME} #${BUILD_NUMBER}", to: 'testeng@edx.org'
+                    } else if (currentBuild.currentResult == "SUCCESS" && currentBuild.previousBuild.currentResult != "SUCCESS") {
+                        slackSend botUser: true,
+                            message: "`${JOB_NAME}` #${BUILD_NUMBER}: Back to normal after ${currentBuild.durationString.replace(' and counting', '')}\n${BUILD_URL}"
+                        emailext body: "See <${BUILD_URL}>",
+                            subject: "Jenkins Build is back to normal: ${JOB_NAME} #${BUILD_NUMBER}", to: 'testeng@edx.org'
+                    }
+                }
+            }
+        }
+    }
+}

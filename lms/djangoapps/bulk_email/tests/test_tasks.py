@@ -6,6 +6,8 @@ Runs tasks on answers to course problems to validate that code
 paths actually work.
 
 """
+
+
 import json
 from itertools import chain, cycle, repeat
 from smtplib import SMTPAuthenticationError, SMTPConnectError, SMTPDataError, SMTPServerDisconnected
@@ -23,12 +25,12 @@ from boto.ses.exceptions import (
     SESLocalAddressCharacterError,
     SESMaxSendingRateExceededError
 )
-from celery.states import FAILURE, SUCCESS  # pylint: disable=no-name-in-module, import-error
+from celery.states import FAILURE, SUCCESS
 from django.conf import settings
 from django.core.management import call_command
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
+from six.moves import range
 
 from bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail, Optout
 from bulk_email.tasks import _get_course_email_context
@@ -73,7 +75,6 @@ def my_update_subtask_status(entry_id, current_task_id, new_subtask_status):
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
 
 
-@attr(shard=5)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
     """Tests instructor task that send bulk email."""
@@ -138,30 +139,30 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
     def _create_students(self, num_students):
         """Create students for testing"""
-        return [self.create_student('robot%d' % i) for i in xrange(num_students)]
+        return [self.create_student('robot%d' % i) for i in range(num_students)]
 
     def _assert_single_subtask_status(self, entry, succeeded, failed=0, skipped=0, retried_nomax=0, retried_withmax=0):
         """Compare counts with 'subtasks' entry in InstructorTask table."""
         subtask_info = json.loads(entry.subtasks)
         # verify subtask-level counts:
-        self.assertEquals(subtask_info.get('total'), 1)
-        self.assertEquals(subtask_info.get('succeeded'), 1 if succeeded > 0 else 0)
-        self.assertEquals(subtask_info.get('failed'), 0 if succeeded > 0 else 1)
+        self.assertEqual(subtask_info.get('total'), 1)
+        self.assertEqual(subtask_info.get('succeeded'), 1 if succeeded > 0 else 0)
+        self.assertEqual(subtask_info.get('failed'), 0 if succeeded > 0 else 1)
         # verify individual subtask status:
         subtask_status_info = subtask_info.get('status')
-        task_id_list = subtask_status_info.keys()
-        self.assertEquals(len(task_id_list), 1)
+        task_id_list = list(subtask_status_info.keys())
+        self.assertEqual(len(task_id_list), 1)
         task_id = task_id_list[0]
         subtask_status = subtask_status_info.get(task_id)
-        print "Testing subtask status: {}".format(subtask_status)
-        self.assertEquals(subtask_status.get('task_id'), task_id)
-        self.assertEquals(subtask_status.get('attempted'), succeeded + failed)
-        self.assertEquals(subtask_status.get('succeeded'), succeeded)
-        self.assertEquals(subtask_status.get('skipped'), skipped)
-        self.assertEquals(subtask_status.get('failed'), failed)
-        self.assertEquals(subtask_status.get('retried_nomax'), retried_nomax)
-        self.assertEquals(subtask_status.get('retried_withmax'), retried_withmax)
-        self.assertEquals(subtask_status.get('state'), SUCCESS if succeeded > 0 else FAILURE)
+        print(u"Testing subtask status: {}".format(subtask_status))
+        self.assertEqual(subtask_status.get('task_id'), task_id)
+        self.assertEqual(subtask_status.get('attempted'), succeeded + failed)
+        self.assertEqual(subtask_status.get('succeeded'), succeeded)
+        self.assertEqual(subtask_status.get('skipped'), skipped)
+        self.assertEqual(subtask_status.get('failed'), failed)
+        self.assertEqual(subtask_status.get('retried_nomax'), retried_nomax)
+        self.assertEqual(subtask_status.get('retried_withmax'), retried_withmax)
+        self.assertEqual(subtask_status.get('state'), SUCCESS if succeeded > 0 else FAILURE)
 
     def _test_run_with_task(
             self, task_class, action_name, total, succeeded,
@@ -171,20 +172,20 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         parent_status = self._run_task_with_mock_celery(task_class, task_entry.id, task_entry.task_id)
 
         # check return value
-        self.assertEquals(parent_status.get('total'), total)
-        self.assertEquals(parent_status.get('action_name'), action_name)
+        self.assertEqual(parent_status.get('total'), total)
+        self.assertEqual(parent_status.get('action_name'), action_name)
 
         # compare with task_output entry in InstructorTask table:
         entry = InstructorTask.objects.get(id=task_entry.id)
         status = json.loads(entry.task_output)
-        self.assertEquals(status.get('attempted'), succeeded + failed)
-        self.assertEquals(status.get('succeeded'), succeeded)
-        self.assertEquals(status.get('skipped'), skipped)
-        self.assertEquals(status.get('failed'), failed)
-        self.assertEquals(status.get('total'), total)
-        self.assertEquals(status.get('action_name'), action_name)
+        self.assertEqual(status.get('attempted'), succeeded + failed)
+        self.assertEqual(status.get('succeeded'), succeeded)
+        self.assertEqual(status.get('skipped'), skipped)
+        self.assertEqual(status.get('failed'), failed)
+        self.assertEqual(status.get('total'), total)
+        self.assertEqual(status.get('action_name'), action_name)
         self.assertGreater(status.get('duration_ms'), 0)
-        self.assertEquals(entry.task_state, SUCCESS)
+        self.assertEqual(entry.task_state, SUCCESS)
         self._assert_single_subtask_status(entry, succeeded, failed, skipped, retried_nomax, retried_withmax)
         return entry
 
@@ -210,9 +211,9 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
             get_conn.return_value.send_messages.side_effect = cycle([Exception("This should not happen!")])
             parent_status = self._run_task_with_mock_celery(send_bulk_course_email, task_entry.id, task_entry.task_id)
-        self.assertEquals(parent_status.get('total'), num_emails)
-        self.assertEquals(parent_status.get('succeeded'), num_emails)
-        self.assertEquals(parent_status.get('failed'), 0)
+        self.assertEqual(parent_status.get('total'), num_emails)
+        self.assertEqual(parent_status.get('succeeded'), num_emails)
+        self.assertEqual(parent_status.get('failed'), 0)
 
     def test_unactivated_user(self):
         # Select number of emails to fit into a single subtask.
@@ -278,6 +279,34 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
     def test_ses_domain_ends_with_dot(self):
         # Test that celery handles permanent SMTPDataErrors by failing and not retrying.
         self._test_email_address_failures(SESDomainEndsWithDotError(554, "Email address ends with a dot"))
+
+    def test_bulk_email_skip_with_non_ascii_emails(self):
+        """
+        Tests that bulk email skips the email address containing non-ASCII characters
+        and does not fail.
+        """
+        num_emails = 10
+        emails_with_non_ascii_chars = 3
+        num_of_course_instructors = 1
+
+        students = [self.create_student('robot%d' % i) for i in range(num_emails)]
+        for student in students[:emails_with_non_ascii_chars]:
+            student.email = '{username}@tesá.com'.format(username=student.username)
+            student.save()
+
+        total = num_emails + num_of_course_instructors
+        expected_succeeds = num_emails - emails_with_non_ascii_chars + num_of_course_instructors
+        expected_fails = emails_with_non_ascii_chars
+
+        with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
+            get_conn.return_value.send_messages.side_effect = cycle([None])
+            self._test_run_with_task(
+                task_class=send_bulk_course_email,
+                action_name='emailed',
+                total=total,
+                succeeded=expected_succeeds,
+                failed=expected_fails
+            )
 
     def _test_retry_after_limited_retry_error(self, exception):
         """Test that celery handles connection failures by retrying."""

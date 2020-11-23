@@ -1,19 +1,21 @@
 """
 API for the gating djangoapp
 """
+
 import json
 import logging
 
+from completion.models import BlockCompletion
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.translation import ugettext as _
-
-from completion.models import BlockCompletion
-from lms.djangoapps.courseware.access import _has_access_to_course
-from lms.djangoapps.course_blocks.api import get_course_blocks
-from lms.djangoapps.grades.subsection_grade_factory import SubsectionGradeFactory
 from milestones import api as milestones_api
 from opaque_keys.edx.keys import UsageKey
+from xblock.completable import XBlockCompletionMode as CompletionMode
+
+from lms.djangoapps.course_blocks.api import get_course_blocks
+from lms.djangoapps.courseware.access import _has_access_to_course
+from lms.djangoapps.grades.api import SubsectionGradeFactory
 from openedx.core.lib.gating.exceptions import GatingValidationError
 from util import milestones_helpers
 from xmodule.modulestore.django import modulestore
@@ -41,13 +43,13 @@ def _get_prerequisite_milestone(prereq_content_key):
     ))
 
     if not milestones:
-        log.warning("Could not find gating milestone for prereq UsageKey %s", prereq_content_key)
+        log.warning(u"Could not find gating milestone for prereq UsageKey %s", prereq_content_key)
         return None
 
     if len(milestones) > 1:
         # We should only ever have one gating milestone per UsageKey
         # Log a warning here and pick the first one
-        log.warning("Multiple gating milestones found for prereq UsageKey %s", prereq_content_key)
+        log.warning(u"Multiple gating milestones found for prereq UsageKey %s", prereq_content_key)
 
     return milestones[0]
 
@@ -66,7 +68,7 @@ def _validate_min_score(min_score):
         GatingValidationError: If the minimum score is not valid
     """
     if min_score:
-        message = _("%(min_score)s is not a valid grade percentage") % {'min_score': min_score}
+        message = _(u"%(min_score)s is not a valid grade percentage") % {'min_score': min_score}
         try:
             min_score = int(min_score)
         except ValueError:
@@ -90,7 +92,7 @@ def gating_enabled(default=None):
         otherwise the result of the decorated function
     """
     def wrap(f):  # pylint: disable=missing-docstring
-        def function_wrapper(course, *args):  # pylint: disable=missing-docstring
+        def function_wrapper(course, *args):
             if not course.enable_subsection_gating:
                 return default
             return f(course, *args)
@@ -161,7 +163,7 @@ def get_prerequisites(course_key):
         milestone = milestones_by_block_id.get(block.location.block_id)
         if milestone:
             milestone['block_display_name'] = block.display_name
-            milestone['block_usage_key'] = unicode(block.location)
+            milestone['block_usage_key'] = str(block.location)
             result.append(milestone)
 
     return result
@@ -181,7 +183,7 @@ def add_prerequisite(course_key, prereq_content_key):
     """
     milestone = milestones_api.add_milestone(
         {
-            'name': _('Gating milestone for {usage_key}').format(usage_key=unicode(prereq_content_key)),
+            'name': _(u'Gating milestone for {usage_key}').format(usage_key=str(prereq_content_key)),
             'namespace': "{usage_key}{qualifier}".format(
                 usage_key=prereq_content_key,
                 qualifier=GATING_NAMESPACE_QUALIFIER
@@ -380,7 +382,8 @@ def compute_is_prereq_met(content_id, user_id, recalc_on_unmet=False):
         subsection = store.get_item(subsection_usage_key)
         prereq_meta_info = {
             'url': reverse('jump_to', kwargs={'course_id': course_key, 'location': subsection_usage_key}),
-            'display_name': subsection.display_name
+            'display_name': subsection.display_name,
+            'id': str(subsection_usage_key)
         }
         prereq_met = update_milestone(milestone, subsection_usage_key, milestone, student)
 
@@ -434,20 +437,16 @@ def get_subsection_grade_percentage(subsection_usage_key, user):
     Returns:
         User's grade percentage for given subsection
     """
-    subsection_grade_percentage = 0.0
     try:
         subsection_structure = get_course_blocks(user, subsection_usage_key)
         if any(subsection_structure):
             subsection_grade_factory = SubsectionGradeFactory(user, course_structure=subsection_structure)
             if subsection_usage_key in subsection_structure:
-                # this will force a recalculation of the subsection grade
-                subsection_grade = subsection_grade_factory.update(
-                    subsection_structure[subsection_usage_key], persist_grade=False
-                )
-                subsection_grade_percentage = subsection_grade.percent_graded * 100.0
+                subsection_grade = subsection_grade_factory.update(subsection_structure[subsection_usage_key])
+                return _get_subsection_percentage(subsection_grade)
     except ItemNotFoundError as err:
-        log.warning("Could not find course_block for subsection=%s error=%s", subsection_usage_key, err)
-    return subsection_grade_percentage
+        log.warning(u"Could not find course_block for subsection=%s error=%s", subsection_usage_key, err)
+    return 0.0
 
 
 def get_subsection_completion_percentage(subsection_usage_key, user):
@@ -463,14 +462,23 @@ def get_subsection_completion_percentage(subsection_usage_key, user):
     try:
         subsection_structure = get_course_blocks(user, subsection_usage_key)
         if any(subsection_structure):
-            completable_blocks = [
-                block for block in subsection_structure
-                if block.block_type not in ['chapter', 'sequential', 'vertical']
-            ]
+            completable_blocks = []
+            for block in subsection_structure:
+                completion_mode = subsection_structure.get_xblock_field(
+                    block, 'completion_mode'
+                )
+
+                #  always exclude html blocks (in addition to EXCLUDED blocks) for gating calculations
+                #  See https://openedx.atlassian.net/browse/WL-1798
+                if completion_mode not in (CompletionMode.AGGREGATOR, CompletionMode.EXCLUDED) \
+                        and not block.block_type == 'html':
+                    completable_blocks.append(block)
+
             if not completable_blocks:
-                return 0
+                return 100
             subsection_completion_total = 0
-            course_block_completions = BlockCompletion.get_course_completions(user, subsection_usage_key.course_key)
+            course_key = subsection_usage_key.course_key
+            course_block_completions = BlockCompletion.get_learning_context_completions(user, course_key)
             for block in completable_blocks:
                 if course_block_completions.get(block):
                     subsection_completion_total += course_block_completions.get(block)
@@ -479,7 +487,7 @@ def get_subsection_completion_percentage(subsection_usage_key, user):
             )
 
     except ItemNotFoundError as err:
-        log.warning("Could not find course_block for subsection=%s error=%s", subsection_usage_key, err)
+        log.warning(u"Could not find course_block for subsection=%s error=%s", subsection_usage_key, err)
 
     return subsection_completion_percentage
 

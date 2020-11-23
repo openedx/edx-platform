@@ -1,8 +1,11 @@
 """
 Test module for Entrance Exams AJAX callback handler workflows
 """
+
+
 import json
 
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
@@ -39,15 +42,15 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         super(EntranceExamHandlerTests, self).setUp()
         self.course_key = self.course.id
         self.usage_key = self.course.location
-        self.course_url = '/course/{}'.format(unicode(self.course.id))
-        self.exam_url = '/course/{}/entrance_exam/'.format(unicode(self.course.id))
+        self.course_url = '/course/{}'.format(six.text_type(self.course.id))
+        self.exam_url = '/course/{}/entrance_exam/'.format(six.text_type(self.course.id))
         self.milestone_relationship_types = milestones_helpers.get_milestone_relationship_types()
 
     def test_entrance_exam_milestone_addition(self):
         """
         Unit Test: test addition of entrance exam milestone content
         """
-        parent_locator = unicode(self.course.location)
+        parent_locator = six.text_type(self.course.location)
         created_block = create_xblock(
             parent_locator=parent_locator,
             user=self.user,
@@ -57,8 +60,8 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         )
         add_entrance_exam_milestone(self.course.id, created_block)
         content_milestones = milestones_helpers.get_course_content_milestones(
-            unicode(self.course.id),
-            unicode(created_block.location),
+            six.text_type(self.course.id),
+            six.text_type(created_block.location),
             self.milestone_relationship_types['FULFILLS']
         )
         self.assertTrue(len(content_milestones))
@@ -68,7 +71,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         """
         Unit Test: test removal of entrance exam milestone content
         """
-        parent_locator = unicode(self.course.location)
+        parent_locator = six.text_type(self.course.location)
         created_block = create_xblock(
             parent_locator=parent_locator,
             user=self.user,
@@ -78,8 +81,8 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         )
         add_entrance_exam_milestone(self.course.id, created_block)
         content_milestones = milestones_helpers.get_course_content_milestones(
-            unicode(self.course.id),
-            unicode(created_block.location),
+            six.text_type(self.course.id),
+            six.text_type(created_block.location),
             self.milestone_relationship_types['FULFILLS']
         )
         self.assertEqual(len(content_milestones), 1)
@@ -88,8 +91,8 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         request.user = user
         remove_entrance_exam_milestone_reference(request, self.course.id)
         content_milestones = milestones_helpers.get_course_content_milestones(
-            unicode(self.course.id),
-            unicode(created_block.location),
+            six.text_type(self.course.id),
+            six.text_type(created_block.location),
             self.milestone_relationship_types['FULFILLS']
         )
         self.assertEqual(len(content_milestones), 0)
@@ -109,9 +112,9 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         self.assertTrue(metadata['entrance_exam_enabled'])
         self.assertIsNotNone(metadata['entrance_exam_minimum_score_pct'])
         self.assertIsNotNone(metadata['entrance_exam_id']['value'])
-        self.assertTrue(len(milestones_helpers.get_course_milestones(unicode(self.course.id))))
+        self.assertTrue(len(milestones_helpers.get_course_milestones(six.text_type(self.course.id))))
         content_milestones = milestones_helpers.get_course_content_milestones(
-            unicode(self.course.id),
+            six.text_type(self.course.id),
             metadata['entrance_exam_id']['value'],
             self.milestone_relationship_types['FULFILLS']
         )
@@ -131,7 +134,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
 
         # Add a new child sequential to the exam module
         # Confirm that the grader type is 'Entrance Exam'
-        chapter_locator_string = json.loads(resp.content).get('locator')
+        chapter_locator_string = json.loads(resp.content.decode('utf-8')).get('locator')
         # chapter_locator = UsageKey.from_string(chapter_locator_string)
         seq_data = {
             'category': "sequential",
@@ -139,7 +142,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
             'parent_locator': chapter_locator_string,
         }
         resp = self.client.ajax_post(reverse_url('xblock_handler'), seq_data)
-        seq_locator_string = json.loads(resp.content).get('locator')
+        seq_locator_string = json.loads(resp.content.decode('utf-8')).get('locator')
         seq_locator = UsageKey.from_string(seq_locator_string)
         section_grader_type = CourseGradingModel.get_section_grader_type(seq_locator)
         self.assertEqual(GRADER_TYPES['ENTRANCE_EXAM'], section_grader_type['graderType'])
@@ -177,11 +180,11 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         )
         user.set_password('test')
         user.save()
-        milestones = milestones_helpers.get_course_milestones(unicode(self.course_key))
+        milestones = milestones_helpers.get_course_milestones(six.text_type(self.course_key))
         self.assertEqual(len(milestones), 1)
         milestone_key = '{}.{}'.format(milestones[0]['namespace'], milestones[0]['name'])
         paths = milestones_helpers.get_course_milestones_fulfillment_paths(
-            unicode(self.course_key),
+            six.text_type(self.course_key),
             milestones_helpers.serialize_user(user)
         )
 
@@ -229,13 +232,14 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
             {'entrance_exam_minimum_score_pct': '50'},
             http_accept='application/json'
         )
+
         self.assertEqual(resp.status_code, 201)
         resp = self.client.get(self.exam_url)
         self.assertEqual(resp.status_code, 200)
         self.course = modulestore().get_course(self.course.id)
-
         # Should raise an ItemNotFoundError and return a 404
         updated_metadata = {'entrance_exam_id': 'i4x://org.4/course_4/chapter/ed7c4c6a4d68409998e2c8554c4629d1'}
+
         CourseMetadata.update_from_dict(
             updated_metadata,
             self.course,
@@ -247,6 +251,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
 
         # Should raise an InvalidKeyError and return a 404
         updated_metadata = {'entrance_exam_id': '123afsdfsad90f87'}
+
         CourseMetadata.update_from_dict(
             updated_metadata,
             self.course,

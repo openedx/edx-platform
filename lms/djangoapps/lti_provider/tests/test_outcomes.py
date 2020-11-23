@@ -2,6 +2,7 @@
 Tests for the LTI outcome service handlers, both in outcomes.py and in tasks.py
 """
 
+
 from django.test import TestCase
 from lxml import etree
 from mock import ANY, MagicMock, patch
@@ -18,7 +19,6 @@ class StoreOutcomeParametersTest(TestCase):
     """
     Tests for the store_outcome_parameters method in outcomes.py
     """
-    shard = 4
 
     def setUp(self):
         super(StoreOutcomeParametersTest, self).setUp()
@@ -133,7 +133,6 @@ class SignAndSendReplaceResultTest(TestCase):
     """
     Tests for the sign_and_send_replace_result method in outcomes.py
     """
-    shard = 4
 
     def setUp(self):
         super(SignAndSendReplaceResultTest, self).setUp()
@@ -185,9 +184,8 @@ class XmlHandlingTest(TestCase):
     Tests for the generate_replace_result_xml and check_replace_result_response
     methods in outcomes.py
     """
-    shard = 4
 
-    response_xml = """
+    response_xml = u"""
         <imsx_POXEnvelopeResponse xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
           <imsx_POXHeader>
             <imsx_POXResponseHeaderInfo>
@@ -298,7 +296,6 @@ class TestAssignmentsForProblem(ModuleStoreTestCase):
     """
     Test cases for the assignments_for_problem method in outcomes.py
     """
-    shard = 4
 
     def setUp(self):
         super(TestAssignmentsForProblem, self).setUp()

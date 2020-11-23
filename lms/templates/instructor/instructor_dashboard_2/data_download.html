@@ -1,4 +1,5 @@
 <%page args="section_data" expression_filter="h"/>
+<%namespace name='static' file='/static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
@@ -46,14 +47,30 @@ from openedx.core.djangolib.markup import HTML, Text
       <p><input type="button" name="survey-results-report" value="${_("Generate Survey Results Report")}" data-endpoint="${ section_data['course_survey_results_url'] }"/></p>
     %endif
 
-    <p>${_("To generate a CSV file that lists all student answers to a given problem, enter the location of the problem (from its Staff Debug Info).")}</p>
+    <p>${_("Select a problem to generate a CSV file that lists all student answers to the problem. You also select a section or chapter to include results of all problems in that section or chapter.")}</p>
+    <% max_entries = settings.FEATURES.get('MAX_PROBLEM_RESPONSES_COUNT') %>
+    %if max_entries is not None:
+      <p>
+        <strong>${_("NOTE")}: </strong>
+        ${_("The generated report is limited to {max_entries} responses. If you expect more than {max_entries} "
+            "responses, try generating the report on a chapter-by-chapter, or problem-by-problem basis, or contact "
+            "your site administrator to increase the limit.").format(max_entries=max_entries)}
+      </p>
+    %endif
 
     <p>
-      <label>
-        <span>${_("Problem location: ")}</span>
-        <input type="text" name="problem-location" />
-      </label>
+      <div class="problems">
+        ${static.renderReact(
+          component="ProblemBrowser",
+          id="react-block-listing",
+          props={
+            "courseId": course.id,
+            "excludeBlockTypes": ['html', 'video', 'discussion']
+          }
+        )}
+      </div>
     </p>
+
     <p>
       <input type="button" name="list-problem-responses-csv" value="${_("Download a CSV of problem responses")}" data-endpoint="${ section_data['get_problem_responses_url'] }" data-csv="true">
     </p>
@@ -89,7 +106,7 @@ from openedx.core.djangolib.markup import HTML, Text
 
     <h3 class="hd hd-3">${_("Reports Available for Download")}</h3>
     <p>
-      ${_("The reports listed below are available for download. A link to every report remains available on this page, identified by the UTC date and time of generation. Reports are not deleted, so you will always be able to access previously generated reports from this page.")}
+      ${_("The reports listed below are available for download, identified by UTC date and time of generation.")}
     </p>
 
   %if settings.FEATURES.get('ENABLE_ASYNC_ANSWER_DISTRIBUTION'):
@@ -100,9 +117,13 @@ from openedx.core.djangolib.markup import HTML, Text
 
     ## Translators: a table of URL links to report files appears after this sentence.
     <p>
-        ${Text(_("{strong_start}Note{strong_end}: To keep student data secure, you cannot save or email these links for direct access. Copies of links expire within 5 minutes.")).format(
+        ${Text(_("{strong_start}Note{strong_end}: {ul_start}{li_start}To keep student data secure, you cannot save or email these links for direct access. Copies of links expire within 5 minutes.{li_end}{li_start}Report files are deleted 90 days after generation. If you will need access to old reports, download and store the files, in accordance with your institution's data security policies.{li_end}{ul_end}")).format(
             strong_start=HTML("<strong>"),
             strong_end=HTML("</strong>"),
+            ul_start=HTML("<ul>"),
+            ul_end=HTML("</ul>"),
+            li_start=HTML("<li>"),
+            li_end=HTML("</li>"),
         )}
     </p><br>
 

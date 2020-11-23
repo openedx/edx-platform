@@ -1,30 +1,32 @@
 """
 Tests the execution of forum notification tasks.
 """
-from datetime import datetime, timedelta
+
+
 import json
 import math
+from datetime import datetime, timedelta
 
 import ddt
-from django.contrib.sites.models import Site
 import mock
-
-import lms.lib.comment_client as cc
-
-from django_comment_common.models import ForumsConfig
-from django_comment_common.signals import comment_created
+import six
+from django.contrib.sites.models import Site
+from edx_ace.channel import ChannelType, get_channel_for_message
 from edx_ace.recipient import Recipient
 from edx_ace.renderers import EmailRenderer
 from edx_ace.utils import date
+
+import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from lms.djangoapps.discussion.signals.handlers import ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY
 from lms.djangoapps.discussion.tasks import _should_send_message, _track_notification_sent
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangoapps.django_comment_common.models import ForumsConfig
+from openedx.core.djangoapps.django_comment_common.signals import comment_created
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.lib.celery.task_utils import emulate_http_request
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
 
 NOW = datetime.utcnow()
 ONE_HOUR_AGO = NOW - timedelta(hours=1)
@@ -66,7 +68,6 @@ def make_mock_responder(subscribed_thread_ids=None, thread_data=None, comment_da
 
 @ddt.ddt
 class TaskTestCase(ModuleStoreTestCase):
-    shard = 4
 
     @classmethod
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -108,7 +109,7 @@ class TaskTestCase(ModuleStoreTestCase):
     def create_thread_and_comments(cls):
         cls.thread = {
             'id': cls.discussion_id,
-            'course_id': unicode(cls.course.id),
+            'course_id': six.text_type(cls.course.id),
             'created_at': date.serialize(TWO_HOURS_AGO),
             'title': 'thread-title',
             'user_id': cls.thread_author.id,
@@ -143,7 +144,16 @@ class TaskTestCase(ModuleStoreTestCase):
             'username': cls.comment_author.username,
         }
         cls.thread['children'] = [cls.comment, cls.comment2]
-        cls.comment['child_count'] = 1,
+        cls.comment['child_count'] = 1
+        cls.thread2 = {
+            'id': cls.discussion_id,
+            'course_id': six.text_type(cls.course.id),
+            'created_at': date.serialize(TWO_HOURS_AGO),
+            'title': 'thread-title',
+            'user_id': cls.thread_author.id,
+            'username': cls.thread_author.username,
+            'commentable_id': 'thread-commentable-id-2',
+        }
 
     def setUp(self):
         super(TaskTestCase, self).setUp()
@@ -183,7 +193,7 @@ class TaskTestCase(ModuleStoreTestCase):
         comment = cc.Comment.find(id=self.comment['id']).retrieve()
         site = Site.objects.get_current()
         site_config = SiteConfigurationFactory.create(site=site)
-        site_config.values[ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY] = True
+        site_config.site_values[ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY] = True
         site_config.save()
         with mock.patch('lms.djangoapps.discussion.signals.handlers.get_current_site', return_value=site):
             comment_created.send(sender=None, user=user, post=comment)
@@ -222,18 +232,20 @@ class TaskTestCase(ModuleStoreTestCase):
         with emulate_http_request(
             site=message.context['site'], user=self.thread_author
         ):
-            rendered_email = EmailRenderer().render(message)
-            self.assertTrue(self.comment['body'] in rendered_email.body_html)
-            self.assertTrue(self.comment_author.username in rendered_email.body_html)
-            self.assertTrue(self.thread_author.username in rendered_email.body_html)
-            self.assertTrue(self.mock_permalink in rendered_email.body_html)
-            self.assertTrue(message.context['site'].domain in rendered_email.body_html)
+            rendered_email = EmailRenderer().render(get_channel_for_message(ChannelType.EMAIL, message), message)
+            assert self.comment['body'] in rendered_email.body_html
+            assert self.comment_author.username in rendered_email.body_html
+            assert self.mock_permalink.return_value in rendered_email.body_html
+            assert message.context['site'].domain in rendered_email.body_html
 
-    def run_should_not_send_email_test(self, comment_dict):
+    def run_should_not_send_email_test(self, thread, comment_dict):
+        """
+        assert email is not sent
+        """
         self.mock_request.side_effect = make_mock_responder(
             subscribed_thread_ids=[self.discussion_id],
             comment_data=comment_dict,
-            thread_data=self.thread,
+            thread_data=thread,
         )
         user = mock.Mock()
         comment = cc.Comment.find(id=comment_dict['id']).retrieve()
@@ -243,16 +255,23 @@ class TaskTestCase(ModuleStoreTestCase):
             'thread_author_id': self.thread_author.id,
             'course_id': self.course.id,
             'comment_id': comment_dict['id'],
-            'thread_id': self.thread['id'],
+            'thread_id': thread['id'],
         })
         self.assertEqual(actual_result, False)
         self.assertFalse(self.mock_ace_send.called)
 
     def test_subcomment_should_not_send_email(self):
-        self.run_should_not_send_email_test(self.subcomment)
+        self.run_should_not_send_email_test(self.thread, self.subcomment)
 
     def test_second_comment_should_not_send_email(self):
-        self.run_should_not_send_email_test(self.comment2)
+        self.run_should_not_send_email_test(self.thread, self.comment2)
+
+    def test_thread_without_children_should_not_send_email(self):
+        """
+        test that email notification will not be sent for the thread
+        that doesn't have attribute 'children'
+        """
+        self.run_should_not_send_email_test(self.thread2, self.comment)
 
     @ddt.data((
         {
@@ -269,6 +288,7 @@ class TaskTestCase(ModuleStoreTestCase):
             'uuid': 'uuid1',
             'send_uuid': 'uuid2',
             'thread_id': 'dummy_discussion_id',
+            'course_id': 'fake_course_edx',
             'thread_created_at': datetime(2000, 1, 1, 0, 0, 0)
         }
     ), (
@@ -286,6 +306,7 @@ class TaskTestCase(ModuleStoreTestCase):
             'uuid': 'uuid3',
             'send_uuid': 'uuid4',
             'thread_id': 'dummy_discussion_id2',
+            'course_id': 'fake_course_edx2',
             'thread_created_at': datetime(2000, 1, 1, 0, 0, 0)
         }
 
@@ -299,12 +320,13 @@ class TaskTestCase(ModuleStoreTestCase):
                 setattr(message, key, entry)
 
             test_props['nonInteraction'] = True
-
-            with mock.patch('analytics.track') as mock_analytics_track:
+            # Also augment context with site object, for setting segment context.
+            site = Site.objects.get_current()
+            context['site'] = site
+            with mock.patch('lms.djangoapps.discussion.tasks.segment.track') as mock_segment_track:
                 _track_notification_sent(message, context)
-                mock_analytics_track.assert_called_once_with(
+                mock_segment_track.assert_called_once_with(
                     user_id=context['thread_author_id'],
-                    event='edx.bi.email.sent',
-                    course_id=context['course_id'],
-                    properties=test_props
+                    event_name='edx.bi.email.sent',
+                    properties=test_props,
                 )

@@ -1,6 +1,8 @@
 """
 Forms for configuring courses for verified track cohorting
 """
+
+
 from django import forms
 from django.utils.translation import ugettext as _
 from opaque_keys import InvalidKeyError
@@ -21,7 +23,7 @@ class VerifiedTrackCourseForm(forms.ModelForm):
     error message instead.
 
     """
-    class Meta(object):  # pylint:disable=missing-docstring
+    class Meta(object):
         model = VerifiedTrackCohortedCourse
         fields = '__all__'
 

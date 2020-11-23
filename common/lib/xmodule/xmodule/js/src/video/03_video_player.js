@@ -179,6 +179,8 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _, Time) {
                 state.videoPlayer.player = new HTML5HLSVideo.Player(
                     state.el,
                     _.extend({}, commonPlayerConfig, {
+                        state: state,
+                        onReadyHLS: function() { dfd.resolve(); },
                         videoSources: state.HLSVideoSources,
                         canPlayHLS: state.canPlayHLS,
                         HLSOnlySources: state.HLSOnlySources
@@ -447,7 +449,6 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _, Time) {
         this.videoPlayer.goToStartTime = false;
 
         this.videoPlayer.seekTo(time);
-        this.trigger('videoProgressSlider.focusSlider');
 
         this.el.trigger('seek', [time, oldTime, type]);
     }

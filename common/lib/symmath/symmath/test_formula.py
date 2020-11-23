@@ -1,12 +1,13 @@
 """
 Tests of symbolic math
 """
+
 import re
 import unittest
 
 from lxml import etree
 
-import formula
+from . import formula
 
 
 def stripXML(xml):
@@ -22,7 +23,7 @@ class FormulaTest(unittest.TestCase):
 
     def setUp(self):
         super(FormulaTest, self).setUp()
-        self.formulaInstance = formula.formula('')
+        self.formulaInstance = formula('')
 
     def test_replace_mathvariants(self):
         expr = '''
@@ -42,7 +43,7 @@ class FormulaTest(unittest.TestCase):
         test = etree.tostring(xml)
 
         # success?
-        self.assertEqual(test, expected)
+        self.assertEqual(test.decode('utf-8'), expected)
 
     def test_fix_simple_superscripts(self):
         expr = '''
@@ -66,7 +67,7 @@ class FormulaTest(unittest.TestCase):
         test = etree.tostring(xml)
 
         # success?
-        self.assertEqual(test, expected)
+        self.assertEqual(test.decode('utf-8'), expected)
 
     def test_fix_complex_superscripts(self):
         expr = '''
@@ -91,7 +92,7 @@ class FormulaTest(unittest.TestCase):
         test = etree.tostring(xml)
 
         # success?
-        self.assertEqual(test, expected)
+        self.assertEqual(test.decode('utf-8'), expected)
 
     def test_fix_msubsup(self):
         expr = '''
@@ -113,4 +114,4 @@ class FormulaTest(unittest.TestCase):
         test = etree.tostring(xml)
 
         # success?
-        self.assertEqual(test, expected)
+        self.assertEqual(test.decode('utf-8'), expected)
