@@ -3855,3 +3855,6 @@ SUPPORT_HOW_TO_UNENROLL_LINK = ''
 
 # Notification email settings
 NOTIFICATION_FROM_EMAIL = 'info@omnipreneurshipacademy.com'
+
+# CDN link for s3 amazon aws server
+CDN_LINK = 'https://static-omnipreneurshipacademy.s3.eu-central-1.amazonaws.com/'
