@@ -15,16 +15,31 @@ from edx_django_utils.cache import TieredCache, get_cache_key
 from edx_django_utils.monitoring import function_trace
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from .data import (
-    CourseOutlineData, CourseSectionData, CourseLearningSequenceData,
-    UserCourseOutlineData, UserCourseOutlineDetailsData, VisibilityData,
+from ..data import (
+    CourseLearningSequenceData,
+    CourseOutlineData,
+    CourseSectionData,
+    CourseVisibility,
+    ExamData,
+    UserCourseOutlineData,
+    UserCourseOutlineDetailsData,
+    VisibilityData,
 )
 from ..models import (
-    CourseSection, CourseSectionSequence, LearningContext, LearningSequence
+    CourseSection,
+    CourseSectionSequence,
+    CourseContext,
+    CourseSequenceExam,
+    LearningContext,
+    LearningSequence
 )
 from .permissions import can_see_all_content
+from .processors.content_gating import ContentGatingOutlineProcessor
+from .processors.milestones import MilestonesOutlineProcessor
 from .processors.schedule import ScheduleOutlineProcessor
+from .processors.special_exams import SpecialExamsOutlineProcessor
 from .processors.visibility import VisibilityOutlineProcessor
+from .processors.enrollment import EnrollmentOutlineProcessor
 
 User = get_user_model()
 log = logging.getLogger(__name__)
@@ -46,11 +61,11 @@ def get_course_outline(course_key: CourseKey) -> CourseOutlineData:
 
     See the definition of CourseOutlineData for details about the data returned.
     """
-    learning_context = _get_learning_context_for_outline(course_key)
+    course_context = _get_course_context_for_outline(course_key)
 
     # Check to see if it's in the cache.
     cache_key = "learning_sequences.api.get_course_outline.v1.{}.{}".format(
-        learning_context.context_key, learning_context.published_version
+        course_context.learning_context.context_key, course_context.learning_context.published_version
     )
     outline_cache_result = TieredCache.get_cached_response(cache_key)
     if outline_cache_result.is_found:
@@ -60,18 +75,28 @@ def get_course_outline(course_key: CourseKey) -> CourseOutlineData:
     # represented (so query CourseSection explicitly instead of relying only on
     # select_related from CourseSectionSequence).
     section_models = CourseSection.objects \
-        .filter(learning_context=learning_context) \
+        .filter(course_context=course_context) \
         .order_by('ordering')
     section_sequence_models = CourseSectionSequence.objects \
-        .filter(learning_context=learning_context) \
+        .filter(course_context=course_context) \
         .order_by('ordering') \
-        .select_related('sequence')
+        .select_related('sequence', 'exam')
 
     # Build mapping of section.id keys to sequence lists.
     sec_ids_to_sequence_list = defaultdict(list)
 
     for sec_seq_model in section_sequence_models:
         sequence_model = sec_seq_model.sequence
+
+        try:
+            exam_data = ExamData(
+                is_practice_exam=sec_seq_model.exam.is_practice_exam,
+                is_proctored_enabled=sec_seq_model.exam.is_proctored_enabled,
+                is_time_limited=sec_seq_model.exam.is_time_limited
+            )
+        except CourseSequenceExam.DoesNotExist:
+            exam_data = ExamData()
+
         sequence_data = CourseLearningSequenceData(
             usage_key=sequence_model.usage_key,
             title=sequence_model.title,
@@ -79,7 +104,8 @@ def get_course_outline(course_key: CourseKey) -> CourseOutlineData:
             visibility=VisibilityData(
                 hide_from_toc=sec_seq_model.hide_from_toc,
                 visible_to_staff_only=sec_seq_model.visible_to_staff_only,
-            )
+            ),
+            exam=exam_data
         )
         sec_ids_to_sequence_list[sec_seq_model.section_id].append(sequence_data)
 
@@ -97,31 +123,40 @@ def get_course_outline(course_key: CourseKey) -> CourseOutlineData:
     ]
 
     outline_data = CourseOutlineData(
-        course_key=learning_context.context_key,
-        title=learning_context.title,
-        published_at=learning_context.published_at,
-        published_version=learning_context.published_version,
+        course_key=course_context.learning_context.context_key,
+        title=course_context.learning_context.title,
+        published_at=course_context.learning_context.published_at,
+        published_version=course_context.learning_context.published_version,
+        days_early_for_beta=course_context.days_early_for_beta,
+        entrance_exam_id=course_context.entrance_exam_id,
         sections=sections_data,
+        self_paced=course_context.self_paced,
+        course_visibility=CourseVisibility(course_context.course_visibility),
     )
     TieredCache.set_all_tiers(cache_key, outline_data, 300)
 
     return outline_data
 
 
-def _get_learning_context_for_outline(course_key: CourseKey) -> LearningContext:
+def _get_course_context_for_outline(course_key: CourseKey) -> CourseContext:
+    """
+    Get Course Context for given param:course_key
+    """
     if course_key.deprecated:
         raise ValueError(
             "Learning Sequence API does not support Old Mongo courses: {}"
             .format(course_key),
         )
     try:
-        learning_context = LearningContext.objects.get(context_key=course_key)
+        course_context = (
+            LearningContext.objects.select_related('course_context').get(context_key=course_key).course_context
+        )
     except LearningContext.DoesNotExist:
         # Could happen if it hasn't been published.
         raise CourseOutlineData.DoesNotExist(
             "No CourseOutlineData for {}".format(course_key)
         )
-    return learning_context
+    return course_context
 
 
 def get_user_course_outline(course_key: CourseKey,
@@ -153,10 +188,12 @@ def get_user_course_outline_details(course_key: CourseKey,
         course_key, user, at_time
     )
     schedule_processor = processors['schedule']
+    special_exams_processor = processors['special_exams']
 
     return UserCourseOutlineDetailsData(
         outline=user_course_outline,
-        schedule=schedule_processor.schedule_data(user_course_outline)
+        schedule=schedule_processor.schedule_data(user_course_outline),
+        special_exam_attempts=special_exams_processor.exam_data(user_course_outline)
     )
 
 
@@ -171,11 +208,13 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,
     # released. These do not need to be run for staff users. This is where we
     # would add in pluggability for OutlineProcessors down the road.
     processor_classes = [
+        ('content_gating', ContentGatingOutlineProcessor),
+        ('milestones', MilestonesOutlineProcessor),
         ('schedule', ScheduleOutlineProcessor),
+        ('special_exams', SpecialExamsOutlineProcessor),
         ('visibility', VisibilityOutlineProcessor),
+        ('enrollment', EnrollmentOutlineProcessor),
         # Future:
-        # ('content_gating', ContentGatingOutlineProcessor),
-        # ('milestones', MilestonesOutlineProcessor),
         # ('user_partitions', UserPartitionsOutlineProcessor),
     ]
 
@@ -209,7 +248,17 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,
         accessible_sequences=accessible_sequences,
         **{
             name: getattr(trimmed_course_outline, name)
-            for name in ['course_key', 'title', 'published_at', 'published_version', 'sections']
+            for name in [
+                'course_key',
+                'title',
+                'published_at',
+                'published_version',
+                'entrance_exam_id',
+                'sections',
+                'self_paced',
+                'course_visibility',
+                'days_early_for_beta',
+            ]
         }
     )
 
@@ -229,40 +278,54 @@ def replace_course_outline(course_outline: CourseOutlineData):
     )
 
     with transaction.atomic():
-        # Update or create the basic LearningContext...
-        learning_context = _update_learning_context(course_outline)
+        # Update or create the basic CourseContext...
+        course_context = _update_course_context(course_outline)
 
         # Wipe out the CourseSectionSequences join+ordering table so we can
         # delete CourseSection and LearningSequence objects more easily.
-        learning_context.section_sequences.all().delete()
+        course_context.section_sequences.all().delete()
 
-        _update_sections(course_outline, learning_context)
-        _update_sequences(course_outline, learning_context)
-        _update_course_section_sequences(course_outline, learning_context)
+        _update_sections(course_outline, course_context)
+        _update_sequences(course_outline, course_context)
+        _update_course_section_sequences(course_outline, course_context)
 
 
-def _update_learning_context(course_outline: CourseOutlineData):
-    learning_context, created = LearningContext.objects.update_or_create(
+def _update_course_context(course_outline: CourseOutlineData):
+    """
+    Update CourseContext with given param:course_outline data.
+    """
+    learning_context, _ = LearningContext.objects.update_or_create(
         context_key=course_outline.course_key,
         defaults={
             'title': course_outline.title,
             'published_at': course_outline.published_at,
-            'published_version': course_outline.published_version
+            'published_version': course_outline.published_version,
+        }
+    )
+    course_context, created = CourseContext.objects.update_or_create(
+        learning_context=learning_context,
+        defaults={
+            'course_visibility': course_outline.course_visibility.value,
+            'days_early_for_beta': course_outline.days_early_for_beta,
+            'self_paced': course_outline.self_paced,
+            'entrance_exam_id': course_outline.entrance_exam_id,
         }
     )
     if created:
-        log.info("Created new LearningContext for %s", course_outline.course_key)
+        log.info("Created new CourseContext for %s", course_outline.course_key)
     else:
-        log.info("Found LearningContext for %s, updating...", course_outline.course_key)
+        log.info("Found CourseContext for %s, updating...", course_outline.course_key)
 
-    return learning_context
+    return course_context
 
 
-def _update_sections(course_outline: CourseOutlineData, learning_context: LearningContext):
-    # Add/update relevant sections...
+def _update_sections(course_outline: CourseOutlineData, course_context: CourseContext):
+    """
+    Add/Update relevant sections
+    """
     for ordering, section_data in enumerate(course_outline.sections):
         CourseSection.objects.update_or_create(
-            learning_context=learning_context,
+            course_context=course_context,
             usage_key=section_data.usage_key,
             defaults={
                 'title': section_data.title,
@@ -276,42 +339,48 @@ def _update_sections(course_outline: CourseOutlineData, learning_context: Learni
         section_data.usage_key for section_data in course_outline.sections
     ]
     CourseSection.objects \
-        .filter(learning_context=learning_context) \
+        .filter(course_context=course_context) \
         .exclude(usage_key__in=section_usage_keys_to_keep) \
         .delete()
 
 
-def _update_sequences(course_outline: CourseOutlineData, learning_context: LearningContext):
+def _update_sequences(course_outline: CourseOutlineData, course_context: CourseContext):
+    """
+    Add/Update relevant sequences
+    """
     for section_data in course_outline.sections:
         for sequence_data in section_data.sequences:
             LearningSequence.objects.update_or_create(
-                learning_context=learning_context,
+                learning_context=course_context.learning_context,
                 usage_key=sequence_data.usage_key,
                 defaults={'title': sequence_data.title}
             )
     LearningSequence.objects \
-        .filter(learning_context=learning_context) \
+        .filter(learning_context=course_context.learning_context) \
         .exclude(usage_key__in=course_outline.sequences) \
         .delete()
 
 
-def _update_course_section_sequences(course_outline: CourseOutlineData, learning_context: LearningContext):
+def _update_course_section_sequences(course_outline: CourseOutlineData, course_context: CourseContext):
+    """
+    Add/Update relevant course section and sequences
+    """
     section_models = {
         section_model.usage_key: section_model
         for section_model
-        in CourseSection.objects.filter(learning_context=learning_context).all()
+        in CourseSection.objects.filter(course_context=course_context).all()
     }
     sequence_models = {
         sequence_model.usage_key: sequence_model
         for sequence_model
-        in LearningSequence.objects.filter(learning_context=learning_context).all()
+        in LearningSequence.objects.filter(learning_context=course_context.learning_context).all()
     }
 
     ordering = 0
     for section_data in course_outline.sections:
         for sequence_data in section_data.sequences:
-            CourseSectionSequence.objects.update_or_create(
-                learning_context=learning_context,
+            course_section_sequence, _ = CourseSectionSequence.objects.update_or_create(
+                course_context=course_context,
                 section=section_models[section_data.usage_key],
                 sequence=sequence_models[sequence_data.usage_key],
                 defaults={
@@ -322,3 +391,17 @@ def _update_course_section_sequences(course_outline: CourseOutlineData, learning
                 },
             )
             ordering += 1
+
+            # If a sequence is an exam, update or create an exam record
+            if bool(sequence_data.exam):
+                CourseSequenceExam.objects.update_or_create(
+                    course_section_sequence=course_section_sequence,
+                    defaults={
+                        'is_practice_exam': sequence_data.exam.is_practice_exam,
+                        'is_proctored_enabled': sequence_data.exam.is_proctored_enabled,
+                        'is_time_limited': sequence_data.exam.is_time_limited,
+                    },
+                )
+            else:
+                # Otherwise, delete any exams associated with it
+                CourseSequenceExam.objects.filter(course_section_sequence=course_section_sequence).delete()

@@ -5,20 +5,20 @@ Unit tests for third_party_auth SAML auth providers
 
 import mock
 
-from third_party_auth.saml import EdXSAMLIdentityProvider, get_saml_idp_class
-from third_party_auth.tests.data.saml_identity_provider_mock_data import (
+from common.djangoapps.third_party_auth.saml import EdXSAMLIdentityProvider, get_saml_idp_class
+from common.djangoapps.third_party_auth.tests.data.saml_identity_provider_mock_data import (
     expected_user_details,
     mock_attributes,
     mock_conf
 )
-from third_party_auth.tests.testutil import SAMLTestCase
+from common.djangoapps.third_party_auth.tests.testutil import SAMLTestCase
 
 
 class TestEdXSAMLIdentityProvider(SAMLTestCase):
     """
         Test EdXSAMLIdentityProvider.
     """
-    @mock.patch('third_party_auth.saml.log')
+    @mock.patch('common.djangoapps.third_party_auth.saml.log')
     def test_get_saml_idp_class_with_fake_identifier(self, log_mock):
         error_mock = log_mock.error
         idp_class = get_saml_idp_class('fake_idp_class_option')

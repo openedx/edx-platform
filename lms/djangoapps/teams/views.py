@@ -41,8 +41,8 @@ from openedx.core.lib.api.view_utils import (
     add_serializer_errors,
     build_api_error
 )
-from student.models import CourseAccessRole, CourseEnrollment
-from util.model_utils import truncate_fields
+from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
+from common.djangoapps.util.model_utils import truncate_fields
 from xmodule.modulestore.django import modulestore
 
 from . import is_feature_enabled
@@ -59,7 +59,7 @@ from .api import (
     user_organization_protection_status
 )
 from .csv import load_team_membership_csv, TeamMembershipImportManager
-from .errors import AlreadyOnTeamInCourse, ElasticSearchConnectionError, NotEnrolledInCourseForTeam
+from .errors import AlreadyOnTeamInTeamset, ElasticSearchConnectionError, NotEnrolledInCourseForTeam
 from .search_indexes import CourseTeamIndexer
 from .serializers import (
     BulkTeamCountTopicSerializer,
@@ -69,11 +69,11 @@ from .serializers import (
     TopicSerializer
 )
 from .utils import emit_team_event
-from .waffle import are_team_submissions_enabled
+from .toggles import are_team_submissions_enabled
 
 TEAM_MEMBERSHIPS_PER_PAGE = 5
 TOPICS_PER_PAGE = 12
-MAXIMUM_SEARCH_SIZE = 100000
+MAXIMUM_SEARCH_SIZE = 10000
 
 log = logging.getLogger(__name__)
 
@@ -586,7 +586,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         is_team_administrator = (has_access(request.user, 'staff', course_key)
                                  or has_discussion_privileges(request.user, course_key))
         if not is_team_administrator and (
-            CourseTeamMembership.user_in_team_for_course(request.user, course_key, topic_id=topic_id)
+            CourseTeamMembership.user_in_team_for_teamset(request.user, course_key, topic_id=topic_id)
         ):
             error_message = build_api_error(
                 ugettext_noop('You are already in a team in this teamset.'),
@@ -1169,7 +1169,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
     """
         **Use Cases**
 
-            List course team memberships or add a user to a course team.
+            List teamset team memberships or add a user to a teamset.
 
         **Example Requests**:
 
@@ -1360,15 +1360,18 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                     status=status.HTTP_404_NOT_FOUND
                 )
             teamset_teams = CourseTeam.objects.filter(course_id=requested_course_key, topic_id=teamset_id)
-            teams_with_access = [
-                team for team in teamset_teams
-                if has_specific_team_access(request.user, team)
-            ]
-            if not teams_with_access:
-                return Response(
-                    build_api_error(ugettext_noop("No teamset found in given course with given id")),
-                    status=status.HTTP_404_NOT_FOUND
-                )
+            if has_course_staff_privileges(request.user, requested_course_key):
+                teams_with_access = list(teamset_teams)
+            else:
+                teams_with_access = [
+                    team for team in teamset_teams
+                    if has_specific_team_access(request.user, team)
+                ]
+                if teamset.is_private_managed and not teams_with_access:
+                    return Response(
+                        build_api_error(ugettext_noop("No teamset found in given course with given id")),
+                        status=status.HTTP_404_NOT_FOUND
+                    )
             team_ids = [team.team_id for team in teams_with_access]
 
         if 'username' in request.query_params:
@@ -1461,10 +1464,10 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                     'add_method': 'joined_from_team_view' if user == request.user else 'added_by_another_user'
                 }
             )
-        except AlreadyOnTeamInCourse:
+        except AlreadyOnTeamInTeamset:
             return Response(
                 build_api_error(
-                    ugettext_noop(u"The user {username} is already a member of a team in this course."),
+                    ugettext_noop("The user {username} is already a member of a team in this teamset."),
                     username=username
                 ),
                 status=status.HTTP_400_BAD_REQUEST
@@ -1472,7 +1475,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         except NotEnrolledInCourseForTeam:
             return Response(
                 build_api_error(
-                    ugettext_noop(u"The user {username} is not enrolled in the course associated with this team."),
+                    ugettext_noop("The user {username} is not enrolled in the course associated with this team."),
                     username=username
                 ),
                 status=status.HTTP_400_BAD_REQUEST

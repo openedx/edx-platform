@@ -13,7 +13,7 @@ from six.moves.urllib.parse import parse_qs, urlsplit, urlunsplit  # pylint: dis
 
 from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
-from third_party_auth import pipeline as tpa_pipeline
+from common.djangoapps.third_party_auth import pipeline as tpa_pipeline
 
 
 class LogoutView(TemplateView):

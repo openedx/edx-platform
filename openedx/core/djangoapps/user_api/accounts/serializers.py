@@ -14,13 +14,14 @@ from django.urls import reverse
 from rest_framework import serializers
 from six import text_type
 
+from common.djangoapps.student.models import UserPasswordToggleHistory
 from lms.djangoapps.badges.utils import badges_enabled
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import errors
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.user_api.models import RetirementState, UserPreference, UserRetirementStatus
 from openedx.core.djangoapps.user_api.serializers import ReadOnlyFieldsSerializerMixin
-from student.models import LanguageProficiency, SocialLink, UserProfile
+from common.djangoapps.student.models import LanguageProficiency, SocialLink, UserProfile
 
 from . import (
     ACCOUNT_VISIBILITY_PREF_KEY,
@@ -216,14 +217,30 @@ class UserReadOnlySerializer(serializers.Serializer):
         return visible_serialized_account
 
 
+class UserAccountDisableHistorySerializer(serializers.ModelSerializer):
+    """
+    Class that serializes User account disable history
+    """
+    created_by = serializers.SerializerMethodField()
+
+    class Meta(object):
+        model = UserPasswordToggleHistory
+        fields = ("created", "comment", "disabled", "created_by")
+
+    def get_created_by(self, user_password_toggle_history):
+        return user_password_toggle_history.created_by.username
+
+
 class AccountUserSerializer(serializers.HyperlinkedModelSerializer, ReadOnlyFieldsSerializerMixin):
     """
     Class that serializes the portion of User model needed for account information.
     """
+    password_toggle_history = UserAccountDisableHistorySerializer(many=True, required=False)
+
     class Meta(object):
         model = User
-        fields = ("username", "email", "date_joined", "is_active")
-        read_only_fields = ("username", "email", "date_joined", "is_active")
+        fields = ("username", "email", "date_joined", "is_active", "password_toggle_history")
+        read_only_fields = fields
         explicit_read_only_fields = ()
 
 
@@ -475,10 +492,12 @@ class UserRetirementPartnerReportSerializer(serializers.Serializer):
     Perform serialization for the UserRetirementPartnerReportingStatus model
     """
     user_id = serializers.IntegerField()
+    student_id = serializers.CharField(required=False)
     original_username = serializers.CharField()
     original_email = serializers.EmailField()
     original_name = serializers.CharField()
     orgs = serializers.ListField(child=serializers.CharField())
+    orgs_config = serializers.ListField(required=False)
     created = serializers.DateTimeField()
 
     # Required overrides of abstract base class methods, but we don't use them

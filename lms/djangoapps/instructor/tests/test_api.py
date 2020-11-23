@@ -33,9 +33,13 @@ from six import text_type, unichr
 from six.moves import range, zip
 from testfixtures import LogCapture
 
-from bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from edx_toggles.toggles.testutils import override_waffle_flag
+from lms.djangoapps.certificates.api import generate_user_certificates
+from lms.djangoapps.certificates.models import CertificateStatuses
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
@@ -45,9 +49,7 @@ from lms.djangoapps.courseware.tests.factories import (
     UserProfileFactory
 )
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
-from lms.djangoapps.certificates.api import generate_user_certificates
-from lms.djangoapps.certificates.models import CertificateStatuses
-from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.djangoapps.instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
 from lms.djangoapps.instructor.views.api import (
     _split_input_list,
@@ -67,11 +69,10 @@ from openedx.core.djangoapps.django_comment_common.utils import seed_permissions
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.lib.teams_config import TeamsConfig
 from openedx.core.lib.xblock_utils import grade_histogram
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
-from student.models import (
+from common.djangoapps.student.models import (
     ALLOWEDTOENROLL_TO_ENROLLED,
     ALLOWEDTOENROLL_TO_UNENROLLED,
     ENROLLED_TO_ENROLLED,
@@ -86,11 +87,14 @@ from student.models import (
     get_retired_email_by_email,
     get_retired_username_by_username
 )
-from student.roles import (
-    CourseBetaTesterRole, CourseDataResearcherRole, CourseFinanceAdminRole,
-    CourseInstructorRole, CourseSalesAdminRole
+from common.djangoapps.student.roles import (
+    CourseBetaTesterRole,
+    CourseDataResearcherRole,
+    CourseFinanceAdminRole,
+    CourseInstructorRole,
+    CourseSalesAdminRole
 )
-from student.tests.factories import AdminFactory, UserFactory
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -149,6 +153,7 @@ INSTRUCTOR_POST_ENDPOINTS = set([
     'calculate_grades_csv',
     'change_due_date',
     'export_ora2_data',
+    'export_ora2_submission_files',
     'get_grading_config',
     'get_problem_responses',
     'get_proctored_exam_results',
@@ -348,7 +353,7 @@ class TestEndpointHttpMethods(SharedModuleStoreTestCase, LoginEnrollmentTestCase
         )
 
 
-@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Ensure that users cannot access endpoints they shouldn't be able to.
@@ -428,6 +433,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             ('get_proctored_exam_results', {}),
             ('get_problem_responses', {}),
             ('export_ora2_data', {}),
+            ('export_ora2_submission_files', {}),
             ('rescore_problem',
              {'problem_to_reset': self.problem_urlname, 'unique_student_identifier': self.user.email}),
             ('override_problem_score',
@@ -1961,7 +1967,8 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
         with LogCapture() as capture:
             message = u'Cancelling course certificate generation for user [{}] against course [{}], ' \
                       u'user is a Beta Tester.'
-            message = message.format(self.course.id, self.beta_tester.username)
+            message = message.format(self.beta_tester.username, self.course.id)
+
             generate_user_certificates(self.beta_tester, self.course.id, self.course)
             capture.check_present(('edx.certificate', 'INFO', message))
 
@@ -2520,7 +2527,6 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
 
 
 @ddt.ddt
-@patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints that show data without side effects.
@@ -2564,7 +2570,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
         response = self.client.post(url, {'problem_location': problem_location})
         res_json = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(res_json, 'Could not find problem with this location.')
+        self.assertEqual(res_json, "Could not find problem with this location.")
 
     def valid_problem_location(test):  # pylint: disable=no-self-argument
         """
@@ -2838,15 +2844,16 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
     @ddt.data(*REPORTS_DATA)
     @ddt.unpack
     @valid_problem_location
-    def test_calculate_report_csv_success(self, report_type, instructor_api_endpoint, task_api_endpoint, extra_instructor_api_kwargs):
+    def test_calculate_report_csv_success(
+        self, report_type, instructor_api_endpoint, task_api_endpoint, extra_instructor_api_kwargs
+    ):
         kwargs = {'course_id': text_type(self.course.id)}
         kwargs.update(extra_instructor_api_kwargs)
         url = reverse(instructor_api_endpoint, kwargs=kwargs)
         success_status = u"The {report_type} report is being created.".format(report_type=report_type)
-        with patch(task_api_endpoint) as patched_task_api_endpoint:
-            patched_task_api_endpoint.return_value.task_id = "12345667-9abc-deff-ffed-cba987654321"
-
+        with patch(task_api_endpoint) as mock_task_api_endpoint:
             if report_type == 'problem responses':
+                mock_task_api_endpoint.return_value = Mock(task_id='task-id-1138')
                 response = self.client.post(url, {'problem_location': ''})
                 self.assertContains(response, success_status)
             else:
@@ -2869,6 +2876,32 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         already_running_status = generate_already_running_error_message(task_type)
 
         with patch('lms.djangoapps.instructor_task.api.submit_export_ora2_data') as mock_submit_ora2_task:
+            mock_submit_ora2_task.side_effect = AlreadyRunningError(already_running_status)
+            response = self.client.post(url, {})
+
+        self.assertContains(response, already_running_status, status_code=400)
+
+    def test_get_ora2_submission_files_success(self):
+        url = reverse('export_ora2_submission_files', kwargs={'course_id': text_type(self.course.id)})
+
+        with patch(
+            'lms.djangoapps.instructor_task.api.submit_export_ora2_submission_files'
+        ) as mock_submit_ora2_task:
+            mock_submit_ora2_task.return_value = True
+            response = self.client.post(url, {})
+
+        success_status = 'Attachments archive is being created.'
+
+        self.assertContains(response, success_status)
+
+    def test_get_ora2_submission_files_already_running(self):
+        url = reverse('export_ora2_submission_files', kwargs={'course_id': text_type(self.course.id)})
+        task_type = 'export_ora2_submission_files'
+        already_running_status = generate_already_running_error_message(task_type)
+
+        with patch(
+            'lms.djangoapps.instructor_task.api.submit_export_ora2_submission_files'
+        ) as mock_submit_ora2_task:
             mock_submit_ora2_task.side_effect = AlreadyRunningError(already_running_status)
             response = self.client.post(url, {})
 
@@ -3349,7 +3382,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
         self.assertContains(response, message)
 
 
-@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Checks that only instructors have access to email endpoints, and that
@@ -3969,7 +4002,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             get_extended_due(self.course, self.week3, self.user1)
         )
 
-    @RELATIVE_DATES_FLAG.override(True)
+    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_reset_date(self):
         self.test_change_due_date()
         url = reverse('reset_due_date', kwargs={'course_id': text_type(self.course.id)})
@@ -3983,7 +4016,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             get_extended_due(self.course, self.week1, self.user1)
         )
 
-    @RELATIVE_DATES_FLAG.override(True)
+    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_reset_date_only_in_edx_when(self):
         # Start with a unit that only has a date in edx-when
         self.assertEqual(get_date_for_block(self.course, self.week3, self.user1), None)
@@ -4116,7 +4149,7 @@ class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestC
         self.client.login(username=self.instructor.username, password='test')
         extract_dates(None, self.course.id)
 
-    @RELATIVE_DATES_FLAG.override(True)
+    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_reset_extension_to_deleted_date(self):
         """
         Test that we can delete a due date extension after deleting the normal

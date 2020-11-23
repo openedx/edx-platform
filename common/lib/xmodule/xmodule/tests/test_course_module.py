@@ -40,11 +40,12 @@ class CourseFieldsTestCase(unittest.TestCase):
 
 class DummySystem(ImportSystem):
     @patch('xmodule.modulestore.xml.OSFS', lambda dir: MemoryFS())
-    def __init__(self, load_error_modules):
+    def __init__(self, load_error_modules, course_id=None):
 
         xmlstore = XMLModuleStore("data_dir", source_dirs=[],
                                   load_error_modules=load_error_modules)
-        course_id = CourseKey.from_string('/'.join([ORG, COURSE, 'test_run']))
+        if course_id is None:
+            course_id = CourseKey.from_string('/'.join([ORG, COURSE, 'test_run']))
         course_dir = "test_dir"
         error_tracker = Mock()
 
@@ -373,17 +374,6 @@ class SelfPacedTestCase(unittest.TestCase):
 
     def test_default(self):
         self.assertFalse(self.course.self_paced)
-
-
-class BypassHomeTestCase(unittest.TestCase):
-    """Tests for setting which allows course home to be bypassed."""
-
-    def setUp(self):
-        super(BypassHomeTestCase, self).setUp()
-        self.course = get_dummy_course('2012-12-02T12:00')
-
-    def test_default(self):
-        self.assertFalse(self.course.bypass_home)
 
 
 class CourseDescriptorTestCase(unittest.TestCase):

@@ -1,0 +1,109 @@
+<%page args="section_data" expression_filter="h"/>
+<%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<section id="reports" class="idash-section tab-data" aria-labelledby="header-reports">
+        <h6  class="mb-15 font-size-100" id="header-reports">
+            <strong>${_("Note")}: </strong>
+            Please select the report type and then click "Download Report" button
+        </h6>
+        <div class="mb-15">
+
+            <div class="">
+                <select class="report-type selector">
+                    <option value="gradingConfiguration"
+                            data-endpoint="${ section_data['get_grading_config_url'] }">
+                        Grading Configuration
+                    </option>
+                    <option value="listAnonymizeStudentIDs"
+                            data-endpoint="${ section_data['get_anon_ids_url'] }"
+                            data-directdownload="true"
+                            class="${'is-disabled' if disable_buttons else ''}"
+                            aria-disabled="${'true' if disable_buttons else 'false'}">Anonymized Student IDs
+                    </option>
+                    %if settings.FEATURES.get('ENABLE_GRADE_DOWNLOADS'):
+                    <option value="profileInformation"
+                            data-endpoint="${ section_data['get_students_features_url'] + '/csv' }"
+                            data-csv="true">Profile Information
+                    </option>
+                    <option value="learnerWhoCanEnroll"
+                            data-endpoint="${ section_data['get_students_who_may_enroll_url'] }" data-csv="true">
+                        Learner
+                        who can enroll
+                    </option>
+                    <option value="listEnrolledPeople"
+                            data-endpoint="${ section_data['get_students_features_url'] }"
+                            data-datatable="true">
+                        List enrolled students profile information
+                    </option>
+                    %if section_data['show_generate_proctored_exam_report_button']:
+                    <option value="proctoredExamResults"
+                            data-endpoint="${ section_data['list_proctored_results_url'] }">Proctored exam results
+                    </option>
+                    %endif
+                    %if section_data['course_has_survey']:
+                    <option value="surveyResultReport"
+                            data-endpoint="${ section_data['course_survey_results_url'] }">
+                        Survey Result report
+                    </option>
+                    %endif
+                    %if settings.FEATURES.get('ALLOW_COURSE_STAFF_GRADE_DOWNLOADS') or section_data['access']['admin']:
+                    <option value="ORADataReport" data-graderelated="true"
+                            data-endpoint="${ section_data['export_ora2_data_url'] }">ORA Data
+                        report
+                    </option>
+                    <option data-graderelated="true" value="problemGradeReport"
+                    data-endpoint="${ section_data['problem_grade_report_url'] }">Problem Grade report
+                    </option>
+                    %endif
+                    %endif
+                </select>
+                <input type="button" value="Download Report" class="download-report ml-10">
+            </div>
+
+        </div>
+
+        <div>
+            <p class="selectionInfo gradingConfiguration">${_("Click to display the grading configuration for the \
+                course. The grading configuration is the breakdown of graded subsections of the course \
+                (such as exams and problem sets), and can be changed on the 'Grading' \
+                page (under 'Settings') in Studio.")}</p>
+            <p hidden="hidden" class="selectionInfo listAnonymizeStudentIDs">${_("Click to download a CSV of \
+                anonymized student IDs:")}</p>
+
+            <p hidden="hidden" class="selectionInfo reports"> ${_("For large courses, generating some reports can take \
+                several hours. When report generation is complete, a \
+                link that includes the date and time of generation appears in the table below. These reports are \
+                generated in the background, meaning it is OK to navigate away from this page while your report is \
+                generating.")}</p>
+
+            <p hidden="hidden" class="selectionInfo reports">${_("Please be patient and do not click these buttons \
+                multiple times. Clicking these buttons multiple times will significantly slow the generation \
+                process.")}
+            </p>
+            % if not disable_buttons:
+            <p hidden="hidden" class="selectionInfo listEnrolledPeople">${_("For smaller courses, click to list \
+                profile information for enrolled students directly on this page:")}</p>
+            %endif
+            <p hidden="hidden" class="selectionInfo reports profileInformation">${_("Click to generate a CSV file of \
+                all students enrolled in this course, along with profile information such as email address and \
+                username:")}</p>
+
+            <p hidden="hidden" class="selectionInfo reports learnerWhoCanEnroll">${_("Click to generate a CSV file \
+                that lists learners who can enroll in the course but have not yet done so.")}</p>
+
+            <p hidden="hidden" class="selectionInfo reports proctoredExamResults">${_("Click to generate a CSV file \
+                of all proctored exam results in this course.")}</p>
+
+            <p hidden="hidden" class="selectionInfo reports surveyResultReport">${_("Click to generate a CSV file of \
+                survey results for this course.")}</p>
+            <p hidden="hidden" class="selectionInfo reports ORADataReport">${_("Click to generate a CSV \
+                ORA grade report for all currently enrolled students.")}</p>
+            <p hidden="hidden" class="selectionInfo reports problemGradeReport">${_("Click to generate a CSV \
+                problem grade report for all currently enrolled students.")}</p>
+        </div>
+
+ </section>

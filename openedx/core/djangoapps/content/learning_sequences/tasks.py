@@ -9,8 +9,13 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 
 from .api import replace_course_outline
-from .api.data import (
-    CourseOutlineData, CourseSectionData, CourseLearningSequenceData, VisibilityData
+from .data import (
+    CourseOutlineData,
+    CourseSectionData,
+    CourseLearningSequenceData,
+    ExamData,
+    VisibilityData,
+    CourseVisibility
 )
 
 
@@ -22,6 +27,14 @@ def update_from_modulestore(course_key):
     We should move this out so that learning_sequences does not depend on
     ModuleStore.
     """
+    course_outline_data = get_outline_from_modulestore(course_key)
+    replace_course_outline(course_outline_data)
+
+
+def get_outline_from_modulestore(course_key):
+    """
+    Get CourseOutlineData corresponding to param:course_key
+    """
     def _make_section_data(section):
         sequences_data = []
         for sequence in section.get_children():
@@ -30,6 +43,11 @@ def update_from_modulestore(course_key):
                     usage_key=sequence.location,
                     title=sequence.display_name,
                     inaccessible_after_due=sequence.hide_after_due,
+                    exam=ExamData(
+                        is_practice_exam=sequence.is_practice_exam,
+                        is_proctored_enabled=sequence.is_proctored_enabled,
+                        is_time_limited=sequence.is_timed_exam
+                    ),
                     visibility=VisibilityData(
                         hide_from_toc=sequence.hide_from_toc,
                         visible_to_staff_only=sequence.visible_to_staff_only
@@ -62,7 +80,10 @@ def update_from_modulestore(course_key):
             title=course.display_name,
             published_at=course.subtree_edited_on,
             published_version=str(course.course_version),  # .course_version is a BSON obj
+            entrance_exam_id=course.entrance_exam_id,
+            days_early_for_beta=course.days_early_for_beta,
             sections=sections_data,
+            self_paced=course.self_paced,
+            course_visibility=CourseVisibility(course.course_visibility),
         )
-
-    replace_course_outline(course_outline_data)
+    return course_outline_data

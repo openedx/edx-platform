@@ -23,17 +23,18 @@ from uuid import uuid4
 
 import openid.oidutil
 from django.utils.translation import ugettext_lazy
+from edx_django_utils.plugins import add_plugins
 from path import Path as path
 from six.moves import range
 
-from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
+from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 from openedx.core.lib.derived import derive_settings
 from openedx.core.lib.tempdir import mkdtemp_clean
+from xmodule.modulestore.modulestore_settings import update_module_store_settings
 
 from .common import *
 
-from util.db import NoOpMigrationModules  # pylint: disable=wrong-import-order
-from util.testing import patch_sessions, patch_testcase  # pylint: disable=wrong-import-order
+from common.djangoapps.util.testing import patch_sessions, patch_testcase  # pylint: disable=wrong-import-order
 
 # This patch disables the commit_on_success decorator during tests
 # in TestCase subclasses.
@@ -72,8 +73,6 @@ FEATURES['DISABLE_START_DATES'] = True
 FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 
 FEATURES['ENABLE_SERVICE_STATUS'] = True
-
-FEATURES['ENABLE_SHOPPING_CART'] = True
 
 FEATURES['ENABLE_VERIFIED_CERTIFICATES'] = True
 
@@ -221,7 +220,7 @@ CACHES = {
     # Blockstore caching tests require a cache that actually works:
     'blockstore': {
         'KEY_PREFIX': 'blockstore',
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
         'LOCATION': 'edx_loc_mem_cache',
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     },
@@ -254,10 +253,10 @@ AUTHENTICATION_BACKENDS = [
     'social_core.backends.facebook.FacebookOAuth2',
     'social_core.backends.azuread.AzureADOAuth2',
     'social_core.backends.twitter.TwitterOAuth',
-    'third_party_auth.identityserver3.IdentityServer3',
-    'third_party_auth.dummy.DummyBackend',
-    'third_party_auth.saml.SAMLAuthBackend',
-    'third_party_auth.lti.LTIAuthBackend',
+    'common.djangoapps.third_party_auth.identityserver3.IdentityServer3',
+    'common.djangoapps.third_party_auth.dummy.DummyBackend',
+    'common.djangoapps.third_party_auth.saml.SAMLAuthBackend',
+    'common.djangoapps.third_party_auth.lti.LTIAuthBackend',
 ] + AUTHENTICATION_BACKENDS
 
 THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = {
@@ -276,27 +275,6 @@ OAUTH_ENFORCE_SECURE = False
 FEATURES['ENABLE_MOBILE_REST_API'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
 
-###################### Payment ##############################3
-# Enable fake payment processing page
-FEATURES['ENABLE_PAYMENT_FAKE'] = True
-
-# Configure the payment processor to use the fake processing page
-# Since both the fake payment page and the shoppingcart app are using
-# the same settings, we can generate this randomly and guarantee
-# that they are using the same secret.
-RANDOM_SHARED_SECRET = ''.join(
-    choice(ascii_letters + digits + punctuation)
-    for x in range(250)
-)
-
-CC_PROCESSOR_NAME = 'CyberSource2'
-CC_PROCESSOR['CyberSource2']['SECRET_KEY'] = RANDOM_SHARED_SECRET
-CC_PROCESSOR['CyberSource2']['ACCESS_KEY'] = "0123456789012345678901"
-CC_PROCESSOR['CyberSource2']['PROFILE_ID'] = "edx"
-CC_PROCESSOR['CyberSource2']['PURCHASE_ENDPOINT'] = "/shoppingcart/payment_fake"
-
-FEATURES['STORE_BILLING_INFO'] = True
-
 ########################### SYSADMIN DASHBOARD ################################
 FEATURES['ENABLE_SYSADMIN_DASHBOARD'] = True
 GIT_REPO_DIR = TEST_ROOT / "course_repos"
@@ -304,7 +282,7 @@ GIT_REPO_DIR = TEST_ROOT / "course_repos"
 ################################# CELERY ######################################
 
 CELERY_ALWAYS_EAGER = True
-CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
+CELERY_RESULT_BACKEND = 'django-cache'
 
 CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
 
@@ -457,6 +435,16 @@ FACEBOOK_APP_SECRET = "Test"
 FACEBOOK_APP_ID = "Test"
 FACEBOOK_API_VERSION = "v2.8"
 
+####################### ELASTICSEARCH TESTS #######################
+# Enable this when testing elasticsearch-based code which couldn't be tested using the mock engine
+ENABLE_ELASTICSEARCH_FOR_TESTS = os.environ.get(
+    'EDXAPP_ENABLE_ELASTICSEARCH_FOR_TESTS', 'no').lower() in ('true', 'yes', '1')
+
+TEST_ELASTICSEARCH_USE_SSL = os.environ.get(
+    'EDXAPP_TEST_ELASTICSEARCH_USE_SSL', 'no').lower() in ('true', 'yes', '1')
+TEST_ELASTICSEARCH_HOST = os.environ.get('EDXAPP_TEST_ELASTICSEARCH_HOST', 'edx.devstack.elasticsearch')
+TEST_ELASTICSEARCH_PORT = int(os.environ.get('EDXAPP_TEST_ELASTICSEARCH_PORT', '9200'))
+
 ######### custom courses #########
 INSTALLED_APPS += ['lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig']
 FEATURES['CUSTOM_COURSES_EDX'] = True
@@ -477,14 +465,19 @@ PROFILE_IMAGE_MIN_BYTES = 100
 
 # Enable the LTI provider feature for testing
 FEATURES['ENABLE_LTI_PROVIDER'] = True
-INSTALLED_APPS.append('lti_provider.apps.LtiProviderConfig')
-AUTHENTICATION_BACKENDS.append('lti_provider.users.LtiBackend')
+INSTALLED_APPS.append('lms.djangoapps.lti_provider.apps.LtiProviderConfig')
+AUTHENTICATION_BACKENDS.append('lms.djangoapps.lti_provider.users.LtiBackend')
 
 # ORGANIZATIONS
 FEATURES['ORGANIZATIONS_APP'] = True
 
 # Financial assistance page
 FEATURES['ENABLE_FINANCIAL_ASSISTANCE_FORM'] = True
+
+COURSE_BLOCKS_API_EXTRA_FIELDS = [
+    ('course', 'course_visibility'),
+    ('course', 'other_course_settings'),
+]
 
 COURSE_CATALOG_URL_ROOT = 'https://catalog.example.com'
 COURSE_CATALOG_API_URL = '{}/api/v1'.format(COURSE_CATALOG_URL_ROOT)
@@ -500,6 +493,9 @@ FRONTEND_LOGIN_URL = '/login'
 FRONTEND_LOGOUT_URL = '/logout'
 FRONTEND_REGISTER_URL = '/register'
 
+# Programs Learner Portal URL
+LEARNER_PORTAL_URL_ROOT = 'http://localhost:8734'
+
 ECOMMERCE_API_URL = 'https://ecommerce.example.com/api/v2/'
 ECOMMERCE_PUBLIC_URL_ROOT = None
 ENTERPRISE_API_URL = 'http://enterprise.example.com/enterprise/api/v1/'
@@ -508,11 +504,6 @@ ENTERPRISE_CONSENT_API_URL = 'http://enterprise.example.com/consent/api/v1/'
 ACTIVATION_EMAIL_FROM_ADDRESS = 'test_activate@edx.org'
 
 TEMPLATES[0]['OPTIONS']['debug'] = True
-
-########################### DRF default throttle rates ############################
-# Increasing rates to enable test cases hitting registration view succesfully.
-# Lower rate is causing view to get blocked, causing test case failure.
-REST_FRAMEWORK['DEFAULT_THROTTLE_RATES']['registration_validation'] = '100/minute'
 
 ########################## VIDEO TRANSCRIPTS STORAGE ############################
 VIDEO_TRANSCRIPTS_SETTINGS = dict(
@@ -549,7 +540,7 @@ JWT_AUTH.update({
 # pylint: enable=unicode-format-string
 ####################### Plugin Settings ##########################
 
-plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_constants.SettingsType.TEST)
+add_plugins(__name__, ProjectType.LMS, SettingsType.TEST)
 
 ########################## Derive Any Derived Settings  #######################
 
@@ -580,6 +571,8 @@ PDF_RECEIPT_TAX_ID_LABEL = 'Tax ID'
 PROFILE_MICROFRONTEND_URL = "http://profile-mfe/abc/"
 ORDER_HISTORY_MICROFRONTEND_URL = "http://order-history-mfe/"
 ACCOUNT_MICROFRONTEND_URL = "http://account-mfe/"
+LOGISTRATION_MICROFRONTEND_URL = "http://logistation-mfe"
+LOGISTRATION_MICROFRONTEND_DOMAIN = "logistation-mfe"
 LEARNING_MICROFRONTEND_URL = "http://learning-mfe"
 
 ########################## limiting dashboard courses ######################
@@ -594,3 +587,6 @@ RATELIMIT_RATE = '2/m'
 
 ##### LOGISTRATION RATE LIMIT SETTINGS #####
 LOGISTRATION_RATELIMIT_RATE = '5/5m'
+LOGISTRATION_API_RATELIMIT = '5/m'
+
+REGISTRATION_VALIDATION_RATELIMIT = '5/minute'

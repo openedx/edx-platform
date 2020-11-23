@@ -7,10 +7,10 @@ import ddt
 
 from django.urls import reverse
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 @ddt.ddt
@@ -18,10 +18,9 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
     """
     Tests for the Course Home Course Metadata API
     """
-    @classmethod
-    def setUpClass(cls):
-        BaseCourseHomeTests.setUpClass()
-        cls.url = reverse('course-home-course-metadata', args=[cls.course.id])
+    def setUp(self):
+        super().setUp()
+        self.url = reverse('course-home-course-metadata', args=[self.course.id])
 
     def test_get_authenticated_user(self):
         CourseEnrollment.enroll(self.user, self.course.id, CourseMode.VERIFIED)

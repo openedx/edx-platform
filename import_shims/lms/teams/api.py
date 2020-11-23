@@ -1,0 +1,5 @@
+from import_shims.warn import warn_deprecated_import
+
+warn_deprecated_import('teams.api', 'lms.djangoapps.teams.api')
+
+from lms.djangoapps.teams.api import *

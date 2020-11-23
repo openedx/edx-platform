@@ -6,6 +6,9 @@ and any production WSGI deployments.
 It exposes a module-level variable named ``application``. Django's
 ``runserver`` and ``runfcgi`` commands discover this application via the
 ``WSGI_APPLICATION`` setting.
+
+Import sorting is intentionally disabled in this module.
+isort:skip_file
 """
 
 # Patch the xml libs before anything else.

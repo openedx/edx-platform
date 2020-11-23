@@ -528,9 +528,13 @@ html.video-fullscreen {
       display: flex;
       font-size: 16px;
 
+      .localized-datetime {
+        max-width: 80%;
+      }
+
       .pill {
         font-size: 12px;
-
+        max-height: 20px;
         padding: 2px 8px;
         border-radius: 5px;
         margin-left: 8px;

@@ -43,6 +43,7 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import (
     CourseKeyField, LearningContextKeyField, UsageKeyField
 )
+from .data import CourseVisibility
 
 
 class LearningContext(TimeStampedModel):
@@ -65,6 +66,23 @@ class LearningContext(TimeStampedModel):
         indexes = [
             models.Index(fields=['-published_at'])
         ]
+
+
+class CourseContext(TimeStampedModel):
+    """
+    A model containing course specific information e.g course_visibility
+    """
+    learning_context = models.OneToOneField(
+        LearningContext, on_delete=models.CASCADE, primary_key=True, related_name="course_context"
+    )
+    # Please note, the tuple is intentionally use value for both actual value and display value
+    # because the name of enum constant is written in upper while the values are lower
+    course_visibility = models.CharField(
+        max_length=32, choices=[(constant.value, constant.value) for constant in CourseVisibility]
+    )
+    days_early_for_beta = models.IntegerField(null=True, blank=True)
+    self_paced = models.BooleanField(default=False)
+    entrance_exam_id = models.CharField(max_length=255, null=True)
 
 
 class LearningSequence(TimeStampedModel):
@@ -128,8 +146,8 @@ class CourseSection(CourseContentVisibilityMixin, TimeStampedModel):
     re-created on course publish.
     """
     id = models.BigAutoField(primary_key=True)
-    learning_context = models.ForeignKey(
-        LearningContext, on_delete=models.CASCADE, related_name='sections'
+    course_context = models.ForeignKey(
+        CourseContext, on_delete=models.CASCADE, related_name='sections'
     )
     usage_key = UsageKeyField(max_length=255)
     title = models.CharField(max_length=1000)
@@ -139,10 +157,10 @@ class CourseSection(CourseContentVisibilityMixin, TimeStampedModel):
 
     class Meta:
         unique_together = [
-            ['learning_context', 'usage_key'],
+            ['course_context', 'usage_key'],
         ]
         index_together = [
-            ['learning_context', 'ordering'],
+            ['course_context', 'ordering'],
         ]
 
 
@@ -162,8 +180,8 @@ class CourseSectionSequence(CourseContentVisibilityMixin, TimeStampedModel):
     re-created on course publish.
     """
     id = models.BigAutoField(primary_key=True)
-    learning_context = models.ForeignKey(
-        LearningContext, on_delete=models.CASCADE, related_name='section_sequences'
+    course_context = models.ForeignKey(
+        CourseContext, on_delete=models.CASCADE, related_name='section_sequences'
     )
     section = models.ForeignKey(CourseSection, on_delete=models.CASCADE)
     sequence = models.ForeignKey(LearningSequence, on_delete=models.CASCADE)
@@ -177,5 +195,17 @@ class CourseSectionSequence(CourseContentVisibilityMixin, TimeStampedModel):
 
     class Meta:
         unique_together = [
-            ['learning_context', 'ordering'],
+            ['course_context', 'ordering'],
         ]
+
+
+class CourseSequenceExam(TimeStampedModel):
+    """
+    This model stores XBlock information that affects outline level information
+    pertaining to special exams
+    """
+    course_section_sequence = models.OneToOneField(CourseSectionSequence, on_delete=models.CASCADE, related_name='exam')
+
+    is_practice_exam = models.BooleanField(default=False)
+    is_proctored_enabled = models.BooleanField(default=False)
+    is_time_limited = models.BooleanField(default=False)

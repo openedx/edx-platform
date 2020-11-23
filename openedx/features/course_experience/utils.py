@@ -11,7 +11,6 @@ from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 from six.moves import range
 
-from course_modes.models import CourseMode
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
@@ -19,7 +18,7 @@ from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.cache_utils import request_cached
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
 
@@ -299,14 +298,30 @@ def dates_banner_should_display(course_key, user):
     for section_key in block_data.get_children(course_usage_key):
         for subsection_key in block_data.get_children(section_key):
             subsection_due_date = block_data.get_xblock_field(subsection_key, 'due', None)
-            if subsection_due_date and (
-                not block_data.get_xblock_field(subsection_key, 'complete', False)
-                and block_data.get_xblock_field(subsection_key, 'graded', False)
-                and subsection_due_date < timezone.now()
-            ):
-                # Display the banner if the due date for an incomplete graded subsection
-                # has passed
+            if (subsection_due_date and subsection_due_date < timezone.now() and
+                    not is_block_structure_complete_for_assignments(block_data, subsection_key)):
+                # Display the banner if the due date for an incomplete graded subsection has passed
                 return True, block_data.get_xblock_field(subsection_key, 'contains_gated_content', False)
 
     # Don't display the banner if there were no missed deadlines
     return False, False
+
+
+def is_block_structure_complete_for_assignments(block_data, block_key):
+    """
+    Considers a block complete only if all scored & graded leaf blocks are complete.
+
+    This is different from the normal `complete` flag because children of the block that are informative (like
+    readings or videos) do not count. We only care about actual homework content.
+    """
+    children = block_data.get_children(block_key)
+    if children:
+        return all(is_block_structure_complete_for_assignments(block_data, child_key) for child_key in children)
+
+    complete = block_data.get_xblock_field(block_key, 'complete', False)
+    graded = block_data.get_xblock_field(block_key, 'graded', False)
+    has_score = block_data.get_xblock_field(block_key, 'has_score', False)
+    weight = block_data.get_xblock_field(block_key, 'weight', 1)
+    scored = has_score and (weight is None or weight > 0)
+
+    return complete or not graded or not scored

@@ -72,6 +72,7 @@ module.exports = Merge.smart({
             // Studio
             Import: './cms/static/js/features/import/factories/import.js',
             CourseOrLibraryListing: './cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx',
+            LibrarySourcedBlockPicker: './common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx',  // eslint-disable-line max-len
             'js/factories/textbooks': './cms/static/js/factories/textbooks.js',
             'js/factories/container': './cms/static/js/factories/container.js',
             'js/factories/context_course': './cms/static/js/factories/context_course.js',
@@ -92,6 +93,9 @@ module.exports = Merge.smart({
             StudentAccountDeletion: './lms/static/js/student_account/components/StudentAccountDeletion.jsx',
             StudentAccountDeletionInitializer: './lms/static/js/student_account/StudentAccountDeletionInitializer.js',
             ProblemBrowser: './lms/djangoapps/instructor/static/instructor/ProblemBrowser/index.jsx',
+            DemographicsCollectionBanner: './lms/static/js/demographics_collection/DemographicsCollectionBanner.jsx',
+            DemographicsCollectionModal: './lms/static/js/demographics_collection/DemographicsCollectionModal.jsx',
+            AxiosJwtTokenService: './lms/static/js/jwt_auth/AxiosJwtTokenService.js',
 
             // Learner Dashboard
             EntitlementFactory: './lms/static/js/learner_dashboard/course_entitlement_factory.js',
@@ -106,7 +110,6 @@ module.exports = Merge.smart({
             CourseHome: './openedx/features/course_experience/static/course_experience/js/CourseHome.js',
             CourseOutline: './openedx/features/course_experience/static/course_experience/js/CourseOutline.js',
             CourseSock: './openedx/features/course_experience/static/course_experience/js/CourseSock.js',
-            CourseTalkReviews: './openedx/features/course_experience/static/course_experience/js/CourseTalkReviews.js',
             Currency: './openedx/features/course_experience/static/course_experience/js/currency.js',
             Enrollment: './openedx/features/course_experience/static/course_experience/js/Enrollment.js',
             LatestUpdate: './openedx/features/course_experience/static/course_experience/js/LatestUpdate.js',
@@ -343,6 +346,18 @@ module.exports = Merge.smart({
                 {
                     test: /logger/,
                     loader: 'imports-loader?this=>window'
+                },
+                {
+                    test: /\.css$/,
+                    use: [
+                        'style-loader',
+                        {
+                            loader: 'css-loader',
+                            options: {
+                                modules: true
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -408,7 +423,6 @@ module.exports = Merge.smart({
             $: 'jQuery',
             backbone: 'Backbone',
             canvas: 'canvas',
-            coursetalk: 'CourseTalk',
             gettext: 'gettext',
             jquery: 'jQuery',
             logger: 'Logger',

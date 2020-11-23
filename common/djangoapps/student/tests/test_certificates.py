@@ -5,19 +5,19 @@ import datetime
 import unittest
 
 import ddt
-import mock
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
 from mock import patch
 from pytz import UTC
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import get_certificate_url
 from lms.djangoapps.certificates.models import CertificateStatuses
-from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
-from student.models import LinkedInAddToProfileConfiguration
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from lms.djangoapps.certificates.tests.factories import (
+    GeneratedCertificateFactory, LinkedInAddToProfileConfigurationFactory
+)
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -167,7 +167,7 @@ class CertificateDisplayTest(CertificateDisplayTestBase):
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
     def test_no_certificate_status_no_problem(self):
-        with patch('student.views.dashboard.cert_info', return_value={}):
+        with patch('common.djangoapps.student.views.dashboard.cert_info', return_value={}):
             self._create_certificate('honor')
             self._check_can_not_download_certificate()
 
@@ -191,10 +191,12 @@ class CertificateDisplayTest(CertificateDisplayTestBase):
             u'do not have a current verified identity with {platform_name}'
             .format(platform_name=settings.PLATFORM_NAME))
 
-    def test_post_to_linkedin_invisibility(self):
+    def test_post_to_linkedin_visibility(self):
         """
         Verifies that the post certificate to linked button
         does not appear by default (when config is not set)
+        Then Verifies that the post certificate to linked button appears
+        as expected once a config is set
         """
         self._create_certificate('honor')
 
@@ -202,38 +204,9 @@ class CertificateDisplayTest(CertificateDisplayTestBase):
         # button should not be visible
         self._check_linkedin_visibility(False)
 
-    def test_post_to_linkedin_visibility(self):
-        """
-        Verifies that the post certificate to linked button appears
-        as expected
-        """
-        self._create_certificate('honor')
-
-        config = LinkedInAddToProfileConfiguration(
-            company_identifier='0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9',
-            enabled=True
-        )
-        config.save()
-
+        LinkedInAddToProfileConfigurationFactory()
         # now we should see it
         self._check_linkedin_visibility(True)
-
-    @mock.patch("openedx.core.djangoapps.theming.helpers.is_request_in_themed_site", mock.Mock(return_value=True))
-    def test_post_to_linkedin_site_specific(self):
-        """
-        Verifies behavior for themed sites which disables the post to LinkedIn
-        feature (for now)
-        """
-        self._create_certificate('honor')
-
-        config = LinkedInAddToProfileConfiguration(
-            company_identifier='0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9',
-            enabled=True
-        )
-        config.save()
-
-        # now we should not see it because we are in a themed site
-        self._check_linkedin_visibility(False)
 
 
 @ddt.ddt

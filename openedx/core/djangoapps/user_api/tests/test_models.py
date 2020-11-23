@@ -6,8 +6,8 @@ Test UserPreferenceModel and UserPreference events
 from django.db import IntegrityError
 from django.test import TestCase
 
-from student.tests.factories import UserFactory
-from student.tests.tests import UserSettingsEventTestMixin
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.tests import UserSettingsEventTestMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

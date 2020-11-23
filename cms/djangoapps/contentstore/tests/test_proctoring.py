@@ -12,7 +12,7 @@ from edx_proctoring.api import get_all_exams_for_course, get_review_policy_by_ex
 from mock import patch
 from pytz import UTC
 
-from contentstore.signals.handlers import listen_for_course_publish
+from cms.djangoapps.contentstore.signals.handlers import listen_for_course_publish
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 

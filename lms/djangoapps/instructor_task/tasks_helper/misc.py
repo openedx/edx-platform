@@ -7,27 +7,37 @@ running state of a course.
 
 import logging
 from collections import OrderedDict
+from contextlib import contextmanager
 from datetime import datetime
+from io import StringIO
+from tempfile import TemporaryFile
 from time import time
+from zipfile import ZipFile
 import csv
+import os
 import unicodecsv
 import six
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.files.storage import DefaultStorage
-from openassessment.data import OraAggregateData
+from openassessment.data import OraAggregateData, OraDownloadData
 from pytz import UTC
 
 from lms.djangoapps.instructor_analytics.basic import get_proctored_exam_results
 from lms.djangoapps.instructor_analytics.csvs import format_dictlist
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
-from survey.models import SurveyAnswer
-from util.file import UniversalNewlineIterator
+from lms.djangoapps.survey.models import SurveyAnswer
+from common.djangoapps.util.file import UniversalNewlineIterator
 
 from .runner import TaskProgress
-from .utils import UPDATE_STATUS_FAILED, UPDATE_STATUS_SUCCEEDED, upload_csv_to_report_store
+from .utils import (
+    UPDATE_STATUS_FAILED,
+    UPDATE_STATUS_SUCCEEDED,
+    upload_csv_to_report_store,
+    upload_zip_to_report_store,
+)
 
 # define different loggers for use within tasks and on client side
 TASK_LOG = logging.getLogger('edx.celery.task')
@@ -336,6 +346,111 @@ def upload_ora2_data(
     upload_csv_to_report_store(rows, 'ORA_data', course_id, start_date)
 
     curr_step = {'step': 'Finalizing ORA data report'}
+    task_progress.update_task_state(extra_meta=curr_step)
+    TASK_LOG.info(u'%s, Task type: %s, Upload complete.', task_info_string, action_name)
+
+    return UPDATE_STATUS_SUCCEEDED
+
+
+def _task_step(task_progress, task_info_string, action_name):
+    """
+    Returns a context manager, that logs error and updates TaskProgress
+    filures counter in case inner block throws an exception.
+    """
+
+    @contextmanager
+    def _step_context_manager(step_description, exception_text, step_error_description):
+        curr_step = {'step': step_description}
+        TASK_LOG.info(
+            '%s, Task type: %s, Current step: %s',
+            task_info_string,
+            action_name,
+            curr_step,
+        )
+
+        task_progress.update_task_state(extra_meta=curr_step)
+
+        try:
+            yield
+
+        # Update progress to failed regardless of error type
+        except Exception:  # pylint: disable=broad-except
+            TASK_LOG.exception(exception_text)
+            task_progress.failed = 1
+
+            task_progress.update_task_state(extra_meta={'step': step_error_description})
+
+    return _step_context_manager
+
+
+def upload_ora2_submission_files(
+    _xmodule_instance_args, _entry_id, course_id, _task_input, action_name
+):
+    """
+    Creates zip archive with submission files in three steps:
+
+    1. Collect all files information using ORA download helper.
+    2. Download all submission attachments, put them in temporary zip
+        file along with submission texts and csv downloads list.
+    3. Upload zip file into reports storage.
+    """
+
+    start_time = time()
+    start_date = datetime.now(UTC)
+
+    num_attempted = 1
+    num_total = 1
+
+    fmt = 'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
+    task_info_string = fmt.format(
+        task_id=_xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None,
+        entry_id=_entry_id,
+        course_id=course_id,
+        task_input=_task_input
+    )
+    TASK_LOG.info(u'%s, Task type: %s, Starting task execution', task_info_string, action_name)
+
+    task_progress = TaskProgress(action_name, num_total, start_time)
+    task_progress.attempted = num_attempted
+
+    step_manager = _task_step(task_progress, task_info_string, action_name)
+
+    submission_files_data = None
+    with step_manager(
+        'Collecting attachments data',
+        'Failed to get ORA submissions attachments data.',
+        'Error while collecting data',
+    ):
+        submission_files_data = OraDownloadData.collect_ora2_submission_files(course_id)
+
+    if submission_files_data is None:
+        return UPDATE_STATUS_FAILED
+
+    with TemporaryFile('rb+') as zip_file:
+        compressed = None
+        with step_manager(
+            'Downloading and compressing attachments files',
+            'Failed to download and compress submissions attachments.',
+            'Error while downloading and compressing submissions attachments',
+        ):
+            compressed = OraDownloadData.create_zip_with_attachments(zip_file, course_id, submission_files_data)
+
+        if compressed is None:
+            return UPDATE_STATUS_FAILED
+
+        zip_filename = None
+        with step_manager(
+            'Uploading zip file to storage',
+            'Failed to upload zip file to storage.',
+            'Error while uploading zip file to storage',
+        ):
+            zip_filename = upload_zip_to_report_store(zip_file, 'submission_files', course_id, start_date),
+
+        if not zip_filename:
+            return UPDATE_STATUS_FAILED
+
+    task_progress.succeeded = 1
+    curr_step = {'step': 'Finalizing attachments extracting'}
     task_progress.update_task_state(extra_meta=curr_step)
     TASK_LOG.info(u'%s, Task type: %s, Upload complete.', task_info_string, action_name)
 

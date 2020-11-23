@@ -14,7 +14,7 @@ from django.utils.translation import ugettext as _
 from edx_django_utils.cache import RequestCache
 from web_fragments.fragment import Fragment
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.access_response import AccessError
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
@@ -24,8 +24,8 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.course_date_signals.utils import get_expected_duration
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from student.models import CourseEnrollment
-from util.date_utils import strftime_localized
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.date_utils import strftime_localized
 
 EXPIRATION_DATE_FORMAT_STR = u'%b %-d, %Y'
 
@@ -62,6 +62,8 @@ def get_user_course_duration(user, course):
       - Course access duration is bounded by the min and max duration.
       - If course fields are missing, default course access duration to MIN_DURATION.
     """
+    if not CourseDurationLimitConfig.enabled_for_enrollment(user, course):
+        return None
 
     enrollment = CourseEnrollment.get_enrollment(user, course.id)
     if enrollment is None or enrollment.mode != CourseMode.AUDIT:
@@ -71,7 +73,7 @@ def get_user_course_duration(user, course):
     if not verified_mode:
         return None
 
-    return get_expected_duration(course)
+    return get_expected_duration(course.id)
 
 
 def get_user_course_expiration_date(user, course):
@@ -107,9 +109,6 @@ def check_course_expired(user, course):
     if get_course_masquerade(user, course.id):
         return ACCESS_GRANTED
 
-    if not CourseDurationLimitConfig.enabled_for_enrollment(user, course):
-        return ACCESS_GRANTED
-
     expiration_date = get_user_course_expiration_date(user, course)
     if expiration_date and timezone.now() > expiration_date:
         return AuditExpiredError(user, course, expiration_date)
@@ -127,9 +126,6 @@ def generate_course_expired_message(user, course):
     """
     Generate the message for the user course expiration date if it exists.
     """
-    if not CourseDurationLimitConfig.enabled_for_enrollment(user, course):
-        return
-
     expiration_date = get_user_course_expiration_date(user, course)
     if not expiration_date:
         return
@@ -179,7 +175,7 @@ def generate_course_expired_message(user, course):
             )
 
             return HTML(full_message).format(
-                a_open=HTML(u'<a href="{upgrade_link}">').format(
+                a_open=HTML(u'<a id="FBE_banner" href="{upgrade_link}">').format(
                     upgrade_link=verified_upgrade_deadline_link(user=user, course=course)
                 ),
                 sronly_span_open=HTML('<span class="sr-only">'),

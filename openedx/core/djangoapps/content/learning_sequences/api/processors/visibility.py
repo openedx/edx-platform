@@ -1,3 +1,7 @@
+"""
+Simple OutlineProcessor that removes items based on VisibilityData.
+"""
+
 from .base import OutlineProcessor
 
 

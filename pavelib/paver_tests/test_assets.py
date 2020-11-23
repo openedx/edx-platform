@@ -208,7 +208,6 @@ class TestPaverWatchAssetTasks(TestCase):
             path('common/static'),
             path('node_modules/@edx'),
             path('node_modules'),
-            path('node_modules/edx-pattern-library/node_modules'),
             path('lms/static/sass/partials'),
             path('lms/static/sass'),
             path('lms/static/certificates/sass'),
@@ -253,6 +252,7 @@ class TestPaverWatchAssetTasks(TestCase):
         self.expected_sass_directories.extend([
             path(TEST_THEME_DIR) / 'lms/static/sass',
             path(TEST_THEME_DIR) / 'lms/static/sass/partials',
+            path(TEST_THEME_DIR) / 'lms/static/certificates/sass',
             path(TEST_THEME_DIR) / 'cms/static/sass',
             path(TEST_THEME_DIR) / 'cms/static/sass/partials',
         ])

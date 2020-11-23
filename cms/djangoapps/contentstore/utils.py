@@ -19,13 +19,13 @@ from six import text_type
 
 from openedx.core.djangoapps.django_comment_common.models import assign_default_role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
-from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
-from student import auth
-from student.models import CourseEnrollment
-from student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student import auth
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -139,7 +139,7 @@ def get_lms_link_for_item(location, preview=False):
     )
 
 
-def get_lms_link_for_certificate_web_view(user_id, course_key, mode):
+def get_lms_link_for_certificate_web_view(course_key, mode):
     """
     Returns the url to the certificate web view.
     """
@@ -151,9 +151,8 @@ def get_lms_link_for_certificate_web_view(user_id, course_key, mode):
     if lms_base is None:
         return None
 
-    return u"//{certificate_web_base}/certificates/user/{user_id}/course/{course_id}?preview={mode}".format(
+    return u"//{certificate_web_base}/certificates/course/{course_id}?preview={mode}".format(
         certificate_web_base=lms_base,
-        user_id=user_id,
         course_id=six.text_type(course_key),
         mode=mode
     )

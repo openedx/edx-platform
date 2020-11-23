@@ -2,9 +2,6 @@
 Views that handle course updates.
 """
 
-
-from datetime import datetime
-
 import six
 from django.contrib.auth.decorators import login_required
 from django.template.context_processors import csrf
@@ -19,37 +16,7 @@ from lms.djangoapps.courseware.courses import get_course_info_section_module, ge
 from lms.djangoapps.courseware.views.views import CourseTabView
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience import default_course_url_name
-
-STATUS_VISIBLE = 'visible'
-STATUS_DELETED = 'deleted'
-
-
-def get_ordered_updates(request, course):
-    """
-    Returns any course updates in reverse chronological order.
-    """
-    info_module = get_course_info_section_module(request, request.user, course, 'updates')
-
-    updates = info_module.items if info_module else []
-    info_block = getattr(info_module, '_xmodule', info_module) if info_module else None
-    ordered_updates = [update for update in updates if update.get('status') == STATUS_VISIBLE]
-    ordered_updates.sort(
-        key=lambda item: (safe_parse_date(item['date']), item['id']),
-        reverse=True
-    )
-    for update in ordered_updates:
-        update['content'] = info_block.system.replace_urls(update['content'])
-    return ordered_updates
-
-
-def safe_parse_date(date):
-    """
-    Since this is used solely for ordering purposes, use today's date as a default
-    """
-    try:
-        return datetime.strptime(date, u'%B %d, %Y')
-    except ValueError:  # occurs for ill-formatted date values
-        return datetime.today()
+from openedx.features.course_experience.course_updates import get_ordered_updates
 
 
 class CourseUpdatesView(CourseTabView):
@@ -64,12 +31,6 @@ class CourseUpdatesView(CourseTabView):
         """
         return super(CourseUpdatesView, self).get(request, course_id, 'courseware', **kwargs)
 
-    def uses_bootstrap(self, request, course, tab):
-        """
-        Always render this tab with bootstrap.
-        """
-        return True
-
     def render_to_fragment(self, request, course=None, tab=None, **kwargs):
         course_id = six.text_type(course.id)
         updates_fragment_view = CourseUpdatesFragmentView()
@@ -80,7 +41,6 @@ class CourseUpdatesFragmentView(EdxFragmentView):
     """
     A fragment to render the updates page for a course.
     """
-    _uses_pattern_library = False
 
     def render_to_fragment(self, request, course_id=None, **kwargs):
         """
@@ -104,7 +64,6 @@ class CourseUpdatesFragmentView(EdxFragmentView):
             'updates': ordered_updates,
             'plain_html_updates': plain_html_updates,
             'disable_courseware_js': True,
-            'uses_pattern_library': True,
         }
         html = render_to_string('course_experience/course-updates-fragment.html', context)
         return Fragment(html)

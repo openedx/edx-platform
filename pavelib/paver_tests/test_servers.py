@@ -44,9 +44,8 @@ EXPECTED_INDEX_COURSE_COMMAND = (
     "python manage.py {system} --settings={settings} reindex_course --setup"
 )
 EXPECTED_PRINT_SETTINGS_COMMAND = [
-    "python manage.py lms --settings={settings} print_setting STATIC_ROOT 2>{log_file}",
-    "python manage.py cms --settings={settings} print_setting STATIC_ROOT 2>{log_file}",
-    "python manage.py lms --settings={settings} print_setting WEBPACK_CONFIG_PATH 2>{log_file}"
+    "python manage.py lms --settings={settings} print_setting STATIC_ROOT WEBPACK_CONFIG_PATH 2>{log_file}",
+    "python manage.py cms --settings={settings} print_setting STATIC_ROOT 2>{log_file}"
 ]
 EXPECTED_WEBPACK_COMMAND = (
     "NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} "

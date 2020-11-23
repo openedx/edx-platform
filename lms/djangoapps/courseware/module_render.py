@@ -25,7 +25,7 @@ from django.utils.text import slugify
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 from edx_django_utils.cache import RequestCache
-from edx_django_utils.monitoring import set_custom_metrics_for_course_key, set_monitoring_transaction_name
+from edx_django_utils.monitoring import set_custom_attributes_for_course_key, set_monitoring_transaction_name
 from edx_proctoring.api import get_attempt_status_summary
 from edx_proctoring.services import ProctoringService
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -44,7 +44,7 @@ from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
 from xblock.reference.plugins import FSService
 from xblock.runtime import KvsFieldData
 
-import static_replace
+from common.djangoapps import static_replace
 from capa.xqueue_interface import XQueueInterface
 from lms.djangoapps.courseware.access import get_user_role, has_access
 from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
@@ -55,7 +55,7 @@ from lms.djangoapps.courseware.masquerade import (
     setup_masquerade
 )
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.courseware.services import UserStateService
 from lms.djangoapps.grades.api import GradesUtilService
@@ -87,12 +87,13 @@ from openedx.core.lib.xblock_utils import request_token as xblock_request_token
 from openedx.core.lib.xblock_utils import wrap_xblock
 from openedx.features.course_duration_limits.access import course_expiration_wrapper
 from openedx.features.discounts.utils import offer_banner_wrapper
-from student.models import anonymous_id_for_user, user_by_anonymous_id
-from student.roles import CourseBetaTesterRole
-from track import contexts
-from util import milestones_helpers
-from util.json_request import JsonResponse
-from xblock_django.user_service import DjangoXBlockUserService
+from openedx.features.content_type_gating.services import ContentTypeGatingService
+from common.djangoapps.student.models import anonymous_id_for_user, user_by_anonymous_id
+from common.djangoapps.student.roles import CourseBetaTesterRole
+from common.djangoapps.track import contexts
+from common.djangoapps.util import milestones_helpers
+from common.djangoapps.util.json_request import JsonResponse
+from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
@@ -132,10 +133,10 @@ def make_track_function(request):
     Make a tracking function that logs what happened.
     For use in ModuleSystem.
     '''
-    import track.views
+    from common.djangoapps.track import views as track_views
 
     def function(event_type, event):
-        return track.views.server_track(request, event_type, event, page='x_module')
+        return track_views.server_track(request, event_type, event, page='x_module')
     return function
 
 
@@ -821,6 +822,7 @@ def get_module_system_for_user(
             'gating': GatingService(),
             'grade_utils': GradesUtilService(course_id=course_id),
             'user_state': UserStateService(),
+            'content_type_gating': ContentTypeGatingService(),
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
@@ -1159,7 +1161,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
     except InvalidKeyError:
         raise Http404
 
-    set_custom_metrics_for_course_key(course_key)
+    set_custom_attributes_for_course_key(course_key)
 
     with modulestore().bulk_operations(course_key):
         try:

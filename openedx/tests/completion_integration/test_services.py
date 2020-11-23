@@ -11,7 +11,7 @@ from opaque_keys.edx.keys import CourseKey
 from six.moves import range
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
@@ -124,7 +124,7 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
         """
         module_system = get_test_system(course_id=module.location.course_key)
         module_system.descriptor_runtime = module.runtime._descriptor_system  # pylint: disable=protected-access
-        module_system._services['library_tools'] = LibraryToolsService(self.store)  # pylint: disable=protected-access
+        module_system._services['library_tools'] = LibraryToolsService(self.store, self.user.id)  # pylint: disable=protected-access
 
         def get_module(descriptor):
             """Mocks module_system get_module function"""

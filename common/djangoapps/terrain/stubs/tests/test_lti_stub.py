@@ -9,7 +9,7 @@ import requests
 import six
 from mock import Mock, patch
 
-from terrain.stubs.lti import StubLtiService
+from common.djangoapps.terrain.stubs.lti import StubLtiService
 
 
 class StubLtiServiceTest(unittest.TestCase):
@@ -59,7 +59,7 @@ class StubLtiServiceTest(unittest.TestCase):
         response = requests.post(self.launch_uri, data=self.payload)
         self.assertIn(b'Wrong LTI signature', response.content)
 
-    @patch('terrain.stubs.lti.signature.verify_hmac_sha1', return_value=True)
+    @patch('common.djangoapps.terrain.stubs.lti.signature.verify_hmac_sha1', return_value=True)
     def test_success_response_launch_lti(self, check_oauth):
         """
         Success lti launch.
@@ -67,32 +67,32 @@ class StubLtiServiceTest(unittest.TestCase):
         response = requests.post(self.launch_uri, data=self.payload)
         self.assertIn(b'This is LTI tool. Success.', response.content)
 
-    @patch('terrain.stubs.lti.signature.verify_hmac_sha1', return_value=True)
+    @patch('common.djangoapps.terrain.stubs.lti.signature.verify_hmac_sha1', return_value=True)
     def test_send_graded_result(self, verify_hmac):  # pylint: disable=unused-argument
         response = requests.post(self.launch_uri, data=self.payload)
         self.assertIn(b'This is LTI tool. Success.', response.content)
         grade_uri = self.uri + 'grade'
-        with patch('terrain.stubs.lti.requests.post') as mocked_post:
+        with patch('common.djangoapps.terrain.stubs.lti.requests.post') as mocked_post:
             mocked_post.return_value = Mock(content='Test response', status_code=200)
             response = six.moves.urllib.request.urlopen(grade_uri, data=b'')
             self.assertIn(b'Test response', response.read())
 
-    @patch('terrain.stubs.lti.signature.verify_hmac_sha1', return_value=True)
+    @patch('common.djangoapps.terrain.stubs.lti.signature.verify_hmac_sha1', return_value=True)
     def test_lti20_outcomes_put(self, verify_hmac):  # pylint: disable=unused-argument
         response = requests.post(self.launch_uri, data=self.payload)
         self.assertIn(b'This is LTI tool. Success.', response.content)
         grade_uri = self.uri + 'lti2_outcome'
-        with patch('terrain.stubs.lti.requests.put') as mocked_put:
+        with patch('common.djangoapps.terrain.stubs.lti.requests.put') as mocked_put:
             mocked_put.return_value = Mock(status_code=200)
             response = six.moves.urllib.request.urlopen(grade_uri, data=b'')
             self.assertIn(b'LTI consumer (edX) responded with HTTP 200', response.read())
 
-    @patch('terrain.stubs.lti.signature.verify_hmac_sha1', return_value=True)
+    @patch('common.djangoapps.terrain.stubs.lti.signature.verify_hmac_sha1', return_value=True)
     def test_lti20_outcomes_put_like_delete(self, verify_hmac):  # pylint: disable=unused-argument
         response = requests.post(self.launch_uri, data=self.payload)
         self.assertIn(b'This is LTI tool. Success.', response.content)
         grade_uri = self.uri + 'lti2_delete'
-        with patch('terrain.stubs.lti.requests.put') as mocked_put:
+        with patch('common.djangoapps.terrain.stubs.lti.requests.put') as mocked_put:
             mocked_put.return_value = Mock(status_code=200)
             response = six.moves.urllib.request.urlopen(grade_uri, data=b'')
             self.assertIn(b'LTI consumer (edX) responded with HTTP 200', response.read())

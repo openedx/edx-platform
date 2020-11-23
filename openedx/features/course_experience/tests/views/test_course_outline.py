@@ -13,42 +13,43 @@ from completion import waffle
 from completion.models import BlockCompletion
 from completion.test_utils import CompletionWaffleTestMixin
 from django.contrib.sites.models import Site
-from django.test import override_settings, RequestFactory
+from django.test import RequestFactory, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from pyquery import PyQuery as pq
+from pytz import UTC
 from six import text_type
 from waffle.models import Switch
 from waffle.testutils import override_switch
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
-from gating import api as lms_gating_api
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesAndSpecialExamsTransformer
+from lms.djangoapps.gating import api as lms_gating_api
 from lms.djangoapps.courseware.tests.factories import StaffFactory
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
-from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesAndSpecialExamsTransformer
+from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.urls import RESET_COURSE_DEADLINES_NAME
+from openedx.core.djangoapps.course_date_signals.models import SelfPacedRelativeDatesConfig
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
-from openedx.core.djangoapps.course_date_signals.models import SelfPacedRelativeDatesConfig
 from openedx.core.lib.gating import api as gating_api
-from openedx.features.course_experience import RELATIVE_DATES_FLAG
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from openedx.features.course_experience import RELATIVE_DATES_FLAG
 from openedx.features.course_experience.views.course_outline import (
     DEFAULT_COMPLETION_TRACKING_START,
     CourseOutlineFragmentView
 )
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from ...utils import get_course_outline_block_tree
-
 from .test_course_home import course_home_url
 
 TEST_PASSWORD = 'test'
@@ -141,7 +142,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
         super(TestCourseOutlinePage, self).setUp()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
-    @RELATIVE_DATES_FLAG.override(active=True)
+    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_outline_details(self):
         for course in self.courses:
 
@@ -196,7 +197,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
         self.assertRegex(content, sequential2.display_name + r'\s*\(1 Question\)\s*</h4>')
         self.assertRegex(content, sequential3.display_name + r'\s*\(2 Questions\)\s*</h4>')
 
-    @RELATIVE_DATES_FLAG.override(active=True)
+    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     @ddt.data(
         ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.AUDIT, False, True),
         ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.VERIFIED, False, True),
@@ -214,7 +215,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
     ):
         ContentTypeGatingConfig.objects.create(
             enabled=True,
-            enabled_as_of=datetime.datetime(2017, 1, 1),
+            enabled_as_of=datetime.datetime(2017, 1, 1, tzinfo=UTC),
         )
         course = self.courses[0]
         for mode in course_modes:
@@ -232,11 +233,11 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
         response = self.client.get(url)
 
         if should_display:
-            self.assertContains(response, '<div class="dates-banner-text"')
+            self.assertContains(response, '<div class="banner-cta-text"')
         else:
-            self.assertNotContains(response, '<div class="dates-banner-text"')
+            self.assertNotContains(response, '<div class="banner-cta-text"')
 
-    @RELATIVE_DATES_FLAG.override(active=True)
+    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_reset_course_deadlines(self):
         course = self.courses[0]
         enrollment = CourseEnrollment.objects.get(course_id=course.id)
@@ -256,14 +257,14 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
         self.client.login(username=staff.username, password=TEST_PASSWORD)
         self.update_masquerade(course=course, username=self.user.username)
 
-        post_dict = {'reset_deadlines_redirect_url_id_dict': json.dumps({'course_id': str(course.id)})}
+        post_dict = {'course_id': str(course.id)}
         self.client.post(reverse(RESET_COURSE_DEADLINES_NAME), post_dict)
         updated_schedule = Schedule.objects.get(id=student_schedule.id)
         self.assertEqual(updated_schedule.start_date.date(), datetime.datetime.today().date())
         updated_staff_schedule = Schedule.objects.get(id=staff_schedule.id)
         self.assertEqual(updated_staff_schedule.start_date, staff_schedule.start_date)
 
-    @RELATIVE_DATES_FLAG.override(active=True)
+    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_reset_course_deadlines_masquerade_generic_student(self):
         course = self.courses[0]
 
@@ -281,7 +282,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
         self.client.login(username=staff.username, password=TEST_PASSWORD)
         self.update_masquerade(course=course)
 
-        post_dict = {'reset_deadlines_redirect_url_id_dict': json.dumps({'course_id': str(course.id)})}
+        post_dict = {'course_id': str(course.id)}
         self.client.post(reverse(RESET_COURSE_DEADLINES_NAME), post_dict)
         updated_student_schedule = Schedule.objects.get(id=student_schedule.id)
         self.assertEqual(updated_student_schedule.start_date, student_schedule.start_date)

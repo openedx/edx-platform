@@ -10,7 +10,7 @@ from mock import patch
 
 from openedx.core.djangoapps.api_admin.management.commands import create_api_access_request
 from openedx.core.djangoapps.api_admin.models import ApiAccessConfig, ApiAccessRequest
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in lms')

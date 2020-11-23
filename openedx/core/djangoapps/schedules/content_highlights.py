@@ -36,8 +36,7 @@ def course_has_highlights(course_key):
 
         if not highlights_are_available:
             log.warning(
-                u"Course team enabled highlights and provided no highlights in %s",
-                course_key
+                'Course team enabled highlights and provided no highlights in {}'.format(course_key)
             )
 
         return highlights_are_available
@@ -72,44 +71,37 @@ def get_next_section_highlights(user, course_key, start_date, target_date):
     """
     course_descriptor = _get_course_with_highlights(course_key)
     course_module = _get_course_module(course_descriptor, user)
-    sections_with_highlights = _get_sections_with_highlights(course_module)
-    highlights = _get_highlights_for_next_section(
-        course_module,
-        sections_with_highlights,
-        start_date,
-        target_date
-    )
-    return highlights
+    return _get_highlights_for_next_section(course_module, start_date, target_date)
 
 
 def _get_course_with_highlights(course_key):
-    # pylint: disable=missing-docstring
+    """ Gets Course descriptor iff highlights are enabled for the course """
     if not COURSE_UPDATE_WAFFLE_FLAG.is_enabled(course_key):
         raise CourseUpdateDoesNotExist(
-            u"%s Course Update Messages waffle flag is disabled.",
-            course_key,
+            '{} Course Update Messages waffle flag is disabled.'.format(course_key)
         )
 
     course_descriptor = _get_course_descriptor(course_key)
     if not course_descriptor.highlights_enabled_for_messaging:
         raise CourseUpdateDoesNotExist(
-            u"%s Course Update Messages are disabled.",
-            course_key,
+            '{} Course Update Messages are disabled.'.format(course_key)
         )
 
     return course_descriptor
 
 
 def _get_course_descriptor(course_key):
+    """ Gets course descriptor from modulestore """
     course_descriptor = modulestore().get_course(course_key, depth=1)
     if course_descriptor is None:
         raise CourseUpdateDoesNotExist(
-            u"Course {} not found.".format(course_key)
+            'Course {} not found.'.format(course_key)
         )
     return course_descriptor
 
 
 def _get_course_module(course_descriptor, user):
+    """ Gets course module that takes into account user state and permissions """
     # Adding courseware imports here to insulate other apps (e.g. schedules) to
     # avoid import errors.
     from lms.djangoapps.courseware.model_data import FieldDataCache
@@ -133,19 +125,22 @@ def _get_course_module(course_descriptor, user):
 
 
 def _section_has_highlights(section):
+    """ Returns if the section has highlights """
     return section.highlights and not section.hide_from_toc
 
 
 def _get_sections_with_highlights(course_module):
+    """ Returns all sections that have highlights in a course """
     return list(filter(_section_has_highlights, course_module.get_children()))
 
 
 def _get_highlights_for_week(sections, week_num, course_key):
+    """ Gets highlights from the section at week num """
     # assume each provided section maps to a single week
     num_sections = len(sections)
-    if not (1 <= week_num <= num_sections):
+    if not 1 <= week_num <= num_sections:
         raise CourseUpdateDoesNotExist(
-            u"Requested week {} but {} has only {} sections.".format(
+            'Requested week {} but {} has only {} sections.'.format(
                 week_num, course_key, num_sections
             )
         )
@@ -154,23 +149,27 @@ def _get_highlights_for_week(sections, week_num, course_key):
     return section.highlights
 
 
-def _get_highlights_for_next_section(course_module, sections, start_date, target_date):
-    for index, section, weeks_to_complete in spaced_out_sections(course_module):
-        if not _section_has_highlights(section):
-            continue
-
+def _get_highlights_for_next_section(course, start_date, target_date):
+    """ Using the target date, retrieves highlights for the next section. """
+    use_next_sections_highlights = False
+    for index, section, weeks_to_complete in spaced_out_sections(course):
         # We calculate section due date ourselves (rather than grabbing the due attribute),
         # since not every section has a real due date (i.e. not all are graded), but we still
         # want to know when this section should have been completed by the learner.
         section_due_date = start_date + weeks_to_complete
 
-        if section_due_date.date() == target_date and index + 1 < len(sections):
-            # Return index + 2 for "week_num", since weeks start at 1 as opposed to indexes,
-            # and we want the next week, so +1 for index and +1 for next
-            return sections[index + 1].highlights, index + 2
+        if section_due_date.date() == target_date:
+            use_next_sections_highlights = True
+        elif use_next_sections_highlights and not _section_has_highlights(section):
+            raise CourseUpdateDoesNotExist(
+                'Next section [{}] has no highlights for {}'.format(section.display_name, course.id)
+            )
+        elif use_next_sections_highlights:
+            return section.highlights, index + 1
 
-    raise CourseUpdateDoesNotExist(
-        u"No section found ending on {} for {}".format(
-            target_date, course_module.id
+    if use_next_sections_highlights:
+        raise CourseUpdateDoesNotExist(
+            'Last section was reached. There are no more highlights for {}'.format(course.id)
         )
-    )
+
+    return None, None

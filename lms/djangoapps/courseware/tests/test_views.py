@@ -11,17 +11,10 @@ import unittest
 from datetime import datetime, timedelta
 from uuid import uuid4
 
+import ddt
 import six
-from markupsafe import escape
-from mock import MagicMock, PropertyMock, call, create_autospec, patch
-from pytz import UTC, utc
-from six import text_type
-from six.moves import range
-from six.moves.urllib.parse import quote, urlencode
-
 from completion.test_utils import CompletionWaffleTestMixin
 from crum import set_current_request
-import ddt
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404, HttpResponseBadRequest
@@ -29,18 +22,25 @@ from django.test import RequestFactory, TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import reverse, reverse_lazy
-from freezegun import freeze_time
+from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
+from markupsafe import escape
 from milestones.tests.utils import MilestonesTestCaseMixin
+from mock import MagicMock, PropertyMock, call, create_autospec, patch
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from pytz import UTC, utc
+from six import text_type
+from six.moves import range
+from six.moves.urllib.parse import quote, urlencode
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, String
-import lms.djangoapps.courseware.views.views as views
 
+import lms.djangoapps.courseware.views.views as views
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from freezegun import freeze_time
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -63,8 +63,9 @@ from lms.djangoapps.courseware.toggles import (
 from lms.djangoapps.courseware.url_helpers import get_microfrontend_url, get_redirect_url
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.courseware.views.index import show_courseware_mfe_link
+from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
-from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
+from lms.djangoapps.grades.config.waffle import waffle_switch as grades_waffle_switch
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
@@ -73,7 +74,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
-from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.url_utils import quote_slashes
@@ -81,18 +82,18 @@ from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
-    COURSE_OUTLINE_PAGE_FLAG,
-    RELATIVE_DATES_FLAG,
-    UNIFIED_COURSE_TAB_FLAG
+    DISABLE_COURSE_OUTLINE_PAGE_FLAG,
+    DISABLE_UNIFIED_COURSE_TAB_FLAG,
+    RELATIVE_DATES_FLAG
 )
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
-from student.models import CourseEnrollment
-from student.roles import CourseStaffRole
-from student.tests.factories import TEST_PASSWORD, AdminFactory, CourseEnrollmentFactory, UserFactory
-from util.tests.test_date_utils import fake_pgettext, fake_ugettext
-from util.url import reload_django_url_config
-from util.views import ensure_valid_course_key
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import TEST_PASSWORD, AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.tests.test_date_utils import fake_pgettext, fake_ugettext
+from common.djangoapps.util.url import reload_django_url_config
+from common.djangoapps.util.views import ensure_valid_course_key
 from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.graders import ShowCorrectness
 from xmodule.modulestore import ModuleStoreEnum
@@ -268,8 +269,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 170),
-        (ModuleStoreEnum.Type.split, 4, 166),
+        (ModuleStoreEnum.Type.mongo, 10, 171),
+        (ModuleStoreEnum.Type.split, 4, 167),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
@@ -903,11 +904,9 @@ class ViewsTestCase(BaseViewsTestCase):
             response = self.client.get(url)
             self.assertRedirects(response, reverse('signin_user') + '?next=' + url)
 
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
+    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_bypass_course_info(self):
         course_id = six.text_type(self.course_key)
-
-        self.assertFalse(self.course.bypass_home)
 
         response = self.client.get(reverse('info', args=[course_id]))
         self.assertEqual(response.status_code, 200)
@@ -915,19 +914,11 @@ class ViewsTestCase(BaseViewsTestCase):
         response = self.client.get(reverse('info', args=[course_id]), HTTP_REFERER=reverse('dashboard'))
         self.assertEqual(response.status_code, 200)
 
-        self.course.bypass_home = True
-        self.store.update_item(self.course, self.user.id)
-        self.assertTrue(self.course.bypass_home)
-
-        response = self.client.get(reverse('info', args=[course_id]), HTTP_REFERER=reverse('dashboard'))
-
-        self.assertRedirects(response, reverse('courseware', args=[course_id]), fetch_redirect_response=False)
-
         response = self.client.get(reverse('info', args=[course_id]), HTTP_REFERER='foo')
         self.assertEqual(response.status_code, 200)
 
     # TODO: TNL-6387: Remove test
-    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
+    @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
     def test_accordion(self):
         """
         This needs a response_context, which is not included in the render_accordion's main method
@@ -1093,27 +1084,27 @@ class TestAccordionDueDate(BaseDueDateTests):
         )
 
     # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
+    @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
     def test_backwards_compatibility(self):
         super(TestAccordionDueDate, self).test_backwards_compatibility()
 
     # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
+    @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
     def test_defaults(self):
         super(TestAccordionDueDate, self).test_defaults()
 
     # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
+    @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
     def test_format_date(self):
         super(TestAccordionDueDate, self).test_format_date()
 
     # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
+    @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
     def test_format_invalid(self):
         super(TestAccordionDueDate, self).test_format_invalid()
 
     # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
+    @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
     def test_format_none(self):
         super(TestAccordionDueDate, self).test_format_none()
 
@@ -1143,10 +1134,10 @@ class StartDateTests(ModuleStoreTestCase):
         """
         return self.client.get(reverse('about_course', args=[six.text_type(course_key)]))
 
-    @patch('util.date_utils.pgettext', fake_pgettext(translations={
+    @patch('common.djangoapps.util.date_utils.pgettext', fake_pgettext(translations={
         ("abbreviated month name", "Sep"): "SEPTEMBER",
     }))
-    @patch('util.date_utils.ugettext', fake_ugettext(translations={
+    @patch('common.djangoapps.util.date_utils.ugettext', fake_ugettext(translations={
         "SHORT_DATE_FORMAT": "%Y-%b-%d",
     }))
     def test_format_localized_in_studio_course(self):
@@ -1434,8 +1425,8 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        (True, 52),
-        (False, 51),
+        (True, 53),
+        (False, 52),
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
@@ -1448,14 +1439,14 @@ class ProgressPageTests(ProgressPageBaseTests):
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 60, 41),
-        (True, 51, 36)
+        (False, 61, 42),
+        (True, 52, 37)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.setup_course()
-        with grades_waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=enable_waffle):
+        with override_waffle_switch(grades_waffle_switch(ASSUME_ZERO_GRADE_IF_ABSENT), active=enable_waffle):
             with self.assertNumQueries(
                 initial, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST
             ), check_mongo_calls(1):
@@ -1707,7 +1698,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         )
         # Invalidate user certificate
         generated_certificate.invalidate()
-        response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
+        response = views.get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
         self.assertEqual(response.cert_status, 'invalidated')
         self.assertEqual(response.title, 'Your certificate has been invalidated')
 
@@ -1720,7 +1711,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.generate_certificate(
             "http://www.example.com/certificate.pdf", "honor"
         )
-        response = views._get_cert_data(
+        response = views.get_cert_data(
             self.user, self.course, CourseMode.HONOR, MagicMock(passed=True)
         )
 
@@ -1736,7 +1727,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         )
         with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
                    return_value=self.mock_certificate_downloadable_status(is_generating=True)):
-            response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
+            response = views.get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 
         self.assertEqual(response.cert_status, 'generating')
         self.assertEqual(response.title, "We're working on it...")
@@ -1750,7 +1741,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         )
         with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
                    return_value=self.mock_certificate_downloadable_status(is_unverified=True)):
-            response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
+            response = views.get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 
         self.assertEqual(response.cert_status, 'unverified')
         self.assertEqual(response.title, "Certificate unavailable")
@@ -1764,10 +1755,24 @@ class ProgressPageTests(ProgressPageBaseTests):
         )
         with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
                    return_value=self.mock_certificate_downloadable_status()):
-            response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
+            response = views.get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 
         self.assertEqual(response.cert_status, 'requesting')
         self.assertEqual(response.title, "Congratulations, you qualified for a certificate!")
+
+    def test_earned_but_not_available_get_cert_data(self):
+        """
+        Verify that earned but not available cert data is returned if cert has been earned, but isn't available.
+        """
+        self.generate_certificate(
+            "http://www.example.com/certificate.pdf", "verified"
+        )
+        with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
+                   return_value=self.mock_certificate_downloadable_status(earned_but_not_available=True)):
+            response = views.get_cert_data(self.user, self.course, CourseMode.VERIFIED, MagicMock(passed=True))
+
+        self.assertEqual(response.cert_status, 'earned_but_not_available')
+        self.assertEqual(response.title, "Your certificate will be available soon!")
 
     def assert_invalidate_certificate(self, certificate):
         """ Dry method to mark certificate as invalid. And assert the response. """
@@ -1800,7 +1805,8 @@ class ProgressPageTests(ProgressPageBaseTests):
         return generated_certificate
 
     def mock_certificate_downloadable_status(
-            self, is_downloadable=False, is_generating=False, is_unverified=False, uuid=None, download_url=None
+            self, is_downloadable=False, is_generating=False, is_unverified=False, uuid=None, download_url=None,
+            earned_but_not_available=None,
     ):
         """Dry method to mock certificate downloadable status response."""
         return {
@@ -1809,6 +1815,7 @@ class ProgressPageTests(ProgressPageBaseTests):
             'is_unverified': is_unverified,
             'download_url': uuid,
             'uuid': download_url,
+            'earned_but_not_available': earned_but_not_available,
         }
 
 
@@ -3129,9 +3136,9 @@ class DatesTabTestCase(ModuleStoreTestCase):
         response = self._get_response(self.course)
         self.assertEqual(response.status_code, 200)
 
-    @RELATIVE_DATES_FLAG.override(active=True)
-    @patch('edx_django_utils.monitoring.set_custom_metric')
-    def test_defaults(self, mock_set_custom_metric):
+    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
+    @patch('edx_django_utils.monitoring.set_custom_attribute')
+    def test_defaults(self, mock_set_custom_attribute):
         enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.VERIFIED)
         now = datetime.now(utc)
         with self.store.bulk_operations(self.course.id):
@@ -3146,7 +3153,7 @@ class DatesTabTestCase(ModuleStoreTestCase):
                 format='Homework',
             )
             vertical = ItemFactory.create(category='vertical', parent_location=subsection.location)
-            ItemFactory.create(category='problem', parent_location=vertical.location)
+            ItemFactory.create(category='problem', parent_location=vertical.location, has_score=True)
 
         with patch('lms.djangoapps.courseware.views.views.get_enrollment') as mock_get_enrollment:
             mock_get_enrollment.return_value = {
@@ -3179,7 +3186,7 @@ class DatesTabTestCase(ModuleStoreTestCase):
 
             response = self._get_response(self.course)
 
-            mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
+            mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=True)
             self.assertContains(response, subsection.display_name)
             # Don't show the Verification Deadline for audit
             self.assertNotContains(response, 'Verification Deadline')
@@ -3190,7 +3197,7 @@ class DatesTabTestCase(ModuleStoreTestCase):
             # Make sure the assignment type is rendered
             self.assertContains(response, 'Homework:')
 
-    @RELATIVE_DATES_FLAG.override(active=True)
+    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_reset_deadlines_banner_displays(self):
         CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.VERIFIED)
         now = datetime.now(utc)
@@ -3205,7 +3212,7 @@ class DatesTabTestCase(ModuleStoreTestCase):
                 graded=True,
             )
         response = self._get_response(self.course)
-        self.assertContains(response, 'div class="dates-banner-text"')
+        self.assertContains(response, 'div class="banner-cta-text"')
 
 
 class TestShowCoursewareMFE(TestCase):
@@ -3244,7 +3251,7 @@ class TestShowCoursewareMFE(TestCase):
         )
         for user, course_key, is_course_staff, preview_active, redirect_active in combos:
             with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, preview_active):
-                with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=redirect_active):
+                with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=redirect_active):
                     assert show_courseware_mfe_link(user, is_course_staff, course_key) is False
 
     @patch.dict(settings.FEATURES, {'ENABLE_COURSEWARE_MICROFRONTEND': True})
@@ -3264,14 +3271,14 @@ class TestShowCoursewareMFE(TestCase):
         )
         for user, is_course_staff, preview_active, redirect_active in old_mongo_combos:
             with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, preview_active):
-                with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=redirect_active):
+                with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=redirect_active):
                     assert show_courseware_mfe_link(user, is_course_staff, old_course_key) is False
 
         # We've checked all old-style course keys now, so we can test only the
         # new ones going forward. Now we check combinations of waffle flags and
         # user permissions...
         with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, True):
-            with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=True):
+            with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
                 # (preview=on, redirect=on)
                 # Global and Course Staff can see the link.
                 self.assertTrue(show_courseware_mfe_link(global_staff_user, True, new_course_key))
@@ -3280,7 +3287,7 @@ class TestShowCoursewareMFE(TestCase):
 
                 # Regular users don't see the link.
                 self.assertFalse(show_courseware_mfe_link(regular_user, False, new_course_key))
-            with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=False):
+            with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=False):
                 # (preview=on, redirect=off)
                 # Global and Course Staff can see the link.
                 self.assertTrue(show_courseware_mfe_link(global_staff_user, True, new_course_key))
@@ -3291,7 +3298,7 @@ class TestShowCoursewareMFE(TestCase):
                 self.assertFalse(show_courseware_mfe_link(regular_user, False, new_course_key))
 
         with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, False):
-            with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=True):
+            with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
                 # (preview=off, redirect=on)
                 # Global staff see the link anyway
                 self.assertTrue(show_courseware_mfe_link(global_staff_user, True, new_course_key))
@@ -3303,7 +3310,7 @@ class TestShowCoursewareMFE(TestCase):
 
                 # Regular users don't see the link.
                 self.assertFalse(show_courseware_mfe_link(regular_user, False, new_course_key))
-            with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=False):
+            with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=False):
                 # (preview=off, redirect=off)
                 # Global staff see the link anyway
                 self.assertTrue(show_courseware_mfe_link(global_staff_user, True, new_course_key))
@@ -3362,7 +3369,7 @@ class MFERedirectTests(BaseViewsTestCase):
         # learners will be redirected when the waffle flag is set
         lms_url, mfe_url = self._get_urls()
 
-        with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=True):
+        with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
             assert self.client.get(lms_url).url == mfe_url
 
     def test_staff_no_redirect(self):
@@ -3374,14 +3381,14 @@ class MFERedirectTests(BaseViewsTestCase):
         self.client.login(username=course_staff.username, password='test')
 
         assert self.client.get(lms_url).status_code == 200
-        with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=True):
+        with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
             assert self.client.get(lms_url).status_code == 200
 
         # global staff will never be redirected
         self._create_global_staff_user()
         assert self.client.get(lms_url).status_code == 200
 
-        with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=True):
+        with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
             assert self.client.get(lms_url).status_code == 200
 
     def test_exam_no_redirect(self):
@@ -3391,5 +3398,5 @@ class MFERedirectTests(BaseViewsTestCase):
 
         lms_url, mfe_url = self._get_urls()
 
-        with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=True):
+        with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
             assert self.client.get(lms_url).status_code == 200

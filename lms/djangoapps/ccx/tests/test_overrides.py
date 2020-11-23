@@ -20,14 +20,14 @@ from lms.djangoapps.ccx.overrides import override_field_for_ccx
 from lms.djangoapps.ccx.tests.utils import flatten, iter_blocks
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.courseware.tests.test_field_overrides import inject_field_overrides
-from student.tests.factories import AdminFactory
+from common.djangoapps.student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @override_settings(
     XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
-    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['ccx.overrides.CustomCoursesForEdxOverrideProvider'],
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider'],
 )
 class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
     """
@@ -71,7 +71,7 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
             coach=AdminFactory.create())
         ccx.save()
 
-        patch = mock.patch('ccx.overrides.get_current_ccx')
+        patch = mock.patch('lms.djangoapps.ccx.overrides.get_current_ccx')
         self.get_ccx = get_ccx = patch.start()
         get_ccx.return_value = ccx
         self.addCleanup(patch.stop)

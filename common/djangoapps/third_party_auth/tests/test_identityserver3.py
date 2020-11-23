@@ -4,11 +4,12 @@ Unit tests for the IdentityServer3 OAuth2 Backend
 import json
 import ddt
 import unittest
-from third_party_auth.identityserver3 import IdentityServer3
-from third_party_auth.tests import testutil
+from common.djangoapps.third_party_auth.identityserver3 import IdentityServer3
+from common.djangoapps.third_party_auth.tests import testutil
+from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
 
 
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
+@skip_unless_thirdpartyauth()
 @ddt.ddt
 class IdentityServer3Test(testutil.TestCase):
     """

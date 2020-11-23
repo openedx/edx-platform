@@ -18,7 +18,7 @@ from lms.djangoapps.courseware.courses import get_course_overview_with_access
 from lms.djangoapps.courseware.views.views import CourseTabView
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience import default_course_url_name
-from util.views import ensure_valid_course_key
+from common.djangoapps.util.views import ensure_valid_course_key
 
 
 class CourseSearchView(CourseTabView):
@@ -40,18 +40,11 @@ class CourseSearchView(CourseTabView):
         home_fragment_view = CourseSearchFragmentView()
         return home_fragment_view.render_to_fragment(request, course_id=course_id, **kwargs)
 
-    def uses_bootstrap(self, request, course, tab):
-        """
-        Always render this tab with bootstrap
-        """
-        return True
-
 
 class CourseSearchFragmentView(EdxFragmentView):
     """
     A fragment to render the home page for a course.
     """
-    _uses_pattern_library = False
 
     def render_to_fragment(self, request, course_id=None, **kwargs):
         """

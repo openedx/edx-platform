@@ -16,17 +16,17 @@ from rest_framework import permissions, status, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 
-from course_modes.models import CourseMode
-from entitlements.rest_api.v1.filters import CourseEntitlementFilter
-from entitlements.rest_api.v1.permissions import IsAdminOrSupportOrAuthenticatedReadOnly
-from entitlements.rest_api.v1.serializers import CourseEntitlementSerializer
-from entitlements.models import CourseEntitlement, CourseEntitlementPolicy, CourseEntitlementSupportDetail
-from entitlements.utils import is_course_run_entitlement_fulfillable
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.entitlements.rest_api.v1.filters import CourseEntitlementFilter
+from common.djangoapps.entitlements.rest_api.v1.permissions import IsAdminOrSupportOrAuthenticatedReadOnly
+from common.djangoapps.entitlements.rest_api.v1.serializers import CourseEntitlementSerializer
+from common.djangoapps.entitlements.models import CourseEntitlement, CourseEntitlementPolicy, CourseEntitlementSupportDetail
+from common.djangoapps.entitlements.utils import is_course_run_entitlement_fulfillable
 from openedx.core.djangoapps.catalog.utils import get_course_runs_for_course, get_owners_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
-from student.models import AlreadyEnrolledError, CourseEnrollment, CourseEnrollmentException
+from common.djangoapps.student.models import AlreadyEnrolledError, CourseEnrollment, CourseEnrollmentException
 
 log = logging.getLogger(__name__)
 
@@ -337,17 +337,20 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
         Returns a response object is there is an error or exception, None otherwise
         """
         try:
+            unexpired_paid_modes = [mode.slug for mode in CourseMode.paid_modes_for_course(course_run_key)]
+            can_upgrade = unexpired_paid_modes and entitlement.mode in unexpired_paid_modes
             enrollment = CourseEnrollment.enroll(
                 user=user,
                 course_key=course_run_key,
                 mode=entitlement.mode,
-                check_access=True
+                check_access=True,
+                can_upgrade=can_upgrade
             )
         except AlreadyEnrolledError:
             enrollment = CourseEnrollment.get_enrollment(user, course_run_key)
             if enrollment.mode == entitlement.mode:
                 entitlement.set_enrollment(enrollment)
-            elif enrollment.mode not in [mode.slug for mode in CourseMode.paid_modes_for_course(course_run_key)]:
+            elif enrollment.mode not in unexpired_paid_modes:
                 enrollment.update_enrollment(mode=entitlement.mode)
                 entitlement.set_enrollment(enrollment)
             # Else the User is already enrolled in another paid Mode and we should

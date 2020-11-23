@@ -13,13 +13,16 @@ import six
 from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from mock import patch
 from pytz import UTC
 from xblock.runtime import DictKeyValueStore
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from lms.djangoapps.courseware.masquerade import (
-    CourseMasquerade, MasqueradingKeyValueStore, get_masquerading_user_group,
+    CourseMasquerade,
+    MasqueradingKeyValueStore,
+    get_masquerading_user_group
 )
 from lms.djangoapps.courseware.tests.factories import StaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase, MasqueradeMixin, masquerade_as_group_member
@@ -27,10 +30,9 @@ from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubm
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -150,11 +152,11 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
 
     def verify_show_answer_present(self, show_answer_expected):
         """
-        Verifies that "Show Answer" is only present when expected (for staff only).
+        Verifies that "Show answer" is only present when expected (for staff only).
         """
         problem_html = json.loads(self.get_problem().content.decode('utf-8'))['html']
         self.assertIn(self.problem_display_name, problem_html)
-        self.assertEqual(show_answer_expected, "Show Answer" in problem_html)
+        self.assertEqual(show_answer_expected, "Show answer" in problem_html)
 
     def ensure_masquerade_as_group_member(self, partition_id, group_id):
         """
@@ -299,7 +301,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
             self.client.cookies[settings.LANGUAGE_COOKIE].value, expected_language_code
         )
 
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
+    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_masquerade_as_specific_user_on_self_paced(self):
         """
@@ -390,7 +392,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         self.get_courseware_page()
         self.assertExpectedLanguageInPreference(self.test_user, english_language_code)
 
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
+    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_masquerade_as_specific_student_course_info(self):
         """

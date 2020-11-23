@@ -59,7 +59,7 @@
         <% } %>
         <div class="post-header-content">
             <h<%- startHeader %> class="post-title"><%- title %></h<%- startHeader%>>
-            <p class="posted-details">
+            <p data-hj-suppress class="posted-details">
             <%
             var timeAgoHtml = interpolate(
                 '<span class="timeago" title="%(created_at)s">%(created_at)s</span>',
@@ -174,7 +174,7 @@
 </script>
 <script aria-hidden="true" type="text/template" id="thread-response-show-template">
 <header class="response-header">
-  <div class="response-header-content">
+  <div data-hj-suppress class="response-header-content">
     <%= HtmlUtils.HTML(author_display) %>
     <p class="posted-details">
         <span class="timeago" title="<%= HtmlUtils.HTML(created_at) %>"><%= HtmlUtils.HTML(created_at) %></span>
@@ -261,7 +261,7 @@
           }
       )
   %>
-  <p class="posted-details">
+  <p data-hj-suppress class="posted-details">
     <%
     var time_ago = interpolate(
       '<span class="timeago" title="%(time)s">%(time)s</span>',

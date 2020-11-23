@@ -19,7 +19,7 @@ from django.utils.translation import ugettext_lazy
 from lazy import lazy
 from pytz import utc
 
-from course_modes.models import CourseMode, get_cosmetic_verified_display_price
+from common.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from lms.djangoapps.certificates.api import get_active_web_certificate
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link, can_show_verified_upgrade
 from lms.djangoapps.verify_student.models import VerificationDeadline
@@ -28,9 +28,8 @@ from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.certificates.api import can_show_certificate_available_date_field
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
-from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import RELATIVE_DATES_FLAG, UPGRADE_DEADLINE_MESSAGE, CourseHomeMessages
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 
 from .context_processor import user_timezone_locale_prefs
 
@@ -76,6 +75,11 @@ class DateSummary(object):
     def description(self):
         """The detail text displayed by this summary."""
         return ''
+
+    @property
+    def extra_info(self):
+        """Extra detail to display as a tooltip."""
+        return None
 
     def register_alerts(self, request, course):
         """
@@ -388,6 +392,7 @@ class CourseAssignmentDate(DateSummary):
         self.contains_gated_content = False
         self.complete = None
         self.past_due = None
+        self._extra_info = None
 
     @property
     def date(self):
@@ -404,6 +409,10 @@ class CourseAssignmentDate(DateSummary):
     @property
     def link(self):
         return self.assignment_link
+
+    @property
+    def extra_info(self):
+        return self._extra_info
 
     @link.setter
     def link(self, link):
@@ -434,8 +443,6 @@ class CourseExpiredDate(DateSummary):
 
     @property
     def date(self):
-        if not CourseDurationLimitConfig.enabled_for_enrollment(self.user, self.course):
-            return
         return get_user_course_expiration_date(self.user, self.course)
 
     @property
@@ -612,7 +619,7 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
                     platform_name=settings.PLATFORM_NAME,
                     button_panel=HTML(
                         '<div class="message-actions">'
-                        '<a class="btn btn-upgrade"'
+                        '<a id="certificate_upsell" class="btn btn-upgrade"'
                         'data-creative="original_message" data-position="course_message"'
                         'href="{upgrade_url}">{upgrade_label}</a>'
                         '</div>'

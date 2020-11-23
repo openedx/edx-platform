@@ -57,7 +57,7 @@
 #
 # Translators:
 # Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018-2020
-# Anatoli F. Peña Castillo <djanatoli@gmail.com>, 2016
+# Anatoli Pena <djanatoli@gmail.com>, 2016
 # Andres Garcia <afgarcia0479@misena.edu.co>, 2019
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Cristian Guerra <cristian.guerra.maya@gmail.com>, 2016
@@ -106,7 +106,7 @@
 # Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018-2020
 # Lohenrex <lohenrex.ragnarok@gmail.com>, 2018
 # Alex Dzul <alexexc2@gmail.com>, 2016
-# Anatoli F. Peña Castillo <djanatoli@gmail.com>, 2016
+# Anatoli Pena <djanatoli@gmail.com>, 2016
 # Andres Garcia <afgarcia0479@misena.edu.co>, 2019
 # AngelesAlvarez, 2020
 # Claudio Anibal Barahona Flores <claudio.barahona@unah.edu.hn>, 2015
@@ -144,7 +144,7 @@
 #
 # Translators:
 # Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018-2020
-# Anatoli F. Peña Castillo <djanatoli@gmail.com>, 2016
+# Anatoli Pena <djanatoli@gmail.com>, 2016
 # Andres Garcia <afgarcia0479@misena.edu.co>, 2019
 # Morphyne <cirrosis60@gmail.com>, 2014
 # Cristian Guerra <cristian.guerra.maya@gmail.com>, 2016
@@ -168,9 +168,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-07-05 20:42+0000\n"
-"PO-Revision-Date: 2020-06-14 20:45+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2020-11-15 20:43+0000\n"
+"PO-Revision-Date: 2020-10-04 20:44+0000\n"
+"Last-Translator: Juan Camilo Montoya Franco <juan.montoya@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
@@ -178,6 +178,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.8.0\n"
+
+#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
+#: cms/static/js/views/video_transcripts.js
+#: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
+msgid ""
+"This may be happening because of an error with our server or your internet "
+"connection. Try refreshing the page or making sure you are online."
+msgstr ""
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -188,8 +196,9 @@ msgstr ""
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
 #: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/tabs.js
-#: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
-#: lms/static/js/views/fields.js
+#: cms/static/js/views/utils/xblock_utils.js
+#: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
+#: lms/static/js/ccx/schedule.js lms/static/js/views/fields.js
 msgid "Saving"
 msgstr "Guardando"
 
@@ -263,6 +272,7 @@ msgstr "Subiendo"
 #: cms/static/js/views/modals/edit_xblock.js
 #: cms/static/js/views/video_transcripts.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: lms/static/js/demographics_collection/Wizard.jsx
 #: lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
 #: common/static/common/templates/discussion/templates.underscore
@@ -401,8 +411,8 @@ msgstr "Advertencia"
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 #: common/static/common/js/discussion/views/response_comment_view.js
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
 #: lms/static/js/student_account/views/FinishAuthView.js
-#: lms/static/js/verify_student/views/payment_confirmation_step_view.js
 #: lms/static/js/verify_student/views/step_view.js
 #: lms/static/js/views/fields.js
 msgid "Error"
@@ -412,6 +422,18 @@ msgstr "Error"
 #: common/lib/xmodule/xmodule/js/public/js/library_content_edit.js
 msgid "Updating with latest library content"
 msgstr "Actualizando con el más reciente contenido de la librería"
+
+#: common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
+msgid "Loading..."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
+msgid "Selected blocks"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
+msgid "Unable to update settings"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/assets/split_test/public/js/split_test_author_view.js
 #: common/lib/xmodule/xmodule/js/public/js/split_test_author_view.js
@@ -882,13 +904,9 @@ msgstr "Borrar fila"
 msgid "Delete table"
 msgstr "Borrar tabla"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/certificate-editor.underscore
-#: cms/templates/js/group-configuration-editor.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Description"
 msgstr "Descripción"
 
@@ -1335,6 +1353,7 @@ msgstr "Nueva ventana"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: lms/static/js/demographics_collection/Wizard.jsx
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/templates.underscore
@@ -1750,7 +1769,6 @@ msgstr "Espacio vertical"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
-#: openedx/features/course_search/static/course_search/templates/course_search_item.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_item.underscore
 msgid "View"
 msgstr "Ver"
@@ -2512,6 +2530,38 @@ msgstr[1] "%d años"
 msgid "Select a section or problem"
 msgstr "Seleccione una sección o problema"
 
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/Main/Main.jsx
+msgid "Create a report of problem responses"
+msgstr ""
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
+msgid "Your report is being generated..."
+msgstr ""
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
+msgid "Your report has been successfully generated."
+msgstr ""
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
+msgid "View Report"
+msgstr ""
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
+msgid "There was an error generating the report link."
+msgstr ""
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
+msgid "There was an error generating your report."
+msgstr ""
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
+msgid "Unable to get report generation status."
+msgstr ""
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
+msgid "Unable to submit request to generate report."
+msgstr ""
+
 #: lms/djangoapps/support/static/support/js/views/certificates.js
 msgid "An unexpected error occurred.  Please try again."
 msgstr "Se produjo un error inesperado. Por favor, inténtalo nuevamente."
@@ -3018,10 +3068,6 @@ msgid "Team Search"
 msgstr "Búsqueda de equipos"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Showing results for \"{searchString}\""
-msgstr "Mostrando resultados para \"{searchString}\""
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Create a New Team"
 msgstr "Crear un nuevo equipo"
 
@@ -3057,6 +3103,10 @@ msgid ""
 msgstr ""
 "Puede remover miembros de este equipo, especialmente si no han participado "
 "en la actividad del equipo."
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Showing results for \"{searchString}\""
+msgstr "Mostrando resultados para \"{searchString}\""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Search teams"
@@ -3576,6 +3626,90 @@ msgstr ""
 "No se ha podido determinar si debemos darle un reembolso debido a un error "
 "del sistema. Por favor, inténtelo de nuevo más tarde."
 
+#: lms/static/js/demographics_collection/DemographicsCollectionBanner.jsx
+msgid "Want to make edX better for everyone?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionBanner.jsx
+msgid "Get started"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Help make edX better for everyone!"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Why does edX collect this information?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid ""
+"An error occurred while attempting to retrieve or save the information "
+"below. Please try again later."
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid ""
+"What was the total combined income, during the last 12 months, of all "
+"members of your family? "
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid ""
+"Have you ever served on active duty in the U.S. Armed Forces, Reserves, or "
+"National Guard?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "What is the highest level of education that you have achieved so far?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid ""
+"What is the highest level of education that any of your parents or guardians"
+" have achieved?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Select employment status"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "What industry do you currently work in?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "What industry do you want to work in?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/MultiselectDropdown.jsx
+msgid "Clear all"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "demographics questionnaire"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "close questionnaire"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "finish later"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "Return to my dashboard"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "Finish later"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "next page"
+msgstr ""
+
 #: lms/static/js/discovery/views/search_form.js
 #, javascript-format
 msgid "Viewing %s course"
@@ -3717,7 +3851,6 @@ msgstr ""
 "nuevamente."
 
 #: lms/static/js/edxnotes/views/tabs/search_results.js
-#: openedx/features/course_search/static/course_search/templates/course_search_results.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
 msgid "Search Results"
 msgstr "Resultados de búsqueda"
@@ -3956,25 +4089,30 @@ msgid "Error while regenerating certificates. Please try again."
 msgstr "Error al regenerar los certificados. Por favor inténtalo nuevamente."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Loading data..."
 msgstr "Cargando datos..."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error getting issued certificates list."
 msgstr "Error al obtener la lista de certificados emitidos."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating proctored exam results. Please try again."
 msgstr ""
 "Error al generar el reporte de resultados de examenes supervisados. Por "
 "favor intenta nuevamente."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating survey results. Please try again."
 msgstr ""
 "Error generando los resultados de encuesta. Por favor intenta nuevamente."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating student profile information. Please try again."
 msgstr ""
 "Error al generar la información de perfil de estudiante. Por favor inténtalo"
@@ -3992,6 +4130,7 @@ msgid "Error getting student list."
 msgstr "Error al obtener la lista de estudiantes."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating list of students who may enroll. Please try again."
 msgstr ""
 "Error al generar la lista de estudiantes que pueden inscribirse al curso. "
@@ -4002,15 +4141,18 @@ msgid "Error retrieving grading configuration."
 msgstr "Error al obtener la configuración de calificaciones."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating grades. Please try again."
 msgstr "Error al generar las calificaciones. Por favor inténtalo nuevamente."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating problem grade report. Please try again."
 msgstr ""
 "Error al generar el reporte de calificaciones. Por favor intenta nuevamente."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating ORA data report. Please try again."
 msgstr ""
 "Error al generar el reporte de datos de ORA. Por favor, intenta nuevamente."
@@ -5102,6 +5244,15 @@ msgstr ""
 "Internet."
 
 #: lms/static/js/student_account/views/LoginView.js
+msgid ""
+"In order to sign in, you need to activate your "
+"account.{line_break}{line_break}We just sent an activation link to "
+"{strong_start} {email} {strong_end}. If  you do not receive an email, check "
+"your spam folders or  {anchorStart}contact {platform_name} "
+"Support{anchorEnd}."
+msgstr ""
+
+#: lms/static/js/student_account/views/LoginView.js
 msgid "An unexpected error has occurred."
 msgstr "Ha ocurrido un error inesperado."
 
@@ -5293,12 +5444,14 @@ msgstr ""
 " en su perfil de edX"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid " Link"
-msgstr "Enlace"
+msgid "{platform_display_name} Link"
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Enter your "
-msgstr "Ingrese su"
+msgid ""
+"Enter your {platform_display_name} username or the URL to your "
+"{platform_display_name} page. Delete the URL to remove the link."
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_account/views/account_settings_view.js
@@ -5475,10 +5628,6 @@ msgstr "Ocurrió un error. Por favor intenta nuevamente."
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Could not submit order"
 msgstr "No se pudo publicar tu petición"
-
-#: lms/static/js/verify_student/views/payment_confirmation_step_view.js
-msgid "Could not retrieve payment information"
-msgstr "No se pudo conseguir la información del pago"
 
 #: lms/static/js/verify_student/views/reverify_view.js
 msgid "Take a photo of your ID"
@@ -5663,10 +5812,10 @@ msgid "Show Less"
 msgstr "Mostrar menos"
 
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
-msgid "{total_results} result"
-msgid_plural "{total_results} results"
-msgstr[0] "{total_results} resultado"
-msgstr[1] "{total_results} resultados"
+msgid "{total_results} result found for \"{search_term}\""
+msgid_plural "{total_results} results found for \"{search_term}\""
+msgstr[0] ""
+msgstr[1] ""
 
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Profile Visibility:"
@@ -5758,16 +5907,6 @@ msgstr "Logros"
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "Profile"
 msgstr "Perfil"
-
-#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
-#: cms/static/js/views/video_transcripts.js
-msgid ""
-"This may be happening because of an error with our server or your internet "
-"connection. Try refreshing the page or making sure you are online."
-msgstr ""
-"Esto puede estar sucediendo debido a un error con nuestros servidores o con "
-"tu conexión a Internet. Intenta refrescar la página o verifica tu acceso a "
-"Internet."
 
 #: cms/static/cms/js/main.js
 msgid "Studio's having trouble saving your work"
@@ -6287,6 +6426,10 @@ msgstr "Cargar otro archivo"
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Adding"
 msgstr "Añadiendo"
+
+#: cms/static/js/views/container.js
+msgid "{startTag}{requestToken}{endTag}{selector}"
+msgstr ""
 
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
@@ -7327,11 +7470,6 @@ msgstr "Acciones"
 msgid "Unscheduled"
 msgstr "No programado"
 
-#: cms/templates/js/course_info_update.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Date"
-msgstr "Fecha"
-
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/templates.underscore
@@ -8090,6 +8228,18 @@ msgid "Mark Exam As Completed"
 msgstr "Marcar el examen como completado"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Exam timer and end exam button"
+msgstr "Cronometro del examen y botón de finalizar examen"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "End My Exam"
+msgstr "Finalizar mi examen"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Hide Timer"
+msgstr "Ocultar cronómetro"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
 msgid "You are taking \"{exam_link}\" as {exam_type}. "
 msgstr "Estás tomando \"{exam_link}\" como {exam_type}. "
 
@@ -8110,18 +8260,6 @@ msgid ""
 msgstr ""
 "Para recibir crédito por problemas, debe seleccionar \"Enviar\" para cada "
 "problema antes de seleccionar \"Finalizar mi examen\"."
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Exam timer and end exam button"
-msgstr "Cronometro del examen y botón de finalizar examen"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "End My Exam"
-msgstr "Finalizar mi examen"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Hide Timer"
-msgstr "Ocultar cronómetro"
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
@@ -9250,7 +9388,6 @@ msgstr ""
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
 msgid "Next: %(nextStepTitle)s"
 msgstr "Siguiente: %(nextStepTitle)s"
@@ -9409,13 +9546,11 @@ msgstr ""
 "esta página."
 
 #: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Activate Your Account"
 msgstr "Activar su cuenta"
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Photo ID"
 msgstr "Foto ID"
 
@@ -9430,7 +9565,6 @@ msgstr ""
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Webcam"
 msgstr "Cámara web"
 
@@ -9538,7 +9672,6 @@ msgid "Check your email for an activation message."
 msgstr "Revise sus correos electrónicos para un mensaje de activación."
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Total"
 msgstr "Total"
 
@@ -9582,82 +9715,6 @@ msgid ""
 msgstr ""
 "Usará su cámara web para tomar una foto de su cara y de su documento de "
 "identificación oficial con foto."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Thank you! We have received your payment for {courseName}."
-msgstr "¡Gracias! Hemos recibido tu pago para {courseName}."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"Please print this page for your records; it serves as your receipt. You will"
-" also receive an email with the same information."
-msgstr ""
-"Por favor imprima esta página para sus registros; la misma es válida como su"
-" recibo. También recibirá un correo electrónico con la esta información."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Order No."
-msgstr "Orden Num."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Amount"
-msgstr "Cantidad"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Please Note"
-msgstr "Por favor tener en cuenta"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Crossed out items have been refunded."
-msgstr "Los items tachados han tenido devolución"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Billed to"
-msgstr "Facturado a"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "No receipt available"
-msgstr "No hay recibo disponible"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Next Step: Confirm your identity"
-msgstr "Siguiente paso: Confirmación de identidad"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Check your email"
-msgstr "Verificar su correo electrónico"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"You need to activate your account before you can enroll in courses. Check "
-"your inbox for an activation email."
-msgstr ""
-"Necesita activar la cuenta antes de que pueda registrarse para el curso. "
-"Revise su bandeja de entrada que un correo electrónico de activación fue "
-"enviado."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"A driver's license, passport, or government-issued ID with your name and "
-"photo."
-msgstr ""
-"Una licencia de conducir, pasaporte, cédula o otra identificación oficial "
-"con su nombre y foto"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-#, python-format
-msgid ""
-"If you don't verify your identity now, you can still explore your course "
-"from your dashboard. You will receive periodic reminders from "
-"%(platformName)s to verify your identity."
-msgstr ""
-"Si no verifica su identidad ahora, de todas formas podrá explorar el curso "
-"desde su Panel de Control. Recibirá recordatorios periódicos de "
-"%(platformName)s para realizar la verificación de identidad."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Want to confirm your identity later?"
-msgstr "¿Desea confirmar su identidad después?"
 
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Identity Verification In Progress"
@@ -9868,7 +9925,7 @@ msgid ""
 "minimum completion percentage to limit access to this subsection. Allowed "
 "values are 0-100"
 msgstr ""
-"Seleccione una sub-sección con prerequisito e ingrese un porcentaje de "
+"Seleccione una sub-sección con prerrequisito e ingrese un porcentaje de "
 "calificación mínimo y un porcentaje mínimo a ser completado para limitar el "
 "acceso a esta sub-sección. Los valores permitidos son de 0 a 100."
 
@@ -10585,6 +10642,10 @@ msgid ""
 " HTML."
 msgstr ""
 "Hay código invalido en su contenido. Por favor verifique la validez del HTML"
+
+#: cms/templates/js/course_info_update.underscore
+msgid "Date"
+msgstr ""
 
 #: cms/templates/js/course_info_update.underscore
 msgid "Post"

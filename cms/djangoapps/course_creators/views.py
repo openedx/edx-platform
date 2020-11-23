@@ -3,9 +3,9 @@ Methods for interacting programmatically with the user creator table.
 """
 
 
-from course_creators.models import CourseCreator
-from student import auth
-from student.roles import CourseCreatorRole
+from cms.djangoapps.course_creators.models import CourseCreator
+from common.djangoapps.student import auth
+from common.djangoapps.student.roles import CourseCreatorRole
 
 
 def add_user_with_status_unrequested(user):

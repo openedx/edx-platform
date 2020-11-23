@@ -6,7 +6,7 @@ Tests for the Video Branding configuration.
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from branding.models import BrandingInfoConfig
+from lms.djangoapps.branding.models import BrandingInfoConfig
 
 
 class BrandingInfoConfigTest(TestCase):

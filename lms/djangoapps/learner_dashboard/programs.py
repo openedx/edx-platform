@@ -31,7 +31,6 @@ class ProgramsFragmentView(EdxFragmentView):
     """
     A fragment to program listing.
     """
-    _uses_pattern_library = False
 
     def render_to_fragment(self, request, **kwargs):
         """
@@ -66,25 +65,11 @@ class ProgramsFragmentView(EdxFragmentView):
         """
         return _('Programs')
 
-    def css_dependencies(self):
-        """
-        Returns list of CSS files that this view depends on.
-
-        The helper function that it uses to obtain the list of CSS files
-        works in conjunction with the Django pipeline to ensure that in development mode
-        the files are loaded individually, but in production just the single bundle is loaded.
-        """
-        if get_language_bidi():
-            return self.get_css_dependencies('style-learner-dashboard-rtl')
-        else:
-            return self.get_css_dependencies('style-learner-dashboard')
-
 
 class ProgramDetailsFragmentView(EdxFragmentView):
     """
     Render the program details fragment.
     """
-    _uses_pattern_library = False
 
     def render_to_fragment(self, request, program_uuid, **kwargs):
         """View details about a specific program."""
@@ -163,16 +148,3 @@ class ProgramDetailsFragmentView(EdxFragmentView):
         Return page title for the standalone page.
         """
         return _('Program Details')
-
-    def css_dependencies(self):
-        """
-        Returns list of CSS files that this view depends on.
-
-        The helper function that it uses to obtain the list of CSS files
-        works in conjunction with the Django pipeline to ensure that in development mode
-        the files are loaded individually, but in production just the single bundle is loaded.
-        """
-        if get_language_bidi():
-            return self.get_css_dependencies('style-learner-dashboard-rtl')
-        else:
-            return self.get_css_dependencies('style-learner-dashboard')

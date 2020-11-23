@@ -53,7 +53,6 @@ var edx = edx || {};
             subviewConstructors = {
                 'intro-step': edx.verify_student.IntroStepView,
                 'make-payment-step': edx.verify_student.MakePaymentStepView,
-                'payment-confirmation-step': edx.verify_student.PaymentConfirmationStepView,
                 'face-photo-step': edx.verify_student.FacePhotoStepView,
                 'id-photo-step': edx.verify_student.IDPhotoStepView,
                 'review-photos-step': edx.verify_student.ReviewPhotosStepView,
@@ -126,7 +125,10 @@ var edx = edx || {};
             // Get or create the step container
             $stepEl = $('#current-step-container');
             if (!$stepEl.length) {
-                $stepEl = $('<div id="current-step-container"></div>').appendTo(this.el);
+                $stepEl = edx.HtmlUtils.append(
+                  $(this.el),
+                  edx.HtmlUtils.HTML('<div id="current-step-container"></div>').toString()
+                );
             }
 
             // Render the subview

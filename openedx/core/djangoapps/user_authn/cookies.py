@@ -12,7 +12,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.dispatch import Signal
 from django.urls import NoReverseMatch, reverse
-from django.utils.http import http_date
+from django.utils.http import http_date, parse_http_date
 from edx_rest_framework_extensions.auth.jwt import cookies as jwt_cookies
 from edx_rest_framework_extensions.auth.jwt.constants import JWT_DELIMITER
 from oauth2_provider.models import Application
@@ -22,7 +22,8 @@ from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_from_token
 from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
-from student.models import CourseEnrollment
+from common.djangoapps.util.json_request import JsonResponse
+
 
 log = logging.getLogger(__name__)
 
@@ -154,13 +155,26 @@ def set_logged_in_cookies(request, response, user):
     return response
 
 
-def refresh_jwt_cookies(request, response, user):
+def get_response_with_refreshed_jwt_cookies(request, user):
     """
-    Resets the JWT related cookies in the response for the given user.
+    Generates the response and resets the JWT related cookies in the response for the given user.
     """
     cookie_settings = standard_cookie_settings(request)
+    response = JsonResponse({})
     _create_and_set_jwt_cookies(response, request, cookie_settings, user=user)
 
+    current_time = time.time()
+    expires_date = cookie_settings.get('expires', None)
+    expires_epoch = parse_http_date(expires_date) if expires_date else 0
+    response.content = json.dumps(
+        {
+            'success': True,
+            'response_epoch_seconds': current_time,
+            'response_http_date': http_date(current_time),
+            'expires': expires_date if expires_date else 'not-found',
+            'expires_epoch_seconds': expires_epoch,
+        }
+    )
     return response
 
 

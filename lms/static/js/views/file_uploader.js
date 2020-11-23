@@ -38,7 +38,7 @@
                     return optionVal || default_value;
                 },
                 submitButton, resultNotification;
-
+            // xss-lint: disable=javascript-jquery-html
             this.$el.html(this.template({
                 title: get_option_with_default('title', ''),
                 inputLabel: get_option_with_default('inputLabel', ''),

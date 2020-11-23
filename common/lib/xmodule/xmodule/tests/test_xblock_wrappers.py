@@ -31,11 +31,11 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from xmodule.annotatable_module import AnnotatableDescriptor
-from xmodule.conditional_module import ConditionalDescriptor
+from xmodule.conditional_module import ConditionalBlock
 from xmodule.course_module import CourseDescriptor
 from xmodule.html_module import HtmlBlock
 from xmodule.poll_module import PollDescriptor
-from xmodule.randomize_module import RandomizeDescriptor
+from xmodule.randomize_module import RandomizeBlock
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.tests import get_test_descriptor_system, get_test_system
 from xmodule.vertical_block import VerticalBlock
@@ -66,9 +66,9 @@ LEAF_XMODULES = {
 # to a list of sample field values to test with.
 # TODO: Add more types of sample data
 CONTAINER_XMODULES = {
-    ConditionalDescriptor: [{}],
+    ConditionalBlock: [{}],
     CourseDescriptor: [{}],
-    RandomizeDescriptor: [{'display_name': 'Test String Display'}],
+    RandomizeBlock: [{'display_name': 'Test String Display'}],
     SequenceDescriptor: [{'display_name': u'Test Unicode हिंदी Display'}],
     VerticalBlock: [{}],
     WrapperBlock: [{}],

@@ -8,6 +8,7 @@ import logging
 import six
 from celery.task import task
 from django.db import transaction
+from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
 
 from xmodule.modulestore.django import modulestore
@@ -145,6 +146,7 @@ def _update_xblocks_cache(course_key):
 
 
 @task(name=u'openedx.core.djangoapps.bookmarks.tasks.update_xblocks_cache')
+@set_code_owner_attribute
 def update_xblocks_cache(course_id):
     """
     Update the XBlocks cache for a course.

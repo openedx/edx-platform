@@ -10,10 +10,10 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
-from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
+from lms.djangoapps.edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
 from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.djangolib.markup import HTML
-from openedx.features.course_experience import course_home_page_title, COURSE_OUTLINE_PAGE_FLAG
+from openedx.features.course_experience import course_home_page_title, DISABLE_COURSE_OUTLINE_PAGE_FLAG
 %>
 <%
    include_special_exams = (
@@ -177,7 +177,7 @@ ${HTML(fragment.foot_html())}
                 <nav aria-label="${_('Course')}" class="sr-is-focusable" tabindex="-1">
                     <div class="has-breadcrumbs">
                         <div class="breadcrumbs">
-                            % if COURSE_OUTLINE_PAGE_FLAG.is_enabled(course.id):
+                            % if not DISABLE_COURSE_OUTLINE_PAGE_FLAG.is_enabled(course.id):
                                 <span class="nav-item nav-item-course">
                                     <a href="${course_url}">${course_home_page_title(course)}</a>
                                 </span>
@@ -271,3 +271,36 @@ ${HTML(fragment.foot_html())}
       % endif
     </nav>
 % endif
+
+<%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
+
+  var fbeLink = $("#FBE_banner");
+  var welcomeLink = $("#welcome");
+  var accessDeniedUpsellLink = $("#accessDeniedUpsell");
+  var sockLink = $("#sock");
+
+  TrackECommerceEvents.trackUpsellClick(fbeLink, 'in_course_audit_access_expires', {
+      pageName: "in_course",
+      linkType: "link",
+      linkCategory: "FBE_banner"
+  });
+
+  TrackECommerceEvents.trackUpsellClick(welcomeLink, 'in_course_welcome', {
+      pageName: "in_course",
+      linkType: "link",
+      linkCategory: "welcome"
+  });
+
+  TrackECommerceEvents.trackUpsellClick(accessDeniedUpsellLink, 'in_course_upgrade', {
+    pageName: "in_course",
+    linkType: "link",
+    linkCategory: "(none)"
+  });
+
+  TrackECommerceEvents.trackUpsellClick(sockLink, 'in_course_sock', {
+      pageName: "in_course",
+      linkType: "button",
+      linkCategory: "green_upgrade"
+  });
+
+</%static:require_module_async>

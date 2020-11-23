@@ -18,9 +18,9 @@ from django.http import HttpResponse
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, reverse
-from freezegun import freeze_time
+from edx_toggles.toggles.testutils import override_waffle_switch
 from mock import patch
-from six.moves import range
+from common.djangoapps.student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
 
 from openedx.core.djangoapps.password_policy.compliance import (
     NonCompliantPasswordException,
@@ -28,17 +28,16 @@ from openedx.core.djangoapps.password_policy.compliance import (
 )
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH
 from openedx.core.djangoapps.user_authn.cookies import jwt_cookies
+from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
 from openedx.core.djangoapps.user_authn.views.login import (
-    AllowedAuthUser,
     ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY,
+    AllowedAuthUser,
     _check_user_auth_flow
 )
-from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.lib.api.test_utils import ApiTestCase
-from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
-from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
+from common.djangoapps.util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 
 
 @ddt.ddt
@@ -75,38 +74,32 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
 
     def test_login_success(self):
         response, mock_audit_log = self._login_response(
-            self.user_email, self.password, patched_audit_log='student.models.AUDIT_LOG'
+            self.user_email, self.password, patched_audit_log='common.djangoapps.student.models.AUDIT_LOG'
         )
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success', self.user_email])
 
     FEATURES_WITH_LOGIN_MFE_ENABLED = settings.FEATURES.copy()
-    FEATURES_WITH_LOGIN_MFE_ENABLED['ENABLE_LOGIN_MICROFRONTEND'] = True
+    FEATURES_WITH_LOGIN_MFE_ENABLED['ENABLE_LOGISTRATION_MICROFRONTEND'] = True
 
     @ddt.data(
         # Default redirect is dashboard.
         {
             'next_url': None,
             'course_id': None,
-            'expected_redirect': '/dashboard',
+            'expected_redirect': settings.LMS_ROOT_URL + '/dashboard',
         },
-        # A relative path is an acceptable redirect.
+        # Added root url in next .
         {
             'next_url': '/harmless-relative-page',
             'course_id': None,
-            'expected_redirect': '/harmless-relative-page',
-        },
-        # Paths without trailing slashes are also considered relative.
-        {
-            'next_url': 'courses',
-            'course_id': None,
-            'expected_redirect': 'courses',
+            'expected_redirect': settings.LMS_ROOT_URL + '/harmless-relative-page',
         },
         # An absolute URL to a non-whitelisted domain is not an acceptable redirect.
         {
             'next_url': 'https://evil.sketchysite',
             'course_id': None,
-            'expected_redirect': '/dashboard',
+            'expected_redirect': settings.LMS_ROOT_URL + '/dashboard',
         },
         # An absolute URL to a whitelisted domain is acceptable.
         {
@@ -119,7 +112,8 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             'next_url': None,
             'course_id': 'coursekey',
             'expected_redirect': (
-                '/account/finish_auth?course_id=coursekey&next=%2Fdashboard'
+                '{root_url}/account/finish_auth?course_id=coursekey&next=%2Fdashboard'.
+                format(root_url=settings.LMS_ROOT_URL)
             ),
         },
         # If valid course_id AND next_url are provided, redirect to finish_auth with
@@ -128,7 +122,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             'next_url': 'freshpage',
             'course_id': 'coursekey',
             'expected_redirect': (
-                '/account/finish_auth?course_id=coursekey&next=freshpage'
+                settings.LMS_ROOT_URL + '/account/finish_auth?course_id=coursekey&next=freshpage'
             )
         },
         # If course_id is provided with invalid next_url, redirect to finish_auth with
@@ -137,7 +131,8 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             'next_url': 'http://scam.scam',
             'course_id': 'coursekey',
             'expected_redirect': (
-                '/account/finish_auth?course_id=coursekey&next=%2Fdashboard'
+                '{root_url}/account/finish_auth?course_id=coursekey&next=%2Fdashboard'.
+                format(root_url=settings.LMS_ROOT_URL)
             ),
         },
     )
@@ -147,10 +142,12 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
     @skip_unless_lms
     def test_login_success_with_redirect(self, next_url, course_id, expected_redirect):
         post_params = {}
+
         if next_url:
             post_params['next'] = next_url
         if course_id:
             post_params['course_id'] = course_id
+
         response, _ = self._login_response(
             self.user_email,
             self.password,
@@ -163,7 +160,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_success_no_pii(self):
         response, mock_audit_log = self._login_response(
-            self.user_email, self.password, patched_audit_log='student.models.AUDIT_LOG'
+            self.user_email, self.password, patched_audit_log='common.djangoapps.student.models.AUDIT_LOG'
         )
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success'])
@@ -175,7 +172,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         self.user.save()
 
         response, mock_audit_log = self._login_response(
-            unicode_email, self.password, patched_audit_log='student.models.AUDIT_LOG'
+            unicode_email, self.password, patched_audit_log='common.djangoapps.student.models.AUDIT_LOG'
         )
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success', unicode_email])
@@ -229,8 +226,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             self.user_email,
             self.password
         )
-        self._assert_response(response, success=False,
-                              value="In order to sign in, you need to activate your account.")
+        self._assert_response(response, success=False, error_code="inactive-user")
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Account not active for user'])
         self._assert_not_in_audit_log(mock_audit_log, 'warning', [u'test'])
 
@@ -246,7 +242,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             self.user_email,
             self.password,
         )
-        self._assert_response(response, success=False, value=self.ACTIVATE_ACCOUNT_WARNING)
+        self._assert_response(response, success=False, error_code="inactive-user")
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Account not active for user'])
 
     @patch('openedx.core.djangoapps.user_authn.views.login._log_and_raise_inactive_user_auth_error')
@@ -287,7 +283,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         response, _ = self._login_response(self.user_email, self.password)
         self._assert_response(response, success=True)
         logout_url = reverse('logout')
-        with patch('student.models.AUDIT_LOG') as mock_audit_log:
+        with patch('common.djangoapps.student.models.AUDIT_LOG') as mock_audit_log:
             response = self.client.post(logout_url)
         self.assertEqual(response.status_code, 200)
         self._assert_audit_log(mock_audit_log, 'info', [u'Logout', u'test'])
@@ -347,7 +343,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         response, _ = self._login_response(self.user_email, self.password)
         self._assert_response(response, success=True)
         logout_url = reverse('logout')
-        with patch('student.models.AUDIT_LOG') as mock_audit_log:
+        with patch('common.djangoapps.student.models.AUDIT_LOG') as mock_audit_log:
             response = self.client.post(logout_url)
         self.assertEqual(response.status_code, 200)
         self._assert_audit_log(mock_audit_log, 'info', [u'Logout'])
@@ -375,26 +371,6 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         # check to see if this response indicates that this was ratelimited
         response, _audit_log = self._login_response(self.user_email, 'wrong_password')
         self._assert_response(response, success=False, value='Too many failed login attempts')
-
-    def test_login_ratelimited(self):
-        """
-        Test that login endpoint is IP ratelimited and only allow 5 requests
-        per 5 minutes per IP.
-        """
-        for i in range(5):
-            password = u'test_password{0}'.format(i)
-            response, _audit_log = self._login_response(self.user_email, password)
-            self._assert_response(response, success=False)
-
-        response, _audit_log = self._login_response(self.user_email, self.password)
-        self.assertEqual(response.status_code, 403)
-
-        # now reset the time to 6 min from now in future and verify that it will
-        # allow another request from same IP and user can successfully login
-        reset_time = datetime.datetime.utcnow() + datetime.timedelta(seconds=361)
-        with freeze_time(reset_time):
-            response, _audit_log = self._login_response(self.user_email, self.password)
-            self._assert_response(response, success=True)
 
     @patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": False})
     def test_login_refresh(self):
@@ -588,7 +564,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             result = self.client.post(self.url, post_params, **extra)
         return result, mock_audit_log
 
-    def _assert_response(self, response, success=None, value=None, status_code=None):
+    def _assert_response(self, response, success=None, value=None, status_code=None, error_code=None):
         """
         Assert that the response has the expected status code and returned a valid
         JSON-parseable dict.
@@ -610,6 +586,9 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
 
         if success is not None:
             self.assertEqual(response_dict['success'], success)
+
+        if error_code is not None:
+            self.assertEqual(response_dict['error_code'], error_code)
 
         if value is not None:
             msg = (u"'%s' did not contain '%s'" %
@@ -747,7 +726,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             'THIRD_PARTY_AUTH_ONLY_HINT': provider_tpa_hint,
         }
 
-        with ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY.override(switch_enabled):
+        with override_waffle_switch(ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY, switch_enabled):
             if not is_third_party_authenticated:
                 site = self.set_up_site(allowed_domain, default_site_configuration_values)
 
@@ -800,7 +779,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             'THIRD_PARTY_AUTH_ONLY_HINT': provider_tpa_hint,
         }
 
-        with ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY.override(True):
+        with override_waffle_switch(ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY, True):
             site = self.set_up_site(allowed_domain, default_site_configuration_values)
 
             with self.assertLogs(level='WARN') as log:

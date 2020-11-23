@@ -39,21 +39,18 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, CourseKey
 from six import text_type
 
-from contentstore.utils import (
-    get_lms_link_for_certificate_web_view,
-    reverse_course_url,
-    get_proctored_exam_settings_url
-)
-from contentstore.views.assets import delete_asset
-from contentstore.views.exception import AssetNotFoundException
-from course_modes.models import CourseMode
-from edxmako.shortcuts import render_to_response
-from student.auth import has_studio_write_access
-from student.roles import GlobalStaff
-from util.db import MYSQL_MAX_INT, generate_int_id
-from util.json_request import JsonResponse
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.student.auth import has_studio_write_access
+from common.djangoapps.student.roles import GlobalStaff
+from common.djangoapps.util.db import MYSQL_MAX_INT, generate_int_id
+from common.djangoapps.util.json_request import JsonResponse
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
+
+from ..utils import get_lms_link_for_certificate_web_view, get_proctored_exam_settings_url, reverse_course_url
+from .assets import delete_asset
+from .exception import AssetNotFoundException
 
 CERTIFICATE_SCHEMA_VERSION = 1
 CERTIFICATE_MINIMUM_ID = 100
@@ -411,7 +408,6 @@ def certificates_list_handler(request, course_key_string):
 
             if has_certificate_modes:
                 certificate_web_view_url = get_lms_link_for_certificate_web_view(
-                    user_id=request.user.id,
                     course_key=course_key,
                     mode=course_modes[0]  # CourseMode.modes_for_course returns default mode if doesn't find anyone.
                 )

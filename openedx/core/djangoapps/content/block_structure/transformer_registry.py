@@ -8,9 +8,9 @@ from base64 import b64encode
 from hashlib import sha1
 
 import six
+from edx_django_utils.plugins import PluginManager
 
 from openedx.core.lib.cache_utils import process_cached
-from openedx.core.lib.plugins import PluginManager
 
 
 class TransformerRegistry(PluginManager):

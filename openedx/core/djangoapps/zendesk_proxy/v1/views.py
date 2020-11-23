@@ -64,6 +64,9 @@ class ZendeskPassthroughView(APIView):
                 custom_fields=request.data['custom_fields'],
                 tags=request.data['tags']
             )
+        except AttributeError as attribute:
+            logger.error('Zendesk Proxy Bad Request AttributeError: %s', attribute)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         except KeyError as key:
             logger.error('Zendesk Proxy Bad Request KeyError: %s', key)
             return Response(status=status.HTTP_400_BAD_REQUEST)

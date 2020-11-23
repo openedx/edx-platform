@@ -4,14 +4,10 @@ End-to-end tests for Student's Profile Page.
 """
 
 
-from contextlib import contextmanager
 from datetime import datetime
-
-import six
 
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.common.logout import LogoutPage
-from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
 from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
 from common.test.acceptance.tests.helpers import AcceptanceTest, EventsTestMixin
 
@@ -85,81 +81,6 @@ class LearnerProfileTestMixin(EventsTestMixin):
         profile_page.visit()
 
         return profile_page
-
-    def set_birth_year(self, birth_year):
-        """
-        Set birth year for the current user to the specified value.
-        """
-        account_settings_page = AccountSettingsPage(self.browser)
-        account_settings_page.visit()
-        account_settings_page.wait_for_page()
-        self.assertEqual(
-            account_settings_page.value_for_dropdown_field('year_of_birth', str(birth_year), focus_out=True),
-            str(birth_year)
-        )
-
-    def verify_profile_page_is_public(self, profile_page, is_editable=True):
-        """
-        Verify that the profile page is currently public.
-        """
-        self.assertEqual(profile_page.visible_fields, self.PUBLIC_PROFILE_FIELDS)
-        if is_editable:
-            self.assertTrue(profile_page.privacy_field_visible)
-            self.assertEqual(profile_page.editable_fields, self.PUBLIC_PROFILE_EDITABLE_FIELDS)
-        else:
-            self.assertEqual(profile_page.editable_fields, [])
-
-    def verify_profile_page_is_private(self, profile_page, is_editable=True):
-        """
-        Verify that the profile page is currently private.
-        """
-        if is_editable:
-            self.assertTrue(profile_page.privacy_field_visible)
-        self.assertEqual(profile_page.visible_fields, self.PRIVATE_PROFILE_FIELDS)
-
-    def verify_profile_page_view_event(self, requesting_username, profile_user_id, visibility=None):
-        """
-        Verifies that the correct view event was captured for the profile page.
-        """
-
-        actual_events = self.wait_for_events(
-            start_time=self.start_time,
-            event_filter={'event_type': 'edx.user.settings.viewed', 'username': requesting_username},
-            number_of_matches=1)
-        self.assert_events_match(
-            [
-                {
-                    'username': requesting_username,
-                    'event': {
-                        'user_id': int(profile_user_id),
-                        'page': 'profile',
-                        'visibility': six.text_type(visibility)
-                    }
-                }
-            ],
-            actual_events
-        )
-
-    @contextmanager
-    def verify_pref_change_event_during(self, username, user_id, setting, **kwargs):
-        """Assert that a single setting changed event is emitted for the user_api_userpreference table."""
-        expected_event = {
-            'username': username,
-            'event': {
-                'setting': setting,
-                'user_id': int(user_id),
-                'table': 'user_api_userpreference',
-                'truncated': []
-            }
-        }
-        expected_event['event'].update(kwargs)
-
-        event_filter = {
-            'event_type': self.USER_SETTINGS_CHANGED_EVENT_NAME,
-            'username': username,
-        }
-        with self.assert_events_match_during(event_filter=event_filter, expected_events=[expected_event]):
-            yield
 
     def initialize_different_user(self, privacy=None, birth_year=None):
         """

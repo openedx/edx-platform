@@ -7,7 +7,7 @@ import logging
 import time
 from datetime import timedelta
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
@@ -17,8 +17,8 @@ from django.urls import reverse
 from django.utils.timezone import now
 from edx_ace import ace
 from edx_ace.recipient import Recipient
-from student.models import CourseEnrollment
-from util.query import use_read_replica_if_available
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.query import use_read_replica_if_available
 
 from lms.djangoapps.verify_student.message_types import VerificationExpiry
 from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
@@ -35,12 +35,12 @@ class Command(BaseCommand):
     """
     This command sends email to learners for which the Software Secure Photo Verification has expired
 
-    The expiry email is sent when the date represented by SoftwareSecurePhotoVerification's field `expiry_date`
+    The expiry email is sent when the date represented by SoftwareSecurePhotoVerification's field `expiration_datetime`
     lies within the date range provided by command arguments. If the email is already sent indicated by field
     `expiry_email_date` then filter if the specified number of days given in settings as
     VERIFICATION_EXPIRY_EMAIL['RESEND_DAYS'] have passed since the last email.
 
-    Since a user can have multiple verification all the previous verifications have expiry_date and expiry_email_date
+    Since a user can have multiple verification all the previous verifications have expiry_email_date
     set to None so that they are not filtered. See lms/djangoapps/verify_student/views.py:1174
 
     The range to filter expired verification is selected based on VERIFICATION_EXPIRY_EMAIL['DAYS_RANGE']. This
@@ -101,12 +101,21 @@ class Command(BaseCommand):
         start_date = end_date - timedelta(days=days)
 
         # Adding an order_by() clause will override the class meta ordering as we don't need ordering here
-        query = SoftwareSecurePhotoVerification.objects.filter(Q(status='approved') &
-                                                               Q(expiry_date__isnull=False) &
-                                                               (Q(expiry_date__gte=start_date,
-                                                                  expiry_date__lt=end_date) |
-                                                                Q(expiry_email_date__lte=date_resend_days_ago)
-                                                                )).order_by()
+        query = SoftwareSecurePhotoVerification.objects.filter(
+            Q(status='approved') &
+            (
+                Q(expiration_date__isnull=False) & (
+                    Q(expiration_date__gte=start_date, expiration_date__lt=end_date) |
+                    Q(expiry_email_date__lte=date_resend_days_ago)
+                ) |
+                # Account for old entries still using `expiry_date` rather than`expiration_date`
+                # (this will be deprecated)
+                Q(expiry_date__isnull=False) & (
+                    Q(expiry_date__gte=start_date, expiry_date__lt=end_date) |
+                    Q(expiry_email_date__lte=date_resend_days_ago)
+                )
+            )
+        ).order_by()
 
         sspv = use_read_replica_if_available(query)
 
@@ -191,7 +200,7 @@ class Command(BaseCommand):
         message_context = get_base_template_context(site)
         message_context.update({
             'platform_name': settings.PLATFORM_NAME,
-            'lms_verification_link': IDVerificationService.email_reverify_url(),
+            'lms_verification_link': '{}/id-verification'.format(settings.ACCOUNT_MICROFRONTEND_URL),
             'help_center_link': settings.ID_VERIFICATION_SUPPORT_LINK
         })
 
@@ -230,7 +239,7 @@ class Command(BaseCommand):
         """
         send_expiry_email_again = True
         email_duration = email_config['resend_days'] * (email_config['default_emails'] - 1)
-        days_since_expiry = (now() - verification.expiry_date).days
+        days_since_expiry = (now() - verification.expiration_datetime).days
 
         if days_since_expiry >= email_duration:
             send_expiry_email_again = False

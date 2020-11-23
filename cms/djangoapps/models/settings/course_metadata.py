@@ -4,19 +4,20 @@ Django module for Course Metadata class -- manages advanced settings and related
 
 
 from datetime import datetime
+
+import pytz
 import six
 from crum import get_current_user
-from django.core.exceptions import ValidationError
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
-import pytz
 from six import text_type
 from xblock.fields import Scope
 
-from cms.djangoapps.contentstore.config.waffle import ENABLE_PROCTORING_PROVIDER_OVERRIDES
+from openedx.core.lib.teams_config import TeamsetType
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
-from student.roles import GlobalStaff
-from xblock_django.models import XBlockStudioConfigurationFlag
+from common.djangoapps.student.roles import GlobalStaff
+from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.modulestore.django import modulestore
 
 
@@ -128,11 +129,6 @@ class CourseMetadata(object):
         # display the "Allow Unsupported XBlocks" setting.
         if not XBlockStudioConfigurationFlag.is_enabled():
             exclude_list.append('allow_unsupported_xblocks')
-
-        # If the ENABLE_PROCTORING_PROVIDER_OVERRIDES waffle flag is not enabled,
-        # do not show "Proctoring Configuration" in Studio Advanced Settings.
-        if not ENABLE_PROCTORING_PROVIDER_OVERRIDES.is_enabled(course_key):
-            exclude_list.append('proctoring_provider')
 
         # Do not show "Course Visibility For Unenrolled Learners" in Studio Advanced Settings
         # if the enable_anonymous_access flag is not enabled
@@ -252,9 +248,14 @@ class CourseMetadata(object):
                     key_values[key] = descriptor.fields[key].from_json(val)
             except (TypeError, ValueError, ValidationError) as err:
                 did_validate = False
-                errors.append({'message': text_type(err), 'model': model})
+                errors.append({'key': key, 'message': text_type(err), 'model': model})
 
-        proctoring_errors = cls._validate_proctoring_settings(descriptor, filtered_dict, user)
+        team_setting_errors = cls.validate_team_settings(filtered_dict)
+        if team_setting_errors:
+            errors = errors + team_setting_errors
+            did_validate = False
+
+        proctoring_errors = cls.validate_proctoring_settings(descriptor, filtered_dict, user)
         if proctoring_errors:
             errors = errors + proctoring_errors
             did_validate = False
@@ -279,7 +280,102 @@ class CourseMetadata(object):
         return cls.fetch(descriptor)
 
     @classmethod
-    def _validate_proctoring_settings(cls, descriptor, settings_dict, user):
+    def validate_team_settings(cls, settings_dict):
+        """
+        Validates team settings
+
+        :param settings_dict: json dict containing all advanced settings
+        :return: a list of error objects
+        """
+        errors = []
+        teams_configuration_model = settings_dict.get('teams_configuration', {})
+        if teams_configuration_model == {}:
+            return errors
+        json_value = teams_configuration_model.get('value')
+        if json_value == '':
+            return errors
+
+        proposed_max_team_size = json_value.get('max_team_size')
+        if proposed_max_team_size != '' and proposed_max_team_size is not None:
+            if proposed_max_team_size <= 0:
+                message = 'max_team_size must be greater than zero'
+                errors.append({'key': 'teams_configuration', 'message': message, 'model': teams_configuration_model})
+            elif proposed_max_team_size > 500:
+                message = 'max_team_size cannot be greater than 500'
+                errors.append({'key': 'teams_configuration', 'message': message, 'model': teams_configuration_model})
+
+        proposed_topics = json_value.get('topics')
+
+        if proposed_topics is None:
+            proposed_teamsets = json_value.get('team_sets')
+            if proposed_teamsets is None:
+                return errors
+            else:
+                proposed_topics = proposed_teamsets
+
+        proposed_topic_ids = [proposed_topic['id'] for proposed_topic in proposed_topics]
+        proposed_topic_dupe_ids = {x for x in proposed_topic_ids if proposed_topic_ids.count(x) > 1}
+        if len(proposed_topic_dupe_ids) > 0:
+            message = 'duplicate ids: ' + ','.join(proposed_topic_dupe_ids)
+            errors.append({'key': 'teams_configuration', 'message': message, 'model': teams_configuration_model})
+
+        for proposed_topic in proposed_topics:
+            topic_validation_errors = cls.validate_single_topic(proposed_topic)
+            if topic_validation_errors:
+                topic_validation_errors['model'] = teams_configuration_model
+                errors.append(topic_validation_errors)
+
+        return errors
+
+    @classmethod
+    def validate_single_topic(cls, topic_settings):
+        """
+        Helper method that validates a single teamset setting.
+        The following conditions result in errors:
+        > unrecognized extra keys
+        > max_team_size <= 0
+        > no name, id or description property
+        > unrecognized teamset type
+        :param topic_settings: the proposed settings being validated
+        :return: an error object if error exists, otherwise None
+        """
+        error_list = []
+        valid_teamset_types = [TeamsetType.open.value, TeamsetType.public_managed.value,
+                               TeamsetType.private_managed.value]
+        valid_keys = {'id', 'name', 'description', 'max_team_size', 'type'}
+        teamset_type = topic_settings.get('type', {})
+        if teamset_type:
+            if teamset_type not in valid_teamset_types:
+                error_list.append('type ' + teamset_type + " is invalid")
+        max_team_size = topic_settings.get('max_team_size', {})
+        if max_team_size:
+            if max_team_size <= 0:
+                error_list.append('max_team_size must be greater than zero')
+            elif max_team_size > 500:
+                error_list.append('max_team_size cannot be greater than 500')
+        teamset_id = topic_settings.get('id', {})
+        if not teamset_id:
+            error_list.append('id attribute must not be empty')
+        teamset_name = topic_settings.get('name', {})
+        if not teamset_name:
+            error_list.append('name attribute must not be empty')
+        teamset_desc = topic_settings.get('description', {})
+        if not teamset_desc:
+            error_list.append('description attribute must not be empty')
+
+        keys = set(topic_settings.keys())
+        key_difference = keys - valid_keys
+        if len(key_difference) > 0:
+            error_list.append('extra keys: ' + ','.join(key_difference))
+
+        if error_list:
+            error = {'key': 'teams_configuration', 'message': ','.join(error_list)}
+            return error
+
+        return None
+
+    @classmethod
+    def validate_proctoring_settings(cls, descriptor, settings_dict, user):
         """
         Verify proctoring settings
 
@@ -302,7 +398,7 @@ class CourseMetadata(object):
                 'The proctoring provider cannot be modified after a course has started.'
                 ' Contact {support_email} for assistance'
             ).format(support_email=settings.PARTNER_SUPPORT_EMAIL or 'support')
-            errors.append({'message': message, 'model': proctoring_provider_model})
+            errors.append({'key': 'proctoring_provider', 'message': message, 'model': proctoring_provider_model})
 
         # Require a valid escalation email if Proctortrack is chosen as the proctoring provider
         escalation_email_model = settings_dict.get('proctoring_escalation_email')
@@ -315,7 +411,11 @@ class CourseMetadata(object):
         if proctoring_provider_model and proctoring_provider_model.get('value') == 'proctortrack':
             if not escalation_email:
                 message = missing_escalation_email_msg.format(provider=proctoring_provider_model.get('value'))
-                errors.append({'message': message, 'model': proctoring_provider_model})
+                errors.append({
+                    'key': 'proctoring_provider',
+                    'message': message,
+                    'model': proctoring_provider_model
+                })
 
         if (
             escalation_email_model and not proctoring_provider_model and
@@ -323,7 +423,11 @@ class CourseMetadata(object):
         ):
             if not escalation_email:
                 message = missing_escalation_email_msg.format(provider=descriptor.proctoring_provider)
-                errors.append({'message': message, 'model': escalation_email_model})
+                errors.append({
+                    'key': 'proctoring_escalation_email',
+                    'message': message,
+                    'model': escalation_email_model
+                })
 
         return errors
 
@@ -332,9 +436,6 @@ class CourseMetadata(object):
         """
         Return whether the requested proctoring provider is different than the current proctoring provider, indicating
         that the user has requested a change to the proctoring_provider Advanced Setting.
-        The requested_provider will be None if the proctoring_provider setting is not available (e.g. if the
-        ENABLE_PROCTORING_PROVIDER_OVERRIDES waffle flag is not enabled for the course). In this case, we consider
-        that there is no change in the requested proctoring provider.
         """
         if requested_provider is None:
             return False

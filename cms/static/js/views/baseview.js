@@ -44,6 +44,7 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/utils/handle_iframe_b
                 this.options = options;
 
                 var _this = this;
+                // xss-lint: disable=javascript-jquery-insertion
                 this.render = _.wrap(this.render, function(render, options) {
                     _this.beforeRender();
                     render(options);

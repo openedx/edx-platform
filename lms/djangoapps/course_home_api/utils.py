@@ -13,3 +13,11 @@ def get_microfrontend_url(course_key, view_name=None):
         mfe_link += '/{}'.format(view_name)
 
     return mfe_link
+
+
+def is_request_from_learning_mfe(request):
+    """
+    Returns whether the given request was made by the frontend-app-learning MFE.
+    """
+    return (settings.LEARNING_MICROFRONTEND_URL and
+            request.META.get('HTTP_REFERER', '').startswith(settings.LEARNING_MICROFRONTEND_URL))

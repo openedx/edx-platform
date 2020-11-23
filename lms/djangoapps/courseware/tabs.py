@@ -11,11 +11,11 @@ from django.utils.translation import ugettext_noop
 
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam
-from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
+from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active, course_home_mfe_outline_tab_is_active
 from lms.djangoapps.course_home_api.utils import get_microfrontend_url
 from openedx.core.lib.course_tabs import CourseTabPluginManager
-from openedx.features.course_experience import RELATIVE_DATES_FLAG, UNIFIED_COURSE_TAB_FLAG, default_course_url_name
-from student.models import CourseEnrollment
+from openedx.features.course_experience import RELATIVE_DATES_FLAG, DISABLE_UNIFIED_COURSE_TAB_FLAG, default_course_url_name
+from common.djangoapps.student.models import CourseEnrollment
 from xmodule.tabs import CourseTab, CourseTabList, course_reverse_func_from_name_func, key_checker
 
 
@@ -41,24 +41,27 @@ class CoursewareTab(EnrolledTab):
     is_default = False
     supports_preview_menu = True
 
+    def __init__(self, tab_dict):
+        def link_func(course, reverse_func):
+            if course_home_mfe_outline_tab_is_active(course.id):
+                return get_microfrontend_url(course_key=course.id, view_name='home')
+            else:
+                reverse_name_func = lambda course: default_course_url_name(course.id)
+                url_func = course_reverse_func_from_name_func(reverse_name_func)
+                return url_func(course, reverse_func)
+
+        tab_dict['link_func'] = link_func
+        super().__init__(tab_dict)
+
     @classmethod
     def is_enabled(cls, course, user=None):
         """
         Returns true if this tab is enabled.
         """
+        if DISABLE_UNIFIED_COURSE_TAB_FLAG.is_enabled(course.id):
+            return super(CoursewareTab, cls).is_enabled(course, user)
         # If this is the unified course tab then it is always enabled
-        if UNIFIED_COURSE_TAB_FLAG.is_enabled(course.id):
-            return True
-        return super(CoursewareTab, cls).is_enabled(course, user)
-
-    @property
-    def link_func(self):
-        """
-        Returns a function that takes a course and reverse function and will
-        compute the course URL for this tab.
-        """
-        reverse_name_func = lambda course: default_course_url_name(course.id)
-        return course_reverse_func_from_name_func(reverse_name_func)
+        return True
 
 
 class CourseInfoTab(CourseTab):
@@ -316,6 +319,7 @@ class DatesTab(EnrolledTab):
     type = "dates"
     title = ugettext_noop(
         "Dates")  # We don't have the user in this context, so we don't want to translate it at this level.
+    priority = 50
     view_name = "dates"
     is_dynamic = True
 
@@ -356,7 +360,7 @@ def get_course_tab_list(user, course):
                 continue
             tab.name = _("Entrance Exam")
         # TODO: LEARNER-611 - once the course_info tab is removed, remove this code
-        if UNIFIED_COURSE_TAB_FLAG.is_enabled(course.id) and tab.type == 'course_info':
+        if not DISABLE_UNIFIED_COURSE_TAB_FLAG.is_enabled(course.id) and tab.type == 'course_info':
             continue
         if tab.type == 'static_tab' and tab.course_staff_only and \
                 not bool(user and has_access(user, 'staff', course, course.id)):
@@ -371,6 +375,12 @@ def get_course_tab_list(user, course):
 
     # Add in any dynamic tabs, i.e. those that are not persisted
     course_tab_list += _get_dynamic_tabs(course, user)
+    # Sorting here because although the CourseTabPluginManager.get_tab_types function
+    # does do sorting on priority, we only use it for getting the dynamic tabs.
+    # We can't switch this function to just use the CourseTabPluginManager without
+    # further investigation since CourseTabList.iterate_displayable returns
+    # Static Tabs that are not returned by the CourseTabPluginManager.
+    course_tab_list.sort(key=lambda tab: tab.priority or float('inf'))
     return course_tab_list
 
 

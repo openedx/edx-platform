@@ -14,6 +14,7 @@ class DateSummarySerializer(serializers.Serializer):
     """
     Serializer for Date Summary Objects.
     """
+    assignment_type = serializers.CharField(default=None)
     complete = serializers.NullBooleanField()
     date = serializers.DateTimeField()
     date_type = serializers.CharField()
@@ -22,6 +23,7 @@ class DateSummarySerializer(serializers.Serializer):
     link = serializers.SerializerMethodField()
     link_text = serializers.CharField()
     title = serializers.CharField()
+    extra_info = serializers.CharField()
 
     def get_learner_has_access(self, block):
         learner_is_full_access = self.context.get('learner_is_full_access', False)
@@ -41,8 +43,6 @@ class DatesTabSerializer(DatesBannerSerializerMixin, serializers.Serializer):
     Serializer for the Dates Tab
     """
     course_date_blocks = DateSummarySerializer(many=True)
-    missed_deadlines = serializers.BooleanField()
-    missed_gated_content = serializers.BooleanField()
+    has_ended = serializers.BooleanField()
     learner_is_full_access = serializers.BooleanField()
     user_timezone = serializers.CharField()
-    verified_upgrade_link = serializers.URLField()

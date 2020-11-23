@@ -10,7 +10,7 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import generics
 from rest_framework.exceptions import APIException
 
-from badges.models import BadgeAssertion
+from lms.djangoapps.badges.models import BadgeAssertion
 from openedx.core.djangoapps.user_api.permissions import is_field_shared_factory
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 

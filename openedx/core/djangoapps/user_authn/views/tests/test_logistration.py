@@ -4,6 +4,7 @@
 
 from datetime import datetime, timedelta
 from http.cookies import SimpleCookie
+from urllib.parse import urlencode
 
 import ddt
 import mock
@@ -20,9 +21,8 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from freezegun import freeze_time
 from pytz import UTC
-from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.branding.api import get_privacy_url
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
@@ -30,8 +30,8 @@ from openedx.core.djangoapps.user_authn.views.login_form import login_and_regist
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
-from util.testing import UrlResetMixin
+from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
@@ -64,6 +64,50 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         )
         self.hidden_disabled_provider = self.configure_azure_ad_provider()
 
+    FEATURES_WITH_LOGIN_MFE_ENABLED = settings.FEATURES.copy()
+    FEATURES_WITH_LOGIN_MFE_ENABLED['ENABLE_LOGISTRATION_MICROFRONTEND'] = True
+
+    @ddt.data(
+        ("signin_user", "/login"),
+        ("register_user", "/register"),
+        ("password_assistance", "/reset"),
+    )
+    @ddt.unpack
+    @override_settings(FEATURES=FEATURES_WITH_LOGIN_MFE_ENABLED)
+    def test_logistration_mfe_redirects(self, url_name, path):
+        """
+        Test that if Logistration MFE is enabled, then we redirect to
+        the correct URL.
+        """
+        response = self.client.get(reverse(url_name))
+
+        self.assertEqual(response.url, settings.LOGISTRATION_MICROFRONTEND_URL + path)
+        self.assertEqual(response.status_code, 302)
+
+    @ddt.data(
+        (
+            "signin_user",
+            "/login",
+            {"next": "dashboard"},
+        ),
+        (
+            "register_user",
+            "/register",
+            {"course_id": "course-v1:edX+DemoX+Demo_Course", "enrollment_action": "enroll"}
+        )
+    )
+    @ddt.unpack
+    @override_settings(FEATURES=FEATURES_WITH_LOGIN_MFE_ENABLED)
+    def test_logistration_redirect_params(self, url_name, path, query_params):
+        """
+        Test that if request is redirected to logistration MFE,
+        query params are passed to the redirect url.
+        """
+        expected_url = settings.LOGISTRATION_MICROFRONTEND_URL + path + '?' + urlencode(query_params)
+        response = self.client.get(reverse(url_name), query_params)
+
+        self.assertRedirects(response, expected_url, target_status_code=302)
+
     @ddt.data(
         ("signin_user", "login"),
         ("register_user", "register"),
@@ -79,7 +123,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         Test that rate limiting for logistration enpoints works as expected.
         """
         login_url = reverse('signin_user')
-        for i in range(5):
+        for _ in range(5):
             response = self.client.get(login_url)
             self.assertEqual(response.status_code, 200)
 
@@ -274,6 +318,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         kwargs.setdefault('icon_class', 'fa-university')
         kwargs.setdefault('attr_email', 'dummy-email-attr')
         kwargs.setdefault('max_session_length', None)
+        kwargs.setdefault('skip_registration_form', False)
         self.configure_saml_provider(**kwargs)
 
     @mock.patch('django.conf.settings.MESSAGE_STORAGE', 'django.contrib.messages.storage.cookie.CookieStorage')
@@ -322,7 +367,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         }
         pipeline_target = 'openedx.core.djangoapps.user_authn.views.login_form.third_party_auth.pipeline'
         with simulate_running_pipeline(pipeline_target, current_backend, **pipeline_response):
-            with mock.patch('edxmako.request_context.get_current_request', return_value=request):
+            with mock.patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=request):
                 response = login_and_registration_form(request)
 
         expected_error_message = Text(_(
@@ -423,15 +468,17 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
 
     @mock.patch('openedx.core.djangoapps.user_authn.views.login_form.enterprise_customer_for_request')
     @ddt.data(
-        ('signin_user', False, None, None),
-        ('register_user', False, None, None),
-        ('signin_user', True, 'Fake EC', 'http://logo.com/logo.jpg'),
-        ('register_user', True, 'Fake EC', 'http://logo.com/logo.jpg'),
-        ('signin_user', True, 'Fake EC', None),
-        ('register_user', True, 'Fake EC', None),
+        ('signin_user', False, None, None, False),
+        ('register_user', False, None, None, False),
+        ('signin_user', True, 'Fake EC', 'http://logo.com/logo.jpg', False),
+        ('register_user', True, 'Fake EC', 'http://logo.com/logo.jpg', False),
+        ('signin_user', True, 'Fake EC', 'http://logo.com/logo.jpg', True),
+        ('register_user', True, 'Fake EC', 'http://logo.com/logo.jpg', True),
+        ('signin_user', True, 'Fake EC', None, False),
+        ('register_user', True, 'Fake EC', None, False),
     )
     @ddt.unpack
-    def test_enterprise_register(self, url_name, ec_present, ec_name, logo_url, mock_get_ec):
+    def test_enterprise_register(self, url_name, ec_present, ec_name, logo_url, is_proxy, mock_get_ec):
         """
         Verify that when an EnterpriseCustomer is received on the login and register views,
         the appropriate sidebar is rendered.
@@ -444,7 +491,11 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         else:
             mock_get_ec.return_value = None
 
-        response = self.client.get(reverse(url_name), HTTP_ACCEPT="text/html")
+        params = []
+        if is_proxy:
+            params.append(("proxy_login", "True"))
+
+        response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
 
         enterprise_sidebar_div_id = u'enterprise-content-container'
 
@@ -452,7 +503,10 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
             self.assertNotContains(response, text=enterprise_sidebar_div_id)
         else:
             self.assertContains(response, text=enterprise_sidebar_div_id)
-            welcome_message = settings.ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE
+            if is_proxy:
+                welcome_message = settings.ENTERPRISE_PROXY_LOGIN_WELCOME_TEMPLATE
+            else:
+                welcome_message = settings.ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE
             expected_message = Text(welcome_message).format(
                 start_bold=HTML('<b>'),
                 end_bold=HTML('</b>'),
@@ -512,6 +566,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
 
         auth_info = {
             "currentProvider": current_provider,
+            "platformName": settings.PLATFORM_NAME,
             "providers": providers,
             "secondaryProviders": [],
             "finishAuthUrl": finish_auth_url,
@@ -542,6 +597,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
 
         auth_info = {
             'currentProvider': current_provider,
+            'platformName': settings.PLATFORM_NAME,
             'providers': [],
             'secondaryProviders': [],
             'finishAuthUrl': finish_auth_url,

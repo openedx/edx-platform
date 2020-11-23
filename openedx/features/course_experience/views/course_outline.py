@@ -22,7 +22,6 @@ from pytz import UTC
 from waffle.models import Switch
 from web_fragments.fragment import Fragment
 
-from course_modes.models import CourseMode
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_overview_with_access
 from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
@@ -33,8 +32,8 @@ from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
 from openedx.features.course_experience.utils import dates_banner_should_display
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from student.models import CourseEnrollment
-from util.milestones_helpers import get_course_content_milestones
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.milestones_helpers import get_course_content_milestones
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 from xmodule.modulestore.django import modulestore
 
@@ -47,7 +46,6 @@ class CourseOutlineFragmentView(EdxFragmentView):
     """
     Course outline fragment to be shown in the unified course view.
     """
-    _uses_pattern_library = False
 
     def render_to_fragment(self, request, course_id, user_is_enrolled=True, **kwargs):  # pylint: disable=arguments-differ
         """
@@ -79,7 +77,6 @@ class CourseOutlineFragmentView(EdxFragmentView):
         missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request.user)
 
         reset_deadlines_url = reverse(RESET_COURSE_DEADLINES_NAME)
-        reset_deadlines_redirect_url_base = COURSE_HOME_VIEW_NAME
 
         context = {
             'csrf': csrf(request)['csrf_token'],
@@ -96,8 +93,6 @@ class CourseOutlineFragmentView(EdxFragmentView):
             # managed by edx-when.
             'in_edx_when': edx_when_api.is_enabled_for_course(course_key),
             'reset_deadlines_url': reset_deadlines_url,
-            'reset_deadlines_redirect_url_base': reset_deadlines_redirect_url_base,
-            'reset_deadlines_redirect_url_id_dict': {'course_id': str(course.id)},
             'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
             'on_course_outline_page': True,
             'missed_deadlines': missed_deadlines,

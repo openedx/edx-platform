@@ -2,6 +2,7 @@
 
 
 import logging
+import unittest
 
 import ddt
 from django.conf import settings
@@ -13,9 +14,9 @@ from mock import patch
 from testfixtures import LogCapture
 
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
-from student.helpers import get_next_url_for_login_page
+from common.djangoapps.student.helpers import get_next_url_for_login_page
 
-LOGGER_NAME = "student.helpers"
+LOGGER_NAME = "common.djangoapps.student.helpers"
 
 
 @ddt.ddt
@@ -101,7 +102,7 @@ class TestLoginHelper(TestCase):
         for method in ['GET', 'POST']
     ]
 
-    @patch('student.helpers.third_party_auth.pipeline.get')
+    @patch('common.djangoapps.student.helpers.third_party_auth.pipeline.get')
     @ddt.data(*tpa_hint_test_cases_with_method)
     @ddt.unpack
     def test_third_party_auth_hint(
@@ -133,3 +134,23 @@ class TestLoginHelper(TestCase):
 
         with with_site_configuration_context(configuration=dict(THIRD_PARTY_AUTH_HINT=tpa_hint)):
             validate_login()
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @ddt.data(
+        (None, '/dashboard'),
+        ('invalid-url', '/dashboard'),
+        ('courses', '/courses'),
+    )
+    @ddt.unpack
+    def test_custom_redirect_url(self, redirect, expected_url):
+        """
+        Test custom redirect after login
+        """
+        configuration_values = {"DEFAULT_REDIRECT_AFTER_LOGIN": redirect}
+        req = self.request.get(settings.LOGIN_URL)
+        req.META["HTTP_ACCEPT"] = "text/html"
+
+        with with_site_configuration_context(configuration=configuration_values):
+            next_page = get_next_url_for_login_page(req)
+
+        self.assertEqual(next_page, expected_url)

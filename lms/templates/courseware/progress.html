@@ -3,7 +3,7 @@
 <%namespace name='static' file='/static_content.html'/>
 <%def name="online_help_token()"><% return "progress" %></%def>
 <%!
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.grades.api import constants as grades_constants
 from django.utils.translation import ugettext as _
@@ -248,3 +248,15 @@ username = get_enterprise_learner_generic_name(request) or student.username
 <%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
     DateUtilFactory.transform(iterationKey=".localized-datetime");
 </%static:require_module_async>
+
+<%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
+
+  var fbeLink = $("#FBE_banner");
+
+  TrackECommerceEvents.trackUpsellClick(fbeLink, 'progress_audit_access_expires', {
+      pageName: "progress_tab",
+      linkType: "link",
+      linkCategory: "FBE_banner"
+  });
+
+</%static:require_module_async> 

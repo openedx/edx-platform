@@ -14,6 +14,7 @@ import ddt
 import six
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db import connections
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
@@ -28,7 +29,7 @@ from capa.tests.response_xml_factory import (
     OptionResponseXMLFactory,
     SchematicResponseXMLFactory
 )
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.grades.api import CourseGradeFactory, task_compute_all_grades_for_course
@@ -36,7 +37,7 @@ from openedx.core.djangoapps.credit.api import get_credit_requirement_status, se
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from openedx.core.lib.url_utils import quote_slashes
-from student.models import CourseEnrollment, anonymous_id_for_user
+from common.djangoapps.student.models import CourseEnrollment, anonymous_id_for_user
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
@@ -139,7 +140,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
     """
 
     # Tell Django to clean out all databases, not just default
-    multi_db = True
+    databases = {alias for alias in connections}
     # arbitrary constant
     COURSE_SLUG = "100"
     COURSE_NAME = "test_course"
@@ -342,7 +343,7 @@ class TestCourseGrader(TestSubmittingProblems):
     Suite of tests for the course grader.
     """
     # Tell Django to clean out all databases, not just default
-    multi_db = True
+    databases = {alias for alias in connections}
 
     def basic_setup(self, late=False, reset=False, showanswer=False):
         """
@@ -755,7 +756,7 @@ class TestCourseGrader(TestSubmittingProblems):
 class ProblemWithUploadedFilesTest(TestSubmittingProblems):
     """Tests of problems with uploaded files."""
     # Tell Django to clean out all databases, not just default
-    multi_db = True
+    databases = {alias for alias in connections}
 
     def setUp(self):
         super(ProblemWithUploadedFilesTest, self).setUp()
@@ -811,7 +812,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
     Check that we can submit a schematic and custom response, and it answers properly.
     """
     # Tell Django to clean out all databases, not just default
-    multi_db = True
+    databases = {alias for alias in connections}
 
     SCHEMATIC_SCRIPT = dedent("""
         # for a schematic response, submission[i] is the json representation

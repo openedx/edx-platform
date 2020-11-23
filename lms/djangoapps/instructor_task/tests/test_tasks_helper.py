@@ -13,8 +13,10 @@ import os
 import shutil
 import tempfile
 from collections import OrderedDict
-from contextlib import contextmanager
+from contextlib import contextmanager, ExitStack
 from datetime import datetime, timedelta
+from io import BytesIO
+from zipfile import ZipFile
 
 import ddt
 import unicodecsv
@@ -32,8 +34,9 @@ from waffle.testutils import override_switch
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
 from lms.djangoapps.courseware.tests.factories import InstructorFactory
@@ -57,7 +60,8 @@ from lms.djangoapps.instructor_task.tasks_helper.grades import (
 from lms.djangoapps.instructor_task.tasks_helper.misc import (
     cohort_students_and_upload,
     upload_course_survey_report,
-    upload_ora2_data
+    upload_ora2_data,
+    upload_ora2_submission_files
 )
 from lms.djangoapps.instructor_task.tests.test_base import (
     InstructorTaskCourseTestCase,
@@ -72,9 +76,9 @@ from openedx.core.djangoapps.credit.tests.factories import CreditCourseFactory
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
 from openedx.core.lib.teams_config import TeamsConfig
-from student.models import ALLOWEDTOENROLL_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from survey.models import SurveyAnswer, SurveyForm
+from common.djangoapps.student.models import ALLOWEDTOENROLL_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from lms.djangoapps.survey.models import SurveyAnswer, SurveyForm
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
@@ -473,6 +477,7 @@ class TestTeamGradeReport(InstructorGradeReportTestCase):
 
 
 # pylint: disable=protected-access
+@ddt.ddt
 class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
     """
     Tests that generation of CSV files listing student answers to a
@@ -513,7 +518,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         student_data, _ = ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
-            usage_key_str=str(self.course.location),
+            usage_key_str_list=[str(self.course.location)],
         )
 
         self.assertEqual(len(student_data), 4)
@@ -533,12 +538,12 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             student_data, student_data_keys_list = ProblemResponses._build_student_data(
                 user_id=self.instructor.id,
                 course_key=self.course.id,
-                usage_key_str=str(problem.location),
+                usage_key_str_list=[str(problem.location)],
             )
         self.assertEqual(len(student_data), 1)
         self.assertDictContainsSubset({
             'username': 'student',
-            'location': 'Problem1',
+            'location': 'test_course > Section > Subsection > Problem1',
             'block_key': 'i4x://edx/1.23x/problem/Problem1',
             'title': 'Problem1',
         }, student_data[0])
@@ -564,7 +569,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         student_data, student_data_keys_list = ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
-            usage_key_str=str(self.course.location),
+            usage_key_str_list=[str(self.course.location)],
         )
         self.assertEqual(len(student_data), 2)
         self.assertDictContainsSubset({
@@ -639,7 +644,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         student_data, student_data_keys_list = ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
-            usage_key_str=str(self.course.location),
+            usage_key_str_list=[str(self.course.location)],
         )
         self.assertEqual(len(student_data), 1)
         self.assertDictContainsSubset({
@@ -658,6 +663,66 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
                           'Answer', 'Answer ID', 'Correct Answer', 'Question',
                           'block_key', 'state'])
 
+    def test_build_student_data_for_multiple_problems(self):
+        """
+        Ensure that building student data works when supplied multiple usage keys.
+        """
+        problem1 = self.define_option_problem(u'Problem1')
+        problem2 = self.define_option_problem(u'Problem2')
+        self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
+        self.submit_student_answer(self.student.username, u'Problem2', ['Option 1'])
+        student_data, _ = ProblemResponses._build_student_data(
+            user_id=self.instructor.id,
+            course_key=self.course.id,
+            usage_key_str_list=[str(problem1.location), str(problem2.location)],
+        )
+        self.assertEqual(len(student_data), 2)
+        for idx in range(1, 3):
+            self.assertDictContainsSubset({
+                'username': 'student',
+                'location': u'test_course > Section > Subsection > Problem{}'.format(idx),
+                'block_key': 'i4x://edx/1.23x/problem/Problem{}'.format(idx),
+                'title': u'Problem{}'.format(idx),
+                'Answer ID': 'i4x-edx-1_23x-problem-Problem{}_2_1'.format(idx),
+                'Answer': u'Option 1',
+                'Correct Answer': u'Option 1',
+                'Question': u'The correct answer is Option 1',
+            }, student_data[idx - 1])
+            self.assertIn('state', student_data[idx - 1])
+
+    @ddt.data(
+        (['problem'], 5),
+        (['other'], 0),
+        (['problem', 'test-category'], 10),
+        (None, 10),
+    )
+    @ddt.unpack
+    def test_build_student_data_with_filter(self, filters, filtered_count):
+        """
+        Ensure that building student data works when supplied multiple usage keys.
+        """
+        for idx in range(1, 6):
+            self.define_option_problem(u'Problem{}'.format(idx))
+            item = ItemFactory.create(
+                parent_location=self.problem_section.location,
+                parent=self.problem_section,
+                category="test-category",
+                display_name=u"Item{}".format(idx),
+                data=''
+            )
+            StudentModule.save_state(self.student, self.course.id, item.location, {})
+
+        for idx in range(1, 6):
+            self.submit_student_answer(self.student.username, u'Problem{}'.format(idx), ['Option 1'])
+
+        student_data, _ = ProblemResponses._build_student_data(
+            user_id=self.instructor.id,
+            course_key=self.course.id,
+            usage_key_str_list=[str(self.course.location)],
+            filter_types=filters,
+        )
+        self.assertEqual(len(student_data), filtered_count)
+
     @patch('lms.djangoapps.instructor_task.tasks_helper.grades.list_problem_responses')
     @patch('xmodule.capa_module.ProblemBlock.generate_report_data', create=True)
     def test_build_student_data_for_block_with_generate_report_data_not_implemented(
@@ -674,14 +739,14 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
-            usage_key_str=str(problem.location),
+            usage_key_str_list=[str(problem.location)],
         )
         mock_generate_report_data.assert_called_with(ANY, ANY)
         mock_list_problem_responses.assert_called_with(self.course.id, ANY, ANY)
 
     def test_success(self):
         task_input = {
-            'problem_location': str(self.course.location),
+            'problem_locations': str(self.course.location),
             'user_id': self.instructor.id
         }
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
@@ -701,9 +766,43 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
         links = report_store.links_for(self.course.id)
 
-        self.assertEqual(len(links), 1)
-        self.assertDictContainsSubset({'attempted': 3, 'succeeded': 3, 'failed': 0}, result)
-        self.assertIn("report_name", result)
+        assert len(links) == 1
+        assert set(({'attempted': 3, 'succeeded': 3, 'failed': 0}).items()).issubset(set(result.items()))
+        assert "report_name" in result
+
+    @ddt.data(
+        ('blkid', None, 'edx_1.23x_test_course_student_state_from_blkid_2020-01-01-0000.csv'),
+        ('blkid', 'poll,survey', 'edx_1.23x_test_course_student_state_from_blkid_for_poll,survey_2020-01-01-0000.csv'),
+        ('blkid1,blkid2', None, 'edx_1.23x_test_course_student_state_from_multiple_blocks_2020-01-01-0000.csv'),
+        (
+            'blkid1,blkid2',
+            'poll,survey',
+            'edx_1.23x_test_course_student_state_from_multiple_blocks_for_poll,survey_2020-01-01-0000.csv',
+        ),
+    )
+    @ddt.unpack
+    def test_file_names(self, problem_locations, problem_types_filter, file_name):
+        task_input = {
+            'problem_locations': problem_locations,
+            'problem_types_filter': problem_types_filter,
+            'user_id': self.instructor.id
+        }
+        with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'), \
+             freeze_time('2020-01-01'):
+            with patch('lms.djangoapps.instructor_task.tasks_helper.grades'
+                       '.ProblemResponses._build_student_data') as mock_build_student_data:
+                mock_build_student_data.return_value = (
+                    [
+                        {'username': 'user0', 'state': u'state0'},
+                        {'username': 'user1', 'state': u'state1'},
+                        {'username': 'user2', 'state': u'state2'},
+                    ],
+                    ['username', 'state']
+                )
+                result = ProblemResponses.generate(
+                    None, None, self.course.id, task_input, 'calculated'
+                )
+        assert result.get('report_name') == file_name
 
 
 @ddt.ddt
@@ -1125,7 +1224,6 @@ class TestCourseSurveyReport(TestReportMixin, InstructorTaskCourseTestCase):
             )
         self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_generate_course_survey_report(self):
         """
         test to generate course survey report
@@ -2494,25 +2592,126 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
                 self.assertEqual(response, UPDATE_STATUS_FAILED)
 
     def test_report_stores_results(self):
-        with freeze_time('2001-01-01 00:00:00'):
+        with ExitStack() as stack:
+            stack.enter_context(freeze_time('2001-01-01 00:00:00'))
+
+            mock_current_task = stack.enter_context(
+                patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
+            )
+            mock_collect_data = stack.enter_context(
+                patch('lms.djangoapps.instructor_task.tasks_helper.misc.OraAggregateData.collect_ora2_data')
+            )
+            mock_store_rows = stack.enter_context(
+                patch('lms.djangoapps.instructor_task.models.DjangoStorageReportStore.store_rows')
+            )
+
+            mock_current_task.return_value = self.current_task
+
             test_header = ['field1', 'field2']
             test_rows = [['row1_field1', 'row1_field2'], ['row2_field1', 'row2_field2']]
 
+            mock_collect_data.return_value = (test_header, test_rows)
+
+            return_val = upload_ora2_data(None, None, self.course.id, None, 'generated')
+
+            timestamp_str = datetime.now(UTC).strftime('%Y-%m-%d-%H%M')
+            course_id_string = quote(text_type(self.course.id).replace('/', '_'))
+            filename = u'{}_ORA_data_{}.csv'.format(course_id_string, timestamp_str)
+
+            self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)
+            mock_store_rows.assert_called_once_with(self.course.id, filename, [test_header] + test_rows)
+
+
+class TestInstructorOra2AttachmentsExport(SharedModuleStoreTestCase):
+    """
+    Tests that ORA2 submission files export works.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.course = CourseFactory.create()
+
+    def setUp(self):
+        super().setUp()
+
+        self.current_task = Mock()
+        self.current_task.update_state = Mock()
+
+    def test_export_fails_if_error_on_collect_step(self):
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task') as mock_current_task:
             mock_current_task.return_value = self.current_task
 
             with patch(
-                'lms.djangoapps.instructor_task.tasks_helper.misc.OraAggregateData.collect_ora2_data'
+                'lms.djangoapps.instructor_task.tasks_helper.misc.OraDownloadData.collect_ora2_submission_files'
             ) as mock_collect_data:
-                mock_collect_data.return_value = (test_header, test_rows)
-                with patch(
-                    'lms.djangoapps.instructor_task.models.DjangoStorageReportStore.store_rows'
-                ) as mock_store_rows:
-                    return_val = upload_ora2_data(None, None, self.course.id, None, 'generated')
+                mock_collect_data.side_effect = KeyError
 
-                    timestamp_str = datetime.now(UTC).strftime('%Y-%m-%d-%H%M')
-                    course_id_string = quote(text_type(self.course.id).replace('/', '_'))
-                    filename = u'{}_ORA_data_{}.csv'.format(course_id_string, timestamp_str)
+                response = upload_ora2_submission_files(None, None, self.course.id, None, 'compressed')
+                self.assertEqual(response, UPDATE_STATUS_FAILED)
 
-                    self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)
-                    mock_store_rows.assert_called_once_with(self.course.id, filename, [test_header] + test_rows)
+    def test_export_fails_if_error_on_create_zip_step(self):
+        with ExitStack() as stack:
+            mock_current_task = stack.enter_context(
+                patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
+            )
+            mock_current_task.return_value = self.current_task
+
+            stack.enter_context(
+                patch('lms.djangoapps.instructor_task.tasks_helper.misc.OraDownloadData.collect_ora2_submission_files')
+            )
+            create_zip_mock = stack.enter_context(
+                patch('lms.djangoapps.instructor_task.tasks_helper.misc.OraDownloadData.create_zip_with_attachments')
+            )
+
+            create_zip_mock.side_effect = KeyError
+
+            response = upload_ora2_submission_files(None, None, self.course.id, None, 'compressed')
+            self.assertEqual(response, UPDATE_STATUS_FAILED)
+
+    def test_export_fails_if_error_on_upload_step(self):
+        with ExitStack() as stack:
+            mock_current_task = stack.enter_context(
+                patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
+            )
+            mock_current_task.return_value = self.current_task
+
+            stack.enter_context(
+                patch('lms.djangoapps.instructor_task.tasks_helper.misc.OraDownloadData.collect_ora2_submission_files')
+            )
+            stack.enter_context(
+                patch('lms.djangoapps.instructor_task.tasks_helper.misc.OraDownloadData.create_zip_with_attachments')
+            )
+            upload_mock = stack.enter_context(
+                patch('lms.djangoapps.instructor_task.tasks_helper.misc.upload_zip_to_report_store')
+            )
+
+            upload_mock.side_effect = KeyError
+
+            response = upload_ora2_submission_files(None, None, self.course.id, None, 'compressed')
+            self.assertEqual(response, UPDATE_STATUS_FAILED)
+
+    def test_task_stores_zip_with_attachments(self):
+        with ExitStack() as stack:
+            mock_current_task = stack.enter_context(
+                patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
+            )
+            mock_collect_files = stack.enter_context(
+                patch('lms.djangoapps.instructor_task.tasks_helper.misc.OraDownloadData.collect_ora2_submission_files')
+            )
+            mock_create_zip = stack.enter_context(
+                patch('lms.djangoapps.instructor_task.tasks_helper.misc.OraDownloadData.create_zip_with_attachments')
+            )
+            mock_store = stack.enter_context(
+                patch('lms.djangoapps.instructor_task.models.DjangoStorageReportStore.store')
+            )
+
+            mock_current_task.return_value = self.current_task
+
+            response = upload_ora2_submission_files(None, None, self.course.id, None, 'compressed')
+
+            mock_collect_files.assert_called_once()
+            mock_create_zip.assert_called_once()
+            mock_store.assert_called_once()
+
+            self.assertEqual(response, UPDATE_STATUS_SUCCEEDED)

@@ -30,7 +30,7 @@ def get_logger_config(log_dir,
     hostname = platform.node().split(".")[0]
     syslog_format = (u"[service_variant={service_variant}]"
                      u"[%(name)s][env:{logging_env}] %(levelname)s "
-                     u"[{hostname}  %(process)d] [user %(userid)s] [%(filename)s:%(lineno)d] "
+                     u"[{hostname}  %(process)d] [user %(userid)s] [ip %(remoteip)s] [%(filename)s:%(lineno)d] "
                      u"- %(message)s").format(service_variant=service_variant,
                                               logging_env=logging_env,
                                               hostname=hostname)
@@ -41,7 +41,7 @@ def get_logger_config(log_dir,
         'formatters': {
             'standard': {
                 'format': u'%(asctime)s %(levelname)s %(process)d '
-                          u'[%(name)s] [user %(userid)s] %(filename)s:%(lineno)d - %(message)s',
+                          u'[%(name)s] [user %(userid)s] [ip %(remoteip)s] %(filename)s:%(lineno)d - %(message)s',
             },
             'syslog_format': {'format': syslog_format},
             'raw': {'format': '%(message)s'},
@@ -51,7 +51,10 @@ def get_logger_config(log_dir,
                 '()': 'django.utils.log.RequireDebugFalse',
             },
             'userid_context': {
-                '()': 'openedx.core.djangoapps.util.log_utils.UserIdFilter',
+                '()': 'edx_django_utils.logging.UserIdFilter',
+            },
+            'remoteip_context': {
+                '()': 'edx_django_utils.logging.RemoteIpFilter',
             }
         },
         'handlers': {
@@ -59,7 +62,7 @@ def get_logger_config(log_dir,
                 'level': 'INFO',
                 'class': 'logging.StreamHandler',
                 'formatter': 'standard',
-                'filters': ['userid_context'],
+                'filters': ['userid_context', 'remoteip_context'],
                 'stream': sys.stderr,
             },
             'mail_admins': {
@@ -72,7 +75,7 @@ def get_logger_config(log_dir,
                 'class': 'logging.handlers.SysLogHandler',
                 'address': '/dev/log',
                 'formatter': 'syslog_format',
-                'filters': ['userid_context'],
+                'filters': ['userid_context', 'remoteip_context'],
                 'facility': SysLogHandler.LOG_LOCAL0,
             },
             'tracking': {

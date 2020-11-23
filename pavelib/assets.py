@@ -43,7 +43,6 @@ COMMON_LOOKUP_PATHS = [
     path("common/static/sass"),
     path('node_modules/@edx'),
     path('node_modules'),
-    path('node_modules/edx-pattern-library/node_modules'),
 ]
 
 # A list of NPM installed libraries that should be copied into the common
@@ -168,6 +167,8 @@ def get_theme_sass_dirs(system, theme_dir):
     system_sass_dir = path(system) / "static" / "sass"
     sass_dir = theme_dir / system / "static" / "sass"
     css_dir = theme_dir / system / "static" / "css"
+    certs_sass_dir = theme_dir / system / "static" / "certificates" / "sass"
+    certs_css_dir = theme_dir / system / "static" / "certificates" / "css"
 
     dependencies = SASS_LOOKUP_DEPENDENCIES.get(system, [])
     if sass_dir.isdir():
@@ -194,6 +195,17 @@ def get_theme_sass_dirs(system, theme_dir):
                 system_sass_dir,
             ],
         })
+
+        # now compile theme sass files for certificate
+        if system == 'lms':
+            dirs.append({
+                "sass_source_dir": certs_sass_dir,
+                "css_destination_dir": certs_css_dir,
+                "lookup_paths": [
+                    sass_dir / "partials",
+                    sass_dir
+                ],
+            })
 
     return dirs
 
@@ -763,9 +775,9 @@ def webpack(options):
     Run a Webpack build.
     """
     settings = getattr(options, 'settings', Env.DEVSTACK_SETTINGS)
-    static_root_lms = Env.get_django_setting("STATIC_ROOT", "lms", settings=settings)
-    static_root_cms = Env.get_django_setting("STATIC_ROOT", "cms", settings=settings)
-    config_path = Env.get_django_setting("WEBPACK_CONFIG_PATH", "lms", settings=settings)
+    result = Env.get_django_settings(['STATIC_ROOT', 'WEBPACK_CONFIG_PATH'], "lms", settings=settings)
+    static_root_lms, config_path = result
+    static_root_cms, = Env.get_django_settings(["STATIC_ROOT"], "cms", settings=settings)
     environment = 'NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms}'.format(
         node_env="development" if config_path == 'webpack.dev.config.js' else "production",
         static_root_lms=static_root_lms,
@@ -788,13 +800,17 @@ def execute_webpack_watch(settings=None):
     # We only want Webpack to re-run on changes to its own entry points,
     # not all JS files, so we use its own watcher instead of subclassing
     # from Watchdog like the other watchers do.
+
+    result = Env.get_django_settings(["STATIC_ROOT", "WEBPACK_CONFIG_PATH"], "lms", settings=settings)
+    static_root_lms, config_path = result
+    static_root_cms, = Env.get_django_settings(["STATIC_ROOT"], "cms", settings=settings)
     run_background_process(
         'STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} $(npm bin)/webpack {options}'.format(
             options='--watch --config={config_path}'.format(
-                config_path=Env.get_django_setting("WEBPACK_CONFIG_PATH", "lms", settings=settings)
+                config_path=config_path
             ),
-            static_root_lms=Env.get_django_setting("STATIC_ROOT", "lms", settings=settings),
-            static_root_cms=Env.get_django_setting("STATIC_ROOT", "cms", settings=settings),
+            static_root_lms=static_root_lms,
+            static_root_cms=static_root_cms,
         )
     )
 

@@ -51,7 +51,7 @@
         <span class="auto-register-message"><%- context.autoRegisterWelcomeMessage %></span>
     <% } %>
 
-    <%= context.fields %>
+    <%= context.fields /* xss-lint: disable=underscore-not-escaped */ %>
 
     <div class="form-field checkbox-optional_fields_toggle">
         <input type="checkbox" id="toggle_optional_fields" class="input-block checkbox"">

@@ -16,7 +16,7 @@ from lms.djangoapps.teams.api import (
 )
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from .utils import emit_team_event
 
 

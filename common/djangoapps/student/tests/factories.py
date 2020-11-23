@@ -14,7 +14,7 @@ from pytz import UTC
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from student.models import (
+from common.djangoapps.student.models import (
     AccountRecovery,
     CourseAccessRole,
     CourseEnrollment,

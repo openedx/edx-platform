@@ -6,6 +6,7 @@ import six
 from celery import task
 from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from django.conf import settings
+from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
 from six.moves import range  # pylint: disable=ungrouped-imports
 
@@ -59,6 +60,7 @@ def enqueue_async_course_overview_update_tasks(
 
 
 @task(base=LoggedPersistOnFailureTask)
+@set_code_owner_attribute
 def async_course_overview_update(*args, **kwargs):
     course_keys = [CourseKey.from_string(arg) for arg in args]
     CourseOverview.update_select_courses(course_keys, force_update=kwargs['force_update'])

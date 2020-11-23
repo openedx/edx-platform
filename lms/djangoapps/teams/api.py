@@ -10,13 +10,13 @@ from django.db.models import Count, Q
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.courses import has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.lib.teams_config import TeamsetType
-from student.models import CourseEnrollment, anonymous_id_for_user
-from student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.models import CourseEnrollment, anonymous_id_for_user
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore.django import modulestore
 
 logger = logging.getLogger(__name__)
@@ -49,6 +49,17 @@ class OrganizationProtectionStatus(Enum):
 ORGANIZATION_PROTECTED_MODES = (
     CourseMode.MASTERS,
 )
+
+
+def get_team_by_team_id(team_id):
+    """
+    API Function to lookup team object by team_id, which is globally unique.
+    If there is no such team, return None.
+    """
+    try:
+        return CourseTeam.objects.get(team_id=team_id)
+    except CourseTeam.DoesNotExist:
+        return None
 
 
 def get_team_by_discussion(discussion_id):
@@ -218,7 +229,7 @@ def teamset_is_public_or_user_is_on_team_in_teamset(user, course_module, teamset
     teamset = course_module.teams_configuration.teamsets_by_id[teamset_id]
     if teamset.teamset_type != TeamsetType.private_managed:
         return True
-    return CourseTeamMembership.user_in_team_for_course(user, course_module.id, topic_id=teamset_id)
+    return CourseTeamMembership.user_in_team_for_teamset(user, course_module.id, topic_id=teamset_id)
 
 
 def user_on_team_or_team_is_public(user, team):

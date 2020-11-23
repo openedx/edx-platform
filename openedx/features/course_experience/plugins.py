@@ -9,11 +9,10 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from lms.djangoapps.courseware.courses import get_course_by_id
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 
-from . import SHOW_REVIEWS_TOOL_FLAG, UNIFIED_COURSE_TAB_FLAG
+from . import DISABLE_UNIFIED_COURSE_TAB_FLAG
 from .course_tools import CourseTool
-from .views.course_reviews import CourseReviewsModuleFragmentView
 from .views.course_updates import CourseUpdatesFragmentView
 
 
@@ -47,7 +46,7 @@ class CourseUpdatesTool(CourseTool):
         """
         Returns True if the user should be shown course updates for this course.
         """
-        if not UNIFIED_COURSE_TAB_FLAG.is_enabled(course_key):
+        if DISABLE_UNIFIED_COURSE_TAB_FLAG.is_enabled(course_key):
             return False
         if not CourseEnrollment.is_enrolled(request.user, course_key):
             return False
@@ -60,45 +59,3 @@ class CourseUpdatesTool(CourseTool):
         Returns the URL for this tool for the specified course key.
         """
         return reverse('openedx.course_experience.course_updates', args=[course_key])
-
-
-class CourseReviewsTool(CourseTool):
-    """
-    The course reviews tool.
-    """
-    @classmethod
-    def analytics_id(cls):
-        """
-        Returns an id to uniquely identify this tool in analytics events.
-        """
-        return 'edx.reviews'
-
-    @classmethod
-    def title(cls):
-        """
-        Returns the title of this tool.
-        """
-        return _('Reviews')
-
-    @classmethod
-    def icon_classes(cls):
-        """
-        Returns icon classes needed to represent this tool.
-        """
-        return 'fa fa-star'
-
-    @classmethod
-    def is_enabled(cls, request, course_key):
-        """
-        Returns True if this tool is enabled for the specified course key.
-        """
-        if not SHOW_REVIEWS_TOOL_FLAG.is_enabled(course_key):
-            return False
-        return CourseReviewsModuleFragmentView.is_configured()
-
-    @classmethod
-    def url(cls, course_key):
-        """
-        Returns the URL for this tool for the specified course key.
-        """
-        return reverse('openedx.course_experience.course_reviews', args=[course_key])

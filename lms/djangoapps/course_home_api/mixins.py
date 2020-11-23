@@ -40,6 +40,5 @@ class DatesBannerSerializerMixin(serializers.Serializer):
                 user=request.user,
                 course_key=course_key,
             )
-            if info['content_type_gating_enabled']:
-                info['verified_upgrade_link'] = verified_upgrade_deadline_link(request.user, course_id=course_key)
+            info['verified_upgrade_link'] = verified_upgrade_deadline_link(request.user, course_id=course_key)
         return info

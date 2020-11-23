@@ -22,12 +22,15 @@ from django.utils.translation import ugettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.waffle_utils import WaffleSwitch
+from edx_toggles.toggles import WaffleSwitch
 from openedx.core.lib.courses import clean_course_id
-from student import STUDENT_WAFFLE_NAMESPACE
-from student.models import (
+from common.djangoapps.student import STUDENT_WAFFLE_NAMESPACE
+from common.djangoapps.student.models import (
     AccountRecovery,
+    AccountRecoveryConfiguration,
     AllowedAuthUser,
+    BulkChangeEnrollmentConfiguration,
+    BulkUnenrollConfiguration,
     CourseAccessRole,
     CourseEnrollment,
     CourseEnrollmentAllowed,
@@ -40,11 +43,9 @@ from student.models import (
     RegistrationCookieConfiguration,
     UserAttribute,
     UserProfile,
-    UserTestGroup,
-    BulkUnenrollConfiguration,
-    AccountRecoveryConfiguration
+    UserTestGroup
 )
-from student.roles import REGISTERED_ACCESS_ROLES
+from common.djangoapps.student.roles import REGISTERED_ACCESS_ROLES
 from xmodule.modulestore.django import modulestore
 
 User = get_user_model()  # pylint:disable=invalid-name
@@ -52,7 +53,7 @@ User = get_user_model()  # pylint:disable=invalid-name
 # This switch exists because the CourseEnrollment admin views make DB queries that impact performance.
 # In a large enough deployment of Open edX, this is enough to cause a site outage.
 # See https://openedx.atlassian.net/browse/OPS-2943
-COURSE_ENROLLMENT_ADMIN_SWITCH = WaffleSwitch(STUDENT_WAFFLE_NAMESPACE, 'courseenrollment_admin')
+COURSE_ENROLLMENT_ADMIN_SWITCH = WaffleSwitch(STUDENT_WAFFLE_NAMESPACE, 'courseenrollment_admin', __name__)
 
 
 class _Check(object):
@@ -223,11 +224,9 @@ class LinkedInAddToProfileConfigurationAdmin(admin.ModelAdmin):
     class Meta(object):
         model = LinkedInAddToProfileConfiguration
 
-    # Exclude deprecated fields
-    exclude = ('dashboard_tracking_code',)
-
 
 class CourseEnrollmentForm(forms.ModelForm):
+    """ Form for Course Enrollments in the Django Admin Panel. """
     def __init__(self, *args, **kwargs):
         # If args is a QueryDict, then the ModelForm addition request came in as a POST with a course ID string.
         # Change the course ID string to a CourseLocator object by copying the QueryDict to make it mutable.
@@ -541,6 +540,7 @@ admin.site.register(AccountRecoveryConfiguration, ConfigurationModelAdmin)
 admin.site.register(DashboardConfiguration, ConfigurationModelAdmin)
 admin.site.register(RegistrationCookieConfiguration, ConfigurationModelAdmin)
 admin.site.register(BulkUnenrollConfiguration, ConfigurationModelAdmin)
+admin.site.register(BulkChangeEnrollmentConfiguration, ConfigurationModelAdmin)
 
 
 # We must first un-register the User model since it may also be registered by the auth app.

@@ -5,7 +5,7 @@ import unittest
 import ddt
 from django.test.utils import override_settings
 from mock import Mock
-from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
@@ -98,12 +98,30 @@ class HtmlBlockCourseApiTestCase(unittest.TestCase):
 
 class HtmlBlockSubstitutionTestCase(unittest.TestCase):
 
-    def test_substitution_works(self):
+    def test_substitution_user_id(self):
         sample_xml = '''%%USER_ID%%'''
         field_data = DictFieldData({'data': sample_xml})
         module_system = get_test_system()
         module = HtmlBlock(module_system, field_data, Mock())
         self.assertEqual(module.get_html(), str(module_system.anonymous_student_id))
+
+    def test_substitution_course_id(self):
+        sample_xml = '''%%COURSE_ID%%'''
+        field_data = DictFieldData({'data': sample_xml})
+        module_system = get_test_system()
+        module = HtmlBlock(module_system, field_data, Mock())
+        course_key = CourseLocator(
+            org='some_org',
+            course='some_course',
+            run='some_run'
+        )
+        usage_key = BlockUsageLocator(
+            course_key=course_key,
+            block_type='problem',
+            block_id='block_id'
+        )
+        module.scope_ids.usage_id = usage_key
+        self.assertEqual(module.get_html(), str(course_key))
 
     def test_substitution_without_magic_string(self):
         sample_xml = '''

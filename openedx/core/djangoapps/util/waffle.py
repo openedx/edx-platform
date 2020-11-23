@@ -3,7 +3,7 @@ Waffle flags and switches
 """
 
 
-from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
+from edx_toggles.toggles import WaffleSwitchNamespace
 
 WAFFLE_NAMESPACE = u'open_edx_util'
 

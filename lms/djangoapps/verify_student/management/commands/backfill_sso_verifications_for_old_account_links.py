@@ -17,7 +17,7 @@ from social_django.models import UserSocialAuth
 
 from common.djangoapps.third_party_auth.api.utils import filter_user_social_auth_queryset_by_provider
 from lms.djangoapps.verify_student.models import SSOVerification
-from third_party_auth.provider import Registry
+from common.djangoapps.third_party_auth.provider import Registry
 
 
 class Command(BaseCommand):

@@ -12,34 +12,33 @@ not other discounts like coupons or enterprise/program offers configured in ecom
 
 from datetime import datetime, timedelta
 
+import pytz
 from crum import get_current_request, impersonate
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-import pytz
+from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
 
-from course_modes.models import CourseMode
-from entitlements.models import CourseEntitlement
-from experiments.models import ExperimentData
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.entitlements.models import CourseEntitlement
+from lms.djangoapps.experiments.models import ExperimentData
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
-from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.features.discounts.models import DiscountPercentageConfig, DiscountRestrictionConfig
-from student.models import CourseEnrollment
-from track import segment
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.track import segment
 
-# .. feature_toggle_name: discounts.enable_discounting
-# .. feature_toggle_type: flag
-# .. feature_toggle_default: False
-# .. feature_toggle_description: Toggle discounts always being disabled
-# .. feature_toggle_category: discounts
-# .. feature_toggle_use_cases: monitored_rollout
-# .. feature_toggle_creation_date: 2019-4-16
-# .. feature_toggle_expiration_date: None
-# .. feature_toggle_warnings: None
-# .. feature_toggle_tickets: REVEM-282
-# .. feature_toggle_status: supported
+# .. toggle_name: discounts.enable_discounting
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Toggle discounts always being disabled
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2019-4-16
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: REVEM-282
+# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
 DISCOUNT_APPLICABILITY_FLAG = WaffleFlag(
     waffle_namespace=WaffleFlagNamespace(name=u'discounts'),
     flag_name=u'enable_discounting',
+    module_name=__name__,
 )
 
 DISCOUNT_APPLICABILITY_HOLDBACK = 'first_purchase_discount_holdback'
@@ -155,7 +154,6 @@ def _is_in_holdback_and_bucket(user):
 
     request = get_current_request()
     if hasattr(request, 'session') and DISCOUNT_APPLICABILITY_HOLDBACK not in request.session:
-
         properties = {
             'site': request.site.domain,
             'app_label': 'discounts',

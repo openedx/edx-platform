@@ -16,8 +16,8 @@ from jwkest import jwk
 from mock import call, patch
 from oauth2_provider import models as dot_models
 
-from student.tests.factories import UserFactory
-from third_party_auth.tests.utils import ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinGoogle
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.third_party_auth.tests.utils import ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinGoogle
 
 from . import mixins
 
@@ -233,18 +233,18 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         (None, 'no_token_type_supplied'),
     )
     @ddt.unpack
-    @patch('edx_django_utils.monitoring.set_custom_metric')
-    def test_access_token_metrics(self, token_type, expected_token_type, mock_set_custom_metric):
+    @patch('edx_django_utils.monitoring.set_custom_attribute')
+    def test_access_token_attributes(self, token_type, expected_token_type, mock_set_custom_attribute):
         response = self._post_request(self.user, self.dot_app, token_type=token_type)
         self.assertEqual(response.status_code, 200)
         expected_calls = [
             call('oauth_token_type', expected_token_type),
             call('oauth_grant_type', 'password'),
         ]
-        mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
+        mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=True)
 
-    @patch('edx_django_utils.monitoring.set_custom_metric')
-    def test_access_token_metrics_for_bad_request(self, mock_set_custom_metric):
+    @patch('edx_django_utils.monitoring.set_custom_attribute')
+    def test_access_token_attributes_for_bad_request(self, mock_set_custom_attribute):
         grant_type = dot_models.Application.GRANT_PASSWORD
         invalid_body = {
             'grant_type': grant_type.replace('-', '_'),
@@ -255,7 +255,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
             call('oauth_token_type', 'no_token_type_supplied'),
             call('oauth_grant_type', 'password'),
         ]
-        mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
+        mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=True)
 
     def test_restricted_jwt_access_token(self):
         """

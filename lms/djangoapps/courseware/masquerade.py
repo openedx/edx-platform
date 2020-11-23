@@ -20,15 +20,15 @@ from pytz import utc
 from web_fragments.fragment import Fragment
 from xblock.runtime import KeyValueStore
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID
 from openedx.features.content_type_gating.helpers import FULL_ACCESS
 from openedx.features.content_type_gating.helpers import LIMITED_ACCESS
-from student.models import CourseEnrollment
-from student.role_helpers import has_staff_roles
-from util.json_request import JsonResponse, expect_json
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.role_helpers import has_staff_roles
+from common.djangoapps.util.json_request import JsonResponse, expect_json
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 from xmodule.partitions.partitions import NoSuchUserPartitionGroupError
@@ -69,6 +69,23 @@ class CourseMasquerade(object):
         """
         self.__init__(**state)
 
+    def get_active_group_name(self, available):
+        """
+        Lookup the active group name, from available options
+
+        Returns: the corresponding group name, if exists,
+            else, return None
+        """
+        if not (self.group_id and self.user_partition_id):
+            return None
+        for group in available:
+            if (
+                self.group_id == group.get('group_id') and
+                self.user_partition_id == group.get('user_partition_id')
+            ):
+                return group.get('name')
+        return None
+
 
 @method_decorator(login_required, name='dispatch')
 class MasqueradeView(View):
@@ -103,7 +120,7 @@ class MasqueradeView(View):
                 'course_key': course_key_string,
                 'group_id': course.group_id,
                 'role': course.role,
-                'user_name': course.user_name or ' ',
+                'user_name': course.user_name or None,
                 'user_partition_id': course.user_partition_id,
             },
             'available': [
@@ -114,6 +131,11 @@ class MasqueradeView(View):
                 {
                     'name': 'Learner',
                     'role': 'student',
+                },
+                {
+                    'name': 'Specific Student...',
+                    'role': 'student',
+                    'user_name': course.user_name or '',
                 },
             ],
         }
@@ -128,6 +150,7 @@ class MasqueradeView(View):
                     }
                     for group in partition.groups
                 ])
+        data['active']['group_name'] = course.get_active_group_name(data['available'])
         return JsonResponse(data)
 
     @method_decorator(expect_json)
@@ -158,7 +181,7 @@ class MasqueradeView(View):
                 return JsonResponse({
                     'success': False,
                     'error': _(
-                        u'There is no user with the username or email address u"{user_identifier}" '
+                        u'There is no user with the username or email address "{user_identifier}" '
                         'enrolled in this course.'
                     ).format(
                         user_identifier=user_name,
@@ -324,6 +347,18 @@ def is_masquerading_as_specific_student(user, course_key):
     """
     course_masquerade = get_course_masquerade(user, course_key)
     return bool(course_masquerade and course_masquerade.user_name)
+
+
+def get_specific_masquerading_user(user, course_key):
+    """
+    Return the specific user that a staff member is masquerading as, or None if they aren't.
+    """
+    course_masquerade = get_course_masquerade(user, course_key)
+    is_specific_user = bool(course_masquerade and course_masquerade.user_name)
+    if is_specific_user:
+        return User.objects.get(username=course_masquerade.user_name)
+    else:
+        return None
 
 
 def get_masquerading_user_group(course_key, user, user_partition):

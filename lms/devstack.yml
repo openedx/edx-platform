@@ -1,0 +1,588 @@
+ACCOUNT_MICROFRONTEND_URL: null
+ACE_CHANNEL_DEFAULT_EMAIL: django_email
+ACE_CHANNEL_SAILTHRU_API_KEY: ''
+ACE_CHANNEL_SAILTHRU_API_SECRET: ''
+ACE_CHANNEL_SAILTHRU_DEBUG: true
+ACE_CHANNEL_SAILTHRU_TEMPLATE_NAME: null
+ACE_CHANNEL_TRANSACTIONAL_EMAIL: django_email
+ACE_ENABLED_CHANNELS:
+- django_email
+ACE_ENABLED_POLICIES:
+- bulk_email_optout
+ACE_ROUTING_KEY: edx.lms.core.default
+ACTIVATION_EMAIL_SUPPORT_LINK: ''
+AFFILIATE_COOKIE_NAME: dev_affiliate_id
+ALTERNATE_WORKER_QUEUES: cms
+ANALYTICS_API_KEY: ''
+ANALYTICS_API_URL: http://localhost:18100
+ANALYTICS_DASHBOARD_NAME: Your Platform Name Here Insights
+ANALYTICS_DASHBOARD_URL: http://localhost:18110/courses
+API_ACCESS_FROM_EMAIL: api-requests@example.com
+API_ACCESS_MANAGER_EMAIL: api-access@example.com
+API_DOCUMENTATION_URL: http://course-catalog-api-guide.readthedocs.io/en/latest/
+AUDIT_CERT_CUTOFF_DATE: null
+AUTH_DOCUMENTATION_URL: http://course-catalog-api-guide.readthedocs.io/en/latest/authentication/index.html
+AUTH_PASSWORD_VALIDATORS:
+-   NAME: django.contrib.auth.password_validation.UserAttributeSimilarityValidator
+-   NAME: common.djangoapps.util.password_policy_validators.MinimumLengthValidator
+    OPTIONS:
+        min_length: 2
+-   NAME: common.djangoapps.util.password_policy_validators.MaximumLengthValidator
+    OPTIONS:
+        max_length: 75
+AWS_ACCESS_KEY_ID: null
+AWS_QUERYSTRING_AUTH: false
+AWS_S3_CUSTOM_DOMAIN: SET-ME-PLEASE (ex. bucket-name.s3.amazonaws.com)
+AWS_SECRET_ACCESS_KEY: null
+AWS_SES_REGION_ENDPOINT: email.us-east-1.amazonaws.com
+AWS_SES_REGION_NAME: us-east-1
+AWS_STORAGE_BUCKET_NAME: SET-ME-PLEASE (ex. bucket-name)
+BASE_COOKIE_DOMAIN: localhost
+BLOCKSTORE_API_URL: http://localhost:18250/api/v1
+BLOCKSTORE_PUBLIC_URL_ROOT: http://localhost:18250
+BLOCK_STRUCTURES_SETTINGS:
+    COURSE_PUBLISH_TASK_DELAY: 30
+    PRUNING_ACTIVE: false
+    TASK_DEFAULT_RETRY_DELAY: 30
+    TASK_MAX_RETRIES: 5
+BRANCH_IO_KEY: ''
+BUGS_EMAIL: bugs@example.com
+BULK_EMAIL_DEFAULT_FROM_EMAIL: no-reply@example.com
+BULK_EMAIL_EMAILS_PER_TASK: 500
+BULK_EMAIL_LOG_SENT_EMAILS: false
+BULK_EMAIL_ROUTING_KEY_SMALL_JOBS: edx.lms.core.default
+CACHES:
+    celery:
+        BACKEND: django.core.cache.backends.memcached.MemcachedCache
+        KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
+        KEY_PREFIX: celery
+        LOCATION:
+        - edx.devstack.memcached:11211
+        TIMEOUT: '7200'
+    configuration:
+        BACKEND: django.core.cache.backends.memcached.MemcachedCache
+        KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
+        KEY_PREFIX: 1001c6274ca4
+        LOCATION:
+        - edx.devstack.memcached:11211
+    course_structure_cache:
+        BACKEND: django.core.cache.backends.memcached.MemcachedCache
+        KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
+        KEY_PREFIX: course_structure
+        LOCATION:
+        - edx.devstack.memcached:11211
+        TIMEOUT: '7200'
+    default:
+        BACKEND: django.core.cache.backends.memcached.MemcachedCache
+        KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
+        KEY_PREFIX: default
+        LOCATION:
+        - edx.devstack.memcached:11211
+        VERSION: '1'
+    general:
+        BACKEND: django.core.cache.backends.memcached.MemcachedCache
+        KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
+        KEY_PREFIX: general
+        LOCATION:
+        - edx.devstack.memcached:11211
+    mongo_metadata_inheritance:
+        BACKEND: django.core.cache.backends.memcached.MemcachedCache
+        KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
+        KEY_PREFIX: mongo_metadata_inheritance
+        LOCATION:
+        - edx.devstack.memcached:11211
+        TIMEOUT: 300
+    staticfiles:
+        BACKEND: django.core.cache.backends.memcached.MemcachedCache
+        KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
+        KEY_PREFIX: 1001c6274ca4_general
+        LOCATION:
+        - edx.devstack.memcached:11211
+CAS_ATTRIBUTE_CALLBACK: ''
+CAS_EXTRA_LOGIN_PARAMS: ''
+CAS_SERVER_URL: ''
+CELERY_BROKER_HOSTNAME: localhost
+CELERY_BROKER_PASSWORD: celery
+CELERY_BROKER_TRANSPORT: amqp
+CELERY_BROKER_USER: celery
+CELERY_BROKER_USE_SSL: false
+CELERY_BROKER_VHOST: ''
+CELERY_EVENT_QUEUE_TTL: null
+CELERY_QUEUES:
+- edx.lms.core.default
+- edx.lms.core.high
+- edx.lms.core.high_mem
+CELERY_TIMEZONE: UTC
+CERTIFICATE_TEMPLATE_LANGUAGES:
+    en: English
+    es: Español
+CERT_QUEUE: certificates
+CMS_BASE: edx.devstack.studio:18010
+CODE_JAIL:
+    limits:
+        CPU: 1
+        FSIZE: 1048576
+        PROXY: 0
+        REALTIME: 3
+        VMEM: 536870912
+    python_bin: /edx/app/edxapp/venvs/edxapp-sandbox/bin/python
+    user: sandbox
+COMMENTS_SERVICE_KEY: password
+COMMENTS_SERVICE_URL: http://localhost:18080
+COMPREHENSIVE_THEME_DIRS:
+- ''
+COMPREHENSIVE_THEME_LOCALE_PATHS: []
+CONTACT_EMAIL: info@example.com
+CONTACT_MAILING_ADDRESS: SET-ME-PLEASE
+CONTENTSTORE:
+    ADDITIONAL_OPTIONS: {}
+    DOC_STORE_CONFIG:
+        authsource: ''
+        collection: modulestore
+        connectTimeoutMS: 2000
+        db: edxapp
+        host:
+        - edx.devstack.mongo
+        password: password
+        port: 27017
+        read_preference: SECONDARY_PREFERRED
+        replicaSet: ''
+        socketTimeoutMS: 3000
+        ssl: false
+        user: edxapp
+    ENGINE: xmodule.contentstore.mongo.MongoContentStore
+    OPTIONS:
+        auth_source: ''
+        db: edxapp
+        host:
+        - edx.devstack.mongo
+        password: password
+        port: 27017
+        ssl: false
+        user: edxapp
+CORS_ORIGIN_ALLOW_ALL: false
+CORS_ORIGIN_WHITELIST: []
+COURSES_WITH_UNSAFE_CODE: []
+COURSE_ABOUT_VISIBILITY_PERMISSION: see_exists
+COURSE_CATALOG_API_URL: http://localhost:8008/api/v1
+COURSE_CATALOG_URL_ROOT: http://localhost:8008
+COURSE_CATALOG_VISIBILITY_PERMISSION: see_exists
+CREDENTIALS_INTERNAL_SERVICE_URL: http://localhost:8005
+CREDENTIALS_PUBLIC_SERVICE_URL: http://localhost:8005
+CREDIT_HELP_LINK_URL: ''
+CREDIT_PROVIDER_SECRET_KEYS: {}
+CROSS_DOMAIN_CSRF_COOKIE_DOMAIN: ''
+CROSS_DOMAIN_CSRF_COOKIE_NAME: ''
+CSRF_COOKIE_SECURE: false
+CSRF_TRUSTED_ORIGINS: []
+DASHBOARD_COURSE_LIMIT: null
+DATABASES:
+    default:
+        ATOMIC_REQUESTS: true
+        CONN_MAX_AGE: 0
+        ENGINE: django.db.backends.mysql
+        HOST: edx.devstack.mysql57
+        NAME: edxapp
+        OPTIONS: {}
+        PASSWORD: password
+        PORT: '3306'
+        USER: edxapp001
+    read_replica:
+        CONN_MAX_AGE: 0
+        ENGINE: django.db.backends.mysql
+        HOST: edx.devstack.mysql57
+        NAME: edxapp
+        OPTIONS: {}
+        PASSWORD: password
+        PORT: '3306'
+        USER: edxapp001
+    student_module_history:
+        CONN_MAX_AGE: 0
+        ENGINE: django.db.backends.mysql
+        HOST: edx.devstack.mysql57
+        NAME: edxapp_csmh
+        OPTIONS: {}
+        PASSWORD: password
+        PORT: '3306'
+        USER: edxapp001
+DATA_DIR: /edx/var/edxapp
+DEFAULT_COURSE_VISIBILITY_IN_CATALOG: both
+DEFAULT_FEEDBACK_EMAIL: feedback@example.com
+DEFAULT_FILE_STORAGE: django.core.files.storage.FileSystemStorage
+DEFAULT_FROM_EMAIL: registration@example.com
+DEFAULT_JWT_ISSUER:
+    AUDIENCE: lms-key
+    ISSUER: http://edx.devstack.lms:18000/oauth2
+    SECRET_KEY: lms-secret
+DEFAULT_MOBILE_AVAILABLE: false
+DEFAULT_SITE_THEME: ''
+DEPRECATED_ADVANCED_COMPONENT_TYPES: []
+DJFS:
+    directory_root: /edx/var/edxapp/django-pyfs/static/django-pyfs
+    type: osfs
+    url_root: /static/django-pyfs
+DOC_STORE_CONFIG:
+    authsource: ''
+    collection: modulestore
+    connectTimeoutMS: 2000
+    db: edxapp
+    host:
+    - edx.devstack.mongo
+    password: password
+    port: 27017
+    read_preference: SECONDARY_PREFERRED
+    replicaSet: ''
+    socketTimeoutMS: 3000
+    ssl: false
+    user: edxapp
+ECOMMERCE_API_SIGNING_KEY: lms-secret
+ECOMMERCE_API_URL: http://localhost:8002/api/v2
+ECOMMERCE_PUBLIC_URL_ROOT: http://localhost:8002
+EDXMKTG_USER_INFO_COOKIE_NAME: edx-user-info
+EDXNOTES_INTERNAL_API: http://edx.devstack.edx_notes_api:18120/api/v1
+EDXNOTES_PUBLIC_API: http://localhost:18120/api/v1
+EDX_API_KEY: PUT_YOUR_API_KEY_HERE
+EDX_PLATFORM_REVISION: master
+ELASTIC_SEARCH_CONFIG:
+-   host: edx.devstack.elasticsearch
+    port: 9200
+    use_ssl: false
+EMAIL_BACKEND: django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST: localhost
+EMAIL_HOST_PASSWORD: ''
+EMAIL_HOST_USER: ''
+EMAIL_PORT: 25
+EMAIL_USE_TLS: false
+ENABLE_COMPREHENSIVE_THEMING: false
+ENTERPRISE_API_URL: http://edx.devstack.lms:18000/enterprise/api/v1
+ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES:
+- audit
+- honor
+ENTERPRISE_CUSTOMER_SUCCESS_EMAIL: customersuccess@edx.org
+ENTERPRISE_ENROLLMENT_API_URL: http://edx.devstack.lms:18000/api/enrollment/v1/
+ENTERPRISE_INTEGRATIONS_EMAIL: enterprise-integrations@edx.org
+ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS: {}
+ENTERPRISE_SERVICE_WORKER_USERNAME: enterprise_worker
+ENTERPRISE_SUPPORT_URL: ''
+ENTERPRISE_TAGLINE: ''
+EVENT_TRACKING_SEGMENTIO_EMIT_WHITELIST: []
+EXTRA_MIDDLEWARE_CLASSES: []
+FACEBOOK_API_VERSION: v2.1
+FACEBOOK_APP_ID: FACEBOOK_APP_ID
+FACEBOOK_APP_SECRET: FACEBOOK_APP_SECRET
+FEATURES:
+    AUTH_USE_OPENID_PROVIDER: true
+    AUTOMATIC_AUTH_FOR_TESTING: false
+    CUSTOM_COURSES_EDX: false
+    ENABLE_COMBINED_LOGIN_REGISTRATION: true
+    ENABLE_CORS_HEADERS: false
+    ENABLE_COUNTRY_ACCESS: false
+    ENABLE_CREDIT_API: false
+    ENABLE_CREDIT_ELIGIBILITY: false
+    ENABLE_CROSS_DOMAIN_CSRF_COOKIE: false
+    ENABLE_CSMH_EXTENDED: true
+    ENABLE_DISCUSSION_HOME_PANEL: true
+    ENABLE_DISCUSSION_SERVICE: true
+    ENABLE_EDXNOTES: true
+    ENABLE_ENROLLMENT_RESET: false
+    ENABLE_GRADE_DOWNLOADS: true
+    ENABLE_INSTRUCTOR_ANALYTICS: false
+    ENABLE_MKTG_SITE: false
+    ENABLE_MOBILE_REST_API: false
+    ENABLE_OAUTH2_PROVIDER: false
+    ENABLE_PUBLISHER: false
+    ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES: true
+    ENABLE_SPECIAL_EXAMS: false
+    ENABLE_SYSADMIN_DASHBOARD: false
+    ENABLE_THIRD_PARTY_AUTH: true
+    ENABLE_VIDEO_UPLOAD_PIPELINE: false
+    PREVIEW_LMS_BASE: preview.localhost:18000
+    SHOW_FOOTER_LANGUAGE_SELECTOR: false
+    SHOW_HEADER_LANGUAGE_SELECTOR: false
+FEEDBACK_SUBMISSION_EMAIL: ''
+FERNET_KEYS:
+- DUMMY KEY CHANGE BEFORE GOING TO PRODUCTION
+FILE_UPLOAD_STORAGE_BUCKET_NAME: SET-ME-PLEASE (ex. bucket-name)
+FILE_UPLOAD_STORAGE_PREFIX: submissions_attachments
+FINANCIAL_REPORTS:
+    BUCKET: null
+    ROOT_PATH: sandbox
+    STORAGE_TYPE: localfs
+FOOTER_ORGANIZATION_IMAGE: images/logo.png
+GITHUB_REPO_ROOT: /edx/var/edxapp/data
+GIT_REPO_DIR: /edx/var/edxapp/course_repos
+GOOGLE_ANALYTICS_ACCOUNT: null
+GOOGLE_ANALYTICS_LINKEDIN: ''
+GOOGLE_ANALYTICS_TRACKING_ID: ''
+GOOGLE_SITE_VERIFICATION_ID: ''
+GRADES_DOWNLOAD:
+    BUCKET: ''
+    ROOT_PATH: ''
+    STORAGE_CLASS: django.core.files.storage.FileSystemStorage
+    STORAGE_KWARGS:
+        location: /tmp/edx-s3/grades
+    STORAGE_TYPE: ''
+HELP_TOKENS_BOOKS:
+    course_author: http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course
+    learner: http://edx.readthedocs.io/projects/open-edx-learner-guide
+HTTPS: 'on'
+ICP_LICENSE: null
+ICP_LICENSE_INFO: {}
+IDA_LOGOUT_URI_LIST: []
+ID_VERIFICATION_SUPPORT_LINK: ''
+JWT_AUTH:
+    JWT_AUDIENCE: lms-key
+    JWT_AUTH_COOKIE_HEADER_PAYLOAD: edx-jwt-cookie-header-payload
+    JWT_AUTH_COOKIE_SIGNATURE: edx-jwt-cookie-signature
+    JWT_AUTH_REFRESH_COOKIE: edx-jwt-refresh-cookie
+    JWT_ISSUER: http://edx.devstack.lms:18000/oauth2
+    JWT_ISSUERS:
+    -   AUDIENCE: lms-key
+        ISSUER: http://edx.devstack.lms:18000/oauth2
+        SECRET_KEY: lms-secret
+    JWT_PRIVATE_SIGNING_JWK: None
+    JWT_PUBLIC_SIGNING_JWK_SET: ''
+    JWT_SECRET_KEY: lms-secret
+    JWT_SIGNING_ALGORITHM: null
+JWT_EXPIRATION: 30
+JWT_ISSUER: http://edx.devstack.lms:18000/oauth2
+JWT_PRIVATE_SIGNING_KEY: null
+LANGUAGE_CODE: en
+LANGUAGE_COOKIE: openedx-language-preference
+LEARNER_PORTAL_URL_ROOT: https://learner-portal-edx.devstack.lms:18000
+LEARNING_MICROFRONTEND_URL: null
+LMS_BASE: edx.devstack.lms:18000
+LMS_INTERNAL_ROOT_URL: http://edx.devstack.lms:18000
+LMS_ROOT_URL: http://edx.devstack.lms:18000
+LOCAL_LOGLEVEL: INFO
+LOGGING_ENV: sandbox
+LOGIN_REDIRECT_WHITELIST: []
+LOG_DIR: /edx/var/log/edx
+LTI_AGGREGATE_SCORE_PASSBACK_DELAY: 900
+LTI_USER_EMAIL_DOMAIN: lti.example.com
+MAILCHIMP_NEW_USER_LIST_ID: null
+MAINTENANCE_BANNER_TEXT: Sample banner message
+MEDIA_ROOT: /edx/var/edxapp/media/
+MEDIA_URL: /media/
+MICROSITE_CONFIGURATION: {}
+MICROSITE_ROOT_DIR: /edx/app/edxapp/edx-microsite
+MKTG_URLS: {}
+MKTG_URL_LINK_MAP: {}
+MOBILE_STORE_URLS: {}
+MODULESTORE:
+    default:
+        ENGINE: xmodule.modulestore.mixed.MixedModuleStore
+        OPTIONS:
+            mappings: {}
+            stores:
+            -   DOC_STORE_CONFIG:
+                    authsource: ''
+                    collection: modulestore
+                    connectTimeoutMS: 2000
+                    db: edxapp
+                    host:
+                    - edx.devstack.mongo
+                    password: password
+                    port: 27017
+                    read_preference: SECONDARY_PREFERRED
+                    replicaSet: ''
+                    socketTimeoutMS: 3000
+                    ssl: false
+                    user: edxapp
+                ENGINE: xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore
+                NAME: split
+                OPTIONS:
+                    default_class: xmodule.hidden_module.HiddenDescriptor
+                    fs_root: /edx/var/edxapp/data
+                    render_template: edxmako.shortcuts.render_to_string
+            -   DOC_STORE_CONFIG:
+                    authsource: ''
+                    collection: modulestore
+                    connectTimeoutMS: 2000
+                    db: edxapp
+                    host:
+                    - edx.devstack.mongo
+                    password: password
+                    port: 27017
+                    read_preference: PRIMARY
+                    replicaSet: ''
+                    socketTimeoutMS: 3000
+                    ssl: false
+                    user: edxapp
+                ENGINE: xmodule.modulestore.mongo.DraftMongoModuleStore
+                NAME: draft
+                OPTIONS:
+                    default_class: xmodule.hidden_module.HiddenDescriptor
+                    fs_root: /edx/var/edxapp/data
+                    render_template: edxmako.shortcuts.render_to_string
+OAUTH_DELETE_EXPIRED: true
+OAUTH_ENFORCE_SECURE: false
+OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS: 365
+OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS: 30
+OPTIMIZELY_PROJECT_ID: null
+ORA2_FILE_PREFIX: default_env-default_deployment/ora2
+ORDER_HISTORY_MICROFRONTEND_URL: null
+PAID_COURSE_REGISTRATION_CURRENCY:
+- usd
+- $
+PARENTAL_CONSENT_AGE_LIMIT: 13
+PARTNER_SUPPORT_EMAIL: ''
+PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG:
+    ENFORCE_COMPLIANCE_ON_LOGIN: false
+PASSWORD_RESET_SUPPORT_LINK: ''
+PAYMENT_SUPPORT_EMAIL: billing@example.com
+PDF_RECEIPT_BILLING_ADDRESS: 'Enter your receipt billing
+
+    address here.
+
+    '
+PDF_RECEIPT_COBRAND_LOGO_PATH: ''
+PDF_RECEIPT_DISCLAIMER_TEXT: 'ENTER YOUR RECEIPT DISCLAIMER TEXT HERE.
+
+    '
+PDF_RECEIPT_FOOTER_TEXT: 'Enter your receipt footer text here.
+
+    '
+PDF_RECEIPT_LOGO_PATH: ''
+PDF_RECEIPT_TAX_ID: 00-0000000
+PDF_RECEIPT_TAX_ID_LABEL: fake Tax ID
+PDF_RECEIPT_TERMS_AND_CONDITIONS: 'Enter your receipt terms and conditions here.
+
+    '
+PLATFORM_DESCRIPTION: Your Platform Description Here
+PLATFORM_FACEBOOK_ACCOUNT: http://www.facebook.com/YourPlatformFacebookAccount
+PLATFORM_NAME: Your Platform Name Here
+PLATFORM_TWITTER_ACCOUNT: '@YourPlatformTwitterAccount'
+POLICY_CHANGE_GRADES_ROUTING_KEY: edx.lms.core.default
+PRESS_EMAIL: press@example.com
+PROCTORING_BACKENDS:
+    DEFAULT: 'null'
+    'null': {}
+PROCTORING_SETTINGS: {}
+PROFILE_IMAGE_BACKEND:
+    class: openedx.core.storage.OverwriteStorage
+    options:
+        base_url: /media/profile-images/
+        location: /edx/var/edxapp/media/profile-images/
+PROFILE_IMAGE_MAX_BYTES: 1048576
+PROFILE_IMAGE_MIN_BYTES: 100
+PROFILE_IMAGE_SECRET_KEY: placeholder_secret_key
+PROFILE_IMAGE_SIZES_MAP:
+    full: 500
+    large: 120
+    medium: 50
+    small: 30
+PROFILE_MICROFRONTEND_URL: null
+PROGRAM_CERTIFICATES_ROUTING_KEY: edx.lms.core.default
+PROGRAM_MANAGER_MICROFRONTEND_URL: null
+RECALCULATE_GRADES_ROUTING_KEY: edx.lms.core.default
+REGISTRATION_EXTRA_FIELDS:
+    city: hidden
+    confirm_email: hidden
+    country: required
+    gender: optional
+    goals: optional
+    honor_code: required
+    level_of_education: optional
+    mailing_address: hidden
+    terms_of_service: hidden
+    year_of_birth: optional
+RETIRED_EMAIL_DOMAIN: retired.invalid
+RETIRED_EMAIL_PREFIX: retired__user_
+RETIRED_USERNAME_PREFIX: retired__user_
+RETIRED_USER_SALTS:
+- OVERRIDE ME WITH A RANDOM VALUE
+- ROTATE SALTS BY APPENDING NEW VALUES
+RETIREMENT_SERVICE_WORKER_USERNAME: retirement_worker
+RETIREMENT_STATES:
+- PENDING
+- ERRORED
+- ABORTED
+- COMPLETE
+SECRET_KEY: DUMMY KEY ONLY FOR TO DEVSTACK
+SEGMENT_KEY: null
+SERVER_EMAIL: devops@example.com
+SESSION_COOKIE_DOMAIN: ''
+SESSION_COOKIE_NAME: sessionid
+SESSION_COOKIE_SECURE: false
+SESSION_SAVE_EVERY_REQUEST: false
+SITE_NAME: localhost
+SOCIAL_AUTH_OAUTH_SECRETS: ''
+SOCIAL_AUTH_SAML_SP_PRIVATE_KEY: ''
+SOCIAL_AUTH_SAML_SP_PRIVATE_KEY_DICT: {}
+SOCIAL_AUTH_SAML_SP_PUBLIC_CERT: ''
+SOCIAL_AUTH_SAML_SP_PUBLIC_CERT_DICT: {}
+SOCIAL_MEDIA_FOOTER_URLS: {}
+SOCIAL_SHARING_SETTINGS:
+    CERTIFICATE_FACEBOOK: false
+    CERTIFICATE_TWITTER: false
+    CUSTOM_COURSE_URLS: false
+    DASHBOARD_FACEBOOK: false
+    DASHBOARD_TWITTER: false
+STATIC_ROOT_BASE: /edx/var/edxapp/staticfiles
+STATIC_URL_BASE: /static/
+STUDIO_NAME: Studio
+STUDIO_SHORT_NAME: Studio
+SUPPORT_SITE_LINK: ''
+SWIFT_AUTH_URL: null
+SWIFT_AUTH_VERSION: null
+SWIFT_KEY: null
+SWIFT_REGION_NAME: null
+SWIFT_TEMP_URL_DURATION: 1800
+SWIFT_TEMP_URL_KEY: null
+SWIFT_TENANT_ID: null
+SWIFT_TENANT_NAME: null
+SWIFT_USERNAME: null
+SWIFT_USE_TEMP_URLS: false
+SYSLOG_SERVER: ''
+SYSTEM_WIDE_ROLE_CLASSES: []
+TECH_SUPPORT_EMAIL: technical@example.com
+TIME_ZONE: America/New_York
+TRACKING_SEGMENTIO_WEBHOOK_SECRET: ''
+UNIVERSITY_EMAIL: university@example.com
+USERNAME_REPLACEMENT_WORKER: OVERRIDE THIS WITH A VALID USERNAME
+VERIFY_STUDENT:
+    DAYS_GOOD_FOR: 365
+    EXPIRING_SOON_WINDOW: 28
+VIDEO_CDN_URL:
+    EXAMPLE_COUNTRY_CODE: http://example.com/edx/video?s3_url=
+VIDEO_IMAGE_MAX_AGE: 31536000
+VIDEO_IMAGE_SETTINGS:
+    DIRECTORY_PREFIX: video-images/
+    STORAGE_KWARGS:
+        base_url: /media/
+        location: edx/var/edxapp/media/
+    VIDEO_IMAGE_MAX_BYTES: 2097152
+    VIDEO_IMAGE_MIN_BYTES: 2048
+VIDEO_TRANSCRIPTS_MAX_AGE: 31536000
+VIDEO_TRANSCRIPTS_SETTINGS:
+    DIRECTORY_PREFIX: video-transcripts/
+    STORAGE_KWARGS:
+        base_url: /media/
+        location: edx/var/edxapp/media/
+    VIDEO_TRANSCRIPTS_MAX_BYTES: 3145728
+VIDEO_UPLOAD_PIPELINE:
+    BUCKET: ''
+    ROOT_PATH: ''
+WIKI_ENABLED: true
+WRITABLE_GRADEBOOK_URL: null
+XBLOCK_FS_STORAGE_BUCKET: null
+XBLOCK_FS_STORAGE_PREFIX: null
+XBLOCK_SETTINGS: {}
+XQUEUE_INTERFACE:
+    basic_auth:
+    - edx
+    - edx
+    django_auth:
+        password: password
+        username: lms
+    url: http://edx.devstack.xqueue:18040
+X_FRAME_OPTIONS: DENY
+YOUTUBE_API_KEY: PUT_YOUR_API_KEY_HERE
+ZENDESK_API_KEY: ''
+ZENDESK_CUSTOM_FIELDS: {}
+ZENDESK_GROUP_ID_MAPPING: {}
+ZENDESK_OAUTH_ACCESS_TOKEN: ''
+ZENDESK_URL: ''
+ZENDESK_USER: ''
+

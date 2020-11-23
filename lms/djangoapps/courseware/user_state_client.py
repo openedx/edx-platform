@@ -106,23 +106,23 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                 usage_key = student_module.module_state_key.map_into_course(student_module.course_id)
                 yield (student_module, usage_key)
 
-    def _nr_metric_name(self, function_name, stat_name, block_type=None):
+    def _nr_attribute_name(self, function_name, stat_name, block_type=None):
         """
-        Return a metric name (string) representing the provided descriptors.
-        The return value is directly usable for custom NR metrics.
+        Return an attribute name (string) representing the provided descriptors.
+        The return value is directly usable for New Relic custom attributes.
         """
         if block_type is None:
-            metric_name_parts = ['xb_user_state', function_name, stat_name]
+            attribute_name_parts = ['xb_user_state', function_name, stat_name]
         else:
-            metric_name_parts = ['xb_user_state', function_name, block_type, stat_name]
-        return '.'.join(metric_name_parts)
+            attribute_name_parts = ['xb_user_state', function_name, block_type, stat_name]
+        return '.'.join(attribute_name_parts)
 
     def _nr_stat_accumulate(self, function_name, stat_name, value):
         """
         Accumulate arbitrary NR stats (not specific to block types).
         """
         monitoring_utils.accumulate(
-            self._nr_metric_name(function_name, stat_name),
+            self._nr_attribute_name(function_name, stat_name),
             value
         )
 
@@ -137,11 +137,11 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         Accumulate NR stats related to block types.
         """
         monitoring_utils.accumulate(
-            self._nr_metric_name(function_name, stat_name),
+            self._nr_attribute_name(function_name, stat_name),
             value,
         )
         monitoring_utils.accumulate(
-            self._nr_metric_name(function_name, stat_name, block_type=block_type),
+            self._nr_attribute_name(function_name, stat_name, block_type=block_type),
             value,
         )
 
@@ -190,7 +190,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             if state == {}:
                 continue
 
-            # collect statistics for metric reporting
+            # collect statistics for custom attribute reporting
             self._nr_block_stat_increment('get_many', usage_key.block_type, 'blocks_out')
             self._nr_block_stat_accumulate('get_many', usage_key.block_type, 'size', state_length)
             total_block_count += 1
@@ -204,7 +204,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                 }
             yield XBlockUserState(username, usage_key, state, module.modified, scope)
 
-        # The rest of this method exists only to report metrics.
+        # The rest of this method exists only to report custom attributes.
         finish_time = time()
         duration = (finish_time - evt_time) * 1000  # milliseconds
         self._nr_stat_accumulate('get_many', 'duration', duration)

@@ -6,7 +6,7 @@ The instructor dashboard is broken into sections.
 Only one section is visible at a time,
   and is responsible for its own functionality.
 
-NOTE: plantTimeout (which is just setTimeout from util.js)
+NOTE: plantTimeout (which is just setTimeout from common.djangoapps.util.js)
       is used frequently in the instructor dashboard to isolate
       failures. If one piece of code under a plantTimeout fails
       then it will not crash the rest of the dashboard.
@@ -164,6 +164,9 @@ such that the value can be defined later than this assignment (file load order).
                 constructor: window.InstructorDashboard.sections.DataDownload,
                 $element: idashContent.find('.' + CSS_IDASH_SECTION + '#data_download')
             }, {
+                constructor: window.InstructorDashboard.sections.DataDownloadV2,
+                $element: idashContent.find('.' + CSS_IDASH_SECTION + '#data_download_2')
+            }, {
                 constructor: window.InstructorDashboard.sections.ECommerce,
                 $element: idashContent.find('.' + CSS_IDASH_SECTION + '#e-commerce')
             }, {
@@ -178,9 +181,6 @@ such that the value can be defined later than this assignment (file load order).
             }, {
                 constructor: window.InstructorDashboard.sections.Email,
                 $element: idashContent.find('.' + CSS_IDASH_SECTION + '#send_email')
-            }, {
-                constructor: window.InstructorDashboard.sections.InstructorAnalytics,
-                $element: idashContent.find('.' + CSS_IDASH_SECTION + '#instructor_analytics')
             }, {
                 constructor: window.InstructorDashboard.sections.Metrics,
                 $element: idashContent.find('.' + CSS_IDASH_SECTION + '#metrics')
@@ -217,7 +217,11 @@ such that the value can be defined later than this assignment (file load order).
             constructor = _arg.constructor;
             $element = _arg.$element;
             return plantTimeout(0, sectionsHaveLoaded.waitFor(function() {
-                return new constructor($element);
+                if ($element[0]) {
+                    return new constructor($element);
+                } else {
+                    return null;
+                }
             }));
         });
     };

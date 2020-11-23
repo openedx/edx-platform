@@ -3,7 +3,7 @@
 Django model specifications for the Program Enrollments API
 """
 
-
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -11,8 +11,9 @@ from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords
+from user_util import user_util
 
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 
 from .constants import ProgramCourseEnrollmentRoles, ProgramCourseEnrollmentStatuses, ProgramEnrollmentStatuses
 
@@ -70,9 +71,14 @@ class ProgramEnrollment(TimeStampedModel):
             return False
 
         for enrollment in enrollments:
-            enrollment.historical_records.update(external_user_key=None)
+            retired_external_key = user_util.get_retired_external_key(
+                enrollment.external_user_key,
+                settings.RETIRED_USER_SALTS,
+            )
+            enrollment.historical_records.update(external_user_key=retired_external_key)
+            enrollment.external_user_key = retired_external_key
+            enrollment.save()
 
-        enrollments.update(external_user_key=None)
         return True
 
     def __str__(self):

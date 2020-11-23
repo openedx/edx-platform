@@ -21,6 +21,7 @@ from django.utils.translation import ugettext_lazy
 from path import Path as path
 
 from openedx.core.release import RELEASE_LINE
+from xmodule.modulestore.modulestore_settings import update_module_store_settings
 
 CONFIG_ROOT = path(__file__).abspath().dirname()
 TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
@@ -32,10 +33,9 @@ TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
 # This is a convenience for ensuring (a) that we can consistently find the files
 # and (b) that the files are the same in Jenkins as in local dev.
 os.environ['SERVICE_VARIANT'] = 'bok_choy_docker' if 'BOK_CHOY_HOSTNAME' in os.environ else 'bok_choy'
-os.environ['CONFIG_ROOT'] = CONFIG_ROOT
 os.environ['LMS_CFG'] = str.format("{config_root}/{service_variant}.yml",
-                                   config_root=os.environ['CONFIG_ROOT'], service_variant=os.environ['SERVICE_VARIANT'])
-os.environ['REVISION_CFG'] = "{config_root}/revisions.yml".format(config_root=os.environ['CONFIG_ROOT'])
+                                   config_root=CONFIG_ROOT, service_variant=os.environ['SERVICE_VARIANT'])
+os.environ['REVISION_CFG'] = "{config_root}/revisions.yml".format(config_root=CONFIG_ROOT)
 
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-position
 
@@ -90,7 +90,7 @@ GRADES_DOWNLOAD = {
 
 LOG_OVERRIDES = [
     ('track.middleware', logging.CRITICAL),
-    ('edxmako.shortcuts', logging.ERROR),
+    ('common.djangoapps.edxmako.shortcuts', logging.ERROR),
     ('edx.discussion', logging.CRITICAL),
 ]
 for log_name, log_level in LOG_OVERRIDES:

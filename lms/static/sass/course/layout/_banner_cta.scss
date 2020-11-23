@@ -1,0 +1,79 @@
+
+@mixin white-button-flat-outline {
+    display: block;
+    border-radius: 2px;
+    border: solid 1px #0175b4;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 24px;
+    padding: 7px 18px;
+
+    // if you change colors here, modify them in hover block below too
+    background: white;
+    color: #2d323e;
+
+    &:hover,
+    &:focus,
+    &:active {
+      cursor: pointer;
+      box-shadow: 0 2px 1px $shadow;
+
+      // re-specify colors to overwrite any styling from our reset styles
+      background: white;
+      color: #2d323e;
+    }
+  }
+
+.banner-cta {
+    border-radius: 4px;
+    border: solid 1px #9cd2e6;
+    background-color: #eff8fa;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    max-width: $text-width-readability-max;
+
+    .banner-cta-text {
+      font-size: 16px;
+      line-height: 24px;
+      color: #414141;
+
+      a.mobile-dates-link {
+        color: #0075b4;
+      }
+    }
+
+    &.has-button {
+      .banner-cta-text {
+        flex: 1 1 20em;
+        max-width: 100%;
+      }
+    }
+
+    &.on-mobile {
+      margin-left: 20px;
+      margin-right: 20px;
+    }
+
+    .banner-cta-button {
+      align-self: start;
+      flex: none;
+      margin-top: $baseline;
+
+      @media only screen and (min-width: 630px) {
+        margin-top: 0px;
+        margin-left: 10px;
+      }
+
+      a {
+        text-decoration: none;
+      }
+
+      button {
+        @include white-button-flat-outline;
+      }
+    }
+  }

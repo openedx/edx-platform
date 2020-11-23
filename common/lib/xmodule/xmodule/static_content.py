@@ -21,7 +21,9 @@ from docopt import docopt
 from path import Path as path
 
 from xmodule.capa_module import ProblemBlock
+from xmodule.conditional_module import ConditionalBlock
 from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
+from xmodule.library_content_module import LibraryContentBlock
 from xmodule.word_cloud_module import WordCloudBlock
 from xmodule.x_module import XModuleDescriptor, HTMLSnippet
 
@@ -65,8 +67,10 @@ class VideoBlock(HTMLSnippet):
 # Should only be used for XModules being converted to XBlocks.
 XBLOCK_CLASSES = [
     AboutBlock,
+    ConditionalBlock,
     CourseInfoBlock,
     HtmlBlock,
+    LibraryContentBlock,
     ProblemBlock,
     StaticTabBlock,
     VideoBlock,

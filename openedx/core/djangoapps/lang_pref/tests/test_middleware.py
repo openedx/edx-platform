@@ -23,7 +23,7 @@ from openedx.core.djangoapps.user_api.preferences.api import (
     set_user_preference
 )
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from student.tests.factories import AnonymousUserFactory, UserFactory
+from common.djangoapps.student.tests.factories import AnonymousUserFactory, UserFactory
 
 
 @ddt.ddt

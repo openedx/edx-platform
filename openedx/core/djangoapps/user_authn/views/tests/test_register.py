@@ -2,26 +2,26 @@
 """Tests for account creation"""
 
 import json
-from unittest import skipIf, skipUnless
 from datetime import datetime
+from unittest import skipIf, skipUnless
 
 import ddt
 import httpretty
 import mock
 import six
-from six.moves import range
-
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
+from django.core.cache import cache
 from django.test import TransactionTestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from pytz import UTC
-
+from six.moves import range
 from social_django.models import Partial, UserSocialAuth
 
+from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangoapps.user_api.accounts import (
@@ -32,37 +32,35 @@ from openedx.core.djangoapps.user_api.accounts import (
     EMAIL_MIN_LENGTH,
     NAME_MAX_LENGTH,
     REQUIRED_FIELD_CONFIRM_EMAIL_MSG,
-    USERNAME_MAX_LENGTH,
-    USERNAME_MIN_LENGTH,
     USERNAME_BAD_LENGTH_MSG,
     USERNAME_CONFLICT_MSG,
     USERNAME_INVALID_CHARS_ASCII,
     USERNAME_INVALID_CHARS_UNICODE,
+    USERNAME_MAX_LENGTH,
+    USERNAME_MIN_LENGTH
 )
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.djangoapps.user_api.accounts.tests import testutils
 from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (  # pylint: disable=unused-import
     RetirementTestCase,
     fake_requested_retirement,
-    setup_retirement_states,
+    setup_retirement_states
 )
-from openedx.core.djangoapps.user_api.tests.test_helpers import TestCaseForm
 from openedx.core.djangoapps.user_api.tests.test_constants import SORTED_COUNTRIES
+from openedx.core.djangoapps.user_api.tests.test_helpers import TestCaseForm
 from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
-from openedx.core.djangoapps.user_authn.views.register import RegistrationValidationThrottle, \
-    REGISTRATION_FAILURE_LOGGING_FLAG
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from openedx.core.djangoapps.user_authn.views.register import REGISTRATION_FAILURE_LOGGING_FLAG
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.api import test_utils
-from student.helpers import authenticate_new_user
-from student.tests.factories import UserFactory
-from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
-from third_party_auth.tests.utils import (
+from common.djangoapps.student.helpers import authenticate_new_user
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
+from common.djangoapps.third_party_auth.tests.utils import (
     ThirdPartyOAuthTestMixin,
     ThirdPartyOAuthTestMixinFacebook,
     ThirdPartyOAuthTestMixinGoogle
 )
-from util.password_policy_validators import (
+from common.djangoapps.util.password_policy_validators import (
     DEFAULT_MAX_PASSWORD_LENGTH,
     create_validator_config,
     password_validators_instruction_texts,
@@ -475,9 +473,15 @@ class RegistrationViewTestV1(ThirdPartyAuthTestMixin, UserAPITestCase):
         )
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        create_validator_config('util.password_policy_validators.MinimumLengthValidator', {'min_length': 2}),
-        create_validator_config('util.password_policy_validators.UppercaseValidator', {'min_upper': 3}),
-        create_validator_config('util.password_policy_validators.SymbolValidator', {'min_symbol': 1}),
+        create_validator_config(
+            'common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 2}
+        ),
+        create_validator_config(
+            'common.djangoapps.util.password_policy_validators.UppercaseValidator', {'min_upper': 3}
+        ),
+        create_validator_config(
+            'common.djangoapps.util.password_policy_validators.SymbolValidator', {'min_symbol': 1}
+        ),
     ])
     def test_register_form_password_complexity(self):
         no_extra_fields_setting = {}
@@ -1722,7 +1726,13 @@ class RegistrationViewTestV1(ThirdPartyAuthTestMixin, UserAPITestCase):
         })
 
 
+@ddt.ddt
 class RegistrationViewTestV2(RegistrationViewTestV1):
+    """
+    Test for registration api V2
+
+    """
+    # pylint: disable=test-inherits-tests
 
     def setUp(self):  # pylint: disable=arguments-differ
         super(RegistrationViewTestV1, self).setUp()
@@ -1902,6 +1912,99 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
                 }
             }
         )
+
+    def _assert_redirect_url(self, response, expected_redirect_url):
+        """
+        Assert that the redirect URL is in the response and has the expected value.
+
+        Assumes that response content is well-formed JSON
+        (you can call `_assert_response` first to assert this).
+        """
+        response_dict = json.loads(response.content.decode('utf-8'))
+        assert 'redirect_url' in response_dict, (
+            "Response JSON unexpectedly does not have redirect_url: {!r}".format(
+                response_dict
+            )
+        )
+        assert response_dict['redirect_url'] == expected_redirect_url
+
+    @ddt.data(
+        # Default redirect is dashboard.
+        {
+            'next_url': None,
+            'course_id': None,
+            'expected_redirect': settings.LMS_ROOT_URL + '/dashboard',
+        },
+        # Added root url in next .
+        {
+            'next_url': '/harmless-relative-page',
+            'course_id': None,
+            'expected_redirect': settings.LMS_ROOT_URL + '/harmless-relative-page',
+        },
+        # An absolute URL to a non-whitelisted domain is not an acceptable redirect.
+        {
+            'next_url': 'https://evil.sketchysite',
+            'course_id': None,
+            'expected_redirect': settings.LMS_ROOT_URL + '/dashboard',
+        },
+        # An absolute URL to a whitelisted domain is acceptable.
+        {
+            'next_url': 'https://openedx.service/coolpage',
+            'course_id': None,
+            'expected_redirect': 'https://openedx.service/coolpage',
+        },
+        # If course_id is provided, redirect to finish_auth with dashboard as next.
+        {
+            'next_url': None,
+            'course_id': 'coursekey',
+            'expected_redirect': (
+                '{root_url}/account/finish_auth?course_id=coursekey&next=%2Fdashboard'.
+                format(root_url=settings.LMS_ROOT_URL)
+            ),
+        },
+        # If valid course_id AND next_url are provided, redirect to finish_auth with
+        # provided next URL.
+        {
+            'next_url': 'freshpage',
+            'course_id': 'coursekey',
+            'expected_redirect': (
+                settings.LMS_ROOT_URL + '/account/finish_auth?course_id=coursekey&next=freshpage'
+            )
+        },
+        # If course_id is provided with invalid next_url, redirect to finish_auth with
+        # course_id and dashboard as next URL.
+        {
+            'next_url': 'http://scam.scam',
+            'course_id': 'coursekey',
+            'expected_redirect': (
+                '{root_url}/account/finish_auth?course_id=coursekey&next=%2Fdashboard'.
+                format(root_url=settings.LMS_ROOT_URL)
+            ),
+        },
+    )
+    @ddt.unpack
+    @override_settings(LOGIN_REDIRECT_WHITELIST=['openedx.service'])
+    @skip_unless_lms
+    def test_register_success_with_redirect(self, next_url, course_id, expected_redirect):
+        post_params = {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        }
+
+        if next_url:
+            post_params['next'] = next_url
+        if course_id:
+            post_params['course_id'] = course_id
+
+        response = self.client.post(
+            self.url,
+            post_params,
+            HTTP_ACCEPT='*/*',
+        )
+        self._assert_redirect_url(response, expected_redirect)
 
 
 @httpretty.activate
@@ -2097,6 +2200,10 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
 
     endpoint_name = 'registration_validation'
     path = reverse(endpoint_name)
+
+    def setUp(self):
+        super(RegistrationValidationViewTests, self).setUp()
+        cache.clear()
 
     def get_validation_decision(self, data):
         response = self.client.post(self.path, data)
@@ -2297,7 +2404,8 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
         to enforce limits; that's why this test needs a "real"
         default cache (as opposed to the usual-for-tests DummyCache)
         """
-        for _ in range(RegistrationValidationThrottle().num_requests):
-            self.request_without_auth('post', self.path)
+        for _ in range(int(settings.REGISTRATION_VALIDATION_RATELIMIT.split('/')[0])):
+            response = self.request_without_auth('post', self.path)
+            self.assertNotEqual(response.status_code, 403)
         response = self.request_without_auth('post', self.path)
-        self.assertEqual(response.status_code, 429)
+        self.assertEqual(response.status_code, 403)

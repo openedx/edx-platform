@@ -21,6 +21,7 @@ from edx_proctoring.api import (
     get_exam_configuration_dashboard_url
 )
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
+from edx_toggles.toggles import WaffleSwitch
 from help_tokens.core import HelpUrlExpert
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
@@ -31,8 +32,31 @@ from xblock.core import XBlock
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
+from cms.djangoapps.models.settings.course_grading import CourseGradingModel
+from cms.djangoapps.xblock_config.models import CourseEditLTIFieldsEnabledFlag
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
-from contentstore.utils import (
+from common.djangoapps.edxmako.shortcuts import render_to_string
+from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
+from openedx.core.lib.gating import api as gating_api
+from openedx.core.lib.xblock_utils import hash_resource, request_token, wrap_xblock, wrap_xblock_aside
+from common.djangoapps.static_replace import replace_static_urls
+from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
+from openedx.core.toggles import ENTRANCE_EXAMS
+from common.djangoapps.util.date_utils import get_default_time_display
+from common.djangoapps.util.json_request import JsonResponse, expect_json
+from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
+from xmodule.course_module import DEFAULT_START_DATE
+from xmodule.library_tools import LibraryToolsService
+from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
+from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
+from xmodule.modulestore.inheritance import own_metadata
+from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService
+from xmodule.tabs import CourseTabList
+from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW
+
+from ..utils import (
     ancestor_has_staff_lock,
     find_release_date_source,
     find_staff_lock_source,
@@ -43,7 +67,7 @@ from contentstore.utils import (
     is_currently_visible_to_students,
     is_self_paced
 )
-from contentstore.views.helpers import (
+from .helpers import (
     create_xblock,
     get_parent_xblock,
     is_unit,
@@ -52,29 +76,7 @@ from contentstore.views.helpers import (
     xblock_studio_url,
     xblock_type_display_name
 )
-from contentstore.views.preview import get_preview_fragment
-from edxmako.shortcuts import render_to_string
-from models.settings.course_grading import CourseGradingModel
-from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
-from openedx.core.djangoapps.waffle_utils import WaffleSwitch
-from openedx.core.lib.gating import api as gating_api
-from openedx.core.lib.xblock_utils import hash_resource, request_token, wrap_xblock, wrap_xblock_aside
-from static_replace import replace_static_urls
-from student.auth import has_studio_read_access, has_studio_write_access
-from util.date_utils import get_default_time_display
-from util.json_request import JsonResponse, expect_json
-from util.milestones_helpers import is_entrance_exams_enabled
-from xblock_config.models import CourseEditLTIFieldsEnabledFlag
-from xblock_django.user_service import DjangoXBlockUserService
-from xmodule.course_module import DEFAULT_START_DATE
-from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
-from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
-from xmodule.modulestore.inheritance import own_metadata
-from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService
-from xmodule.tabs import CourseTabList
-from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW
+from .preview import get_preview_fragment
 
 __all__ = [
     'orphan_handler', 'xblock_handler', 'xblock_view_handler', 'xblock_outline_handler', 'xblock_container_handler'
@@ -89,7 +91,7 @@ NEVER = lambda x: False
 ALWAYS = lambda x: True
 
 
-highlights_setting = WaffleSwitch(u'dynamic_pacing', u'studio_course_update')
+highlights_setting = WaffleSwitch('dynamic_pacing', 'studio_course_update', __name__)
 
 
 def _filter_entrance_exam_grader(graders):
@@ -98,7 +100,7 @@ def _filter_entrance_exam_grader(graders):
     views/controls like the 'Grade as' dropdown that allows a course author to select
     the grader type for a given section of a course
     """
-    if is_entrance_exams_enabled():
+    if ENTRANCE_EXAMS.is_enabled():
         graders = [grader for grader in graders if grader.get('type') != u'Entrance Exam']
     return graders
 
@@ -278,7 +280,7 @@ class StudioPermissionsService(object):
 
     Deprecated. To be replaced by a more general authorization service.
 
-    Only used by LibraryContentDescriptor (and library_tools.py).
+    Only used by LibraryContentBlock (and library_tools.py).
     """
     def __init__(self, user):
         self._user = user
@@ -304,7 +306,7 @@ class StudioEditModuleRuntime(object):
 
     def service(self, block, service_name):
         """
-        This block is not bound to a user but some blocks (LibraryContentModule) may need
+        This block is not bound to a user but some blocks (LibraryContentBlock) may need
         user-specific services to check for permissions, etc.
         If we return None here, CombinedSystem will load services from the descriptor runtime.
         """
@@ -319,6 +321,8 @@ class StudioEditModuleRuntime(object):
                 return ConfigurationService(CourseEditLTIFieldsEnabledFlag)
             if service_name == "teams_configuration":
                 return TeamsConfigurationService()
+            if service_name == "library_tools":
+                return LibraryToolsService(modulestore(), self._user.id)
         return None
 
 

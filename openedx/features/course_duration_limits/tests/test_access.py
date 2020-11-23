@@ -8,8 +8,8 @@ import ddt
 from django.utils import timezone
 from pytz import UTC
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
@@ -19,8 +19,8 @@ from openedx.features.course_duration_limits.access import (
     get_user_course_expiration_date
 )
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from student.tests.factories import CourseEnrollmentFactory
-from util.date_utils import strftime_localized
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
+from common.djangoapps.util.date_utils import strftime_localized
 
 
 @ddt.ddt

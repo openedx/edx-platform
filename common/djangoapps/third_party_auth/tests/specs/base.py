@@ -26,11 +26,11 @@ from openedx.core.djangoapps.user_authn.views.login_form import login_and_regist
 from openedx.core.djangoapps.user_authn.views.register import RegistrationView
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context
-from student import models as student_models
-from student.tests.factories import UserFactory
+from common.djangoapps.student import models as student_models
+from common.djangoapps.student.tests.factories import UserFactory
 
-from third_party_auth import middleware, pipeline
-from third_party_auth.tests import testutil
+from common.djangoapps.third_party_auth import middleware, pipeline
+from common.djangoapps.third_party_auth.tests import testutil
 
 
 def create_account(request):
@@ -126,7 +126,7 @@ class HelperMixin(object):
         self.assertEqual(400, response.status_code)
         payload = json.loads(response.content.decode('utf-8'))
         self.assertFalse(payload.get('success'))
-        self.assertIn('In order to sign in, you need to activate your account.', payload.get('value'))
+        self.assertIn('inactive-user', payload.get('error_code'))
 
     def assert_json_failure_response_is_missing_social_auth(self, response):
         """Asserts failure on /login for missing social auth looks right."""
@@ -291,7 +291,7 @@ class HelperMixin(object):
     def _patch_edxmako_current_request(self, request):
         """Make ``request`` be the current request for edxmako template rendering."""
 
-        with mock.patch('edxmako.request_context.get_current_request', return_value=request):
+        with mock.patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=request):
             yield
 
     def get_user_by_email(self, strategy, email):
@@ -547,7 +547,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
     def test_canceling_authentication_redirects_to_root_when_auth_entry_not_set(self):
         self.assert_exception_redirect_looks_correct('/')
 
-    @mock.patch('third_party_auth.pipeline.segment.track')
+    @mock.patch('common.djangoapps.third_party_auth.pipeline.segment.track')
     def test_full_pipeline_succeeds_for_linking_account(self, _mock_segment_track):
         # First, create, the GET request and strategy that store pipeline state,
         # configure the backend, and mock out wire traffic.
@@ -699,7 +699,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         self.assert_account_settings_context_looks_correct(
             account_settings_context(post_request), duplicate=True, linked=True)
 
-    @mock.patch('third_party_auth.pipeline.segment.track')
+    @mock.patch('common.djangoapps.third_party_auth.pipeline.segment.track')
     def test_full_pipeline_succeeds_for_signing_in_to_existing_active_account(self, _mock_segment_track):
         # First, create, the GET request and strategy that store pipeline state,
         # configure the backend, and mock out wire traffic.

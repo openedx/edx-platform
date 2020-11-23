@@ -9,14 +9,14 @@ import ddt
 import mock
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.teams import api as teams_api
 from lms.djangoapps.teams.models import CourseTeam
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from openedx.core.lib.teams_config import TeamsConfig, TeamsetType
-from student.models import CourseEnrollment, AnonymousUserId
-from student.roles import CourseStaffRole
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.models import CourseEnrollment, AnonymousUserId
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -101,6 +101,13 @@ class PythonAPITests(SharedModuleStoreTestCase):
 
         cls.team1a.add_user(cls.user4)
         cls.team2a.add_user(cls.user4)
+
+    def test_get_team_by_team_id_non_existence(self):
+        self.assertIsNone(teams_api.get_team_by_team_id('DO_NOT_EXIST'))
+
+    def test_get_team_by_team_id_exists(self):
+        team = teams_api.get_team_by_team_id(self.team1.team_id)
+        self.assertEqual(team, self.team1)
 
     def test_get_team_by_discussion_non_existence(self):
         self.assertIsNone(teams_api.get_team_by_discussion('DO_NOT_EXIST'))
