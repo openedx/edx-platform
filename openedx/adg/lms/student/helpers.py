@@ -2,6 +2,7 @@
 Helpers for edx student app
 """
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.urls import reverse
 from django.utils.http import int_to_base36
@@ -148,6 +149,10 @@ def compose_and_send_adg_course_enrollment_invitation_email(user_email, message_
         message_context['course_name'] = message_context['display_name']
     elif 'course' in message_context:
         message_context['course_name'] = Text(message_context['course'].display_name_with_default)
+
+    user = User.objects.filter(email=user_email).select_related('profile').first()
+    if user:
+        message_context['full_name'] = user.profile.name
 
     message_context.pop('course')
     send_mandrill_email(MandrillClient.COURSE_ENROLLMENT_INVITATION, user_email, message_context)
