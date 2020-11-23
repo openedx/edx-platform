@@ -34,7 +34,7 @@ from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH, EMAIL_MIN_LENGTH
 from openedx.core.djangoapps.user_authn.views.password_reset import (
-    SETTING_CHANGE_INITIATED, password_reset, password_reset_logistration,
+    SETTING_CHANGE_INITIATED, password_reset, LogistrationPasswordResetView,
     PasswordResetConfirmWrapper)
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory
@@ -754,7 +754,7 @@ class ResetPasswordAPITests(EventTestMixin, CacheIsolationTestCase):
                 "logistration_password_reset",
                 kwargs={"uidb36": uidb36, "token": token}
             ) + query_param,
-            request_param
+            request_param, format='json'
         )
         return post_request
 
@@ -771,7 +771,8 @@ class ResetPasswordAPITests(EventTestMixin, CacheIsolationTestCase):
 
         post_request = self.create_reset_request(uidb36, token, False)
         post_request.user = AnonymousUser()
-        json_response = password_reset_logistration(post_request, uidb36=uidb36, token=token)
+        reset_view = LogistrationPasswordResetView.as_view()
+        json_response = reset_view(post_request, uidb36=uidb36, token=token).render()
         json_response = json.loads(json_response.content.decode('utf-8'))
         self.assertEqual(json_response.get('reset_status'), status)
 
@@ -784,7 +785,8 @@ class ResetPasswordAPITests(EventTestMixin, CacheIsolationTestCase):
 
         post_request = self.create_reset_request(self.uidb36, self.token, False)
         post_request.user = AnonymousUser()
-        self.assertRaises(Exception, password_reset_logistration(post_request, uidb36=uidb36, token=token))
+        reset_view = LogistrationPasswordResetView.as_view()
+        self.assertRaises(Exception, reset_view(post_request, uidb36=uidb36, token=token))
 
     def test_password_mismatch_in_reset_request(self):
         """
@@ -792,7 +794,8 @@ class ResetPasswordAPITests(EventTestMixin, CacheIsolationTestCase):
         """
         post_request = self.create_reset_request(self.uidb36, self.token, False, 'new_password2')
         post_request.user = AnonymousUser()
-        json_response = password_reset_logistration(post_request, uidb36=self.uidb36, token=self.token)
+        reset_view = LogistrationPasswordResetView.as_view()
+        json_response = reset_view(post_request, uidb36=self.uidb36, token=self.token).render()
         json_response = json.loads(json_response.content.decode('utf-8'))
         self.assertFalse(json_response.get('reset_status'))
 
@@ -803,7 +806,8 @@ class ResetPasswordAPITests(EventTestMixin, CacheIsolationTestCase):
         """
         post_request = self.create_reset_request(self.uidb36, self.token, True)
         post_request.user = AnonymousUser()
-        password_reset_logistration(post_request, uidb36=self.uidb36, token=self.token)
+        reset_view = LogistrationPasswordResetView.as_view()
+        reset_view(post_request, uidb36=self.uidb36, token=self.token)
 
         updated_user = User.objects.get(id=self.user.id)
         self.assertEqual(updated_user.email, self.secondary_email)
@@ -824,7 +828,8 @@ class ResetPasswordAPITests(EventTestMixin, CacheIsolationTestCase):
         post_request = self.create_reset_request(self.uidb36, self.token, True)
         post_request.user = AnonymousUser()
         post_request.site = Mock(domain='example.com')
-        password_reset_logistration(post_request, uidb36=self.uidb36, token=self.token)
+        reset_view = LogistrationPasswordResetView.as_view()
+        reset_view(post_request, uidb36=self.uidb36, token=self.token)
         updated_user = User.objects.get(id=self.user.id)
 
         from_email = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)

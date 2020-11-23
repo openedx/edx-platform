@@ -25,6 +25,7 @@ from edx_ace import ace
 from edx_ace.recipient import Recipient
 from eventtracking import tracker
 from ratelimit.decorators import ratelimit
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.djangoapps.edxmako.shortcuts import render_to_string
@@ -641,107 +642,106 @@ def password_change_request_handler(request):
         return HttpResponseBadRequest(_("No email address provided."))
 
 
-@require_POST
-@ensure_csrf_cookie
-def password_reset_token_validate(request):
-    """HTTP end-point to validate password reset token. """
-    is_valid = False
-    token = request.POST.get('token')
-    try:
-        token = token.split('-', 1)
-        uid_int = base36_to_int(token[0])
-        if request.user.is_authenticated and request.user.id != uid_int:
-            return JsonResponse({'is_valid': is_valid})
+class PasswordResetTokenValidation(APIView):
 
-        user = User.objects.get(id=uid_int)
-        if UserRetirementRequest.has_user_requested_retirement(user):
-            return JsonResponse({'is_valid': is_valid})
+    def post(self, request):
+        """ HTTP end-point to validate password reset token. """
+        is_valid = False
+        token = request.data.get('token')
+        try:
+            token = token.split('-', 1)
+            uid_int = base36_to_int(token[0])
+            if request.user.is_authenticated and request.user.id != uid_int:
+                return Response({'is_valid': is_valid})
 
-        is_valid = default_token_generator.check_token(user, token[1])
-        if is_valid and not user.is_active:
-            user.is_active = True
-            user.save()
-    except Exception:   # pylint: disable=broad-except
-        AUDIT_LOG.exception("Invalid password reset confirm token")
+            user = User.objects.get(id=uid_int)
+            if UserRetirementRequest.has_user_requested_retirement(user):
+                return Response({'is_valid': is_valid})
 
-    return JsonResponse({'is_valid': is_valid})
+            is_valid = default_token_generator.check_token(user, token[1])
+            if is_valid and not user.is_active:
+                user.is_active = True
+                user.save()
+        except Exception:   # pylint: disable=broad-except
+            AUDIT_LOG.exception("Invalid password reset confirm token")
 
-
-def _check_token_has_required_values(uidb36, token):
-    """
-    Helper function to test that token
-    string passed has the required kwargs needed
-    to process token validation.
-    """
-
-    if not uidb36 or not token:
-        return False, None
-    try:
-        uid_int = base36_to_int(uidb36)
-    except ValueError:
-        return False, None
-    return True, uid_int
+        return Response({'is_valid': is_valid})
 
 
-@require_POST
-@ensure_csrf_cookie
-def password_reset_logistration(request, **kwargs):
-    """Reset learner password using passed token and new credentials"""
+class LogistrationPasswordResetView(APIView):
 
-    reset_status = False
-    uidb36 = kwargs.get('uidb36')
-    token = kwargs.get('token')
+    def post(self, request, **kwargs):
+        """ Reset learner password using passed token and new credentials """
 
-    has_required_values, uid_int = _check_token_has_required_values(uidb36, token)
-    if not has_required_values:
-        AUDIT_LOG.exception("Invalid password reset confirm token")
-        return JsonResponse({'reset_status': reset_status})
+        reset_status = False
+        uidb36 = kwargs.get('uidb36')
+        token = kwargs.get('token')
 
-    request.POST = request.POST.copy()
-    request.POST['new_password1'] = normalize_password(request.POST['new_password1'])
-    request.POST['new_password2'] = normalize_password(request.POST['new_password2'])
+        has_required_values, uid_int = self._check_token_has_required_values(uidb36, token)
+        if not has_required_values:
+            AUDIT_LOG.exception("Invalid password reset confirm token")
+            return Response({'reset_status': reset_status})
 
-    password = request.POST['new_password1']
-    try:
-        user = User.objects.get(id=uid_int)
-        if not default_token_generator.check_token(user, token):
-            AUDIT_LOG.exception("Token validation failed")
-            return JsonResponse({'reset_status': reset_status})
+        request.data._mutable = True
+        request.data['new_password1'] = normalize_password(request.data['new_password1'])
+        request.data['new_password2'] = normalize_password(request.data['new_password2'])
 
-        validate_password(password, user=user)
-        form = SetPasswordForm(user, request.POST)
-        if form.is_valid():
-            form.save()
-            reset_status = True
+        password = request.data['new_password1']
+        try:
+            user = User.objects.get(id=uid_int)
+            if not default_token_generator.check_token(user, token):
+                AUDIT_LOG.exception("Token validation failed")
+                return Response({'reset_status': reset_status})
 
-            if 'is_account_recovery' in request.GET:
-                try:
-                    old_primary_email = user.email
-                    user.email = user.account_recovery.secondary_email
-                    user.account_recovery.delete()
-                    # emit an event that the user changed their secondary email to the primary email
-                    tracker.emit(
-                        SETTING_CHANGE_INITIATED,
-                        {
-                            "setting": "email",
-                            "old": old_primary_email,
-                            "new": user.email,
-                            "user_id": user.id,
-                        }
-                    )
-                    user.save()
-                    send_password_reset_success_email(user, request)
-                except ObjectDoesNotExist:
-                    log.error('Account recovery process initiated without AccountRecovery instance for user {username}'
-                              .format(username=user.username))
-    except ValidationError as err:
-        AUDIT_LOG.exception("Password validation failed")
-        error_status = {
-            'reset_status': reset_status,
-            'err_msg': ' '.join(err.messages)
-        }
-        return JsonResponse(error_status)
-    except Exception:   # pylint: disable=broad-except
-        AUDIT_LOG.exception("Setting new password failed")
+            validate_password(password, user=user)
+            form = SetPasswordForm(user, request.data)
+            if form.is_valid():
+                form.save()
+                reset_status = True
 
-    return JsonResponse({'reset_status': reset_status})
+                if 'is_account_recovery' in request.GET:
+                    try:
+                        old_primary_email = user.email
+                        user.email = user.account_recovery.secondary_email
+                        user.account_recovery.delete()
+                        # emit an event that the user changed their secondary email to the primary email
+                        tracker.emit(
+                            SETTING_CHANGE_INITIATED,
+                            {
+                                "setting": "email",
+                                "old": old_primary_email,
+                                "new": user.email,
+                                "user_id": user.id,
+                            }
+                        )
+                        user.save()
+                        send_password_reset_success_email(user, request)
+                    except ObjectDoesNotExist:
+                        err = 'Account recovery process initiated without AccountRecovery instance for user {username}'
+                        log.error(err.format(username=user.username))
+        except ValidationError as err:
+            AUDIT_LOG.exception("Password validation failed")
+            error_status = {
+                'reset_status': reset_status,
+                'err_msg': ' '.join(err.messages)
+            }
+            return Response(error_status)
+        except Exception:   # pylint: disable=broad-except
+            AUDIT_LOG.exception("Setting new password failed")
+
+        return Response({'reset_status': reset_status})
+
+    def _check_token_has_required_values(self, uidb36, token):
+        """
+        Helper function to test that token
+        string passed has the required kwargs needed
+        to process token validation.
+        """
+
+        if not uidb36 or not token:
+            return False, None
+        try:
+            uid_int = base36_to_int(uidb36)
+        except ValueError:
+            return False, None
+        return True, uid_int
