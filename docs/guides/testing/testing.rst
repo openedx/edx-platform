@@ -433,7 +433,7 @@ teardown and other unmanaged state.
 
     paver test_bokchoy --serversonly
 
-  Note if setup has already been done, you can run::
+   Note if setup has already been done, you can run::
 
     paver test_bokchoy --serversonly --fasttest
 
