@@ -79,6 +79,8 @@ UI Acceptance Tests
 
 .. _Bok Choy: https://bok-choy.readthedocs.org/en/latest/tutorial.html
 
+Linting
+~~~~~~~~~~~~~~~~~~~
 
 Test Locations
 --------------
@@ -145,7 +147,7 @@ For example, this command runs a single python unit test file::
 
 Various tools like ddt create tests with very complex names, rather than figuring out the name yourself, you can:
 
-Select tests to run based on their name, provide an expression to the `pytest -k option`_ which performs a substring match on test names::
+1. Select tests to run based on their name, provide an expression to the `pytest -k option`_ which performs a substring match on test names::
 
     pytest common/lib/xmodule/xmodule/tests/test_stringify.py -k test_stringify
 
@@ -153,7 +155,7 @@ Select tests to run based on their name, provide an expression to the `pytest -k
 .. _node ID: https://docs.pytest.org/en/latest/example/markers.html#node-id
 
 
-Alternatively, you can the get the name of all test methods in a class, file, or project, including all ddt.data variations, by running pytest with `--collectonly`::
+2. Alternatively, you can the get the name of all test methods in a class, file, or project, including all ddt.data variations, by running pytest with `--collectonly`::
 
     pytest common/lib/xmodule/xmodule/tests/test_stringify.py --collectonly
 
