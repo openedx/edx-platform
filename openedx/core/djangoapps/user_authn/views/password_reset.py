@@ -644,7 +644,6 @@ def password_change_request_handler(request):
 
 class PasswordResetTokenValidation(APIView):
 
-    @method_decorator(ensure_csrf_cookie)
     def post(self, request):
         """ HTTP end-point to validate password reset token. """
         is_valid = False
@@ -671,7 +670,6 @@ class PasswordResetTokenValidation(APIView):
 
 class LogistrationPasswordResetView(APIView):
 
-    @method_decorator(ensure_csrf_cookie)
     def post(self, request, **kwargs):
         """ Reset learner password using passed token and new credentials """
 
