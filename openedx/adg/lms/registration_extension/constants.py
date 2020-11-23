@@ -3,19 +3,6 @@ Constants related to ADG.
 """
 from django.utils.translation import ugettext_lazy as _
 
-# TODO: Move this setting to model
-BUSINESS_LINES = (
-    ('Tanmiah', _('Tanmiah Food Group')),
-    ('Petromin', _('Petromin')),
-    ('RSI', _('Red Sea International')),
-    ('Dukan', _('Dukan')),
-    ('SAED', _('SAED')),
-    ('BARQ', _('BARQ System')),
-    ('PPC', _('Premium Paints Company')),
-    ('IPD', _('International Project Developers')),
-    ('ADG', _('Al-Dabbagh Group'))
-)
-
 CITIES = {
     'KSA': [
         ('Yanbu', _('Yanbu')),

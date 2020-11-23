@@ -8,4 +8,7 @@ class ApplicationsConfig(AppConfig):
     """
     Applications app configuration.
     """
-    name = 'applications'
+    name = 'openedx.adg.lms.applications'
+
+    def ready(self):
+        from . import handlers  # pylint: disable=unused-import

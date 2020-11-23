@@ -1,6 +1,7 @@
 """
 All models for applications app
 """
+
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
 from django.db import models
@@ -9,15 +10,19 @@ from model_utils.models import TimeStampedModel
 
 from openedx.adg.lms.utils.date_utils import month_choices, year_choices
 
+from .constants import ALLOWED_LOGO_EXTENSIONS
+from .helpers import validate_logo_size
+
 
 class ApplicationHub(TimeStampedModel):
     """
     Model for status of all required parts of user application submission.
     """
-    user = models.OneToOneField(User, related_name='application_hub', on_delete=models.CASCADE, )
-    is_prerequisite_courses_passed = models.BooleanField(default=False, )
-    is_application_submitted = models.BooleanField(default=False, )
-    is_assessment_completed = models.BooleanField(default=False, )
+    user = models.OneToOneField(
+        User, related_name='application_hub', on_delete=models.CASCADE, verbose_name=_('User'),
+    )
+    is_prerequisite_courses_passed = models.BooleanField(default=False, verbose_name=_('Prerequisite Courses Passed'), )
+    is_application_submitted = models.BooleanField(default=False, verbose_name=_('Application Submitted'), )
 
     class Meta:
         app_label = 'applications'
@@ -30,25 +35,46 @@ class ApplicationHub(TimeStampedModel):
         return 'User {user_id}, application status id={id}'.format(user_id=self.user.id, id=self.id)
 
 
+class BusinessLine(TimeStampedModel):
+    """
+    Model to save the business lines
+    """
+    title = models.CharField(verbose_name=_('Title'), max_length=255, unique=True, )
+    logo = models.ImageField(
+        upload_to='business-lines/logos/', null=True, verbose_name=_('Logo'),
+        validators=[FileExtensionValidator(ALLOWED_LOGO_EXTENSIONS), validate_logo_size],
+    )
+    description = models.TextField(verbose_name=_('Description'),)
+
+    class Meta:
+        app_label = 'applications'
+
+    def __str__(self):
+        return 'Business Line {}'.format(self.title)
+
+
 class UserApplication(TimeStampedModel):
     """
     Model for status of all required parts of user application submission.
     """
-    user = models.OneToOneField(User, related_name='application', on_delete=models.CASCADE, )
+    user = models.OneToOneField(User, related_name='application', on_delete=models.CASCADE, verbose_name=_('User'), )
     city = models.CharField(verbose_name=_('City'), max_length=255, )
+    business_line = models.OneToOneField(BusinessLine, verbose_name=_('Business Line'),
+                                         on_delete=models.CASCADE, null=True)
+
     organization = models.CharField(verbose_name=_('Organization'), max_length=255, blank=True, )
     linkedin_url = models.URLField(verbose_name=_('LinkedIn URL'), max_length=255, blank=True, )
     resume = models.FileField(
-        max_length=500, blank=True, null=True, upload_to='files/resume/',
+        max_length=500, blank=True, null=True, upload_to='files/resume/', verbose_name=_('Resume'),
         validators=[FileExtensionValidator(['pdf', 'doc', 'jpg', 'png'])],
         help_text=_('Accepted extensions: .pdf, .doc, .jpg, .png'),
     )
     cover_letter_file = models.FileField(
-        max_length=500, blank=True, null=True, upload_to='files/cover_letter/',
+        max_length=500, blank=True, null=True, upload_to='files/cover_letter/', verbose_name=_('Cover Letter File'),
         validators=[FileExtensionValidator(['pdf', 'doc', 'jpg', 'png'])],
         help_text=_('Accepted extensions: .pdf, .doc, .jpg, .png'),
     )
-    cover_letter = models.TextField(blank=True, )
+    cover_letter = models.TextField(blank=True, verbose_name=_('Cover Letter'), )
 
     OPEN = 'open'
     ACCEPTED = 'accepted'
@@ -62,7 +88,7 @@ class UserApplication(TimeStampedModel):
     status = models.CharField(
         verbose_name=_('Application Status'), choices=STATUS_CHOICES, max_length=8, default=OPEN,
     )
-    reviewed_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE, )
+    reviewed_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE, verbose_name=_('Reviewed By'), )
 
     class Meta:
         app_label = 'applications'
@@ -84,10 +110,14 @@ class UserStartAndEndDates(TimeStampedModel):
         'UserApplication', related_name='%(app_label)s_%(class)ss', related_query_name='%(app_label)s_%(class)s',
         on_delete=models.CASCADE,
     )
-    date_started_month = models.IntegerField(choices=month_choices, )
-    date_started_year = models.IntegerField(choices=year_choices, )
-    date_completed_month = models.IntegerField(choices=month_choices, blank=True, null=True, )
-    date_completed_year = models.IntegerField(choices=year_choices, blank=True, null=True, )
+    date_started_month = models.IntegerField(verbose_name=_('Start Month'), choices=month_choices, )
+    date_started_year = models.IntegerField(verbose_name=_('Start Year'), choices=year_choices, )
+    date_completed_month = models.IntegerField(
+        verbose_name=_('Completed Month'), choices=month_choices, blank=True, null=True,
+    )
+    date_completed_year = models.IntegerField(
+        verbose_name=_('Completed Year'), choices=year_choices, blank=True, null=True,
+    )
 
     class Meta(object):
         abstract = True
@@ -143,9 +173,11 @@ class AdminNote(TimeStampedModel):
     """
     Model to save the notes of admin on the user application.
     """
-    user_application = models.ForeignKey(UserApplication, on_delete=models.CASCADE, )
-    admin = models.ForeignKey(User, on_delete=models.CASCADE, )
-    note = models.TextField()
+    user_application = models.ForeignKey(
+        UserApplication, on_delete=models.CASCADE, verbose_name=_('User Application'),
+    )
+    admin = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('Admin'), )
+    note = models.TextField(verbose_name=_('Note'))
 
     class Meta:
         app_label = 'applications'

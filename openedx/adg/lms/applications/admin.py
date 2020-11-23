@@ -3,7 +3,7 @@ Registering models for applications app.
 """
 from django.contrib import admin
 
-from .models import ApplicationHub, Education, UserApplication, WorkExperience
+from .models import ApplicationHub, BusinessLine, Education, UserApplication, WorkExperience
 
 
 @admin.register(ApplicationHub)
@@ -11,9 +11,9 @@ class ApplicationHubAdmin(admin.ModelAdmin):
     """
     Django admin class for ApplicationHub
     """
-    fields = ('user', 'is_prerequisite_courses_passed', 'is_application_submitted', 'is_assessment_completed',)
+    fields = ('user', 'is_prerequisite_courses_passed', 'is_application_submitted',)
     list_display = (
-        'id', 'user', 'is_prerequisite_courses_passed', 'is_application_submitted', 'is_assessment_completed'
+        'id', 'user', 'is_prerequisite_courses_passed', 'is_application_submitted',
     )
     raw_id_fields = ('user',)
 
@@ -58,3 +58,14 @@ class WorkExperienceAdmin(admin.ModelAdmin):
     list_display = ('id', 'name_of_organization', 'job_position_title', 'user_application',)
     list_filter = ('name_of_organization', 'job_position_title',)
     search_fields = ('name_of_organization', 'job_position_title',)
+
+
+@admin.register(BusinessLine)
+class BusinessLineAdmin(admin.ModelAdmin):
+    """
+    Django admin class for BusinessLine
+    """
+    fields = ('title', 'logo', 'description',)
+    list_display = ('id', 'title', 'logo', 'description',)
+    list_filter = ('title',)
+    search_fields = ('title',)
