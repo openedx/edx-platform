@@ -121,9 +121,11 @@ Note -
 Running Python Unit tests
 -------------------------
 
-We use `pytest`_ to run the test suite.
+We have two methods of running tests in LMS: `pytest`_ or `paver`. Pytest is a testing framework for python and should be your goto for local python unit testing. Paver is a scripting tool and we're written helper code that setup the necessary environments for some tests. This is a fallback for testing more complex cases and it is recommended if you want to run tests on a large subset of tests.
 
 .. _pytest: https://pytest.org/
+
+.. _paver: https://pythonhosted.org/Paver/
 
 For example, this command runs all the python test scripts::
 
