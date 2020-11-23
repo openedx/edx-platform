@@ -611,7 +611,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         student_data, student_data_keys_list = ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
-            usage_key_str=str(self.course.location),
+            usage_key_str_list=[str(self.course.location)],
         )
         self.assertEqual(len(student_data), 2)
         self.assertDictContainsSubset({
