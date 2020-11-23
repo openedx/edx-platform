@@ -121,141 +121,40 @@ Note -
 Running Python Unit tests
 -------------------------
 
-We have two methods of running tests in LMS: `pytest`_ or `paver`. Pytest is a testing framework for python and should be your goto for local python unit testing. Paver is a scripting tool and we're written helper code that setup the necessary environments for some tests. This is a fallback for testing more complex cases and it is recommended if you want to run tests on a large subset of tests.
+We use `pytest`_ to run python tests. Pytest is a testing framework for python and should be your goto for local python unit testing.
 
 .. _pytest: https://pytest.org/
 
-.. _paver: https://pythonhosted.org/Paver/
-
-For example, this command runs all the python test scripts::
-
-    paver test_python
-
-It also runs ``collectstatic``, which prepares the
-static files used by the site (for example, compiling Sass to
-CSS).
-
-You can re-run all failed python tests by running this command (see note at end of
-section)::
-
-    paver test_python --failed
-
-To test lms python tests use this command::
-
-    paver test_system -s lms
-
-To test cms python tests use this command::
-
-    paver test_system -s cms
-
-To run these tests without ``collectstatic``, which is faster, append the following argument::
-
-    paver test_system -s lms --fasttest
-
-To run cms python tests without ``collectstatic`` use this command::
-
-    paver test_system -s cms --fasttest
-
-For the sake of speed, by default the python unit test database tables
-are created directly from apps' models. If you want to run the tests
-against a database created by applying the migrations instead, use the
-``--enable-migrations`` option::
-
-    paver test_system -s lms --enable-migrations
-
-To see the migration output, use::
-
-    paver test_system -s lms --enable-migrations --verbose --disable_capture
-
-To run a single django test class use this command::
-
-    paver test_system -t lms/djangoapps/courseware/tests/tests.py::ActivateLoginTest
 
 Running a Single Test
 ~~~~~~~~~~~~~~~~~~~~~
 
-When developing tests, it is often helpful to be able to really just run
-one single test without the overhead of PIP installs, UX builds, etc. In
-this case, it is helpful to look at the output of paver, and run just
-the specific command (optionally, stripping away coverage metrics). At
-the time of this writing, the command is the following::
+Various ways to run tests using pytest::
 
-    pytest lms/djangoapps/courseware/tests/test_courses.py
-
-
-To run a single test format the command like this::
-
-    paver test_system -t lms/djangoapps/courseware/tests/tests.py::ActivateLoginTest::test_activate_login
-
-You can use ``--randomize`` to randomize the test case sequence.  In the
-short term, this is likely to reveal bugs in our test setup and teardown;
-please fix (or at least file tickets for) any such issues you encounter.
-
-You can also enable test concurrency with the ``--processes=N`` flag (where ``N``
-is the number of processes to run tests with, and ``-1`` means one process per
-available core). Note, however, that when running concurrently, breakpoints may
-not work correctly.
-
-For example::
-
-    # This will run all tests in the order that they appear in their files, serially
-    paver test_system -s lms --no-randomize --processes=0
-
-    # This will run using only 2 processes for tests
-    paver test_system -s lms --processes=2
-
-To re-run all failing django tests from lms or cms, use the
-``--failed``,\ ``-f`` flag (see note at end of section)::
-
-    paver test_system -s lms --failed
-    paver test_system -s cms --failed
-
-There is also a ``--exitfirst``, ``-x`` option that will stop pytest
-after the first failure.
-
-common/lib tests are tested with the ``test_lib`` task, which also
-accepts the ``--failed`` and ``--exitfirst`` options::
-
-    paver test_lib -l common/lib/xmodule
-    paver test_lib -l common/lib/xmodule --failed
+    pytest path/test_m­odule.py                          # Run tests in a module.
+    pytest path/test_m­odule.p­y:­:te­st_func               # Run a specific test within a module.
+    pytest path/test_m­odule.p­y:­:Te­stC­las­s               # Run tests in a class
+    pytest path/test_m­odule.p­y:­:Te­stC­las­s::­tes­t_m­ethod  # Run a specific method of a class.
+    pytest path/testing/                                # Run tests in a directory.
 
 For example, this command runs a single python unit test file::
 
     pytest common/lib/xmodule/xmodule/tests/test_stringify.py
 
+Various tools like ddt create tests with very complex names, rather than figuring out the name yourself, you can:
 
-To select tests to run based on their name, provide an expression to the
-`pytest -k option`_ which performs a substring match on test names::
+To select tests to run based on their name, provide an expression to the `pytest -k option`_ which performs a substring match on test names::
 
     pytest common/lib/xmodule/xmodule/tests/test_stringify.py -k test_stringify
 
 .. _pytest -k option: https://docs.pytest.org/en/latest/example/markers.html#using-k-expr-to-select-tests-based-on-their-name
 .. _node ID: https://docs.pytest.org/en/latest/example/markers.html#node-id
 
-Alternatively, you can select tests based on their `node ID`_ directly,
-which is useful when you need to run only one of mutliple tests with the same
-name in different classes or files.
 
-This command runs any python unit test method that matches the substring
-`test_stringify` within a specified TestCase class within a specified file::
-
-    pytest common/lib/xmodule/xmodule/tests/test_stringify.py::TestCase -k test_stringify
-
-Note: if the method has an `@ddt.data` decorator, ddt will create multiple
-methods with the same prefix name and each individual data input as the suffix
-(e.g. `test_stringify_1_foo`). To test all of the ddt.data variations of the
-same test method, pass the prefix name to the pytest `-k` option.
-
-If you need to run only one of the test variations, you can the get the
-name of all test methods in a class, file, or project, including all ddt.data
-variations, by running pytest with `--collectonly`::
+Alternatively, you can the get the name of all test methods in a class, file, or project, including all ddt.data variations, by running pytest with `--collectonly`::
 
     pytest common/lib/xmodule/xmodule/tests/test_stringify.py --collectonly
 
-
-This is an example of how to run a single test and get stdout shown immediately, with proper env config::
-
-    pytest cms/djangoapps/contentstore/tests/test_import.py -s
 
 How to output coverage locally
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

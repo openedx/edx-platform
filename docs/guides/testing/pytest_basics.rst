@@ -1,7 +1,7 @@
 Running a Single Test
 ~~~~~~~~~~~~~~~~~~~~~
 
-various ways to run tests using pytest::
+Various ways to run tests using pytest::
 
     pytest path/test_m­od.py                          # Run tests in a module.
     pytest path/test_m­od.p­y:­:te­st_func               # Run a specific test within a module.
@@ -26,18 +26,3 @@ To select tests to run based on their name, provide an expression to the `pytest
 Alternatively, you can the get the name of all test methods in a class, file, or project, including all ddt.data variations, by running pytest with `--collectonly`::
 
     pytest common/lib/xmodule/xmodule/tests/test_stringify.py --collectonly
-
-Note: if the method has an `@ddt.data` decorator, ddt will create multiple methods with the same prefix name and each individual data input as the suffix (e.g. `test_stringify_1_foo`). To test all of the ddt.data variations of the same test method, pass the prefix name to the pytest `-k` option.
-
-If you need to run only one of the test variations, you can the get the
-name of all test methods in a class, file, or project, including all ddt.data
-variations, by running pytest with `--collectonly`::
-
-    pytest common/lib/xmodule/xmodule/tests/test_stringify.py --collectonly
-
-
-This is an example of how to run a single test and get stdout shown immediately, with proper env config::
-
-    pytest cms/djangoapps/contentstore/tests/test_import.py -s
-
-How to output coverage locally
