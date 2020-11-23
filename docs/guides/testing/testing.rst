@@ -145,7 +145,7 @@ For example, this command runs a single python unit test file::
 
 Various tools like ddt create tests with very complex names, rather than figuring out the name yourself, you can:
 
-To select tests to run based on their name, provide an expression to the `pytest -k option`_ which performs a substring match on test names::
+Select tests to run based on their name, provide an expression to the `pytest -k option`_ which performs a substring match on test names::
 
     pytest common/lib/xmodule/xmodule/tests/test_stringify.py -k test_stringify
 
