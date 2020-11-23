@@ -131,11 +131,11 @@ Running a Single Test
 
 Various ways to run tests using pytest::
 
-    pytest path/test_m­odule.py                          # Run tests in a module.
+    pytest path/test_m­odule.py                          # Run all tests in a module.
     pytest path/test_m­odule.p­y:­:te­st_func               # Run a specific test within a module.
-    pytest path/test_m­odule.p­y:­:Te­stC­las­s               # Run tests in a class
+    pytest path/test_m­odule.p­y:­:Te­stC­las­s               # Run all tests in a class
     pytest path/test_m­odule.p­y:­:Te­stC­las­s::­tes­t_m­ethod  # Run a specific method of a class.
-    pytest path/testing/                                # Run tests in a directory.
+    pytest path/testing/                                # Run all tests in a directory.
 
 For example, this command runs a single python unit test file::
 
