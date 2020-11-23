@@ -15,8 +15,7 @@ For example, this command runs a single python unit test file::
 
 Various tools like ddt create tests with very complex names, rather than figuring out the name yourself, you can:
 
-To select tests to run based on their name, provide an expression to the
-`pytest -k option`_ which performs a substring match on test names::
+To select tests to run based on their name, provide an expression to the `pytest -k option`_ which performs a substring match on test names::
 
     pytest common/lib/xmodule/xmodule/tests/test_stringify.py -k test_stringify
 
@@ -24,16 +23,11 @@ To select tests to run based on their name, provide an expression to the
 .. _node ID: https://docs.pytest.org/en/latest/example/markers.html#node-id
 
 
-Alternatively, you can the get the
-name of all test methods in a class, file, or project, including all ddt.data
-variations, by running pytest with `--collectonly`::
+Alternatively, you can the get the name of all test methods in a class, file, or project, including all ddt.data variations, by running pytest with `--collectonly`::
 
     pytest common/lib/xmodule/xmodule/tests/test_stringify.py --collectonly
 
-Note: if the method has an `@ddt.data` decorator, ddt will create multiple
-methods with the same prefix name and each individual data input as the suffix
-(e.g. `test_stringify_1_foo`). To test all of the ddt.data variations of the
-same test method, pass the prefix name to the pytest `-k` option.
+Note: if the method has an `@ddt.data` decorator, ddt will create multiple methods with the same prefix name and each individual data input as the suffix (e.g. `test_stringify_1_foo`). To test all of the ddt.data variations of the same test method, pass the prefix name to the pytest `-k` option.
 
 If you need to run only one of the test variations, you can the get the
 name of all test methods in a class, file, or project, including all ddt.data
