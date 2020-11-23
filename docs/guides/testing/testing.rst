@@ -144,7 +144,7 @@ For example, this command runs a single python unit test file::
     pytest common/lib/xmodule/xmodule/tests/test_stringify.py
 
 Note -
-edx-platorm having multiple services(lms, cms) in it. The environment for each service is different enough that we run some tests in both environments in jenkins. To make sure tests will pass in both environments(especially for tests in "common" directory), add the following option at end of pytest command::
+edx-platorm has multiple services(lms, cms) in it. The environment for each service is different enough that we run some tests in both environments in jenkins. To make sure tests will pass in both environments(especially for tests in "common" directory), add the following option at end of pytest command::
 
     pytest test --rootdir <lms or cms>
 
@@ -162,6 +162,19 @@ Various tools like ddt create tests with very complex names, rather than figurin
 
     pytest common/lib/xmodule/xmodule/tests/test_stringify.py --collectonly
 
+
+.. _the pdb documentation: http://docs.python.org/library/pdb.html
+
+Very handy: if you pass the ``--pdb`` flag to a pytest, the test runner will drop you
+into pdb on error. This lets you go up and down the stack and see what the
+values of the variables are. Check out `the pdb documentation`_.  Note that
+this only works if you aren't collecting coverage statistics (pdb and
+coverage.py use the same mechanism to trace code execution).
+
+Use this command to put a temporary debugging breakpoint in a test.
+If you check this in, your tests will hang on jenkins::
+
+    breakpoint()
 
 How to output coverage locally
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -210,34 +223,7 @@ run one of these commands::
     pytest common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
 
 .. _YouTube stub server: https://github.com/edx/edx-platform/blob/master/common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
-.. _the pdb documentation: http://docs.python.org/library/pdb.html
 
-Very handy: if you pass the ``--pdb`` flag to a paver test function, or
-uncomment the ``pdb=1`` line in ``setup.cfg``, the test runner will drop you
-into pdb on error. This lets you go up and down the stack and see what the
-values of the variables are. Check out `the pdb documentation`_.  Note that
-this only works if you aren't collecting coverage statistics (pdb and
-coverage.py use the same mechanism to trace code execution).
-
-Use this command to put a temporary debugging breakpoint in a test.
-If you check this in, your tests will hang on jenkins::
-
-    import pdb; pdb.set_trace()
-
-Note: More on the ``--failed`` functionality:
-
-* In order to use this, you must run the tests first. If you haven't already
-  run the tests, or if no tests failed in the previous run, then using the
-  ``--failed`` switch will result in **all** of the tests being run. See more
-  about this in the `pytest documentation
-  <https://docs.pytest.org/en/latest/cache.html>`__.
-
-* Note that ``paver test_python`` calls pytest separately for cms and lms.
-  This means that if tests failed only in lms on the previous run, then calling
-  ``paver test_python --failed`` will run **all of the tests for cms** in
-  addition to the previously failing lms tests. If you want it to run only the
-  failing tests for lms or cms, use the ``paver test_system -s lms --failed``
-  or ``paver test_system -s cms --failed`` commands.
 
 Debugging Unittest Flakiness
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
