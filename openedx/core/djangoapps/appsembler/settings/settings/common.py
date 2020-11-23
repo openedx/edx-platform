@@ -48,6 +48,8 @@ def plugin_settings(settings):
     # and fix test issues
     settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS = True
 
+    settings.TAHOE_ENABLE_CUSTOM_ERROR_VIEW = True  # Use the Django default error page during testing
+
     if not settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
         # TODO: Fix middlewares
         _middleware_list = list(settings.MIDDLEWARE)

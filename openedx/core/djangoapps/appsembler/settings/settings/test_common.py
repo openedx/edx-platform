@@ -20,6 +20,8 @@ def plugin_settings(settings):
     settings.TAHOE_SILENT_MISSING_CSS_CONFIG = True  # see ./common.py
     settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS = True  # see ./common.py
 
+    settings.TAHOE_ENABLE_CUSTOM_ERROR_VIEW = False  # see ./common.py
+
     if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
         settings.INSTALLED_APPS += (
             'openedx.core.djangoapps.appsembler.multi_tenant_emails',

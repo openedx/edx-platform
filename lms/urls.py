@@ -71,7 +71,9 @@ if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
 # These are used by Django to render these error codes. Do not remove.
 # pylint: disable=invalid-name
 handler404 = static_template_view_views.render_404
-handler500 = static_template_view_views.render_500
+
+if settings.TAHOE_ENABLE_CUSTOM_ERROR_VIEW:
+    handler500 = static_template_view_views.render_500
 
 notification_prefs_urls = [
     url(r'^notification_prefs/enable/', notification_prefs_views.ajax_enable),
