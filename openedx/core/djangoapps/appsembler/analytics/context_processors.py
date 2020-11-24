@@ -16,7 +16,8 @@ def google_analytics(request):
     user = request.user
     # if user is created through AMC
     if user.is_authenticated and user_has_role(user, CourseCreatorRole()):
-        data['USER_EMAIL_HASH'] = hashlib.sha256(request.user.email).hexdigest()
+        email_hash = hashlib.sha256(request.user.email.encode('utf-8')).hexdigest()
+        data['USER_EMAIL_HASH'] = email_hash
 
     return data
 
