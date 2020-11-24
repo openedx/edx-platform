@@ -581,7 +581,7 @@ def _get_asset_json(display_name, content_type, date, location, thumbnail_locati
     if site_for_course:
         domain = site_for_course.domain
 
-    external_url = '//{domain}{asset_url}'.format(
+    external_url = u'//{domain}{asset_url}'.format(
         domain=domain,
         asset_url=asset_url,
     )
