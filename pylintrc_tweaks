@@ -1,11 +1,6 @@
 # pylintrc tweaks for use with edx_lint.
 [MASTER]
 ignore+ = ,.git,.tox,migrations,node_modules,.pycharm_helpers
-# TODO: This path modification exists as temporary support for deprecated import patterns.
-# It will be removed in an upcoming Open edX release.
-# See docs/decisions/0007-sys-path-modification-removal.rst
-init-hook="import sys; sys.path.extend(['import_shims/lms', 'import_shims/studio'])"
-ignore-patterns=**/import_shims/**/*.py
 
 [MESSAGES CONTROL]
 disable+ =
