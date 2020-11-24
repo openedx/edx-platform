@@ -6,18 +6,22 @@ import itertools
 from datetime import datetime
 
 import ddt
+from edx_toggles.toggles.testutils import override_waffle_flag
 from django.conf import settings
 from django.urls import reverse
 from mock import Mock, patch
 
 from common.djangoapps.course_modes.models import CourseMode
-from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND, COURSE_HOME_MICROFRONTEND_OUTLINE_TAB
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
+from openedx.core.djangoapps.course_date_signals.utils import MIN_DURATION
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
-from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, ENABLE_COURSE_GOALS
+from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from openedx.features.course_experience import (
+    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, DISPLAY_COURSE_SOCK_FLAG, ENABLE_COURSE_GOALS,
+)
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
@@ -307,3 +311,27 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         self.assertEqual(data['offer_html'] is not None, show_enrolled)
         self.assertEqual(data['course_expired_html'] is not None, show_enrolled)
         self.assertEqual(data['resume_course']['url'] is not None, show_enrolled)
+
+    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_OUTLINE_TAB, active=True)
+    @ddt.data(True, False)
+    def test_can_show_upgrade_sock(self, sock_enabled):
+        with override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=sock_enabled):
+            response = self.client.get(self.url)
+            self.assertEqual(response.data['can_show_upgrade_sock'], sock_enabled)
+
+    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_OUTLINE_TAB, active=True)
+    def test_verified_mode(self):
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id)
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.data['verified_mode'], {
+            'access_expiration_date': enrollment.created + MIN_DURATION,
+            'currency': 'USD',
+            'currency_symbol': '$',
+            'price': 149,
+            'sku': 'ABCD1234',
+            'upgrade_url': '/dashboard',
+        })

@@ -4,7 +4,6 @@ Course API Views
 
 import json
 
-from babel.numbers import get_currency_symbol
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from django.conf import settings
@@ -33,8 +32,6 @@ from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.toggles import REDIRECT_TO_COURSEWARE_MICROFRONTEND, course_exit_page_is_active
-from lms.djangoapps.courseware.utils import can_show_verified_upgrade
-from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -42,9 +39,7 @@ from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from openedx.features.course_duration_limits.access import (
-    get_user_course_expiration_date, generate_course_expired_message
-)
+from openedx.features.course_duration_limits.access import generate_course_expired_message
 from openedx.features.discounts.utils import generate_offer_html
 from common.djangoapps.student.models import (
     CourseEnrollment, CourseEnrollmentCelebration, LinkedInAddToProfileConfiguration
@@ -53,6 +48,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import path_to_location
 
 from .serializers import CourseInfoSerializer
+from .utils import serialize_upgrade_info
 
 
 class CoursewareMeta:
@@ -186,18 +182,7 @@ class CoursewareMeta:
         """
         Return verified mode information, or None.
         """
-        if not can_show_verified_upgrade(self.effective_user, self.enrollment_object):
-            return None
-
-        mode = CourseMode.verified_mode_for_course(self.course_key)
-        return {
-            'access_expiration_date': get_user_course_expiration_date(self.effective_user, self.overview),
-            'price': mode.min_price,
-            'currency': mode.currency.upper(),
-            'currency_symbol': get_currency_symbol(mode.currency.upper()),
-            'sku': mode.sku,
-            'upgrade_url': verified_upgrade_deadline_link(self.effective_user, self.overview),
-        }
+        return serialize_upgrade_info(self.effective_user, self.overview, self.enrollment_object)
 
     @property
     def notes(self):
