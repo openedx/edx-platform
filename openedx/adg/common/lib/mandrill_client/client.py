@@ -14,7 +14,7 @@ class MandrillClient(object):
     Mandrill class to send ADG emails
     """
     CHANGE_USER_EMAIL_ALERT = 'adg-confirm-email-address-change'
-    COURSE_ENROLLMENT_INVITATION = 'course-enrollment-invitation'
+    COURSE_ENROLLMENT_INVITATION = 'adg-invitation-course'
     ENROLLMENT_CONFIRMATION = 'adg-enrollment-confirmation'
     PASSWORD_RESET = 'adg-password-reset'
     USER_ACCOUNT_ACTIVATION = 'adg-user-activation-email'
