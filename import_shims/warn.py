@@ -7,6 +7,8 @@ See /docs/decisions/0007-sys-path-modification-removal.rst for details.
 
 import warnings
 
+from edx_django_utils.monitoring import set_custom_attribute
+
 
 class DeprecatedEdxPlatformImportWarning(DeprecationWarning):
     """
@@ -39,6 +41,7 @@ def warn_deprecated_import(old_import, new_import):
     """
     Warn that a module is being imported from its old location.
     """
+    set_custom_attribute("deprecated_edx_platform_import", old_import)
     warnings.warn(
         DeprecatedEdxPlatformImportWarning(old_import, new_import),
         stacklevel=3,  # Should surface the line that is doing the importing.
