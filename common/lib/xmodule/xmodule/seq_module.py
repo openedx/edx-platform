@@ -24,6 +24,8 @@ from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Boolean, Integer, List, Scope, String
 
 from edx_toggles.toggles import LegacyWaffleFlag
+from edx_toggles.toggles import WaffleFlag
+from lms.djangoapps.courseware.toggles import COURSEWARE_PROCTORING_IMPROVEMENTS
 from openedx.core.lib.graph_traversals import traverse_pre_order
 
 from .exceptions import NotFoundError
@@ -767,6 +769,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 'allow_proctoring_opt_out': self.allow_proctoring_opt_out,
                 'due_date': self.due,
                 'grace_period': self.graceperiod,
+                'experimental_procotoring_features': COURSEWARE_PROCTORING_IMPROVEMENTS.is_enabled(course_id),
             }
 
             # inject the user's credit requirements and fulfillments
