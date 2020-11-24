@@ -83,21 +83,20 @@ class PasswordResetConfirmation extends React.Component {
           />
 
           <form id="passwordreset-form" method="post" action="">
-            <strong className="from-h-style">
+            <h2 className="section-title lines">
               <span className="text">
                 {this.props.formTitle}
               </span>
-            </strong>
+            </h2>
 
-            <h3 className="" id="new_password_help_text">
-              {gettext('Please enter a new password below.' +
-                  ' Passwords must be at least 8 characters and contain at least 1 number and 1 uppercase letter.')}
-            </h3>
+            <p className="action-label" id="new_password_help_text">
+              {gettext('Enter and confirm your new password.')}
+            </p>
 
             <PasswordResetInput
               name="new_password1"
               describedBy="new_password_help_text"
-              placeholder={gettext('Password')}
+              label={gettext('Password')}
               onBlur={this.onBlurPassword1}
               isValid={this.state.isValid}
               validationMessage={this.state.validationMessage}
@@ -106,7 +105,7 @@ class PasswordResetConfirmation extends React.Component {
             <PasswordResetInput
               name="new_password2"
               describedBy="new_password_help_text"
-              placeholder={gettext('Confirm Password')}
+              label={gettext('Confirm Password')}
               onBlur={this.onBlurPassword2}
               isValid={!this.state.showMatchError}
               validationMessage={gettext('Passwords do not match.')}
@@ -119,13 +118,11 @@ class PasswordResetConfirmation extends React.Component {
               value={this.props.csrfToken}
             />
 
-            <div className="text-center">
-                <Button
-                    type="submit"
-                    className={['action', 'action-primary', 'action-update', 'js-reset', 'button']}
-                    label={this.props.primaryActionButtonLabel}
-                />
-            </div>
+            <Button
+              type="submit"
+              className={['action', 'action-primary', 'action-update', 'js-reset']}
+              label={this.props.primaryActionButtonLabel}
+            />
           </form>
         </div>
       </section>
@@ -142,8 +139,8 @@ PasswordResetConfirmation.propTypes = {
 
 PasswordResetConfirmation.defaultProps = {
   errorMessage: '',
-  primaryActionButtonLabel: gettext('CHANGE PASSWORD'),
-  formTitle: gettext('Password Reset'),
+  primaryActionButtonLabel: gettext('Reset My Password'),
+  formTitle: gettext('Reset Your Password'),
 };
 
 export { PasswordResetConfirmation }; // eslint-disable-line import/prefer-default-export
