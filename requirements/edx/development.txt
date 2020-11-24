@@ -272,7 +272,7 @@ smmap==3.0.4              # via -r requirements/edx/testing.txt, gitdb
 snowballstemmer==2.0.0    # via sphinx
 social-auth-app-django==4.0.0  # via -r requirements/edx/testing.txt
 social-auth-core==3.3.3   # via -r requirements/edx/testing.txt, social-auth-app-django
-sorl-thumbnail==12.7.0    # via -r requirements/edx/testing.txt, django-wiki
+sorl-thumbnail==12.6.3    # via -r requirements/edx/testing.txt, django-wiki
 sortedcontainers==2.3.0   # via -r requirements/edx/testing.txt
 soupsieve==2.0.1          # via -r requirements/edx/testing.txt, beautifulsoup4
 sphinx==3.3.1             # via edx-sphinx-theme, sphinxcontrib-httpdomain

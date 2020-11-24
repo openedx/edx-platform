@@ -260,7 +260,7 @@ slumber==0.7.1            # via -r requirements/edx/base.txt, edx-bulk-grades, e
 smmap==3.0.4              # via gitdb
 social-auth-app-django==4.0.0  # via -r requirements/edx/base.txt
 social-auth-core==3.3.3   # via -r requirements/edx/base.txt, social-auth-app-django
-sorl-thumbnail==12.7.0    # via -r requirements/edx/base.txt, django-wiki
+sorl-thumbnail==12.6.3    # via -r requirements/edx/base.txt, django-wiki
 sortedcontainers==2.3.0   # via -r requirements/edx/base.txt
 soupsieve==2.0.1          # via -r requirements/edx/base.txt, beautifulsoup4
 sqlparse==0.4.1           # via -r requirements/edx/base.txt, django
