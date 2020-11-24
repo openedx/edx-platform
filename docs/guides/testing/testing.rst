@@ -123,13 +123,17 @@ Unless otherwise mentioned, all the following commands should be run from inside
 Running Python Unit tests
 -------------------------
 
-We use `pytest`_ to run python tests. Pytest is a testing framework for python and should be your goto for local python unit testing.
+We use `pytest`_ to run Python tests. Pytest is a testing framework for python and should be your goto for local Python unit testing.
+
+Pytest (and all of the plugins we use with it) has a lot of options. Use `pytest --help` to see all your option and pytest has good docs around testing.
 
 .. _pytest: https://pytest.org/
 
 
 Running a Single Test
 ~~~~~~~~~~~~~~~~~~~~~
+
+When developing tests, it is often helpful to be able to really just run one single test without the overhead of PIP installs, UX builds, etc.
 
 Various ways to run tests using pytest::
 
@@ -144,7 +148,7 @@ For example, this command runs a single python unit test file::
     pytest common/lib/xmodule/xmodule/tests/test_stringify.py
 
 Note -
-edx-platorm has multiple services(lms, cms) in it. The environment for each service is different enough that we run some tests in both environments in jenkins. To make sure tests will pass in each of these environments(especially for tests in "common" directory), you will need to test in each seperately. Add --rootdir flag at end of your pytest call and specify the env you are testing in::
+edx-platorm has multiple services (lms, cms) in it. The environment for each service is different enough that we run some tests in both environments in jenkins. To make sure tests will pass in each of these environments (especially for tests in "common" directory), you will need to test in each seperately. Add --rootdir flag at end of your pytest call and specify the env you are testing in::
 
     pytest test --rootdir <lms or cms>
 
@@ -162,22 +166,41 @@ Various tools like ddt create tests with very complex names, rather than figurin
 
     pytest common/lib/xmodule/xmodule/tests/test_stringify.py --collectonly
 
+Testing with migrations
+***********************
 
-.. _the pdb documentation: http://docs.python.org/library/pdb.html
+For the sake of speed, by default the python unit test database tables
+are created directly from apps' models. If you want to run the tests
+against a database created by applying the migrations instead, use the
+``--create-db --migrations`` option::
 
-Very handy: if you pass the ``--pdb`` flag to a pytest, the test runner will drop you
+    pytest test --create-db --migrations
+
+Debugging a test
+~~~~~~~~~~~~~~~~
+
+There are various ways to debug tests in Python and more specifically with pytest:
+
+#. using the verbose -v or really verbose -vv flags can be helpful for displaying diffs on assertion failures.
+#. if you want to focus on one test failure at a time, the ``--exitfirst``or ``-x`` flags to have pytest stope
+after the first failure.
+#. by default, the plugin pytest-randomly will randomize test case sequence. This is to help reveal bugs in your test setup and teardown. If you do not want this randomness, use the --randomly-dont-reorganize flag
+#. if you pass the ``--pdb`` flag to a pytest, the test runner will drop you
 into pdb on error. This lets you go up and down the stack and see what the
 values of the variables are. Check out `the pdb documentation`_.  Note that
 this only works if you aren't collecting coverage statistics (pdb and
 coverage.py use the same mechanism to trace code execution).
 
-If there is a specific point in code you would like to debug, you can add the build-in "breakpoint()" function there and it will automatically drop you at the point next time the code runs. If you check this in, your tests will hang on jenkins. Example of use::
+#. If there is a specific point in code you would like to debug, you can add the build-in "breakpoint()" function there and it will automatically drop you at the point next time the code runs. If you check this in, your tests will hang on jenkins. Example of use::
 
     if True:
       # you will be dropped here in the pdb shell when running test or code
       breakpoint()
       a=2
       random_variable = False
+
+.. _the pdb documentation: http://docs.python.org/library/pdb.html
+
 
 How to output coverage locally
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -337,7 +360,7 @@ failed tests are captured in test\_root/log.
 Use this command to put a temporary debugging breakpoint in a test.
 If you check this in, your tests will hang on jenkins::
 
-    import pdb; pdb.set_trace()
+    breakpoint()
 
 By default, all bokchoy tests are run with the 'split' ModuleStore. To
 override the modulestore that is used, use the default\_store option.
