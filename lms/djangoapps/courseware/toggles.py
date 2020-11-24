@@ -92,12 +92,16 @@ COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_FIRST_SECTION_CELEBRATION = CourseW
 # .. toggle_description: Waffle flag to display a celebration modal on learner completion of their first
 #   discussion post. Supports staged rollout to students for a new micro-frontend-based implementation
 #   of the courseware page.
+#   This flag is being implemented as an Experiment with 3 buckets for users (see toggle_tickets for details):
+#       Bucket 0 (33%): Control group that will not receive the celebration
+#       Bucket 1 (33%): Experiment group that will receive the celebration, but without normative data body text
+#       Bucket 2 (33%): Experiment group that will receive the celebration with normative data body text
 # .. toggle_use_cases: temporary, open_edx
-# .. toggle_creation_date: 2020-11-24
+# .. toggle_creation_date: 2020-12-01
 # .. toggle_target_removal_date: None
 # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and ENABLE_COURSEWARE_MICROFRONTEND and
 #   COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES.
-# .. toggle_tickets: AA-303
+# .. toggle_tickets: AA-303, AA-293
 COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_FIRST_DISCUSSION_POST = ExperimentWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'mfe_progress_milestones_first_discussion_post', __name__,
     num_buckets=3, use_course_aware_bucketing=False,
@@ -132,6 +136,7 @@ def courseware_mfe_first_section_celebration_is_active(course_key):
         COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES.is_enabled(course_key) and
         COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_FIRST_SECTION_CELEBRATION.is_enabled(course_key)
     )
+
 
 def courseware_mfe_first_discussion_celebration_is_active(course_key):
     return (

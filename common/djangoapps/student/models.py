@@ -3101,12 +3101,12 @@ class UserCelebration(TimeStampedModel):
     In general, these celebrations should be course agnostic and could show up at any point for
     a learner. Some will be one-off celebrations (like first discussion post) while others could
     be repeated for a user (like streaks).
-    For celebrations that can be repeated with each enrollment, see CourseEnrollmentCelebration
+    For celebrations that occur for each enrollment a user has, see CourseEnrollmentCelebration.
 
     .. no_pii:
     """
     user = models.OneToOneField(User, models.CASCADE, related_name='celebrations')
-    # Use a NullBooleanField in case another celebration creates the row.
+    # Null means we don't know yet and have to ask the forums service for the value
     celebrate_first_discussion_post = NullBooleanField(default=None)
 
     def __str__(self):

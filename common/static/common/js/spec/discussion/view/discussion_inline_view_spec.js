@@ -104,7 +104,9 @@
             test.ajaxSpy.and.callFake(function(params) {
                 var deferred = $.Deferred();
                 deferred.resolve();
-                params.success(result);
+                // The first discussion celebration POST does not have a success handler so
+                // if we try and do `params.success(result)` on it, the function raises an error.
+                if (params.success) params.success(result);
                 return deferred;
             });
         };

@@ -108,8 +108,14 @@
             spyOn(view, 'getWmdContent').and.returnValue(responseText);
             $.ajax.and.callFake(function(params) {
                 expect(params.type).toEqual('POST');
-                expect(params.data.body).toEqual(responseText);
-                params.success(createAjaxResponseJson(testResponseJson, true), 'success');
+                // With the inclusion of discussion celebrations, we added a second POST to update
+                // a UserCelebration model that this user has now made a post.
+                if (params.url.toString().indexOf('discussion') !== -1) {
+                    expect(params.data.body).toEqual(responseText);
+                    params.success(createAjaxResponseJson(testResponseJson, true), 'success');
+                } else if (params.url.toString().indexOf('celebration') !== -1) {
+                    expect(params.data).toEqual('{"first_discussion":false}');
+                }
                 return {
                     always: function() {
                     }

@@ -207,26 +207,30 @@
                     },
                     error: DiscussionUtil.formErrorHandler(this.$('.post-errors')),
                     success: function(response) {
-                        var thread, discussionBreadcrumbsModel;
+                        var thread, discussionBreadcrumbsModel, url;
                         thread = new Thread(response.content);
 
                         /* This is used as a signal to the Learning MFE to determine if the user
                            should see the discussion milestone celebration.
-                           Note: at time of writing, this is only listened to for inline discussions
-                           inside of the Learning MFE. Discussion Tab posts will happen once the
-                           Discussion MFE exists */
+
+                           Note: at time of writing, this is only listened to by inline discussion
+                           posts inside of the Learning MFE (read: in the courseware). Discussion
+                           Tab posts will not be shown the discussion milestone celebration until
+                           the Discussion MFE is implemented. */
                         parent.postMessage({event_name: 'discussion_post'}, '*');
+
                         /* Then we need to update our first discussion celebration mysql model.
-                           We do this here rather than in the Learning MFE (where the celebration
-                           actually happens right now) to catch both inline discussions and posts on
-                           the discussion tab.
-                           Unfortunately, we only care about the first time a user posts and this
-                           will send a request every single time, but until the Discussion MFE
-                           exists, we are left with this. Once the Discussion MFE exists, this
-                           can be added in there to only send this request if its the user's first
-                           post so it happens once per user instead of once per post.
-                           See frontend-app-learning/src/courseware/course/celebration/FirstDiscussionCelebrationModal.jsx
-                           for an example of the modal and how the post would work.
+                           We do this here rather than in the Learning MFE in order to notify about
+                           both inline discussions and posts on the discussion tab.
+
+                           We only care about the first time a user posts and this will send a request
+                           every time. In the future, it would be better to only send this POST
+                           _after_ showing the celebration in the Learning MFE (for inline) or the
+                           Discussion MFE (for the discussion tab) so it happens once per user
+                           instead of once per post. See
+                           frontend-app-learning/src/courseware/course/celebration/FirstDiscussionCelebrationModal.jsx
+                           for an example of the modal and how the POST would work.
+
                            Note: when this is eventually moved, make sure we still update the mysql
                            model even if we don't actually celebrate (we might not celebrate because
                            we are running the discussion celebration as an experiment, but you can
@@ -237,7 +241,7 @@
                             url: url,
                             type: 'POST',
                             contentType: 'application/json',
-                            data: JSON.stringify({first_discussion: true}),
+                            data: JSON.stringify({first_discussion: false}),
                         });
 
                         // Update the breadcrumbs and discussion Id(s) related to current topic
@@ -272,13 +276,13 @@
                 }
                 this.trigger('newPost:cancel');
                 parent.postMessage({event_name: 'discussion_post'}, '*');
-                url = DiscussionUtil.urlFor('discussion_celebration')
-                DiscussionUtil.safeAjax({
-                    url: url,
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({first_discussion: true}),
-                });
+                // var url = DiscussionUtil.urlFor('discussion_celebration')
+                // DiscussionUtil.safeAjax({
+                //     url: url,
+                //     type: 'POST',
+                //     contentType: 'application/json',
+                //     data: JSON.stringify({first_discussion: false}),
+                // });
                 this.resetForm();
             };
 

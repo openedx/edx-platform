@@ -381,6 +381,7 @@
                         body: body
                     },
                     success: function(data) {
+                        var url;
                         /* This is used as a signal to the Learning MFE to determine if the user
                            should see the discussion milestone celebration.
                            Note: at time of writing, this is only listened to for inline discussions
