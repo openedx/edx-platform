@@ -181,20 +181,15 @@ Debugging a test
 
 There are various ways to debug tests in Python and more specifically with pytest:
 
-1. using the verbose -v or really verbose -vv flags can be helpful for displaying diffs on assertion failures.
+- using the verbose -v or really verbose -vv flags can be helpful for displaying diffs on assertion failures
 
-2. if you want to focus on one test failure at a time, the ``--exitfirst``or ``-x`` flags to have pytest stope
-after the first failure.
+- if you want to focus on one test failure at a time, the ``--exitfirst``or ``-x`` flags to have pytest stope after the first failure
 
-3. by default, the plugin pytest-randomly will randomize test case sequence. This is to help reveal bugs in your test setup and teardown. If you do not want this randomness, use the --randomly-dont-reorganize flag
+- by default, the plugin pytest-randomly will randomize test case sequence. This is to help reveal bugs in your test setup and teardown. If you do not want this randomness, use the --randomly-dont-reorganize flag
 
-4. if you pass the ``--pdb`` flag to a pytest, the test runner will drop you
-into pdb on error. This lets you go up and down the stack and see what the
-values of the variables are. Check out `the pdb documentation`_.  Note that
-this only works if you aren't collecting coverage statistics (pdb and
-coverage.py use the same mechanism to trace code execution).
+- if you pass the ``--pdb`` flag to a pytest, the test runner will drop you into pdb on error. This lets you go up and down the stack and see what the values of the variables are. Check out `the pdb documentation`_.  Note that this only works if you aren't collecting coverage statistics (pdb and coverage.py use the same mechanism to trace code execution).
 
-5. If there is a specific point in code you would like to debug, you can add the build-in "breakpoint()" function there and it will automatically drop you at the point next time the code runs. If you check this in, your tests will hang on jenkins. Example of use::
+- If there is a specific point in code you would like to debug, you can add the build-in "breakpoint()" function there and it will automatically drop you at the point next time the code runs. If you check this in, your tests will hang on jenkins. Example of use::
 
     if True:
       # you will be dropped here in the pdb shell when running test or code
