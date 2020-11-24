@@ -18,8 +18,8 @@ from student.tests.factories import UserFactory
 
 
 @ddt.ddt
+@skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'RED-1571: Refactor')
 @patch.dict('django.conf.settings.FEATURES', {'APPSEMBLER_MULTI_TENANT_EMAILS': True})
-@skipIf(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in CMS')
 class MultiTenantStudioLoginTestCase(TestCase):
     """
     Testing the APPSEMBLER_MULTI_TENANT_EMAILS feature when enabled in Studio.

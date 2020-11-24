@@ -7,8 +7,3 @@ a limitation when such modules depend on `cms` and `pytest` cannot figure that o
 This is likely a sign that there's a need to refactor those modules with cross-dependency, however
 it's not clear how to address that issue.
 """
-
-from django.conf import settings
-import unittest
-if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-    raise unittest.SkipTest('fix broken tests')
