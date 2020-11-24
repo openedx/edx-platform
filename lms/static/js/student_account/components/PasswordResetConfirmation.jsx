@@ -96,7 +96,7 @@ class PasswordResetConfirmation extends React.Component {
             <PasswordResetInput
               name="new_password1"
               describedBy="new_password_help_text"
-              label={gettext('Password')}
+              label={gettext('New Password')}
               onBlur={this.onBlurPassword1}
               isValid={this.state.isValid}
               validationMessage={this.state.validationMessage}
