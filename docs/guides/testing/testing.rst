@@ -144,7 +144,7 @@ For example, this command runs a single python unit test file::
     pytest common/lib/xmodule/xmodule/tests/test_stringify.py
 
 Note -
-edx-platorm has multiple services(lms, cms) in it. The environment for each service is different enough that we run some tests in both environments in jenkins. To make sure tests will pass in both environments(especially for tests in "common" directory), add the following option at end of pytest command::
+edx-platorm has multiple services(lms, cms) in it. The environment for each service is different enough that we run some tests in both environments in jenkins. To make sure tests will pass in each of these environments(especially for tests in "common" directory), you will need to test in each seperately. Add --rootdir flag at end of your pytest call and specify the env you are testing in::
 
     pytest test --rootdir <lms or cms>
 
