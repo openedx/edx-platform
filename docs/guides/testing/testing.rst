@@ -171,10 +171,13 @@ values of the variables are. Check out `the pdb documentation`_.  Note that
 this only works if you aren't collecting coverage statistics (pdb and
 coverage.py use the same mechanism to trace code execution).
 
-Use this command to put a temporary debugging breakpoint in a test.
-If you check this in, your tests will hang on jenkins::
+If there is a specific point in code you would like to debug, you can add the build-in "breakpoint()" function there and it willa utomatically drop you at the point next time the code runs. If you check this in, your tests will hang on jenkins. Example of use::
 
-    breakpoint()
+    if True:
+      # you will be dropped here in the pdb shell when running test or code
+      breakpoint()
+      a=2
+      random_variable = False
 
 How to output coverage locally
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
