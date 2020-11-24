@@ -171,7 +171,7 @@ values of the variables are. Check out `the pdb documentation`_.  Note that
 this only works if you aren't collecting coverage statistics (pdb and
 coverage.py use the same mechanism to trace code execution).
 
-If there is a specific point in code you would like to debug, you can add the build-in "breakpoint()" function there and it willa utomatically drop you at the point next time the code runs. If you check this in, your tests will hang on jenkins. Example of use::
+If there is a specific point in code you would like to debug, you can add the build-in "breakpoint()" function there and it will automatically drop you at the point next time the code runs. If you check this in, your tests will hang on jenkins. Example of use::
 
     if True:
       # you will be dropped here in the pdb shell when running test or code
