@@ -260,7 +260,7 @@ slumber==0.7.1            # via -r requirements/edx/base.txt, edx-bulk-grades, e
 smmap==3.0.4              # via gitdb
 social-auth-app-django==4.0.0  # via -r requirements/edx/base.txt
 social-auth-core==3.3.3   # via -r requirements/edx/base.txt, social-auth-app-django
-sorl-thumbnail==12.6.3    # via -r requirements/edx/base.txt, django-wiki
+sorl-thumbnail==12.7.0    # via -r requirements/edx/base.txt, django-wiki
 sortedcontainers==2.3.0   # via -r requirements/edx/base.txt
 soupsieve==2.0.1          # via -r requirements/edx/base.txt, beautifulsoup4
 sqlparse==0.4.1           # via -r requirements/edx/base.txt, django
@@ -283,7 +283,7 @@ uritemplate==3.0.1        # via -r requirements/edx/base.txt, coreapi, drf-yasg
 urllib3==1.26.2           # via -r requirements/edx/base.txt, elasticsearch, geoip2, requests, selenium, transifex-client
 user-util==0.3.1          # via -r requirements/edx/base.txt
 vine==1.3.0               # via -r requirements/edx/base.txt, amqp, celery
-virtualenv==20.2.0        # via tox
+virtualenv==20.2.1        # via tox
 voluptuous==0.12.0        # via -r requirements/edx/base.txt, ora2
 watchdog==0.10.4          # via -r requirements/edx/base.txt
 web-fragments==0.3.2      # via -r requirements/edx/base.txt, crowdsourcehinter-xblock, edx-sga, staff-graded-xblock, xblock, xblock-utils
