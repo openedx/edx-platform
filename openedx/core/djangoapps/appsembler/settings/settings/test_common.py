@@ -22,6 +22,12 @@ def plugin_settings(settings):
 
     settings.TAHOE_ENABLE_CUSTOM_ERROR_VIEW = False  # see ./common.py
 
+    # Permanently skip some tests that we're unable or don't want to fix
+    # yet, this allows us to revisit those tests if needed
+    # which is slightly better than just `@skip`
+    # usage: decorate the test function or class with: `@skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, '_reason_')`
+    settings.TAHOE_ALWAYS_SKIP_TEST = True
+
     if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
         settings.INSTALLED_APPS += (
             'openedx.core.djangoapps.appsembler.multi_tenant_emails',

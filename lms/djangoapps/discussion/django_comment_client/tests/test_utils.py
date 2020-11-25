@@ -535,7 +535,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             divided_only_if_explicit=True
         )
 
-    @unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'TODO: fix date failures')
+    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Skip flaky tests due to date issues')
     def test_get_unstarted_discussion_xblocks(self):
         self.create_discussion("Chapter 1", "Discussion 1", start=self.later)
 

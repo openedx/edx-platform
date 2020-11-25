@@ -69,7 +69,7 @@ class TestCourseListing(ModuleStoreTestCase):
         ModuleStoreTestCase.tearDown(self)
 
     @patch.dict('django.conf.settings.FEATURES', {'ORGANIZATIONS_APP': True})
-    @unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'TODO: fix date failures')
+    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Skip flaky tests due to date issues')
     def test_rerun(self):
         """
         Just testing the functionality the view handler adds over the tasks tested in test_clone_course
