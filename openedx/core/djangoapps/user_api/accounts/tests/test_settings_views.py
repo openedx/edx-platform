@@ -31,12 +31,6 @@ from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
 from openedx.features.enterprise_support.utils import get_enterprise_readonly_account_fields
 
 
-from django.conf import settings
-import unittest
-if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-    raise unittest.SkipTest('fix broken tests')
-
-
 @skip_unless_lms
 class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiConfigMixin, TestCase):
     """ Tests for the account settings view. """
@@ -259,7 +253,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
 
         self.assertEqual(len(order_detail), 1)
 
-    @unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'TODO: fix in Juniper')
+    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'fix this test when we enable the account MFE')
     def test_redirect_view(self):
         with override_waffle_flag(REDIRECT_TO_ACCOUNT_MICROFRONTEND, active=True):
             old_url_path = reverse('account_settings')
