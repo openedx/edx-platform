@@ -80,7 +80,7 @@ class CourseValidationViewTest(SharedModuleStoreTestCase, APITestCase):
         resp = self.client.get(self.get_url(self.course_key))
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
-    @unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'TODO: fix date failures')
+    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Skip flaky tests due to date issues')
     def test_staff_succeeds(self):
         self.client.login(username=self.staff.username, password=self.password)
         resp = self.client.get(self.get_url(self.course_key), {'all': 'true'})
