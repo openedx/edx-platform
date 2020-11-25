@@ -12,6 +12,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
+from openedx.adg.lms.utils.env_utils import is_testing_environment
 
 import third_party_auth
 from edxmako.shortcuts import render_to_response
@@ -84,6 +85,12 @@ def get_login_session_form(request):
         HttpResponse
 
     """
+
+    if not is_testing_environment():
+        from openedx.adg.lms.user_authn_override.login_form import get_login_session_form_override
+
+        return get_login_session_form_override(request)
+
     form_desc = FormDescription("post", reverse("user_api_login_session"))
     _apply_third_party_auth_overrides(request, form_desc)
 
