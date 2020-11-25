@@ -33,7 +33,7 @@ boto==2.39.0              # via -r requirements/edx/base.in, edxval
 botocore==1.8.17          # via -r requirements/edx/base.in, boto3, s3transfer
 bridgekeeper==0.9         # via -r requirements/edx/base.in
 certifi==2020.11.8        # via -r requirements/edx/paver.txt, elasticsearch, requests
-cffi==1.14.3              # via -r requirements/edx/../edx-sandbox/shared.txt, cryptography
+cffi==1.14.4              # via -r requirements/edx/../edx-sandbox/shared.txt, cryptography
 chardet==3.0.4            # via -r requirements/edx/paver.txt, pysrt, requests
 chem==1.2.0               # via -r requirements/edx/base.in
 click==7.1.2              # via -r requirements/edx/../edx-sandbox/shared.txt, code-annotations, nltk, user-util
