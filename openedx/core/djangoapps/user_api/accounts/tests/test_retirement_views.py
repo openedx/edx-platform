@@ -90,10 +90,6 @@ from .retirement_helpers import (  # pylint: disable=unused-import
 )
 
 
-if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-    raise unittest.SkipTest('fix broken tests')
-
-
 def build_jwt_headers(user):
     """
     Helper function for creating headers for the JWT authentication.
@@ -780,7 +776,6 @@ class TestAccountRetirementList(RetirementTestCase):
 
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
-@unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'TODO: fix in Juniper')
 class TestAccountRetirementsByStatusAndDate(RetirementTestCase):
     """
     Tests the retirements_by_status_and_date endpoint
@@ -852,7 +847,7 @@ class TestAccountRetirementsByStatusAndDate(RetirementTestCase):
         Verify that users in non-requested states are not returned
         """
         state = RetirementState.objects.get(state_name='PENDING')
-        create_retirement_status(state=state)
+        create_retirement_status(UserFactory(), state=state)
         self.assert_status_and_user_list([])
 
     def test_users_exist(self):
@@ -883,7 +878,7 @@ class TestAccountRetirementsByStatusAndDate(RetirementTestCase):
         # Create retirements for the last 10 days
         for days_back in range(0, 10):
             create_datetime = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=days_back)
-            ret = create_retirement_status(state=complete_state, create_datetime=create_datetime)
+            ret = create_retirement_status(UserFactory(), state=complete_state, create_datetime=create_datetime)
             retirements.append(self._retirement_to_dict(ret))
 
         # Go back in time adding days to the query, assert the correct retirements are present
@@ -1575,6 +1570,10 @@ class TestLMSAccountRetirementPost(RetirementTestCase, ModuleStoreTestCase):
         self.assertEqual(response.status_code, expected_status)
         return response
 
+    @unittest.skipIf(
+        settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,
+        'IntegrityError in wiki_articleplugin needs devstack/staging to test before marking as perm. failure.'
+    )
     def test_retire_user(self):
         # check that rows that will not exist after retirement exist now
         self.assertTrue(CreditRequest.objects.filter(username=self.test_user.username).exists())
@@ -1611,6 +1610,10 @@ class TestLMSAccountRetirementPost(RetirementTestCase, ModuleStoreTestCase):
         self.assertEqual(retired_api_access_request.company_name, '')
         self.assertEqual(retired_api_access_request.reason, '')
 
+    @unittest.skipIf(
+        settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,
+        'IntegrityError in wiki_articleplugin needs devstack/staging to test before marking as perm. failure.'
+    )
     def test_retire_user_twice_idempotent(self):
         # check that a second call to the retire_misc endpoint will work
         data = {'username': self.original_username}
