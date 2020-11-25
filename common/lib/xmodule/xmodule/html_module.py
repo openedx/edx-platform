@@ -428,7 +428,6 @@ class StaticTabFields(object):
     )
 
 
-@edxnotes
 @XBlock.tag("detached")
 class StaticTabBlock(StaticTabFields, HtmlBlockMixin):
     """
