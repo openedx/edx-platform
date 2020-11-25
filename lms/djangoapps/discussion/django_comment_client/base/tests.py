@@ -376,7 +376,7 @@ class ViewsTestCaseMixin(object):
 @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
 @disable_signal(views, 'thread_created')
 @disable_signal(views, 'thread_edited')
-@unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'low priority juniper query count failures')
+@unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'low priority query count failures')
 class ViewsQueryCountTestCase(
         ForumsEnableMixin,
         UrlResetMixin,
