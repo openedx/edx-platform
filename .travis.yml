@@ -33,14 +33,19 @@ env:
     - BOTO_CONFIG="/etc/nonexistent.cfg"
 
 jobs:
-  include:
-    - name: pep8
-    - name: common-minimal
-    - name: common
-    - name: lms-1
-    - name: lms-2
-    - name: mte
-    - name: studio
+  exclude:
+    # Disable all jobs on TravisCI on Juniper branches.
+    # It's not helpful at all for Juniper.
+    # See https://appsembler.atlassian.net/browse/ENGOPS-60?focusedCommentId=29611
+    - python: 3.5
+#  include:
+#    - name: pep8
+#    - name: common-minimal
+#    - name: common
+#    - name: lms-1
+#    - name: lms-2
+#    - name: mte
+#    - name: studio
 
 script: tox -e $TRAVIS_JOB_NAME
 
@@ -49,5 +54,3 @@ branches:
   # so `continuous-integration/travis-ci/push` shouldn't be built anymore.
   only:
     - /^appsembler\/(tahoe|hawthorn)\/(develop|master)$/
-    - main
-
