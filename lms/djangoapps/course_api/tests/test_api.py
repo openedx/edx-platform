@@ -22,12 +22,6 @@ from ..api import UNKNOWN_BLOCK_DISPLAY_NAME, course_detail, get_due_dates, list
 from .mixins import CourseApiFactoryMixin
 
 
-from django.conf import settings
-import unittest
-if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-    raise unittest.SkipTest('fix broken tests')
-
-
 class CourseApiTestMixin(CourseApiFactoryMixin):
     """
     Establish basic functionality for Course API tests

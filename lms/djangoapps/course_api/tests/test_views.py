@@ -365,10 +365,7 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
         self.assertEqual(res.data['pagination']['count'], 1)
         self.assertEqual(len(res.data['results']), 1)  # Should return a single course
 
-    @skipIf(
-        settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,
-        'Appsembler: Performance queries count are failing on Tahoe / Juniper'
-    )
+    @skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Skip failing query count test')
     def test_too_many_courses(self):
         """
         Test that search results are limited to 100 courses, and that they don't
