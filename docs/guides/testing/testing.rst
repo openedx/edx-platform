@@ -88,7 +88,7 @@ Test Locations
    located in ``common/lib/capa/capa/tests``.
 
 -  Javascript unit tests: Located in ``spec`` folders. For example,
-   ``common/lib/xmodule/xmodule/js/spec`` and
+   ``xmodule/js/spec`` and
    ``{cms,lms}/static/js/spec`` For consistency, you should use the
    same directory structure for implementation and test. For example,
    the test for ``src/views/module.js`` should be written in

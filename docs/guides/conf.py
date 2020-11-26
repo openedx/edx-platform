@@ -28,11 +28,11 @@ sys.path.append(root / "common/djangoapps")
 sys.path.append(root / "common/lib/capa")
 sys.path.append(root / "common/lib/safe_lxml")
 sys.path.append(root / "common/lib/symmath")
-sys.path.append(root / "common/lib/xmodule")
 sys.path.append(root / "lms/djangoapps")
 sys.path.append(root / "lms/envs")
 sys.path.append(root / "openedx/core/djangoapps")
 sys.path.append(root / "openedx/features")
+sys.path.append(root / "xmodule")
 
 # Use a settings module that allows all LMS and Studio code to be imported
 # without errors.  If running sphinx-apidoc, we already set a different
@@ -236,9 +236,9 @@ modules = {
     'common/lib/capa/capa': 'common/lib/capa',
     'common/lib/safe_lxml/safe_lxml': 'common/lib/safe_lxml',
     'common/lib/symmath/symmath': 'common/lib/symmath',
-    'common/lib/xmodule/xmodule': 'common/lib/xmodule',
     'lms': 'lms',
     'openedx': 'openedx',
+    'xmodule': 'xmodule',
 }
 
 # These Django apps under cms don't import correctly with the "cms.djangapps" prefix

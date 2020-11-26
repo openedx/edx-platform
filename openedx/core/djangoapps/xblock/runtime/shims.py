@@ -100,7 +100,7 @@ class RuntimeShim(object):
     def can_execute_unsafe_code(self):
         """
         Determine if capa problems in this context/course are allowed to run
-        unsafe code. See common/lib/xmodule/xmodule/util/sandboxing.py
+        unsafe code. See xmodule/util/sandboxing.py
 
         Seems only to be used by capa.
         """
