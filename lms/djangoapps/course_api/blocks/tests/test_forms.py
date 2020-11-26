@@ -19,12 +19,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from ..forms import BlockListGetForm
 
 
-from django.conf import settings
-import unittest
-if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-    raise unittest.SkipTest('fix broken tests')
-
-
 @ddt.ddt
 class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
     """
