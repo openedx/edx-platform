@@ -3,13 +3,11 @@
 
 import ddt
 from mock import patch, Mock
-from unittest import skipIf
 
 from completion import models
 from completion.test_utils import CompletionWaffleTestMixin
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.conf import settings
 
 from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from openedx.core.djangolib.testing.utils import skip_unless_lms
@@ -69,7 +67,6 @@ class UserAccountSettingsTest(TestCase):
 
 
 @ddt.ddt
-@skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'TODO: fix in Juniper')
 class CompletionUtilsTestCase(SharedModuleStoreTestCase, FilteredQueryCountMixin, CompletionWaffleTestMixin, TestCase):
     """
     Test completion utility functions
@@ -123,10 +120,10 @@ class CompletionUtilsTestCase(SharedModuleStoreTestCase, FilteredQueryCountMixin
         when sending a user object
         """
         block_url = retrieve_last_sitewide_block_completed(
-            self.engaged_user.username if use_username else self.engaged_user
+            self.engaged_user
         )
         empty_block_url = retrieve_last_sitewide_block_completed(
-            self.cruft_user.username if use_username else self.cruft_user
+            self.cruft_user
         )
         self.assertEqual(
             block_url,
