@@ -401,7 +401,7 @@ class DeactivateLogoutView(APIView):
 
                 try:
                     # Send notification email to user
-                    site = Site.objects.get_current()
+                    site = Site.objects.get_current(request)
                     notification_context = get_base_template_context(site)
                     notification_context.update({'full_name': request.user.profile.name})
                     notification = DeletionNotificationMessage().personalize(
