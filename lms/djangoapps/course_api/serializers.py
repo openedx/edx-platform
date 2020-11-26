@@ -64,7 +64,6 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     enrollment_start = serializers.DateTimeField()
     enrollment_end = serializers.DateTimeField()
     id = serializers.CharField()  # pylint: disable=invalid-name
-    invitation_only = serializers.BooleanField()
     media = _CourseApiMediaCollectionSerializer(source='*')
     name = serializers.CharField(source='display_name_with_default_escaped')
     number = serializers.CharField(source='display_number_with_default')
