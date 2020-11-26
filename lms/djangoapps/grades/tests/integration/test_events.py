@@ -4,7 +4,6 @@ Test grading events across apps.
 
 
 import six
-from unittest import skip
 from crum import set_current_request
 from mock import call as mock_call
 from mock import patch
@@ -21,12 +20,6 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from ... import events
-
-
-from django.conf import settings
-import unittest
-if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-    raise unittest.SkipTest('fix broken tests')
 
 
 class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTestCase):
@@ -84,7 +77,6 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
         self.instructor = UserFactory.create(is_staff=True, username=u'test_instructor', password=u'test')
         self.refresh_course()
 
-    @skip("Occasionally fails and adding the flaky decorator doesn't help")
     @patch('lms.djangoapps.grades.events.tracker')
     def test_submit_answer(self, events_tracker):
         self.submit_question_answer('p1', {'2_1': 'choice_choice_2'})
