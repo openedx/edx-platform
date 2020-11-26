@@ -22,8 +22,6 @@
     # via -r requirements/edx/base.txt
 -e git+https://github.com/edx/RateXBlock.git@2.0.1#egg=rate-xblock
     # via -r requirements/edx/base.txt
--e common/lib/safe_lxml
-    # via -r requirements/edx/base.txt
 -e common/lib/sandbox-packages
     # via -r requirements/edx/base.txt
 -e openedx/core/lib/xblock_builtin/xblock_discussion

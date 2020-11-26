@@ -5,7 +5,7 @@
 
 import pytest
 
-from safe_lxml import defuse_xml_libs
+from openedx.core.lib.safe_lxml import defuse_xml_libs
 
 # This import is needed for pytest plugin configuration, so please avoid deleting this during refactoring
 from openedx.core.pytest_hooks import pytest_configure  # pylint: disable=unused-import
