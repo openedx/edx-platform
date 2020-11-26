@@ -20,7 +20,7 @@ test_root/staticfiles
 common/static/xmodule
 
 
-# Symlinks into common/lib/xmodule/xmodule/js
+# Symlinks into xmodule/js
 cms/static/xmodule_js
 lms/static/xmodule_js
 
@@ -50,12 +50,6 @@ common/lib/capa/capa/tests/test_files/js/test_problem_display.js
 common/lib/capa/capa/tests/test_files/js/test_problem_generator.js
 common/lib/capa/capa/tests/test_files/js/test_problem_grader.js
 common/lib/capa/capa/tests/test_files/js/xproblem.js
-common/lib/xmodule/xmodule/js/spec/annotatable/display_spec.js
-common/lib/xmodule/xmodule/js/spec/capa/display_spec.js
-common/lib/xmodule/xmodule/js/spec/html/edit_spec.js
-common/lib/xmodule/xmodule/js/spec/problem/edit_spec_hint.js
-common/lib/xmodule/xmodule/js/spec/problem/edit_spec.js
-common/lib/xmodule/xmodule/js/spec/tabs/edit.js
 lms/static/js/spec/calculator_spec.js
 lms/static/js/spec/courseware_spec.js
 lms/static/js/spec/feedback_form_spec.js
@@ -63,6 +57,12 @@ lms/static/js/spec/helper.js
 lms/static/js/spec/histogram_spec.js
 lms/static/js/spec/modules/tab_spec.js
 lms/static/js/spec/requirejs_spec.js
+xmodule/js/spec/annotatable/display_spec.js
+xmodule/js/spec/capa/display_spec.js
+xmodule/js/spec/html/edit_spec.js
+xmodule/js/spec/problem/edit_spec_hint.js
+xmodule/js/spec/problem/edit_spec.js
+xmodule/js/spec/tabs/edit.js
 
 
 !**/.eslintrc.js

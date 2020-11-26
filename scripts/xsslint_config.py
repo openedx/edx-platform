@@ -20,7 +20,6 @@ from xsslint.linters import (
 SKIP_DIRS = (
     '.git',
     '.pycharm_helpers',
-    'common/static/xmodule/modules',
     'common/static/bundles',
     'docs',
     'perf_tests',
@@ -30,6 +29,7 @@ SKIP_DIRS = (
     'spec',
     'test_root',
     'vendor',
+    'xmodule/modules',
 )
 
 

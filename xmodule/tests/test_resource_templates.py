@@ -41,7 +41,7 @@ class TestClass(ResourceTemplates):
 
     @classmethod
     def get_template_dir(cls):
-        return 'templates/test'
+        return 'xmodule/templates/test'
 
 
 class TestClass2(TestClass):

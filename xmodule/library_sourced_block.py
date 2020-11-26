@@ -66,7 +66,11 @@ class LibrarySourcedBlock(StudioEditableXBlockMixin, EditableChildrenMixin, XBlo
         Render a form for editing this XBlock
         """
         fragment = Fragment()
-        static_content = ResourceLoader('common.djangoapps.pipeline_mako').load_unicode('templates/static_content.html')
+        static_content = ResourceLoader(
+            'common.djangoapps.pipeline_mako'
+        ).load_unicode(
+            'xmodule/templates/static_content.html'
+        )
         render_react = MakoTemplate(static_content, default_filters=[]).get_def('renderReact')
         react_content = render_react.render(
             component="LibrarySourcedBlockPicker",
@@ -75,7 +79,7 @@ class LibrarySourcedBlock(StudioEditableXBlockMixin, EditableChildrenMixin, XBlo
                 'selectedXblocks': self.source_block_ids,
             }
         )
-        fragment.content = loader.render_django_template('templates/library-sourced-block-studio-view.html', {
+        fragment.content = loader.render_django_template('xmodule/templates/library-sourced-block-studio-view.html', {
             'react_content': react_content,
             'save_url': self.runtime.handler_url(self, 'submit_studio_edits'),
         })

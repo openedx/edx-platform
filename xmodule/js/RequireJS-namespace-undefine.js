@@ -1,1 +1,1 @@
-../../../../../common/static/js/RequireJS-namespace-undefine.js
+../../common/static/js/RequireJS-namespace-undefine.js

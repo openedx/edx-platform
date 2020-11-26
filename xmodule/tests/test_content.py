@@ -210,7 +210,7 @@ class ContentTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
         """
         Test that only one filename starts with 000.
         """
-        output_root = path('common/static/xmodule/descriptors/js')
+        output_root = path('xmodule/descriptors/js')
         file_owners = _write_js(output_root, _list_descriptors(), 'get_studio_view_js')
         js_file_paths = {file_path for file_path in sum(list(file_owners.values()), []) if os.path.basename(file_path).startswith('000-')}  # lint-amnesty, pylint: disable=line-too-long
         assert len(js_file_paths) == 1

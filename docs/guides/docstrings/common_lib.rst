@@ -11,4 +11,3 @@ out from edx-platform into separate packages at some point.
     common/lib/capa/modules
     common/lib/safe_lxml/modules
     common/lib/symmath/modules
-    common/lib/xmodule/modules
