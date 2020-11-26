@@ -111,7 +111,7 @@ def server_track(request, event_type, event, page=None):
     except:
         username = "anonymous"
 
-    if isinstance(event, basestring) and event:
+    if isinstance(event, str) and event:
         try:
             event = json.loads(event)
         except ValueError:
