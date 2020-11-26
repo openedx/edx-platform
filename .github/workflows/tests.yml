@@ -1,0 +1,38 @@
+name: edx-platform tests
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo
+        ports:
+          - 27017:27017
+    strategy:
+      matrix:
+        python-version: [3.5]
+        tox-env:
+          - pep8
+          - common-minimal
+          - common
+          - lms-1
+          - lms-2
+          - mte
+          - studio
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }} ${{ matrix.tox-env }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -y python-dev libxml2-dev libxmlsec1-dev
+        pip install tox
+    - name: Run tox
+      run: |
+        tox -e ${{ matrix.tox-env }}
