@@ -96,10 +96,14 @@ if theme:
 engine = Engine(dirs=dirs)
 loader = ThemeTemplateLoader(engine)
 
+## Note: Appsembler - We've changed `loader` -> `loader.base_loader` to fix Studio errors
+##       this change is a tech-debt that's not specifically tested. It meant to
+##       use theme template loader for static includes such as underscore files.
+
 source = None
-for origin in loader.get_template_sources(path):
+for origin in loader.base_loader.get_template_sources(path):
     try:
-        source = loader.get_contents(origin)
+        source = loader.base_loader.get_contents(origin)
     except TemplateDoesNotExist:
         pass
 
