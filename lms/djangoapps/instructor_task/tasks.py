@@ -182,7 +182,7 @@ def calculate_problem_responses_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY, name='adding_error')
 @set_code_owner_attribute
 def calculate_grades_csv(entry_id, xmodule_instance_args):
     """
