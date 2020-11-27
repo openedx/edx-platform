@@ -4,17 +4,14 @@ Tests for APPSEMBLER_MULTI_TENANT_EMAILS in Studio for course team invite.
 
 from mock import patch
 import json
-import unittest
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import LibraryFactory
 
-from django.conf import settings
 from contentstore.views import course_team_handler
 from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
-from django.test.utils import override_settings
 from student.roles import CourseInstructorRole, LibraryUserRole
 from organizations.models import OrganizationCourse
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
@@ -26,9 +23,7 @@ from openedx.core.djangoapps.appsembler.multi_tenant_emails.tests.test_utils imp
 from student.roles import CourseCreatorRole, CourseAccessRole
 
 
-@unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'fix stuck test')
 @patch.dict('django.conf.settings.FEATURES', {'APPSEMBLER_MULTI_TENANT_EMAILS': True})
-@override_settings(DEFAULT_SITE_THEME='edx-theme-codebase')
 class MultiTenantStudioCourseTeamTestCase(ModuleStoreTestCase):
     """
     Testing the Course Team management when the APPSEMBLER_MULTI_TENANT_EMAILS feature is enabled in Studio.
