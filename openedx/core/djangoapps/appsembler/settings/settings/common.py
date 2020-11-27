@@ -27,6 +27,11 @@ def plugin_settings(settings):
         0, 'beeline.middleware.django.HoneyMiddleware'
     )
 
+    # Disable PDF certificates on Tahoe by default because we only support HTML certificate
+    # This is a custom Tahoe feature flag.
+    # TODO: Add tests for the feature
+    settings.FEATURES['ENABLE_TAHOE_PDF_CERTS'] = False
+
     settings.DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += (
         'openedx.core.djangoapps.appsembler.intercom_integration.context_processors.intercom',
         'openedx.core.djangoapps.appsembler.analytics.context_processors.google_analytics',
