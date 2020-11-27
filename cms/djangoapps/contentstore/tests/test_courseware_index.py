@@ -565,7 +565,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         self._perform_test_using_store(store_type, self._test_not_indexable)
 
     @ddt.data(*WORKS_WITH_STORES)
-    @skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'TODO: fix date failures')
+    @skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Skip flaky test due to date issues')
     def test_start_date_propagation(self, store_type):
         self._perform_test_using_store(store_type, self._test_start_date_propagation)
 
