@@ -35,10 +35,6 @@ TEST_API_URL = 'http://www-internal.example.com/api'
 JSON = 'application/json'
 
 
-if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-    raise unittest.SkipTest('fix broken tests')
-
-
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class RefundableTest(SharedModuleStoreTestCase):

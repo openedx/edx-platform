@@ -56,10 +56,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 log = logging.getLogger(__name__)
 
 
-if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-    raise unittest.SkipTest('fix broken tests')
-
-
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
 class CourseEndingTest(TestCase):
@@ -557,7 +553,6 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
 
 
 @ddt.ddt
-@override_settings(DEFAULT_SITE_THEME='edx-theme-codebase')
 class DashboardTestsWithSiteOverrides(SiteMixin, ModuleStoreTestCase):
     """
     Tests for site settings overrides used when rendering the dashboard view
@@ -579,7 +574,7 @@ class DashboardTestsWithSiteOverrides(SiteMixin, ModuleStoreTestCase):
         ('testserver2.com', {'ENABLE_VERIFIED_CERTIFICATES': True, 'DISPLAY_COURSE_MODES_ON_DASHBOARD': True}),
     )
     @ddt.unpack
-    @unittest.expectedFailure  # Appsembler: Broken tests for reasons not known to me -- Omar
+    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Broken tests for reasons.')
     def test_course_mode_visible(self, site_domain, site_configuration_values):
         """
         Test that the course mode for courses is visible on the dashboard

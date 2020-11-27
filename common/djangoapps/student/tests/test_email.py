@@ -123,14 +123,14 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
     ]
 
     @ddt.data('plain_text', 'html')
-    @unittest.skip('Appsembler: Broken tests because of multi-tenant hostname fixes. Could not fix it myself -- Omar')
+    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, ' Broken due to multi-tenant hostname fixes. Could not fix it.')
     def test_activation_email(self, test_body_type):
         self._create_account()
         self._assert_activation_email(self.ACTIVATION_SUBJECT, self.OPENEDX_FRAGMENTS, test_body_type)
 
     @with_comprehensive_theme("edx.org")
     @ddt.data('plain_text', 'html')
-    @unittest.skip('Appsembler: Broken tests because of multi-tenant hostname fixes. Could not fix it myself -- Omar')
+    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, ' Broken due to multi-tenant hostname fixes. Could not fix it.')
     def test_activation_email_edx_domain(self, test_body_type):
         self._create_account()
         self._assert_activation_email(self.ACTIVATION_SUBJECT, self.OPENEDX_FRAGMENTS, test_body_type)

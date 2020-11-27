@@ -44,13 +44,7 @@ from edxmako.shortcuts import marketing_link, render_to_response, render_to_stri
 from entitlements.models import CourseEntitlement
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.catalog.utils import get_programs_with_type
-from openedx.core.djangoapps.appsembler.sites.utils import (
-    get_current_organization,
-    is_request_for_amc_admin,
-    is_request_for_new_amc_site,
-    add_course_creator_role,
-)
-from openedx.core.djangoapps.theming.helpers import get_current_request
+from openedx.core.djangoapps.appsembler.sites.utils import get_current_organization
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
@@ -58,8 +52,6 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangolib.markup import HTML, Text
-from organizations.models import Organization, UserOrganizationMapping
-from organizations.models import Organization, UserOrganizationMapping
 from student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info, generate_activation_email_context
 from student.message_types import AccountActivation, EmailChange, EmailChangeConfirmation, RecoveryEmailCreate
 from student.models import (

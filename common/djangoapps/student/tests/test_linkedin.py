@@ -3,9 +3,9 @@
 
 
 import ddt
-from unittest import skip
+from unittest import skipIf
 from django.conf import settings
-from django.test import override_settings, TestCase
+from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
 from six.moves.urllib.parse import quote, urlencode
 
@@ -14,8 +14,7 @@ from student.models import LinkedInAddToProfileConfiguration
 
 
 @ddt.ddt
-@override_settings(DEFAULT_SITE_THEME='edx-theme-codebase')
-@skip('Appsembler: Broken tests, likely because of our theme modifications. Cannot be sure -- Omar.')
+@skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, ' Broken tests, likely because of our theme modifications. Cannot be sure.')
 class LinkedInAddToProfileUrlTests(TestCase):
     """Tests for URL generation of LinkedInAddToProfileConfig. """
 
