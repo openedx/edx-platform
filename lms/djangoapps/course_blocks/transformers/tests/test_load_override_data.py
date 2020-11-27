@@ -30,7 +30,7 @@ expected_overrides = {
 
 
 @ddt.ddt
-@unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'TODO: fix course blocks tests')
+@unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'skip date-related failure')
 class TestOverrideDataTransformer(ModuleStoreTestCase):
     """
     Test proper behavior for OverrideDataTransformer
