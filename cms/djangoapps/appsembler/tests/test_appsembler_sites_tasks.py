@@ -2,9 +2,7 @@
 Tests for appsembler.sites.tasks.
 """
 import datetime
-import unittest
 
-from django.conf import settings
 from django.test import override_settings
 from organizations.models import UserOrganizationMapping
 from organizations.tests.factories import OrganizationFactory
@@ -30,7 +28,6 @@ IMPORT_SETTINGS = {
 
 
 @override_settings(**IMPORT_SETTINGS)
-@unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'fix stuck test')
 class ImportCourseOnSiteCreationTestCase(ModuleStoreTestCase):
     """
     Integration tests for the `import_course_on_site_creation` task.
