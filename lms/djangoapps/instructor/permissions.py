@@ -30,7 +30,10 @@ RESCORE_EXAMS = 'instructor.rescore_exams'
 VIEW_REGISTRATION = 'instructor.view_registration'
 VIEW_DASHBOARD = 'instructor.dashboard'
 
+TAHOE_CERTIFICATE_ADMIN = 'instructor.tahoe_certificates'  # Custom rule so Tahoe customers can control certificates
 
+
+perms[TAHOE_CERTIFICATE_ADMIN] = HasAccessRule('staff')
 perms[ALLOW_STUDENT_TO_BYPASS_ENTRANCE_EXAM] = HasAccessRule('staff')
 perms[ASSIGN_TO_COHORTS] = HasAccessRule('staff')
 perms[EDIT_COURSE_ACCESS] = HasAccessRule('instructor')

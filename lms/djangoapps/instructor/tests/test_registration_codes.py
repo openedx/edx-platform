@@ -12,9 +12,6 @@ from django.utils.translation import ugettext as _
 from six import text_type
 from six.moves import range
 
-import unittest
-from django.conf import settings
-
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.tests.factories import InstructorFactory
@@ -34,7 +31,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @override_settings(REGISTRATION_CODE_LENGTH=8)
-@unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'TODO: fix in Juniper')
 class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
     """
     Test registration code status.

@@ -123,8 +123,8 @@ from student.models import (
     anonymous_id_for_user,
     get_user_by_username_or_email,
     get_user_by_username_or_email_inside_organization,
-    unique_id_for_user,
-    is_email_retired
+    is_email_retired,
+    unique_id_for_user
 )
 from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
 from util.file import (
@@ -2964,14 +2964,7 @@ def _instructor_dash_url(course_key, section=None):
     return url
 
 
-if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-    staff_decorator = require_global_staff  # Hack until it's fixed
-else:
-    # In Hawthorn we used `require_level('staff')` but edX probably removed it
-    staff_decorator = require_level('staff')
-
-
-@staff_decorator
+@require_course_permission(permissions.TAHOE_CERTIFICATE_ADMIN)
 @require_POST
 def generate_example_certificates(request, course_id=None):
     """Start generating a set of example certificates.
@@ -2988,20 +2981,7 @@ def generate_example_certificates(request, course_id=None):
     return redirect(_instructor_dash_url(course_key, section='certificates'))
 
 
-if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-    # `@require_level('staff')` is gone as of Juniper. This method statement monkeypatches tests failures in
-    #   `CertificatesInstructorDashTest`.
-    #
-    #  This is related to Maxi's PR for Hawthorn: https://github.com/appsembler/edx-platform/pull/257
-    #
-    #  I replaced it with `@require_course_permission(ENABLE_CERTIFICATE_GENERATION)` from upstream
-    #  to bring in: https://github.com/edx/edx-platform/commit/b85527535397212826807af1bf03b9cc0e7bb04d
-    certs_permission_decorator = require_course_permission(permissions.ENABLE_CERTIFICATE_GENERATION)  # Juniper
-else:
-    certs_permission_decorator = require_level('staff')
-
-
-@certs_permission_decorator
+@require_course_permission(permissions.TAHOE_CERTIFICATE_ADMIN)
 @require_POST
 def enable_certificate_generation(request, course_id=None):
     """Enable/disable self-generated certificates for a course.
@@ -3046,7 +3026,7 @@ def mark_student_can_skip_entrance_exam(request, course_id):
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@staff_decorator
+@require_course_permission(permissions.TAHOE_CERTIFICATE_ADMIN)
 @require_POST
 @common_exceptions_400
 def start_certificate_generation(request, course_id):
@@ -3068,7 +3048,7 @@ def start_certificate_generation(request, course_id):
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@staff_decorator
+@require_course_permission(permissions.TAHOE_CERTIFICATE_ADMIN)
 @require_POST
 @common_exceptions_400
 def start_certificate_regeneration(request, course_id):
@@ -3110,7 +3090,7 @@ def start_certificate_regeneration(request, course_id):
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@staff_decorator
+@require_course_permission(permissions.TAHOE_CERTIFICATE_ADMIN)
 @require_http_methods(['POST', 'DELETE'])
 def certificate_exception_view(request, course_id):
     """
@@ -3290,7 +3270,7 @@ def get_student(username_or_email, course_key):
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@certs_permission_decorator
+@require_course_permission(permissions.TAHOE_CERTIFICATE_ADMIN)
 @require_POST
 @common_exceptions_400
 def generate_certificate_exceptions(request, course_id, generate_for=None):
@@ -3332,7 +3312,7 @@ def generate_certificate_exceptions(request, course_id, generate_for=None):
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@certs_permission_decorator
+@require_course_permission(permissions.TAHOE_CERTIFICATE_ADMIN)
 @require_POST
 def generate_bulk_certificate_exceptions(request, course_id):
     """
@@ -3432,7 +3412,7 @@ def generate_bulk_certificate_exceptions(request, course_id):
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@staff_decorator
+@require_course_permission(permissions.TAHOE_CERTIFICATE_ADMIN)
 @require_http_methods(['POST', 'DELETE'])
 def certificate_invalidation_view(request, course_id):
     """

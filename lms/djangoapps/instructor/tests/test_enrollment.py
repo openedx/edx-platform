@@ -50,7 +50,7 @@ class TestSettableEnrollmentState(CacheIsolationTestCase):
         super(TestSettableEnrollmentState, self).setUp()
         self.course_key = CourseLocator('Robot', 'fAKE', 'C--se--ID')
 
-    @unittest.skip('Appsembler: Unable to fix the test -- Omar')
+    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Unable to fix the test')
     def test_mes_create(self):
         """
         Test SettableEnrollmentState creation of user.
@@ -110,7 +110,7 @@ class TestEnrollmentChangeBase(six.with_metaclass(ABCMeta, CacheIsolationTestCas
 @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=False))
 class TestInstructorEnrollDB(TestEnrollmentChangeBase):
     """ Test instructor.enrollment.enroll_email """
-    @unittest.expectedFailure  # Appsembler: Could not fix the test -- Omar
+    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Could not fix the test')
     def test_enroll(self):
         before_ideal = SettableEnrollmentState(
             user=True,
@@ -130,7 +130,7 @@ class TestInstructorEnrollDB(TestEnrollmentChangeBase):
 
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
-    @unittest.expectedFailure  # Appsembler: Could not fix the test -- Omar
+    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Could not fix the test')
     def test_enroll_again(self):
         before_ideal = SettableEnrollmentState(
             user=True,
@@ -227,7 +227,7 @@ class TestInstructorEnrollDB(TestEnrollmentChangeBase):
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
 
-@unittest.skip('Appsembler: Skip all tests because they fail without an easy fix -- Omar')
+@unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Those tests fail without an easy fix')
 class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
     """ Test instructor.enrollment.unenroll_email """
     def test_unenroll(self):

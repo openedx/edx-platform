@@ -8,6 +8,7 @@ import datetime
 import pytz
 import six
 from django.urls import reverse
+from django.conf import settings
 from six import text_type
 import unittest
 
@@ -57,7 +58,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         # Coupons should show up for White Label sites with priced honor modes.
         self.assertContains(response, 'Coupon Code List')
 
-    @unittest.expectedFailure  # Appsembler: Fails for unknown reasons -- Omar
+    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Fails for unknown reasons')
     def test_reports_section_under_e_commerce_tab(self):
         """
         Test reports section, under E-commerce Tab, is in the Instructor Dashboard

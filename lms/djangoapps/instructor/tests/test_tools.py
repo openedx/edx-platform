@@ -261,7 +261,7 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         with self.assertRaises(tools.DashboardError):
             tools.set_due_date_extension(self.course, self.week3, self.user, extended)
 
-    @unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'fix individual due dates')
+    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'date failure')
     def test_reset_due_date_extension(self):
         extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=UTC)
         tools.set_due_date_extension(self.course, self.week1, self.user, extended)

@@ -75,9 +75,8 @@ class TestInstructorAccessAllow(EmailTemplateTagMixin, SharedModuleStoreTestCase
         allow_access(self.course, user, 'ccx_coach')
         self.assertTrue(CourseCcxCoachRole(self.course.id).has_user(user))
 
-    def test_allow_beta(self, mock_get_user):
-        """ Test allow beta ag
-        mock_get_user.return_value = userainst list beta. """
+    def test_allow_beta(self, _mock_get_user):
+        """ Test allow beta against list beta. """
         user = UserFactory()
         allow_access(self.course, user, 'beta')
         self.assertTrue(CourseBetaTesterRole(self.course.id).has_user(user))
