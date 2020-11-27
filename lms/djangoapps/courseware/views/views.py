@@ -1204,8 +1204,10 @@ def _downloadable_certificate_message(course, cert_downloadable_status):
         elif not cert_downloadable_status['is_pdf_certificate']:
             return GENERATING_CERT_DATA
 
-    # Hack: Was `return _downloadable_cert_data(download_url=cert_downloadable_status['download_url'])`
-    return None
+    if not settings.FEATURES['ENABLE_TAHOE_PDF_CERTS']:
+        return None
+
+    return _downloadable_cert_data(download_url=cert_downloadable_status['download_url'])
 
 
 def _missing_required_verification(student, enrollment_mode):
@@ -1232,11 +1234,14 @@ def _certificate_message(student, course, enrollment_mode):
     if _missing_required_verification(student, enrollment_mode):
         return UNVERIFIED_CERT_DATA
 
-    # TODO: Check in Juniper. Do we have tests for it? -- Omar
-    if certs_api.has_html_certificates_enabled(course) and certs_api.get_active_web_certificate(course) is not None:
-        return REQUESTING_CERT_DATA
-    else:
-        return None
+    if not settings.FEATURES['ENABLE_TAHOE_PDF_CERTS']:
+        has_html_certs = certs_api.has_html_certificates_enabled(course)
+        active_web_certificate = certs_api.get_active_web_certificate(course) is not None
+
+        if not (has_html_certs and active_web_certificate):
+            return None
+
+    return REQUESTING_CERT_DATA
 
 
 def _get_cert_data(student, course, enrollment_mode, course_grade=None):
@@ -1250,6 +1255,11 @@ def _get_cert_data(student, course, enrollment_mode, course_grade=None):
         returns dict if course certificate is available else None.
     """
     cert_data = _certificate_message(student, course, enrollment_mode)
+
+    if not settings.FEATURES['ENABLE_TAHOE_PDF_CERTS']:
+        if not cert_data:
+            return
+
     if not CourseMode.is_eligible_for_certificate(enrollment_mode, status=cert_data.cert_status):
         return INELIGIBLE_PASSING_CERT_DATA.get(enrollment_mode)
 

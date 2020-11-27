@@ -58,11 +58,6 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, Group, UserPartition
 
-
-from django.conf import settings
-import unittest
-if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-    raise unittest.SkipTest('fix broken tests')
 QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
 # pylint: disable=protected-access
