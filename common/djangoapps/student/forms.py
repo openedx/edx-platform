@@ -16,13 +16,10 @@ from django.utils.translation import ugettext_lazy as _
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 
-from organizations.models import UserOrganizationMapping
-from openedx.core.djangoapps.appsembler.sites.utils import is_request_for_new_amc_site
-
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.theming.helpers import get_current_request, get_current_site
+from openedx.core.djangoapps.theming.helpers import get_current_site
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference

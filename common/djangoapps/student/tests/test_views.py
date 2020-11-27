@@ -46,11 +46,6 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-
-if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-    raise unittest.SkipTest('fix broken tests')
-
-
 PASSWORD = 'test'
 
 
@@ -581,7 +576,6 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         response = self.client.get(reverse('dashboard'))
         self.assertNotContains(response, 'You are not enrolled in any courses yet.')
 
-    @unittest.expectedFailure  # TODO: `EMPTY_DASHBOARD_MESSAGE` is broken in the Appsembler theme -- Omar
     def test_show_empty_dashboard_message(self):
         """
         Verify that when the EMPTY_DASHBOARD_MESSAGE feature is set,

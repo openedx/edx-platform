@@ -13,9 +13,6 @@ from django.urls import reverse
 from student.models import UserStanding
 from student.tests.factories import UserFactory, UserStandingFactory
 
-if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-    raise unittest.SkipTest('fix broken tests')
-
 
 class UserStandingTest(TestCase):
     """test suite for user standing view for enabling and disabling accounts"""

@@ -26,10 +26,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-    raise unittest.SkipTest('fix broken tests')
-
-
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
 class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
@@ -275,7 +271,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         (False, True,),
     )
     @ddt.unpack
-    @unittest.skip('Appsembler: Broken tests. Likely because of our theme changes. Skipping for now -- Omar')
+    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Broken tests. Likely because of our theme changes.')
     def test_donate_button_with_enabled_site_configuration(self, enable_donation_config, enable_donation_site_config):
         # Enable the enrollment success message and donations
         self._configure_message_timeout(10000)

@@ -26,10 +26,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 
-import unittest
-if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-    raise unittest.SkipTest('fix broken tests')
-
 
 class AdminCourseRolesPageTest(SharedModuleStoreTestCase):
     """Test the django admin course roles form saving data in db.

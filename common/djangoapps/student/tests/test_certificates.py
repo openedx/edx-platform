@@ -11,7 +11,7 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from mock import patch
 from pytz import UTC
-from unittest import skip
+from unittest import skipIf
 
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import get_certificate_url
@@ -27,10 +27,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 PAST_DATE = datetime.datetime.now(UTC) - datetime.timedelta(days=2)
 FUTURE_DATE = datetime.datetime.now(UTC) + datetime.timedelta(days=2)
-
-
-if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-    raise unittest.SkipTest('fix broken tests')
 
 
 class CertificateDisplayTestBase(SharedModuleStoreTestCase):
@@ -258,7 +254,7 @@ class CertificateDisplayTestHtmlView(CertificateDisplayTestBase):
     @ddt.data('verified', 'honor')
     @override_settings(CERT_NAME_SHORT='Test_Certificate')
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
-    @skip('Appsembler: Broken because of our certificate customizations. Could not fix it myself -- Omar')
+    @skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, ' Broken because of our certificate customizations. Could not fix it')
     def test_display_download_certificate_button(self, enrollment_mode):
         """
         Tests if CERTIFICATES_HTML_VIEW is True
@@ -300,7 +296,7 @@ class CertificateDisplayTestLinkedHtmlView(CertificateDisplayTestBase):
     @ddt.data('verified')
     @override_settings(CERT_NAME_SHORT='Test_Certificate')
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
-    @skip('Appsembler: Broken because of our certificate customizations. Could not fix it myself -- Omar')
+    @skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, ' Broken because of our certificate customizations. Could not fix it')
     def test_linked_student_to_web_view_credential(self, enrollment_mode):
 
         cert = self._create_certificate(enrollment_mode)
