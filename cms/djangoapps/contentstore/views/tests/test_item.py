@@ -2126,7 +2126,7 @@ class TestEditSplitModule(ItemTest):
         # Test environment and Studio use different module systems
         # (CachingDescriptorSystem is used in tests, PreviewModuleSystem in Studio).
         # CachingDescriptorSystem doesn't have user service, that's needed for
-        # SplitTestModule. So, in this line of code we add this service manually.
+        # SplitTestBlock. So, in this line of code we add this service manually.
         split_test.runtime._services['user'] = DjangoXBlockUserService(self.user)  # pylint: disable=protected-access
 
         # Call add_missing_groups method to add the missing group.
