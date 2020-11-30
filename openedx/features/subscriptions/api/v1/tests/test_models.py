@@ -163,6 +163,5 @@ class UserSubscriptionsTests(ModuleStoreTestCase):
 
         user_subscription_history = UserSubscriptionHistory.objects.filter(
             site=user_subscription.site,
-        ).all()
-
+        )
         self.assertEqual(len(user_subscription_history), 3)

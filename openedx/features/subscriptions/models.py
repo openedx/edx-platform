@@ -141,7 +141,6 @@ class UserSubscriptionHistory(TimeStampedModel):
     course_enrollments = models.ManyToManyField(CourseEnrollment, blank=True)
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
-
     class Meta:
         get_latest_by = 'modified'
         ordering = ('-modified', '-created',)
