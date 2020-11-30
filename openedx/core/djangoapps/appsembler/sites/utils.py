@@ -15,9 +15,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.db.models.query import Q
 
-if not settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-    # TODO: Fix broken imports
-    from provider.oauth2.models import AccessToken, RefreshToken, Client
+from oauth2_provider.models import AccessToken, RefreshToken, Application
 
 from django.utils.text import slugify
 
@@ -101,7 +99,7 @@ def get_amc_oauth_client():
     """
     Return the AMC OAuth2 Client model instance.
     """
-    return Client.objects.get(url=settings.AMC_APP_URL)
+    return Application.objects.get(client_id=settings.AMC_APP_OAUTH2_CLIENT_ID)
 
 
 @beeline.traced(name="get_amc_tokens")

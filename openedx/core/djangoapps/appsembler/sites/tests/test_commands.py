@@ -1,7 +1,6 @@
 import hashlib
 import os
 import pkg_resources
-import uuid
 from mock import patch, mock_open
 from io import StringIO
 
@@ -47,9 +46,7 @@ from student.tests.factories import (
 
 from organizations.models import Organization, OrganizationCourse
 
-if not settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-    from provider.constants import CONFIDENTIAL
-    from oauth2_provider.models import AccessToken, RefreshToken, Client
+from oauth2_provider.models import AccessToken, RefreshToken, Application
 
 from student.roles import CourseCreatorRole
 
@@ -71,7 +68,8 @@ class CreateDevstackSiteCommandTestCase(TestCase):
 
     def setUp(self):
         assert settings.ENABLE_COMPREHENSIVE_THEMING
-        Client.objects.create(url=settings.AMC_APP_URL, client_type=CONFIDENTIAL)
+        Application.objects.create(client_id=settings.AMC_APP_OAUTH2_CLIENT_ID,
+                                   client_type=Application.CONFIDENTIAL)
 
     def test_no_sites(self):
         """
@@ -122,7 +120,8 @@ class RemoveSiteCommandTestCase(TestCase):
     """
     def setUp(self):
         assert settings.ENABLE_COMPREHENSIVE_THEMING
-        Client.objects.create(url=settings.AMC_APP_URL, client_type=CONFIDENTIAL)
+        Application.objects.create(client_id=settings.AMC_APP_OAUTH2_CLIENT_ID,
+                                   client_type=Application.CONFIDENTIAL)
 
         self.to_be_deleted = 'delete'
         self.shall_remain = 'keep'
@@ -438,7 +437,7 @@ class TestOffboardSiteCommand(ModuleStoreTestCase):
         new_user_count = 3
 
         assert organization.userorganizationmapping_set.count() == 0
-        users = self.create_org_users(org=organization, new_user_count=new_user_count)
+        self.create_org_users(org=organization, new_user_count=new_user_count)
         assert organization.userorganizationmapping_set.count() == new_user_count
 
         data = self.command.process_organization_users(organization)
