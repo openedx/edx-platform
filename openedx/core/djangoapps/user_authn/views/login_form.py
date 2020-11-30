@@ -91,17 +91,10 @@ def get_login_session_form(request):
     # meant to hold the user's email address.
     email_label = _("Email")
 
-    # Translators: These instructions appear on the login form, immediately
-    # below a field meant to hold the user's email address.
-    email_instructions = _("The email address you used to register with {platform_name}").format(
-        platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
-    )
-
     form_desc.add_field(
         "email",
         field_type="email",
         label=email_label,
-        instructions=email_instructions,
         restrictions={
             "min_length": accounts.EMAIL_MIN_LENGTH,
             "max_length": accounts.EMAIL_MAX_LENGTH,
@@ -213,6 +206,7 @@ def login_and_registration_form(request, initial_mode="login"):
             'is_account_recovery_feature_enabled': is_secondary_email_feature_enabled(),
             'is_multiple_user_enterprises_feature_enabled': is_multiple_user_enterprises_feature_enabled()
         },
+        'disable_header': True,
         'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in header
         'responsive': True,
         'allow_iframing': True,
