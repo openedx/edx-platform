@@ -44,6 +44,7 @@ from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.courses import course_image_url
 from openedx.core.djangoapps.certificates.api import display_date_for_certificate, certificates_viewable_for_course
+from openedx.features.edly.utils import get_current_site_invalid_certificate_context
 from student.models import LinkedInAddToProfileConfiguration
 from util import organizations_helpers as organization_api
 from util.date_utils import strftime_localized
@@ -158,7 +159,8 @@ def _update_context_with_basic_info(context, course_id, platform_name, configura
     context['course_id'] = course_id
 
     # Update the view context with the default ConfigurationModel settings
-    context.update(configuration.get('default', {}))
+    current_site_context_data = get_current_site_invalid_certificate_context(configuration)
+    context.update(current_site_context_data)
 
     # Translators:  'All rights reserved' is a legal term used in copyrighting to protect published content
     reserved = _("All rights reserved")

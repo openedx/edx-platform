@@ -5,6 +5,7 @@ import jwt
 import mock
 from mock import MagicMock
 
+import crum
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.core.exceptions import PermissionDenied
@@ -12,6 +13,7 @@ from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory
 
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings as cookie_settings
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.features.edly import cookies as cookies_api
@@ -35,6 +37,7 @@ from openedx.features.edly.utils import (
     user_belongs_to_edly_sub_organization,
     user_can_login_on_requested_edly_organization,
     filter_courses_based_on_org,
+    get_current_site_invalid_certificate_context,
 )
 from organizations.tests.factories import OrganizationFactory
 from student import auth
@@ -346,3 +349,75 @@ class UtilsTests(ModuleStoreTestCase):
 
         edly_user = create_learner_link_with_permission_groups(edly_user)
         assert edly_user.groups.filter(name=edly_user_group).exists()
+
+    def test_get_current_site_invalid_certificate_context_without_site_configuration(self):
+        """
+        Test method returns correct data without site configuration.
+        """
+        crum.set_current_request(request=RequestFactory().get('/'))
+        test_default_certificate_html_configurations = {
+            'default': {
+                'accomplishment_class_append': 'accomplishment-certificate',
+                'platform_name': 'fake-platform-name',
+                'logo_src': 'fake-logo-path',
+                'logo_url': 'fake-logo-url',
+                'company_verified_certificate_url': 'fake-verified-certificate-url',
+                'company_privacy_url': 'fake-privacy-url',
+                'company_tos_url': 'fake-tos-url',
+                'company_about_url': 'fake-about-url'
+            }
+        }
+
+        expected_current_site_context_data = test_default_certificate_html_configurations['default']
+        curent_site_context_data = get_current_site_invalid_certificate_context(test_default_certificate_html_configurations)
+
+        assert expected_current_site_context_data['platform_name'] == curent_site_context_data['platform_name']
+        assert expected_current_site_context_data['company_privacy_url'] == curent_site_context_data['company_privacy_url']
+        assert expected_current_site_context_data['company_tos_url'] == curent_site_context_data['company_tos_url']
+
+    def test_get_current_site_invalid_certificate_context_with_site_configuration(self):
+        """
+        Test method returns correct data with site configuration.
+        """
+        crum.set_current_request(request=self.request)
+        test_default_certificate_html_configurations = {
+            'default': {
+                'accomplishment_class_append': 'accomplishment-certificate',
+                'platform_name': 'fake-platform-name',
+                'logo_src': 'fake-logo-path',
+                'logo_url': 'fake-logo-url',
+                'company_verified_certificate_url': 'fake-verified-certificate-url',
+                'company_privacy_url': 'fake-privacy-url',
+                'company_tos_url': 'fake-tos-url',
+                'company_about_url': 'fake-about-url'
+            }
+        }
+
+        SiteConfigurationFactory(
+            site=self.request.site,
+            values={
+                'ENABLE_MKTG_SITE': True,
+                'platform_name': 'fake-2nd-platform-name',
+                'MKTG_URLS': {
+                    'ROOT': 'http://{}'.format(self.request.site.domain),
+                    'PRIVACY': '/fake-privacy-path',
+                    'TOS_AND_HONOR': '/fake-tos-path',
+                }
+            }
+        )
+        current_site_context_data = get_current_site_invalid_certificate_context(test_default_certificate_html_configurations)
+
+        expected_current_site_context = test_default_certificate_html_configurations['default']
+        expected_current_site_context['platform_name'] = self.request.site.configuration.values.get('platform_name')
+        assert expected_current_site_context['platform_name'] == current_site_context_data['platform_name']
+
+        marketing_urls = self.request.site.configuration.get_value('MKTG_URLS', {})
+        marketing_root_url = marketing_urls.get('ROOT')
+
+        tos_path = marketing_urls.get('TOS_AND_HONOR')
+        expected_company_tos_url = '{}{}'.format(marketing_root_url, tos_path)
+        assert expected_company_tos_url == current_site_context_data['company_tos_url']
+
+        privacy_path = marketing_urls.get('PRIVACY')
+        expected_company_privacy_url = '{}{}'.format(marketing_root_url, privacy_path)
+        assert expected_company_privacy_url == current_site_context_data['company_privacy_url']

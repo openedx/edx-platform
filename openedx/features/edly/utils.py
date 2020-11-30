@@ -8,6 +8,8 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.forms.models import model_to_dict
 
+from lms.djangoapps.branding.api import get_logo_url, get_privacy_url, get_tos_and_honor_code_url
+from openedx.core.djangoapps.site_configuration.helpers import get_current_site_configuration
 from openedx.features.edly.models import EdlyUserProfile, EdlySubOrganization
 from student import auth
 from student.roles import (
@@ -333,3 +335,31 @@ def create_learner_link_with_permission_groups(user):
         user.groups.add(new_group)
 
     return user
+
+
+def get_current_site_invalid_certificate_context(default_html_certificate_configuration):
+    """
+    Gets current site's context data for invalid certificate.
+
+    Try to get current site's context data for invalid certificate from site configuration
+    or fallback to empty urls.
+
+    Arguments:
+        default_html_certificate_configuration (dict): Default html configurations dict.
+
+    Returns:
+        dict: Context data.
+    """
+    context = dict(default_html_certificate_configuration.get('default'))
+    current_site_configuration = get_current_site_configuration()
+
+    if not current_site_configuration:
+        return context
+
+    context['platform_name'] = current_site_configuration.get_value('platform_name', settings.PLATFORM_NAME)
+    context['logo_src'] = get_logo_url()
+    logo_redirect_url = settings.LMS_ROOT_URL
+    context['logo_url'] = logo_redirect_url
+    context['company_privacy_url'] = get_privacy_url()
+    context['company_tos_url'] = get_tos_and_honor_code_url()
+    return context
