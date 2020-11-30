@@ -938,6 +938,8 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_c
 ############## ADG Specific Settings  #########################
 
 MANDRILL_API_KEY = ENV_TOKENS.get('MANDRILL_API_KEY', None)
+MAILCHIMP_API_KEY = AUTH_TOKENS.get('MAILCHIMP_API_KEY', None)
+MAILCHIMP_LIST_ID = AUTH_TOKENS.get('MAILCHIMP_LIST_ID', None)
 
 ########################## Derive Any Derived Settings  #######################
 

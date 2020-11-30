@@ -1,10 +1,10 @@
 """
 Default unit test configuration and fixtures.
 """
-
 from unittest import TestCase
 
 import pytest
+from django.db.models.signals import m2m_changed, post_delete, post_init, post_save, pre_delete, pre_init, pre_save
 
 from adg.pipelines.skip_tests import TEST_SKIP_LIST
 
@@ -56,3 +56,34 @@ def pytest_collection_modifyitems(items):
     for item in items_to_skip:
         item.add_marker(skip_listed)
         print(item.nodeid)
+
+
+@pytest.fixture()
+def mute_signals(request):
+    """
+    A fixture to mute signals. To disable signal for any pytest use fixture `@pytest.mark.mute_signals`
+    """
+
+    signals = [
+        pre_init,
+        post_init,
+        pre_save,
+        post_save,
+        pre_delete,
+        post_delete,
+        m2m_changed
+    ]
+
+    restore = {}
+    for signal in signals:
+        # Temporarily remove the signal's receivers (a.k.a attached functions)
+        restore[signal] = signal.receivers
+        signal.receivers = []
+
+    def restore_signals():
+        # When the test tears down, restore the signals.
+        for signal_to_restore, stored_receivers in restore.items():
+            signal_to_restore.receivers = stored_receivers
+
+    # Called after a test has finished.
+    request.addfinalizer(restore_signals)

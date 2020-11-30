@@ -537,6 +537,11 @@ SYSTEM_WIDE_ROLE_CLASSES = ENV_TOKENS.get('SYSTEM_WIDE_ROLE_CLASSES') or SYSTEM_
 
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_constants.SettingsType.PRODUCTION)
 
+############## ADG Specific Settings  #########################
+
+MAILCHIMP_API_KEY = AUTH_TOKENS.get('MAILCHIMP_API_KEY', None)
+MAILCHIMP_LIST_ID = AUTH_TOKENS.get('MAILCHIMP_LIST_ID', None)
+
 ########################## Derive Any Derived Settings  #######################
 
 derive_settings(__name__)

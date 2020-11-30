@@ -590,3 +590,9 @@ PROCTORING_SETTINGS = {}
 ############### Settings for Django Rate limit #####################
 
 RATELIMIT_RATE = '2/m'
+
+############### ADG #####################
+
+MAILCHIMP_API_KEY = 'test'
+MAILCHIMP_LIST_ID = 'test'
+SUSPEND_RECEIVERS = True

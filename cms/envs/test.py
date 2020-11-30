@@ -298,3 +298,9 @@ SYSTEM_WIDE_ROLE_CLASSES = os.environ.get("SYSTEM_WIDE_ROLE_CLASSES", [])
 DEFAULT_MOBILE_AVAILABLE = True
 
 PROCTORING_SETTINGS = {}
+
+############### ADG #####################
+
+MAILCHIMP_API_KEY = 'test'
+MAILCHIMP_LIST_ID = 'test'
+SUSPEND_RECEIVERS = True

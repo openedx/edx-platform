@@ -2488,15 +2488,15 @@ INSTALLED_APPS = [
 ######################### ADG APPS #####################################
 
 ADG_INSTALLED_APPS = [
-
-    'openedx.adg.lms.course_meta',
-
     # ADG Features app
     'openedx.adg.lms.applications',
     'openedx.adg.lms.registration_extension',
 ]
 
 INSTALLED_APPS.extend(ADG_INSTALLED_APPS)
+
+from openedx.adg.common.installed_apps import ADG_COMMON_INSTALLED_APPS
+INSTALLED_APPS.extend(ADG_COMMON_INSTALLED_APPS)
 
 ######################### CSRF #########################################
 
@@ -3852,6 +3852,8 @@ GITHUB_REPO_ROOT = '/edx/var/edxapp/data'
 SUPPORT_HOW_TO_UNENROLL_LINK = ''
 
 ##################### ADG Settings ############################
+
+SUSPEND_RECEIVERS = False
 
 # Notification email settings
 NOTIFICATION_FROM_EMAIL = 'info@omnipreneurshipacademy.com'
