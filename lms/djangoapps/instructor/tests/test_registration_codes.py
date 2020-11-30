@@ -34,7 +34,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @override_settings(REGISTRATION_CODE_LENGTH=8)
-@unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'TODO: fix in Juniper')
 class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
     """
     Test registration code status.
