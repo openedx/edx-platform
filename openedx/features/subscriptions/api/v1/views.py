@@ -32,7 +32,7 @@ class SubscriptionsListView(ListAPIView):
         if return_only_valid_subscriptions:
             return UserSubscription.get_valid_subscriptions(self.request.site, username=username)
 
-        return UserSubscription.objects.filter(user_username=username)
+        return UserSubscription.objects.filter(user__username=username)
 
 
 class SubscriptionRetrieveUpdateView(PutAsCreateMixin, RetrieveUpdateAPIView):
@@ -50,7 +50,10 @@ class SubscriptionRetrieveUpdateView(PutAsCreateMixin, RetrieveUpdateAPIView):
     ordering = ['-created']
 
     def get_object(self, queryset=None):
-        username = self.request.data.get('user', self.request.user.username)
+        username = self.request.query_params.get('user')
+        if not username:
+            username = self.request.data.get('user', self.request.user.username)
+
         self.kwargs['user__username'] = username
         user_subscription = UserSubscription.objects.filter(**self.kwargs).first()
 

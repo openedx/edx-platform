@@ -1,7 +1,8 @@
 from datetime import date, datetime, timedelta
 import ddt
 
-from openedx.features.subscriptions.models import UserSubscription
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
+from openedx.features.subscriptions.models import UserSubscription, UserSubscriptionHistory
 from openedx.features.subscriptions.api.v1.tests.factories import UserSubscriptionFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -30,6 +31,7 @@ class UserSubscriptionsTests(ModuleStoreTestCase):
     def setUp(self):
         super(UserSubscriptionsTests, self).setUp()
         self.user = UserFactory()
+        self.site = SiteFactory()
 
     @ddt.unpack
     @ddt.data(
@@ -56,7 +58,8 @@ class UserSubscriptionsTests(ModuleStoreTestCase):
             expiration_date=expiration_date,
             subscription_type=subscription_type,
             subscription_id=subscription_id,
-            user=self.user
+            user=self.user,
+            site=self.site
         )
         if number_of_enrollments:
             course_enrollments = _get_course_enrollments(number_of_enrollments, self.user)
@@ -124,12 +127,42 @@ class UserSubscriptionsTests(ModuleStoreTestCase):
             expiration_date=expiration_date,
             subscription_type=subscription_type,
             subscription_id=subscription_id,
-            user=self.user
+            user=self.user,
+            site=self.site
         )
         if number_of_enrollments:
             course_enrollments = _get_course_enrollments(number_of_enrollments, self.user)
             for enrollment in course_enrollments:
                 user_subscription.course_enrollments.add(enrollment)
 
-        self.assertEqual(UserSubscription.get_valid_subscription(self.user.id).count() == 1, expected_value)
-        self.assertEqual(bool(UserSubscription.get_valid_subscription(self.user.id)), expected_value)
+        self.assertEqual(UserSubscription.get_valid_subscriptions(self.user.id).count() == 1, expected_value)
+        self.assertEqual(bool(UserSubscription.get_valid_subscriptions(self.user.id)), expected_value)
+
+    def test_user_subscription_post_update_receiver(self):
+        """
+        Test that "UserSubscription" history is correctly maintained on update.
+        """
+        user_subscription_history = UserSubscriptionHistory.objects.filter(
+            site=self.site
+        )
+        self.assertEqual(len(user_subscription_history), 0)
+        user_subscription = UserSubscriptionFactory(
+            max_allowed_courses=2,
+            expiration_date=date.today(),
+            subscription_type=UserSubscription.LIMITED_ACCESS,
+            subscription_id=1,
+            user=self.user,
+            site=self.site
+        )
+        user_subscription_history = UserSubscriptionHistory.objects.filter(
+            site=user_subscription.site,
+        )
+        self.assertEqual(len(user_subscription_history), 2)
+        user_subscription.max_allowed_courses = 3
+        user_subscription.save()
+
+        user_subscription_history = UserSubscriptionHistory.objects.filter(
+            site=user_subscription.site,
+        ).all()
+
+        self.assertEqual(len(user_subscription_history), 3)
