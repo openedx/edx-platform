@@ -368,9 +368,20 @@ To run JavaScript tests in a browser, run these commands::
     paver test_js_dev -s common
     paver test_js_dev -s common-requirejs
 
+Debugging Specific Javascript Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The best way to debug individual tests is to run the test suite in the browser and
+use your browser's Javascript debugger. The debug page will allow you to select
+an individual test and only view the results of that test.
+
+
+Debugging Tests in a Browser
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 To debug these tests on devstack in a local browser:
 
-* first run the appropriate test_js_dev command from above which will open a browser using XQuartz
+* first run the appropriate test_js_dev command from above
 * open http://localhost:19876/debug.html in your host system's browser of choice
 * this will run all the tests and show you the results including details of any failures
 * you can click on an individually failing test and/or suite to re-run it by itself
