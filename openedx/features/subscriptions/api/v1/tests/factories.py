@@ -1,9 +1,10 @@
 from datetime import date
 import factory
-from factory import SelfAttribute, Sequence, SubFactory
-from factory.fuzzy import FuzzyChoice, FuzzyDate, FuzzyInteger
+from factory import SubFactory
+from factory.fuzzy import FuzzyDate, FuzzyInteger
 from factory.django import DjangoModelFactory
 
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.features.subscriptions.models import UserSubscription
 from student.tests.factories import UserFactory
 
@@ -20,6 +21,7 @@ class UserSubscriptionFactory(DjangoModelFactory):
     max_allowed_courses = FuzzyInteger(1, 10)
     expiration_date = FuzzyDate(start_date=date.today(), end_date=date.today())
     subscription_type = UserSubscription.LIMITED_ACCESS
+    site = SubFactory(SiteFactory)
 
     @factory.post_generation
     def course_enrollments(self, create, extracted, **kwargs):
