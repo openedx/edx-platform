@@ -2,6 +2,7 @@
 Login form and views
 """
 
+from django import forms
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
@@ -22,13 +23,13 @@ def get_login_session_form_override(request):
     1. Added placeholder for email
     2. Removed email instructions
     3. Added placeholder for password
-
+    4. Added ModelChoiceField support to handle foreign key field
 
     Returns:
         FormDescription
 
     """
-
+    FormDescription.FIELD_TYPE_MAP[forms.ModelChoiceField] = 'select'
     form_desc = FormDescription('post', reverse('user_api_login_session'))
     _apply_third_party_auth_overrides(request, form_desc)
 

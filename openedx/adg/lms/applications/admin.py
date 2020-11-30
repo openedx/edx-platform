@@ -23,9 +23,8 @@ class UserApplicationAdmin(admin.ModelAdmin):
     """
     Django admin class for UserApplication
     """
-    fields = ('user', 'city', 'organization', 'linkedin_url', 'resume', 'cover_letter_file', 'cover_letter',)
-    list_display = ('id', 'user_email', 'city',)
-    list_filter = ('city', 'user__profile__country')
+    list_display = ('id', 'user_email', 'business_line',)
+    list_filter = ('business_line',)
     raw_id_fields = ('user', )
 
     def user_email(self, obj):

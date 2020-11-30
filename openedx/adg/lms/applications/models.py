@@ -39,18 +39,19 @@ class BusinessLine(TimeStampedModel):
     """
     Model to save the business lines
     """
-    title = models.CharField(verbose_name=_('Title'), max_length=255, unique=True, )
+    title = models.CharField(verbose_name=_('Title'), max_length=150, unique=True, )
     logo = models.ImageField(
-        upload_to='business-lines/logos/', null=True, verbose_name=_('Logo'),
+        upload_to='business-lines/logos/', verbose_name=_('Logo'),
         validators=[FileExtensionValidator(ALLOWED_LOGO_EXTENSIONS), validate_logo_size],
+        help_text=_('Accepted extensions: .png, .jpg, .svg'),
     )
-    description = models.TextField(verbose_name=_('Description'),)
+    description = models.TextField(verbose_name=_('Description'), )
 
     class Meta:
         app_label = 'applications'
 
     def __str__(self):
-        return 'Business Line {}'.format(self.title)
+        return '{}'.format(self.title)
 
 
 class UserApplication(TimeStampedModel):
@@ -58,9 +59,8 @@ class UserApplication(TimeStampedModel):
     Model for status of all required parts of user application submission.
     """
     user = models.OneToOneField(User, related_name='application', on_delete=models.CASCADE, verbose_name=_('User'), )
-    city = models.CharField(verbose_name=_('City'), max_length=255, )
-    business_line = models.OneToOneField(BusinessLine, verbose_name=_('Business Line'),
-                                         on_delete=models.CASCADE, null=True)
+    business_line = models.ForeignKey(BusinessLine, verbose_name=_('Business Line'),
+                                      on_delete=models.CASCADE, null=True)
 
     organization = models.CharField(verbose_name=_('Organization'), max_length=255, blank=True, )
     linkedin_url = models.URLField(verbose_name=_('LinkedIn URL'), max_length=255, blank=True, )
