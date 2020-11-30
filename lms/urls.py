@@ -48,6 +48,7 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.views.login import redirect_to_lms_login
+from openedx.core.djangoapps.user_authn.views.login_form import login_and_registration_form
 from openedx.core.djangoapps.verified_track_content import views as verified_track_content_views
 from openedx.features.enterprise_support.api import enterprise_enabled
 from static_template_view import views as static_template_view_views
@@ -94,7 +95,7 @@ notification_prefs_urls = [
 
 
 urlpatterns = [
-    url(r'^$', branding_views.index, name='root'),  # Main marketing page, or redirect to courseware
+    url(r'^$', login_and_registration_form, name='root'),  # Main marketing page, or redirect to Login
 
     url(r'', include('student.urls')),
     # TODO: Move lms specific student views out of common code
