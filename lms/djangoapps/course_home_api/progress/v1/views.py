@@ -127,11 +127,9 @@ class ProgressTabView(RetrieveAPIView):
         verification_status = IDVerificationService.user_status(request.user)
         verification_link = None
         if verification_status['status'] is None or verification_status['status'] == 'expired':
-            verification_link = IDVerificationService.get_verify_location('verify_student_verify_now',
-                                                                          course_id=course_key)
+            verification_link = IDVerificationService.get_verify_location(course_id=course_key)
         elif verification_status['status'] == 'must_reverify':
-            verification_link = IDVerificationService.get_verify_location('verify_student_reverify',
-                                                                          course_id=course_key)
+            verification_link = IDVerificationService.get_verify_location(course_id=course_key)
         verification_data = {
             'link': verification_link,
             'status': verification_status['status'],

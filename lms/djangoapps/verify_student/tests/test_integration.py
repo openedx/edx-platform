@@ -6,11 +6,12 @@ import six
 from django.urls import reverse
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from lms.djangoapps.commerce.tests.mocks import mock_payment_processors
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+from ..services import IDVerificationService
 
 
 class TestProfEdVerification(ModuleStoreTestCase):
@@ -34,31 +35,26 @@ class TestProfEdVerification(ModuleStoreTestCase):
             min_price=self.MIN_PRICE,
             suggested_prices=''
         )
-        purchase_workflow = "?purchase_workflow=single"
         self.urls = {
             'course_modes_choose': reverse(
                 'course_modes_choose',
                 args=[six.text_type(self.course_key)]
             ),
 
-            'verify_student_start_flow': reverse(
-                'verify_student_start_flow',
-                args=[six.text_type(self.course_key)]
-            ) + purchase_workflow,
+            'verify_student_start_flow': IDVerificationService.get_verify_location(self.course_key),
         }
 
     def test_start_flow(self):
         # Go to the course mode page, expecting a redirect to the intro step of the
         # payment flow (since this is a professional ed course). Otherwise, the student
         # would have the option to choose their track.
-        with mock_payment_processors():
-            resp = self.client.get(self.urls['course_modes_choose'], follow=True)
-            self.assertRedirects(resp, self.urls['verify_student_start_flow'])
+        resp = self.client.get(self.urls['course_modes_choose'])
+        self.assertRedirects(
+            resp,
+            self.urls['verify_student_start_flow'],
+            fetch_redirect_response=False,
+        )
 
         # For professional ed courses, expect that the student is NOT enrolled
         # automatically in the course.
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_key))
-
-        # On the first page of the flow, verify that there's a button allowing the user
-        # to proceed to the payment processor; this is the only action the user is allowed to take.
-        self.assertContains(resp, 'payment-button')

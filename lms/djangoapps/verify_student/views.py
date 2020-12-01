@@ -52,7 +52,6 @@ from common.djangoapps.util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
 
 from .services import IDVerificationService
-from .toggles import redirect_to_idv_microfrontend
 
 log = logging.getLogger(__name__)
 
@@ -499,10 +498,7 @@ class PayAndVerifyView(View):
             if is_enrolled:
                 if already_paid:
                     # If the student has paid, but not verified, redirect to the verification flow.
-                    url = IDVerificationService.get_verify_location(
-                        'verify_student_verify_now',
-                        six.text_type(course_key)
-                    )
+                    url = IDVerificationService.get_verify_location(six.text_type(course_key))
             else:
                 url = reverse('verify_student_start_flow', kwargs=course_kwargs)
 
@@ -1216,19 +1212,5 @@ class ReverifyView(View):
         Most of the work is done client-side by composing the same
         Backbone views used in the initial verification flow.
         """
-        verification_status = IDVerificationService.user_status(request.user)
-        expiration_datetime = IDVerificationService.get_expiration_datetime(request.user, ['approved'])
-        if can_verify_now(verification_status, expiration_datetime):
-            if redirect_to_idv_microfrontend():
-                return redirect('{}/id-verification'.format(settings.ACCOUNT_MICROFRONTEND_URL))
-            context = {
-                "user_full_name": request.user.profile.name,
-                "platform_name": configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
-                "capture_sound": staticfiles_storage.url("audio/camera_capture.wav"),
-            }
-            return render_to_response("verify_student/reverify.html", context)
-        else:
-            context = {
-                "status": verification_status['status']
-            }
-            return render_to_response("verify_student/reverify_not_allowed.html", context)
+        IDV_workflow = IDVerificationService.get_verify_location()
+        return redirect(IDV_workflow)
