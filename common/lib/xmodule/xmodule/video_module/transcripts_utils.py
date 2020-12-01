@@ -5,6 +5,7 @@ Utility functions for transcripts.
 
 
 import copy
+import html
 import logging
 import os
 from functools import wraps
@@ -19,7 +20,6 @@ from pysrt import SubRipFile, SubRipItem, SubRipTime
 from pysrt.srtexc import Error
 from six import text_type
 from six.moves import range, zip
-from six.moves.html_parser import HTMLParser
 
 from openedx.core.djangolib import blockstore_cache
 from openedx.core.lib import blockstore_api
@@ -660,7 +660,7 @@ class Transcript(object):
 
             if output_format == 'txt':
                 text = SubRipFile.from_string(content.decode('utf-8')).text
-                return HTMLParser().unescape(text)
+                return html.unescape(text)
 
             elif output_format == 'sjson':
                 try:
@@ -679,7 +679,7 @@ class Transcript(object):
             if output_format == 'txt':
                 text = json.loads(content)['text']
                 text_without_none = [line if line else '' for line in text]
-                return HTMLParser().unescape("\n".join(text_without_none))
+                return html.unescape("\n".join(text_without_none))
 
             elif output_format == 'srt':
                 return generate_srt_from_sjson(json.loads(content), speed=1.0)

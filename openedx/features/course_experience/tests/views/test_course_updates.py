@@ -7,6 +7,7 @@ from datetime import datetime
 
 import six
 from django.urls import reverse
+from pytz import UTC
 
 from lms.djangoapps.courseware.courses import get_course_info_usage_key
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
@@ -126,7 +127,7 @@ class TestCourseUpdatesPage(SharedModuleStoreTestCase):
         self.assertContains(response, 'Second Message')
 
     def test_queries(self):
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=UTC))
         create_course_update(self.course, self.user, 'First Message')
 
         # Pre-fetch the view to populate any caches

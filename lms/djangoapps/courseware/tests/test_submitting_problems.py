@@ -14,6 +14,7 @@ import ddt
 import six
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db import connections
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
@@ -139,7 +140,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
     """
 
     # Tell Django to clean out all databases, not just default
-    multi_db = True
+    databases = {alias for alias in connections}
     # arbitrary constant
     COURSE_SLUG = "100"
     COURSE_NAME = "test_course"
@@ -342,7 +343,7 @@ class TestCourseGrader(TestSubmittingProblems):
     Suite of tests for the course grader.
     """
     # Tell Django to clean out all databases, not just default
-    multi_db = True
+    databases = {alias for alias in connections}
 
     def basic_setup(self, late=False, reset=False, showanswer=False):
         """
@@ -755,7 +756,7 @@ class TestCourseGrader(TestSubmittingProblems):
 class ProblemWithUploadedFilesTest(TestSubmittingProblems):
     """Tests of problems with uploaded files."""
     # Tell Django to clean out all databases, not just default
-    multi_db = True
+    databases = {alias for alias in connections}
 
     def setUp(self):
         super(ProblemWithUploadedFilesTest, self).setUp()
@@ -811,7 +812,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
     Check that we can submit a schematic and custom response, and it answers properly.
     """
     # Tell Django to clean out all databases, not just default
-    multi_db = True
+    databases = {alias for alias in connections}
 
     SCHEMATIC_SCRIPT = dedent("""
         # for a schematic response, submission[i] is the json representation
