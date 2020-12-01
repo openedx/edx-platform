@@ -13,7 +13,7 @@ window.ABTestSelector = function(runtime, elem) {
             // force this id to remain a string, even if it looks like something else
             var child_group_id = $(this).data('group-id').toString();
             if (child_group_id === group_id) {
-                _this.content_container.html($(this).text());
+                _this.content_container.html(edx.HtmlUtils.HTML($(this).text()).toString());
                 XBlock.initializeBlocks(_this.content_container, $(elem).data('request-token'));
             }
         });
