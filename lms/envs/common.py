@@ -2736,8 +2736,8 @@ INSTALLED_APPS = [
 
     'ratelimitbackend',
 
-    # Event Tracking library, xAPI
-    'eventtracking',
+    # Backends for receiving edX LMS events
+    'event_routing_backends.apps.EventRoutingBackendsConfig',
 ]
 
 ######################### CSRF #########################################
