@@ -3839,6 +3839,7 @@ ENTERPRISE_ALL_SERVICE_USERNAMES = [
     'enterprise_worker',
     'license_manager_worker',
     'enterprise_catalog_worker',
+    'enterprise_channel_worker',
 ]
 
 
