@@ -2,8 +2,9 @@
 Client for Sending email via mandrill
 """
 
-from django.conf import settings
+
 import logging
+from django.conf import settings
 import mandrill
 
 log = logging.getLogger(__name__)
