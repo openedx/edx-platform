@@ -117,8 +117,7 @@ from openedx.features.course_experience.course_tools import HttpMethod
                             <li class="course-tool">
                                 % if course_tool.http_method == HttpMethod.GET:
                                     <a class="course-tool-link" data-analytics-id="${course_tool.analytics_id()}" href="${course_tool.url(course_key)}">
-                                        <span class="icon ${course_tool.icon_classes()}" aria-hidden="true"></span>
-                                        ${course_tool.title()}
+                                        <span class="icon ${course_tool.icon_classes()}" aria-hidden="true"></span>${course_tool.title()}
                                     </a>
                                 % elif course_tool.http_method == HttpMethod.POST:
                                     <form class="course-tool-form" action="${course_tool.url(course_key)}" method="post">
@@ -247,4 +246,4 @@ from openedx.features.course_experience.course_tools import HttpMethod
         linkCategory: "(none)"
       });
 
-</%static:require_module_async> 
+</%static:require_module_async>
