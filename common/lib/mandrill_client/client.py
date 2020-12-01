@@ -106,6 +106,6 @@ class MandrillClient(object):
             log.info("A mandrill info:  %s", result)
         except mandrill.Error as e:
             # Mandrill errors are thrown as exceptions
-            log.error('A mandrill error occurred: %s - %s', (e.__class__, e))
+            log.error('A mandrill error occurred: %s - %s', e.__class__, e)
             raise
         return result
