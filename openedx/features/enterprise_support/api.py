@@ -572,12 +572,7 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
         )
     else:
         client = ConsentApiClient(user=request.user)
-
-        current_enterprise_uuid = None
-        learner_active_enterprise = get_learner_active_enterprise(enterprise_learner_details)
-        if learner_active_enterprise:
-            current_enterprise_uuid = learner_active_enterprise['uuid']
-
+        current_enterprise_uuid = enterprise_customer_uuid_for_request(request)
         consent_needed = any(
             str(current_enterprise_uuid) == str(learner['enterprise_customer']['uuid'])
             and Site.objects.get(domain=learner['enterprise_customer']['site']['domain']) == request.site
@@ -601,7 +596,8 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
 
             if str(current_enterprise_uuid) not in enterprises:
                 LOGGER.info(  # pragma: no cover
-                    '[ENTERPRISE DSC] Enterprise mismatch. USER: [%s], CurrentEnterprise: [%s], UserEnterprises: [%s]',
+                    '[ENTERPRISE DSC] Consent requirement failed due to enterprise mismatch. '
+                    'USER: [%s], CurrentEnterprise: [%s], LearnerEnterprises: [%s]',
                     user.username,
                     current_enterprise_uuid,
                     enterprises
@@ -610,7 +606,8 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
                 domains = [learner['enterprise_customer']['site']['domain'] for learner in enterprise_learner_details]
                 if not Site.objects.filter(domain__in=domains).filter(id=request.site.id).exists():
                     LOGGER.info(  # pragma: no cover
-                        '[ENTERPRISE DSC] Site mismatch. USER: [%s], RequestSite: [%s], LearnerEnterpriseDomains: [%s]',
+                        '[ENTERPRISE DSC] Consent requirement failed due to site mismatch. '
+                        'USER: [%s], RequestSite: [%s], LearnerEnterpriseDomains: [%s]',
                         user.username,
                         request.site,
                         domains
@@ -906,16 +903,3 @@ def unlink_enterprise_user_from_idp(request, user, idp_backend_name):
                     )
             except (EnterpriseCustomerUser.DoesNotExist, PendingEnterpriseCustomerUser.DoesNotExist):
                 pass
-
-
-def get_learner_active_enterprise(learner_enterprise_details):
-    """
-    Return a learners active enterprise.
-    """
-    learner_active_enterprise = None
-    for learner_enterprise_detail in learner_enterprise_details:
-        if learner_enterprise_detail['active']:
-            learner_active_enterprise = learner_enterprise_detail['enterprise_customer']
-            break
-
-    return learner_active_enterprise

@@ -178,7 +178,6 @@ class EnterpriseServiceMockMixin(object):
                     ],
                     'replace_sensitive_sso_username': True,
                 },
-                'active': True,
                 'user_id': 5,
                 'user': {
                     'username': 'verified',
