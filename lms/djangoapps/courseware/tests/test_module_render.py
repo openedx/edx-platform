@@ -78,7 +78,7 @@ from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVer
 from common.djangoapps.xblock_django.models import XBlockConfiguration
 from xmodule.capa_module import ProblemBlock
 from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
-from xmodule.lti_module import LTIDescriptor
+from xmodule.lti_module import LTIBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
@@ -1917,7 +1917,9 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
             self.assertTrue(mock_grade_histogram.called)
 
 
-PER_COURSE_ANONYMIZED_DESCRIPTORS = (LTIDescriptor, )
+PER_COURSE_ANONYMIZED_XBLOCKS = (
+    LTIBlock,
+)
 PER_STUDENT_ANONYMIZED_XBLOCKS = [
     AboutBlock,
     CourseInfoBlock,
@@ -1930,7 +1932,6 @@ PER_STUDENT_ANONYMIZED_XBLOCKS = [
 # The "set" here is to work around the bug that load_classes returns duplicates for multiply-declared classes.
 PER_STUDENT_ANONYMIZED_DESCRIPTORS = sorted(set([
     class_ for (name, class_) in XModuleDescriptor.load_classes()
-    if not issubclass(class_, PER_COURSE_ANONYMIZED_DESCRIPTORS)
 ] + PER_STUDENT_ANONYMIZED_XBLOCKS), key=str)
 
 
@@ -1999,20 +2000,20 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
                 self._get_anonymous_id(CourseKey.from_string(course_id), descriptor_class)
             )
 
-    @ddt.data(*PER_COURSE_ANONYMIZED_DESCRIPTORS)
-    def test_per_course_anonymized_id(self, descriptor_class):
+    @ddt.data(*PER_COURSE_ANONYMIZED_XBLOCKS)
+    def test_per_course_anonymized_id(self, xblock_class):
         self.assertEqual(
             # This value is set by observation, so that later changes to the student
             # id computation don't break old data
             '0c706d119cad686d28067412b9178454',
-            self._get_anonymous_id(CourseKey.from_string('MITx/6.00x/2012_Fall'), descriptor_class)
+            self._get_anonymous_id(CourseKey.from_string('MITx/6.00x/2012_Fall'), xblock_class)
         )
 
         self.assertEqual(
             # This value is set by observation, so that later changes to the student
             # id computation don't break old data
             'e9969c28c12c8efa6e987d6dbeedeb0b',
-            self._get_anonymous_id(CourseKey.from_string('MITx/6.00x/2013_Spring'), descriptor_class)
+            self._get_anonymous_id(CourseKey.from_string('MITx/6.00x/2013_Spring'), xblock_class)
         )
 
 
@@ -2288,11 +2289,11 @@ class TestRebindModule(TestSubmittingProblems):
         module = self.get_module_for_user(self.anon_user)
         user2 = UserFactory()
         user2.id = 2
-        module.system.rebind_noauth_module_to_user(module._xmodule, user2)  # pylint: disable=protected-access
+        module.system.rebind_noauth_module_to_user(module, user2)
         self.assertTrue(module)
         self.assertEqual(module.system.anonymous_student_id, anonymous_id_for_user(user2, self.course.id))
         self.assertEqual(module.scope_ids.user_id, user2.id)
-        self.assertEqual(module._xmodule.scope_ids.user_id, user2.id)  # pylint: disable=protected-access
+        self.assertEqual(module.scope_ids.user_id, user2.id)
 
 
 @ddt.ddt

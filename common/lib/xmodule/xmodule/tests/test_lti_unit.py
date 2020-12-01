@@ -4,28 +4,31 @@
 
 import datetime
 import textwrap
+import unittest
 from copy import copy
 
 import six
 from lxml import etree
 from mock import Mock, PropertyMock, patch
+from opaque_keys.edx.locator import BlockUsageLocator
 from pytz import UTC
 from six import text_type
 from webob.request import Request
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
 
 from xmodule.fields import Timedelta
 from xmodule.lti_2_util import LTIError
-from xmodule.lti_module import LTIDescriptor
+from xmodule.lti_module import LTIBlock
 
-from . import LogicTest
+from . import get_test_system
 
 
-class LTIModuleTest(LogicTest):
+class LTIBlockTest(unittest.TestCase):
     """Logic tests for LTI module."""
-    descriptor_class = LTIDescriptor
 
     def setUp(self):
-        super(LTIModuleTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.environ = {'wsgi.url_scheme': 'http', 'REQUEST_METHOD': 'POST'}
         self.request_body_xml_template = textwrap.dedent(u"""
             <?xml version = "1.0" encoding = "UTF-8"?>
@@ -53,11 +56,17 @@ class LTIModuleTest(LogicTest):
                   </imsx_POXBody>
                 </imsx_POXEnvelopeRequest>
             """)
+        self.system = get_test_system()
         self.system.get_real_user = Mock()
         self.system.publish = Mock()
         self.system.rebind_noauth_module_to_user = Mock()
+        self.user_id = self.system.anonymous_student_id
 
-        self.user_id = self.xmodule.runtime.anonymous_student_id
+        self.xmodule = LTIBlock(
+            self.system,
+            DictFieldData({}),
+            ScopeIds(None, None, None, BlockUsageLocator(self.system.course_id, 'lti', 'name'))
+        )
         self.lti_id = self.xmodule.lti_id
         self.unquoted_resource_link_id = u'{}-i4x-2-3-lti-31de800015cf4afb973356dbe81496df'.format(
             self.xmodule.runtime.hostname
@@ -75,7 +84,6 @@ class LTIModuleTest(LogicTest):
 
         self.xmodule.due = None
         self.xmodule.graceperiod = None
-        self.xmodule.descriptor = self.system.construct_xblock_from_class(self.descriptor_class, self.xmodule.scope_ids)
 
     def get_request_body(self, params=None):
         """Fetches the body of a request specified by params"""
@@ -111,7 +119,7 @@ class LTIModuleTest(LogicTest):
         }
 
     @patch(
-        'xmodule.lti_module.LTIModule.get_client_key_secret',
+        'xmodule.lti_module.LTIBlock.get_client_key_secret',
         return_value=('test_client_key', u'test_client_secret')
     )
     def test_authorization_header_not_present(self, _get_key_secret):
@@ -135,7 +143,7 @@ class LTIModuleTest(LogicTest):
         self.assertDictEqual(expected_response, real_response)
 
     @patch(
-        'xmodule.lti_module.LTIModule.get_client_key_secret',
+        'xmodule.lti_module.LTIBlock.get_client_key_secret',
         return_value=('test_client_key', u'test_client_secret')
     )
     def test_authorization_header_empty(self, _get_key_secret):
@@ -300,7 +308,7 @@ class LTIModuleTest(LogicTest):
         self.assertEqual(real_outcome_service_url, mock_url_prefix + test_service_name)
 
     def test_resource_link_id(self):
-        with patch('xmodule.lti_module.LTIModule.location', new_callable=PropertyMock):
+        with patch('xmodule.lti_module.LTIBlock.location', new_callable=PropertyMock):
             self.xmodule.location.html_id = lambda: 'i4x-2-3-lti-31de800015cf4afb973356dbe81496df'
             expected_resource_link_id = text_type(six.moves.urllib.parse.quote(self.unquoted_resource_link_id))
             real_resource_link_id = self.xmodule.get_resource_link_id()
@@ -324,7 +332,7 @@ class LTIModuleTest(LogicTest):
         modulestore = Mock()
         modulestore.get_course.return_value = mocked_course
         runtime = Mock(modulestore=modulestore)
-        self.xmodule.descriptor.runtime = runtime
+        self.xmodule.runtime = runtime
         self.xmodule.lti_id = "lti_id"
         key, secret = self.xmodule.get_client_key_secret()
         expected = ('test_client', 'test_secret')
@@ -342,7 +350,7 @@ class LTIModuleTest(LogicTest):
         modulestore = Mock()
         modulestore.get_course.return_value = mocked_course
         runtime = Mock(modulestore=modulestore)
-        self.xmodule.descriptor.runtime = runtime
+        self.xmodule.runtime = runtime
         # set another lti_id
         self.xmodule.lti_id = "another_lti_id"
         key_secret = self.xmodule.get_client_key_secret()
@@ -360,14 +368,14 @@ class LTIModuleTest(LogicTest):
         modulestore = Mock()
         modulestore.get_course.return_value = mocked_course
         runtime = Mock(modulestore=modulestore)
-        self.xmodule.descriptor.runtime = runtime
+        self.xmodule.runtime = runtime
         self.xmodule.lti_id = 'lti_id'
         with self.assertRaises(LTIError):
             self.xmodule.get_client_key_secret()
 
     @patch('xmodule.lti_module.signature.verify_hmac_sha1', Mock(return_value=True))
     @patch(
-        'xmodule.lti_module.LTIModule.get_client_key_secret',
+        'xmodule.lti_module.LTIBlock.get_client_key_secret',
         Mock(return_value=('test_client_key', u'test_client_secret'))
     )
     def test_successful_verify_oauth_body_sign(self):
@@ -376,8 +384,8 @@ class LTIModuleTest(LogicTest):
         """
         self.xmodule.verify_oauth_body_sign(self.get_signed_grade_mock_request())
 
-    @patch('xmodule.lti_module.LTIModule.get_outcome_service_url', Mock(return_value=u'https://testurl/'))
-    @patch('xmodule.lti_module.LTIModule.get_client_key_secret',
+    @patch('xmodule.lti_module.LTIBlock.get_outcome_service_url', Mock(return_value=u'https://testurl/'))
+    @patch('xmodule.lti_module.LTIBlock.get_client_key_secret',
            Mock(return_value=(u'__consumer_key__', u'__lti_secret__')))
     def test_failed_verify_oauth_body_sign_proxy_mangle_url(self):
         """
@@ -449,7 +457,7 @@ class LTIModuleTest(LogicTest):
 
     @patch('xmodule.lti_module.signature.verify_hmac_sha1', Mock(return_value=False))
     @patch(
-        'xmodule.lti_module.LTIModule.get_client_key_secret',
+        'xmodule.lti_module.LTIBlock.get_client_key_secret',
         Mock(return_value=('test_client_key', u'test_client_secret'))
     )
     def test_failed_verify_oauth_body_sign(self):

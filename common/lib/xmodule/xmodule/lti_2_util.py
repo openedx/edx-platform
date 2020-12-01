@@ -1,6 +1,6 @@
 """
 A mixin class for LTI 2.0 functionality.  This is really just done to refactor the code to
-keep the LTIModule class from getting too big
+keep the LTIBlock class from getting too big
 """
 
 
@@ -26,13 +26,12 @@ LTI_2_0_JSON_CONTENT_TYPE = 'application/vnd.ims.lis.v2.result+json'
 
 
 class LTIError(Exception):
-    """Error class for LTIModule and LTI20ModuleMixin"""
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    """Error class for LTIBlock and LTI20BlockMixin"""
 
 
-class LTI20ModuleMixin(object):
+class LTI20BlockMixin(object):
     """
-    This class MUST be mixed into LTIModule.  It does not do anything on its own.  It's just factored
+    This class MUST be mixed into LTIBlock.  It does not do anything on its own.  It's just factored
     out for modularity.
     """
 
