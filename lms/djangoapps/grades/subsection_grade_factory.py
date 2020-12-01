@@ -9,6 +9,7 @@ from logging import getLogger
 from lazy import lazy
 from submissions import api as submissions_api
 
+from openedx.core.djangoapps.signals.signals import COURSE_ASSESSMENT_GRADE_CHANGED
 from lms.djangoapps.courseware.model_data import ScoresClient
 from lms.djangoapps.grades.config import assume_zero_if_absent, should_persist_grades
 from lms.djangoapps.grades.models import PersistentSubsectionGrade
@@ -103,6 +104,13 @@ class SubsectionGradeFactory(object):
                 force_update_subsections
             )
             self._update_saved_subsection_grade(subsection.location, grade_model)
+
+            COURSE_ASSESSMENT_GRADE_CHANGED.send_robust(
+                sender=None,
+                user=self.student,
+                subsection_id=calculated_grade.location,
+                subsection_grade=calculated_grade.graded_total.earned
+            )
 
         return calculated_grade
 
