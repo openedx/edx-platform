@@ -1,0 +1,288 @@
+version: 2
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build
+      - lms_unit_tests:
+          requires:
+            -  build
+      - cms_unit_tests:
+            requires:
+            -  build
+      - lib_unit_tests:
+            requires:
+            -  build
+      - javascript_tests:
+            requires:
+            -  build
+      - quality_tests:
+            requires:
+            -  build
+
+jobs:
+
+  build:
+    docker:
+      - image: edxops/focal-common:latest
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-{{ checksum ".circleci/config.yml" }}-configuration-{{ checksum "scripts/circle-ci-configuration.sh" }}
+
+      - run:
+          name: Install deb packages
+          command: |
+            source ./scripts/circle-ci-configuration.sh
+
+      - save_cache:
+          key: v1-{{ checksum ".circleci/config.yml" }}-configuration-{{ checksum "scripts/circle-ci-configuration.sh" }}
+          paths:
+            - "downloads"
+
+      - restore_cache:
+          keys:
+            - v1-{{ checksum ".circleci/config.yml" }}-pip-deps-{{ checksum "requirements/edx/base.txt" }}-{{ checksum "requirements/edx/testing.txt" }}-{{ checksum "requirements/edx/django.txt" }}-{{ checksum "requirements/edx/base.txt" }}
+
+      - run:
+          name: Install pip packages
+          command: |
+
+            # If venv has not been restored by restore_cache, set it up.
+            export PATH=$PATH:$(npm bin)
+            [ ! -f /tmp/workspace/venv/bin/activate ] && virtualenv -p python3.8 /tmp/workspace/venv
+
+            source /tmp/workspace/venv/bin/activate
+
+            # All files listed here must be included in the cache key for pip packages.
+            pip install --exists-action w -r requirements/edx/django.txt
+            pip install --exists-action w -r requirements/edx/testing.txt
+            pip install --exists-action w -r requirements/edx/paver.txt
+            pip install --exists-action w -r requirements/edx/base.txt
+
+      - persist_to_workspace:
+          root: /tmp/workspace
+          paths:
+            - venv
+
+      - restore_cache:
+          keys:
+            - v2-{{ checksum ".circleci/config.yml" }}-npm-deps-{{ checksum "package.json" }}
+
+      - run:
+          name: Install npm packages
+          command: |
+            node -v
+            npm -v
+            npm install
+
+      - save_cache:
+          key: v2-{{ checksum ".circleci/config.yml" }}-npm-deps-{{ checksum "package.json" }}
+          paths:
+            - "node_modules"
+
+  lms_unit_tests:
+    docker:
+      - image: edxops/focal-common:latest
+      - image: circleci/mongo:3.6-ram
+        ports:
+          - "27017:27017"
+    environment:
+      - NO_PREREQ_INSTALL: "true"
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-{{ checksum ".circleci/config.yml" }}-configuration-{{ checksum "scripts/circle-ci-configuration.sh" }}
+
+      - run:
+          name: Install deb packages
+          command: |
+            source ./scripts/circle-ci-configuration.sh
+
+      - attach_workspace:
+          at: /tmp/workspace
+
+      - restore_cache:
+          keys:
+            - v2-{{ checksum ".circleci/config.yml" }}-npm-deps-{{ checksum "package.json" }}
+
+      - run:
+          name: Install local pip packages
+          command: |
+            source /tmp/workspace/venv/bin/activate
+            pip install -r requirements/edx/testing.txt
+
+      - run:
+          name: Run tests
+          no_output_timeout: 30m
+          command: |
+            source /tmp/workspace/venv/bin/activate
+            export PATH=$PATH:$(npm bin)
+            paver test_system -s lms --cov-args="-p"
+
+  cms_unit_tests:
+    docker:
+      - image: edxops/focal-common:latest
+      - image: circleci/mongo:3.6-ram
+        ports:
+          - "27017:27017"
+    environment:
+      - NO_PREREQ_INSTALL: "true"
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-{{ checksum ".circleci/config.yml" }}-configuration-{{ checksum "scripts/circle-ci-configuration.sh" }}
+
+      - run:
+          name: Install deb packages
+          command: |
+            source ./scripts/circle-ci-configuration.sh
+
+      - attach_workspace:
+          at: /tmp/workspace
+
+      - restore_cache:
+          keys:
+            - v2-{{ checksum ".circleci/config.yml" }}-npm-deps-{{ checksum "package.json" }}
+
+      - run:
+          name: Install local pip packages
+          command: |
+            source /tmp/workspace/venv/bin/activate
+            pip install -r requirements/edx/testing.txt
+
+      - run:
+          name: Run tests
+          command: |
+            source /tmp/workspace/venv/bin/activate
+            export PATH=$PATH:$(npm bin)
+            paver test_system -s cms --cov-args="-p"
+
+  lib_unit_tests:
+    docker:
+      - image: edxops/focal-common:latest
+      - image: circleci/mongo:3.6-ram
+        ports:
+          - "27017:27017"
+    environment:
+      - NO_PREREQ_INSTALL: "true"
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-{{ checksum ".circleci/config.yml" }}-configuration-{{ checksum "scripts/circle-ci-configuration.sh" }}
+
+      - run:
+          name: Install deb packages
+          command: |
+            source ./scripts/circle-ci-configuration.sh
+
+      - attach_workspace:
+          at: /tmp/workspace
+
+      - restore_cache:
+          keys:
+            - v2-{{ checksum ".circleci/config.yml" }}-npm-deps-{{ checksum "package.json" }}
+
+      - run:
+          name: Install local pip packages
+          command: |
+            source /tmp/workspace/venv/bin/activate
+            pip install -r requirements/edx/testing.txt
+
+      - run:
+          name: Run tests
+          command: |
+            source /tmp/workspace/venv/bin/activate
+            paver test_lib --cov-args="-p"
+
+  javascript_tests:
+    docker:
+      - image: edxops/focal-common:latest
+    environment:
+      - NO_PREREQ_INSTALL: "true"
+      - DISPLAY=:99
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-{{ checksum ".circleci/config.yml" }}-configuration-{{ checksum "scripts/circle-ci-configuration.sh" }}
+
+      - run:
+          name: Install deb packages
+          command: |
+            source ./scripts/circle-ci-configuration.sh
+
+      - attach_workspace:
+          at: /tmp/workspace
+
+      - restore_cache:
+          keys:
+            - v2-{{ checksum ".circleci/config.yml" }}-npm-deps-{{ checksum "package.json" }}
+
+      - run:
+          name: Install local pip packages
+          command: |
+            source /tmp/workspace/venv/bin/activate
+            pip install -r requirements/edx/testing.txt
+
+      - run:
+          name: Run tests
+          command: |
+            source /tmp/workspace/venv/bin/activate
+            export PATH=$PATH:node_modules/.bin
+            karma --version
+            xvfb-run --server-args="-screen 0 1280x1024x24" paver test_js --coverage
+
+  quality_tests:
+    docker:
+      - image: edxops/focal-common:latest
+    environment:
+      - NO_PREREQ_INSTALL: "true"
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-{{ checksum ".circleci/config.yml" }}-configuration-{{ checksum "scripts/circle-ci-configuration.sh" }}
+
+      - run:
+          name: Install deb packages
+          command: |
+            source ./scripts/circle-ci-configuration.sh
+
+      - attach_workspace:
+          at: /tmp/workspace
+
+      - restore_cache:
+          keys:
+            - v2-{{ checksum ".circleci/config.yml" }}-npm-deps-{{ checksum "package.json" }}
+
+      - run:
+          name: Install local pip packages
+          command: |
+            source /tmp/workspace/venv/bin/activate
+            pip install -r requirements/edx/testing.txt
+
+      - run:
+          name: Run tests
+          no_output_timeout: 30m
+          command: |
+            source /tmp/workspace/venv/bin/activate
+
+            # Force the script into the paralell build
+            export CIRCLE_NODE_TOTAL=workflows
+
+            # Force the script to run the quality_tests
+            export CIRCLE_NODE_INDEX=0
+            export PATH=$PATH:$(npm bin)
+            ./scripts/all-tests.sh
