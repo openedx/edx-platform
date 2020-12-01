@@ -1359,6 +1359,9 @@ INSTALLED_APPS = [
     # Tracking
     'common.djangoapps.track',
     'eventtracking.django.apps.EventTrackingConfig',
+    
+    # Backends for receiving edX LMS events
+    'event_routing_backends.apps.EventRoutingBackendsConfig',
 
     # For asset pipelining
     'common.djangoapps.edxmako.apps.EdxMakoConfig',
@@ -1513,9 +1516,6 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
 
     'ratelimitbackend',
-
-    # Event Tracking library, xAPI
-    'eventtracking',
 ]
 
 
