@@ -5,13 +5,17 @@ import itertools
 from datetime import datetime, timedelta
 
 import ddt
+from crum import set_current_request
+from django.test import RequestFactory
 from django.utils import timezone
 from pytz import UTC
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
+from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_duration_limits.access import (
     generate_course_expired_message,
@@ -32,6 +36,13 @@ class TestAccess(CacheIsolationTestCase):
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=UTC))
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
 
+    def assertDateInMessage(self, date, message):
+        # First, check that the formatted version is in there
+        self.assertIn(strftime_localized(date, '%b %-d, %Y'), message)
+
+        # But also that the machine-readable version is in there
+        self.assertIn('data-datetime="%s"' % date.isoformat(), message)
+
     @ddt.data(
         *itertools.product(
             itertools.product([None, -2, -1, 1, 2], repeat=2),
@@ -42,6 +53,13 @@ class TestAccess(CacheIsolationTestCase):
         now = timezone.now()
         schedule_offset, course_offset = offsets
 
+        # Set a timezone and request, to test that the message looks at the user's setting
+        request = RequestFactory().get('/')
+        request.user = UserFactory()
+        set_current_request(request)
+        self.addCleanup(set_current_request, None)
+        set_user_preference(request.user, 'time_zone', 'Asia/Tokyo')
+
         if schedule_offset is not None:
             schedule_upgrade_deadline = now + timedelta(days=schedule_offset)
         else:
@@ -51,9 +69,6 @@ class TestAccess(CacheIsolationTestCase):
             course_upgrade_deadline = now + timedelta(days=course_offset)
         else:
             course_upgrade_deadline = None
-
-        def format_date(date):
-            return strftime_localized(date, u'%b %-d, %Y')
 
         enrollment = CourseEnrollmentFactory.create(
             course__start=datetime(2018, 1, 1, tzinfo=UTC),
@@ -78,16 +93,17 @@ class TestAccess(CacheIsolationTestCase):
 
         message = generate_course_expired_message(enrollment.user, enrollment.course)
 
-        self.assertIn(format_date(duration_limit_upgrade_deadline), message)
+        self.assertDateInMessage(duration_limit_upgrade_deadline, message)
+        self.assertIn('data-timezone="Asia/Tokyo"', message)
 
         soft_upgradeable = schedule_upgrade_deadline is not None and now < schedule_upgrade_deadline
         upgradeable = course_upgrade_deadline is None or now < course_upgrade_deadline
         has_upgrade_deadline = course_upgrade_deadline is not None
 
         if upgradeable and soft_upgradeable:
-            self.assertIn(format_date(schedule_upgrade_deadline), message)
+            self.assertDateInMessage(schedule_upgrade_deadline, message)
         elif upgradeable and has_upgrade_deadline:
-            self.assertIn(format_date(course_upgrade_deadline), message)
+            self.assertDateInMessage(course_upgrade_deadline, message)
         else:
             self.assertNotIn("Upgrade by", message)
 
