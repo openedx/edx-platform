@@ -103,7 +103,7 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
     """
     def setUp(self):
         super().setUp()
-        self.course = CourseFactory.create(highlights_enabled_for_messaging=True, self_paced=True)
+        self.course = CourseFactory.create(highlights_enabled_for_messaging=True)
         with self.store.bulk_operations(self.course.id):
             ItemFactory.create(parent=self.course, category='chapter', highlights=['good stuff'])
 
@@ -145,7 +145,7 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
             'week_highlights': ['good stuff'],
             'week_num': 1,
         }
-        self.assertEqual(schedules, [(self.user, None, expected_context, True)])
+        self.assertEqual(schedules, [(self.user, None, expected_context)])
 
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     @override_switch('schedules.course_update_show_unsubscribe', True)
@@ -235,7 +235,7 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
             'week_highlights': ['good stuff 2'],
             'week_num': 2,
         }
-        self.assertEqual(schedules, [(self.user, None, expected_context, True)])
+        self.assertEqual(schedules, [(self.user, None, expected_context)])
 
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     @override_switch('schedules.course_update_show_unsubscribe', True)
