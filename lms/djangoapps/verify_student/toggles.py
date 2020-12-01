@@ -27,24 +27,3 @@ USE_NEW_EMAIL_TEMPLATES = WaffleFlag(
 
 def use_new_templates_for_id_verification_emails():
     return USE_NEW_EMAIL_TEMPLATES.is_enabled()
-
-
-# Waffle flag to redirect to the new IDV flow on the account microfrontend
-# .. toggle_name: verify_student.redirect_to_idv_microfrontend
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Supports staged rollout to students for the new IDV flow.
-# .. toggle_use_cases: temporary, open_edx
-# .. toggle_creation_date: 2020-07-09
-# .. toggle_target_removal_date: None
-# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
-# .. toggle_tickets: MST-318
-REDIRECT_TO_IDV_MICROFRONTEND = WaffleFlag(
-    waffle_namespace=WAFFLE_FLAG_NAMESPACE,
-    flag_name='redirect_to_idv_microfrontend',
-    module_name=__name__,
-)
-
-
-def redirect_to_idv_microfrontend():
-    return REDIRECT_TO_IDV_MICROFRONTEND.is_enabled()
