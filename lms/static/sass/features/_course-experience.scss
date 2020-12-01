@@ -140,11 +140,13 @@
           width: auto;
           flex-grow: 1;
           font-size: font-size(small);
-          color: theme-color("primary");
+          color: $link-color;
+          text-decoration: underline;
+
           cursor: pointer;
 
           &:hover {
-            color: $black-t2;
+            color: $link-hover-color;
           }
         }
       }
