@@ -1,7 +1,8 @@
 name: mysqldbdump
 on:
-  schedule:
-    - cron: '0 8 * * *'
+  pull_request:
+    branches:
+      - master
 jobs:
   mysqldbdump:
     name: mysqldbdump
