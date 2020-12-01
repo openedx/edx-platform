@@ -130,3 +130,7 @@ pymongo<3.11
 
 # vulture 2.0 requires Python >= 3.6
 vulture<2.0
+
+
+# sympy latest version causing test failures.
+sympy==1.6.2
