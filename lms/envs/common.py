@@ -1109,6 +1109,45 @@ TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat', r'^/segm
 
 EVENT_TRACKING_ENABLED = True
 EVENT_TRACKING_BACKENDS = {
+    "caliper": {
+        "ENGINE": "eventtracking.backends.async_routing.AsyncRoutingBackend",
+        "OPTIONS": {
+            "backend_name": "caliper",
+            "processors": [
+                {
+                    "ENGINE": "eventtracking.processors.regex_filter.RegexFilter",
+                    "OPTIONS": {
+                        "filter_type": "allowlist",
+                        "regular_expressions": [
+                            "edx.course.enrollment.*",
+                            "seek_video",
+                            "edx.video.position.changed"
+                        ]
+                    }
+                }
+            ],
+            "backends": {
+                "caliper": {
+                    "ENGINE": "event_routing_backends.backends.events_router.EventsRouter",
+                    "OPTIONS": {
+                        "processors": [
+                            {
+                                "ENGINE": "event_routing_backends.processors.caliper.transformer_processor.CaliperProcessor",
+                                "OPTIONS": {}
+                            },
+                            {
+                                "ENGINE": "event_routing_backends.processors.caliper.envelop_processor.CaliperEnvelopProcessor",
+                                "OPTIONS": {
+                                    "sensor_id": "http://test.com/sensors"
+                                }
+                            }
+                        ],
+                        "backend_name": "caliper"
+                    }
+                }
+            }
+        }
+    },
     'tracking_logs': {
         'ENGINE': 'eventtracking.backends.routing.RoutingBackend',
         'OPTIONS': {
