@@ -486,7 +486,7 @@ def enterprise_customer_uuid_for_request(request):
     else:
         enterprise_customer_uuid = _customer_uuid_from_query_param_cookies_or_session(request)
 
-    if enterprise_customer_uuid is _CACHE_MISS:
+    if enterprise_customer_uuid is _CACHE_MISS or enterprise_customer_uuid is None:
         if not request.user.is_authenticated:
             return None
 
