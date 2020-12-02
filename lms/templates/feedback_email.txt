@@ -1,8 +1,0 @@
-Feedback from: ${ user }
-E-mail: ${ email }
-Browser: ${ browser }
-url: ${ url }
-time: ${ time }
-Subject: ${ subject }
-Feedback: 
-${ feedback }

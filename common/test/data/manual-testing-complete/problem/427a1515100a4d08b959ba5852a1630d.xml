@@ -1,6 +1,0 @@
-<problem display_name="Blank Common Problem" markdown="Capital of France is Paris:&#10;&#10;[[false, (true)]]&#10;">
-  <p>Capital of France is Paris:</p>
-  <optionresponse>
-    <optioninput options="('false','true')" correct="true"/>
-  </optionresponse>
-</problem>

@@ -1,2 +1,0 @@
-class CourseUpdateDoesNotExist(Exception):
-    pass

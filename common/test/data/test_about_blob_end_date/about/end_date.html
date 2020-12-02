@@ -1,1 +1,0 @@
-Learning never ends

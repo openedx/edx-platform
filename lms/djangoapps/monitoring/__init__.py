@@ -1,3 +1,0 @@
-"""
-LMS specific monitoring helpers.
-"""

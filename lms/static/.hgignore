@@ -1,7 +1,0 @@
-syntax: glob
-*.pyc
-*~
-*.scssc
-*.swp
-*.orig
-*.DS_Store

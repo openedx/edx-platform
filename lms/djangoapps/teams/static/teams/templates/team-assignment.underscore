@@ -1,3 +1,0 @@
-<li class="team-assignment">
-    <a href="<%- linkLocation %>"><%- displayName %></a>
-</li>

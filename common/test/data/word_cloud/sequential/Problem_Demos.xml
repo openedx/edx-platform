@@ -1,5 +1,0 @@
-<sequential>
-    <vertical name="test_vertical">
-        <word_cloud name="cloud1" display_name="cloud" num_inputs="5" num_top_words="250" />
-    </vertical>
-</sequential>

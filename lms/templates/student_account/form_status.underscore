@@ -1,6 +1,0 @@
-<div class="<%- jsHook %> status">
-    <div class="message-copy">
-        <%= HtmlUtils.ensureHtml(message) %>
-    </p>
-</div>
-
