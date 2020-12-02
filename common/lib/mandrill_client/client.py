@@ -2,7 +2,6 @@
 Client for Sending email via mandrill
 """
 
-
 import logging
 
 import mandrill
@@ -103,9 +102,9 @@ class MandrillClient(object):
                 template_content=[],
                 message=message,
             )
-            log.info("A mandrill info:  %s", result)
+            log.info("A mandrill info:  {result}".format(result=result))
         except mandrill.Error as e:
             # Mandrill errors are thrown as exceptions
-            log.error('A mandrill error occurred: %s - %s', e.__class__, e)
+            log.error('A mandrill error occurred: {eClass} - {error}'.format(eClass=e.__class__, errr=e))
             raise
         return result
