@@ -102,9 +102,9 @@ class MandrillClient(object):
                 template_content=[],
                 message=message,
             )
-            log.info("A mandrill info:  {result}".format(result=result))
+            log.info('A mandrill info:  {result}'.format(result=result))
         except mandrill.Error as e:
             # Mandrill errors are thrown as exceptions
-            log.error("A mandrill error occurred: {eClass} - {error}".format(eClass=e.__class__, error=e))
+            log.error('A mandrill error occurred: {eClass} - {error}'.format(eClass=e.__class__, error=e))
             raise
         return result
