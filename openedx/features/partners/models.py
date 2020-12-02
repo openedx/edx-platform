@@ -27,7 +27,7 @@ class Partner(TimeStampedModel):
     email = models.EmailField(help_text="Contact email of an organization")
     configuration = JSONField(null=False, blank=True, default=dumps({"USER_LIMIT": ""}))
     main_title = models.CharField(blank=True, max_length=100, help_text="Display on partners landing page as main title.")
-    main_description = models.TextField(blank=True, help_text='Brief description of partners landing page.')
+    main_description = models.TextField(blank=True, help_text="Brief description of partners landing page.")
     main_bg_image = models.ImageField(
         blank=True, storage=CustomS3Storage(), max_length=500, help_text="Background image under main title and description.",
         upload_to=UploadToPathAndRename(path='images', name_prefix='main_bg_image', add_path_prefix=True)
