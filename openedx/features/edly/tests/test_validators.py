@@ -10,7 +10,10 @@ from openedx.features.edly.tests.factories import (
     EdlyUserProfileFactory,
     SiteFactory
 )
-from openedx.features.edly.validators import is_edly_user_allowed_to_login
+from openedx.features.edly.validators import (
+    is_edly_user_allowed_to_login,
+    is_edly_user_allowed_to_login_with_social_auth
+)
 
 
 class EdlyValidatorsTests(TestCase):
@@ -42,5 +45,26 @@ class EdlyValidatorsTests(TestCase):
 
         EdlySubOrganizationFactory(lms_site=self.request.site)
         has_access = is_edly_user_allowed_to_login(self.request, self.user)
+
+        assert not has_access
+
+    def test_user_allow_to_login_with_social_auth(self):
+        """
+        Test user can login to site with social auth.
+        """
+
+        edly_sub_organization = EdlySubOrganizationFactory(lms_site=self.request.site)
+        self.edly_user_profile.edly_sub_organizations.add(edly_sub_organization)
+        has_access = is_edly_user_allowed_to_login_with_social_auth(self.request, self.user)
+
+        assert has_access
+
+    def test_user_allow_to_login_with_social_auth(self):
+        """
+        Test user can not login to site with social auth.
+        """
+
+        edly_sub_organization = EdlySubOrganizationFactory(lms_site=self.request.site)
+        has_access = is_edly_user_allowed_to_login_with_social_auth(self.request, self.user)
 
         assert not has_access

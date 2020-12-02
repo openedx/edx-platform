@@ -4,6 +4,10 @@ from openedx.features.edly.models import (
     EdlySubOrganization,
     EdlyUserProfile
 )
+from openedx.features.edly.utils import (
+    create_user_link_with_edly_sub_organization,
+    user_can_login_on_requested_edly_organization
+)
 
 logger = getLogger(__name__)
 
@@ -42,3 +46,25 @@ def is_edly_user_allowed_to_login(request, possibly_authenticated_user):
         return True
 
     return False
+
+
+def is_edly_user_allowed_to_login_with_social_auth(request, user):
+    """
+    Check if the user is allowed to login on the current site with social auth.
+
+    Arguments:
+        request (object): HTTP request object
+        user: User object trying to authenticate
+
+    Returns:
+        bool: Returns True if User can login to site otherwise False.
+    """
+
+    if not is_edly_user_allowed_to_login(request, user):
+        if user_can_login_on_requested_edly_organization(request, user):
+            create_user_link_with_edly_sub_organization(request, user)
+        else:
+            logger.warning('User %s is not allowed to login for site %s.' % (user.email, request.site))
+            return False
+
+    return True

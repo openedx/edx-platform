@@ -72,6 +72,7 @@ from django.core.mail.message import EmailMessage
 from django.urls import reverse
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
+from django.utils.translation import ugettext as _
 import social_django
 from social_core.exceptions import AuthException
 from social_core.pipeline import partial
@@ -80,6 +81,7 @@ from social_core.pipeline.social_auth import associate_by_email
 from edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
+from openedx.features.edly.validators import is_edly_user_allowed_to_login_with_social_auth
 from lms.djangoapps.verify_student.models import SSOVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
 from third_party_auth.utils import user_exists
@@ -632,6 +634,9 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
             # Check that the cookie isn't already set.
             # This ensures that we allow the user to continue to the next
             # pipeline step once he/she has the cookie set by this step.
+            if not is_edly_user_allowed_to_login_with_social_auth(request, user):
+                raise AuthException(user, _('You are not allowed to login on this site.'))
+
             has_cookie = user_authn_cookies.are_logged_in_cookies_set(request)
             if not has_cookie:
                 try:
