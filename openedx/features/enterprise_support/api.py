@@ -529,9 +529,11 @@ def enterprise_customer_for_request(request):
     the request being made is tied to a particular EnterpriseCustomer.
     """
     enterprise_customer = enterprise_customer_from_session(request)
+
     if enterprise_customer is _CACHE_MISS:
         enterprise_customer = enterprise_customer_from_api(request)
         add_enterprise_customer_to_session(request, enterprise_customer)
+
     return enterprise_customer
 
 
