@@ -53,13 +53,13 @@ class MandrillClient(object):
 
     def get_email_to(self, receiver_emails_string):
         """
-        parsing the comma separated email to a list of emails
+        Parsing the comma separated email to a list of emails
 
         Arguments:
             receiver_emails_string: String contains a comma separated emails
 
         Returns:
-            receiver_emails (List): A List of receiver email
+            receiver_emails (ist): A List of receiver email
         """
         email_list = receiver_emails_string.split(',')
         receiver_emails = [{'email': email} for email in email_list]
@@ -72,8 +72,10 @@ class MandrillClient(object):
 
         arguments:
         template_name: the slug/identifier of the mandrill email template
-        user_email: the email or comma separated emails of the receiver's
+        receiver_emails_string: the email or comma separated emails of the receiver's
         context: the data which is passed to the template. must be a dict
+        attachments: list of file attachments
+        Subject: A subject  title for email
         reply_to_email:  email for reply_to
         images: images attachments for referring it from content of email template
         """
