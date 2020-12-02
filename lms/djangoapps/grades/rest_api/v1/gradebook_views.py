@@ -529,7 +529,12 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
 
         if request.GET.get('username'):
             with self._get_user_or_raise(request, course_key) as grade_user:
-                course_grade = CourseGradeFactory().read(grade_user, course)
+                collected_block_structure = course_data.collected_structure
+                course_grade = CourseGradeFactory().read(
+                    grade_user,
+                    course,
+                    collected_block_structure
+                )
 
             entry = self._gradebook_entry(grade_user, course, graded_subsections, course_grade)
             serializer = StudentGradebookEntrySerializer(entry)
