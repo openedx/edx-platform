@@ -9,6 +9,7 @@ import re
 import string
 import subprocess
 import sys
+import unittest
 from datetime import datetime, timedelta
 from unittest import TestCase
 
@@ -23,6 +24,7 @@ class TestGenerate(TestCase):
     """
     generated_files = ('django-partial.po', 'djangojs-partial.po', 'mako.po')
 
+    @unittest.skipIf(os.environ.get("CIRCLECI") == 'true', "Skip this test in Circle CI.")
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
