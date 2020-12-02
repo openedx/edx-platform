@@ -59,7 +59,7 @@ class MandrillClient(object):
             receiver_emails_string: String contains a comma separated emails
 
         Returns:
-            receiver_emails (list): A list of receiver email
+            receiver_emails (list): A list of receiver emails
         """
         email_list = receiver_emails_string.split(',')
         receiver_emails = [{'email': email} for email in email_list]
@@ -79,10 +79,8 @@ class MandrillClient(object):
         reply_to_email:  email for reply_to
         images: images attachments for referring it from content of email template
         """
-        if images is None:
-            images = []
-        if attachments is None:
-            attachments = []
+        images = images or []
+        attachments = attachments or []
         global_merge_vars = [{'name': key, 'content': context[key]} for key in context]
 
         message = {
