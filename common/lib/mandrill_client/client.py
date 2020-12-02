@@ -51,9 +51,9 @@ class MandrillClient(object):
     def __init__(self):
         self.mandrill_client = mandrill.Mandrill(settings.MANDRILL_API_KEY)
 
-    def get_email_to(self, receiver_emails_string):
+    def get_receiver_emails(self, receiver_emails_string):
         """
-        Parsing the comma separated email to a list of emails
+        Parsing the comma separated email to a list of receiver emails
 
         Arguments:
             receiver_emails_string: String contains a comma separated emails
@@ -87,7 +87,7 @@ class MandrillClient(object):
 
         message = {
             'from_email': settings.NOTIFICATION_FROM_EMAIL,
-            'to': self.get_email_to(receiver_emails_string),
+            'to': self.get_receiver_emails(receiver_emails_string),
             'global_merge_vars': global_merge_vars,
             'attachments': attachments,
             'images': images,
