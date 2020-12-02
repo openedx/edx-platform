@@ -5,9 +5,9 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.generic import View
+from organizations.api import get_organizations
 
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
-from common.djangoapps.util.organizations_helpers import get_organizations
 
 
 class OrganizationListView(View):

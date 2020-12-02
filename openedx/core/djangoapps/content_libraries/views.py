@@ -10,6 +10,8 @@ from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
 import edx_api_doc_tools as apidocs
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
+from organizations.api import ensure_organization
+from organizations.exceptions import InvalidOrganizationException
 from organizations.models import Organization
 from rest_framework import status
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
@@ -156,14 +158,17 @@ class LibraryRootView(APIView):
         # definitions elsewhere.
         data['library_type'] = data.pop('type')
         data['library_license'] = data.pop('license')
-        # Get the organization short_name out of the "key.org" pseudo-field that the serializer added:
-        org_name = data["key"]["org"]
         # Move "slug" out of the "key.slug" pseudo-field that the serializer added:
         data["slug"] = data.pop("key")["slug"]
+        # Get the organization short_name out of the "key.org" pseudo-field that the serializer added:
+        org_name = data["key"]["org"]
         try:
-            org = Organization.objects.get(short_name=org_name)
-        except Organization.DoesNotExist:
-            raise ValidationError(detail={"org": "No such organization '{}' found.".format(org_name)})
+            ensure_organization(org_name)
+        except InvalidOrganizationException:
+            raise ValidationError(
+                detail={"org": "No such organization '{}' found.".format(org_name)}
+            )
+        org = Organization.objects.get(short_name=org_name)
         try:
             result = api.create_library(org=org, **data)
         except api.LibraryAlreadyExists:

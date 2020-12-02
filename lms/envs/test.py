@@ -468,9 +468,6 @@ FEATURES['ENABLE_LTI_PROVIDER'] = True
 INSTALLED_APPS.append('lms.djangoapps.lti_provider.apps.LtiProviderConfig')
 AUTHENTICATION_BACKENDS.append('lms.djangoapps.lti_provider.users.LtiBackend')
 
-# ORGANIZATIONS
-FEATURES['ORGANIZATIONS_APP'] = True
-
 # Financial assistance page
 FEATURES['ENABLE_FINANCIAL_ASSISTANCE_FORM'] = True
 

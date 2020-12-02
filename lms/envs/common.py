@@ -442,9 +442,6 @@ FEATURES = {
     # Milestones application flag
     'MILESTONES_APP': False,
 
-    # Organizations application flag
-    'ORGANIZATIONS_APP': False,
-
     # Prerequisite courses feature flag
     'ENABLE_PREREQUISITE_COURSES': False,
 
@@ -2735,6 +2732,9 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
 
     'ratelimitbackend',
+
+    # Database-backed Organizations App (http://github.com/edx/edx-organizations)
+    'organizations',
 ]
 
 ######################### CSRF #########################################
@@ -3348,9 +3348,6 @@ OPTIONAL_APPS = [
 
     # edxval
     ('edxval', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
-
-    # Organizations App (http://github.com/edx/edx-organizations)
-    ('organizations', None),
 
     # Enterprise Apps (http://github.com/edx/edx-enterprise)
     ('enterprise', None),

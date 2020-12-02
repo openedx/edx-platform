@@ -327,6 +327,23 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                     courses[course_id] = course
         return list(courses.values())
 
+    def get_library_keys(self):
+        """
+        Returns a list of all unique content library keys in the mixed
+        modulestore.
+
+        Returns: list[LibraryLocator]
+        """
+        all_library_keys = set()
+        for store in self.modulestores:
+            if not hasattr(store, 'get_library_keys'):
+                continue
+            all_library_keys |= set(
+                self._clean_locator_for_mapping(library_key)
+                for library_key in store.get_library_keys()
+            )
+        return list(all_library_keys)
+
     @strip_key
     def get_library_summaries(self, **kwargs):
         """
