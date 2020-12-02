@@ -608,7 +608,8 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
 @unittest.skipIf(
     settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,
-    'this should be re-examined later see https://github.com/appsembler/edx-platform/pull/706'
+    'This should be re-examined later see https://github.com/appsembler/edx-platform/pull/706. '
+    'It may not be needed because we may not have performance problems anymore. '
 )
 class TestInstructorDashboardMenuForDueDates(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -657,7 +658,8 @@ class TestInstructorDashboardMenuForDueDates(ModuleStoreTestCase, LoginEnrollmen
         )
 
         response = self.client.get(url)
-        self.assertNotIn('data-section="extensions"', response.content)
+        content = response.content.decode('utf-8')
+        self.assertNotIn('data-section="extensions"', content)
 
     @with_site_configuration(configuration={
         'INDIVIDUAL_DUE_DATES': True,  # site configuration override
@@ -676,7 +678,8 @@ class TestInstructorDashboardMenuForDueDates(ModuleStoreTestCase, LoginEnrollmen
         )
 
         response = self.client.get(url)
-        self.assertIn('data-section="extensions"', response.content)
+        content = response.content.decode('utf-8')
+        self.assertIn('data-section="extensions"', content)
 
 
 @ddt.ddt

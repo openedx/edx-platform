@@ -44,10 +44,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
-@unittest.skipIf(
-    settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,
-    'fix for Juniper',
-)
+@mock.patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
 class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
     """Tests for the certificate panel of the instructor dash. """
 
@@ -76,17 +73,25 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         # Enable the certificate generation feature
         CertificateGenerationConfiguration.objects.create(enabled=True)
 
-    def test_visible_only_to_course_staff(self):
-        # Regular users don't see the certificates section
+    def test_not_visible_to_students(self):
+        # Tahoe: Regular users don't see the certificates section
         self.client.login(username=self.user.username, password="test")
-        self._assert_certificates_visible(False)
+        # Tahoe: For normal students the whole page should not be visible.
+        self._assert_certificates_visible(False, status_code=404)  # Shouldn't be able to access the page at all
 
-        # Course Instructors can see the certificates section
+    def test_visible_to_course_instructors(self):
+        # Tahoe: Course Instructors can see the certificates section
         self.client.login(username=self.instructor.username, password="test")
         self._assert_certificates_visible(True)
 
-        # Course staff can see the certificates section
+    def test_visible_to_course_staff(self):
+        # Tahoe: Course staff can see the certificates section
         self.client.login(username=self.staff.username, password="test")
+        self._assert_certificates_visible(True)
+
+    def test_visible_to_global_staff(self):
+        # Tahoe: Course staff can see the certificates section
+        self.client.login(username=self.global_staff.username, password="test")
         self._assert_certificates_visible(True)
 
     def test_visible_only_when_feature_flag_enabled(self):
@@ -99,11 +104,13 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         self._assert_certificates_visible(False)
 
     @ddt.data("started", "error", "success")
+    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Related to PDF certs. We do not use them.')
     def test_show_certificate_status(self, status):
         self.client.login(username=self.global_staff.username, password="test")
         with self._certificate_status("honor", status):
             self._assert_certificate_status("honor", status)
 
+    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Related to PDF certs. We do not use them.')
     def test_show_enabled_button(self):
         self.client.login(username=self.global_staff.username, password="test")
 
@@ -121,6 +128,7 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
             # Now the "disable" button should be shown
             self._assert_enable_certs_button(False)
 
+    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Related to PDF certs. We do not use them.')
     def test_can_disable_even_after_failure(self):
         self.client.login(username=self.global_staff.username, password="test")
 
@@ -168,13 +176,13 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         self.assertNotContains(response, 'Generate Certificates')
         self.assertNotContains(response, 'btn-start-generating-certificates')
 
-    def _assert_certificates_visible(self, is_visible):
+    def _assert_certificates_visible(self, is_visible, status_code=200):
         """Check that the certificates section is visible on the instructor dash. """
         response = self.client.get(self.url)
         if is_visible:
-            self.assertContains(response, "Student-Generated Certificates")
+            self.assertContains(response, "Student-Generated Certificates", status_code=status_code)
         else:
-            self.assertNotContains(response, "Student-Generated Certificates")
+            self.assertNotContains(response, "Student-Generated Certificates", status_code=status_code)
 
     @contextlib.contextmanager
     def _certificate_status(self, description, status):
@@ -249,19 +257,22 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
 
     @ddt.data('generate_example_certificates', 'enable_certificate_generation')
     def test_allow_course_staff(self, url_name):
+        """
+        Tahoe: Certificate views permission.
+        """
         url = reverse(url_name, kwargs={'course_id': self.course.id})
 
-        # Regular users do not have access
+        # Tahoe: Regular users do not have access
         self.client.login(username=self.user.username, password='test')
         response = self.client.post(url)
         self.assertEqual(response.status_code, 403)
 
-        # Instructors have access
+        # Tahoe: Instructors have access
         self.client.login(username=self.instructor.username, password='test')
         response = self.client.post(url)
         self.assertEqual(response.status_code, 302)
 
-        # Course staff have access
+        # Tahoe: Course staff have access
         self.client.login(username=self.staff.username, password='test')
         response = self.client.post(url)
         self.assertEqual(response.status_code, 302)
@@ -312,7 +323,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
     def test_certificate_generation_api_without_global_staff(self):
         """
         Test certificates generation api endpoint returns permission denied if
-        user who made the request is not member of the course staff.
+        user who made the request is not member of global/course staff.
         """
         user = UserFactory.create()
         self.client.login(username=user.username, password='test')
@@ -324,7 +335,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 403)
         self.client.login(username=self.instructor.username, password='test')
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)  # Tahoe: Changed to 200 because we expect instructors to use this
 
     def test_certificate_generation_api_with_global_staff(self):
         """

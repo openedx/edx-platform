@@ -202,7 +202,9 @@ def instructor_dashboard_2(request, course_id):
     # and enable self-generated certificates for a course.
     # Note: This is hidden for all CCXs
     certs_enabled = CertificateGenerationConfiguration.current().enabled and not hasattr(course_key, 'ccx')
-    if certs_enabled and (access['admin'] or access['staff']) and configuration_helpers.get_value('CERTIFICATES_HTML_VIEW', False):
+    site_has_cert_enabled = configuration_helpers.get_value('CERTIFICATES_HTML_VIEW',
+                                                            settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False))
+    if certs_enabled and (access['admin'] or access['staff']) and site_has_cert_enabled:
         sections.append(_section_certificates(course))
 
     openassessment_blocks = modulestore().get_items(

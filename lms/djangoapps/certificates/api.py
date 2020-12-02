@@ -505,7 +505,8 @@ def _certificate_download_url(user_id, course_id, user_certificate=None):
 
 
 def has_html_certificates_enabled(course):
-    if not configuration_helpers.get_value("CERTIFICATES_HTML_VIEW", False):
+    if not configuration_helpers.get_value('CERTIFICATES_HTML_VIEW',
+                                           settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False)):
         return False
     return course.cert_html_view_enabled
 
