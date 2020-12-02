@@ -5,8 +5,6 @@ A backfill command to migrate Open edX instances to the new world of
 For full context, see:
 https://github.com/edx/edx-organizations/blob/master/docs/decisions/0001-phase-in-db-backed-organizations-to-all.rst
 """
-from textwrap import dedent
-
 from django.core.management import BaseCommand, CommandError
 from organizations import api as organizations_api
 
@@ -16,7 +14,7 @@ from xmodule.modulestore.django import modulestore
 
 class Command(BaseCommand):
     """
-    Back-populate edx-organizations models from existing courses & content libraries.
+    Back-populate edx-organizations models from existing course runs & content libraries.
 
     Before the Lilac open release, Open edX instances by default did not make
     use of the models in edx-organizations.
@@ -42,7 +40,11 @@ class Command(BaseCommand):
         >     active=True,
         > )
     """
-    help = dedent(__doc__).strip()
+
+    # Make help  message the first line of docstring.
+    # I'd like to include the entire docstring but Django omits the newlines,
+    # so it looks pretty bad.
+    help = __doc__.strip().splitlines()[0]
 
     def add_arguments(self, parser):
         parser.add_argument(
