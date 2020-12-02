@@ -59,7 +59,7 @@ class MandrillClient(object):
             receiver_emails_string: String contains a comma separated emails
 
         Returns:
-            receiver_emails (list): A List of receiver email
+            receiver_emails (list): A list of receiver email
         """
         email_list = receiver_emails_string.split(',')
         receiver_emails = [{'email': email} for email in email_list]
