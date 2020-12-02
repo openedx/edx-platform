@@ -12,8 +12,8 @@ def test_create_user_group_with_business_line():
     """
     Assert that user group is created when new business line is added
     """
-    BusinessLineFactory()
-    assert Group.objects.filter(name='foo').exists()
+    business_line = BusinessLineFactory()
+    assert Group.objects.filter(name=business_line.title).exists()
 
 
 @pytest.mark.django_db
@@ -24,7 +24,7 @@ def test_modify_user_group_with_business_line():
     business_line = BusinessLineFactory()
     business_line.title = 'bar'
     business_line.save()
-    assert Group.objects.filter(name='bar').exists() and not Group.objects.filter(name='foo').exists()
+    assert Group.objects.filter(name=business_line.title).exists()
 
 
 @pytest.mark.django_db
@@ -34,4 +34,4 @@ def test_delete_user_group_with_business_line():
     """
     business_line = BusinessLineFactory()
     business_line.delete()
-    assert not Group.objects.filter(name='foo').exists()
+    assert not Group.objects.filter(name=business_line.title).exists()
