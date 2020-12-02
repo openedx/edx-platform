@@ -50,12 +50,12 @@ class Command(BaseCommand):
         parser.add_argument(
             '--apply',
             action='store_true',
-            help="Apply backfill to database (instead of just showing the changes)."
+            help="Apply backfill to database without prompting for confirmation."
         )
         parser.add_argument(
             '--dry',
             action='store_true',
-            help="Apply backfill to database (instead of just showing the changes)."
+            help="Show backfill, but do not apply changes to database."
         )
 
     def handle(self, *args, **options):
