@@ -3,6 +3,7 @@ Tests for the course modes Django admin interface.
 """
 
 
+import os
 import unittest
 from datetime import datetime, timedelta
 
@@ -36,6 +37,7 @@ class AdminCourseModePageTest(ModuleStoreTestCase):
     Test the course modes Django admin interface.
     """
 
+    @unittest.skipIf(os.environ.get("CIRCLECI") == 'true', "Skip this test in Circle CI.")
     def test_expiration_timezone(self):
         # Test that expiration datetimes are saved and retrieved with the timezone set to UTC.
         # This verifies the fix for a bug in which the date displayed to users was different

