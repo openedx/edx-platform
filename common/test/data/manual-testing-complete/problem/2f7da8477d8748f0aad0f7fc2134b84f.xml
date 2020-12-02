@@ -19,7 +19,7 @@ for response in submission[0]:
   if response[0] == 'ac':
       for node in response[1:]:
           ac_values = node['NodeA']
-print "the ac analysis value:", ac_values
+print("the ac analysis value:", ac_values)
 if ac_values == None:
   correct = ['incorrect']
 elif ac_values[0][1] &lt; ac_values[1][1]:
