@@ -2849,7 +2849,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=800 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=801 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -4425,6 +4425,7 @@ CREATE TABLE `integrated_channel_learnerdatatransmissionaudit` (
   `status` varchar(100) NOT NULL,
   `error_message` longtext NOT NULL,
   `created` datetime(6) NOT NULL,
+  `subsection_id` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `integrated_channel_learnerd_enterprise_course_enrollmen_c2e6c2e0` (`enterprise_course_enrollment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
