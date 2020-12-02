@@ -30,7 +30,7 @@ from xblock.core import XBlock
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-from xmodule.annotatable_module import AnnotatableDescriptor
+from xmodule.annotatable_module import AnnotatableBlock
 from xmodule.conditional_module import ConditionalBlock
 from xmodule.course_module import CourseDescriptor
 from xmodule.html_module import HtmlBlock
@@ -55,7 +55,7 @@ from xmodule.x_module import (
 # to a list of sample field values to test with.
 # TODO: Add more types of sample data
 LEAF_XMODULES = {
-    AnnotatableDescriptor: [{}],
+    AnnotatableBlock: [{}],
     HtmlBlock: [{}],
     PollDescriptor: [{'display_name': 'Poll Display Name'}],
     WordCloudBlock: [{}],
