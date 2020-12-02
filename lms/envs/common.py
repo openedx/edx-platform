@@ -1119,9 +1119,7 @@ EVENT_TRACKING_BACKENDS = {
                     "OPTIONS": {
                         "filter_type": "allowlist",
                         "regular_expressions": [
-                            "edx.course.enrollment.*",
-                            "seek_video",
-                            "edx.video.position.changed"
+                            ".*",
                         ]
                     }
                 }
