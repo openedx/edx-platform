@@ -59,68 +59,60 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-
-        # Find `orgs` and `org_coursekey_pairs` to be bulk-added.
-        # The `sorted` calls aren't strictly necessary, but they'll help make this
-        # function more deterministic in case something goes wrong.
+        """
+        Handle the backfill command.
+        """
         orgslug_coursekey_pairs = find_orgslug_coursekey_pairs()
         orgslug_library_pairs = find_orgslug_library_pairs()
         orgslugs = (
             {orgslug for orgslug, _ in orgslug_coursekey_pairs} |
             {orgslug for orgslug, _ in orgslug_library_pairs}
         )
+        # Note: the `organizations.api.bulk_add_*` code will handle:
+        # * not overwriting existing organizations, and
+        # * skipping duplicates, based on the short name (case-insensiive),
+        # so we don't have to worry about those here.
         orgs = [
             {"short_name": orgslug, "name": orgslug}
+            # The `sorted` calls aren't strictly necessary, but they'll help make this
+            # function more deterministic in case something goes wrong.
             for orgslug in sorted(orgslugs)
         ]
         org_coursekey_pairs = [
             ({"short_name": orgslug}, coursekey)
             for orgslug, coursekey in sorted(orgslug_coursekey_pairs)
         ]
-
-        # Note that edx-organizations code will handle:
-        # * Not overwriting existing organizations.
-        # * Skipping duplicates, based on the short name (case-insensiive).
-
-        # Start with a dry run.
-        # This will log to the user which orgs/org-courses will be created/reactivated.
-        organizations_api.bulk_add_organizations(
-            orgs,
-            dry_run=True,
-        )
-        organizations_api.bulk_add_organization_courses(
-            org_coursekey_pairs,
-            dry_run=True,
-        )
-        if not should_apply_changes(options):
+        if not confirm_changes(options, orgs, org_coursekey_pairs):
             print("No changes applied.")
             return
-
-        # It's go time.
         print("Applying changes...")
-        organizations_api.bulk_add_organizations(
-            orgs,
-            dry_run=False,
-        )
-        organizations_api.bulk_add_organization_courses(
-            org_coursekey_pairs,
-            dry_run=False,
-        )
+        organizations_api.bulk_add_organizations(orgs, dry_run=False)
+        organizations_api.bulk_add_organization_courses(org_coursekey_pairs, dry_run=False)
         print("Changes applied successfully.")
 
 
-def should_apply_changes(options):
+def confirm_changes(options, orgs, org_coursekey_pairs):
     """
-    Should we apply the changes to the db?
+    Should we apply the changes to the database?
 
-    If already specified on the command line, use that value.
+    If `--apply`, this just returns True.
+    If `--dry`, this does a dry run and then returns False.
+    Otherwise, it does a dry run and then prompts the user.
 
-    Otherwise, prompt.
+    Arguments:
+        options (dict[str]): command-line arguments.
+        orgs (list[dict]): list of org data dictionaries to bulk-add.
+        org_coursekey_pairs (list[tuple[dict, CourseKey]]):
+            list of (org data dictionary, course key) links to bulk-add.
+
+    Returns: bool
     """
     if options.get('apply') and options.get('dry'):
         raise CommandError("Only one of 'apply' and 'dry' may be specified")
     if options.get('apply'):
         return True
+    organizations_api.bulk_add_organizations(orgs, dry_run=True)
+    organizations_api.bulk_add_organization_courses(org_coursekey_pairs, dry_run=True)
     if options.get('dry'):
         return False
     answer = ""

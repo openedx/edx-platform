@@ -147,17 +147,36 @@ class BackfillOrgsAndOrgCoursesTest(SharedModuleStoreTestCase):
         # Make sure user was prompted the number of times we expected.
         assert mock_input.call_count == len(user_inputs)
 
-        # Make sure each function was called once for the dry run.
-        assert mock_add_orgs.call_args_list[0].kwargs == {"dry_run": True}
-        assert mock_add_org_courses.call_args_list[0].kwargs == {"dry_run": True}
-
-        # Make sure we did the actual db write iff `should_apply_changes`.
-        if should_apply_changes:
+        if should_apply_changes and user_inputs:
+            # If we DID apply changes and the user WAS prompted first,
+            # then we expect one DRY bulk-add run *and* one REAL bulk-add run.
+            assert mock_add_orgs.call_count == 2
+            assert mock_add_org_courses.call_count == 2
+            assert mock_add_orgs.call_args_list[0].kwargs == {"dry_run": True}
+            assert mock_add_org_courses.call_args_list[0].kwargs == {"dry_run": True}
             assert mock_add_orgs.call_args_list[1].kwargs == {"dry_run": False}
             assert mock_add_org_courses.call_args_list[1].kwargs == {"dry_run": False}
-        else:
+        elif should_apply_changes:
+            # If DID apply changes but the user WASN'T prompted,
+            # then we expect just one REAL bulk-add run.
             assert mock_add_orgs.call_count == 1
             assert mock_add_org_courses.call_count == 1
+            assert mock_add_orgs.call_args.kwargs == {"dry_run": False}
+            assert mock_add_org_courses.call_args.kwargs == {"dry_run": False}
+        elif user_inputs:
+            # If we DIDN'T apply changes but the user WAS prompted
+            # then we expect just one DRY bulk-add run.
+            assert mock_add_orgs.call_count == 1
+            assert mock_add_org_courses.call_count == 1
+            assert mock_add_orgs.call_args.kwargs == {"dry_run": True}
+            assert mock_add_org_courses.call_args.kwargs == {"dry_run": True}
+        else:
+            # Similarly, if we DIDN'T apply changes and the user WASN'T prompted
+            # then we expect just one DRY bulk-add run.
+            assert mock_add_orgs.call_count == 1
+            assert mock_add_org_courses.call_count == 1
+            assert mock_add_orgs.call_args.kwargs == {"dry_run": True}
+            assert mock_add_org_courses.call_args.kwargs == {"dry_run": True}
 
     def test_conflicting_arguments(self):
         """
