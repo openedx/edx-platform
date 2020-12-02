@@ -499,7 +499,8 @@ def render_html_view(request, course_id, certificate=None):
     configuration = CertificateHtmlViewConfiguration.get_config()
 
     # Kick the user back to the "Invalid" screen if the feature is disabled globally
-    if not configuration_helpers.get_value('CERTIFICATES_HTML_VIEW', settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False)):
+    if not configuration_helpers.get_value('CERTIFICATES_HTML_VIEW',
+                                           settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False)):
         return _render_invalid_certificate(request, course_id, platform_name, configuration)
 
     # Load the course and user objects
