@@ -847,6 +847,7 @@ class LoginSessionViewTest(ApiTestCase):
                 "errorMessages": {},
                 "supplementalText": "",
                 "supplementalLink": "",
+                "loginIssueSupportLink": "https://support.example.com/login-issue-help.html",
             },
             {
                 "name": "password",
@@ -862,6 +863,7 @@ class LoginSessionViewTest(ApiTestCase):
                 "errorMessages": {},
                 "supplementalText": "",
                 "supplementalLink": "",
+                "loginIssueSupportLink": "https://support.example.com/login-issue-help.html",
             },
         ])
 
