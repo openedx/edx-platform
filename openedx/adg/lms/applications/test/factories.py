@@ -3,7 +3,7 @@ All model factories for applications
 """
 import factory
 
-from openedx.adg.lms.applications.models import BusinessLine, UserApplication
+from openedx.adg.lms.applications.models import ApplicationHub, BusinessLine, UserApplication
 from student.tests.factories import UserFactory
 
 
@@ -29,3 +29,15 @@ class UserApplicationFactory(factory.DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     business_line = factory.SubFactory(BusinessLineFactory)
     organization = 'testOrganization'
+
+
+class ApplicationHubFactory(factory.DjangoModelFactory):
+    """
+    Factory for ApplicationHub model
+    """
+
+    class Meta:
+        model = ApplicationHub
+        django_get_or_create = ('user',)
+
+    user = factory.SubFactory(UserFactory)
