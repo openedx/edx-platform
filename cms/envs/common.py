@@ -2309,3 +2309,10 @@ VERIFY_STUDENT = {
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2020-11-02
 ORGANIZATIONS_AUTOCREATE = True
+
+################# Settings for brand logos. #################
+LOGO_URL = None
+LOGO_URL_PNG = None
+LOGO_TRADEMARK_URL = None
+FAVICON_URL = None
+DEFAULT_EMAIL_LOGO_URL = 'https://edx-cdn.org/v3/default/logo.png'

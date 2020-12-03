@@ -7,8 +7,8 @@ based on the current site.
 from django import template
 from django.conf import settings
 from django.templatetags.static import static
-from django.contrib.staticfiles.storage import staticfiles_storage
 
+from lms.djangoapps.branding.api import get_favicon_url
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import HTML
@@ -35,12 +35,12 @@ def platform_name():
 
 
 @register.simple_tag(name="favicon_path")
-def favicon_path(default=getattr(settings, 'FAVICON_PATH', 'images/favicon.ico')):
+def favicon_path():
     """
     Django template tag that outputs the configured favicon:
     {% favicon_path %}
     """
-    return staticfiles_storage.url(configuration_helpers.get_value('favicon_path', default))
+    return get_favicon_url()
 
 
 @register.simple_tag(name="microsite_css_overrides_file")
