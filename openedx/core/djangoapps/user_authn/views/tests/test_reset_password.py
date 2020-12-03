@@ -672,6 +672,7 @@ class PasswordResetViewTest(UserAPITestCase):
                 "errorMessages": {},
                 "supplementalText": "",
                 "supplementalLink": "",
+                "loginIssueSupportLink": "https://support.example.com/login-issue-help.html",
             }
         ])
 

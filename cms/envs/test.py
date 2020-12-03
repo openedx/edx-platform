@@ -33,6 +33,7 @@ from lms.envs.test import (  # pylint: disable=wrong-import-order
     ECOMMERCE_API_URL,
     ENABLE_COMPREHENSIVE_THEMING,
     JWT_AUTH,
+    LOGIN_ISSUE_SUPPORT_LINK,
     MEDIA_ROOT,
     MEDIA_URL,
     PLATFORM_DESCRIPTION,

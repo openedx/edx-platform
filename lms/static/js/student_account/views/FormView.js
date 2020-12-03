@@ -94,7 +94,8 @@
                         requiredStr: this.requiredStr,
                         optionalStr: this.optionalStr,
                         supplementalText: data[i].supplementalText || '',
-                        supplementalLink: data[i].supplementalLink || ''
+                        supplementalLink: data[i].supplementalLink || '',
+                        loginIssueSupportLink: data[i].loginIssueSupportLink || ''
                     })));
                 }
 
