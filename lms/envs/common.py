@@ -2542,19 +2542,19 @@ MKTG_URL_OVERRIDES = {}
 MKTG_URL_LINK_MAP = {
     'ABOUT': 'about',
     'CONTACT': 'contact',
-    'FAQ': 'help',
+    'FAQ': None,
     'COURSES': 'courses',
-    'ROOT': 'root',
+    'ROOT': None,
     'TOS': 'tos',
-    'HONOR': 'honor',  # If your site does not have an honor code, simply delete this line.
-    'PRIVACY': 'privacy',
-    'PRESS': 'press',
-    'BLOG': 'blog',
-    'DONATE': 'donate',
+    'PRIVACY': None,
+    'PRESS': None,
+    'BLOG': None,
+    'DONATE': None,
     'SITEMAP.XML': 'sitemap_xml',
 
     # Verified Certificates
-    'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
+    'WHAT_IS_VERIFIED_CERT': None,
+    'OUR_TEAM': 'our_team',
 }
 
 STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION = 'html'
