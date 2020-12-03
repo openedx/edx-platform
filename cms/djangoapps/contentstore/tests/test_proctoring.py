@@ -6,7 +6,9 @@ Tests for the edx_proctoring integration into Studio
 from datetime import datetime, timedelta
 
 import ddt
+import os
 import six
+import unittest
 from django.conf import settings
 from edx_proctoring.api import get_all_exams_for_course, get_review_policy_by_exam_id
 from mock import patch
@@ -107,6 +109,7 @@ class TestProctoredExams(ModuleStoreTestCase):
         (True, True, True, True, False),
     )
     @ddt.unpack
+    @unittest.skipIf(os.environ.get("CIRCLECI") == 'true', "Skip this test in Circle CI.")
     def test_publishing_exam(self, is_proctored_exam,
                              is_practice_exam, expected_active, republish, hide_after_due):
         """
@@ -241,6 +244,7 @@ class TestProctoredExams(ModuleStoreTestCase):
         (False, False, 0),
     )
     @ddt.unpack
+    @unittest.skipIf(os.environ.get("CIRCLECI") == 'true', "Skip this test in Circle CI.")
     def test_advanced_settings(self, enable_timed_exams, enable_proctored_exams, expected_count):
         """
         Make sure the feature flag is honored

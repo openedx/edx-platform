@@ -8,6 +8,8 @@ import json
 from uuid import uuid4
 
 import mock
+import os
+import unittest
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test.utils import override_settings
@@ -62,6 +64,7 @@ class ExportCourseTestCase(CourseTestCase):
         result = export_olx.delay(self.user.id, key, u'en')
         self._assert_failed(result, json.dumps({u'raw_error_msg': u'Boom!'}))
 
+    @unittest.skipIf(os.environ.get("CIRCLECI") == 'true', "Skip this test in Circle CI.")
     def test_invalid_user_id(self):
         """
         Verify that attempts to export a course as an invalid user fail
