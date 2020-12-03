@@ -6,26 +6,26 @@
             var $parentEl, $moveLeftEl, $showEl, $moveRightEl, showElLeftMargin;
 
             $parentEl = $(
-            '<div ' +
+            '<div ' + // xss-lint: disable=javascript-concat-html
                 'style=" ' +
                     'width: 665px; ' +
                     'height: 102px; ' +
                     'margin-left: auto; ' +
                     'margin-right: auto; ' +
-                '" ' +
+                '" ' + // xss-lint: disable=javascript-concat-html
             '></div>'
         );
 
             $moveLeftEl = $(
-            '<div ' +
+            '<div ' + // xss-lint: disable=javascript-concat-html
                 'style=" ' +
                     'width: 40px; ' +
                     'height: 102px; ' +
                     'display: inline; ' +
                     'float: left; ' +
-                '" ' +
-            '>' +
-                '<div ' +
+                '" ' + // xss-lint: disable=javascript-concat-html
+            '>' + // xss-lint: disable=javascript-concat-html
+                '<div ' + // xss-lint: disable=javascript-concat-html
                     'style=" ' +
                         'width: 38px; ' +
                         'height: 100px; ' +
@@ -43,8 +43,8 @@
                         "background-image: url('" + baseUrl + "images/arrow-left.png'); " +
                         'background-position: center center; ' +
                         'background-repeat: no-repeat; ' +
-                    '" ' +
-                '></div>' +
+                    '" ' + // xss-lint: disable=javascript-concat-html
+                '></div>' + // xss-lint: disable=javascript-concat-html
             '</div>'
         );
             $moveLeftEl.appendTo($parentEl);
@@ -78,14 +78,14 @@
             });
 
             $showEl = $(
-            '<div ' +
+            '<div ' + // xss-lint: disable=javascript-concat-html
                 'style=" ' +
                     'width: 585px; ' +
                     'height: 102px; ' +
                     'overflow: hidden; ' +
                     'display: inline; ' +
                     'float: left; ' +
-                '" ' +
+                '" ' + // xss-lint: disable=javascript-concat-html
             '></div>'
         );
             $showEl.appendTo($parentEl);
@@ -97,13 +97,13 @@
         // will be contained in a parent element whose 'overflow' CSS value
         // will be hidden, preventing the long row from fully being visible.
             state.sliderEl = $(
-            '<div ' +
+            '<div ' + // xss-lint: disable=javascript-concat-html
                 'style=" ' +
                     'width: 20000px; ' +
                     'height: 100px; ' +
                     'border-top: 1px solid #CCC; ' +
                     'border-bottom: 1px solid #CCC; ' +
-                '" ' +
+                '" ' + // xss-lint: disable=javascript-concat-html
             '></div>'
         );
             state.sliderEl.appendTo($showEl);
@@ -113,15 +113,15 @@
             });
 
             $moveRightEl = $(
-            '<div ' +
+            '<div ' + // xss-lint: disable=javascript-concat-html
                 'style=" ' +
                     'width: 40px; ' +
                     'height: 102px; ' +
                     'display: inline; ' +
                     'float: left; ' +
-                '" ' +
-            '>' +
-                '<div ' +
+                '" ' + // xss-lint: disable=javascript-concat-html
+            '>' + // xss-lint: disable=javascript-concat-html
+                '<div ' + // xss-lint: disable=javascript-concat-html
                     'style=" ' +
                         'width: 38px; ' +
                         'height: 100px; ' +
@@ -139,9 +139,9 @@
                         "background-image: url('" + baseUrl + "images/arrow-right.png'); " +
                         'background-position: center center; ' +
                         'background-repeat: no-repeat; ' +
-                    '" ' +
-                '></div>' +
-            '</div>'
+                    '" ' + // xss-lint: disable=javascript-concat-html
+                '></div>' + // xss-lint: disable=javascript-concat-html
+            '</div>' // xss-lint: disable=javascript-concat-html
         );
             $moveRightEl.appendTo($parentEl);
 
