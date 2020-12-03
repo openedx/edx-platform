@@ -1,16 +1,22 @@
 from json import dumps
+from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.core.validators import FileExtensionValidator
+from django.utils.text import format_lazy
+from django.utils.translation import ugettext_lazy as _
 
+from pytz import UTC
 from jsonfield.fields import JSONField
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
 from openedx.features.philu_utils.backend_storage import CustomS3Storage
+from openedx.features.philu_utils.utils import bytes_to_mb
 from util.philu_utils import UploadToPathAndRename
 
-from .constants import PARTNER_USER_STATUS_APPROVED, PARTNER_USER_STATUS_WAITING
+from .constants import PARTNER_USER_STATUS_APPROVED, PARTNER_USER_STATUS_WAITING, PARTNER_IMAGE_MAX_SIZE
 
 
 class Partner(TimeStampedModel):
@@ -29,12 +35,18 @@ class Partner(TimeStampedModel):
     main_title = models.CharField(blank=True, max_length=100, help_text="Display on partners landing page as main title.")
     main_description = models.TextField(blank=True, help_text="Brief description of partners landing page.")
     main_bg_image = models.ImageField(
-        blank=True, storage=CustomS3Storage(), max_length=500, help_text="Background image under main title and description.",
-        upload_to=UploadToPathAndRename(path='images', name_prefix='main_bg_image', add_path_prefix=True)
+        blank=True, storage=CustomS3Storage(), max_length=500,
+        validators=[FileExtensionValidator(['jpg', 'png'], )], verbose_name=_('ADD MAIN BACKGROUND IMAGE'),
+        help_text=format_lazy(
+            _('Accepted extensions: .jpg, .png (maximum {mb} MB)'), mb=bytes_to_mb(PARTNER_IMAGE_MAX_SIZE)
+        ), upload_to=UploadToPathAndRename(path='images', name_prefix='main_bg_image', add_path_prefix=True)
     )
     parallax_bg_image = models.ImageField(
-        blank=True, storage=CustomS3Storage(), max_length=500, help_text="Background image of parallax.",
-        upload_to=UploadToPathAndRename(path='images', name_prefix='parallax_bg_image', add_path_prefix=True)
+        blank=True, storage=CustomS3Storage(), max_length=500,
+        validators=[FileExtensionValidator(['jpg', 'png'], )], verbose_name=_('ADD PARALLAX BACKGROUND IMAGE'),
+        help_text=format_lazy(
+            _('Accepted extensions: .jpg, .png (maximum {mb} MB)'), mb=bytes_to_mb(PARTNER_IMAGE_MAX_SIZE)
+        ), upload_to=UploadToPathAndRename(path='images', name_prefix='main_bg_image', add_path_prefix=True)
     )
     heading1 = models.CharField(blank=True, max_length=100, help_text="Heading 1")
     heading1_description = models.TextField(blank=True)
@@ -42,6 +54,7 @@ class Partner(TimeStampedModel):
     heading2_description = models.TextField(blank=True)
     testimonials1 = JSONField(blank=True, default=dumps({"description": "", "qoute_by": "", "address": ""}))
     testimonials2 = JSONField(blank=True, default=dumps({"description": "", "qoute_by": "", "address": ""}))
+    partnership_year = models.PositiveIntegerField(blank=True, default=datetime.now(UTC).year)
 
     def __unicode__(self):
         return '{}'.format(self.label)
