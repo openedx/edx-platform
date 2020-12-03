@@ -32,8 +32,8 @@ class Partner(TimeStampedModel):
     slug = models.CharField(max_length=100, unique=True, help_text="A unique identifier for an organization")
     email = models.EmailField(help_text="Contact email of an organization")
     configuration = JSONField(null=False, blank=True, default=dumps({"USER_LIMIT": ""}))
-    main_title = models.CharField(blank=True, max_length=100, help_text="Display on partners landing page as main title.")
-    main_description = models.TextField(blank=True, help_text="Brief description of partners landing page.")
+    main_title = models.CharField(blank=True, max_length=100, help_text=_("max 100 characters"))
+    main_description = models.TextField(blank=True, max_length=500, help_text=_("max 500 characters"))
     main_bg_image = models.ImageField(
         blank=True, storage=CustomS3Storage(), max_length=500,
         validators=[FileExtensionValidator(['jpg', 'png'], )], verbose_name=_('ADD MAIN BACKGROUND IMAGE'),
@@ -48,13 +48,13 @@ class Partner(TimeStampedModel):
             _('Accepted extensions: .jpg, .png (maximum {mb} MB)'), mb=bytes_to_mb(PARTNER_IMAGE_MAX_SIZE)
         ), upload_to=UploadToPathAndRename(path='images', name_prefix='main_bg_image', add_path_prefix=True)
     )
-    heading1 = models.CharField(blank=True, max_length=100, help_text="Heading 1")
-    heading1_description = models.TextField(blank=True)
-    heading2 = models.CharField(blank=True, max_length=100, help_text="Heading 2")
-    heading2_description = models.TextField(blank=True)
+    heading1 = models.CharField(blank=True, max_length=100)
+    heading1_description = models.TextField(blank=True, max_length=500, help_text=_("max 500 characters"))
+    heading2 = models.CharField(blank=True, max_length=100)
+    heading2_description = models.TextField(blank=True, max_length=500, help_text=_("max 500 characters"))
     testimonials1 = JSONField(blank=True, default=dumps({"description": "", "qoute_by": "", "address": ""}))
     testimonials2 = JSONField(blank=True, default=dumps({"description": "", "qoute_by": "", "address": ""}))
-    partnership_year = models.PositiveIntegerField(blank=True, default=datetime.now(UTC).year)
+    partnership_year = models.PositiveIntegerField(blank=True, null=True, default=datetime.now(UTC).year)
 
     def __unicode__(self):
         return '{}'.format(self.label)
