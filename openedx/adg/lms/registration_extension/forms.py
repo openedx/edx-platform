@@ -1,10 +1,11 @@
 """
 Forms for custom registration form app.
 """
-from django.forms import ModelForm
+from django.forms import ModelChoiceField, ModelForm
 from django.utils.translation import ugettext as _
 
 from edxmako.shortcuts import marketing_link
+from openedx.adg.lms.applications.models import BusinessLine
 from openedx.adg.lms.registration_extension.constants import CITIES
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
 from openedx.core.djangoapps.user_api import accounts
@@ -139,6 +140,12 @@ class ExtendedProfileForm(ModelForm):
     """
     Form for adg extended user profile.
     """
+    company = ModelChoiceField(
+        queryset=BusinessLine.objects.all(),
+        to_field_name='title',
+        empty_label='Select company',
+        required=False
+    )
 
     class Meta(object):
         model = ExtendedUserProfile
