@@ -11,7 +11,7 @@ from django.conf import settings
 from django.urls import reverse
 from mock import patch
 from opaque_keys.edx.locator import CourseKey, LibraryLocator
-from six import binary_type, text_type
+from six import text_type
 from six.moves import range
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, parse_json
@@ -125,7 +125,7 @@ class UnitTestLibraries(CourseTestCase):
         """
         # Create some more libraries
         libraries = [LibraryFactory.create() for _ in range(3)]
-        lib_dict = dict([(lib.location.library_key, lib) for lib in libraries])
+        lib_dict = {lib.location.library_key: lib for lib in libraries}
 
         response = self.client.get_json(LIBRARY_REST_URL)
         self.assertEqual(response.status_code, 200)
@@ -308,7 +308,11 @@ class UnitTestLibraries(CourseTestCase):
         lib.save()
 
         problem_type_templates = next(
-            (component['templates'] for component in get_component_templates(lib, library=True) if component['type'] == 'problem'),
+            (
+                component['templates']
+                for component in get_component_templates(lib, library=True)
+                if component['type'] == 'problem'
+            ),
             []
         )
         # Each problem template has a category which shows whether problem is a 'problem'
