@@ -158,10 +158,11 @@ class LibraryRootView(APIView):
         # definitions elsewhere.
         data['library_type'] = data.pop('type')
         data['library_license'] = data.pop('license')
+        key_data = data.pop("key")
         # Move "slug" out of the "key.slug" pseudo-field that the serializer added:
-        data["slug"] = data.pop("key")["slug"]
+        data["slug"] = key_data["slug"]
         # Get the organization short_name out of the "key.org" pseudo-field that the serializer added:
-        org_name = data["key"]["org"]
+        org_name = key_data["org"]
         try:
             ensure_organization(org_name)
         except InvalidOrganizationException:
