@@ -22,7 +22,7 @@ from django.utils.translation import ugettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from edx_toggles.toggles import WaffleSwitch
+from edx_toggles.toggles import LegacyWaffleSwitch
 from openedx.core.lib.courses import clean_course_id
 from common.djangoapps.student import STUDENT_WAFFLE_NAMESPACE
 from common.djangoapps.student.models import (
@@ -53,7 +53,7 @@ User = get_user_model()  # pylint:disable=invalid-name
 # This switch exists because the CourseEnrollment admin views make DB queries that impact performance.
 # In a large enough deployment of Open edX, this is enough to cause a site outage.
 # See https://openedx.atlassian.net/browse/OPS-2943
-COURSE_ENROLLMENT_ADMIN_SWITCH = WaffleSwitch(STUDENT_WAFFLE_NAMESPACE, 'courseenrollment_admin', __name__)
+COURSE_ENROLLMENT_ADMIN_SWITCH = LegacyWaffleSwitch(STUDENT_WAFFLE_NAMESPACE, 'courseenrollment_admin', __name__)
 
 
 class _Check(object):

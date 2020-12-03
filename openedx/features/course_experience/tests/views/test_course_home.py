@@ -951,9 +951,9 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
-        name = SHOW_UPGRADE_MSG_ON_COURSE_HOME.waffle_namespace._namespaced_name(
-            SHOW_UPGRADE_MSG_ON_COURSE_HOME.flag_name)
-        self.flag, __ = Flag.objects.update_or_create(name=name, defaults={'everyone': True})
+        self.flag, __ = Flag.objects.update_or_create(
+            name=SHOW_UPGRADE_MSG_ON_COURSE_HOME.name, defaults={'everyone': True}
+        )
 
     def assert_upgrade_message_not_displayed(self):
         response = self.client.get(self.url)

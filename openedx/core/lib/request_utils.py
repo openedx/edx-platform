@@ -12,14 +12,14 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from six.moves.urllib.parse import urlparse
 
-from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
+from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 # accommodates course api urls, excluding any course api routes that do not fall under v*/courses, such as v1/blocks.
 COURSE_REGEX = re.compile(r'^(.*?/courses/)(?!v[0-9]+/[^/]+){}'.format(settings.COURSE_ID_PATTERN))
 
-WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='request_utils')
-CAPTURE_COOKIE_SIZES = WaffleFlag(WAFFLE_FLAG_NAMESPACE, 'capture_cookie_sizes', __name__)
+WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='request_utils')
+CAPTURE_COOKIE_SIZES = LegacyWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'capture_cookie_sizes', __name__)
 log = logging.getLogger(__name__)
 
 

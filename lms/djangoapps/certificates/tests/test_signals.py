@@ -7,7 +7,7 @@ and disabling for instructor-paced courses.
 import ddt
 import mock
 import six
-from edx_toggles.toggles import WaffleSwitch
+from edx_toggles.toggles import LegacyWaffleSwitch
 from edx_toggles.toggles.testutils import override_waffle_switch
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -26,7 +26,7 @@ from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.models import IDVerificationAttempt, SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.certificates.config import waffle
 
-AUTO_CERTIFICATE_GENERATION_SWITCH = WaffleSwitch(waffle.waffle(), waffle.AUTO_CERTIFICATE_GENERATION)
+AUTO_CERTIFICATE_GENERATION_SWITCH = LegacyWaffleSwitch(waffle.waffle(), waffle.AUTO_CERTIFICATE_GENERATION)
 
 
 class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):

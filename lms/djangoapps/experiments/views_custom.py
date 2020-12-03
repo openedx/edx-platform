@@ -16,7 +16,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.djangoapps.course_modes.models import get_cosmetic_verified_display_price
-from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
+from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.utils import can_show_verified_upgrade
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
@@ -37,8 +37,8 @@ from common.djangoapps.track import segment
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: REV-934
 # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
-MOBILE_UPSELL_FLAG = WaffleFlag(
-    waffle_namespace=WaffleFlagNamespace(name=u'experiments'),
+MOBILE_UPSELL_FLAG = LegacyWaffleFlag(
+    waffle_namespace=LegacyWaffleFlagNamespace(name=u'experiments'),
     flag_name=u'mobile_upsell_rev934',
     module_name=__name__,
 )
