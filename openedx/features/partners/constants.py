@@ -51,3 +51,4 @@ PERFORMANCE_PERM_FRMT = 'can_access_{slug}_performance'
 
 PARTNER_USER_STATUS_WAITING = 'waiting'
 PARTNER_USER_STATUS_APPROVED = 'approved'
+PARTNER_IMAGE_MAX_SIZE = 2 * 1024 * 1024  # 2 MB
