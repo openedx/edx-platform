@@ -23,7 +23,7 @@ from openedx.core.djangoapps.schedules.models import ScheduleExperience
 from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 from openedx.core.djangoapps.theming.helpers import get_current_site
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.signals import ENROLLMENT_TRACK_UPDATED
+from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED
 from common.djangoapps.track import segment
 
 from .config import CREATE_SCHEDULE_WAFFLE_FLAG
@@ -59,6 +59,24 @@ def create_schedule(sender, **kwargs):  # pylint: disable=unused-argument
             enrollment.user.id if (enrollment and enrollment.user) else None,
             enrollment.course_id if enrollment else None
         ))
+
+
+@receiver(ENROLL_STATUS_CHANGE)
+def update_schedule(sender, event, user, course_id, **kwargs):  # pylint: disable=unused-argument
+    """
+    When a CourseEnrollment's status is updated, update the Schedule's active status if configured.
+    """
+    try:
+        schedule = Schedule.objects.get(enrollment__user=user, enrollment__course=course_id)
+    except Schedule.DoesNotExist:
+        # Exit since it could just be an indication of Schedules are not enabled.
+        return
+
+    if event == 'enroll':
+        schedule.active = True
+    elif event == 'unenroll':
+        schedule.active = False
+    schedule.save()
 
 
 @receiver(COURSE_START_DATE_CHANGED)
