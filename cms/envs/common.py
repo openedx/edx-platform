@@ -2308,6 +2308,7 @@ VERIFY_STUDENT = {
 #   the orgs referenced in Studio content, then leave it enabled.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2020-11-02
+# .. toggle_tickets: https://github.com/edx/edx-platform/pull/25153
 ORGANIZATIONS_AUTOCREATE = True
 
 ################# Settings for brand logos. #################
