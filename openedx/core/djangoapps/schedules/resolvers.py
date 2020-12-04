@@ -471,6 +471,7 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
         schedules = Schedule.objects.select_related('enrollment').filter(
             self.experience_filter,
             active=True,
+            enrollment__is_active=True,
             enrollment__course_id=self.course_id,
             enrollment__user__is_active=True,
             start_date__gte=target_date - course_duration,
