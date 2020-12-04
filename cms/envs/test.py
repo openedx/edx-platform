@@ -298,3 +298,7 @@ SYSTEM_WIDE_ROLE_CLASSES = os.environ.get("SYSTEM_WIDE_ROLE_CLASSES", [])
 DEFAULT_MOBILE_AVAILABLE = True
 
 PROCTORING_SETTINGS = {}
+
+
+###################### PakX Features ######################
+INSTALLED_APPS.append('openedx.features.pakx_features')
