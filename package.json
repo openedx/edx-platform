@@ -5,7 +5,7 @@
     "@edx/brand-edx.org": "^1.2.5",
     "@edx/edx-bootstrap": "1.0.4",
     "@edx/edx-proctoring": "^1.5.0",
-    "@edx/frontend-component-cookie-policy-banner": "1.0.0",
+    "@edx/frontend-component-cookie-policy-banner": "1.0.6",
     "@edx/paragon": "2.6.4",
     "@edx/studio-frontend": "^1.16.22",
     "axios": "^0.18.1",
