@@ -1,22 +1,25 @@
-from json import dumps
+"""
+Partners models
+"""
 from datetime import datetime
+from json import dumps
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.db import models
 from django.core.validators import FileExtensionValidator
+from django.db import models
 from django.utils.text import format_lazy
 from django.utils.translation import ugettext_lazy as _
-
-from pytz import UTC
 from jsonfield.fields import JSONField
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
+from pytz import UTC
+
 from openedx.features.philu_utils.backend_storage import CustomS3Storage
 from openedx.features.philu_utils.utils import bytes_to_mb
 from util.philu_utils import UploadToPathAndRename
 
-from .constants import PARTNER_USER_STATUS_APPROVED, PARTNER_USER_STATUS_WAITING, PARTNER_IMAGE_MAX_SIZE
+from .constants import PARTNER_IMAGE_MAX_SIZE, PARTNER_USER_STATUS_APPROVED, PARTNER_USER_STATUS_WAITING
 
 
 class Partner(TimeStampedModel):
