@@ -17,6 +17,8 @@ from django.views.decorators.http import require_http_methods
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator
+from organizations.api import ensure_organization
+from organizations.exceptions import InvalidOrganizationException
 from six import text_type
 
 from cms.djangoapps.course_creators.views import get_course_creator_status
@@ -183,6 +185,7 @@ def _create_library(request):
     try:
         display_name = request.json['display_name']
         org = request.json['org']
+        ensure_organization(org)
         library = request.json.get('number', None)
         if library is None:
             library = request.json['library']
@@ -214,6 +217,13 @@ def _create_library(request):
                 'organization and library code. Please '
                 'change your library code so that it is unique within your organization.'
             )
+        })
+    except InvalidOrganizationException:
+        log.exception("Unable to create library - %s is not a valid org short_name.", org)
+        return JsonResponseBadRequest({
+            'ErrMsg': _(
+                "'{organization_key}' is not a valid organization identifier."
+            ).format(organization_key=org)
         })
 
     lib_key_str = text_type(new_lib.location.library_key)
