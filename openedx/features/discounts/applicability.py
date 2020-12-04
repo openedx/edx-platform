@@ -16,7 +16,7 @@ import pytz
 from crum import get_current_request, impersonate
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
+from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.entitlements.models import CourseEntitlement
@@ -35,8 +35,8 @@ from common.djangoapps.track import segment
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: REVEM-282
 # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
-DISCOUNT_APPLICABILITY_FLAG = LegacyWaffleFlag(
-    waffle_namespace=LegacyWaffleFlagNamespace(name=u'discounts'),
+DISCOUNT_APPLICABILITY_FLAG = WaffleFlag(
+    waffle_namespace=WaffleFlagNamespace(name=u'discounts'),
     flag_name=u'enable_discounting',
     module_name=__name__,
 )

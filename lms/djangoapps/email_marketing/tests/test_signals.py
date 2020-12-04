@@ -625,7 +625,7 @@ class SailthruTests(TestCase):
     @patch('sailthru.sailthru_client.SailthruClient.purchase')
     @patch('sailthru.sailthru_client.SailthruClient.api_get')
     @patch('sailthru.sailthru_client.SailthruClient.api_post')
-    @patch('edx_toggles.toggles.LegacyWaffleSwitchNamespace.is_enabled')
+    @patch('edx_toggles.toggles.WaffleSwitchNamespace.is_enabled')
     def test_update_course_enrollment_whitelabel(
             self,
             switch,
@@ -650,7 +650,7 @@ class SailthruTests(TestCase):
         update_sailthru(None, self.user, 'verified', self.course_id)
         self.assertFalse(mock_sailthru_purchase.called)
 
-    @patch('edx_toggles.toggles.LegacyWaffleSwitchNamespace.is_enabled')
+    @patch('edx_toggles.toggles.WaffleSwitchNamespace.is_enabled')
     @patch('sailthru.sailthru_client.SailthruClient.purchase')
     def test_purchase_is_not_invoked(self, mock_sailthru_purchase, switch):
         """Make sure purchase is not called in the following condition:
@@ -660,7 +660,7 @@ class SailthruTests(TestCase):
         update_sailthru(None, self.user, 'verified', self.course_id)
         self.assertFalse(mock_sailthru_purchase.called)
 
-    @patch('edx_toggles.toggles.LegacyWaffleSwitchNamespace.is_enabled')
+    @patch('edx_toggles.toggles.WaffleSwitchNamespace.is_enabled')
     @patch('sailthru.sailthru_client.SailthruClient.purchase')
     def test_encoding_is_working_for_email_contains_unicode(self, mock_sailthru_purchase, switch):
         """Make sure encoding is working for emails contains unicode characters

@@ -18,7 +18,7 @@ from mock import patch
 from organizations import api as organizations_api
 
 from common.djangoapps.course_modes.models import CourseMode
-from edx_toggles.toggles import LegacyWaffleSwitch
+from edx_toggles.toggles import WaffleSwitch
 from edx_toggles.toggles.testutils import override_waffle_switch
 from lms.djangoapps.badges.events.course_complete import get_completion_badge
 from lms.djangoapps.badges.tests.factories import (
@@ -58,7 +58,7 @@ from common.djangoapps.util.date_utils import strftime_localized
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-AUTO_CERTIFICATE_GENERATION_SWITCH = LegacyWaffleSwitch(waffle.waffle(), waffle.AUTO_CERTIFICATE_GENERATION)
+AUTO_CERTIFICATE_GENERATION_SWITCH = WaffleSwitch(waffle.waffle(), waffle.AUTO_CERTIFICATE_GENERATION)
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 FEATURES_WITH_BADGES_ENABLED = FEATURES_WITH_CERTS_ENABLED.copy()

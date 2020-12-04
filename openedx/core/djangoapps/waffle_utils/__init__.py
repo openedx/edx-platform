@@ -7,18 +7,16 @@ import warnings
 from contextlib import contextmanager
 
 from edx_django_utils.monitoring import set_custom_attribute
-from edx_toggles.toggles import (
-    LegacyWaffleFlag,
-    LegacyWaffleFlagNamespace,
-    LegacyWaffleSwitch,
-    LegacyWaffleSwitchNamespace,
-)
+from edx_toggles.toggles import WaffleFlag as BaseWaffleFlag
+from edx_toggles.toggles import WaffleFlagNamespace as BaseWaffleFlagNamespace
+from edx_toggles.toggles import WaffleSwitch as BaseWaffleSwitch
+from edx_toggles.toggles import WaffleSwitchNamespace as BaseWaffleSwitchNamespace
 from opaque_keys.edx.keys import CourseKey
 
 log = logging.getLogger(__name__)
 
 
-class WaffleSwitchNamespace(LegacyWaffleSwitchNamespace):
+class WaffleSwitchNamespace(BaseWaffleSwitchNamespace):
     """
     Deprecated class: instead, use edx_toggles.toggles.WaffleSwitchNamespace.
     """
@@ -33,9 +31,7 @@ class WaffleSwitchNamespace(LegacyWaffleSwitchNamespace):
             DeprecationWarning,
             stacklevel=2,
         )
-        set_custom_attribute(
-            "deprecated_waffle_utils", "WaffleSwitchNamespace[{}]".format(name)
-        )
+        set_custom_attribute("deprecated_waffle_utils", "WaffleSwitchNamespace[{}]".format(name))
 
     @contextmanager
     def override(self, switch_name, active=True):
@@ -56,12 +52,12 @@ class WaffleSwitchNamespace(LegacyWaffleSwitchNamespace):
         from edx_toggles.toggles.testutils import override_waffle_switch
 
         with override_waffle_switch(
-            LegacyWaffleSwitch(self, switch_name, module_name=__name__), active
+            BaseWaffleSwitch(self, switch_name, module_name=__name__), active
         ):
             yield
 
 
-class WaffleSwitch(LegacyWaffleSwitch):
+class WaffleSwitch(BaseWaffleSwitch):
     """
     Deprecated class: instead, use edx_toggles.toggles.WaffleSwitch.
     """
@@ -73,12 +69,10 @@ class WaffleSwitch(LegacyWaffleSwitch):
             DeprecationWarning,
             stacklevel=2,
         )
-        set_custom_attribute(
-            "deprecated_waffle_utils", "WaffleSwitch[{}]".format(self.name)
-        )
+        set_custom_attribute("deprecated_waffle_utils", "WaffleSwitch[{}]".format(self.name))
 
 
-class WaffleFlagNamespace(LegacyWaffleFlagNamespace):
+class WaffleFlagNamespace(BaseWaffleFlagNamespace):
     """
     Deprecated class: instead, use edx_toggles.toggles.WaffleFlagNamespace.
     """
@@ -90,12 +84,10 @@ class WaffleFlagNamespace(LegacyWaffleFlagNamespace):
             DeprecationWarning,
             stacklevel=2,
         )
-        set_custom_attribute(
-            "deprecated_waffle_utils", "WaffleFlagNamespace[{}]".format(name)
-        )
+        set_custom_attribute("deprecated_waffle_utils", "WaffleFlagNamespace[{}]".format(name))
 
 
-class WaffleFlag(LegacyWaffleFlag):
+class WaffleFlag(BaseWaffleFlag):
     """
     Deprecated class: instead, use edx_toggles.toggles.WaffleFlag.
     """
@@ -107,9 +99,7 @@ class WaffleFlag(LegacyWaffleFlag):
             DeprecationWarning,
             stacklevel=2,
         )
-        set_custom_attribute(
-            "deprecated_waffle_utils", "WaffleFlag[{}]".format(self.name)
-        )
+        set_custom_attribute("deprecated_waffle_utils", "WaffleFlag[{}]".format(self.name))
 
     @contextmanager
     def override(self, active=True):
@@ -131,7 +121,7 @@ class WaffleFlag(LegacyWaffleFlag):
             yield
 
 
-class CourseWaffleFlag(LegacyWaffleFlag):
+class CourseWaffleFlag(BaseWaffleFlag):
     """
     Represents a single waffle flag that can be forced on/off for a course. This class should be used instead of
     WaffleFlag when in the context of a course.
@@ -165,13 +155,15 @@ class CourseWaffleFlag(LegacyWaffleFlag):
         from .models import WaffleFlagCourseOverrideModel
 
         cache_key = "{}.{}".format(self.namespaced_flag_name, str(course_key))
-        course_override = self.cached_flags().get(cache_key)
+        # pylint: disable=protected-access
+        course_override = self.waffle_namespace._cached_flags.get(cache_key)
 
         if course_override is None:
             course_override = WaffleFlagCourseOverrideModel.override_value(
                 self.namespaced_flag_name, course_key
             )
-            self.cached_flags()[cache_key] = course_override
+            # pylint: disable=protected-access
+            self.waffle_namespace._cached_flags[cache_key] = course_override
 
         if course_override == WaffleFlagCourseOverrideModel.ALL_CHOICES.on:
             return True
@@ -196,6 +188,9 @@ class CourseWaffleFlag(LegacyWaffleFlag):
             )
         is_enabled_for_course = self._get_course_override_value(course_key)
         if is_enabled_for_course is not None:
-            self.set_monitor_value(is_enabled_for_course)
+            # pylint: disable=protected-access
+            self.waffle_namespace._monitor_value(
+                self.flag_name, is_enabled_for_course
+            )
             return is_enabled_for_course
         return super().is_enabled()

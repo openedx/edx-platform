@@ -21,7 +21,7 @@ from django.utils.translation import get_language
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
-from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
+from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
 from pytz import UTC
 from ratelimit.decorators import ratelimit
 from requests import HTTPError
@@ -104,8 +104,8 @@ REGISTER_USER = Signal(providing_args=["user", "registration"])
 # .. toggle_target_removal_date: 2020-06-01
 # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
 # .. toggle_tickets: None
-REGISTRATION_FAILURE_LOGGING_FLAG = LegacyWaffleFlag(
-    waffle_namespace=LegacyWaffleFlagNamespace(name=u'registration'),
+REGISTRATION_FAILURE_LOGGING_FLAG = WaffleFlag(
+    waffle_namespace=WaffleFlagNamespace(name=u'registration'),
     flag_name=u'enable_failure_logging',
     module_name=__name__,
 )

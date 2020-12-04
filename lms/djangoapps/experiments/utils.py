@@ -12,7 +12,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import format_course_price, get_cosmetic_verified_display_price, CourseMode
-from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
+from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
 from common.djangoapps.entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_staff_access_to_preview_mode
@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 # TODO: clean up as part of REVEM-199 (START)
-experiments_namespace = LegacyWaffleFlagNamespace(name=u'experiments')
+experiments_namespace = WaffleFlagNamespace(name=u'experiments')
 
 # .. toggle_name: experiments.add_programs
 # .. toggle_implementation: WaffleFlag
@@ -42,7 +42,7 @@ experiments_namespace = LegacyWaffleFlagNamespace(name=u'experiments')
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: REVEM-63, REVEM-198
 # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
-PROGRAM_INFO_FLAG = LegacyWaffleFlag(
+PROGRAM_INFO_FLAG = WaffleFlag(
     waffle_namespace=experiments_namespace,
     flag_name=u'add_programs',
     module_name=__name__,
@@ -57,7 +57,7 @@ PROGRAM_INFO_FLAG = LegacyWaffleFlag(
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: REVEM-118
 # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
-DASHBOARD_INFO_FLAG = LegacyWaffleFlag(experiments_namespace, u'add_dashboard_info', __name__)
+DASHBOARD_INFO_FLAG = WaffleFlag(experiments_namespace, u'add_dashboard_info', __name__)
 # TODO END: clean up as part of REVEM-199 (End)
 
 # TODO: Clean up as part of REV-1205 (START)
@@ -70,7 +70,7 @@ DASHBOARD_INFO_FLAG = LegacyWaffleFlag(experiments_namespace, u'add_dashboard_in
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: REV-1205
 # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
-UPSELL_TRACKING_FLAG = LegacyWaffleFlag(
+UPSELL_TRACKING_FLAG = WaffleFlag(
     waffle_namespace=experiments_namespace,
     flag_name=u'add_upsell_tracking',
     module_name=__name__,

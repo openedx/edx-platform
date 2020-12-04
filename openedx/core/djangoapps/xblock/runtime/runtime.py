@@ -5,7 +5,7 @@ Common base classes for all new XBlock runtimes.
 import logging
 
 import crum
-from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
+from completion import waffle as completion_waffle
 from completion.models import BlockCompletion
 from completion.services import CompletionService
 from django.contrib.auth import get_user_model
@@ -183,7 +183,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
         """
         Submit a completion object for the block.
         """
-        if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():
+        if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
             return
         BlockCompletion.objects.submit_completion(
             user=self.user,

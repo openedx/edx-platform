@@ -3,7 +3,7 @@ Miscellaneous waffle switches that both LMS and Studio need to access
 """
 
 
-from edx_toggles.toggles import LegacyWaffleSwitchNamespace
+from edx_toggles.toggles import WaffleSwitchNamespace
 
 # Namespace
 WAFFLE_NAMESPACE = u'course_experience'
@@ -25,4 +25,4 @@ def waffle():
     """
     Returns the namespaced, cached, audited shared Waffle Switch class.
     """
-    return LegacyWaffleSwitchNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'Course Experience: ')
+    return WaffleSwitchNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'Course Experience: ')

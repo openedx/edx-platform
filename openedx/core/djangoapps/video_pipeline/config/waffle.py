@@ -3,7 +3,7 @@ This module contains configuration settings via waffle flags
 for the Video Pipeline app.
 """
 
-from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
+from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 # Videos Namespace
@@ -40,14 +40,14 @@ def waffle_flags():
     """
     Returns the namespaced, cached, audited Waffle flags dictionary for Videos.
     """
-    namespace = LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'Videos: ')
+    namespace = WaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'Videos: ')
     return {
         DEPRECATE_YOUTUBE: CourseWaffleFlag(
             waffle_namespace=namespace,
             flag_name=DEPRECATE_YOUTUBE,
             module_name=__name__,
         ),
-        ENABLE_DEVSTACK_VIDEO_UPLOADS: LegacyWaffleFlag(
+        ENABLE_DEVSTACK_VIDEO_UPLOADS: WaffleFlag(
             waffle_namespace=namespace,
             flag_name=ENABLE_DEVSTACK_VIDEO_UPLOADS,
             module_name=__name__,

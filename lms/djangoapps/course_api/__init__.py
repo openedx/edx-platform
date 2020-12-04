@@ -1,9 +1,9 @@
 """ Course API """
 
 
-from edx_toggles.toggles import LegacyWaffleSwitch, LegacyWaffleSwitchNamespace
+from edx_toggles.toggles import WaffleSwitch, WaffleSwitchNamespace
 
-WAFFLE_SWITCH_NAMESPACE = LegacyWaffleSwitchNamespace(name='course_list_api_rate_limit')
+WAFFLE_SWITCH_NAMESPACE = WaffleSwitchNamespace(name='course_list_api_rate_limit')
 
 # .. toggle_name: course_list_api_rate_limit.rate_limit_2
 # .. toggle_implementation: WaffleSwitch
@@ -15,7 +15,7 @@ WAFFLE_SWITCH_NAMESPACE = LegacyWaffleSwitchNamespace(name='course_list_api_rate
 # .. toggle_target_removal_date: None
 # .. toggle_warnings: None
 # .. toggle_tickets: https://openedx.atlassian.net/browse/LEARNER-5527
-USE_RATE_LIMIT_2_FOR_COURSE_LIST_API = LegacyWaffleSwitch(WAFFLE_SWITCH_NAMESPACE, 'rate_limit_2', __name__)
+USE_RATE_LIMIT_2_FOR_COURSE_LIST_API = WaffleSwitch(WAFFLE_SWITCH_NAMESPACE, 'rate_limit_2', __name__)
 # .. toggle_name: course_list_api_rate_limit.rate_limit_10
 # .. toggle_implementation: WaffleSwitch
 # .. toggle_default: False
@@ -26,4 +26,4 @@ USE_RATE_LIMIT_2_FOR_COURSE_LIST_API = LegacyWaffleSwitch(WAFFLE_SWITCH_NAMESPAC
 # .. toggle_target_removal_date: None
 # .. toggle_warnings: None
 # .. toggle_tickets: https://openedx.atlassian.net/browse/LEARNER-5527
-USE_RATE_LIMIT_10_FOR_COURSE_LIST_API = LegacyWaffleSwitch(WAFFLE_SWITCH_NAMESPACE, 'rate_limit_10', __name__)
+USE_RATE_LIMIT_10_FOR_COURSE_LIST_API = WaffleSwitch(WAFFLE_SWITCH_NAMESPACE, 'rate_limit_10', __name__)

@@ -4,6 +4,7 @@ Feature flag support for experiments
 
 import datetime
 import logging
+from contextlib import contextmanager
 
 import dateutil
 import pytz
@@ -61,7 +62,6 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         def test_my_experiment(self):
             ...
     """
-
     def __init__(
             self,
             waffle_namespace,
@@ -80,33 +80,6 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
             for bucket in range(num_buckets)
         ]
         self.use_course_aware_bucketing = use_course_aware_bucketing
-
-    @property
-    def _app_label(self):
-        """
-        By convention, the app label associated to an experiment waffle flag is the dotted prefix of the flag name. For
-        example: if the flag name is "grades.my.experiment.waffle.flag", then the `_app_label` will be "grades".
-        This app label replaces what was formerly known as the waffle flag namespace.
-        """
-        return self._split_name[0]
-
-    @property
-    def _experiment_name(self):
-        """
-        By convention, the app label associated to an experiment waffle flag is the first dotted suffix of the flag
-        name. For example: if the flag name name is "grades.my.experiment.waffle.flag", then the `_experiment_name`
-        will be "my.experiment.waffle.flag".
-        """
-        return self._split_name[1]
-
-    @property
-    def _split_name(self):
-        """
-        Return the flag name prefix (before the first dot) and suffix. This raises a ValueError if the flag does not
-        contain a dot ".".
-        """
-        prefix, suffix = self.name.split(".", maxsplit=1)
-        return prefix, suffix
 
     def _cache_bucket(self, key, value):
         request_cache = RequestCache('experiments')
@@ -205,7 +178,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         # If we are using course-aware bucketing, then also append that course key
         # to `bucketing_group_name`, such that users can be hashed into different
         # buckets for different course-runs.
-        experiment_name = bucketing_group_name = self.name
+        experiment_name = bucketing_group_name = self.namespaced_flag_name
         if course_key:
             experiment_name += ".{}".format(course_key)
         if course_key and self.use_course_aware_bucketing:
@@ -252,8 +225,8 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
                 event_name='edx.bi.experiment.user.bucketed',
                 properties={
                     'site': request.site.domain,
-                    'app_label': self._app_label,
-                    'experiment': self._experiment_name,
+                    'app_label': self.waffle_namespace.name,
+                    'experiment': self.flag_name,
                     'course_id': str(course_key) if course_key else None,
                     'bucket': bucket,
                     'is_staff': user.is_staff,

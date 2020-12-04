@@ -16,7 +16,7 @@ from six import text_type
 
 from common.djangoapps import third_party_auth
 from common.djangoapps.course_modes.models import CourseMode
-from edx_toggles.toggles import LegacyWaffleSwitchNamespace
+from edx_toggles.toggles import WaffleSwitchNamespace
 from lms.djangoapps.email_marketing.tasks import (
     get_email_cookies_via_sailthru,
     update_course_enrollment,
@@ -40,7 +40,7 @@ CHANGED_FIELDNAMES = ['username', 'is_active', 'name', 'gender', 'education',
                       'country', LANGUAGE_KEY]
 
 WAFFLE_NAMESPACE = 'sailthru'
-WAFFLE_SWITCHES = LegacyWaffleSwitchNamespace(name=WAFFLE_NAMESPACE)
+WAFFLE_SWITCHES = WaffleSwitchNamespace(name=WAFFLE_NAMESPACE)
 
 SAILTHRU_AUDIT_PURCHASE_ENABLED = 'audit_purchase_enabled'
 
