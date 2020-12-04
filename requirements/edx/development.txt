@@ -67,11 +67,11 @@ django-countries==5.5     # via -c requirements/edx/../constraints.txt, -r requi
 django-crum==0.7.9        # via -r requirements/edx/testing.txt, edx-django-utils, edx-enterprise, edx-proctoring, edx-rbac, edx-toggles, super-csv
 django-debug-toolbar==3.2  # via -r requirements/edx/development.in
 django-fernet-fields==0.6  # via -r requirements/edx/testing.txt, edx-enterprise, edxval
-django-filter==2.4.0      # via -r requirements/edx/testing.txt, edx-enterprise, lti-consumer-xblock
+django-filter==2.4.0      # via -r requirements/edx/testing.txt, edx-enterprise
 django-ipware==2.1.0      # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, edx-enterprise, edx-proctoring
 django-js-asset==1.2.2    # via -r requirements/edx/testing.txt, django-mptt
 django-method-override==1.0.4  # via -r requirements/edx/testing.txt
-django-model-utils==4.1.1  # via -r requirements/edx/testing.txt, django-user-tasks, edx-bulk-grades, edx-celeryutils, edx-completion, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-rbac, edx-submissions, edx-when, edxval, ora2, super-csv
+django-model-utils==4.1.0  # via -r requirements/edx/testing.txt, django-user-tasks, edx-bulk-grades, edx-celeryutils, edx-completion, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-rbac, edx-submissions, edx-when, edxval, ora2, super-csv
 django-mptt==0.11.0       # via -r requirements/edx/testing.txt, django-wiki
 django-multi-email-field==0.6.2  # via -r requirements/edx/testing.txt, edx-enterprise
 django-mysql==3.9.0       # via -r requirements/edx/testing.txt
@@ -122,7 +122,7 @@ edx-rest-api-client==5.2.1  # via -r requirements/edx/testing.txt, edx-enterpris
 edx-search==2.0.1         # via -r requirements/edx/testing.txt
 edx-sga==0.13.0           # via -r requirements/edx/testing.txt
 edx-sphinx-theme==1.5.0   # via -r requirements/edx/development.in
-edx-submissions==3.2.3    # via -r requirements/edx/testing.txt, ora2
+edx-submissions==3.2.2    # via -r requirements/edx/testing.txt, ora2
 edx-tincan-py35==0.0.9    # via -r requirements/edx/testing.txt, edx-enterprise
 edx-toggles==1.2.0        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, edx-completion, ora2
 edx-user-state-client==1.2.0  # via -r requirements/edx/testing.txt
@@ -172,7 +172,7 @@ lazy-object-proxy==1.4.3  # via -r requirements/edx/testing.txt, astroid
 lazy==1.4                 # via -r requirements/edx/testing.txt, acid-xblock, bok-choy, lti-consumer-xblock, ora2
 libsass==0.10.0           # via -r requirements/edx/testing.txt, ora2
 loremipsum==1.0.5         # via -r requirements/edx/testing.txt, ora2
-lti-consumer-xblock==2.4.0  # via -r requirements/edx/testing.txt
+lti-consumer-xblock==2.3  # via -r requirements/edx/testing.txt
 lxml==4.5.0               # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, capa, edxval, lti-consumer-xblock, ora2, pyquery, safe-lxml, xblock, xmlsec
 m2r==0.2.1                # via sphinxcontrib-openapi
 mailsnake==1.6.4          # via -r requirements/edx/testing.txt
@@ -195,7 +195,7 @@ nodeenv==1.5.0            # via -r requirements/edx/testing.txt
 numpy==1.18.5             # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, chem, openedx-calc, scipy
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
 openedx-calc==1.0.9       # via -r requirements/edx/testing.txt
-ora2==2.13.3              # via -r requirements/edx/testing.txt
+ora2==2.12.1              # via -r requirements/edx/testing.txt
 packaging==20.7           # via -r requirements/edx/testing.txt, bleach, drf-yasg, pytest, sphinx, tox
 path.py==12.5.0           # via -r requirements/edx/testing.txt, edx-enterprise, edx-i18n-tools, ora2, staff-graded-xblock, xmodule
 path==13.1.0              # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, path.py
