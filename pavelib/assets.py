@@ -536,7 +536,7 @@ def _compile_sass(system, theme, debug, force, timing_info):
 
         if not sass_source_dir.isdir():
             print("\033[91m Sass dir '{dir}' does not exists, skipping sass compilation for '{theme}' \033[00m".format(
-                dir=sass_dirs, theme=theme or system,
+                dir=sass_source_dir, theme=theme or system,
             ))
             # theme doesn't override sass directory, so skip it
             continue
