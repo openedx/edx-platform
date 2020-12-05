@@ -211,18 +211,30 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
     """
     _bulk_ops_record_type = SplitBulkWriteRecord
 
+    def _get_resource_and_run(self, course_key):
+        """
+        Returns correct resource and run depending on type of locator.
+        """
+        if isinstance(course_key, CourseLocator):
+            return course_key.course, course_key.run
+
+        if isinstance(course_key, LibraryLocator):
+            return course_key.library, course_key.RUN
+
+        raise TypeError(u'{!r} is not a CourseLocator or LibraryLocator'.format(course_key))
+
     def _get_bulk_ops_record(self, course_key, ignore_case=False):
         """
-        Return the :class:`.SplitBulkWriteRecord` for this course.
+        Return the :class:`.SplitBulkWriteRecord` for this course or library.
         """
         # handle split specific things and defer to super otherwise
         if course_key is None:
             return self._bulk_ops_record_type()
 
-        if not isinstance(course_key, (CourseLocator, LibraryLocator)):
-            raise TypeError(u'{!r} is not a CourseLocator or LibraryLocator'.format(course_key))
+        resource, run = self._get_resource_and_run(course_key)
+
         # handle version_guid based retrieval locally
-        if course_key.org is None or course_key.course is None or course_key.run is None:
+        if course_key.org is None or resource is None or run is None:
             return self._active_bulk_ops.records[
                 course_key.replace(org=None, course=None, run=None, branch=None)
             ]
@@ -234,12 +246,11 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
 
     def _clear_bulk_ops_record(self, course_key):
         """
-        Clear the record for this course
+        Clear the record for this course or library
         """
-        if not isinstance(course_key, (CourseLocator, LibraryLocator)):
-            raise TypeError('{!r} is not a CourseLocator or LibraryLocator'.format(course_key))
+        resource, run = self._get_resource_and_run(course_key)
 
-        if course_key.org and course_key.course and course_key.run:
+        if course_key.org and resource and run:
             del self._active_bulk_ops.records[course_key.replace(branch=None, version_guid=None)]
         else:
             del self._active_bulk_ops.records[

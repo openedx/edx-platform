@@ -17,6 +17,7 @@ import six
 from six.moves import cPickle as pickle
 from contracts import check, new_contract
 from mongodb_proxy import autoretry_read
+from opaque_keys.edx.locator import LibraryLocator
 # Import this just to export it
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
 
@@ -429,16 +430,18 @@ class MongoConnection(object):
         """
         Get the course_index from the persistence mechanism whose id is the given key
         """
+        key_attributes = ('org', 'library', 'RUN') if isinstance(key, LibraryLocator) else ('org', 'course', 'run')
+
         with TIMER.timer("get_course_index", key):
             if ignore_case:
                 query = {
                     key_attr: re.compile(u'^{}$'.format(re.escape(getattr(key, key_attr))), re.IGNORECASE)
-                    for key_attr in ('org', 'course', 'run')
+                    for key_attr in key_attributes
                 }
             else:
                 query = {
                     key_attr: getattr(key, key_attr)
-                    for key_attr in ('org', 'course', 'run')
+                    for key_attr in key_attributes
                 }
             return self.course_index.find_one(query)
 
