@@ -2296,7 +2296,7 @@ class TestComponentTemplates(CourseTestCase):
         """
         self._verify_basic_component("discussion", "Discussion")
         self._verify_basic_component("video", "Video")
-        self._verify_basic_component("openassessment", "Blank Open Response Assessment")
+        self._verify_basic_component("openassessment", "Blank Open Response Assessment", True, 6)
         self._verify_basic_component_display_name("discussion", "Discussion")
         self._verify_basic_component_display_name("video", "Video")
         self._verify_basic_component_display_name("openassessment", "Open Response")
@@ -2485,12 +2485,12 @@ class TestComponentTemplates(CourseTestCase):
         template_support_levels = [template['support_level'] for template in templates[0]['templates']]
         self.assertEqual(template_support_levels, expected_support_levels)
 
-    def _verify_basic_component(self, component_type, display_name, support_level=True):
+    def _verify_basic_component(self, component_type, display_name, support_level=True, no_of_templates=1):
         """
         Verify the display name and support level of basic components (that have no boilerplates).
         """
         templates = self.get_templates_of_type(component_type)
-        self.assertEqual(1, len(templates))
+        self.assertEqual(no_of_templates, len(templates))
         self.assertEqual(display_name, templates[0]['display_name'])
         self.assertEqual(support_level, templates[0]['support_level'])
 
