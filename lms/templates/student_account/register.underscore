@@ -56,7 +56,7 @@
     <div class="form-field checkbox-optional_fields_toggle">
         <input type="checkbox" id="toggle_optional_fields" class="input-block checkbox"">
         <label for="toggle_optional_fields">
-            <span class="label-text">
+            <span class="label-text-small">
                 <%- gettext("Support education research by providing additional information") %>
             </span>
         </label>

@@ -320,6 +320,10 @@ ul.fa-ul{
       width: calc(50% - 10px);
     }
 
+    .label-text-small {
+      font-size: small;
+    }
+
     /** FROM _accounts.scss - start **/
     label,
     input,
@@ -434,7 +438,7 @@ ul.fa-ul{
         display: inline;
         width: auto;
         height: auto;
-        margin-right: ($baseline/4);
+        margin-right: 0px;
 
         & + label {
           display: inline;
