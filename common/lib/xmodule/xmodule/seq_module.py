@@ -769,7 +769,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 'allow_proctoring_opt_out': self.allow_proctoring_opt_out,
                 'due_date': self.due,
                 'grace_period': self.graceperiod,
-                'experimental_procotoring_features': COURSEWARE_PROCTORING_IMPROVEMENTS.is_enabled(course_id),
+                'experimental_proctoring_features': COURSEWARE_PROCTORING_IMPROVEMENTS.is_enabled(course_id),
             }
 
             # inject the user's credit requirements and fulfillments
