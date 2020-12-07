@@ -332,6 +332,10 @@ ul.fa-ul{
       font-style: normal;
       font-weight: 500;
 
+      &.honor_tos_combined {
+        font-size: small;
+      }
+
       &.focus-in {
         position: relative;
         padding-top: 0;
