@@ -7,6 +7,7 @@ import json
 
 from crum import get_current_request
 from django.conf import settings
+from django.core.cache import cache
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import TieredCache, get_cache_key
@@ -401,7 +402,15 @@ def is_enterprise_learner(user):
     Returns:
         (bool): True if given user is an enterprise learner.
     """
-    return EnterpriseCustomerUser.objects.filter(user_id=user.id).exists()
+    cached_is_enterprise_key = '{}:user_is_enterprise'.format(user.id)
+    if cache.get(cached_is_enterprise_key):
+        return True
+
+    if EnterpriseCustomerUser.objects.filter(user_id=user.id).exists():
+        # Cache the enterprise user for one hour.
+        cache.set(cached_is_enterprise_key, True, expiry=3600)
+        return True
+    return False
 
 
 def get_enterprise_slug_login_url():
