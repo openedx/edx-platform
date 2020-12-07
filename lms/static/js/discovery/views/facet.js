@@ -3,8 +3,9 @@
         'jquery',
         'underscore',
         'backbone',
-        'gettext'
-    ], function($, _, Backbone, gettext) {
+        'gettext',
+        'edx-ui-toolkit/js/utils/html-utils'
+    ], function($, _, Backbone, gettext, HtmlUtils) {
         'use strict';
 
         return Backbone.View.extend({
@@ -14,11 +15,14 @@
             className: '',
 
             initialize: function() {
-                this.tpl = _.template($(this.templateId).html());
+                this.tpl = HtmlUtils.template($(this.templateId).html());
             },
 
             render: function(type, name, term, count) {
-                this.$el.html(this.tpl({name: name, term: term, count: count}));
+                HtmlUtils.setHtml(
+                    this.$el,
+                    this.tpl({name: name, term: term, count: count})
+                );
                 this.$el.attr('data-facet', type);
                 return this;
             },
