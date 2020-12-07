@@ -69,13 +69,14 @@
   -webkit-flex-wrap: wrap;
   -moz-flex-wrap: wrap;
 
-  h2 {
+  h1 {
     @extend %t-title4;
 
     margin-top: $baseline;
     letter-spacing: normal;
     font-family: $font-family-sans-serif;
     color: $uxpl-blue-hover-active;
+    text-align: left;
   }
 
   h3 {

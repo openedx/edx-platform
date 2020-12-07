@@ -24,7 +24,7 @@
     </p>
     <p><%- gettext("To continue learning with this account, sign in below.") %></p>
 <% } else { %>
-    <h2><%- gettext("Sign In") %></h2>
+    <h1><%- gettext("Sign In") %></h1>
 <% } %>
 
 <form id="login" class="login-form" tabindex="-1" method="POST">
