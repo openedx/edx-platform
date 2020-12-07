@@ -1047,6 +1047,10 @@ DJFS = {
     'url_root': '/static/django-pyfs',
 }
 
+# Set certificate issued date format. It supports all formats supported by
+# `common.djangoapps.util.date_utils.strftime_localized`.
+CERTIFICATE_DATE_FORMAT = "%B %-d, %Y"
+
 ### Dark code. Should be enabled in local settings for devel.
 
 ENABLE_MULTICOURSE = False  # set to False to disable multicourse display (see lib.util.views.edXhome)
