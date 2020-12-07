@@ -30,9 +30,6 @@ class BaseInstructorTask(Task):
     """
     abstract = True
 
-    def __init__(self):
-        self.name = "lms.djangoapps.instructor_task.tasks_base.BaseInstructorTask"
-
     def on_success(self, task_progress, task_id, args, kwargs):
         """
         Update InstructorTask object corresponding to this task with info about success.
