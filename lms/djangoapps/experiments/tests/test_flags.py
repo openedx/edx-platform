@@ -156,6 +156,15 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
             self.assertEqual(self.flag.get_bucket(), expected_bucket)
             self.assertEqual(self.flag.is_experiment_on(), active)
 
+    def test_app_label_experiment_name(self):
+        # pylint: disable=protected-access
+        self.assertEqual("experiments", self.flag._app_label)
+        self.assertEqual("test", self.flag._experiment_name)
+
+        flag = ExperimentWaffleFlag("namespace", "flag.name", __name__)
+        self.assertEqual("namespace", flag._app_label)
+        self.assertEqual("flag.name", flag._experiment_name)
+
 
 class ExperimentWaffleFlagCourseAwarenessTest(SharedModuleStoreTestCase):
     """

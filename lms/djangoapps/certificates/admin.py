@@ -10,6 +10,7 @@ from django import forms
 from django.conf import settings
 from django.contrib import admin
 from django.utils.safestring import mark_safe
+from organizations.api import get_organizations
 
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -19,7 +20,6 @@ from lms.djangoapps.certificates.models import (
     CertificateTemplateAsset,
     GeneratedCertificate
 )
-from common.djangoapps.util.organizations_helpers import get_organizations
 
 
 class CertificateTemplateForm(forms.ModelForm):

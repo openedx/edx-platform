@@ -44,6 +44,7 @@ THIRD_PARTY_APPS = {
     'django_object_actions': 'https://github.com/crccheck/django-object-actions',
     'drf_yasg': 'https://github.com/axnsan12/drf-yasg',
     'lx_pathway_plugin': 'https://github.com/open-craft/lx-pathway-plugin',
+    'rest_framework': 'https://github.com/encode/django-rest-framework',
     'simple_history': 'https://github.com/treyhunner/django-simple-history',
     'social_django': 'https://github.com/python-social-auth/social-app-django',
     'corsheaders': 'https://github.com/adamchainz/django-cors-headers',

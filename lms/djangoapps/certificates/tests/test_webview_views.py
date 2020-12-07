@@ -5,6 +5,7 @@
 import datetime
 import json
 from collections import OrderedDict
+from urllib.parse import urlencode
 from uuid import uuid4
 
 import ddt
@@ -14,10 +15,10 @@ from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from mock import patch
-from urllib.parse import urlencode
+from organizations import api as organizations_api
 
 from common.djangoapps.course_modes.models import CourseMode
-from edx_toggles.toggles import WaffleSwitch
+from edx_toggles.toggles import LegacyWaffleSwitch
 from edx_toggles.toggles.testutils import override_waffle_switch
 from lms.djangoapps.badges.events.course_complete import get_completion_badge
 from lms.djangoapps.badges.tests.factories import (
@@ -53,12 +54,11 @@ from openedx.core.lib.tests.assertions.events import assert_event_matches
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.track.tests import EventTrackingTestCase
-from common.djangoapps.util import organizations_helpers as organizations_api
 from common.djangoapps.util.date_utils import strftime_localized
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-AUTO_CERTIFICATE_GENERATION_SWITCH = WaffleSwitch(waffle.waffle(), waffle.AUTO_CERTIFICATE_GENERATION)
+AUTO_CERTIFICATE_GENERATION_SWITCH = LegacyWaffleSwitch(waffle.waffle(), waffle.AUTO_CERTIFICATE_GENERATION)
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 FEATURES_WITH_BADGES_ENABLED = FEATURES_WITH_CERTS_ENABLED.copy()
@@ -413,7 +413,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             'logo': '/logo_test1.png/'
         }
         test_org = organizations_api.add_organization(organization_data=test_organization_data)
-        organizations_api.add_organization_course(organization_data=test_org, course_id=six.text_type(self.course.id))
+        organizations_api.add_organization_course(organization_data=test_org, course_key=six.text_type(self.course.id))
         self._add_course_certificates(count=1, signatory_count=1, is_active=True)
         test_url = get_certificate_url(
             user_id=self.user.id,
@@ -483,7 +483,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             'logo': '/logo_test1.png'
         }
         test_org = organizations_api.add_organization(organization_data=test_organization_data)
-        organizations_api.add_organization_course(organization_data=test_org, course_id=six.text_type(self.course.id))
+        organizations_api.add_organization_course(organization_data=test_org, course_key=six.text_type(self.course.id))
         self._add_course_certificates(count=1, signatory_count=1, is_active=True)
         badge_class = get_completion_badge(course_id=self.course_id, user=self.user)
         BadgeAssertionFactory.create(

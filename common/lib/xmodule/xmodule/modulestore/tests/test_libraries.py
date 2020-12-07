@@ -145,6 +145,13 @@ class TestLibraries(MixedSplitTestCase):
         result = self.store.get_library(LibraryLocator("non", "existent"))
         self.assertEqual(result, None)
 
+    def test_get_library_keys(self):
+        """ Test get_library_keys() """
+        libraries = [LibraryFactory.create(modulestore=self.store) for _ in range(3)]
+        lib_keys_expected = {lib.location.library_key for lib in libraries}
+        lib_keys_actual = set(self.store.get_library_keys())
+        assert lib_keys_expected == lib_keys_actual
+
     def test_get_libraries(self):
         """ Test get_libraries() """
         libraries = [LibraryFactory.create(modulestore=self.store) for _ in range(3)]

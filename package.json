@@ -2,7 +2,7 @@
   "name": "edx",
   "version": "0.1.0",
   "dependencies": {
-    "@edx/brand-edx.org": "^1.1.2",
+    "@edx/brand-edx.org": "^1.2.5",
     "@edx/edx-bootstrap": "1.0.4",
     "@edx/edx-proctoring": "^1.5.0",
     "@edx/frontend-component-cookie-policy-banner": "1.0.0",

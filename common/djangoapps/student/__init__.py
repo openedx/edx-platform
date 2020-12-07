@@ -3,7 +3,7 @@ Student app helpers and settings
 """
 
 
-from edx_toggles.toggles import WaffleSwitchNamespace
+from edx_toggles.toggles import LegacyWaffleSwitchNamespace
 
 # Namespace for student app waffle switches
-STUDENT_WAFFLE_NAMESPACE = WaffleSwitchNamespace(name='student')
+STUDENT_WAFFLE_NAMESPACE = LegacyWaffleSwitchNamespace(name='student')

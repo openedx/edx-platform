@@ -4,7 +4,7 @@ waffle switches for the Grades app.
 """
 
 
-from edx_toggles.toggles import WaffleFlagNamespace, WaffleSwitch, WaffleSwitchNamespace
+from edx_toggles.toggles import LegacyWaffleFlagNamespace, LegacyWaffleSwitch, LegacyWaffleSwitchNamespace
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 # Namespace
@@ -89,7 +89,7 @@ def waffle():
     """
     Returns the namespaced, cached, audited Waffle class for Grades.
     """
-    return WaffleSwitchNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'Grades: ')
+    return LegacyWaffleSwitchNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'Grades: ')
 
 
 def waffle_switch(name):
@@ -97,9 +97,9 @@ def waffle_switch(name):
     Return the corresponding namespaced waffle switch.
 
     WARNING: do not replicate this pattern. Instead of declaring waffle switch names as strings, you should create
-    WaffleSwitch objects as top-level constants.
+    LegacyWaffleSwitch objects as top-level constants.
     """
-    return WaffleSwitch(waffle(), name, module_name=__name__)
+    return LegacyWaffleSwitch(waffle(), name, module_name=__name__)
 
 
 def waffle_flags():
@@ -107,9 +107,9 @@ def waffle_flags():
     Returns the namespaced, cached, audited Waffle flags dictionary for Grades.
 
     WARNING: do not replicate this pattern. Instead of declaring waffle flag names as strings, you should create
-    WaffleFlag and CourseWaffleFlag objects as top-level constants.
+    LegacyWaffleFlag and CourseWaffleFlag objects as top-level constants.
     """
-    namespace = WaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'Grades: ')
+    namespace = LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'Grades: ')
     return {
         # By default, enable rejected exam grade overrides. Can be disabled on a course-by-course basis.
         # TODO: After removing this flag, add a migration to remove waffle flag in a follow-up deployment.

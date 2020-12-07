@@ -21,7 +21,7 @@ from edx_proctoring.api import (
     get_exam_configuration_dashboard_url
 )
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
-from edx_toggles.toggles import WaffleSwitch
+from edx_toggles.toggles import LegacyWaffleSwitch
 from help_tokens.core import HelpUrlExpert
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
@@ -91,7 +91,7 @@ NEVER = lambda x: False
 ALWAYS = lambda x: True
 
 
-highlights_setting = WaffleSwitch('dynamic_pacing', 'studio_course_update', __name__)
+highlights_setting = LegacyWaffleSwitch('dynamic_pacing', 'studio_course_update', __name__)
 
 
 def _filter_entrance_exam_grader(graders):

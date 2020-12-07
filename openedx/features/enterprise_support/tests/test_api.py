@@ -866,19 +866,28 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         mock_partial_pipeline.assert_called_once_with(mock_request)
         self.assertNotIn(ENTERPRISE_CUSTOMER_KEY_NAME, mock_request.session)
 
+    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db')
     @mock.patch('openedx.features.enterprise_support.api.get_partial_pipeline', return_value=None)
-    def test_customer_uuid_for_request_sso_provider_id_customer_non_existent(self, mock_partial_pipeline):
+    def test_customer_uuid_for_request_sso_provider_id_customer_non_existent_but_exist_in_db(
+        self,
+        mock_partial_pipeline,
+        mock_data_from_db,
+    ):
+        enterprise_customer_uuid = 'adab9a14-f263-42e6-a234-db707026c4a6'
         mock_request = mock.Mock(
             GET={'tpa_hint': 'my-third-party-auth'},
             COOKIES={},
             session={},
         )
+        mock_data_from_db.return_value = [
+            {'enterprise_customer': {'uuid': enterprise_customer_uuid}},
+        ]
 
         actual_uuid = enterprise_customer_uuid_for_request(mock_request)
 
-        self.assertIsNone(actual_uuid)
+        self.assertEqual(actual_uuid, enterprise_customer_uuid)
         mock_partial_pipeline.assert_called_once_with(mock_request)
-        self.assertNotIn(ENTERPRISE_CUSTOMER_KEY_NAME, mock_request.session)
+        self.assertIn(ENTERPRISE_CUSTOMER_KEY_NAME, mock_request.session)
 
     @mock.patch('openedx.features.enterprise_support.api.get_partial_pipeline', return_value=None)
     def test_enterprise_uuid_for_request_from_query_params(self, mock_partial_pipeline):

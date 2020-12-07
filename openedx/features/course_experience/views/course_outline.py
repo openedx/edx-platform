@@ -7,7 +7,7 @@ import datetime
 import re
 import six
 
-from completion import waffle as completion_waffle
+from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.shortcuts import redirect
@@ -166,10 +166,8 @@ class CourseOutlineFragmentView(EdxFragmentView):
         """
         Returns the date that the ENABLE_COMPLETION_TRACKING waffle switch was enabled.
         """
-        # pylint: disable=protected-access
-        switch_name = completion_waffle.waffle()._namespaced_name(completion_waffle.ENABLE_COMPLETION_TRACKING)
         try:
-            return Switch.objects.get(name=switch_name).created
+            return Switch.objects.get(name=ENABLE_COMPLETION_TRACKING_SWITCH.name).created
         except Switch.DoesNotExist:
             return DEFAULT_COMPLETION_TRACKING_START
 

@@ -127,7 +127,7 @@ class RerunCourseTaskTestCase(CourseTestCase):
         old_course_id = str(old_course_key)
         new_course_id = str(new_course_key)
 
-        organization = OrganizationFactory()
+        organization = OrganizationFactory(short_name=old_course_key.org)
         OrganizationCourse.objects.create(course_id=old_course_id, organization=organization)
 
         restricted_course = RestrictedCourse.objects.create(course_key=self.course.id)

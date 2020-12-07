@@ -9,12 +9,12 @@ from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-from xmodule.annotatable_module import AnnotatableModule
+from xmodule.annotatable_module import AnnotatableBlock
 
 from . import get_test_system
 
 
-class AnnotatableModuleTestCase(unittest.TestCase):
+class AnnotatableBlockTestCase(unittest.TestCase):
     sample_xml = '''
         <annotatable display_name="Iliad">
             <instructions>Read the text.</instructions>
@@ -33,9 +33,8 @@ class AnnotatableModuleTestCase(unittest.TestCase):
     '''
 
     def setUp(self):
-        super(AnnotatableModuleTestCase, self).setUp()
-        self.annotatable = AnnotatableModule(
-            Mock(),
+        super().setUp()
+        self.annotatable = AnnotatableBlock(
             get_test_system(),
             DictFieldData({'data': self.sample_xml}),
             ScopeIds(None, None, None, BlockUsageLocator(CourseLocator('org', 'course', 'run'), 'category', 'name'))
@@ -68,7 +67,7 @@ class AnnotatableModuleTestCase(unittest.TestCase):
     def test_annotation_class_attr_with_valid_highlight(self):
         xml = '<annotation title="x" body="y" problem="0" highlight="{highlight}">test</annotation>'
 
-        for color in self.annotatable.highlight_colors:
+        for color in self.annotatable.HIGHLIGHT_COLORS:
             el = etree.fromstring(xml.format(highlight=color))
             value = 'annotatable-span highlight highlight-{highlight}'.format(highlight=color)
 

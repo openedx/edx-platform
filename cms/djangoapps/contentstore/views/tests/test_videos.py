@@ -16,7 +16,7 @@ import pytz
 import six
 from django.conf import settings
 from django.test.utils import override_settings
-from edx_toggles.toggles import WaffleSwitch
+from edx_toggles.toggles import LegacyWaffleSwitch
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from edxval.api import (
     create_or_update_transcript_preferences,
@@ -54,7 +54,7 @@ from ..videos import (
     convert_video_status
 )
 
-VIDEO_IMAGE_UPLOAD_ENABLED_SWITCH = WaffleSwitch(WAFFLE_SWITCHES, VIDEO_IMAGE_UPLOAD_ENABLED)
+VIDEO_IMAGE_UPLOAD_ENABLED_SWITCH = LegacyWaffleSwitch(WAFFLE_SWITCHES, VIDEO_IMAGE_UPLOAD_ENABLED)
 
 
 class VideoUploadTestBase(object):

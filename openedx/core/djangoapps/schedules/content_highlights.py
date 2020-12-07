@@ -1,5 +1,5 @@
 """
-Contains methods for accessing weekly course highlights. Weekly highlights is a
+Contains methods for accessing course highlights. Course highlights is a
 schedule experience built on the Schedules app.
 """
 

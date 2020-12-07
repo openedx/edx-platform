@@ -16,7 +16,11 @@ from django.db.utils import DatabaseError
 from edx_ace import ace
 from edx_ace.message import Message
 from edx_ace.utils.date import deserialize, serialize
-from edx_django_utils.monitoring import set_code_owner_attribute, set_custom_attribute
+from edx_django_utils.monitoring import (
+    set_code_owner_attribute,
+    set_code_owner_attribute_from_module,
+    set_custom_attribute
+)
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 
@@ -102,6 +106,7 @@ class BinnedScheduleMessageBaseTask(ScheduleMessageBaseTask):
 
     @classmethod
     def enqueue(cls, site, current_date, day_offset, override_recipient_email=None):
+        set_code_owner_attribute_from_module(__name__)
         current_date = resolvers._get_datetime_beginning_of_day(current_date)
 
         if not cls.is_enqueue_enabled(site):
@@ -127,6 +132,7 @@ class BinnedScheduleMessageBaseTask(ScheduleMessageBaseTask):
     def run(
         self, site_id, target_day_str, day_offset, bin_num, override_recipient_email=None,
     ):
+        set_code_owner_attribute_from_module(__name__)
         site = Site.objects.select_related('configuration').get(id=site_id)
         with emulate_http_request(site=site):
             msg_type = self.make_message_type(day_offset)
@@ -228,6 +234,7 @@ class ScheduleCourseNextSectionUpdate(ScheduleMessageBaseTask):
 
     @classmethod
     def enqueue(cls, site, current_date, day_offset, override_recipient_email=None):
+        set_code_owner_attribute_from_module(__name__)
         target_datetime = (current_date - datetime.timedelta(days=day_offset))
 
         if not cls.is_enqueue_enabled(site):
@@ -249,6 +256,7 @@ class ScheduleCourseNextSectionUpdate(ScheduleMessageBaseTask):
             )
 
     def run(self, site_id, target_day_str, course_key, override_recipient_email=None):
+        set_code_owner_attribute_from_module(__name__)
         site = Site.objects.select_related('configuration').get(id=site_id)
         with emulate_http_request(site=site):
             _annotate_for_monitoring(message_types.CourseUpdate(), site, 0, target_day_str, -1)
