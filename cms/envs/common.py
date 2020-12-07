@@ -1358,6 +1358,9 @@ INSTALLED_APPS = [
     'common.djangoapps.track',
     'eventtracking.django.apps.EventTrackingConfig',
 
+    # Backends for receiving edX LMS events
+    'event_routing_backends.apps.EventRoutingBackendsConfig',
+
     # For asset pipelining
     'common.djangoapps.edxmako.apps.EdxMakoConfig',
     'pipeline',

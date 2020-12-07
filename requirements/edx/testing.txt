@@ -59,12 +59,12 @@ distlib==0.3.1            # via virtualenv
 django-appconf==1.0.4     # via -r requirements/edx/base.txt, django-statici18n
 django-celery-results==2.0.0  # via -r requirements/edx/base.txt
 django-classy-tags==2.0.0  # via -r requirements/edx/base.txt, django-sekizai
-django-config-models==2.0.3  # via -r requirements/edx/base.txt, edx-enterprise
+django-config-models==2.0.3  # via -r requirements/edx/base.txt, edx-enterprise, edx-event-routing-backends
 django-cookies-samesite==0.8.0  # via -r requirements/edx/base.txt
 django-cors-headers==2.5.3  # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
 django-countries==5.5     # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edx-enterprise
 django-crum==0.7.9        # via -r requirements/edx/base.txt, edx-django-utils, edx-enterprise, edx-proctoring, edx-rbac, edx-toggles, super-csv
-django-fernet-fields==0.6  # via -r requirements/edx/base.txt, edx-enterprise, edxval
+django-fernet-fields==0.6  # via -r requirements/edx/base.txt, edx-enterprise, edx-event-routing-backends, edxval
 django-filter==2.4.0      # via -r requirements/edx/base.txt, edx-enterprise
 django-ipware==2.1.0      # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edx-enterprise, edx-proctoring
 django-js-asset==1.2.2    # via -r requirements/edx/base.txt, django-mptt
@@ -106,7 +106,8 @@ edx-django-release-util==0.4.4  # via -r requirements/edx/base.txt
 edx-django-sites-extensions==2.5.1  # via -r requirements/edx/base.txt
 edx-django-utils==3.13.0  # via -r requirements/edx/base.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-toggles, edx-when, ora2
 edx-drf-extensions==6.2.0  # via -r requirements/edx/base.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.13.5    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
+edx-enterprise==3.13.5   # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
+edx-event-routing-backends==1.0.0  # via -r requirements/edx/base.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, ora2
 edx-lint==1.5.2           # via -r requirements/edx/testing.in
 edx-milestones==0.3.0     # via -r requirements/edx/base.txt
@@ -127,7 +128,7 @@ edxval==1.4.4             # via -r requirements/edx/base.txt
 elasticsearch==7.10.0     # via -r requirements/edx/base.txt, edx-search
 enmerkar-underscore==1.0.0  # via -r requirements/edx/base.txt
 enmerkar==0.7.1           # via -r requirements/edx/base.txt, enmerkar-underscore
-event-tracking==1.0.0     # via -r requirements/edx/base.txt, edx-proctoring, edx-search
+event-tracking==1.0.0     # via -r requirements/edx/base.txt, edx-event-routing-backends, edx-proctoring, edx-search
 execnet==1.7.1            # via pytest-xdist
 factory-boy==2.8.1        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
 faker==5.0.0              # via factory-boy
@@ -151,7 +152,7 @@ inflect==3.0.2            # via -c requirements/edx/../constraints.txt, -r requi
 inflection==0.5.1         # via -r requirements/edx/base.txt, drf-yasg
 iniconfig==1.1.1          # via pytest
 ipaddress==1.0.23         # via -r requirements/edx/base.txt
-isodate==0.6.0            # via -r requirements/edx/base.txt, python3-saml
+isodate==0.6.0            # via -r requirements/edx/base.txt, edx-event-routing-backends, python3-saml
 isort==4.3.21             # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in, pylint
 itypes==1.2.0             # via -r requirements/edx/base.txt, coreapi
 jinja2-pluralize==0.3.0   # via -r requirements/edx/coverage.txt, diff-cover
@@ -159,7 +160,7 @@ jinja2==2.11.2            # via -r requirements/edx/base.txt, -r requirements/ed
 jmespath==0.10.0          # via -r requirements/edx/base.txt, boto3, botocore
 joblib==0.14.1            # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, nltk
 jsondiff==1.2.0           # via -r requirements/edx/base.txt, edx-enterprise
-jsonfield2==3.0.3         # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edx-celeryutils, edx-enterprise, edx-proctoring, edx-submissions, ora2
+jsonfield2==3.0.3         # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edx-celeryutils, edx-enterprise, edx-event-routing-backends, edx-proctoring, edx-submissions, ora2
 kombu==4.6.11             # via -r requirements/edx/base.txt, celery
 laboratory==1.0.2         # via -r requirements/edx/base.txt
 lazy-object-proxy==1.4.3  # via astroid
@@ -227,14 +228,14 @@ pytest-metadata==1.8.0    # via -r requirements/edx/testing.in, pytest-json-repo
 pytest-randomly==3.5.0    # via -r requirements/edx/testing.in
 pytest-xdist[psutil]==2.1.0  # via -r requirements/edx/testing.in
 pytest==6.1.2             # via -r requirements/edx/testing.in, pytest-attrib, pytest-cov, pytest-django, pytest-forked, pytest-json-report, pytest-metadata, pytest-randomly, pytest-xdist
-python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, analytics-python, botocore, edx-ace, edx-drf-extensions, edx-enterprise, edx-proctoring, faker, freezegun, icalendar, ora2, xblock
+python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, analytics-python, botocore, edx-ace, edx-drf-extensions, edx-enterprise, edx-event-routing-backends, edx-proctoring, faker, freezegun, icalendar, ora2, xblock
 python-levenshtein==0.12.0  # via -r requirements/edx/base.txt
 python-memcached==1.59    # via -r requirements/edx/base.txt
 python-slugify==4.0.1     # via -r requirements/edx/base.txt, code-annotations, transifex-client
 python-swiftclient==3.10.1  # via -r requirements/edx/base.txt, ora2
 python3-openid==3.2.0 ; python_version >= "3"  # via -r requirements/edx/base.txt, social-auth-core
 python3-saml==1.9.0       # via -r requirements/edx/base.txt
-pytz==2020.4              # via -r requirements/edx/base.txt, babel, capa, celery, django, django-ses, edx-completion, edx-enterprise, edx-proctoring, edx-submissions, edx-tincan-py35, event-tracking, fs, icalendar, ora2, xblock
+pytz==2020.4              # via -r requirements/edx/base.txt, babel, capa, celery, django, django-ses, edx-completion, edx-enterprise, edx-event-routing-backends, edx-proctoring, edx-submissions, edx-tincan-py35, event-tracking, fs, icalendar, ora2, xblock
 pyuca==1.2                # via -r requirements/edx/base.txt
 pyyaml==5.3.1             # via -r requirements/edx/base.txt, code-annotations, edx-django-release-util, edx-i18n-tools, xblock
 random2==1.0.1            # via -r requirements/edx/base.txt
@@ -242,7 +243,7 @@ recommender-xblock==1.4.9  # via -r requirements/edx/base.txt
 redis==3.5.3              # via -r requirements/edx/base.txt
 regex==2020.11.13         # via -r requirements/edx/base.txt, nltk
 requests-oauthlib==1.3.0  # via -r requirements/edx/base.txt, social-auth-core
-requests==2.25.0          # via -r requirements/edx/base.txt, analytics-python, coreapi, django-oauth-toolkit, edx-analytics-data-api-client, edx-bulk-grades, edx-drf-extensions, edx-enterprise, edx-rest-api-client, geoip2, mailsnake, pyjwkest, python-swiftclient, requests-oauthlib, sailthru-client, slumber, social-auth-core, tableauserverclient, transifex-client
+requests==2.25.0          # via -r requirements/edx/base.txt, analytics-python, coreapi, django-oauth-toolkit, edx-analytics-data-api-client, edx-bulk-grades, edx-drf-extensions, edx-enterprise, edx-event-routing-backends, edx-rest-api-client, geoip2, mailsnake, pyjwkest, python-swiftclient, requests-oauthlib, sailthru-client, slumber, social-auth-core, tableauserverclient, transifex-client
 rest-condition==1.0.3     # via -r requirements/edx/base.txt, edx-drf-extensions
 ruamel.yaml.clib==0.2.2   # via -r requirements/edx/base.txt, ruamel.yaml
 ruamel.yaml==0.16.12      # via -r requirements/edx/base.txt, drf-yasg
