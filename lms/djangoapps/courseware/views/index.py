@@ -430,6 +430,7 @@ class CoursewareIndex(View):
             settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH') or
             (settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF') and self.is_staff)
         )
+        hide_course_navigation = settings.FEATURES.get('HIDE_COURSEWARE_NAVIGATION')
         staff_access = self.is_staff
 
         courseware_context = {
@@ -451,7 +452,7 @@ class CoursewareIndex(View):
             'disable_optimizely': not WaffleSwitchNamespace('RET').is_enabled('enable_optimizely_in_courseware'),
             'section_title': None,
             'sequence_title': None,
-            'disable_accordion': COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id),
+            'disable_accordion': hide_course_navigation,
             'show_search': show_search,
         }
         courseware_context.update(

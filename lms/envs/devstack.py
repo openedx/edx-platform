@@ -176,6 +176,9 @@ FEATURES['ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF'] = True
 SEARCH_ENGINE = 'search.elastic.ElasticSearchEngine'
 
 
+########################## Courseware Navigation #######################
+FEATURES['HIDE_COURSEWARE_NAVIGATION'] = False
+
 ########################## Dashboard Search #######################
 FEATURES['ENABLE_DASHBOARD_SEARCH'] = False
 
