@@ -16,12 +16,15 @@
             },
 
             render: function() {
-                this.$el.html(_.template(sectionTemplate)({
-                    HtmlUtils: HtmlUtils,
-                    sections: this.options.sections,
-                    tabName: this.options.tabName,
-                    tabLabel: this.options.tabLabel
-                }));
+                HtmlUtils.setHtml(
+                    this.$el,
+                    HtmlUtils.template(sectionTemplate)({
+                        HtmlUtils: HtmlUtils,
+                        sections: this.options.sections,
+                        tabName: this.options.tabName,
+                        tabLabel: this.options.tabLabel
+                    })
+                );
 
                 this.renderFields();
             },
