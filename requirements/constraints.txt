@@ -23,6 +23,10 @@ django-countries==5.5
 # Removes deprecated get_ip function, which we still use (ARCHBOM-1329 for unpinning)
 django-ipware<3.0.0
 
+# Pinning as a temporary fix to https://openedx.atlassian.net/browse/CR-2982, as per
+# https://github.com/edx/edx-platform/pull/25766
+django-model-utils==4.1.0
+
 # 2.0.0 dropped support for Python 3.5
 django-pipeline<2.0.0
 
@@ -36,6 +40,10 @@ drf-yasg<1.17.1
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
 edx-enterprise==3.13.5
+
+# Pinning as a temporary fix to https://openedx.atlassian.net/browse/CR-2982, as per
+# https://github.com/edx/edx-platform/pull/25766
+edx-submissions==3.2.2
 
 # We expect v2.0.0 to introduce large breaking changes in the feature toggle API
 edx-toggles<2.0.0
@@ -67,6 +75,10 @@ jsonfield2<3.1.0
 # kiwisolver 1.2.0 requires Python 3.6+
 kiwisolver<1.2.0
 
+# Pinning as a temporary fix to https://openedx.atlassian.net/browse/CR-2982, as per
+# https://github.com/edx/edx-platform/pull/25766
+lti-consumer-xblock==2.3
+
 # 4.5.1 introduced a bug when used together with xmlsec: https://bugs.launchpad.net/lxml/+bug/1880251
 # Tests passed, but hit a problem in stage
 lxml<4.5.1
@@ -88,6 +100,10 @@ oauthlib==3.0.1
 
 # django-auth-toolkit==1.3.3 requires oauthlib>=3.1.0 which is pinned because of test failures
 django-oauth-toolkit<=1.3.2
+
+# Pinning as a temporary fix to https://openedx.atlassian.net/browse/CR-2982, as per
+# https://github.com/edx/edx-platform/pull/25766
+ora2==2.12.1
 
 # path 13.2.0 drops support for Python 3.5
 path<13.2.0
