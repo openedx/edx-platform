@@ -19,7 +19,7 @@ before_install:
   - travis_retry sudo apt-get install python-dev libxml2-dev libxmlsec1-dev
 
 install:
-  - pip install tox
+  - pip install tox tox-pip-version
 
 env:
   global:

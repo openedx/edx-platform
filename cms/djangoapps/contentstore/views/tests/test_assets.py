@@ -447,7 +447,6 @@ class AssetToJsonTestCase(AssetsTestCase):
         response_with_unicode = JsonResponse(output)
         assert '/asset-v1:' in response_with_unicode.content, 'Ensure json gets serialized'
 
-
     @override_settings(LMS_BASE="lms_base_url")
     @patch('contentstore.views.assets.get_site_for_course', mock.Mock(return_value=mock.Mock(domain='site_domain')))
     def test_site_url(self):
