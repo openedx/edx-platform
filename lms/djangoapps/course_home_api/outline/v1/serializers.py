@@ -6,7 +6,7 @@ from django.utils.translation import ngettext
 from rest_framework import serializers
 
 from lms.djangoapps.course_home_api.dates.v1.serializers import DateSummarySerializer
-from lms.djangoapps.course_home_api.mixins import DatesBannerSerializerMixin
+from lms.djangoapps.course_home_api.mixins import DatesBannerSerializerMixin, VerifiedModeSerializerMixin
 
 
 class CourseBlockSerializer(serializers.Serializer):
@@ -74,8 +74,8 @@ class CourseToolSerializer(serializers.Serializer):
     url = serializers.SerializerMethodField()
 
     def get_url(self, tool):
-        course_key = self.context.get('course_key')
-        url = tool.url(course_key)
+        course_overview = self.context.get('course_overview')
+        url = tool.url(course_overview.id)
         request = self.context.get('request')
         return request.build_absolute_uri(url)
 
@@ -105,7 +105,7 @@ class ResumeCourseSerializer(serializers.Serializer):
     url = serializers.URLField()
 
 
-class OutlineTabSerializer(DatesBannerSerializerMixin, serializers.Serializer):
+class OutlineTabSerializer(DatesBannerSerializerMixin, VerifiedModeSerializerMixin, serializers.Serializer):
     """
     Serializer for the Outline Tab
     """

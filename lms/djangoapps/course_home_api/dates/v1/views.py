@@ -20,7 +20,6 @@ from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.course_home_api.dates.v1.serializers import DatesTabSerializer
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
-from openedx.features.course_experience.utils import dates_banner_should_display
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 
 

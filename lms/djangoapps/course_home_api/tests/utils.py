@@ -41,7 +41,9 @@ class BaseCourseHomeTests(ModuleStoreTestCase, MasqueradeMixin):
         CourseModeFactory(
             course_id=self.course.id,
             mode_slug=CourseMode.VERIFIED,
-            expiration_datetime=datetime(2028, 1, 1)
+            expiration_datetime=datetime(2028, 1, 1),
+            min_price=149,
+            sku='ABCD1234',
         )
         VerificationDeadline.objects.create(course_key=self.course.id, deadline=datetime(2028, 1, 1))
 
