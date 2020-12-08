@@ -10,6 +10,13 @@ from openedx.adg.lms.utils.decorators import suspendingreceiver
 from student.models import EnrollStatusChange, UserProfile
 from student.signals import ENROLL_STATUS_CHANGE
 
+from .helpers import (
+    get_extendeduserprofile_merge_fields,
+    get_user_merge_fields,
+    get_userapplication_merge_fields,
+    get_userprofile_merge_fields,
+    is_mailchimp_sync_required
+)
 from .tasks import task_send_user_enrollments_to_mailchimp, task_send_user_info_to_mailchimp
 
 
@@ -36,11 +43,27 @@ def send_user_info_to_mailchimp(sender, created, instance, **kwargs):
     Returns:
         None
     """
-    MAILCHIMP_FIELDS = ['organization', 'status', 'business_line', 'company']
-    if not (created or sender == UserProfile or any(field in kwargs['update_fields'] for field in MAILCHIMP_FIELDS)):
+    if not is_mailchimp_sync_required(created, sender, **kwargs):
         return
 
-    task_send_user_info_to_mailchimp.delay(sender, instance)
+    MERGE_FIELDS_CALLABLES = {
+        'get_user_merge_fields': get_user_merge_fields,
+        'get_userprofile_merge_fields': get_userprofile_merge_fields,
+        'get_userapplication_merge_fields': get_userapplication_merge_fields,
+        'get_extendeduserprofile_merge_fields': get_extendeduserprofile_merge_fields
+    }
+
+    user_email = instance.email if sender == User else instance.user.email
+    user_json = {
+        'email_address': user_email,
+        'status_if_new': 'subscribed',
+        'merge_fields': {}
+    }
+
+    sender_callable_name = 'get_{}_merge_fields'.format(sender.__name__.lower())
+    user_json['merge_fields'].update(MERGE_FIELDS_CALLABLES[sender_callable_name](instance))
+
+    task_send_user_info_to_mailchimp.delay(user_email, user_json)
 
 
 @suspendingreceiver(ENROLL_STATUS_CHANGE)
@@ -61,3 +84,4 @@ def send_user_enrollments_to_mailchimp(sender, event=None, **kwargs):  # pylint:
         return
 
     task_send_user_enrollments_to_mailchimp.delay(**kwargs)
+
