@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     services:
       mongodb:
         image: mongo
@@ -34,9 +34,10 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
+      # TODO: Remove tox-pip-version once we upgrade to Koa+, or whenever we have addressed pip 20.3 strict issues.
       run: |
         sudo apt-get install -y python-dev libxml2-dev libxmlsec1-dev
-        pip install tox
+        pip install tox tox-pip-version
     - name: Run tox
       run: |
         tox -e ${{ matrix.tox-env }}
