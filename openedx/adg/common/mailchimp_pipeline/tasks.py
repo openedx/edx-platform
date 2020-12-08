@@ -5,6 +5,7 @@ import logging
 
 from celery.task import task
 from django.conf import settings
+from django.contrib.auth.models import User
 
 from openedx.adg.common.course_meta.models import CourseMeta
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -31,13 +32,13 @@ def task_send_user_info_to_mailchimp(user_email, user_json):
 
 
 @task(routing_key=settings.HIGH_PRIORITY_QUEUE)
-def task_send_user_enrollments_to_mailchimp(user, course_id, **kwargs):  # pylint: disable=unused-argument
+def task_send_user_enrollments_to_mailchimp(user_id, course_id):
     """
     Update member info on Mailchimp (audience) list, related to course. Add course enrollment title
     and course short id to member contact info on Mailchimp.
 
     Args:
-        user (user object): User model object
+        user_id (int): user id
         course_id (CourseKeyField): Enrolled course id
 
     Returns:
@@ -51,6 +52,7 @@ def task_send_user_enrollments_to_mailchimp(user, course_id, **kwargs):  # pylin
         )
         return
 
+    user = User.objects.get(id=user_id)
     CourseMeta.objects.get_or_create(course=course)  # Create course short id for enrolled course
     enrollment_short_ids, enrollment_titles = get_enrollment_course_names_and_short_ids_by_user(user)
 

@@ -46,7 +46,7 @@ def test_task_send_user_enrollments_to_mailchimp(mocker):
     user = UserFactory()
     course = CourseOverviewFactory()
 
-    mailchimp_tasks.task_send_user_enrollments_to_mailchimp(user, course.id)
+    mailchimp_tasks.task_send_user_enrollments_to_mailchimp(user.id, course.id)
 
     user_json = {
         "email_address": user.email,
@@ -70,7 +70,7 @@ def test_task_send_user_enrollments_to_mailchimp_invalid_course_id(mocker):
     mock_log_error = mocker.patch.object(mailchimp_tasks.log, 'error')
     mock_get_or_create = mocker.patch.object(mailchimp_tasks.CourseMeta.objects, 'get_or_create')
 
-    mailchimp_tasks.task_send_user_enrollments_to_mailchimp(UserFactory(), 'course/test/123')
+    mailchimp_tasks.task_send_user_enrollments_to_mailchimp(UserFactory().id, 'course/test/123')
 
     mock_log_error.assert_called_once_with(mocker.ANY)
     assert not mock_get_or_create.called

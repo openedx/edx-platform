@@ -83,4 +83,4 @@ def send_user_enrollments_to_mailchimp(sender, event=None, **kwargs):  # pylint:
     if event not in [EnrollStatusChange.enroll, EnrollStatusChange.unenroll]:
         return
 
-    task_send_user_enrollments_to_mailchimp.delay(**kwargs)
+    task_send_user_enrollments_to_mailchimp.delay(kwargs.get('user').id, kwargs['course_id'])

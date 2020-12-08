@@ -151,12 +151,13 @@ def test_send_user_enrollments_to_mailchimp_with_valid_enrollment_event(mocker, 
     Assert that `send_user_enrollments_to_mailchimp` called with appropriate params
     """
     event = EnrollStatusChange.enroll
-    dummy_kwargs = {'user': 'dummy', 'course': 'test_course'}
+    user = UserFactory()
+    dummy_kwargs = {'user': user, 'course_id': 'test_course'}
     mock_call = mocker.patch.object(mailchimp_handlers, 'task_send_user_enrollments_to_mailchimp')
 
     mailchimp_handlers.send_user_enrollments_to_mailchimp(sender=None, event=event, **dummy_kwargs)
 
-    mock_call.delay.assert_called_once_with(**dummy_kwargs)
+    mock_call.delay.assert_called_once_with(user.id, dummy_kwargs['course_id'])
 
 
 @pytest.mark.django_db
