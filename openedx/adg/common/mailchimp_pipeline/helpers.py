@@ -86,7 +86,6 @@ def get_userapplication_merge_fields(instance):
     }
 
 
-
 def get_extendeduserprofile_merge_fields(instance):
     """
     Computes merge_fields for mailchimp using ExtendedUserProfile object.

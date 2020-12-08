@@ -84,4 +84,3 @@ def send_user_enrollments_to_mailchimp(sender, event=None, **kwargs):  # pylint:
         return
 
     task_send_user_enrollments_to_mailchimp.delay(**kwargs)
-

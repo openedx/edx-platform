@@ -31,6 +31,7 @@ def test_task_send_user_info_to_mailchimp(mocker):
     mailchimp_tasks.task_send_user_info_to_mailchimp(user_email, user_json)
     mock_create_or_update_list_member.assert_called_once_with(email=user_email, data=user_json)
 
+
 @pytest.mark.django_db
 @pytest.mark.mute_signals
 def test_task_send_user_enrollments_to_mailchimp(mocker):
