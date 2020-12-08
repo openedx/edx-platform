@@ -130,12 +130,14 @@ class CourseApiTestViews(BaseCoursewareTests):
                                               'The audit track does not include a certificate.')
                     assert response.data['certificate_data']['msg'] == expected_audit_message
                     assert response.data['verify_identity_url'] is None
+                    assert response.data['verification_status'] is 'none'
                     assert response.data['linkedin_add_to_profile_url'] is None
                 else:
                     assert response.data['certificate_data']['cert_status'] == 'earned_but_not_available'
                     expected_verify_identity_url = reverse('verify_student_verify_now', args=[self.course.id])
                     # The response contains an absolute URL so this is only checking the path of the final
                     assert expected_verify_identity_url in response.data['verify_identity_url']
+                    assert response.data['verification_status'] is 'none'
 
                     request = RequestFactory().request()
                     cert_url = get_certificate_url(course_id=self.course.id, uuid=cert.verify_uuid)

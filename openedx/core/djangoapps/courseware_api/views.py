@@ -258,6 +258,17 @@ class CoursewareMeta:
                 return IDVerificationService.get_verify_location('verify_student_verify_now', self.course_key)
 
     @property
+    def verification_status(self):
+        """
+        Returns a String of the verification status of learner.
+        """
+        if self.enrollment_object and self.enrollment_object.mode in CourseMode.VERIFIED_MODES:
+            return IDVerificationService.user_status(self.effective_user)['status']
+        # I know this looks weird (and is), but this is just so it is inline with what the
+        # IDVerificationService.user_status method would return before a verification was created
+        return 'none'
+
+    @property
     def linkedin_add_to_profile_url(self):
         """
         Returns a URL to add a certificate to a LinkedIn profile (will autofill fields).
