@@ -4,8 +4,9 @@
         'underscore',
         'backbone',
         'gettext',
-        'edx-ui-toolkit/js/utils/date-utils'
-    ], function($, _, Backbone, gettext, DateUtils) {
+        'edx-ui-toolkit/js/utils/date-utils',
+        'edx-ui-toolkit/js/utils/html-utils'
+    ], function($, _, Backbone, gettext, DateUtils, HtmlUtils) {
         'use strict';
 
         function formatDate(date, userLanguage, userTimezone) {
@@ -26,7 +27,7 @@
             className: 'courses-listing-item',
 
             initialize: function() {
-                this.tpl = _.template($(this.templateId).html());
+                this.tpl = HtmlUtils.template($(this.templateId).html());
             },
 
             render: function() {
@@ -51,7 +52,10 @@
                     userLanguage,
                     userTimezone
                 );
-                this.$el.html(this.tpl(data));
+                HtmlUtils.setHtml(
+                    this.$el,
+                    this.tpl(data)
+                );
                 return this;
             }
 
