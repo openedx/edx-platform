@@ -106,7 +106,7 @@ class SubsectionGradeFactory(object):
             self._update_saved_subsection_grade(subsection.location, grade_model)
 
             COURSE_ASSESSMENT_GRADE_CHANGED.send_robust(
-                sender=None,
+                sender=self,
                 user=self.student,
                 subsection_id=calculated_grade.location,
                 subsection_grade=calculated_grade.graded_total.earned

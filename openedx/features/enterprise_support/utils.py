@@ -34,6 +34,13 @@ def get_data_consent_share_cache_key(user_id, course_id):
     return get_cache_key(type='data_sharing_consent_needed', user_id=user_id, course_id=course_id)
 
 
+def get_is_enterprise_cache_key(user_id):
+    """
+        Returns cache key for the enterprise learner validation method needed against user_id.
+    """
+    return get_cache_key(type='is_enterprise_learner', user_id=user_id)
+
+
 def clear_data_consent_share_cache(user_id, course_id):
     """
         clears data_sharing_consent_needed cache
@@ -394,7 +401,7 @@ def get_enterprise_learner_generic_name(request):
 
 def is_enterprise_learner(user):
     """
-    Check if the given user belongs to an enterprise.
+    Check if the given user belongs to an enterprise. Cache the value if an enterprise learner is found.
 
     Arguments:
         user (User): Django User object.
@@ -402,13 +409,13 @@ def is_enterprise_learner(user):
     Returns:
         (bool): True if given user is an enterprise learner.
     """
-    cached_is_enterprise_key = '{}:user_is_enterprise'.format(user.id)
+    cached_is_enterprise_key = get_is_enterprise_cache_key(user.id)
     if cache.get(cached_is_enterprise_key):
         return True
 
     if EnterpriseCustomerUser.objects.filter(user_id=user.id).exists():
         # Cache the enterprise user for one hour.
-        cache.set(cached_is_enterprise_key, True, expiry=3600)
+        cache.set(cached_is_enterprise_key, True, 3600)
         return True
     return False
 

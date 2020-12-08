@@ -450,11 +450,21 @@ class TestEnterpriseUtils(TestCase):
         assert '' == generic_name
 
     def test_is_enterprise_learner(self):
-        EnterpriseCustomerUserFactory.create(active=True, user_id=self.user.id)
-        self.assertTrue(is_enterprise_learner(self.user))
+        with mock.patch(
+            'django.core.cache.cache.set'
+        ) as mock_cache_set:
+            EnterpriseCustomerUserFactory.create(active=True, user_id=self.user.id)
+            self.assertTrue(is_enterprise_learner(self.user))
+
+        self.assertTrue(mock_cache_set.called)
 
     def test_is_enterprise_learner_no_enterprise_user(self):
-        self.assertFalse(is_enterprise_learner(self.user))
+        with mock.patch(
+            'django.core.cache.cache.set'
+        ) as mock_cache_set:
+            self.assertFalse(is_enterprise_learner(self.user))
+
+        self.assertFalse(mock_cache_set.called)
 
     @mock.patch('openedx.features.enterprise_support.utils.reverse')
     def test_get_enterprise_slug_login_url_no_reverse_match(self, mock_reverse):
