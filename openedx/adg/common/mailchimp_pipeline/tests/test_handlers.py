@@ -156,12 +156,21 @@ def test_send_user_enrollments_to_mailchimp_with_valid_enrollment_event(mocker, 
     course = CourseOverviewFactory()
 
     dummy_kwargs = {'user': user, 'course_id': course.id}
-    mock_get_or_create = mocker.patch.object(mailchimp_handlers.CourseMeta.objects, 'get_or_create')
     mock_enrolls = mocker.patch.object(mailchimp_handlers, 'get_enrollment_course_names_and_short_ids_by_user')
-    mock_enrolls.return_value = '100, 101, 102', 'course1, course2, course3'
+    mock_enrolls.return_value = '100,101,102', 'course1,course2,course3'
+    mock_call = mocker.patch.object(mailchimp_handlers, 'task_send_user_enrollments_to_mailchimp')
 
     mailchimp_handlers.send_user_enrollments_to_mailchimp(sender=None, event=event, **dummy_kwargs)
-    mock_get_or_create.assert_called_once_with(course=course)
+
+    user_json = {
+        'email_address': user.email,
+        'status_if_new': 'subscribed',
+        'merge_fields': {
+            'ENROLLS': 'course1,course2,course3',
+            'ENROLL_IDS': '100,101,102'
+        },
+    }
+    mock_call.delay.assert_called_once_with(user.email, user_json)
 
 
 @pytest.mark.django_db

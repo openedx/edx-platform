@@ -39,15 +39,15 @@ def test_task_send_user_enrollments_to_mailchimp(mocker):
     """
     mock_mailchimp_client = mocker.patch.object(mailchimp_tasks, 'MailchimpClient', autospec=True)
     mock_create_or_update_list_member = mock_mailchimp_client().create_or_update_list_member
-    user = UserFactory()
+    user_email = 'test@example.com'
     user_json = {
-        "email_address": user.email,
+        "email_address": user_email,
         "status_if_new": "subscribed",
         "merge_fields": {
-            "ENROLLS": 'course1, course2, course3',
-            "ENROLL_IDS": '100, 101, 102',
+            "ENROLLS": 'course1,course2,course3',
+            "ENROLL_IDS": '100,101,102',
         }
     }
 
-    mailchimp_tasks.task_send_user_enrollments_to_mailchimp(user.email, user_json)
-    mock_create_or_update_list_member.assert_called_once_with(email=user.email, data=user_json)
+    mailchimp_tasks.task_send_user_enrollments_to_mailchimp(user_email, user_json)
+    mock_create_or_update_list_member.assert_called_once_with(email=user_email, data=user_json)
