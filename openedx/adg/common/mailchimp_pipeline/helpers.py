@@ -43,57 +43,57 @@ def is_mailchimp_sync_required(created, sender, **kwargs):
     return created or sender == UserProfile or any(field in update_fields for field in MAILCHIMP_FIELDS)
 
 
-def get_user_merge_fields(instance):
+def get_user_merge_fields(user):
     """
     Computes merge_fields for mailchimp using User object.
 
     Args:
-        instance (User): User object
+        user (User): User object
 
     Returns:
         dict: Contains merge fields for a User instance.
     """
-    return {'USERNAME': instance.username, 'DATEREGIS': str(instance.date_joined.strftime('%m/%d/%Y'))}
+    return {'USERNAME': user.username, 'DATEREGIS': str(user.date_joined.strftime('%m/%d/%Y'))}
 
 
-def get_userprofile_merge_fields(instance):
+def get_userprofile_merge_fields(user_profile):
     """
     Computes merge_fields for mailchimp using UserProfile object.
 
     Args:
-        instance (UserProfile): UserProfile object
+        user_profile (UserProfile): UserProfile object
 
     Returns:
         dict: Contains merge_fields of UserProfile object.
     """
-    return {'LOCATION': instance.city, 'FULLNAME': instance.name}
+    return {'LOCATION': user_profile.city, 'FULLNAME': user_profile.name}
 
 
-def get_userapplication_merge_fields(instance):
+def get_userapplication_merge_fields(user_application):
     """
     Computes merge_fields for mailchimp using UserApplication object.
 
     Args:
-        instance (UserApplication): UserAppication object
+        user_application (UserApplication): UserAppication object
 
     Returns:
         dict: Contains merge_fields for UserApplication object.
     """
     return {
-        'ORG_NAME': instance.organization or '',
-        'APP_STATUS': instance.status,
-        'B_LINE': instance.business_line.title or ''
+        'ORG_NAME': user_application.organization or '',
+        'APP_STATUS': user_application.status,
+        'B_LINE': user_application.business_line.title or ''
     }
 
 
-def get_extendeduserprofile_merge_fields(instance):
+def get_extendeduserprofile_merge_fields(extended_profile):
     """
     Computes merge_fields for mailchimp using ExtendedUserProfile object.
 
     Args:
-        instance (ExtendedUserProfile): object of ExtendedUserProfile
+        extended_profile (ExtendedUserProfile): object of ExtendedUserProfile
 
     Returns:
         dict: Contains merge_fields for ExtendedUserProfile object.
     """
-    return {'COMPANY': instance.company.title or ''}
+    return {'COMPANY': extended_profile.company.title or ''}

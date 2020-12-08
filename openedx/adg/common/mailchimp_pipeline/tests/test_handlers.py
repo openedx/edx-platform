@@ -36,9 +36,9 @@ def test_send_user_info_to_mailchimp_user_created(mocker, mailchimp_handlers):
     is called specific number of times as per the object creation and is called with the given params.
     """
     mock_task = mocker.patch.object(mailchimp_handlers, 'task_send_user_info_to_mailchimp')
-    instance = UserFactory()
-    profile = instance.profile
-    user_email = instance.email
+    user = UserFactory()
+    profile = user.profile
+    user_email = user.email
 
     base_user_info = {
         'email_address': user_email,
@@ -46,7 +46,7 @@ def test_send_user_info_to_mailchimp_user_created(mocker, mailchimp_handlers):
     }
     user_json = {
         **base_user_info,
-        'merge_fields': get_user_merge_fields(instance),
+        'merge_fields': get_user_merge_fields(user),
     }
     profile_json = {
         **base_user_info,
@@ -74,9 +74,9 @@ def test_send_user_info_to_mailchimp_user_updated(mocker, mailchimp_handlers):
     specific number of times and is not called for User update.
     """
     mock_task = mocker.patch.object(mailchimp_handlers, 'task_send_user_info_to_mailchimp')
-    instance = UserFactory()
-    instance.username = 'dummyuser'
-    instance.save()
+    user = UserFactory()
+    user.username = 'dummyuser'
+    user.save()
 
     assert mock_task.delay.call_count == 2
 
@@ -91,8 +91,8 @@ def test_send_user_info_to_mailchimp_application_fields(mocker, mailchimp_handle
     required at mailchimp and is not called when `update_fields` is empty.
     """
     mock_task = mocker.patch.object(mailchimp_handlers, 'task_send_user_info_to_mailchimp')
-    instance = UserApplicationFactory()
-    user_email = instance.user.email
+    user_application = UserApplicationFactory()
+    user_email = user_application.user.email
 
     base_user_json = {
         'email_address': user_email,
@@ -100,19 +100,19 @@ def test_send_user_info_to_mailchimp_application_fields(mocker, mailchimp_handle
     }
     user_json = {
         **base_user_json,
-        'merge_fields': get_userapplication_merge_fields(instance)
+        'merge_fields': get_userapplication_merge_fields(user_application)
     }
 
-    instance.organization = 'dummy org'
-    instance.save(update_fields=('organization',))
+    user_application.organization = 'dummy org'
+    user_application.save(update_fields=('organization',))
 
     user_app_updated_json = {
         **base_user_json,
-        'merge_fields': get_userapplication_merge_fields(instance)
+        'merge_fields': get_userapplication_merge_fields(user_application)
     }
 
-    instance.organization = 'dummy org2'
-    instance.save()
+    user_application.organization = 'dummy org2'
+    user_application.save()
 
     assert mock_task.delay.call_count == 4
     mock_task.delay.assert_any_call(user_email, user_json)
@@ -128,8 +128,8 @@ def test_send_user_info_to_mailchimp_user_company_updated(mocker, mailchimp_hand
     specific number of times when object of ExtendedUserProfile is created.
     """
     mock_task = mocker.patch.object(mailchimp_handlers, 'task_send_user_info_to_mailchimp')
-    instance = ExtendedUserProfileFactory()
-    user_email = instance.user.email
+    extended_user_profile = ExtendedUserProfileFactory()
+    user_email = extended_user_profile.user.email
 
     base_user_json = {
         'email_address': user_email,
@@ -137,7 +137,7 @@ def test_send_user_info_to_mailchimp_user_company_updated(mocker, mailchimp_hand
     }
     user_json = {
         **base_user_json,
-        'merge_fields': get_extendeduserprofile_merge_fields(instance)
+        'merge_fields': get_extendeduserprofile_merge_fields(extended_user_profile)
     }
 
     assert mock_task.delay.call_count == 3
