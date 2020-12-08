@@ -12,6 +12,7 @@ from openedx.adg.common.mailchimp_pipeline.helpers import (
 )
 from openedx.adg.lms.applications.test.factories import UserApplicationFactory
 from openedx.adg.lms.registration_extension.tests.factories import ExtendedUserProfileFactory
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.models import EnrollStatusChange
 from student.tests.factories import UserFactory
@@ -152,12 +153,15 @@ def test_send_user_enrollments_to_mailchimp_with_valid_enrollment_event(mocker, 
     """
     event = EnrollStatusChange.enroll
     user = UserFactory()
-    dummy_kwargs = {'user': user, 'course_id': 'test_course'}
-    mock_call = mocker.patch.object(mailchimp_handlers, 'task_send_user_enrollments_to_mailchimp')
+    course = CourseOverviewFactory()
+
+    dummy_kwargs = {'user': user, 'course_id': course.id}
+    mock_get_or_create = mocker.patch.object(mailchimp_handlers.CourseMeta.objects, 'get_or_create')
+    mock_enrolls = mocker.patch.object(mailchimp_handlers, 'get_enrollment_course_names_and_short_ids_by_user')
+    mock_enrolls.return_value = '100, 101, 102', 'course1, course2, course3'
 
     mailchimp_handlers.send_user_enrollments_to_mailchimp(sender=None, event=event, **dummy_kwargs)
-
-    mock_call.delay.assert_called_once_with(user.id, dummy_kwargs['course_id'])
+    mock_get_or_create.assert_called_once_with(course=course)
 
 
 @pytest.mark.django_db

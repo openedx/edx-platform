@@ -1,16 +1,21 @@
 """
 Signals for Mailchimp pipeline
 """
+import logging
+
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 
+from openedx.adg.common.course_meta.models import CourseMeta
 from openedx.adg.lms.applications.models import UserApplication
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
 from openedx.adg.lms.utils.decorators import suspendingreceiver
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import EnrollStatusChange, UserProfile
 from student.signals import ENROLL_STATUS_CHANGE
 
 from .helpers import (
+    get_enrollment_course_names_and_short_ids_by_user,
     get_extendeduserprofile_merge_fields,
     get_user_merge_fields,
     get_userapplication_merge_fields,
@@ -18,6 +23,8 @@ from .helpers import (
     is_mailchimp_sync_required
 )
 from .tasks import task_send_user_enrollments_to_mailchimp, task_send_user_info_to_mailchimp
+
+log = logging.getLogger(__name__)
 
 
 @suspendingreceiver(post_save, sender=ExtendedUserProfile)
@@ -83,4 +90,24 @@ def send_user_enrollments_to_mailchimp(sender, event=None, **kwargs):  # pylint:
     if event not in [EnrollStatusChange.enroll, EnrollStatusChange.unenroll]:
         return
 
-    task_send_user_enrollments_to_mailchimp.delay(kwargs.get('user').id, kwargs['course_id'])
+    course_id = kwargs['course_id']
+    try:
+        course = CourseOverview.objects.get(id=course_id)
+    except CourseOverview.DoesNotExist:
+        log.error('Unable to sync course enrollment to mailchimp, for course={course_id}'.format(course_id=course_id))
+        return
+
+    user = kwargs.get('user')
+    CourseMeta.objects.get_or_create(course=course)  # Create course short id for enrolled course
+    enrollment_short_ids, enrollment_titles = get_enrollment_course_names_and_short_ids_by_user(user)
+
+    user_json = {
+        'email_address': user.email,
+        'status_if_new': 'subscribed',
+        'merge_fields': {
+            'ENROLLS': enrollment_titles,
+            'ENROLL_IDS': enrollment_short_ids,
+        }
+    }
+
+    task_send_user_enrollments_to_mailchimp.delay(user.email, user_json)
