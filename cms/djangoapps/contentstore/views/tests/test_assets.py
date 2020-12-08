@@ -1,3 +1,4 @@
+# coding=utf-8
 """
 Unit tests for the asset upload endpoint.
 """
@@ -28,6 +29,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_importer import import_course_from_xml
+from util.json_request import JsonResponse
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -414,13 +416,13 @@ class AssetToJsonTestCase(AssetsTestCase):
     upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=UTC)
     content_type = 'image/jpg'
     course_key = CourseLocator('org', 'class', 'run')
-    location = course_key.make_asset_key('asset', 'my_file_name.jpg')
+    location = course_key.make_asset_key('asset', 'ḿӳ_fíĺé_name.jpg')
 
     def make_asset(self):
-        thumbnail_location = self.course_key.make_asset_key('thumbnail', 'my_file_name_thumb.jpg')
+        thumbnail_location = self.course_key.make_asset_key('thumbnail', 'ḿӳ_fíĺé_name_thumb.jpg')
         # pylint: disable=protected-access
         return assets._get_asset_json(
-            "my_file",
+            "ḿӳ_fíĺé",
             self.content_type,
             self.upload_date,
             self.location,
@@ -431,25 +433,29 @@ class AssetToJsonTestCase(AssetsTestCase):
     @override_settings(LMS_BASE="lms_base_url")
     def test_basic(self):
         output = self.make_asset()
-        self.assertEqual(output["display_name"], "my_file")
+        self.assertEqual(output["display_name"], "ḿӳ_fíĺé")
         self.assertEqual(output["date_added"], "Jun 01, 2013 at 10:30 UTC")
-        self.assertEqual(output["url"], "/asset-v1:org+class+run+type@asset+block@my_file_name.jpg")
+        self.assertEqual(output["url"], "/asset-v1:org+class+run+type@asset+block@ḿӳ_fíĺé_name.jpg")
         self.assertEqual(
-            output["external_url"], "//lms_base_url/asset-v1:org+class+run+type@asset+block@my_file_name.jpg"
+            output["external_url"], "//lms_base_url/asset-v1:org+class+run+type@asset+block@ḿӳ_fíĺé_name.jpg"
         )
-        self.assertEqual(output["portable_url"], "/static/my_file_name.jpg")
-        self.assertEqual(output["thumbnail"], "/asset-v1:org+class+run+type@thumbnail+block@my_file_name_thumb.jpg")
+        self.assertEqual(output["portable_url"], "/static/ḿӳ_fíĺé_name.jpg")
+        self.assertEqual(output["thumbnail"], "/asset-v1:org+class+run+type@thumbnail+block@ḿӳ_fíĺé_name_thumb.jpg")
         self.assertEqual(output["id"], six.text_type(self.location))
         self.assertEqual(output['locked'], True)
         # pylint: disable=protected-access
         output = assets._get_asset_json("name", self.content_type, self.upload_date, self.location, None, False)
         self.assertIsNone(output["thumbnail"])
 
+        response_with_unicode = JsonResponse(output)
+        content = response_with_unicode.content.decode('utf-8')
+        assert '/asset-v1:' in content, 'Ensure json gets serialized'
+
     @override_settings(LMS_BASE="lms_base_url")
     @patch('contentstore.views.assets.get_site_for_course', mock.Mock(return_value=mock.Mock(domain='site_domain')))
     def test_site_url(self):
         output = self.make_asset()
-        assert output["external_url"] == "//site_domain/asset-v1:org+class+run+type@asset+block@my_file_name.jpg"
+        assert output["external_url"] == "//site_domain/asset-v1:org+class+run+type@asset+block@ḿӳ_fíĺé_name.jpg"
 
 
 class LockAssetTestCase(AssetsTestCase):

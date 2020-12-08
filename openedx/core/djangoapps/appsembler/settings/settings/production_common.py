@@ -92,3 +92,5 @@ def plugin_settings(settings):
     # Honeycomb
     settings.HONEYCOMB_DATASET = settings.AUTH_TOKENS.get('HONEYCOMB_DATASET', None)
     settings.HONEYCOMB_WRITEKEY = settings.AUTH_TOKENS.get('HONEYCOMB_WRITEKEY', None)
+
+    settings.TAHOE_SCORM_XBLOCK_ROOT_DIR = settings.ENV_TOKENS.get('TAHOE_SCORM_XBLOCK_ROOT_DIR', False)

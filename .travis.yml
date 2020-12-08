@@ -24,7 +24,7 @@ cache:
   pip: true
 
 install:
-  - pip install tox
+  - pip install tox tox-pip-version
 
 env:
   global:
