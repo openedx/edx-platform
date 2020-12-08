@@ -41,6 +41,8 @@ INSTALLED_APPS.extend([
     'contentstore.apps.ContentstoreConfig',
     'cms.djangoapps.course_creators',
     'xblock_config.apps.XBlockConfig',
-    'user_tasks',
     'lms.djangoapps.lti_provider'
 ])
+
+
+COMMON_TEST_DATA_ROOT = ''
