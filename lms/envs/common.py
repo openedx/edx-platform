@@ -301,6 +301,9 @@ FEATURES = {
     'ENABLE_COURSEWARE_SEARCH': False,
     'ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF': False,
 
+    # Courseware navigation
+    'HIDE_COURSEWARE_NAVIGATION': False,
+
     # Dashboard search feature
     'ENABLE_DASHBOARD_SEARCH': False,
 
