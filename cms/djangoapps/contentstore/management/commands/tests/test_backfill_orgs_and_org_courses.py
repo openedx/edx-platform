@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 import ddt
 from django.core.management import CommandError, call_command
+from opaque_keys.edx.locator import CourseLocator
 from organizations import api as organizations_api
 from organizations.api import (
     add_organization,
@@ -55,9 +56,17 @@ class BackfillOrgsAndOrgCoursesTest(SharedModuleStoreTestCase):
         # org_B: already existing, but has no content.
         add_organization({"short_name": "org_B", "name": "Org B"})
 
-        # org_C: has a couple courses; should be created.
+        # org_C: has a few courses; should be created.
         CourseOverviewFactory(org="org_C", run="1")
         CourseOverviewFactory(org="org_C", run="2")
+        # Include an Old Mongo Modulestore -style deprecated course key.
+        # This can be safely removed when Old Mongo Modulestore support is
+        # removed.
+        CourseOverviewFactory(
+            id=CourseLocator.from_string("org_C/toy/3"),
+            org="org_C",
+            run="3",
+        )
 
         # org_D: has both a course and a library; should be created.
         CourseOverviewFactory(org="org_D", run="1")
@@ -88,7 +97,7 @@ class BackfillOrgsAndOrgCoursesTest(SharedModuleStoreTestCase):
         }
         assert len(get_organization_courses(get_organization_by_short_name('org_A'))) == 2
         assert len(get_organization_courses(get_organization_by_short_name('org_B'))) == 0
-        assert len(get_organization_courses(get_organization_by_short_name('org_C'))) == 2
+        assert len(get_organization_courses(get_organization_by_short_name('org_C'))) == 3
         assert len(get_organization_courses(get_organization_by_short_name('org_D'))) == 1
         assert len(get_organization_courses(get_organization_by_short_name('org_E'))) == 0
 

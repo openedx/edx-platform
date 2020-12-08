@@ -62,11 +62,11 @@ class Command(BaseCommand):
         """
         Handle the backfill command.
         """
-        orgslug_coursekey_pairs = find_orgslug_coursekey_pairs()
-        orgslug_library_pairs = find_orgslug_library_pairs()
+        orgslug_courseid_pairs = find_orgslug_courseid_pairs()
+        orgslug_libraryid_pairs = find_orgslug_libraryid_pairs()
         orgslugs = (
-            {orgslug for orgslug, _ in orgslug_coursekey_pairs} |
-            {orgslug for orgslug, _ in orgslug_library_pairs}
+            {orgslug for orgslug, _ in orgslug_courseid_pairs} |
+            {orgslug for orgslug, _ in orgslug_libraryid_pairs}
         )
         # Note: the `organizations.api.bulk_add_*` code will handle:
         # * not overwriting existing organizations, and
@@ -78,20 +78,20 @@ class Command(BaseCommand):
             # function more deterministic in case something goes wrong.
             for orgslug in sorted(orgslugs)
         ]
-        org_coursekey_pairs = [
-            ({"short_name": orgslug}, coursekey)
-            for orgslug, coursekey in sorted(orgslug_coursekey_pairs)
+        org_courseid_pairs = [
+            ({"short_name": orgslug}, courseid)
+            for orgslug, courseid in sorted(orgslug_courseid_pairs)
         ]
-        if not confirm_changes(options, orgs, org_coursekey_pairs):
+        if not confirm_changes(options, orgs, orgslug_courseid_pairs):
             print("No changes applied.")
             return
         print("Applying changes...")
         organizations_api.bulk_add_organizations(orgs, dry_run=False)
-        organizations_api.bulk_add_organization_courses(org_coursekey_pairs, dry_run=False)
+        organizations_api.bulk_add_organization_courses(org_courseid_pairs, dry_run=False)
         print("Changes applied successfully.")
 
 
-def confirm_changes(options, orgs, org_coursekey_pairs):
+def confirm_changes(options, orgs, orgslug_courseid_pairs):
     """
     Should we apply the changes to the database?
 
@@ -102,8 +102,8 @@ def confirm_changes(options, orgs, org_coursekey_pairs):
     Arguments:
         options (dict[str]): command-line arguments.
         orgs (list[dict]): list of org data dictionaries to bulk-add.
-        org_coursekey_pairs (list[tuple[dict, CourseKey]]):
-            list of (org data dictionary, course key) links to bulk-add.
+        org_courseid_pairs (list[tuple[dict, str]]):
+            list of (org data dictionary, course key string) links to bulk-add.
 
     Returns: bool
     """
@@ -112,7 +112,7 @@ def confirm_changes(options, orgs, org_coursekey_pairs):
     if options.get('apply'):
         return True
     organizations_api.bulk_add_organizations(orgs, dry_run=True)
-    organizations_api.bulk_add_organization_courses(org_coursekey_pairs, dry_run=True)
+    organizations_api.bulk_add_organization_courses(orgslug_courseid_pairs, dry_run=True)
     if options.get('dry'):
         return False
     answer = ""
@@ -121,17 +121,17 @@ def confirm_changes(options, orgs, org_coursekey_pairs):
     return answer.lower().startswith('y')
 
 
-def find_orgslug_coursekey_pairs():
+def find_orgslug_courseid_pairs():
     """
-    Returns the unique pairs of (organization short name, course run key)
+    Returns the unique pairs of (organization short name, course run key string)
     from the CourseOverviews table, which should contain all course runs in the
     system.
 
-    Returns: set[tuple[str, CourseKey]]
+    Returns: set[tuple[str, str]]
     """
     # Using a set comprehension removes any duplicate (org, course) pairs.
     return {
-        (course_key.org, course_key)
+        (course_key.org, str(course_key))
         for course_key
         # Worth noting: This will load all CourseOverviews, no matter their VERSION.
         # This is intentional: there may be course runs that haven't updated
@@ -141,9 +141,9 @@ def find_orgslug_coursekey_pairs():
     }
 
 
-def find_orgslug_library_pairs():
+def find_orgslug_libraryid_pairs():
     """
-    Returns the unique pairs of (organization short name, content library key)
+    Returns the unique pairs of (organization short name, content library key string)
     from the modulestore.
 
     Note that this only considers "version 1" (aka "legacy" or "modulestore-based")
@@ -152,11 +152,11 @@ def find_orgslug_library_pairs():
     because those require a database-level link to their authoring organization,
     and thus would not need backfilling via this command.
 
-    Returns: set[tuple[str, LibraryLocator]]
+    Returns: set[tuple[str, str]]
     """
     # Using a set comprehension removes any duplicate (org, library) pairs.
     return {
-        (library_key.org, library_key)
+        (library_key.org, str(library_key))
         for library_key
         in modulestore().get_library_keys()
     }
