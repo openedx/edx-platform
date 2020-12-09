@@ -39,7 +39,7 @@ drf-yasg<1.17.1
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.13.7
+edx-enterprise==3.13.10
 
 # Pinning as a temporary fix to https://openedx.atlassian.net/browse/CR-2982, as per
 # https://github.com/edx/edx-platform/pull/25766
