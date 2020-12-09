@@ -66,9 +66,7 @@ pyparsing==2.4.7
     #   matplotlib
     #   openedx-calc
 python-dateutil==2.4.0
-    # via
-    #   -c requirements/edx-sandbox/../constraints.txt
-    #   matplotlib
+    # via matplotlib
 random2==1.0.1
     # via -r requirements/edx-sandbox/py38.in
 regex==2021.4.4

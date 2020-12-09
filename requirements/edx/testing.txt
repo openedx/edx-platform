@@ -1006,9 +1006,8 @@ pytest==6.2.4
     #   pytest-metadata
     #   pytest-randomly
     #   pytest-xdist
-python-dateutil==2.4.0
+python-dateutil==2.8.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   analytics-python
     #   botocore
