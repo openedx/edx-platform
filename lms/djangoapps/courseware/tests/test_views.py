@@ -3251,7 +3251,7 @@ class TestShowCoursewareMFE(TestCase):
         )
         for user, course_key, is_course_staff, preview_active, redirect_active in combos:
             with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, preview_active):
-                with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=redirect_active):
+                with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=redirect_active):
                     assert show_courseware_mfe_link(user, is_course_staff, course_key) is False
 
     @patch.dict(settings.FEATURES, {'ENABLE_COURSEWARE_MICROFRONTEND': True})
@@ -3271,14 +3271,14 @@ class TestShowCoursewareMFE(TestCase):
         )
         for user, is_course_staff, preview_active, redirect_active in old_mongo_combos:
             with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, preview_active):
-                with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=redirect_active):
+                with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=redirect_active):
                     assert show_courseware_mfe_link(user, is_course_staff, old_course_key) is False
 
         # We've checked all old-style course keys now, so we can test only the
         # new ones going forward. Now we check combinations of waffle flags and
         # user permissions...
         with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, True):
-            with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
+            with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
                 # (preview=on, redirect=on)
                 # Global and Course Staff can see the link.
                 self.assertTrue(show_courseware_mfe_link(global_staff_user, True, new_course_key))
@@ -3287,7 +3287,7 @@ class TestShowCoursewareMFE(TestCase):
 
                 # Regular users don't see the link.
                 self.assertFalse(show_courseware_mfe_link(regular_user, False, new_course_key))
-            with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=False):
+            with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=False):
                 # (preview=on, redirect=off)
                 # Global and Course Staff can see the link.
                 self.assertTrue(show_courseware_mfe_link(global_staff_user, True, new_course_key))
@@ -3298,7 +3298,7 @@ class TestShowCoursewareMFE(TestCase):
                 self.assertFalse(show_courseware_mfe_link(regular_user, False, new_course_key))
 
         with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, False):
-            with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
+            with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
                 # (preview=off, redirect=on)
                 # Global staff see the link anyway
                 self.assertTrue(show_courseware_mfe_link(global_staff_user, True, new_course_key))
@@ -3310,7 +3310,7 @@ class TestShowCoursewareMFE(TestCase):
 
                 # Regular users don't see the link.
                 self.assertFalse(show_courseware_mfe_link(regular_user, False, new_course_key))
-            with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=False):
+            with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=False):
                 # (preview=off, redirect=off)
                 # Global staff see the link anyway
                 self.assertTrue(show_courseware_mfe_link(global_staff_user, True, new_course_key))
@@ -3369,7 +3369,7 @@ class MFERedirectTests(BaseViewsTestCase):
         # learners will be redirected when the waffle flag is set
         lms_url, mfe_url = self._get_urls()
 
-        with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
+        with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
             assert self.client.get(lms_url).url == mfe_url
 
     def test_staff_no_redirect(self):
@@ -3381,14 +3381,14 @@ class MFERedirectTests(BaseViewsTestCase):
         self.client.login(username=course_staff.username, password='test')
 
         assert self.client.get(lms_url).status_code == 200
-        with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
+        with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
             assert self.client.get(lms_url).status_code == 200
 
         # global staff will never be redirected
         self._create_global_staff_user()
         assert self.client.get(lms_url).status_code == 200
 
-        with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
+        with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
             assert self.client.get(lms_url).status_code == 200
 
     def test_exam_no_redirect(self):
@@ -3398,5 +3398,5 @@ class MFERedirectTests(BaseViewsTestCase):
 
         lms_url, mfe_url = self._get_urls()
 
-        with override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
+        with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
             assert self.client.get(lms_url).status_code == 200

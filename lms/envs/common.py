@@ -638,7 +638,7 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2020-03-05
     # .. toggle_target_removal_date: None
-    # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/23317'
+    # .. toggle_tickets: DEPR-109
     # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and see REDIRECT_TO_COURSEWARE_MICROFRONTEND for
     #   rollout.
     'ENABLE_COURSEWARE_MICROFRONTEND': False,
