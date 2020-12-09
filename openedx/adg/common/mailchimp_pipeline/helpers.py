@@ -82,7 +82,7 @@ def get_userapplication_merge_fields(user_application):
     return {
         'ORG_NAME': user_application.organization or '',
         'APP_STATUS': user_application.status,
-        'B_LINE': user_application.business_line.title or ''
+        'B_LINE': user_application.business_line.title if user_application.business_line else ''
     }
 
 
@@ -96,4 +96,4 @@ def get_extendeduserprofile_merge_fields(extended_profile):
     Returns:
         dict: Contains merge_fields for ExtendedUserProfile object.
     """
-    return {'COMPANY': extended_profile.company.title or ''}
+    return {'COMPANY': extended_profile.company.title if extended_profile.company else ''}
