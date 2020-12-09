@@ -19,6 +19,7 @@ class MandrillClient(object):
     PASSWORD_RESET = 'adg-password-reset'
     USER_ACCOUNT_ACTIVATION = 'adg-user-activation-email'
     VERIFY_CHANGE_USER_EMAIL = 'adg-verify-email-address-change-step-2'
+    APPLICATION_SUBMISSION_CONFIRMATION = 'adg-application-submission-confirmation-1'
 
     def __init__(self):
         self.mandrill_client = mandrill.Mandrill(settings.MANDRILL_API_KEY)
