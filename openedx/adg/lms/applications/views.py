@@ -124,13 +124,13 @@ class ApplicationSuccessView(RedirectToLoginOrRelevantPageMixin, TemplateView):
         """
         return HttpResponse(status=400)
 
-    def get_context_data(self, *args, **kwargs):
+    def get_context_data(self, **kwargs):
         """
         Send the application submission date for the authenticated user in the context dictionary.
 
         Returns:
             dict object.
         """
-        context = super(ApplicationSuccessView, self).get_context_data(*args, **kwargs)
+        context = super(ApplicationSuccessView, self).get_context_data(**kwargs)
         context['submission_date'] = self.request.user.application_hub.submission_date
         return context

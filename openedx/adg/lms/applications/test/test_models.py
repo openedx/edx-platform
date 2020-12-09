@@ -11,8 +11,8 @@ from .factories import ApplicationHubFactory
 
 
 @pytest.mark.django_db
-@pytest.fixture()
-def application_hub():
+@pytest.fixture(name='application_hub')
+def application_hub_fixture():
     """
     Create an ApplicationHub object for the specified test user.
 
