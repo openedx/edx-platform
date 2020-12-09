@@ -640,13 +640,15 @@ def show_courseware_mfe_link(user, staff_access, course_key):
     if user.is_staff:
         return True
 
-    # If you have course staff access, you see this link if we've enabled the
-    # course team preview CourseWaffleFlag for this course *or* if we've turned
-    # on the redirect for your students.
-    mfe_enabled_for_course_team = COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW.is_enabled(course_key)
-    mfe_enabled_for_course = REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled(course_key)
-
-    if staff_access and (mfe_enabled_for_course_team or mfe_enabled_for_course):
-        return True
+    # If you have course staff access, you can see this link if...
+    if staff_access:
+        # (a) we've turned on the redirect for your students, or...
+        mfe_enabled_for_course = REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled(course_key)
+        if mfe_enabled_for_course:
+            return True
+        # (b) we've enabled the course team preview.
+        mfe_enabled_for_course_team = COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW.is_enabled(course_key)
+        if mfe_enabled_for_course_team:
+            return True
 
     return False
