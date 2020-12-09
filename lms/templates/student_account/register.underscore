@@ -45,7 +45,7 @@
                 </h3>
             </div>
         <% } else { %>
-            <h2><%- gettext('Create an Account')%></h2>
+            <h1 class="section-title"><%- gettext('Create an Account')%></h1>
         <% } %>
     <% } else if (context.autoRegisterWelcomeMessage) { %>
         <span class="auto-register-message"><%- context.autoRegisterWelcomeMessage %></span>
