@@ -1,3 +1,7 @@
+"""
+Common celery utilities.
+"""
+
 import threading
 
 SINGLETON_LOCK = threading.Lock()
@@ -6,6 +10,7 @@ SINGLETON_LOCK = threading.Lock()
 # instantiated for that variant.
 SINGLETON_VARIANT = None
 
+
 def assert_celery_uninstantiated(variant):
     """
     Raise if celery is already instantiated for the other variant of edxapp.
@@ -13,6 +18,7 @@ def assert_celery_uninstantiated(variant):
     Specifically, raise if this function is called multiple times with
     different variant values. Safe to call multiple times with same variant.
     """
+    global SINGLETON_VARIANT
     with SINGLETON_LOCK:
         if SINGLETON_VARIANT is None:
             SINGLETON_VARIANT = variant
