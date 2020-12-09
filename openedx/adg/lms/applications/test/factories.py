@@ -3,7 +3,8 @@ All model factories for applications
 """
 import factory
 
-from openedx.adg.lms.applications.models import BusinessLine
+from openedx.adg.lms.applications.models import BusinessLine, UserApplication
+from student.tests.factories import UserFactory
 
 
 class BusinessLineFactory(factory.DjangoModelFactory):
@@ -15,3 +16,16 @@ class BusinessLineFactory(factory.DjangoModelFactory):
 
     title = factory.Faker('word')
     description = factory.Faker('sentence')
+
+
+class UserApplicationFactory(factory.DjangoModelFactory):
+    """
+    Factory for UserApplication model
+    """
+
+    class Meta:
+        model = UserApplication
+
+    user = factory.SubFactory(UserFactory)
+    business_line = factory.SubFactory(BusinessLineFactory)
+    organization = 'testOrganization'
