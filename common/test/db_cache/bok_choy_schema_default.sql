@@ -2870,7 +2870,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=805 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=806 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5503,10 +5503,10 @@ CREATE TABLE `proctoring_proctoredexamstudentattempt` (
   `user_id` int(11) NOT NULL,
   `is_status_acknowledged` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `proctoring_proctoredexam_user_id_proctored_exam_i_1464b206_uniq` (`user_id`,`proctored_exam_id`),
   KEY `proctoring_proctored_proctored_exam_id_0732c688_fk_proctorin` (`proctored_exam_id`),
   KEY `proctoring_proctoredexamstudentattempt_attempt_code_b10ad854` (`attempt_code`),
   KEY `proctoring_proctoredexamstudentattempt_external_id_9c302af3` (`external_id`),
+  KEY `proctoring_proctoredexamstudentattempt_user_id_2b58b7ed` (`user_id`),
   CONSTRAINT `proctoring_proctored_proctored_exam_id_0732c688_fk_proctorin` FOREIGN KEY (`proctored_exam_id`) REFERENCES `proctoring_proctoredexam` (`id`),
   CONSTRAINT `proctoring_proctored_user_id_2b58b7ed_fk_auth_user` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -7827,7 +7827,7 @@ CREATE TABLE `workflow_assessmentworkflowstep` (
   `assessment_completed_at` datetime(6) DEFAULT NULL,
   `order_num` int(10) unsigned NOT NULL,
   `workflow_id` int(11) NOT NULL,
-  `skipped` tinyint(1),
+  `skipped` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `workflow_assessmentw_workflow_id_fe52b4aa_fk_workflow_` (`workflow_id`),
   CONSTRAINT `workflow_assessmentw_workflow_id_fe52b4aa_fk_workflow_` FOREIGN KEY (`workflow_id`) REFERENCES `workflow_assessmentworkflow` (`id`)
