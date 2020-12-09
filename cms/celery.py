@@ -10,11 +10,15 @@ import os
 
 from celery import Celery
 
+from openedx.core.lib.celery import assert_celery_uninstantiated
 from openedx.core.lib.celery.routers import AlternateEnvironmentRouter
 
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cms.envs.production')
 
+# Prevent instantiation of both CMS and LMS celery.
+# See assert_celery_uninstantiated for more details.
+assert_celery_uninstantiated('cms')
 APP = Celery('proj')
 
 APP.conf.task_protocol = 1
