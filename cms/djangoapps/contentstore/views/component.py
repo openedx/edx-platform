@@ -41,7 +41,7 @@ __all__ = [
 log = logging.getLogger(__name__)
 
 # NOTE: This list is disjoint from ADVANCED_COMPONENT_TYPES
-COMPONENT_TYPES = ['discussion', 'html', 'problem', 'video']
+COMPONENT_TYPES = ['discussion', 'html', 'openassessment', 'problem', 'video']
 
 ADVANCED_COMPONENT_TYPES = sorted(set(name for name, class_ in XBlock.load_classes()) - set(COMPONENT_TYPES))
 
@@ -260,7 +260,8 @@ def get_component_templates(courselike, library=False):
         'discussion': _("Discussion"),
         'html': _("HTML"),
         'problem': _("Problem"),
-        'video': _("Video")
+        'video': _("Video"),
+        'openassessment': _("Open Response")
     }
 
     component_templates = []
@@ -269,9 +270,11 @@ def get_component_templates(courselike, library=False):
     # by the components in the order listed in COMPONENT_TYPES.
     component_types = COMPONENT_TYPES[:]
 
-    # Libraries do not support discussions
+    # Libraries do not support discussions and openassessment
+    component_not_supported_by_library = ['discussion', 'openassessment']
     if library:
-        component_types = [component for component in component_types if component != 'discussion']
+        component_types = [component for component in component_types
+                           if component not in set(component_not_supported_by_library)]
 
     component_types = _filter_disabled_blocks(component_types)
 
@@ -288,9 +291,14 @@ def get_component_templates(courselike, library=False):
             # add the default template with localized display name
             # TODO: Once mixins are defined per-application, rather than per-runtime,
             # this should use a cms mixed-in class. (cpennington)
+            template_id = None
             display_name = xblock_type_display_name(category, _('Blank'))  # this is the Blank Advanced problem
+            # The first template that is given should be Blank Assessment Template
+            if category == 'openassessment':
+                display_name = _("Blank Open Response Assessment")
+                template_id = "blank-assessment"
             templates_for_category.append(
-                create_template_dict(display_name, category, support_level_without_template, None, 'advanced')
+                create_template_dict(display_name, category, support_level_without_template, template_id, 'advanced')
             )
             categories.add(category)
 
