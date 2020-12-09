@@ -112,6 +112,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     course_exit_page_is_active = serializers.BooleanField()
     certificate_data = CertificateDataSerializer()
     verify_identity_url = AbsoluteURLField()
+    verification_status = serializers.CharField()
     linkedin_add_to_profile_url = serializers.URLField()
 
     def __init__(self, *args, **kwargs):
