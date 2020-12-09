@@ -6,6 +6,7 @@ SubsectionGrade Factory Class
 from collections import OrderedDict
 from logging import getLogger
 
+from django.conf import settings
 from lazy import lazy
 from submissions import api as submissions_api
 
@@ -105,12 +106,13 @@ class SubsectionGradeFactory(object):
             )
             self._update_saved_subsection_grade(subsection.location, grade_model)
 
-            COURSE_ASSESSMENT_GRADE_CHANGED.send_robust(
-                sender=self,
-                user=self.student,
-                subsection_id=calculated_grade.location,
-                subsection_grade=calculated_grade.graded_total.earned
-            )
+            if settings.FEATURES.get('ENABLE_COURSE_ASSESSMENT_GRADE_CHANGE_SIGNAL'):
+                COURSE_ASSESSMENT_GRADE_CHANGED.send_robust(
+                    sender=self,
+                    user=self.student,
+                    subsection_id=calculated_grade.location,
+                    subsection_grade=calculated_grade.graded_total.earned
+                )
 
         return calculated_grade
 

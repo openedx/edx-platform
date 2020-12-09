@@ -49,6 +49,7 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
         self.assertIsInstance(grade, ZeroSubsectionGrade)
         self.assert_grade(grade, 0.0, 1.0)
 
+    @patch.dict(settings.FEATURES, {'ENABLE_COURSE_ASSESSMENT_GRADE_CHANGE_SIGNAL': True})
     def test_update(self):
         """
         Assuming the underlying score reporting methods work,
