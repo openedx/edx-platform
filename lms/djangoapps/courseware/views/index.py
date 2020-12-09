@@ -41,10 +41,8 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
     DISABLE_COURSE_OUTLINE_PAGE_FLAG,
-    RELATIVE_DATES_FLAG,
     default_course_url_name
 )
-from openedx.features.course_experience.urls import COURSE_HOME_VIEW_NAME
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from common.djangoapps.student.models import CourseEnrollment
@@ -55,7 +53,7 @@ from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
 from ..access import has_access
 from ..access_utils import check_public_access
-from ..courses import check_course_access_with_redirect, get_course_with_access, get_current_child, get_studio_url
+from ..courses import get_course_with_access, get_current_child, get_studio_url
 from ..entrance_exams import (
     course_has_entrance_exam,
     get_entrance_exam_content,
@@ -640,13 +638,15 @@ def show_courseware_mfe_link(user, staff_access, course_key):
     if user.is_staff:
         return True
 
-    # If you have course staff access, you see this link if we've enabled the
-    # course team preview CourseWaffleFlag for this course *or* if we've turned
-    # on the redirect for your students.
-    mfe_enabled_for_course_team = COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW.is_enabled(course_key)
-    mfe_experiment_enabled_for_course = REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_experiment_on(course_key)
-
-    if staff_access and (mfe_enabled_for_course_team or mfe_experiment_enabled_for_course):
-        return True
+    # If you have course staff access, you can see this link if...
+    if staff_access:
+        # (a) we've turned on the redirect for your students, or...
+        mfe_enabled_for_course = REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled(course_key)
+        if mfe_enabled_for_course:
+            return True
+        # (b) we've enabled the course team preview.
+        mfe_enabled_for_course_team = COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW.is_enabled(course_key)
+        if mfe_enabled_for_course_team:
+            return True
 
     return False

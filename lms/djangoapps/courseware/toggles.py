@@ -3,14 +3,13 @@ Toggles for courseware in-course experience.
 """
 
 from edx_toggles.toggles import LegacyWaffleFlagNamespace
-from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 # Namespace for courseware waffle flags.
 WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='courseware')
 
 # .. toggle_name: courseware.courseware_mfe
-# .. toggle_implementation: ExperimentWaffleFlag
+# .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Waffle flag to redirect to another learner profile experience. Supports staged rollout to
 #   students for a new micro-frontend-based implementation of the courseware page.
@@ -19,9 +18,9 @@ WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='courseware')
 # .. toggle_target_removal_date: 2020-12-31
 # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and
 #   ENABLE_COURSEWARE_MICROFRONTEND.
-# .. toggle_tickets: TNL-7000
-REDIRECT_TO_COURSEWARE_MICROFRONTEND = ExperimentWaffleFlag(
-    WAFFLE_FLAG_NAMESPACE, 'courseware_mfe', __name__, use_course_aware_bucketing=False
+# .. toggle_tickets: DEPR-109
+REDIRECT_TO_COURSEWARE_MICROFRONTEND = CourseWaffleFlag(
+    WAFFLE_FLAG_NAMESPACE, 'courseware_mfe', __name__
 )
 
 # .. toggle_name: courseware.microfrontend_course_team_preview
@@ -35,7 +34,7 @@ REDIRECT_TO_COURSEWARE_MICROFRONTEND = ExperimentWaffleFlag(
 # .. toggle_target_removal_date: 2020-12-31
 # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and
 #   ENABLE_COURSEWARE_MICROFRONTEND.
-# .. toggle_tickets: TNL-6982
+# .. toggle_tickets: DEPR-109
 COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'microfrontend_course_team_preview', __name__
 )
@@ -90,8 +89,8 @@ COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_FIRST_SECTION_CELEBRATION = CourseW
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Waffle flag to toggle various enhancements to the proctoring experience, including but
-#   not limited to the display of learner facing proctoring information on the course outline, changes to the Proctortrack
-#   onboarding flow, changes to IDV (identity verification) requirements, etc.
+#   not limited to the display of learner facing proctoring information on the course outline, changes to the
+#   Proctortrack onboarding flow, changes to IDV (identity verification) requirements, etc.
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2020-10-07
 # .. toggle_target_removal_date: None
