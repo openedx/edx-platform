@@ -191,16 +191,18 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
             url=reverse('bookmarks')
         )
         bookmarks_data = response.data['results']
-        self.assertEqual(len(bookmarks_data), 3)
+        self.assertEqual(len(bookmarks_data), 5)
         self.assert_bookmark_data_is_valid(self.other_bookmark_1, bookmarks_data[0])
-        self.assert_bookmark_data_is_valid(self.bookmark_2, bookmarks_data[1])
-        self.assert_bookmark_data_is_valid(self.bookmark_1, bookmarks_data[2])
+        self.assert_bookmark_data_is_valid(self.bookmark_4, bookmarks_data[1])
+        self.assert_bookmark_data_is_valid(self.bookmark_3, bookmarks_data[2])
+        self.assert_bookmark_data_is_valid(self.bookmark_2, bookmarks_data[3])
+        self.assert_bookmark_data_is_valid(self.bookmark_1, bookmarks_data[4])
 
         self.assert_bookmark_event_emitted(
             mock_tracker,
             event_name='edx.bookmark.listed',
             list_type='all_courses',
-            bookmarks_count=3,
+            bookmarks_count=5,
             page_size=10,
             page_number=1
         )
@@ -230,16 +232,16 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         response = self.send_post(
             client=self.client,
             url=reverse('bookmarks'),
-            data={'usage_id': six.text_type(self.vertical_3.location)}
+            data={'usage_id': six.text_type(self.vertical_2.location)}
         )
 
         # Assert Newly created bookmark.
-        self.assertEqual(response.data['id'], '%s,%s' % (self.user.username, six.text_type(self.vertical_3.location)))
+        self.assertEqual(response.data['id'], '%s,%s' % (self.user.username, six.text_type(self.vertical_2.location)))
         self.assertEqual(response.data['course_id'], self.course_id)
-        self.assertEqual(response.data['usage_id'], six.text_type(self.vertical_3.location))
+        self.assertEqual(response.data['usage_id'], six.text_type(self.vertical_2.location))
         self.assertIsNotNone(response.data['created'])
         self.assertEqual(len(response.data['path']), 2)
-        self.assertEqual(response.data['display_name'], self.vertical_3.display_name)
+        self.assertEqual(response.data['display_name'], self.vertical_2.display_name)
 
     def test_post_bookmark_with_invalid_data(self):
         """
@@ -334,9 +336,9 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
     @patch('eventtracking.tracker.emit')
     @ddt.unpack
     @ddt.data(
-        {'page_size': -1, 'expected_bookmarks_count': 2, 'expected_page_size': 10, 'expected_page_number': 1},
-        {'page_size': 0, 'expected_bookmarks_count': 2, 'expected_page_size': 10, 'expected_page_number': 1},
-        {'page_size': 999, 'expected_bookmarks_count': 2, 'expected_page_size': 100, 'expected_page_number': 1}
+        {'page_size': -1, 'expected_bookmarks_count': 4, 'expected_page_size': 10, 'expected_page_number': 1},
+        {'page_size': 0, 'expected_bookmarks_count': 4, 'expected_page_size': 10, 'expected_page_number': 1},
+        {'page_size': 999, 'expected_bookmarks_count': 4, 'expected_page_size': 100, 'expected_page_number': 1}
     )
     def test_listed_event_for_different_page_size_values(self, mock_tracker, page_size, expected_bookmarks_count,
                                                          expected_page_size, expected_page_number):
@@ -364,7 +366,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
             mock_tracker,
             event_name='edx.bookmark.listed',
             list_type='all_courses',
-            bookmarks_count=3,
+            bookmarks_count=5,
             page_size=2,
             page_number=2
         )
@@ -482,7 +484,7 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
         query_parameters = 'course_id={}'.format(six.moves.urllib.parse.quote(self.course_id))
         response = self.send_get(client=self.client, url=reverse('bookmarks'), query_parameters=query_parameters)
         bookmarks_data = response.data['results']
-        self.assertEqual(len(bookmarks_data), 2)
+        self.assertEqual(len(bookmarks_data), 4)
 
         self.send_delete(
             client=self.client,
@@ -494,7 +496,7 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
         response = self.send_get(client=self.client, url=reverse('bookmarks'), query_parameters=query_parameters)
         bookmarks_data = response.data['results']
 
-        self.assertEqual(len(bookmarks_data), 1)
+        self.assertEqual(len(bookmarks_data), 3)
 
     def test_delete_bookmark_that_belongs_to_other_user(self):
         """
