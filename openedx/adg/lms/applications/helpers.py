@@ -9,6 +9,7 @@ from django.utils.translation import ugettext as _
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.adg.lms.student.helpers import send_mandrill_email
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
 from .constants import LOGO_IMAGE_MAX_SIZE
 
 

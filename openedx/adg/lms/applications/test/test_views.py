@@ -10,6 +10,7 @@ from django.urls import reverse
 
 from openedx.adg.lms.applications.views import ApplicationHubView, ApplicationSuccessView
 from student.tests.factories import UserFactory
+
 from .constants import PASSWORD, USERNAME
 from .factories import ApplicationHubFactory
 
@@ -110,7 +111,7 @@ def test_get_initial_application_state_for_application_hub_view(mock_render, app
 @pytest.mark.django_db
 @mock.patch('openedx.adg.lms.applications.views.render')
 def test_get_written_application_completed_state_for_application_hub_view(
-    mock_render, application_hub_view_get_request):
+        mock_render, application_hub_view_get_request):
     """
     Test the case where the user has completed the written application but not the pre_req courses.
     """

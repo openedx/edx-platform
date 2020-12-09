@@ -10,6 +10,7 @@ from django.views.generic import TemplateView
 
 from openedx.adg.common.course_meta.models import CourseMeta
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+
 from .helpers import send_application_submission_confirmation_email
 from .models import ApplicationHub
 

@@ -7,6 +7,7 @@ import pytest
 
 from openedx.adg.lms.applications.constants import LOGO_IMAGE_MAX_SIZE
 from openedx.adg.lms.applications.helpers import send_application_submission_confirmation_email, validate_logo_size
+
 from .constants import EMAIL
 
 

@@ -10,6 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
 
 from openedx.adg.lms.utils.date_utils import month_choices, year_choices
+
 from .constants import ALLOWED_LOGO_EXTENSIONS
 from .helpers import validate_logo_size
 
