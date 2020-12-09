@@ -81,7 +81,7 @@
   select,
   textarea {
     font-family: $font-family-sans-serif;
-    color: $m-gray-d1;
+    color: $gray-700;
   }
 
   .copy {
@@ -445,12 +445,15 @@
     width: flex-grid(12, 12);
     margin-bottom: 0;
     border-bottom: none;
+    padding: 0;
 
     .title {
       @include clearfix();
 
       width: flex-grid(12, 12);
       margin: 0;
+      text-align: left !important;
+      border-bottom: none !important;
 
       .sts-course,
       .sts-track {
@@ -1353,9 +1356,11 @@
     width: flex-grid(12, 12);
 
     > .title {
-      @extend %hd-lv2;
-
-      color: $m-blue-d1;
+      font-size: 1.8rem;
+      font-weight: 700;
+      line-height: 1.1;
+      color: $primary-500;
+      border-bottom: none !important;
     }
 
     .instruction {
@@ -1414,7 +1419,7 @@
   &.step-select-track {
     .container {
       min-width: 0;
-      max-width: map-get($container-max-widths, xl);
+      max-width: 1140px;
     }
 
     .sts-track {
@@ -1443,7 +1448,7 @@
 
       border-top: ($baseline/4) solid $m-gray-d4;
       padding: $baseline ($baseline*1.5);
-      background: $m-gray-l4;
+      background: $light-300;
 
       &:last-child {
         margin-bottom: 0;
@@ -1504,7 +1509,7 @@
     }
 
     .register-choice-audit {
-      border-color: $m-blue-d1;
+      border-top: 5px solid $light-700;
 
       .deco-ribbon {
         position: relative;
@@ -1523,24 +1528,34 @@
       }
 
       .action-select input {
-        @extend %btn-primary-blue;
+        @extend .btn-outline-primary;
+        box-shadow: none;
+        border-radius: 0;
+        font-weight: 500;
+        color: $primary-500 !important;
+
+        &:hover,
+        &:active,
+        &:focus {
+          color: $white !important;
+        }
       }
     }
 
     .register-choice-certificate {
-      border-color: $verified-color-lvl3;
+      border-color: $primary-500;
       position: relative;
 
       .deco-ribbon {
         position: absolute;
-        top: -10px;
+        top: -5px;
 
         @include right($baseline);
 
         display: block;
-        width: 45px;
-        height: 45px;
-        background: transparent url('#{$static-path}/images/verified-ribbon.png') no-repeat 0 0;
+        width: 36px;
+        height: 44px;
+        background: transparent url('#{$static-path}/images/verified-ribbon_36x44.png') no-repeat 0 0;
       }
 
       .action-intro,
@@ -1563,8 +1578,15 @@
       }
 
       .action-select button[name="verified_mode"] {
-        font-weight: 600;
-        padding: 10px 15px;
+        @extend .btn-primary;
+        font-weight: 500 !important;
+
+        &:hover,
+        &:active,
+        &:focus {
+          border-color: $dark-300;
+          background: $dark-300;
+        }
       }
 
       // extra register options/info
