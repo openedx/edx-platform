@@ -16,20 +16,18 @@ from .models import ApplicationHub
 
 class RedirectToLoginOrRelevantPageMixin(AccessMixin):
     """
-    Redirect to login page if the user is not authenticated. Redirect to the specified url in the `handle_no_permission`
-    if the `is_view_precondition` is not satisfied.
-    If the user is authenticated and the requirements are upto the mark, view is accessible.
+    AccessView that allows only authenticated users with pre_conditions satisfied to access the view.
     """
 
     def dispatch(self, request, *args, **kwargs):
         """
-        Redirects to login page without calling the 'handle_no_permission()' method.
+        Redirects to login page for unauthenticated users. Runs `handle_no_permission` if preconditions are not
+        satisfied. Runs the view normally for authenticated user with proper conditions satisfied.
         """
         if not request.user.is_authenticated:
             return redirect_to_login(request.get_full_path(), self.get_login_url(), self.get_redirect_field_name())
-        else:
-            if not self.is_precondition_satisfied():
-                return self.handle_no_permission()
+        elif not self.is_precondition_satisfied():
+            return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -79,9 +77,9 @@ class ApplicationHubView(RedirectToLoginOrRelevantPageMixin, View):
         pre_req_courses = [CourseOverview.get_from_id(course_id) for course_id in pre_req_course_ids]
 
         return render(
-            request, self.template_name, context={'user_application_hub': user_application_hub,
-                                                  'pre_req_courses': pre_req_courses
-                                                  }
+            request,
+            self.template_name,
+            context={'user_application_hub': user_application_hub, 'pre_req_courses': pre_req_courses}
         )
 
     def post(self, request):

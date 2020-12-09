@@ -15,8 +15,8 @@ from .factories import ApplicationHubFactory
 
 
 @pytest.mark.django_db
-@pytest.fixture()
-def user(db):
+@pytest.fixture(name='user')
+def user_fixture(db):
     """
     Create a test user and their corresponding ApplicationHub object
 
@@ -92,8 +92,7 @@ def test_post_user_redirects_without_login_for_application_hub_view():
 
 @pytest.mark.django_db
 @mock.patch('openedx.adg.lms.applications.views.render')
-def test_get_initial_application_state_for_application_hub_view(mock_render,
-                                                                application_hub_view_get_request):
+def test_get_initial_application_state_for_application_hub_view(mock_render, application_hub_view_get_request):
     """
     Test the case where the user has not completed even a single objective of the application.
     """
@@ -104,15 +103,14 @@ def test_get_initial_application_state_for_application_hub_view(mock_render,
         'pre_req_courses': []
     }
     mock_render.assert_called_once_with(
-        application_hub_view_get_request, 'adg/lms/applications/hub.html',
-        context=expected_context
+        application_hub_view_get_request, 'adg/lms/applications/hub.html', context=expected_context
     )
 
 
 @pytest.mark.django_db
 @mock.patch('openedx.adg.lms.applications.views.render')
-def test_get_written_application_completed_state_for_application_hub_view(mock_render,
-                                                                          application_hub_view_get_request):
+def test_get_written_application_completed_state_for_application_hub_view(
+    mock_render, application_hub_view_get_request):
     """
     Test the case where the user has completed the written application but not the pre_req courses.
     """
@@ -123,15 +121,13 @@ def test_get_written_application_completed_state_for_application_hub_view(mock_r
         'pre_req_courses': []
     }
     mock_render.assert_called_once_with(
-        application_hub_view_get_request, 'adg/lms/applications/hub.html',
-        context=expected_context
+        application_hub_view_get_request, 'adg/lms/applications/hub.html', context=expected_context
     )
 
 
 @pytest.mark.django_db
 @mock.patch('openedx.adg.lms.applications.views.render')
-def test_get_pre_req_courses_passed_state_for_application_hub_view(mock_render,
-                                                                   application_hub_view_get_request):
+def test_get_pre_req_courses_passed_state_for_application_hub_view(mock_render, application_hub_view_get_request):
     """
     Test the case where the user has completed the pre_req courses but not the written application.
     """
@@ -144,15 +140,13 @@ def test_get_pre_req_courses_passed_state_for_application_hub_view(mock_render,
         'pre_req_courses': []
     }
     mock_render.assert_called_once_with(
-        application_hub_view_get_request, 'adg/lms/applications/hub.html',
-        context=expected_context
+        application_hub_view_get_request, 'adg/lms/applications/hub.html', context=expected_context
     )
 
 
 @pytest.mark.django_db
 @mock.patch('openedx.adg.lms.applications.views.render')
-def test_get_complete_application_done_state_for_application_hub_view(mock_render,
-                                                                      application_hub_view_get_request):
+def test_get_complete_application_done_state_for_application_hub_view(mock_render, application_hub_view_get_request):
     """
     Test the case where the user has completed both objectives i.e the pre_req courses and the
     written application.
@@ -165,8 +159,7 @@ def test_get_complete_application_done_state_for_application_hub_view(mock_rende
         'pre_req_courses': []
     }
     mock_render.assert_called_once_with(
-        application_hub_view_get_request, 'adg/lms/applications/hub.html',
-        context=expected_context
+        application_hub_view_get_request, 'adg/lms/applications/hub.html', context=expected_context
     )
 
 
@@ -194,10 +187,8 @@ def test_post_logged_in_user_without_required_objectives_completed_for_applicati
 
 @mock.patch('openedx.adg.lms.applications.views.send_application_submission_confirmation_email')
 @mock.patch('openedx.adg.lms.applications.views.render')
-def test_post_logged_in_user_with_required_objectives_completed_to_application_hub_view(mock_render,
-                                                                                        mock_send_mail,
-                                                                                        user,
-                                                                                        logged_in_client):
+def test_post_logged_in_user_with_required_objectives_completed_to_application_hub_view(
+        mock_render, mock_send_mail, user, logged_in_client):
     """
     Test the case where an authenticated user, with all the required objectives completed, hits the url.
     """
