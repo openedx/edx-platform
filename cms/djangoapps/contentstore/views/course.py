@@ -23,11 +23,13 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
-from edx_toggles.toggles import WaffleSwitchNamespace
+from edx_toggles.toggles import LegacyWaffleSwitchNamespace
 from milestones import api as milestones_api
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
+from organizations.api import add_organization_course, ensure_organization
+from organizations.exceptions import InvalidOrganizationException
 from six import text_type
 from six.moves import filter
 
@@ -66,9 +68,6 @@ from common.djangoapps.util.milestones_helpers import (
     set_prerequisite_courses
 )
 from openedx.core import toggles as core_toggles
-from common.djangoapps.util.organizations_helpers import (
-    add_organization_course, get_organization_by_short_name, organizations_enabled
-)
 from common.djangoapps.util.string_utils import _has_non_ascii_characters
 from common.djangoapps.xblock_django.api import deprecated_xblocks
 from xmodule.contentstore.content import StaticContent
@@ -512,7 +511,7 @@ def course_listing(request):
     """
 
     optimization_enabled = GlobalStaff().has_user(request.user) and \
-        WaffleSwitchNamespace(name=WAFFLE_NAMESPACE).is_enabled(u'enable_global_staff_optimization')
+        LegacyWaffleSwitchNamespace(name=WAFFLE_NAMESPACE).is_enabled(u'enable_global_staff_optimization')
 
     org = request.GET.get('org', '') if optimization_enabled else None
     courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
@@ -887,10 +886,13 @@ def create_new_course(user, org, number, run, fields):
     Raises:
         DuplicateCourseError: Course run already exists.
     """
-    org_data = get_organization_by_short_name(org)
-    if not org_data and organizations_enabled():
-        raise ValidationError(_('You must link this course to an organization in order to continue. Organization '
-                                'you selected does not exist in the system, you will need to add it to the system'))
+    try:
+        org_data = ensure_organization(org)
+    except InvalidOrganizationException:
+        raise ValidationError(_(
+            'You must link this course to an organization in order to continue. Organization '
+            'you selected does not exist in the system, you will need to add it to the system'
+        ))
     store_for_new_course = modulestore().default_modulestore.get_modulestore_type()
     new_course = create_new_course_in_store(store_for_new_course, user, org, number, run, fields)
     add_organization_course(org_data, new_course.id)

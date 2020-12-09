@@ -311,6 +311,7 @@ MKTG_URL_LINK_MAP = {
 SUPPORT_SITE_LINK = 'https://example.support.edx.org'
 PASSWORD_RESET_SUPPORT_LINK = 'https://support.example.com/password-reset-help.html'
 ACTIVATION_EMAIL_SUPPORT_LINK = 'https://support.example.com/activation-email-help.html'
+LOGIN_ISSUE_SUPPORT_LINK = 'https://support.example.com/login-issue-help.html'
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = OrderedDict([
     ("utm_campaign", "edX.org Referral"),
     ("utm_source", "edX.org"),
@@ -468,9 +469,6 @@ FEATURES['ENABLE_LTI_PROVIDER'] = True
 INSTALLED_APPS.append('lms.djangoapps.lti_provider.apps.LtiProviderConfig')
 AUTHENTICATION_BACKENDS.append('lms.djangoapps.lti_provider.users.LtiBackend')
 
-# ORGANIZATIONS
-FEATURES['ORGANIZATIONS_APP'] = True
-
 # Financial assistance page
 FEATURES['ENABLE_FINANCIAL_ASSISTANCE_FORM'] = True
 
@@ -570,7 +568,7 @@ PDF_RECEIPT_TAX_ID_LABEL = 'Tax ID'
 
 PROFILE_MICROFRONTEND_URL = "http://profile-mfe/abc/"
 ORDER_HISTORY_MICROFRONTEND_URL = "http://order-history-mfe/"
-ACCOUNT_MICROFRONTEND_URL = "http://account-mfe/"
+ACCOUNT_MICROFRONTEND_URL = "http://account-mfe"
 LOGISTRATION_MICROFRONTEND_URL = "http://logistation-mfe"
 LOGISTRATION_MICROFRONTEND_DOMAIN = "logistation-mfe"
 LEARNING_MICROFRONTEND_URL = "http://learning-mfe"

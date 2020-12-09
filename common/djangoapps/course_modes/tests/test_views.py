@@ -20,6 +20,7 @@ from common.djangoapps.course_modes.models import CourseMode, Mode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.commerce.tests import test_utils as ecomm_test_utils
 from lms.djangoapps.commerce.tests.mocks import mock_payment_processors
+from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
@@ -116,11 +117,10 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         # Configure whether we're upgrading or not
         url = reverse('course_modes_choose', args=[six.text_type(self.course.id)])
         response = self.client.get(url)
+
+        start_flow_url = IDVerificationService.get_verify_location(course_id=self.course.id)
         # Check whether we were correctly redirected
-        purchase_workflow = "?purchase_workflow=single"
-        start_flow_url = reverse('verify_student_start_flow', args=[six.text_type(self.course.id)]) + purchase_workflow
-        with mock_payment_processors():
-            self.assertRedirects(response, start_flow_url)
+        self.assertRedirects(response, start_flow_url, fetch_redirect_response=False)
 
     def test_no_id_redirect_otto(self):
         # Create the course modes
@@ -266,10 +266,8 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
 
         # Since the only available track is professional ed, expect that
         # we're redirected immediately to the start of the payment flow.
-        purchase_workflow = "?purchase_workflow=single"
-        start_flow_url = reverse('verify_student_start_flow', args=[six.text_type(self.course.id)]) + purchase_workflow
-        with mock_payment_processors():
-            self.assertRedirects(response, start_flow_url)
+        start_flow_url = IDVerificationService.get_verify_location(course_id=self.course.id)
+        self.assertRedirects(response, start_flow_url, fetch_redirect_response=False)
 
         # Now enroll in the course
         CourseEnrollmentFactory(
@@ -312,15 +310,12 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         if expected_redirect == 'dashboard':
             redirect_url = reverse('dashboard')
         elif expected_redirect == 'start-flow':
-            redirect_url = reverse(
-                'verify_student_start_flow',
-                kwargs={'course_id': six.text_type(self.course.id)}
-            )
+            redirect_url = IDVerificationService.get_verify_location(course_id=self.course.id)
         else:
             self.fail("Must provide a valid redirect URL name")
 
         with mock_payment_processors(expect_called=None):
-            self.assertRedirects(response, redirect_url)
+            self.assertRedirects(response, redirect_url, fetch_redirect_response=False,)
 
     def test_choose_mode_audit_enroll_on_post(self):
         audit_mode = 'audit'

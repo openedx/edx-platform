@@ -118,12 +118,11 @@ def should_show_debug_toolbar(request):
 FEATURES['MILESTONES_APP'] = True
 
 ########################### ORGANIZATIONS #################################
-# This is disabled for Devstack Studio for developer convenience.
-# If it were enabled, then users would not be able to create course runs
-# with any arbritrary org slug -- they would have to first make sure that
-# the organization exists in the Organization table.
-# Note that some production environments (such as studio.edx.org) do enable this flag.
-FEATURES['ORGANIZATIONS_APP'] = False
+# Although production studio.edx.org disables `ORGANIZATIONS_AUTOCREATE`,
+# we purposefully leave auto-creation enabled in Devstack Studio for developer
+# convenience, allowing devs to create test courses for any organization
+# without having to first manually create said organizations in the admin panel.
+ORGANIZATIONS_AUTOCREATE = True
 
 ################################ ENTRANCE EXAMS ################################
 FEATURES['ENTRANCE_EXAMS'] = True

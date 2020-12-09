@@ -4,18 +4,18 @@ Tests for the Course Outline view and supporting views.
 
 
 import datetime
-import json
 import re
 
 import ddt
 import six
-from completion import waffle
+from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from completion.models import BlockCompletion
 from completion.test_utils import CompletionWaffleTestMixin
 from django.contrib.sites.models import Site
 from django.test import RequestFactory, override_settings
 from django.urls import reverse
 from django.utils import timezone
+from edx_toggles.toggles.testutils import override_waffle_switch
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -23,7 +23,6 @@ from pyquery import PyQuery as pq
 from pytz import UTC
 from six import text_type
 from waffle.models import Switch
-from waffle.testutils import override_switch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -514,12 +513,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         )
         self.assertEqual(200, self.client.get(last_accessed_url).status_code)
 
-    @override_switch(
-        '{}.{}'.format(
-            waffle.WAFFLE_NAMESPACE, waffle.ENABLE_COMPLETION_TRACKING
-        ),
-        active=True
-    )
+    @override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, active=True)
     def complete_sequential(self, course, sequential):
         """
         Completes provided sequential.
@@ -688,12 +682,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         content = pq(response.content)
         self.assertTrue(content('.action-resume-course').attr('href').endswith('/course/' + course.url_name))
 
-    @override_switch(
-        '{}.{}'.format(
-            waffle.WAFFLE_NAMESPACE, waffle.ENABLE_COMPLETION_TRACKING
-        ),
-        active=True
-    )
+    @override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, active=True)
     def test_course_outline_auto_open(self):
         """
         Tests that the course outline auto-opens to the first subsection
@@ -728,11 +717,10 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         time of the waffle switch that enables completion data tracking.
         """
         view = CourseOutlineFragmentView()
-        switches = waffle.waffle()
-        # pylint: disable=protected-access
-        switch_name = switches._namespaced_name(waffle.ENABLE_COMPLETION_TRACKING)
+        switch_name = ENABLE_COMPLETION_TRACKING_SWITCH.name
         switch, _ = Switch.objects.get_or_create(name=switch_name)
 
+        # pylint: disable=protected-access
         self.assertEqual(switch.created, view._completion_data_collection_start())
 
         switch.delete()

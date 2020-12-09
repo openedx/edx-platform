@@ -13,5 +13,5 @@ jinja2==2.11.2            # via diff-cover, jinja2-pluralize
 markupsafe==1.1.1         # via jinja2
 more-itertools==8.6.0     # via zipp
 pluggy==0.13.1            # via diff-cover
-pygments==2.7.2           # via diff-cover
+pygments==2.7.3           # via diff-cover
 zipp==1.0.0               # via -c requirements/edx/../constraints.txt, importlib-metadata

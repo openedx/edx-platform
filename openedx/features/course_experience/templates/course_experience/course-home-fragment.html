@@ -84,6 +84,9 @@ from openedx.features.course_experience.course_tools import HttpMethod
             % endif
         </div>
         <aside class="page-content-secondary course-sidebar">
+            % if show_proctoring_info_panel:
+                <div class="proctoring-info-panel" data-course-id="${course_key}"></div>
+            % endif
             % if has_goal_permission:
                 <div class="section section-goals ${'' if current_goal else 'hidden'}">
                     <div class="current-goal-container">
@@ -117,8 +120,7 @@ from openedx.features.course_experience.course_tools import HttpMethod
                             <li class="course-tool">
                                 % if course_tool.http_method == HttpMethod.GET:
                                     <a class="course-tool-link" data-analytics-id="${course_tool.analytics_id()}" href="${course_tool.url(course_key)}">
-                                        <span class="icon ${course_tool.icon_classes()}" aria-hidden="true"></span>
-                                        ${course_tool.title()}
+                                        <span class="icon ${course_tool.icon_classes()}" aria-hidden="true"></span>${course_tool.title()}
                                     </a>
                                 % elif course_tool.http_method == HttpMethod.POST:
                                     <form class="course-tool-form" action="${course_tool.url(course_key)}" method="post">
@@ -247,4 +249,4 @@ from openedx.features.course_experience.course_tools import HttpMethod
         linkCategory: "(none)"
       });
 
-</%static:require_module_async> 
+</%static:require_module_async>

@@ -14,7 +14,7 @@ from openedx.core.djangoapps.schedules.tasks import ScheduleCourseNextSectionUpd
 
 class Command(SendEmailBaseCommand):
     """
-    Command to send Schedule course updates
+    Command to send Schedule course updates for Self-paced Courses
     """
     help = dedent(__doc__).strip()
     async_send_task = ScheduleCourseNextSectionUpdate

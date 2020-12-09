@@ -416,24 +416,24 @@ def get_expiration_banner_text(user, course, language='en'):
     Get text for banner that messages user course expiration date
     for different tests that depend on it.
     """
-    expiration_date = now() + timedelta(weeks=4)
     upgrade_link = verified_upgrade_deadline_link(user=user, course=course)
     enrollment = CourseEnrollment.get_enrollment(user, course.id)
+    expiration_date = enrollment.created + timedelta(weeks=4)
     upgrade_deadline = enrollment.upgrade_deadline
     if upgrade_deadline is None or now() < upgrade_deadline:
         upgrade_deadline = enrollment.course_upgrade_deadline
 
-    date_string = u'<span class="localized-datetime" data-format="shortDate" \
+    date_string = u'<span class="localized-datetime" data-format="shortDate" data-timezone="None" \
         data-datetime="{formatted_date}" data-language="{language}">{formatted_date_localized}</span>'
     formatted_expiration_date = date_string.format(
         language=language,
-        formatted_date=expiration_date.strftime("%Y-%m-%d"),
+        formatted_date=expiration_date.isoformat(),
         formatted_date_localized=strftime_localized(expiration_date, EXPIRATION_DATE_FORMAT_STR)
     )
     if upgrade_deadline:
         formatted_upgrade_deadline = date_string.format(
             language=language,
-            formatted_date=upgrade_deadline.strftime("%Y-%m-%d"),
+            formatted_date=upgrade_deadline.isoformat(),
             formatted_date_localized=strftime_localized(upgrade_deadline, EXPIRATION_DATE_FORMAT_STR)
         )
 

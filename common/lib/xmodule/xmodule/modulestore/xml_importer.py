@@ -32,6 +32,7 @@ from abc import abstractmethod
 
 import six
 import xblock
+from edx_django_utils.monitoring import set_custom_attribute
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryLocator
@@ -173,9 +174,9 @@ class StaticContentImporter:
         try:
             self.static_content_store.save(content)
         except Exception as err:
-            log.exception(u'Error importing {0}, error={1}'.format(
-                file_subpath, err
-            ))
+            msg = "Error importing {0}, error={1}".format(file_subpath, err)
+            log.exception(msg)
+            set_custom_attribute('course_import_failure', "Static Content Save Failure: {}".format(msg))
 
         return file_subpath, asset_key
 
@@ -493,7 +494,9 @@ class ImportManager(object):
                     runtime=courselike.runtime,
                 )
             except Exception:
-                log.error('failed to import module location %s', leftover)
+                msg = 'failed to import module location {}'.format(leftover)
+                log.error(msg)
+                set_custom_attribute('course_import_failure', "Module Load failure: {}".format(msg))
                 raise
 
     def run_imports(self):

@@ -103,7 +103,7 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
     """
     def setUp(self):
         super().setUp()
-        self.course = CourseFactory.create(highlights_enabled_for_messaging=True, self_paced=True)
+        self.course = CourseFactory.create(highlights_enabled_for_messaging=True)
         with self.store.bulk_operations(self.course.id):
             ItemFactory.create(parent=self.course, category='chapter', highlights=['good stuff'])
 
@@ -124,6 +124,7 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
         )
 
     @override_settings(CONTACT_MAILING_ADDRESS='123 Sesame Street')
+    @override_settings(LOGO_URL_PNG='https://www.logo.png')
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     def test_schedule_context(self):
         resolver = self.create_resolver()
@@ -137,6 +138,7 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
             'dashboard_url': '/dashboard',
             'homepage_url': '/',
             'mobile_store_urls': {},
+            'logo_url': 'https://www.logo.png',
             'platform_name': '\xe9dX',
             'show_upsell': False,
             'social_media_urls': {},
@@ -145,7 +147,7 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
             'week_highlights': ['good stuff'],
             'week_num': 1,
         }
-        self.assertEqual(schedules, [(self.user, None, expected_context, True)])
+        self.assertEqual(schedules, [(self.user, None, expected_context)])
 
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     @override_switch('schedules.course_update_show_unsubscribe', True)
@@ -211,12 +213,14 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
         )
 
     @override_settings(CONTACT_MAILING_ADDRESS='123 Sesame Street')
+    @override_settings(LOGO_URL_PNG='https://www.logo.png')
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     def test_schedule_context(self):
         resolver = self.create_resolver()
         # using this to make sure the select_related stays intact
         with self.assertNumQueries(17):
-            schedules = list(resolver.get_schedules())
+            sc = resolver.get_schedules()
+            schedules = list(sc)
 
         expected_context = {
             'contact_email': 'info@example.com',
@@ -227,6 +231,7 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
             'dashboard_url': '/dashboard',
             'homepage_url': '/',
             'mobile_store_urls': {},
+            'logo_url': 'https://www.logo.png',
             'platform_name': '\xe9dX',
             'show_upsell': False,
             'social_media_urls': {},
@@ -235,7 +240,7 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
             'week_highlights': ['good stuff 2'],
             'week_num': 2,
         }
-        self.assertEqual(schedules, [(self.user, None, expected_context, True)])
+        self.assertEqual(schedules, [(self.user, None, expected_context)])
 
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     @override_switch('schedules.course_update_show_unsubscribe', True)

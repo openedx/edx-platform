@@ -20,7 +20,7 @@ chem                                # A helper library for chemistry calculation
 matplotlib==2.2.4                   # 2D plotting library
 numpy==1.16.5                       # Numeric array processing utilities; used by scipy
 pyparsing==2.2.0                    # Python Parsing module
-random2                             # Implementation of random module that works identically under Python 2 and 3
+random2==1.0.1                      # Implementation of random module that works identically under Python 2 and 3
 scipy==1.2.1                        # Math, science, and engineering library
 sympy==1.4                          # Symbolic math library
 git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4

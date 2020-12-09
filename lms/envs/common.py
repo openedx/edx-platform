@@ -442,9 +442,6 @@ FEATURES = {
     # Milestones application flag
     'MILESTONES_APP': False,
 
-    # Organizations application flag
-    'ORGANIZATIONS_APP': False,
-
     # Prerequisite courses feature flag
     'ENABLE_PREREQUISITE_COURSES': False,
 
@@ -2735,6 +2732,12 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
 
     'ratelimitbackend',
+
+    # Backends for receiving edX LMS events
+    'event_routing_backends.apps.EventRoutingBackendsConfig',
+
+    # Database-backed Organizations App (http://github.com/edx/edx-organizations)
+    'organizations',
 ]
 
 ######################### CSRF #########################################
@@ -2805,6 +2808,7 @@ SUPPORT_SITE_LINK = ''
 ID_VERIFICATION_SUPPORT_LINK = ''
 PASSWORD_RESET_SUPPORT_LINK = ''
 ACTIVATION_EMAIL_SUPPORT_LINK = ''
+LOGIN_ISSUE_SUPPORT_LINK = ''
 
 # Days before the expired date that we warn the user
 ENTITLEMENT_EXPIRED_ALERT_PERIOD = 90
@@ -3349,9 +3353,6 @@ OPTIONAL_APPS = [
     # edxval
     ('edxval', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
 
-    # Organizations App (http://github.com/edx/edx-organizations)
-    ('organizations', None),
-
     # Enterprise Apps (http://github.com/edx/edx-enterprise)
     ('enterprise', None),
     ('consent', None),
@@ -3839,6 +3840,7 @@ ENTERPRISE_ALL_SERVICE_USERNAMES = [
     'enterprise_worker',
     'license_manager_worker',
     'enterprise_catalog_worker',
+    'enterprise_channel_worker',
 ]
 
 
@@ -4150,3 +4152,10 @@ MAX_BLOCKS_PER_CONTENT_LIBRARY = 1000
 # COUNTRIES_FIRST = ['SA', 'BH', 'QA'] will display these countries on top of the list
 # https://github.com/SmileyChris/django-countries#show-certain-countries-first
 COUNTRIES_FIRST = []
+
+################# Settings for brand logos. #################
+LOGO_URL = None
+LOGO_URL_PNG = None
+LOGO_TRADEMARK_URL = None
+FAVICON_URL = None
+DEFAULT_EMAIL_LOGO_URL = 'https://edx-cdn.org/v3/default/logo.png'

@@ -52,7 +52,6 @@ from common.djangoapps.util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
 
 from .services import IDVerificationService
-from .toggles import redirect_to_idv_microfrontend
 
 log = logging.getLogger(__name__)
 
@@ -499,10 +498,7 @@ class PayAndVerifyView(View):
             if is_enrolled:
                 if already_paid:
                     # If the student has paid, but not verified, redirect to the verification flow.
-                    url = IDVerificationService.get_verify_location(
-                        'verify_student_verify_now',
-                        six.text_type(course_key)
-                    )
+                    url = IDVerificationService.get_verify_location(six.text_type(course_key))
             else:
                 url = reverse('verify_student_start_flow', kwargs=course_kwargs)
 
@@ -841,6 +837,8 @@ class SubmitPhotosView(View):
             checkpoint (str): Location of the checkpoint in the course.
 
         """
+        log.info((u"User {user_id} is submitting photos for ID verification").format(user_id=request.user.id))
+
         # If the user already has an initial verification attempt, we can re-use the photo ID
         # the user submitted with the initial attempt.
         initial_verification = SoftwareSecurePhotoVerification.get_initial_verification(request.user)
@@ -852,7 +850,7 @@ class SubmitPhotosView(View):
 
         # If necessary, update the user's full name
         if "full_name" in params:
-            response = self._update_full_name(request.user, params["full_name"])
+            response = self._update_full_name(request, params["full_name"])
             if response is not None:
                 return response
 
@@ -860,7 +858,7 @@ class SubmitPhotosView(View):
         # Validation ensures that we'll have a face image, but we may not have
         # a photo ID image if this is a re-verification.
         face_image, photo_id_image, response = self._decode_image_data(
-            params["face_image"], params.get("photo_id_image")
+            request, params["face_image"], params.get("photo_id_image")
         )
 
         # If we have a photo_id we do not want use the initial verification image.
@@ -922,6 +920,7 @@ class SubmitPhotosView(View):
         # The face image is always required.
         if "face_image" not in params:
             msg = _("Missing required parameter face_image")
+            log.error((u"User {user_id} missing required parameter face_image").format(user_id=request.user.id))
             return None, HttpResponseBadRequest(msg)
 
         # If provided, parse the course key and checkpoint location
@@ -929,11 +928,12 @@ class SubmitPhotosView(View):
             try:
                 params["course_key"] = CourseKey.from_string(params["course_key"])
             except InvalidKeyError:
+                log.error((u"User {user_id} provided invalid course_key").format(user_id=request.user.id))
                 return None, HttpResponseBadRequest(_("Invalid course key"))
 
         return params, None
 
-    def _update_full_name(self, user, full_name):
+    def _update_full_name(self, request, full_name):
         """
         Update the user's full name.
 
@@ -946,16 +946,23 @@ class SubmitPhotosView(View):
 
         """
         try:
-            update_account_settings(user, {"name": full_name})
+            update_account_settings(request.user, {"name": full_name})
         except UserNotFound:
+            log.error((u"No profile found for user {user_id}").format(user_id=request.user.id))
             return HttpResponseBadRequest(_("No profile found for user"))
         except AccountValidationError:
             msg = _(
                 u"Name must be at least {min_length} character long."
             ).format(min_length=NAME_MIN_LENGTH)
+            log.error(
+                (u"User {user_id} provided an account name less than {min_length} characters").format(
+                    user_id=request.user.id,
+                    min_length=NAME_MIN_LENGTH
+                )
+            )
             return HttpResponseBadRequest(msg)
 
-    def _decode_image_data(self, face_data, photo_id_data=None):
+    def _decode_image_data(self, request, face_data, photo_id_data=None):
         """
         Decode image data sent with the request.
 
@@ -983,6 +990,7 @@ class SubmitPhotosView(View):
 
         except InvalidImageData:
             msg = _("Image data is not valid.")
+            log.error((u"Image data for user {user_id} is not valid").format(user_id=request.user.id))
             return None, None, HttpResponseBadRequest(msg)
 
     def _submit_attempt(self, user, face_image, photo_id_image=None, initial_verification=None):
@@ -1216,19 +1224,5 @@ class ReverifyView(View):
         Most of the work is done client-side by composing the same
         Backbone views used in the initial verification flow.
         """
-        verification_status = IDVerificationService.user_status(request.user)
-        expiration_datetime = IDVerificationService.get_expiration_datetime(request.user, ['approved'])
-        if can_verify_now(verification_status, expiration_datetime):
-            if redirect_to_idv_microfrontend():
-                return redirect('{}/id-verification'.format(settings.ACCOUNT_MICROFRONTEND_URL))
-            context = {
-                "user_full_name": request.user.profile.name,
-                "platform_name": configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
-                "capture_sound": staticfiles_storage.url("audio/camera_capture.wav"),
-            }
-            return render_to_response("verify_student/reverify.html", context)
-        else:
-            context = {
-                "status": verification_status['status']
-            }
-            return render_to_response("verify_student/reverify_not_allowed.html", context)
+        IDV_workflow = IDVerificationService.get_verify_location()
+        return redirect(IDV_workflow)

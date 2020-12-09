@@ -256,8 +256,9 @@ class OutlineTabView(RetrieveAPIView):
             'welcome_message_html': welcome_message_html or None,
         }
         context = self.get_serializer_context()
-        context['course_key'] = course_key
+        context['course_overview'] = course_overview
         context['enable_links'] = show_enrolled or allow_public
+        context['enrollment'] = enrollment
         serializer = self.get_serializer_class()(data, context=context)
 
         return Response(serializer.data)

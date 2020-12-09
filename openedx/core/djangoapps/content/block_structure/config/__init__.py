@@ -4,7 +4,7 @@ waffle switches for the Block Structure framework.
 """
 
 
-from edx_toggles.toggles import WaffleSwitch, WaffleSwitchNamespace
+from edx_toggles.toggles import LegacyWaffleSwitch, LegacyWaffleSwitchNamespace
 from openedx.core.lib.cache_utils import request_cached
 
 from .models import BlockStructureConfiguration
@@ -22,7 +22,7 @@ def waffle():
     """
     Returns the namespaced and cached Waffle class for BlockStructures.
     """
-    return WaffleSwitchNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'BlockStructure: ')
+    return LegacyWaffleSwitchNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'BlockStructure: ')
 
 
 def waffle_switch(name):
@@ -30,9 +30,9 @@ def waffle_switch(name):
     Return the waffle switch associated to this namespace.
 
     WARNING: do not replicate this pattern. Instead of declaring waffle switch names as strings, you should create
-    WaffleSwitch objects as top-level constants.
+    LegacyWaffleSwitch objects as top-level constants.
     """
-    return WaffleSwitch(waffle(), name, module_name=__name__)
+    return LegacyWaffleSwitch(waffle(), name, module_name=__name__)
 
 
 @request_cached()

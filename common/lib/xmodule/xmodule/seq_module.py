@@ -23,7 +23,9 @@ from xblock.core import XBlock
 from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Boolean, Integer, List, Scope, String
 
+from edx_toggles.toggles import LegacyWaffleFlag
 from edx_toggles.toggles import WaffleFlag
+from lms.djangoapps.courseware.toggles import COURSEWARE_PROCTORING_IMPROVEMENTS
 from openedx.core.lib.graph_traversals import traverse_pre_order
 
 from .exceptions import NotFoundError
@@ -48,7 +50,7 @@ class_priority = ['video', 'problem']
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
-TIMED_EXAM_GATING_WAFFLE_FLAG = WaffleFlag(
+TIMED_EXAM_GATING_WAFFLE_FLAG = LegacyWaffleFlag(
     waffle_namespace="xmodule",
     flag_name=u'rev_1377_rollout',
     module_name=__name__,
@@ -767,6 +769,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 'allow_proctoring_opt_out': self.allow_proctoring_opt_out,
                 'due_date': self.due,
                 'grace_period': self.graceperiod,
+                'experimental_proctoring_features': COURSEWARE_PROCTORING_IMPROVEMENTS.is_enabled(course_id),
             }
 
             # inject the user's credit requirements and fulfillments

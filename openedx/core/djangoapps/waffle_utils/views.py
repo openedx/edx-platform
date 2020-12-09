@@ -49,8 +49,7 @@ class ToggleStateView(views.APIView):
         """
         waffle_switch_instances = WaffleSwitch.get_instances()
         for switch_instance in waffle_switch_instances:
-            switch_name = switch_instance.namespaced_switch_name
-            switch = self._get_or_create_toggle_response(switches_dict, switch_name)
+            switch = self._get_or_create_toggle_response(switches_dict, switch_instance.name)
             self._add_toggle_instance_details(switch, switch_instance)
 
     def _add_waffle_switch_state(self, switches_dict):
@@ -98,8 +97,7 @@ class ToggleStateView(views.APIView):
         """
         waffle_flag_instances = WaffleFlag.get_instances()
         for flag_instance in waffle_flag_instances:
-            flag_name = flag_instance.namespaced_flag_name
-            flag = self._get_or_create_toggle_response(flags_dict, flag_name)
+            flag = self._get_or_create_toggle_response(flags_dict, flag_instance.name)
             self._add_toggle_instance_details(flag, flag_instance)
 
     def _add_toggle_instance_details(self, toggle, toggle_instance):

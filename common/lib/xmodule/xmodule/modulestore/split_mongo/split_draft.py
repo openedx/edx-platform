@@ -461,6 +461,20 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             if index_entry is not None:
                 self._update_head(draft_course_key, index_entry, ModuleStoreEnum.BranchName.draft, new_structure['_id'])
 
+    def reset_course_to_version(self, course_key, version_guid, user_id):
+        """
+        Resets a course to a version specified by the string `version_guid`.
+
+        The `version_guid` refers to the Mongo-level id ("_id")
+        of the structure we want to revert to. It should be a 24-digit hex string.
+        """
+        draft_course_key = course_key.for_branch(ModuleStoreEnum.BranchName.draft)
+        version_object_id = course_key.as_object_id(version_guid)
+        with self.bulk_operations(draft_course_key):
+            index_entry = self._get_index_if_valid(draft_course_key)
+            self._update_head(draft_course_key, index_entry, ModuleStoreEnum.BranchName.draft, version_object_id)
+            self.force_publish_course(draft_course_key, user_id, commit=True)
+
     def update_parent_if_moved(self, item_location, original_parent_location, course_structure, user_id):
         """
         Update parent of an item if it has moved.

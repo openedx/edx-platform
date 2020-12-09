@@ -37,7 +37,7 @@ try:
     )
     from enterprise.api.v1.serializers import EnterpriseCustomerUserReadOnlySerializer
     from consent.models import DataSharingConsent, DataSharingConsentTextOverrides
-except ImportError:
+except ImportError:  # pragma: no cover
     pass
 
 
@@ -477,11 +477,16 @@ def enterprise_customer_uuid_for_request(request):
                 enterprise_customer_identity_provider__provider_id=sso_provider_id
             ).uuid
         except EnterpriseCustomer.DoesNotExist:
+            LOGGER.info(
+                '[ENTERPRISE DSC] Customer not found using SSO Provider ID. User: [%s], SSOProviderID: [%s]',
+                request.user.username,
+                sso_provider_id
+            )
             enterprise_customer_uuid = None
     else:
         enterprise_customer_uuid = _customer_uuid_from_query_param_cookies_or_session(request)
 
-    if enterprise_customer_uuid is _CACHE_MISS:
+    if enterprise_customer_uuid is _CACHE_MISS or enterprise_customer_uuid is None:
         if not request.user.is_authenticated:
             return None
 
@@ -499,6 +504,12 @@ def enterprise_customer_uuid_for_request(request):
         # Now that we've asked the database for this users's enterprise customer data,
         # add it to their session (even if it's null/empty, which indicates the user
         # has no associated enterprise customer).
+        LOGGER.info(
+            '[ENTERPRISE DSC] Updating Session. User: [%s], UserAuthenticated: [%s], EnterpriseCustomer: [%s]',
+            request.user.username,
+            request.user.is_authenticated,
+            enterprise_customer
+        )
         add_enterprise_customer_to_session(request, enterprise_customer)
 
     return enterprise_customer_uuid
@@ -517,6 +528,12 @@ def _customer_uuid_from_query_param_cookies_or_session(request):
     ):
         enterprise_customer_uuid = function(request)
         if enterprise_customer_uuid is not _CACHE_MISS:
+            LOGGER.info(
+                '[ENTERPRISE DSC] Customer Info. User: [%s], Function: [%s], UUID: [%s]',
+                request.user.username,
+                function,
+                enterprise_customer_uuid
+            )
             return enterprise_customer_uuid
 
     return _CACHE_MISS
@@ -531,6 +548,12 @@ def enterprise_customer_for_request(request):
     enterprise_customer = enterprise_customer_from_session(request)
     if enterprise_customer is _CACHE_MISS:
         enterprise_customer = enterprise_customer_from_api(request)
+        LOGGER.info(
+            '[ENTERPRISE DSC] Updating Session. User: [%s], UserAuthenticated: [%s], EnterpriseCustomer: [%s]',
+            request.user.username,
+            request.user.is_authenticated,
+            enterprise_customer
+        )
         add_enterprise_customer_to_session(request, enterprise_customer)
     return enterprise_customer
 
@@ -586,12 +609,17 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
         )
 
         if not consent_needed:
+            # TODO: https://openedx.atlassian.net/browse/ENT-3724
+            # this whole code branch seems to do nothing other than log some misleading info:
+            # the consent requirement doesn't actually fail.  If there's an enterprise or site mismatch,
+            # we'll still end up in the else branch of "if consent_needed:" below, where
+            # we'll log that consent is not needed, and ultimately, return False.
+            # Are we supposed to raise some exceptions in here?
             enterprises = [str(learner['enterprise_customer']['uuid']) for learner in enterprise_learner_details]
 
             if str(current_enterprise_uuid) not in enterprises:
-                LOGGER.info(
-                    '[ENTERPRISE DSC] Consent requirement failed due to enterprise mismatch. '
-                    'USER: [%s], CurrentEnterprise: [%s], LearnerEnterprises: [%s]',
+                LOGGER.info(  # pragma: no cover
+                    '[ENTERPRISE DSC] Enterprise mismatch. USER: [%s], CurrentEnterprise: [%s], UserEnterprises: [%s]',
                     user.username,
                     current_enterprise_uuid,
                     enterprises
@@ -599,9 +627,8 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
             else:
                 domains = [learner['enterprise_customer']['site']['domain'] for learner in enterprise_learner_details]
                 if not Site.objects.filter(domain__in=domains).filter(id=request.site.id).exists():
-                    LOGGER.info(
-                        '[ENTERPRISE DSC] Consent requirement failed due to site mismatch. '
-                        'USER: [%s], RequestSite: [%s], LearnerEnterpriseDomains: [%s]',
+                    LOGGER.info(  # pragma: no cover
+                        '[ENTERPRISE DSC] Site mismatch. USER: [%s], RequestSite: [%s], LearnerEnterpriseDomains: [%s]',
                         user.username,
                         request.site,
                         domains
@@ -742,6 +769,12 @@ def get_enterprise_learner_portal_enabled_message(request):
         learner_data = get_enterprise_learner_data_from_db(request.user)
         enterprise_customer = learner_data[0]['enterprise_customer'] if learner_data else None
         # Add to session cache regardless of whether it is null
+        LOGGER.info(
+            '[ENTERPRISE DSC] Updating Session. User: [%s], UserAuthenticated: [%s], EnterpriseCustomer: [%s]',
+            request.user.username,
+            request.user.is_authenticated,
+            enterprise_customer
+        )
         add_enterprise_customer_to_session(request, enterprise_customer)
         if enterprise_customer:
             cache_enterprise(enterprise_customer)

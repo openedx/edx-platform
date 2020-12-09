@@ -11,7 +11,7 @@ from collections import OrderedDict
 from functools import partial
 
 import six
-from completion import waffle as completion_waffle
+from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from completion.models import BlockCompletion
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -536,7 +536,7 @@ def get_module_system_for_user(
         handlers = {
             'grade': handle_grade_event,
         }
-        if completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+        if ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():
             handlers.update({
                 'completion': handle_completion_event,
                 'progress': handle_deprecated_progress_event,
@@ -567,7 +567,7 @@ def get_module_system_for_user(
         """
         Submit a completion object for the block.
         """
-        if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+        if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():
             raise Http404
         else:
             BlockCompletion.objects.submit_completion(
@@ -601,7 +601,7 @@ def get_module_system_for_user(
         edx-solutions.  New XBlocks should not emit these events, but instead
         emit completion events directly.
         """
-        if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+        if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():
             raise Http404
         else:
             requested_user_id = event.get('user_id', user.id)

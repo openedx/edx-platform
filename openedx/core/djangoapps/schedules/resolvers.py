@@ -352,6 +352,8 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
     """
     Send a message to all users whose schedule started at ``self.current_date`` + ``day_offset`` and the
     course has updates.
+
+    Only used for Instructor-paced Courses
     """
     log_prefix = 'Course Update'
     schedule_date_field = 'start_date'
@@ -359,9 +361,8 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
     experience_filter = Q(experience__experience_type=ScheduleExperience.EXPERIENCES.course_updates)
 
     def send(self, msg_type):
-        for (user, language, context, is_self_paced) in self.schedules_for_bin():
-            msg_type = CourseUpdate() if is_self_paced else InstructorLedCourseUpdate()
-            msg = msg_type.personalize(
+        for (user, language, context) in self.schedules_for_bin():
+            msg = InstructorLedCourseUpdate().personalize(
                 Recipient(
                     user.username,
                     self.override_recipient_email or user.email,
@@ -383,6 +384,11 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
             enrollment = schedule.enrollment
             course = schedule.enrollment.course
             user = enrollment.user
+
+            # (Weekly) Course Updates are only for Instructor-paced courses.
+            # See CourseNextSectionUpdate for Self-paced updates.
+            if course.self_paced:
+                continue
 
             try:
                 week_highlights = get_week_highlights(user, enrollment.course_id, week_num)
@@ -415,13 +421,15 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
                 })
                 template_context.update(_get_upsell_information_for_schedule(user, schedule))
 
-                yield (user, schedule.enrollment.course.closest_released_language, template_context, course.self_paced)
+                yield (user, schedule.enrollment.course.closest_released_language, template_context)
 
 
 @attr.s
 class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
     """
     Send a message to all users whose schedule gives them a due date of yesterday.
+
+    Only used for Self-paced Courses
     """
     async_send_task = attr.ib()
     site = attr.ib()
@@ -434,9 +442,8 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
 
     def send(self):
         schedules = self.get_schedules()
-        for (user, language, context, is_self_paced) in schedules:
-            msg_type = CourseUpdate() if is_self_paced else InstructorLedCourseUpdate()
-            msg = msg_type.personalize(
+        for (user, language, context) in schedules:
+            msg = CourseUpdate().personalize(
                 Recipient(
                     user.username,
                     self.override_recipient_email or user.email,
@@ -464,6 +471,7 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
         schedules = Schedule.objects.select_related('enrollment').filter(
             self.experience_filter,
             active=True,
+            enrollment__is_active=True,
             enrollment__course_id=self.course_id,
             enrollment__user__is_active=True,
             start_date__gte=target_date - course_duration,
@@ -476,6 +484,11 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
             # We don't want to show any updates if the course has ended so we short circuit here.
             if course.end and course.end.date() <= target_date:
                 return
+
+            # Next Section Updates are only for Self-paced courses since it uses Personalized
+            # Learner Schedule logic. See CourseUpdateResolver for Instructor-paced updates
+            if not course.self_paced:
+                continue
 
             user = schedule.enrollment.user
             start_date = max(filter(None, (schedule.start_date, course.start)))
@@ -512,7 +525,7 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
             })
             template_context.update(_get_upsell_information_for_schedule(user, schedule))
 
-            yield (user, course.closest_released_language, template_context, course.self_paced)
+            yield (user, course.closest_released_language, template_context)
 
 
 def _get_trackable_course_home_url(course_id):

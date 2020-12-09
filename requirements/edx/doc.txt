@@ -6,10 +6,10 @@
 #
 alabaster==0.7.12         # via sphinx
 babel==2.9.0              # via sphinx
-certifi==2020.11.8        # via requests
+certifi==2020.12.5        # via requests
 chardet==3.0.4            # via requests
 click==7.1.2              # via code-annotations
-code-annotations==0.10.1  # via -r requirements/edx/doc.in
+code-annotations==0.10.2  # via -r requirements/edx/doc.in
 django==2.2.17            # via -c requirements/edx/../constraints.txt, code-annotations
 docutils==0.16            # via sphinx
 edx-sphinx-theme==1.5.0   # via -r requirements/edx/doc.in
@@ -19,15 +19,15 @@ idna==2.10                # via requests
 imagesize==1.2.0          # via sphinx
 jinja2==2.11.2            # via code-annotations, sphinx
 markupsafe==1.1.1         # via jinja2
-packaging==20.4           # via sphinx
+packaging==20.7           # via sphinx
 pbr==5.5.1                # via stevedore
-pygments==2.7.2           # via sphinx
+pygments==2.7.3           # via sphinx
 pyparsing==2.4.7          # via packaging
 python-slugify==4.0.1     # via code-annotations
 pytz==2020.4              # via babel, django
 pyyaml==5.3.1             # via code-annotations
 requests==2.25.0          # via sphinx
-six==1.15.0               # via edx-sphinx-theme, packaging, stevedore
+six==1.15.0               # via edx-sphinx-theme, stevedore
 smmap==3.0.4              # via gitdb
 snowballstemmer==2.0.0    # via sphinx
 sphinx==3.3.1             # via -r requirements/edx/doc.in, edx-sphinx-theme

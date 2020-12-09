@@ -430,7 +430,7 @@ class CourseAssignmentDate(DateSummary):
         """ Used to set the title_html and title properties for the assignment date block """
         if link:
             self.assignment_title_html = HTML(
-                '<a href="{assignment_link}">{assignment_title}</a>'
+                '<a href="{assignment_link}" class="btn btn-outline-primary">{assignment_title}</a>'
             ).format(assignment_link=link, assignment_title=title)
         self.assignment_title = title
 
@@ -664,11 +664,11 @@ class VerificationDeadlineDate(DateSummary):
             'verification-deadline-passed': (_('Learn More'), ''),
             'verification-deadline-retry': (
                 _('Retry Verification'),
-                IDVerificationService.get_verify_location('verify_student_reverify'),
+                IDVerificationService.get_verify_location(),
             ),
             'verification-deadline-upcoming': (
                 _('Verify My Identity'),
-                IDVerificationService.get_verify_location('verify_student_verify_now', self.course_id),
+                IDVerificationService.get_verify_location(self.course_id),
             )
         }
 

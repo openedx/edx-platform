@@ -10,7 +10,7 @@ from django.conf import settings
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import TieredCache, get_cache_key
-from edx_toggles.toggles import WaffleFlag
+from edx_toggles.toggles import LegacyWaffleFlag
 from enterprise.api.v1.serializers import EnterpriseCustomerBrandingConfigurationSerializer
 from enterprise.models import EnterpriseCustomer, EnterpriseCustomerUser
 from social_django.models import UserSocialAuth
@@ -22,7 +22,7 @@ from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings
 from openedx.core.djangolib.markup import HTML, Text
 from common.djangoapps.student.helpers import get_next_url_for_login_page
 
-ENTERPRISE_HEADER_LINKS = WaffleFlag('enterprise', 'enterprise_header_links', __name__)
+ENTERPRISE_HEADER_LINKS = LegacyWaffleFlag('enterprise', 'enterprise_header_links', __name__)
 
 
 def get_data_consent_share_cache_key(user_id, course_id):
@@ -144,7 +144,7 @@ def enterprise_fields_only(fields):
 
 def update_third_party_auth_context_for_enterprise(request, context, enterprise_customer=None):
     """
-    Return updated context of third party auth with modified for enterprise.
+    Return updated context of third party auth with modified data for the given enterprise customer.
 
     Arguments:
         request (HttpRequest): The request for the logistration page.

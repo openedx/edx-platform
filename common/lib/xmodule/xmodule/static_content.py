@@ -20,6 +20,7 @@ import six
 from docopt import docopt
 from path import Path as path
 
+from xmodule.annotatable_module import AnnotatableBlock
 from xmodule.capa_module import ProblemBlock
 from xmodule.conditional_module import ConditionalBlock
 from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
@@ -67,6 +68,7 @@ class VideoBlock(HTMLSnippet):
 # Should only be used for XModules being converted to XBlocks.
 XBLOCK_CLASSES = [
     AboutBlock,
+    AnnotatableBlock,
     ConditionalBlock,
     CourseInfoBlock,
     HtmlBlock,

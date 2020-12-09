@@ -7,6 +7,7 @@ import logging
 
 from celery.task import task
 from django.conf import settings
+from edx_django_utils.monitoring import set_code_owner_attribute
 from edxval.api import ValInternalError
 from lxml.etree import XMLSyntaxError
 from opaque_keys.edx.keys import CourseKey
@@ -36,6 +37,7 @@ def block_structure_task(**kwargs):
 
 
 @block_structure_task()
+@set_code_owner_attribute
 def update_course_in_cache_v2(self, **kwargs):
     """
     Updates the course blocks (mongo -> BlockStructure) for the specified course.
@@ -48,6 +50,7 @@ def update_course_in_cache_v2(self, **kwargs):
 
 
 @block_structure_task()
+@set_code_owner_attribute
 def update_course_in_cache(self, course_id):
     """
     Updates the course blocks (mongo -> BlockStructure) for the specified course.
@@ -65,6 +68,7 @@ def _update_course_in_cache(self, **kwargs):
 
 
 @block_structure_task()
+@set_code_owner_attribute
 def get_course_in_cache_v2(self, **kwargs):
     """
     Gets the course blocks for the specified course, updating the cache if needed.
@@ -77,6 +81,7 @@ def get_course_in_cache_v2(self, **kwargs):
 
 
 @block_structure_task()
+@set_code_owner_attribute
 def get_course_in_cache(self, course_id):
     """
     Gets the course blocks for the specified course, updating the cache if needed.

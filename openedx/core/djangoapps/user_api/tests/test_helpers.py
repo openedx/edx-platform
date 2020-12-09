@@ -128,7 +128,8 @@ class FormDescriptionTest(TestCase):
                         "required": "You must provide a value!"
                     },
                     "supplementalLink": "",
-                    "supplementalText": ""
+                    "supplementalText": "",
+                    "loginIssueSupportLink": "https://support.example.com/login-issue-help.html",
                 }
             ]
         }))

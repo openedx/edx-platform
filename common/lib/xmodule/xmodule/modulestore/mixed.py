@@ -327,6 +327,23 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                     courses[course_id] = course
         return list(courses.values())
 
+    def get_library_keys(self):
+        """
+        Returns a list of all unique content library keys in the mixed
+        modulestore.
+
+        Returns: list[LibraryLocator]
+        """
+        all_library_keys = set()
+        for store in self.modulestores:
+            if not hasattr(store, 'get_library_keys'):
+                continue
+            all_library_keys |= set(
+                self._clean_locator_for_mapping(library_key)
+                for library_key in store.get_library_keys()
+            )
+        return list(all_library_keys)
+
     @strip_key
     def get_library_summaries(self, **kwargs):
         """
@@ -825,6 +842,19 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         store = self._verify_modulestore_support(location.course_key, 'revert_to_published')
         return store.revert_to_published(location, user_id)
+
+    def reset_course_to_version(self, course_key, version_guid, user_id):
+        """
+        Resets the content of a course at `course_key` to a version specified by `version_guid`.
+
+        :raises NotImplementedError: if not supported by store.
+        """
+        store = self._verify_modulestore_support(course_key, 'reset_course_to_version')
+        return store.reset_course_to_version(
+            course_key=course_key,
+            version_guid=version_guid,
+            user_id=user_id,
+        )
 
     def close_all_connections(self):
         """

@@ -1073,6 +1073,19 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             )
         return courses_summaries
 
+    def get_library_keys(self):
+        """
+        Returns a list of all unique content library keys in the Split
+        modulestore.
+
+        Returns: list[LibraryLocator]
+        """
+        return list({
+            self._create_library_locator(library_index, branch=None)
+            for library_index
+            in self.find_matching_course_indexes(branch="library")
+        })
+
     @autoretry_read()
     def get_library_summaries(self, **kwargs):
         """

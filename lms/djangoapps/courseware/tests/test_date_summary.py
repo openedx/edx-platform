@@ -37,6 +37,7 @@ from lms.djangoapps.courseware.models import (
 )
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.djangoapps.verify_student.models import VerificationDeadline
+from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules.signals import CREATE_SCHEDULE_WAFFLE_FLAG
@@ -679,7 +680,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                 'You must successfully complete verification before this date to qualify for a Verified Certificate.'
             )
             self.assertEqual(block.link_text, 'Verify My Identity')
-            self.assertEqual(block.link, reverse('verify_student_verify_now', args=(course.id,)))
+            self.assertEqual(block.link, IDVerificationService.get_verify_location(course.id))
 
     def test_verification_deadline_date_retry(self):
         with freeze_time('2015-01-02'):
@@ -696,7 +697,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                 'You must successfully complete verification before this date to qualify for a Verified Certificate.'
             )
             self.assertEqual(block.link_text, 'Retry Verification')
-            self.assertEqual(block.link, reverse('verify_student_reverify'))
+            self.assertEqual(block.link, IDVerificationService.get_verify_location())
 
     def test_verification_deadline_date_denied(self):
         with freeze_time('2015-01-02'):

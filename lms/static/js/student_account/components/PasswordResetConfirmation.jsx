@@ -83,11 +83,11 @@ class PasswordResetConfirmation extends React.Component {
           />
 
           <form id="passwordreset-form" method="post" action="">
-            <h2 className="section-title lines">
+            <h1 className="section-title">
               <span className="text">
                 {this.props.formTitle}
               </span>
-            </h2>
+            </h1>
 
             <p className="action-label" id="new_password_help_text">
               {gettext('Enter and confirm your new password.')}

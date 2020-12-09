@@ -8,10 +8,13 @@ More important high-level tests are in contentstore/tests/test_libraries.py
 import ddt
 import mock
 from django.conf import settings
+from django.test.utils import override_settings
 from django.urls import reverse
 from mock import patch
+from organizations.api import get_organization_by_short_name
+from organizations.exceptions import InvalidOrganizationException
 from opaque_keys.edx.locator import CourseKey, LibraryLocator
-from six import binary_type, text_type
+from six import text_type
 from six.moves import range
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, parse_json
@@ -125,7 +128,7 @@ class UnitTestLibraries(CourseTestCase):
         """
         # Create some more libraries
         libraries = [LibraryFactory.create() for _ in range(3)]
-        lib_dict = dict([(lib.location.library_key, lib) for lib in libraries])
+        lib_dict = {lib.location.library_key: lib for lib in libraries}
 
         response = self.client.get_json(LIBRARY_REST_URL)
         self.assertEqual(response.status_code, 200)
@@ -227,6 +230,41 @@ class UnitTestLibraries(CourseTestCase):
         self.assertIn('already a library defined', parse_json(response)['ErrMsg'])
         self.assertEqual(response.status_code, 400)
 
+    @override_settings(ORGANIZATIONS_AUTOCREATE=True)
+    def test_library_with_unknown_organization_autocreation(self):
+        """
+        Test that when automatic organization creation is enabled,
+        creating a content library with an unknown organization auto-creates
+        said organization.
+        """
+        with self.assertRaises(InvalidOrganizationException):
+            get_organization_by_short_name("org_xyz")
+        response = self.client.ajax_post(LIBRARY_REST_URL, {
+            'org': "org_xyz",
+            'library': "org_test_lib",
+            'display_name': "This library's organization doesn't exist... yet.",
+        })
+        assert response.status_code == 200
+        assert get_organization_by_short_name("org_xyz")
+
+    @override_settings(ORGANIZATIONS_AUTOCREATE=False)
+    def test_library_with_unknown_organization_validation_error(self):
+        """
+        Test that when automatic organization creation is disabled,
+        creating a content library with an unknown organization raises an error.
+        """
+        with self.assertRaises(InvalidOrganizationException):
+            get_organization_by_short_name("org_xyz")
+        response = self.client.ajax_post(LIBRARY_REST_URL, {
+            'org': "org_xyz",
+            'library': "org_test_lib",
+            'display_name': "This library's organization doesn't exist!",
+        })
+        assert response.status_code == 400
+        assert "'org_xyz' is not a valid organization identifier" in parse_json(response)['ErrMsg']
+        with self.assertRaises(InvalidOrganizationException):
+            get_organization_by_short_name("org_xyz")
+
     ######################################################
     # Tests for /library/:lib_key/ - get a specific library as JSON or HTML editing view
 
@@ -308,7 +346,11 @@ class UnitTestLibraries(CourseTestCase):
         lib.save()
 
         problem_type_templates = next(
-            (component['templates'] for component in get_component_templates(lib, library=True) if component['type'] == 'problem'),
+            (
+                component['templates']
+                for component in get_component_templates(lib, library=True)
+                if component['type'] == 'problem'
+            ),
             []
         )
         # Each problem template has a category which shows whether problem is a 'problem'
