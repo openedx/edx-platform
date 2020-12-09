@@ -40,7 +40,7 @@ def test_task_send_user_enrollments_to_mailchimp(mocker):
     """
     mock_get_or_create = mocker.patch.object(mailchimp_tasks.CourseMeta.objects, 'get_or_create')
     mock_enrolls = mocker.patch.object(mailchimp_tasks, 'get_enrollment_course_names_and_short_ids_by_user')
-    mock_enrolls.return_value = '100,101,102', 'course1,course2,course3'
+    mock_enrolls.return_value = '100, 101, 102', 'course1, course2, course3'
     mock_mailchimp_client = mocker.patch.object(mailchimp_tasks, 'MailchimpClient', autospec=True)
     mock_create_or_update_list_member = mock_mailchimp_client().create_or_update_list_member
     user = UserFactory()
@@ -52,8 +52,8 @@ def test_task_send_user_enrollments_to_mailchimp(mocker):
         "email_address": user.email,
         "status_if_new": "subscribed",
         "merge_fields": {
-            "ENROLLS": 'course1,course2,course3',
-            "ENROLL_IDS": '100,101,102',
+            "ENROLLS": 'course1, course2, course3',
+            "ENROLL_IDS": '100, 101, 102',
         }
     }
 
