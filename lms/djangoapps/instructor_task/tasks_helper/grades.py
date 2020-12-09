@@ -897,6 +897,8 @@ class ProblemResponses(object):
         store = modulestore()
         user_state_client = DjangoXBlockUserStateClient()
 
+        # Each user's generated report data may contain different fields, so we use an OrderedDict to prevent
+        # duplication of keys while preserving the order the XBlock provides the keys in.
         student_data_keys = OrderedDict()
 
         with store.bulk_operations(course_key):
