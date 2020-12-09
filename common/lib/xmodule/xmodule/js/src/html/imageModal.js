@@ -13,6 +13,7 @@ var setupFullScreenModal = function() {
                 largeSRC: largeImageSRC
             };
             var html = _.template($('#image-modal-tpl').text())(data);
+            // xss-lint: disable=javascript-jquery-insertion
             $(this).replaceWith(html);
         }
     });
