@@ -323,3 +323,5 @@ zipp==1.0.0               # via -c requirements/edx/../constraints.txt, -r requi
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
+
+git+https://github.com/edx/edx-enterprise@ENT-3548-attach-multiple-idps-to-enterprise-customer#egg=edx-enterprise==3.14.0
