@@ -120,24 +120,6 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
             courses_list = list(get_course_enrollments(self.student, None, []))
             self.assertEqual(courses_list, [])
 
-    def test_course_listing_errored_deleted_courses(self):
-        """
-        Create good courses, courses that won't load, and deleted courses which still have
-        roles. Test course listing.
-        """
-        mongo_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
-
-        good_location = mongo_store.make_course_key('testOrg', 'testCourse', 'RunBabyRun')
-        self._create_course_with_access_groups(good_location, default_store=ModuleStoreEnum.Type.mongo)
-
-        course_location = mongo_store.make_course_key('testOrg', 'doomedCourse', 'RunBabyRun')
-        self._create_course_with_access_groups(course_location, default_store=ModuleStoreEnum.Type.mongo)
-        mongo_store.delete_course(course_location, ModuleStoreEnum.UserID.test)
-
-        courses_list = list(get_course_enrollments(self.student, None, []))
-        self.assertEqual(len(courses_list), 1, courses_list)
-        self.assertEqual(courses_list[0].course_id, good_location)
-
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
     def test_course_listing_has_pre_requisite_courses(self):
         """
