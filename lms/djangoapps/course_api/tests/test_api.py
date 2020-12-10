@@ -15,11 +15,12 @@ from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, CourseAccessRoleFactory
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, check_mongo_calls
 
-from ..api import UNKNOWN_BLOCK_DISPLAY_NAME, course_detail, get_due_dates, list_courses
+from ..api import UNKNOWN_BLOCK_DISPLAY_NAME, course_detail, get_due_dates, list_courses, get_course_member_queryset
 from .mixins import CourseApiFactoryMixin
 
 
@@ -305,3 +306,91 @@ class TestGetCourseDates(CourseDetailTestMixin, SharedModuleStoreTestCase):
                 ]
                 actual_due_dates = get_due_dates(request, self.course.id, self.staff_user)
                 assert expected_due_dates == actual_due_dates
+
+
+class TestGetCourseMembers(CourseApiTestMixin, SharedModuleStoreTestCase):
+    """
+    Test get_course_member_queryset function
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestGetCourseMembers, cls).setUpClass()
+        cls.course = cls.create_course()
+        cls.course2 = cls.create_course(course='course2')
+        cls.honor = cls.create_user('honor', is_staff=False)
+        cls.staff = cls.create_user('staff', is_staff=True)
+        cls.instructor = cls.create_user('instructor', is_staff=True)
+
+        # attach users with cls.course
+        CourseEnrollmentFactory.create(user=cls.honor, course_id=cls.course.id)
+        CourseAccessRoleFactory.create(user=cls.staff, course_id=cls.course.id, role='staff')
+        CourseAccessRoleFactory.create(user=cls.instructor, course_id=cls.course.id, role='instructor')
+
+        # attach users with cls.course2
+        CourseEnrollmentFactory.create(user=cls.honor, course_id=cls.course2.id)
+        CourseAccessRoleFactory.create(user=cls.staff, course_id=cls.course2.id, role='staff')
+        CourseAccessRoleFactory.create(user=cls.instructor, course_id=cls.course2.id, role='instructor')
+
+    def test_get_course_member_queryset(self):
+        """
+        Test all different possible filtering
+        """
+        # by default it should return all type of users
+        queryset = get_course_member_queryset(self.course.id)
+        assert queryset.count() == 3
+
+        # exclude students
+        queryset = get_course_member_queryset(self.course.id, include_students=False)
+        assert queryset.count() == 2
+
+        # get only staff
+        queryset = get_course_member_queryset(self.course.id, include_students=False, access_roles=['staff'])
+        assert queryset.count() == 1
+        assert queryset[0].username == 'staff'
+
+        # get only instructor
+        queryset = get_course_member_queryset(self.course.id, include_students=False, access_roles=['instructor'])
+        assert queryset.count() == 1
+        assert queryset[0].username == 'instructor'
+
+        # get only students
+        queryset = get_course_member_queryset(self.course.id, include_students=True, access_roles=[])
+        assert queryset.count() == 1
+        assert queryset[0].username == 'honor'
+
+    def test_prefetch_enrollments(self):
+        """
+        Test prefetching CourseEnrollment instances.
+        """
+        # It should get all enrollments if prefetch_enrollments is False
+        queryset = get_course_member_queryset(self.course.id, include_students=True, access_roles=[])
+        assert queryset[0].courseenrollment_set.count() == 2
+
+        # It should only get enrollment related to the course if prefetch_enrollments is True
+        queryset = get_course_member_queryset(
+            self.course.id,
+            include_students=True,
+            access_roles=[],
+            prefetch_user_course_roles=True
+        )
+        assert queryset[0].courseenrollment_set.count() == 1
+        assert queryset[0].courseenrollment_set.all()[0].course_id == self.course.id
+
+    def test_prefetch_accessroles(self):
+        """
+        Test prefetching CourseAccessRole instances.
+        """
+        # It should get all access roles if prefetch_accessroles is False
+        queryset = get_course_member_queryset(self.course.id, include_students=False, access_roles=['staff'])
+        assert queryset[0].courseaccessrole_set.count() == 2
+
+        # It should only get access roles related to the course if prefetch_accessroles is True
+        queryset = get_course_member_queryset(
+            self.course.id,
+            include_students=False,
+            access_roles=['staff'],
+            prefetch_user_course_roles=True
+        )
+        assert queryset[0].courseaccessrole_set.count() == 1
+        assert queryset[0].courseaccessrole_set.all()[0].course_id == self.course.id

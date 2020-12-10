@@ -6,14 +6,15 @@ import logging
 import search
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.db.models import Prefetch, Q
 from django.urls import reverse
 from edx_django_utils.monitoring import function_trace
 from edx_when.api import get_dates_for_course
 from opaque_keys.edx.django.models import CourseKeyField
 from rest_framework.exceptions import PermissionDenied
 
-from common.djangoapps.student.models import CourseAccessRole
-from common.djangoapps.student.roles import GlobalStaff
+from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
+from common.djangoapps.student.roles import GlobalStaff, REGISTERED_ACCESS_ROLES
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import (
     get_course_overview_with_access,
@@ -266,3 +267,79 @@ def get_course_run_url(request, course_id):
     """
     course_run_url = reverse('openedx.course_experience.course_home', args=[course_id])
     return request.build_absolute_uri(course_run_url)
+
+
+def get_course_member_queryset(course_key, include_students=True, access_roles=None, prefetch_user_course_roles=False):
+    """
+    Returns a User queryset that filters all users related to a course. For example - Students, Teachers, Staffs etc.
+
+    Examples:
+        - Get all members:
+            get_course_member_queryset(course_key)
+        - Get only students excluding staffs:
+            get_course_member_queryset(course_key, include_students=True, access_roles=[])
+        - Get only staffs excluding students:
+            get_course_member_queryset(course_key, include_students=False, access_roles=None)
+        - Get only instructors:
+            get_course_member_queryset(course_key, include_students=False, access_roles=['instructor'])
+        - Get instructors & students:
+            get_course_member_queryset(course_key, include_students=True, access_roles=['instructor'])
+        - Get all members and prefetch course related roles:
+            get_course_member_queryset(course_key, prefetch_user_course_roles=True)
+
+    Arguments:
+        course_key (CourseKey): the CourseKey for the course
+        include_students: Wether or not to include students,
+        access_roles:
+            accepts an array of string course access roles.
+            If None provided, it includes all roles.
+        prefetch_user_course_roles:
+            prefetches CourseAccessRole & CourseEnrollment instances attached with user.
+            This only includes CourseAccessRole & CourseEnrollment instances related to
+            the provided CourseKey.
+
+    Returns:
+        (QuerySet): User queryset
+    """
+    queryset = User.objects.filter()
+
+    # if access_roles not given, assign all registered access roles
+    if access_roles is None:
+        access_roles = list(REGISTERED_ACCESS_ROLES.keys())
+
+    # conditions for filtering based on CourseAccessRole
+    access_role_qs = Q(
+        courseaccessrole__course_id=course_key,
+        courseaccessrole__role__in=access_roles
+    )
+
+    # conditions for filtering based on CourseEnrollment
+    students_qs = Q(
+        courseenrollment__course_id=course_key,
+        courseenrollment__is_active=True
+    )
+
+    if include_students:
+        queryset = queryset.filter(access_role_qs | students_qs)
+    else:
+        queryset = queryset.filter(access_role_qs)
+
+    if prefetch_user_course_roles:
+
+        # prefetch CourseAccessRole items related to the course and given roles
+        queryset = queryset.prefetch_related(Prefetch(
+            'courseaccessrole_set',
+            CourseAccessRole.objects.filter(
+                course_id=course_key, role__in=access_roles)
+        ))
+
+        # prefetch CourseEnrollment items related to the course
+        queryset = queryset.prefetch_related(Prefetch(
+            'courseenrollment_set',
+            CourseEnrollment.objects.filter(course_id=course_key)
+        ))
+
+    # prevent duplicates
+    queryset = queryset.distinct()
+
+    return queryset
