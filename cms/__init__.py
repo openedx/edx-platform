@@ -5,7 +5,7 @@ registration and discovery can work correctly.
 Import sorting is intentionally disabled in this module.
 isort:skip_file
 """
-import os
+
 
 # We monkey patch Kombu's entrypoints listing because scanning through this
 # accounts for the majority of LMS/Studio startup time for tests, and we don't
@@ -20,5 +20,4 @@ kombu.utils.entrypoints = lambda namespace: iter([])
 
 # This will make sure the app is always imported when
 # Django starts so that shared_task will use this app.
-if os.environ.get('SERVICE_VARIANT', 'cms').startswith('cms'):
-    from .celery import APP as CELERY_APP
+from .celery import APP as CELERY_APP
