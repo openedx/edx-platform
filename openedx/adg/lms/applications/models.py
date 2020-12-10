@@ -57,7 +57,7 @@ class ApplicationHub(TimeStampedModel):
         return self.is_prerequisite_courses_passed and self.is_written_application_completed
 
     @property
-    def percentage_of_objectives_completed(self):
+    def progress_of_objectives_completed_in_float(self):
         """
         Property to return percentage of the total objectives completed.
 

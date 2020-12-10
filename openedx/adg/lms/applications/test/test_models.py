@@ -55,14 +55,14 @@ def mark_objectives_complete(application_hub, objectives_completed):
     (['is_written_application_completed'], 0.5),
     (['is_prerequisite_courses_passed', 'is_written_application_completed'], 1.0)
 ])
-def test_percentage_of_objectives_completed_in_application_hub(objectives_completed,
-                                                               expected_return_value,
-                                                               application_hub):
+def test_progress_of_objectives_completed_in_float_in_application_hub(objectives_completed,
+                                                                      expected_return_value,
+                                                                      application_hub):
     """
     Test if the `percentage_of_objectives_completed` property is working as expected for all possible cases.
     """
     mark_objectives_complete(application_hub, objectives_completed)
-    assert application_hub.percentage_of_objectives_completed == expected_return_value
+    assert application_hub.progress_of_objectives_completed_in_float == expected_return_value
 
 
 @pytest.mark.django_db
