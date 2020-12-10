@@ -7,6 +7,10 @@
 // 6. Added 'button' class for <button>
 // 7. Updated primaryActionButtonLabel
 // 8. updated formTitle
+// 9. updated PasswordResetInput import.
+// 10. Added field types passwordType1 and passwordType2 in state.
+// 11. Added two functions onClickPassword1 and onClickPassword2.
+// 12. Added type and onClickHandler in props to PasswordResetInput fields.
 
 /* globals gettext */
 
@@ -16,7 +20,7 @@ import React from 'react';
 
 import { Button, StatusAlert } from '@edx/paragon/static';
 
-import PasswordResetInput from '../../../../../../lms/static/js/student_account/components/PasswordResetInput';
+import PasswordResetInput from './PasswordResetInput';
 
 // NOTE: Use static paragon with this because some internal classes (StatusAlert at least)
 // conflict with some standard LMS ones ('alert' at least). This means that you need to do
@@ -34,9 +38,25 @@ class PasswordResetConfirmation extends React.Component {
       showMatchError: false,
       isValid: true,
       validationMessage: '',
+      passwordType1: 'password',
+      passwordType2: 'password',
     };
     this.onBlurPassword1 = this.onBlurPassword1.bind(this);
     this.onBlurPassword2 = this.onBlurPassword2.bind(this);
+    this.onClickPassword1 = this.onClickPassword1.bind(this);
+    this.onClickPassword2 = this.onClickPassword2.bind(this);
+  }
+
+  onClickPassword1() {
+      this.setState({
+          passwordType1: this.state.passwordType1 === 'password' ? 'text' : 'password'
+      });
+  }
+
+  onClickPassword2() {
+      this.setState({
+          passwordType2: this.state.passwordType2 === 'password' ? 'text' : 'password'
+      });
   }
 
   onBlurPassword1(password) {
@@ -111,6 +131,8 @@ class PasswordResetConfirmation extends React.Component {
               onBlur={this.onBlurPassword1}
               isValid={this.state.isValid}
               validationMessage={this.state.validationMessage}
+              type={this.state.passwordType1}
+              onClickHandler={this.onClickPassword1}
             />
 
             <PasswordResetInput
@@ -120,6 +142,8 @@ class PasswordResetConfirmation extends React.Component {
               onBlur={this.onBlurPassword2}
               isValid={!this.state.showMatchError}
               validationMessage={gettext('Passwords do not match.')}
+              type={this.state.passwordType2}
+              onClickHandler={this.onClickPassword2}
             />
 
             <input
