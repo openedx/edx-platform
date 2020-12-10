@@ -4131,6 +4131,9 @@ BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
 # in the blockstore-based XBlock runtime
 XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
 
+# Blockstore data could contain S3 links, so this should be lower than Blockstore's AWS_QUERYSTRING_EXPIRE
+BLOCKSTORE_BUNDLE_CACHE_TIMEOUT = 169200
+
 ######################### MICROSITE ###############################
 MICROSITE_ROOT_DIR = '/edx/app/edxapp/edx-microsite'
 MICROSITE_CONFIGURATION = {}
