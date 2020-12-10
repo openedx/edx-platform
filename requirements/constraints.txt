@@ -128,6 +128,8 @@ pymongo<3.11
 # vulture 2.0 requires Python >= 3.6
 vulture<2.0
 
-
 # sympy latest version causing test failures.
 sympy==1.6.2
+
+# cryptography 3.3.1 started failing tests on sandbox because it dropped support for python3.5
+cryptography==3.2.1
