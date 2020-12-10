@@ -50,10 +50,10 @@ def mark_objectives_complete(application_hub, objectives_completed):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('objectives_completed,expected_return_value', [
-    ([], '0%'),
-    (['is_prerequisite_courses_passed'], '50%'),
-    (['is_written_application_completed'], '50%'),
-    (['is_prerequisite_courses_passed', 'is_written_application_completed'], '100%')
+    ([], 0.0),
+    (['is_prerequisite_courses_passed'], 0.5),
+    (['is_written_application_completed'], 0.5),
+    (['is_prerequisite_courses_passed', 'is_written_application_completed'], 1.0)
 ])
 def test_percentage_of_objectives_completed_in_application_hub(objectives_completed,
                                                                expected_return_value,
