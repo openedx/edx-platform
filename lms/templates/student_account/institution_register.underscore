@@ -1,10 +1,10 @@
 <div class="wrapper-other-login">
     <div class="section-title lines">
-        <h2>
+        <h1>
             <span class="text">
                 <%- gettext("Register with Institution/Campus Credentials") %>
             </span>
-        </h2>
+        </h1>
     </div>
 
     <p class="instructions"><%- gettext("Choose your institution from the list below:") %></p>
@@ -20,9 +20,9 @@
     </ul>
 
     <div class="section-title lines">
-        <h2>
+        <h3>
             <span class="text"><%- gettext("or") %></span>
-        </h2>
+        </h3>
     </div>
 
     <div class="toggle-form">
