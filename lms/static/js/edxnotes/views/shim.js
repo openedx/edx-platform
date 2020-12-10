@@ -1,8 +1,8 @@
 (function(define, undefined) {
     'use strict';
     define([
-        'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/utils/utils'
-    ], function($, _, Annotator, Utils) {
+        'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/utils/utils', 'edx-ui-toolkit/js/utils/html-utils'
+    ], function($, _, Annotator, Utils, HtmlUtils) {
         var _t = Annotator._t;
 
     /**
@@ -48,9 +48,15 @@
             // It depends on the number of annotatable components on the page.
             var tagsField = $('li.annotator-item >input', this.annotator.editor.element).attr('id');
             if ($("label.sr[for='" + tagsField + "']", this.annotator.editor.element).length === 0) {
-                $('<label class="sr" for=' + tagsField + '>' + _t('Tags (space-separated)') + '</label>').insertBefore(
-                    $('#' + tagsField, this.annotator.editor.element)
-                );
+                HtmlUtils.prepend(
+                  $('#' + tagsField, this.annotator.editor.element),
+                  $(HtmlUtils.joinHtml(
+                    HtmlUtils.HTML('<label class="sr" for='),
+                    tagsField,
+                    HtmlUtils.HTML('>'),
+                    _t('Tags (space-separated)'),
+                    HtmlUtils.HTML('</label>')
+                  )));
             }
             return this;
         },
@@ -159,14 +165,15 @@
             .addField({
                 load: function(field, annotation) {
                     if (annotation.text) {
-                        $(field).html(Utils.nl2br(Annotator.Util.escape(annotation.text)));
+                        $(field).html(HtmlUtils.HTML(Utils.nl2br(annotation.text)).toString());
                     } else {
-                        $(field).html('<i>' + _t('No Comment') + '</i>');
+                        // eslint-disable-next-line max-len
+                        $(field).html(HtmlUtils.joinHtml(HtmlUtils.HTML('<i>'), _t('No Comment'), HtmlUtils.HTML('</i>')).toString());
                     }
                     return self.publish('annotationViewerTextField', [field, annotation]);
                 }
             })
-            .element.appendTo(this.wrapper).bind({
+            .element.appendTo(this.wrapper).bind({ // xss-lint: disable=javascript-jquery-insert-into-target
                 mouseover: this.clearViewerHideTimer,
                 mouseout: this.startViewerHideTimer
             });
@@ -210,9 +217,15 @@
             // It depends on the number of annotatable components on the page.
             var noteField = $('li.annotator-item >textarea', this.element).attr('id');
             if ($("label.sr[for='" + noteField + "']", this.element).length === 0) {
-                $('<label class="sr" for=' + noteField + '>' + _t('Note') + '</label>').insertBefore(
-                    $('#' + noteField, this.element)
-                );
+                HtmlUtils.prepend(
+                    $('#' + noteField, this.element),
+                    $(HtmlUtils.joinHtml(
+                      HtmlUtils.HTML('<label class="sr" for='),
+                      noteField,
+                      HtmlUtils.HTML('>'),
+                      _t('Note'),
+                      HtmlUtils.HTML('</label>')
+                    )));
             }
 
             if (event.type === 'keydown') {
@@ -234,6 +247,7 @@
      * Modifies Annotator.onHighlightMouseover to avoid showing the viewer if the
      * editor is opened.
      **/
+        // xss-lint: disable=javascript-jquery-insertion
         Annotator.prototype.onHighlightMouseover = _.wrap(
         Annotator.prototype.onHighlightMouseover,
         function(func, event) {
