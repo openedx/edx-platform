@@ -46,13 +46,21 @@ class LockedTest(ModuleStoreTestCase):
             add_mock.assert_called_once_with(cache_key, "true", GRADING_POLICY_COUNTDOWN_SECONDS)
 
 
-class CourseOverviewSignalsTestCase(ModuleStoreTestCase):
+@ddt.ddt
+class CourseDeletedTestCase(ModuleStoreTestCase):
     """
-    Tests for CourseOverview signals.
+    Tests for course_deleted signals and side-effects
     """
     ENABLED_SIGNALS = ['course_deleted']
     TODAY = datetime.datetime.utcnow()
     NEXT_WEEK = TODAY + datetime.timedelta(days=7)
+
+    def setUp(self):
+        """
+        Add a student & teacher
+        """
+        super(CourseDeletedTestCase, self).setUp()
+        self.student = UserFactory()
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_cache_invalidation(self, modulestore_type):
