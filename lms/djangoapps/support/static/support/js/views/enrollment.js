@@ -7,8 +7,9 @@
         'moment',
         'support/js/views/enrollment_modal',
         'support/js/collections/enrollment',
-        'text!support/templates/enrollment.underscore'
-    ], function(Backbone, _, moment, EnrollmentModal, EnrollmentCollection, enrollmentTemplate) {
+        'text!support/templates/enrollment.underscore',
+        'edx-ui-toolkit/js/utils/html-utils'
+    ], function(Backbone, _, moment, EnrollmentModal, EnrollmentCollection, enrollmentTemplate, HtmlUtils) {
         return Backbone.View.extend({
 
             ENROLLMENT_CHANGE_REASONS: {
@@ -35,14 +36,16 @@
 
             render: function() {
                 var user = this.enrollments.user;
-                this.$el.html(_.template(enrollmentTemplate)({
-                    user: user,
-                    enrollments: this.enrollments,
-                    formatDate: function(date) {
-                        return date ? moment.utc(date).format('lll z') : 'N/A';
-                    }
-                }));
-
+                HtmlUtils.setHtml(
+                    this.$el,
+                    HtmlUtils.template(enrollmentTemplate)({
+                        user: user,
+                        enrollments: this.enrollments,
+                        formatDate: function(date) {
+                            return date ? moment.utc(date).format('lll z') : 'N/A';
+                        }
+                    })
+                );
                 this.checkInitialSearch();
                 return this;
             },
