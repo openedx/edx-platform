@@ -33,7 +33,7 @@ class CollectionListView extends Backbone.View {
         this.$el.before(HtmlUtils.ensureHtml(this.getTitleHtml()).toString());
       }
 
-      this.$el.html(childList);
+      this.$el.html(HtmlUtils.HTML(childList).toString());
     }
   }
 
