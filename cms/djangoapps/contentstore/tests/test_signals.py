@@ -114,6 +114,7 @@ class CourseDeletedTestCase(ModuleStoreTestCase):
         Create good courses, courses that won't load, and deleted courses which still have
         roles. Test course listing.
         """
+        # pylint: disable=protected-access
         mongo_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
         good_location = mongo_store.make_course_key('testOrg', 'testCourse', 'RunBabyRun')
         self._create_course_with_access_groups(good_location, default_store=ModuleStoreEnum.Type.mongo)
