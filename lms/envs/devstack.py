@@ -93,6 +93,7 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.sql.SQLPanel',
     'debug_toolbar.panels.signals.SignalsPanel',
     'debug_toolbar.panels.logging.LoggingPanel',
+    'debug_toolbar.panels.history.HistoryPanel',
     # ProfilingPanel has been intentionally removed for default devstack.py
     # runtimes for performance reasons. If you wish to re-enable it in your
     # local development environment, please create a new settings file
