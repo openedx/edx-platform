@@ -48,4 +48,4 @@ DIFF_COVER_REPORT=$(diff-cover reports/coverage.xml --compare-branch="${branch=o
 export DIFF_COVER_REPORT
 # post comment to PR only from circleci
 [[ "$CIRCLECI" ]] && python3 adg/pipelines/scripts/post_comment.py -t Edx -s $EXIT_CODE
-exit "$EXIT_CODE"
+exit $EXIT_CODE
