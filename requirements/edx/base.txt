@@ -99,7 +99,7 @@ edx-django-sites-extensions==2.5.1  # via -r requirements/edx/base.in
 edx-django-utils==3.13.0  # via -r requirements/edx/base.in, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-toggles, edx-when, ora2, super-csv
 edx-drf-extensions==6.2.0  # via -r requirements/edx/base.in, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
 edx-enterprise==3.13.10    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
-edx-event-routing-backends==1.0.0  # via -r requirements/edx/base.in
+-e git+https://github.com/edx/event-routing-backends.git@0c1290dacabe866f99ed93effd3b5dfc9a9bfb69#egg=event-routing-backends
 edx-i18n-tools==0.5.3     # via ora2
 edx-milestones==0.3.0     # via -r requirements/edx/base.in
 edx-opaque-keys[django]==2.1.1  # via -r requirements/edx/paver.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, lti-consumer-xblock, xmodule
@@ -119,7 +119,7 @@ edxval==1.4.4             # via -r requirements/edx/base.in
 elasticsearch==7.10.0     # via edx-search
 enmerkar-underscore==1.0.0  # via -r requirements/edx/base.in
 enmerkar==0.7.1           # via enmerkar-underscore
-event-tracking==1.0.0     # via -r requirements/edx/base.in, edx-event-routing-backends, edx-proctoring, edx-search
+-e git+https://github.com/edx/event-tracking.git@87650bef1b92afd2b9ceda2e5371f5793c1eaa35#egg=event-tracking
 fs-s3fs==0.1.8            # via -r requirements/edx/base.in, django-pyfs
 fs==2.0.18                # via -r requirements/edx/base.in, django-pyfs, fs-s3fs, xblock
 future==0.18.2            # via django-ses, edx-celeryutils, edx-enterprise, pycontracts, pyjwkest

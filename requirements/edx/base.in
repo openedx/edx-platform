@@ -80,7 +80,7 @@ edx-django-sites-extensions
 edx-django-utils>=3.12.0            # Utilities for cache, monitoring, and plugins; 3.12.0+ for set_code_owner_attribute method
 edx-drf-extensions
 edx-enterprise
-edx-event-routing-backends
+-e git+https://github.com/edx/event-routing-backends.git@0c1290dacabe866f99ed93effd3b5dfc9a9bfb69#egg=event-routing-backends
 edx-milestones
 edx-organizations
 edx-proctoring>=2.0.1
@@ -93,7 +93,7 @@ edx-toggles                         # Feature toggles management
 edx-user-state-client
 edx-when
 edxval
-event-tracking
+-e git+https://github.com/edx/event-tracking.git@87650bef1b92afd2b9ceda2e5371f5793c1eaa35#egg=event-tracking
 fs==2.0.18
 fs-s3fs==0.1.8
 geoip2                              # Python API for the GeoIP web services and databases
