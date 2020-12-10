@@ -137,4 +137,4 @@ upgrade-importlinter:  # Temporary convenience rule.
 
 lint-imports:
 	pip install -r requirements/edx/importlinter.txt
-	lint-imports
+	lint-imports --config importlinter.cfg
