@@ -1,0 +1,5 @@
+
+-c ../constraints.txt
+
+# Installing off of master now due to unreleased features we want.
+-e git+https://github.com/seddonym/import-linter.git@master#egg=import-linter

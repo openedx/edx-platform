@@ -87,6 +87,7 @@ REQ_FILES = \
 	requirements/edx/base \
 	requirements/edx/testing \
 	requirements/edx/development \
+	requirements/edx/importlinter \
 	scripts/xblock/requirements
 
 compile-requirements: export CUSTOM_COMPILE_COMMAND=make upgrade
@@ -131,3 +132,9 @@ docker_push: docker_tag docker_auth ## push to docker hub
 	docker push 'openedx/edx-platform:latest-devstack'
 	docker push "openedx/edx-platform:${GITHUB_SHA}-devstack"
 
+upgrade-importlinter:  # Temporary convenience rule.
+	pip-compile -v --no-emit-trusted-host --no-index --rebuild --upgrade -o requirements/edx/importlinter.txt requirements/edx/importlinter.in
+
+lint-imports:
+	pip install -r requirements/edx/importlinter.txt
+	lint-imports

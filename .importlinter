@@ -1,0 +1,310 @@
+[importlinter]
+root_packages =
+    cms
+    # IMPORTANT NOTE:
+    # Because packages in common/lib are installed locally (via `requirements/edx/local.in`)
+    # and referenced by their unqualified package name (for example, `xmodule.modulestore`
+    # instead of `common.lib.xmodule.xmodule.modulestore`), import linter doesn't understand
+    # how to lint them, so we can neither make contracts about code in common/lib nor
+    # expect other contract to considers import chains passing through through common/lib.
+    common,
+    import_shims
+    lms
+    openedx
+    pavelib
+include_external_packages = True
+
+
+########################################################################################
+# Limit coupling of LMS-specific and Studio-specific code.
+#
+# We check for both direct imports (lms->cms, cms->lms)
+# and indirect imports (e.g. lms->openedx->cms, cms->common.djangoapps->lms, etc.).
+# The former is redundant given that we're checking the latter, but it will be easier
+# to first resolve direct imports before diving into indirect imports, hence
+# the redundant contracts.
+########################################################################################
+
+# lms currently doesn't import cms directly. Cool!
+[importlinter:contract:lms_cms_forbidden_shallow]
+name=LMS/Studio decoupling: lms may not *directly* import cms.
+type=forbidden
+allow_indirect_imports=True
+source_modules =
+    lms
+forbidden_modules =
+    cms
+
+# We have a handful of instances of cms importing lms directly.
+[importlinter:contract:cms_lms_forbidden_shallow]
+name=LMS/Studio decoupling: cms may not *directly* import lms, with exceptions.
+type=forbidden
+allow_indirect_imports=True
+source_modules =
+    cms
+forbidden_modules =
+    lms
+ignore_imports=
+    cms.djangoapps.contentstore.api.tests.base -> lms.djangoapps.courseware.tests.factories
+    cms.djangoapps.contentstore.api.tests.test_import -> lms.djangoapps.courseware.tests.factories
+    cms.djangoapps.contentstore.api.tests.test_validation -> lms.djangoapps.courseware.tests.factories
+    cms.djangoapps.contentstore.course_group_config -> lms.lib.utils
+    cms.djangoapps.contentstore.management.commands.edit_course_tabs -> lms.djangoapps.courseware.courses
+    cms.djangoapps.contentstore.rest_api.v1.tests.test_views -> lms.djangoapps.courseware.tests.factories
+    cms.djangoapps.contentstore.signals.handlers -> lms.djangoapps.grades.api
+    cms.djangoapps.contentstore.tests.test_users_default_role -> lms.djangoapps.courseware.tests.factories
+    cms.djangoapps.contentstore.views.preview -> lms.djangoapps.lms_xblock.field_data
+    cms.djangoapps.contentstore.views.tests.test_item -> lms.djangoapps.lms_xblock.mixin
+    cms.envs.common -> lms.djangoapps.lms_xblock.mixin
+    cms.envs.common -> lms.envs.common
+    cms.envs.test -> lms.envs.test
+
+# Only one instance of cms importing lms, even considering indirect imports.
+# NOTE: Import chains passing through common/lib are not yet considered.
+[importlinter:contract:lms_cms_forbidden_deep]
+name=LMS/Studio decoupling: lms may not *directly NOR indirectly* import cms, with exceptions.
+type=forbidden
+source_modules =
+    lms
+forbidden_modules =
+    cms
+ignore_imports =
+    openedx.core.djangoapps.content.course_overviews.signals -> cms.djangoapps.contentstore.courseware_index
+
+# cms has a lot of indirect references to lms...
+# NOTE: Import chains passing through common/lib are not yet considered.
+[importlinter:contract:cms_lms_forbidden_deep]
+name=LMS/Studio decoupling: lms may not *directly NOR indirectly* import cms, with exceptions.
+type=forbidden
+source_modules =
+    cms
+forbidden_modules =
+    lms
+ignore_imports =
+    cms.djangoapps.contentstore.api.tests.base -> lms.djangoapps.courseware.tests.factories
+    cms.djangoapps.contentstore.api.tests.test_import -> lms.djangoapps.courseware.tests.factories
+    cms.djangoapps.contentstore.api.tests.test_validation -> lms.djangoapps.courseware.tests.factories
+    cms.djangoapps.contentstore.course_group_config -> lms.lib.utils
+    cms.djangoapps.contentstore.management.commands.edit_course_tabs -> lms.djangoapps.courseware.courses
+    cms.djangoapps.contentstore.rest_api.v1.tests.test_views -> lms.djangoapps.courseware.tests.factories
+    cms.djangoapps.contentstore.signals.handlers -> lms.djangoapps.grades.api
+    cms.djangoapps.contentstore.tests.test_users_default_role -> lms.djangoapps.courseware.tests.factories
+    cms.djangoapps.contentstore.views.preview -> lms.djangoapps.lms_xblock.field_data
+    cms.djangoapps.contentstore.views.tests.test_item -> lms.djangoapps.lms_xblock.mixin
+    cms.envs.common -> lms.djangoapps.lms_xblock.mixin
+    cms.envs.common -> lms.envs.common
+    cms.envs.test -> lms.envs.test
+    common.djangoapps.course_modes.models -> lms.djangoapps.certificates.models
+    common.djangoapps.entitlements.models -> lms.djangoapps.certificates.models
+    common.djangoapps.entitlements.models -> lms.djangoapps.commerce.utils
+    common.djangoapps.entitlements.models -> lms.djangoapps.commerce.utils
+    common.djangoapps.entitlements.models -> lms.djangoapps.commerce.utils
+    common.djangoapps.student.helpers -> lms.djangoapps.certificates.api
+    common.djangoapps.student.helpers -> lms.djangoapps.certificates.models
+    common.djangoapps.student.helpers -> lms.djangoapps.certificates.models
+    common.djangoapps.student.helpers -> lms.djangoapps.certificates.models
+    common.djangoapps.student.helpers -> lms.djangoapps.grades.api
+    common.djangoapps.student.helpers -> lms.djangoapps.verify_student.models
+    common.djangoapps.student.helpers -> lms.djangoapps.verify_student.services
+    common.djangoapps.student.helpers -> lms.djangoapps.verify_student.services
+    common.djangoapps.student.helpers -> lms.djangoapps.verify_student.utils
+    common.djangoapps.student.models -> lms.djangoapps.certificates.models
+    common.djangoapps.student.models -> lms.djangoapps.courseware.models
+    common.djangoapps.student.models -> lms.djangoapps.verify_student.models
+    common.djangoapps.third_party_auth.pipeline -> lms.djangoapps.verify_student.models
+    common.djangoapps.third_party_auth.pipeline -> lms.djangoapps.verify_student.utils
+    common.djangoapps.third_party_auth.pipeline -> lms.djangoapps.verify_student.utils
+    common.djangoapps.util.views -> lms.djangoapps.courseware.access
+    common.djangoapps.util.views -> lms.djangoapps.courseware.masquerade
+    common.djangoapps.util.views -> lms.djangoapps.courseware.masquerade
+    openedx.core.djangoapps.certificates.api -> lms.djangoapps.certificates.models
+    openedx.core.djangoapps.content.course_overviews.models -> lms.djangoapps.ccx.utils
+    openedx.core.djangoapps.content.course_overviews.models -> lms.djangoapps.certificates.api
+    openedx.core.djangoapps.content.course_overviews.models -> lms.djangoapps.discussion.django_comment_client
+    openedx.core.djangoapps.course_groups.cohorts -> lms.djangoapps.courseware.courses
+    openedx.core.djangoapps.course_groups.partition_scheme -> lms.djangoapps.courseware.masquerade
+    openedx.core.djangoapps.enrollments.permissions -> lms.djangoapps.courseware.rules
+    openedx.core.djangoapps.user_api.serializers -> lms.djangoapps.verify_student.models
+    openedx.core.lib.gating.api -> lms.djangoapps.course_blocks.api
+    openedx.core.lib.gating.api -> lms.djangoapps.courseware.access
+    openedx.core.lib.gating.api -> lms.djangoapps.courseware.access
+    openedx.core.lib.gating.api -> lms.djangoapps.courseware.access
+    openedx.core.lib.gating.api -> lms.djangoapps.grades.api
+    openedx.features.content_type_gating.helpers -> lms.djangoapps.courseware.masquerade
+    openedx.features.content_type_gating.partitions -> lms.djangoapps.commerce.utils
+    openedx.features.course_experience -> lms.djangoapps.experiments.flags
+    openedx.features.course_experience.utils -> lms.djangoapps.course_api.blocks.api
+    openedx.features.course_experience.utils -> lms.djangoapps.course_blocks.api
+    openedx.features.course_experience.utils -> lms.djangoapps.course_blocks.api
+    openedx.features.course_experience.utils -> lms.djangoapps.course_blocks.api
+    openedx.features.course_experience.utils -> lms.djangoapps.course_blocks.utils
+    openedx.features.course_experience.utils -> lms.djangoapps.courseware.access
+    openedx.features.discounts.applicability -> lms.djangoapps.experiments.models
+    openedx.features.discounts.applicability -> lms.djangoapps.experiments.models
+    openedx.features.discounts.applicability -> lms.djangoapps.experiments.models
+    openedx.features.discounts.applicability -> lms.djangoapps.experiments.stable_bucketing
+    openedx.features.discounts.utils -> lms.djangoapps.courseware.utils
+    openedx.features.discounts.utils -> lms.djangoapps.courseware.utils
+    openedx.features.discounts.utils -> lms.djangoapps.experiments.models
+    openedx.features.discounts.utils -> lms.djangoapps.experiments.models
+    openedx.features.enterprise_support.utils -> lms.djangoapps.branding.api
+    openedx.features.enterprise_support.utils -> lms.djangoapps.branding.api
+
+
+########################################################################################
+# Limit dependence of shared code on LMS-specific code and Studio-specific code.
+#
+# Many of the violations that these contracts would catch would also be caught
+# by the LMS/Studio decoupling checks. However, this provides an extra level
+# of strictness, as it checks for imports like lms->common->lms or cms->openedx->cms,
+# which would be allowed by the LMS/Studio decoupling checks.
+########################################################################################
+
+# We can't lint common/lib yet.
+# [importlinter:contract:common_lib_to_cms_forbidden]
+# name = Shared-code independence: common.lib may not import cms, with exceptions.
+# type = forbidden
+# source_modules =
+#     common.lib
+# forbidden_modules =
+#     cms
+# ignore_imports =
+#     ...
+
+# common.djangoapps doesn't import from cms, even indirectly. Cool!
+[importlinter:contract:common_djangoapps_to_cms_forbidden]
+name = Shared-code independence: common.djangoapps may not import cms.
+type = forbidden
+source_modules =
+    common.djangoapps
+forbidden_modules =
+    cms
+
+# openedx only has a handeful of cms imports, including indirect ones.
+[importlinter:contract:openedx_to_cms_forbidden]
+name = Shared-code independence: openedx may not import cms, with exceptions.
+type = forbidden
+source_modules =
+    openedx
+forbidden_modules =
+    cms
+ignore_imports =
+    openedx.core.djangoapps.content.course_overviews.signals -> cms.djangoapps.contentstore.courseware_index
+    openedx.core.djangoapps.content_libraries.api -> cms.djangoapps.contentstore.views.helpers
+    openedx.core.djangoapps.content_libraries.management.commands.reindex_content_library -> cms.djangoapps.contentstore.management.commands.prompt
+    openedx.core.djangoapps.verified_track_content.management.commands.swap_from_auto_track_cohort_pilot -> cms.djangoapps.contentstore.course_group_config
+
+# We can't lint common/lib yet.
+# [importlinter:contract:common_lib_to_lms_forbidden]
+# name = Shared-code independence: common.lib may not import lms, with exceptions.
+# type = forbidden
+# source_modules =
+#     common.lib
+# forbidden_modules =
+#     lms
+# ignore_imports =
+#     ...
+
+# There are a lot of these right now; need to come back later and build the ignore list.
+# [importlinter:contract:common_djangoapps_to_lms_forbidden]
+# name = Shared-code independence: common.djangoapps djangoapps may not import lms, with exceptions.
+# type = forbidden
+# source_modules =
+#     common.djangoapps
+# forbidden_modules =
+#     lms
+# ignore_imports =
+#     ...
+
+# There are a lot of these right now; need to come back later and build the ignore list.
+# [importlinter:contract:openedx_to_lms_forbidden]
+# name = Shared-code independence: openedx may not import lms, with exceptions.
+# type = forbidden
+# source_modules =
+#     openedx
+# forbidden_modules =
+#     lms
+# ignore_imports =
+#     ...
+
+
+########################################################################################
+# Steps towards splitting individual packages out of the platform.
+#
+# The idea here is that we'd use import-linter to ensure that directories that are
+# candidates for extraction maintain a limited set of imports into edx-platform.
+# I haven't been able to do find a good working example of this yet, I'll keep trying.
+########################################################################################
+
+# [importlinter:contract:survey_independence]
+# name=Library independence: lms.djangoapps.survey may only reference lms.djangoapps.
+# type=forbidden
+# source_modules =
+#     lms.djangoapps.survey
+# forbidden_modules =
+#     cms
+#     common.djangoapps
+#     lms.lib
+#     openedx
+
+# We can't lint common/lib yet.
+# [importlinter:contract:symmath_independence]
+# name=Library independence: symmath lib does not reference other edx-platform code, with exceptions.
+# type=forbidden
+# source_modules =
+#     common.lib.symmath
+# forbidden_modules =
+#     cms
+#     common.djangoapps
+#     lms
+#     openedx
+
+# We can't lint common/lib yet.
+# [importlinter:contract:xmodule_independence]
+# name=Library independence: xmodule lib does not reference other edx-platform code, with exceptions.
+# type=forbidden
+# source_modules =
+#     common.lib.xmodule
+# forbidden_modules =
+#     cms
+#     common.djangoapps
+#     lms
+#     openedx
+
+
+########################################################################################
+# Ensure that special tooling code isn't imported within application code.
+#
+# Other than the LMS/Studio split, another usage of import-linter is ensuring
+# that application code doesn't become reliant on any of our special directories
+# like pavelib or import_shims.
+########################################################################################
+
+[importlinter:contract:paver_and_pavelib_forbidden]
+name = Tooling isolation: Neither paver nor pavelib may be referenced outside of pavelib itself, with exceptions.
+type = forbidden
+source_modules=
+    lms
+    common
+    cms
+    openedx
+    import_shims
+forbidden_modules =
+    pavelib
+    paver
+ignore_imports =
+    openedx.core.djangoapps.theming.management.commands.compile_sass -> pavelib.assets
+    openedx.core.djangoapps.theming.management.commands.compile_sass -> paver
+    openedx.testing.coverage_context_listener.pytest_plugin -> pavelib.utils.envs
+
+[importlinter:contract:import_shims_forbidden]
+name = Tooling isolation: import_shims may not be referenced outside of import_shims itself.
+type = forbidden
+source_modules =
+    lms
+    common
+    cms
+    openedx
+    pavelib
+forbidden_modules =
+    import_shims
