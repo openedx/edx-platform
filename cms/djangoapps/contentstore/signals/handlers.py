@@ -17,6 +17,7 @@ from cms.djangoapps.contentstore.courseware_index import (
 )
 from cms.djangoapps.contentstore.proctoring import register_special_exams
 from lms.djangoapps.grades.api import task_compute_all_grades_for_course
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credit.signals import on_course_publish
 from openedx.core.lib.gating import api as gating_api
 from common.djangoapps.track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
@@ -84,6 +85,16 @@ def listen_for_library_update(sender, library_key, **kwargs):  # pylint: disable
         from cms.djangoapps.contentstore.tasks import update_library_index
 
         update_library_index.delay(six.text_type(library_key), datetime.now(UTC).isoformat())
+
+
+@receiver(SignalHandler.course_deleted)
+def handle_course_deleted(sender, course_key, **kwargs):  # pylint: disable=unused-argument
+    """
+    Handle course_deleted signals
+    and invalidate the course's CourseOverview cache entry.
+    """
+    CourseOverview.objects.filter(id=course_key).delete()
+    CourseAboutSearchIndexer.remove_deleted_items(course_key)
 
 
 @receiver(SignalHandler.item_deleted)
