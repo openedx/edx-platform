@@ -692,6 +692,18 @@ FEATURES = {
     # .. toggle_tickets: https://openedx.atlassian.net/browse/TNL-7273
     # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
     'ENABLE_ORA_USERNAMES_ON_DATA_EXPORT': False,
+
+    # .. toggle_name: ENABLE_COURSE_ASSESSMENT_GRADE_CHANGE_SIGNAL
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to start sending signals for assessment level grade updates. Notably, the only
+    #   handler of this signal at the time of this writing sends assessment updates to enterprise integrated channels.
+    # .. toggle_use_cases: temporary
+    # .. toggle_creation_date: 2020-12-09
+    # .. toggle_target_removal_date: 2021-02-01
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/ENT-3818
+    # .. toggle_warnings: None.
+    'ENABLE_COURSE_ASSESSMENT_GRADE_CHANGE_SIGNAL': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API

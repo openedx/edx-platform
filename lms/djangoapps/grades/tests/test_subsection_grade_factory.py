@@ -49,14 +49,19 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
         self.assertIsInstance(grade, ZeroSubsectionGrade)
         self.assert_grade(grade, 0.0, 1.0)
 
+    @patch.dict(settings.FEATURES, {'ENABLE_COURSE_ASSESSMENT_GRADE_CHANGE_SIGNAL': True})
     def test_update(self):
         """
         Assuming the underlying score reporting methods work,
         test that the score is calculated properly.
         """
         with mock_get_score(1, 2):
-            grade = self.subsection_grade_factory.update(self.sequence)
+            with patch(
+                'openedx.core.djangoapps.signals.signals.COURSE_ASSESSMENT_GRADE_CHANGED.send_robust'
+            ) as mock_update_grades_signal:
+                grade = self.subsection_grade_factory.update(self.sequence)
         self.assert_grade(grade, 1, 2)
+        assert mock_update_grades_signal.called
 
     def test_write_only_if_engaged(self):
         """

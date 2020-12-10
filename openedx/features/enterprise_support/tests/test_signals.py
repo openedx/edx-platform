@@ -17,7 +17,7 @@ from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.certificates.signals import listen_for_passing_grade
 from openedx.core.djangoapps.commerce.utils import ECOMMERCE_DATE_FORMAT
 from openedx.core.djangoapps.credit.tests.test_api import TEST_ECOMMERCE_WORKER
-from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED
+from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED, COURSE_ASSESSMENT_GRADE_CHANGED
 from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
 from openedx.features.enterprise_support.tests.factories import (
     EnterpriseCourseEnrollmentFactory,
@@ -207,3 +207,39 @@ class EnterpriseSupportSignals(SharedModuleStoreTestCase):
             COURSE_GRADE_NOW_PASSED.send(sender=None, user=self.user, course_id=course_key)
             mock_task_apply.assert_called_once_with(kwargs=task_kwargs)
             COURSE_GRADE_NOW_PASSED.connect(listen_for_passing_grade, dispatch_uid='new_passing_learner')
+
+    def test_handle_enterprise_learner_subsection(self):
+        """
+        Test to assert transmit_subsection_learner_data is called when COURSE_ASSESSMENT_GRADE_CHANGED signal is fired.
+        """
+        with patch(
+            'integrated_channels.integrated_channel.tasks.transmit_subsection_learner_data.apply_async',
+            return_value=None
+        ) as mock_task_apply:
+            course_key = CourseKey.from_string(self.course_id)
+            COURSE_ASSESSMENT_GRADE_CHANGED.disconnect()
+            COURSE_ASSESSMENT_GRADE_CHANGED.send(
+                sender=None,
+                user=self.user,
+                course_id=course_key,
+                subsection_id='subsection_id',
+                subsection_grade=1.0
+            )
+            self.assertFalse(mock_task_apply.called)
+
+            self._create_enterprise_enrollment(self.user.id, self.course_id)
+            task_kwargs = {
+                'username': self.user.username,
+                'course_run_id': self.course_id,
+                'subsection_id': 'subsection_id',
+                'grade': '1.0'
+            }
+            COURSE_ASSESSMENT_GRADE_CHANGED.send(
+                sender=None,
+                user=self.user,
+                course_id=course_key,
+                subsection_id='subsection_id',
+                subsection_grade=1.0
+            )
+            mock_task_apply.assert_called_once_with(kwargs=task_kwargs)
+            COURSE_ASSESSMENT_GRADE_CHANGED.connect(listen_for_passing_grade)

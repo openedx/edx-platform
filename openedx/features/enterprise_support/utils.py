@@ -7,6 +7,7 @@ import json
 
 from crum import get_current_request
 from django.conf import settings
+from django.core.cache import cache
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import TieredCache, get_cache_key
@@ -31,6 +32,13 @@ def get_data_consent_share_cache_key(user_id, course_id):
     """
 
     return get_cache_key(type='data_sharing_consent_needed', user_id=user_id, course_id=course_id)
+
+
+def get_is_enterprise_cache_key(user_id):
+    """
+        Returns cache key for the enterprise learner validation method needed against user_id.
+    """
+    return get_cache_key(type='is_enterprise_learner', user_id=user_id)
 
 
 def clear_data_consent_share_cache(user_id, course_id):
@@ -393,7 +401,7 @@ def get_enterprise_learner_generic_name(request):
 
 def is_enterprise_learner(user):
     """
-    Check if the given user belongs to an enterprise.
+    Check if the given user belongs to an enterprise. Cache the value if an enterprise learner is found.
 
     Arguments:
         user (User): Django User object.
@@ -401,7 +409,15 @@ def is_enterprise_learner(user):
     Returns:
         (bool): True if given user is an enterprise learner.
     """
-    return EnterpriseCustomerUser.objects.filter(user_id=user.id).exists()
+    cached_is_enterprise_key = get_is_enterprise_cache_key(user.id)
+    if cache.get(cached_is_enterprise_key):
+        return True
+
+    if EnterpriseCustomerUser.objects.filter(user_id=user.id).exists():
+        # Cache the enterprise user for one hour.
+        cache.set(cached_is_enterprise_key, True, 3600)
+        return True
+    return False
 
 
 def get_enterprise_slug_login_url():

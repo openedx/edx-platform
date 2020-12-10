@@ -11,12 +11,12 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomer, EnterpriseCustomerUser
-from integrated_channels.integrated_channel.tasks import transmit_single_learner_data
+from integrated_channels.integrated_channel.tasks import transmit_single_learner_data, transmit_subsection_learner_data
 from slumber.exceptions import HttpClientError
 
 from lms.djangoapps.email_marketing.tasks import update_user
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
-from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED
+from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED, COURSE_ASSESSMENT_GRADE_CHANGED
 from openedx.features.enterprise_support.api import enterprise_enabled
 from openedx.features.enterprise_support.tasks import clear_enterprise_customer_data_consent_share_cache
 from openedx.features.enterprise_support.utils import clear_data_consent_share_cache, is_enterprise_learner
@@ -84,6 +84,22 @@ def handle_enterprise_learner_passing_grade(sender, user, course_id, **kwargs): 
         }
 
         transmit_single_learner_data.apply_async(kwargs=kwargs)
+
+
+@receiver(COURSE_ASSESSMENT_GRADE_CHANGED)
+def handle_enterprise_learner_subsection(sender, user, course_id, subsection_id, subsection_grade, **kwargs):  # pylint: disable=unused-argument
+    """
+    Listen for an enterprise learner completing a subsection, transmit data to relevant integrated channel.
+    """
+    if enterprise_enabled() and is_enterprise_learner(user):
+        kwargs = {
+            'username': str(user.username),
+            'course_run_id': str(course_id),
+            'subsection_id': str(subsection_id),
+            'grade': str(subsection_grade),
+        }
+
+        transmit_subsection_learner_data.apply_async(kwargs=kwargs)
 
 
 @receiver(UNENROLL_DONE)
