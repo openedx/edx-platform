@@ -9,7 +9,7 @@
 // 8. updated formTitle
 // 9. updated PasswordResetInput import.
 // 10. Added field types passwordType1 and passwordType2 in state.
-// 11. Added two functions onClickPassword1 and onClickPassword2.
+// 11. Added three functions onClickTogglePasswordType1 and onClickTogglePasswordType2.
 // 12. Added type and onClickHandler in props to PasswordResetInput fields.
 // 13. Added CDN link to props.
 
@@ -44,19 +44,23 @@ class PasswordResetConfirmation extends React.Component {
     };
     this.onBlurPassword1 = this.onBlurPassword1.bind(this);
     this.onBlurPassword2 = this.onBlurPassword2.bind(this);
-    this.onClickPassword1 = this.onClickPassword1.bind(this);
-    this.onClickPassword2 = this.onClickPassword2.bind(this);
+    this.onClickTogglePasswordType1 = this.onClickTogglePasswordType1.bind(this);
+    this.onClickTogglePasswordType2 = this.onClickTogglePasswordType2.bind(this);
   }
 
-  onClickPassword1() {
+  getNewPasswordType(passwordType) {
+      return (passwordType === 'password') ? 'text' : 'password'
+  }
+
+  onClickTogglePasswordType1() {
       this.setState({
-          passwordType1: this.state.passwordType1 === 'password' ? 'text' : 'password'
+          passwordType1: this.getNewPasswordType(this.state.passwordType1)
       });
   }
 
-  onClickPassword2() {
+  onClickTogglePasswordType2() {
       this.setState({
-          passwordType2: this.state.passwordType2 === 'password' ? 'text' : 'password'
+          passwordType2: this.getNewPasswordType(this.state.passwordType2)
       });
   }
 
@@ -133,7 +137,7 @@ class PasswordResetConfirmation extends React.Component {
               isValid={this.state.isValid}
               validationMessage={this.state.validationMessage}
               type={this.state.passwordType1}
-              onClickHandler={this.onClickPassword1}
+              onClickHandler={this.onClickTogglePasswordType1}
               CDN_LINK={this.props.CDN_LINK}
             />
 
@@ -145,7 +149,7 @@ class PasswordResetConfirmation extends React.Component {
               isValid={!this.state.showMatchError}
               validationMessage={gettext('Passwords do not match.')}
               type={this.state.passwordType2}
-              onClickHandler={this.onClickPassword2}
+              onClickHandler={this.onClickTogglePasswordType2}
               CDN_LINK={this.props.CDN_LINK}
             />
 
