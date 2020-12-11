@@ -51,7 +51,10 @@ class CourseDeletedTestCase(ModuleStoreTestCase):
     """
     Tests for course_deleted signals and side-effects
     """
-    ENABLED_SIGNALS = ['course_deleted']
+    ENABLED_SIGNALS = [
+        'course_deleted',
+        'course_published',
+    ]
     TODAY = datetime.datetime.utcnow()
     NEXT_WEEK = TODAY + datetime.timedelta(days=7)
 
