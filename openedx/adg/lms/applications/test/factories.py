@@ -11,6 +11,7 @@ class BusinessLineFactory(factory.DjangoModelFactory):
     """
     Factory for BusinessLine model
     """
+
     class Meta:
         model = BusinessLine
 

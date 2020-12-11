@@ -11,9 +11,13 @@ class ApplicationHubAdmin(admin.ModelAdmin):
     """
     Django admin class for ApplicationHub
     """
-    fields = ('user', 'is_prerequisite_courses_passed', 'is_application_submitted',)
+    fields = (
+        'user', 'is_prerequisite_courses_passed', 'is_written_application_completed', 'is_application_submitted',
+        'submission_date'
+    )
     list_display = (
-        'id', 'user', 'is_prerequisite_courses_passed', 'is_application_submitted',
+        'id', 'user', 'is_prerequisite_courses_passed', 'is_written_application_completed', 'is_application_submitted',
+        'submission_date'
     )
     raw_id_fields = ('user',)
 
@@ -25,7 +29,7 @@ class UserApplicationAdmin(admin.ModelAdmin):
     """
     list_display = ('id', 'user_email', 'business_line',)
     list_filter = ('business_line',)
-    raw_id_fields = ('user', )
+    raw_id_fields = ('user',)
 
     def user_email(self, obj):
         return obj.user.email
