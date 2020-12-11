@@ -31,6 +31,11 @@ def get_site_config_for_event(event_props):
                 # allow to fail if more than one Organization to avoid sharing data
                 orgcourse = models.OrganizationCourse.objects.get(course_id=args)
                 org = orgcourse.organization
+            else:
+                raise exceptions.EventProcessingError(
+                    "There isn't and org or course_id attribute set in the "
+                    "segment event, so we couldn't determine the site."
+                )
             site = utils.get_site_by_organization(org)
             site_configuration = site.configuration
         except (
