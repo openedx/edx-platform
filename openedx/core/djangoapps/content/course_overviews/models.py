@@ -76,12 +76,14 @@ class CourseOverview(TimeStampedModel):
     display_number_with_default = TextField()
     display_org_with_default = TextField()
 
-    # Start/end dates
-    # TODO Remove 'start' & 'end' in removing field in column renaming, DE-1822
     start = DateTimeField(null=True)
     end = DateTimeField(null=True)
+
+    # These are deprecated and unused, but cannot be dropped via simple migration due to the size of the downstream
+    # history table. See DENG-19 for details.
     start_date = DateTimeField(null=True)
     end_date = DateTimeField(null=True)
+
     advertised_start = TextField(null=True)
     announcement = DateTimeField(null=True)
 
@@ -191,10 +193,7 @@ class CourseOverview(TimeStampedModel):
         course_overview.display_org_with_default = course.display_org_with_default
 
         course_overview.start = start
-        # Add writes to new fields 'start_date' & 'end_date'.
-        course_overview.start_date = start
         course_overview.end = end
-        course_overview.end_date = end
         course_overview.advertised_start = course.advertised_start
         course_overview.announcement = course.announcement
 
