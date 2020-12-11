@@ -11,6 +11,9 @@
 # celery 5.0 has dropped python3.5 support.
 celery<5.0
 
+# cryptography 3.3 has dropped python3.5 support.
+cryptography<3.3
+
 # Stay on the latest LTS release of Django
 Django<2.3
 
