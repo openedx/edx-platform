@@ -82,7 +82,7 @@ class Command(BaseCommand):
             ({"short_name": orgslug}, courseid)
             for orgslug, courseid in sorted(orgslug_courseid_pairs)
         ]
-        if not confirm_changes(options, orgs, orgslug_courseid_pairs):
+        if not confirm_changes(options, orgs, org_courseid_pairs):
             print("No changes applied.")
             return
         print("Applying changes...")
@@ -91,7 +91,7 @@ class Command(BaseCommand):
         print("Changes applied successfully.")
 
 
-def confirm_changes(options, orgs, orgslug_courseid_pairs):
+def confirm_changes(options, orgs, org_courseid_pairs):
     """
     Should we apply the changes to the database?
 
@@ -112,7 +112,7 @@ def confirm_changes(options, orgs, orgslug_courseid_pairs):
     if options.get('apply'):
         return True
     organizations_api.bulk_add_organizations(orgs, dry_run=True)
-    organizations_api.bulk_add_organization_courses(orgslug_courseid_pairs, dry_run=True)
+    organizations_api.bulk_add_organization_courses(org_courseid_pairs, dry_run=True)
     if options.get('dry'):
         return False
     answer = ""
