@@ -152,6 +152,11 @@ def main():
         help='Display the totals for each rule.'
     )
     parser.add_argument(
+        '--summary-format', dest='summary_format',
+        choices=['eslint', 'json'], default='eslint',
+        help='Choose the display format for the summary.'
+    )
+    parser.add_argument(
         '--verbose', dest='verbose', action='store_true',
         help='Print multiple lines where possible for additional context of violations.'
     )
@@ -166,6 +171,7 @@ def main():
     options = {
         'list_files': args.list_files,
         'rule_totals': args.rule_totals,
+        'summary_format': args.summary_format,
         'verbose': args.verbose,
         'skip_dirs': getattr(config, 'SKIP_DIRS', ())
     }

@@ -3,6 +3,7 @@ Utility classes for reporting linter results.
 """
 
 
+import json
 import os
 import re
 
@@ -275,17 +276,43 @@ class SummaryResults(object):
 
         """
         if options['list_files'] is False:
-            if options['rule_totals']:
-                max_rule_id_len = max(len(rule_id) for rule_id in self.totals_by_rule)
-                print("", file=out)
-                for rule_id in sorted(self.totals_by_rule.keys()):
-                    padding = " " * (max_rule_id_len - len(rule_id))
-                    print("{}: {}{} violations".format(rule_id, padding, self.totals_by_rule[rule_id]), file=out)
-                print("", file=out)
+            if options['summary_format'] == 'json':
+                self._print_json_format(options, out)
+            else:
+                self._print_eslint_format(options, out)
 
-            # matches output of eslint for simplicity
+    def _print_eslint_format(self, options, out):
+        """
+        Implementation of print_results with eslint-style output.
+        """
+        if options['rule_totals']:
+            max_rule_id_len = max(len(rule_id) for rule_id in self.totals_by_rule)
             print("", file=out)
-            print("{} violations total".format(self.total_violations), file=out)
+            for rule_id in sorted(self.totals_by_rule.keys()):
+                padding = " " * (max_rule_id_len - len(rule_id))
+                print("{}: {}{} violations".format(rule_id, padding, self.totals_by_rule[rule_id]), file=out)
+            print("", file=out)
+
+        # matches output of eslint for simplicity
+        print("", file=out)
+        print("{} violations total".format(self.total_violations), file=out)
+
+    def _print_json_format(self, options, out):
+        """
+        Implementation of print_results with JSON output.
+        """
+        print("", file=out)
+        print("Violation counts:", file=out)
+        data = {'rules': self.totals_by_rule}
+        if options['rule_totals']:
+            data['total'] = self.total_violations
+        json.dump(data, fp=out, indent=4, sort_keys=True)
+        print("", file=out)
+        print(
+            "If you've fixed some XSS issues and these numbers have gone down, "
+            "you can use this to update scripts/xsslint_thresholds.json",
+            file=out
+        )
 
 
 class FileResults(object):
