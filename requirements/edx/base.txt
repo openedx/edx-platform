@@ -103,7 +103,7 @@ edx-event-routing-backends==2.0.0  # via -r requirements/edx/base.in
 edx-i18n-tools==0.5.3     # via ora2
 edx-milestones==0.3.0     # via -r requirements/edx/base.in
 edx-opaque-keys[django]==2.1.1  # via -r requirements/edx/paver.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, lti-consumer-xblock, xmodule
-edx-organizations==6.3.0  # via -r requirements/edx/base.in
+edx-organizations==6.4.0  # via -r requirements/edx/base.in
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/base.in
 edx-proctoring==2.5.0     # via -r requirements/edx/base.in, edx-proctoring-proctortrack
 edx-rbac==1.3.3           # via edx-enterprise
@@ -217,7 +217,7 @@ social-auth-app-django==4.0.0  # via -r requirements/edx/base.in
 social-auth-core==3.3.3   # via -r requirements/edx/base.in, social-auth-app-django
 sorl-thumbnail==12.7.0    # via -r requirements/edx/base.in, django-wiki
 sortedcontainers==2.3.0   # via -r requirements/edx/base.in
-soupsieve==2.0.1          # via beautifulsoup4
+soupsieve==2.1            # via beautifulsoup4
 sqlparse==0.4.1           # via -r requirements/edx/base.in, django
 staff-graded-xblock==1.1  # via -r requirements/edx/base.in
 stevedore==1.32.0         # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, -r requirements/edx/paver.txt, code-annotations, edx-ace, edx-django-utils, edx-enterprise, edx-opaque-keys
