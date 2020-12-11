@@ -208,7 +208,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
 
         # Fetch the view and verify the query counts
         # TODO: decrease query count as part of REVO-28
-        with self.assertNumQueries(73, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(75, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
@@ -428,7 +428,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
              </div>'''.format(
             discount_expiration_date=discount_expiration_date,
             percentage=percentage,
-            strikeout_price=HTML(format_strikeout_price(user, self.course, check_for_discount=False)[0]),
+            strikeout_price=HTML(format_strikeout_price(user, self.course)[0]),
             upgrade_link=upgrade_link
         )
 

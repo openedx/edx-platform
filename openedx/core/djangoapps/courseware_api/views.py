@@ -27,6 +27,7 @@ from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access_response import (
     CoursewareMicrofrontendDisabledAccessError,
 )
+from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import check_course_access, get_course_by_id
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
@@ -39,8 +40,8 @@ from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from openedx.features.course_duration_limits.access import generate_course_expired_message
-from openedx.features.discounts.utils import generate_offer_html
+from openedx.features.course_duration_limits.access import generate_course_expired_message, get_access_expiration_data
+from openedx.features.discounts.utils import generate_offer_data, generate_offer_html
 from common.djangoapps.student.models import (
     CourseEnrollment, CourseEnrollmentCelebration, LinkedInAddToProfileConfiguration
 )
@@ -119,9 +120,17 @@ class CoursewareMeta:
         return {'mode': mode, 'is_active': is_active}
 
     @property
+    def access_expiration(self):
+        return get_access_expiration_data(self.effective_user, self.overview)
+
+    @property
     def course_expired_message(self):
         # TODO: TNL-7185 Legacy: Refactor to return the expiration date and format the message in the MFE
         return generate_course_expired_message(self.effective_user, self.overview)
+
+    @property
+    def offer(self):
+        return generate_offer_data(self.effective_user, self.overview)
 
     @property
     def offer_html(self):
@@ -310,6 +319,12 @@ class CoursewareMeta:
 
         return programs
 
+    @property
+    def user_timezone(self):
+        """Returns the user's timezone setting (may be None)"""
+        user_timezone_locale = user_timezone_locale_prefs(self.request)
+        return user_timezone_locale['user_timezone']
+
 
 class CoursewareInformation(RetrieveAPIView):
     """
@@ -325,9 +340,17 @@ class CoursewareInformation(RetrieveAPIView):
 
         Body consists of the following fields:
 
+        * access_expiration: An object detailing when access to this course will expire
+            * expiration_date: (str) When the access expires, in ISO 8601 notation
+            * masquerading_expired_course: (bool) Whether this course is expired for the masqueraded user
+            * upgrade_deadline: (str) Last chance to upgrade, in ISO 8601 notation (or None if can't upgrade anymore)
+            * upgrade_url: (str) Upgrade linke (or None if can't upgrade anymore)
         * effort: A textual description of the weekly hours of effort expected
             in the course.
         * end: Date the course ends, in ISO 8601 notation
+        * enrollment: Enrollment status of authenticated user
+            * mode: `audit`, `verified`, etc
+            * is_active: boolean
         * enrollment_end: Date enrollment ends, in ISO 8601 notation
         * enrollment_start: Date enrollment begins, in ISO 8601 notation
         * id: A unique identifier of the course; a serialized representation
@@ -338,6 +361,13 @@ class CoursewareInformation(RetrieveAPIView):
                 * uri: The location of the image
         * name: Name of the course
         * number: Catalog number of the course
+        * offer: An object detailing upgrade discount information
+            * code: (str) Checkout code
+            * expiration_date: (str) Expiration of offer, in ISO 8601 notation
+            * original_price: (str) Full upgrade price without checkout code; includes currency symbol
+            * discounted_price: (str) Upgrade price with checkout code; includes currency symbol
+            * percentage: (int) Amount of discount
+            * upgrade_url: (str) Checkout URL
         * org: Name of the organization that owns the course
         * related_programs: A list of objects that contains program data related to the given course including:
             * progress: An object containing program progress:
@@ -359,9 +389,7 @@ class CoursewareInformation(RetrieveAPIView):
             * `"empty"`: no start date is specified
         * pacing: Course pacing. Possible values: instructor, self
         * tabs: Course tabs
-        * enrollment: Enrollment status of authenticated user
-            * mode: `audit`, `verified`, etc
-            * is_active: boolean
+        * user_timezone: User's chosen timezone setting (or null for browser default)
         * can_load_course: Whether the user can view the course (AccessResponse object)
         * is_staff: Whether the effective user has staff access to the course
         * original_user_is_staff: Whether the original user has staff access to the course
