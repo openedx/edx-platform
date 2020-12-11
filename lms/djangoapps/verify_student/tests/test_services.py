@@ -116,6 +116,31 @@ class TestIDVerificationService(ModuleStoreTestCase):
 
         self.assertEqual(expected_user_ids, verified_user_ids)
 
+    def test_get_verify_location_no_course_key(self):
+        """
+        Test for the path to the IDV flow with no course key given
+        """
+        path = IDVerificationService.get_verify_location()
+        expected_path = '{}/id-verification'.format(settings.ACCOUNT_MICROFRONTEND_URL)
+        self.assertEqual(path, expected_path)
+
+    def test_get_verify_location_from_course_id(self):
+        """
+        Test for the path to the IDV flow with a course ID
+        """
+        course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
+        path = IDVerificationService.get_verify_location(course.id)
+        expected_path = '{}/id-verification'.format(settings.ACCOUNT_MICROFRONTEND_URL)
+        self.assertEqual(path, expected_path + '?course_id=Robot/999/Test_Course')
+
+    def test_get_verify_location_from_string(self):
+        """
+        Test for the path to the IDV flow with a course key string
+        """
+        path = IDVerificationService.get_verify_location('course-v1:edX+DemoX+Demo_Course')
+        expected_path = '{}/id-verification'.format(settings.ACCOUNT_MICROFRONTEND_URL)
+        self.assertEqual(path, expected_path + '?course_id=course-v1%3AedX%2BDemoX%2BDemo_Course')
+
 
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @ddt.ddt

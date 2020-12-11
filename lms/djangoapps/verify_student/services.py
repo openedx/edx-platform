@@ -5,6 +5,7 @@ Implementation of abstraction layer for other parts of the system to make querie
 import logging
 from datetime import timedelta
 from itertools import chain
+from urllib.parse import quote
 
 from django.conf import settings
 from django.urls import reverse
@@ -238,5 +239,5 @@ class IDVerificationService(object):
         """
         location = '{}/id-verification'.format(settings.ACCOUNT_MICROFRONTEND_URL)
         if course_id:
-            location = location + '?course_id={}'.format(str(course_id))
+            location += '?course_id={}'.format(quote(str(course_id)))
         return location
