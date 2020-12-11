@@ -38,7 +38,8 @@ class BackfillOrgsAndOrgCoursesTest(SharedModuleStoreTestCase):
       `course_overviews`, `modulestore`, and `organizations`, respectively.
     """
 
-    def test_end_to_end(self):
+    @ddt.data("--dry", "--apply")
+    def test_end_to_end(self, run_type):
         """
         Test the happy path of the backfill command without any mocking.
         """
@@ -86,20 +87,30 @@ class BackfillOrgsAndOrgCoursesTest(SharedModuleStoreTestCase):
         assert len(get_organization_courses(get_organization_by_short_name('org_B'))) == 0
 
         # Run the backfill.
-        call_command("backfill_orgs_and_org_courses", "--apply")
+        call_command("backfill_orgs_and_org_courses", run_type)
 
-        # Confirm ending condition:
-        # All five orgs present. Each org a has expected number of org-course linkages.
-        assert set(
-            org["short_name"] for org in get_organizations()
-        ) == {
-            "org_A", "org_B", "org_C", "org_D", "org_E"
-        }
-        assert len(get_organization_courses(get_organization_by_short_name('org_A'))) == 2
-        assert len(get_organization_courses(get_organization_by_short_name('org_B'))) == 0
-        assert len(get_organization_courses(get_organization_by_short_name('org_C'))) == 3
-        assert len(get_organization_courses(get_organization_by_short_name('org_D'))) == 1
-        assert len(get_organization_courses(get_organization_by_short_name('org_E'))) == 0
+        if run_type == "--dry":
+            # Confirm ending conditions are the same as the starting conditions.
+            assert set(
+                org["short_name"] for org in get_organizations()
+            ) == {
+                "org_A", "org_B"
+            }
+            assert len(get_organization_courses(get_organization_by_short_name('org_A'))) == 1
+            assert len(get_organization_courses(get_organization_by_short_name('org_B'))) == 0
+        else:
+            # Confirm ending condition:
+            # All five orgs present. Each org a has expected number of org-course linkages.
+            assert set(
+                org["short_name"] for org in get_organizations()
+            ) == {
+                "org_A", "org_B", "org_C", "org_D", "org_E"
+            }
+            assert len(get_organization_courses(get_organization_by_short_name('org_A'))) == 2
+            assert len(get_organization_courses(get_organization_by_short_name('org_B'))) == 0
+            assert len(get_organization_courses(get_organization_by_short_name('org_C'))) == 3
+            assert len(get_organization_courses(get_organization_by_short_name('org_D'))) == 1
+            assert len(get_organization_courses(get_organization_by_short_name('org_E'))) == 0
 
     @ddt.data(
         {
