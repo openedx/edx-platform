@@ -87,7 +87,7 @@ edx-proctoring>=2.0.1
 edx-proctoring-proctortrack==1.0.5  # Intentionally and permanently pinned to ensure code changes are reviewed
 edx-rest-api-client
 edx-search
-edx-sga
+-e git+https://github.com/mzulqarnain1/edx-sga.git@437a3d58fe882fd0b7536f895f835564c4db08d7#egg=edx-sga==1.0
 edx-submissions
 edx-toggles                         # Feature toggles management
 edx-user-state-client
