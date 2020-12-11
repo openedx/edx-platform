@@ -41,6 +41,7 @@ from openedx.core.djangoapps.credit.models import CreditRequirementStatus, Credi
 from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments
 from openedx.core.djangoapps.profile_images.images import remove_profile_images
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
+from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
 from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models, retire_dop_oauth2_models
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
@@ -416,7 +417,9 @@ class DeactivateLogoutView(APIView):
 
                 # Log the user out.
                 logout(request)
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            response = Response(status=status.HTTP_204_NO_CONTENT)
+            delete_logged_in_cookies(response)
+            return response
         except KeyError:
             return Response(u'Username not specified.', status=status.HTTP_404_NOT_FOUND)
         except user_model.DoesNotExist:
