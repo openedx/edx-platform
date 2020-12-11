@@ -897,7 +897,9 @@ class ProblemResponses(object):
         store = modulestore()
         user_state_client = DjangoXBlockUserStateClient()
 
-        student_data_keys = set()
+        # Each user's generated report data may contain different fields, so we use an OrderedDict to prevent
+        # duplication of keys while preserving the order the XBlock provides the keys in.
+        student_data_keys = OrderedDict()
 
         with store.bulk_operations(course_key):
             for usage_key in usage_keys:
@@ -944,7 +946,15 @@ class ProblemResponses(object):
                             for user_state in user_states:
                                 user_response = response.copy()
                                 user_response.update(user_state)
-                                student_data_keys = student_data_keys.union(list(user_state.keys()))
+
+                                # Respect the column order as returned by the xblock, if any.
+                                if isinstance(user_state, OrderedDict):
+                                    user_state_keys = user_state.keys()
+                                else:
+                                    user_state_keys = sorted(user_state.keys())
+                                for key in user_state_keys:
+                                    student_data_keys[key] = 1
+
                                 responses.append(user_response)
                         else:
                             responses.append(response)
@@ -961,7 +971,7 @@ class ProblemResponses(object):
         # finally end with the more machine friendly block_key and state.
         student_data_keys_list = (
             ['username', 'title', 'location'] +
-            sorted(student_data_keys) +
+            list(student_data_keys.keys()) +
             ['block_key', 'state']
         )
 
