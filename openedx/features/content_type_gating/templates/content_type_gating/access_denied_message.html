@@ -17,5 +17,6 @@
         </span>
         {% endif %}
     </div>
-    <img src="/static/images/edx-verified-mini-cert.png">
+    <img src="{% static 'images/edx-verified-mini-cert.png' %}"
+         alt="{% trans 'Example of a verified certificate' as tmsg %}{{ tmsg | force_escape }}">
 </div>

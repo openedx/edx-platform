@@ -140,7 +140,9 @@ from openedx.features.course_experience.course_tools import HttpMethod
             % if upgrade_url and upgrade_price:
                 <div class="section section-upgrade course-home-sidebar-upgrade ${'discount' if has_discount else 'no-discount'}">
                     <h3 class="hd hd-6">${_("Pursue a verified certificate")}</h3>
-                        <img src="https://courses.edx.org/static/images/edx-verified-mini-cert.png" alt="">
+                        <img src="${static.url('images/edx-verified-mini-cert.png')}"
+                             alt="${_('Sample verified certificate with your name, the course title, the logo of the institution and the signatures of the instructors for this course.')}" />
+
                         <div class="upgrade-container">
                             <p>
                                 <a id="green_upgrade" class="btn-brand btn-upgrade"
