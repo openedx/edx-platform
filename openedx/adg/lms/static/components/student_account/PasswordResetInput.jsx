@@ -20,7 +20,7 @@ function PasswordResetInput(props) {
         required
         {...props}
       />
-      <span className='show-pass-icon toggle-password password-change-eye-icon' onClick={props.onClickHandler}>
+      <span className='show-pass-icon password-change-eye-icon' onClick={props.onClickHandler}>
           <img src={props.CDN_LINK + 'icons/eye-icon.png'}/>
       </span>
     </div>
