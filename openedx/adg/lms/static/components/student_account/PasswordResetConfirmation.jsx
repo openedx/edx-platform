@@ -11,6 +11,7 @@
 // 10. Added field types passwordType1 and passwordType2 in state.
 // 11. Added two functions onClickPassword1 and onClickPassword2.
 // 12. Added type and onClickHandler in props to PasswordResetInput fields.
+// 13. Added CDN link to props.
 
 /* globals gettext */
 
@@ -133,6 +134,7 @@ class PasswordResetConfirmation extends React.Component {
               validationMessage={this.state.validationMessage}
               type={this.state.passwordType1}
               onClickHandler={this.onClickPassword1}
+              CDN_LINK={this.props.CDN_LINK}
             />
 
             <PasswordResetInput
@@ -144,6 +146,7 @@ class PasswordResetConfirmation extends React.Component {
               validationMessage={gettext('Passwords do not match.')}
               type={this.state.passwordType2}
               onClickHandler={this.onClickPassword2}
+              CDN_LINK={this.props.CDN_LINK}
             />
 
             <input
