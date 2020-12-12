@@ -233,9 +233,11 @@ def get_current_organization(failure_return_none=False):
                     )
             else:
                 try:
-                    # TODO: Using `get` is expected to fail when multiple-orgs found for a site.
-                    #       Maybe catch MultipleObjectsReturned?
-                    current_org = current_site.organizations.get()
+                    # UNIFICATION:
+                    # Tahoe SaaS enforces a single Organization per Site.
+                    # For standalone, we need to be able to assign multiple Orgs.
+                    # At least don't fail when multiple Orgs are linked
+                    current_org = current_site.organizations.first()
                 except Organization.DoesNotExist:
                     if not failure_return_none:
                         raise  # Re-raise the exception
