@@ -111,7 +111,6 @@ class OutlineTabSerializer(DatesBannerSerializerMixin, VerifiedModeSerializerMix
     """
     access_expiration = serializers.DictField()
     course_blocks = CourseBlockSerializer()
-    course_expired_html = serializers.CharField()
     course_goals = CourseGoalsSerializer()
     course_tools = CourseToolSerializer(many=True)
     dates_widget = DatesWidgetSerializer()
@@ -119,6 +118,5 @@ class OutlineTabSerializer(DatesBannerSerializerMixin, VerifiedModeSerializerMix
     handouts_html = serializers.CharField()
     has_ended = serializers.BooleanField()
     offer = serializers.DictField()
-    offer_html = serializers.CharField()
     resume_course = ResumeCourseSerializer()
     welcome_message_html = serializers.CharField()

@@ -40,8 +40,8 @@ from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from openedx.features.course_duration_limits.access import generate_course_expired_message, get_access_expiration_data
-from openedx.features.discounts.utils import generate_offer_data, generate_offer_html
+from openedx.features.course_duration_limits.access import get_access_expiration_data
+from openedx.features.discounts.utils import generate_offer_data
 from common.djangoapps.student.models import (
     CourseEnrollment, CourseEnrollmentCelebration, LinkedInAddToProfileConfiguration
 )
@@ -124,18 +124,8 @@ class CoursewareMeta:
         return get_access_expiration_data(self.effective_user, self.overview)
 
     @property
-    def course_expired_message(self):
-        # TODO: TNL-7185 Legacy: Refactor to return the expiration date and format the message in the MFE
-        return generate_course_expired_message(self.effective_user, self.overview)
-
-    @property
     def offer(self):
         return generate_offer_data(self.effective_user, self.overview)
-
-    @property
-    def offer_html(self):
-        # TODO: TNL-7185 Legacy: Refactor to return the offer data and format the message in the MFE
-        return generate_offer_html(self.effective_user, self.overview)
 
     @property
     def content_type_gating_enabled(self):
