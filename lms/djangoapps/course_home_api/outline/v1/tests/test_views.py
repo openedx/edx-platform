@@ -171,11 +171,9 @@ class OutlineTabTestViews(BaseCourseHomeTests):
 
         response = self.client.get(self.url)
         self.assertIsNone(response.data['offer'])
-        self.assertIsNone(response.data['offer_html'])
 
         with override_waffle_flag(DISCOUNT_APPLICABILITY_FLAG, active=True):
             response = self.client.get(self.url)
-            self.assertIsNotNone(response.data['offer_html'])
 
             # Just a quick spot check that the dictionary looks like what we expect
             self.assertEqual(response.data['offer']['code'], 'EDXWELCOME')
@@ -188,11 +186,9 @@ class OutlineTabTestViews(BaseCourseHomeTests):
 
         response = self.client.get(self.url)
         self.assertIsNone(response.data['access_expiration'])
-        self.assertIsNone(response.data['course_expired_html'])
 
         enrollment.update_enrollment(CourseMode.AUDIT)
         response = self.client.get(self.url)
-        self.assertIsNotNone(response.data['course_expired_html'])
 
         # Just a quick spot check that the dictionary looks like what we expect
         deadline = enrollment.created + MIN_DURATION
@@ -297,8 +293,8 @@ class OutlineTabTestViews(BaseCourseHomeTests):
     @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_OUTLINE_TAB, active=True)
     @override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, active=True)
-    @patch('lms.djangoapps.course_home_api.outline.v1.views.generate_offer_html', new=Mock(return_value='<p>Offer</p>'))
-    @patch('lms.djangoapps.course_home_api.outline.v1.views.generate_course_expired_message', new=Mock(return_value='<p>Expired</p>'))
+    @patch('lms.djangoapps.course_home_api.outline.v1.views.generate_offer_data', new=Mock(return_value={'a': 1}))
+    @patch('lms.djangoapps.course_home_api.outline.v1.views.get_access_expiration_data', new=Mock(return_value={'b': 1}))
     @ddt.data(*itertools.product([True, False], [True, False],
                                  [None, COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE]))
     @ddt.unpack
@@ -329,8 +325,8 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         data = self.client.get(self.url).data
         self.assertEqual(data['course_blocks'] is not None, show_enrolled or is_public or is_public_outline)
         self.assertEqual(data['handouts_html'] is not None, show_enrolled or is_public)
-        self.assertEqual(data['offer_html'] is not None, show_enrolled)
-        self.assertEqual(data['course_expired_html'] is not None, show_enrolled)
+        self.assertEqual(data['offer'] is not None, show_enrolled)
+        self.assertEqual(data['access_expiration'] is not None, show_enrolled)
         self.assertEqual(data['resume_course']['url'] is not None, show_enrolled)
 
     @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)

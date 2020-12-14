@@ -30,14 +30,14 @@ from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course
 from lms.djangoapps.courseware.date_summary import TodaysDate
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.features.course_duration_limits.access import generate_course_expired_message, get_access_expiration_data
+from openedx.features.course_duration_limits.access import get_access_expiration_data
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.course_updates import (
     dismiss_current_update_for_user, get_current_update_for_user,
 )
 from openedx.features.course_experience.utils import get_course_outline_block_tree
-from openedx.features.discounts.utils import generate_offer_data, generate_offer_html
+from openedx.features.discounts.utils import generate_offer_data
 from common.djangoapps.student.models import CourseEnrollment
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore.django import modulestore
@@ -176,11 +176,8 @@ class OutlineTabView(RetrieveAPIView):
         show_handouts = show_enrolled or allow_public
         handouts_html = get_course_info_section(request, request.user, course, 'handouts') if show_handouts else ''
 
-        # TODO: TNL-7185 Legacy: Refactor to return the offer & expired data and format the message in the MFE
         offer_data = show_enrolled and generate_offer_data(request.user, course_overview)
-        offer_html = show_enrolled and generate_offer_html(request.user, course_overview)
         access_expiration = show_enrolled and get_access_expiration_data(request.user, course_overview)
-        course_expired_html = show_enrolled and generate_course_expired_message(request.user, course_overview)
 
         welcome_message_html = show_enrolled and get_current_update_for_user(request, course)
 
@@ -259,7 +256,6 @@ class OutlineTabView(RetrieveAPIView):
         data = {
             'access_expiration': access_expiration or None,
             'course_blocks': course_blocks,
-            'course_expired_html': course_expired_html or None,
             'course_goals': course_goals,
             'course_tools': course_tools,
             'dates_widget': dates_widget,
@@ -267,7 +263,6 @@ class OutlineTabView(RetrieveAPIView):
             'handouts_html': handouts_html or None,
             'has_ended': course.has_ended(),
             'offer': offer_data or None,
-            'offer_html': offer_html or None,
             'resume_course': resume_course,
             'welcome_message_html': welcome_message_html or None,
         }
