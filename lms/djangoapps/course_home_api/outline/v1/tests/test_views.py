@@ -22,6 +22,7 @@ from openedx.features.course_duration_limits.models import CourseDurationLimitCo
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, DISPLAY_COURSE_SOCK_FLAG, ENABLE_COURSE_GOALS,
 )
+from openedx.features.discounts.applicability import DISCOUNT_APPLICABILITY_FLAG
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
@@ -165,17 +166,37 @@ class OutlineTabTestViews(BaseCourseHomeTests):
 
     @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_OUTLINE_TAB, active=True)
-    @patch('lms.djangoapps.course_home_api.outline.v1.views.generate_offer_html', new=Mock(return_value='<p>Offer</p>'))
-    def test_offer_html(self):
+    def test_offer(self):
         CourseEnrollment.enroll(self.user, self.course.id)
-        self.assertEqual(self.client.get(self.url).data['offer_html'], '<p>Offer</p>')
+
+        response = self.client.get(self.url)
+        self.assertIsNone(response.data['offer'])
+        self.assertIsNone(response.data['offer_html'])
+
+        with override_waffle_flag(DISCOUNT_APPLICABILITY_FLAG, active=True):
+            response = self.client.get(self.url)
+            self.assertIsNotNone(response.data['offer_html'])
+
+            # Just a quick spot check that the dictionary looks like what we expect
+            self.assertEqual(response.data['offer']['code'], 'EDXWELCOME')
 
     @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_OUTLINE_TAB, active=True)
-    @patch('lms.djangoapps.course_home_api.outline.v1.views.generate_course_expired_message', new=Mock(return_value='<p>Expired</p>'))
-    def test_course_expired_html(self):
-        CourseEnrollment.enroll(self.user, self.course.id)
-        self.assertEqual(self.client.get(self.url).data['course_expired_html'], '<p>Expired</p>')
+    def test_access_expiration(self):
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id, CourseMode.VERIFIED)
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+
+        response = self.client.get(self.url)
+        self.assertIsNone(response.data['access_expiration'])
+        self.assertIsNone(response.data['course_expired_html'])
+
+        enrollment.update_enrollment(CourseMode.AUDIT)
+        response = self.client.get(self.url)
+        self.assertIsNotNone(response.data['course_expired_html'])
+
+        # Just a quick spot check that the dictionary looks like what we expect
+        deadline = enrollment.created + MIN_DURATION
+        self.assertEqual(response.data['access_expiration']['expiration_date'], deadline)
 
     @override_waffle_flag(ENABLE_COURSE_GOALS, active=True)
     @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)

@@ -19,6 +19,7 @@ from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_duration_limits.access import (
     generate_course_expired_message,
+    get_access_expiration_data,
     get_user_course_duration,
     get_user_course_expiration_date
 )
@@ -42,6 +43,34 @@ class TestAccess(CacheIsolationTestCase):
 
         # But also that the machine-readable version is in there
         self.assertIn('data-datetime="%s"' % date.isoformat(), message)
+
+    def test_get_access_expiration_data(self):
+        enrollment = CourseEnrollmentFactory()
+        overview = enrollment.course
+        user = enrollment.user
+
+        now = timezone.now()
+        upgrade_deadline = now + timedelta(days=2)
+        CourseModeFactory(
+            course_id=enrollment.course.id,
+            mode_slug=CourseMode.VERIFIED,
+            expiration_datetime=upgrade_deadline,
+        )
+        CourseModeFactory(
+            course_id=enrollment.course.id,
+            mode_slug=CourseMode.AUDIT,
+        )
+
+        expiration_date = get_user_course_expiration_date(user, overview)
+        self.assertIsNotNone(expiration_date)
+
+        data = get_access_expiration_data(user, overview)
+        self.assertEqual(data, {
+            'expiration_date': expiration_date,
+            'masquerading_expired_course': False,
+            'upgrade_deadline': upgrade_deadline,
+            'upgrade_url': '/dashboard',
+        })
 
     @ddt.data(
         *itertools.product(

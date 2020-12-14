@@ -78,11 +78,13 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     Compare this with CourseDetailSerializer.
     """
 
+    access_expiration = serializers.DictField()
     can_show_upgrade_sock = serializers.BooleanField()
     content_type_gating_enabled = serializers.BooleanField()
     course_expired_message = serializers.CharField()
     effort = serializers.CharField()
     end = serializers.DateTimeField()
+    enrollment = serializers.DictField()
     enrollment_start = serializers.DateTimeField()
     enrollment_end = serializers.DateTimeField()
     id = serializers.CharField()  # pylint: disable=invalid-name
@@ -90,6 +92,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     media = _CourseApiMediaCollectionSerializer(source='*')
     name = serializers.CharField(source='display_name_with_default_escaped')
     number = serializers.CharField(source='display_number_with_default')
+    offer = serializers.DictField()
     offer_html = serializers.CharField()
     org = serializers.CharField(source='display_org_with_default')
     related_programs = CourseProgramSerializer(many=True)
@@ -98,8 +101,8 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     start_display = serializers.CharField()
     start_type = serializers.CharField()
     pacing = serializers.CharField()
-    enrollment = serializers.DictField()
     tabs = serializers.ListField()
+    user_timezone = serializers.CharField()
     verified_mode = serializers.DictField()
     show_calculator = serializers.BooleanField()
     original_user_is_staff = serializers.BooleanField()
