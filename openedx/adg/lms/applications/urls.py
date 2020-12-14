@@ -6,12 +6,11 @@ from django.views.generic import TemplateView
 from rest_framework.routers import DefaultRouter
 
 from .api_views import EducationViewSet, WorkExperienceViewSet
+from .views import ApplicationHubView, ApplicationSuccessView
 
 router = DefaultRouter()
 router.register('education', EducationViewSet, basename='education')
 router.register('work_experience', WorkExperienceViewSet, basename='work_experience')
-
-from .views import ApplicationHubView, ApplicationSuccessView
 
 urlpatterns = [
     path('', ApplicationHubView.as_view(), name='application_hub'),

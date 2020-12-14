@@ -2,9 +2,7 @@
 API views for applications app
 """
 from django_filters.rest_framework import DjangoFilterBackend
-from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
-from rest_framework import permissions, viewsets
-from rest_framework.authentication import BasicAuthentication
+from rest_framework import viewsets
 
 from openedx.core.lib.api.view_utils import view_auth_classes
 
