@@ -1019,8 +1019,11 @@ div.problem .action {
     .submit-cta-description {
         color: $blue;
         font-size: small;
+        padding-right: $baseline / 2;
     }
     .submit-cta-link-button {
+        border: none;
+        padding-right: $baseline / 4;
         text-decoration: underline;
         text-transform: none;
     }
@@ -1035,6 +1038,10 @@ div.problem .action {
     font-size: $medium-font-size;
     -webkit-font-smoothing: antialiased;
     vertical-align: middle;
+
+    &.cta-enabled {
+      margin-top: 0;
+    }
   }
 }
 

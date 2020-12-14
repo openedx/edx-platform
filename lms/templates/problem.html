@@ -1,6 +1,6 @@
 <%page expression_filter="h"/>
 <%!
-from django.utils.translation import ungettext, ugettext as _
+from django.utils.translation import ngettext, gettext as _
 from openedx.core.djangolib.markup import HTML
 %>
 
@@ -85,9 +85,10 @@ from openedx.core.djangolib.markup import HTML
             </form>
         % endif
       % endif
-      <div class="submission-feedback" id="submission_feedback_${short_id}">
-        % if attempts_allowed:
-          ${ungettext("You have used {num_used} of {num_total} attempt", "You have used {num_used} of {num_total} attempts", attempts_allowed).format(num_used=attempts_used, num_total=attempts_allowed)}
+      <div class="submission-feedback ${'cta-enabled' if submit_disabled_cta else ''}" id="submission_feedback_${short_id}">
+        ## When attempts are not 0, the CTA above will contain a message about the number of used attempts
+        % if attempts_allowed and (not submit_disabled_cta or attempts_used == 0):
+          ${ngettext("You have used {num_used} of {num_total} attempt", "You have used {num_used} of {num_total} attempts", attempts_allowed).format(num_used=attempts_used, num_total=attempts_allowed)}
         % endif
         <span class="sr">${_("Some problems have options such as save, reset, hints, or show answer. These options follow the Submit button.")}</span>
       </div>

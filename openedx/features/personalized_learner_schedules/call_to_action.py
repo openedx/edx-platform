@@ -1,10 +1,14 @@
+"""
+Creates Call to Actions for resetting a Personalized Learner Schedule for use inside of Courseware.
+"""
+
 import logging
 
 from crum import get_current_request
 
 from django.conf import settings
 from django.urls import reverse
-from django.utils.translation import gettext as _
+from django.utils.translation import ngettext, gettext as _
 
 from lms.djangoapps.course_home_api.utils import is_request_from_learning_mfe
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
@@ -14,12 +18,14 @@ log = logging.getLogger(__name__)
 
 
 class PersonalizedLearnerScheduleCallToAction:
+    """
+    Creates Call to Actions for resetting a Personalized Learner Schedule for use inside of Courseware.
+    """
     CAPA_SUBMIT_DISABLED = 'capa_submit_disabled'
     VERTICAL_BANNER = 'vertical_banner'
-
     past_due_class_warnings = set()
 
-    def get_ctas(self, xblock, category):
+    def get_ctas(self, xblock, category, completed):
         """
         Return the calls to action associated with the specified category for the given xblock.
 
@@ -44,13 +50,13 @@ class PersonalizedLearnerScheduleCallToAction:
             # xblock is a capa problem, and the submit button is disabled. Check if it's because of a personalized
             # schedule due date being missed, and if so, we can offer to shift it.
             if self._is_block_shiftable(xblock):
-                ctas.append(self._make_reset_deadlines_cta(xblock, is_learning_mfe))
+                ctas.append(self._make_reset_deadlines_cta(xblock, category, is_learning_mfe))
 
-        elif category == self.VERTICAL_BANNER:
+        elif category == self.VERTICAL_BANNER and not completed:
             # xblock is a vertical, so we'll check all the problems inside it. If there are any that will show a
             # a "shift dates" CTA under CAPA_SUBMIT_DISABLED, then we'll also show the same CTA as a vertical banner.
             if any(self._is_block_shiftable(item) for item in xblock.get_display_items()):
-                ctas.append(self._make_reset_deadlines_cta(xblock, is_learning_mfe))
+                ctas.append(self._make_reset_deadlines_cta(xblock, category, is_learning_mfe))
 
         return ctas
 
@@ -79,6 +85,10 @@ class PersonalizedLearnerScheduleCallToAction:
 
     @staticmethod
     def _log_past_due_warning(name):
+        """
+        Logs out if an xblock has is_past_due defined as a property
+        (since we want to move to using it as a function everywhere)
+        """
         if name in PersonalizedLearnerScheduleCallToAction.past_due_class_warnings:
             return
 
@@ -87,8 +97,11 @@ class PersonalizedLearnerScheduleCallToAction:
                     '%s.is_past_due into a method.', name)
         PersonalizedLearnerScheduleCallToAction.past_due_class_warnings.add(name)
 
-    @staticmethod
-    def _make_reset_deadlines_cta(xblock, is_learning_mfe=False):
+    @classmethod
+    def _make_reset_deadlines_cta(cls, xblock, category, is_learning_mfe=False):
+        """
+        Constructs a call to action object containing the necessary information for the view
+        """
         from lms.urls import RESET_COURSE_DEADLINES_NAME
         course_key = xblock.scope_ids.usage_id.context_key
 
@@ -102,6 +115,24 @@ class PersonalizedLearnerScheduleCallToAction:
                              'updating. Don’t worry, we’ll shift all the due dates for you and you won’t lose '
                              'any of your progress.'),
         }
+
+        has_attempts = hasattr(xblock, 'attempts') and hasattr(xblock, 'max_attempts')
+
+        if category == cls.CAPA_SUBMIT_DISABLED and has_attempts and xblock.attempts:
+            if xblock.max_attempts:
+                cta_data['link_name'] = ngettext('Try again ({attempts} attempt remaining)',
+                                                 'Try again ({attempts} attempts remaining)',
+                                                 (xblock.max_attempts - xblock.attempts)).format(
+                    attempts=(xblock.max_attempts - xblock.attempts)
+                )
+                cta_data['description'] = (_('You have used {attempts} of {max_attempts} attempts for this '
+                                             'problem.').format(
+                    attempts=xblock.attempts, max_attempts=xblock.max_attempts
+                ) + ' ' + cta_data['description'])
+            else:
+                cta_data['link_name'] = _('Try again (unlimited attempts)')
+                cta_data['description'] = _('You have used {attempts} of unlimited attempts for this '
+                                            'problem.').format(attempts=xblock.attempts) + ' ' + cta_data['description']
 
         if is_learning_mfe:
             cta_data['event_data'] = {
