@@ -10,6 +10,7 @@ import React from 'react';
 import { InputText } from '@edx/paragon/static';
 
 function PasswordResetInput(props) {
+  const eyeIconClasses = `show-pass-icon password-change-eye-icon ${props.type === 'text' ? 'show-password' : ''}`;
   return (
     <div className="form-field">
       <InputText
@@ -20,7 +21,7 @@ function PasswordResetInput(props) {
         required
         {...props}
       />
-      <span className={props.eyeIconClasses} onClick={props.onClickHandler}>
+      <span className={eyeIconClasses} onClick={props.onClickHandler}>
           <img src={props.CDN_LINK + 'icons/eye-icon.png'}/>
       </span>
     </div>

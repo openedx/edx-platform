@@ -12,7 +12,6 @@
 // 11. Added three functions onClickTogglePasswordType1 and onClickTogglePasswordType2.
 // 12. Added type and onClickHandler in props to PasswordResetInput fields.
 // 13. Added CDN link to props.
-// 14. Added classes for eye icon and handled them using props.
 
 /* globals gettext */
 
@@ -34,8 +33,6 @@ import PasswordResetInput from './PasswordResetInput';
 class PasswordResetConfirmation extends React.Component {
   constructor(props) {
     super(props);
-    this.showPasswordClasses = 'show-pass-icon password-change-eye-icon show-password';
-    this.hidePasswordClasses = 'show-pass-icon password-change-eye-icon';
     this.state = {
       password: '',
       passwordConfirmation: '',
@@ -44,8 +41,6 @@ class PasswordResetConfirmation extends React.Component {
       validationMessage: '',
       passwordType1: 'password',
       passwordType2: 'password',
-      eyeIconClasses1: this.hidePasswordClasses,
-      eyeIconClasses2: this.hidePasswordClasses,
     };
     this.onBlurPassword1 = this.onBlurPassword1.bind(this);
     this.onBlurPassword2 = this.onBlurPassword2.bind(this);
@@ -57,21 +52,15 @@ class PasswordResetConfirmation extends React.Component {
       return (passwordType === 'password') ? 'text' : 'password'
   }
 
-  getEyeIconClasses(prevClasses) {
-      return (prevClasses.includes('show-password')) ? this.hidePasswordClasses : this.showPasswordClasses
-  }
-
   onClickTogglePasswordType1() {
       this.setState({
-          passwordType1: this.getNewPasswordType(this.state.passwordType1),
-          eyeIconClasses1: this.getEyeIconClasses(this.state.eyeIconClasses1)
+          passwordType1: this.getNewPasswordType(this.state.passwordType1)
       });
   }
 
   onClickTogglePasswordType2() {
       this.setState({
-          passwordType2: this.getNewPasswordType(this.state.passwordType2),
-          eyeIconClasses2: this.getEyeIconClasses(this.state.eyeIconClasses2)
+          passwordType2: this.getNewPasswordType(this.state.passwordType2)
       });
   }
 
@@ -150,7 +139,6 @@ class PasswordResetConfirmation extends React.Component {
               type={this.state.passwordType1}
               onClickHandler={this.onClickTogglePasswordType1}
               CDN_LINK={this.props.CDN_LINK}
-              eyeIconClasses={this.state.eyeIconClasses1}
             />
 
             <PasswordResetInput
@@ -163,7 +151,6 @@ class PasswordResetConfirmation extends React.Component {
               type={this.state.passwordType2}
               onClickHandler={this.onClickTogglePasswordType2}
               CDN_LINK={this.props.CDN_LINK}
-              eyeIconClasses={this.state.eyeIconClasses2}
             />
 
             <input
