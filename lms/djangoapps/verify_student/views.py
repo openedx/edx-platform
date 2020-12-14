@@ -833,12 +833,8 @@ class SubmitPhotosView(View):
             face_image (str): base64-encoded image data of the user's face.
             photo_id_image (str): base64-encoded image data of the user's photo ID.
             full_name (str): The user's full name, if the user is requesting a name change as well.
-            course_key (str): Identifier for the course, if initiated from a checkpoint.
-            checkpoint (str): Location of the checkpoint in the course.
 
         """
-        log.info((u"User {user_id} is submitting photos for ID verification").format(user_id=request.user.id))
-
         # If the user already has an initial verification attempt, we can re-use the photo ID
         # the user submitted with the initial attempt.
         initial_verification = SoftwareSecurePhotoVerification.get_initial_verification(request.user)
@@ -893,7 +889,6 @@ class SubmitPhotosView(View):
             for param_name in [
                 "face_image",
                 "photo_id_image",
-                "course_key",
                 "full_name"
             ]
             if param_name in request.POST
@@ -922,14 +917,6 @@ class SubmitPhotosView(View):
             msg = _("Missing required parameter face_image")
             log.error((u"User {user_id} missing required parameter face_image").format(user_id=request.user.id))
             return None, HttpResponseBadRequest(msg)
-
-        # If provided, parse the course key and checkpoint location
-        if "course_key" in params:
-            try:
-                params["course_key"] = CourseKey.from_string(params["course_key"])
-            except InvalidKeyError:
-                log.error((u"User {user_id} provided invalid course_key").format(user_id=request.user.id))
-                return None, HttpResponseBadRequest(_("Invalid course key"))
 
         return params, None
 
