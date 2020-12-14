@@ -729,7 +729,7 @@ CONTEXT_PROCESSORS = [
 
 ################### ADG CONTEXT PROCESSORS #########################
 ADG_CONTEXT_PROCESSORS = [
-    'openedx.adg.lms.user_authn_override.context_processors.cdn_context',
+    'openedx.adg.context_processors.cdn_context',
 ]
 CONTEXT_PROCESSORS.extend(ADG_CONTEXT_PROCESSORS)
 
