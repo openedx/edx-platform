@@ -118,7 +118,7 @@ def save_video_transcript(edx_video_id, input_format, transcript_content, langua
                 'file_format': Transcript.SJSON,
                 'language_code': language_code
             },
-            file_data=ContentFile(sjson_subs),
+            file_data=ContentFile(sjson_subs.encode('utf-8')),
         )
         result = True
     except (TranscriptsGenerationException, UnicodeDecodeError):
@@ -231,7 +231,7 @@ def upload_transcripts(request):
                     'file_format': Transcript.SJSON,
                     'language_code': u'en'
                 },
-                file_data=ContentFile(sjson_subs),
+                file_data=ContentFile(sjson_subs.encode('utf-8')),
             )
 
             if transcript_created is None:
