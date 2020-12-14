@@ -41,7 +41,7 @@ def get_copyright():
     Returns:
        str, A string which contains a copyright text
     """
-    return u'\u00A9 {year} {org_name}.'.format(
+    return u'\u00A9 {year} {org_name}'.format(
         year=datetime.today().year,
         org_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
     )
