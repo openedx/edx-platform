@@ -109,7 +109,7 @@ def save_video_transcript(edx_video_id, input_format, transcript_content, langua
             content=transcript_content,
             input_format=input_format,
             output_format=Transcript.SJSON
-        ).encode()
+        )
         create_or_update_video_transcript(
             video_id=edx_video_id,
             language_code=language_code,
