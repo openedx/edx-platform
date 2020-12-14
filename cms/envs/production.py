@@ -136,7 +136,7 @@ CELERY_QUEUES = {
     DEFAULT_PRIORITY_QUEUE: {}
 }
 
-CELERY_ROUTES = "{}celery.route_task".format(QUEUE_VARIANT)
+CELERY_ROUTES = "openedx.core.lib.celery.router.route_task"
 
 # STATIC_URL_BASE specifies the base url to use for static files
 STATIC_URL_BASE = ENV_TOKENS.get('STATIC_URL_BASE', None)
