@@ -6,7 +6,6 @@
 #
 -e git+https://github.com/edx/acid-block.git@758855a67d2f12bd74db4d5e7a0862d6e65f079c#egg=acid-xblock  # via -r requirements/edx/testing.txt
 -e common/lib/capa  # via -r requirements/edx/testing.txt
--e git+https://github.com/edx/celery.git@cb85b6ca26cad14fee494342e9c2782d81119223#egg=celery  # via -r requirements/edx/testing.txt
 -e git+https://github.com/edx/codejail.git@3.1.3#egg=codejail==3.1.3  # via -r requirements/edx/testing.txt
 -e git+https://github.com/edx/django-wiki.git@0.1.1#egg=django-wiki  # via -r requirements/edx/testing.txt
 -e git+https://github.com/edx/DoneXBlock.git@2.0.3#egg=done-xblock  # via -r requirements/edx/testing.txt
@@ -36,6 +35,7 @@ boto3==1.4.8              # via -r requirements/edx/testing.txt, django-ses, fs-
 boto==2.39.0              # via -r requirements/edx/testing.txt, edxval
 botocore==1.8.17          # via -r requirements/edx/testing.txt, boto3, s3transfer
 bridgekeeper==0.9         # via -r requirements/edx/testing.txt
+celery==4.4.7             # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, django-celery-results, django-user-tasks, edx-celeryutils, edx-enterprise, event-tracking
 certifi==2020.12.5        # via -r requirements/edx/testing.txt, elasticsearch, requests
 cffi==1.14.4              # via -r requirements/edx/testing.txt, cryptography
 chardet==3.0.4            # via -r requirements/edx/testing.txt, pysrt, requests
@@ -197,7 +197,7 @@ numpy==1.18.5             # via -c requirements/edx/../constraints.txt, -r requi
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
 openedx-calc==1.0.9       # via -r requirements/edx/testing.txt
 ora2==2.13.3              # via -r requirements/edx/testing.txt
-packaging==20.7           # via -r requirements/edx/testing.txt, bleach, drf-yasg, pytest, sphinx, tox
+packaging==20.8           # via -r requirements/edx/testing.txt, bleach, drf-yasg, pytest, sphinx, tox
 path.py==12.5.0           # via -r requirements/edx/testing.txt, edx-enterprise, edx-i18n-tools, ora2, staff-graded-xblock, xmodule
 path==13.1.0              # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, path.py
 paver==1.3.4              # via -r requirements/edx/testing.txt
@@ -209,7 +209,7 @@ pluggy==0.13.1            # via -r requirements/edx/testing.txt, diff-cover, pyt
 polib==1.1.0              # via -r requirements/edx/testing.txt, edx-i18n-tools
 psutil==5.7.3             # via -r requirements/edx/testing.txt, edx-django-utils, pytest-xdist
 py2neo==3.1.2             # via -r requirements/edx/testing.txt
-py==1.9.0                 # via -r requirements/edx/testing.txt, pytest, pytest-forked, tox
+py==1.10.0                # via -r requirements/edx/testing.txt, pytest, pytest-forked, tox
 pycodestyle==2.6.0        # via -r requirements/edx/testing.txt
 pycontracts==1.8.12       # via -r requirements/edx/testing.txt, edx-user-state-client
 pycountry==20.7.3         # via -r requirements/edx/testing.txt
@@ -236,7 +236,7 @@ pytest-json-report==1.2.4  # via -r requirements/edx/testing.txt
 pytest-metadata==1.8.0    # via -r requirements/edx/testing.txt, pytest-json-report
 pytest-randomly==3.5.0    # via -r requirements/edx/testing.txt
 pytest-xdist[psutil]==2.1.0  # via -r requirements/edx/testing.txt
-pytest==6.1.2             # via -r requirements/edx/testing.txt, pytest-attrib, pytest-cov, pytest-django, pytest-forked, pytest-json-report, pytest-metadata, pytest-randomly, pytest-xdist
+pytest==6.2.0             # via -r requirements/edx/testing.txt, pytest-attrib, pytest-cov, pytest-django, pytest-forked, pytest-json-report, pytest-metadata, pytest-randomly, pytest-xdist
 python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, analytics-python, botocore, edx-ace, edx-drf-extensions, edx-enterprise, edx-event-routing-backends, edx-proctoring, faker, freezegun, icalendar, ora2, xblock
 python-levenshtein==0.12.0  # via -r requirements/edx/testing.txt
 python-memcached==1.59    # via -r requirements/edx/testing.txt
