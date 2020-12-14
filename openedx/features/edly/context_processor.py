@@ -3,6 +3,7 @@ from math import floor
 from django.conf import settings
 from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
 DEFAULT_SERVICES_NOTIFICATIONS_COOKIE_EXPIRY = 180  # value in seconds
 DEFAULT_COLOR_DICT = {
@@ -65,6 +66,7 @@ def edly_app_context(request):  # pylint: disable=unused-argument
             'zendesk_widget_url': marketing_link('ZENDESK-WIDGET'),
             'footer_url': marketing_link('FOOTER'),
             'gtm_id': configuration_helpers.get_value('GTM_ID'),
+            'is_mobile_app': is_request_from_mobile_app(request)
         }
     )
 

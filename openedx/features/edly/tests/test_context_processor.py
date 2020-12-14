@@ -36,3 +36,4 @@ class EdlyAppContextProcessorTests(TestCase):
         self.assertEqual(context['zendesk_widget_url'], marketing_link('ZENDESK-WIDGET'))
         self.assertEqual(context['footer_url'], marketing_link('FOOTER'))
         self.assertEqual(context['gtm_id'], 'GTM-XXXXXX')
+        self.assertEqual(context['is_mobile_app'], False)
