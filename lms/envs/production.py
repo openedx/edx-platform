@@ -150,7 +150,7 @@ CELERY_QUEUES = {
     HIGH_MEM_QUEUE: {},
 }
 
-CELERY_ROUTES = "openedx.core.lib.celery.router.route_task"
+CELERY_ROUTES = "openedx.core.lib.celery.routers.route_task"
 CELERYBEAT_SCHEDULE = {}  # For scheduling tasks, entries can be added to this dict
 
 # STATIC_ROOT specifies the directory where static files are
