@@ -16,6 +16,20 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @pytest.fixture
+def mock_mandrill_client(request, mocker):
+    """
+    A fixture to create patched Mandrill client for tests. This client does not need API key.
+    """
+    mock = mocker.MagicMock()
+    mock.function.return_value = 'send_mail()'
+
+    mock_mandrill = mocker.patch.object(student_helpers, 'MandrillClient')
+    mock_mandrill.return_value = mock
+
+    return mock_mandrill
+
+
+@pytest.fixture
 def user_with_profile(request):
     """
     Create user with profile, this fixture will be passed as a parameter to all pytests
@@ -129,13 +143,13 @@ def test_compose_and_send_adg_update_email_confirmation(
 
 
 @pytest.mark.django_db
-def test_send_mandrill_email(mocker, user_with_profile):  # pylint: disable=redefined-outer-name
+# pylint: disable=redefined-outer-name,unused-argument
+def test_send_mandrill_email(mocker, user_with_profile, mock_mandrill_client):
     """
     Test `send_mandrill_email` helper method of student
     """
-
     mock_email_data = mocker.patch.object(student_helpers, 'EmailData')
-    mock_mandrill_email = mocker.patch.object(student_helpers.MandrillClient, 'send_mail')
+    mock_mandrill_email = mocker.patch.object(student_helpers.MandrillClient(), 'send_mail')
 
     template_name = 'some_template_slug'
     context = {'dummy_key': 'some_dummy_data'}

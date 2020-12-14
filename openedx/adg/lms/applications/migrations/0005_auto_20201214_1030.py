@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('applications', '0003_user_application_update_business_line'),
+        ('applications', '0004_application_hub_add_submission_date'),
     ]
 
     operations = [
