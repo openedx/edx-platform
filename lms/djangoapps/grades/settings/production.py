@@ -4,11 +4,11 @@
 def plugin_settings(settings):
     """Common settings for Grades"""
     # Queue to use for updating persistent grades
-    settings.RECALCULATE_GRADES_ROUTING_KEY = settings.ENV_TOKENS.get(
+    settings.RECALCULATE_GRADES_ROUTING_KEY = settings.EDXAPP_CONFIG.get(
         'RECALCULATE_GRADES_ROUTING_KEY', settings.DEFAULT_PRIORITY_QUEUE,
     )
 
     # Queue to use for updating grades due to grading policy change
-    settings.POLICY_CHANGE_GRADES_ROUTING_KEY = settings.ENV_TOKENS.get(
+    settings.POLICY_CHANGE_GRADES_ROUTING_KEY = settings.EDXAPP_CONFIG.get(
         'POLICY_CHANGE_GRADES_ROUTING_KEY', settings.DEFAULT_PRIORITY_QUEUE,
     )

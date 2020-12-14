@@ -7,10 +7,10 @@ import warnings
 def plugin_settings(settings):
     """Settings for the instructor plugin."""
     # Analytics Dashboard
-    settings.ANALYTICS_DASHBOARD_URL = settings.ENV_TOKENS.get(
+    settings.ANALYTICS_DASHBOARD_URL = settings.EDXAPP_CONFIG.get(
         "ANALYTICS_DASHBOARD_URL", settings.ANALYTICS_DASHBOARD_URL
     )
-    settings.ANALYTICS_DASHBOARD_NAME = settings.ENV_TOKENS.get(
+    settings.ANALYTICS_DASHBOARD_NAME = settings.EDXAPP_CONFIG.get(
         "ANALYTICS_DASHBOARD_NAME", settings.ANALYTICS_DASHBOARD_NAME
     )
     # Backward compatibility for deprecated feature names
