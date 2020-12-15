@@ -15,13 +15,13 @@ def create_flag(apps, schema_editor):
     Flag = apps.get_model('waffle', 'Flag')
     # Replacement for flag_undefined_default=True on flag definition
     Flag.objects.get_or_create(
-        name=waffle_flags()[REJECTED_EXAM_OVERRIDES_GRADE].namespaced_flag_name, defaults={'everyone': True}
+        name=waffle_flags()[REJECTED_EXAM_OVERRIDES_GRADE].name, defaults={'everyone': True}
     )
     Flag.objects.get_or_create(
-        name=waffle_flags()[ENFORCE_FREEZE_GRADE_AFTER_COURSE_END].namespaced_flag_name, defaults={'everyone': True}
+        name=waffle_flags()[ENFORCE_FREEZE_GRADE_AFTER_COURSE_END].name, defaults={'everyone': True}
     )
     Flag.objects.get_or_create(
-        name=waffle_flags()[WRITABLE_GRADEBOOK].namespaced_flag_name, defaults={'everyone': True}
+        name=waffle_flags()[WRITABLE_GRADEBOOK].name, defaults={'everyone': True}
     )
 
 
