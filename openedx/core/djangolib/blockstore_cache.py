@@ -147,7 +147,7 @@ def get_bundle_version_number(bundle_uuid, draft_name=None):
             # Cache the draft files using the version.  This saves an API call when the draft is first retrieved.
             draft_files = list(draft_metadata.files.values())
             draft_files_cache_key = _construct_versioned_cache_key(
-                bundle_uuid, version, ('bundle_draft_files', ), draft_name)
+                bundle_uuid, version, ('bundle_draft_files_v2', ), draft_name)
             cache.set(draft_files_cache_key, draft_files)
     # If we're not using a draft or the draft does not exist [anymore], fall
     # back to the bundle version, if any versions have been published:
@@ -182,7 +182,9 @@ def get_bundle_draft_files_cached(bundle_uuid, draft_name):
     get automatic cache invalidation when the draft is updated.
     """
     bundle_cache = BundleCache(bundle_uuid, draft_name)
-    cache_key = ('bundle_draft_files', )
+
+    # This key is `_v2` to avoid reading invalid values cached by a past version of this code with no timeout.
+    cache_key = ('bundle_draft_files_v2', )
     result = bundle_cache.get(cache_key)
     if result is None:
         result = list(blockstore_api.get_bundle_files(bundle_uuid, use_draft=draft_name))
