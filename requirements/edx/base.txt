@@ -85,7 +85,7 @@ djangorestframework-xml==2.0.0  # via edx-enterprise
 djangorestframework==3.9.4  # via -r requirements/edx/base.in, django-config-models, django-user-tasks, drf-jwt, drf-yasg, edx-api-doc-tools, edx-completion, edx-drf-extensions, edx-enterprise, edx-organizations, edx-proctoring, edx-submissions, ora2, rest-condition, super-csv
 docopt==0.6.2             # via xmodule
 docutils==0.16            # via botocore
-drf-jwt==1.17.2           # via edx-drf-extensions
+drf-jwt==1.17.3           # via edx-drf-extensions
 drf-yasg==1.17.0          # via -c requirements/edx/../constraints.txt, edx-api-doc-tools
 edx-ace==0.1.17           # via -r requirements/edx/base.in
 edx-analytics-data-api-client==0.16.1  # via -r requirements/edx/base.in
@@ -103,11 +103,11 @@ edx-event-routing-backends==2.0.0  # via -r requirements/edx/base.in
 edx-i18n-tools==0.5.3     # via ora2
 edx-milestones==0.3.0     # via -r requirements/edx/base.in
 edx-opaque-keys[django]==2.1.1  # via -r requirements/edx/paver.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, lti-consumer-xblock, xmodule
-edx-organizations==6.4.0  # via -r requirements/edx/base.in
+edx-organizations==6.5.0  # via -r requirements/edx/base.in
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/base.in
 edx-proctoring==2.5.3     # via -r requirements/edx/base.in, edx-proctoring-proctortrack
 edx-rbac==1.3.3           # via edx-enterprise
-edx-rest-api-client==5.2.1  # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring
+edx-rest-api-client==5.2.2  # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring
 edx-search==2.0.1         # via -r requirements/edx/base.in
 edx-sga==0.13.1           # via -r requirements/edx/base.in
 edx-submissions==3.2.3    # via -r requirements/edx/base.in, ora2
@@ -119,7 +119,7 @@ edxval==1.4.4             # via -r requirements/edx/base.in
 elasticsearch==7.10.1     # via edx-search
 enmerkar-underscore==1.0.0  # via -r requirements/edx/base.in
 enmerkar==0.7.1           # via enmerkar-underscore
-event-tracking==1.0.0     # via -r requirements/edx/base.in, edx-event-routing-backends, edx-proctoring, edx-search
+event-tracking==1.0.3     # via -r requirements/edx/base.in, edx-event-routing-backends, edx-proctoring, edx-search
 fs-s3fs==0.1.8            # via -r requirements/edx/base.in, django-pyfs
 fs==2.0.18                # via -r requirements/edx/base.in, django-pyfs, fs-s3fs, xblock
 future==0.18.2            # via django-ses, edx-celeryutils, edx-enterprise, pycontracts, pyjwkest
@@ -154,7 +154,7 @@ markupsafe==1.1.1         # via -r requirements/edx/paver.txt, chem, jinja2, mak
 maxminddb==1.5.4          # via -c requirements/edx/../constraints.txt, geoip2
 mock==3.0.5               # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.txt, xblock-drag-and-drop-v2, xblock-poll
 git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a#egg=MongoDBProxy==0.1.0+edx.2  # via -r requirements/edx/github.in
-mongoengine==0.21.0       # via -r requirements/edx/base.in
+mongoengine==0.22.0       # via -r requirements/edx/base.in
 mpmath==1.1.0             # via sympy
 mysqlclient==2.0.2        # via -r requirements/edx/base.in
 newrelic==5.22.1.152      # via -r requirements/edx/base.in, edx-django-utils
@@ -163,7 +163,7 @@ nodeenv==1.5.0            # via -r requirements/edx/base.in
 numpy==1.18.5             # via -c requirements/edx/../constraints.txt, chem, openedx-calc, scipy
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
 openedx-calc==1.0.9       # via -r requirements/edx/base.in
-ora2==2.13.3              # via -r requirements/edx/base.in
+ora2==2.13.5              # via -r requirements/edx/base.in
 packaging==20.8           # via bleach, drf-yasg
 path.py==12.5.0           # via edx-enterprise, edx-i18n-tools, ora2, staff-graded-xblock, xmodule
 path==13.1.0              # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.txt, path.py
