@@ -403,7 +403,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             mock_get_enterprise_learner_data,
     ):
         def mock_get_enterprise_customer(**kwargs):
-            uuid = kwargs.get('enterprise_customer_identity_provider__provider_id')
+            uuid = kwargs.get('enterprise_customer_identity_providers__provider_id')
             if uuid:
                 return mock.MagicMock(uuid=uuid, user=self.user)
             raise Exception
