@@ -23,7 +23,7 @@ from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_from_token
 from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from common.djangoapps.util.json_request import JsonResponse
-from common.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 
 
 log = logging.getLogger(__name__)
@@ -196,16 +196,8 @@ def _set_deprecated_user_info_cookie(response, request, user, cookie_settings):
         }
     }
     """
-    image_urls = []
-    user_info = _get_user_info_cookie_data(request, user)
-
-    if user.profile and user.profile.has_profile_image:
-        image_urls = get_profile_image_urls_for_user(request, user)
-    print('image urls')
-    print(image_urls)
     response.set_cookie(
         settings.EDXMKTG_USER_INFO_COOKIE_NAME,
-        json.dumps(image_urls),
         json.dumps(user_info),
         **cookie_settings
     )
@@ -257,12 +249,20 @@ def _get_user_info_cookie_data(request, user):
     for url_name, url_path in six.iteritems(header_urls):
         header_urls[url_name] = request.build_absolute_uri(url_path)
 
+    
+    image_urls = []
+    if user.profile and user.profile.has_profile_image:
+        image_urls = _get_user_info_cookie_data(request, user)
+
+    print('****')
     print(user)
+    print(image_urls)
 
     user_info = {
         'version': settings.EDXMKTG_USER_INFO_COOKIE_VERSION,
         'username': user.username,
         'header_urls': header_urls,
+        'image_urls': image_urls,
     }
 
     return user_info

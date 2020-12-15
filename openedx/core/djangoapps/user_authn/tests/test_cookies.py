@@ -15,13 +15,14 @@ from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewi
 from openedx.core.djangoapps.user_authn import cookies as cookies_api
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from common.djangoapps.student.tests.factories import AnonymousUserFactory, UserFactory
+from common.djangoapps.student.tests.factories import AnonymousUserFactory, UserFactory, UserProfileFactory
 
 
 class CookieTests(TestCase):
     def setUp(self):
         super(CookieTests, self).setUp()
         self.user = UserFactory.create()
+        self.user.profile = UserProfileFactory.create()
         self.request = RequestFactory().get('/')
         self.request.user = self.user
         self.request.session = self._get_stub_session()
