@@ -727,6 +727,12 @@ CONTEXT_PROCESSORS = [
     'mobile_api.context_processor.is_from_mobile_app'
 ]
 
+################### ADG CONTEXT PROCESSORS #########################
+ADG_CONTEXT_PROCESSORS = [
+    'openedx.adg.context_processors.cdn_context',
+]
+CONTEXT_PROCESSORS.extend(ADG_CONTEXT_PROCESSORS)
+
 # Django templating
 TEMPLATES = [
     {
