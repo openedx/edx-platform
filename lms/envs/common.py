@@ -1692,9 +1692,6 @@ MIDDLEWARE = [
     # Generate code ownership attributes. Keep this immediately after RequestCacheMiddleware.
     'edx_django_utils.monitoring.CodeOwnerMonitoringMiddleware',
 
-    # Cookie monitoring
-    'openedx.core.lib.request_utils.CookieMonitoringMiddleware',
-
     'lms.djangoapps.mobile_api.middleware.AppVersionUpgrade',
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'lms.djangoapps.discussion.django_comment_client.middleware.AjaxExceptionMiddleware',
