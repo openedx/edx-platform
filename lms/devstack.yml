@@ -394,7 +394,7 @@ MODULESTORE:
                 OPTIONS:
                     default_class: xmodule.hidden_module.HiddenDescriptor
                     fs_root: /edx/var/edxapp/data
-                    render_template: edxmako.shortcuts.render_to_string
+                    render_template: common.djangoapps.edxmako.shortcuts.render_to_string
             -   DOC_STORE_CONFIG:
                     authsource: ''
                     collection: modulestore
@@ -414,7 +414,7 @@ MODULESTORE:
                 OPTIONS:
                     default_class: xmodule.hidden_module.HiddenDescriptor
                     fs_root: /edx/var/edxapp/data
-                    render_template: edxmako.shortcuts.render_to_string
+                    render_template: common.djangoapps.edxmako.shortcuts.render_to_string
 OAUTH_DELETE_EXPIRED: true
 OAUTH_ENFORCE_SECURE: false
 OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS: 365
