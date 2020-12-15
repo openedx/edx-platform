@@ -10,19 +10,23 @@ from django.urls import reverse
 from edx_rest_framework_extensions.auth.jwt.decoder import jwt_decode_handler
 from edx_rest_framework_extensions.auth.jwt.middleware import JwtAuthCookieMiddleware
 from mock import MagicMock, patch
+from datetime import date
 
 from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from openedx.core.djangoapps.user_authn import cookies as cookies_api
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import AnonymousUserFactory, UserFactory, UserProfileFactory
+from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
+from openedx.core.djangoapps.profile_images.images import create_profile_images
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names
 
 
 class CookieTests(TestCase):
     def setUp(self):
         super(CookieTests, self).setUp()
         self.user = UserFactory.create()
-        self.user.profile = UserProfileFactory.create()
+        self.user.profile = UserProfileFactory.create(user=self.user)
         self.request = RequestFactory().get('/')
         self.request.user = self.user
         self.request.session = self._get_stub_session()
@@ -32,6 +36,18 @@ class CookieTests(TestCase):
             get_expiry_age=lambda: max_age,
         )
 
+    def _get_expected_image_urls(self):
+        expected_image_urls = {
+            'full': '/static/default_500.png',
+            'large': '/static/default_120.png',
+            'medium': '/static/default_50.png',
+            'small': '/static/default_30.png'
+        }
+
+        expected_image_urls = cookies_api._convert_to_absolute_uris(self.request, expected_image_urls)
+
+        return expected_image_urls
+
     def _get_expected_header_urls(self):
         expected_header_urls = {
             'logout': reverse('logout'),
@@ -40,9 +56,7 @@ class CookieTests(TestCase):
             'learner_profile': reverse('learner_profile', kwargs={'username': self.user.username}),
         }
 
-        # Convert relative URL paths to absolute URIs
-        for url_name, url_path in six.iteritems(expected_header_urls):
-            expected_header_urls[url_name] = self.request.build_absolute_uri(url_path)
+        expected_header_urls = cookies_api._convert_to_absolute_uris(self.request, expected_header_urls)
 
         return expected_header_urls
 
@@ -86,16 +100,21 @@ class CookieTests(TestCase):
 
     @skip_unless_lms
     def test_get_user_info_cookie_data(self):
+        with make_image_file() as image_file:
+            create_profile_images(image_file, get_profile_image_names(self.user.username))
+            self.user.profile.profile_image_uploaded_at = date.today()
+            self.user.profile.save()
+
         actual = cookies_api._get_user_info_cookie_data(self.request, self.user)  # pylint: disable=protected-access
 
         expected = {
             'version': settings.EDXMKTG_USER_INFO_COOKIE_VERSION,
             'username': self.user.username,
             'header_urls': self._get_expected_header_urls(),
+            'image_urls': self._get_expected_image_urls(),
         }
 
         self.assertDictEqual(actual, expected)
-        self.assertEqual(0,1)
 
     def test_set_logged_in_cookies_anonymous_user(self):
         anonymous_user = AnonymousUserFactory()

@@ -196,6 +196,7 @@ def _set_deprecated_user_info_cookie(response, request, user, cookie_settings):
         }
     }
     """
+    user_info = _get_user_info_cookie_data(request, user)
     response.set_cookie(
         settings.EDXMKTG_USER_INFO_COOKIE_NAME,
         json.dumps(user_info),
@@ -218,6 +219,12 @@ def _set_deprecated_logged_in_cookie(response, cookie_settings):
 
     return response
 
+def _convert_to_absolute_uris(request, urls_obj):
+    """ Convert relative URL paths to absolute URIs """
+    for url_name, url_path in six.iteritems(urls_obj):
+        urls_obj[url_name] = request.build_absolute_uri(url_path)
+
+    return urls_obj
 
 def _get_user_info_cookie_data(request, user):
     """ Returns information that will populate the user info cookie. """
@@ -245,18 +252,13 @@ def _get_user_info_cookie_data(request, user):
     except User.DoesNotExist:
         pass
 
-    # Convert relative URL paths to absolute URIs
-    for url_name, url_path in six.iteritems(header_urls):
-        header_urls[url_name] = request.build_absolute_uri(url_path)
+    header_urls = _convert_to_absolute_uris(request, header_urls)
 
-    
-    image_urls = []
-    if user.profile and user.profile.has_profile_image:
-        image_urls = _get_user_info_cookie_data(request, user)
+    image_urls = {}
+    if user.profile:
+        image_urls = get_profile_image_urls_for_user(user)
 
-    print('****')
-    print(user)
-    print(image_urls)
+    image_urls = _convert_to_absolute_uris(request, image_urls)
 
     user_info = {
         'version': settings.EDXMKTG_USER_INFO_COOKIE_VERSION,
