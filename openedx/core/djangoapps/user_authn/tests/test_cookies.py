@@ -94,6 +94,7 @@ class CookieTests(TestCase):
         }
 
         self.assertDictEqual(actual, expected)
+        self.assertEqual(0,1)
 
     def test_set_logged_in_cookies_anonymous_user(self):
         anonymous_user = AnonymousUserFactory()

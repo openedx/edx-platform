@@ -23,6 +23,7 @@ from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_from_token
 from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from common.djangoapps.util.json_request import JsonResponse
+from common.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 
 
 log = logging.getLogger(__name__)
@@ -195,9 +196,16 @@ def _set_deprecated_user_info_cookie(response, request, user, cookie_settings):
         }
     }
     """
+    image_urls = []
     user_info = _get_user_info_cookie_data(request, user)
+
+    if user.profile and user.profile.has_profile_image:
+        image_urls = get_profile_image_urls_for_user(request, user)
+    print('image urls')
+    print(image_urls)
     response.set_cookie(
         settings.EDXMKTG_USER_INFO_COOKIE_NAME,
+        json.dumps(image_urls),
         json.dumps(user_info),
         **cookie_settings
     )
@@ -248,6 +256,8 @@ def _get_user_info_cookie_data(request, user):
     # Convert relative URL paths to absolute URIs
     for url_name, url_path in six.iteritems(header_urls):
         header_urls[url_name] = request.build_absolute_uri(url_path)
+
+    print(user)
 
     user_info = {
         'version': settings.EDXMKTG_USER_INFO_COOKIE_VERSION,
