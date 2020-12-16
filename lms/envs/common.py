@@ -1640,10 +1640,10 @@ FOOTER_OPENEDX_URL = "https://open.edx.org"
 # We use logo images served from files.edx.org so we can (roughly) track
 # how many OpenEdX installations are running.
 # Site operators can choose from these logo options:
-# * https://files.edx.org/openedx-logos/edx-openedx-logo-tag.png
-# * https://files.edx.org/openedx-logos/edx-openedx-logo-tag-light.png"
-# * https://files.edx.org/openedx-logos/edx-openedx-logo-tag-dark.png
-FOOTER_OPENEDX_LOGO_IMAGE = "https://files.edx.org/openedx-logos/edx-openedx-logo-tag.png"
+# * https://files.edx.org/openedx-logos/open-edx-logo-tag.png
+# * https://files.edx.org/openedx-logos/open-edx-logo-tag-light.png"
+# * https://files.edx.org/openedx-logos/open-edx-logo-tag-dark.png
+FOOTER_OPENEDX_LOGO_IMAGE = "https://files.edx.org/openedx-logos/open-edx-logo-tag.png"
 
 # This is just a placeholder image.
 # Site operators can customize this with their organization's image.
