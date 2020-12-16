@@ -146,6 +146,14 @@ class UtilsTests(ModuleStoreTestCase):
         user_has_access = user_has_edly_organization_access(self.request)
         assert user_has_access is True
 
+    def test_staff_user_with_organization_access(self):
+        """
+        Test staff user have access to a valid site URL which is not linked to that user.
+        """
+        self.request.user = self.admin_user
+        user_has_access = user_has_edly_organization_access(self.request)
+        assert user_has_access is True
+
     def test_user_without_organization_access(self):
         """
         Test user has no access to a valid site URL but that site in not linked to the user.

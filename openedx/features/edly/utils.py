@@ -38,6 +38,9 @@ def user_has_edly_organization_access(request):
         bool: Returns True if User has Edly Organization Access Otherwise False.
     """
 
+    if request.user.is_superuser or request.user.is_staff:
+        return True
+
     if getattr(request.user, 'edly_profile', None) is None:
         return False
 
