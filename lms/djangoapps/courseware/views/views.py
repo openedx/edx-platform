@@ -1631,6 +1631,9 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             u"Rendering of the xblock view '{}' is not supported.".format(bleach.clean(requested_view, strip=True))
         )
 
+    staff_access = has_access(request.user, 'staff', course_key)
+    _course_masquerade, request.user = setup_masquerade(request, course_key, staff_access)
+
     with modulestore().bulk_operations(course_key):
         # verify the user has access to the course, including enrollment check
         try:
@@ -1668,7 +1671,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'disable_window_wrap': True,
             'enable_completion_on_view_service': enable_completion_on_view_service,
             'edx_notes_enabled': is_feature_enabled(course, request.user),
-            'staff_access': bool(request.user.has_perm(VIEW_XQA_INTERFACE, course)),
+            'staff_access': staff_access,
             'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
             'missed_deadlines': missed_deadlines,
             'missed_gated_content': missed_gated_content,

@@ -1,4 +1,7 @@
-import six
+"""
+Views for Course Experience API.
+"""
+import logging
 
 from django.conf import settings
 from django.urls import reverse
@@ -13,15 +16,20 @@ from rest_framework.generics import RetrieveAPIView
 
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
 from lms.djangoapps.course_home_api.utils import get_microfrontend_url
+from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_with_access
+from lms.djangoapps.courseware.masquerade import setup_masquerade
 
-from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.course_experience.api.v1.serializers import CourseDeadlinesMobileSerializer
+from openedx.features.course_experience.utils import dates_banner_should_display
+
+log = logging.getLogger(__name__)
 
 
 class UnableToResetDeadlines(APIException):
@@ -36,6 +44,13 @@ class UnableToResetDeadlines(APIException):
 ))
 @permission_classes((IsAuthenticated,))
 def reset_course_deadlines(request):
+    """
+    Set the start_date of a schedule to today, which in turn will adjust due dates for
+    sequentials belonging to a self paced course
+
+    IMPORTANT NOTE: If updates are happening to the logic here, ALSO UPDATE the `reset_course_deadlines`
+    function in common/djangoapps/util/views.py as well.
+    """
     course_key = request.data.get('course_key', None)
 
     # If body doesnt contain 'course_key', return 400 to client.
@@ -47,13 +62,21 @@ def reset_course_deadlines(request):
         raise ParseError(_("Only 'course_key' is expected."))
 
     try:
-        reset_self_paced_schedule(request.user, course_key)
+        course_key = CourseKey.from_string(course_key)
+        _course_masquerade, user = setup_masquerade(
+            request,
+            course_key,
+            has_access(request.user, 'staff', course_key)
+        )
 
-        key = CourseKey.from_string(course_key)
-        if course_home_mfe_dates_tab_is_active(key):
-            body_link = get_microfrontend_url(course_key=course_key, view_name='dates')
+        missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, user)
+        if missed_deadlines and not missed_gated_content:
+            reset_self_paced_schedule(user, course_key)
+
+        if course_home_mfe_dates_tab_is_active(course_key):
+            body_link = get_microfrontend_url(course_key=str(course_key), view_name='dates')
         else:
-            body_link = '{}{}'.format(settings.LMS_ROOT_URL, reverse('dates', args=[six.text_type(course_key)]))
+            body_link = '{}{}'.format(settings.LMS_ROOT_URL, reverse('dates', args=[str(course_key)]))
 
         return Response({
             'body': format_html('<a href="{}">{}</a>', body_link, _('View all dates')),
@@ -62,7 +85,8 @@ def reset_course_deadlines(request):
             'link_text': _('View all dates'),
             'message': _('Deadlines successfully reset.'),
         })
-    except Exception:
+    except Exception as e:
+        log.exception(e)
         raise UnableToResetDeadlines
 
 
