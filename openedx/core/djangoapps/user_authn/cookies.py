@@ -16,6 +16,7 @@ from django.utils.http import http_date, parse_http_date
 from edx_rest_framework_extensions.auth.jwt import cookies as jwt_cookies
 from edx_rest_framework_extensions.auth.jwt.constants import JWT_DELIMITER
 from oauth2_provider.models import Application
+from common.djangoapps.student.models import UserProfile
 
 from openedx.core.djangoapps.oauth_dispatch.adapters import DOTAdapter
 from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token
@@ -23,6 +24,7 @@ from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_from_token
 from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from common.djangoapps.util.json_request import JsonResponse
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 
 
 log = logging.getLogger(__name__)
@@ -219,6 +221,14 @@ def _set_deprecated_logged_in_cookie(response, cookie_settings):
     return response
 
 
+def _convert_to_absolute_uris(request, urls_obj):
+    """ Convert relative URL paths to absolute URIs """
+    for url_name, url_path in six.iteritems(urls_obj):
+        urls_obj[url_name] = request.build_absolute_uri(url_path)
+
+    return urls_obj
+
+
 def _get_user_info_cookie_data(request, user):
     """ Returns information that will populate the user info cookie. """
 
@@ -245,14 +255,21 @@ def _get_user_info_cookie_data(request, user):
     except User.DoesNotExist:
         pass
 
-    # Convert relative URL paths to absolute URIs
-    for url_name, url_path in six.iteritems(header_urls):
-        header_urls[url_name] = request.build_absolute_uri(url_path)
+    header_urls = _convert_to_absolute_uris(request, header_urls)
+
+    image_urls = {}
+    try:
+        image_urls = get_profile_image_urls_for_user(user)
+    except UserProfile.DoesNotExist:
+        pass
+
+    image_urls = _convert_to_absolute_uris(request, image_urls)
 
     user_info = {
         'version': settings.EDXMKTG_USER_INFO_COOKIE_VERSION,
         'username': user.username,
         'header_urls': header_urls,
+        'user_image_urls': image_urls,
     }
 
     return user_info
