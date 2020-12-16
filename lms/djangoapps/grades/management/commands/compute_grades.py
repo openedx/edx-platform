@@ -80,7 +80,7 @@ class Command(BaseCommand):
         """
         Enqueue all tasks, in shuffled order.
         """
-        task_options = {'routing_key': options['routing_key']} if options.get('routing_key') else {}
+        task_options = {'queue': options['routing_key']} if options.get('routing_key') else {}
         for seq_id, kwargs in enumerate(self._shuffled_task_kwargs(options)):
             kwargs['seq_id'] = seq_id
             result = tasks.compute_grades_for_course_v2.apply_async(kwargs=kwargs, **task_options)
