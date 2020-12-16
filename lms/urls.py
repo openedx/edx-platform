@@ -747,6 +747,17 @@ urlpatterns += [
 ]
 
 urlpatterns += [
+    url(
+        r'^courses/{}/lti_tab/(?P<provider_uuid>[^/]+)/$'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        CourseTabView.as_view(),
+        name='lti_course_tab',
+        kwargs={'tab_type': 'lti_tab'},
+    ),
+]
+
+urlpatterns += [
     # This MUST be the last view in the courseware--it's a catch-all for custom tabs.
     url(
         r'^courses/{}/(?P<tab_slug>[^/]+)/$'.format(
