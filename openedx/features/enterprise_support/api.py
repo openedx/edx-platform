@@ -474,7 +474,7 @@ def enterprise_customer_uuid_for_request(request):
             # has an ID equal to the ID we got from the running pipeline or from the
             # request tpa_hint URL parameter.
             enterprise_customer_uuid = EnterpriseCustomer.objects.get(
-                enterprise_customer_identity_provider__provider_id=sso_provider_id
+                enterprise_customer_identity_providers__provider_id=sso_provider_id
             ).uuid
         except EnterpriseCustomer.DoesNotExist:
             LOGGER.info(
