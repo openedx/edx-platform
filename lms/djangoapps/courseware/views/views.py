@@ -55,7 +55,8 @@ from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.commerce.utils import EcommerceService
-from lms.djangoapps.course_home_api.utils import is_request_from_learning_mfe
+from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
+from lms.djangoapps.course_home_api.utils import get_microfrontend_url, is_request_from_learning_mfe
 from lms.djangoapps.courseware.access import has_access, has_ccx_coach_role
 from lms.djangoapps.courseware.access_utils import check_course_open_for_learner, check_public_access
 from lms.djangoapps.courseware.courses import (
@@ -643,7 +644,8 @@ class CourseTabView(EdxFragmentView):
                             register_label=_("register"),
                             current_url=urlquote_plus(request.path),
                         ),
-                    )
+                    ),
+                    once_only=True
                 )
             else:
                 PageLevelMessages.register_warning_message(
@@ -1010,6 +1012,9 @@ def dates(request, course_id):
     from lms.urls import COURSE_DATES_NAME, RESET_COURSE_DEADLINES_NAME
 
     course_key = CourseKey.from_string(course_id)
+    if course_home_mfe_dates_tab_is_active(course_key) and not request.user.is_staff:
+        microfrontend_url = get_microfrontend_url(course_key=course_key, view_name=COURSE_DATES_NAME)
+        raise Redirect(microfrontend_url)
 
     # Enable NR tracing for this view based on course
     monitoring_utils.set_custom_attribute('course_id', text_type(course_key))
@@ -1617,7 +1622,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
     Returns an HttpResponse with HTML content for the xBlock with the given usage_key.
     The returned HTML is a chromeless rendering of the xBlock (excluding content of the containing courseware).
     """
-    from lms.urls import COURSE_DATES_NAME, RESET_COURSE_DEADLINES_NAME
+    from lms.urls import RESET_COURSE_DEADLINES_NAME
     from openedx.features.course_experience.urls import COURSE_HOME_VIEW_NAME
 
     usage_key = UsageKey.from_string(usage_key_string)
@@ -1626,7 +1631,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
     course_key = usage_key.course_key
 
     requested_view = request.GET.get('view', 'student_view')
-    if requested_view != 'student_view':
+    if requested_view != 'student_view' and requested_view != 'public_view':
         return HttpResponseBadRequest(
             u"Rendering of the xblock view '{}' is not supported.".format(bleach.clean(requested_view, strip=True))
         )
@@ -1662,7 +1667,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
         missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request.user)
 
         context = {
-            'fragment': block.render('student_view', context=student_view_context),
+            'fragment': block.render(requested_view, context=student_view_context),
             'course': course,
             'disable_accordion': True,
             'allow_iframing': True,

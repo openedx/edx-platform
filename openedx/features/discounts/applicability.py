@@ -150,7 +150,7 @@ def _is_in_holdback_and_bucket(user):
         return False
 
     # Holdback is 10%
-    bucket = stable_bucketing_hash_group(DISCOUNT_APPLICABILITY_HOLDBACK, 10, user.username)
+    bucket = stable_bucketing_hash_group(DISCOUNT_APPLICABILITY_HOLDBACK, 10, user)
 
     request = get_current_request()
     if hasattr(request, 'session') and DISCOUNT_APPLICABILITY_HOLDBACK not in request.session:

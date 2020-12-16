@@ -138,7 +138,7 @@ class Rev934(DeveloperErrorViewMixin, APIView):
         upgrade_price = six.text_type(get_cosmetic_verified_display_price(course))
         could_upsell = bool(user_upsell and basket_url)
 
-        bucket = stable_bucketing_hash_group(MOBILE_UPSELL_EXPERIMENT, 2, user.username)
+        bucket = stable_bucketing_hash_group(MOBILE_UPSELL_EXPERIMENT, 2, user)
 
         if could_upsell and hasattr(request, 'session') and MOBILE_UPSELL_EXPERIMENT not in request.session:
             properties = {
