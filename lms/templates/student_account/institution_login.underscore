@@ -1,11 +1,9 @@
 <div class="wrapper-other-login">
-    <div class="section-title lines">
-        <h1>
-            <span class="text">
-                <%- gettext("Sign in with Institution/Campus Credentials") %>
-            </span>
-        </h1>
-    </div>
+    <h1 class="section-title">
+        <span class="text">
+            <%- gettext("Sign in with Institution/Campus Credentials") %>
+        </span>
+    </h1>
 
     <p class="instructions"><%- gettext("Choose your institution from the list below:") %></p>
 
