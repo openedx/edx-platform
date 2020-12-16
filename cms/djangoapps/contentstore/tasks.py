@@ -83,7 +83,7 @@ def clone_instance(instance, field_values):
     return instance
 
 
-@task()
+@task
 @set_code_owner_attribute
 def rerun_course(source_course_key_string, destination_course_key_string, user_id, fields=None):
     """
@@ -170,7 +170,7 @@ def _parse_time(time_isoformat):
     ).replace(tzinfo=UTC)
 
 
-@task(routing_key=settings.UPDATE_SEARCH_INDEX_JOB_QUEUE)
+@task
 @set_code_owner_attribute
 def update_search_index(course_id, triggered_time_isoformat):
     """ Updates course search index. """
@@ -195,7 +195,7 @@ def update_search_index(course_id, triggered_time_isoformat):
         LOGGER.debug(u'Search indexing successful for complete course %s', course_id)
 
 
-@task()
+@task
 @set_code_owner_attribute
 def update_library_index(library_id, triggered_time_isoformat):
     """ Updates course search index. """

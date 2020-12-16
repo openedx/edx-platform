@@ -18,7 +18,7 @@ from xmodule.modulestore.django import modulestore
 log = logging.getLogger(__name__)
 
 
-@task()
+@task
 @set_code_owner_attribute
 def task_evaluate_subsection_completion_milestones(course_id, block_id, user_id):
     """

@@ -16,8 +16,6 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
-ACE_ROUTING_KEY = getattr(settings, 'ACE_ROUTING_KEY', None)
-SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = getattr(settings, 'SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY', None)
 log = logging.getLogger(__name__)
 
 
@@ -74,7 +72,7 @@ class BaseSoftwareSecureTask(Task):
             )
 
 
-@task(routing_key=ACE_ROUTING_KEY)
+@task
 @set_code_owner_attribute
 def send_verification_status_email(context):
     """
@@ -101,7 +99,6 @@ def send_verification_status_email(context):
     bind=True,
     default_retry_delay=settings.SOFTWARE_SECURE_REQUEST_RETRY_DELAY,
     max_retries=settings.SOFTWARE_SECURE_RETRY_MAX_ATTEMPTS,
-    routing_key=SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY,
 )
 @set_code_owner_attribute
 def send_request_to_ss_for_user(self, user_verification_id, copy_id_photo_from):
