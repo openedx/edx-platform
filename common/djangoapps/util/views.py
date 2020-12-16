@@ -196,6 +196,9 @@ def reset_course_deadlines(request):
     """
     Set the start_date of a schedule to today, which in turn will adjust due dates for
     sequentials belonging to a self paced course
+
+    IMPORTANT NOTE: If updates are happening to the logic here, ALSO UPDATE the `reset_course_deadlines`
+    function in openedx/features/course_experience/api/v1/views.py as well.
     """
     course_key = CourseKey.from_string(request.POST.get('course_id'))
     _course_masquerade, user = setup_masquerade(
