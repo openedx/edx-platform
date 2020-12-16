@@ -3,6 +3,7 @@
 
 import json
 import six
+from datetime import date
 from django.conf import settings
 from django.http import HttpResponse
 from django.test import RequestFactory, TestCase
@@ -10,7 +11,6 @@ from django.urls import reverse
 from edx_rest_framework_extensions.auth.jwt.decoder import jwt_decode_handler
 from edx_rest_framework_extensions.auth.jwt.middleware import JwtAuthCookieMiddleware
 from mock import MagicMock, patch
-from datetime import date
 
 from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from openedx.core.djangoapps.user_authn import cookies as cookies_api
@@ -36,6 +36,13 @@ class CookieTests(TestCase):
             get_expiry_age=lambda: max_age,
         )
 
+    def _convert_to_absolute_uris(self, request, urls_obj):
+        """ Convert relative URL paths to absolute URIs """
+        for url_name, url_path in six.iteritems(urls_obj):
+            urls_obj[url_name] = request.build_absolute_uri(url_path)
+
+        return urls_obj
+
     def _get_expected_image_urls(self):
         expected_image_urls = {
             'full': '/static/default_500.png',
@@ -44,7 +51,7 @@ class CookieTests(TestCase):
             'small': '/static/default_30.png'
         }
 
-        expected_image_urls = cookies_api._convert_to_absolute_uris(self.request, expected_image_urls)
+        expected_image_urls = self._convert_to_absolute_uris(self.request, expected_image_urls)
 
         return expected_image_urls
 
@@ -56,7 +63,7 @@ class CookieTests(TestCase):
             'learner_profile': reverse('learner_profile', kwargs={'username': self.user.username}),
         }
 
-        expected_header_urls = cookies_api._convert_to_absolute_uris(self.request, expected_header_urls)
+        expected_header_urls = self._convert_to_absolute_uris(self.request, expected_header_urls)
 
         return expected_header_urls
 
@@ -111,7 +118,7 @@ class CookieTests(TestCase):
             'version': settings.EDXMKTG_USER_INFO_COOKIE_VERSION,
             'username': self.user.username,
             'header_urls': self._get_expected_header_urls(),
-            'image_urls': self._get_expected_image_urls(),
+            'user_image_urls': self._get_expected_image_urls(),
         }
 
         self.assertDictEqual(actual, expected)
