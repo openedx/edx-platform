@@ -48,7 +48,7 @@ coreschema==0.0.4         # via -r requirements/edx/base.txt, coreapi, drf-yasg
 coverage==5.3             # via -r requirements/edx/coverage.txt, pytest-cov
 git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0  # via -r requirements/edx/testing.in
 crowdsourcehinter-xblock==0.6  # via -r requirements/edx/base.txt
-cryptography==3.2.1       # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, django-fernet-fields, edx-enterprise, pyjwt, social-auth-core
+cryptography==3.3.1       # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, django-fernet-fields, edx-enterprise, pyjwt, social-auth-core
 cssselect==1.1.0          # via -r requirements/edx/testing.in, pyquery
 cssutils==1.0.2           # via -r requirements/edx/base.txt, pynliner
 ddt==1.4.1                # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, xblock-drag-and-drop-v2, xblock-poll

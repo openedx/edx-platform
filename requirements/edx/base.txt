@@ -42,7 +42,7 @@ contextlib2==0.6.0.post1  # via -r requirements/edx/base.in
 coreapi==2.3.3            # via drf-yasg
 coreschema==0.0.4         # via coreapi, drf-yasg
 crowdsourcehinter-xblock==0.6  # via -r requirements/edx/base.in
-cryptography==3.2.1       # via -c requirements/edx/../constraints.txt, -r requirements/edx/../edx-sandbox/shared.txt, django-fernet-fields, edx-enterprise, pyjwt, social-auth-core
+cryptography==3.3.1       # via -c requirements/edx/../constraints.txt, -r requirements/edx/../edx-sandbox/shared.txt, django-fernet-fields, edx-enterprise, pyjwt, social-auth-core
 cssutils==1.0.2           # via pynliner
 ddt==1.4.1                # via xblock-drag-and-drop-v2, xblock-poll
 decorator==4.4.2          # via pycontracts

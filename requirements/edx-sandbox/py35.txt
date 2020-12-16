@@ -9,7 +9,7 @@ common/lib/symmath  # via -r requirements/edx-sandbox/py35.in
 cffi==1.14.4              # via -r requirements/edx-sandbox/shared.txt, cryptography
 chem==1.2.0               # via -r requirements/edx-sandbox/py35.in
 click==7.1.2              # via -r requirements/edx-sandbox/shared.txt, nltk
-cryptography==3.2.1       # via -c requirements/edx-sandbox/../constraints.txt, -r requirements/edx-sandbox/shared.txt
+cryptography==3.3.1       # via -c requirements/edx-sandbox/../constraints.txt, -r requirements/edx-sandbox/shared.txt
 cycler==0.10.0            # via matplotlib
 decorator==4.4.2          # via networkx
 joblib==0.14.1            # via -c requirements/edx-sandbox/../constraints.txt, -r requirements/edx-sandbox/shared.txt, nltk
