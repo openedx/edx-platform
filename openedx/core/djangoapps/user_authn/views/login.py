@@ -151,6 +151,7 @@ def _enforce_password_policy_compliance(request, user):
         # Allow login, but warn the user that they will be required to reset their password soon.
         PageLevelMessages.register_warning_message(request, six.text_type(e))
     except password_policy_compliance.NonCompliantPasswordException as e:
+        AUDIT_LOG.info("Password reset initiated for email %s.", user.email)
         send_password_reset_email_for_user(user, request)
         # Prevent the login attempt.
         raise AuthFailedError(HTML(six.text_type(e)), error_code=e.__class__.__name__)

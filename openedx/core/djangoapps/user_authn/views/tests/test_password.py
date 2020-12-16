@@ -269,7 +269,7 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
             self.assertEqual(response.status_code, 200)
 
             expected_logs = (
-                (LOGGER_NAME, 'INFO', 'Password reset initiated for user {}.'.format(self.NEW_EMAIL)),
+                (LOGGER_NAME, 'INFO', 'Password reset initiated for email {}.'.format(self.NEW_EMAIL)),
                 (LOGGER_NAME, 'INFO', 'Invalid password reset attempt')
             )
             logger.check(*expected_logs)
