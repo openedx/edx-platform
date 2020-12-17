@@ -8,6 +8,7 @@ from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access_response import AccessResponse
 from lms.djangoapps.courseware.access_utils import ACCESS_DENIED, ACCESS_GRANTED, check_public_access
 from lms.djangoapps.courseware.courses import get_course
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseStaffRole
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
@@ -39,15 +40,14 @@ def can_access_self_blocks(requesting_user: User, course_key: CourseKey) -> Acce
     )
     if user_is_enrolled_or_staff:
         return ACCESS_GRANTED
-    try:
-        return is_course_public(course_key)
-    except ValueError:
-        return ACCESS_DENIED
+    return is_course_public(course_key)
 
 
 def is_course_public(course_key: CourseKey) -> AccessResponse:
     """
     This checks if a course is publicly accessible or not.
     """
+    if not CourseOverview.course_exists(course_key):
+        return ACCESS_DENIED
     course = get_course(course_key, depth=0)
     return check_public_access(course, [COURSE_VISIBILITY_PUBLIC])

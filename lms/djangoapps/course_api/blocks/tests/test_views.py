@@ -395,7 +395,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         self.verify_response_with_requested_fields(response)
 
 
-class TestBlocksInCourseView(TestBlocksView):
+class TestBlocksInCourseView(TestBlocksView):  # pylint: disable=test-inherits-tests
     """
     Test class for BlocksInCourseView
     """
@@ -413,4 +413,9 @@ class TestBlocksInCourseView(TestBlocksView):
         self.verify_response(400, params={'course_id': 'invalid_course_id'})
 
     def test_non_existent_course(self):
+        self.verify_response(403, params={'course_id': str(CourseLocator('non', 'existent', 'course'))})
+
+    def test_non_existent_course_anonymous(self):
+        self.client.logout()
+        self.query_params['username'] = ''
         self.verify_response(403, params={'course_id': str(CourseLocator('non', 'existent', 'course'))})
