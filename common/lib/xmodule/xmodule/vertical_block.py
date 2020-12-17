@@ -12,6 +12,8 @@ import pytz
 import six
 from lxml import etree
 from web_fragments.fragment import Fragment
+
+from common.lib.xmodule.xmodule.util.misc import is_xblock_an_assignment
 from xblock.core import XBlock
 from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.progress import Progress
@@ -257,11 +259,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         all_complete = None
         for child in children:
             complete = completions[child.scope_ids.usage_id] == 1
-            graded = getattr(child, 'graded', False)
-            has_score = getattr(child, 'has_score', False)
-            weight = getattr(child, 'weight', 1)
-            scored = has_score and (weight is None or weight > 0)
-            if graded and scored:
+            if is_xblock_an_assignment(child):
                 if not complete:
                     return False
                 all_complete = True

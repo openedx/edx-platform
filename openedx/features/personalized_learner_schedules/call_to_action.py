@@ -10,6 +10,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import ngettext, gettext as _
 
+from common.lib.xmodule.xmodule.util.misc import is_xblock_an_assignment
 from lms.djangoapps.course_home_api.utils import is_request_from_learning_mfe
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.course_experience.utils import dates_banner_should_display
@@ -49,19 +50,19 @@ class PersonalizedLearnerScheduleCallToAction:
         if category == self.CAPA_SUBMIT_DISABLED:
             # xblock is a capa problem, and the submit button is disabled. Check if it's because of a personalized
             # schedule due date being missed, and if so, we can offer to shift it.
-            if self._is_block_shiftable(xblock):
+            if self._is_block_shiftable(xblock, category):
                 ctas.append(self._make_reset_deadlines_cta(xblock, category, is_learning_mfe))
 
         elif category == self.VERTICAL_BANNER and not completed:
             # xblock is a vertical, so we'll check all the problems inside it. If there are any that will show a
             # a "shift dates" CTA under CAPA_SUBMIT_DISABLED, then we'll also show the same CTA as a vertical banner.
-            if any(self._is_block_shiftable(item) for item in xblock.get_display_items()):
+            if any(self._is_block_shiftable(item, category) for item in xblock.get_display_items()):
                 ctas.append(self._make_reset_deadlines_cta(xblock, category, is_learning_mfe))
 
         return ctas
 
-    @staticmethod
-    def _is_block_shiftable(xblock):
+    @classmethod
+    def _is_block_shiftable(cls, xblock, category):
         """
         Test if the xblock would be solvable if we were to shift dates.
 
@@ -81,7 +82,14 @@ class PersonalizedLearnerScheduleCallToAction:
             PersonalizedLearnerScheduleCallToAction._log_past_due_warning(type(xblock).__name__)
             is_past_due = xblock.is_past_due
 
-        return xblock.self_paced and can_attempt and is_past_due
+        can_shift = xblock.self_paced and can_attempt and is_past_due
+
+        # Note: we will still show the CTA at the xblock level (next to the submit button) regardless
+        # of if the xblock is an assignment (meaning graded *and* scored)
+        if category == cls.VERTICAL_BANNER:
+            can_shift = can_shift and is_xblock_an_assignment(xblock)
+
+        return can_shift
 
     @staticmethod
     def _log_past_due_warning(name):
