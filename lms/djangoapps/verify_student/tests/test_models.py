@@ -415,6 +415,18 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
                 now() + timedelta(days=10)
             )
 
+    def test_get_verification_from_receipt(self):
+        result = SoftwareSecurePhotoVerification.get_verification_from_receipt('')
+        self.assertIs(result, None)
+
+        user = UserFactory.create()
+        attempt = SoftwareSecurePhotoVerification(user=user)
+        attempt.status = PhotoVerification.STATUS.submitted
+        attempt.save()
+        receipt_id = attempt.receipt_id
+        result = SoftwareSecurePhotoVerification.get_verification_from_receipt(receipt_id)
+        self.assertIsNotNone(result)
+
 
 class SSOVerificationTest(TestVerificationBase):
     """

@@ -38,7 +38,7 @@ from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
 from lms.djangoapps.verify_student.tests import TestVerificationBase
 from xmodule.modulestore import ModuleStoreEnum
@@ -1775,3 +1775,81 @@ class TestReverifyView(TestVerificationBase):
         response = self.client.get(url)
         verification_start_url = IDVerificationService.get_verify_location()
         self.assertRedirects(response, verification_start_url, fetch_redirect_response=False)
+
+
+@override_settings(
+    VERIFY_STUDENT={
+        "SOFTWARE_SECURE": {
+            "API_URL": "https://verify.example.com/submit/",
+            "API_ACCESS_KEY": "dcf291b5572942f99adaab4c2090c006",
+            "API_SECRET_KEY": "c392efdcc0354c5f922dc39844ec0dc7",
+            "FACE_IMAGE_AES_KEY": "f82400259e3b4f88821cd89838758292",
+            "RSA_PUBLIC_KEY": (
+                "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDkgtz3fQdiXshy/RfOHkoHlhx/"
+                "SSPZ+nNyE9JZXtwhlzsXjnu+e9GOuJzgh4kUqo73ePIG5FxVU+mnacvufq2cu1SOx"
+                "lRYGyBK7qDf9Ym67I5gmmcNhbzdKcluAuDCPmQ4ecKpICQQldrDQ9HWDxwjbbcqpVB"
+                "PYWkE1KrtypGThmcehLmabf6SPq1CTAGlXsHgUtbWCwV6mqR8yScV0nRLln0djLDm9d"
+                "L8tIVFFVpAfBaYYh2Cm5EExQZjxyfjWd8P5H+8/l0pmK2jP7Hc0wuXJemIZbsdm+DSD"
+                "FhCGY3AILGkMwr068dGRxfBtBy/U9U5W+nStvkDdMrSgQezS5+V test@example.com"
+            ),
+            "AWS_ACCESS_KEY": "c987c7efe35c403caa821f7328febfa1",
+            "AWS_SECRET_KEY": "fc595fc657c04437bb23495d8fe64881",
+            "CERT_VERIFICATION_PATH": False,
+        },
+        "DAYS_GOOD_FOR": 10,
+        "STORAGE_CLASS": 'storages.backends.s3boto.S3BotoStorage',
+        "STORAGE_KWARGS": {
+            'bucket': 'test-idv',
+        },
+    },
+)
+class TestPhotoURLView(ModuleStoreTestCase, TestVerificationBase):
+    """
+    Tests for the results_callback view.
+    """
+
+    def setUp(self):
+        super(TestPhotoURLView, self).setUp()
+
+        self.user = AdminFactory()
+        login_success = self.client.login(username=self.user.username, password='test')
+        self.assertTrue(login_success)
+        self.attempt = SoftwareSecurePhotoVerification(
+            status="submitted",
+            user=self.user
+        )
+        self.attempt.save()
+        self.receipt_id = self.attempt.receipt_id
+
+    def test_photo_url_view_returns_data(self):
+        url = reverse('verification_photo_urls', kwargs={'receipt_id': six.text_type(self.receipt_id)})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["EdX-ID"], self.receipt_id)
+        self.assertEqual(
+            response.data["PhotoID"],
+            "https://{bucket}/photo_id/{receipt_id}".format(
+                bucket=settings.AWS_S3_CUSTOM_DOMAIN,
+                receipt_id=self.receipt_id
+            )
+        )
+        self.assertEqual(
+            response.data["UserPhoto"],
+            "https://{bucket}/face/{receipt_id}".format(
+                bucket=settings.AWS_S3_CUSTOM_DOMAIN,
+                receipt_id=self.receipt_id
+            )
+        )
+
+    def test_photo_url_view_returns_404_if_invalid_receipt_id(self):
+        url = reverse('verification_photo_urls', kwargs={'receipt_id': six.text_type('00000000-0000-0000-0000-000000000000')})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_403_for_non_staff(self):
+        self.user = UserFactory()
+        login_success = self.client.login(username=self.user.username, password='test')
+        self.assertTrue(login_success)
+        url = reverse('verification_photo_urls', kwargs={'receipt_id': six.text_type(self.receipt_id)})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)

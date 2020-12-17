@@ -8,6 +8,8 @@ from django.conf.urls import url
 
 from lms.djangoapps.verify_student import views
 
+IDV_RECEIPT_ID_PATTERN = r'(?P<receipt_id>[0-9a-z]{8}-([0-9a-z]{4}-){3}[0-9a-z]{12})'
+
 urlpatterns = [
     # The user is starting the verification / payment process,
     # most likely after enrolling in a course and selecting
@@ -97,6 +99,12 @@ urlpatterns = [
         r'^reverify$',
         views.ReverifyView.as_view(),
         name="verify_student_reverify"
+    ),
+
+    url(
+        r'^photo-urls/{receipt_id}$'.format(receipt_id=IDV_RECEIPT_ID_PATTERN),
+        views.PhotoUrlsView.as_view(),
+        name="verification_photo_urls"
     ),
 ]
 
