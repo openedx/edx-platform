@@ -164,12 +164,12 @@ class CourseWaffleFlag(LegacyWaffleFlag):
         # Import is placed here to avoid model import at project startup.
         from .models import WaffleFlagCourseOverrideModel
 
-        cache_key = "{}.{}".format(self.namespaced_flag_name, str(course_key))
+        cache_key = "{}.{}".format(self.name, str(course_key))
         course_override = self.cached_flags().get(cache_key)
 
         if course_override is None:
             course_override = WaffleFlagCourseOverrideModel.override_value(
-                self.namespaced_flag_name, course_key
+                self.name, course_key
             )
             self.cached_flags()[cache_key] = course_override
 

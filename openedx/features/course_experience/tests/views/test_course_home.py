@@ -225,7 +225,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
         self.assertRedirects(response, '/dashboard?notlive=Jan+01%2C+2030')
 
         # With the Waffle flag enabled, the course should be visible
-        with override_flag(COURSE_PRE_START_ACCESS_FLAG.namespaced_flag_name, True):
+        with override_flag(COURSE_PRE_START_ACCESS_FLAG.name, True):
             url = course_home_url(future_course)
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
