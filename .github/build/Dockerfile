@@ -95,7 +95,7 @@ ENTRYPOINT ["docker-entrypoint.sh"]
 
 # Run server
 EXPOSE 8000
-CMD gunicorn --name ${SERVICE_VARIANT} --workers ${WORKER_COUNT:-1} --bind=0.0.0.0:8000 --max-requests=${MAX_REQUESTS:-1000} --preload ${SERVICE_VARIANT}.wsgi:application
+CMD gunicorn --name ${SERVICE_VARIANT} --workers ${WORKER_COUNT:-1} --max-requests-jitter=${WORKER_JITTER:50} --bind=0.0.0.0:8000 --max-requests=${MAX_REQUESTS:-1000} --preload ${SERVICE_VARIANT}.wsgi:application
 
 FROM base as testing
 
