@@ -675,22 +675,6 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
         return init_verification.latest('created_at') if init_verification.exists() else None
 
-    @classmethod
-    def get_verification_from_receipt(cls, receipt_id):
-        """Get a verification for a user based on the photo receipt_id
-
-        Arguments:
-            receipt_id(String): receipt ID of the user photo or ID photo
-
-        Return:
-            SoftwareSecurePhotoVerification (object) or None
-        """
-        try:
-            verification = cls.objects.get(receipt_id=receipt_id)
-            return verification
-        except cls.DoesNotExist:
-            return None
-
     @status_before_must_be("created")
     def upload_face_image(self, img_data):
         """
