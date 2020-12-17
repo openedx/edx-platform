@@ -1,8 +1,7 @@
 // LMS layouts
-
 .content-wrapper {
   max-width: map-get($container-max-widths, xl);
-  margin-top: $baseline;
+  margin: $baseline auto 0 auto;
   padding: 0 0 $baseline/2;
 
   @include media-breakpoint-up(md) {
