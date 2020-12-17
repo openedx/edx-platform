@@ -3,8 +3,7 @@ All model factories for applications
 """
 import factory
 
-from openedx.adg.lms.applications.models import BusinessLine
-from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
+from openedx.adg.lms.applications.models import ApplicationHub, BusinessLine, UserApplication
 from student.tests.factories import UserFactory
 
 
@@ -12,6 +11,7 @@ class BusinessLineFactory(factory.DjangoModelFactory):
     """
     Factory for BusinessLine model
     """
+
     class Meta:
         model = BusinessLine
 
@@ -19,13 +19,26 @@ class BusinessLineFactory(factory.DjangoModelFactory):
     description = factory.Faker('sentence')
 
 
-class ExtendedUserProfileFactory(factory.django.DjangoModelFactory):
+class UserApplicationFactory(factory.DjangoModelFactory):
     """
-    Factory for ExtendedUserProfile model
+    Factory for UserApplication model
     """
 
     class Meta:
-        model = ExtendedUserProfile
+        model = UserApplication
 
     user = factory.SubFactory(UserFactory)
-    saudi_national = False
+    business_line = factory.SubFactory(BusinessLineFactory)
+    organization = 'testOrganization'
+
+
+class ApplicationHubFactory(factory.DjangoModelFactory):
+    """
+    Factory for ApplicationHub Model
+    """
+
+    class Meta:
+        model = ApplicationHub
+        django_get_or_create = ('user',)
+
+    user = factory.SubFactory(UserFactory)

@@ -37,7 +37,7 @@ class MailchimpClient(object):
 
         Args:
             email (str): Email address of member
-            data (json): member data in json format
+            data (dict): member data in json format
 
         Returns:
             None

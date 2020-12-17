@@ -1,6 +1,7 @@
 """
 All models for applications app
 """
+from datetime import date
 
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
@@ -18,17 +19,61 @@ class ApplicationHub(TimeStampedModel):
     """
     Model for status of all required parts of user application submission.
     """
+    TOTAL_APPLICATION_OBJECTIVES = 2
+
     user = models.OneToOneField(
         User, related_name='application_hub', on_delete=models.CASCADE, verbose_name=_('User'),
     )
     is_prerequisite_courses_passed = models.BooleanField(default=False, verbose_name=_('Prerequisite Courses Passed'), )
+    is_written_application_completed = models.BooleanField(default=False,
+                                                           verbose_name=_('Written Application Submitted'), )
     is_application_submitted = models.BooleanField(default=False, verbose_name=_('Application Submitted'), )
+    submission_date = models.DateField(null=True, blank=True, verbose_name=_('Submission Date'), )
 
     class Meta:
         app_label = 'applications'
 
     def set_is_prerequisite_courses_passed(self):
+        """
+        Mark pre_req_course objective as complete i.e set is_prerequisite_courses_passed to True.
+        """
         self.is_prerequisite_courses_passed = True
+        self.save()
+
+    def set_is_written_application_completed(self):
+        """
+        Mark written_application objective as complete i.e set is_written_application_completed to True.
+        """
+        self.is_written_application_completed = True
+        self.save()
+
+    def are_application_pre_reqs_completed(self):
+        """
+        Check if all the application objectives are completed or not.
+
+        Returns:
+            bool: True if all objectives are done, otherwise False.
+        """
+        return self.is_prerequisite_courses_passed and self.is_written_application_completed
+
+    @property
+    def progress_of_objectives_completed_in_float(self):
+        """
+        Property to return percentage of the total objectives completed.
+
+        Returns:
+            str: percentage in string
+        """
+        number_of_objectives_completed = sum([self.is_written_application_completed,
+                                              self.is_prerequisite_courses_passed])
+        return number_of_objectives_completed / self.TOTAL_APPLICATION_OBJECTIVES
+
+    def submit_application_for_current_date(self):
+        """
+        Set the is_application_submitted flag and add the submission_date of the current date.
+        """
+        self.is_application_submitted = True
+        self.submission_date = date.today()
         self.save()
 
     def __str__(self):
@@ -143,7 +188,7 @@ class Education(UserStartAndEndDates):
 
     name_of_school = models.CharField(verbose_name=_('Name of School / University'), max_length=255, )
     degree = models.CharField(verbose_name=_('Degree Received'), choices=DEGREE_TYPES, max_length=2, )
-    ares_of_study = models.CharField(verbose_name=_('Area of Study'), max_length=255, blank=True)
+    area_of_study = models.CharField(verbose_name=_('Area of Study'), max_length=255, blank=True, )
     is_in_progress = models.BooleanField(verbose_name=_('In Progress'), default=False, )
 
     class Meta:
@@ -160,7 +205,7 @@ class WorkExperience(UserStartAndEndDates):
     name_of_organization = models.CharField(verbose_name=_('Name of Organization'), max_length=255, )
     job_position_title = models.CharField(verbose_name=_('Job Position / Title'), max_length=255, )
     is_current_position = models.BooleanField(verbose_name=_('Current Position'), default=False, )
-    job_responsibilities = models.TextField(verbose_name=_('Job Responsibilities'), blank=True, )
+    job_responsibilities = models.TextField(verbose_name=_('Job Responsibilities'), )
 
     class Meta:
         app_label = 'applications'
