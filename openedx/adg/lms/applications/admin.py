@@ -41,11 +41,11 @@ class EducationAdmin(admin.ModelAdmin):
     Django admin class for Education
     """
     fields = (
-        'name_of_school', 'degree', 'ares_of_study', 'date_started_month', 'date_started_year', 'date_completed_month',
+        'name_of_school', 'degree', 'area_of_study', 'date_started_month', 'date_started_year', 'date_completed_month',
         'date_completed_year', 'is_in_progress', 'user_application',
     )
-    list_display = ('id', 'name_of_school', 'degree', 'ares_of_study', 'user_application',)
-    list_filter = ('degree', 'ares_of_study',)
+    list_display = ('id', 'name_of_school', 'degree', 'area_of_study', 'user_application',)
+    list_filter = ('degree', 'area_of_study',)
     search_fields = ('name_of_school', 'degree',)
 
 

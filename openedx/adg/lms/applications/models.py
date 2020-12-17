@@ -188,7 +188,7 @@ class Education(UserStartAndEndDates):
 
     name_of_school = models.CharField(verbose_name=_('Name of School / University'), max_length=255, )
     degree = models.CharField(verbose_name=_('Degree Received'), choices=DEGREE_TYPES, max_length=2, )
-    ares_of_study = models.CharField(verbose_name=_('Area of Study'), max_length=255, blank=True)
+    area_of_study = models.CharField(verbose_name=_('Area of Study'), max_length=255, blank=True, )
     is_in_progress = models.BooleanField(verbose_name=_('In Progress'), default=False, )
 
     class Meta:
@@ -205,7 +205,7 @@ class WorkExperience(UserStartAndEndDates):
     name_of_organization = models.CharField(verbose_name=_('Name of Organization'), max_length=255, )
     job_position_title = models.CharField(verbose_name=_('Job Position / Title'), max_length=255, )
     is_current_position = models.BooleanField(verbose_name=_('Current Position'), default=False, )
-    job_responsibilities = models.TextField(verbose_name=_('Job Responsibilities'), blank=True, )
+    job_responsibilities = models.TextField(verbose_name=_('Job Responsibilities'), )
 
     class Meta:
         app_label = 'applications'
