@@ -8,7 +8,8 @@ import pytest
 from dateutil.relativedelta import relativedelta
 
 from openedx.adg.lms.applications.forms import ContactInformationForm
-from openedx.adg.lms.applications.test.factories import ExtendedProfileFactory, ProfileFactory, UserFactory
+from openedx.adg.lms.applications.test.factories import ExtendedUserProfileFactory
+from student.tests.factories import UserFactory
 
 
 def contact_information_dictionary(name='test', email='test@example.com', city='XYZ',
@@ -40,11 +41,7 @@ def create_factories():
     """
     user = UserFactory.create()
 
-    profile = ProfileFactory()
-    profile.user = user
-    profile.save()
-
-    extended_profile = ExtendedProfileFactory()
+    extended_profile = ExtendedUserProfileFactory()
     extended_profile.user = user
     extended_profile.save()
     return user

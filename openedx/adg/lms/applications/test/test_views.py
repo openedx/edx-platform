@@ -4,8 +4,9 @@ All tests for applications views
 from django.test import Client, TestCase
 from django.test.client import RequestFactory
 
+from openedx.adg.lms.applications.test.factories import ExtendedUserProfileFactory
 from openedx.adg.lms.applications.views import ContactInformationView
-from openedx.adg.lms.applications.test.factories import ExtendedProfileFactory, ProfileFactory, UserFactory
+from student.tests.factories import UserFactory
 
 
 class ContactInformationViewTest(TestCase):
@@ -20,11 +21,7 @@ class ContactInformationViewTest(TestCase):
         self.client = Client()
         self.user = UserFactory()
 
-        profile = ProfileFactory()
-        profile.user = self.user
-        profile.save()
-
-        extended_profile = ExtendedProfileFactory()
+        extended_profile = ExtendedUserProfileFactory()
         extended_profile.user = self.user
         extended_profile.save()
 
