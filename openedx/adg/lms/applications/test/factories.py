@@ -22,8 +22,9 @@ class BusinessLineFactory(factory.DjangoModelFactory):
 
 class UserFactory(factory.DjangoModelFactory):
     """
-    Factory for BusinessLine model
+    Factory for User model
     """
+
     class Meta:
         model = User
 
@@ -33,6 +34,10 @@ class UserFactory(factory.DjangoModelFactory):
 
 
 class ProfileFactory(factory.django.DjangoModelFactory):
+    """
+    Factory for UserProfile model
+    """
+
     class Meta:
         model = UserProfile
 
@@ -42,6 +47,10 @@ class ProfileFactory(factory.django.DjangoModelFactory):
 
 
 class ExtendedProfileFactory(factory.django.DjangoModelFactory):
+    """
+    Factory for ExtendedUserProfile model
+    """
+
     class Meta:
         model = ExtendedUserProfile
 

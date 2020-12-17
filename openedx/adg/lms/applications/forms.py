@@ -21,6 +21,7 @@ class ContactInformationForm(forms.Form):
     name = forms.CharField(max_length=255, )
     email = forms.EmailField()
     city = forms.CharField(max_length=255, )
+    saudi_national = forms.BooleanField()
 
     MALE = 'male'
     FEMALE = 'female'

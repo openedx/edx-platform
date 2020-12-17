@@ -22,7 +22,7 @@ def contact_information_dictionary(name='test', email='test@example.com', city='
         'name': name,
         'email': email,
         'city': city,
-        'saudi_national': False,
+        'saudi_national': True,
         'gender': gender,
         'phone_number': phone_number,
         'birth_day': birth_day,
