@@ -4,13 +4,14 @@
 import ddt
 import mock
 from django.conf import settings
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory, CourseRunFactory, ProgramFactory
+from openedx.core.djangoapps.credentials.helpers import is_learner_records_enabled
 from openedx.core.djangoapps.credentials.signals import is_course_run_in_a_program, send_grade_if_interesting
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
@@ -122,6 +123,16 @@ class TestCredentialsSignalsSendGrade(TestCase):
         site_config.site_values['ENABLE_LEARNER_RECORDS'] = False
         site_config.save()
         send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None)
+        self.assertFalse(mock_send_grade_to_credentials.delay.called)
+
+    def test_send_grade_records_disabled_globally(
+        self, _mock_is_course_run_in_a_program, mock_send_grade_to_credentials,
+        _mock_is_learner_issuance_enabled
+    ):
+        self.assertTrue(is_learner_records_enabled())
+        with override_settings(FEATURES={"ENABLE_LEARNER_RECORDS": False}):
+            self.assertFalse(is_learner_records_enabled())
+            send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None)
         self.assertFalse(mock_send_grade_to_credentials.delay.called)
 
 

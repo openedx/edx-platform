@@ -6,13 +6,14 @@ This module contains signals / handlers related to programs.
 import logging
 
 from django.dispatch import receiver
+
+from openedx.core.djangoapps.credentials.helpers import is_learner_records_enabled_for_org
 from openedx.core.djangoapps.signals.signals import (
     COURSE_CERT_AWARDED,
     COURSE_CERT_CHANGED,
     COURSE_CERT_DATE_CHANGE,
     COURSE_CERT_REVOKED
 )
-from openedx.core.djangoapps.site_configuration import helpers
 
 LOGGER = logging.getLogger(__name__)
 
@@ -115,7 +116,7 @@ def handle_course_cert_changed(sender, user, course_key, mode, status, **kwargs)
 
     # Avoid scheduling new tasks if learner records are disabled for this site (right now, course certs are only
     # used for learner records -- when that changes, we can remove this bit and always send course certs).
-    if not helpers.get_value_for_org(course_key.org, 'ENABLE_LEARNER_RECORDS', True):
+    if not is_learner_records_enabled_for_org(course_key.org):
         if verbose:
             LOGGER.info(
                 u"Skipping send cert: ENABLE_LEARNER_RECORDS False for org [{org}]".format(

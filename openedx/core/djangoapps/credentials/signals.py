@@ -12,8 +12,8 @@ from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCer
 from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
-from openedx.core.djangoapps.site_configuration import helpers
 
+from .helpers import is_learner_records_enabled, is_learner_records_enabled_for_org
 from .tasks.v1.tasks import send_grade_to_credentials
 
 log = getLogger(__name__)
@@ -74,7 +74,7 @@ def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, 
         return
 
     # Avoid scheduling new tasks if learner records are disabled for this site.
-    if not helpers.get_value_for_org(course_run_key.org, 'ENABLE_LEARNER_RECORDS', True):
+    if not is_learner_records_enabled_for_org(course_run_key.org):
         if verbose:
             log.info(
                 u"Skipping send grade: ENABLE_LEARNER_RECORDS False for org [{org}]".format(
