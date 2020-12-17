@@ -3,7 +3,7 @@ python-intercom==3.1.0
 raven==6.10.0
 django-anymail==5.0
 django-tiers==0.2.2
-dj-database-url==0.4.2
+dj-database-url==0.5.0
 psycopg2-binary==2.8.3
 django-hijack==2.1.10
 django-hijack-admin==2.1.10
