@@ -24,7 +24,7 @@ analytics-python==1.2.9   # via -r requirements/edx/testing.txt
 aniso8601==8.1.0          # via -r requirements/edx/testing.txt, edx-tincan-py35, tincan
 apipkg==1.5               # via -r requirements/edx/testing.txt, execnet
 appdirs==1.4.4            # via -r requirements/edx/testing.txt, fs, virtualenv
-astroid==2.3.3            # via -r requirements/edx/testing.txt, pylint, pylint-celery
+astroid==2.4.2            # via -r requirements/edx/testing.txt, pylint, pylint-celery
 attrs==20.3.0             # via -r requirements/edx/testing.txt, edx-ace, jsonschema, pytest
 babel==2.9.0              # via -r requirements/edx/testing.txt, enmerkar, enmerkar-underscore, sphinx
 beautifulsoup4==4.9.3     # via -r requirements/edx/testing.txt, pynliner
@@ -112,7 +112,7 @@ edx-drf-extensions==6.2.0  # via -r requirements/edx/testing.txt, edx-completion
 edx-enterprise==3.16.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 edx-event-routing-backends==2.0.0  # via -r requirements/edx/testing.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/testing.txt, ora2
-edx-lint==1.5.2           # via -r requirements/edx/testing.txt
+edx-lint==1.6             # via -r requirements/edx/testing.txt
 edx-milestones==0.3.0     # via -r requirements/edx/testing.txt
 edx-opaque-keys[django]==2.1.1  # via -r requirements/edx/testing.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, lti-consumer-xblock, xmodule
 edx-organizations==6.5.0  # via -r requirements/edx/testing.txt
@@ -125,7 +125,7 @@ edx-sga==0.13.1           # via -r requirements/edx/testing.txt
 edx-sphinx-theme==1.5.0   # via -r requirements/edx/development.in
 edx-submissions==3.2.3    # via -r requirements/edx/testing.txt, ora2
 edx-tincan-py35==0.0.9    # via -r requirements/edx/testing.txt, edx-enterprise
-edx-toggles==1.2.0        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, edx-completion, ora2
+edx-toggles==1.2.1        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, edx-completion, ora2
 edx-user-state-client==1.2.0  # via -r requirements/edx/testing.txt
 edx-when==1.3.0           # via -r requirements/edx/testing.txt, edx-proctoring
 edxval==1.4.4             # via -r requirements/edx/testing.txt
@@ -196,7 +196,7 @@ nodeenv==1.5.0            # via -r requirements/edx/testing.txt
 numpy==1.18.5             # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, chem, openedx-calc, scipy
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
 openedx-calc==1.0.9       # via -r requirements/edx/testing.txt
-ora2==2.13.6              # via -r requirements/edx/testing.txt
+ora2==2.13.7              # via -r requirements/edx/testing.txt
 packaging==20.8           # via -r requirements/edx/testing.txt, bleach, drf-yasg, pytest, sphinx, tox
 path.py==12.5.0           # via -r requirements/edx/testing.txt, edx-enterprise, edx-i18n-tools, ora2, staff-graded-xblock, xmodule
 path==13.1.0              # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, path.py
@@ -219,9 +219,9 @@ pygments==2.7.3           # via -r requirements/edx/testing.txt, diff-cover, sph
 pyjwkest==1.4.2           # via -r requirements/edx/testing.txt, edx-drf-extensions, lti-consumer-xblock
 pyjwt[crypto]==1.7.1      # via -r requirements/edx/testing.txt, drf-jwt, edx-rest-api-client, social-auth-core
 pylint-celery==0.3        # via -r requirements/edx/testing.txt, edx-lint
-pylint-django==2.0.11     # via -r requirements/edx/testing.txt, edx-lint
+pylint-django==2.3.0      # via -r requirements/edx/testing.txt, edx-lint
 pylint-plugin-utils==0.6  # via -r requirements/edx/testing.txt, pylint-celery, pylint-django
-pylint==2.4.4             # via -r requirements/edx/testing.txt, edx-lint, pylint-celery, pylint-django, pylint-plugin-utils
+pylint==2.6.0             # via -r requirements/edx/testing.txt, edx-lint, pylint-celery, pylint-django, pylint-plugin-utils
 pymongo==3.10.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, edx-opaque-keys, event-tracking, mongodbproxy, mongoengine
 pynliner==0.8.0           # via -r requirements/edx/testing.txt
 pyparsing==2.4.7          # via -r requirements/edx/testing.txt, chem, openedx-calc, packaging, pycontracts
@@ -293,7 +293,7 @@ tableauserverclient==0.14.1  # via -r requirements/edx/testing.txt, edx-enterpri
 testfixtures==6.17.0      # via -r requirements/edx/testing.txt, edx-enterprise
 text-unidecode==1.3       # via -r requirements/edx/testing.txt, faker, python-slugify
 tincan==1.0.0             # via -r requirements/edx/testing.txt, edx-event-routing-backends
-toml==0.10.2              # via -r requirements/edx/testing.txt, pytest, tox
+toml==0.10.2              # via -r requirements/edx/testing.txt, pylint, pytest, tox
 tox-battery==0.6.1        # via -r requirements/edx/testing.txt
 tox==3.20.1               # via -r requirements/edx/testing.txt, tox-battery
 tqdm==4.54.1              # via -r requirements/edx/testing.txt, nltk
