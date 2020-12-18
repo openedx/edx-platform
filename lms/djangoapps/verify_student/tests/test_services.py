@@ -324,3 +324,25 @@ class TestIDVerificationServiceUserStatus(TestCase):
             }
             status = IDVerificationService.user_status(self.user)
             self.assertDictEqual(status, expected_status)
+
+    def test_denied_after_approved_verification(self):
+        with freeze_time('2015-07-11') as frozen_datetime:
+            # create approved photo verification for the user
+            SoftwareSecurePhotoVerification.objects.create(
+                user=self.user,
+                status='approved',
+                expiration_date=now() + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+            )
+            expected_date = now()
+            frozen_datetime.move_to('2015-07-14')
+            SoftwareSecurePhotoVerification.objects.create(
+                user=self.user,
+                status='denied',
+                expiration_date=now() + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+            )
+            expected_status = {
+                'status': 'approved', 'error': '', 'should_display': True,
+                'verification_expiry': '', 'status_date': expected_date
+            }
+            status = IDVerificationService.user_status(self.user)
+            self.assertDictEqual(status, expected_status)
