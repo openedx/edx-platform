@@ -103,3 +103,36 @@ class DiscussionsConfigurationModelTest(TestCase):
         """
         is_enabled = DiscussionsConfiguration.is_enabled(self.course_key_with_values)
         assert not is_enabled
+
+    def test_get_nonexistent(self):
+        """
+        Assert we get an "empty" model back for nonexistent records
+        """
+        configuration = DiscussionsConfiguration.get(self.course_key_without_config)
+        assert configuration is not None
+        assert not configuration.enabled
+        assert not configuration.lti_configuration
+        assert not configuration.plugin_configuration
+        assert not configuration.provider_type
+
+    def test_get_defaults(self):
+        """
+        Assert we can lookup a record with default values
+        """
+        configuration = DiscussionsConfiguration.get(self.course_key_with_defaults)
+        assert configuration is not None
+        assert configuration.enabled
+        assert not configuration.lti_configuration
+        assert not configuration.plugin_configuration
+        assert not configuration.provider_type
+
+    def test_get_explicit(self):
+        """
+        Assert we can lookup a record with explicitly-set values
+        """
+        configuration = DiscussionsConfiguration.get(self.course_key_with_values)
+        assert configuration is not None
+        assert not configuration.enabled
+        assert not configuration.lti_configuration
+        assert configuration.plugin_configuration
+        assert configuration.provider_type == 'cs_comments_service'

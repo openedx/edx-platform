@@ -1,6 +1,8 @@
 """
 Provide django models to back the discussions app
 """
+from __future__ import annotations
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -75,8 +77,16 @@ class DiscussionsConfiguration(TimeStampedModel):
 
         Default to False, if no configuration exists
         """
+        configuration = cls.get(context_key)
+        return configuration.enabled
+
+    @classmethod
+    def get(cls, context_key) -> cls:
+        """
+        Lookup a model by context_key
+        """
         try:
             configuration = cls.objects.get(context_key=context_key)
         except cls.DoesNotExist:
-            return False
-        return configuration.enabled
+            configuration = cls(context_key=context_key, enabled=False)
+        return configuration
