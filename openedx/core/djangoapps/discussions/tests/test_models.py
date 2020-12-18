@@ -82,3 +82,24 @@ class DiscussionsConfigurationModelTest(TestCase):
         assert configuration.lti_configuration is None
         assert configuration.plugin_configuration['url'] == 'http://localhost'
         assert configuration.provider_type == 'cs_comments_service'
+
+    def test_is_enabled_nonexistent(self):
+        """
+        Assert that discussions are disabled, when no configuration exists
+        """
+        is_enabled = DiscussionsConfiguration.is_enabled(self.course_key_without_config)
+        assert not is_enabled
+
+    def test_is_enabled_default(self):
+        """
+        Assert that discussions are enabled by default, when a configuration exists
+        """
+        is_enabled = DiscussionsConfiguration.is_enabled(self.course_key_with_defaults)
+        assert is_enabled
+
+    def test_is_enabled_explicit(self):
+        """
+        Assert that discussions can be explitly disabled
+        """
+        is_enabled = DiscussionsConfiguration.is_enabled(self.course_key_with_values)
+        assert not is_enabled

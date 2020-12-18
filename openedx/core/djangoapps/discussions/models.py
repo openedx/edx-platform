@@ -67,3 +67,16 @@ class DiscussionsConfiguration(TimeStampedModel):
             provider=self.provider_type,
             enabled=self.enabled,
         )
+
+    @classmethod
+    def is_enabled(cls, context_key) -> bool:
+        """
+        Check if there is an active configuration for a given course key
+
+        Default to False, if no configuration exists
+        """
+        try:
+            configuration = cls.objects.get(context_key=context_key)
+        except cls.DoesNotExist:
+            return False
+        return configuration.enabled
