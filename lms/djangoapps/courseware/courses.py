@@ -41,6 +41,7 @@ from lms.djangoapps.courseware.date_summary import (
     VerificationDeadlineDate,
     VerifiedUpgradeDeadlineDate
 )
+from lms.djangoapps.courseware.exceptions import CourseRunNotFound
 from lms.djangoapps.courseware.masquerade import check_content_start_date_for_masquerade_user
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module
@@ -80,7 +81,7 @@ def get_course(course_id, depth=0):
     """
     Given a course id, return the corresponding course descriptor.
 
-    If the course does not exist, raises a ValueError.  This is appropriate
+    If the course does not exist, raises a CourseRunNotFound. This is appropriate
     for internal use.
 
     depth: The number of levels of children for the modulestore to cache.
@@ -88,7 +89,7 @@ def get_course(course_id, depth=0):
     """
     course = modulestore().get_course(course_id, depth=depth)
     if course is None:
-        raise ValueError(u"Course not found: {0}".format(course_id))
+        raise CourseRunNotFound(course_key=course_id)
     return course
 
 
