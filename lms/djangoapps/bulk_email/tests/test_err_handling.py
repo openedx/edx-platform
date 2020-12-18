@@ -21,6 +21,7 @@ from six.moves import range
 
 from lms.djangoapps.bulk_email.models import SEND_TO_MYSELF, BulkEmailFlag, CourseEmail
 from lms.djangoapps.bulk_email.tasks import perform_delegate_email_batches, send_course_email
+from lms.djangoapps.courseware.exceptions import CourseRunNotFound
 from lms.djangoapps.instructor_task.exceptions import DuplicateTaskException
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.subtasks import (
@@ -200,8 +201,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         email.save()
         entry = InstructorTask.create(course_id, "task_type", "task_key", "task_input", self.instructor)
         task_input = {"email_id": email.id}
-        # (?i) is a regex for ignore case
-        with self.assertRaisesRegex(ValueError, r"(?i)course not found"):
+        with self.assertRaises(CourseRunNotFound):
             perform_delegate_email_batches(entry.id, course_id, task_input, "action_name")
 
     def test_nonexistent_to_option(self):
