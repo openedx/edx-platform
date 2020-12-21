@@ -1,5 +1,9 @@
 How to write a celery task
 ==========================
+.. contents::
+
+Introduction
+------------
 
 With the celery 4.4 upgrade, routing of celery tasks was broken and all the tasks were routed to the default queues of lms and cms. So we investigated and found that celery changed the implementation style of a custom router. Previously celery needed a class based custom router and in 4.0 they introduced a new Task Router API, in which celery needs a function for routing tasks to desired queues. Hence, we updated the routing architecture of edx-platform.
 
