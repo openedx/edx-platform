@@ -21,7 +21,7 @@ class Command(BaseCommand):
             print('On:', site.domain)
             try:
                 site_config = SiteConfiguration.objects.get(site=site)
-                site_config
+                site_config.save()
                 print('OK')
             except Exception as e:
                 print('Error')
