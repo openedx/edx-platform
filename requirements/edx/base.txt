@@ -172,7 +172,7 @@ pbr==5.5.1                # via -r requirements/edx/paver.txt, stevedore
 piexif==1.1.3             # via -r requirements/edx/base.in
 pillow==7.2.0             # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, edx-enterprise, edx-organizations
 polib==1.1.0              # via edx-i18n-tools
-psutil==5.7.3             # via -r requirements/edx/paver.txt, edx-django-utils
+psutil==5.8.0             # via -r requirements/edx/paver.txt, edx-django-utils
 py2neo==3.1.2             # via -r requirements/edx/base.in
 pycontracts==1.8.12       # via -r requirements/edx/base.in, edx-user-state-client
 pycountry==20.7.3         # via -r requirements/edx/base.in
@@ -235,7 +235,7 @@ urllib3==1.26.2           # via -r requirements/edx/paver.txt, elasticsearch, ge
 user-util==0.3.1          # via -r requirements/edx/base.in
 vine==1.3.0               # via amqp, celery
 voluptuous==0.12.1        # via ora2
-watchdog==1.0.1           # via -r requirements/edx/paver.txt
+watchdog==1.0.2           # via -r requirements/edx/paver.txt
 web-fragments==0.3.2      # via -r requirements/edx/base.in, crowdsourcehinter-xblock, edx-sga, staff-graded-xblock, xblock, xblock-utils
 webencodings==0.5.1       # via bleach, html5lib
 webob==1.8.6              # via xblock, xmodule

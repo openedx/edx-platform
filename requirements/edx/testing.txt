@@ -45,7 +45,7 @@ code-annotations==0.10.2  # via -r requirements/edx/base.txt, -r requirements/ed
 contextlib2==0.6.0.post1  # via -r requirements/edx/base.txt
 coreapi==2.3.3            # via -r requirements/edx/base.txt, drf-yasg
 coreschema==0.0.4         # via -r requirements/edx/base.txt, coreapi, drf-yasg
-coverage==5.3             # via -r requirements/edx/coverage.txt, pytest-cov
+coverage==5.3.1           # via -r requirements/edx/coverage.txt, pytest-cov
 git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0  # via -r requirements/edx/testing.in
 crowdsourcehinter-xblock==0.6  # via -r requirements/edx/base.txt
 cryptography==3.2.1       # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, django-fernet-fields, edx-enterprise, pyjwt, social-auth-core
@@ -198,7 +198,7 @@ piexif==1.1.3             # via -r requirements/edx/base.txt
 pillow==7.2.0             # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edx-enterprise, edx-organizations
 pluggy==0.13.1            # via -r requirements/edx/coverage.txt, diff-cover, pytest, tox
 polib==1.1.0              # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, edx-i18n-tools
-psutil==5.7.3             # via -r requirements/edx/base.txt, edx-django-utils, pytest-xdist
+psutil==5.8.0             # via -r requirements/edx/base.txt, edx-django-utils, pytest-xdist
 py2neo==3.1.2             # via -r requirements/edx/base.txt
 py==1.10.0                # via pytest, pytest-forked, tox
 pycodestyle==2.6.0        # via -r requirements/edx/testing.in
@@ -286,7 +286,7 @@ user-util==0.3.1          # via -r requirements/edx/base.txt
 vine==1.3.0               # via -r requirements/edx/base.txt, amqp, celery
 virtualenv==20.2.2        # via tox
 voluptuous==0.12.1        # via -r requirements/edx/base.txt, ora2
-watchdog==1.0.1           # via -r requirements/edx/base.txt
+watchdog==1.0.2           # via -r requirements/edx/base.txt
 web-fragments==0.3.2      # via -r requirements/edx/base.txt, crowdsourcehinter-xblock, edx-sga, staff-graded-xblock, xblock, xblock-utils
 webencodings==0.5.1       # via -r requirements/edx/base.txt, bleach, html5lib
 webob==1.8.6              # via -r requirements/edx/base.txt, xblock, xmodule
