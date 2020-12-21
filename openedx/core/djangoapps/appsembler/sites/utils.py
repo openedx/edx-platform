@@ -1,3 +1,6 @@
+from django.db.models import Q, F
+from django.utils import timezone
+
 import beeline
 import json
 
@@ -52,6 +55,45 @@ def get_site_by_organization(org):
     """
     assert org.sites.count() == 1, 'Should have one and only one site.'
     return org.sites.all()[0]
+
+
+def get_active_organizations():
+    """
+    Get active organizations based on Tiers information.
+
+    Note: This mostly a hack that's needed for improving the performance of
+          batch operations by excluding dead sites.
+
+    TODO: This helper should live in a future Tahoe Sites package.
+    """
+    from tiers.models import Tier
+    # This queries the AMC Postgres database
+    active_tiers = Tier.objects.filter(
+        Q(tier_enforcement_exempt=True) |
+        Q(tier_expires_at__gte=timezone.now())
+    ).annotate(
+        organization_edx_uuid=F('organization__edx_uuid')
+    ).values_list('organization_edx_uuid', flat=True)
+
+    # Now back to the LMS MySQL database
+    return Organization.objects.filter(
+        edx_uuid__in=[str(edx_uuid) for edx_uuid in active_tiers],
+    )
+
+
+def get_active_sites():
+    """
+    Get active sites based on Tiers information.
+
+    Note: This mostly a hack that's needed for improving the performance of
+          batch operations by excluding dead sites.
+
+    TODO: This helper should live in a future Tahoe Sites package.
+    """
+    sites = []
+    for organization in get_active_organizations():
+        sites.extend(organization.sites.all())
+    return sites
 
 
 @beeline.traced(name="get_amc_oauth_client")
