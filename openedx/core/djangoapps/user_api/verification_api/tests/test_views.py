@@ -15,7 +15,7 @@ from lms.djangoapps.verify_student.tests.factories import SSOVerificationFactory
 from common.djangoapps.student.tests.factories import UserFactory
 
 FROZEN_TIME = '2015-01-01'
-VERIFY_STUDENT = {'DAYS_GOOD_FOR': 365}
+VERIFY_STUDENT = {'DAYS_GOOD_FOR': 365, 'EXPIRING_SOON_WINDOW': 20}
 
 
 class VerificationStatusViewTestsMixin:
@@ -95,9 +95,12 @@ class PhotoVerificationStatusViewTests(VerificationStatusViewTestsMixin, TestCas
     VIEW_NAME = 'verification_status'
 
     def get_expected_response(self, *args, **kwargs):
+        verification_status = self.photo_verification.status
+        if self.photo_verification.status == 'submitted':
+            verification_status = 'pending'
         return {
-            'status': self.photo_verification.status,
-            'expiration_datetime': '{}Z'.format(kwargs.get('expected_expires').isoformat()),
+            'status': verification_status,
+            'expiration_datetime': '',
             'is_verified': kwargs.get('verified')
         }
 
@@ -105,6 +108,14 @@ class PhotoVerificationStatusViewTests(VerificationStatusViewTestsMixin, TestCas
         """ The endpoint should return that the user is verified if the user's verification is accepted. """
         self.photo_verification.status = 'approved'
         self.photo_verification.save()
+        self.client.logout()
+        self.client.login(username=self.user.username, password=self.PASSWORD)
+        self.assert_verification_returned(verified=True)
+
+    def test_multiple_verifications(self):
+        self.photo_verification.status = 'approved'
+        self.photo_verification.save()
+        SoftwareSecurePhotoVerification.objects.create(user=self.user, status='denied')
         self.client.logout()
         self.client.login(username=self.user.username, password=self.PASSWORD)
         self.assert_verification_returned(verified=True)
