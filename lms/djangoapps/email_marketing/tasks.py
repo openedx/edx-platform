@@ -8,7 +8,7 @@ import time
 from datetime import datetime, timedelta
 
 import six
-from celery import task
+from celery import shared_task
 from django.conf import settings
 from django.core.cache import cache
 from edx_django_utils.monitoring import set_code_owner_attribute
@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 SAILTHRU_LIST_CACHE_KEY = "email.marketing.cache"
 
 
-@task(bind=True)
+@shared_task(bind=True)
 @set_code_owner_attribute
 def get_email_cookies_via_sailthru(self, user_email, post_parms):
     """
@@ -62,7 +62,7 @@ def get_email_cookies_via_sailthru(self, user_email, post_parms):
     return None
 
 
-@task(bind=True, default_retry_delay=3600, max_retries=24)
+@shared_task(bind=True, default_retry_delay=3600, max_retries=24)
 @set_code_owner_attribute
 def update_user(self, sailthru_vars, email, site=None, new_user=False, activation=False):
     """
@@ -145,7 +145,7 @@ def is_default_site(site):
     return not site or site.get('id') == settings.SITE_ID
 
 
-@task(bind=True, default_retry_delay=3600, max_retries=24)
+@shared_task(bind=True, default_retry_delay=3600, max_retries=24)
 @set_code_owner_attribute
 def update_user_email(self, new_email, old_email):
     """
@@ -306,7 +306,7 @@ def _retryable_sailthru_error(error):
     return code == 9 or code == 43
 
 
-@task(bind=True)
+@shared_task(bind=True)
 @set_code_owner_attribute
 def update_course_enrollment(self, email, course_key, mode, site=None):
     """Adds/updates Sailthru when a user adds to cart/purchases/upgrades a course

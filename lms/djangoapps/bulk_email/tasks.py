@@ -27,7 +27,7 @@ from boto.ses.exceptions import (
     SESLocalAddressCharacterError,
     SESMaxSendingRateExceededError
 )
-from celery import current_task, task
+from celery import current_task, shared_task
 from celery.exceptions import RetryTaskError
 from celery.states import FAILURE, RETRY, SUCCESS
 from django.conf import settings
@@ -237,7 +237,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     return progress
 
 
-@task(default_retry_delay=settings.BULK_EMAIL_DEFAULT_RETRY_DELAY, max_retries=settings.BULK_EMAIL_MAX_RETRIES)
+@shared_task(default_retry_delay=settings.BULK_EMAIL_DEFAULT_RETRY_DELAY, max_retries=settings.BULK_EMAIL_MAX_RETRIES)
 @set_code_owner_attribute
 def send_course_email(entry_id, email_id, to_list, global_email_context, subtask_status_dict):
     """
