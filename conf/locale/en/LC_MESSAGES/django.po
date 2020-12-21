@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-10-27 18:46+0000\n"
-"PO-Revision-Date: 2020-10-27 18:46:05.616826\n"
+"POT-Creation-Date: 2020-12-21 11:26+0000\n"
+"PO-Revision-Date: 2020-12-21 11:26:51.093972\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -106,6 +106,15 @@ msgstr ""
 msgid ""
 "There is a problem with this transcript file. Try to upload a different "
 "file."
+msgstr ""
+
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This is the status for a video that the servers are currently
+#. processing
+#: cms/djangoapps/contentstore/views/videos.py
+#: openedx/adg/lms/applications/models.py
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "In Progress"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/videos.py
@@ -238,6 +247,7 @@ msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 #: lms/templates/courseware/course_about.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Price"
 msgstr ""
 
@@ -345,6 +355,7 @@ msgstr ""
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's password.
 #: common/djangoapps/student/admin.py
+#: openedx/adg/lms/user_authn_override/login_form.py
 #: openedx/core/djangoapps/user_authn/views/login_form.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/provider_login.html lms/templates/signup_modal.html
@@ -4725,8 +4736,10 @@ msgstr ""
 msgid "Donate"
 msgstr ""
 
-#: lms/djangoapps/branding/api.py lms/templates/footer.html
+#: lms/djangoapps/branding/api.py
+#: openedx/adg/lms/branding_extension/helpers.py lms/templates/footer.html
 #: lms/templates/static_templates/about.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/footer.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
@@ -4738,7 +4751,9 @@ msgstr ""
 msgid "{platform_name} for Business"
 msgstr ""
 
-#: lms/djangoapps/branding/api.py lms/templates/static_templates/contact.html
+#: lms/djangoapps/branding/api.py
+#: openedx/adg/lms/branding_extension/helpers.py
+#: lms/templates/static_templates/contact.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
@@ -5741,6 +5756,7 @@ msgstr ""
 #: openedx/features/course_experience/views/course_home_messages.py
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/navbar-not-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
 msgid "Sign in"
 msgstr ""
@@ -6344,9 +6360,13 @@ msgstr ""
 msgid "User ID"
 msgstr ""
 
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's public username.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: openedx/adg/lms/registration_extension/forms.py
 #: openedx/core/djangoapps/schedules/admin.py
 #: lms/templates/api_admin/catalogs/search.html
 #: lms/templates/ccx/enrollment.html lms/templates/staff_problem_info.html
@@ -6354,6 +6374,8 @@ msgid "Username"
 msgstr ""
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This label appears above a field on the password reset
+#. form meant to hold the user's email address.
 #. Translators: This label appears above a field on the login form
 #. meant to hold the user's email address.
 #. Translators: This label appears above a field on the password reset
@@ -6362,11 +6384,14 @@ msgstr ""
 #. meant to hold the user's email address.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+#: openedx/adg/lms/user_authn_override/login_form.py
+#: openedx/adg/lms/user_authn_override/password_reset.py
 #: openedx/core/djangoapps/user_authn/views/login_form.py
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
 msgid "Email"
 msgstr ""
 
@@ -6390,6 +6415,7 @@ msgstr ""
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/signup_modal.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Gender"
 msgstr ""
@@ -6440,10 +6466,12 @@ msgstr ""
 #. which allows the user to input the city in which they live.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: openedx/adg/lms/registration_extension/forms.py
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "City"
 msgstr ""
@@ -6487,6 +6515,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/shoppingcart/reports.py
+#: openedx/adg/lms/applications/models.py
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
@@ -6979,6 +7008,7 @@ msgstr ""
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
@@ -7128,6 +7158,7 @@ msgstr ""
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the Title
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: openedx/adg/lms/applications/models.py
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py wiki/forms.py
 #: wiki/templates/wiki/dir.html
@@ -8183,7 +8214,11 @@ msgstr ""
 msgid "User Disabled Successfully"
 msgstr ""
 
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This example email address is used as a placeholder in
+#. a field on the password reset form meant to hold the user's email address.
 #: lms/djangoapps/support/views/refund.py
+#: openedx/adg/lms/user_authn_override/password_reset.py
 #: lms/templates/shoppingcart/billing_details.html
 msgid "Email Address"
 msgstr ""
@@ -8805,6 +8840,7 @@ msgstr ""
 
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/main.html
 msgid "Skip to main content"
 msgstr ""
 
@@ -9270,6 +9306,7 @@ msgstr ""
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/courses.html
 #: themes/edx.org/lms/templates/dashboard.html
 #: themes/stanford-style/lms/templates/index.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
@@ -9366,6 +9403,486 @@ msgstr ""
 
 #: lms/urls.py
 msgid "LMS Administration"
+msgstr ""
+
+#: openedx/adg/lms/applications/helpers.py
+#, python-brace-format
+msgid "File size must not exceed {size} KB"
+msgstr ""
+
+#: openedx/adg/lms/applications/helpers.py
+msgid "Completion date must comes after started date"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+msgid "User"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Prerequisite Courses Passed"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Written Application Submitted"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Application Submitted"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Submission Date"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Logo"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Accepted extensions: .png, .jpg, .svg"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+msgid "Business Line"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/settings.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "Organization"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "LinkedIn URL"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Resume"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+msgid "Accepted extensions: .pdf, .doc, .jpg, .png"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Cover Letter File"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Cover Letter"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Open"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Accepted"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Waitlist"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Application Status"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Reviewed By"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "User Application"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "User Applications"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Start Month"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Start Year"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Completed Month"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Completed Year"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "High School Diploma or GED"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Associate Degree"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Bachelor’s Degree"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Master’s Degree"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Doctoral Degree"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Name of School / University"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "Degree Received"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "Area of Study"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Name of Organization"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "Job Position / Title"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "Current Position"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "Job Responsibilities"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Admin"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Note"
+msgstr ""
+
+#: openedx/adg/lms/applications/serializers.py
+msgid "Area of study is required for all degrees above High School Diploma"
+msgstr ""
+
+#: openedx/adg/lms/branding_extension/helpers.py
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/static_templates/our_team.html
+msgid "Our Team"
+msgstr ""
+
+#: openedx/adg/lms/branding_extension/helpers.py
+msgid "Terms"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Yanbu"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Umm Lajj"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Ţurayf"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Turabah"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Tārūt"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Tabuk"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Ţubarjal"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Sulţānah"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Sayhāt"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Şāmitah"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Sakakah"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Şafwá"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Şabyā"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Raḩīmah"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Rābigh"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Qal‘at Bīshah"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Najrān"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Mecca"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Khamis Mushait"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Jizan"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Jeddah"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Ha‘il"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Duba"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Buraydah"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Abqaiq"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Badr Ḩunayn"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Az Zulfi"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Dhahran"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Aţ Ţaraf"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Ta’if"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "As Sulayyil"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Riyadh"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Ar Rass"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "‘Ar‘ar"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "An Nimāş"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Qurayyat"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Al Wajh"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Al ‘Ulá"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Al Qayşūmah"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Al Qaţīf"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Al Munayzilah"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Al Mubarraz"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Al Mithnab"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Medina"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Khobar"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Al Khafjī"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Al Jumūm"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Al Jubayl"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Al Hufūf"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Al Bukayrīyah"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Al Baţţālīyah"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Al Bāḩah"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "‘Afīf"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Ad Dilam"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Ad Dawādimī"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Dammam"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Abū ‘Arīsh"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Abha"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Ash Shafā"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Unaizah"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/forms.py
+msgid "I am a current Al-Dabbagh Group employee."
+msgstr ""
+
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's public username.
+#: openedx/adg/lms/registration_extension/forms.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid ""
+"The name that will identify you in your courses. It cannot be changed later."
+msgstr ""
+
+#. Translators: 'Terms of Service' is a legal document users must agree to
+#. in order to register a new account.
+#: openedx/adg/lms/registration_extension/forms.py
+#, python-brace-format
+msgid ""
+"\n"
+"        By continuing, you confirm that you are at least 16 years of age and agree to\n"
+"        Al-Dabbagh Group’s {terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}.\n"
+"        "
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/forms.py
+msgid "Terms of Use"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/forms.py
+msgid "Al-Dabbagh Group Company"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/models.py
+msgid "Birth Date"
+msgstr ""
+
+#: openedx/adg/lms/registration_extension/models.py
+msgid "Saudi National"
+msgstr ""
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Company
+#: openedx/adg/lms/registration_extension/models.py
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Company"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/apps.py
@@ -10431,13 +10948,6 @@ msgid "State/Province/Region"
 msgstr ""
 
 #. Translators: This label appears above a field on the registration form
-#. which allows the user to input the Company
-#: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_authn/views/registration_form.py
-msgid "Company"
-msgstr ""
-
-#. Translators: This label appears above a field on the registration form
 #. which allows the user to input the Job Title
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
@@ -10865,14 +11375,6 @@ msgstr ""
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Public Username"
-msgstr ""
-
-#. Translators: These instructions appear on the registration form,
-#. immediately
-#. below a field meant to hold the user's public username.
-#: openedx/core/djangoapps/user_authn/views/registration_form.py
-msgid ""
-"The name that will identify you in your courses. It cannot be changed later."
 msgstr ""
 
 #. Translators: This label appears above a dropdown menu on the registration
@@ -11868,12 +12370,6 @@ msgstr ""
 msgid "Uploading"
 msgstr ""
 
-#. Translators: This is the status for a video that the servers are currently
-#. processing
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "In Progress"
-msgstr ""
-
 #. Translators: This is the status for a video that the servers have
 #. successfully processed
 #: cms/djangoapps/contentstore/views/videos.py
@@ -12104,11 +12600,13 @@ msgstr ""
 #: lms/templates/edxnotes/edxnotes.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/courses.html
 msgid "Loading"
 msgstr ""
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Course Number"
 msgstr ""
 
@@ -12150,6 +12648,7 @@ msgstr ""
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/courses.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Courses"
 msgstr ""
@@ -12170,12 +12669,14 @@ msgid "Instructors"
 msgstr ""
 
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Requirements"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/module-error.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/course.html
 msgid "Details"
 msgstr ""
 
@@ -12231,6 +12732,7 @@ msgstr ""
 
 #: cms/templates/widgets/header.html lms/templates/header/user_dropdown.html
 #: lms/templates/user_dropdown.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/user_dropdown.html
 msgid "Account"
 msgstr ""
 
@@ -12311,6 +12813,7 @@ msgstr ""
 
 #: cms/templates/widgets/user_dropdown.html
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/user_dropdown.html
 msgid "Sign Out"
 msgstr ""
 
@@ -12474,6 +12977,7 @@ msgstr ""
 
 #: lms/templates/dashboard.html lms/templates/header/user_dropdown.html
 #: lms/templates/user_dropdown.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/user_dropdown.html
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Dashboard"
 msgstr ""
@@ -12494,6 +12998,7 @@ msgstr ""
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/navbar-not-authenticated.html
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Explore courses"
 msgstr ""
@@ -12659,6 +13164,7 @@ msgid "You should Register before trying to access the Unit"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html lms/templates/enroll_staff.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/course_about.html
 msgctxt "self"
 msgid "Enroll"
 msgstr ""
@@ -12759,6 +13265,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/courseware/courses.html lms/templates/index.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/courses.html
 #: themes/stanford-style/lms/templates/index.html
 msgid "Search for a course"
 msgstr ""
@@ -13402,6 +13909,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/user_dropdown.html
 msgid "Dashboard for:"
 msgstr ""
 
@@ -13412,6 +13920,7 @@ msgstr ""
 #: lms/templates/header/header.html lms/templates/header/user_dropdown.html
 #: lms/templates/user_dropdown.html
 #: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/header.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/user_dropdown.html
 msgid "More Options"
 msgstr ""
 
@@ -14453,6 +14962,8 @@ msgid "time"
 msgstr ""
 
 #: lms/templates/ccx/schedule.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
 msgid "(Optional)"
 msgstr ""
 
@@ -14826,72 +15337,88 @@ msgid "This content is graded"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "An error has occurred. Please ensure that you are logged in to enroll."
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "An error occurred. Please try again later."
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "You are enrolled in this course"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
 #: lms/templates/dashboard/_dashboard_course_resume.html
 #: lms/templates/shoppingcart/registration_code_receipt.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/course_about.html
 #: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
 msgid "View Course"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Course is full"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Enrollment in this course is by invitation only"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Enrollment is Closed"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Enroll Now"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "View About Page in studio"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Classes Start"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Classes End"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Estimated Effort"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Prerequisites"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid ""
 "You must successfully complete {link_start}{prc_display}{link_end} before "
 "you begin this course."
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Additional Resources"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/course_about.html
 msgctxt "self"
 msgid "enroll"
 msgstr ""
@@ -14955,10 +15482,12 @@ msgid "Show Earlier Course Updates"
 msgstr ""
 
 #: lms/templates/courseware/courses.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/courses.html
 msgid "List of Courses"
 msgstr ""
 
 #: lms/templates/courseware/courses.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/courseware/courses.html
 msgid "Refine Your Search"
 msgstr ""
 
@@ -16633,11 +17162,13 @@ msgstr ""
 #: lms/templates/header/navbar-logo-header.html
 #: lms/templates/navigation/bootstrap/navbar-logo-header.html
 #: lms/templates/navigation/navbar-logo-header.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/navbar-logo-header.html
 msgid "{platform_name} Home Page"
 msgstr ""
 
 #: lms/templates/header/header.html lms/templates/header/user_dropdown.html
 #: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/header.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/user_dropdown.html
 msgid "Options Menu"
 msgstr ""
 
@@ -16657,6 +17188,7 @@ msgstr ""
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/navbar-authenticated.html
 msgid "Sysadmin"
 msgstr ""
 
@@ -16664,11 +17196,13 @@ msgstr ""
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/shoppingcart/shopping_cart.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Shopping Cart"
 msgstr ""
 
 #: lms/templates/header/navbar-not-authenticated.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/navbar-not-authenticated.html
 msgid "Supplemental Links"
 msgstr ""
 
@@ -16684,14 +17218,17 @@ msgid "Schools"
 msgstr ""
 
 #: lms/templates/header/user_dropdown.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
 msgstr ""
 
 #: lms/templates/header/user_dropdown.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/user_dropdown.html
 msgid "Profile"
 msgstr ""
 
 #: lms/templates/header/user_dropdown.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/user_dropdown.html
 msgid "Order History"
 msgstr ""
 
@@ -16900,10 +17437,12 @@ msgid "Has the course started?"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
 msgid "Yes"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
 msgid "No"
 msgstr ""
 
@@ -17795,10 +18334,6 @@ msgid "Add Staff"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Admin"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Course team members with the Admin role help you manage your course. They "
 "can do all of the tasks that Staff can do, and can also add and remove the "
@@ -18460,10 +18995,12 @@ msgid "Reset Your {platform_name} Password"
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/registration/password_reset_confirm.html
 msgid "Invalid Password Reset Link"
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/registration/password_reset_confirm.html
 msgid ""
 "This password reset link is invalid. It may have been used already. To reset"
 " your password, go to the {start_link}sign-in{end_link} page and select "
@@ -18957,6 +19494,7 @@ msgid "Please Wait"
 msgstr ""
 
 #: lms/templates/student_account/login_and_register.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/login_and_register.html
 msgid "Sign in or Register"
 msgstr ""
 
@@ -19467,8 +20005,322 @@ msgstr ""
 msgid "An error occurred. Try loading the page again."
 msgstr ""
 
-#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/header.html
-msgid "you know what?"
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/user_dropdown.html
+msgid "My Application"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "Contact Information"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "My Experience"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "Select a business"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+msgid "Contact information"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+msgid "Are you a Saudi National?"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+msgid "Prefer not to answer"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+msgid "Phone Number"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+msgid "Date of birth"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+msgid "Day"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+msgid "1"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "Month"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "January"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "Year"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "1980"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+msgid "Linkedin URL"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+msgid "Add Resume "
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+msgid ""
+"Please upload your resume, if you have one. Your resume must include your "
+"education and work experience. This is optional; if you do not have a "
+"resume, you can manually fill out your education and work experience on the "
+"next page."
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+msgid "Add Resume"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "Next"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+msgid ""
+"Which business line and location would you like to apply to? Read about the "
+"businesses below:"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+msgid "PETROMIN FUEL"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+msgid ""
+"Petromin has created a state-of-the-art gas station network in the Kingdom "
+"in order to enrich the customer experience, supported by innovative "
+"automotive services. With the establishment of Petromin fuel stations, we "
+"have created a one-stop destination for vehicle owners, allowing them a "
+"range of services including fuel refilling, car servicing at Petromin "
+"Express in less than 30 minutes, tire balance checking at Revolve that "
+"boasts of fully computerized equipment, and fixing electronic or AC problems"
+" at ‘Auto Care."
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+msgid "PETROMIN EXPRESS"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+msgid ""
+"Petromin Express is the 5th largest oil lube network in the world with over "
+"than 700 outlets across KSA., It offers a range of service packages tailored"
+" to meet the needs of the customers. All of our outlets employ experienced "
+"technicians who are trained to serve all car brands with great care, while "
+"customers relax in the waiting area. Some of the service provided include: "
+"Oil change–synthetic & mineral packages, Filters-oil, air, cabin, "
+"Transmission fluid exchange, Power steering fluid exchange - to name a few."
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+msgid "PETROMIN AUTOCARE"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+msgid ""
+"Petromin Auto Care is specialized in service & repairs for all car brands. "
+"There are more than 16 workshops of Petromin Auto Care across the kingdom, "
+"having professional trained technicians perform services and repairs as per "
+"approved standards with reasonable prices and a high quality multi-brand "
+"service centers."
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+msgid "DUKAN"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+msgid ""
+"With a concept of providing “High quality products at a lower cost,” Dukan has been able to provide the Saudi middle-class customers with the opportunity to increase their savings through lower prices, without compromising quality.  "
+" "
+"Stores are situated in convenient locations, placed deep into residential neighborhoods in areas with high urbanization in order to provide easy accessibility to local communities addressing their daily needs."
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+msgid ""
+"Stores are situated in convenient locations, placed deep into residential "
+"neighborhoods in areas with high urbanization in order to provide easy "
+"accessibility to local communities addressing their daily needs."
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+msgid "PRIMO"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+msgid ""
+"A modernized three-in-one convenience store with more than 3,500 SKUs "
+"including local and imported products, as well as a partnerships with "
+"Starbucks and Munch bakery. Primo has 31 stores across the Kingdom, serving "
+"an average of 15,000 customers daily."
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+msgid "Cover letter "
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+msgid ""
+"You can attach or type a cover letter explaining why you are interested in "
+"this program and business. This is optional — your application will still be"
+" considered without a cover letter."
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+msgid "Add cover letter"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "Back"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+msgid "Submit & continue"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "Education"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "School / University"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "Date Started"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "Date Completed"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "Add education"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "Work Experience"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "Not applicable; I do not have any work experience."
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "Please share some details about your role and work."
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+msgid "Add experience"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
+msgid "Welcome to the Omni in a Box application!"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
+msgid ""
+"You can view the application requirements and track your progress on this "
+"page. After you submit a complete application, the Omni in a Box team will "
+"review your application."
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
+msgid ""
+"Please Note: In order to be eligible for the program, you must be a Saudi "
+"National between the ages of 21 - 60 and have a high school diploma or GED."
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
+msgid "Prerequisite Courses"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
+msgid "You must get a passing score in the following introductory courses: "
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
+msgid "Written Application"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
+msgid ""
+"This written application will help us get to know you! Before you start, "
+"make sure you have everything you need to answer questions about your "
+"background and interest in the program. A resume is recommended and a cover "
+"letter is optional."
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
+msgid "Start Application"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
+msgid "Submit Application"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/success.html
+#: wiki/templates/wiki/article/create_root.html
+msgid "Congratulations!"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/success.html
+msgid "You submitted the Omni in a Box application on {}."
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/adg/lms/applications/success.html
+msgid "You will receive a decision by email within two weeks of submission."
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/navbar-authenticated.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/navbar-not-authenticated.html
+msgid "ABOUT"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/navbar-authenticated.html
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/navbar-not-authenticated.html
+msgid "LEARN"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/header/navbar-not-authenticated.html
+msgid "apply"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/registration/password_reset_confirm.html
+msgid "Reset Password"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/static_templates/our_team.html
+msgid "Content to be finalized ..."
 msgstr ""
 
 #: themes/edx.org/cms/templates/widgets/sock.html
@@ -20122,11 +20974,6 @@ msgstr ""
 msgid ""
 "The public display name for the new course. (This name is often the same as "
 "the original course name.)"
-msgstr ""
-
-#: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/settings.html
-msgid "Organization"
 msgstr ""
 
 #. Translators: This is an example for the name of the organization sponsoring
@@ -23297,10 +24144,6 @@ msgid "History of"
 msgstr ""
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-msgid "User"
-msgstr ""
-
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "File"
 msgstr ""
@@ -23765,10 +24608,6 @@ msgstr ""
 
 #: wiki/templates/wiki/article/create_root.html
 msgid "Create root article"
-msgstr ""
-
-#: wiki/templates/wiki/article/create_root.html
-msgid "Congratulations!"
 msgstr ""
 
 #: wiki/templates/wiki/article/create_root.html
