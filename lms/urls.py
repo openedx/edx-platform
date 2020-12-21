@@ -1008,8 +1008,3 @@ urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.LMS))
 urlpatterns += [
     url(r'^api/course_home/', include('lms.djangoapps.course_home_api.urls')),
 ]
-
-# Applications app API urls
-urlpatterns += [
-    url(r'^api/applications/', include('openedx.adg.lms.applications.api_urls', namespace='applications_api')),
-]
