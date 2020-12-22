@@ -1,10 +1,14 @@
 """
 Helper methods for applications
 """
+import os
+
 from datetime import datetime
 
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator, ValidationError
+
+from django.core.validators import ValidationError
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
@@ -13,6 +17,7 @@ from openedx.adg.lms.student.helpers import send_mandrill_email
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 from .constants import LOGO_IMAGE_MAX_SIZE, MAXIMUM_YEAR_OPTION, MINIMUM_YEAR_OPTION
+from django.utils.html import format_html
 
 
 def validate_logo_size(file_):
@@ -140,3 +145,27 @@ def validate_file_size(data_file, max_size):
     if size and max_size < size:
         return _('File size must not exceed {size} MB').format(size=max_size / 1024 / 1024)
     return None
+
+
+def can_display_file(file):
+    filename = str(file)
+    if not filename.endswith('doc'):
+        return True
+
+
+def display_file(file):
+    _name, ext = os.path.splitext(str(file))
+    if ext in ['.jpg', '.png']:
+        html = '<img src="{path_to_image}"/>'.format(path_to_image=file.url)
+    else:  # for pdf
+        html = '<iframe src="{path_to_file}" style="width:600px; height:500px;"></iframe>'.format(path_to_file=file.url)
+
+    return format_html(html)
+
+
+def display_start_and_end_date(entry, is_current):
+    start_date = '{month} {year}'.format(month=entry.get_date_started_month_display(), year=entry.date_started_year)
+    completed_date = 'Present' if is_current else '{month} {year}'.format(
+        month=entry.get_date_completed_month_display(), year=entry.date_completed_year
+    )
+    return '{started} to {completed}'.format(started=start_date, completed=completed_date)

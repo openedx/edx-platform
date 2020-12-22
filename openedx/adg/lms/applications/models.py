@@ -13,6 +13,11 @@ from openedx.adg.lms.utils.date_utils import month_choices
 
 from .constants import ALLOWED_LOGO_EXTENSIONS
 from .helpers import max_year_value_validator, min_year_value_validator, validate_logo_size
+from .helpers import validate_logo_size
+from openedx.adg.common.course_meta.models import CourseMeta
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from lms.djangoapps.grades.api import CourseGradeFactory
+from collections import namedtuple
 
 
 class ApplicationHub(TimeStampedModel):
@@ -110,7 +115,7 @@ class UserApplication(TimeStampedModel):
     organization = models.CharField(verbose_name=_('Organization'), max_length=255, blank=True, )
     linkedin_url = models.URLField(verbose_name=_('LinkedIn URL'), max_length=255, blank=True, )
     resume = models.FileField(
-        max_length=500, blank=True, null=True, upload_to='files/resume/', verbose_name=_('Resume'),
+        max_length=500, blank=True, null=True, upload_to='files/resume/', verbose_name=_('Resume File'),
         validators=[FileExtensionValidator(['pdf', 'doc', 'jpg', 'png'])],
         help_text=_('Accepted extensions: .pdf, .doc, .jpg, .png'),
     )
@@ -119,7 +124,7 @@ class UserApplication(TimeStampedModel):
         validators=[FileExtensionValidator(['pdf', 'doc', 'jpg', 'png'])],
         help_text=_('Accepted extensions: .pdf, .doc, .jpg, .png'),
     )
-    cover_letter = models.TextField(blank=True, verbose_name=_('Cover Letter'), )
+    cover_letter_text = models.TextField(blank=True, verbose_name=_('Cover Letter'), )
 
     OPEN = 'open'
     ACCEPTED = 'accepted'
@@ -133,15 +138,42 @@ class UserApplication(TimeStampedModel):
     status = models.CharField(
         verbose_name=_('Application Status'), choices=STATUS_CHOICES, max_length=8, default=OPEN,
     )
-    reviewed_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE, verbose_name=_('Reviewed By'), )
+    reviewed_by = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.CASCADE, verbose_name=_('Reviewed By')
+    )
+    internal_admin_note = models.TextField(null=True, blank=True, verbose_name=_('Admin Note'))
 
     class Meta:
         app_label = 'applications'
-        verbose_name = _('User Application')
-        verbose_name_plural = _('User Applications')
+        verbose_name = _('Application')
+        ordering = ['created']
 
     def __str__(self):
-        return 'UserApplication {id}, for user {email}'.format(id=self.id, email=self.user.email)
+        return '{}'.format(self.user.get_full_name())
+
+    @property
+    def is_cover_letter_provided(self):
+        return self.cover_letter_text or self.cover_letter_file
+
+    @property
+    def prereq_course_scores(self):
+        prereq_course_overviews = list(
+            CourseOverview.objects.filter(
+                id__in=CourseMeta.objects.filter(is_prereq=True).values_list('course', flat=True)
+            )
+        )
+        scores_in_prereq_courses = []
+        for course_overview in prereq_course_overviews:
+            course_name = course_overview.display_name
+            course_grade = CourseGradeFactory().read(self.user, course_key=course_overview.id)
+            course_percentage = course_grade.percent*100
+
+            CourseScore = namedtuple('CourseScore', 'course_name course_percentage')
+
+            course_score = CourseScore(course_name, course_percentage)
+            scores_in_prereq_courses.append(course_score)
+
+        return scores_in_prereq_courses
 
     def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
         if self.pk:
@@ -198,7 +230,7 @@ class Education(UserStartAndEndDates):
         (DOCTORAL_DEGREE, _('Doctoral Degree')),
     ]
 
-    name_of_school = models.CharField(verbose_name=_('Name of School / University'), max_length=255, )
+    name_of_school = models.CharField(verbose_name=_('School / University'), max_length=255, )
     degree = models.CharField(verbose_name=_('Degree Received'), choices=DEGREE_TYPES, max_length=2, )
     area_of_study = models.CharField(verbose_name=_('Area of Study'), max_length=255, blank=True, )
     is_in_progress = models.BooleanField(verbose_name=_('In Progress'), default=False, )
@@ -207,14 +239,14 @@ class Education(UserStartAndEndDates):
         app_label = 'applications'
 
     def __str__(self):
-        return 'Education {id}, for {degree}'.format(id=self.id, degree=self.degree)
+        return ''
 
 
 class WorkExperience(UserStartAndEndDates):
     """
     Model for user work experience for application submission.
     """
-    name_of_organization = models.CharField(verbose_name=_('Name of Organization'), max_length=255, )
+    name_of_organization = models.CharField(verbose_name=_('Organization'), max_length=255, )
     job_position_title = models.CharField(verbose_name=_('Job Position / Title'), max_length=255, )
     is_current_position = models.BooleanField(verbose_name=_('Current Position'), default=False, )
     job_responsibilities = models.TextField(verbose_name=_('Job Responsibilities'), )
@@ -223,21 +255,4 @@ class WorkExperience(UserStartAndEndDates):
         app_label = 'applications'
 
     def __str__(self):
-        return 'WorkExperience {id}, for {organization}'.format(id=self.id, organization=self.name_of_organization)
-
-
-class AdminNote(TimeStampedModel):
-    """
-    Model to save the notes of admin on the user application.
-    """
-    user_application = models.ForeignKey(
-        UserApplication, on_delete=models.CASCADE, verbose_name=_('User Application'),
-    )
-    admin = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('Admin'), )
-    note = models.TextField(verbose_name=_('Note'))
-
-    class Meta:
-        app_label = 'applications'
-
-    def __str__(self):
-        return 'Application {id}, Admin note {note} '.format(id=self.user_application.id, note=self.note)
+        return ''

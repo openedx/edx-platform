@@ -17,7 +17,7 @@ class ExtendedUserProfile(models.Model):
         User, db_index=True, related_name='extended_profile', on_delete=models.CASCADE)
 
     birth_date = models.DateField(verbose_name=_('Birth Date'), null=True, )
-    saudi_national = models.BooleanField(verbose_name=_('Saudi National'), null=True, )
+    is_saudi_national = models.BooleanField(verbose_name=_('Are you a Saudi National?'), null=True, )
 
     company = models.ForeignKey(BusinessLine, verbose_name=_('Company'),
                                 on_delete=models.CASCADE, null=True, blank=True)
