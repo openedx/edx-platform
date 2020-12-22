@@ -154,6 +154,12 @@ def can_display_file(file):
 
 
 def display_file(file):
+    """
+    Return html to display image or embedded view for pdf
+
+    Arguments:
+        file (File): file that needs to be rendered
+    """
     _name, ext = os.path.splitext(str(file))
     if ext in ['.jpg', '.png']:
         html = '<img src="{path_to_image}"/>'.format(path_to_image=file.url)
@@ -164,6 +170,16 @@ def display_file(file):
 
 
 def display_start_and_end_date(entry, is_current):
+    """
+    Extract, format and return start and end date of Education/WorkExperience
+
+    Arguments:
+        entry (UserStartAndEndDates): Education or WorkExperience object
+        is_current (bool): True if Education is in progress or WorkExperience is current position
+
+    Returns:
+        str: start and end date
+    """
     start_date = '{month} {year}'.format(month=entry.get_date_started_month_display(), year=entry.date_started_year)
     completed_date = 'Present' if is_current else '{month} {year}'.format(
         month=entry.get_date_completed_month_display(), year=entry.date_completed_year

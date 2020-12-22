@@ -2,17 +2,17 @@
 Registering models for applications app.
 """
 from django.contrib import admin
+from django.contrib.admin import AdminSite
 from django.contrib.auth.models import User
+from django.utils.html import format_html
 
-from .models import ApplicationHub, BusinessLine, Education, UserApplication, WorkExperience
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
 from student.models import UserProfile
-from .forms import UserApplicationAdminForm
 
-from django.contrib.admin import AdminSite
+from .constants import COVER_LETTER_ONLY, RESUME_AND_COVER_LETTER, RESUME_ONLY
+from .forms import UserApplicationAdminForm
 from .helpers import can_display_file, display_file, display_start_and_end_date
-from .constants import RESUME_AND_COVER_LETTER, RESUME_ONLY, COVER_LETTER_ONLY
-from django.utils.html import format_html
+from .models import ApplicationHub, BusinessLine, Education, UserApplication, WorkExperience
 
 
 @admin.register(ApplicationHub)
@@ -93,6 +93,9 @@ adg_admin_site = ADGAdmin(name='adg_admin')
 
 
 class EducationInline(admin.StackedInline):
+    """
+    InlineModelAdmin for Education model
+    """
     model = Education
 
     fields = ('name_of_school', 'degree', 'area_of_study', 'dates')
@@ -112,6 +115,9 @@ class EducationInline(admin.StackedInline):
 
 
 class WorkExperienceInline(admin.StackedInline):
+    """
+    InlineModelAdmin for WorkExperience model
+    """
     model = WorkExperience
 
     fields = ('name_of_organization', 'job_position_title', 'dates', 'responsibilities')
@@ -211,6 +217,9 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
     is_saudi_national.short_description = 'Are you a Saudi National?'
 
     def gender(self, obj):
+        """
+        Return gender of applicant
+        """
         user_profile = UserProfile.objects.get(user=obj.user)
         if user_profile.gender == 'm':
             return 'Man'
@@ -237,6 +246,9 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
     cover_letter_display.short_description = 'Cover Letter'
 
     def prerequisites(self, obj):
+        """
+        Return the html for course names of all prereq courses and applicant's respective scores in those courses
+        """
         html_for_score = '<p>{course_name}: <b>{course_percentage}%</b></p>'
         final_html = ''
         prereq_scores = obj.prereq_course_scores
@@ -327,12 +339,12 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         if obj.resume:
             return
         for inline in self.get_inline_instances(request, obj):
-            if type(inline) == WorkExperienceInline\
+            if isinstance(inline, WorkExperienceInline)\
                     and not WorkExperience.objects.filter(user_application=obj).exists():
                 continue
             yield inline.get_formset(request, obj), inline
 
-    def get_form(self, request, obj=None, **kwargs):
+    def get_form(self, request, obj=None, change=False, **kwargs):
         admin_form = super(UserApplicationADGAdmin, self).get_form(request, obj, **kwargs)
 
         class AdminFormWithRequest(admin_form):
@@ -345,7 +357,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
-    def has_add_permission(self, request, obj=None):
+    def has_add_permission(self, request):
         return False
 
 

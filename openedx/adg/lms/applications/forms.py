@@ -111,6 +111,9 @@ class UserProfileForm(forms.ModelForm):
 
 
 class UserApplicationAdminForm(forms.ModelForm):
+    """
+    Form for UserApplication ADG admin view
+    """
     class Meta:
         model = UserApplication
         fields = '__all__'

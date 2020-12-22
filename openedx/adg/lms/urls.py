@@ -1,5 +1,5 @@
 """
-Urls for adg apps
+URLs for ADG LMS
 """
 from django.conf.urls import include, url
 from django.urls import path

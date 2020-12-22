@@ -1,6 +1,7 @@
 """
 All models for applications app
 """
+from collections import namedtuple
 from datetime import date
 
 from django.contrib.auth.models import User
@@ -10,14 +11,12 @@ from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
 
 from openedx.adg.lms.utils.date_utils import month_choices
+from lms.djangoapps.grades.api import CourseGradeFactory
+from openedx.adg.common.course_meta.models import CourseMeta
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 from .constants import ALLOWED_LOGO_EXTENSIONS
 from .helpers import max_year_value_validator, min_year_value_validator, validate_logo_size
-from .helpers import validate_logo_size
-from openedx.adg.common.course_meta.models import CourseMeta
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from lms.djangoapps.grades.api import CourseGradeFactory
-from collections import namedtuple
 
 
 class ApplicationHub(TimeStampedModel):
@@ -157,6 +156,12 @@ class UserApplication(TimeStampedModel):
 
     @property
     def prereq_course_scores(self):
+        """
+        Fetch and return applicant scores in the pre-requisite courses of the franchise program
+
+        Returns:
+            list: List of prereq course name and score pairs
+        """
         prereq_course_overviews = list(
             CourseOverview.objects.filter(
                 id__in=CourseMeta.objects.filter(is_prereq=True).values_list('course', flat=True)
