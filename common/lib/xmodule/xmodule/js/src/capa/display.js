@@ -1324,7 +1324,7 @@
                     } else {
                         that.hintButton.attr({disabled: 'disabled'});
                     }
-                    that.el.find('.notification-hint').show();
+                    that.el.find('.notification-hint').removeClass('is-hidden')
                     that.focus_on_hint_notification(nextIndex);
                 } else {
                     that.gentle_alert(response.msg);
