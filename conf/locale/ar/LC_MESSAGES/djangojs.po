@@ -47,7 +47,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-12-21 11:26+0000\n"
+"POT-Creation-Date: 2020-12-22 10:22+0000\n"
 "PO-Revision-Date: 2020-10-27 19:11+0000\n"
 "Last-Translator: Rana Waqar <rana.waqar@arbisoft.com>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -10315,7 +10315,7 @@ msgstr ""
 
 #: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/register.underscore
 msgid "Already have an account?"
-msgstr "هل لديك حساب {platformName} مسبقاً؟"
+msgstr "هل لديك حساب مسبقاً؟"
 
 #: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/register.underscore
 msgid "Start learning with the Omnipreneurship Academy!"
