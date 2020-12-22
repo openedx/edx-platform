@@ -137,11 +137,13 @@ def _get_pylint_violations(systems=ALL_SYSTEMS.split(','), errors_only=False, cl
         system_report = report_dir / 'pylint.report'
         if clean or not system_report.exists():
             sh(
+                "export DJANGO_SETTINGS_MODULE={env}.envs.test; "
                 "pylint {flags} --output-format=parseable {apps} "
                 "> {report_dir}/pylint.report".format(
                     flags=" ".join(flags),
                     apps=apps_list,
-                    report_dir=report_dir
+                    report_dir=report_dir,
+                    env=('cms' if system == 'cms' else 'lms')
                 ),
                 ignore_error=True,
             )
