@@ -1,10 +1,14 @@
 """
 XBlock runtime services for LibraryContentModule
 """
+from crum import get_current_request
+
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator
 from search.search_engine_base import SearchEngine
 
+from openedx.features.edly.utils import get_edx_org_from_cookie
 from xmodule.capa_module import CapaDescriptor
 from xmodule.library_content_module import ANY_CAPA_TYPE_VALUE
 from xmodule.modulestore import ModuleStoreEnum
@@ -175,7 +179,9 @@ class LibraryToolsService(object):
         List all known libraries.
         Returns tuples of (LibraryLocator, display_name)
         """
+        edly_user_info_cookie = get_current_request().COOKIES.get(settings.EDLY_USER_INFO_COOKIE_NAME, '')
+        edx_organization = get_edx_org_from_cookie(edly_user_info_cookie)
         return [
             (lib.location.library_key.replace(version_guid=None, branch=None), lib.display_name)
-            for lib in self.store.get_library_summaries()
+            for lib in self.store.get_library_summaries(org=edx_organization)
         ]
