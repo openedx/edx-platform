@@ -1,0 +1,9 @@
+{% load i18n %}
+{% autoescape off %}
+
+{% blocktrans %}Your subscription package has expired.{% endblocktrans %}
+{% if subscription_renew_url %}
+    {% blocktrans %}To renew this package, visit {{subscription_renew_url}}.{% endblocktrans %}
+{% endif %}
+{% blocktrans %}To subscribe to a new subscription package, you can visit {{subscriptions_marketing_url}}.{% endblocktrans %}
+{% endautoescape %}

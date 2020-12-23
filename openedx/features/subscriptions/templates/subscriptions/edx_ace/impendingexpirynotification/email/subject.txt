@@ -1,0 +1,5 @@
+{% load i18n %}
+{% autoescape off %}
+
+{% blocktrans trimmed %}Your subscription is about to end!{% endblocktrans %}
+{% endautoescape %}
