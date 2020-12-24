@@ -18,7 +18,7 @@
 -e openedx/core/lib/xblock_builtin/xblock_discussion  # via -r requirements/edx/local.in
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive  # via -r requirements/edx/github.in
 -e common/lib/xmodule  # via -r requirements/edx/local.in
-amqp==2.6.1               # via kombu
+amqp==5.0.2               # via kombu
 analytics-python==1.2.9   # via -r requirements/edx/base.in
 aniso8601==8.1.0          # via edx-tincan-py35, tincan
 appdirs==1.4.4            # via fs
@@ -31,12 +31,15 @@ boto3==1.4.8              # via -r requirements/edx/base.in, django-ses, fs-s3fs
 boto==2.39.0              # via -r requirements/edx/base.in, edxval
 botocore==1.8.17          # via -r requirements/edx/base.in, boto3, s3transfer
 bridgekeeper==0.9         # via -r requirements/edx/base.in
-celery==4.4.7             # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, django-celery-results, django-user-tasks, edx-celeryutils, edx-enterprise, event-tracking
+celery==5.0.5             # via -r requirements/edx/base.in, django-celery-results, django-user-tasks, edx-celeryutils, edx-enterprise, event-tracking
 certifi==2020.12.5        # via -r requirements/edx/paver.txt, elasticsearch, requests
 cffi==1.14.4              # via -r requirements/edx/../edx-sandbox/shared.txt, cryptography
 chardet==4.0.0            # via -r requirements/edx/paver.txt, pysrt, requests
 chem==1.2.0               # via -r requirements/edx/base.in
-click==7.1.2              # via -r requirements/edx/../edx-sandbox/shared.txt, code-annotations, nltk, user-util
+click-didyoumean==0.0.3   # via celery
+click-plugins==1.1.1      # via celery
+click-repl==0.1.6         # via celery
+click==7.1.2              # via -r requirements/edx/../edx-sandbox/shared.txt, celery, click-didyoumean, click-plugins, click-repl, code-annotations, nltk, user-util
 code-annotations==0.10.2  # via edx-enterprise, edx-toggles
 contextlib2==0.6.0.post1  # via -r requirements/edx/base.in
 coreapi==2.3.3            # via drf-yasg
@@ -139,7 +142,7 @@ jmespath==0.10.0          # via boto3, botocore
 joblib==0.14.1            # via -c requirements/edx/../constraints.txt, -r requirements/edx/../edx-sandbox/shared.txt, nltk
 jsondiff==1.2.0           # via edx-enterprise
 jsonfield2==3.0.3         # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, edx-celeryutils, edx-enterprise, edx-event-routing-backends, edx-proctoring, edx-submissions, ora2
-kombu==4.6.11             # via celery
+kombu==5.0.2              # via celery
 laboratory==1.0.2         # via -r requirements/edx/base.in
 lazy==1.4                 # via -r requirements/edx/paver.txt, acid-xblock, lti-consumer-xblock, ora2
 libsass==0.10.0           # via -r requirements/edx/paver.txt, ora2
@@ -172,6 +175,7 @@ pbr==5.5.1                # via -r requirements/edx/paver.txt, stevedore
 piexif==1.1.3             # via -r requirements/edx/base.in
 pillow==7.2.0             # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, edx-enterprise, edx-organizations
 polib==1.1.0              # via edx-i18n-tools
+prompt-toolkit==3.0.8     # via click-repl
 psutil==5.8.0             # via -r requirements/edx/paver.txt, edx-django-utils
 py2neo==3.1.2             # via -r requirements/edx/base.in
 pycontracts==1.8.12       # via -r requirements/edx/base.in, edx-user-state-client
@@ -211,7 +215,7 @@ scipy==1.4.1              # via -c requirements/edx/../constraints.txt, chem, op
 semantic-version==2.8.5   # via edx-drf-extensions
 shapely==1.7.1            # via -r requirements/edx/base.in
 simplejson==3.17.2        # via -r requirements/edx/base.in, sailthru-client, super-csv, xblock-utils
-six==1.15.0               # via -r requirements/edx/../edx-sandbox/shared.txt, -r requirements/edx/base.in, -r requirements/edx/paver.txt, analytics-python, bleach, chem, codejail, crowdsourcehinter-xblock, cryptography, django-countries, django-simple-history, django-wiki, drf-yasg, edx-ace, edx-bulk-grades, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-milestones, edx-opaque-keys, edx-rbac, event-tracking, fs, fs-s3fs, help-tokens, html5lib, isodate, libsass, mock, openedx-calc, paver, pycontracts, pyjwkest, python-dateutil, python-memcached, python-swiftclient, social-auth-app-django, social-auth-core, stevedore, xblock
+six==1.15.0               # via -r requirements/edx/../edx-sandbox/shared.txt, -r requirements/edx/base.in, -r requirements/edx/paver.txt, analytics-python, bleach, chem, click-repl, codejail, crowdsourcehinter-xblock, cryptography, django-countries, django-simple-history, django-wiki, drf-yasg, edx-ace, edx-bulk-grades, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-milestones, edx-opaque-keys, edx-rbac, event-tracking, fs, fs-s3fs, help-tokens, html5lib, isodate, libsass, mock, openedx-calc, paver, pycontracts, pyjwkest, python-dateutil, python-memcached, python-swiftclient, social-auth-app-django, social-auth-core, stevedore, xblock
 slumber==0.7.1            # via edx-bulk-grades, edx-enterprise, edx-rest-api-client
 social-auth-app-django==4.0.0  # via -r requirements/edx/base.in
 social-auth-core==3.3.3   # via -r requirements/edx/base.in, social-auth-app-django
@@ -233,9 +237,10 @@ unicodecsv==0.14.1        # via -r requirements/edx/base.in, edx-enterprise
 uritemplate==3.0.1        # via coreapi, drf-yasg
 urllib3==1.26.2           # via -r requirements/edx/paver.txt, elasticsearch, geoip2, requests
 user-util==0.3.1          # via -r requirements/edx/base.in
-vine==1.3.0               # via amqp, celery
+vine==5.0.0               # via amqp, celery
 voluptuous==0.12.1        # via ora2
 watchdog==1.0.2           # via -r requirements/edx/paver.txt
+wcwidth==0.2.5            # via prompt-toolkit
 web-fragments==0.3.2      # via -r requirements/edx/base.in, crowdsourcehinter-xblock, edx-sga, staff-graded-xblock, xblock, xblock-utils
 webencodings==0.5.1       # via bleach, html5lib
 webob==1.8.6              # via xblock, xmodule
