@@ -212,7 +212,7 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
                 'thread_title': 'thread-title',
                 'thread_username': self.thread_author.username,
                 'thread_commentable_id': self.thread['commentable_id'],
-                'post_link': self.mock_permalink.return_value,
+                'post_link': 'https://{}{}'.format(site.domain, self.mock_permalink.return_value),
                 'site': site,
                 'site_id': site.id
             })
