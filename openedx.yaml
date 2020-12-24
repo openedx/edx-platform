@@ -5,10 +5,10 @@ nick: edx
 openedx-release: {ref: release}
 
 oeps:
-    oep-2: true
-    oep-18: true
-    oep-7: true
+  oep-2: true
+  oep-18: true
+  oep-7: true
 
 tags:
-    - core
-    - webservice
+  - core
+  - webservice
