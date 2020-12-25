@@ -33,7 +33,10 @@ from common.djangoapps.edxmako.shortcuts import render_to_string
 from xmodule.seq_module import SequenceModule
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.vertical_block import VerticalBlock
-from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW, XModule, XModuleDescriptor, shim_xmodule_js
+from xmodule.x_module import (
+    PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW,
+    XModule, XModuleDescriptor, shim_xmodule_js,
+)
 
 log = logging.getLogger(__name__)
 
@@ -110,6 +113,9 @@ def wrap_xblock(
         )
     ]
 
+    if view == STUDENT_VIEW and getattr(block, 'HIDDEN', False):
+        css_classes.append('is-hidden')
+
     if isinstance(block, (XModule, XModuleDescriptor)) or getattr(block, 'uses_xmodule_styles_setup', False):
         if view in PREVIEW_VIEWS:
             # The block is acting as an XModule
@@ -117,9 +123,6 @@ def wrap_xblock(
         elif view == STUDIO_VIEW:
             # The block is acting as an XModuleDescriptor
             css_classes.append('xmodule_edit')
-
-        if getattr(block, 'HIDDEN', False):
-            css_classes.append('is-hidden')
 
         css_classes.append('xmodule_' + markupsafe.escape(class_name))
 
