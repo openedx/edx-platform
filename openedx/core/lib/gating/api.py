@@ -294,7 +294,7 @@ def get_gated_content(course, user):
     Returns the unfulfilled gated content usage keys in the given course.
 
     Arguments:
-        course (CourseDescriptor): The course
+        course (CourseBlock): The course
         user (User): The user
 
     Returns:

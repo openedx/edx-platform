@@ -20,7 +20,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.enrollments.api import is_enrollment_valid_for_proctoring
 from common.djangoapps.student.models import CourseAccessRole
 from common.djangoapps.student.roles import CourseRole, OrgRole
-from xmodule.course_module import CourseDescriptor
+from xmodule.course_module import CourseBlock
 from xmodule.error_module import ErrorBlock
 from xmodule.x_module import XModule
 
@@ -105,7 +105,7 @@ class HasStaffAccessToContent(Rule):
         """
         # delegate the work to type-specific functions.
         # (start with more specific types, then get more general)
-        if isinstance(instance, (CourseDescriptor, CourseOverview)):
+        if isinstance(instance, (CourseBlock, CourseOverview)):
             course_key = instance.id
         elif isinstance(instance, (ErrorBlock, XModule, XBlock)):
             course_key = instance.scope_ids.usage_id.course_key
@@ -163,7 +163,7 @@ class HasRolesRule(Rule):  # lint-amnesty, pylint: disable=abstract-method, miss
             return False
         if isinstance(instance, CourseKey):
             course_key = instance
-        elif isinstance(instance, (CourseDescriptor, CourseOverview)):
+        elif isinstance(instance, (CourseBlock, CourseOverview)):
             course_key = instance.id
         elif isinstance(instance, (ErrorBlock, XModule, XBlock)):
             course_key = instance.scope_ids.usage_id.course_key

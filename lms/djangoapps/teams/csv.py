@@ -26,7 +26,7 @@ def load_team_membership_csv(course, response):
     Load a CSV detailing course membership.
 
     Arguments:
-        course (CourseDescriptor): Course module for which CSV
+        course (CourseBlock): Course module for which CSV
             download has been requested.
         response (HttpResponse): Django response object to which
             the CSV content will be written.

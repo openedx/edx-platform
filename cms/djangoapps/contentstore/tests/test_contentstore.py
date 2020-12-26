@@ -45,7 +45,7 @@ from xmodule.capa_module import ProblemBlock
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.utils import empty_asset_trashcan, restore_asset_from_trashcan
-from xmodule.course_module import CourseDescriptor, Textbook
+from xmodule.course_module import CourseBlock, Textbook
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -54,7 +54,7 @@ from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
-from xmodule.seq_module import SequenceDescriptor
+from xmodule.seq_module import SequenceBlock
 from xmodule.video_module import VideoBlock
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
@@ -1480,13 +1480,13 @@ class ContentStoreTest(ContentStoreTestCase):
     def test_course_factory(self):
         """Test that the course factory works correctly."""
         course = CourseFactory.create()
-        self.assertIsInstance(course, CourseDescriptor)
+        self.assertIsInstance(course, CourseBlock)
 
     def test_item_factory(self):
         """Test that the item factory works correctly."""
         course = CourseFactory.create()
         item = ItemFactory.create(parent_location=course.location)
-        self.assertIsInstance(item, SequenceDescriptor)
+        self.assertIsInstance(item, SequenceBlock)
 
     def test_course_overview_view_with_course(self):
         """Test viewing the course overview page with an existing course"""

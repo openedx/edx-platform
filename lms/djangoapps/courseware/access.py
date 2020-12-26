@@ -64,7 +64,7 @@ from common.djangoapps.util.milestones_helpers import (
     get_pre_requisite_courses_not_completed,
     is_prerequisite_courses_enabled
 )
-from xmodule.course_module import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CourseDescriptor
+from xmodule.course_module import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CourseBlock
 from xmodule.error_module import ErrorBlock
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
 from xmodule.x_module import XModule
@@ -126,7 +126,7 @@ def has_access(user, action, obj, course_key=None):
     type-specific functions below for the known actions for that type.
 
     course_key: A course_key specifying which course run this access is for.
-        Required when accessing anything other than a CourseDescriptor, 'global',
+        Required when accessing anything other than a CourseBlock, 'global',
         or a location with category 'course'
 
     Returns an AccessResponse object.  It is up to the caller to actually
@@ -143,7 +143,7 @@ def has_access(user, action, obj, course_key=None):
 
     # delegate the work to type-specific functions.
     # (start with more specific types, then get more general)
-    if isinstance(obj, CourseDescriptor):
+    if isinstance(obj, CourseBlock):
         return _has_access_course(user, action, obj)
 
     if isinstance(obj, CourseOverview):
@@ -194,7 +194,7 @@ def _can_view_courseware_with_prerequisites(user, course):
     Arguments:
         user (User): the user whose course access we are checking.
         course (AType): the course for which we are checking access.
-            where AType is CourseDescriptor, CourseOverview, or any other
+            where AType is CourseBlock, CourseOverview, or any other
             class that represents a course and has the attributes .location
             and .id.
     """
@@ -224,7 +224,7 @@ def _can_load_course_on_mobile(user, course):
 
     Arguments:
         user (User): the user whose course access we are checking.
-        course (CourseDescriptor|CourseOverview): the course for which we are
+        course (CourseBlock|CourseOverview): the course for which we are
             checking access.
 
     Returns:
@@ -245,7 +245,7 @@ def _can_enroll_courselike(user, courselike):
 
     Arguments:
         user (User): The user attempting to enroll.
-        courselike (CourseDescriptor or CourseOverview): The object representing the
+        courselike (CourseBlock or CourseOverview): The object representing the
             course in which the user is trying to enroll.
 
     Returns:
@@ -295,7 +295,7 @@ def _has_access_course(user, action, courselike):
     Arguments:
         user (User): the user whose course access we are checking.
         action (string): The action that is being checked.
-        courselike (CourseDescriptor or CourseOverview): The object
+        courselike (CourseBlock or CourseOverview): The object
             representing the course that the user wants to access.
 
     Valid actions:
@@ -903,7 +903,7 @@ def is_mobile_available_for_user(user, descriptor):
         mobile_available flag on the course
         Beta User and staff access overrides the mobile_available flag
     Arguments:
-        descriptor (CourseDescriptor|CourseOverview): course or overview of course in question
+        descriptor (CourseBlock|CourseOverview): course or overview of course in question
     """
     return (
         auth.user_has_role(user, CourseBetaTesterRole(descriptor.id))
