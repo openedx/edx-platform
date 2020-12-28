@@ -26,6 +26,8 @@ def send_task_complete_email(self, task_name, task_state_text, dest_addr, detail
         'DISABLE_CMS_TASK_EMAILS',
         settings.FEATURES.get('DISABLE_CMS_TASK_EMAILS', True)
     )
+    disable_emails = True if disable_emails == 'true' else False if disable_emails == 'false' else disable_emails
+
     if disable_emails:
         LOGGER.info(
             'Studio task emails are disabled. To enable them, \
