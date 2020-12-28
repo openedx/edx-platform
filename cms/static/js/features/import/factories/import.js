@@ -46,7 +46,7 @@ define([
                         msg = gettext('File format not supported. Please upload a file with a {ext} extension.')
                             .replace('{ext}', '<code>tar.gz</code>');
 
-                        $('.error-block').text(msg).show();
+                        $('.error-block').html(msg).show();
                     }
                 };
 
