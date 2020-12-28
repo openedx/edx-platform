@@ -46,3 +46,6 @@ def plugin_settings(settings):
     settings.CUSTOM_DOMAINS_REDIRECT_CACHE_KEY_PREFIX = 'custom_domains_redirects'
 
     settings.COPY_SEGMENT_EVENT_PROPERTIES_TO_TOP_LEVEL = False
+
+    # Appsembler allows generating honor certs
+    settings.FEATURES['TAHOE_AUTO_GENERATE_HONOR_CERTS'] = True
