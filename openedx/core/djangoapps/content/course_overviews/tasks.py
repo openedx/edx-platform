@@ -3,7 +3,7 @@
 import logging
 
 import six
-from celery import task
+from celery import shared_task
 from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from django.conf import settings
 from edx_django_utils.monitoring import set_code_owner_attribute
@@ -59,7 +59,7 @@ def enqueue_async_course_overview_update_tasks(
         )
 
 
-@task(base=LoggedPersistOnFailureTask)
+@shared_task(base=LoggedPersistOnFailureTask)
 @set_code_owner_attribute
 def async_course_overview_update(*args, **kwargs):
     course_keys = [CourseKey.from_string(arg) for arg in args]
