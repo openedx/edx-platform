@@ -86,7 +86,7 @@ django-simple-history==2.12.0  # via -r requirements/edx/base.txt, edx-enterpris
 django-splash==0.2.9      # via -r requirements/edx/base.txt
 django-statici18n==2.0.1  # via -r requirements/edx/base.txt
 django-storages==1.8      # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edxval
-django-user-tasks==1.3.1  # via -r requirements/edx/base.txt
+django-user-tasks==1.3.2  # via -r requirements/edx/base.txt
 django-waffle==2.0.0      # via -r requirements/edx/base.txt, edx-django-utils, edx-drf-extensions, edx-enterprise, edx-proctoring, edx-toggles
 django-webpack-loader==0.7.0  # via -r requirements/edx/base.txt, edx-proctoring
 djangorestframework-xml==2.0.0  # via -r requirements/edx/base.txt, edx-enterprise
@@ -121,7 +121,7 @@ edx-search==2.0.1         # via -r requirements/edx/base.txt
 edx-sga==0.13.1           # via -r requirements/edx/base.txt
 edx-submissions==3.2.3    # via -r requirements/edx/base.txt, ora2
 edx-tincan-py35==0.0.9    # via -r requirements/edx/base.txt, edx-enterprise
-edx-toggles==1.2.1        # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edx-completion, ora2
+edx-toggles==1.2.2        # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edx-completion, ora2
 edx-user-state-client==1.2.0  # via -r requirements/edx/base.txt
 edx-when==1.3.0           # via -r requirements/edx/base.txt, edx-proctoring
 edxval==1.4.4             # via -r requirements/edx/base.txt
@@ -131,7 +131,7 @@ enmerkar==0.7.1           # via -r requirements/edx/base.txt, enmerkar-underscor
 event-tracking==1.0.3     # via -r requirements/edx/base.txt, edx-event-routing-backends, edx-proctoring, edx-search
 execnet==1.7.1            # via pytest-xdist
 factory-boy==2.8.1        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
-faker==5.0.2              # via factory-boy
+faker==5.3.0              # via factory-boy
 filelock==3.0.12          # via tox, virtualenv
 freezegun==0.3.12         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
 fs-s3fs==0.1.8            # via -r requirements/edx/base.txt, django-pyfs
@@ -182,7 +182,7 @@ mongoengine==0.22.1       # via -r requirements/edx/base.txt
 more-itertools==8.6.0     # via -r requirements/edx/coverage.txt, zipp
 mpmath==1.1.0             # via -r requirements/edx/base.txt, sympy
 mysqlclient==2.0.2        # via -r requirements/edx/base.txt
-newrelic==5.22.1.152      # via -r requirements/edx/base.txt, edx-django-utils
+newrelic==5.24.0.153      # via -r requirements/edx/base.txt, edx-django-utils
 nltk==3.5                 # via -r requirements/edx/base.txt, chem
 nodeenv==1.5.0            # via -r requirements/edx/base.txt
 numpy==1.18.5             # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, chem, openedx-calc, scipy
@@ -234,7 +234,7 @@ python-slugify==4.0.1     # via -r requirements/edx/base.txt, code-annotations, 
 python-swiftclient==3.11.0  # via -r requirements/edx/base.txt, ora2
 python3-openid==3.2.0 ; python_version >= "3"  # via -r requirements/edx/base.txt, social-auth-core
 python3-saml==1.9.0       # via -r requirements/edx/base.txt
-pytz==2020.4              # via -r requirements/edx/base.txt, babel, capa, celery, django, django-ses, edx-completion, edx-enterprise, edx-event-routing-backends, edx-proctoring, edx-submissions, edx-tincan-py35, event-tracking, fs, icalendar, ora2, tincan, xblock
+pytz==2020.5              # via -r requirements/edx/base.txt, babel, capa, celery, django, django-ses, edx-completion, edx-enterprise, edx-event-routing-backends, edx-proctoring, edx-submissions, edx-tincan-py35, event-tracking, fs, icalendar, ora2, tincan, xblock
 pyuca==1.2                # via -r requirements/edx/base.txt
 pyyaml==5.3.1             # via -r requirements/edx/base.txt, code-annotations, edx-django-release-util, edx-i18n-tools, xblock
 random2==1.0.1            # via -r requirements/edx/base.txt
@@ -266,7 +266,7 @@ soupsieve==2.1            # via -r requirements/edx/base.txt, beautifulsoup4
 sqlparse==0.4.1           # via -r requirements/edx/base.txt, django
 staff-graded-xblock==1.1  # via -r requirements/edx/base.txt
 stevedore==1.32.0         # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, code-annotations, edx-ace, edx-django-utils, edx-enterprise, edx-opaque-keys
-super-csv==1.1.0          # via -r requirements/edx/base.txt, edx-bulk-grades
+super-csv==2.0.0          # via -r requirements/edx/base.txt, edx-bulk-grades
 sympy==1.6.2              # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, symmath
 tableauserverclient==0.14.1  # via -r requirements/edx/base.txt, edx-enterprise
 testfixtures==6.17.0      # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, edx-enterprise
@@ -275,7 +275,7 @@ tincan==1.0.0             # via -r requirements/edx/base.txt, edx-event-routing-
 toml==0.10.2              # via pylint, pytest, tox
 tox-battery==0.6.1        # via -r requirements/edx/testing.in
 tox==3.20.1               # via -r requirements/edx/testing.in, tox-battery
-tqdm==4.54.1              # via -r requirements/edx/base.txt, nltk
+tqdm==4.55.0              # via -r requirements/edx/base.txt, nltk
 transifex-client==0.14.2  # via -r requirements/edx/testing.in
 ua-parser==0.10.0         # via -r requirements/edx/base.txt, django-cookies-samesite
 unicodecsv==0.14.1        # via -r requirements/edx/base.txt, edx-enterprise

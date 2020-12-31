@@ -24,13 +24,13 @@ pbr==5.5.1                # via stevedore
 pygments==2.7.3           # via sphinx
 pyparsing==2.4.7          # via packaging
 python-slugify==4.0.1     # via code-annotations
-pytz==2020.4              # via babel, django
+pytz==2020.5              # via babel, django
 pyyaml==5.3.1             # via code-annotations
 requests==2.25.1          # via sphinx
 six==1.15.0               # via edx-sphinx-theme, stevedore
 smmap==3.0.4              # via gitdb
 snowballstemmer==2.0.0    # via sphinx
-sphinx==3.4.0             # via -r requirements/edx/doc.in, edx-sphinx-theme
+sphinx==3.4.1             # via -r requirements/edx/doc.in, edx-sphinx-theme
 sphinxcontrib-applehelp==1.0.2  # via sphinx
 sphinxcontrib-devhelp==1.0.2  # via sphinx
 sphinxcontrib-htmlhelp==1.0.3  # via sphinx
