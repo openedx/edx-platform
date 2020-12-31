@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-10-27 18:45+0000\n"
-"PO-Revision-Date: 2020-10-27 18:46:05.266583\n"
+"POT-Creation-Date: 2020-12-22 10:22+0000\n"
+"PO-Revision-Date: 2020-12-22 10:23:46.169169\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -2035,7 +2035,8 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js cms/templates/js/paging-header.underscore
+#: common/static/bundles/ContactInfo.js common/static/bundles/commons.js
+#: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Next"
@@ -2899,6 +2900,10 @@ msgstr ""
 msgid "Turn off transcripts"
 msgstr ""
 
+#: common/static/bundles/ContactInfo.js
+msgid "Contact information"
+msgstr ""
+
 #: common/static/bundles/CourseGoals.js
 #: openedx/features/course_experience/static/course_experience/js/CourseGoals.js
 msgid "Thank you for setting your course goal to {goal}!"
@@ -3044,38 +3049,45 @@ msgid ""
 msgstr ""
 
 #: common/static/bundles/PasswordResetConfirmation.js
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-msgid "Enter and confirm your new password."
+#: openedx/adg/lms/static/components/student_account/PasswordResetConfirmation.jsx
+msgid ""
+"Please enter a new password below. Passwords must be at least 8 characters "
+"and contain at least 1 number and 1 uppercase letter."
+msgstr ""
+
+#: common/static/bundles/PasswordResetConfirmation.js
+#: lms/static/js/student_account/views/account_settings_factory.js
+#: openedx/adg/lms/static/components/student_account/PasswordResetConfirmation.jsx
+#: lms/templates/student_account/account.underscore
+msgid "Password"
 msgstr ""
 
 #: common/static/bundles/PasswordResetConfirmation.js
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-msgid "New Password"
-msgstr ""
-
-#: common/static/bundles/PasswordResetConfirmation.js
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+#: openedx/adg/lms/static/components/student_account/PasswordResetConfirmation.jsx
 msgid "Confirm Password"
 msgstr ""
 
 #: common/static/bundles/PasswordResetConfirmation.js
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+#: openedx/adg/lms/static/components/student_account/PasswordResetConfirmation.jsx
 msgid "Passwords do not match."
 msgstr ""
 
 #: common/static/bundles/PasswordResetConfirmation.js
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-msgid "Reset My Password"
+#: openedx/adg/lms/static/components/student_account/PasswordResetConfirmation.jsx
+msgid "CHANGE PASSWORD"
 msgstr ""
 
 #: common/static/bundles/PasswordResetConfirmation.js
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-#: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Reset Your Password"
+#: openedx/adg/lms/static/components/student_account/PasswordResetConfirmation.jsx
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/password_reset.underscore
+msgid "Password Reset"
 msgstr ""
 
 #: common/static/bundles/PasswordResetConfirmation.js
 #: lms/static/js/student_account/components/PasswordResetInput.jsx
+#: openedx/adg/lms/static/components/student_account/PasswordResetInput.jsx
 msgid "Error: "
 msgstr ""
 
@@ -3262,6 +3274,8 @@ msgstr ""
 #: common/static/bundles/SingleSupportForm.js
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/login.underscore
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/login.underscore
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/register.underscore
 msgid "Sign in"
 msgstr ""
 
@@ -5066,11 +5080,14 @@ msgstr ""
 #: cms/templates/js/transcript-organization-credentials.underscore
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Username"
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/membership.js
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
 msgid "Email"
 msgstr ""
 
@@ -5657,6 +5674,23 @@ msgstr ""
 msgid "Could not override problem score for {user}."
 msgstr ""
 
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+msgid "Enter and confirm your new password."
+msgstr ""
+
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+msgid "New Password"
+msgstr ""
+
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+msgid "Reset My Password"
+msgstr ""
+
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Reset Your Password"
+msgstr ""
+
 #: lms/static/js/student_account/tos_modal.js
 msgid "Terms of Service and Honor Code"
 msgstr ""
@@ -5705,13 +5739,8 @@ msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
-"{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
-"address is associated with your {platform_name} account, we will send a "
-"message with password recovery instructions to this email "
-"address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
-" message after 1 minute, verify that you entered the correct email address, "
-"or check your spam folder.{paragraphEnd}{paragraphStart}If you need further "
-"assistance, {anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
+"Thank you! Please check your email for a message with password reset "
+"instructions."
 msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
@@ -5737,6 +5766,7 @@ msgstr ""
 
 #: lms/static/js/student_account/views/RegisterView.js
 #: lms/templates/student_account/register.underscore
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/register.underscore
 msgid "Create Account"
 msgstr ""
 
@@ -5810,11 +5840,6 @@ msgstr ""
 msgid ""
 "The name that identifies you on {platform_name}. You cannot change your "
 "username."
-msgstr ""
-
-#: lms/static/js/student_account/views/account_settings_factory.js
-#: lms/templates/student_account/account.underscore
-msgid "Password"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -6596,6 +6621,7 @@ msgstr ""
 
 #: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Type"
 msgstr ""
 
@@ -7044,6 +7070,7 @@ msgid "Video duration is {humanizeDuration}"
 msgstr ""
 
 #: cms/static/js/views/video_thumbnail.js
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
 msgid "minutes"
 msgstr ""
 
@@ -7163,7 +7190,14 @@ msgstr ""
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Actions"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+msgid "Timed Exam"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore
@@ -7607,6 +7641,7 @@ msgid "Course Key"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Status"
 msgstr ""
 
@@ -8736,61 +8771,74 @@ msgid "Create an Account."
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/login.underscore
 msgid "Sign in to continue learning as {email}"
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/login.underscore
 msgid "Sign in to continue learning"
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/login.underscore
 msgid ""
 "You already have an edX account with your {enterprise_name} email address."
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/login.underscore
 msgid ""
 "Going forward, your account information will be updated and maintained by "
 "{enterprise_name}."
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/login.underscore
 msgid ""
 "You can view your information or unlink from {enterprise_name} anytime in "
 "your Account Settings."
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/login.underscore
 msgid "To continue learning with this account, sign in below."
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/login.underscore
 msgid "Sign In"
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/login.underscore
 msgid ""
 "Sign in here using your email address and password, or use one of the "
 "providers listed below."
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/login.underscore
 msgid "Sign in here using your email address and password."
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/login.underscore
 msgid "If you do not yet have an account, use the button below to register."
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/login.underscore
 msgid "Use my university info"
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/login.underscore
 msgid "or sign in with"
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/login.underscore
 #, python-format
 msgid "Sign in with %(providerName)s"
 msgstr ""
@@ -8818,19 +8866,23 @@ msgid "Sign in."
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/register.underscore
 msgid "Create an account using"
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/register.underscore
 #, python-format
 msgid "Create account using %(providerName)s."
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/register.underscore
 msgid "Use my institution/campus credentials"
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/register.underscore
 msgid "or create a new one here"
 msgstr ""
 
@@ -9398,6 +9450,75 @@ msgstr ""
 msgid "Take Photo"
 msgstr ""
 
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+msgid "Add a New Allowance"
+msgstr ""
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+msgid "Special Exam"
+msgstr ""
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
+#, python-format
+msgid " %(exam_display_name)s "
+msgstr ""
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+msgid "Exam Type"
+msgstr ""
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
+msgid "Allowance Type"
+msgstr ""
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+msgid "Additional Time (minutes)"
+msgstr ""
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+msgid "Value"
+msgstr ""
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+msgid "Username or Email"
+msgstr ""
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
+msgid "Allowances"
+msgstr ""
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
+msgid "Add Allowance"
+msgstr ""
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
+msgid "Exam Name"
+msgstr ""
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
+msgid "Allowance Value"
+msgstr ""
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
+msgid "Time Limit"
+msgstr ""
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
+msgid "Started At"
+msgstr ""
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
+msgid "Completed At"
+msgstr ""
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
+#, python-format
+msgid " %(username)s "
+msgstr ""
+
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
 msgid "Bookmarked on"
 msgstr ""
@@ -9480,6 +9601,40 @@ msgid ""
 "{download_link_start}Download this image (right-click or option-click, save "
 "as){link_end} and then {upload_link_start}upload{link_end} it to your "
 "backpack."
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/form_field.underscore
+msgid "Forgot password?"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/login.underscore
+msgid "New to the Omnipreneurship Academy?"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/login.underscore
+msgid "Create account"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/password_reset.underscore
+msgid ""
+"Please enter the email address you registered with. We will send you a "
+"password reset email."
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/password_reset.underscore
+msgid "SEND"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/register.underscore
+msgid "Already have an account?"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/register.underscore
+msgid "Start learning with the Omnipreneurship Academy!"
+msgstr ""
+
+#: themes/adg-edx-theme/edx-platform/adg/lms/templates/student_account/register.underscore
+msgid "Create a free account in less than a minute."
 msgstr ""
 
 #: cms/templates/js/access-editor.underscore
@@ -9940,10 +10095,6 @@ msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Proctored Exam"
-msgstr ""
-
-#: cms/templates/js/course-outline.underscore
-msgid "Timed Exam"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore

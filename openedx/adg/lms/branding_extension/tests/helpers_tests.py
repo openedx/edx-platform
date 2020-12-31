@@ -48,4 +48,4 @@ def test_get_copyright(mocker):
         return_value=test_platform_name
     )
 
-    assert get_copyright() == '\u00A9 {} {}.'.format(2021, test_platform_name)
+    assert get_copyright() == '\u00A9 {} {}'.format(2021, test_platform_name)

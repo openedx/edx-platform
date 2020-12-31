@@ -50,8 +50,8 @@ def test_get_enrollment_course_names_and_short_ids_by_user(user_enrollments):  #
     user, _ = user_enrollments
     course_short_ids, course_titles = get_enrollment_course_names_and_short_ids_by_user(user)
 
-    assert course_short_ids == '100, 101, 102'
-    assert course_titles == 'course1, course2, course3'
+    assert course_short_ids == '100,101,102'
+    assert course_titles == 'course1,course2,course3'
 
 
 def test_is_mailchimp_sync_required():
