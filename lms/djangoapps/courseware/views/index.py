@@ -44,8 +44,8 @@ from openedx.features.course_experience import (
     default_course_url_name,
     RELATIVE_DATES_FLAG,
 )
-from openedx.features.course_experience.urls import COURSE_HOME_VIEW_NAME
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
+from openedx.features.course_experience.utils import get_course_outline_block_tree
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from student.models import CourseEnrollment
 from util.views import ensure_valid_course_key
@@ -469,10 +469,14 @@ class CoursewareIndex(View):
             self.section_url_name,
             self.field_data_cache,
         )
+
+        course_block_tree = get_course_outline_block_tree(
+            request, six.text_type(self.course.id), request.user, allow_start_dates_in_future=True
+        )
         courseware_context['accordion'] = render_accordion(
             self.request,
             self.course,
-            table_of_contents['chapters'],
+            course_block_tree,
         )
 
         courseware_context['course_sock_fragment'] = CourseSockFragmentView().render_to_fragment(
@@ -582,7 +586,8 @@ def render_accordion(request, course, table_of_contents):
     """
     context = dict(
         [
-            ('toc', table_of_contents),
+            ('blocks', table_of_contents),
+            ('course_title', course.display_name),
             ('course_id', six.text_type(course.id)),
             ('csrf', csrf(request)['csrf_token']),
             ('due_date_display_format', course.due_date_display_format),

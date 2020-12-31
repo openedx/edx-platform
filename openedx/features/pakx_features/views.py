@@ -11,7 +11,7 @@ from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.catalog.utils import get_programs_with_type
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
-from openedx.features.pakx_features.utils import add_tag_to_enrolled_courses
+from openedx.features.pakx_features.utils import add_course_progress_and_resume_info_tags_to_enrolled_courses
 # Create your views here.
 
 
