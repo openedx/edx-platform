@@ -47,7 +47,7 @@ from lms.djangoapps.verify_student.services import IDVerificationService
         <li class="status status-verification is-denied">
             <span class="title status-title">${_("Current Verification Status: Expired")}</span>
             <p class="status-note">${_("Your verification has expired. To receive a verified certificate, you must submit a new photo of yourself and your government-issued photo ID before the verification deadline for your course.")}</p>
-            <p class="status-note"><span><b>${_("Warning")}: </b></span><i>${_(" Please be aware photo verification can take up to three days once initiated and you will not be able to earn a certificate or take a proctored exam until approved.")}</i></p>
+            <p class="status-note"><span><b>${_("Warning")}: </b></span>${_(" Please be aware photo verification can take up to three days once initiated and you will not be able to earn a certificate or take a proctored exam until approved.")}</p>
             <div class="btn-reverify">
                 <a href="${IDVerificationService.get_verify_location()}" class="action action-reverify">${_("Resubmit Verification")}</a>
             </div>
