@@ -1,0 +1,5 @@
+{% load i18n %}
+{% autoescape off %}
+
+{% blocktrans %}Your subscription package will expire in less than 24 hours. To subscribe to a new subscription package, you can visit {{subscriptions_marketing_url}}.{% endblocktrans %}
+{% endautoescape %}

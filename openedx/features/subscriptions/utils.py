@@ -1,7 +1,9 @@
 import waffle
+from urlparse import urljoin
 from django.conf import settings
 
 from courseware.access_utils import ACCESS_DENIED, ACCESS_GRANTED
+from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.features.subscriptions.models import UserSubscription
 
 from student.models import User
@@ -47,3 +49,20 @@ def is_course_accessible_with_subscription(user, course):
 
         return ACCESS_DENIED
 
+def get_subscription_renew_url(subscription_id):
+    """
+    Get subscription renew url if given subscription is renewable.
+    """
+    renew_subscription_path = ''
+    try:
+        subscription = UserSubscription.objects.get(subscription_id=subscription_id)
+    except UserSubscription.DoesNotExist:
+        return renew_subscription_path
+
+    if subscription.subscription_type != UserSubscription.FULL_ACCESS_COURSES:
+        return renew_subscription_path
+
+    renew_subscription_path = 'api/v2/subscriptions/renew_subscription/?subscription_id={subscription_id}'.format(
+        subscription_id=subscription_id
+    )
+    return urljoin(get_value('MARKETING_SITE_ROOT', ''), renew_subscription_path)
