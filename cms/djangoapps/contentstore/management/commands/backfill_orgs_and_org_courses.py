@@ -107,6 +107,11 @@ class Command(BaseCommand):
             action='store_true',
             help="Show backfill, but do not apply changes to database."
         )
+        parser.add_argument(
+            '--inactive',
+            action='store_true',
+            help="Backfill data as inactive and do not re-activate any existing data."
+        )
 
     def handle(self, *args, **options):
         """
@@ -135,7 +140,12 @@ class Command(BaseCommand):
         if not confirm_changes(options, orgs, org_courseid_pairs):
             print("No changes applied.")
             return
-        bulk_add_data(orgs, org_courseid_pairs, dry_run=False)
+        bulk_add_data(
+            orgs,
+            org_courseid_pairs,
+            dry_run=False,
+            activate=(not options.get('inactive')),
+        )
 
 
 def confirm_changes(options, orgs, org_courseid_pairs):
@@ -158,7 +168,12 @@ def confirm_changes(options, orgs, org_courseid_pairs):
         raise CommandError("Only one of 'apply' and 'dry' may be specified")
     if options.get('apply'):
         return True
-    bulk_add_data(orgs, org_courseid_pairs, dry_run=True)
+    bulk_add_data(
+        orgs,
+        org_courseid_pairs,
+        dry_run=True,
+        activate=(not options.get('inactive')),
+    )
     if options.get('dry'):
         return False
     answer = ""
@@ -167,7 +182,7 @@ def confirm_changes(options, orgs, org_courseid_pairs):
     return answer.lower().startswith('y')
 
 
-def bulk_add_data(orgs, org_courseid_pairs, dry_run):
+def bulk_add_data(orgs, org_courseid_pairs, dry_run, activate):
     """
     Bulk-add the organizations and organization-course linkages.
 
@@ -182,6 +197,9 @@ def bulk_add_data(orgs, org_courseid_pairs, dry_run):
         org_courseid_pairs (list[tuple[dict, str]]):
             list of (org data dictionary, course key string) links to bulk-add.
         dry_run: Whether or not this run should be "dry" (ie, don't apply changes).
+        activate: Whether newly-added organizations and organization-course linkages
+            should be activated, and whether existing-but-inactive
+            organizations/linkages should be reactivated.
     """
     adding_phrase = "Dry-run of bulk-adding" if dry_run else "Bulk-adding"
     created_phrase = "Will create" if dry_run else "Created"
@@ -190,7 +208,7 @@ def bulk_add_data(orgs, org_courseid_pairs, dry_run):
     print("------------------------------------------------------")
     print(f"{adding_phrase} organizations...")
     orgs_created, orgs_reactivated = organizations_api.bulk_add_organizations(
-        orgs, dry_run=dry_run
+        orgs, dry_run=dry_run, activate=activate
     )
     print(f"{created_phrase} {len(orgs_created)} organizations:")
     for org_short_name in sorted(orgs_created):
@@ -202,7 +220,7 @@ def bulk_add_data(orgs, org_courseid_pairs, dry_run):
     print("------------------------------------------------------")
     print(f"{adding_phrase} organization-course linkages...")
     linkages_created, linkages_reactivated = organizations_api.bulk_add_organization_courses(
-        org_courseid_pairs, dry_run=dry_run
+        org_courseid_pairs, dry_run=dry_run, activate=activate
     )
     print(f"{created_phrase} {len(linkages_created)} organization-course linkages:")
     for org_short_name, course_id in sorted(linkages_created):
