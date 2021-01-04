@@ -2930,7 +2930,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=814 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=815 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3908,7 +3908,6 @@ CREATE TABLE `enterprise_historicalpendingenterprisecustomeruser` (
   PRIMARY KEY (`history_id`),
   KEY `enterprise_historica_history_user_id_c491461b_fk_auth_user` (`history_user_id`),
   KEY `enterprise_historicalpendingenterprisecustomeruser_id_3cf88198` (`id`),
-  KEY `enterprise_historicalpendin_user_email_88c478b4` (`user_email`),
   KEY `enterprise_historicalpendin_enterprise_customer_id_6c02ed95` (`enterprise_customer_id`),
   CONSTRAINT `enterprise_historica_history_user_id_c491461b_fk_auth_user` FOREIGN KEY (`history_user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -3959,7 +3958,10 @@ CREATE TABLE `enterprise_pendingenterprisecustomeradminuser` (
   `user_email` varchar(254) NOT NULL,
   `enterprise_customer_id` char(32) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `enterprise_pendingenterp_enterprise_customer_id_u_3b1fae93_uniq` (`enterprise_customer_id`,`user_email`),
+  UNIQUE KEY `unique pending admin user and EnterpriseCustomer` (`user_email`,`enterprise_customer_id`),
+  KEY `enterprise_pendingenterpris_enterprise_customer_id_aae02661` (`enterprise_customer_id`),
+  KEY `enterprise__user_em_fead22_idx` (`user_email`,`enterprise_customer_id`),
+  KEY `enterprise__user_em_6e1f5b_idx` (`user_email`),
   CONSTRAINT `enterprise_pendingen_enterprise_customer__aae02661_fk_enterpris` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -3973,8 +3975,10 @@ CREATE TABLE `enterprise_pendingenterprisecustomeruser` (
   `user_email` varchar(254) NOT NULL,
   `enterprise_customer_id` char(32) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `enterprise_pendingenterp_user_email_5440d1d3_uniq` (`user_email`),
+  UNIQUE KEY `unique user and EnterpriseCustomer` (`user_email`,`enterprise_customer_id`),
   KEY `enterprise_pendingen_enterprise_customer__a858ce2d_fk_enterpris` (`enterprise_customer_id`),
+  KEY `enterprise__user_em_f98d36_idx` (`user_email`,`enterprise_customer_id`),
+  KEY `enterprise__user_em_488930_idx` (`user_email`),
   CONSTRAINT `enterprise_pendingen_enterprise_customer__a858ce2d_fk_enterpris` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
