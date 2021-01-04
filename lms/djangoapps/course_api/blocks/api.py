@@ -72,6 +72,7 @@ def get_blocks(
     if requested_fields is None:
         requested_fields = []
     include_completion = 'completion' in requested_fields
+    include_has_scheduled_content = 'has_scheduled_content' in requested_fields
     include_special_exams = 'special_exam_info' in requested_fields
     include_gated_sections = 'show_gated_sections' in requested_fields
 
@@ -106,7 +107,12 @@ def get_blocks(
 
     # transform
     blocks = course_blocks_api.get_course_blocks(
-        user, usage_key, transformers, allow_start_dates_in_future=allow_start_dates_in_future)
+        user,
+        usage_key,
+        transformers,
+        allow_start_dates_in_future=allow_start_dates_in_future,
+        include_has_scheduled_content=include_has_scheduled_content
+    )
 
     # filter blocks by types
     if block_types_filter:
