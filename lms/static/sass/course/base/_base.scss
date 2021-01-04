@@ -41,7 +41,15 @@ body {
   background-color: $course-bg-color;
 }
 
-body, h1, h2, h3, h4, h5, h6, p, label {
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+label {
   @include text-align(left);
 
   font-family: $font-family-sans-serif;
@@ -101,9 +109,7 @@ input[type="password"] {
   border: 1px solid $border-color-2;
   border-radius: 0;
   box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6), inset 0 0 3px 0 $shadow-l1;
-
-  @include box-sizing(border-box);
-
+  box-sizing: border-box;
   font: normal 1em $font-family-sans-serif;
   height: 35px;
   padding: ($baseline/4) 12px;
@@ -149,15 +155,18 @@ img {
   top: 0;
   left: 0;
   z-index: 99999;
-  padding: 0 10px;
+  padding: ($baseline/2);
   border-radius: 3px;
-  background: rgba(0, 0, 0, 0.85);
+  background: #ffffff;
+  border-color: #000000;
+  border-width: 2px;
+  border-style: solid;
   font-size: 11px;
   font-weight: 400;
-  line-height: 26px;
-  color: $white;
+  color: #000000;
   pointer-events: none;
   opacity: 0;
+  max-width: 200px;
 
   @include transition(opacity 0.1s linear 0s);
 
@@ -165,11 +174,11 @@ img {
     content: '▾';
     display: block;
     position: absolute;
-    bottom: -14px;
+    bottom: -($baseline - 2);
     left: 50%;
     margin-left: -7px;
     font-size: 20px;
-    color: rgba(0, 0, 0, 0.85);
+    color: #000000;
   }
 }
 
@@ -200,7 +209,8 @@ img {
   opacity: 0;
   -webkit-transition: all 0.2s;
 
-  p, span {
+  p,
+  span {
     color: $white;
   }
 

@@ -5,6 +5,7 @@ Test the Blockstore-based XBlock runtime and content libraries together.
 import json
 
 from completion.test_utils import CompletionWaffleTestMixin
+from django.db import connections
 from django.test import TestCase, override_settings
 from organizations.models import Organization
 from rest_framework.test import APIClient
@@ -16,12 +17,15 @@ from openedx.core.djangoapps.content_libraries.tests.base import (
     requires_blockstore,
     URL_BLOCK_RENDER_VIEW,
     URL_BLOCK_GET_HANDLER_URL,
+    URL_BLOCK_METADATA_URL,
 )
 from openedx.core.djangoapps.content_libraries.tests.user_state_block import UserStateTestBlock
+from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIGHTS_RESERVED, CC_4_BY
+from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.djangolib.testing.utils import skip_unless_lms, skip_unless_cms
 from openedx.core.lib import blockstore_api
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.unit_block import UnitBlock
 
 
@@ -45,12 +49,14 @@ class ContentLibraryContentTestMixin(object):
         )
         cls.library = library_api.create_library(
             collection_uuid=cls.collection.uuid,
+            library_type=COMPLEX,
             org=cls.organization,
             slug=cls.__name__,
             title=(cls.__name__ + " Test Lib"),
             description="",
             allow_public_learning=True,
             allow_public_read=False,
+            library_license=ALL_RIGHTS_RESERVED,
         )
 
 
@@ -82,8 +88,10 @@ class ContentLibraryRuntimeTest(ContentLibraryContentTestMixin, TestCase):
             slug="idolx",
             title=("Identical OLX Test Lib 2"),
             description="",
+            library_type=COMPLEX,
             allow_public_learning=True,
             allow_public_read=False,
+            library_license=CC_4_BY,
         )
         unit_block2_key = library_api.create_library_block(library2.key, "unit", "u1").usage_key
         library_api.create_library_block_child(unit_block2_key, "problem", "p1")
@@ -113,6 +121,57 @@ class ContentLibraryRuntimeTest(ContentLibraryContentTestMixin, TestCase):
         # And problems do have has_score True:
         self.assertEqual(problem_block.has_score, True)
 
+    @skip_unless_cms  # creating child blocks only works properly in Studio
+    def test_xblock_metadata(self):
+        """
+        Test the XBlock metadata API
+        """
+        unit_block_key = library_api.create_library_block(self.library.key, "unit", "metadata-u1").usage_key
+        problem_key = library_api.create_library_block_child(unit_block_key, "problem", "metadata-p1").usage_key
+        new_olx = """
+        <problem display_name="New Multi Choice Question" max_attempts="5">
+            <multiplechoiceresponse>
+                <p>This is a normal capa problem. It has "maximum attempts" set to **5**.</p>
+                <label>Blockstore is designed to store.</label>
+                <choicegroup type="MultipleChoice">
+                    <choice correct="false">XBlock metadata only</choice>
+                    <choice correct="true">XBlock data/metadata and associated static asset files</choice>
+                    <choice correct="false">Static asset files for XBlocks and courseware</choice>
+                    <choice correct="false">XModule metadata only</choice>
+                </choicegroup>
+            </multiplechoiceresponse>
+        </problem>
+        """.strip()
+        library_api.set_library_block_olx(problem_key, new_olx)
+        library_api.publish_changes(self.library.key)
+
+        # Now view the problem as Alice:
+        client = APIClient()
+        client.login(username=self.student_a.username, password='edx')
+
+        # Check the metadata API for the unit:
+        metadata_view_result = client.get(
+            URL_BLOCK_METADATA_URL.format(block_key=unit_block_key),
+            {"include": "children,editable_children"},
+        )
+        self.assertEqual(metadata_view_result.data["children"], [str(problem_key)])
+        self.assertEqual(metadata_view_result.data["editable_children"], [str(problem_key)])
+
+        # Check the metadata API for the problem:
+        metadata_view_result = client.get(
+            URL_BLOCK_METADATA_URL.format(block_key=problem_key),
+            {"include": "student_view_data,index_dictionary"},
+        )
+        self.assertEqual(metadata_view_result.data["block_id"], str(problem_key))
+        self.assertEqual(metadata_view_result.data["display_name"], "New Multi Choice Question")
+        self.assertNotIn("children", metadata_view_result.data)
+        self.assertNotIn("editable_children", metadata_view_result.data)
+        self.assertDictContainsSubset({
+            "content_type": "CAPA",
+            "problem_types": ["multiplechoiceresponse"],
+        }, metadata_view_result.data["index_dictionary"])
+        self.assertEqual(metadata_view_result.data["student_view_data"], None)  # Capa doesn't provide student_view_data
+
 
 @requires_blockstore
 # We can remove the line below to enable this in Studio once we implement a session-backed
@@ -124,6 +183,8 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
     state for XBlocks when learners access blocks directly in a library context,
     if the library allows direct learning.
     """
+
+    databases = {alias for alias in connections}
 
     @XBlock.register_temp_plugin(UserStateTestBlock, UserStateTestBlock.BLOCK_TYPE)
     def test_default_values(self):
@@ -339,6 +400,7 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
         student_view_result = client.get(URL_BLOCK_RENDER_VIEW.format(block_key=block_id, view_name='student_view'))
         problem_key = "input_{}_2_1".format(block_id)
         self.assertIn(problem_key, student_view_result.data["content"])
+
         # And submit a wrong answer:
         result = client.get(URL_BLOCK_GET_HANDLER_URL.format(block_key=block_id, handler_name='xmodule_handler'))
         problem_check_url = result.data["handler_url"] + 'problem_check'
@@ -372,6 +434,49 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
         sm = get_score(self.student_a, block_id)
         self.assertEqual(sm.grade, 1)
         self.assertEqual(sm.max_grade, 1)
+
+    @skip_unless_lms
+    def test_i18n(self):
+        """
+        Test that a block's rendered content respects the Accept-Language header and returns translated content.
+        """
+        block_id = library_api.create_library_block(self.library.key, "problem", "i18n_problem").usage_key
+        new_olx = """
+        <problem display_name="New Multi Choice Question" max_attempts="5">
+            <multiplechoiceresponse>
+                <p>This is a normal capa problem. It has "maximum attempts" set to **5**.</p>
+                <label>Blockstore is designed to store.</label>
+                <choicegroup type="MultipleChoice">
+                    <choice correct="false">XBlock metadata only</choice>
+                    <choice correct="true">XBlock data/metadata and associated static asset files</choice>
+                    <choice correct="false">Static asset files for XBlocks and courseware</choice>
+                    <choice correct="false">XModule metadata only</choice>
+                </choicegroup>
+            </multiplechoiceresponse>
+        </problem>
+        """.strip()
+        library_api.set_library_block_olx(block_id, new_olx)
+        library_api.publish_changes(self.library.key)
+
+        # Enable the dummy language in darklang
+        DarkLangConfig(
+            released_languages='eo',
+            changed_by=self.student_a,
+            enabled=True
+        ).save()
+
+        client = APIClient()
+
+        # View the problem without specifying a language
+        default_public_view = client.get(URL_BLOCK_RENDER_VIEW.format(block_key=block_id, view_name='public_view'))
+        self.assertIn("Submit", default_public_view.data["content"])
+        self.assertNotIn("Süßmït", default_public_view.data["content"])
+
+        # View the problem and request the dummy language
+        dummy_public_view = client.get(URL_BLOCK_RENDER_VIEW.format(block_key=block_id, view_name='public_view'),
+                                       HTTP_ACCEPT_LANGUAGE='eo')
+        self.assertIn("Süßmït", dummy_public_view.data["content"])
+        self.assertNotIn("Submit", dummy_public_view.data["content"])
 
 
 @requires_blockstore

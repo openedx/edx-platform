@@ -10,7 +10,7 @@ from .block_depth import BlockDepthTransformer
 from .navigation import BlockNavigationTransformer
 from .student_view import StudentViewTransformer
 from .video_urls import VideoBlockURLTransformer
-from ..toggles import ENABLE_VIDEO_URL_REWRITE
+from .extra_fields import ExtraFieldsTransformer
 
 
 class BlocksAPITransformer(BlockStructureTransformer):
@@ -23,6 +23,7 @@ class BlocksAPITransformer(BlockStructureTransformer):
         BlockCountsTransformer
         BlockDepthTransformer
         BlockNavigationTransformer
+        ExtraFieldsTransformer
 
     Note:
         * BlockDepthTransformer must be executed before BlockNavigationTransformer.
@@ -58,6 +59,7 @@ class BlocksAPITransformer(BlockStructureTransformer):
         BlockCountsTransformer.collect(block_structure)
         BlockDepthTransformer.collect(block_structure)
         BlockNavigationTransformer.collect(block_structure)
+        ExtraFieldsTransformer.collect(block_structure)
 
         # TODO support olx_data by calling export_to_xml(?)
 
@@ -69,5 +71,5 @@ class BlocksAPITransformer(BlockStructureTransformer):
         BlockCountsTransformer(self.block_types_to_count).transform(usage_info, block_structure)
         BlockDepthTransformer(self.depth).transform(usage_info, block_structure)
         BlockNavigationTransformer(self.nav_depth).transform(usage_info, block_structure)
-        if ENABLE_VIDEO_URL_REWRITE.is_enabled(block_structure.root_block_usage_key.course_key):
-            VideoBlockURLTransformer().transform(usage_info, block_structure)
+        VideoBlockURLTransformer().transform(usage_info, block_structure)
+        ExtraFieldsTransformer().transform(usage_info, block_structure)

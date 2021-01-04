@@ -1,0 +1,19 @@
+{% load i18n %}
+<div class="editor-with-buttons">
+  <div class="wrapper-comp-settings is-active editor-with-buttons" id="settings-tab">
+    <div class="list-input settings-list">
+      {{ react_content|safe }}
+    </div>
+  </div>
+  <div class="xblock-actions">
+    <ul>
+      <li class="action-item">
+        <a href="#" class="button action-primary save-button" data-submit-url="{{save_url}}">{% trans "Save and Import" as tmsg %} {{tmsg|force_escape}}</a>
+      </li>
+
+      <li class="action-item">
+        <a href="#" class="button cancel-button">{% trans "Cancel" as tmsg %} {{tmsg|force_escape}}</a>
+      </li>
+    </ul>
+  </div>
+</div>

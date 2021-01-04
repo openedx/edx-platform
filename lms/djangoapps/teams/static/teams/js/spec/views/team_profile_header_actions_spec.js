@@ -21,7 +21,8 @@ define([
                 id: teamId,
                 name: teamName,
                 membership: membership,
-                url: createTeamsUrl(teamId)
+                url: createTeamsUrl(teamId),
+                topic_id: 'topic-id'
             };
         };
 
@@ -44,9 +45,10 @@ define([
                     }),
                     topicOptions = typeof topicMaxTeamSize !== 'undefined' ?
                         {max_team_size: topicMaxTeamSize} : {},
-                    topic = isInstructorManagedTopic ?
-                        TeamSpecHelpers.createMockInstructorManagedTopic(topicOptions) :
-                        TeamSpecHelpers.createMockTopic(topicOptions);
+                    topic;
+
+                topicOptions.type = isInstructorManagedTopic ? 'public_managed' : 'open';
+                topic = TeamSpecHelpers.createMockTopic(topicOptions);
 
                 return new TeamProfileHeaderActionsView(
                     {
@@ -116,7 +118,9 @@ define([
                     requests,
                     'GET',
                     TeamSpecHelpers.testContext.teamMembershipsUrl + '?' + $.param({
-                        username: currentUsername, course_id: TeamSpecHelpers.testCourseID
+                        username: currentUsername,
+                        course_id: TeamSpecHelpers.testCourseID,
+                        teamset_id: 'topic-id'
                     })
                 );
 
@@ -163,14 +167,16 @@ define([
                     requests,
                     'GET',
                     TeamSpecHelpers.testContext.teamMembershipsUrl + '?' + $.param({
-                        username: currentUsername, course_id: TeamSpecHelpers.testCourseID
+                        username: currentUsername,
+                        course_id: TeamSpecHelpers.testCourseID,
+                        teamset_id: 'topic-id'
                     })
                 );
 
                 // current user is a member of another team so we should see the correct message
                 AjaxHelpers.respondWithJson(requests, {count: 1});
                 expect(view.$('.action.action-primary').length).toEqual(0);
-                expect(view.$('.join-team-message').text().trim()).toBe(view.alreadyMemberMessage);
+                expect(view.$('.join-team-message').text().trim()).toBe(view.alreadyTeamsetMemberMessage);
             });
 
             it('shows team full message', function() {
@@ -210,7 +216,9 @@ define([
                     requests,
                     'GET',
                     TeamSpecHelpers.testContext.teamMembershipsUrl + '?' + $.param({
-                        username: currentUsername, course_id: TeamSpecHelpers.testCourseID
+                        username: currentUsername,
+                        course_id: TeamSpecHelpers.testCourseID,
+                        teamset_id: 'topic-id'
                     })
                 );
 
@@ -241,7 +249,9 @@ define([
                     requests,
                     'GET',
                     TeamSpecHelpers.testContext.teamMembershipsUrl + '?' + $.param({
-                        username: currentUsername, course_id: TeamSpecHelpers.testCourseID
+                        username: currentUsername,
+                        course_id: TeamSpecHelpers.testCourseID,
+                        teamset_id: 'topic-id'
                     })
                 );
 
@@ -270,7 +280,9 @@ define([
                     requests,
                     'GET',
                     TeamSpecHelpers.testContext.teamMembershipsUrl + '?' + $.param({
-                        username: currentUsername, course_id: TeamSpecHelpers.testCourseID
+                        username: currentUsername,
+                        course_id: TeamSpecHelpers.testCourseID,
+                        teamset_id: 'topic-id'
                     })
                 );
 

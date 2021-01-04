@@ -16,6 +16,7 @@ from importlib import import_module
 
 import six
 from django.utils.encoding import python_2_unicode_compatible
+from edx_django_utils.monitoring import set_custom_attribute
 from fs.osfs import OSFS
 from lazy import lazy
 from lxml import etree
@@ -382,6 +383,7 @@ class XMLModuleStore(ModuleStoreReadBase):
             msg = "ERROR: Failed to load courselike '{0}': {1}".format(
                 course_dir.encode("utf-8"), six.text_type(exc)
             )
+            set_custom_attribute('course_import_failure', "Courselike load failure: {}".format(msg))
             log.exception(msg)
             errorlog.tracker(msg)
             self.errored_courses[course_dir] = errorlog
@@ -842,7 +844,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         return {'xml': True}
 
     @contextmanager
-    def branch_setting(self, branch_setting, course_id=None):  # pylint: disable=unused-argument
+    def branch_setting(self, branch_setting, course_id=None):
         """
         A context manager for temporarily setting the branch value for the store to the given branch_setting.
         """

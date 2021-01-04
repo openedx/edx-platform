@@ -100,7 +100,8 @@
       font-size: $forum-small-font-size;
     }
 
-    .row-item-full, .row-item {
+    .row-item-full,
+    .row-item {
       font-size: $forum-small-font-size;
       padding: 0 ($baseline/2);
       width: 26%;
@@ -155,25 +156,46 @@
 
       .row-description {
         display: inline-block;
-        width:80%;
+        width: 80%;
       }
     }
   }
 
   .helpgrid-row-navigation {
-    .fa-bars {color: theme-color("light");}
-    .fa-search {color: $gray-300;}
-    .fa-sort {color: $gray-300;}
+    .fa-bars {
+      color: theme-color("light");
+    }
+
+    .fa-search {
+      color: $gray-300;
+    }
+
+    .fa-sort {
+      color: $gray-300;
+    }
   }
 
   .helpgrid-row-participation {
-    .fa-plus {color: $green;}
-    .fa-flag {color: $pink;}
-    .fa-star {color: $blue;}
+    .fa-plus {
+      color: $green;
+    }
+
+    .fa-flag {
+      color: $pink;
+    }
+
+    .fa-star {
+      color: $blue;
+    }
   }
 
   .helpgrid-row-notification {
-    .fa-square {color: $green;}
-    .fa-envelope {color: $gray-300;}
+    .fa-square {
+      color: $green;
+    }
+
+    .fa-envelope {
+      color: $gray-300;
+    }
   }
 }

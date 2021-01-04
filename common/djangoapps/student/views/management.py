@@ -36,12 +36,12 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import text_type
 
-import track.views
-from bulk_email.models import Optout
-from course_modes.models import CourseMode
+from common.djangoapps.track import views as track_views
+from lms.djangoapps.bulk_email.models import Optout
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.courses import get_courses, sort_by_announcement, sort_by_start_date
-from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
-from entitlements.models import CourseEntitlement
+from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_response, render_to_string
+from common.djangoapps.entitlements.models import CourseEntitlement
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.catalog.utils import get_programs_with_type
 from openedx.core.djangoapps.embargo import api as embargo_api
@@ -49,12 +49,11 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
-from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangolib.markup import HTML, Text
-from student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info, generate_activation_email_context
-from student.message_types import AccountActivation, EmailChange, EmailChangeConfirmation, RecoveryEmailCreate
-from student.models import (
+from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info, generate_activation_email_context
+from common.djangoapps.student.message_types import AccountActivation, EmailChange, EmailChangeConfirmation, RecoveryEmailCreate
+from common.djangoapps.student.models import (
     AccountRecovery,
     CourseEnrollment,
     PendingEmailChange,
@@ -68,11 +67,11 @@ from student.models import (
     create_comments_service_user,
     email_exists_or_retired
 )
-from student.signals import REFUND_ORDER
-from student.tasks import send_activation_email
-from student.text_me_the_app import TextMeTheAppFragmentView
-from util.db import outer_atomic
-from util.json_request import JsonResponse
+from common.djangoapps.student.signals import REFUND_ORDER
+from common.djangoapps.student.tasks import send_activation_email
+from common.djangoapps.student.text_me_the_app import TextMeTheAppFragmentView
+from common.djangoapps.util.db import outer_atomic
+from common.djangoapps.util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.student")
@@ -315,7 +314,7 @@ def change_enrollment(request, check_access=True):
 
     # Allow us to monitor performance of this transaction on a per-course basis since we often roll-out features
     # on a per-course basis.
-    monitoring_utils.set_custom_metric('course_id', text_type(course_id))
+    monitoring_utils.set_custom_attribute('course_id', text_type(course_id))
 
     if action == "enroll":
         # Make sure the course exists
@@ -487,12 +486,12 @@ def activate_account(request, key):
     """
     # If request is in Studio call the appropriate view
     if theming_helpers.get_project_root_name().lower() == u'cms':
-        monitoring_utils.set_custom_metric('student_activate_account', 'cms')
+        monitoring_utils.set_custom_attribute('student_activate_account', 'cms')
         return activate_account_studio(request, key)
 
-    # TODO: Use metric to determine if there are any `activate_account` calls for cms in Production.
+    # TODO: Use custom attribute to determine if there are any `activate_account` calls for cms in Production.
     # If not, the templates wouldn't be needed for cms, but we still need a way to activate for cms tests.
-    monitoring_utils.set_custom_metric('student_activate_account', 'lms')
+    monitoring_utils.set_custom_attribute('student_activate_account', 'lms')
     try:
         registration = Registration.objects.get(activation_key=key)
     except (Registration.DoesNotExist, Registration.MultipleObjectsReturned):
@@ -515,16 +514,6 @@ def activate_account(request, key):
             messages.info(
                 request,
                 HTML(_('{html_start}This account has already been activated.{html_end}')).format(
-                    html_start=HTML('<p class="message-title">'),
-                    html_end=HTML('</p>'),
-                ),
-                extra_tags='account-activation aa-icon',
-            )
-        elif waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
-            messages.error(
-                request,
-                HTML(u'{html_start}{message}{html_end}').format(
-                    message=Text(SYSTEM_MAINTENANCE_MSG),
                     html_start=HTML('<p class="message-title">'),
                     html_end=HTML('</p>'),
                 ),
@@ -572,9 +561,6 @@ def activate_account_studio(request, key):
         user_logged_in = request.user.is_authenticated
         already_active = True
         if not registration.user.is_active:
-            if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
-                return render_to_response('registration/activation_invalid.html',
-                                          {'csrf': csrf(request)['csrf_token']})
             registration.activate()
             already_active = False
 
@@ -706,7 +692,7 @@ def do_email_change_request(user, new_email, activation_key=None, secondary_emai
 
 
 @ensure_csrf_cookie
-def activate_secondary_email(request, key):  # pylint: disable=unused-argument
+def activate_secondary_email(request, key):
     """
     This is called when the activation link is clicked. We activate the secondary email
     for the requested user.
@@ -734,14 +720,11 @@ def activate_secondary_email(request, key):  # pylint: disable=unused-argument
 
 
 @ensure_csrf_cookie
-def confirm_email_change(request, key):  # pylint: disable=unused-argument
+def confirm_email_change(request, key):
     """
     User requested a new e-mail. This is called when the activation
     link is clicked. We confirm with the old e-mail, and update
     """
-    if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
-        return render_to_response('email_change_failed.html', {'err_msg': SYSTEM_MAINTENANCE_MSG})
-
     with transaction.atomic():
         try:
             pec = PendingEmailChange.objects.get(activation_key=key)
@@ -841,7 +824,7 @@ def change_email_settings(request):
             user.email,
             course_id,
         )
-        track.views.server_track(
+        track_views.server_track(
             request,
             "change-email-settings",
             {"receive_emails": "yes", "course": course_id},
@@ -855,7 +838,7 @@ def change_email_settings(request):
             user.email,
             course_id,
         )
-        track.views.server_track(
+        track_views.server_track(
             request,
             "change-email-settings",
             {"receive_emails": "no", "course": course_id},

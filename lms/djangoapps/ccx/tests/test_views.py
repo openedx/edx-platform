@@ -9,7 +9,6 @@ import re
 
 import ddt
 import six
-import six.moves.urllib.parse  # pylint: disable=import-error
 from six.moves import range, zip
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
@@ -28,7 +27,7 @@ from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.courseware.testutils import FieldOverrideTestMixin
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import get_override_for_ccx, override_field_for_ccx
 from lms.djangoapps.ccx.tests.factories import CcxFactory
@@ -41,9 +40,9 @@ from lms.djangoapps.instructor.access import allow_access, list_with_level
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from openedx.core.djangoapps.django_comment_common.utils import are_permissions_roles_seeded
-from student.models import CourseEnrollment, CourseEnrollmentAllowed
-from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
-from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
+from common.djangoapps.student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
@@ -172,7 +171,7 @@ class TestAdminAccessCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
 
 @override_settings(
     XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
-    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['ccx.overrides.CustomCoursesForEdxOverrideProvider'],
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider'],
 )
 class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
     """
@@ -237,7 +236,7 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
         progress_page_due_date = section.due.strftime(u"%Y-%m-%d %H:%M")
         self.assertEqual(progress_page_due_date, due)
 
-    @patch('ccx.views.render_to_response', intercept_renderer)
+    @patch('lms.djangoapps.ccx.views.render_to_response', intercept_renderer)
     @patch('lms.djangoapps.courseware.views.views.render_to_response', intercept_renderer)
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
     def test_edit_schedule(self):
@@ -286,7 +285,7 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
 
 @override_settings(
     XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
-    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['ccx.overrides.CustomCoursesForEdxOverrideProvider'],
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider'],
 )
 @ddt.ddt
 class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
@@ -472,8 +471,8 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
                     self.assertEqual(get_date(ccx, unit, 'start', parent_node=subsection), self.mooc_start)
                     self.assertEqual(get_date(ccx, unit, 'due', parent_node=subsection), self.mooc_due)
 
-    @patch('ccx.views.render_to_response', intercept_renderer)
-    @patch('ccx.views.TODAY')
+    @patch('lms.djangoapps.ccx.views.render_to_response', intercept_renderer)
+    @patch('lms.djangoapps.ccx.views.TODAY')
     def test_edit_schedule(self, today):
         """
         Get CCX schedule, modify it, save it.
@@ -551,7 +550,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.assertEqual(policy['GRADER'][3]['type'], 'Final Exam')
         self.assertEqual(policy['GRADER'][3]['min_count'], 0)
 
-    @patch('ccx.views.render_to_response', intercept_renderer)
+    @patch('lms.djangoapps.ccx.views.render_to_response', intercept_renderer)
     def test_save_without_min_count(self):
         """
         POST grading policy without min_count field.
@@ -631,7 +630,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         )
         data = {
             button_tuple[0]: button_tuple[1],
-            student_form_input_name: u','.join([student.email, ]),  # pylint: disable=no-member
+            student_form_input_name: u','.join([student.email, ]),
         }
         if send_email:
             data['email-students'] = 'Notify-students-by-email'
@@ -642,7 +641,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.assertIn(302, response.redirect_chain[0])
         self.assertEqual(len(outbox), outbox_count)
         if send_email:
-            self.assertIn(student.email, outbox[0].recipients())  # pylint: disable=no-member
+            self.assertIn(student.email, outbox[0].recipients())
         # a CcxMembership exists for this student
         self.assertTrue(
             CourseEnrollment.objects.filter(course_id=self.course.id, user=student).exists()
@@ -727,7 +726,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         )
         data = {
             button_tuple[0]: button_tuple[1],
-            student_form_input_name: u','.join([student.email, ]),  # pylint: disable=no-member
+            student_form_input_name: u','.join([student.email, ]),
         }
         if send_email:
             data['email-students'] = 'Notify-students-by-email'
@@ -738,7 +737,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.assertIn(302, response.redirect_chain[0])
         self.assertEqual(len(outbox), outbox_count)
         if send_email:
-            self.assertIn(student.email, outbox[0].recipients())  # pylint: disable=no-member
+            self.assertIn(student.email, outbox[0].recipients())
         # a CcxMembership does not exists for this student
         self.assertFalse(
             CourseEnrollment.objects.filter(course_id=self.course.id, user=student).exists()
@@ -930,8 +929,8 @@ class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleSto
         node.visible_to_staff_only = True
         self.mstore.update_item(node, self.coach.id)
 
-    @patch('ccx.views.render_to_response', intercept_renderer)
-    @patch('ccx.views.TODAY')
+    @patch('lms.djangoapps.ccx.views.render_to_response', intercept_renderer)
+    @patch('lms.djangoapps.ccx.views.TODAY')
     def test_get_ccx_schedule(self, today):
         """
         Gets CCX schedule and checks number of blocks in it.
@@ -983,7 +982,7 @@ def patched_get_children(self, usage_key_filter=None):
 
 @override_settings(
     XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
-    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['ccx.overrides.CustomCoursesForEdxOverrideProvider'],
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider'],
 )
 @patch('xmodule.x_module.XModuleMixin.get_children', patched_get_children, spec=True)
 class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -1070,7 +1069,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
             course_key=self.ccx_key
         )
 
-    @patch('ccx.views.render_to_response', intercept_renderer)
+    @patch('lms.djangoapps.ccx.views.render_to_response', intercept_renderer)
     @patch('lms.djangoapps.instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
     def test_gradebook(self):
         self.course.enable_ccx = True

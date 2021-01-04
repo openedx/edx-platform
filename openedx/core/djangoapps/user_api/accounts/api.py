@@ -15,16 +15,16 @@ from django.utils.translation import override as override_language
 from django.utils.translation import ugettext as _
 from pytz import UTC
 from six import text_type  # pylint: disable=ungrouped-imports
-from student import views as student_views
-from student.models import (
+from common.djangoapps.student import views as student_views
+from common.djangoapps.student.models import (
     AccountRecovery,
     User,
     UserProfile,
     email_exists_or_retired,
     username_exists_or_retired
 )
-from util.model_utils import emit_setting_changed_event
-from util.password_policy_validators import validate_password
+from common.djangoapps.util.model_utils import emit_setting_changed_event
+from common.djangoapps.util.password_policy_validators import validate_password
 
 from openedx.core.djangoapps.user_api import accounts, errors, helpers
 from openedx.core.djangoapps.user_api.errors import (
@@ -158,6 +158,7 @@ def update_account_settings(requesting_user, update, username=None):
         _notify_language_proficiencies_update_if_needed(update, user, user_profile, old_language_proficiencies)
         _store_old_name_if_needed(old_name, user_profile, requesting_user)
         _update_extended_profile_if_needed(update, user_profile)
+        _update_state_if_needed(update, user_profile)
 
     except PreferenceValidationError as err:
         raise AccountValidationError(err.preference_errors)
@@ -287,6 +288,13 @@ def _update_extended_profile_if_needed(data, user_profile):
             new_value = field['field_value']
             meta[field_name] = new_value
         user_profile.set_meta(meta)
+        user_profile.save()
+
+
+def _update_state_if_needed(data, user_profile):
+    # If the country was changed to something other than US, remove the state.
+    if "country" in data and data['country'] != UserProfile.COUNTRY_WITH_STATES:
+        user_profile.state = None
         user_profile.save()
 
 

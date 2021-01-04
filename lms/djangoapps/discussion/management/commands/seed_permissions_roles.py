@@ -1,4 +1,3 @@
-# pylint: disable=missing-docstring
 """
 Management command to seed default permissions and roles.
 """

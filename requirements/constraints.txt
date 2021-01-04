@@ -8,28 +8,40 @@
 # pin when possible.  Writing an issue against the offending project and
 # linking to it here is good.
 
-# We're not ready for Celery 4 yet, but 3.1.25+ are forward-compatible with it.
-# As of this writing, there's a 3.1.26.post2 with a very important bugfix
-# (although it is advertised in the changelog as 3.1.26.)
-celery>=3.1.25,<4.0.0
+# celery 5.0 has dropped python3.5 support.
+celery<5.0
+
+# cryptography 3.3 has dropped python3.5 support.
+cryptography<3.3
+
+# Stay on the latest LTS release of Django
+Django<2.3
 
 # The CORS_ORIGIN_WHITELIST changes in a backwards incompatible way in 3.0.0, needs matching configuration repo changes
 django-cors-headers<3.0.0
 
-# Version 4.0.0 dropped support for Django < 2.0.1
-django-model-utils<4.0.0
+# It seems like django-countries > 5.5 may cause performance issues for us.
+django-countries==5.5
 
-# Version 1.2.0 dropped support for Django 1.11
-django-oauth-toolkit<1.2.0
+# Removes deprecated get_ip function, which we still use (ARCHBOM-1329 for unpinning)
+django-ipware<3.0.0
+
+# 2.0.0 dropped support for Python 3.5
+django-pipeline<2.0.0
 
 # django-storages version 1.9 drops support for boto storage backend.
 django-storages<1.9
 
-# Support was dropped for Python 3.5, Django 2.0, Django 2.1, DRF 3.7
+# Support was dropped for Python 3.5
 drf-yasg<1.17.1
 
-# Not properly supporting latest changing of drf-jwt
-drf-jwt==1.14.0
+# The team that owns this package will manually bump this package rather than having it pulled in automatically.
+# This is to allow them to better control its deployment and to do it in a process that works better
+# for them.
+edx-enterprise==3.16.2
+
+# We expect v2.0.0 to introduce large breaking changes in the feature toggle API
+edx-toggles<2.0.0
 
 # Upgrading to 2.12.0 breaks several test classes due to API changes, need to update our code accordingly
 factory-boy==2.8.1
@@ -37,11 +49,30 @@ factory-boy==2.8.1
 # Newer versions need a more recent version of python-dateutil
 freezegun==0.3.12
 
+# When we went from httpretty 0.9.7 to 1.0.2, tests broke
+httpretty<1.0
+
 # 4.0.0 dropped support for Python 3.5
 inflect<4.0.0
 
+# 5.0.0 dropped support for Python 3.5
+isort<5.0.0
+
+# 0.15.0 dropped support for Python 3.5
+joblib<0.15.0
+
+# Version 2.0.0 is giving incompatible versions errors on upgrade
+importlib-metadata==1.7.0
+
 # jsonfield2 3.1.0 drops support for python 3.5
 jsonfield2<3.1.0
+
+# kiwisolver 1.2.0 requires Python 3.6+
+kiwisolver<1.2.0
+
+# 4.5.1 introduced a bug when used together with xmlsec: https://bugs.launchpad.net/lxml/+bug/1880251
+# Tests passed, but hit a problem in stage
+lxml<4.5.1
 
 # Convert text markup to HTML; used in capa problems, forums, and course wikis; pin Markdown version as tests failed for its upgrade to the latest release
 Markdown==2.6.11
@@ -49,30 +80,32 @@ Markdown==2.6.11
 # Matplotlib 3.1 requires Python 3.6
 matplotlib<3.1
 
+# maxminddb 2.0.0 has dropped support for Python 3.5
+maxminddb<2.0.0
+
 # mock version 4.0.0 drops support for python 3.5
 mock<4.0.0
 
-# mysqlclient 1.5 is scheduled to change internal APIs used by Django 1.11
-mysqlclient<1.5
+# oauthlib>3.0.1 causes test failures ( also remove the django-oauth-toolkit constraint when this is fixed )
+oauthlib==3.0.1
 
-# Version 0.23.0 requires python-dateutil>=2.5.0
-pandas==0.22.0
+# django-auth-toolkit==1.3.3 requires oauthlib>=3.1.0 which is pinned because of test failures
+django-oauth-toolkit<=1.3.2
 
 # path 13.2.0 drops support for Python 3.5
 path<13.2.0
 
+# pillow 8.0.0 drops support for Python 3.5
+pillow<8.0.0
+
+# ARCHBOM-1141: pip-tools upgrade requires pip upgrade
+pip-tools<5.0.0
+
 # Upgrading to 2.5.3 on 2020-01-03 triggered "'tzlocal' object has no attribute '_std_offset'" errors in production
 python-dateutil==2.4.0
 
-# python3-saml 1.6.0 breaks unittests in common/djangoapps/third_party_auth/tests/test_views.py::SAMLMetadataTest
-python3-saml==1.5.0
-
-# oauthlib>3.0.1 causes test failures
-oauthlib==3.0.1
-
-# transifex-client 0.13.5 and 0.13.6 needlessly pin six and urllib3, 0.13.7 does so for python-slugify
-#   https://github.com/transifex/transifex-client/issues/252
-transifex-client==0.13.4
+# stevedore 2.0.0 requires python >= 3.6
+stevedore<2.0.0
 
 # Constraint from astroid 2.3.3
 wrapt==1.11.*
@@ -80,5 +113,26 @@ wrapt==1.11.*
 # zipp 2.0.0 requires Python >= 3.6
 zipp==1.0.0
 
-# It seems like django-countries > 5.5 may cause performance issues for us.
-django-countries==5.5
+# Matplotlib 3.1 requires Python 3.6
+matplotlib<3.1
+
+# numpy 1.19 requires Python 3.6
+numpy<1.19
+
+# scipy 1.5 requires Python 3.6
+scipy<1.5
+
+# geoip2 requires Python 3.6
+geoip2<4.0.1
+
+# tests failing for pymongo==3.11
+pymongo<3.11
+
+# vulture 2.0 requires Python >= 3.6
+vulture<2.0
+
+# sympy latest version causing test failures.
+sympy==1.6.2
+
+# cryptography 3.3.1 started failing tests on sandbox because it dropped support for python3.5
+cryptography==3.2.1

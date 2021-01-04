@@ -33,12 +33,12 @@ class StubXQueueServiceTest(unittest.TestCase):
         self.addCleanup(self.server.shutdown)
 
         # Patch the timer async calls
-        patcher = mock.patch('terrain.stubs.xqueue.post')
+        patcher = mock.patch('common.djangoapps.terrain.stubs.xqueue.post')
         self.post = patcher.start()
         self.addCleanup(patcher.stop)
 
         # Patch POST requests
-        patcher = mock.patch('terrain.stubs.xqueue.Timer')
+        patcher = mock.patch('common.djangoapps.terrain.stubs.xqueue.Timer')
         timer = patcher.start()
         timer.side_effect = FakeTimer
         self.addCleanup(patcher.stop)
@@ -105,7 +105,7 @@ class StubXQueueServiceTest(unittest.TestCase):
         self.server.config['test_1'] = {'response': True}
         self.server.config['test_2'] = {'response': False}
 
-        with mock.patch('terrain.stubs.http.LOGGER') as logger:
+        with mock.patch('common.djangoapps.terrain.stubs.http.LOGGER') as logger:
 
             # Post a submission to the XQueue stub
             callback_url = 'http://127.0.0.1:8000/test_callback'

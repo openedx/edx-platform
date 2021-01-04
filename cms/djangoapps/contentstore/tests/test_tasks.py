@@ -16,10 +16,10 @@ from organizations.models import OrganizationCourse
 from organizations.tests.factories import OrganizationFactory
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
-from contentstore.tasks import export_olx, rerun_course
-from contentstore.tests.test_libraries import LibraryTestCase
-from contentstore.tests.utils import CourseTestCase
-from course_action_state.models import CourseRerunState
+from cms.djangoapps.contentstore.tasks import export_olx, rerun_course
+from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from common.djangoapps.course_action_state.models import CourseRerunState
 from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
 from xmodule.modulestore.django import modulestore
 
@@ -27,7 +27,7 @@ TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 
-def side_effect_exception(*args, **kwargs):  # pylint: disable=unused-argument
+def side_effect_exception(*args, **kwargs):
     """
     Side effect for mocking which raises an exception
     """
@@ -53,7 +53,7 @@ class ExportCourseTestCase(CourseTestCase):
         output = artifacts[0]
         self.assertEqual(output.name, 'Output')
 
-    @mock.patch('contentstore.tasks.export_course_to_xml', side_effect=side_effect_exception)
+    @mock.patch('cms.djangoapps.contentstore.tasks.export_course_to_xml', side_effect=side_effect_exception)
     def test_exception(self, mock_export):  # pylint: disable=unused-argument
         """
         The export task should fail gracefully if an exception is thrown
@@ -127,7 +127,7 @@ class RerunCourseTaskTestCase(CourseTestCase):
         old_course_id = str(old_course_key)
         new_course_id = str(new_course_key)
 
-        organization = OrganizationFactory()
+        organization = OrganizationFactory(short_name=old_course_key.org)
         OrganizationCourse.objects.create(course_id=old_course_id, organization=organization)
 
         restricted_course = RestrictedCourse.objects.create(course_key=self.course.id)

@@ -6,7 +6,7 @@ Views for verifying the health (heartbeat) of the app.
 import logging
 import six
 
-from util.json_request import JsonResponse
+from common.djangoapps.util.json_request import JsonResponse
 
 from .runchecks import runchecks
 

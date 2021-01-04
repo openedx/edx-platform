@@ -25,8 +25,8 @@ from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KE
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
-from student.models import PendingEmailChange, UserProfile
-from student.tests.factories import TEST_PASSWORD, UserFactory
+from common.djangoapps.student.models import PendingEmailChange, UserProfile
+from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory
 
 from .. import ALL_USERS_VISIBILITY, CUSTOM_VISIBILITY, PRIVATE_VISIBILITY
 
@@ -107,6 +107,7 @@ class UserAPITestCase(APITestCase):
         """
         legacy_profile = UserProfile.objects.get(id=user.id)
         legacy_profile.country = "US"
+        legacy_profile.state = "MA"
         legacy_profile.level_of_education = "m"
         legacy_profile.year_of_birth = 2000
         legacy_profile.goals = "world peace"
@@ -175,7 +176,7 @@ class TestOwnUsernameAPI(CacheIsolationTestCase, UserAPITestCase):
         Test that a client (logged in) can get her own username.
         """
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        self._verify_get_own_username(16)
+        self._verify_get_own_username(17)
 
     def test_get_username_inactive(self):
         """
@@ -185,7 +186,7 @@ class TestOwnUsernameAPI(CacheIsolationTestCase, UserAPITestCase):
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         self.user.is_active = False
         self.user.save()
-        self._verify_get_own_username(16)
+        self._verify_get_own_username(17)
 
     def test_get_username_not_logged_in(self):
         """
@@ -266,7 +267,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         Verify that all account fields are returned (even those that are not shareable).
         """
         data = response.data
-        self.assertEqual(23, len(data))
+        self.assertEqual(25, len(data))
 
         # public fields (3)
         expected_account_privacy = (
@@ -291,12 +292,14 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         # additional admin fields (10)
         self.assertEqual(self.user.email, data["email"])
         self.assertIsNotNone(data["extended_profile"])
+        self.assertEqual("MA", data["state"])
         self.assertEqual("f", data["gender"])
         self.assertEqual("world peace", data["goals"])
         self.assertTrue(data["is_active"])
         self.assertEqual("Park Ave", data['mailing_address'])
         self.assertEqual(requires_parental_consent, data["requires_parental_consent"])
         self.assertIsNone(data["secondary_email"])
+        self.assertIsNone(data["secondary_email_enabled"])
         self.assertEqual(year_of_birth, data["year_of_birth"])
 
     def test_anonymous_access(self):
@@ -328,6 +331,22 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         response = client.get(reverse("accounts_api", kwargs={'username': "does_not_exist"}))
         self.assertEqual(404, response.status_code)
 
+    @ddt.data(
+        ("client", "user"),
+        ("staff_client", "staff_user"),
+    )
+    @ddt.unpack
+    def test_get_account_by_email(self, api_client, user):
+        """
+        Test that requesting a user email search works.
+        """
+        client = self.login_client(api_client, user)
+        self.create_mock_profile(self.user)
+        set_user_preference(self.user, ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY)
+
+        response = self.send_get(client, query_parameters='email={}'.format(self.user.email))
+        self._verify_full_account_response(response)
+
     # Note: using getattr so that the patching works even if there is no configuration.
     # This is needed when testing CMS as the patching is still executed even though the
     # suite is skipped.
@@ -339,7 +358,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
         self.create_mock_profile(self.user)
-        with self.assertNumQueries(22):
+        with self.assertNumQueries(24):
             response = self.send_get(self.different_client)
         self._verify_full_shareable_account_response(response, account_privacy=ALL_USERS_VISIBILITY)
 
@@ -354,7 +373,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
         self.create_mock_profile(self.user)
-        with self.assertNumQueries(22):
+        with self.assertNumQueries(24):
             response = self.send_get(self.different_client)
         self._verify_private_account_response(response)
 
@@ -395,6 +414,9 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
 
         # Verify how the view parameter changes the fields that are returned.
         response = self.send_get(client, query_parameters='view=shared')
+        verify_fields_visible_to_all_users(response)
+
+        response = self.send_get(client, query_parameters='view=shared&email={}'.format(self.user.email))
         verify_fields_visible_to_all_users(response)
 
     @ddt.data(
@@ -475,12 +497,13 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             with self.assertNumQueries(queries):
                 response = self.send_get(self.client)
             data = response.data
-            self.assertEqual(23, len(data))
+            self.assertEqual(25, len(data))
             self.assertEqual(self.user.username, data["username"])
             self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
             for empty_field in ("year_of_birth", "level_of_education", "mailing_address", "bio"):
                 self.assertIsNone(data[empty_field])
             self.assertIsNone(data["country"])
+            self.assertIsNone(data["state"])
             self.assertEqual("m", data["gender"])
             self.assertEqual("Learn a lot", data["goals"])
             self.assertEqual(self.user.email, data["email"])
@@ -495,12 +518,12 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             self.assertEqual(False, data["accomplishments_shared"])
 
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        verify_get_own_information(20)
+        verify_get_own_information(22)
 
         # Now make sure that the user can get the same information, even if not active
         self.user.is_active = False
         self.user.save()
-        verify_get_own_information(13)
+        verify_get_own_information(14)
 
     def test_get_account_empty_string(self):
         """
@@ -508,15 +531,16 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         legacy_profile = UserProfile.objects.get(id=self.user.id)
         legacy_profile.country = ""
+        legacy_profile.state = ""
         legacy_profile.level_of_education = ""
         legacy_profile.gender = ""
         legacy_profile.bio = ""
         legacy_profile.save()
 
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        with self.assertNumQueries(20):
+        with self.assertNumQueries(22):
             response = self.send_get(self.client)
-        for empty_field in ("level_of_education", "gender", "country", "bio"):
+        for empty_field in ("level_of_education", "gender", "country", "state", "bio",):
             self.assertIsNone(response.data[empty_field])
 
     @ddt.data(
@@ -552,6 +576,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         ("gender", "f", "not a gender", u'"not a gender" is not a valid choice.'),
         ("level_of_education", "none", u"ȻħȺɍłɇs", u'"ȻħȺɍłɇs" is not a valid choice.'),
         ("country", "GB", "XY", u'"XY" is not a valid choice.'),
+        ("state", "MA", "PY", u'"PY" is not a valid choice.'),
         ("year_of_birth", 2009, "not_an_int", u"A valid integer is required."),
         ("name", "bob", "z" * 256, u"Ensure this field has no more than 255 characters."),
         ("name", u"ȻħȺɍłɇs", "   ", u"The name field must be at least 1 character long."),
@@ -586,10 +611,15 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
 
         if fails_validation_value:
             error_response = self.send_patch(client, {field: fails_validation_value}, expected_status=400)
+            expected_user_message = u'This value is invalid.'
+            if field == 'bio':
+                expected_user_message = u"The about me field must be at most 300 characters long."
+
             self.assertEqual(
-                u'This value is invalid.',
+                expected_user_message,
                 error_response.data["field_errors"][field]["user_message"]
             )
+
             self.assertEqual(
                 u"Value '{value}' is not valid for field '{field}': {messages}".format(
                     value=fails_validation_value, field=field, messages=[developer_validation_message]
@@ -657,7 +687,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         Also verifies the behaviour when setting to None.
         """
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        for field_name in ["gender", "level_of_education", "country"]:
+        for field_name in ["gender", "level_of_education", "country", "state"]:
             response = self.send_patch(self.client, {field_name: ""})
             # Although throwing a 400 might be reasonable, the default DRF behavior with ModelSerializer
             # is to convert to None, which also seems acceptable (and is difficult to override).
@@ -762,7 +792,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         )
         self.assertEqual("Valid e-mail address required.", field_errors["email"]["user_message"])
 
-    @mock.patch('student.views.management.do_email_change_request')
+    @mock.patch('common.djangoapps.student.views.management.do_email_change_request')
     def test_patch_duplicate_email(self, do_email_change_request):
         """
         Test that same success response will be sent to user even if the given email already used.
@@ -886,12 +916,12 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         response = self.send_get(client)
         if has_full_access:
             data = response.data
-            self.assertEqual(23, len(data))
+            self.assertEqual(25, len(data))
             self.assertEqual(self.user.username, data["username"])
             self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
             self.assertEqual(self.user.email, data["email"])
             self.assertEqual(year_of_birth, data["year_of_birth"])
-            for empty_field in ("country", "level_of_education", "mailing_address", "bio"):
+            for empty_field in ("country", "level_of_education", "mailing_address", "bio", "state",):
                 self.assertIsNone(data[empty_field])
             self.assertEqual("m", data["gender"])
             self.assertEqual("Learn a lot", data["goals"])
@@ -920,7 +950,7 @@ class TestAccountAPITransactions(TransactionTestCase):
         self.user = UserFactory.create(password=TEST_PASSWORD)
         self.url = reverse("accounts_api", kwargs={'username': self.user.username})
 
-    @mock.patch('student.views.do_email_change_request')
+    @mock.patch('common.djangoapps.student.views.do_email_change_request')
     def test_update_account_settings_rollback(self, mock_email_change):
         """
         Verify that updating account settings is transactional when a failure happens.

@@ -10,8 +10,8 @@ from django.utils.six import StringIO
 from mock import patch
 from six.moves import range
 
-from course_modes.models import CourseMode
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.tests.factories import UserFactory, CourseEnrollmentFactory
 from openedx.core.djangoapps.credit.tests.test_api import TEST_ECOMMERCE_WORKER
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.features.enterprise_support.tests.factories import (
@@ -27,10 +27,9 @@ class TestEnterpriseCourseEnrollmentCreateOldOrder(TestCase):
     """
 
     @classmethod
-    def setUpClass(cls):
-        super(TestEnterpriseCourseEnrollmentCreateOldOrder, cls).setUpClass()
+    def setUpTestData(cls):
+        super(TestEnterpriseCourseEnrollmentCreateOldOrder, cls).setUpTestData()
         UserFactory(username=TEST_ECOMMERCE_WORKER)
-        cls.enrollment_count = 30
         cls._create_enterprise_course_enrollments(30)
 
     @classmethod
@@ -74,7 +73,10 @@ class TestEnterpriseCourseEnrollmentCreateOldOrder(TestCase):
                 output
             )
         )
-        self.assertEqual(mock_create_manual_enrollment_orders.call_count, 4)  # batch of 4 (10, 10, 10, 2)
+        # There are total 32 enrollments so there would be 4 batches (i.e: [10, 10, 10, 2])
+        # as there are 2 enrollments in last batch and that 2 enrollments are not valid enrollment to process,
+        # so _create_manual_enrollment_orders will not be called for last batch.
+        self.assertEqual(mock_create_manual_enrollment_orders.call_count, 3)
 
     @patch('lms.djangoapps.commerce.management.commands.create_orders_for_old_enterprise_course_enrollment'
            '.Command._create_manual_enrollment_orders')
@@ -89,6 +91,7 @@ class TestEnterpriseCourseEnrollmentCreateOldOrder(TestCase):
             '--start-index=5',
             '--end-index=20',
             '--batch-size=10',
+            '--sleep-time=0.5',
             stdout=out
         )
         output = out.getvalue()

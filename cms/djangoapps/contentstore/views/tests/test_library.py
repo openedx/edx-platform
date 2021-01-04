@@ -8,18 +8,23 @@ More important high-level tests are in contentstore/tests/test_libraries.py
 import ddt
 import mock
 from django.conf import settings
+from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch
+from organizations.api import get_organization_by_short_name
+from organizations.exceptions import InvalidOrganizationException
 from opaque_keys.edx.locator import CourseKey, LibraryLocator
-from six import binary_type, text_type
+from six import text_type
 from six.moves import range
 
-from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, parse_json
-from contentstore.utils import reverse_course_url, reverse_library_url
-from contentstore.views.component import get_component_templates
-from contentstore.views.library import get_library_creator_status
-from course_creators.views import add_user_with_status_granted as grant_course_creator_status
-from student.roles import LibraryUserRole
+from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, parse_json
+from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_library_url
+from cms.djangoapps.course_creators.views import add_user_with_status_granted as grant_course_creator_status
+from common.djangoapps.student.roles import LibraryUserRole
 from xmodule.modulestore.tests.factories import LibraryFactory
+
+from ..component import get_component_templates
+from ..library import get_library_creator_status
 
 LIBRARY_REST_URL = '/library/'  # URL for GET/POST requests involving libraries
 
@@ -47,23 +52,23 @@ class UnitTestLibraries(CourseTestCase):
     ######################################################
     # Tests for /library/ - list and create libraries:
 
-    @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", False)
+    @mock.patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", False)
     def test_library_creator_status_libraries_not_enabled(self):
         _, nostaff_user = self.create_non_staff_authed_user_client()
         self.assertEqual(get_library_creator_status(nostaff_user), False)
 
-    @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True)
+    @mock.patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", True)
     def test_library_creator_status_with_is_staff_user(self):
         self.assertEqual(get_library_creator_status(self.user), True)
 
-    @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True)
+    @mock.patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", True)
     def test_library_creator_status_with_course_creator_role(self):
         _, nostaff_user = self.create_non_staff_authed_user_client()
         with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             grant_course_creator_status(self.user, nostaff_user)
             self.assertEqual(get_library_creator_status(nostaff_user), True)
 
-    @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True)
+    @mock.patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", True)
     def test_library_creator_status_with_no_course_creator_role(self):
         _, nostaff_user = self.create_non_staff_authed_user_client()
         self.assertEqual(get_library_creator_status(nostaff_user), True)
@@ -82,7 +87,7 @@ class UnitTestLibraries(CourseTestCase):
         Ensure that the setting DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION as expected.
         """
         _, nostaff_user = self.create_non_staff_authed_user_client()
-        with mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True):
+        with mock.patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", True):
             with mock.patch.dict(
                 "django.conf.settings.FEATURES",
                 {
@@ -93,7 +98,7 @@ class UnitTestLibraries(CourseTestCase):
                 self.assertEqual(get_library_creator_status(nostaff_user), expected_status)
 
     @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_COURSE_CREATION': True})
-    @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True)
+    @mock.patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", True)
     def test_library_creator_status_with_no_course_creator_role_and_disabled_nonstaff_course_creation(self):
         """
         Ensure that `DISABLE_COURSE_CREATION` feature works with libraries as well.
@@ -109,7 +114,7 @@ class UnitTestLibraries(CourseTestCase):
         self.assertEqual(get_response.status_code, 200)
         self.assertEqual(post_response.status_code, 403)
 
-    @patch("contentstore.views.library.LIBRARIES_ENABLED", False)
+    @patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", False)
     def test_with_libraries_disabled(self):
         """
         The library URLs should return 404 if libraries are disabled.
@@ -123,7 +128,7 @@ class UnitTestLibraries(CourseTestCase):
         """
         # Create some more libraries
         libraries = [LibraryFactory.create() for _ in range(3)]
-        lib_dict = dict([(lib.location.library_key, lib) for lib in libraries])
+        lib_dict = {lib.location.library_key: lib for lib in libraries}
 
         response = self.client.get_json(LIBRARY_REST_URL)
         self.assertEqual(response.status_code, 200)
@@ -225,6 +230,41 @@ class UnitTestLibraries(CourseTestCase):
         self.assertIn('already a library defined', parse_json(response)['ErrMsg'])
         self.assertEqual(response.status_code, 400)
 
+    @override_settings(ORGANIZATIONS_AUTOCREATE=True)
+    def test_library_with_unknown_organization_autocreation(self):
+        """
+        Test that when automatic organization creation is enabled,
+        creating a content library with an unknown organization auto-creates
+        said organization.
+        """
+        with self.assertRaises(InvalidOrganizationException):
+            get_organization_by_short_name("org_xyz")
+        response = self.client.ajax_post(LIBRARY_REST_URL, {
+            'org': "org_xyz",
+            'library': "org_test_lib",
+            'display_name': "This library's organization doesn't exist... yet.",
+        })
+        assert response.status_code == 200
+        assert get_organization_by_short_name("org_xyz")
+
+    @override_settings(ORGANIZATIONS_AUTOCREATE=False)
+    def test_library_with_unknown_organization_validation_error(self):
+        """
+        Test that when automatic organization creation is disabled,
+        creating a content library with an unknown organization raises an error.
+        """
+        with self.assertRaises(InvalidOrganizationException):
+            get_organization_by_short_name("org_xyz")
+        response = self.client.ajax_post(LIBRARY_REST_URL, {
+            'org': "org_xyz",
+            'library': "org_test_lib",
+            'display_name': "This library's organization doesn't exist!",
+        })
+        assert response.status_code == 400
+        assert "'org_xyz' is not a valid organization identifier" in parse_json(response)['ErrMsg']
+        with self.assertRaises(InvalidOrganizationException):
+            get_organization_by_short_name("org_xyz")
+
     ######################################################
     # Tests for /library/:lib_key/ - get a specific library as JSON or HTML editing view
 
@@ -297,6 +337,7 @@ class UnitTestLibraries(CourseTestCase):
         self.assertIn('problem', templates)
         self.assertNotIn('discussion', templates)
         self.assertNotIn('advanced', templates)
+        self.assertNotIn('openassessment', templates)
 
     def test_advanced_problem_types(self):
         """
@@ -306,7 +347,11 @@ class UnitTestLibraries(CourseTestCase):
         lib.save()
 
         problem_type_templates = next(
-            (component['templates'] for component in get_component_templates(lib, library=True) if component['type'] == 'problem'),
+            (
+                component['templates']
+                for component in get_component_templates(lib, library=True)
+                if component['type'] == 'problem'
+            ),
             []
         )
         # Each problem template has a category which shows whether problem is a 'problem'
@@ -342,3 +387,21 @@ class UnitTestLibraries(CourseTestCase):
         response = self.client.get(manage_users_url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, extra_user.username)
+
+    def test_component_limits(self):
+        """
+        Test that component limits in libraries are respected.
+        """
+        with self.settings(MAX_BLOCKS_PER_CONTENT_LIBRARY=1):
+            library = LibraryFactory.create()
+            data = {
+                'parent_locator': str(library.location),
+                'category': 'html'
+            }
+            response = self.client.ajax_post(reverse('xblock_handler'), data)
+            self.assertEqual(response.status_code, 200)
+
+            # Adding another component should cause failure:
+            response = self.client.ajax_post(reverse('xblock_handler'), data)
+            self.assertEqual(response.status_code, 400)
+            self.assertIn('cannot have more than 1 component', parse_json(response)['error'])

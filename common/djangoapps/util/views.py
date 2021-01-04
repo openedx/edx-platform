@@ -1,5 +1,3 @@
-
-
 import json
 import logging
 import sys
@@ -10,15 +8,20 @@ import crum
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseServerError
-from django.views.decorators.csrf import requires_csrf_token
+from django.views.decorators.csrf import ensure_csrf_cookie, requires_csrf_token
 from django.views.defaults import server_error
+from django.shortcuts import redirect
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from six.moves import map
 
-import track.views
-from edxmako.shortcuts import render_to_response
-from student.roles import GlobalStaff
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.masquerade import setup_masquerade
+from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
+from openedx.features.course_experience.utils import dates_banner_should_display
+from common.djangoapps.track import views as track_views
+from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.student.roles import GlobalStaff
 
 log = logging.getLogger(__name__)
 
@@ -49,7 +52,7 @@ def ensure_valid_usage_key(view_func):
     If usage_key_string is not valid raise 404.
     """
     @wraps(view_func)
-    def inner(request, *args, **kwargs):  # pylint: disable=missing-docstring
+    def inner(request, *args, **kwargs):
         usage_key = kwargs.get('usage_key_string')
         if usage_key is not None:
             try:
@@ -66,7 +69,7 @@ def ensure_valid_usage_key(view_func):
 def require_global_staff(func):
     """View decorator that requires that the user have global staff permissions. """
     @wraps(func)
-    def wrapped(request, *args, **kwargs):  # pylint: disable=missing-docstring
+    def wrapped(request, *args, **kwargs):
         if GlobalStaff().has_user(request.user):
             return func(request, *args, **kwargs)
         else:
@@ -159,14 +162,13 @@ def calculate(request):
     except:
         event = {'error': list(map(str, sys.exc_info())),
                  'equation': equation}
-        track.views.server_track(request, 'error:calc', event, page='calc')
+        track_views.server_track(request, 'error:calc', event, page='calc')
         return HttpResponse(json.dumps({'result': 'Invalid syntax'}))
     return HttpResponse(json.dumps({'result': str(result)}))
 
 
 def info(request):
-    ''' Info page (link from main header) '''
-    # pylint: disable=unused-argument
+    """ Info page (link from main header) """
     return render_to_response("info.html", {})
 
 
@@ -187,3 +189,27 @@ def add_p3p_header(view_func):
         response['P3P'] = settings.P3P_HEADER
         return response
     return inner
+
+
+@ensure_csrf_cookie
+def reset_course_deadlines(request):
+    """
+    Set the start_date of a schedule to today, which in turn will adjust due dates for
+    sequentials belonging to a self paced course
+
+    IMPORTANT NOTE: If updates are happening to the logic here, ALSO UPDATE the `reset_course_deadlines`
+    function in openedx/features/course_experience/api/v1/views.py as well.
+    """
+    course_key = CourseKey.from_string(request.POST.get('course_id'))
+    _course_masquerade, user = setup_masquerade(
+        request,
+        course_key,
+        has_access(request.user, 'staff', course_key)
+    )
+
+    missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, user)
+    if missed_deadlines and not missed_gated_content:
+        reset_self_paced_schedule(user, course_key)
+
+    referrer = request.META.get('HTTP_REFERER')
+    return redirect(referrer) if referrer else HttpResponse()

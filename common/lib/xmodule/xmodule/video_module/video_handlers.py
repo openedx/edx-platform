@@ -384,6 +384,24 @@ class VideoStudentViewHandlers(object):
         return response
 
     @XBlock.handler
+    def student_view_user_state(self, request, suffix=''):
+        """
+        Endpoint to get user-specific state, like current position and playback speed,
+        without rendering the full student_view HTML. This is similar to student_view_state,
+        but that one cannot contain user-specific info.
+        """
+        view_state = self.student_view_data()
+        view_state.update({
+            "saved_video_position": self.saved_video_position.total_seconds(),
+            "speed": self.speed,
+        })
+        return Response(
+            json.dumps(view_state),
+            content_type='application/json',
+            charset='UTF-8'
+        )
+
+    @XBlock.handler
     def yt_video_metadata(self, request, suffix=''):
         """
         Endpoint to get YouTube metadata.
@@ -391,7 +409,11 @@ class VideoStudentViewHandlers(object):
         runtime uses a similar REST API that's not an XBlock handler.
         """
         from lms.djangoapps.courseware.views.views import load_metadata_from_youtube
-        metadata, status_code = load_metadata_from_youtube(video_id=self.youtube_id_1_0)
+        if not self.youtube_id_1_0:
+            # TODO: more informational response to explain that yt_video_metadata not supported for non-youtube videos.
+            return Response('{}', status=400)
+
+        metadata, status_code = load_metadata_from_youtube(video_id=self.youtube_id_1_0, request=request)
         response = Response(json.dumps(metadata), status=status_code)
         response.content_type = 'application/json'
         return response

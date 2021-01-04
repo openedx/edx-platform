@@ -16,7 +16,7 @@ from opaque_keys.edx.locator import CourseLocator
 from pytz import UTC
 from rest_framework.exceptions import PermissionDenied
 from six.moves import range
-from six.moves.urllib.parse import parse_qs, urlencode, urlparse, urlunparse  # pylint: disable=import-error
+from six.moves.urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from lms.djangoapps.courseware.tests.factories import BetaTesterFactory, StaffFactory
@@ -56,8 +56,8 @@ from openedx.core.djangoapps.django_comment_common.models import (
     Role
 )
 from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.testing import UrlResetMixin
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -179,8 +179,8 @@ class GetCourseTestBlackouts(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCa
         self.assertEqual(
             result["blackouts"],
             [
-                {"start": "2015-06-09T00:00:00+00:00", "end": "2015-06-10T00:00:00+00:00"},
-                {"start": "2015-06-11T00:00:00+00:00", "end": "2015-06-12T00:00:00+00:00"},
+                {"start": "2015-06-09T00:00:00Z", "end": "2015-06-10T00:00:00Z"},
+                {"start": "2015-06-11T00:00:00Z", "end": "2015-06-12T00:00:00Z"},
             ]
         )
 

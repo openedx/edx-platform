@@ -31,6 +31,11 @@
         }
       }
     }
+    .wrapper-logo {
+      img {
+        height: $header-logo-height * 1.05;
+      }
+    }
 
     .legal-nav {
       padding: 0;
@@ -40,7 +45,7 @@
           text-decoration: none;
           padding: 0;
           margin-right: $baseline/4;
-          font-size: .8em;
+          font-size: 0.8em;
         }
       }
 
@@ -57,7 +62,7 @@
       @include text-align(left);
 
       margin: -2px 0 8px;
-      font-size: .8em;
+      font-size: 0.8em;
       color: $gray;
     }
 

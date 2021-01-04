@@ -6,6 +6,8 @@ Add and create new modes for running courses on this particular LMS
 from collections import defaultdict, namedtuple
 from datetime import timedelta
 
+import inspect
+import logging
 import six
 from config_models.models import ConfigurationModel
 from django.conf import settings
@@ -24,6 +26,8 @@ from simple_history.models import HistoricalRecords
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.cache_utils import request_cached
+
+log = logging.getLogger(__name__)
 
 Mode = namedtuple('Mode',
                   [
@@ -53,19 +57,6 @@ class CourseMode(models.Model):
         related_name='modes',
         on_delete=models.DO_NOTHING,
     )
-
-    # Django sets the `course_id` property in __init__ with the value from the database
-    # This pair of properties converts that into a proper CourseKey
-    @property
-    def course_id(self):
-        return self._course_id
-
-    @course_id.setter
-    def course_id(self, value):
-        if isinstance(value, six.string_types):
-            self._course_id = CourseKey.from_string(value)
-        else:
-            self._course_id = value
 
     # the reference to this mode that can be used by Enrollments to generate
     # similar behavior for the same slug across courses
@@ -142,13 +133,14 @@ class CourseMode(models.Model):
 
     history = HistoricalRecords()
 
-    HONOR = u'honor'
-    PROFESSIONAL = u'professional'
-    VERIFIED = u'verified'
-    AUDIT = u'audit'
-    NO_ID_PROFESSIONAL_MODE = u'no-id-professional'
-    CREDIT_MODE = u'credit'
-    MASTERS = u'masters'
+    HONOR = 'honor'
+    PROFESSIONAL = 'professional'
+    VERIFIED = 'verified'
+    AUDIT = 'audit'
+    NO_ID_PROFESSIONAL_MODE = 'no-id-professional'
+    CREDIT_MODE = 'credit'
+    MASTERS = 'masters'
+    EXECUTIVE_EDUCATION = 'executive-education'
 
     DEFAULT_MODE = Mode(
         settings.COURSE_MODE_DEFAULTS['slug'],
@@ -163,13 +155,22 @@ class CourseMode(models.Model):
     )
     DEFAULT_MODE_SLUG = settings.COURSE_MODE_DEFAULTS['slug']
 
-    ALL_MODES = [AUDIT, CREDIT_MODE, HONOR, NO_ID_PROFESSIONAL_MODE, PROFESSIONAL, VERIFIED, MASTERS, ]
+    ALL_MODES = [
+        AUDIT,
+        CREDIT_MODE,
+        HONOR,
+        NO_ID_PROFESSIONAL_MODE,
+        PROFESSIONAL,
+        VERIFIED,
+        MASTERS,
+        EXECUTIVE_EDUCATION
+    ]
 
     # Modes utilized for audit/free enrollments
     AUDIT_MODES = [AUDIT, HONOR]
 
     # Modes that allow a student to pursue a verified certificate
-    VERIFIED_MODES = [VERIFIED, PROFESSIONAL, MASTERS]
+    VERIFIED_MODES = [VERIFIED, PROFESSIONAL, MASTERS, EXECUTIVE_EDUCATION]
 
     # Modes that allow a student to pursue a non-verified certificate
     NON_VERIFIED_MODES = [HONOR, AUDIT, NO_ID_PROFESSIONAL_MODE]
@@ -178,7 +179,7 @@ class CourseMode(models.Model):
     CREDIT_MODES = [CREDIT_MODE]
 
     # Modes that are eligible to purchase credit
-    CREDIT_ELIGIBLE_MODES = [VERIFIED, PROFESSIONAL, NO_ID_PROFESSIONAL_MODE]
+    CREDIT_ELIGIBLE_MODES = [VERIFIED, PROFESSIONAL, NO_ID_PROFESSIONAL_MODE, EXECUTIVE_EDUCATION]
 
     # Modes for which certificates/programs may need to be updated
     CERTIFICATE_RELEVANT_MODES = CREDIT_MODES + CREDIT_ELIGIBLE_MODES + [MASTERS]
@@ -186,18 +187,14 @@ class CourseMode(models.Model):
     # Modes that are allowed to upsell
     UPSELL_TO_VERIFIED_MODES = [HONOR, AUDIT]
 
-    # Courses purchased through the shoppingcart
-    # should be "honor". Since we've changed the DEFAULT_MODE_SLUG from
-    # "honor" to "audit", we still need to have the shoppingcart
-    # use "honor"
-    DEFAULT_SHOPPINGCART_MODE_SLUG = HONOR
-    DEFAULT_SHOPPINGCART_MODE = Mode(HONOR, _('Honor'), 0, '', 'usd', None, None, None, None)
-
     CACHE_NAMESPACE = u"course_modes.CourseMode.cache."
 
     class Meta(object):
         app_label = "course_modes"
         unique_together = ('course', 'mode_slug', 'currency')
+
+    def __init__(self, *args, **kwargs):
+        super(CourseMode, self).__init__(*args, **kwargs)
 
     def clean(self):
         """
@@ -342,17 +339,16 @@ class CourseMode(models.Model):
     @classmethod
     @request_cached(CACHE_NAMESPACE)
     def modes_for_course(
-        cls, course_id=None, include_expired=False, only_selectable=True, course=None, exclude_credit=True
+        cls, course_id=None, include_expired=False, only_selectable=True, course=None,
     ):
         """
         Returns a list of the non-expired modes for a given course id
 
         If no modes have been set in the table, returns the default mode
 
-        Arguments:
+        Keyword Arguments:
             course_id (CourseKey): Search for course modes for this course.
 
-        Keyword Arguments:
             include_expired (bool): If True, expired course modes will be included
             in the returned JSON data. If False, these modes will be omitted.
 
@@ -376,10 +372,10 @@ class CourseMode(models.Model):
             course_id = course.id
             course = None
 
-        if course_id is not None:
-            found_course_modes = cls.objects.filter(course_id=course_id)
+        if course is not None:
+            found_course_modes = course.modes.all()
         else:
-            found_course_modes = course.modes
+            found_course_modes = cls.objects.filter(course_id=course_id)
 
         # Filter out expired course modes if include_expired is not set
         if not include_expired:
@@ -392,10 +388,7 @@ class CourseMode(models.Model):
         # we exclude them from the list if we're only looking for selectable modes
         # (e.g. on the track selection page or in the payment/verification flows).
         if only_selectable:
-            if course is not None and hasattr(course, 'selectable_modes'):
-                found_course_modes = course.selectable_modes
-            elif exclude_credit:
-                found_course_modes = found_course_modes.exclude(mode_slug__in=cls.CREDIT_MODES)
+            found_course_modes = found_course_modes.exclude(mode_slug__in=cls.CREDIT_MODES)
 
         modes = ([mode.to_tuple() for mode in found_course_modes])
         if not modes:
@@ -543,6 +536,19 @@ class CourseMode(models.Model):
             bool
         """
         return cls.PROFESSIONAL in modes_dict or cls.NO_ID_PROFESSIONAL_MODE in modes_dict
+
+    @classmethod
+    def contains_audit_mode(cls, modes_dict):
+        """
+        Check whether the modes_dict contains an audit mode.
+
+        Args:
+            modes_dict (dict): a dict of course modes
+
+        Returns:
+            bool: whether modes_dict contains an audit mode
+        """
+        return cls.AUDIT in modes_dict
 
     @classmethod
     def is_professional_mode(cls, course_mode_tuple):

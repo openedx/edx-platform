@@ -50,12 +50,12 @@
     "Midnight": "Midnat",
     "Noon": "Middag",
     "Note: You are %s hour ahead of server time.": [
-      "Obs: Du er %s time forud i forhold servertiden.",
-      "Obs: Du er %s timer forud i forhold servertiden."
+      "Obs: Du er %s time forud i forhold til servertiden.",
+      "Obs: Du er %s timer forud i forhold til servertiden."
     ],
     "Note: You are %s hour behind server time.": [
-      "Obs: Du er %s time bagud i forhold servertiden.",
-      "Obs: Du er %s timer forud i forhold servertiden."
+      "Obs: Du er %s time bagud i forhold til servertiden.",
+      "Obs: Du er %s timer bagud i forhold til servertiden."
     ],
     "November": "November",
     "Now": "Nu",
@@ -101,7 +101,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -151,9 +151,9 @@
       "%Y-%m-%d"
     ],
     "DECIMAL_SEPARATOR": ",",
-    "FIRST_DAY_OF_WEEK": "1",
+    "FIRST_DAY_OF_WEEK": 1,
     "MONTH_DAY_FORMAT": "j. F",
-    "NUMBER_GROUPING": "3",
+    "NUMBER_GROUPING": 3,
     "SHORT_DATETIME_FORMAT": "d.m.Y H:i",
     "SHORT_DATE_FORMAT": "d.m.Y",
     "THOUSAND_SEPARATOR": ".",

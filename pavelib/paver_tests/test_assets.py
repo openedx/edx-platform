@@ -6,7 +6,6 @@ from unittest import TestCase
 
 import ddt
 import paver.tasks
-import six
 from mock import patch
 from paver.easy import call_task, path
 from watchdog.observers import Observer
@@ -58,27 +57,27 @@ class TestPaverAssetTasks(PaverTestCase):
 
         if "lms" in system:
             if force:
-                expected_messages.append(u'rm -rf lms/static/css/*.css')
-            expected_messages.append(u'libsass lms/static/sass')
+                expected_messages.append('rm -rf lms/static/css/*.css')
+            expected_messages.append('libsass lms/static/sass')
             expected_messages.append(
-                u'rtlcss lms/static/css/bootstrap/lms-main.css lms/static/css/bootstrap/lms-main-rtl.css'
+                'rtlcss lms/static/css/bootstrap/lms-main.css lms/static/css/bootstrap/lms-main-rtl.css'
             )
             expected_messages.append(
-                u'rtlcss lms/static/css/discussion/lms-discussion-bootstrap.css'
-                u' lms/static/css/discussion/lms-discussion-bootstrap-rtl.css'
+                'rtlcss lms/static/css/discussion/lms-discussion-bootstrap.css'
+                ' lms/static/css/discussion/lms-discussion-bootstrap-rtl.css'
             )
             if force:
-                expected_messages.append(u'rm -rf lms/static/certificates/css/*.css')
-            expected_messages.append(u'libsass lms/static/certificates/sass')
+                expected_messages.append('rm -rf lms/static/certificates/css/*.css')
+            expected_messages.append('libsass lms/static/certificates/sass')
         if "studio" in system:
             if force:
-                expected_messages.append(u'rm -rf cms/static/css/*.css')
-            expected_messages.append(u'libsass cms/static/sass')
+                expected_messages.append('rm -rf cms/static/css/*.css')
+            expected_messages.append('libsass cms/static/sass')
             expected_messages.append(
-                u'rtlcss cms/static/css/bootstrap/studio-main.css cms/static/css/bootstrap/studio-main-rtl.css'
+                'rtlcss cms/static/css/bootstrap/studio-main.css cms/static/css/bootstrap/studio-main-rtl.css'
             )
 
-        six.assertCountEqual(self, self.task_messages, expected_messages)
+        self.assertCountEqual(self.task_messages, expected_messages)
 
 
 @ddt.ddt
@@ -125,77 +124,77 @@ class TestPaverThemeAssetTasks(PaverTestCase):
         )
         expected_messages = []
         if force:
-            expected_messages.append(u'rm -rf common/static/css/*.css')
-        expected_messages.append(u'libsass common/static/sass')
+            expected_messages.append('rm -rf common/static/css/*.css')
+        expected_messages.append('libsass common/static/sass')
 
         if 'lms' in system:
-            expected_messages.append(u'mkdir_p ' + repr(TEST_THEME_DIR / 'lms/static/css'))
+            expected_messages.append('mkdir_p ' + repr(TEST_THEME_DIR / 'lms/static/css'))
             if force:
                 expected_messages.append(
-                    u'rm -rf {test_theme_dir}/lms/static/css/*.css'.format(test_theme_dir=str(TEST_THEME_DIR))
+                    'rm -rf {test_theme_dir}/lms/static/css/*.css'.format(test_theme_dir=str(TEST_THEME_DIR))
                 )
             expected_messages.append("libsass lms/static/sass")
             expected_messages.append(
-                u'rtlcss {test_theme_dir}/lms/static/css/bootstrap/lms-main.css'
-                u' {test_theme_dir}/lms/static/css/bootstrap/lms-main-rtl.css'.format(
+                'rtlcss {test_theme_dir}/lms/static/css/bootstrap/lms-main.css'
+                ' {test_theme_dir}/lms/static/css/bootstrap/lms-main-rtl.css'.format(
                     test_theme_dir=str(TEST_THEME_DIR),
                 )
             )
             expected_messages.append(
-                u'rtlcss {test_theme_dir}/lms/static/css/discussion/lms-discussion-bootstrap.css'
-                u' {test_theme_dir}/lms/static/css/discussion/lms-discussion-bootstrap-rtl.css'.format(
+                'rtlcss {test_theme_dir}/lms/static/css/discussion/lms-discussion-bootstrap.css'
+                ' {test_theme_dir}/lms/static/css/discussion/lms-discussion-bootstrap-rtl.css'.format(
                     test_theme_dir=str(TEST_THEME_DIR),
                 )
             )
             if force:
                 expected_messages.append(
-                    u'rm -rf {test_theme_dir}/lms/static/css/*.css'.format(test_theme_dir=str(TEST_THEME_DIR))
+                    'rm -rf {test_theme_dir}/lms/static/css/*.css'.format(test_theme_dir=str(TEST_THEME_DIR))
                 )
             expected_messages.append(
-                u'libsass {test_theme_dir}/lms/static/sass'.format(test_theme_dir=str(TEST_THEME_DIR))
+                'libsass {test_theme_dir}/lms/static/sass'.format(test_theme_dir=str(TEST_THEME_DIR))
             )
             if force:
-                expected_messages.append(u'rm -rf lms/static/css/*.css')
-            expected_messages.append(u'libsass lms/static/sass')
+                expected_messages.append('rm -rf lms/static/css/*.css')
+            expected_messages.append('libsass lms/static/sass')
             expected_messages.append(
-                u'rtlcss lms/static/css/bootstrap/lms-main.css lms/static/css/bootstrap/lms-main-rtl.css'
+                'rtlcss lms/static/css/bootstrap/lms-main.css lms/static/css/bootstrap/lms-main-rtl.css'
             )
             expected_messages.append(
-                u'rtlcss lms/static/css/discussion/lms-discussion-bootstrap.css'
-                u' lms/static/css/discussion/lms-discussion-bootstrap-rtl.css'
+                'rtlcss lms/static/css/discussion/lms-discussion-bootstrap.css'
+                ' lms/static/css/discussion/lms-discussion-bootstrap-rtl.css'
             )
             if force:
-                expected_messages.append(u'rm -rf lms/static/certificates/css/*.css')
-            expected_messages.append(u'libsass lms/static/certificates/sass')
+                expected_messages.append('rm -rf lms/static/certificates/css/*.css')
+            expected_messages.append('libsass lms/static/certificates/sass')
 
         if "studio" in system:
-            expected_messages.append(u'mkdir_p ' + repr(TEST_THEME_DIR / 'cms/static/css'))
+            expected_messages.append('mkdir_p ' + repr(TEST_THEME_DIR / 'cms/static/css'))
             if force:
                 expected_messages.append(
-                    u'rm -rf {test_theme_dir}/cms/static/css/*.css'.format(test_theme_dir=str(TEST_THEME_DIR))
+                    'rm -rf {test_theme_dir}/cms/static/css/*.css'.format(test_theme_dir=str(TEST_THEME_DIR))
                 )
-            expected_messages.append(u'libsass cms/static/sass')
+            expected_messages.append('libsass cms/static/sass')
             expected_messages.append(
-                u'rtlcss {test_theme_dir}/cms/static/css/bootstrap/studio-main.css'
-                u' {test_theme_dir}/cms/static/css/bootstrap/studio-main-rtl.css'.format(
+                'rtlcss {test_theme_dir}/cms/static/css/bootstrap/studio-main.css'
+                ' {test_theme_dir}/cms/static/css/bootstrap/studio-main-rtl.css'.format(
                     test_theme_dir=str(TEST_THEME_DIR),
                 )
             )
             if force:
                 expected_messages.append(
-                    u'rm -rf {test_theme_dir}/cms/static/css/*.css'.format(test_theme_dir=str(TEST_THEME_DIR))
+                    'rm -rf {test_theme_dir}/cms/static/css/*.css'.format(test_theme_dir=str(TEST_THEME_DIR))
                 )
             expected_messages.append(
-                u'libsass {test_theme_dir}/cms/static/sass'.format(test_theme_dir=str(TEST_THEME_DIR))
+                'libsass {test_theme_dir}/cms/static/sass'.format(test_theme_dir=str(TEST_THEME_DIR))
             )
             if force:
-                expected_messages.append(u'rm -rf cms/static/css/*.css')
-            expected_messages.append(u'libsass cms/static/sass')
+                expected_messages.append('rm -rf cms/static/css/*.css')
+            expected_messages.append('libsass cms/static/sass')
             expected_messages.append(
-                u'rtlcss cms/static/css/bootstrap/studio-main.css cms/static/css/bootstrap/studio-main-rtl.css'
+                'rtlcss cms/static/css/bootstrap/studio-main.css cms/static/css/bootstrap/studio-main-rtl.css'
             )
 
-        six.assertCountEqual(self, self.task_messages, expected_messages)
+        self.assertCountEqual(self.task_messages, expected_messages)
 
 
 class TestPaverWatchAssetTasks(TestCase):
@@ -209,7 +208,6 @@ class TestPaverWatchAssetTasks(TestCase):
             path('common/static'),
             path('node_modules/@edx'),
             path('node_modules'),
-            path('node_modules/edx-pattern-library/node_modules'),
             path('lms/static/sass/partials'),
             path('lms/static/sass'),
             path('lms/static/certificates/sass'),
@@ -221,11 +219,11 @@ class TestPaverWatchAssetTasks(TestCase):
         if 'pavelib.assets.watch_assets' in paver.tasks.environment.options:
             del paver.tasks.environment.options['pavelib.assets.watch_assets']
 
-        super(TestPaverWatchAssetTasks, self).setUp()
+        super().setUp()
 
     def tearDown(self):
         self.expected_sass_directories = []
-        super(TestPaverWatchAssetTasks, self).tearDown()
+        super().tearDown()
 
     def test_watch_assets(self):
         """
@@ -245,7 +243,7 @@ class TestPaverWatchAssetTasks(TestCase):
 
                     self.assertIsInstance(sass_watcher_args[0], Observer)
                     self.assertIsInstance(sass_watcher_args[1], list)
-                    six.assertCountEqual(self, sass_watcher_args[1], self.expected_sass_directories)
+                    self.assertCountEqual(sass_watcher_args[1], self.expected_sass_directories)
 
     def test_watch_theme_assets(self):
         """
@@ -254,6 +252,7 @@ class TestPaverWatchAssetTasks(TestCase):
         self.expected_sass_directories.extend([
             path(TEST_THEME_DIR) / 'lms/static/sass',
             path(TEST_THEME_DIR) / 'lms/static/sass/partials',
+            path(TEST_THEME_DIR) / 'lms/static/certificates/sass',
             path(TEST_THEME_DIR) / 'cms/static/sass',
             path(TEST_THEME_DIR) / 'cms/static/sass/partials',
         ])
@@ -275,7 +274,7 @@ class TestPaverWatchAssetTasks(TestCase):
                     sass_watcher_args = mock_register.call_args_list[0][0]
                     self.assertIsInstance(sass_watcher_args[0], Observer)
                     self.assertIsInstance(sass_watcher_args[1], list)
-                    six.assertCountEqual(self, sass_watcher_args[1], self.expected_sass_directories)
+                    self.assertCountEqual(sass_watcher_args[1], self.expected_sass_directories)
 
 
 @ddt.ddt
@@ -347,7 +346,7 @@ class TestCollectAssets(PaverTestCase):
         """
         for i, sys in enumerate(systems):
             msg = self.task_messages[i]
-            self.assertTrue(msg.startswith(u'python manage.py {}'.format(sys)))
+            self.assertTrue(msg.startswith('python manage.py {}'.format(sys)))
             self.assertIn(' collectstatic ', msg)
             self.assertIn('--settings={}'.format(Env.DEVSTACK_SETTINGS), msg)
             self.assertTrue(msg.endswith(' {}'.format(log_location)))
@@ -374,7 +373,7 @@ class TestUpdateAssetsTask(PaverTestCase):
         call_task('pavelib.assets.update_assets', args=cmd_args)
         self.assertTrue(
             self._is_substring_in_list(self.task_messages, expected_substring),
-            msg=u"{substring} not found in messages".format(substring=expected_substring)
+            msg="{substring} not found in messages".format(substring=expected_substring)
         )
 
     def _is_substring_in_list(self, messages_list, expected_substring):

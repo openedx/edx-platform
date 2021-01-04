@@ -7,7 +7,10 @@ from django.contrib.auth.models import User
 from django.utils.timezone import now
 from rest_framework import serializers
 
-from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
+from lms.djangoapps.verify_student.models import (
+    ManualVerification,
+    SoftwareSecurePhotoVerification
+)
 
 from .models import UserPreference
 
@@ -98,35 +101,25 @@ class CountryTimeZoneSerializer(serializers.Serializer):  # pylint: disable=abst
     description = serializers.CharField()
 
 
-class IDVerificationSerializer(serializers.ModelSerializer):
-    """
-    Serializer that generates a representation of a user's ID verification status.
-    """
-    is_verified = serializers.SerializerMethodField()
+class IDVerificationDetailsSerializer(serializers.Serializer):
+    type = serializers.SerializerMethodField()
+    status = serializers.CharField()
+    expiration_datetime = serializers.DateTimeField()
+    message = serializers.SerializerMethodField()
+    updated_at = serializers.DateTimeField()
 
-    def get_is_verified(self, obj):
-        """
-        Return a boolean indicating if a the user is verified.
-        """
-        return obj.status == 'approved' and obj.expiration_datetime > now()
+    def get_type(self, obj):
+        if isinstance(obj, SoftwareSecurePhotoVerification):
+            return 'Software Secure'
+        elif isinstance(obj, ManualVerification):
+            return 'Manual'
+        else:
+            return 'SSO'
 
-
-class SoftwareSecurePhotoVerificationSerializer(IDVerificationSerializer):
-
-    class Meta(object):
-        fields = ('status', 'expiration_datetime', 'is_verified')
-        model = SoftwareSecurePhotoVerification
-
-
-class SSOVerificationSerializer(IDVerificationSerializer):
-
-    class Meta(object):
-        fields = ('status', 'expiration_datetime', 'is_verified')
-        model = SSOVerification
-
-
-class ManualVerificationSerializer(IDVerificationSerializer):
-
-    class Meta(object):
-        fields = ('status', 'expiration_datetime', 'is_verified')
-        model = ManualVerification
+    def get_message(self, obj):
+        if isinstance(obj, SoftwareSecurePhotoVerification):
+            return obj.error_msg
+        elif isinstance(obj, ManualVerification):
+            return obj.reason
+        else:
+            return ''

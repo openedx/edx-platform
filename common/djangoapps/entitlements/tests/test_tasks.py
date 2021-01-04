@@ -9,9 +9,9 @@ import mock
 import pytz
 from django.test import TestCase
 
-from entitlements import tasks
-from entitlements.models import CourseEntitlementPolicy
-from entitlements.tests.factories import CourseEntitlementFactory
+from common.djangoapps.entitlements import tasks
+from common.djangoapps.entitlements.models import CourseEntitlementPolicy
+from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
@@ -40,7 +40,7 @@ class TestExpireOldEntitlementsTask(TestCase):
         make_entitlement()
 
         with mock.patch(
-            'entitlements.models.CourseEntitlement.expired_at_datetime',
+            'common.djangoapps.entitlements.models.CourseEntitlement.expired_at_datetime',
             new_callable=mock.PropertyMock
         ) as mock_datetime:
             tasks.expire_old_entitlements.delay(1, 3).get()
@@ -56,7 +56,7 @@ class TestExpireOldEntitlementsTask(TestCase):
         make_entitlement()
 
         with mock.patch(
-            'entitlements.models.CourseEntitlement.expired_at_datetime',
+            'common.djangoapps.entitlements.models.CourseEntitlement.expired_at_datetime',
             new_callable=mock.PropertyMock
         ) as mock_datetime:
             tasks.expire_old_entitlements.delay(1, 3).get()
@@ -72,7 +72,7 @@ class TestExpireOldEntitlementsTask(TestCase):
         make_entitlement()
 
         with mock.patch(
-            'entitlements.models.CourseEntitlement.expired_at_datetime',
+            'common.djangoapps.entitlements.models.CourseEntitlement.expired_at_datetime',
             new_callable=mock.PropertyMock,
             side_effect=boom
         ) as mock_datetime:

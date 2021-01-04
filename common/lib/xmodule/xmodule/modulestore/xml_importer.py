@@ -32,6 +32,7 @@ from abc import abstractmethod
 
 import six
 import xblock
+from edx_django_utils.monitoring import set_custom_attribute
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryLocator
@@ -173,9 +174,9 @@ class StaticContentImporter:
         try:
             self.static_content_store.save(content)
         except Exception as err:
-            log.exception(u'Error importing {0}, error={1}'.format(
-                file_subpath, err
-            ))
+            msg = "Error importing {0}, error={1}".format(file_subpath, err)
+            log.exception(msg)
+            set_custom_attribute('course_import_failure', "Static Content Save Failure: {}".format(msg))
 
         return file_subpath, asset_key
 
@@ -460,15 +461,19 @@ class ImportManager(object):
                     if self.verbose:
                         log.debug('importing module location %s', child.location)
 
-                    _update_and_import_module(
-                        child,
-                        self.store,
-                        self.user_id,
-                        courselike_key,
-                        dest_id,
-                        do_import_static=self.do_import_static,
-                        runtime=courselike.runtime,
-                    )
+                    try:
+                        _update_and_import_module(
+                            child,
+                            self.store,
+                            self.user_id,
+                            courselike_key,
+                            dest_id,
+                            do_import_static=self.do_import_static,
+                            runtime=courselike.runtime,
+                        )
+                    except Exception:
+                        log.error('failed to import module location %s', child.location)
+                        raise
 
                     depth_first(child)
 
@@ -478,15 +483,21 @@ class ImportManager(object):
             if self.verbose:
                 log.debug('importing module location %s', leftover)
 
-            _update_and_import_module(
-                self.xml_module_store.get_item(leftover),
-                self.store,
-                self.user_id,
-                courselike_key,
-                dest_id,
-                do_import_static=self.do_import_static,
-                runtime=courselike.runtime,
-            )
+            try:
+                _update_and_import_module(
+                    self.xml_module_store.get_item(leftover),
+                    self.store,
+                    self.user_id,
+                    courselike_key,
+                    dest_id,
+                    do_import_static=self.do_import_static,
+                    runtime=courselike.runtime,
+                )
+            except Exception:
+                msg = 'failed to import module location {}'.format(leftover)
+                log.error(msg)
+                set_custom_attribute('course_import_failure', "Module Load failure: {}".format(msg))
+                raise
 
     def run_imports(self):
         """
@@ -689,7 +700,7 @@ class LibraryImportManager(ImportManager):
         """
         Get the descriptor of the library from the XML import modulestore.
         """
-        source_library = self.xml_module_store.get_library(courselike_key)  # pylint: disable=no-member
+        source_library = self.xml_module_store.get_library(courselike_key)
         library, library_data_path = self.import_courselike(
             runtime, courselike_key, dest_id, source_library,
         )
@@ -745,7 +756,7 @@ def _update_and_import_module(
         """
         Move the module to a new course.
         """
-        def _convert_ref_fields_to_new_namespace(reference):  # pylint: disable=invalid-name
+        def _convert_ref_fields_to_new_namespace(reference):
             """
             Convert a reference to the new namespace, but only
             if the original namespace matched the original course.
@@ -805,6 +816,10 @@ def _update_and_import_module(
     fields = _update_module_references(module, source_course_id, dest_course_id)
     asides = module.get_asides() if isinstance(module, XModuleMixin) else None
 
+    if module.location.block_type == 'library_content':
+        with store.branch_setting(branch_setting=ModuleStoreEnum.Branch.published_only):
+            lib_content_block_already_published = store.has_item(module.location)
+
     block = store.import_xblock(
         user_id, dest_course_id, module.location.block_type,
         module.location.block_id, fields, runtime, asides=asides
@@ -814,17 +829,37 @@ def _update_and_import_module(
     # Get to the point where XML import is happening inside the
     # modulestore that is eventually going to store the data.
     # Ticket: https://openedx.atlassian.net/browse/PLAT-1046
+
+    # Special case handling for library content blocks. The fact that this is
+    # in Modulestore code is _bad_ and breaks abstraction barriers, but is too
+    # much work to factor out at this point.
     if block.location.block_type == 'library_content':
-        # if library exists, update source_library_version and children
+        # If library exists, update source_library_version and children
         # according to this existing library and library content block.
         if store.get_library(block.source_library_key):
+            # If the library content block is already in the course, then don't
+            # refresh the children when we re-import it. This lets us address
+            # TNL-7507 (Randomized Content Block Settings Lost in Course Import)
+            # while still avoiding AA-310, where the IDs of the children for an
+            # existing library_content block might be altered, losing student
+            # user state.
+            #
+            # Note that while this method is run on import, it's also run when
+            # adding the library content from Studio for the first time.
+            #
+            # TLDR: When importing, we only copy the default values from content
+            # in a library the first time that library_content block is created.
+            # Future imports ignore what's in the library so as not to disrupt
+            # course state. You _can_ still update to the library via the Studio
+            # UI for updating to the latest version of a library for this block.
+            if lib_content_block_already_published:
+                return block
 
             # Update library content block's children on draft branch
             with store.branch_setting(branch_setting=ModuleStoreEnum.Branch.draft_preferred):
-                LibraryToolsService(store).update_children(
+                LibraryToolsService(store, user_id).update_children(
                     block,
-                    user_id,
-                    version=block.source_library_version
+                    version=block.source_library_version,
                 )
 
             # Publish it if importing the course for branch setting published_only.

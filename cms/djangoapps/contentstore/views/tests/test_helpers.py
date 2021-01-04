@@ -6,9 +6,10 @@ Unit tests for helpers.py.
 import six
 from django.utils import http
 
-from contentstore.tests.utils import CourseTestCase
-from contentstore.views.helpers import xblock_studio_url, xblock_type_display_name
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory
+
+from ..helpers import xblock_studio_url, xblock_type_display_name
 
 
 class HelpersTestCase(CourseTestCase):
@@ -27,7 +28,7 @@ class HelpersTestCase(CourseTestCase):
                                      display_name="Week 1")
         self.assertEqual(
             xblock_studio_url(chapter),
-            u'{}?show={}'.format(course_url, http.urlquote(chapter.location))
+            u'{}?show={}'.format(course_url, http.urlquote(str(chapter.location).encode()))
         )
 
         # Verify sequential URL
@@ -35,7 +36,7 @@ class HelpersTestCase(CourseTestCase):
                                         display_name="Lesson 1")
         self.assertEqual(
             xblock_studio_url(sequential),
-            u'{}?show={}'.format(course_url, http.urlquote(sequential.location))
+            u'{}?show={}'.format(course_url, http.urlquote(str(sequential.location).encode()))
         )
 
         # Verify unit URL

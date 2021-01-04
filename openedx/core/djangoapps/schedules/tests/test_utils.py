@@ -5,7 +5,7 @@ Tests for schedules utils
 import datetime
 
 import ddt
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from mock import patch
 from pytz import utc
 
@@ -13,7 +13,7 @@ from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory
 from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import CourseEnrollmentFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -48,7 +48,7 @@ class ResetSelfPacedScheduleTests(SharedModuleStoreTestCase):
         self.create_schedule()
         original_start = self.schedule.start_date
 
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(3):
             reset_self_paced_schedule(self.user, self.course.id, use_availability_date=False)
 
         self.schedule.refresh_from_db()
@@ -63,7 +63,7 @@ class ResetSelfPacedScheduleTests(SharedModuleStoreTestCase):
         self.create_schedule(offset=offset)
         expected_start = self.course.start + datetime.timedelta(days=expected_offset)
 
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(3):
             reset_self_paced_schedule(self.user, self.course.id, use_availability_date=True)
 
         self.schedule.refresh_from_db()

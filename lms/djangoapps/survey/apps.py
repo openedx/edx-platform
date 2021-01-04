@@ -10,11 +10,11 @@ class SurveyConfig(AppConfig):
     """
     Application Configuration for survey.
     """
-    name = 'survey'
+    name = 'lms.djangoapps.survey'
     verbose_name = 'Student Surveys'
 
     def ready(self):
         """
         Connect signal handlers.
         """
-        from . import signals  # pylint: disable=unused-variable
+        from . import signals  # pylint: disable=unused-import

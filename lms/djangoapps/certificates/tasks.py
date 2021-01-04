@@ -3,12 +3,15 @@ Module for generating certificate for a user
 """
 
 
-from celery import task
 from logging import getLogger
+
+from celery import task
 from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from django.contrib.auth.models import User
-from lms.djangoapps.verify_student.services import IDVerificationService
+from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
+
+from lms.djangoapps.verify_student.services import IDVerificationService
 
 from .api import generate_user_certificates
 
@@ -16,6 +19,7 @@ logger = getLogger(__name__)
 
 
 @task(base=LoggedPersistOnFailureTask, bind=True, default_retry_delay=30, max_retries=2)
+@set_code_owner_attribute
 def generate_certificate(self, **kwargs):
     """
     Generates a certificate for a single user.

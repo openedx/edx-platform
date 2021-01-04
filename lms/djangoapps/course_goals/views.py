@@ -3,7 +3,6 @@ Course Goals Views - includes REST API
 """
 
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -16,7 +15,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 
 from openedx.core.lib.api.permissions import IsStaffOrOwner
-from track import segment
+from common.djangoapps.track import segment
 
 from .api import get_course_goal_options
 from .models import GOAL_KEY_CHOICES, CourseGoal
@@ -58,6 +57,7 @@ class CourseGoalViewSet(viewsets.ModelViewSet):
     queryset = CourseGoal.objects.all()
     serializer_class = CourseGoalSerializer
 
+    # Another version of this endpoint exists in ../course_home_api/outline/v1/views.py
     def create(self, post_data):
         """ Create a new goal if one does not exist, otherwise update the existing goal. """
         # Ensure goal_key is valid

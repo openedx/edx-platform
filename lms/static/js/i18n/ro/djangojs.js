@@ -27,6 +27,8 @@
     ],
     "6 a.m.": "6 a.m.",
     "6 p.m.": "6 p.m.",
+    "April": "Aprilie",
+    "August": "August",
     "Available %s": "%s disponibil",
     "Cancel": "Anuleaz\u0103",
     "Choose": "Alege",
@@ -39,32 +41,42 @@
     "Click to remove all chosen %s at once.": "Click pentru a elimina toate %s alese.",
     "Could not retrieve download url.": "Nu s-a putut ob\u0163ine linkul de desc\u0103rcare.",
     "Could not retrieve upload url.": "Nu s-a putut ob\u0163ine linkul de \u00eenc\u0103rcare.",
+    "December": "Decembrie",
     "Error": "Eroare",
+    "February": "Februarie",
     "Filter": "Filtru",
     "Heading 3": "Titlu 3",
     "Heading 4": "Titlu 4",
     "Heading 5": "Titlu 5",
     "Heading 6": "Titlu 6",
     "Hide": "Ascunde",
+    "January": "Ianuarie",
+    "July": "Iulie",
+    "June": "Iunie",
+    "March": "Martie",
+    "May": "Mai",
     "Midnight": "Miezul nop\u021bii",
     "Noon": "Amiaz\u0103",
     "Note: You are %s hour ahead of server time.": [
-      "Not\u0103: Sunte\u021bi cu %s ora \u00eenaintea orei serverului.",
+      "Not\u0103: Sunte\u021bi cu %s or\u0103 \u00eenaintea orei serverului.",
       "Not\u0103: Sunte\u021bi cu %s ore \u00eenaintea orei serverului.",
-      "Not\u0103: Sunte\u021bi cu %s ore \u00eenaintea orei serverului."
+      "Not\u0103: Sunte\u021bi cu %s de ore \u00eenaintea orei serverului."
     ],
     "Note: You are %s hour behind server time.": [
       "Not\u0103: Sunte\u021bi cu %s or\u0103 \u00een urma orei serverului.",
       "Not\u0103: Sunte\u021bi cu %s ore \u00een urma orei serverului.",
-      "Not\u0103: Sunte\u021bi cu %s ore \u00een urma orei serverului."
+      "Not\u0103: Sunte\u021bi cu %s de ore \u00een urma orei serverului."
     ],
+    "November": "Noiembrie",
     "Now": "Acum",
+    "October": "Octombrie",
     "One or more rescheduling tasks failed.": "Una sau mai multe reprogram\u0103ri au e\u015fuat.",
     "Paragraph": "Paragraf",
     "Preformatted": "Preformatat",
     "Remove": "Elimin\u0103",
     "Remove all": "Elimin\u0103 toate",
     "Saving...": "Se salveaz\u0103...",
+    "September": "Septembrie",
     "Server error.": "Eroare de server.",
     "Show": "Arat\u0103",
     "Status of Your Response": "Statusul r\u0103spunsului t\u0103u",
@@ -86,7 +98,14 @@
     "Yesterday": "Ieri",
     "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "A\u021bi selectat o ac\u0163iune \u0219i nu a\u021b\u0163i f\u0103cut modific\u0103ri \u00een c\u00eempuri individuale. Probabil c\u0103uta\u021bi butonul Go, \u00een loc de Salveaz\u0103.",
     "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "A\u0163i selectat o ac\u0163iune, dar nu a\u0163i salvat \u00eenc\u0103 modific\u0103rile la c\u00e2mpuri individuale. Face\u0163i clic pe OK pentru a salva. Va trebui s\u0103 executa\u021bi ac\u021biunea din nou.",
-    "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "Ave\u0163i modific\u0103ri nesalvate \u00een c\u00eempuri individuale editabile. Dac\u0103 executa\u0163i o ac\u021biune, modific\u0103rile nesalvate vor fi pierdute."
+    "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "Ave\u0163i modific\u0103ri nesalvate \u00een c\u00eempuri individuale editabile. Dac\u0103 executa\u0163i o ac\u021biune, modific\u0103rile nesalvate vor fi pierdute.",
+    "one letter Friday\u0004F": "V",
+    "one letter Monday\u0004M": "L",
+    "one letter Saturday\u0004S": "S",
+    "one letter Sunday\u0004S": "D",
+    "one letter Thursday\u0004T": "J",
+    "one letter Tuesday\u0004T": "M",
+    "one letter Wednesday\u0004W": "M"
   };
   for (var key in newcatalog) {
     django.catalog[key] = newcatalog[key];
@@ -108,7 +127,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -144,45 +163,35 @@
     django.formats = {
     "DATETIME_FORMAT": "j F Y, H:i",
     "DATETIME_INPUT_FORMATS": [
+      "%d.%m.%Y, %H:%M",
+      "%d.%m.%Y, %H:%M:%S",
+      "%d.%B.%Y, %H:%M",
+      "%d.%B.%Y, %H:%M:%S",
       "%Y-%m-%d %H:%M:%S",
       "%Y-%m-%d %H:%M:%S.%f",
       "%Y-%m-%d %H:%M",
-      "%Y-%m-%d",
-      "%m/%d/%Y %H:%M:%S",
-      "%m/%d/%Y %H:%M:%S.%f",
-      "%m/%d/%Y %H:%M",
-      "%m/%d/%Y",
-      "%m/%d/%y %H:%M:%S",
-      "%m/%d/%y %H:%M:%S.%f",
-      "%m/%d/%y %H:%M",
-      "%m/%d/%y"
+      "%Y-%m-%d"
     ],
     "DATE_FORMAT": "j F Y",
     "DATE_INPUT_FORMATS": [
-      "%Y-%m-%d",
-      "%m/%d/%Y",
-      "%m/%d/%y",
-      "%b %d %Y",
-      "%b %d, %Y",
-      "%d %b %Y",
-      "%d %b, %Y",
-      "%B %d %Y",
-      "%B %d, %Y",
+      "%d.%m.%Y",
+      "%d.%b.%Y",
       "%d %B %Y",
-      "%d %B, %Y"
+      "%A, %d %B %Y",
+      "%Y-%m-%d"
     ],
     "DECIMAL_SEPARATOR": ",",
-    "FIRST_DAY_OF_WEEK": "0",
+    "FIRST_DAY_OF_WEEK": 1,
     "MONTH_DAY_FORMAT": "j F",
-    "NUMBER_GROUPING": "0",
+    "NUMBER_GROUPING": 3,
     "SHORT_DATETIME_FORMAT": "d.m.Y, H:i",
     "SHORT_DATE_FORMAT": "d.m.Y",
     "THOUSAND_SEPARATOR": ".",
     "TIME_FORMAT": "H:i",
     "TIME_INPUT_FORMATS": [
+      "%H:%M",
       "%H:%M:%S",
-      "%H:%M:%S.%f",
-      "%H:%M"
+      "%H:%M:%S.%f"
     ],
     "YEAR_MONTH_FORMAT": "F Y"
   };

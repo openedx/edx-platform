@@ -27,8 +27,8 @@ from lms.djangoapps.ccx.utils import add_master_course_staff_to_ccx, assign_staf
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api import authentication, permissions
-from student.models import CourseEnrollment
-from student.roles import CourseCcxCoachRole
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseCcxCoachRole
 from xmodule.modulestore.django import SignalHandler
 
 from .paginators import CCXAPIPagination
@@ -648,7 +648,7 @@ class CCXDetailView(GenericAPIView):
         serializer = self.get_serializer(ccx_course_object)
         return Response(serializer.data)
 
-    def delete(self, request, ccx_course_id=None):  # pylint: disable=unused-argument
+    def delete(self, request, ccx_course_id=None):
         """
         Deletes a CCX course.
 

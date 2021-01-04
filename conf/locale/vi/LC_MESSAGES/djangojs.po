@@ -6,7 +6,7 @@
 # Translators:
 # NguyenTheTruong <41204219thetruong@gmail.com>, 2016
 # Anh Phan <vietnamesel10n@gmail.com>, 2013
-# Dinh Hung Tu <inactive+dinhhungtu@transifex.com>, 2015
+# 7b361a451bd8feeed2dbd9245f836232_a786ad5 <aefa5f09660e622131eca858f9656914_301034>, 2015
 # Hoang Doan <dthoang92@gmail.com>, 2014
 # Hoang Ha <halink0803@gmail.com>, 2014
 # Ha Ngoc Chung <ngocchung75@gmail.com>, 2013
@@ -23,8 +23,10 @@
 # NGUYEN CONG NAM <congnam0409@gmail.com>, 2014
 # Nguyen Don Binh <donbinhvn@gmail.com>, 2014
 # NGUYEN HOANG AN <neyugn2909@gmail.com>, 2014-2015
+# Nguyen Lam <lamnguyen.cis@gmail.com>, 2020
 # Nguyen Quang Huy <huynq23091@gmail.com>, 2013-2015
 # Nhan Nguyen <constfang@yahoo.com>, 2015
+# Nhung Tran <nhungtth@hachium.com>, 2020
 # Anh Phan <vietnamesel10n@gmail.com>, 2013
 # Thắng Trần <tmt111295@gmail.com>, 2019
 # Theodora. Tôn Nữ Quý Thiện <thien.tonnu1001@gmail.com>, 2015
@@ -56,6 +58,7 @@
 # Nguyen Nhat Quang <technicalmanager@gmail.com>, 2016
 # Nguyen Quang Huy <huynq23091@gmail.com>, 2014
 # Anh Phan <vietnamesel10n@gmail.com>, 2013
+# Le Minh Tri <trilm@hihexa.com>, 2020
 # Trung V. Nguyen <trung.ngvan@gmail.com>, 2015
 # truong tran <tranminhtruong88@yahoo.com.vn>, 2017
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
@@ -68,6 +71,7 @@
 # Tan Phat Trang <phattt2901@gmail.com>, 2019
 # Hoà Lê Thanh <hoa.lethanh@gmail.com>, 2019
 # Thắng Trần <tmt111295@gmail.com>, 2019
+# Le Minh Tri <trilm@hihexa.com>, 2020
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)
@@ -76,7 +80,7 @@
 #
 # Translators:
 # NguyenTheTruong <41204219thetruong@gmail.com>, 2016
-# Dinh Hung Tu <inactive+dinhhungtu@transifex.com>, 2015
+# 7b361a451bd8feeed2dbd9245f836232_a786ad5 <aefa5f09660e622131eca858f9656914_301034>, 2015
 # Hoang Ha <halink0803@gmail.com>, 2014
 # Hoà Lê Thanh <hoa.lethanh@gmail.com>, 2017
 # Nguyen Don Binh <donbinhvn@gmail.com>, 2014
@@ -84,6 +88,7 @@
 # Nguyen Nhat Quang <technicalmanager@gmail.com>, 2016
 # Thi Thanh Nga Do <thanhnga.ftu2@gmail.com>, 2015
 # Theodora. Tôn Nữ Quý Thiện <thien.tonnu1001@gmail.com>, 2015
+# Le Minh Tri <trilm@hihexa.com>, 2020
 # Trung V. Nguyen <trung.ngvan@gmail.com>, 2015-2016
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)
@@ -97,6 +102,7 @@
 # Hoang Ha <halink0803@gmail.com>, 2014
 # Hoà Lê Thanh <hoa.lethanh@gmail.com>, 2017
 # Hoang Ha <halink0803@gmail.com>, 2014
+# Le Minh Tri <trilm@hihexa.com>, 2020
 # Linh Nguyen <linhvn09@gmail.com>, 2016
 # NGUYEN HOANG AN <neyugn2909@gmail.com>, 2014
 # Nguyen Nhat Quang <technicalmanager@gmail.com>, 2016
@@ -106,16 +112,24 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-03-08 20:42+0000\n"
-"PO-Revision-Date: 2019-09-29 20:43+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2020-11-22 20:43+0000\n"
+"PO-Revision-Date: 2020-10-04 20:44+0000\n"
+"Last-Translator: Hoà Lê Thanh <hoa.lethanh@gmail.com>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"Generated-By: Babel 1.3\n"
+"Generated-By: Babel 2.8.0\n"
+
+#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
+#: cms/static/js/views/video_transcripts.js
+#: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
+msgid ""
+"This may be happening because of an error with our server or your internet "
+"connection. Try refreshing the page or making sure you are online."
+msgstr ""
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -126,8 +140,9 @@ msgstr ""
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
 #: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/tabs.js
-#: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
-#: lms/static/js/views/fields.js
+#: cms/static/js/views/utils/xblock_utils.js
+#: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
+#: lms/static/js/ccx/schedule.js lms/static/js/views/fields.js
 msgid "Saving"
 msgstr "Đang lưu"
 
@@ -164,6 +179,7 @@ msgstr "Xóa"
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/signatory-actions.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
+#: common/static/common/templates/discussion/templates.underscore
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
@@ -184,8 +200,10 @@ msgstr "Đang tải lên"
 #: cms/static/js/views/modals/edit_xblock.js
 #: cms/static/js/views/video_transcripts.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: lms/static/js/demographics_collection/Wizard.jsx
 #: lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
+#: common/static/common/templates/discussion/templates.underscore
 #: common/static/common/templates/image-modal.underscore
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Close"
@@ -312,8 +330,8 @@ msgstr ""
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 #: common/static/common/js/discussion/views/response_comment_view.js
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
 #: lms/static/js/student_account/views/FinishAuthView.js
-#: lms/static/js/verify_student/views/payment_confirmation_step_view.js
 #: lms/static/js/verify_student/views/step_view.js
 #: lms/static/js/views/fields.js
 msgid "Error"
@@ -323,6 +341,18 @@ msgstr "Lỗi"
 #: common/lib/xmodule/xmodule/js/public/js/library_content_edit.js
 msgid "Updating with latest library content"
 msgstr "Đang cập nhật nội dung thư viện mới nhất"
+
+#: common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
+msgid "Loading..."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
+msgid "Selected blocks"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
+msgid "Unable to update settings"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/assets/split_test/public/js/split_test_author_view.js
 #: common/lib/xmodule/xmodule/js/public/js/split_test_author_view.js
@@ -784,14 +814,9 @@ msgstr "Xóa hàng"
 msgid "Delete table"
 msgstr "Xóa bảng"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/certificate-editor.underscore
-#: cms/templates/js/group-configuration-editor.underscore
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Description"
 msgstr "Mô tả"
 
@@ -1228,8 +1253,10 @@ msgstr "Cửa sổ mới"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: lms/static/js/demographics_collection/Wizard.jsx
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Next"
 msgstr "Tiếp theo"
 
@@ -1638,7 +1665,6 @@ msgstr "Vertical space"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
-#: openedx/features/course_search/static/course_search/templates/course_search_item.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_item.underscore
 msgid "View"
 msgstr "Xem"
@@ -2356,6 +2382,38 @@ msgstr[0] "%d năm"
 msgid "Select a section or problem"
 msgstr "Chọn một mục hoặc vấn đề"
 
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/Main/Main.jsx
+msgid "Create a report of problem responses"
+msgstr ""
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
+msgid "Your report is being generated..."
+msgstr ""
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
+msgid "Your report has been successfully generated."
+msgstr ""
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
+msgid "View Report"
+msgstr ""
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
+msgid "There was an error generating the report link."
+msgstr ""
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
+msgid "There was an error generating your report."
+msgstr ""
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
+msgid "Unable to get report generation status."
+msgstr ""
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
+msgid "Unable to submit request to generate report."
+msgstr ""
+
 #: lms/djangoapps/support/static/support/js/views/certificates.js
 msgid "An unexpected error occurred.  Please try again."
 msgstr "Đã có một lỗi xảy ra. Vui lòng thử lại."
@@ -2489,29 +2547,39 @@ msgid "Other"
 msgstr "Lựa chọn khác"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "What can we help you with, {username}?"
-msgstr "Chúng tôi có thể giúp gì cho bạn, {username}?"
+msgid "Course Discussion Forum"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid ""
+"While our support team is happy to assist with the edX platform, the course "
+"staff has the expertise for specific assignment questions, grading or the "
+"proper procedures in each course. Please post all course related questions "
+"within the Discussion Forum where the Course Staff can directly respond."
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
 msgstr "Chi tiết"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "The more you tell us, the more quickly and helpfully we can respond!"
+msgid "the more quickly and helpfully we can respond!"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr "Gửi"
+msgid "Create Support Ticket"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "What can we help you with, {username}?"
+msgstr "Chúng tôi có thể giúp gì cho bạn, {username}?"
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
 msgstr "Đăng nhập vào {platform} để chúng tôi có thể hỗ trợ bạn tốt hơn."
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
-msgid ""
-"If you are unable to access your account contact us via email using {email}."
+msgid "Need help logging in?"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -2529,6 +2597,18 @@ msgstr ""
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
 msgstr "Nhập một số chi tiết cho yêu cầu hỗ trợ của bạn."
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid ""
+"Due to the recent increase in interest in online education and edX, we are "
+"currently experiencing an unusually high volume of support requests. We "
+"appreciate your patience as we work to review each request. Please check the"
+" "
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid " as many questions may have already been answered."
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 #: lms/djangoapps/support/static/support/jsx/success.jsx
@@ -2553,7 +2633,8 @@ msgstr "Chuyển đến Trang chủ {platform}"
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid ""
-"Thank you for submitting a request! We will contact you within 24 hours."
+"Thank you for submitting a request! We appreciate your patience while we "
+"work to review your request."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
@@ -2736,6 +2817,10 @@ msgid "An error occurred. Try again."
 msgstr "Có lỗi xảy ra. Vui lòng thử lại."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
+msgid "No assignments for team"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 msgid "Leave this team?"
 msgstr "Rời nhóm này?"
 
@@ -2752,8 +2837,8 @@ msgid "Confirm"
 msgstr "Xác nhận"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
-msgid "You already belong to another team."
-msgstr "Bạn đã nằm trong một nhóm khác."
+msgid "You already belong to another team in this team set."
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "This team is full."
@@ -2808,10 +2893,6 @@ msgid "Team Search"
 msgstr "Tìm nhóm"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Showing results for \"{searchString}\""
-msgstr "Hiện kết quả tìm \"{searchString}\""
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Create a New Team"
 msgstr "Tạo một nhóm mới"
 
@@ -2847,6 +2928,10 @@ msgid ""
 msgstr ""
 "Bạn có thể xóa thành viên khỏi nhóm, đặc biệt là khi họ không tham gia vào "
 "các hoạt động của nhóm."
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Showing results for \"{searchString}\""
+msgstr "Hiện kết quả tìm \"{searchString}\""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Search teams"
@@ -2909,6 +2994,11 @@ msgstr ""
 "{search_span_start}tìm kiếm nhóm{span_end} trong chủ đề này. "
 "{create_span_start}Tạo một nhóm mới{span_end} nếu bạn vẫn không tìm được "
 "nhóm nào."
+
+#: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
+msgid ""
+"An error occurred while looking up team membership. Try refreshing the page."
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/topics.js
 msgid "All topics"
@@ -3268,6 +3358,7 @@ msgid "There has been an error processing your survey."
 msgstr "Xảy ra lỗi khi xử lí phiếu điều tra của bạn."
 
 #: lms/static/js/courseware/credit_progress.js
+#: common/static/common/templates/discussion/templates.underscore
 #: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
 msgid "More"
@@ -3341,6 +3432,90 @@ msgid ""
 msgstr ""
 "Không thể xác định việc hoàn lại tiền cho bạn vì Lỗi hệ thống. Vui lòng thử "
 "lại sau."
+
+#: lms/static/js/demographics_collection/DemographicsCollectionBanner.jsx
+msgid "Want to make edX better for everyone?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionBanner.jsx
+msgid "Get started"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Help make edX better for everyone!"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Why does edX collect this information?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid ""
+"An error occurred while attempting to retrieve or save the information "
+"below. Please try again later."
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid ""
+"What was the total combined income, during the last 12 months, of all "
+"members of your family? "
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid ""
+"Have you ever served on active duty in the U.S. Armed Forces, Reserves, or "
+"National Guard?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "What is the highest level of education that you have achieved so far?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid ""
+"What is the highest level of education that any of your parents or guardians"
+" have achieved?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Select employment status"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "What industry do you currently work in?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "What industry do you want to work in?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/MultiselectDropdown.jsx
+msgid "Clear all"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "demographics questionnaire"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "close questionnaire"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "finish later"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "Return to my dashboard"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "Finish later"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "next page"
+msgstr ""
 
 #: lms/static/js/discovery/views/search_form.js
 #, javascript-format
@@ -3475,7 +3650,6 @@ msgstr ""
 "khác."
 
 #: lms/static/js/edxnotes/views/tabs/search_results.js
-#: openedx/features/course_search/static/course_search/templates/course_search_results.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
 msgid "Search Results"
 msgstr "Kết quả tìm kiếm"
@@ -3698,22 +3872,27 @@ msgid "Error while regenerating certificates. Please try again."
 msgstr "Lỗi trong khi tạo lại chứng chỉ.Thử lại"
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Loading data..."
 msgstr "đang tải dữ liệu..."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error getting issued certificates list."
 msgstr "lỗi khi nhận danh sách chứng chỉ đã phát hành."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating proctored exam results. Please try again."
 msgstr "Đã có lỗi xảy ra khi phát kết quả thi. Xin vui lòng thử lại lần nữa."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating survey results. Please try again."
 msgstr "Lỗi khi tạo kết quả khảo sát. Vui lòng thử lại."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating student profile information. Please try again."
 msgstr "Xảy ra lỗi khi xuất thông tin hồ sơ học viên. Xin vui lòng thử lại."
 
@@ -3729,6 +3908,7 @@ msgid "Error getting student list."
 msgstr "Lỗi khi xem danh sách học viên."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating list of students who may enroll. Please try again."
 msgstr ""
 "Xảy ra lỗi khi xuất danh sách học viên có thể ghi danh. Xin vui lòng thử "
@@ -3739,14 +3919,17 @@ msgid "Error retrieving grading configuration."
 msgstr "Lỗi khi xem kết cấu điểm."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating grades. Please try again."
 msgstr "Lỗi khi xuất điểm số. Vui lòng thử lại."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating problem grade report. Please try again."
 msgstr "Lỗi khi xuất bảng điểm. Vui lòng thử lại."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating ORA data report. Please try again."
 msgstr "Lỗi khi tạo báo cáo dữ liệu ORA. Vui lòng thử lại."
 
@@ -4756,6 +4939,15 @@ msgstr ""
 "bạn."
 
 #: lms/static/js/student_account/views/LoginView.js
+msgid ""
+"In order to sign in, you need to activate your "
+"account.{line_break}{line_break}We just sent an activation link to "
+"{strong_start} {email} {strong_end}. If  you do not receive an email, check "
+"your spam folders or  {anchorStart}contact {platform_name} "
+"Support{anchorEnd}."
+msgstr ""
+
+#: lms/static/js/student_account/views/LoginView.js
 msgid "An unexpected error has occurred."
 msgstr ""
 
@@ -4940,12 +5132,14 @@ msgstr ""
 "trên hồ sơ EDX của bạn."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid " Link"
-msgstr "Liên kết"
+msgid "{platform_display_name} Link"
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Enter your "
-msgstr "Nhập của bạn"
+msgid ""
+"Enter your {platform_display_name} username or the URL to your "
+"{platform_display_name} page. Delete the URL to remove the link."
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_account/views/account_settings_view.js
@@ -5124,10 +5318,6 @@ msgstr "Có lỗi xảy ra. Vui lòng thử lại sau."
 msgid "Could not submit order"
 msgstr "Không gửi được đơn hàng"
 
-#: lms/static/js/verify_student/views/payment_confirmation_step_view.js
-msgid "Could not retrieve payment information"
-msgstr "Không nhận được thông tin tài khoản"
-
 #: lms/static/js/verify_student/views/reverify_view.js
 msgid "Take a photo of your ID"
 msgstr "Chụp ảnh cho ID của bạn"
@@ -5300,10 +5490,20 @@ msgstr "Mở rộng tất cả"
 msgid "Collapse All"
 msgstr "Thu gọn tất cả"
 
+#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr ""
+
+#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr ""
+
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
-msgid "{total_results} result"
-msgid_plural "{total_results} results"
-msgstr[0] "{total_results} kết quả"
+msgid "{total_results} result found for \"{search_term}\""
+msgid_plural "{total_results} results found for \"{search_term}\""
+msgstr[0] ""
 
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Profile Visibility:"
@@ -5394,15 +5594,6 @@ msgstr "Những thành quả"
 msgid "Profile"
 msgstr "Hồ sơ"
 
-#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
-#: cms/static/js/views/video_transcripts.js
-msgid ""
-"This may be happening because of an error with our server or your internet "
-"connection. Try refreshing the page or making sure you are online."
-msgstr ""
-"Lỗi này có thể do máy chủ của chúng tôi hoặc kết nối internet của bạn. Hãy "
-"thử tải lại trang hoặc kiểm tra lại kết nối internet."
-
 #: cms/static/cms/js/main.js
 msgid "Studio's having trouble saving your work"
 msgstr "Studio xảy ra sự cố khi lưu lại công việc của bạn"
@@ -5450,6 +5641,10 @@ msgstr "Có, cho phép chỉnh sửa Chứng chỉ"
 msgid "certificate"
 msgstr "chứng chỉ"
 
+#: cms/static/js/certificates/views/certificate_preview.js
+msgid "Deactivating"
+msgstr ""
+
 #: cms/static/js/certificates/views/certificates_list.js
 msgid "Set up your certificate"
 msgstr "Thiết lập chứng chỉ của bạn"
@@ -5461,8 +5656,8 @@ msgid "You have not created any certificates yet."
 msgstr "Bạn chưa tạo bất kỳ chứng chỉ nào."
 
 #: cms/static/js/certificates/views/signatory_editor.js
-msgid "Delete \"<%= signatoryName %>\" from the list of signatories?"
-msgstr "Xoá \"<%= signatoryName %>\" từ danh sách ký tên?"
+msgid "Delete \"<%- signatoryName %>\" from the list of signatories?"
+msgstr ""
 
 #: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/course_info_update.js
@@ -5769,11 +5964,9 @@ msgstr "Tất cả các chương phải có tên và liên kết chương"
 
 #: cms/static/js/models/uploads.js
 msgid ""
-"Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
-"<%= fileExtensions %> to upload."
+"Only <%- fileTypes %> files can be uploaded. Please select a file ending in "
+"<%- (fileExtensions) %> to upload."
 msgstr ""
-"Chỉ tập tin dạng <%= fileTypes %> có thể được tải lên. Xin vui lòng chọn một"
-" tập tin kết thúc bằng  <%= fileExtensions %> để tải lên."
 
 #: cms/static/js/models/uploads.js
 #: lms/templates/student_account/hinted_login.underscore
@@ -5900,6 +6093,10 @@ msgstr "Tải tập tin khác"
 msgid "Adding"
 msgstr "Thêm"
 
+#: cms/static/js/views/container.js
+msgid "{startTag}{requestToken}{endTag}{selector}"
+msgstr ""
+
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
 msgstr "Bạn chắc chắn muốn xóa bản cập nhật này?"
@@ -5954,8 +6151,8 @@ msgid "{selectedProvider} credentials saved"
 msgstr ""
 
 #: cms/static/js/views/edit_chapter.js
-msgid "Upload a new PDF to “<%= name %>”"
-msgstr "Tải lên một file PDF mới lên “<%= name %>”"
+msgid "Upload a new PDF to “<%- name %>”"
+msgstr ""
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Please select a PDF file to upload."
@@ -6559,18 +6756,14 @@ msgstr "Rất tiếc, có lỗi xảy ra"
 #: cms/static/js/views/utils/create_course_utils.js
 msgid ""
 "The combined length of the organization, course number, and course run "
-"fields cannot be more than <%=limit%> characters."
+"fields cannot be more than <%- limit %> characters."
 msgstr ""
-"Chiều dài kết hợp của các trường tổ chức, số hiệu khoá học, học kỳ không "
-"được nhiều hơn  <%=limit%> ký tự."
 
 #: cms/static/js/views/utils/create_library_utils.js
 msgid ""
 "The combined length of the organization and library code fields cannot be "
-"more than <%=limit%> characters."
+"more than <%- limit %> characters."
 msgstr ""
-"Chiều dài kết hợp của trường tổ chức và mã mã thư viện không được nhiều hơn "
-"<%=limit%> ký tự."
 
 #: cms/static/js/views/utils/move_xblock_utils.js
 msgid "Success! \"{displayName}\" has been moved."
@@ -6923,14 +7116,9 @@ msgstr "Hoạt động"
 msgid "Unscheduled"
 msgstr ""
 
-#: cms/templates/js/course_info_update.underscore
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Date"
-msgstr "Ngày"
-
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Previous"
 msgstr "Trước"
 
@@ -6977,6 +7165,309 @@ msgstr "Xoá tìm kiếm"
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 msgid "Search"
 msgstr "Tìm kiếm"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Add a Response"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "This thread is closed."
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Add a response:"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
+msgstr "Nộp"
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "discussion posted %(time_ago)s by %(author)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "question posted %(time_ago)s by %(author)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Pinned"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Reported"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Closed"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "Related to: %(courseware_title_linked)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "This post is visible only to %(group_name)s."
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "This post is visible to everyone."
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Editing post"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid ""
+"Add a clear and descriptive title to encourage participation. (Required)"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Edit your post below."
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Update post"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "Show Comment (%(num_comments)s)"
+msgid_plural "Show Comments (%(num_comments)s)"
+msgstr[0] ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Add a comment"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "marked as answer %(time_ago)s by %(user)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "marked as answer %(time_ago)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "endorsed %(time_ago)s by %(user)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "endorsed %(time_ago)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Editing response"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Update response"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "posted %(time_ago)s by %(author)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Editing comment"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Update comment"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "discussion"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "answered question"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "unanswered question"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Following"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Community TA"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "{unread_comments_count} new"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid ""
+"%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
+"unread comments)%(span_close)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Add a Post"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Visible to"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid ""
+"Discussion admins, moderators, and TAs can make their posts visible to all "
+"students or specify a single group."
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "All Groups"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "follow this post"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "post anonymously"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "post anonymously to classmates"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Error posting your message."
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "This post will be visible only to %(group_name)s."
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "This post will be visible to everyone."
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Topic area"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Add your post to a relevant topic to help others find it. (Required)"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "(Community TA)"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "(Staff)"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
+msgid "All Posts"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Return to all posts"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "View discussion"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Load more"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Post type"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid ""
+"Questions raise issues that need answers. Discussions share ideas and start "
+"conversations. (Required)"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Question"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Discussion"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Endorse"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Unendorse"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Mark as Answer"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Unmark as Answer"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Follow"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Unfollow"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Vote for this post,"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Report abuse"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Report"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Unreport"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Pin"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Unpin"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Open"
+msgstr ""
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Discussion Home"
@@ -7035,10 +7526,6 @@ msgid ""
 msgstr ""
 "Chọn ô này để nhận thư tóm tắt hàng ngày về các hoạt động mới từ các bài "
 "posts mà bạn đang theo dõi. "
-
-#: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
-msgid "All Posts"
-msgstr ""
 
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 msgid "username or email"
@@ -7279,6 +7766,10 @@ msgid "Join Team"
 msgstr "Tham gia nhóm"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+msgid "Team Assignments"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid "Team Details"
 msgstr "Chi tiết nhóm"
 
@@ -7362,101 +7853,21 @@ msgstr ""
 msgid "Remove unit %(unitName)s"
 msgstr ""
 
-#: lms/templates/commerce/provider.underscore
-#, python-format
-msgid ""
-"You still need to visit the %(display_name)s website to complete the credit "
-"process."
-msgstr ""
-"Bạn vẫn cần phải truy cập vào các trang web %(display_name)s để hoàn tất quá"
-" trình tín chỉ."
-
-#: lms/templates/commerce/provider.underscore
-#, python-format
-msgid ""
-"To finalize course credit, %(display_name)s requires %(platform_name)s "
-"learners to submit a credit request."
-msgstr ""
-
-#: lms/templates/commerce/provider.underscore
-msgid "Get Credit"
-msgstr "Lấy tín chỉ"
-
-#: lms/templates/commerce/receipt.underscore
-#, python-format
-msgid ""
-"Thank you %(full_name)s! We have received your payment for %(course_name)s."
-msgstr ""
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"Please print this page for your records; it serves as your receipt. You will"
-" also receive an email with the same information."
-msgstr ""
-"Hãy in trang này để lưu trữ, nó phục vụ như là biên lai của bạn. Bạn cũng sẽ"
-" nhận được một email với các thông tin tương tự."
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Order No."
-msgstr "Đơn hàng số"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Amount"
-msgstr "Số lượng"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Total"
-msgstr "Tổng cộng"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Please Note"
-msgstr "Xin lưu ý"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Crossed out items have been refunded."
-msgstr "Các mặt hàng gạch chéo là đã được hoàn trả."
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Billed to"
-msgstr "Đã gửi hóa đơn cho"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "No receipt available"
-msgstr "Không biên nhận có sẵn"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
-msgid "Go to Dashboard"
-msgstr "Đi đến bảng điều khiển"
-
-#: lms/templates/commerce/receipt.underscore
-msgid ""
-"If you don't verify your identity now, you can still explore your course "
-"from your dashboard. You will receive periodic reminders from {platformName}"
-" to verify your identity."
-msgstr ""
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Want to confirm your identity later?"
-msgstr "Bạn muốn xác nhận danh tính của bạn vào lúc khác?"
-
-#: lms/templates/commerce/receipt.underscore
-msgid "Verify Now"
-msgstr "Xác nhận ngay bây giờ"
-
 #: lms/templates/courseware/proctored-exam-controls.underscore
 msgid "Mark Exam As Completed"
 msgstr "Đánh dấu bài thi đã hoàn thành"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Exam timer and end exam button"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "End My Exam"
+msgstr "Kết thúc bài thi của tôi"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Hide Timer"
+msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "You are taking \"{exam_link}\" as {exam_type}. "
@@ -7474,26 +7885,6 @@ msgstr ""
 msgid ""
 "To receive credit for problems, you must select \"Submit\" for each problem "
 "before you select \"End My Exam\"."
-msgstr ""
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show More"
-msgstr ""
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show Less"
-msgstr ""
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Exam timer and end exam button"
-msgstr ""
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "End My Exam"
-msgstr "Kết thúc bài thi của tôi"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Hide Timer"
 msgstr ""
 
 #: lms/templates/discovery/course_card.underscore
@@ -7589,7 +7980,7 @@ msgstr ""
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
 "The following information is already a part of your {platform} profile. "
-"We\\'ve included it here for your application."
+"We've included it here for your application."
 msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
@@ -7617,6 +8008,10 @@ msgid ""
 "Thank you for submitting your financial assistance application for "
 "{course_name}! You can expect a response in 2-4 business days."
 msgstr ""
+
+#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
+msgid "Go to Dashboard"
+msgstr "Đi đến bảng điều khiển"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Bulk Exceptions"
@@ -7956,14 +8351,6 @@ msgid "You can change sessions until {expiration_date}."
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "Final Grade"
-msgstr ""
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "for {courseName}"
-msgstr ""
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "View Archived Course"
 msgstr ""
 
@@ -8177,7 +8564,27 @@ msgid "An error occurred. Please reload the page."
 msgstr "Có lỗi xảy ra. Hãy tải lại trang."
 
 #: lms/templates/student_account/form_field.underscore
-msgid "Need help logging in?"
+msgid "Need help signing in?"
+msgstr ""
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Forgot my password"
+msgstr ""
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Other sign-in issues"
+msgstr ""
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Sign in with your company or school"
+msgstr ""
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Need other help signing in?"
+msgstr ""
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Create an account"
 msgstr ""
 
 #: lms/templates/student_account/hinted_login.underscore
@@ -8379,17 +8786,13 @@ msgid "What You Need for Verification"
 msgstr "Những gì bạn cần để xác minh"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/make_payment_step.underscore
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Webcam"
-msgstr "Webcam"
+msgid "Device with Camera"
+msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"You need a computer or cell phone that has a webcam. When you receive a "
-"browser prompt, make sure that you allow access to the camera."
+"You need a device that has a webcam. If you receive a browser prompt for "
+"access to your camera, please make sure to click 'Allow'."
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8397,12 +8800,8 @@ msgid "Photo Identification"
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
-msgid ""
-"You need a driver's license, passport, or other government-issued ID that "
-"has your name and photo."
+msgid "You need a valid ID that contains your full name and photo."
 msgstr ""
-"Bạn cần có bằng lái xe, hộ chiếu, hoặc ID chính phủ phát hành có tên và ảnh "
-"của bạn."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -8428,14 +8827,9 @@ msgid "Your entire face fits inside the frame."
 msgstr "Toàn bộ khuôn mặt của bạn phù hợp với bên trong khung."
 
 #: lms/templates/verify_student/face_photo_step.underscore
-msgid "The photo of your face matches the photo on your ID."
-msgstr ""
-"Những hình ảnh của khuôn mặt của bạn phù hợp với hình ảnh trên ID của bạn."
-
-#: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"To use the current photo, select the Take Photo button {icon}. To take "
-"another photo, select the Retake Photo button {icon}."
+"To take the photo of your face, click on the camera button {icon}. If you "
+"need to try again, click 'Retake Photo'."
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8452,12 +8846,9 @@ msgid "Why does %(platformName)s need my photo?"
 msgstr "Tại sao %(platformName)s cần ảnh của bạn?"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
 msgid ""
-"As part of the verification process, you take a photo of both your face and "
-"a government-issued photo ID. Our authorization service confirms your "
-"identity by comparing the photo you take with the photo on your ID."
+"We use your verification photos to confirm your identity and ensure the "
+"validity of your certificate."
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8469,18 +8860,12 @@ msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
 #, python-format
 msgid ""
-"We use the highest levels of security available to encrypt your photo and "
-"send it to our authorization service for review. Your photo and information "
-"are not saved or visible anywhere on %(platformName)s after the verification"
-" process is complete."
+"We securely encrypt your photo and send it to our authorization service for "
+"review. Your photo and information are not saved or visible anywhere on "
+"%(platformName)s after the verification process is complete."
 msgstr ""
-"Chúng tôi sử dụng các mức bảo mật cao nhất có sẵn để mã hóa hình ảnh của bạn"
-" và gửi nó đến dịch vụ ủy quyền của chúng tôi để xem xét. Ảnh và thông tin "
-"của bạn sẽ không được lưu hay bất cứ nơi nào có thể nhìn thấy trên "
-"%(platformName)s sau khi quá trình xác minh hoàn tất."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8529,7 +8914,6 @@ msgstr ""
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
 msgid "Next: %(nextStepTitle)s"
 msgstr "Tiếp theo: %(nextStepTitle)s"
@@ -8539,20 +8923,14 @@ msgid "Take a Photo of Your ID"
 msgstr "Hãy hình ảnh của ID của bạn"
 
 #: lms/templates/verify_student/id_photo_step.underscore
-msgid ""
-"Use your webcam to take a photo of your ID. We will match this photo with "
-"the photo of your face and the name on your account."
+msgid "Use your webcam to take a photo of your ID."
 msgstr ""
-"Sử dụng webcam của bạn để có một bức ảnh của ID của bạn. Chúng tôi sẽ đối "
-"bức ảnh này với hình ảnh của khuôn mặt của bạn và tên tài khoản của bạn."
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
-"You need an ID with your name and photo. A driver's license, passport, or "
-"other government-issued IDs are all acceptable."
+"You need an ID with your name and photo. A driver's license, passport, or ID"
+" are all acceptable."
 msgstr ""
-"Bạn cần một ID có tên và ảnh của bạn. Giấy phép, hộ chiếu, hoặc ID chính phủ"
-" phát hành của một trình điều khiển được tất cả chấp nhận được."
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -8574,6 +8952,13 @@ msgstr ""
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Use the Retake Photo button if you are not pleased with your photo"
+msgstr ""
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid ""
+"As part of the verification process, you take a photo of both your face and "
+"a photo ID. Our authorization service confirms your identity by comparing "
+"the photo you take with the photo on your ID."
 msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8627,6 +9012,26 @@ msgstr ""
 "Chúng ta có thể phù hợp với hình ảnh mà bạn đã có một trong những ID của "
 "bạn?"
 
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"As part of the verification process, you take a photo of both your face and "
+"a government-issued photo ID. Our authorization service confirms your "
+"identity by comparing the photo you take with the photo on your ID."
+msgstr ""
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+#, python-format
+msgid ""
+"We use the highest levels of security available to encrypt your photo and "
+"send it to our authorization service for review. Your photo and information "
+"are not saved or visible anywhere on %(platformName)s after the verification"
+" process is complete."
+msgstr ""
+"Chúng tôi sử dụng các mức bảo mật cao nhất có sẵn để mã hóa hình ảnh của bạn"
+" và gửi nó đến dịch vụ ủy quyền của chúng tôi để xem xét. Ảnh và thông tin "
+"của bạn sẽ không được lưu hay bất cứ nơi nào có thể nhìn thấy trên "
+"%(platformName)s sau khi quá trình xác minh hoàn tất."
+
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: {courseName}"
 msgstr ""
@@ -8639,13 +9044,11 @@ msgid ""
 msgstr ""
 
 #: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Activate Your Account"
 msgstr "Kích hoạt tài khoản của bạn"
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Photo ID"
 msgstr ""
 
@@ -8656,6 +9059,12 @@ msgid ""
 msgstr ""
 "Giấy phép, hộ chiếu, hoặc ID chính phủ phát hành của một người lái xe với "
 "tên và ảnh của bạn"
+
+#: lms/templates/verify_student/intro_step.underscore
+#: lms/templates/verify_student/make_payment_step.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid "Webcam"
+msgstr "Webcam"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
@@ -8752,6 +9161,10 @@ msgid "Check your email for an activation message."
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid "Total"
+msgstr "Tổng cộng"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Professional Certificate for {courseName}"
 msgstr ""
 
@@ -8784,45 +9197,6 @@ msgid ""
 "government-issued photo ID."
 msgstr ""
 
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Thank you! We have received your payment for {courseName}."
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Next Step: Confirm your identity"
-msgstr "Bước tiếp theo: "
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Check your email"
-msgstr "Kiểm tra email của bạn"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"You need to activate your account before you can enroll in courses. Check "
-"your inbox for an activation email."
-msgstr ""
-"Bạn cần kích hoạt tài khoản trước khi ghi danh vào khoá học. Kiểm tra hộp "
-"thư đến cho email cần kích hoạt."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"A driver's license, passport, or government-issued ID with your name and "
-"photo."
-msgstr ""
-"Bằng lái xe, hộ chiếu, chứng minh nhân dân hoặc thẻ học viên có tên và ảnh "
-"của bạn."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-#, python-format
-msgid ""
-"If you don't verify your identity now, you can still explore your course "
-"from your dashboard. You will receive periodic reminders from "
-"%(platformName)s to verify your identity."
-msgstr ""
-"Nếu bạn không xác minh danh tính của bạn bây giờ, bạn vẫn có thể khám phá "
-"khóa học của bạn từ bảng điều khiển của bạn. Bạn sẽ nhận được nhắc nhở định "
-"kỳ từ %(platformName)s là để xác minh danh tính của bạn."
-
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Identity Verification In Progress"
 msgstr "Việc xác nhận danh tính đang được tiến hành"
@@ -8831,13 +9205,9 @@ msgstr "Việc xác nhận danh tính đang được tiến hành"
 msgid ""
 "We have received your information and are verifying your identity. You will "
 "see a message on your dashboard when the verification process is complete "
-"(usually within 1-2 days). In the meantime, you can still access all "
+"(usually within 5-7 days). In the meantime, you can still access all "
 "available course content."
 msgstr ""
-"Chúng tôi đã nhận được thông tin của bạn và đang tiến xác nhận danh tính của"
-" bạn. Bạn sẽ thấy một tin nhắn trên bảng điều khiển khi quá trình xác nhận "
-"hoàn tất (thông thường trong vòng 1-2 ngày). Trong thời gian chờ đợi, bạn "
-"vãn có thể truy cập nội dung các khoá học có sẵn."
 
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Return to Your Dashboard"
@@ -8872,10 +9242,6 @@ msgstr "Những yêu cầu của hình:"
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Does the photo of you show your whole face?"
 msgstr "Hình của bạn có hiển thị toàn bộ khuôn mặt không?"
-
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Does the photo of you match your ID photo?"
-msgstr "Hình của bạn có giống với hình trên chứng minh nhân dân không?"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Is your name on your ID readable?"
@@ -9729,6 +10095,10 @@ msgstr ""
 "rằng đó là HTML hợp lệ."
 
 #: cms/templates/js/course_info_update.underscore
+msgid "Date"
+msgstr ""
+
+#: cms/templates/js/course_info_update.underscore
 msgid "Post"
 msgstr "Bài viết"
 
@@ -10365,6 +10735,21 @@ msgid "Exam Types"
 msgstr "Loại Bài thi"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"This subsection was released to learners as a special exam, but was reverted"
+" back to a basic exam. You may not configure it as a special exam now. "
+"Contact edX Support for assistance."
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"This special exam has been released to learners. You may not convert it to "
+"another type of special exam. You may revert this subsection back to being a"
+" basic exam by selecting 'None', but you will NOT be able to configure it as"
+" a special exam in the future."
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Timed"
 msgstr "Có tính giờ"
 
@@ -10564,11 +10949,11 @@ msgid "Read more"
 msgstr ""
 
 #: cms/templates/js/video-transcripts.underscore
-msgid "Show transcripts ({totalTranscripts})"
+msgid "No transcript uploaded."
 msgstr ""
 
 #: cms/templates/js/video-transcripts.underscore
-msgid "No transcript uploaded."
+msgid "Show transcripts ({totalTranscripts})"
 msgstr ""
 
 #: cms/templates/js/xblock-access-editor.underscore

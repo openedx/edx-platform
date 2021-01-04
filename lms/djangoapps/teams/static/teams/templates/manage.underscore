@@ -11,7 +11,7 @@
                 ) %>
             </p>
             <button
-                id="download-team-csv-input"
+                id="download-team-csv"
                 class="download-team-csv action action-primary"
             >
                 <%- gettext("Download Memberships") %>
@@ -27,13 +27,16 @@
                     "users to teams."
                 ) %>
             </p>
-            <button class="upload-team-csv btn action action-primary">
-                <input
-                    id="upload-team-csv-input"
-                    type="file"
-                    accept="text/csv"
-                    class="input-overlay-hack"
-                />
+            <input
+                id="upload-team-csv-input"
+                type="file"
+                accept="text/csv"
+            />
+            <button
+                id="upload-team-csv"
+                class="btn action action-primary is-disabled"
+                aria-disabled="true"
+            >
                 <%- gettext("Upload Memberships") %>
             </button>
             <!-- We need to describe the format of the CSV here (TODO MST-49) -->

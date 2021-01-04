@@ -11,7 +11,7 @@ from uuid import uuid4
 
 import requests
 import six
-from six.moves.urllib.parse import urlencode, urlparse, parse_qs  # pylint: disable=import-error
+from six.moves.urllib.parse import urlencode, urlparse, parse_qs
 from dateutil.parser import parse as dateutil_parse
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -23,13 +23,13 @@ from requests.exceptions import RequestException
 
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_current_child
-from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
-from edxnotes.plugins import EdxNotesTab
+from lms.djangoapps.edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
+from lms.djangoapps.edxnotes.plugins import EdxNotesTab
 from lms.lib.utils import get_parent_unit
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangolib.markup import Text
-from student.models import anonymous_id_for_user
-from util.date_utils import get_default_time_display
+from common.djangoapps.student.models import anonymous_id_for_user
+from common.djangoapps.util.date_utils import get_default_time_display
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -449,7 +449,7 @@ def generate_uid():
     """
     Generates unique id.
     """
-    return uuid4().int  # pylint: disable=no-member
+    return uuid4().int
 
 
 def is_feature_enabled(course, user):

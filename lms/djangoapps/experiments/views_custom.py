@@ -6,9 +6,8 @@ The Discount API Views should return information about discounts that apply to t
 
 
 import six
-
-from django.utils.decorators import method_decorator
 from django.http import HttpResponseBadRequest
+from django.utils.decorators import method_decorator
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
@@ -16,36 +15,32 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from common.djangoapps.course_modes.models import get_cosmetic_verified_display_price
+from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
+from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.courseware.utils import can_show_verified_upgrade
+from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
-from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermissionIsAuthenticated
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.track import segment
 
-from lms.djangoapps.courseware.utils import verified_upgrade_link_is_valid
-from course_modes.models import get_cosmetic_verified_display_price
-from lms.djangoapps.commerce.utils import EcommerceService
-from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
-from student.models import CourseEnrollment
-from track import segment
-
-
-# .. feature_toggle_name: experiments.mobile_upsell_rev934
-# .. feature_toggle_type: flag
-# .. feature_toggle_default: False
-# .. feature_toggle_description: Toggle mobile upsell enabled
-# .. feature_toggle_category: experiments
-# .. feature_toggle_use_cases: monitored_rollout
-# .. feature_toggle_creation_date: 2019-09-05
-# .. feature_toggle_expiration_date: None
-# .. feature_toggle_warnings: None
-# .. feature_toggle_tickets: REV-934
-# .. feature_toggle_status: supported
-MOBILE_UPSELL_FLAG = WaffleFlag(
-    waffle_namespace=WaffleFlagNamespace(name=u'experiments'),
+# .. toggle_name: experiments.mobile_upsell_rev934
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Toggle mobile upsell enabled
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2019-09-05
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: REV-934
+# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
+MOBILE_UPSELL_FLAG = LegacyWaffleFlag(
+    waffle_namespace=LegacyWaffleFlagNamespace(name=u'experiments'),
     flag_name=u'mobile_upsell_rev934',
-    flag_undefined_default=False
+    module_name=__name__,
 )
 MOBILE_UPSELL_EXPERIMENT = 'mobile_upsell_experiment'
 
@@ -135,7 +130,7 @@ class Rev934(DeveloperErrorViewMixin, APIView):
             enrollment = CourseEnrollment.objects.select_related(
                 'course'
             ).get(user_id=user.id, course_id=course.id)
-            user_upsell = verified_upgrade_link_is_valid(enrollment)
+            user_upsell = can_show_verified_upgrade(user, enrollment)
         except CourseEnrollment.DoesNotExist:
             user_upsell = True
 
@@ -143,7 +138,7 @@ class Rev934(DeveloperErrorViewMixin, APIView):
         upgrade_price = six.text_type(get_cosmetic_verified_display_price(course))
         could_upsell = bool(user_upsell and basket_url)
 
-        bucket = stable_bucketing_hash_group(MOBILE_UPSELL_EXPERIMENT, 2, user.username)
+        bucket = stable_bucketing_hash_group(MOBILE_UPSELL_EXPERIMENT, 2, user)
 
         if could_upsell and hasattr(request, 'session') and MOBILE_UPSELL_EXPERIMENT not in request.session:
             properties = {

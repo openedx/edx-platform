@@ -18,10 +18,10 @@ from opaque_keys.edx.locator import CourseLocator
 from PIL import Image
 from pytz import UTC
 
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url
-from contentstore.views import assets
-from static_replace import replace_static_urls
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url
+from cms.djangoapps.contentstore.views import assets
+from common.djangoapps.static_replace import replace_static_urls
 from xmodule.assetstore import AssetMetadata
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
@@ -354,16 +354,12 @@ class UploadTestCase(AssetsTestCase):
         resp = self.upload_asset("test_image", asset_type="image")
         self.assertEqual(resp.status_code, 200)
 
-    def test_no_file(self):
-        resp = self.client.post(self.url, {"name": "file.txt"}, "application/json")
-        self.assertEqual(resp.status_code, 400)
-
     @data(
         (int(MAX_FILE_SIZE / 2.0), "small.file.test", 200),
         (MAX_FILE_SIZE, "justequals.file.test", 200),
         (MAX_FILE_SIZE + 90, "large.file.test", 413),
     )
-    @mock.patch('contentstore.views.assets.get_file_size')
+    @mock.patch('cms.djangoapps.contentstore.views.assets.get_file_size')
     def test_file_size(self, case, get_file_size):
         max_file_size, name, status_code = case
 

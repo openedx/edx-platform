@@ -1,19 +1,13 @@
-# pylint: disable=unicode-format-string
-# coding=utf-8
-
 """
 Check code quality using pycodestyle, pylint, and diff_quality.
 """
 
-
-import io
 import json
 import os
 import re
 from datetime import datetime
 from xml.sax.saxutils import quoteattr
 
-import six
 from paver.easy import BuildFailure, cmdopts, needs, sh, task
 
 from openedx.core.djangolib.markup import HTML
@@ -22,12 +16,12 @@ from .utils.envs import Env
 from .utils.timer import timed
 
 ALL_SYSTEMS = 'lms,cms,common,openedx,pavelib,scripts'
-JUNIT_XML_TEMPLATE = u"""<?xml version="1.0" encoding="UTF-8"?>
+JUNIT_XML_TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
 <testsuite name="{name}" tests="1" errors="0" failures="{failure_count}" skip="0">
 <testcase classname="pavelib.quality" name="{name}" time="{seconds}">{failure_element}</testcase>
 </testsuite>
 """
-JUNIT_XML_FAILURE_TEMPLATE = u'<failure message={message}/>'
+JUNIT_XML_FAILURE_TEMPLATE = '<failure message={message}/>'
 START_TIME = datetime.utcnow()
 
 
@@ -101,7 +95,7 @@ def find_fixme(options):
         apps_list = ' '.join(top_python_dirs(system))
 
         cmd = (
-            u"pylint --disable all --enable=fixme "
+            "pylint --disable all --enable=fixme "
             "--output-format=parseable {apps} "
             "> {report_dir}/pylint_fixme.report".format(
                 apps=apps_list,
@@ -143,11 +137,13 @@ def _get_pylint_violations(systems=ALL_SYSTEMS.split(','), errors_only=False, cl
         system_report = report_dir / 'pylint.report'
         if clean or not system_report.exists():
             sh(
-                u"pylint {flags} --output-format=parseable {apps} "
+                "export DJANGO_SETTINGS_MODULE={env}.envs.test; "
+                "pylint {flags} --output-format=parseable {apps} "
                 "> {report_dir}/pylint.report".format(
                     flags=" ".join(flags),
                     apps=apps_list,
-                    report_dir=report_dir
+                    report_dir=report_dir,
+                    env=('cms' if system == 'cms' else 'lms')
                 ),
                 ignore_error=True,
             )
@@ -194,7 +190,7 @@ def run_pylint(options):
     if num_violations < lower_violations_limit > -1:
         fail_quality(
             result_name,
-            u"FAILURE: Too few pylint violations. "
+            "FAILURE: Too few pylint violations. "
             "Expected to see at least {lower_limit} pylint violations. "
             "Either pylint is not running correctly -or- "
             "the limits should be lowered and/or the lower limit should be removed.".format(
@@ -206,7 +202,7 @@ def run_pylint(options):
     if num_violations > upper_violations_limit > -1:
         fail_quality(
             result_name,
-            u"FAILURE: Too many pylint violations. "
+            "FAILURE: Too many pylint violations. "
             "The limit is {upper_limit}.".format(upper_limit=upper_violations_limit)
         )
     else:
@@ -268,7 +264,7 @@ def _get_pep8_violations(clean=True):
     Env.METRICS_DIR.makedirs_p()
 
     if not report.exists():
-        sh(u'pycodestyle . | tee {} -a'.format(report))
+        sh('pycodestyle . | tee {} -a'.format(report))
 
     violations_list = _pep8_violations(report)
 
@@ -298,7 +294,7 @@ def run_pep8(options):  # pylint: disable=unused-argument
     violations_list = ''.join(violations_list)
 
     # Print number of violations to log
-    violations_count_str = u"Number of PEP 8 violations: {count}".format(count=count)
+    violations_count_str = "Number of PEP 8 violations: {count}".format(count=count)
     print(violations_count_str)
     print(violations_list)
 
@@ -314,41 +310,6 @@ def run_pep8(options):  # pylint: disable=unused-argument
         fail_quality('pep8', failure_string)
     else:
         write_junit_xml('pep8')
-
-
-@task
-@needs('pavelib.prereqs.install_python_prereqs')
-@timed
-def run_complexity():
-    """
-    Uses radon to examine cyclomatic complexity.
-    For additional details on radon, see https://radon.readthedocs.org/
-    """
-    system_string = '/ '.join(ALL_SYSTEMS.split(',')) + '/'
-    complexity_report_dir = (Env.REPORT_DIR / "complexity")
-    complexity_report = complexity_report_dir / "python_complexity.log"
-
-    # Ensure an empty complexity report dir is in place.
-    _prepare_report_dir(complexity_report_dir)
-
-    print("--> Calculating cyclomatic complexity of python files...")
-    try:
-        sh(
-            u"radon cc {system_string} --total-average > {complexity_report}".format(
-                system_string=system_string,
-                complexity_report=complexity_report
-            )
-        )
-        complexity_metric = _get_count_from_last_line(complexity_report, "python_complexity")
-        _write_metric(
-            complexity_metric,
-            (Env.METRICS_DIR / "python_complexity")
-        )
-        print("--> Python cyclomatic complexity report complete.")
-        print(u"radon cyclomatic complexity score: {metric}".format(metric=str(complexity_metric)))
-
-    except BuildFailure:
-        print("FAILURE: Unable to calculate python-only code-complexity.")
 
 
 @task
@@ -372,7 +333,7 @@ def run_eslint(options):
     violations_limit = int(getattr(options, 'limit', -1))
 
     sh(
-        u"nodejs --max_old_space_size=4096 node_modules/.bin/eslint "
+        "node --max_old_space_size=4096 node_modules/.bin/eslint "
         "--ext .js --ext .jsx --format=compact . | tee {eslint_report}".format(
             eslint_report=eslint_report
         ),
@@ -384,7 +345,7 @@ def run_eslint(options):
     except TypeError:
         fail_quality(
             'eslint',
-            u"FAILURE: Number of eslint violations could not be found in {eslint_report}".format(
+            "FAILURE: Number of eslint violations could not be found in {eslint_report}".format(
                 eslint_report=eslint_report
             )
         )
@@ -396,7 +357,7 @@ def run_eslint(options):
     if num_violations > violations_limit > -1:
         fail_quality(
             'eslint',
-            u"FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(
+            "FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(
                 count=num_violations, violations_limit=violations_limit
             )
         )
@@ -414,7 +375,7 @@ def _get_stylelint_violations():
     formatter = 'node_modules/stylelint-formatter-pretty'
 
     sh(
-        u"stylelint **/*.scss --custom-formatter={formatter} | tee {stylelint_report}".format(
+        "stylelint **/*.scss --custom-formatter={formatter} | tee {stylelint_report}".format(
             formatter=formatter,
             stylelint_report=stylelint_report,
         ),
@@ -426,7 +387,7 @@ def _get_stylelint_violations():
     except TypeError:
         fail_quality(
             'stylelint',
-            u"FAILURE: Number of stylelint violations could not be found in {stylelint_report}".format(
+            "FAILURE: Number of stylelint violations could not be found in {stylelint_report}".format(
                 stylelint_report=stylelint_report
             )
         )
@@ -453,7 +414,7 @@ def run_stylelint(options):
     if num_violations > violations_limit > -1:
         fail_quality(
             'stylelint',
-            u"FAILURE: Stylelint failed with too many violations: ({count}).\nThe limit is {violations_limit}.".format(
+            "FAILURE: Stylelint failed with too many violations: ({count}).\nThe limit is {violations_limit}.".format(
                 count=num_violations,
                 violations_limit=violations_limit,
             )
@@ -496,7 +457,7 @@ def run_xsslint(options):
     _prepare_report_dir(xsslint_report_dir)
 
     sh(
-        u"{repo_root}/scripts/xsslint/{xsslint_script} --rule-totals --config={cfg_module} >> {xsslint_report}".format(
+        "{repo_root}/scripts/xsslint/{xsslint_script} --rule-totals --config={cfg_module} >> {xsslint_report}".format(
             repo_root=Env.REPO_ROOT,
             xsslint_script=xsslint_script,
             xsslint_report=xsslint_report,
@@ -508,21 +469,21 @@ def run_xsslint(options):
     xsslint_counts = _get_xsslint_counts(xsslint_report)
 
     try:
-        metrics_str = u"Number of {xsslint_script} violations: {num_violations}\n".format(
+        metrics_str = "Number of {xsslint_script} violations: {num_violations}\n".format(
             xsslint_script=xsslint_script, num_violations=int(xsslint_counts['total'])
         )
         if 'rules' in xsslint_counts and any(xsslint_counts['rules']):
             metrics_str += "\n"
             rule_keys = sorted(xsslint_counts['rules'].keys())
             for rule in rule_keys:
-                metrics_str += u"{rule} violations: {count}\n".format(
+                metrics_str += "{rule} violations: {count}\n".format(
                     rule=rule,
                     count=int(xsslint_counts['rules'][rule])
                 )
     except TypeError:
         fail_quality(
             'xsslint',
-            u"FAILURE: Number of {xsslint_script} violations could not be found in {xsslint_report}".format(
+            "FAILURE: Number of {xsslint_script} violations could not be found in {xsslint_report}".format(
                 xsslint_script=xsslint_script, xsslint_report=xsslint_report
             )
         )
@@ -531,14 +492,14 @@ def run_xsslint(options):
     # Record the metric
     _write_metric(metrics_str, metrics_report)
     # Print number of violations to log.
-    sh(u"cat {metrics_report}".format(metrics_report=metrics_report), ignore_error=True)
+    sh("cat {metrics_report}".format(metrics_report=metrics_report), ignore_error=True)
 
     error_message = ""
 
     # Test total violations against threshold.
     if 'total' in list(violation_thresholds.keys()):
         if violation_thresholds['total'] < xsslint_counts['total']:
-            error_message = u"Too many violations total ({count}).\nThe limit is {violations_limit}.".format(
+            error_message = "Too many violations total ({count}).\nThe limit is {violations_limit}.".format(
                 count=xsslint_counts['total'], violations_limit=violation_thresholds['total']
             )
 
@@ -548,14 +509,14 @@ def run_xsslint(options):
         for threshold_key in threshold_keys:
             if threshold_key not in xsslint_counts['rules']:
                 error_message += (
-                    u"\nNumber of {xsslint_script} violations for {rule} could not be found in "
+                    "\nNumber of {xsslint_script} violations for {rule} could not be found in "
                     "{xsslint_report}."
                 ).format(
                     xsslint_script=xsslint_script, rule=threshold_key, xsslint_report=xsslint_report
                 )
             elif violation_thresholds['rules'][threshold_key] < xsslint_counts['rules'][threshold_key]:
                 error_message += \
-                    u"\nToo many {rule} violations ({count}).\nThe {rule} limit is {violations_limit}.".format(
+                    "\nToo many {rule} violations ({count}).\nThe {rule} limit is {violations_limit}.".format(
                         rule=threshold_key, count=xsslint_counts['rules'][threshold_key],
                         violations_limit=violation_thresholds['rules'][threshold_key],
                     )
@@ -563,7 +524,7 @@ def run_xsslint(options):
     if error_message:
         fail_quality(
             'xsslint',
-            u"FAILURE: XSSLinter Failed.\n{error_message}\n"
+            "FAILURE: XSSLinter Failed.\n{error_message}\n"
             "See {xsslint_report} or run the following command to hone in on the problem:\n"
             "  ./scripts/xss-commit-linter.sh -h".format(
                 error_message=error_message, xsslint_report=xsslint_report
@@ -586,7 +547,7 @@ def run_xsscommitlint():
     _prepare_report_dir(xsscommitlint_report_dir)
 
     sh(
-        u"{repo_root}/scripts/{xsscommitlint_script} | tee {xsscommitlint_report}".format(
+        "{repo_root}/scripts/{xsscommitlint_script} | tee {xsscommitlint_report}".format(
             repo_root=Env.REPO_ROOT,
             xsscommitlint_script=xsscommitlint_script,
             xsscommitlint_report=xsscommitlint_report,
@@ -601,13 +562,13 @@ def run_xsscommitlint():
     except TypeError:
         fail_quality(
             'xsscommitlint',
-            u"FAILURE: Number of {xsscommitlint_script} violations could not be found in {xsscommitlint_report}".format(
+            "FAILURE: Number of {xsscommitlint_script} violations could not be found in {xsscommitlint_report}".format(
                 xsscommitlint_script=xsscommitlint_script, xsscommitlint_report=xsscommitlint_report
             )
         )
 
     # Print number of violations to log.
-    violations_count_str = u"Number of {xsscommitlint_script} violations: {num_violations}\n".format(
+    violations_count_str = "Number of {xsscommitlint_script} violations: {num_violations}\n".format(
         xsscommitlint_script=xsscommitlint_script, num_violations=num_violations
     )
 
@@ -615,10 +576,10 @@ def run_xsscommitlint():
     metrics_report = (Env.METRICS_DIR / "xsscommitlint")
     _write_metric(violations_count_str, metrics_report)
     # Output report to console.
-    sh(u"cat {metrics_report}".format(metrics_report=metrics_report), ignore_error=True)
+    sh("cat {metrics_report}".format(metrics_report=metrics_report), ignore_error=True)
     if num_violations:
         fail_quality(
-            u'xsscommitlint',
+            'xsscommitlint',
             "FAILURE: XSSCommitLinter Failed.\n{error_message}\n"
             "See {xsscommitlint_report} or run the following command to hone in on the problem:\n"
             "  ./scripts/xss-commit-linter.sh -h".format(
@@ -637,7 +598,7 @@ def _write_metric(metric, filename):
     Env.METRICS_DIR.makedirs_p()
 
     with open(filename, "w") as metric_file:
-        metric_file.write(six.text_type(metric))
+        metric_file.write(str(metric))
 
 
 def _prepare_report_dir(dir_name):
@@ -663,16 +624,17 @@ def _get_report_contents(filename, report_name, last_line_only=False):
 
     """
     if os.path.isfile(filename):
-        with open(filename, 'r') as report_file:
+        with open(filename) as report_file:
             if last_line_only:
                 lines = report_file.readlines()
                 for line in reversed(lines):
                     if line != '\n':
                         return line
+                return None
             else:
                 return report_file.read()
     else:
-        file_not_found_message = u"FAILURE: The following log file could not be found: {file}".format(file=filename)
+        file_not_found_message = "FAILURE: The following log file could not be found: {file}".format(file=filename)
         fail_quality(report_name, file_not_found_message)
 
 
@@ -681,14 +643,14 @@ def _get_count_from_last_line(filename, file_type):
     This will return the number in the last line of a file.
     It is returning only the value (as a floating number).
     """
-    last_line = _get_report_contents(filename, file_type, last_line_only=True).strip()
+    report_contents = _get_report_contents(filename, file_type, last_line_only=True)
 
-    if file_type == "python_complexity":
-        # Example of the last line of a complexity report: "Average complexity: A (1.93953443446)"
-        regex = r'\d+.\d+'
-    else:
-        # Example of the last line of a compact-formatted eslint report (for example): "62829 problems"
-        regex = r'^\d+'
+    if report_contents is None:
+        return 0
+
+    last_line = report_contents.strip()
+    # Example of the last line of a compact-formatted eslint report (for example): "62829 problems"
+    regex = r'^\d+'
 
     try:
         return float(re.search(regex, last_line).group(0))
@@ -774,7 +736,7 @@ def _extract_missing_pii_annotations(filename):
     uncovered_models = 0
     pii_check_passed = True
     if os.path.isfile(filename):
-        with io.open(filename, 'r') as report_file:
+        with open(filename, 'r') as report_file:
             lines = report_file.readlines()
 
             # Find the count of uncovered models.
@@ -796,7 +758,7 @@ def _extract_missing_pii_annotations(filename):
             # Each line in lines already contains a newline.
             full_log = ''.join(lines)
     else:
-        fail_quality('pii', u'FAILURE: Log file could not be found: {}'.format(filename))
+        fail_quality('pii', 'FAILURE: Log file could not be found: {}'.format(filename))
 
     return (uncovered_models, pii_check_passed, full_log)
 
@@ -822,7 +784,7 @@ def run_pii_check(options):
             print()
             print("Running {} PII Annotation check and report".format(env_name))
             print("-" * 45)
-            run_output_file = six.text_type(output_file).format(env_name.lower())
+            run_output_file = str(output_file).format(env_name.lower())
             sh(
                 "mkdir -p {} && "
                 "export DJANGO_SETTINGS_MODULE={}; "
@@ -850,12 +812,49 @@ def run_pii_check(options):
     # Write metric file.
     if uncovered_count is None:
         uncovered_count = 0
-    metrics_str = u"Number of PII Annotation violations: {}\n".format(uncovered_count)
+    metrics_str = "Number of PII Annotation violations: {}\n".format(uncovered_count)
     _write_metric(metrics_str, (Env.METRICS_DIR / pii_report_name))
 
     # Finally, fail the paver task if code_annotations suggests that the check failed.
     if not pii_check_passed:
         fail_quality('pii', full_log)
+
+
+@task
+@needs('pavelib.prereqs.install_python_prereqs')
+@timed
+def check_keywords():
+    """
+    Check Django model fields for names that conflict with a list of reserved keywords
+    """
+    report_path = os.path.join(Env.REPORT_DIR, 'reserved_keywords')
+    sh("mkdir -p {}".format(report_path))
+
+    overall_status = True
+    for env, env_settings_file in [('lms', 'lms.envs.test'), ('cms', 'cms.envs.test')]:
+        report_file = "{}_reserved_keyword_report.csv".format(env)
+        override_file = os.path.join(Env.REPO_ROOT, "db_keyword_overrides.yml")
+        try:
+            sh(
+                "export DJANGO_SETTINGS_MODULE={settings_file}; "
+                "python manage.py {app} check_reserved_keywords "
+                "--override_file {override_file} "
+                "--report_path {report_path} "
+                "--report_file {report_file}".format(
+                    settings_file=env_settings_file, app=env, override_file=override_file,
+                    report_path=report_path, report_file=report_file
+                )
+            )
+        except BuildFailure:
+            overall_status = False
+
+    if not overall_status:
+        fail_quality(
+            'keywords',
+            'Failure: reserved keyword checker failed. Reports can be found here: {}'.format(
+                report_path
+            )
+        )
 
 
 @task
@@ -891,20 +890,20 @@ def run_quality(options):
         if is_html:
             lines = ['<body>\n']
             sep = '-------------<br/>\n'
-            title = HTML(u"<h1>Quality Report: {}</h1>\n").format(linter)
+            title = HTML("<h1>Quality Report: {}</h1>\n").format(linter)
             violations_bullets = ''.join(
                 [HTML('<li>{violation}</li><br/>\n').format(violation=violation) for violation in violations_list]
             )
             violations_str = HTML('<ul>\n{bullets}</ul>\n').format(bullets=HTML(violations_bullets))
-            violations_count_str = HTML(u"<b>Violations</b>: {count}<br/>\n")
-            fail_line = HTML(u"<b>FAILURE</b>: {} count should be 0<br/>\n").format(linter)
+            violations_count_str = HTML("<b>Violations</b>: {count}<br/>\n")
+            fail_line = HTML("<b>FAILURE</b>: {} count should be 0<br/>\n").format(linter)
         else:
             lines = []
             sep = '-------------\n'
-            title = u"Quality Report: {}\n".format(linter)
+            title = "Quality Report: {}\n".format(linter)
             violations_str = ''.join(violations_list)
-            violations_count_str = u"Violations: {count}\n"
-            fail_line = u"FAILURE: {} count should be {}\n".format(linter, limit)
+            violations_count_str = "Violations: {count}\n"
+            fail_line = "FAILURE: {} count should be {}\n".format(linter, limit)
 
         violations_count_str = violations_count_str.format(count=count)
 
@@ -931,19 +930,19 @@ def run_quality(options):
 
     # ----- Set up for diff-quality pylint call -----
     # Set the string to be used for the diff-quality --compare-branch switch.
-    compare_branch = getattr(options, 'compare_branch', u'origin/master')
-    compare_commit = sh(u'git merge-base HEAD {}'.format(compare_branch), capture=True).strip()
+    compare_branch = getattr(options, 'compare_branch', 'origin/master')
+    compare_commit = sh('git merge-base HEAD {}'.format(compare_branch), capture=True).strip()
     if sh('git rev-parse HEAD', capture=True).strip() != compare_commit:
-        compare_branch_string = u'--compare-branch={0}'.format(compare_commit)
+        compare_branch_string = '--compare-branch={}'.format(compare_commit)
 
         # Set the string, if needed, to be used for the diff-quality --fail-under switch.
         diff_threshold = int(getattr(options, 'percentage', -1))
-        percentage_string = u''
+        percentage_string = ''
         if diff_threshold > -1:
-            percentage_string = u'--fail-under={0}'.format(diff_threshold)
+            percentage_string = '--fail-under={}'.format(diff_threshold)
 
         pylint_files = get_violations_reports("pylint")
-        pylint_reports = u' '.join(pylint_files)
+        pylint_reports = ' '.join(pylint_files)
         if not run_diff_quality(
             violations_type="pylint",
             reports=pylint_reports,
@@ -955,7 +954,7 @@ def run_quality(options):
             failure_reasons.append('Pylint violation(s) were found in the lines of code that were added or changed.')
 
         eslint_files = get_violations_reports("eslint")
-        eslint_reports = u' '.join(eslint_files)
+        eslint_reports = ' '.join(eslint_files)
         if not run_diff_quality(
                 violations_type="eslint",
                 reports=eslint_reports,
@@ -984,7 +983,7 @@ def run_diff_quality(
     """
     try:
         sh(
-            u"diff-quality --violations={type} "
+            "diff-quality --violations={type} "
             "{reports} {percentage_string} {compare_branch_string} "
             "--html-report {dquality_dir}/diff_quality_{type}.html ".format(
                 type=violations_type,
@@ -995,11 +994,14 @@ def run_diff_quality(
             )
         )
         return True
-    except BuildFailure as error_message:
-        if is_percentage_failure(error_message):
+    except BuildFailure as failure:
+        if is_percentage_failure(failure.args):
             return False
         else:
-            fail_quality('diff_quality', 'FAILURE: {}'.format(error_message))
+            fail_quality(
+                'diff_quality',
+                'FAILURE: See "Diff Quality Report" in Jenkins left-sidebar for details. {}'.format(failure)
+            )
 
 
 def is_percentage_failure(error_message):

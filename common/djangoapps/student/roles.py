@@ -13,7 +13,7 @@ from django.contrib.auth.models import User
 from opaque_keys.edx.django.models import CourseKeyField
 
 from openedx.core.lib.cache_utils import get_cache
-from student.models import CourseAccessRole
+from common.djangoapps.student.models import CourseAccessRole
 
 log = logging.getLogger(__name__)
 
@@ -185,7 +185,7 @@ class RoleBase(AccessRole):
         """
         # silently ignores anonymous and inactive users so that any that are
         # legit get updated.
-        from student.models import CourseAccessRole
+        from common.djangoapps.student.models import CourseAccessRole
         for user in users:
             if user.is_authenticated and user.is_active and not self.has_user(user):
                 entry = CourseAccessRole(user=user, role=self._role_name, course_id=self.course_key, org=self.org)
@@ -312,6 +312,7 @@ class CourseCcxCoachRole(CourseRole):
         super(CourseCcxCoachRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
+@register_access_role
 class CourseDataResearcherRole(CourseRole):
     """A Data Researcher"""
     ROLE = 'data_researcher'
@@ -341,6 +342,14 @@ class OrgLibraryUserRole(OrgRole):
 
     def __init__(self, *args, **kwargs):
         super(OrgLibraryUserRole, self).__init__(self.ROLE, *args, **kwargs)
+
+
+class OrgDataResearcherRole(OrgRole):
+    """A Data Researcher"""
+    ROLE = 'data_researcher'
+
+    def __init__(self, *args, **kwargs):
+        super(OrgDataResearcherRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
 @register_access_role

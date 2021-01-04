@@ -45,18 +45,18 @@
                 </h3>
             </div>
         <% } else { %>
-            <h2><%- gettext('Create an Account')%></h2>
+            <h1 class="section-title"><%- gettext('Create an Account')%></h1>
         <% } %>
     <% } else if (context.autoRegisterWelcomeMessage) { %>
         <span class="auto-register-message"><%- context.autoRegisterWelcomeMessage %></span>
     <% } %>
 
-    <%= context.fields %>
+    <%= context.fields /* xss-lint: disable=underscore-not-escaped */ %>
 
     <div class="form-field checkbox-optional_fields_toggle">
         <input type="checkbox" id="toggle_optional_fields" class="input-block checkbox"">
         <label for="toggle_optional_fields">
-            <span class="label-text">
+            <span class="label-text-small">
                 <%- gettext("Support education research by providing additional information") %>
             </span>
         </label>

@@ -13,6 +13,18 @@ COURSE_GRADE_CHANGED = Signal(providing_args=["user", "course_grade", "course_ke
 # rather than a User object; however, this will require changes to the milestones and badges APIs
 COURSE_CERT_CHANGED = Signal(providing_args=["user", "course_key", "mode", "status"])
 COURSE_CERT_AWARDED = Signal(providing_args=["user", "course_key", "mode", "status"])
+COURSE_CERT_REVOKED = Signal(providing_args=["user", "course_key", "mode", "status"])
+COURSE_CERT_DATE_CHANGE = Signal(providing_args=["course_key"])
+
+
+COURSE_ASSESSMENT_GRADE_CHANGED = Signal(
+    providing_args=[
+        'user',
+        'course_id',
+        'subsection_id',
+        'subsection_grade',
+    ]
+)
 
 # Signal that indicates that a user has passed a course.
 COURSE_GRADE_NOW_PASSED = Signal(
@@ -30,5 +42,7 @@ COURSE_GRADE_NOW_FAILED = Signal(
     ]
 )
 
-# Signal that indicates that a user has become verified
+# Signal that indicates that a user has become verified for certificate purposes
 LEARNER_NOW_VERIFIED = Signal(providing_args=['user'])
+
+USER_ACCOUNT_ACTIVATED = Signal(providing_args=["user"])  # Signal indicating email verification

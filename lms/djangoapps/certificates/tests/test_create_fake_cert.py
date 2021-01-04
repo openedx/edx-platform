@@ -2,7 +2,6 @@
 
 
 import six
-
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
@@ -10,7 +9,7 @@ from opaque_keys.edx.locator import CourseLocator
 from six import text_type
 
 from lms.djangoapps.certificates.models import GeneratedCertificate
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class CreateFakeCertTest(TestCase):

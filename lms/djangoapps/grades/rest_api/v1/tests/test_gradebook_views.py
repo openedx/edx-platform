@@ -17,7 +17,8 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from six import text_type
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
+from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory
 from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
@@ -36,8 +37,7 @@ from lms.djangoapps.grades.rest_api.v1.views import CourseEnrollmentPagination
 from lms.djangoapps.grades.subsection_grade import ReadSubsectionGrade
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -1706,6 +1706,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         )
 
         expected_data = {
+            'success': True,
             'original_grade': OrderedDict([
                 ('earned_all', 1.0),
                 ('possible_all', 2.0),
@@ -1733,6 +1734,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         )
 
         expected_data = {
+            'success': True,
             'original_grade': OrderedDict([
                 ('earned_all', 6.0),
                 ('possible_all', 12.0),
@@ -1770,6 +1772,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         )
 
         expected_data = {
+            'success': True,
             'original_grade': OrderedDict([
                 ('earned_all', 6.0),
                 ('possible_all', 12.0),
@@ -1827,6 +1830,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         )
 
         expected_data = {
+            'success': True,
             'original_grade': OrderedDict([
                 ('earned_all', 6.0),
                 ('possible_all', 12.0),
@@ -1928,6 +1932,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
             self.get_url(subsection_id=self.usage_key, user_id=other_user.id)
         )
         expected_data = {
+            'success': True,
             'original_grade': OrderedDict([
                 ('earned_all', 0.0),
                 ('possible_all', 0.0),
@@ -1952,3 +1957,35 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         )
 
         self.assertEqual(status.HTTP_403_FORBIDDEN, resp.status_code)
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_get_override_for_unreleased_block(self):
+        self.login_course_staff()
+        unreleased_subsection = ItemFactory.create(
+            parent_location=self.chapter_1.location,
+            category='sequential',
+            graded=True,
+            start=datetime(2999, 1, 1, tzinfo=UTC),  # arbitrary future date
+            display_name='Unreleased Section',
+        )
+
+        resp = self.client.get(
+            self.get_url(subsection_id=unreleased_subsection.location)
+        )
+
+        expected_data = {
+            'success': False,
+            'error_message': "Cannot override subsection grade: subsection is not available for target learner.",
+            'original_grade': OrderedDict([
+                ('earned_all', 0.0),
+                ('possible_all', 0.0),
+                ('earned_graded', 0.0),
+                ('possible_graded', 0.0)
+            ]),
+            'user_id': self.user_id,
+            'override': None,
+            'course_id': text_type(self.usage_key.course_key),
+            'subsection_id': text_type(unreleased_subsection.location),
+            'history': []
+        }
+        self.assertEqual(expected_data, resp.data)

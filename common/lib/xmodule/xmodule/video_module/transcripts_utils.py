@@ -5,27 +5,27 @@ Utility functions for transcripts.
 
 
 import copy
-import simplejson as json
+import html
 import logging
 import os
 from functools import wraps
 
 import requests
+import simplejson as json
 import six
 from django.conf import settings
 from lxml import etree
+from opaque_keys.edx.locator import BundleDefinitionLocator
 from pysrt import SubRipFile, SubRipItem, SubRipTime
 from pysrt.srtexc import Error
 from six import text_type
 from six.moves import range, zip
-from six.moves.html_parser import HTMLParser  # pylint: disable=import-error
 
-from opaque_keys.edx.locator import BundleDefinitionLocator
+from openedx.core.djangolib import blockstore_cache
+from openedx.core.lib import blockstore_api
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
-from openedx.core.djangolib import blockstore_cache
-from openedx.core.lib import blockstore_api
 
 from .bumper_utils import get_bumper_settings
 
@@ -40,19 +40,19 @@ log = logging.getLogger(__name__)
 NON_EXISTENT_TRANSCRIPT = 'non_existent_dummy_file_name'
 
 
-class TranscriptException(Exception):  # pylint: disable=missing-docstring
+class TranscriptException(Exception):
     pass
 
 
-class TranscriptsGenerationException(Exception):  # pylint: disable=missing-docstring
+class TranscriptsGenerationException(Exception):
     pass
 
 
-class GetTranscriptsFromYouTubeException(Exception):  # pylint: disable=missing-docstring
+class GetTranscriptsFromYouTubeException(Exception):
     pass
 
 
-class TranscriptsRequestValidationException(Exception):  # pylint: disable=missing-docstring
+class TranscriptsRequestValidationException(Exception):
     pass
 
 
@@ -660,7 +660,7 @@ class Transcript(object):
 
             if output_format == 'txt':
                 text = SubRipFile.from_string(content.decode('utf-8')).text
-                return HTMLParser().unescape(text)
+                return html.unescape(text)
 
             elif output_format == 'sjson':
                 try:
@@ -679,7 +679,7 @@ class Transcript(object):
             if output_format == 'txt':
                 text = json.loads(content)['text']
                 text_without_none = [line if line else '' for line in text]
-                return HTMLParser().unescape("\n".join(text_without_none))
+                return html.unescape("\n".join(text_without_none))
 
             elif output_format == 'srt':
                 return generate_srt_from_sjson(json.loads(content), speed=1.0)
@@ -784,49 +784,6 @@ class VideoTranscriptsMixin(object):
         # to clean redundant language codes.
         return list(set(translations))
 
-    def get_transcript(self, transcripts, transcript_format='srt', lang=None):
-        """
-        Returns transcript, filename and MIME type.
-
-        transcripts (dict): A dict with all transcripts and a sub.
-
-        Raises:
-            - NotFoundError if cannot find transcript file in storage.
-            - ValueError if transcript file is empty or incorrect JSON.
-            - KeyError if transcript file has incorrect format.
-
-        If language is 'en', self.sub should be correct subtitles name.
-        If language is 'en', but if self.sub is not defined, this means that we
-        should search for video name in order to get proper transcript (old style courses).
-        If language is not 'en', give back transcript in proper language and format.
-        """
-        if not lang:
-            lang = self.get_default_transcript_language(transcripts)
-
-        sub, other_lang = transcripts["sub"], transcripts["transcripts"]
-        if lang == 'en':
-            if sub:  # HTML5 case and (Youtube case for new style videos)
-                transcript_name = sub
-            elif self.youtube_id_1_0:  # old courses
-                transcript_name = self.youtube_id_1_0
-            else:
-                log.debug("No subtitles for 'en' language")
-                raise ValueError
-
-            data = Transcript.asset(self.location, transcript_name, lang).data.decode('utf-8')
-            filename = u'{}.{}'.format(transcript_name, transcript_format)
-            content = Transcript.convert(data, 'sjson', transcript_format)
-        else:
-            data = Transcript.asset(self.location, None, None, other_lang[lang]).data.decode('utf-8')
-            filename = u'{}.{}'.format(os.path.splitext(other_lang[lang])[0], transcript_format)
-            content = Transcript.convert(data, 'srt', transcript_format)
-
-        if not content:
-            log.debug('no subtitles produced in get_transcript')
-            raise ValueError
-
-        return content, filename, Transcript.mime_types[transcript_format]
-
     def get_default_transcript_language(self, transcripts):
         """
         Returns the default transcript language for this video module.
@@ -910,7 +867,10 @@ def get_transcript_from_val(edx_video_id, lang=None, output_format=Transcript.SR
 
 def get_transcript_for_video(video_location, subs_id, file_name, language):
     """
-    Get video transcript from content store.
+    Get video transcript from content store. This is a lower level function and is used by
+    `get_transcript_from_contentstore`. Prefer that function instead where possible. If you
+    need to support getting transcripts from VAL or Blockstore as well, use the `get_transcript`
+    function instead.
 
     NOTE: Transcripts can be searched from content store by two ways:
     1. by an id(a.k.a subs_id) which will be used to construct transcript filename

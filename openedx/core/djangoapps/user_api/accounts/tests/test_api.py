@@ -19,15 +19,15 @@ from django.urls import reverse
 from mock import Mock, patch
 from six import iteritems
 from social_django.models import UserSocialAuth
-from student.models import (
+from common.djangoapps.student.models import (
     AccountRecovery,
     PendingEmailChange,
     PendingSecondaryEmailChange,
     UserProfile
 )
-from student.tests.factories import UserFactory
-from student.tests.tests import UserSettingsEventTestMixin
-from student.views.management import activate_secondary_email
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.tests import UserSettingsEventTestMixin
+from common.djangoapps.student.views.management import activate_secondary_email
 
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangoapps.user_api.accounts import PRIVATE_VISIBILITY
@@ -80,7 +80,7 @@ class CreateAccountMixin(object):
 
 @skip_unless_lms
 @ddt.ddt
-@patch('student.views.management.render_to_response', Mock(side_effect=mock_render_to_response, autospec=True))
+@patch('common.djangoapps.student.views.management.render_to_response', Mock(side_effect=mock_render_to_response, autospec=True))
 class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAccountMixin, RetirementTestCase):
     """
     These tests specifically cover the parts of the API methods that are not covered by test_views.py.
@@ -366,7 +366,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         self.assertIn("Full Name cannot contain the following characters: < >", field_errors["name"]["user_message"])
 
     @patch('django.core.mail.EmailMultiAlternatives.send')
-    @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+    @patch('common.djangoapps.student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_update_sending_email_fails(self, send_mail):
         """Test what happens if all validation checks pass, but sending the email for email change fails."""
         send_mail.side_effect = [Exception, None]
@@ -481,6 +481,23 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         self.assertIsNot(account_recovery, None)
         self.assertEqual(account_recovery.secondary_email, test_email)
 
+    def test_change_country_removes_state(self):
+        '''
+        Test that changing the country (to something other than a country with
+        states) removes the state
+        '''
+        # First set the country and state
+        update_account_settings(self.user, {"country": UserProfile.COUNTRY_WITH_STATES, "state": "MA"})
+        account_settings = get_account_settings(self.default_request)[0]
+        self.assertEqual(account_settings['country'], UserProfile.COUNTRY_WITH_STATES)
+        self.assertEqual(account_settings['state'], 'MA')
+
+        # Change the country and check that state is removed
+        update_account_settings(self.user, {"country": ""})
+        account_settings = get_account_settings(self.default_request)[0]
+        self.assertEqual(account_settings['country'], None)
+        self.assertEqual(account_settings['state'], None)
+
 
 @patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
 @patch.dict(
@@ -521,6 +538,7 @@ class AccountSettingsOnCreationTest(CreateAccountMixin, TestCase):
             'mailing_address': u'',
             'year_of_birth': None,
             'country': None,
+            'state': None,
             'social_links': [],
             'bio': None,
             'profile_image': {
@@ -534,6 +552,7 @@ class AccountSettingsOnCreationTest(CreateAccountMixin, TestCase):
             'accomplishments_shared': False,
             'extended_profile': [],
             'secondary_email': None,
+            'secondary_email_enabled': None,
             'time_zone': None,
             'course_certificates': None,
             'phone_number': None,

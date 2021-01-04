@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.test.utils import override_settings
 
-from util.password_policy_validators import (
+from common.djangoapps.util.password_policy_validators import (
     create_validator_config,
     password_validators_instruction_texts,
     validate_password
@@ -73,25 +73,25 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
                                        'This password is too short. It must contain at least 2 characters.')
 
     @data(
-        ([create_validator_config('util.password_policy_validators.MinimumLengthValidator', {'min_length': 2})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 2})],
             'at least 2 characters.'),
 
         ([
-            create_validator_config('util.password_policy_validators.MinimumLengthValidator', {'min_length': 2}),
-            create_validator_config('util.password_policy_validators.AlphabeticValidator', {'min_alphabetic': 2}),
+            create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 2}),
+            create_validator_config('common.djangoapps.util.password_policy_validators.AlphabeticValidator', {'min_alphabetic': 2}),
         ], 'characters, including 2 letters.'),
 
         ([
-            create_validator_config('util.password_policy_validators.MinimumLengthValidator', {'min_length': 2}),
-            create_validator_config('util.password_policy_validators.AlphabeticValidator', {'min_alphabetic': 2}),
-            create_validator_config('util.password_policy_validators.NumericValidator', {'min_numeric': 1}),
+            create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 2}),
+            create_validator_config('common.djangoapps.util.password_policy_validators.AlphabeticValidator', {'min_alphabetic': 2}),
+            create_validator_config('common.djangoapps.util.password_policy_validators.NumericValidator', {'min_numeric': 1}),
         ], 'characters, including 2 letters & 1 number.'),
 
         ([
-            create_validator_config('util.password_policy_validators.MinimumLengthValidator', {'min_length': 2}),
-            create_validator_config('util.password_policy_validators.UppercaseValidator', {'min_upper': 3}),
-            create_validator_config('util.password_policy_validators.NumericValidator', {'min_numeric': 1}),
-            create_validator_config('util.password_policy_validators.SymbolValidator', {'min_symbol': 2}),
+            create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 2}),
+            create_validator_config('common.djangoapps.util.password_policy_validators.UppercaseValidator', {'min_upper': 3}),
+            create_validator_config('common.djangoapps.util.password_policy_validators.NumericValidator', {'min_numeric': 1}),
+            create_validator_config('common.djangoapps.util.password_policy_validators.SymbolValidator', {'min_symbol': 2}),
         ], 'including 3 uppercase letters & 1 number & 2 symbols.'),
     )
     @unpack
@@ -116,13 +116,13 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
         self.validation_errors_checker(password, msg, user)
 
     @data(
-        ([create_validator_config('util.password_policy_validators.MinimumLengthValidator', {'min_length': 1})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 1})],
             u'', 'This password is too short. It must contain at least 1 character.'),
 
-        ([create_validator_config('util.password_policy_validators.MinimumLengthValidator', {'min_length': 8})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 8})],
             u'd', 'This password is too short. It must contain at least 8 characters.'),
 
-        ([create_validator_config('util.password_policy_validators.MinimumLengthValidator', {'min_length': 8})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 8})],
             u'longpassword', None),
     )
     @unpack
@@ -132,13 +132,13 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
             self.validation_errors_checker(password, msg)
 
     @data(
-        ([create_validator_config('util.password_policy_validators.MaximumLengthValidator', {'max_length': 1})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.MaximumLengthValidator', {'max_length': 1})],
             u'longpassword', 'This password is too long. It must contain no more than 1 character.'),
 
-        ([create_validator_config('util.password_policy_validators.MaximumLengthValidator', {'max_length': 10})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.MaximumLengthValidator', {'max_length': 10})],
             u'longpassword', 'This password is too long. It must contain no more than 10 characters.'),
 
-        ([create_validator_config('util.password_policy_validators.MaximumLengthValidator', {'max_length': 20})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.MaximumLengthValidator', {'max_length': 20})],
             u'shortpassword', None),
     )
     @unpack
@@ -160,13 +160,13 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
         self.validation_errors_checker(password, msg)
 
     @data(
-        ([create_validator_config('util.password_policy_validators.AlphabeticValidator', {'min_alphabetic': 1})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.AlphabeticValidator', {'min_alphabetic': 1})],
             u'12345', 'This password must contain at least 1 letter.'),
 
-        ([create_validator_config('util.password_policy_validators.AlphabeticValidator', {'min_alphabetic': 5})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.AlphabeticValidator', {'min_alphabetic': 5})],
             u'test123', 'This password must contain at least 5 letters.'),
 
-        ([create_validator_config('util.password_policy_validators.AlphabeticValidator', {'min_alphabetic': 2})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.AlphabeticValidator', {'min_alphabetic': 2})],
             u'password', None),
     )
     @unpack
@@ -176,13 +176,13 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
             self.validation_errors_checker(password, msg)
 
     @data(
-        ([create_validator_config('util.password_policy_validators.NumericValidator', {'min_numeric': 1})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.NumericValidator', {'min_numeric': 1})],
             u'test', 'This password must contain at least 1 number.'),
 
-        ([create_validator_config('util.password_policy_validators.NumericValidator', {'min_numeric': 4})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.NumericValidator', {'min_numeric': 4})],
             u'test123', 'This password must contain at least 4 numbers.'),
 
-        ([create_validator_config('util.password_policy_validators.NumericValidator', {'min_numeric': 2})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.NumericValidator', {'min_numeric': 2})],
             u'password123', None),
     )
     @unpack
@@ -192,13 +192,13 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
             self.validation_errors_checker(password, msg)
 
     @data(
-        ([create_validator_config('util.password_policy_validators.UppercaseValidator', {'min_upper': 1})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.UppercaseValidator', {'min_upper': 1})],
             u'lowercase', 'This password must contain at least 1 uppercase letter.'),
 
-        ([create_validator_config('util.password_policy_validators.UppercaseValidator', {'min_upper': 6})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.UppercaseValidator', {'min_upper': 6})],
             u'NOTenough', 'This password must contain at least 6 uppercase letters.'),
 
-        ([create_validator_config('util.password_policy_validators.UppercaseValidator', {'min_upper': 1})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.UppercaseValidator', {'min_upper': 1})],
             u'camelCase', None),
     )
     @unpack
@@ -208,13 +208,13 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
             self.validation_errors_checker(password, msg)
 
     @data(
-        ([create_validator_config('util.password_policy_validators.LowercaseValidator', {'min_lower': 1})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.LowercaseValidator', {'min_lower': 1})],
             u'UPPERCASE', 'This password must contain at least 1 lowercase letter.'),
 
-        ([create_validator_config('util.password_policy_validators.LowercaseValidator', {'min_lower': 4})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.LowercaseValidator', {'min_lower': 4})],
             u'notENOUGH', 'This password must contain at least 4 lowercase letters.'),
 
-        ([create_validator_config('util.password_policy_validators.LowercaseValidator', {'min_lower': 1})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.LowercaseValidator', {'min_lower': 1})],
             u'goodPassword', None),
     )
     @unpack
@@ -224,13 +224,13 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
             self.validation_errors_checker(password, msg)
 
     @data(
-        ([create_validator_config('util.password_policy_validators.PunctuationValidator', {'min_punctuation': 1})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.PunctuationValidator', {'min_punctuation': 1})],
             u'no punctuation', 'This password must contain at least 1 punctuation mark.'),
 
-        ([create_validator_config('util.password_policy_validators.PunctuationValidator', {'min_punctuation': 7})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.PunctuationValidator', {'min_punctuation': 7})],
             u'p@$$w0rd$!', 'This password must contain at least 7 punctuation marks.'),
 
-        ([create_validator_config('util.password_policy_validators.PunctuationValidator', {'min_punctuation': 3})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.PunctuationValidator', {'min_punctuation': 3})],
             u'excl@m@t!on', None),
     )
     @unpack
@@ -240,13 +240,13 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
             self.validation_errors_checker(password, msg)
 
     @data(
-        ([create_validator_config('util.password_policy_validators.SymbolValidator', {'min_symbol': 1})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.SymbolValidator', {'min_symbol': 1})],
             u'no symbol', 'This password must contain at least 1 symbol.'),
 
-        ([create_validator_config('util.password_policy_validators.SymbolValidator', {'min_symbol': 3})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.SymbolValidator', {'min_symbol': 3})],
             u'☹️boo☹️', 'This password must contain at least 3 symbols.'),
 
-        ([create_validator_config('util.password_policy_validators.SymbolValidator', {'min_symbol': 2})],
+        ([create_validator_config('common.djangoapps.util.password_policy_validators.SymbolValidator', {'min_symbol': 2})],
             u'☪symbols!☹️', None),
     )
     @unpack

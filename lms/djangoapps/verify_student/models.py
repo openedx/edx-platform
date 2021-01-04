@@ -9,7 +9,6 @@ of a student over a period of time. Right now, the only models are the abstract
 photo verification process as generic as possible.
 """
 
-
 import base64
 import codecs
 import functools
@@ -21,13 +20,12 @@ from datetime import timedelta
 from email.utils import formatdate
 
 import requests
-import simplejson
 import six
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
-from django.db import models
+from django.db import models, transaction
 from django.urls import reverse
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
@@ -46,7 +44,7 @@ from lms.djangoapps.verify_student.ssencrypt import (
 from openedx.core.djangoapps.signals.signals import LEARNER_NOW_VERIFIED
 from openedx.core.storage import get_storage
 
-from .utils import earliest_allowed_verification_date
+from .utils import auto_verify_for_testing_enabled, earliest_allowed_verification_date, submit_request_to_ss
 
 log = logging.getLogger(__name__)
 
@@ -115,6 +113,17 @@ class IDVerificationAttempt(StatusModel):
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
 
+    def expiration_default():
+        return now() + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+
+    # Datetime that the verification will expire.
+    expiration_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        db_index=True,
+        default=expiration_default
+    )
+
     class Meta(object):
         app_label = "verify_student"
         abstract = True
@@ -122,7 +131,9 @@ class IDVerificationAttempt(StatusModel):
 
     @property
     def expiration_datetime(self):
-        """Datetime that the verification will expire. """
+        """Account for old DB entries which have `expiration_date` set to NULL."""
+        if self.expiration_date:
+            return self.expiration_date
         days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
         return self.created_at + timedelta(days=days_good_for)
 
@@ -142,7 +153,7 @@ class IDVerificationAttempt(StatusModel):
 
         """
         return (
-            self.created_at < deadline and
+            self.created_at <= deadline and
             self.expiration_datetime > now()
         )
 
@@ -192,9 +203,9 @@ class SSOVerification(IDVerificationAttempt):
     .. no_pii:
     """
 
-    OAUTH2 = u'third_party_auth.models.OAuth2ProviderConfig'
-    SAML = u'third_party_auth.models.SAMLProviderConfig'
-    LTI = u'third_party_auth.models.LTIProviderConfig'
+    OAUTH2 = u'common.djangoapps.third_party_auth.models.OAuth2ProviderConfig'
+    SAML = u'common.djangoapps.third_party_auth.models.SAMLProviderConfig'
+    LTI = u'common.djangoapps.third_party_auth.models.LTIProviderConfig'
     IDENTITY_PROVIDER_TYPE_CHOICES = (
         (OAUTH2, u'OAuth2 Provider'),
         (SAML, u'SAML Provider'),
@@ -355,11 +366,11 @@ class PhotoVerification(IDVerificationAttempt):
         return self.error_msg
 
     @status_before_must_be("created")
-    def upload_face_image(self, img):
+    def upload_face_image(self, img_data):
         raise NotImplementedError
 
     @status_before_must_be("created")
-    def upload_photo_id_image(self, img):
+    def upload_photo_id_image(self, img_data):
         raise NotImplementedError
 
     @status_before_must_be("created")
@@ -392,8 +403,8 @@ class PhotoVerification(IDVerificationAttempt):
         # At any point prior to this, they can change their names via their
         # student dashboard. But at this point, we lock the value into the
         # attempt.
-        self.name = self.user.profile.name
-        self.status = "ready"
+        self.name = self.user.profile.name  # pylint: disable=no-member
+        self.status = self.STATUS.ready
         self.save()
 
     @status_before_must_be("must_retry", "submitted", "approved", "denied")
@@ -426,7 +437,7 @@ class PhotoVerification(IDVerificationAttempt):
             logs. This should be a relatively rare occurrence.
         """
         # If someone approves an outdated version of this, the first one wins
-        if self.status == "approved":
+        if self.status == self.STATUS.approved:
             return
 
         log.info(u"Verification for user '{user_id}' approved by '{reviewer}'.".format(
@@ -436,7 +447,10 @@ class PhotoVerification(IDVerificationAttempt):
         self.error_code = ""  # reset, in case this attempt was denied before
         self.reviewing_user = user_id
         self.reviewing_service = service
-        self.status = "approved"
+        self.status = self.STATUS.approved
+        self.expiration_date = now() + timedelta(
+            days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+        )
         self.save()
         # Emit signal to find and generate eligible certificates
         LEARNER_NOW_VERIFIED.send_robust(
@@ -446,6 +460,51 @@ class PhotoVerification(IDVerificationAttempt):
 
         message = u'LEARNER_NOW_VERIFIED signal fired for {user} from PhotoVerification'
         log.info(message.format(user=self.user.username))
+
+    @status_before_must_be("ready", "must_retry")
+    def mark_submit(self):
+        """
+        Submit this attempt.
+        Valid attempt statuses when calling this method:
+            `ready`, `must_retry`
+
+        Status after method completes: `submitted`
+
+        State Transitions:
+
+            → → → `must_retry`
+            ↑        ↑ ↓
+         `ready` → `submitted`
+        """
+        self.submitted_at = now()
+        self.status = self.STATUS.submitted
+        self.save()
+
+    @status_before_must_be("ready", "must_retry", "submitted")
+    def mark_must_retry(self, error=""):
+        """
+        Set the attempt status to `must_retry`.
+        Mark that this attempt could not be completed because of a system error.
+        Status should be moved to `must_retry`. For example, if Software Secure
+        service is down and we couldn't process the request even after retrying.
+
+        Valid attempt statuses when calling this method:
+            `ready`, `submitted`
+
+        Status after method completes: `must_retry`
+
+        State Transitions:
+
+            → → → `must_retry`
+            ↑        ↑ ↓
+          `ready` → `submitted`
+        """
+        if self.status == self.STATUS.must_retry:
+            return
+
+        self.status = self.STATUS.must_retry
+        self.error_msg = error
+        self.save()
 
     @status_before_must_be("must_retry", "submitted", "approved", "denied")
     def deny(self,
@@ -490,7 +549,7 @@ class PhotoVerification(IDVerificationAttempt):
         self.error_code = error_code
         self.reviewing_user = reviewing_user
         self.reviewing_service = reviewing_service
-        self.status = "denied"
+        self.status = self.STATUS.denied
         self.save()
 
     @status_before_must_be("must_retry", "submitted", "approved", "denied")
@@ -505,14 +564,14 @@ class PhotoVerification(IDVerificationAttempt):
         reported to us that they couldn't process our submission because they
         couldn't decrypt the image we sent.
         """
-        if self.status in ["approved", "denied"]:
+        if self.status in [self.STATUS.approved, self.STATUS.denied]:
             return  # If we were already approved or denied, just leave it.
 
         self.error_msg = error_msg
         self.error_code = error_code
         self.reviewing_user = reviewing_user
         self.reviewing_service = reviewing_service
-        self.status = "must_retry"
+        self.status = self.STATUS.must_retry
         self.save()
 
     @classmethod
@@ -581,29 +640,19 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
     IMAGE_LINK_DURATION = 5 * 60 * 60 * 24  # 5 days in seconds
     copy_id_photo_from = models.ForeignKey("self", null=True, blank=True, on_delete=models.CASCADE)
 
-    # Fields for functionality of sending email when verification expires
-    # expiry_date: The date when the SoftwareSecurePhotoVerification will expire
-    # expiry_email_date: This field is used to maintain a check for learners to which email
-    # to notify for expired verification is already sent.
+    # DEPRECATED: the `expiry_date` field has been replaced by `expiration_date`
     expiry_date = models.DateTimeField(null=True, blank=True, db_index=True)
+
+    # This field is used to maintain a check for learners to which email
+    # to notify for expired verification is already sent.
     expiry_email_date = models.DateTimeField(null=True, blank=True, db_index=True)
 
-    @status_before_must_be("must_retry", "submitted", "approved", "denied")
-    def approve(self, user_id=None, service=""):
-        """
-        Approve the verification attempt for user
-
-        Valid attempt statuses when calling this method:
-            `submitted`, `approved`, `denied`
-
-        After method completes:
-            status is set to `approved`
-            expiry_date is set to one year from now
-        """
-        self.expiry_date = now() + timedelta(
-            days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
-        )
-        super(SoftwareSecurePhotoVerification, self).approve(user_id, service)
+    @property
+    def expiration_datetime(self):
+        """Use expiry_date for older entries if it still exists."""
+        if self.expiry_date:
+            return self.expiry_date
+        return super(SoftwareSecurePhotoVerification, self).expiration_datetime
 
     @classmethod
     def get_initial_verification(cls, user, earliest_allowed_date=None):
@@ -626,6 +675,22 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
         return init_verification.latest('created_at') if init_verification.exists() else None
 
+    @classmethod
+    def get_verification_from_receipt(cls, receipt_id):
+        """Get a verification for a user based on the photo receipt_id
+
+        Arguments:
+            receipt_id(String): receipt ID of the user photo or ID photo
+
+        Return:
+            SoftwareSecurePhotoVerification (object) or None
+        """
+        try:
+            verification = cls.objects.get(receipt_id=receipt_id)
+            return verification
+        except cls.DoesNotExist:
+            return None
+
     @status_before_must_be("created")
     def upload_face_image(self, img_data):
         """
@@ -641,7 +706,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         # developing and aren't interested in working on student identity
         # verification functionality. If you do want to work on it, you have to
         # explicitly enable these in your private settings.
-        if settings.FEATURES.get('AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'):
+        if auto_verify_for_testing_enabled():
             return
 
         aes_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["FACE_IMAGE_AES_KEY"]
@@ -671,7 +736,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         # developing and aren't interested in working on student identity
         # verification functionality. If you do want to work on it, you have to
         # explicitly enable these in your private settings.
-        if settings.FEATURES.get('AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'):
+        if auto_verify_for_testing_enabled():
             # fake photo id key is set only for initial verification
             self.photo_id_key = 'fake-photo-id-key'
             self.save()
@@ -698,32 +763,32 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
     def submit(self, copy_id_photo_from=None):
         """
         Submit our verification attempt to Software Secure for validation. This
-        will set our status to "submitted" if the post is successful, and
+        will set our status to "submitted", if the post is successful or will set to
         "must_retry" if the post fails.
 
         Keyword Arguments:
             copy_id_photo_from (SoftwareSecurePhotoVerification): If provided, re-send the ID photo
-                data from this attempt.  This is used for reverification, in which new face photos
+                data from this attempt.  This is used for re-verification, in which new face photos
                 are sent with previously-submitted ID photos.
-
         """
-        try:
-            response = self.send_request(copy_id_photo_from=copy_id_photo_from)
-            if response.ok:
-                self.submitted_at = now()
-                self.status = "submitted"
-                self.save()
-            else:
-                self.status = "must_retry"
-                self.error_msg = response.text
-                self.save()
-        except Exception:       # pylint: disable=broad-except
-            log.exception(
-                u'Software Secure submission failed for user %s, setting status to must_retry',
-                self.user.username
+        if auto_verify_for_testing_enabled():
+            self.mark_submit()
+            fake_response = requests.Response()
+            fake_response.status_code = 200
+            return fake_response
+
+        if copy_id_photo_from is not None:
+            log.info(
+                ('Software Secure attempt for user: %r and receipt ID: %r used the same photo ID data as the '
+                 'receipt with ID %r.'),
+                self.user.username,
+                self.receipt_id,
+                copy_id_photo_from.receipt_id,
             )
-            self.status = "must_retry"
-            self.save()
+
+        transaction.on_commit(
+            lambda: submit_request_to_ss(user_verification=self, copy_id_photo_from=copy_id_photo_from)
+        )
 
     def parsed_error_msg(self):
         """
@@ -766,7 +831,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
                     parsed_errors.append(parsed_error)
                 else:
                     log.debug(u'Ignoring photo verification error message: %s', message)
-        except Exception:   # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             log.exception(u'Failed to parse error message for SoftwareSecurePhotoVerification %d', self.pk)
 
         return parsed_errors
@@ -845,7 +910,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
         Keyword Arguments:
             copy_id_photo_from (SoftwareSecurePhotoVerification): If provided, re-send the ID photo
-                data from this attempt.  This is used for reverification, in which new face photos
+                data from this attempt.  This is used for re-verification, in which new face photos
                 are sent with previously-submitted ID photos.
 
         Returns:
@@ -911,55 +976,6 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
         return header_txt + "\n\n" + body_txt
 
-    def send_request(self, copy_id_photo_from=None):
-        """
-        Assembles a submission to Software Secure and sends it via HTTPS.
-
-        Keyword Arguments:
-            copy_id_photo_from (SoftwareSecurePhotoVerification): If provided, re-send the ID photo
-                data from this attempt.  This is used for reverification, in which new face photos
-                are sent with previously-submitted ID photos.
-
-        Returns:
-            request.Response
-
-        """
-        # If AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING is True, we want to
-        # skip posting anything to Software Secure. We actually don't even
-        # create the message because that would require encryption and message
-        # signing that rely on settings.VERIFY_STUDENT values that aren't set
-        # in dev. So we just pretend like we successfully posted
-        if settings.FEATURES.get('AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'):
-            fake_response = requests.Response()
-            fake_response.status_code = 200
-            return fake_response
-
-        headers, body = self.create_request(copy_id_photo_from=copy_id_photo_from)
-
-        response = requests.post(
-            settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["API_URL"],
-            headers=headers,
-            data=simplejson.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8'),
-            verify=False
-        )
-
-        log.info(u"Sent request to Software Secure for receipt ID %s.", self.receipt_id)
-        if copy_id_photo_from is not None:
-            log.info(
-                (
-                    u"Software Secure attempt with receipt ID %s used the same photo ID "
-                    u"data as the receipt with ID %s"
-                ),
-                self.receipt_id, copy_id_photo_from.receipt_id
-            )
-
-        log.debug("Headers:\n{}\n\n".format(headers))
-        log.debug("Body:\n{}\n\n".format(body))
-        log.debug(u"Return code: {}".format(response.status_code))
-        log.debug(u"Return message:\n\n{}\n\n".format(response.text))
-
-        return response
-
     def should_display_status_to_user(self):
         """Whether or not the status from this attempt should be displayed to the user."""
         return True
@@ -975,9 +991,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         Returns:
             SoftwareSecurePhotoVerification (object) or None
         """
-        recent_verification = SoftwareSecurePhotoVerification.objects.filter(status='approved',
-                                                                             user_id=user.id,
-                                                                             expiry_date__isnull=False)
+        recent_verification = SoftwareSecurePhotoVerification.objects.filter(status='approved', user_id=user.id)
 
         return recent_verification.latest('updated_at') if recent_verification.exists() else None
 
@@ -997,7 +1011,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
         verification = SoftwareSecurePhotoVerification.get_recent_verification(user)
 
-        if verification and verification.expiry_date < recently_expired_date and not verification.expiry_email_date:
+        if verification and verification.expiration_datetime < recently_expired_date and not verification.expiry_email_date:
             expiry_email_date = today - timedelta(days=email_config['RESEND_DAYS'])
             SoftwareSecurePhotoVerification.objects.filter(pk=verification.pk).update(
                 expiry_email_date=expiry_email_date)

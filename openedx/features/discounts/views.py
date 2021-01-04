@@ -5,6 +5,8 @@ The Discount API Views should return information about discounts that apply to t
 # -*- coding: utf-8 -*-
 
 
+import logging
+
 from django.contrib.auth.models import User
 from django.utils.decorators import method_decorator
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -14,7 +16,7 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from experiments.models import ExperimentData
+from lms.djangoapps.experiments.models import ExperimentData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
@@ -23,6 +25,8 @@ from openedx.core.lib.api.permissions import ApiKeyHeaderPermissionIsAuthenticat
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 
 from .applicability import can_receive_discount, discount_percentage, REV1008_EXPERIMENT_ID
+
+log = logging.getLogger(__name__)
 
 
 class CourseUserDiscount(DeveloperErrorViewMixin, APIView):
@@ -77,12 +81,15 @@ class CourseUserDiscount(DeveloperErrorViewMixin, APIView):
         payload = {'discount_applicable': discount_applicable, 'discount_percent': discount_percent}
 
         # Record whether the last basket loaded for this course had a discount
-        ExperimentData.objects.update_or_create(
-            user=request.user,
-            experiment_id=REV1008_EXPERIMENT_ID,
-            key='discount_' + str(course),
-            value=discount_applicable
-        )
+        try:
+            ExperimentData.objects.update_or_create(
+                user=request.user,
+                experiment_id=REV1008_EXPERIMENT_ID,
+                key='discount_' + str(course),
+                value=discount_applicable
+            )
+        except Exception as e:  # pylint: disable=broad-except
+            log.exception(str(e))
 
         return Response({
             'discount_applicable': discount_applicable,

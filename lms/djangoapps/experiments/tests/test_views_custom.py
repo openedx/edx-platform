@@ -5,21 +5,19 @@ Tests for experimentation views
 
 from datetime import timedelta
 from uuid import uuid4
-import six
 
+import six
 from django.urls import reverse
 from django.utils.timezone import now
 from rest_framework.test import APITestCase
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.course_blocks.transformers.tests.helpers import ModuleStoreTestCase
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from xmodule.modulestore.tests.factories import CourseFactory
-
 from lms.djangoapps.experiments.views_custom import MOBILE_UPSELL_FLAG
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.factories import CourseFactory
 
 CROSS_DOMAIN_REFERER = 'https://ecommerce.edx.org'
 
@@ -72,7 +70,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
     @override_waffle_flag(MOBILE_UPSELL_FLAG, active=True)
     def test_simple_course(self):
         course = CourseFactory.create(start=now() - timedelta(days=30))
-        response = self.client.get(self.url, {'course_id': course.id})
+        response = self.client.get(self.url, {'course_id': str(course.id)})
         self.assertEqual(response.status_code, 200)
         expected = {
             'show_upsell': False,
@@ -97,7 +95,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
             sku=six.text_type(uuid4().hex)
         )
 
-        response = self.client.get(self.url, {'course_id': course.id})
+        response = self.client.get(self.url, {'course_id': str(course.id)})
         self.assertEqual(response.status_code, 200)
         result = response.data
         self.assertIn('basket_url', result)
@@ -125,7 +123,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
             expiration_datetime=now() - timedelta(days=30),
         )
 
-        response = self.client.get(self.url, {'course_id': course.id})
+        response = self.client.get(self.url, {'course_id': str(course.id)})
         self.assertEqual(response.status_code, 200)
         expected = {
             'show_upsell': False,
@@ -151,7 +149,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
             sku=six.text_type(uuid4().hex)
         )
 
-        response = self.client.get(self.url, {'course_id': course.id})
+        response = self.client.get(self.url, {'course_id': str(course.id)})
         self.assertEqual(response.status_code, 200)
         expected = {
             'show_upsell': False,
@@ -175,7 +173,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
             sku=six.text_type(uuid4().hex)
         )
 
-        response = self.client.get(self.url, {'course_id': course.id})
+        response = self.client.get(self.url, {'course_id': str(course.id)})
         self.assertEqual(response.status_code, 200)
         expected = {
             'show_upsell': False,
@@ -204,7 +202,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
             user=self.user
         )
 
-        response = self.client.get(self.url, {'course_id': course.id})
+        response = self.client.get(self.url, {'course_id': str(course.id)})
         self.assertEqual(response.status_code, 200)
         result = response.data
         self.assertIn('basket_url', result)

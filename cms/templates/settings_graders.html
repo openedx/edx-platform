@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "grading" %></%def>
 <%block name="title">${_("Grading Settings")}</%block>
@@ -5,10 +6,12 @@
 
 <%namespace name='static' file='static_content.html'/>
 <%!
+  import six
+  from six.moves.urllib.parse import quote
   import json
-  from contentstore import utils
+  from cms.djangoapps.contentstore import utils
   from django.utils.translation import ugettext as _
-  from models.settings.encoder import CourseSettingsEncoder
+  from cms.djangoapps.models.settings.encoder import CourseSettingsEncoder
   from openedx.core.djangolib.js_utils import (
       dump_js_escaped_json, js_escaped_string
   )
@@ -28,7 +31,7 @@
 <%block name="requirejs">
     require(["js/factories/settings_graders"], function(SettingsGradersFactory) {
         SettingsGradersFactory(
-            _.extend(${dump_js_escaped_json(course_details, cls=CourseSettingsEncoder) | n},
+            _.extend(${dump_js_escaped_json(course_details, cls=CourseSettingsEncoder) | n, decode.utf8},
                 {is_credit_course: ${is_credit_course | n, dump_js_escaped_json}}),
             "${grading_url | n, js_escaped_string}"
         );
@@ -105,7 +108,7 @@
 
         <section class="group-settings grade-rules">
           <header>
-            <h2 class="title-2">${_("Grading Rules &amp; Policies")}</h2>
+            <h2 class="title-2">${_("Grading Rules & Policies")}</h2>
             <span class="tip">${_("Deadlines, requirements, and logistics around grading student work")}</span>
           </header>
 
@@ -151,6 +154,7 @@
       <div class="bit">
       % if context_course:
         <%
+          url_encoded_course_id = quote(six.text_type(context_course.id).encode('utf-8'), safe='')
           detailed_settings_url = utils.reverse_course_url('settings_handler', context_course.id)
           course_team_url = utils.reverse_course_url('course_team_handler', context_course.id)
           advanced_settings_url = utils.reverse_course_url('advanced_settings_handler', context_course.id)
@@ -158,10 +162,13 @@
         <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related" aria-label="${_('Other Course Settings')}">
           <ul>
-            <li class="nav-item"><a href="${detailed_settings_url}">${_("Details &amp; Schedule")}</a></li>
+            <li class="nav-item"><a href="${detailed_settings_url}">${_("Details & Schedule")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
             <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
             <li class="nav-item"><a href="${advanced_settings_url}">${_("Advanced Settings")}</a></li>
+            % if course_authoring_microfrontend_url:
+              <li class="nav-item"><a href="${course_authoring_microfrontend_url}/proctored-exam-settings/${url_encoded_course_id}">${_("Proctored Exam Settings")}</a></li>
+            % endif
           </ul>
         </nav>
       % endif

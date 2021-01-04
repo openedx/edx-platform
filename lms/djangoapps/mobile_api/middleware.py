@@ -12,9 +12,9 @@ from django.utils.deprecation import MiddlewareMixin
 from pytz import UTC
 import six
 
-from mobile_api.mobile_platform import MobilePlatform
-from mobile_api.models import AppVersionConfig
-from mobile_api.utils import parsed_version
+from lms.djangoapps.mobile_api.mobile_platform import MobilePlatform
+from lms.djangoapps.mobile_api.models import AppVersionConfig
+from lms.djangoapps.mobile_api.utils import parsed_version
 from openedx.core.lib.cache_utils import get_cache
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 

@@ -17,8 +17,9 @@
             },
 
             events: {
-                'click #download-team-csv-input': 'downloadCsv',
-                'change #upload-team-csv-input': ViewUtils.withDisabledElement('uploadCsv')
+                'click #download-team-csv': 'downloadCsv',
+                'change #upload-team-csv-input': 'setTeamMembershipCsv',
+                'click #upload-team-csv': ViewUtils.withDisabledElement('uploadCsv')
             },
 
             initialize: function(options) {
@@ -32,6 +33,7 @@
                     this.$el,
                     HtmlUtils.template(manageTemplate)({})
                 );
+                this.delegateEvents(this.events);
                 return this;
             },
 
@@ -39,33 +41,38 @@
                 window.location.href = this.csvDownloadUrl;
             },
 
-            uploadCsv: function(event) {
-                var file = event.target.files[0];
-                var self = this;
+            setTeamMembershipCsv: function(event) {
+                this.membershipFile = event.target.files[0];
+
+                // enable the upload button when a file is selected
+                if (this.membershipFile) {
+                    $('#upload-team-csv').removeClass('is-disabled').attr('aria-disabled', false);
+                } else {
+                    $('#upload-team-csv').addClass('is-disabled').attr('aria-disabled', true);
+                }
+            },
+
+            uploadCsv: function() {
                 var formData = new FormData();
+                formData.append('csv', this.membershipFile);  // xss-lint: disable=javascript-jquery-append
 
-                // clear selected file to allow re-uploading
-                $(event.target).prop('value', '');
-
-                formData.append('csv', file);  // xss-lint: disable=javascript-jquery-append
                 return $.ajax({
                     type: 'POST',
-                    url: self.csvUploadUrl,
+                    url: this.csvUploadUrl,
                     data: formData,
                     processData: false,  // tell jQuery not to process the data
                     contentType: false   // tell jQuery not to set contentType
                 }).done(
-                    self.handleCsvUploadSuccess
+                    this.handleCsvUploadSuccess
                 ).fail(
-                    self.handleCsvUploadFailure
+                    this.handleCsvUploadFailure
                 );
             },
 
             handleCsvUploadSuccess: function(data) {
                 TeamUtils.showInfoBanner(data.message, false);
 
-                // This handler is currently unimplemented (TODO MST-44)
-                this.teamEvents.trigger('teams:update', {});
+                // Implement a teams:update event (TODO MST-44)
             },
 
             handleCsvUploadFailure: function(jqXHR) {

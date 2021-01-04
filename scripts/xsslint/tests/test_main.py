@@ -4,6 +4,7 @@ Tests for main.py
 """
 
 
+import json
 import re
 from six import StringIO
 from unittest import TestCase
@@ -69,6 +70,7 @@ class TestXSSLinter(TestCase):
                 'list_files': False,
                 'verbose': False,
                 'rule_totals': False,
+                'summary_format': 'eslint',
                 'skip_dirs': ()
             },
             summary_results=self.summary_results,
@@ -107,6 +109,7 @@ class TestXSSLinter(TestCase):
                 'list_files': False,
                 'verbose': True,
                 'rule_totals': False,
+                'summary_format': 'eslint',
                 'skip_dirs': ()
             },
             summary_results=self.summary_results,
@@ -139,6 +142,7 @@ class TestXSSLinter(TestCase):
                 'list_files': False,
                 'verbose': False,
                 'rule_totals': True,
+                'summary_format': 'eslint',
                 'skip_dirs': ()
             },
             summary_results=self.summary_results,
@@ -153,6 +157,36 @@ class TestXSSLinter(TestCase):
         self.assertIsNotNone(re.search(r'{}:\s*{} violations'.format(self.ruleset.python_wrap_html.rule_id, 1), output))
         self.assertIsNotNone(re.search(r'{} violations total'.format(5), output))
 
+    def test_lint_with_json_output(self):
+        """
+        Tests the top-level linting with JSON summary format.
+        """
+        _lint(
+            'scripts/xsslint/tests/templates',
+            template_linters=self.template_linters,
+            options={
+                'list_files': False,
+                'verbose': False,
+                'rule_totals': True,
+                'summary_format': 'json',
+                'skip_dirs': ()
+            },
+            summary_results=self.summary_results,
+            out=self.out,
+        )
+
+        output = self.out.getvalue()
+        self.assertIsNotNone(re.search(r'test\.py.*{}'.format(self.ruleset.python_wrap_html.rule_id), output))
+
+        # Find something that looks like pretty-printed JSON
+        json_match = re.search(r'\n\{.*\n\}', output, re.DOTALL)
+        self.assertIsNotNone(json_match)
+        data = json.loads(json_match.group())
+        # Check for rule counts (including zero-instance ones) and total
+        self.assertEqual(1, data['rules']['javascript-concat-html'])
+        self.assertEqual(0, data['rules']['python-concat-html'])
+        self.assertEqual(5, data['total'])
+
     def test_lint_with_list_files(self):
         """
         Tests the top-level linting with list files option.
@@ -164,6 +198,7 @@ class TestXSSLinter(TestCase):
                 'list_files': True,
                 'verbose': False,
                 'rule_totals': False,
+                'summary_format': 'eslint',
                 'skip_dirs': ()
             },
             summary_results=self.summary_results,

@@ -1,6 +1,7 @@
 """
 Define request handlers used by the zendesk_proxy djangoapp
 """
+import logging
 
 from rest_framework import status
 from rest_framework.parsers import JSONParser
@@ -10,6 +11,7 @@ from rest_framework.views import APIView
 
 from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
 
+logger = logging.getLogger(__name__)
 REQUESTS_PER_HOUR = 50
 
 
@@ -55,14 +57,18 @@ class ZendeskPassthroughView(APIView):
         """
         try:
             proxy_status = create_zendesk_ticket(
-                requester_name=request.data['requester']['name'],
-                requester_email=request.data['requester']['email'],
+                requester_name=request.user.username,
+                requester_email=request.user.email,
                 subject=request.data['subject'],
                 body=request.data['comment']['body'],
                 custom_fields=request.data['custom_fields'],
                 tags=request.data['tags']
             )
-        except KeyError:
+        except AttributeError as attribute:
+            logger.error('Zendesk Proxy Bad Request AttributeError: %s', attribute)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        except KeyError as key:
+            logger.error('Zendesk Proxy Bad Request KeyError: %s', key)
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         return Response(

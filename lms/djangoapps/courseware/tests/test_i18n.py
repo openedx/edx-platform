@@ -16,7 +16,7 @@ from django.utils import translation
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class BaseI18nTestCase(CacheIsolationTestCase):
@@ -36,7 +36,7 @@ class BaseI18nTestCase(CacheIsolationTestCase):
 
     def assert_tag_has_attr(self, content, tag, attname, value):
         """Assert that a tag in `content` has a certain value in a certain attribute."""
-        regex_string = six.text_type(r"""<{tag} [^>]*\b{attname}=['"]([\w\d\- ]+)['"][^>]*>""")  # noqa: W605,E501 pylint: disable=unicode-format-string
+        regex_string = six.text_type(r"""<{tag} [^>]*\b{attname}=['"]([\w\d\- ]+)['"][^>]*>""")  # noqa: W605,E501
         regex = regex_string.format(tag=tag, attname=attname)
         match = re.search(regex, content)
         self.assertTrue(match, u"Couldn't find desired tag '%s' with attr '%s' in %r" % (tag, attname, content))

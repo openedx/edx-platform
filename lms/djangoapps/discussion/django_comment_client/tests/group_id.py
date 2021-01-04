@@ -4,8 +4,8 @@
 import json
 import re
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.djangoapps.django_comment_common.utils import set_course_discussion_settings
@@ -69,7 +69,7 @@ class CohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
         pass
 
     def test_cohorted_topic_student_without_group_id(self, mock_request):
-        self.call_view(mock_request, "cohorted_topic", self.student, None, pass_group_id=False)
+        self.call_view(mock_request, "cohorted_topic", self.student, '', pass_group_id=False)
         self._assert_comments_service_called_with_group_id(mock_request, self.student_cohort.id)
 
     def test_cohorted_topic_student_none_group_id(self, mock_request):
@@ -85,7 +85,7 @@ class CohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
         self._assert_comments_service_called_with_group_id(mock_request, self.student_cohort.id)
 
     def test_cohorted_topic_moderator_without_group_id(self, mock_request):
-        self.call_view(mock_request, "cohorted_topic", self.moderator, None, pass_group_id=False)
+        self.call_view(mock_request, "cohorted_topic", self.moderator, '', pass_group_id=False)
         self._assert_comments_service_called_without_group_id(mock_request)
 
     def test_cohorted_topic_moderator_none_group_id(self, mock_request):
@@ -133,11 +133,11 @@ class NonCohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
         pass
 
     def test_non_cohorted_topic_student_without_group_id(self, mock_request):
-        self.call_view(mock_request, "non_cohorted_topic", self.student, None, pass_group_id=False)
+        self.call_view(mock_request, "non_cohorted_topic", self.student, '', pass_group_id=False)
         self._assert_comments_service_called_without_group_id(mock_request)
 
     def test_non_cohorted_topic_student_none_group_id(self, mock_request):
-        self.call_view(mock_request, "non_cohorted_topic", self.student, None)
+        self.call_view(mock_request, "non_cohorted_topic", self.student, '')
         self._assert_comments_service_called_without_group_id(mock_request)
 
     def test_non_cohorted_topic_student_with_own_group_id(self, mock_request):
@@ -149,11 +149,11 @@ class NonCohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
         self._assert_comments_service_called_without_group_id(mock_request)
 
     def test_non_cohorted_topic_moderator_without_group_id(self, mock_request):
-        self.call_view(mock_request, "non_cohorted_topic", self.moderator, None, pass_group_id=False)
+        self.call_view(mock_request, "non_cohorted_topic", self.moderator, '', pass_group_id=False)
         self._assert_comments_service_called_without_group_id(mock_request)
 
     def test_non_cohorted_topic_moderator_none_group_id(self, mock_request):
-        self.call_view(mock_request, "non_cohorted_topic", self.moderator, None)
+        self.call_view(mock_request, "non_cohorted_topic", self.moderator, '')
         self._assert_comments_service_called_without_group_id(mock_request)
 
     def test_non_cohorted_topic_moderator_with_own_group_id(self, mock_request):
@@ -176,6 +176,6 @@ class NonCohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
         )
 
         team.add_user(self.student)
-        self.call_view(mock_request, team.discussion_topic_id, self.student, None)
+        self.call_view(mock_request, team.discussion_topic_id, self.student, '')
 
         self._assert_comments_service_called_without_group_id(mock_request)

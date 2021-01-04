@@ -10,7 +10,7 @@ from django.db.models import Q
 
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
 from .runner import TaskProgress
@@ -134,7 +134,7 @@ def invalidate_generated_certificates(course_id, enrolled_students, certificate_
     :param enrolled_students: (queryset or list) students enrolled in the course
     :param certificate_statuses: certificates statuses for whom to remove generated certificate
     """
-    certificates = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
+    certificates = GeneratedCertificate.objects.filter(
         user__in=enrolled_students,
         course_id=course_id,
         status__in=certificate_statuses,

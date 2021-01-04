@@ -8,14 +8,19 @@ import unittest
 from datetime import timedelta
 
 import ddt
+import mock
 from django.conf import settings
 from django.utils import timezone
 from mock import patch
 from pytest import mark
 
 from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
-from lms.djangoapps.verify_student.utils import most_recent_verification, verification_for_datetime
-from student.tests.factories import UserFactory
+from lms.djangoapps.verify_student.utils import (
+    most_recent_verification,
+    submit_request_to_ss,
+    verification_for_datetime
+)
+from common.djangoapps.student.tests.factories import UserFactory
 
 FAKE_SETTINGS = {
     "DAYS_GOOD_FOR": 10,
@@ -65,14 +70,14 @@ class TestVerifyStudentUtils(unittest.TestCase):
         self.assertEqual(result, attempt)
 
         # Immediately before the expiration date, should get the attempt
-        expiration = attempt.created_at + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+        expiration = attempt.expiration_datetime + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
         before_expiration = expiration - timedelta(seconds=1)
         query = SoftwareSecurePhotoVerification.objects.filter(user=user)
         result = verification_for_datetime(before_expiration, query)
         self.assertEqual(result, attempt)
 
         # Immediately after the expiration date, should not get the attempt
-        attempt.created_at = attempt.created_at - timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+        attempt.expiration_date = now - timedelta(seconds=1)
         attempt.save()
         after = now + timedelta(days=1)
         query = SoftwareSecurePhotoVerification.objects.filter(user=user)
@@ -143,3 +148,21 @@ class TestVerifyStudentUtils(unittest.TestCase):
             self.assertEqual(most_recent, sso_verification)
         else:
             self.assertEqual(most_recent, manual_verification)
+
+    @mock.patch('lms.djangoapps.verify_student.utils.log')
+    @mock.patch(
+        'lms.djangoapps.verify_student.tasks.send_request_to_ss_for_user.delay', mock.Mock(side_effect=Exception('error'))
+    )
+    def test_submit_request_to_ss(self, mock_log):
+        """Tests that we log appropriate information when celery task creation fails."""
+        user = UserFactory.create()
+        attempt = SoftwareSecurePhotoVerification.objects.create(user=user)
+        attempt.mark_ready()
+        submit_request_to_ss(user_verification=attempt, copy_id_photo_from=None)
+
+        mock_log.error.assert_called_with(
+            "Software Secure submit request %r failed, result: %s",
+            user.username,
+            'error'
+        )
+        self.assertTrue(attempt.status, SoftwareSecurePhotoVerification.STATUS.must_retry)

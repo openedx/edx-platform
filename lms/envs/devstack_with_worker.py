@@ -17,14 +17,11 @@ import os
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
-if 'BOK_CHOY_HOSTNAME' in os.environ:
-    from lms.envs.devstack_docker import *
-else:
-    from lms.envs.devstack import *
+from lms.envs.devstack import *
 
 # Require a separate celery worker
 CELERY_ALWAYS_EAGER = False
-
+BROKER_URL = 'redis://:password@edx.devstack.redis:6379/'
 # Disable transaction management because we are using a worker. Views
 # that request a task and wait for the result will deadlock otherwise.
 for database_name in DATABASES:

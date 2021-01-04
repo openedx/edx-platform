@@ -1,4 +1,4 @@
-# pylint: disable=missing-docstring,consider-iterating-dictionary
+# pylint: disable=consider-iterating-dictionary, missing-module-docstring
 
 
 import json
@@ -22,8 +22,8 @@ from lms.djangoapps.discussion.notification_prefs.views import (
     set_subscription
 )
 from openedx.core.djangoapps.user_api.models import UserPreference
-from student.tests.factories import UserFactory
-from util.testing import UrlResetMixin
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.util.testing import UrlResetMixin
 
 
 @override_settings(SECRET_KEY="test secret key")
@@ -53,7 +53,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):
     def create_prefs(self):
         """Create all test preferences in the database"""
         for (user, token) in self.tokens.items():
-            UserPreference.objects.create(user=user, key=NOTIFICATION_PREF_KEY, value=token)
+            UserPreference.objects.get_or_create(user=user, key=NOTIFICATION_PREF_KEY, value=token)
 
     def assertPrefValid(self, user):
         """Ensure that the correct preference for the user is persisted"""

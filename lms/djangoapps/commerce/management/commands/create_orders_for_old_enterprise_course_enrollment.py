@@ -3,8 +3,9 @@ Management command to
 ./manage.py lms create_orders_for_old_enterprise_course_enrollment
 ./manage.py lms create_orders_for_old_enterprise_course_enrollment --start-index=0 --end-index=100
 ./manage.py lms create_orders_for_old_enterprise_course_enrollment --start-index=0 --end-index=100 --batch-size=20
+./manage.py lms create_orders_for_old_enterprise_course_enrollment --start-index=0 --end-index=100 --sleep-time=1.5
 """
-
+import time
 import traceback
 from textwrap import dedent
 
@@ -16,11 +17,11 @@ from opaque_keys.edx.keys import CourseKey
 from requests import Timeout
 from slumber.exceptions import HttpServerError, SlumberBaseException
 
-from student.models import CourseEnrollment
-from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from enterprise.models import EnterpriseCourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 
-from util.query import use_read_replica_if_available
+from common.djangoapps.util.query import use_read_replica_if_available
 
 User = get_user_model()
 
@@ -181,7 +182,7 @@ class Command(BaseCommand):
         )
         return success, new, failed, invalid, non_paid, order_numbers
 
-    def _sync(self, enrollments_queryset, enrollments_count, enrollments_batch_size):
+    def _sync(self, enrollments_queryset, enrollments_count, enrollments_batch_size, sleep_time):
         """
             Syncs a single site
         """
@@ -220,6 +221,9 @@ class Command(BaseCommand):
                 invalid_enrollments += invalid
                 non_paid_enrollments += non_paid
                 new_created_order_numbers += order_numbers
+                self.stdout.write(u'\t\tsleeping for {} second/seconds'.format(sleep_time))
+                time.sleep(sleep_time)
+
             self.stdout.write(
                 u'\tSuccessfully synced enrollments batch from {start} to {end}'.format(
                     start=offset, end=offset + enrollments_query_batch_size,
@@ -258,6 +262,14 @@ class Command(BaseCommand):
             type=int,
             help='Size of enrollments batch to be sent to ecommerce',
         )
+        parser.add_argument(
+            '--sleep-time',
+            action='store',
+            dest='sleep_time',
+            type=float,
+            default=1,
+            help='Sleep time in seconds between update of batches'
+        )
 
     def handle(self, *args, **options):
         """
@@ -266,13 +278,14 @@ class Command(BaseCommand):
         start_index = options['start_index']
         end_index = options['end_index']
         batch_size = options['batch_size']
+        sleep_time = options['sleep_time']
 
         try:
             self.stdout.write(u'Command execution started with options = {}.'.format(options))
             enrollments_queryset = self._get_enrollments_queryset(start_index, end_index)
             enrollments_count = enrollments_queryset.count()
             self.stdout.write(u'Total Enrollments count to process: {count}'.format(count=enrollments_count))
-            self._sync(enrollments_queryset, enrollments_count, batch_size)
+            self._sync(enrollments_queryset, enrollments_count, batch_size, sleep_time)
 
         except Exception as ex:
             traceback.print_exc()

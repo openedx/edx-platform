@@ -4,7 +4,6 @@ Module that provides a connection to the ModuleStore specified in the django set
 Passes settings.MODULESTORE as kwargs to MongoModuleStore
 """
 
-
 from importlib import import_module
 import gettext
 import logging
@@ -33,7 +32,7 @@ from xmodule.util.xmodule_django import get_current_request_hostname
 
 # We also may not always have the current request user (crum) module available
 try:
-    from xblock_django.user_service import DjangoXBlockUserService
+    from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
     from crum import get_current_user
 
     HAS_USER_SERVICE = True
@@ -41,7 +40,7 @@ except ImportError:
     HAS_USER_SERVICE = False
 
 try:
-    from xblock_django.api import disabled_xblocks
+    from common.djangoapps.xblock_django.api import disabled_xblocks
 except ImportError:
     disabled_xblocks = None
 
@@ -140,6 +139,7 @@ class SignalHandler(object):
 
         from django.dispatch import receiver
         from celery.task import task
+        from edx_django_utils.monitoring import set_code_owner_attribute
         from xmodule.modulestore.django import modulestore, SignalHandler
 
         @receiver(SignalHandler.course_published)
@@ -147,6 +147,7 @@ class SignalHandler(object):
             do_my_expensive_update.delay(course_key)
 
         @task()
+        @set_code_owner_attribute
         def do_my_expensive_update(course_key):
             # ...
 
@@ -399,7 +400,7 @@ class ModuleI18nService(object):
         # refactored to a place that will be right, and the code can be made
         # right there.  If you are reading this comment after April 1, 2014,
         # then Cale was a liar.
-        from util.date_utils import strftime_localized
+        from common.djangoapps.util.date_utils import strftime_localized
 
         return strftime_localized(*args, **kwargs)
 

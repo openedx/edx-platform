@@ -3,19 +3,18 @@
 
 import logging
 
+import edx_api_doc_tools as apidocs
 import six
 from django.contrib.auth import get_user_model
-import edx_api_doc_tools as apidocs
 from edx_rest_framework_extensions import permissions
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
-
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_condition import C
-from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from lms.djangoapps.certificates.api import get_certificate_for_user, get_certificates_for_user
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
@@ -24,6 +23,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.user_api.accounts.api import visible_fields
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
+from .permissions import IsOwnerOrPublicCertificates
 
 log = logging.getLogger(__name__)
 User = get_user_model()
@@ -160,6 +160,7 @@ class CertificatesListView(APIView):
                 permissions.JwtHasUserFilterForRequestedUser
             )
         ),
+        (C(permissions.IsStaff) | IsOwnerOrPublicCertificates),
     )
 
     required_scopes = ['certificates:read']
@@ -280,10 +281,7 @@ class CertificatesListView(APIView):
                 # add certificate into viewable certificate list only if it's a PDF certificate
                 # or there is an active certificate configuration.
                 if course_certificate['is_pdf_certificate'] or course_overview.has_any_active_web_certificate:
-                    course_display_name = course_overview.display_name
-                    if not course_overview.pk:
-                        course_display_name = course_overview.display_name_with_default
-                    course_certificate['course_display_name'] = course_display_name
+                    course_certificate['course_display_name'] = course_overview.display_name_with_default
                     course_certificate['course_organization'] = course_overview.display_org_with_default
                     viewable_certificates.append(course_certificate)
 

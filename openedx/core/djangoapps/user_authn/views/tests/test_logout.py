@@ -7,14 +7,14 @@ import unittest
 
 import ddt
 import mock
-import six.moves.urllib.parse as parse  # pylint: disable=import-error
+import six
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
-from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
 
-from student.tests.factories import UserFactory
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -75,7 +75,7 @@ class LogoutTests(TestCase):
         )
         response = self.client.get(url, HTTP_HOST=host)
         expected = {
-            'target': parse.unquote(redirect_url),
+            'target': six.moves.urllib.parse.unquote(redirect_url),
         }
         self.assertDictContainsSubset(expected, response.context_data)
 

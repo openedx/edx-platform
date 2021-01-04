@@ -4,15 +4,15 @@
 Tests for js_utils.py
 """
 
-import re
-import six.moves.html_parser  # pylint: disable=import-error
 import json
+import re
+import html
 from unittest import TestCase
 
+import six
 from mako.template import Template
 
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
-import six  # pylint: disable=ungrouped-imports
 
 
 class TestJSUtils(TestCase):
@@ -185,9 +185,8 @@ class TestJSUtils(TestCase):
                 should be parseable into a near equivalent to test_dict.
 
         """
-        html_parser = six.moves.html_parser.HTMLParser()
 
-        expected_json = html_parser.unescape(expected_json_for_html_string)
+        expected_json = html.unescape(expected_json_for_html_string)
         parsed_expected_dict = json.loads(expected_json)
         # tuples become arrays in json, so it is parsed to a list that is
         # switched back to a tuple before comparing

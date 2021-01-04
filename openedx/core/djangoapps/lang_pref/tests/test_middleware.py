@@ -23,7 +23,7 @@ from openedx.core.djangoapps.user_api.preferences.api import (
     set_user_preference
 )
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from student.tests.factories import AnonymousUserFactory, UserFactory
+from common.djangoapps.student.tests.factories import AnonymousUserFactory, UserFactory
 
 
 @ddt.ddt
@@ -75,6 +75,7 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
                 value=lang_pref_out,
                 domain=settings.SESSION_COOKIE_DOMAIN,
                 max_age=COOKIE_DURATION,
+                secure=self.request.is_secure(),
             )
         else:
             response.delete_cookie.assert_called_with(

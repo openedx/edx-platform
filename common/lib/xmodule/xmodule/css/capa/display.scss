@@ -130,10 +130,10 @@ h2 {
   display: block;
 }
 
-iframe[seamless]{
+iframe[seamless] {
   overflow: hidden;
   padding: 0;
-  border: 0px none transparent;
+  border: 0 none transparent;
   background-color: transparent;
 }
 
@@ -157,7 +157,8 @@ div.problem {
     padding: 0;
     width: auto;
 
-    canvas, img {
+    canvas,
+    img {
       page-break-inside: avoid;
     }
   }
@@ -209,7 +210,7 @@ div.problem {
   width: 100px;
 
   label {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
 
     display: inline-block;
     clear: both;
@@ -231,7 +232,7 @@ div.problem {
   }
 
   fieldset {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
   }
 
   input[type="radio"],
@@ -775,7 +776,7 @@ div.problem {
 .problem {
   .capa_inputtype.textline, .inputtype.formulaequationinput {
     input {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
 
       border: 2px solid $gray-l4;
       border-radius: 3px;
@@ -849,6 +850,15 @@ div.problem {
       }
     }
 
+  }
+
+  .inputtype.formulaequationinput {
+    > div {
+      input {
+        direction: ltr;
+        @include text-align(left);
+      }
+    }
   }
 
   .trailing_text {
@@ -943,7 +953,6 @@ div.problem {
 // +Problem - Actions
 // ====================
 div.problem .action {
-  margin-top: $baseline;
   min-height: $baseline;
   width: 100%;
   display: flex;
@@ -952,6 +961,13 @@ div.problem .action {
   flex-direction: row;
   align-items: center;
   flex-wrap: wrap;
+
+  .problem-action-buttons-wrapper {
+      display: inline-flex;
+      justify-content: flex-end;
+      width: 100%;
+      padding-bottom: $baseline;
+  }
 
   .problem-action-button-wrapper {
     @include border-right(1px solid $light-gray1);
@@ -967,6 +983,8 @@ div.problem .action {
     @include margin-right($baseline / 5);
 
     max-width: 110px;
+    text-decoration: underline;
+    text-transform: none;
 
     .icon {
       margin-bottom: $baseline / 10;
@@ -994,6 +1012,21 @@ div.problem .action {
 
       white-space: nowrap;
     }
+
+    .submit-cta {
+        display: inline-block;
+    }
+    .submit-cta-description {
+        color: $blue;
+        font-size: small;
+        padding-right: $baseline / 2;
+    }
+    .submit-cta-link-button {
+        border: none;
+        padding-right: $baseline / 4;
+        text-decoration: underline;
+        text-transform: none;
+    }
   }
 
   .submission-feedback {
@@ -1005,6 +1038,10 @@ div.problem .action {
     font-size: $medium-font-size;
     -webkit-font-smoothing: antialiased;
     vertical-align: middle;
+
+    &.cta-enabled {
+      margin-top: 0;
+    }
   }
 }
 
@@ -1284,7 +1321,7 @@ div.problem {
 
       a.full {
         @include position(absolute, 0 0 1px 0);
-        @include box-sizing(border-box);
+        box-sizing: border-box;
 
         display: block;
         padding: ($baseline/5);

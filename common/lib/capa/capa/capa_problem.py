@@ -21,9 +21,9 @@ from collections import OrderedDict
 from copy import deepcopy
 from datetime import datetime
 from xml.sax.saxutils import unescape
-from openedx.core.lib.edx_six import get_gettext
 
 import six
+from django.utils.encoding import python_2_unicode_compatible
 from lxml import etree
 from pytz import UTC
 
@@ -33,9 +33,9 @@ import capa.responsetypes as responsetypes
 import capa.xqueue_interface as xqueue_interface
 from capa.correctmap import CorrectMap
 from capa.safe_exec import safe_exec
-from capa.util import contextualize_text, convert_files_to_filenames
-from django.utils.encoding import python_2_unicode_compatible
+from capa.util import contextualize_text, convert_files_to_filenames, get_course_id_from_capa_module
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.lib.edx_six import get_gettext
 from xmodule.stringify import stringify_children
 
 # extra things displayed after "show answers" is pressed
@@ -95,20 +95,20 @@ class LoncapaSystem(object):
     See :class:`ModuleSystem` for documentation of other attributes.
 
     """
-    def __init__(                                       # pylint: disable=invalid-name
+    def __init__(
         self,
         ajax_url,
         anonymous_student_id,
         cache,
         can_execute_unsafe_code,
         get_python_lib_zip,
-        DEBUG,                                          # pylint: disable=invalid-name
+        DEBUG,
         filestore,
         i18n,
         node_path,
         render_template,
         seed,      # Why do we do this if we have self.seed?
-        STATIC_URL,                                     # pylint: disable=invalid-name
+        STATIC_URL,
         xqueue,
         matlab_api_key=None
     ):
@@ -190,7 +190,17 @@ class LoncapaProblem(object):
             problem_text = problem_text.encode('utf-8')
         self.tree = etree.XML(problem_text)
 
-        self.make_xml_compatible(self.tree)
+        try:
+            self.make_xml_compatible(self.tree)
+        except Exception:
+            capa_module = self.capa_module
+            log.exception(
+                "CAPAProblemError: %s, id:%s, data: %s",
+                capa_module.display_name,
+                self.problem_id,
+                capa_module.data
+            )
+            raise
 
         # handle any <include file="foo"> tags
         self._process_includes()
@@ -920,6 +930,9 @@ class LoncapaProblem(object):
                     python_path=python_path,
                     extra_files=extra_files,
                     cache=self.capa_system.cache,
+                    limit_overrides_context=get_course_id_from_capa_module(
+                        self.capa_module
+                    ),
                     slug=self.problem_id,
                     unsafely=self.capa_system.can_execute_unsafe_code(),
                 )

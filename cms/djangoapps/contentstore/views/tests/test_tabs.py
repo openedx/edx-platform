@@ -3,9 +3,9 @@
 
 import json
 
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url
-from contentstore.views import tabs
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url
+from cms.djangoapps.contentstore.views import tabs
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

@@ -20,6 +20,10 @@ urlpatterns = [
             url(r'^$', views.LibraryDetailsView.as_view()),
             # Get the list of XBlock types that can be added to this library
             url(r'^block_types/$', views.LibraryBlockTypesView.as_view()),
+            # Get the list of Blockstore Bundle Links for this library, or add a new one:
+            url(r'^links/$', views.LibraryLinksView.as_view()),
+            # Update or delete a link:
+            url(r'^links/(?P<link_id>[^/]+)/$', views.LibraryLinkDetailView.as_view()),
             # Get the list of XBlocks in this library, or add a new one:
             url(r'^blocks/$', views.LibraryBlocksView.as_view()),
             # Commit (POST) or revert (DELETE) all pending changes to this library:
@@ -27,7 +31,7 @@ urlpatterns = [
             # Get the list of users/groups who have permission to view/edit/administer this library:
             url(r'^team/$', views.LibraryTeamView.as_view()),
             # Add/Edit (PUT) or remove (DELETE) a user's permission to use this library
-            url(r'^team/user/(?P<user_id>\d+)/$', views.LibraryTeamUserView.as_view()),
+            url(r'^team/user/(?P<username>[^/]+)/$', views.LibraryTeamUserView.as_view()),
             # Add/Edit (PUT) or remove (DELETE) a group's permission to use this library
             url(r'^team/group/(?P<group_name>[^/]+)/$', views.LibraryTeamGroupView.as_view()),
         ])),

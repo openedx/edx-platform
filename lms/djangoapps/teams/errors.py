@@ -13,8 +13,8 @@ class NotEnrolledInCourseForTeam(TeamAPIRequestError):
     pass
 
 
-class AlreadyOnTeamInCourse(TeamAPIRequestError):
-    """User is already a member of another team in the same course."""
+class AlreadyOnTeamInTeamset(TeamAPIRequestError):
+    """User is already a member of another team in the same teamset."""
     pass
 
 

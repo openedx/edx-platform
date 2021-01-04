@@ -12,7 +12,7 @@ from django.test.utils import override_settings
 from eventtracking import tracker
 from mock import patch, sentinel
 
-from track.middleware import TrackMiddleware
+from common.djangoapps.track.middleware import TrackMiddleware
 
 
 @ddt.ddt
@@ -24,7 +24,7 @@ class TrackMiddlewareTestCase(TestCase):
         self.track_middleware = TrackMiddleware()
         self.request_factory = RequestFactory()
 
-        patcher = patch('track.views.server_track')
+        patcher = patch('common.djangoapps.track.views.server_track')
         self.mock_server_track = patcher.start()
         self.addCleanup(patcher.stop)
 
@@ -45,8 +45,7 @@ class TrackMiddlewareTestCase(TestCase):
         When HTTP headers contains latin1 characters.
         """
         request = self.request_factory.get('/somewhere')
-        # pylint: disable=no-member
-        request.META[meta_key] = 'test latin1 \xd3 \xe9 \xf1'  # pylint: disable=no-member
+        request.META[meta_key] = 'test latin1 \xd3 \xe9 \xf1'
 
         context = self.get_context_for_request(request)
         self.assertEqual(context[context_key], u'test latin1 Ó é ñ')

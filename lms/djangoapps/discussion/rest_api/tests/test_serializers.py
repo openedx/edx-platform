@@ -10,7 +10,7 @@ import httpretty
 import mock
 import six
 from django.test.client import RequestFactory
-from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
+from six.moves.urllib.parse import urlparse
 
 from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
 from lms.djangoapps.discussion.rest_api.serializers import CommentSerializer, ThreadSerializer, get_context
@@ -29,8 +29,8 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_STUDENT,
     Role
 )
-from student.tests.factories import UserFactory
-from util.testing import UrlResetMixin
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase

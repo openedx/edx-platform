@@ -16,7 +16,7 @@ from django.core.management.base import BaseCommand
 from mailsnake import MailSnake
 from opaque_keys.edx.keys import CourseKey
 
-from student.models import UserProfile, unique_id_for_user
+from common.djangoapps.student.models import UserProfile, unique_id_for_user
 
 BATCH_SIZE = 15000
 # If you try to subscribe with too many users at once
@@ -135,7 +135,7 @@ def get_student_data(students, exclude=None):
     """
     # To speed the query, we won't retrieve the full User object, only
     # two of its values. The namedtuple simulates the User object.
-    FakeUser = namedtuple('Fake', 'id username is_anonymous')  # pylint: disable=invalid-name
+    FakeUser = namedtuple('Fake', 'id username is_anonymous')
 
     exclude = exclude if exclude else set()
 

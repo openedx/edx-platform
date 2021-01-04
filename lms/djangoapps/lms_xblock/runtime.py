@@ -10,12 +10,13 @@ from django.conf import settings
 from django.urls import reverse
 from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
 
-from badges.service import BadgingService
-from badges.utils import badges_enabled
+from lms.djangoapps.badges.service import BadgingService
+from lms.djangoapps.badges.utils import badges_enabled
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from lms.djangoapps.teams.services import TeamsService
 from openedx.core.djangoapps.user_api.course_tag import api as user_course_tag_api
 from openedx.core.lib.url_utils import quote_slashes
+from openedx.core.lib.xblock_services.call_to_action import CallToActionService
 from openedx.core.lib.xblock_utils import wrap_xblock_aside, xblock_local_resource_url
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.django import ModuleI18nService, modulestore
@@ -28,7 +29,13 @@ def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
     """
     This method matches the signature for `xblock.runtime:Runtime.handler_url()`
 
-    See :method:`xblock.runtime:Runtime.handler_url`
+    :param block: The block to generate the url for
+    :param handler_name: The handler on that block that the url should resolve to
+    :param suffix: Any path suffix that should be added to the handler url
+    :param query: Any query string that should be added to the handler url
+        (which should not include an initial ? or &)
+    :param thirdparty: If true, return a fully-qualified URL instead of relative
+        URL. This is useful for URLs to be used by third-party services.
     """
     view_name = 'xblock_handler'
     if handler_name:
@@ -146,7 +153,7 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
             services['completion'] = CompletionService(user=user, context_key=kwargs.get('course_id'))
         services['fs'] = xblock.reference.plugins.FSService()
         services['i18n'] = ModuleI18nService
-        services['library_tools'] = LibraryToolsService(store)
+        services['library_tools'] = LibraryToolsService(store, user_id=user.id if user else None)
         services['partitions'] = PartitionService(
             course_id=kwargs.get('course_id'),
             cache=request_cache_dict
@@ -158,6 +165,7 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         self.request_token = kwargs.pop('request_token', None)
         services['teams'] = TeamsService()
         services['teams_configuration'] = TeamsConfigurationService()
+        services['call_to_action'] = CallToActionService()
         super(LmsModuleSystem, self).__init__(**kwargs)
 
     def handler_url(self, *args, **kwargs):

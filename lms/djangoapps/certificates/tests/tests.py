@@ -12,7 +12,7 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
 from pytz import UTC
 
-from badges.tests.factories import CourseCompleteImageConfigurationFactory
+from lms.djangoapps.badges.tests.factories import CourseCompleteImageConfigurationFactory
 from lms.djangoapps.certificates.models import (
     CertificateStatuses,
     GeneratedCertificate,
@@ -20,9 +20,9 @@ from lms.djangoapps.certificates.models import (
     certificate_status_for_student
 )
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
-from student.models import CourseEnrollment
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.milestones_helpers import milestones_achieved_by_user, set_prerequisite_courses
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.milestones_helpers import milestones_achieved_by_user, set_prerequisite_courses
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -215,7 +215,7 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         self.assertEqual(completed_milestones[0]['namespace'], six.text_type(pre_requisite_course.id))
 
     @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
-    @patch('badges.backends.badgr.BadgrBackend', spec=True)
+    @patch('lms.djangoapps.badges.backends.badgr.BadgrBackend', spec=True)
     def test_badge_callback(self, handler):
         student = UserFactory()
         course = CourseFactory.create(org='edx', number='998', display_name='Test Course', issue_badges=True)

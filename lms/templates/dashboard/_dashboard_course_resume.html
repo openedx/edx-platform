@@ -1,0 +1,26 @@
+<%page args="resume_button_url, course_overview, enrollment, is_unfulfilled_entitlement, course_target, related_programs" expression_filter="h"/>
+
+<%!
+import six
+from django.utils.translation import ugettext as _
+%>
+
+% if resume_button_url != '':
+  <a href="${resume_button_url}"
+      class="course-target-link enter-course ${'hidden' if is_unfulfilled_entitlement else ''}"
+      data-course-key="${enrollment.course_id}">
+    ${_('Resume Course')}
+    <span class="sr">
+      &nbsp;${course_overview.display_name_with_default}
+    </span>
+  </a>
+% else:
+  <a href="${course_target}"
+      class="course-target-link enter-course ${'hidden' if is_unfulfilled_entitlement else ''}"
+      data-course-key="${enrollment.course_id}">
+    ${_('View Course')}
+    <span class="sr">
+      &nbsp;${course_overview.display_name_with_default}
+    </span>
+  </a>
+% endif

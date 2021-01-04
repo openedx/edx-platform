@@ -14,11 +14,12 @@ from pytz import UTC
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from student.models import (
+from common.djangoapps.student.models import (
     AccountRecovery,
     CourseAccessRole,
     CourseEnrollment,
     CourseEnrollmentAllowed,
+    CourseEnrollmentCelebration,
     PendingEmailChange,
     Registration,
     User,
@@ -27,7 +28,6 @@ from student.models import (
 )
 
 # Factories are self documenting
-# pylint: disable=missing-docstring
 
 TEST_PASSWORD = 'test'
 
@@ -90,7 +90,7 @@ class UserFactory(DjangoModelFactory):
     date_joined = datetime(2011, 1, 1, tzinfo=UTC)
 
     @factory.post_generation
-    def profile(obj, create, extracted, **kwargs):  # pylint: disable=unused-argument, no-self-argument
+    def profile(obj, create, extracted, **kwargs):  # pylint: disable=unused-argument, missing-function-docstring
         if create:
             obj.save()
             return UserProfileFactory.create(user=obj, **kwargs)
@@ -142,6 +142,11 @@ class CourseEnrollmentFactory(DjangoModelFactory):
             course_id = kwargs.get('course_id')
             course_overview = None
             if course_id is not None:
+                # 'course_id' is not needed by the model when course is passed.
+                # This arg used to be called course_id before we added the CourseOverview
+                # foreign key constraint to CourseEnrollment.
+                del kwargs['course_id']
+
                 if isinstance(course_id, six.string_types):
                     course_id = CourseKey.from_string(course_id)
                     course_kwargs.setdefault('id', course_id)
@@ -152,10 +157,20 @@ class CourseEnrollmentFactory(DjangoModelFactory):
                     pass
 
             if course_overview is None:
+                if 'id' not in course_kwargs and course_id:
+                    course_kwargs['id'] = course_id
+
                 course_overview = CourseOverviewFactory(**course_kwargs)
             kwargs['course'] = course_overview
 
         return manager.create(*args, **kwargs)
+
+
+class CourseEnrollmentCelebrationFactory(DjangoModelFactory):
+    class Meta:
+        model = CourseEnrollmentCelebration
+
+    enrollment = factory.SubFactory(CourseEnrollmentFactory)
 
 
 class CourseAccessRoleFactory(DjangoModelFactory):

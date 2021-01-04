@@ -1,7 +1,7 @@
 .view-video-uploads {
   .content-primary,
   .content-supplementary {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
   }
 
   .nav-actions {
@@ -25,6 +25,10 @@
     padding: 0;
     color: $ui-link-color;
     cursor: pointer;
+  }
+
+  .message-error {
+    color: $red;
   }
 
   .video-transcripts-wrapper {
@@ -486,7 +490,7 @@
       }
 
       .name-col {
-        width: 25%;
+        width: 23%;
       }
 
       .transcripts-col {
@@ -500,7 +504,7 @@
 
       .date-col,
       .status-col {
-        width: 10%;
+        width: 15%;
       }
 
       .actions-col {

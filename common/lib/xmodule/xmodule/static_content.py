@@ -20,8 +20,12 @@ import six
 from docopt import docopt
 from path import Path as path
 
+from xmodule.annotatable_module import AnnotatableBlock
 from xmodule.capa_module import ProblemBlock
+from xmodule.conditional_module import ConditionalBlock
 from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
+from xmodule.library_content_module import LibraryContentBlock
+from xmodule.word_cloud_module import WordCloudBlock
 from xmodule.x_module import XModuleDescriptor, HTMLSnippet
 
 LOG = logging.getLogger(__name__)
@@ -64,11 +68,15 @@ class VideoBlock(HTMLSnippet):
 # Should only be used for XModules being converted to XBlocks.
 XBLOCK_CLASSES = [
     AboutBlock,
+    AnnotatableBlock,
+    ConditionalBlock,
     CourseInfoBlock,
     HtmlBlock,
+    LibraryContentBlock,
     ProblemBlock,
     StaticTabBlock,
     VideoBlock,
+    WordCloudBlock,
 ]
 
 
@@ -94,20 +102,24 @@ def write_descriptor_js(output_root):
 
 def _list_descriptors():
     """Return a list of all registered XModuleDescriptor classes."""
-    return [
-        desc for desc in [
+    return sorted(
+        [
             desc for (_, desc) in XModuleDescriptor.load_classes()
-        ]
-    ] + XBLOCK_CLASSES
+        ] + XBLOCK_CLASSES,
+        key=str
+    )
 
 
 def _list_modules():
     """Return a list of all registered XModule classes."""
-    return [
-        desc.module_class for desc in [
-            desc for (_, desc) in XModuleDescriptor.load_classes()
-        ]
-    ] + XBLOCK_CLASSES
+    return sorted(
+        [
+            desc.module_class for desc in [
+                desc for (_, desc) in XModuleDescriptor.load_classes()
+            ]
+        ] + XBLOCK_CLASSES,
+        key=str
+    )
 
 
 def _ensure_dir(directory):
@@ -152,7 +164,8 @@ def _write_styles(selector, output_root, classes, css_attribute):
         "@import 'bourbon/bourbon';",
         "@import 'lms/theme/variables';",
     ]
-    for class_, fragment_names in css_imports.items():
+    for class_, fragment_names in sorted(css_imports.items()):
+        fragment_names = sorted(fragment_names)
         module_styles_lines.append("""{selector}.xmodule_{class_} {{""".format(
             class_=class_, selector=selector
         ))
@@ -268,7 +281,13 @@ def write_webpack(output_file, module_files, descriptor_files):
         outfile.write(
             textwrap.dedent(u"""\
                 module.exports = {config_json};
-            """).format(config_json=json.dumps(config, indent=4))
+            """).format(
+                config_json=json.dumps(
+                    config,
+                    indent=4,
+                    sort_keys=True,
+                )
+            )
         )
 
 

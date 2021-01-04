@@ -13,7 +13,7 @@ from django.core.files.images import get_image_dimensions
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils.translation import ugettext as _
 from edxval.api import get_course_video_image_url, update_video_image
-from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
+from six.moves.urllib.parse import urljoin
 
 # Youtube thumbnail sizes.
 # https://img.youtube.com/vi/{youtube_id}/{thumbnail_quality}.jpg

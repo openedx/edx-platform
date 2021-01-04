@@ -1,11 +1,21 @@
 """
 Tests of the openedx.features.discounts.utils module.
 """
-from unittest import TestCase
 from mock import patch, Mock
-import six
 
 import ddt
+import six
+from django.contrib.auth.models import AnonymousUser
+from django.test import TestCase
+from django.utils.translation import override as override_lang
+from edx_toggles.toggles.testutils import override_waffle_flag
+
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.features.discounts.applicability import DISCOUNT_APPLICABILITY_FLAG, get_discount_expiration_date
 
 from .. import utils
 
@@ -38,10 +48,46 @@ class TestStrikeoutPrice(TestCase):
             content, has_discount = utils.format_strikeout_price(Mock(name='user'), Mock(name='course'))
 
         assert six.text_type(content) == (
-            u"<span class='sr'>"
+            u"<span class='sr-only'>"
             u"Original price: <span class='price original'>{original_price}</span>, discount price: "
             u"</span>"
             u"<span class='price discount'>{discount_price}</span> "
             u"<del aria-hidden='true'><span class='price original'>{original_price}</span></del>"
         ).format(original_price=formatted_base_price, discount_price=final_price)
         assert has_discount
+
+
+@override_waffle_flag(DISCOUNT_APPLICABILITY_FLAG, active=True)
+class TestOfferData(TestCase):
+    """
+    Tests of the generate_offer_data call.
+    """
+    def setUp(self):
+        super().setUp()
+
+        self.user = UserFactory()
+        self.overview = CourseOverviewFactory()
+        CourseModeFactory(course_id=self.overview.id, mode_slug=CourseMode.AUDIT)
+        CourseModeFactory(course_id=self.overview.id, mode_slug=CourseMode.VERIFIED, min_price=149)
+        CourseEnrollment.enroll(self.user, self.overview.id, CourseMode.AUDIT)
+
+    def test_happy_path(self):
+        self.assertEqual(utils.generate_offer_data(self.user, self.overview), {
+            'code': 'EDXWELCOME',
+            'expiration_date': get_discount_expiration_date(self.user, self.overview),
+            'original_price': '$149',
+            'discounted_price': '$126.65',
+            'percentage': 15,
+            'upgrade_url': '/dashboard',
+        })
+
+    def test_spanish_code(self):
+        with override_lang('es-419'):
+            self.assertEqual(utils.generate_offer_data(self.user, self.overview)['code'], 'BIENVENIDOAEDX')
+
+    def test_anonymous(self):
+        self.assertIsNone(utils.generate_offer_data(AnonymousUser(), self.overview))
+
+    @patch('openedx.features.discounts.utils.can_receive_discount', return_value=False)
+    def test_no_discount(self, _mock):
+        self.assertIsNone(utils.generate_offer_data(self.user, self.overview))

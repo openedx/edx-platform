@@ -15,7 +15,7 @@ from django.test.utils import override_settings
 from django.utils.six import StringIO
 from six.moves import range
 
-from util.db import enable_named_outer_atomic, generate_int_id, outer_atomic
+from common.djangoapps.util.db import enable_named_outer_atomic, generate_int_id, outer_atomic
 
 
 def do_nothing():
@@ -196,6 +196,7 @@ class MigrationTests(TestCase):
     """
     Tests for migrations.
     """
+
     @override_settings(MIGRATION_MODULES={})
     def test_migrations_are_in_sync(self):
         """

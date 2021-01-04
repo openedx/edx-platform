@@ -2,16 +2,15 @@
 
 import logging
 import re
+
 import six
+from django.conf import settings
+from django.contrib.staticfiles import finders
+from django.contrib.staticfiles.storage import staticfiles_storage
+from opaque_keys.edx.locator import AssetLocator
 from six import text_type
 
-from django.contrib.staticfiles.storage import staticfiles_storage
-from django.contrib.staticfiles import finders
-from django.conf import settings
-
 from xmodule.contentstore.content import StaticContent
-
-from opaque_keys.edx.locator import AssetLocator
 
 log = logging.getLogger(__name__)
 XBLOCK_STATIC_RESOURCE_PREFIX = '/static/xblock'
@@ -24,8 +23,7 @@ def _url_replace_regex(prefix):
     To anyone contemplating making this more complicated:
     http://xkcd.com/1171/
     """
-    return u"""
-        (?x)                      # flags=re.VERBOSE
+    return """(?x)                # flags=re.VERBOSE
         (?P<quote>\\\\?['"])      # the opening quotes
         (?P<prefix>{prefix})      # the prefix
         (?P<rest>.*?)             # everything else in the url
@@ -203,7 +201,7 @@ def replace_static_urls(text, data_directory=None, course_id=None, static_asset_
                 # if not, then assume it's courseware specific content and then look in the
                 # Mongo-backed database
                 # Import is placed here to avoid model import at project startup.
-                from static_replace.models import AssetBaseUrlConfig, AssetExcludedExtensionsConfig
+                from common.djangoapps.static_replace.models import AssetBaseUrlConfig, AssetExcludedExtensionsConfig
                 base_url = AssetBaseUrlConfig.get_base_url()
                 excluded_exts = AssetExcludedExtensionsConfig.get_excluded_extensions()
                 url = StaticContent.get_canonicalized_asset_path(course_id, rest, base_url, excluded_exts)

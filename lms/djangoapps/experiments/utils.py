@@ -11,18 +11,17 @@ from django.utils.timezone import now
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import format_course_price, get_cosmetic_verified_display_price, CourseMode
-from lms.djangoapps.courseware.access import has_staff_access_to_preview_mode
-from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
-from entitlements.models import CourseEntitlement
+from common.djangoapps.course_modes.models import format_course_price, get_cosmetic_verified_display_price, CourseMode
+from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
+from common.djangoapps.entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.courseware.access import has_staff_access_to_preview_mode
+from lms.djangoapps.courseware.utils import can_show_verified_upgrade, verified_upgrade_deadline_link
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.django_comment_common.models import Role
 from openedx.core.djangoapps.schedules.models import Schedule
-from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
-from openedx.features.course_duration_limits.access import get_user_course_expiration_date, get_user_course_duration
-from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from student.models import CourseEnrollment
+from openedx.features.course_duration_limits.access import get_user_course_duration, get_user_course_expiration_date
+from common.djangoapps.student.models import CourseEnrollment
 from xmodule.partitions.partitions_service import get_all_partitions_for_course, get_user_partition_groups
 
 # Import this for backwards compatibility (so that anyone importing this function from here doesn't break)
@@ -32,40 +31,51 @@ logger = logging.getLogger(__name__)
 
 
 # TODO: clean up as part of REVEM-199 (START)
-experiments_namespace = WaffleFlagNamespace(name=u'experiments')
+experiments_namespace = LegacyWaffleFlagNamespace(name=u'experiments')
 
 # .. toggle_name: experiments.add_programs
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Toggle for adding the current course's program information to user metadata
-# .. toggle_category: experiments
-# .. toggle_use_cases: monitored_rollout
+# .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2019-2-25
-# .. toggle_expiration_date: None
-# .. toggle_warnings: None
+# .. toggle_target_removal_date: None
 # .. toggle_tickets: REVEM-63, REVEM-198
-# .. toggle_status: supported
-PROGRAM_INFO_FLAG = WaffleFlag(
+# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
+PROGRAM_INFO_FLAG = LegacyWaffleFlag(
     waffle_namespace=experiments_namespace,
     flag_name=u'add_programs',
-    flag_undefined_default=False
+    module_name=__name__,
 )
 
 # .. toggle_name: experiments.add_dashboard_info
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Toggle for adding info about each course to the dashboard metadata
-# .. toggle_category: experiments
-# .. toggle_use_cases: monitored_rollout
+# .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2019-3-28
-# .. toggle_expiration_date: None
-# .. toggle_warnings: None
+# .. toggle_target_removal_date: None
 # .. toggle_tickets: REVEM-118
-# .. toggle_status: supported
-DASHBOARD_INFO_FLAG = WaffleFlag(experiments_namespace,
-                                 u'add_dashboard_info',
-                                 flag_undefined_default=False)
+# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
+DASHBOARD_INFO_FLAG = LegacyWaffleFlag(experiments_namespace, u'add_dashboard_info', __name__)
 # TODO END: clean up as part of REVEM-199 (End)
+
+# TODO: Clean up as part of REV-1205 (START)
+# .. toggle_name: experiments.add_upsell_tracking
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Make sure upsell tracking JS works as expected.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2020-7-7
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: REV-1205
+# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
+UPSELL_TRACKING_FLAG = LegacyWaffleFlag(
+    waffle_namespace=experiments_namespace,
+    flag_name=u'add_upsell_tracking',
+    module_name=__name__,
+)
+# TODO END: Clean up as part of REV-1205 (End)
 
 
 def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
@@ -78,37 +88,36 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
     otherwise, returns None for both the link and date.
     """
     if enrollment is None and course is None:
-        logger.warn(u'Must specify either an enrollment or a course')
+        logger.warning(u'Must specify either an enrollment or a course')
         return (None, None, None)
 
     if enrollment:
-        if course is None:
-            course = enrollment.course
-        elif enrollment.course_id != course.id:
-            logger.warn(u'{} refers to a different course than {} which was supplied. Enrollment course id={}, '
-                        u'repr={!r}, deprecated={}. Course id={}, repr={!r}, deprecated={}.'
-                        .format(enrollment,
-                                course,
-                                enrollment.course_id,
-                                enrollment.course_id,
-                                enrollment.course_id.deprecated,
-                                course.id,
-                                course.id,
-                                course.id.deprecated
-                                )
-                        )
+        if course and enrollment.course_id != course.id:
+            logger.warning(u'{} refers to a different course than {} which was supplied. Enrollment course id={}, '
+                           u'repr={!r}, deprecated={}. Course id={}, repr={!r}, deprecated={}.'
+                           .format(enrollment,
+                                   course,
+                                   enrollment.course_id,
+                                   enrollment.course_id,
+                                   enrollment.course_id.deprecated,
+                                   course.id,
+                                   course.id,
+                                   course.id.deprecated
+                                   )
+                           )
             return (None, None, None)
 
         if enrollment.user_id != user.id:
-            logger.warn(u'{} refers to a different user than {} which was supplied. Enrollment user id={}, repr={!r}. '
-                        u'User id={}, repr={!r}.'.format(enrollment,
-                                                         user,
-                                                         enrollment.user_id,
-                                                         enrollment.user_id,
-                                                         user.id,
-                                                         user.id,
-                                                         )
-                        )
+            logger.warning(u'{} refers to a different user than {} which was supplied. '
+                           u'Enrollment user id={}, repr={!r}. '
+                           u'User id={}, repr={!r}.'.format(enrollment,
+                                                            user,
+                                                            enrollment.user_id,
+                                                            enrollment.user_id,
+                                                            user.id,
+                                                            user.id,
+                                                            )
+                           )
             return (None, None, None)
 
     if enrollment is None:
@@ -116,9 +125,9 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
         if enrollment is None:
             return (None, None, None)
 
-    if user.is_authenticated and verified_upgrade_link_is_valid(enrollment):
+    if user.is_authenticated and can_show_verified_upgrade(user, enrollment, course):
         return (
-            verified_upgrade_deadline_link(user, course),
+            verified_upgrade_deadline_link(user, enrollment.course),
             enrollment.upgrade_deadline,
             enrollment.course_upgrade_deadline,
         )
@@ -227,7 +236,7 @@ def is_enrolled_in_course_run(course_run, enrollment_course_ids):
         course_run_key = CourseKey.from_string(key)
         return course_run_key in enrollment_course_ids
     except InvalidKeyError:
-        logger.warn(
+        logger.warning(
             u'Unable to determine if user was enrolled since the course key {} is invalid'.format(key)
         )
         return False  # Invalid course run key. Assume user is not enrolled.
@@ -255,46 +264,120 @@ def get_dashboard_course_info(user, dashboard_enrollments):
 
 def get_experiment_user_metadata_context(course, user):
     """
-    Return a context dictionary with the keys used by the user_metadata.html.
+    Return a context dictionary with the keys used for Optimizely experiments, exposed via user_metadata.html:
+    view from the DOM in those calling views using: JSON.parse($("#user-metadata").text());
+    Most views call this function with both parameters, but student dashboard has only a user
     """
     enrollment = None
     # TODO: clean up as part of REVO-28 (START)
     user_enrollments = None
     audit_enrollments = None
     has_non_audit_enrollments = False
-    try:
-        user_enrollments = CourseEnrollment.objects.select_related('course', 'schedule').filter(user_id=user.id)
-        has_non_audit_enrollments = user_enrollments.exclude(mode__in=CourseMode.UPSELL_TO_VERIFIED_MODES).exists()
+    context = {}
+    if course is not None:
+        try:
+            user_enrollments = CourseEnrollment.objects.select_related('course', 'schedule').filter(user_id=user.id)
+            has_non_audit_enrollments = user_enrollments.exclude(mode__in=CourseMode.UPSELL_TO_VERIFIED_MODES).exists()
+            # TODO: clean up as part of REVO-28 (END)
+            enrollment = CourseEnrollment.objects.select_related(
+                'course', 'schedule'
+            ).get(user_id=user.id, course_id=course.id)
+        except CourseEnrollment.DoesNotExist:
+            pass  # Not enrolled, use the default values
+
+        has_entitlements = False
+        if user.is_authenticated:
+            has_entitlements = CourseEntitlement.objects.filter(user=user).exists()
+
+        context = get_base_experiment_metadata_context(course, user, enrollment, user_enrollments)
+        has_staff_access = has_staff_access_to_preview_mode(user, course.id)
+        forum_roles = []
+        if user.is_authenticated:
+            forum_roles = list(Role.objects.filter(users=user, course_id=course.id).values_list('name').distinct())
+
+        # get user partition data
+        if user.is_authenticated:
+            partition_groups = get_all_partitions_for_course(course)
+            user_partitions = get_user_partition_groups(course.id, partition_groups, user, 'name')
+        else:
+            user_partitions = {}
+
+        # TODO: clean up as part of REVO-28 (START)
+        context['has_non_audit_enrollments'] = has_non_audit_enrollments or has_entitlements
         # TODO: clean up as part of REVO-28 (END)
-        enrollment = CourseEnrollment.objects.select_related(
-            'course', 'schedule'
-        ).get(user_id=user.id, course_id=course.id)
-    except CourseEnrollment.DoesNotExist:
-        pass  # Not enrolled, use the default values
+        context['has_staff_access'] = has_staff_access
+        context['forum_roles'] = forum_roles
+        context['partition_groups'] = user_partitions
 
-    has_entitlements = False
-    if user.is_authenticated:
-        has_entitlements = CourseEntitlement.objects.filter(user=user).exists()
+    user_metadata = {
+        key: context.get(key)
+        for key in (
+            'username',
+            'user_id',
+            'course_id',
+            'course_display_name',
+            'enrollment_mode',
+            'upgrade_link',
+            'upgrade_price',
+            'audit_access_deadline',
+            'course_duration',
+            'pacing_type',
+            'has_staff_access',
+            'forum_roles',
+            'partition_groups',
+            # TODO: clean up as part of REVO-28 (START)
+            'has_non_audit_enrollments',
+            # TODO: clean up as part of REVO-28 (END)
+            # TODO: clean up as part of REVEM-199 (START)
+            'program_key_fields',
+            # TODO: clean up as part of REVEM-199 (END)
+        )
+    }
 
-    context = get_base_experiment_metadata_context(course, user, enrollment, user_enrollments)
-    has_staff_access = has_staff_access_to_preview_mode(user, course.id)
-    forum_roles = []
-    if user.is_authenticated:
-        forum_roles = list(Role.objects.filter(users=user, course_id=course.id).values_list('name').distinct())
+    if user:
+        user_metadata['username'] = user.username
+        user_metadata['user_id'] = user.id
+        if hasattr(user, 'email'):
+            user_metadata['email'] = user.email
 
-    # get user partition data
-    if user.is_authenticated:
-        partition_groups = get_all_partitions_for_course(course)
-        user_partitions = get_user_partition_groups(course.id, partition_groups, user, 'name')
-    else:
-        user_partitions = {}
+    for datekey in (
+            'schedule_start',
+            'enrollment_time',
+            'course_start',
+            'course_end',
+            'dynamic_upgrade_deadline',
+            'course_upgrade_deadline',
+            'audit_access_deadline',
+    ):
+        user_metadata[datekey] = (
+            context.get(datekey).isoformat() if context.get(datekey) else None
+        )
 
-    # TODO: clean up as part of REVO-28 (START)
-    context['has_non_audit_enrollments'] = has_non_audit_enrollments or has_entitlements
-    # TODO: clean up as part of REVO-28 (END)
-    context['has_staff_access'] = has_staff_access
-    context['forum_roles'] = forum_roles
-    context['partition_groups'] = user_partitions
+    for timedeltakey in (
+        'course_duration',
+    ):
+        user_metadata[timedeltakey] = (
+            context.get(timedeltakey).total_seconds() if context.get(timedeltakey) else None
+        )
+
+    course_key = context.get('course_key')
+    if course and not course_key:
+        course_key = course.id
+
+    if course_key:
+        if isinstance(course_key, CourseKey):
+            user_metadata['course_key_fields'] = {
+                'org': course_key.org,
+                'course': course_key.course,
+                'run': course_key.run,
+            }
+
+            if not context.get('course_id'):
+                user_metadata['course_id'] = six.text_type(course_key)
+        elif isinstance(course_key, six.string_types):
+            user_metadata['course_id'] = course_key
+
+    context['user_metadata'] = user_metadata
     return context
 
 
@@ -323,7 +406,8 @@ def get_base_experiment_metadata_context(course, user, enrollment, user_enrollme
         user, enrollment, course
     )
 
-    deadline, duration = get_audit_access_expiration(user, course)
+    duration = get_user_course_duration(user, course)
+    deadline = duration and get_user_course_expiration_date(user, course)
 
     return {
         'upgrade_link': upgrade_link,
@@ -337,22 +421,13 @@ def get_base_experiment_metadata_context(course, user, enrollment, user_enrollme
         'audit_access_deadline': deadline,
         'course_duration': duration,
         'course_key': course.id,
+        'course_display_name': course.display_name_with_default,
         'course_start': course.start,
         'course_end': course.end,
         # TODO: clean up as part of REVEM-199 (START)
         'program_key_fields': program_key,
         # TODO: clean up as part of REVEM-199 (END)
     }
-
-
-def get_audit_access_expiration(user, course):
-    """
-    Return the expiration date and course duration for the user's audit access to this course.
-    """
-    if not CourseDurationLimitConfig.enabled_for_enrollment(user=user, course_key=course.id):
-        return None, None
-
-    return get_user_course_expiration_date(user, course), get_user_course_duration(user, course)
 
 
 # TODO: clean up as part of REVEM-199 (START)

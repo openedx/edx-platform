@@ -11,11 +11,12 @@ from collections import OrderedDict
 from functools import partial
 
 import six
-from completion import waffle as completion_waffle
+from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from completion.models import BlockCompletion
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
+from django.db import transaction
 from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.middleware.csrf import CsrfViewMiddleware
 from django.template.context_processors import csrf
@@ -24,7 +25,7 @@ from django.utils.text import slugify
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 from edx_django_utils.cache import RequestCache
-from edx_django_utils.monitoring import set_custom_metrics_for_course_key, set_monitoring_transaction_name
+from edx_django_utils.monitoring import set_custom_attributes_for_course_key, set_monitoring_transaction_name
 from edx_proctoring.api import get_attempt_status_summary
 from edx_proctoring.services import ProctoringService
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -43,7 +44,7 @@ from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
 from xblock.reference.plugins import FSService
 from xblock.runtime import KvsFieldData
 
-import static_replace
+from common.djangoapps import static_replace
 from capa.xqueue_interface import XQueueInterface
 from lms.djangoapps.courseware.access import get_user_role, has_access
 from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
@@ -54,7 +55,7 @@ from lms.djangoapps.courseware.masquerade import (
     setup_masquerade
 )
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.courseware.services import UserStateService
 from lms.djangoapps.grades.api import GradesUtilService
@@ -86,12 +87,13 @@ from openedx.core.lib.xblock_utils import request_token as xblock_request_token
 from openedx.core.lib.xblock_utils import wrap_xblock
 from openedx.features.course_duration_limits.access import course_expiration_wrapper
 from openedx.features.discounts.utils import offer_banner_wrapper
-from student.models import anonymous_id_for_user, user_by_anonymous_id
-from student.roles import CourseBetaTesterRole
-from track import contexts
-from util import milestones_helpers
-from util.json_request import JsonResponse
-from xblock_django.user_service import DjangoXBlockUserService
+from openedx.features.content_type_gating.services import ContentTypeGatingService
+from common.djangoapps.student.models import anonymous_id_for_user, user_by_anonymous_id
+from common.djangoapps.student.roles import CourseBetaTesterRole
+from common.djangoapps.track import contexts
+from common.djangoapps.util import milestones_helpers
+from common.djangoapps.util.json_request import JsonResponse
+from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
@@ -131,10 +133,10 @@ def make_track_function(request):
     Make a tracking function that logs what happened.
     For use in ModuleSystem.
     '''
-    import track.views
+    from common.djangoapps.track import views as track_views
 
     def function(event_type, event):
-        return track.views.server_track(request, event_type, event, page='x_module')
+        return track_views.server_track(request, event_type, event, page='x_module')
     return function
 
 
@@ -534,7 +536,7 @@ def get_module_system_for_user(
         handlers = {
             'grade': handle_grade_event,
         }
-        if completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+        if ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():
             handlers.update({
                 'completion': handle_completion_event,
                 'progress': handle_deprecated_progress_event,
@@ -565,7 +567,7 @@ def get_module_system_for_user(
         """
         Submit a completion object for the block.
         """
-        if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+        if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():
             raise Http404
         else:
             BlockCompletion.objects.submit_completion(
@@ -599,7 +601,7 @@ def get_module_system_for_user(
         edx-solutions.  New XBlocks should not emit these events, but instead
         emit completion events directly.
         """
-        if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+        if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():
             raise Http404
         else:
             requested_user_id = event.get('user_id', user.id)
@@ -820,6 +822,7 @@ def get_module_system_for_user(
             'gating': GatingService(),
             'grade_utils': GradesUtilService(course_id=course_id),
             'user_state': UserStateService(),
+            'content_type_gating': ContentTypeGatingService(),
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
@@ -994,6 +997,7 @@ def xqueue_callback(request, course_id, userid, mod_id, dispatch):
 
 @csrf_exempt
 @xframe_options_exempt
+@transaction.non_atomic_requests
 def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=None):
     """
     Entry point for unauthenticated XBlock handlers.
@@ -1008,6 +1012,7 @@ def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=
 
 @csrf_exempt
 @xframe_options_exempt
+@transaction.non_atomic_requests
 def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     """
     Generic view for extensions. This is where AJAX calls go.
@@ -1087,7 +1092,7 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
         descriptor = modulestore().get_item(usage_key)
         descriptor_orig_usage_key, descriptor_orig_version = modulestore().get_block_original_usage(usage_key)
     except ItemNotFoundError:
-        log.warn(
+        log.warning(
             u"Invalid location for course id %s: %s",
             usage_key.course_key,
             usage_key
@@ -1156,7 +1161,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
     except InvalidKeyError:
         raise Http404
 
-    set_custom_metrics_for_course_key(course_key)
+    set_custom_attributes_for_course_key(course_key)
 
     with modulestore().bulk_operations(course_key):
         try:
@@ -1233,8 +1238,8 @@ def xblock_view(request, course_id, usage_id, view_name):
             the second is the resource description
     """
     if not settings.FEATURES.get('ENABLE_XBLOCK_VIEW_ENDPOINT', False):
-        log.warn("Attempt to use deactivated XBlock view endpoint -"
-                 " see FEATURES['ENABLE_XBLOCK_VIEW_ENDPOINT']")
+        log.warning("Attempt to use deactivated XBlock view endpoint -"
+                    " see FEATURES['ENABLE_XBLOCK_VIEW_ENDPOINT']")
         raise Http404
 
     try:

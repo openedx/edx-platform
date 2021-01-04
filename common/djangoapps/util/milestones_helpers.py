@@ -1,4 +1,3 @@
-# pylint: disable=invalid-name
 """
 Utility library for working with the edx-milestones app
 """
@@ -7,6 +6,7 @@ Utility library for working with the edx-milestones app
 import six
 from django.conf import settings
 from django.utils.translation import ugettext as _
+from edx_toggles.toggles import SettingDictToggle
 from milestones import api as milestones_api
 from milestones.exceptions import InvalidMilestoneRelationshipTypeException, InvalidUserException
 from milestones.models import MilestoneRelationshipType
@@ -18,11 +18,25 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.lib.cache_utils import get_cache
 from xmodule.modulestore.django import modulestore
 
+
 NAMESPACE_CHOICES = {
     'ENTRANCE_EXAM': 'entrance_exams'
 }
 
 REQUEST_CACHE_NAME = "milestones"
+
+# TODO this should be moved to edx/edx-milestones
+# .. toggle_name: FEATURES['ENABLE_MILESTONES_APP']
+# .. toggle_implementation: SettingDictToggle
+# .. toggle_default: False
+# .. toggle_description: Enable the milestones application, which manages significant Course and/or Student events in
+#   the Open edX platform. (see https://github.com/edx/edx-milestones)
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2014-11-21
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: None
+# .. toggle_tickets: None
+ENABLE_MILESTONES_APP = SettingDictToggle("FEATURES", "MILESTONES_APP", default=False, module_name=__name__)
 
 
 def get_namespace_choices():
@@ -32,19 +46,11 @@ def get_namespace_choices():
     return NAMESPACE_CHOICES
 
 
-def is_entrance_exams_enabled():
-    """
-    Checks to see if the Entrance Exams feature is enabled
-    Use this operation instead of checking the feature flag all over the place
-    """
-    return settings.FEATURES.get('ENTRANCE_EXAMS')
-
-
 def is_prerequisite_courses_enabled():
     """
     Returns boolean indicating prerequisite courses enabled system wide or not.
     """
-    return settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES') and settings.FEATURES.get('MILESTONES_APP')
+    return settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES') and ENABLE_MILESTONES_APP.is_enabled()
 
 
 def add_prerequisite_course(course_key, prerequisite_course_key):
@@ -107,7 +113,7 @@ def set_prerequisite_courses(course_key, prerequisite_course_keys):
             add_prerequisite_course(course_key, prerequisite_course_key)
 
 
-def get_pre_requisite_courses_not_completed(user, enrolled_courses):  # pylint: disable=invalid-name
+def get_pre_requisite_courses_not_completed(user, enrolled_courses):
     """
     Makes a dict mapping courses to their unfulfilled milestones using the
     fulfillment API of the milestones app.
@@ -186,7 +192,7 @@ def fulfill_course_milestone(course_key, user):
     Marks the course specified by the given course_key as complete for the given user.
     If any other courses require this course as a prerequisite, their milestones will be appropriately updated.
     """
-    if not settings.FEATURES.get('MILESTONES_APP'):
+    if not ENABLE_MILESTONES_APP.is_enabled():
         return None
     try:
         course_milestones = milestones_api.get_course_milestones(course_key=course_key, relationship="fulfills")
@@ -202,7 +208,7 @@ def remove_course_milestones(course_key, user, relationship):
     """
     Remove all user milestones for the course specified by course_key.
     """
-    if not settings.FEATURES.get('MILESTONES_APP'):
+    if not ENABLE_MILESTONES_APP.is_enabled():
         return None
     course_milestones = milestones_api.get_course_milestones(course_key=course_key, relationship=relationship)
     for milestone in course_milestones:
@@ -215,7 +221,7 @@ def get_required_content(course_key, user):
     and if those milestones can be fulfilled via completion of a particular course content module
     """
     required_content = []
-    if settings.FEATURES.get('MILESTONES_APP'):
+    if ENABLE_MILESTONES_APP.is_enabled():
         course_run_id = six.text_type(course_key)
 
         if user.is_authenticated:
@@ -249,7 +255,7 @@ def milestones_achieved_by_user(user, namespace):
     """
     It would fetch list of milestones completed by user
     """
-    if not settings.FEATURES.get('MILESTONES_APP'):
+    if not ENABLE_MILESTONES_APP.is_enabled():
         return None
     return milestones_api.get_user_milestones({'id': user.id}, namespace)
 
@@ -269,7 +275,7 @@ def seed_milestone_relationship_types():
     """
     Helper method to pre-populate MRTs so the tests can run
     """
-    if not settings.FEATURES.get('MILESTONES_APP'):
+    if not ENABLE_MILESTONES_APP.is_enabled():
         return None
     MilestoneRelationshipType.objects.create(name='requires')
     MilestoneRelationshipType.objects.create(name='fulfills')
@@ -297,7 +303,7 @@ def add_milestone(milestone_data):
     """
     Client API operation adapter/wrapper
     """
-    if not settings.FEATURES.get('MILESTONES_APP'):
+    if not ENABLE_MILESTONES_APP.is_enabled():
         return None
     return milestones_api.add_milestone(milestone_data)
 
@@ -306,7 +312,7 @@ def get_milestones(namespace):
     """
     Client API operation adapter/wrapper
     """
-    if not settings.FEATURES.get('MILESTONES_APP'):
+    if not ENABLE_MILESTONES_APP.is_enabled():
         return []
     return milestones_api.get_milestones(namespace)
 
@@ -315,7 +321,7 @@ def get_milestone_relationship_types():
     """
     Client API operation adapter/wrapper
     """
-    if not settings.FEATURES.get('MILESTONES_APP'):
+    if not ENABLE_MILESTONES_APP.is_enabled():
         return {}
     return milestones_api.get_milestone_relationship_types()
 
@@ -324,7 +330,7 @@ def add_course_milestone(course_id, relationship, milestone):
     """
     Client API operation adapter/wrapper
     """
-    if not settings.FEATURES.get('MILESTONES_APP'):
+    if not ENABLE_MILESTONES_APP.is_enabled():
         return None
     return milestones_api.add_course_milestone(course_id, relationship, milestone)
 
@@ -333,7 +339,7 @@ def get_course_milestones(course_id):
     """
     Client API operation adapter/wrapper
     """
-    if not settings.FEATURES.get('MILESTONES_APP'):
+    if not ENABLE_MILESTONES_APP.is_enabled():
         return []
     return milestones_api.get_course_milestones(course_id)
 
@@ -342,7 +348,7 @@ def add_course_content_milestone(course_id, content_id, relationship, milestone)
     """
     Client API operation adapter/wrapper
     """
-    if not settings.FEATURES.get('MILESTONES_APP'):
+    if not ENABLE_MILESTONES_APP.is_enabled():
         return None
     return milestones_api.add_course_content_milestone(course_id, content_id, relationship, milestone)
 
@@ -356,7 +362,7 @@ def get_course_content_milestones(course_id, content_id=None, relationship='requ
     Returns all content blocks in a course if content_id is None, otherwise it just returns that
     specific content block.
     """
-    if not settings.FEATURES.get('MILESTONES_APP'):
+    if not ENABLE_MILESTONES_APP.is_enabled():
         return []
 
     if user_id is None:
@@ -383,7 +389,7 @@ def remove_course_content_user_milestones(course_key, content_key, user, relatio
     """
     Removes the specified User-Milestone link from the system for the specified course content module.
     """
-    if not settings.FEATURES.get('MILESTONES_APP'):
+    if not ENABLE_MILESTONES_APP.is_enabled():
         return []
 
     course_content_milestones = milestones_api.get_course_content_milestones(course_key, content_key, relationship)
@@ -395,14 +401,14 @@ def remove_content_references(content_id):
     """
     Client API operation adapter/wrapper
     """
-    if not settings.FEATURES.get('MILESTONES_APP'):
+    if not ENABLE_MILESTONES_APP.is_enabled():
         return None
     return milestones_api.remove_content_references(content_id)
 
 
 def any_unfulfilled_milestones(course_id, user_id):
     """ Returns a boolean if user has any unfulfilled milestones """
-    if not settings.FEATURES.get('MILESTONES_APP'):
+    if not ENABLE_MILESTONES_APP.is_enabled():
         return False
 
     user_id = None if user_id is None else int(user_id)
@@ -417,7 +423,7 @@ def get_course_milestones_fulfillment_paths(course_id, user_id):
     """
     Client API operation adapter/wrapper
     """
-    if not settings.FEATURES.get('MILESTONES_APP'):
+    if not ENABLE_MILESTONES_APP.is_enabled():
         return None
     return milestones_api.get_course_milestones_fulfillment_paths(
         course_id,
@@ -429,7 +435,7 @@ def add_user_milestone(user, milestone):
     """
     Client API operation adapter/wrapper
     """
-    if not settings.FEATURES.get('MILESTONES_APP'):
+    if not ENABLE_MILESTONES_APP.is_enabled():
         return None
     return milestones_api.add_user_milestone(user, milestone)
 
@@ -438,7 +444,7 @@ def remove_user_milestone(user, milestone):
     """
     Client API operation adapter/wrapper
     """
-    if not settings.FEATURES.get('MILESTONES_APP'):
+    if not ENABLE_MILESTONES_APP.is_enabled():
         return None
     return milestones_api.remove_user_milestone(user, milestone)
 
@@ -451,6 +457,6 @@ def get_service():
     Note: MilestonesService only has access to the functions
     explicitly requested in the MilestonesServices class
     """
-    if not settings.FEATURES.get('MILESTONES_APP', False):
+    if not ENABLE_MILESTONES_APP.is_enabled():
         return None
     return MilestonesService()

@@ -2,37 +2,69 @@ define([
     'backbone',
     'underscore',
     'teams/js/views/topic_teams',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'teams/js/spec_helpers/team_spec_helpers',
     'common/js/spec_helpers/page_helpers'
-], function(Backbone, _, TopicTeamsView, TeamSpecHelpers, PageHelpers) {
+], function(Backbone, _, TopicTeamsView, AjaxHelpers, TeamSpecHelpers, PageHelpers) {
     'use strict';
     describe('Topic Teams View', function() {
-        var createTopicTeamsView = function(options, isInstructorManagedTopic) {
-            var myTeamsCollection;
-            options = options || {}; // eslint-disable-line no-param-reassign
-            myTeamsCollection = options.myTeamsCollection || TeamSpecHelpers.createMockTeams({results: []});
-            return new TopicTeamsView({
-                el: '.teams-container',
-                model: isInstructorManagedTopic ?
-                    TeamSpecHelpers.createMockInstructorManagedTopic() : TeamSpecHelpers.createMockTopic(),
-                collection: options.teams || TeamSpecHelpers.createMockTeams(),
-                myTeamsCollection: myTeamsCollection,
-                showActions: true,
-                context: _.extend({}, TeamSpecHelpers.testContext, options)
-            }).render();
+        var requests, teamsView;
+
+        var verifyTeamsetTeamsRequest = function(hasTeams) {
+            AjaxHelpers.expectRequestURL(
+                requests,
+                TeamSpecHelpers.testContext.teamMembershipsUrl,
+                {
+                    username: TeamSpecHelpers.testUser,
+                    course_id: TeamSpecHelpers.testCourseID,
+                    teamset_id: TeamSpecHelpers.testTopicID,
+                }
+            );
+            AjaxHelpers.respondWithJson(
+                requests,
+                { count: hasTeams ? 1 : 0 }
+            );
+            AjaxHelpers.expectNoRequests(requests);
         };
 
-        var verifyActions = function(teamsView, options) {
+        var createTopicTeamsView = function(_options) {
+            var options = _options || {};
+            var onTeamInTeamset = options.onTeamInTeamset || false,
+                isInstructorManagedTopic = options.isInstructorManagedTopic || false;
+
+            var result, topicTeamsView;
+
+            requests = AjaxHelpers.requests(this);
+            topicTeamsView = new TopicTeamsView({
+                el: '.teams-container',
+                model: isInstructorManagedTopic ?
+                    TeamSpecHelpers.createMockTopic({type: 'public_managed'}) : TeamSpecHelpers.createMockTopic(),
+                collection: options.teams || TeamSpecHelpers.createMockTeams({results: []}),
+                context: _.extend({}, TeamSpecHelpers.testContext, options)
+            });
+            result = topicTeamsView.render();
+
+            if (
+                topicTeamsView.context.userInfo.staff ||
+                topicTeamsView.context.userInfo.privileged ||
+                isInstructorManagedTopic
+            ) {
+                AjaxHelpers.expectNoRequests(requests);
+            } else {
+                verifyTeamsetTeamsRequest(onTeamInTeamset);
+            }
+            return result;
+        };
+
+        var verifyActions = function(showActions) {
             var expectedTitle = 'Are you having trouble finding a team to join?',
                 expectedMessage = 'Browse teams in other topics or search teams in this topic. ' +
                     'If you still can\'t find a team to join, create a new team in this topic.',
                 title = teamsView.$('.title').text().trim(),
-                message = teamsView.$('.copy').text().trim();
-            if (!options) {
-                options = {showActions: true}; // eslint-disable-line no-param-reassign
-            }
+                message = teamsView.$('.copy').text().trim(),
+                _showActions = showActions === undefined ? true : showActions;
 
-            if (options.showActions) {
+            if (_showActions) {
                 expect(title).toBe(expectedTitle);
                 expect(message).toBe(expectedMessage);
             } else {
@@ -47,37 +79,41 @@ define([
         });
 
         it('can render itself', function() {
-            var testTeamData = TeamSpecHelpers.createMockTeamData(1, 5),
-                teamsView = createTopicTeamsView({
-                    teams: TeamSpecHelpers.createMockTeams({
-                        results: testTeamData
-                    })
-                });
-            var footerEl = teamsView.$('.teams-paging-footer');
+            var testTeamData = TeamSpecHelpers.createMockTeamData(1, 5);
+            var options = {
+                teams: TeamSpecHelpers.createMockTeams({
+                    results: testTeamData
+                })
+            };
+            var footerEl;
+
+            teamsView = createTopicTeamsView(options);
+            footerEl = teamsView.$('.teams-paging-footer');
+
             expect(teamsView.$('.teams-paging-header').text()).toMatch('Showing 1-5 out of 6 total');
             expect(footerEl.text()).toMatch('1\\s+out of\\s+\/\\s+2'); // eslint-disable-line no-useless-escape
             expect(footerEl).not.toHaveClass('hidden');
 
             TeamSpecHelpers.verifyCards(teamsView, testTeamData);
-            verifyActions(teamsView);
+            verifyActions();
         });
 
         it('can browse all teams', function() {
-            var teamsView = createTopicTeamsView();
+            teamsView = createTopicTeamsView();
             spyOn(Backbone.history, 'navigate');
             teamsView.$('.browse-teams').click();
             expect(Backbone.history.navigate.calls.mostRecent().args[0]).toBe('browse');
         });
 
         it('gives the search field focus when clicking on the search teams link', function() {
-            var teamsView = createTopicTeamsView();
+            teamsView = createTopicTeamsView();
             spyOn($.fn, 'focus').and.callThrough();
             teamsView.$('.search-teams').click();
             expect(teamsView.$('.search-field').first().focus).toHaveBeenCalled();
         });
 
         it('can show the create team modal', function() {
-            var teamsView = createTopicTeamsView();
+            teamsView = createTopicTeamsView();
             spyOn(Backbone.history, 'navigate');
             teamsView.$('a.create-team').click();
             expect(Backbone.history.navigate.calls.mostRecent().args[0]).toBe(
@@ -85,15 +121,14 @@ define([
             );
         });
 
-        it('does not show actions for a user already in a team', function() {
-            var options = {myTeamsCollection: TeamSpecHelpers.createMockTeams()};
-            var teamsView = createTopicTeamsView(options);
-            verifyActions(teamsView, {showActions: false});
+        it('does not show actions for a user already in a team in the teamset', function() {
+            teamsView = createTopicTeamsView({ onTeamInTeamset: true });
+            verifyActions(false);
         });
 
         it('does not show actions for a student in an instructor managed topic', function() {
-            var teamsView = createTopicTeamsView({}, true);
-            verifyActions(teamsView, {showActions: false});
+            teamsView = createTopicTeamsView({ isInstructorManagedTopic: true });
+            verifyActions(false);
         });
 
         it('shows actions for a privileged user already in a team', function() {
@@ -102,10 +137,10 @@ define([
                     privileged: true,
                     staff: false
                 },
-                myTeamsCollection: TeamSpecHelpers.createMockTeams()
+                onTeamInTeamset: true,
             };
-            var teamsView = createTopicTeamsView(options);
-            verifyActions(teamsView, {showActions: true});
+            teamsView = createTopicTeamsView(options);
+            verifyActions();
         });
 
         it('shows actions for a staff user already in a team', function() {
@@ -114,10 +149,10 @@ define([
                     privileged: false,
                     staff: true
                 },
-                myTeamsCollection: TeamSpecHelpers.createMockTeams()
+                onTeamInTeamset: true,
             };
-            var teamsView = createTopicTeamsView(options);
-            verifyActions(teamsView, {showActions: true});
+            teamsView = createTopicTeamsView(options);
+            verifyActions();
         });
 
         /*
@@ -126,7 +161,7 @@ define([
             var requests = AjaxHelpers.requests(this),
                 teamMemberships = TeamSpecHelpers.createMockTeamMemberships([]),
                 teamsView = createTopicTeamsView({ teamMemberships: teamMemberships });
-            verifyActions(teamsView, {showActions: true});
+            verifyActions({showActions: true});
             teamMemberships.teamEvents.trigger('teams:update', { action: 'create' });
             teamsView.render();
             AjaxHelpers.expectRequestURL(
@@ -141,7 +176,7 @@ define([
                 }
             );
             AjaxHelpers.respondWithJson(requests, {});
-            verifyActions(teamsView, {showActions: false});
+            verifyActions({showActions: false});
         });
         */
     });

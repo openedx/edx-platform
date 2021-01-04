@@ -13,6 +13,8 @@ from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
 
 from openedx.core.djangoapps.site_configuration import helpers
 
+from .helpers import is_learner_records_enabled
+
 API_VERSION = 'v2'
 
 
@@ -97,7 +99,7 @@ class CredentialsApiConfig(ConfigurationModel):
         Publicly-accessible Records URL root.
         """
         # Not every site wants the Learner Records feature, so we allow opting out.
-        if not helpers.get_value('ENABLE_LEARNER_RECORDS', True):
+        if not is_learner_records_enabled():
             return None
         root = helpers.get_value('CREDENTIALS_PUBLIC_SERVICE_URL', settings.CREDENTIALS_PUBLIC_SERVICE_URL)
         return urljoin(root, '/records/')

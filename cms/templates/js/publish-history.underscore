@@ -12,5 +12,6 @@ if (published_on && published_by) {
 %>
 
 <div class="wrapper-last-publish">
+    <% // xss-lint: disable=underscore-not-escaped %>
     <p class="copy"><%= copy %></p>
 </div>

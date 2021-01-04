@@ -3,17 +3,21 @@ Django module for Course Metadata class -- manages advanced settings and related
 """
 
 
+from datetime import datetime
+
+import pytz
 import six
 from crum import get_current_user
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 from six import text_type
 from xblock.fields import Scope
 
-from cms.djangoapps.contentstore.config.waffle import ENABLE_PROCTORING_PROVIDER_OVERRIDES
+from openedx.core.lib.teams_config import TeamsetType
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
-from student.roles import GlobalStaff
-from xblock_django.models import XBlockStudioConfigurationFlag
+from common.djangoapps.student.roles import GlobalStaff
+from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.modulestore.django import modulestore
 
 
@@ -25,9 +29,9 @@ class CourseMetadata(object):
     editable metadata.
     '''
     # The list of fields that wouldn't be shown in Advanced Settings.
-    # Should not be used directly. Instead the get_blacklist_of_fields method should
+    # Should not be used directly. Instead the get_exclude_list_of_fields method should
     # be used if the field needs to be filtered depending on the feature flag.
-    FIELDS_BLACK_LIST = [
+    FIELDS_EXCLUDE_LIST = [
         'cohort_config',
         'xml_attributes',
         'start',
@@ -71,77 +75,77 @@ class CourseMetadata(object):
     ]
 
     @classmethod
-    def get_blacklist_of_fields(cls, course_key):
+    def get_exclude_list_of_fields(cls, course_key):
         """
-        Returns a list of fields to not include in Studio Advanced settings based on a
+        Returns a list of fields to exclude from the Studio Advanced settings based on a
         feature flag (i.e. enabled or disabled).
         """
         # Copy the filtered list to avoid permanently changing the class attribute.
-        black_list = list(cls.FIELDS_BLACK_LIST)
+        exclude_list = list(cls.FIELDS_EXCLUDE_LIST)
 
         # Do not show giturl if feature is not enabled.
         if not settings.FEATURES.get('ENABLE_EXPORT_GIT'):
-            black_list.append('giturl')
+            exclude_list.append('giturl')
 
         # Do not show edxnotes if the feature is disabled.
         if not settings.FEATURES.get('ENABLE_EDXNOTES'):
-            black_list.append('edxnotes')
+            exclude_list.append('edxnotes')
 
         # Do not show video auto advance if the feature is disabled
         if not settings.FEATURES.get('ENABLE_OTHER_COURSE_SETTINGS'):
-            black_list.append('other_course_settings')
+            exclude_list.append('other_course_settings')
 
         # Do not show video_upload_pipeline if the feature is disabled.
         if not settings.FEATURES.get('ENABLE_VIDEO_UPLOAD_PIPELINE'):
-            black_list.append('video_upload_pipeline')
+            exclude_list.append('video_upload_pipeline')
 
         # Do not show video auto advance if the feature is disabled
         if not settings.FEATURES.get('ENABLE_AUTOADVANCE_VIDEOS'):
-            black_list.append('video_auto_advance')
+            exclude_list.append('video_auto_advance')
 
         # Do not show social sharing url field if the feature is disabled.
         if (not hasattr(settings, 'SOCIAL_SHARING_SETTINGS') or
                 not getattr(settings, 'SOCIAL_SHARING_SETTINGS', {}).get("CUSTOM_COURSE_URLS")):
-            black_list.append('social_sharing_url')
+            exclude_list.append('social_sharing_url')
 
         # Do not show teams configuration if feature is disabled.
         if not settings.FEATURES.get('ENABLE_TEAMS'):
-            black_list.append('teams_configuration')
+            exclude_list.append('teams_configuration')
 
         if not settings.FEATURES.get('ENABLE_VIDEO_BUMPER'):
-            black_list.append('video_bumper')
+            exclude_list.append('video_bumper')
 
         # Do not show enable_ccx if feature is not enabled.
         if not settings.FEATURES.get('CUSTOM_COURSES_EDX'):
-            black_list.append('enable_ccx')
-            black_list.append('ccx_connector')
+            exclude_list.append('enable_ccx')
+            exclude_list.append('ccx_connector')
 
         # Do not show "Issue Open Badges" in Studio Advanced Settings
         # if the feature is disabled.
         if not settings.FEATURES.get('ENABLE_OPENBADGES'):
-            black_list.append('issue_badges')
+            exclude_list.append('issue_badges')
 
         # If the XBlockStudioConfiguration table is not being used, there is no need to
         # display the "Allow Unsupported XBlocks" setting.
         if not XBlockStudioConfigurationFlag.is_enabled():
-            black_list.append('allow_unsupported_xblocks')
-
-        # If the ENABLE_PROCTORING_PROVIDER_OVERRIDES waffle flag is not enabled,
-        # do not show "Proctoring Configuration" in Studio Advanced Settings.
-        if not ENABLE_PROCTORING_PROVIDER_OVERRIDES.is_enabled(course_key):
-            black_list.append('proctoring_provider')
+            exclude_list.append('allow_unsupported_xblocks')
 
         # Do not show "Course Visibility For Unenrolled Learners" in Studio Advanced Settings
         # if the enable_anonymous_access flag is not enabled
         if not COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course_key=course_key):
-            black_list.append('course_visibility')
+            exclude_list.append('course_visibility')
 
         # Do not show "Create Zendesk Tickets For Suspicious Proctored Exam Attempts" in
         # Studio Advanced Settings if the user is not edX staff.
         if not GlobalStaff().has_user(get_current_user()):
-            black_list.append('create_zendesk_tickets')
+            exclude_list.append('create_zendesk_tickets')
 
-        return black_list
+        # Do not show "Proctortrack Exam Escalation Contact" if Proctortrack is not
+        # an available proctoring backend.
+        if not settings.PROCTORING_BACKENDS or settings.PROCTORING_BACKENDS.get('proctortrack') is None:
+            exclude_list.append('proctoring_escalation_email')
+
+        return exclude_list
 
     @classmethod
     def fetch(cls, descriptor):
@@ -151,10 +155,10 @@ class CourseMetadata(object):
         """
         result = {}
         metadata = cls.fetch_all(descriptor)
-        black_list_of_fields = cls.get_blacklist_of_fields(descriptor.id)
+        exclude_list_of_fields = cls.get_exclude_list_of_fields(descriptor.id)
 
         for key, value in six.iteritems(metadata):
-            if key in black_list_of_fields:
+            if key in exclude_list_of_fields:
                 continue
             result[key] = value
         return result
@@ -188,19 +192,19 @@ class CourseMetadata(object):
         """
         Decode the json into CourseMetadata and save any changed attrs to the db.
 
-        Ensures none of the fields are in the blacklist.
+        Ensures none of the fields are in the exclude list.
         """
-        blacklist_of_fields = cls.get_blacklist_of_fields(descriptor.id)
+        exclude_list_of_fields = cls.get_exclude_list_of_fields(descriptor.id)
         # Don't filter on the tab attribute if filter_tabs is False.
         if not filter_tabs:
-            blacklist_of_fields.remove("tabs")
+            exclude_list_of_fields.remove("tabs")
 
         # Validate the values before actually setting them.
         key_values = {}
 
         for key, model in six.iteritems(jsondict):
             # should it be an error if one of the filtered list items is in the payload?
-            if key in blacklist_of_fields:
+            if key in exclude_list_of_fields:
                 continue
             try:
                 val = model['value']
@@ -226,12 +230,12 @@ class CourseMetadata(object):
             errors: list of error objects
             result: the updated course metadata or None if error
         """
-        blacklist_of_fields = cls.get_blacklist_of_fields(descriptor.id)
+        exclude_list_of_fields = cls.get_exclude_list_of_fields(descriptor.id)
 
         if not filter_tabs:
-            blacklist_of_fields.remove("tabs")
+            exclude_list_of_fields.remove("tabs")
 
-        filtered_dict = dict((k, v) for k, v in six.iteritems(jsondict) if k not in blacklist_of_fields)
+        filtered_dict = dict((k, v) for k, v in six.iteritems(jsondict) if k not in exclude_list_of_fields)
         did_validate = True
         errors = []
         key_values = {}
@@ -242,9 +246,19 @@ class CourseMetadata(object):
                 val = model['value']
                 if hasattr(descriptor, key) and getattr(descriptor, key) != val:
                     key_values[key] = descriptor.fields[key].from_json(val)
-            except (TypeError, ValueError) as err:
+            except (TypeError, ValueError, ValidationError) as err:
                 did_validate = False
-                errors.append({'message': text_type(err), 'model': model})
+                errors.append({'key': key, 'message': text_type(err), 'model': model})
+
+        team_setting_errors = cls.validate_team_settings(filtered_dict)
+        if team_setting_errors:
+            errors = errors + team_setting_errors
+            did_validate = False
+
+        proctoring_errors = cls.validate_proctoring_settings(descriptor, filtered_dict, user)
+        if proctoring_errors:
+            errors = errors + proctoring_errors
+            did_validate = False
 
         # If did validate, go ahead and update the metadata
         if did_validate:
@@ -264,3 +278,166 @@ class CourseMetadata(object):
             modulestore().update_item(descriptor, user.id)
 
         return cls.fetch(descriptor)
+
+    @classmethod
+    def validate_team_settings(cls, settings_dict):
+        """
+        Validates team settings
+
+        :param settings_dict: json dict containing all advanced settings
+        :return: a list of error objects
+        """
+        errors = []
+        teams_configuration_model = settings_dict.get('teams_configuration', {})
+        if teams_configuration_model == {}:
+            return errors
+        json_value = teams_configuration_model.get('value')
+        if json_value == '':
+            return errors
+
+        proposed_max_team_size = json_value.get('max_team_size')
+        if proposed_max_team_size != '' and proposed_max_team_size is not None:
+            if proposed_max_team_size <= 0:
+                message = 'max_team_size must be greater than zero'
+                errors.append({'key': 'teams_configuration', 'message': message, 'model': teams_configuration_model})
+            elif proposed_max_team_size > 500:
+                message = 'max_team_size cannot be greater than 500'
+                errors.append({'key': 'teams_configuration', 'message': message, 'model': teams_configuration_model})
+
+        proposed_topics = json_value.get('topics')
+
+        if proposed_topics is None:
+            proposed_teamsets = json_value.get('team_sets')
+            if proposed_teamsets is None:
+                return errors
+            else:
+                proposed_topics = proposed_teamsets
+
+        proposed_topic_ids = [proposed_topic['id'] for proposed_topic in proposed_topics]
+        proposed_topic_dupe_ids = {x for x in proposed_topic_ids if proposed_topic_ids.count(x) > 1}
+        if len(proposed_topic_dupe_ids) > 0:
+            message = 'duplicate ids: ' + ','.join(proposed_topic_dupe_ids)
+            errors.append({'key': 'teams_configuration', 'message': message, 'model': teams_configuration_model})
+
+        for proposed_topic in proposed_topics:
+            topic_validation_errors = cls.validate_single_topic(proposed_topic)
+            if topic_validation_errors:
+                topic_validation_errors['model'] = teams_configuration_model
+                errors.append(topic_validation_errors)
+
+        return errors
+
+    @classmethod
+    def validate_single_topic(cls, topic_settings):
+        """
+        Helper method that validates a single teamset setting.
+        The following conditions result in errors:
+        > unrecognized extra keys
+        > max_team_size <= 0
+        > no name, id or description property
+        > unrecognized teamset type
+        :param topic_settings: the proposed settings being validated
+        :return: an error object if error exists, otherwise None
+        """
+        error_list = []
+        valid_teamset_types = [TeamsetType.open.value, TeamsetType.public_managed.value,
+                               TeamsetType.private_managed.value]
+        valid_keys = {'id', 'name', 'description', 'max_team_size', 'type'}
+        teamset_type = topic_settings.get('type', {})
+        if teamset_type:
+            if teamset_type not in valid_teamset_types:
+                error_list.append('type ' + teamset_type + " is invalid")
+        max_team_size = topic_settings.get('max_team_size', {})
+        if max_team_size:
+            if max_team_size <= 0:
+                error_list.append('max_team_size must be greater than zero')
+            elif max_team_size > 500:
+                error_list.append('max_team_size cannot be greater than 500')
+        teamset_id = topic_settings.get('id', {})
+        if not teamset_id:
+            error_list.append('id attribute must not be empty')
+        teamset_name = topic_settings.get('name', {})
+        if not teamset_name:
+            error_list.append('name attribute must not be empty')
+        teamset_desc = topic_settings.get('description', {})
+        if not teamset_desc:
+            error_list.append('description attribute must not be empty')
+
+        keys = set(topic_settings.keys())
+        key_difference = keys - valid_keys
+        if len(key_difference) > 0:
+            error_list.append('extra keys: ' + ','.join(key_difference))
+
+        if error_list:
+            error = {'key': 'teams_configuration', 'message': ','.join(error_list)}
+            return error
+
+        return None
+
+    @classmethod
+    def validate_proctoring_settings(cls, descriptor, settings_dict, user):
+        """
+        Verify proctoring settings
+
+        Returns a list of error objects
+        """
+        errors = []
+
+        # If the user is not edX staff, the user has requested a change to the proctoring_provider
+        # Advanced Setting, and it is after course start, prevent the user from changing the
+        # proctoring provider.
+        proctoring_provider_model = settings_dict.get('proctoring_provider', {})
+        if (
+            not user.is_staff and
+            cls._has_requested_proctoring_provider_changed(
+                descriptor.proctoring_provider, proctoring_provider_model.get('value')
+            ) and
+            datetime.now(pytz.UTC) > descriptor.start
+        ):
+            message = (
+                'The proctoring provider cannot be modified after a course has started.'
+                ' Contact {support_email} for assistance'
+            ).format(support_email=settings.PARTNER_SUPPORT_EMAIL or 'support')
+            errors.append({'key': 'proctoring_provider', 'message': message, 'model': proctoring_provider_model})
+
+        # Require a valid escalation email if Proctortrack is chosen as the proctoring provider
+        escalation_email_model = settings_dict.get('proctoring_escalation_email')
+        if escalation_email_model:
+            escalation_email = escalation_email_model.get('value')
+        else:
+            escalation_email = descriptor.proctoring_escalation_email
+
+        missing_escalation_email_msg = 'Provider \'{provider}\' requires an exam escalation contact.'
+        if proctoring_provider_model and proctoring_provider_model.get('value') == 'proctortrack':
+            if not escalation_email:
+                message = missing_escalation_email_msg.format(provider=proctoring_provider_model.get('value'))
+                errors.append({
+                    'key': 'proctoring_provider',
+                    'message': message,
+                    'model': proctoring_provider_model
+                })
+
+        if (
+            escalation_email_model and not proctoring_provider_model and
+            descriptor.proctoring_provider == 'proctortrack'
+        ):
+            if not escalation_email:
+                message = missing_escalation_email_msg.format(provider=descriptor.proctoring_provider)
+                errors.append({
+                    'key': 'proctoring_escalation_email',
+                    'message': message,
+                    'model': escalation_email_model
+                })
+
+        return errors
+
+    @staticmethod
+    def _has_requested_proctoring_provider_changed(current_provider, requested_provider):
+        """
+        Return whether the requested proctoring provider is different than the current proctoring provider, indicating
+        that the user has requested a change to the proctoring_provider Advanced Setting.
+        """
+        if requested_provider is None:
+            return False
+        else:
+            return current_provider != requested_provider

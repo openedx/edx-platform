@@ -7,7 +7,7 @@ from django.contrib.auth.models import User as DjangoUser
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from rest_framework import serializers
-from six.moves.urllib.parse import urlencode, urlunparse  # pylint: disable=import-error
+from six.moves.urllib.parse import urlencode, urlunparse
 
 from lms.djangoapps.discussion.django_comment_client.utils import (
     course_discussion_division_enabled,
@@ -34,7 +34,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     Role
 )
 from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
-from student.models import get_user_by_username_or_email
+from common.djangoapps.student.models import get_user_by_username_or_email
 
 
 def get_context(course, request, thread=None):

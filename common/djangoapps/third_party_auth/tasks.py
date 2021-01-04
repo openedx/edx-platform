@@ -12,13 +12,14 @@ import pytz
 import requests
 from celery.task import task
 from django.utils.timezone import now
+from edx_django_utils.monitoring import set_code_owner_attribute
 from lxml import etree
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from requests import exceptions
 from six import text_type
 
 from openedx.core.djangolib.markup import Text
-from third_party_auth.models import SAMLConfiguration, SAMLProviderConfig, SAMLProviderData
+from common.djangoapps.third_party_auth.models import SAMLConfiguration, SAMLProviderConfig, SAMLProviderData
 
 log = logging.getLogger(__name__)
 
@@ -31,6 +32,7 @@ class MetadataParseError(Exception):
 
 
 @task(name='third_party_auth.fetch_saml_metadata')
+@set_code_owner_attribute
 def fetch_saml_metadata():
     """
     Fetch and store/update the metadata of all IdPs

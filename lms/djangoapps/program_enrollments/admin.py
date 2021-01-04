@@ -5,7 +5,11 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
 
-from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
+from lms.djangoapps.program_enrollments.models import (
+    CourseAccessRoleAssignment,
+    ProgramCourseEnrollment,
+    ProgramEnrollment
+)
 
 
 class ProgramEnrollmentAdmin(admin.ModelAdmin):
@@ -67,7 +71,6 @@ def _pce_ce(pce):
         enrollment=enrollment, active_string=active_string
     )
 
-
 _pce_pe_id.short_description = "Program Enrollment"
 _pce_pe_user.short_description = "Pgm Enrollment: User"
 _pce_pe_external_user_key.short_description = "Pgm Enrollment: Ext User Key"
@@ -102,5 +105,45 @@ class ProgramCourseEnrollmentAdmin(admin.ModelAdmin):
     raw_id_fields = ('program_enrollment', 'course_enrollment')
 
 
+def _pending_role_assignment_enrollment_id(pending_role_assignment):
+    """
+    Generate a link to edit enrollment, with ID in link text.
+    """
+    pce = pending_role_assignment.enrollment
+    if not pce:
+        return None
+    link_url = reverse(
+        "admin:program_enrollments_programcourseenrollment_change",
+        args=[pce.id],
+    )
+    link_text = "id={pce.id:05}".format(pce=pce)
+    return format_html("<a href={}>{}</a>", link_url, link_text)
+
+
+def _pending_role_assignment_external_user_key(pending_role_assignment):
+    """
+    Generate the external user key for a pending role assignment
+    """
+    pce = pending_role_assignment.enrollment
+    return _pce_pe_external_user_key(pce)
+
+_pending_role_assignment_enrollment_id.short_description = "Program Course Enrollment"
+_pending_role_assignment_external_user_key.short_description = "Pgm Enrollment: Ext User Key"
+
+
+class CourseAccessRoleAssignmentAdmin(admin.ModelAdmin):
+    """
+    Admin tool for the CourseAccessRoleAssignment model
+    """
+    list_display = (
+        'id',
+        'role',
+        _pending_role_assignment_enrollment_id,
+        _pending_role_assignment_external_user_key
+    )
+    list_filter = ('role',)
+    raw_id_fields = ('enrollment',)
+
 admin.site.register(ProgramEnrollment, ProgramEnrollmentAdmin)
 admin.site.register(ProgramCourseEnrollment, ProgramCourseEnrollmentAdmin)
+admin.site.register(CourseAccessRoleAssignment, CourseAccessRoleAssignmentAdmin)

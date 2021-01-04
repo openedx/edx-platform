@@ -316,7 +316,6 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
 
         .note-comment {
           color: $gray-d2;
-
         }
       }
     }
@@ -478,7 +477,8 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
       }
     }
 
-    p, ul {
+    p,
+    ul {
       margin-bottom: $baseline;
     }
   }

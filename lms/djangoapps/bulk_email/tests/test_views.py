@@ -9,13 +9,13 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 
-from bulk_email.models import Optout
-from bulk_email.views import opt_out_email_updates
+from lms.djangoapps.bulk_email.models import Optout
+from lms.djangoapps.bulk_email.views import opt_out_email_updates
 from six import text_type
 
 from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher
 from openedx.core.lib.tests import attr
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 

@@ -5,6 +5,7 @@ Module for running content split tests
 
 import json
 import logging
+import threading
 from functools import reduce
 from operator import itemgetter
 from uuid import uuid4
@@ -32,31 +33,41 @@ _ = lambda text: text
 DEFAULT_GROUP_NAME = _(u'Group ID {group_id}')
 
 
-class SplitTestFields(object):
-    """Fields needed for split test module"""
-    has_children = True
+class UserPartitionValues(threading.local):
+    """
+    A thread-local storage for available user_partitions
+    """
+    def __init__(self):
+        super().__init__()
+        self.values = []
 
-    # All available user partitions (with value and display name). This is updated each time
-    # editable_metadata_fields is called.
-    user_partition_values = []
-    # Default value used for user_partition_id
-    no_partition_selected = {'display_name': _("Not Selected"), 'value': -1}
-
-    @staticmethod
-    def build_partition_values(all_user_partitions, selected_user_partition):
+    def build_partition_values(self, all_user_partitions, selected_user_partition):
         """
         This helper method builds up the user_partition values that will
         be passed to the Studio editor
         """
-        SplitTestFields.user_partition_values = []
+        self.values = []
         # Add "No selection" value if there is not a valid selected user partition.
         if not selected_user_partition:
-            SplitTestFields.user_partition_values.append(SplitTestFields.no_partition_selected)
+            self.values.append(SplitTestFields.no_partition_selected)
         for user_partition in get_split_user_partitions(all_user_partitions):
-            SplitTestFields.user_partition_values.append(
+            self.values.append(
                 {"display_name": user_partition.name, "value": user_partition.id}
             )
-        return SplitTestFields.user_partition_values
+        return self.values
+
+
+# All available user partitions (with value and display name). This is updated each time
+# editable_metadata_fields is called.
+user_partition_values = UserPartitionValues()
+
+
+class SplitTestFields(object):
+    """Fields needed for split test module"""
+    has_children = True
+
+    # Default value used for user_partition_id
+    no_partition_selected = {'display_name': _("Not Selected"), 'value': -1}
 
     display_name = String(
         display_name=_("Display Name"),
@@ -77,7 +88,7 @@ class SplitTestFields(object):
         scope=Scope.content,
         display_name=_("Group Configuration"),
         default=no_partition_selected["value"],
-        values=lambda: SplitTestFields.user_partition_values  # Will be populated before the Studio editor is shown.
+        values=lambda: user_partition_values.values  # Will be populated before the Studio editor is shown.
     )
 
     # group_id is an int
@@ -329,7 +340,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
             return fragment
 
     @XBlock.handler
-    def log_child_render(self, request, suffix=''):  # pylint: disable=unused-argument
+    def log_child_render(self, request, suffix=''):
         """
         Record in the tracking logs which child was rendered
         """
@@ -382,9 +393,10 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         return self.descriptor.validate()
 
 
-@XBlock.needs('user_tags')  # pylint: disable=abstract-method
+@XBlock.needs('user_tags')
 @XBlock.needs('partitions')
 @XBlock.needs('user')
+# pylint: disable=missing-class-docstring
 class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDescriptor):
     # the editing interface can be the same as for sequences -- just a container
     module_class = SplitTestModule
@@ -477,7 +489,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
     @property
     def editable_metadata_fields(self):
         # Update the list of partitions based on the currently available user_partitions.
-        SplitTestFields.build_partition_values(self.user_partitions, self.get_selected_partition())
+        user_partition_values.build_partition_values(self.user_partitions, self.get_selected_partition())
 
         editable_fields = super(SplitTestDescriptor, self).editable_metadata_fields
 
@@ -648,7 +660,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         return None
 
     @XBlock.handler
-    def add_missing_groups(self, request, suffix=''):  # pylint: disable=unused-argument
+    def add_missing_groups(self, request, suffix=''):
         """
         Create verticals for any missing groups in the split test instance.
 

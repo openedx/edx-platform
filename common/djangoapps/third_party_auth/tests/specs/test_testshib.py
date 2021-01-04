@@ -25,10 +25,10 @@ from enterprise.models import EnterpriseCustomerIdentityProvider, EnterpriseCust
 from openedx.core.djangoapps.user_authn.views.login import login_user
 from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerFactory
-from third_party_auth import pipeline
-from third_party_auth.saml import SapSuccessFactorsIdentityProvider, log as saml_log
-from third_party_auth.tasks import fetch_saml_metadata
-from third_party_auth.tests import testutil, utils
+from common.djangoapps.third_party_auth import pipeline
+from common.djangoapps.third_party_auth.saml import SapSuccessFactorsIdentityProvider, log as saml_log
+from common.djangoapps.third_party_auth.tasks import fetch_saml_metadata
+from common.djangoapps.third_party_auth.tests import testutil, utils
 
 from .base import IntegrationTestMixin
 
@@ -109,6 +109,8 @@ class SamlIntegrationTestUtilities(object):
         kwargs.setdefault('icon_class', 'fa-university')
         kwargs.setdefault('attr_email', 'urn:oid:1.3.6.1.4.1.5923.1.1.1.6')  # eduPersonPrincipalName
         kwargs.setdefault('max_session_length', None)
+        kwargs.setdefault('send_to_registration_first', False)
+        kwargs.setdefault('skip_email_verification', False)
         saml_provider = self.configure_saml_provider(**kwargs)  # pylint: disable=no-member
 
         if fetch_metadata:
@@ -140,7 +142,7 @@ class SamlIntegrationTestUtilities(object):
 
 
 @ddt.ddt
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
+@utils.skip_unless_thirdpartyauth()
 class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin, testutil.SAMLTestCase):
     """
     TestShib provider Integration Test, to test SAML functionality
@@ -308,16 +310,25 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
             # logs - one for the request and one for the response
             self.assertEqual(mock_log.call_count, 4)
 
-            (msg, action_type, idp_name, xml), _kwargs = mock_log.call_args_list[0]
+            expected_next_url = "/dashboard"
+            (msg, action_type, idp_name, request_data, next_url, xml), _kwargs = mock_log.call_args_list[0]
             self.assertTrue(msg.startswith(u"SAML login %s"))
             self.assertEqual(action_type, "request")
             self.assertEqual(idp_name, self.PROVIDER_IDP_SLUG)
+            self.assertDictContainsSubset(
+                {"idp": idp_name, "auth_entry": "login", "next": expected_next_url},
+                request_data
+            )
+            self.assertEqual(next_url, expected_next_url)
             self.assertIn('<samlp:AuthnRequest', xml)
 
-            (msg, action_type, idp_name, xml), _kwargs = mock_log.call_args_list[1]
+            (msg, action_type, idp_name, response_data, next_url, xml), _kwargs = mock_log.call_args_list[1]
             self.assertTrue(msg.startswith(u"SAML login %s"))
             self.assertEqual(action_type, "response")
             self.assertEqual(idp_name, self.PROVIDER_IDP_SLUG)
+            self.assertDictContainsSubset({"RelayState": idp_name}, response_data)
+            self.assertIn('SAMLResponse', response_data)
+            self.assertEqual(next_url, expected_next_url)
             self.assertIn('<saml2p:Response', xml)
         else:
             self.assertFalse(mock_log.called)
@@ -364,7 +375,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
             self._test_return_login(previous_session_timed_out=True)
 
 
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
+@utils.skip_unless_thirdpartyauth()
 class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin, testutil.SAMLTestCase):
     """
     Test basic SAML capability using the TestShib details, and then check that we're able
@@ -454,7 +465,7 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
         Mock an error response when calling the OData API for user details.
         """
 
-        def callback(request, uri, headers):  # pylint: disable=unused-argument
+        def callback(request, uri, headers):
             """
             Return a 500 error when someone tries to call the URL.
             """

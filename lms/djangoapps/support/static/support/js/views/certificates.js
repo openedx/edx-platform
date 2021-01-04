@@ -7,8 +7,9 @@
         'gettext',
         'support/js/collections/certificate',
         'text!support/templates/certificates.underscore',
-        'text!support/templates/certificates_results.underscore'
-    ], function(Backbone, _, gettext, CertCollection, certificatesTpl, resultsTpl) {
+        'text!support/templates/certificates_results.underscore',
+        'edx-ui-toolkit/js/utils/html-utils'
+    ], function(Backbone, _, gettext, CertCollection, certificatesTpl, resultsTpl, HtmlUtils) {
         return Backbone.View.extend({
             events: {
                 'submit .certificates-form': 'search',
@@ -24,7 +25,7 @@
             },
 
             render: function() {
-                this.$el.html(_.template(certificatesTpl));
+                this.$el.html(HtmlUtils.HTML(_.template(certificatesTpl)).toString());
 
                 // If there is an initial filter, then immediately trigger a search.
                 // This is useful because it allows users to share search results:
@@ -44,12 +45,12 @@
                     certificates: this.certificates
                 };
 
-                this.setResults(_.template(resultsTpl)(context));
+                this.setResults(HtmlUtils.template(resultsTpl)(context));
             },
 
             renderError: function(error) {
                 var errorMsg = error || gettext('An unexpected error occurred.  Please try again.');
-                this.setResults(errorMsg);
+                this.setResults(HtmlUtils.Text(errorMsg));
             },
 
             search: function(event) {
@@ -170,7 +171,10 @@
             },
 
             setResults: function(html) {
-                $('.certificates-results', this.$el).html(html);
+                HtmlUtils.setHtml(
+                    $('.certificates-results', this.$el),
+                    html
+                );
             },
 
             disableButtons: function() {

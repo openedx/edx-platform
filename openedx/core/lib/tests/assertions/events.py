@@ -190,15 +190,16 @@ def block_indent(text, spaces=4):
 
 def parse_event_payload(event):
     """
-    Given an event, parse the "event" field as a JSON string.
+    Given an event, parse the 'event' field, if found otherwise 'data' field as a JSON string.
 
     Note that this may simply return the same event unchanged, or return a new copy of the event with the payload
     parsed. It will never modify the event in place.
     """
-    if 'event' in event and isinstance(event['event'], six.string_types):
+    payload_key = 'event' if 'event' in event else 'data'
+    if payload_key in event and isinstance(event[payload_key], six.string_types):
         event = event.copy()
         try:
-            event['event'] = json.loads(event['event'])
+            event[payload_key] = json.loads(event[payload_key])
         except ValueError:
             pass
     return event

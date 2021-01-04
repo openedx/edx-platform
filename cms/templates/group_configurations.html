@@ -5,12 +5,14 @@
 <%def name="experiment_group_configurations_help_token()"><% return "group_configurations" %></%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
-from contentstore import utils
+from cms.djangoapps.contentstore import utils
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.js_utils import (
     dump_js_escaped_json, js_escaped_string
 )
 from openedx.core.djangolib.markup import HTML, Text
+import six
+from six.moves.urllib.parse import quote
 %>
 
 <%block name="title">${_("Group Configurations")}</%block>
@@ -113,6 +115,7 @@ from openedx.core.djangolib.markup import HTML, Text
       <div class="bit">
       % if context_course:
         <%
+          url_encoded_course_id = quote(six.text_type(context_course.id).encode('utf-8'), safe='')
           details_url = utils.reverse_course_url('settings_handler', context_course.id)
           grading_url = utils.reverse_course_url('grading_handler', context_course.id)
           course_team_url = utils.reverse_course_url('course_team_handler', context_course.id)
@@ -125,6 +128,9 @@ from openedx.core.djangolib.markup import HTML, Text
             <li class="nav-item"><a href="${grading_url}">${_("Grading")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
             <li class="nav-item"><a href="${advanced_settings_url}">${_("Advanced Settings")}</a></li>
+            % if course_authoring_microfrontend_url:
+              <li class="nav-item"><a href="${course_authoring_microfrontend_url}/proctored-exam-settings/${url_encoded_course_id}">${_("Proctored Exam Settings")}</a></li>
+            % endif
           </ul>
         </nav>
       % endif

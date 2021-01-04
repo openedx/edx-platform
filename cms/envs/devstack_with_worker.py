@@ -17,10 +17,7 @@ import os
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
-if 'BOK_CHOY_HOSTNAME' in os.environ:
-    from cms.envs.devstack_docker import *
-else:
-    from cms.envs.devstack import *
+from cms.envs.devstack import *
 
 # Require a separate celery worker
 CELERY_ALWAYS_EAGER = False

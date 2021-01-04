@@ -47,6 +47,7 @@ from xmodule.modulestore.exceptions import (
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.search import navigation_index, path_to_location
+from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
 from xmodule.modulestore.tests.factories import check_exact_number_of_calls, check_mongo_calls, mongo_uses_error_check
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
@@ -155,7 +156,6 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
 
         self.user_id = ModuleStoreEnum.UserID.test
 
-    # pylint: disable=invalid-name
     def _create_course(self, course_key, asides=None):
         """
         Create a course w/ one item in the persistence store using the given course & item location.
@@ -249,7 +249,6 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         """
         return self.store.has_changes(self.store.get_item(location))
 
-    # pylint: disable=dangerous-default-value
     def _initialize_mixed(self, mappings=None, contentstore=None):
         """
         initializes the mixed modulestore.
@@ -1797,6 +1796,96 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         reverted_parent = self.store.get_item(self.sequential_x1)
         # It does not discard the child vertical, even though that child is a draft (with no published version)
         self.assertEqual(num_children, len(reverted_parent.children))
+
+    def test_reset_course_to_version(self):
+        """
+        Test calling `DraftVersioningModuleStore.test_reset_course_to_version`.
+        """
+        # Set up test course.
+        self.initdb(ModuleStoreEnum.Type.split)  # Old Mongo does not support this operation.
+        self._create_block_hierarchy()
+        self.store.publish(self.course.location, self.user_id)
+
+        # Get children of a vertical as a set.
+        # We will use this set as a basis for content comparision in this test.
+        original_vertical = self.store.get_item(self.vertical_x1a)
+        original_vertical_children = set(original_vertical.children)
+
+        # Find the version_guid of our course by diving into Split Mongo.
+        split = self._get_split_modulestore()
+        course_index = split.get_course_index(self.course.location.course_key)
+        original_version_guid = course_index["versions"]["published-branch"]
+
+        # Reset course to currently-published version.
+        # This should be a no-op.
+        self.store.reset_course_to_version(
+            self.course.location.course_key,
+            original_version_guid,
+            self.user_id,
+        )
+        noop_reset_vertical = self.store.get_item(self.vertical_x1a)
+        assert set(noop_reset_vertical.children) == original_vertical_children
+
+        # Delete a problem from the vertical and publish.
+        # Vertical should have one less problem than before.
+        self.store.delete_item(self.problem_x1a_1, self.user_id)
+        self.store.publish(self.course.location, self.user_id)
+        modified_vertical = self.store.get_item(self.vertical_x1a)
+        assert set(modified_vertical.children) == (
+            original_vertical_children - {self.problem_x1a_1}
+        )
+
+        # Add a couple more children to the vertical.
+        # and publish a couple more times.
+        # We want to make sure we can restore from something a few versions back.
+        self.store.create_child(
+            self.user_id,
+            self.vertical_x1a,
+            'problem',
+            block_id='new_child1',
+        )
+        self.store.publish(self.course.location, self.user_id)
+        self.store.create_child(
+            self.user_id,
+            self.vertical_x1a,
+            'problem',
+            block_id='new_child2',
+        )
+        self.store.publish(self.course.location, self.user_id)
+
+        # Add another child, but don't publish.
+        # We want to make sure that this works with a dirty draft branch.
+        self.store.create_child(
+            self.user_id,
+            self.vertical_x1a,
+            'problem',
+            block_id='new_child3',
+        )
+
+        # Reset course to original version.
+        # The restored vertical should have the same children as it did originally.
+        self.store.reset_course_to_version(
+            self.course.location.course_key,
+            original_version_guid,
+            self.user_id,
+        )
+        restored_vertical = self.store.get_item(self.vertical_x1a)
+        assert set(restored_vertical.children) == original_vertical_children
+
+    def _get_split_modulestore(self):
+        """
+        Grab the SplitMongo modulestore instance from within the Mixed modulestore.
+
+        Assumption: There is a SplitMongo modulestore within the Mixed modulestore.
+        This assumpion is hacky, but it seems OK because we're removing the
+        Old (non-Split) Mongo modulestores soon.
+
+        Returns: SplitMongoModuleStore
+        """
+        for store in self.store.modulestores:
+            if isinstance(store, SplitMongoModuleStore):
+                return store
+        assert False, "SplitMongoModuleStore was not found in MixedModuleStore"
 
     # Draft: get all items which can be or should have parents
     # Split: active_versions, structure
@@ -3571,7 +3660,7 @@ class TestAsidesWithMixedModuleStore(CommonMixedModuleStoreSetup):
         super(TestAsidesWithMixedModuleStore, self).setUp()
         key_store = DictKeyValueStore()
         field_data = KvsFieldData(key_store)
-        self.runtime = TestRuntime(services={'field-data': field_data})  # pylint: disable=abstract-class-instantiated
+        self.runtime = TestRuntime(services={'field-data': field_data})
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     @XBlockAside.register_temp_plugin(AsideFoo, 'test_aside1')

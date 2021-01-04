@@ -1200,7 +1200,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         )
         DEPRECATE_YOUTUBE_FLAG = waffle_flags()[DEPRECATE_YOUTUBE]
         with patch.object(WaffleFlagCourseOverrideModel, 'override_value', return_value=data['course_override']):
-            with override_flag(DEPRECATE_YOUTUBE_FLAG.namespaced_flag_name, active=data['waffle_enabled']):
+            with override_flag(DEPRECATE_YOUTUBE_FLAG.name, active=data['waffle_enabled']):
                 self.initialize_block(data=video_xml, metadata=metadata)
                 context = self.item_descriptor.render(STUDENT_VIEW).content
                 self.assertIn(u'"prioritizeHls": {}'.format(data['result']), context)
@@ -1326,7 +1326,6 @@ class TestEditorSavedMethod(BaseTestVideoXBlock):
         }
         # path to subs_3_yD_cEKoCk.srt.sjson file
         self.file_name = 'subs_3_yD_cEKoCk.srt.sjson'
-        # pylint: disable=no-value-for-parameter
         self.test_dir = path(__file__).abspath().dirname().dirname().dirname().dirname().dirname()
         self.file_path = self.test_dir + '/common/test/data/uploads/' + self.file_name
 

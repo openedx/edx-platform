@@ -4,17 +4,19 @@ Views to render a learner's achievements.
 
 
 from django.template.loader import render_to_string
+from web_fragments.fragment import Fragment
+
 from lms.djangoapps.certificates import api as certificate_api
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
-from web_fragments.fragment import Fragment
 
 
 class LearnerAchievementsFragmentView(EdxFragmentView):
     """
     A fragment to render a learner's achievements.
     """
+
     def render_to_fragment(self, request, username=None, own_profile=False, **kwargs):
         """
         Renders the current learner's achievements.

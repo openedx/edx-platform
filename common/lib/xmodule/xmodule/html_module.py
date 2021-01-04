@@ -42,14 +42,14 @@ log = logging.getLogger("edx.courseware")
 _ = lambda text: text
 
 
-@edxnotes
 @XBlock.needs("i18n")
-class HtmlBlock(
+class HtmlBlockMixin(
     XmlMixin, EditingMixin,
     XModuleDescriptorToXBlockMixin, XModuleToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin,
 ):
     """
-    The HTML XBlock.
+    The HTML XBlock mixin.
+    This provides the base class for all Html-ish blocks (including the HTML XBlock).
     """
     display_name = String(
         display_name=_("Display Name"),
@@ -116,9 +116,12 @@ class HtmlBlock(
 
     def get_html(self):
         """ Returns html required for rendering the block. """
-        # pylint: disable=no-member
-        if self.data is not None and getattr(self.system, 'anonymous_student_id', None) is not None:
-            return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
+        if self.data:
+            data = self.data
+            if getattr(self.runtime, 'anonymous_student_id', None):
+                data = data.replace("%%USER_ID%%", self.runtime.anonymous_student_id)
+            data = data.replace("%%COURSE_ID%%", str(self.scope_ids.usage_id.context_key))
+            return data
         return self.data
 
     def studio_view(self, _context):
@@ -338,12 +341,12 @@ class HtmlBlock(
         """
         `use_latex_compiler` should not be editable in the Studio settings editor.
         """
-        non_editable_fields = super(HtmlBlock, self).non_editable_metadata_fields
-        non_editable_fields.append(HtmlBlock.use_latex_compiler)
+        non_editable_fields = super(HtmlBlockMixin, self).non_editable_metadata_fields
+        non_editable_fields.append(HtmlBlockMixin.use_latex_compiler)
         return non_editable_fields
 
     def index_dictionary(self):
-        xblock_body = super(HtmlBlock, self).index_dictionary()
+        xblock_body = super(HtmlBlockMixin, self).index_dictionary()
         # Removing script and style
         html_content = re.sub(
             re.compile(
@@ -369,6 +372,14 @@ class HtmlBlock(
         return xblock_body
 
 
+@edxnotes
+class HtmlBlock(HtmlBlockMixin):
+    """
+    This is the actual HTML XBlock.
+    Nothing extra is required; this is just a wrapper to include edxnotes support.
+    """
+
+
 class AboutFields(object):
     display_name = String(
         help=_("The display name for this component."),
@@ -383,7 +394,7 @@ class AboutFields(object):
 
 
 @XBlock.tag("detached")
-class AboutBlock(AboutFields, HtmlBlock):
+class AboutBlock(AboutFields, HtmlBlockMixin):
     """
     These pieces of course content are treated as HtmlBlocks but we need to overload where the templates are located
     in order to be able to create new ones
@@ -418,7 +429,7 @@ class StaticTabFields(object):
 
 
 @XBlock.tag("detached")
-class StaticTabBlock(StaticTabFields, HtmlBlock):
+class StaticTabBlock(StaticTabFields, HtmlBlockMixin):
     """
     These pieces of course content are treated as HtmlBlocks but we need to overload where the templates are located
     in order to be able to create new ones
@@ -443,7 +454,7 @@ class CourseInfoFields(object):
 
 
 @XBlock.tag("detached")
-class CourseInfoBlock(CourseInfoFields, HtmlBlock):
+class CourseInfoBlock(CourseInfoFields, HtmlBlockMixin):
     """
     These pieces of course content are treated as HtmlBlock but we need to overload where the templates are located
     in order to be able to create new ones
@@ -460,11 +471,9 @@ class CourseInfoBlock(CourseInfoFields, HtmlBlock):
 
         # When we switch this to an XBlock, we can merge this with student_view,
         # but for now the XModule mixin requires that this method be defined.
-        # pylint: disable=no-member
-        if self.data != "":
-            if self.system.anonymous_student_id:
-                return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
-            return self.data
+        data = super().get_html()
+        if data != "":
+            return data
         else:
             # This should no longer be called on production now that we are using a separate updates page
             # and using a fragment HTML file - it will be called in tests until those are removed.

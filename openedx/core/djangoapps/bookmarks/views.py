@@ -137,7 +137,7 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
         * "display_name"
         * "path"
 
-        # Example Requests
+        **Example Requests**
 
         GET /api/bookmarks/v1/bookmarks/?course_id={course_id1}&fields=display_name,path
         """
@@ -211,7 +211,7 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
         the usage_id is invalid or a block corresponding to the usage_id
         could not be found.
 
-        # Example Requests
+        **Example Requests**
 
         POST /api/bookmarks/v1/bookmarks/
         Request data: {"usage_id": <usage-id>}
@@ -316,7 +316,7 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
         """
         Get a specific bookmark for a user.
 
-        # Example Requests
+        **Example Requests**
 
         GET /api/bookmarks/v1/bookmarks/{username},{usage_id}?fields=display_name,path
         """

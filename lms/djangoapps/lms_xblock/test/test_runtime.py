@@ -9,14 +9,14 @@ from django.test import TestCase
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import BlockUsageLocator, CourseLocator
-from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
+from six.moves.urllib.parse import urlparse
 from xblock.exceptions import NoSuchServiceError
 from xblock.fields import ScopeIds
 
-from badges.tests.factories import BadgeClassFactory
-from badges.tests.test_models import get_image
+from lms.djangoapps.badges.tests.factories import BadgeClassFactory
+from lms.djangoapps.badges.tests.test_models import get_image
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.django import ModuleI18nService
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

@@ -56,16 +56,24 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-03-08 20:42+0000\n"
-"PO-Revision-Date: 2019-09-29 20:43+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2020-11-15 20:43+0000\n"
+"PO-Revision-Date: 2020-10-04 20:44+0000\n"
+"Last-Translator: Tamta Tchumburidze <tamtatioon@gmail.com>\n"
 "Language-Team: Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/)\n"
 "Language: ka\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
-"Generated-By: Babel 1.3\n"
+"Generated-By: Babel 2.8.0\n"
+
+#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
+#: cms/static/js/views/video_transcripts.js
+#: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
+msgid ""
+"This may be happening because of an error with our server or your internet "
+"connection. Try refreshing the page or making sure you are online."
+msgstr ""
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -76,8 +84,9 @@ msgstr ""
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
 #: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/tabs.js
-#: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
-#: lms/static/js/views/fields.js
+#: cms/static/js/views/utils/xblock_utils.js
+#: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
+#: lms/static/js/ccx/schedule.js lms/static/js/views/fields.js
 msgid "Saving"
 msgstr "შენახვა"
 
@@ -114,6 +123,7 @@ msgstr "წაშლა"
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/signatory-actions.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
+#: common/static/common/templates/discussion/templates.underscore
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
@@ -134,8 +144,10 @@ msgstr "ატვირთვა"
 #: cms/static/js/views/modals/edit_xblock.js
 #: cms/static/js/views/video_transcripts.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: lms/static/js/demographics_collection/Wizard.jsx
 #: lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
+#: common/static/common/templates/discussion/templates.underscore
 #: common/static/common/templates/image-modal.underscore
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Close"
@@ -160,6 +172,7 @@ msgstr "ფაილის არჩევა"
 #: cms/static/js/views/course_info_update.js cms/static/js/views/tabs.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/js/Markdown.Editor.js
+#: common/static/common/templates/discussion/templates.underscore
 #: lms/templates/learner_dashboard/verification_popover.underscore
 msgid "OK"
 msgstr "დიახ"
@@ -249,8 +262,8 @@ msgstr ""
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 #: common/static/common/js/discussion/views/response_comment_view.js
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
 #: lms/static/js/student_account/views/FinishAuthView.js
-#: lms/static/js/verify_student/views/payment_confirmation_step_view.js
 #: lms/static/js/verify_student/views/step_view.js
 #: lms/static/js/views/fields.js
 msgid "Error"
@@ -260,6 +273,18 @@ msgstr "შეცდომა"
 #: common/lib/xmodule/xmodule/js/public/js/library_content_edit.js
 msgid "Updating with latest library content"
 msgstr "ბიბლიოთეკის უახლესი შინაარსით განახლება"
+
+#: common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
+msgid "Loading..."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
+msgid "Selected blocks"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
+msgid "Unable to update settings"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/assets/split_test/public/js/split_test_author_view.js
 #: common/lib/xmodule/xmodule/js/public/js/split_test_author_view.js
@@ -719,12 +744,14 @@ msgstr ""
 msgid "Delete table"
 msgstr ""
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/group-configuration-editor.underscore
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Description"
-msgstr "აღწერა"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -768,6 +795,7 @@ msgstr ""
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Edit"
 msgstr ""
 
@@ -1162,6 +1190,7 @@ msgstr ""
 
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Next"
 msgstr "მომდევნო"
 
@@ -1495,6 +1524,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/signatory-details.underscore
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Title"
 msgstr ""
 
@@ -1553,7 +1583,6 @@ msgid "Vertical space"
 msgstr ""
 
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
-#: openedx/features/course_search/static/course_search/templates/course_search_item.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_item.underscore
 msgid "View"
 msgstr "ნახვა"
@@ -2251,6 +2280,38 @@ msgstr[1] ""
 msgid "Select a section or problem"
 msgstr ""
 
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/Main/Main.jsx
+msgid "Create a report of problem responses"
+msgstr ""
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
+msgid "Your report is being generated..."
+msgstr ""
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
+msgid "Your report has been successfully generated."
+msgstr ""
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
+msgid "View Report"
+msgstr ""
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
+msgid "There was an error generating the report link."
+msgstr ""
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
+msgid "There was an error generating your report."
+msgstr ""
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
+msgid "Unable to get report generation status."
+msgstr ""
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
+msgid "Unable to submit request to generate report."
+msgstr ""
+
 #: lms/djangoapps/support/static/support/js/views/certificates.js
 msgid "An unexpected error occurred.  Please try again."
 msgstr "წარმოიშვა გაუთვალისწინებელი შეცდომა. გთხოვთ, კიდევ სცადოთ."
@@ -2384,7 +2445,15 @@ msgid "Other"
 msgstr "სხვა"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "What can we help you with, {username}?"
+msgid "Course Discussion Forum"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid ""
+"While our support team is happy to assist with the edX platform, the course "
+"staff has the expertise for specific assignment questions, grading or the "
+"proper procedures in each course. Please post all course related questions "
+"within the Discussion Forum where the Course Staff can directly respond."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
@@ -2392,20 +2461,23 @@ msgid "Details"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "The more you tell us, the more quickly and helpfully we can respond!"
+msgid "the more quickly and helpfully we can respond!"
 msgstr ""
 
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr "გაგზავნა"
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Create Support Ticket"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "What can we help you with, {username}?"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
-msgid ""
-"If you are unable to access your account contact us via email using {email}."
+msgid "Need help logging in?"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -2420,6 +2492,18 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid ""
+"Due to the recent increase in interest in online education and edX, we are "
+"currently experiencing an unusually high volume of support requests. We "
+"appreciate your patience as we work to review each request. Please check the"
+" "
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid " as many questions may have already been answered."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -2445,7 +2529,8 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid ""
-"Thank you for submitting a request! We will contact you within 24 hours."
+"Thank you for submitting a request! We appreciate your patience while we "
+"work to review your request."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
@@ -2629,6 +2714,10 @@ msgid "An error occurred. Try again."
 msgstr "დაფიქსირდა შეცდომა. კიდევ სცადეთ."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
+msgid "No assignments for team"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 msgid "Leave this team?"
 msgstr "ტოვებთ ამ გუნდს?"
 
@@ -2645,8 +2734,8 @@ msgid "Confirm"
 msgstr "დადასტურება"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
-msgid "You already belong to another team."
-msgstr "თქვენ უკვე სხვა გუნდს მიეკუთვნებით."
+msgid "You already belong to another team in this team set."
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "This team is full."
@@ -2699,10 +2788,6 @@ msgid "Team Search"
 msgstr "გუნდში ძიება"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Showing results for \"{searchString}\""
-msgstr "„{searchString}“-ის შედეგების ჩვენება"
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Create a New Team"
 msgstr "ახალი გუნდის შექმნა"
 
@@ -2738,6 +2823,10 @@ msgid ""
 msgstr ""
 "შეგიძლიათ ამ გუნდის წევრები წაშალოთ, განსაკუთრებით იმ შემთხვევაში თუ მათ "
 "მონაწილეობა არ მიუღიათ გუნდის საქმიანობაში."
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Showing results for \"{searchString}\""
+msgstr "„{searchString}“-ის შედეგების ჩვენება"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Search teams"
@@ -2802,6 +2891,11 @@ msgstr ""
 "{search_span_start}გუნდების ძებნა{span_end} ამ თემაში. თუ კვლავ ვერ მონახეთ "
 "გუნდი შესაერთებლად, {create_span_start}შექმენით ახალი გუნდი ამ "
 "თემაში{span_end}."
+
+#: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
+msgid ""
+"An error occurred while looking up team membership. Try refreshing the page."
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/topics.js
 msgid "All topics"
@@ -3139,6 +3233,7 @@ msgid "There has been an error processing your survey."
 msgstr "თქვენი კვლევის დამუშავებისას მოხდა შეცდომა."
 
 #: lms/static/js/courseware/credit_progress.js
+#: common/static/common/templates/discussion/templates.underscore
 #: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
 msgid "More"
@@ -3155,6 +3250,7 @@ msgid "HTML preview of post"
 msgstr ""
 
 #: lms/static/js/customwmd.js
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Your question or idea (required)"
 msgstr ""
 
@@ -3207,6 +3303,90 @@ msgstr ""
 msgid ""
 "Unable to determine whether we should give you a refund because of System "
 "Error. Please try again later."
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionBanner.jsx
+msgid "Want to make edX better for everyone?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionBanner.jsx
+msgid "Get started"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Help make edX better for everyone!"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Why does edX collect this information?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid ""
+"An error occurred while attempting to retrieve or save the information "
+"below. Please try again later."
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid ""
+"What was the total combined income, during the last 12 months, of all "
+"members of your family? "
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid ""
+"Have you ever served on active duty in the U.S. Armed Forces, Reserves, or "
+"National Guard?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "What is the highest level of education that you have achieved so far?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid ""
+"What is the highest level of education that any of your parents or guardians"
+" have achieved?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Select employment status"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "What industry do you currently work in?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "What industry do you want to work in?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/MultiselectDropdown.jsx
+msgid "Clear all"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "demographics questionnaire"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "close questionnaire"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "finish later"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "Return to my dashboard"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "Finish later"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "next page"
 msgstr ""
 
 #: lms/static/js/discovery/views/search_form.js
@@ -3335,7 +3515,6 @@ msgstr ""
 "\"%(query_string)s\"-თვის შედეგები ვერ მოიძებნა. გთხოვთ, კიდევ სცადეთ ძებნა."
 
 #: lms/static/js/edxnotes/views/tabs/search_results.js
-#: openedx/features/course_search/static/course_search/templates/course_search_results.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
 msgid "Search Results"
 msgstr "ძიების შედეგები"
@@ -3565,24 +3744,29 @@ msgid "Error while regenerating certificates. Please try again."
 msgstr "სერტიფიკატების რეგენერირების შეცდომა. გთხოვთ, კიდევ სცადეთ."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Loading data..."
 msgstr "მონაცემთა ჩატვირთვა..."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error getting issued certificates list."
 msgstr "გაცემული სერტიფიკატების სიის მიღების შეცდომა."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating proctored exam results. Please try again."
 msgstr ""
 "დაკვირვების ქვეშ გამოცდის შედეგების გენერირების შეცდომა. გთხოვთ კიდევ "
 "სცადოთ."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating survey results. Please try again."
 msgstr "კვლევის შედეგების გენერირების შეცდომა. გთხოვთ კიდევ სცადოთ."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating student profile information. Please try again."
 msgstr ""
 "სტუდენტის პროფილის ინფორმაციის გენერირების შეცდომა. გთხოვთ კიდევ სცადოთ."
@@ -3599,6 +3783,7 @@ msgid "Error getting student list."
 msgstr "სტუდენტთა სიის მიღების შეცდომა."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating list of students who may enroll. Please try again."
 msgstr ""
 "იმ სტუდენტთა სიის გენერირების შეცდომა, რომლებსაც ჩარიცხვა შეუძლიათ. გთხოვთ "
@@ -3609,15 +3794,18 @@ msgid "Error retrieving grading configuration."
 msgstr "შეფასების კონფიგურაციის მოძიების შეცდომა."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating grades. Please try again."
 msgstr "შეფასების გენერირების შეცდომა. გთხოვთ კიდევ სცადოთ."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating problem grade report. Please try again."
 msgstr ""
 "ამოცანის შეფასების ანგარიშის გენერირების შეცდომა. გთხოვთ კიდევ სცადოთ."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating ORA data report. Please try again."
 msgstr "ORA მონაცემთა ანგარიშის გენერირების შეცდომა. გთხოვთ კიდევ სცადოთ."
 
@@ -4624,6 +4812,15 @@ msgstr ""
 "კავშირი."
 
 #: lms/static/js/student_account/views/LoginView.js
+msgid ""
+"In order to sign in, you need to activate your "
+"account.{line_break}{line_break}We just sent an activation link to "
+"{strong_start} {email} {strong_end}. If  you do not receive an email, check "
+"your spam folders or  {anchorStart}contact {platform_name} "
+"Support{anchorEnd}."
+msgstr ""
+
+#: lms/static/js/student_account/views/LoginView.js
 msgid "An unexpected error has occurred."
 msgstr ""
 
@@ -4793,11 +4990,13 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid " Link"
+msgid "{platform_display_name} Link"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Enter your "
+msgid ""
+"Enter your {platform_display_name} username or the URL to your "
+"{platform_display_name} page. Delete the URL to remove the link."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -4974,10 +5173,6 @@ msgstr "დაფიქსირდა შეცდომა. გთხოვთ
 msgid "Could not submit order"
 msgstr "შეკვეთის გაგზავნა ვერ მოხერხდა"
 
-#: lms/static/js/verify_student/views/payment_confirmation_step_view.js
-msgid "Could not retrieve payment information"
-msgstr "გადახდის შესახებ ინფორმაციის მოძიება ვერ მოხერხდა "
-
 #: lms/static/js/verify_student/views/reverify_view.js
 msgid "Take a photo of your ID"
 msgstr "გადაიღეთ თქვენი პირადობის მოწმობის ფოტო"
@@ -5147,9 +5342,19 @@ msgstr "ყველას გახსნა"
 msgid "Collapse All"
 msgstr "ყველას აკეცვა"
 
+#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr ""
+
+#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr ""
+
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
-msgid "{total_results} result"
-msgid_plural "{total_results} results"
+msgid "{total_results} result found for \"{search_term}\""
+msgid_plural "{total_results} results found for \"{search_term}\""
 msgstr[0] ""
 msgstr[1] ""
 
@@ -5235,13 +5440,6 @@ msgstr ""
 msgid "Profile"
 msgstr ""
 
-#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
-#: cms/static/js/views/video_transcripts.js
-msgid ""
-"This may be happening because of an error with our server or your internet "
-"connection. Try refreshing the page or making sure you are online."
-msgstr ""
-
 #: cms/static/cms/js/main.js
 msgid "Studio's having trouble saving your work"
 msgstr ""
@@ -5289,6 +5487,10 @@ msgstr "დიახ, აქტიურ სერტიფიკატზე �
 msgid "certificate"
 msgstr "სერტიფიკატი"
 
+#: cms/static/js/certificates/views/certificate_preview.js
+msgid "Deactivating"
+msgstr ""
+
 #: cms/static/js/certificates/views/certificates_list.js
 msgid "Set up your certificate"
 msgstr "სერტიფიკატის მომზადება"
@@ -5300,8 +5502,8 @@ msgid "You have not created any certificates yet."
 msgstr "ჯერჯერობით სერტიფიკატი არ შეგიქმნიათ."
 
 #: cms/static/js/certificates/views/signatory_editor.js
-msgid "Delete \"<%= signatoryName %>\" from the list of signatories?"
-msgstr "ამოიღეთ <%= signatoryName %>\" ხელმომწერთა სიიდან?"
+msgid "Delete \"<%- signatoryName %>\" from the list of signatories?"
+msgstr ""
 
 #: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/course_info_update.js
@@ -5611,8 +5813,8 @@ msgstr ""
 
 #: cms/static/js/models/uploads.js
 msgid ""
-"Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
-"<%= fileExtensions %> to upload."
+"Only <%- fileTypes %> files can be uploaded. Please select a file ending in "
+"<%- (fileExtensions) %> to upload."
 msgstr ""
 
 #: lms/templates/student_account/hinted_login.underscore
@@ -5737,6 +5939,10 @@ msgstr "ახალი ფაილის ჩატვირთვა"
 msgid "Adding"
 msgstr ""
 
+#: cms/static/js/views/container.js
+msgid "{startTag}{requestToken}{endTag}{selector}"
+msgstr ""
+
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
 msgstr "დარწმუნებული ხართ, რომ განახლების წაშლა გსურთ?"
@@ -5791,7 +5997,7 @@ msgid "{selectedProvider} credentials saved"
 msgstr ""
 
 #: cms/static/js/views/edit_chapter.js
-msgid "Upload a new PDF to “<%= name %>”"
+msgid "Upload a new PDF to “<%- name %>”"
 msgstr ""
 
 #: cms/static/js/views/edit_chapter.js
@@ -6360,18 +6566,14 @@ msgstr ""
 #: cms/static/js/views/utils/create_course_utils.js
 msgid ""
 "The combined length of the organization, course number, and course run "
-"fields cannot be more than <%=limit%> characters."
+"fields cannot be more than <%- limit %> characters."
 msgstr ""
-"ორგანიზაციის, კურსის ნომრისა და კურსის მსვლელობის ველის საერთო სიგრძე ვერ "
-"იქნება <%=limit%> სიმბოლოზე მეტი."
 
 #: cms/static/js/views/utils/create_library_utils.js
 msgid ""
 "The combined length of the organization and library code fields cannot be "
-"more than <%=limit%> characters."
+"more than <%- limit %> characters."
 msgstr ""
-"ორგანიზაციისა და ბიბლიოთეკის კოდის ველის საერთო სიგრძე არ უნდა აღემატებოდეს "
-"<%=limit%> სიმბოლოს."
 
 #: cms/static/js/views/utils/move_xblock_utils.js
 msgid "Success! \"{displayName}\" has been moved."
@@ -6709,14 +6911,9 @@ msgstr "მოქმედებები"
 msgid "Unscheduled"
 msgstr "გაშვების თარიღი მითითებული არაა"
 
-#: cms/templates/js/course_info_update.underscore
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Date"
-msgstr "თარიღი"
-
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Previous"
 msgstr "წინა"
 
@@ -6763,6 +6960,310 @@ msgstr "საძიებო ველის გაწმენდა"
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 msgid "Search"
 msgstr "ძიება"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Add a Response"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "This thread is closed."
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Add a response:"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
+msgstr "გაგზავნა"
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "discussion posted %(time_ago)s by %(author)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "question posted %(time_ago)s by %(author)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Pinned"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Reported"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Closed"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "Related to: %(courseware_title_linked)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "This post is visible only to %(group_name)s."
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "This post is visible to everyone."
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Editing post"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid ""
+"Add a clear and descriptive title to encourage participation. (Required)"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Edit your post below."
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Update post"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "Show Comment (%(num_comments)s)"
+msgid_plural "Show Comments (%(num_comments)s)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Add a comment"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "marked as answer %(time_ago)s by %(user)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "marked as answer %(time_ago)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "endorsed %(time_ago)s by %(user)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "endorsed %(time_ago)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Editing response"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Update response"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "posted %(time_ago)s by %(author)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Editing comment"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Update comment"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "discussion"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "answered question"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "unanswered question"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Following"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Community TA"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "{unread_comments_count} new"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid ""
+"%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
+"unread comments)%(span_close)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Add a Post"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Visible to"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid ""
+"Discussion admins, moderators, and TAs can make their posts visible to all "
+"students or specify a single group."
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "All Groups"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "follow this post"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "post anonymously"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "post anonymously to classmates"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Error posting your message."
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "This post will be visible only to %(group_name)s."
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "This post will be visible to everyone."
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Topic area"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Add your post to a relevant topic to help others find it. (Required)"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "(Community TA)"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "(Staff)"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
+msgid "All Posts"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Return to all posts"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "View discussion"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Load more"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Post type"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid ""
+"Questions raise issues that need answers. Discussions share ideas and start "
+"conversations. (Required)"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Question"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Discussion"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Endorse"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Unendorse"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Mark as Answer"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Unmark as Answer"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Follow"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Unfollow"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Vote for this post,"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Report abuse"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Report"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Unreport"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Pin"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Unpin"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Open"
+msgstr ""
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Discussion Home"
@@ -6822,10 +7323,6 @@ msgstr ""
 "მონიშნეთ ეს ველი, რომ დღეში ერთხელ მიიღოთ ელფოსტის მიმოხილვა, რომლითაც თქვენ"
 " მიერ მიდევნებულ თემებში ახალ კომენტარებსა და წაუკითხავ შეტყობინებებს "
 "გაეცნობით."
-
-#: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
-msgid "All Posts"
-msgstr ""
 
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 msgid "username or email"
@@ -7068,6 +7565,10 @@ msgid "Join Team"
 msgstr "გუნდში გაწევრიანება"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+msgid "Team Assignments"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid "Team Details"
 msgstr "გუნდის დეტალები"
 
@@ -7153,108 +7654,21 @@ msgstr "ამოიღეთ ქვეგანყოფილება %(subse
 msgid "Remove unit %(unitName)s"
 msgstr "წაშალეთ  მოდული %(unitName)s"
 
-#: lms/templates/commerce/provider.underscore
-#, python-format
-msgid ""
-"You still need to visit the %(display_name)s website to complete the credit "
-"process."
-msgstr ""
-"კრედიტების ასაღებად, თქვენ მაინც გჭირდებათ %(display_name)s ვებ-საიტის "
-"მონახულება."
-
-#: lms/templates/commerce/provider.underscore
-#, python-format
-msgid ""
-"To finalize course credit, %(display_name)s requires %(platform_name)s "
-"learners to submit a credit request."
-msgstr ""
-"კურსის კრედიტების მოსაპოვებლად, %(display_name)s ითხოვს, რომ "
-"%(platform_name)s მსმენელებმა კრედიტის მოთხოვნა გაგზავნონ."
-
-#: lms/templates/commerce/provider.underscore
-msgid "Get Credit"
-msgstr "კრედიტის მიღება"
-
-#: lms/templates/commerce/receipt.underscore
-#, python-format
-msgid ""
-"Thank you %(full_name)s! We have received your payment for %(course_name)s."
-msgstr ""
-"მადლობა %(full_name)s! ჩვენ მივიღეთ თქვენი გადახდა კურსისთვის "
-"„%(course_name)s“."
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"Please print this page for your records; it serves as your receipt. You will"
-" also receive an email with the same information."
-msgstr ""
-"გთხოვთ ამობეჭდოთ თქვენი ჩანაწერების ეს გვერდი. ის ასრულებს ქვითრის ფუნქციას."
-" თქვენ ასევე მიიღებთ ელფოსტის შეტყობინებას იგივე ინფორმაციით."
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Order No."
-msgstr "შეკვეთის ნომერი"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Amount"
-msgstr "რაოდენობა"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Total"
-msgstr "სულ"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Please Note"
-msgstr "გთხოვთ, გაითვალისწინოთ"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Crossed out items have been refunded."
-msgstr "გადახაზულ ერთეულებში გადახდილი თანხა დაბრუნებულია."
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Billed to"
-msgstr "გადაერიცხა"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "No receipt available"
-msgstr "ქვითარი ხელმისაწვდომი არ არის"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
-msgid "Go to Dashboard"
-msgstr "სამუშაო დაფაზე დაბრუნება"
-
-#: lms/templates/commerce/receipt.underscore
-msgid ""
-"If you don't verify your identity now, you can still explore your course "
-"from your dashboard. You will receive periodic reminders from {platformName}"
-" to verify your identity."
-msgstr ""
-"თუ თქვენ არ დაადასტურებთ თქვენს ვინაობას, მაინც შეძლებთ კურსის მოძიებას "
-"სამუშაო დაფაზე. პერიოდულად თქვენ მიიღებთ შეხსენებას, რომ {platformName} "
-"ითხოვს პიროვნების იდენტიფიკაციას."
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Want to confirm your identity later?"
-msgstr "გსურთ, თქვენი პიროვნება მოგვიანებით დაადასტუროთ?"
-
-#: lms/templates/commerce/receipt.underscore
-msgid "Verify Now"
-msgstr "დადასტურება"
-
 #: lms/templates/courseware/proctored-exam-controls.underscore
 msgid "Mark Exam As Completed"
 msgstr "ყველა გამოცდის დასრულებულად მონიშვნა"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Exam timer and end exam button"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "End My Exam"
+msgstr "ჩემი გამოცდის დასრულება"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Hide Timer"
+msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "You are taking \"{exam_link}\" as {exam_type}. "
@@ -7275,26 +7689,6 @@ msgid ""
 msgstr ""
 "ამოცანებში კრდიტების მისაღებად, უნდა აირჩიოთ „გაგზავნა“ ყოველი საკითხისთვის,"
 " ვიდრე „ჩემი გამოცდის დასრულებას“ აირჩევთ."
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show More"
-msgstr ""
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show Less"
-msgstr ""
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Exam timer and end exam button"
-msgstr ""
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "End My Exam"
-msgstr "ჩემი გამოცდის დასრულება"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Hide Timer"
-msgstr ""
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
@@ -7389,10 +7783,8 @@ msgstr "თქვენ შესახებ"
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
 "The following information is already a part of your {platform} profile. "
-"We\\'ve included it here for your application."
+"We've included it here for your application."
 msgstr ""
-"შემდეგი ინფორმაცია უკვე არის თქვენი {platform} პროფილის ნაწილი. ჩვენ უკვე "
-"შევიტანეთ ის თქვენს აპლიკაციაში."
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Email address"
@@ -7421,6 +7813,10 @@ msgid ""
 msgstr ""
 "გმადლობთ, რომ გაგზავნეთ ფინანსური დახმარების აპლიკაცია {course_name} "
 "კურსისთვის! პასუხს 2-4 სამუშაო დღის განმავლობაში მიიღებთ."
+
+#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
+msgid "Go to Dashboard"
+msgstr "სამუშაო დაფაზე დაბრუნება"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Bulk Exceptions"
@@ -7782,14 +8178,6 @@ msgid "You can change sessions until {expiration_date}."
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "Final Grade"
-msgstr ""
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "for {courseName}"
-msgstr ""
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "View Archived Course"
 msgstr "დაარქივებული კურსის ნახვა"
 
@@ -8006,7 +8394,27 @@ msgid "An error occurred. Please reload the page."
 msgstr "დაფიქსირდა შეცდომა. გთხოვთ გადატვირთოთ გვერდი."
 
 #: lms/templates/student_account/form_field.underscore
-msgid "Need help logging in?"
+msgid "Need help signing in?"
+msgstr ""
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Forgot my password"
+msgstr ""
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Other sign-in issues"
+msgstr ""
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Sign in with your company or school"
+msgstr ""
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Need other help signing in?"
+msgstr ""
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Create an account"
 msgstr ""
 
 #: lms/templates/student_account/hinted_login.underscore
@@ -8216,17 +8624,13 @@ msgid "What You Need for Verification"
 msgstr "რა არის საჭირო დადასტურებისთვის"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/make_payment_step.underscore
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Webcam"
-msgstr "ვერბკამერა"
+msgid "Device with Camera"
+msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"You need a computer or cell phone that has a webcam. When you receive a "
-"browser prompt, make sure that you allow access to the camera."
+"You need a device that has a webcam. If you receive a browser prompt for "
+"access to your camera, please make sure to click 'Allow'."
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8234,12 +8638,8 @@ msgid "Photo Identification"
 msgstr "ფოტოს იდენტიფიცირება"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-msgid ""
-"You need a driver's license, passport, or other government-issued ID that "
-"has your name and photo."
+msgid "You need a valid ID that contains your full name and photo."
 msgstr ""
-"დაგჭირდებათ მართვის მოწმობა, პასპორტი, ან სახელმწიფოს მიერ გაცემული "
-"პირადობის მოწმობა, რომელშიც მითითებული იქნება თქვენი სახელი და ფოტო."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -8265,13 +8665,9 @@ msgid "Your entire face fits inside the frame."
 msgstr "თქვენი სახე ჩარჩოში სრულად ჩანს."
 
 #: lms/templates/verify_student/face_photo_step.underscore
-msgid "The photo of your face matches the photo on your ID."
-msgstr "თქვენი ფოტო ემთხვევა პირადობის მოწმობის ფოტოს."
-
-#: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"To use the current photo, select the Take Photo button {icon}. To take "
-"another photo, select the Retake Photo button {icon}."
+"To take the photo of your face, click on the camera button {icon}. If you "
+"need to try again, click 'Retake Photo'."
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8288,17 +8684,10 @@ msgid "Why does %(platformName)s need my photo?"
 msgstr "რისთვის სჭირდება %(platformName)s-ს ჩემი ფოტო?"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
 msgid ""
-"As part of the verification process, you take a photo of both your face and "
-"a government-issued photo ID. Our authorization service confirms your "
-"identity by comparing the photo you take with the photo on your ID."
+"We use your verification photos to confirm your identity and ensure the "
+"validity of your certificate."
 msgstr ""
-"როგორც პიროვნების დადასტურების პროცესის ნაწილი, თქვენ იღებთ როგორც საკუთარ "
-"პორტრეტს, ასევე სახელმწიფო უწყებების გაცემულ ფოტოსურათიან დოკუმენტს. ჩვენი "
-"ავტორიზაციის სერვისი პიროვნების დადასტურებას გადაღებული ფოტოსა და პირადობის "
-"დამადასტურებელი მოწმობის ფოტოს შედარებით ახდენს."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8309,18 +8698,12 @@ msgstr "რას უკეთებს %(platformName)s ამ ფოტოე�
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
 #, python-format
 msgid ""
-"We use the highest levels of security available to encrypt your photo and "
-"send it to our authorization service for review. Your photo and information "
-"are not saved or visible anywhere on %(platformName)s after the verification"
-" process is complete."
+"We securely encrypt your photo and send it to our authorization service for "
+"review. Your photo and information are not saved or visible anywhere on "
+"%(platformName)s after the verification process is complete."
 msgstr ""
-"ჩვენ ვიყენებთ უსაფრთხოების უმაღლეს დონეს, რომელიც დაშიფრავს თქვენს ფოტოს და "
-"ჩვენ ავტორიზაციის სერვისში განსახილველად გადაგზავნის. თქვენი ფოტო და "
-"ინფორმაცია არ შეინახება და დადასტურების პროცედურის დასრულების შემდეგ "
-"%(platformName)s-ზე არსად გამოჩნდება."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8369,7 +8752,6 @@ msgstr ""
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
 msgid "Next: %(nextStepTitle)s"
 msgstr "შემდეგ: %(nextStepTitle)s"
@@ -8379,21 +8761,14 @@ msgid "Take a Photo of Your ID"
 msgstr "გადაუღეთ ფოტო თქვენს პირადობის მოწმობას"
 
 #: lms/templates/verify_student/id_photo_step.underscore
-msgid ""
-"Use your webcam to take a photo of your ID. We will match this photo with "
-"the photo of your face and the name on your account."
+msgid "Use your webcam to take a photo of your ID."
 msgstr ""
-"პირადობის მოწმობის ფოტოს გადასაღებად გამოიყენეთ თქვენი ვებკამერა. ჩვენ მას "
-"თქვენს სახელსა და თქვენს ანგარიშში მითითებულ სახელს შევადარებთ."
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
-"You need an ID with your name and photo. A driver's license, passport, or "
-"other government-issued IDs are all acceptable."
+"You need an ID with your name and photo. A driver's license, passport, or ID"
+" are all acceptable."
 msgstr ""
-"თქვენ დაგჭირდებათ პირადობის მოწმობა, რომელშიც მითითებულია თქვენი სახელი და "
-"ფოტო. მისაღებია სახელმწიფო უწყებების გაცემული ნებისმიერი საბუთი. მათ შორის "
-"მართვის მოწმობა, პასპორტი და სხვა."
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -8417,6 +8792,13 @@ msgstr ""
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Use the Retake Photo button if you are not pleased with your photo"
+msgstr ""
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid ""
+"As part of the verification process, you take a photo of both your face and "
+"a photo ID. Our authorization service confirms your identity by comparing "
+"the photo you take with the photo on your ID."
 msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8469,6 +8851,30 @@ msgstr ""
 "შეიძლება შევადაროთ თქვენი გადაღებული ფოტო თქვენ პირადობის მოწმობაზე არსებულ "
 "ფოტოს?"
 
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"As part of the verification process, you take a photo of both your face and "
+"a government-issued photo ID. Our authorization service confirms your "
+"identity by comparing the photo you take with the photo on your ID."
+msgstr ""
+"როგორც პიროვნების დადასტურების პროცესის ნაწილი, თქვენ იღებთ როგორც საკუთარ "
+"პორტრეტს, ასევე სახელმწიფო უწყებების გაცემულ ფოტოსურათიან დოკუმენტს. ჩვენი "
+"ავტორიზაციის სერვისი პიროვნების დადასტურებას გადაღებული ფოტოსა და პირადობის "
+"დამადასტურებელი მოწმობის ფოტოს შედარებით ახდენს."
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+#, python-format
+msgid ""
+"We use the highest levels of security available to encrypt your photo and "
+"send it to our authorization service for review. Your photo and information "
+"are not saved or visible anywhere on %(platformName)s after the verification"
+" process is complete."
+msgstr ""
+"ჩვენ ვიყენებთ უსაფრთხოების უმაღლეს დონეს, რომელიც დაშიფრავს თქვენს ფოტოს და "
+"ჩვენ ავტორიზაციის სერვისში განსახილველად გადაგზავნის. თქვენი ფოტო და "
+"ინფორმაცია არ შეინახება და დადასტურების პროცედურის დასრულების შემდეგ "
+"%(platformName)s-ზე არსად გამოჩნდება."
+
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: {courseName}"
 msgstr ""
@@ -8486,13 +8892,11 @@ msgstr ""
 "დაუბრუნდეთ და გადატვირთოთ ეს გვერდი."
 
 #: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Activate Your Account"
 msgstr "გაააქტიურეთ თქვენი ანგარიში"
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Photo ID"
 msgstr "ფოტო  ID"
 
@@ -8503,6 +8907,12 @@ msgid ""
 msgstr ""
 "მართვის მოწმობა, პასპორტი, ან სახელმწიფოს გაცემული პირადობის დამადასტურებელი"
 " საბუთი თქვენი სახელითა და ფოტოსურათით"
+
+#: lms/templates/verify_student/intro_step.underscore
+#: lms/templates/verify_student/make_payment_step.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid "Webcam"
+msgstr "ვერბკამერა"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
@@ -8609,6 +9019,10 @@ msgid "Check your email for an activation message."
 msgstr "აქტივაციის შეტყობინების სანახავად გადაამოწმეთ თქვენი ელფოსტა."
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid "Total"
+msgstr "სულ"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Professional Certificate for {courseName}"
 msgstr "„{courseName}“ კურსის პროფესიული სერთიფიკატი"
 
@@ -8649,45 +9063,6 @@ msgstr ""
 "ფოტოიანი პირადობის მოწმობისა და საკუთარი ფოტო პორტრეტის გადასაღებად, თქვენ "
 "უნდა გამოიყენოთ ვებკამერა."
 
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Thank you! We have received your payment for {courseName}."
-msgstr "გმადლობთ! ჩვენ მივიღეთ თქვენი გადახდა კურსისთვის: {courseName}."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Next Step: Confirm your identity"
-msgstr "შემდეგი საფეხური: თქვენი პიროვნების დადასტურება"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Check your email"
-msgstr "შეამოწმეთ თქვენი ელფოსტა"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"You need to activate your account before you can enroll in courses. Check "
-"your inbox for an activation email."
-msgstr ""
-"კურსებზე ჩარიცხვამდე თქვენი ანგარიში უნდა გაააქტიუროთ. შეამოწმეთ ელფოსტა "
-"აქტივაციის შეტყობინებაზე."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"A driver's license, passport, or government-issued ID with your name and "
-"photo."
-msgstr ""
-"მართვის მოწმობა, პასპორტი, ან სახელმწიფო ორგანოების მიერ გაცემული პირადობის "
-"დამადასტურებელი საბუთი, რომლეზეც მითითებულია თქვენი სახელი და ფოტო."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-#, python-format
-msgid ""
-"If you don't verify your identity now, you can still explore your course "
-"from your dashboard. You will receive periodic reminders from "
-"%(platformName)s to verify your identity."
-msgstr ""
-"თუ თქვენ არ დაადასტურებთ თქვენს ვინაობას, მაინც შეძლებთ კურსის მოძიებას "
-"სამუშაო დაფაზე. პერიოდულად თქვენ მიიღებთ შეხსენებას, რომ %(platformName)s "
-"ითხოვს პიროვნების იდენტიფიკაციას."
-
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Identity Verification In Progress"
 msgstr "მიმდინარეობს ვინაობის გადამოწმება"
@@ -8696,13 +9071,9 @@ msgstr "მიმდინარეობს ვინაობის გად�
 msgid ""
 "We have received your information and are verifying your identity. You will "
 "see a message on your dashboard when the verification process is complete "
-"(usually within 1-2 days). In the meantime, you can still access all "
+"(usually within 5-7 days). In the meantime, you can still access all "
 "available course content."
 msgstr ""
-"ჩვენ მივიღეთ თქვენი ინფორმაცია და ვახდენთ თქვენი ვინაობის დადასტურებას. "
-"გადამოწმების პროცესის დასრულების შემდეგ, სამართავ დაფაზე შეტყობინება "
-"გამოჩნდება (ჩეულებრივ 1-2 დღეში). მანამდე კი, თქვენ კვლავ გექნებათ წვდომა "
-"კურსის ყველა მასალაზე."
 
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Return to Your Dashboard"
@@ -8737,10 +9108,6 @@ msgstr "ფოტოს მოხოვნები:"
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Does the photo of you show your whole face?"
 msgstr "ჩანს თუ არა ფოტოზე თქვენი სახე სრულად?"
-
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Does the photo of you match your ID photo?"
-msgstr "ემთხვევა თუ არა თქვენი ფოტო თქვენი ID-ის ფოტოს."
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Is your name on your ID readable?"
@@ -9596,6 +9963,10 @@ msgstr ""
 "არასწორი კოდი შიგთავსში. გთხოვთ, დარწმუნდეთ რომ ეს მართებული HTML კოდია."
 
 #: cms/templates/js/course_info_update.underscore
+msgid "Date"
+msgstr ""
+
+#: cms/templates/js/course_info_update.underscore
 msgid "Post"
 msgstr "პოსტი"
 
@@ -10216,6 +10587,21 @@ msgid "Exam Types"
 msgstr "გამოცდის ტიპები"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"This subsection was released to learners as a special exam, but was reverted"
+" back to a basic exam. You may not configure it as a special exam now. "
+"Contact edX Support for assistance."
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"This special exam has been released to learners. You may not convert it to "
+"another type of special exam. You may revert this subsection back to being a"
+" basic exam by selecting 'None', but you will NOT be able to configure it as"
+" a special exam in the future."
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Timed"
 msgstr "დროითი"
 
@@ -10402,11 +10788,11 @@ msgid "Read more"
 msgstr ""
 
 #: cms/templates/js/video-transcripts.underscore
-msgid "Show transcripts ({totalTranscripts})"
+msgid "No transcript uploaded."
 msgstr ""
 
 #: cms/templates/js/video-transcripts.underscore
-msgid "No transcript uploaded."
+msgid "Show transcripts ({totalTranscripts})"
 msgstr ""
 
 #: cms/templates/js/xblock-access-editor.underscore

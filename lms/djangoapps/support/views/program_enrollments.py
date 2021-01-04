@@ -12,13 +12,24 @@ from django.utils.decorators import method_decorator
 from django.views.generic import View
 from social_django.models import UserSocialAuth
 
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.program_enrollments.api import (
     fetch_program_enrollments_by_student,
+    get_users_by_external_keys_and_org_key,
     link_program_enrollments
 )
+from lms.djangoapps.program_enrollments.exceptions import (
+    BadOrganizationShortNameException,
+    ProviderConfigurationException,
+    ProviderDoesNotExistException
+)
 from lms.djangoapps.support.decorators import require_support_permission
-from third_party_auth.models import SAMLProviderConfig
+from lms.djangoapps.support.serializers import (
+    ProgramEnrollmentSerializer,
+    serialize_user_info
+)
+from lms.djangoapps.verify_student.services import IDVerificationService
+from common.djangoapps.third_party_auth.models import SAMLProviderConfig
 
 TEMPLATE_PATH = 'support/link_program_enrollments.html'
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
@@ -123,76 +134,123 @@ class ProgramEnrollmentsInspectorView(View):
         Search the data store for information about ProgramEnrollment and
         SSO linkage with the user.
         """
-        errors = []
+        search_error = ''
         edx_username_or_email = request.GET.get('edx_user', '').strip()
-        org_key = request.GET.get('IdPSelect', '').strip()
+        org_key = request.GET.get('org_key', '').strip()
         external_user_key = request.GET.get('external_user_key', '').strip()
         learner_program_enrollments = {}
+        saml_providers_with_org_key = self._get_org_keys_and_idps()
+        selected_provider = None
+        if org_key:
+            selected_provider = saml_providers_with_org_key.get(org_key)
         if edx_username_or_email:
-            learner_program_enrollments, error = self._get_account_info(edx_username_or_email)
-            if error:
-                errors.append(error)
+            learner_program_enrollments, search_error = self._get_account_info(
+                edx_username_or_email,
+                selected_provider,
+            )
         elif org_key and external_user_key:
-            learner_program_enrollments = {}
-        elif not external_user_key and org_key:
-            errors.append(
-                'You must provide either the edX username or email, or the '
-                'Learner Account Provider and External Key pair to do search!'
+            learner_program_enrollments = self._get_external_user_info(
+                external_user_key,
+                org_key,
+                selected_provider,
+            )
+            if not learner_program_enrollments:
+                search_error = 'No user found for external key {} for institution {}'.format(
+                    external_user_key, org_key
+                )
+        elif not org_key and not external_user_key:
+            # This is initial rendering state.
+            pass
+        else:
+            search_error = (
+                "To perform a search, you must provide either the student's "
+                "(a) edX username, "
+                "(b) email address associated with their edX account, or "
+                "(c) Identity-providing institution and external key!"
             )
 
         return render_to_response(
             self.CONSOLE_TEMPLATE_PATH,
             {
-                'successes': [],
-                'errors': errors,
+                'error': search_error,
                 'learner_program_enrollments': learner_program_enrollments,
-                'org_keys': self._get_org_keys_with_idp(),
+                'org_keys': sorted(saml_providers_with_org_key.keys()),
             }
         )
 
-    def _get_org_keys_with_idp(self):
+    def _get_org_keys_and_idps(self):
         """
-        From our Third_party_auth models, return a list
-        of organizations whose SAMLProviders are active and configured
+        From our Third_party_auth models, return a dictionary of
+        of organizations keys and their correspondingactive and configured SAMLProviders
         """
         saml_providers = SAMLProviderConfig.objects.current_set().filter(
             enabled=True,
             organization__isnull=False
         ).select_related('organization')
 
-        return [saml_provider.organization.short_name for saml_provider in saml_providers]
+        return {
+            saml_provider.organization.short_name: saml_provider for saml_provider in saml_providers
+        }
 
-    def _get_account_info(self, username_or_email):
+    def _get_account_info(self, username_or_email, idp_provider=None):
         """
-        Provided the edx account username or email, return edx account info
-        and program_enrollments_info. If we cannot identify the user, return
-        empty object and error.
+        Provided the edx account username or email, and the SAML provider selected,
+        return edx account info and program_enrollments_info.
+        If we cannot identify the user, return empty object and error.
         """
-        user_info = {}
-        external_key = None
         try:
             user = User.objects.get(Q(username=username_or_email) | Q(email=username_or_email))
-            user_info['username'] = user.username
-            user_info['email'] = user.email
-            try:
-                user_social_auth = UserSocialAuth.objects.get(user=user)
-                _, external_key = user_social_auth.uid.split(':', 1)
-                user_info['external_user_key'] = external_key
-                user_info['SSO'] = {
-                    'uid': user_social_auth.uid,
-                    'provider': user_social_auth.provider
-                }
-            except UserSocialAuth.DoesNotExist:
-                pass
-
+            user_social_auths = None
+            user_social_auths = UserSocialAuth.objects.filter(user=user)
+            if idp_provider:
+                user_social_auths = user_social_auths.filter(provider=idp_provider.backend_name)
+            user_info = serialize_user_info(user, user_social_auths)
             enrollments = self._get_enrollments(user=user)
             result = {'user': user_info}
             if enrollments:
                 result['enrollments'] = enrollments
 
+            result['id_verification'] = IDVerificationService.user_status(user)
             return result, ''
         except User.DoesNotExist:
             return {}, 'Could not find edx account with {}'.format(username_or_email)
+
+    def _get_external_user_info(self, external_user_key, org_key, idp_provider=None):
+        """
+        Provided the external_user_key and org_key, return edx account info
+        and program_enrollments_info if any. If we cannot identify the data,
+        return empty object.
+        """
+        found_user = None
+        result = {}
+        try:
+            users_by_key = get_users_by_external_keys_and_org_key(
+                [external_user_key],
+                org_key
+            )
+            found_user = users_by_key.get(external_user_key)
+        except (
+            BadOrganizationShortNameException,
+            ProviderConfigurationException,
+            ProviderDoesNotExistException
+        ):
+            # We cannot identify edX user from external_user_key and org_key pair
+            pass
+
+        enrollments = self._get_enrollments(external_user_key=external_user_key)
+        if enrollments:
+            result['enrollments'] = enrollments
+        if found_user:
+            user_social_auths = UserSocialAuth.objects.filter(user=found_user)
+            if idp_provider:
+                user_social_auths = user_social_auths.filter(provider=idp_provider.backend_name)
+            user_info = serialize_user_info(found_user, user_social_auths)
+            result['user'] = user_info
+            result['id_verification'] = IDVerificationService.user_status(found_user)
+        elif 'enrollments' in result:
+            result['user'] = {'external_user_key': external_user_key}
+
+        return result
 
     def _get_enrollments(self, user=None, external_user_key=None):
         """
@@ -204,55 +262,5 @@ class ProgramEnrollmentsInspectorView(View):
             user=user,
             external_user_key=external_user_key
         ).prefetch_related('program_course_enrollments')
-
-        enrollments_by_program_uuid = {}
-        for program_enrollment in program_enrollments:
-            serialized_program_enrollment = self._serialize_program_enrollment(program_enrollment)
-            enrollment_item = {
-                'program_enrollment': serialized_program_enrollment
-            }
-            program_course_enrollments = program_enrollment.program_course_enrollments.all()
-            for program_course_enrollment in program_course_enrollments.select_related(
-                'course_enrollment'
-            ):
-                serialized_program_course_enrollment = self._serialize_program_course_enrollment(
-                    program_course_enrollment
-                )
-                enrollment_item.setdefault('program_course_enrollments', []).append(
-                    serialized_program_course_enrollment
-                )
-            enrollments_by_program_uuid[program_enrollment.program_uuid] = enrollment_item
-
-        return list(enrollments_by_program_uuid.values())
-
-    def _serialize_program_enrollment(self, program_enrollment):
-        if not program_enrollment:
-            return {}
-
-        return {
-            'created': program_enrollment.created.strftime(DATETIME_FORMAT),
-            'modified': program_enrollment.modified.strftime(DATETIME_FORMAT),
-            'program_uuid': str(program_enrollment.program_uuid),
-            'external_user_key': program_enrollment.external_user_key,
-            'status': program_enrollment.status
-        }
-
-    def _serialize_program_course_enrollment(self, program_course_enrollment):
-        """
-        Return a dictionary of ProgramCourseEnrollment serialized
-        """
-        if not program_course_enrollment:
-            return {}
-
-        course_enrollment = program_course_enrollment.course_enrollment
-        return {
-            'created': program_course_enrollment.created.strftime(DATETIME_FORMAT),
-            'modified': program_course_enrollment.modified.strftime(DATETIME_FORMAT),
-            'course_enrollment': {
-                'course_id': str(course_enrollment.course_id),
-                'is_active': course_enrollment.is_active,
-                'mode': course_enrollment.mode,
-            },
-            'status': program_course_enrollment.status,
-            'course_key': str(program_course_enrollment.course_key),
-        }
+        serialized = ProgramEnrollmentSerializer(program_enrollments, many=True)
+        return serialized.data

@@ -4,6 +4,7 @@
 import datetime
 import json
 import uuid
+from collections import namedtuple
 from copy import deepcopy
 
 import ddt
@@ -19,13 +20,14 @@ from pytz import utc
 from testfixtures import LogCapture
 from waffle.testutils import override_switch
 
-from course_modes.models import CourseMode
-from entitlements.tests.factories import CourseEntitlementFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
 from lms.djangoapps.commerce.utils import EcommerceService
-from lms.djangoapps.grades.tests.utils import mock_passing_grade
+from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.catalog.tests.factories import (
     CourseFactory,
     CourseRunFactory,
@@ -42,13 +44,17 @@ from openedx.core.djangoapps.programs.utils import (
     ProgramMarketingDataExtender,
     ProgramProgressMeter,
     get_certificates,
-    get_logged_in_program_certificate_url
+    get_logged_in_program_certificate_url,
+    is_user_enrolled_in_program_type
 )
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import AnonymousUserFactory, CourseEnrollmentFactory, UserFactory
-from util.date_utils import strftime_localized
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from common.djangoapps.student.tests.factories import AnonymousUserFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.date_utils import strftime_localized
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase, SharedModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
+)
 from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
 
 CERTIFICATES_API_MODULE = 'lms.djangoapps.certificates.api'
@@ -151,7 +157,7 @@ class TestProgramProgressMeter(TestCase):
         self.assertEqual(meter.engaged_programs, [program])
         self._assert_progress(
             meter,
-            ProgressFactory(uuid=program['uuid'], in_progress=1, grades={course_run_key: 0.0})
+            ProgressFactory(uuid=program['uuid'], in_progress=1)
         )
         self.assertEqual(list(meter.completed_programs_with_available_dates.keys()), [])
 
@@ -250,7 +256,6 @@ class TestProgramProgressMeter(TestCase):
                 completed=[],
                 in_progress=[program['courses'][0]],
                 not_started=[],
-                grades={course_run_key: 0.0},
             )
         ]
 
@@ -287,7 +292,6 @@ class TestProgramProgressMeter(TestCase):
                 completed=[],
                 in_progress=[program['courses'][0]],
                 not_started=[],
-                grades={course_run_key: 0.0},
             )
         ]
 
@@ -329,7 +333,6 @@ class TestProgramProgressMeter(TestCase):
                 completed=0,
                 in_progress=1 if offset in [None, 1] else 0,
                 not_started=1 if offset in [-1] else 0,
-                grades={course_run_key: 0.0},
             )
         ]
 
@@ -369,13 +372,9 @@ class TestProgramProgressMeter(TestCase):
         programs = data[:2]
         self.assertEqual(meter.engaged_programs, programs)
 
-        grades = {
-            newer_course_run_key: 0.0,
-            older_course_run_key: 0.0,
-        }
         self._assert_progress(
             meter,
-            *(ProgressFactory(uuid=program['uuid'], in_progress=1, grades=grades) for program in programs)
+            *(ProgressFactory(uuid=program['uuid'], in_progress=1) for program in programs)
         )
         self.assertEqual(list(meter.completed_programs_with_available_dates.keys()), [])
 
@@ -441,14 +440,9 @@ class TestProgramProgressMeter(TestCase):
         programs = data[:3]
         self.assertEqual(meter.engaged_programs, programs)
 
-        grades = {
-            solo_course_run_key: 0.0,
-            shared_course_run_key: 0.0,
-        }
-
         self._assert_progress(
             meter,
-            *(ProgressFactory(uuid=program['uuid'], in_progress=1, grades=grades) for program in programs)
+            *(ProgressFactory(uuid=program['uuid'], in_progress=1) for program in programs)
         )
         self.assertEqual(list(meter.completed_programs_with_available_dates.keys()), [])
 
@@ -509,7 +503,7 @@ class TestProgramProgressMeter(TestCase):
         _, program_uuid = data[0], data[0]['uuid']
         self._assert_progress(
             meter,
-            ProgressFactory(uuid=program_uuid, in_progress=1, not_started=1, grades={first_course_run_key: 0.0})
+            ProgressFactory(uuid=program_uuid, in_progress=1, not_started=1)
         )
         self.assertEqual(list(meter.completed_programs_with_available_dates.keys()), [])
 
@@ -521,10 +515,6 @@ class TestProgramProgressMeter(TestCase):
             ProgressFactory(
                 uuid=program_uuid,
                 in_progress=2,
-                grades={
-                    first_course_run_key: 0.0,
-                    second_course_run_key: 0.0,
-                },
             )
         )
         self.assertEqual(list(meter.completed_programs_with_available_dates.keys()), [])
@@ -538,10 +528,6 @@ class TestProgramProgressMeter(TestCase):
                 uuid=program_uuid,
                 completed=1,
                 in_progress=1,
-                grades={
-                    first_course_run_key: 0.0,
-                    second_course_run_key: 0.0,
-                }
             )
         )
         self.assertEqual(list(meter.completed_programs_with_available_dates.keys()), [])
@@ -556,10 +542,6 @@ class TestProgramProgressMeter(TestCase):
                 uuid=program_uuid,
                 completed=1,
                 in_progress=1,
-                grades={
-                    first_course_run_key: 0.0,
-                    second_course_run_key: 0.0,
-                }
             )
         )
         self.assertEqual(list(meter.completed_programs_with_available_dates.keys()), [])
@@ -573,10 +555,6 @@ class TestProgramProgressMeter(TestCase):
             ProgressFactory(
                 uuid=program_uuid,
                 completed=2,
-                grades={
-                    first_course_run_key: 0.0,
-                    second_course_run_key: 0.0,
-                }
             )
         )
         self.assertEqual(list(meter.completed_programs_with_available_dates.keys()), [program_uuid])
@@ -607,7 +585,7 @@ class TestProgramProgressMeter(TestCase):
         _, program_uuid = data[0], data[0]['uuid']
         self._assert_progress(
             meter,
-            ProgressFactory(uuid=program_uuid, completed=1, grades={course_run_key: 0.0})
+            ProgressFactory(uuid=program_uuid, completed=1)
         )
         self.assertEqual(list(meter.completed_programs_with_available_dates.keys()), [program_uuid])
 
@@ -725,38 +703,6 @@ class TestProgramProgressMeter(TestCase):
         mock_completed_course_runs.return_value = [{'course_run_id': course_run_key, 'type': CourseMode.VERIFIED}]
         self.assertEqual(meter._is_course_complete(course), True)
 
-    def test_course_grade_results(self, mock_get_programs):
-        grade_percent = .8
-        with mock_passing_grade(percent=grade_percent):
-            course_run_key = generate_course_run_key()
-            data = [
-                ProgramFactory(
-                    courses=[
-                        CourseFactory(course_runs=[
-                            CourseRunFactory(key=course_run_key),
-                        ]),
-                    ]
-                )
-            ]
-            mock_get_programs.return_value = data
-
-            self._create_enrollments(course_run_key)
-
-            meter = ProgramProgressMeter(self.site, self.user)
-
-            program = data[0]
-            expected = [
-                ProgressFactory(
-                    uuid=program['uuid'],
-                    completed=[],
-                    in_progress=[program['courses'][0]],
-                    not_started=[],
-                    grades={course_run_key: grade_percent},
-                )
-            ]
-
-            self.assertEqual(meter.progress(count_only=False), expected)
-
     def test_detail_url_for_mobile_only(self, mock_get_programs):
         """
         Verify that correct program detail url is returned for mobile.
@@ -854,7 +800,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
                     'certificate_url': None,
                     'course_url': reverse('course_root', args=[self.course.id]),
                     'enrollment_open_date': strftime_localized(DEFAULT_ENROLLMENT_START_DATE, 'SHORT_DATE'),
-                    'is_course_ended': self.course.end < datetime.datetime.now(utc),
+                    'is_course_ended': self.course.has_ended(),
                     'is_enrolled': False,
                     'is_enrollment_open': True,
                     'upgrade_url': None,
@@ -1611,3 +1557,94 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
             data['skus'],
             [course['course_runs'][0]['seats'][0]['sku'] for course in self.program['courses']]
         )
+
+
+@skip_unless_lms
+@mock.patch('openedx.core.djangoapps.programs.utils.get_programs_by_type')
+class TestProgramEnrollment(SharedModuleStoreTestCase):
+    """
+    Tests to test program enrollment utility methods for program data from the program cache.
+
+    Requests to the data in the Program cache are mocked out.
+    """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+    MICROBACHELORS = 'microbachelors'
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.store = modulestore()
+        cls.user = UserFactory()
+        cls.program = ProgramFactory(type=cls.MICROBACHELORS)
+        cls.catalog_course_run = cls.program['courses'][0]['course_runs'][0]
+        cls.course_key = CourseKey.from_string(cls.catalog_course_run['key'])
+        cls.course_run = ModuleStoreCourseFactory.create(
+            org=cls.course_key.org,
+            number=cls.course_key.course,
+            run=cls.course_key.run,
+            modulestore=cls.store,
+        )
+        CourseModeFactory.create(course_id=cls.course_run.id, mode_slug=CourseMode.VERIFIED)
+
+    def test_user_not_in_program(self, mock_get_programs_by_type):
+        mock_get_programs_by_type.return_value = [self.program]
+        self.assertFalse(is_user_enrolled_in_program_type(user=self.user, program_type_slug=self.MICROBACHELORS))
+
+    def test_user_enrolled_in_mb_program(self, mock_get_programs_by_type):
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course_run.id, mode=CourseMode.VERIFIED)
+        mock_get_programs_by_type.return_value = [self.program]
+        self.assertTrue(is_user_enrolled_in_program_type(user=self.user, program_type_slug=self.MICROBACHELORS))
+
+    def test_user_enrolled_unpaid_in_program(self, mock_get_programs_by_type):
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course_run.id, mode=CourseMode.AUDIT)
+        mock_get_programs_by_type.return_value = [self.program]
+        self.assertTrue(is_user_enrolled_in_program_type(user=self.user, program_type_slug=self.MICROBACHELORS))
+
+    def test_user_enrolled_unpaid_in_program_paid_only_request(self, mock_get_programs_by_type):
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course_run.id, mode=CourseMode.AUDIT)
+        mock_get_programs_by_type.return_value = [self.program]
+        self.assertFalse(
+            is_user_enrolled_in_program_type(user=self.user, program_type_slug=self.MICROBACHELORS, paid_modes_only=True)
+        )
+
+    # NEW CODE HERE
+    @mock.patch('openedx.core.djangoapps.programs.utils.get_paid_modes_for_course')
+    def test_user_enrolled_in_paid_only_with_no_matching_paid_course_modes(self, mock_get_paid_modes_for_course, mock_get_programs_by_type):
+        second_program = ProgramFactory(type=self.MICROBACHELORS)
+        second_catalog_course_run = second_program['courses'][0]['course_runs'][0]
+        second_course_key = CourseKey.from_string(second_catalog_course_run['key'])
+        second_course_run = ModuleStoreCourseFactory.create(
+            org=second_course_key.org,
+            number=second_course_key.course,
+            run=second_course_key.run,
+            modulestore=self.store,
+        )
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course_run.id, mode=CourseMode.AUDIT)
+        CourseEnrollmentFactory.create(user=self.user, course_id=second_course_run.id, mode=CourseMode.AUDIT)
+
+        mock_get_programs_by_type.return_value = [self.program, second_program]
+
+        # While most of a programs courses would likely come with a paid mode, if the course in question is now expired,
+        # then get_paid_modes_for_course would return an empty list. Even with no paid modes, if we request paid modes only
+        # we should return False
+        mock_get_paid_modes_for_course.return_value = []
+        # raise Exception((mock_get_programs_by_type, mock_get_paid_modes_for_course))
+        self.assertFalse(
+            is_user_enrolled_in_program_type(user=self.user, program_type_slug=self.MICROBACHELORS, paid_modes_only=True)
+        )
+
+        # We should continue to return false even if they do contain paid modes
+        Mode = namedtuple('Mode', ['slug'])
+        # mock_get_paid_modes_for_course.return_value = [Mode(CourseMode.VERIFIED)]
+        self.assertFalse(
+            is_user_enrolled_in_program_type(user=self.user, program_type_slug=self.MICROBACHELORS, paid_modes_only=True)
+        )
+
+    def test_user_with_entitlement_no_enrollment(self, mock_get_programs_by_type):
+        CourseEntitlementFactory.create(
+            user=self.user,
+            mode=CourseMode.VERIFIED,
+            course_uuid=self.program['courses'][0]['uuid']
+        )
+        mock_get_programs_by_type.return_value = [self.program]
+        self.assertTrue(is_user_enrolled_in_program_type(user=self.user, program_type_slug=self.MICROBACHELORS))

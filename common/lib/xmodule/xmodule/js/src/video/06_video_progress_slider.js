@@ -287,7 +287,7 @@ function() {
     // the title attribute of the slider know to "video ended", and focusing
     // on it. The screen reader will read the attr text.
     //
-    // The user can then tab his way forward, landing on the next control
+    // The user can then tab their way forward, landing on the next control
     // element, the Play button.
     //
     // @param params  -  object with property `end`. If set to true, the
@@ -329,7 +329,6 @@ function() {
                     msg = ngettext('%(value)s second', '%(value)s seconds', value);
                     break;
                 }
-                // xss-lint: disable=javascript-interpolate
                 return interpolate(msg, {value: value}, true);
             };
 

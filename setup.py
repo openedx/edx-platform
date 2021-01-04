@@ -6,7 +6,7 @@ from setuptools import setup
 
 setup(
     name="Open edX",
-    version="0.11",
+    version="0.12",
     install_requires=["setuptools"],
     requires=[],
     # NOTE: These are not the names we should be installing.  This tree should
@@ -40,8 +40,8 @@ setup(
             "calendar_sync_toggle = openedx.features.calendar_sync.plugins:CalendarSyncToggleTool",
             "course_bookmarks = openedx.features.course_bookmarks.plugins:CourseBookmarksTool",
             "course_updates = openedx.features.course_experience.plugins:CourseUpdatesTool",
-            "course_reviews = openedx.features.course_experience.plugins:CourseReviewsTool",
             "verified_upgrade = lms.djangoapps.courseware.course_tools:VerifiedUpgradeTool",
+            "financial_assistance = lms.djangoapps.courseware.course_tools:FinancialAssistanceTool",
         ],
         "openedx.user_partition_scheme": [
             "random = openedx.core.djangoapps.user_api.partition_schemes:RandomUserPartitionScheme",
@@ -52,6 +52,7 @@ setup(
         ],
         "openedx.block_structure_transformer": [
             "library_content = lms.djangoapps.course_blocks.transformers.library_content:ContentLibraryTransformer",
+            "library_content_randomize = lms.djangoapps.course_blocks.transformers.library_content:ContentLibraryOrderTransformer",
             "split_test = lms.djangoapps.course_blocks.transformers.split_test:SplitTestTransformer",
             "start_date = lms.djangoapps.course_blocks.transformers.start_date:StartDateTransformer",
             "user_partitions = lms.djangoapps.course_blocks.transformers.user_partitions:UserPartitionTransformer",
@@ -65,9 +66,13 @@ setup(
             "load_override_data = lms.djangoapps.course_blocks.transformers.load_override_data:OverrideDataTransformer",
             "content_type_gate = openedx.features.content_type_gating.block_transformers:ContentTypeGateTransformer",
             "access_denied_message_filter = lms.djangoapps.course_blocks.transformers.access_denied_filter:AccessDeniedMessageFilterTransformer",
+            "open_assessment_transformer = lms.djangoapps.courseware.transformers:OpenAssessmentDateTransformer",
         ],
         "openedx.ace.policy": [
             "bulk_email_optout = lms.djangoapps.bulk_email.policies:CourseEmailOptout"
+        ],
+        "openedx.call_to_action": [
+            "personalized_learner_schedules = openedx.features.personalized_learner_schedules.call_to_action:PersonalizedLearnerScheduleCallToAction"
         ],
         "lms.djangoapp": [
             "announcements = openedx.features.announcements.apps:AnnouncementsConfig",
@@ -107,6 +112,10 @@ setup(
         ],
         'openedx.learning_context': [
             'lib = openedx.core.djangoapps.content_libraries.library_context:LibraryContextImpl',
+        ],
+        'openedx.dynamic_partition_generator': [
+            'enrollment_track = common.lib.xmodule.xmodule.partitions.enrollment_track_partition_generator:create_enrollment_track_partition',
+            'content_type_gating = openedx.features.content_type_gating.partitions:create_content_gating_partition'
         ],
     }
 )

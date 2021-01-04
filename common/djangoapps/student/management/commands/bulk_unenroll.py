@@ -1,5 +1,6 @@
-
-
+"""
+Un-enroll Bulk users course wide as well as specified in csv
+"""
 import logging
 
 import unicodecsv
@@ -7,66 +8,83 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from student.models import CourseEnrollment, User, BulkUnenrollConfiguration
+from common.djangoapps.student.models import CourseEnrollment, BulkUnenrollConfiguration
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
 class Command(BaseCommand):
-
+    """
+    Management command to un-enroll course enrollments at once.
+    """
     help = """"
     Un-enroll bulk users from the courses.
     It expect that the data will be provided in a csv file format with
-    first row being the header and columns will be as follows:
-    user_id, username, email, course_id, is_verified, verification_date
+    first row being the header and columns will be either one of the
+    following:
+    | username | course_id |
+    OR
+    | course_id |
+
+    Example:
+            $ ... bulk_unenroll --csv_path=foo.csv
+            $ ... bulk_unenroll --csv_path=foo.csv --commit
     """
+    commit = False
 
     def add_arguments(self, parser):
-        parser.add_argument('-p', '--csv_path',
-                            metavar='csv_path',
-                            dest='csv_path',
-                            required=False,
-                            help='Path to CSV file.')
+        parser.add_argument(
+            '-p', '--csv_path',
+            metavar='csv_path',
+            dest='csv_path',
+            required=False,
+            help='Path to CSV file.')
+        parser.add_argument(
+            '--commit',
+            action='store_true',
+            help='Save the changes, without this flag only a dry run will be performed and nothing will be changed')
 
     def handle(self, *args, **options):
-
         csv_path = options['csv_path']
+        self.commit = options['commit']
+
         if csv_path:
             with open(csv_path, 'rb') as csv_file:
-                self.unenroll_users(csv_file)
+                self.unenroll_users_from_csv(csv_file)
         else:
             csv_file = BulkUnenrollConfiguration.current().csv_file
-            self.unenroll_users(csv_file)
+            self.unenroll_users_from_csv(csv_file)
 
-    def unenroll_users(self, csv_file):
+    def unenroll_users_from_csv(self, csv_file):
+        """
+        Un-enroll the given set of users provided in csv
+        """
         reader = list(unicodecsv.DictReader(csv_file))
-        users_unenrolled = {}
         for row in reader:
-            username = row['username']
-            course_key = row['course_id']
+            self.unenroll_learners(row.get('course_id'), username=row.get('username', None))
 
-            try:
-                course_id = CourseKey.from_string(row['course_id'])
-            except InvalidKeyError:
-                msg = 'Invalid course id {course_id}, skipping un-enrollement for {username}, {email}'.format(**row)
-                logger.warning(msg)
-                continue
+    def unenroll_learners(self, course_id, username=None):
+        """
+        Un-enroll learners from course_id(s)
+        """
+        try:
+            course_key = CourseKey.from_string(course_id)
+        except InvalidKeyError:
+            msg = 'Invalid course id {}, skipping un-enrollement.'.format(course_id)
+            logger.warning(msg)
+            return
 
-            try:
-                enrollment = CourseEnrollment.objects.get(user__username=username, course_id=course_id)
+        enrollments = CourseEnrollment.objects.filter(course_id=course_key, is_active=True)
+        if username:
+            enrollments = enrollments.filter(user__username=username)
+
+        logger.info("Processing [{}] with [{}] enrollments.".format(course_id, enrollments.count()))
+
+        if self.commit:
+            for enrollment in enrollments:
                 enrollment.update_enrollment(is_active=False, skip_refund=True)
-                if username in users_unenrolled:
-                    users_unenrolled[username].append(course_key.encode())
-                else:
-                    users_unenrolled[username] = [course_key.encode()]
-
-            except ObjectDoesNotExist:
-                msg = 'Enrollment for the user {} in course {} does not exist!'.format(username, course_key)
-                logger.info(msg)
-
-            except Exception as err:
-                msg = 'Error un-enrolling User {} from course {}: '.format(username, course_key, err)
-                logger.error(msg, exc_info=True)
-
-        logger.info("Following users have been unenrolled successfully from the following courses: {users_unenrolled}"
-                    .format(users_unenrolled=["{}:{}".format(k, v) for k, v in users_unenrolled.items()]))
+                logger.info(
+                    "User [{}] have been successfully unenrolled from the course: {}".format(
+                        enrollment.user.username, course_key
+                    )
+                )

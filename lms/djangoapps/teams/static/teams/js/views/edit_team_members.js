@@ -52,7 +52,7 @@
 
                     _.each(this.model.get('membership'), function(membership) {
                         // eslint-disable-next-line no-undef
-                        dateJoined = interpolate( // xss-lint: disable=javascript-interpolate
+                        dateJoined = interpolate(
                             /* Translators: 'date' is a placeholder for a fuzzy,
                              * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
                              */
@@ -62,7 +62,7 @@
                         );
 
                         // eslint-disable-next-line no-undef
-                        lastActivity = interpolate( // xss-lint: disable=javascript-interpolate
+                        lastActivity = interpolate(
                             /* Translators: 'date' is a placeholder for a fuzzy,
                              * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
                              */

@@ -61,25 +61,24 @@ import logging
 import textwrap
 from xml.sax.saxutils import escape
 
-from pkg_resources import resource_string
-
 import bleach
 import mock
 import oauthlib.oauth1
 import six
-import six.moves.urllib.parse
 from lxml import etree
 from oauthlib.oauth1.rfc5849 import signature
+from pkg_resources import resource_string
 from pytz import UTC
 from six import text_type
 from webob import Response
 from xblock.core import List, Scope, String, XBlock
 from xblock.fields import Boolean, Float
+
+from openedx.core.djangolib.markup import HTML, Text
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.lti_2_util import LTI20ModuleMixin, LTIError
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.x_module import XModule, module_attr
-from openedx.core.djangolib.markup import HTML, Text
 
 log = logging.getLogger(__name__)
 
@@ -346,7 +345,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         ]
     }
     css = {'scss': [resource_string(__name__, 'css/lti/lti.scss')]}
-    js_module_name = "LTI"
+    js_module_name = 'LTI'
 
     def get_input_fields(self):
         # LTI provides a list of default parameters that might be passed as
@@ -558,6 +557,12 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         }
         return roles.get(self.system.get_user_role(), u'Student')
 
+    def get_icon_class(self):
+        """ Returns the icon class """
+        if self.graded and self.has_score:  # pylint: disable=no-member
+            return 'problem'
+        return 'other'
+
     def oauth_params(self, custom_parameters, client_key, client_secret):
         """
         Signs request and returns signature and OAuth parameters.
@@ -663,7 +668,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         return params
 
     @XBlock.handler
-    def grade_handler(self, request, suffix):  # pylint: disable=unused-argument
+    def grade_handler(self, request, suffix):
         """
         This is called by courseware.module_render, to handle an AJAX call.
 

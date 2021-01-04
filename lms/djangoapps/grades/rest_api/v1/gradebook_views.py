@@ -13,6 +13,7 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.db.models import Case, Exists, F, OuterRef, When, Q
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework import status
@@ -57,16 +58,16 @@ from openedx.core.lib.api.view_utils import (
     view_auth_classes
 )
 from openedx.core.lib.cache_utils import request_cached
-from student.auth import has_course_author_access
-from student.models import CourseEnrollment
-from student.roles import BulkRoleCache
-from track.event_transaction_utils import (
+from common.djangoapps.student.auth import has_course_author_access
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import BulkRoleCache
+from common.djangoapps.track.event_transaction_utils import (
     create_new_event_transaction_id,
     get_event_transaction_id,
     get_event_transaction_type,
     set_event_transaction_type
 )
-from util.date_utils import to_timestamp
+from common.djangoapps.util.date_utils import to_timestamp
 from xmodule.modulestore.django import modulestore
 from xmodule.util.misc import get_default_short_labeler
 
@@ -920,6 +921,10 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
         )
 
 
+class SubsectionUnavailableToUserException(Exception):
+    pass
+
+
 @view_auth_classes()
 class SubsectionGradeView(GradeViewMixin, APIView):
     """
@@ -1043,6 +1048,8 @@ class SubsectionGradeView(GradeViewMixin, APIView):
                 developer_message='Invalid UserID',
                 error_code='invalid_user_id'
             )
+        success = True
+        err_msg = ""
         override = None
         history = []
         history_record_limit = request.GET.get('history_record_limit')
@@ -1067,16 +1074,30 @@ class SubsectionGradeView(GradeViewMixin, APIView):
                 'possible_graded': original_grade.possible_graded,
             }
         except PersistentSubsectionGrade.DoesNotExist:
-            grade_data = self._get_grade_data_for_not_attempted_assignment(user_id, usage_key)
+            try:
+                grade_data = self._get_grade_data_for_not_attempted_assignment(user_id, usage_key)
+            except SubsectionUnavailableToUserException as exc:
+                success = False
+                err_msg = str(exc)
+                grade_data = {
+                    'earned_all': 0,
+                    'possible_all': 0,
+                    'earned_graded': 0,
+                    'possible_graded': 0,
+                }
 
-        results = SubsectionGradeResponseSerializer({
+        response_data = {
+            'success': success,
             'original_grade': grade_data,
             'override': override,
             'history': history,
             'subsection_id': usage_key,
             'user_id': user_id,
             'course_id': usage_key.course_key,
-        })
+        }
+        if not success:
+            response_data['error_message'] = err_msg
+        results = SubsectionGradeResponseSerializer(response_data)
         return Response(results.data)
 
     def _get_grade_data_for_not_attempted_assignment(self, user_id, usage_key):
@@ -1085,6 +1106,10 @@ class SubsectionGradeView(GradeViewMixin, APIView):
         """
         student = get_user_model().objects.get(id=user_id)
         course_structure = get_course_blocks(student, usage_key)
+        if usage_key not in course_structure:
+            raise SubsectionUnavailableToUserException(
+                _("Cannot override subsection grade: subsection is not available for target learner.")
+            )
         subsection_grade_factory = SubsectionGradeFactory(student, course_structure=course_structure)
         grade = subsection_grade_factory.create(course_structure[usage_key], read_only=True, force_calculate=True)
         grade_data = {

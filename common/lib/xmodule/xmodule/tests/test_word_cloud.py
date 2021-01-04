@@ -1,35 +1,91 @@
 # -*- coding: utf-8 -*-
 """Test for Word cloud Xmodule functional logic."""
 
+import json
 
+from django.test import TestCase
+from fs.memoryfs import MemoryFS
+from lxml import etree
+from mock import Mock
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from webob.multidict import MultiDict
+from xblock.field_data import DictFieldData
 
-from xmodule.word_cloud_module import WordCloudDescriptor
+from xmodule.word_cloud_module import WordCloudBlock
+from . import get_test_descriptor_system, get_test_system
 
-from . import LogicTest
 
+class WordCloudBlockTest(TestCase):
+    """
+    Logic tests for Word Cloud XBlock.
+    """
 
-class WordCloudModuleTest(LogicTest):
-    """Logic tests for Word Cloud Xmodule."""
-    descriptor_class = WordCloudDescriptor
     raw_field_data = {
         'all_words': {'cat': 10, 'dog': 5, 'mom': 1, 'dad': 2},
         'top_words': {'cat': 10, 'dog': 5, 'dad': 2},
-        'submitted': False
+        'submitted': False,
+        'display_name': 'Word Cloud Block',
+        'instructions': 'Enter some random words that comes to your mind'
     }
 
+    def test_xml_import_export_cycle(self):
+        """
+        Test the import export cycle.
+        """
+
+        runtime = get_test_descriptor_system()
+        runtime.export_fs = MemoryFS()
+
+        original_xml = (
+            '<word_cloud display_name="Favorite Fruits" display_student_percents="false" '
+            'instructions="What are your favorite fruits?" num_inputs="3" num_top_words="100"/>\n'
+        )
+
+        olx_element = etree.fromstring(original_xml)
+        id_generator = Mock()
+        block = WordCloudBlock.parse_xml(olx_element, runtime, None, id_generator)
+        block.location = BlockUsageLocator(
+            CourseLocator('org', 'course', 'run', branch='revision'), 'word_cloud', 'block_id'
+        )
+
+        self.assertEqual(block.display_name, 'Favorite Fruits')
+        self.assertFalse(block.display_student_percents)
+        self.assertEqual(block.instructions, 'What are your favorite fruits?')
+        self.assertEqual(block.num_inputs, 3)
+        self.assertEqual(block.num_top_words, 100)
+
+        node = etree.Element("unknown_root")
+        # This will export the olx to a separate file.
+        block.add_xml_to_node(node)
+        with runtime.export_fs.open(u'word_cloud/block_id.xml') as f:
+            exported_xml = f.read()
+
+        self.assertEqual(exported_xml, original_xml)
+
     def test_bad_ajax_request(self):
-        "Make sure that answer for incorrect request is error json"
-        response = self.ajax_request('bad_dispatch', {})
+        """
+        Make sure that answer for incorrect request is error json.
+        """
+
+        module_system = get_test_system()
+        block = WordCloudBlock(module_system, DictFieldData(self.raw_field_data), Mock())
+
+        response = json.loads(block.handle_ajax('bad_dispatch', {}))
         self.assertDictEqual(response, {
             'status': 'fail',
             'error': 'Unknown Command!'
         })
 
     def test_good_ajax_request(self):
-        "Make sure that ajax request works correctly"
+        """
+        Make sure that ajax request works correctly.
+        """
+
+        module_system = get_test_system()
+        block = WordCloudBlock(module_system, DictFieldData(self.raw_field_data), Mock())
+
         post_data = MultiDict(('student_words[]', word) for word in ['cat', 'cat', 'dog', 'sun'])
-        response = self.ajax_request('submit', post_data)
+        response = json.loads(block.handle_ajax('submit', post_data))
         self.assertEqual(response['status'], 'success')
         self.assertEqual(response['submitted'], True)
         self.assertEqual(response['total_count'], 22)
@@ -48,3 +104,21 @@ class WordCloudModuleTest(LogicTest):
         )
 
         self.assertEqual(100.0, sum(i['percent'] for i in response['top_words']))
+
+    def test_indexibility(self):
+        """
+        Test indexibility of Word Cloud
+        """
+
+        module_system = get_test_system()
+        block = WordCloudBlock(module_system, DictFieldData(self.raw_field_data), Mock())
+        self.assertEqual(
+            block.index_dictionary(),
+            {
+                'content_type': 'Word Cloud',
+                'content': {
+                    'display_name': 'Word Cloud Block',
+                    'instructions': 'Enter some random words that comes to your mind'
+                }
+            }
+        )

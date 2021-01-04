@@ -27,11 +27,6 @@ class CourseCardView extends Backbone.View {
       this.enrollModel.urlRoot = this.urlModel.get('commerce_api_url');
     }
     this.context = options.context || {};
-    if (this.context.collectionCourseStatus === 'completed') {
-      this.model.updateCourseRunWithHighestGrade(this.context.courseData.grades);
-    }
-    this.grade = this.context.courseData.grades[this.model.get('course_run_key')];
-    this.grade = Math.round(this.grade * 100);
     this.collectionCourseStatus = this.context.collectionCourseStatus || '';
     this.entitlement = this.model.get('user_entitlement');
 
@@ -51,14 +46,15 @@ class CourseCardView extends Backbone.View {
     const $upgradeMessage = this.$('.upgrade-message');
     const $certStatus = this.$('.certificate-status');
     const $expiredNotification = this.$('.expired-notification');
+    const courseKey = this.model.get('course_run_key');
     const expired = this.model.get('expired');
+    const canUpgrade = this.model.get('upgrade_url') && !(expired === true);
     const courseUUID = this.model.get('uuid');
     const containerSelector = `#course-${courseUUID}`;
 
     this.enrollView = new CourseEnrollView({
       $parentEl: this.$('.course-actions'),
       model: this.model,
-      grade: this.grade,
       collectionCourseStatus: this.collectionCourseStatus,
       urlModel: this.urlModel,
       enrollModel: this.enrollModel,
@@ -78,8 +74,7 @@ class CourseCardView extends Backbone.View {
         enterCourseBtn: `${containerSelector} .view-course-button`,
         availableSessions: JSON.stringify(this.model.get('course_runs')),
         entitlementUUID: this.entitlement.uuid,
-        currentSessionId: this.model.isEnrolledInSession() ?
-                                 this.model.get('course_run_key') : null,
+        currentSessionId: this.model.isEnrolledInSession() && !canUpgrade ? courseKey : null,
         enrollUrl: this.model.get('enroll_url'),
         courseHomeUrl: this.model.get('course_url'),
         expiredAt: this.entitlement.expired_at,
@@ -87,7 +82,7 @@ class CourseCardView extends Backbone.View {
       });
     }
 
-    if (this.model.get('upgrade_url') && !(expired === true)) {
+    if (canUpgrade) {
       this.upgradeMessage = new UpgradeMessageView({
         $el: $upgradeMessage,
         model: this.model,

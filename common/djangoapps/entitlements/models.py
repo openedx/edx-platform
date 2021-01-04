@@ -14,14 +14,14 @@ from model_utils import Choices
 from model_utils.models import TimeStampedModel
 from simple_history.models import HistoricalRecords
 
-from course_modes.models import CourseMode
-from entitlements.utils import is_course_run_entitlement_fulfillable
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.entitlements.utils import is_course_run_entitlement_fulfillable
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.commerce.utils import refund_entitlement
 from openedx.core.djangoapps.catalog.utils import get_course_uuid_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.models import CourseEnrollment, CourseEnrollmentException
-from util.date_utils import strftime_localized
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentException
+from common.djangoapps.util.date_utils import strftime_localized
 
 log = logging.getLogger("common.entitlements.models")
 
@@ -76,14 +76,14 @@ class CourseEntitlementPolicy(models.Model):
         days_since_entitlement_created = (now_timestamp - entitlement.created).days
 
         # We want to return whichever days value is less since it is then the more recent one
-        days_until_regain_ends = (self.regain_period.days -  # pylint: disable=no-member
+        days_until_regain_ends = (self.regain_period.days -
                                   min(days_since_course_start, days_since_enrollment, days_since_entitlement_created))
 
         # If the base days until expiration is less than the days until the regain period ends, use that instead
         if days_until_expiry < days_until_regain_ends:
             return days_until_expiry
 
-        return days_until_regain_ends  # pylint: disable=no-member
+        return days_until_regain_ends
 
     def is_entitlement_regainable(self, entitlement):
         """
@@ -120,7 +120,7 @@ class CourseEntitlementPolicy(models.Model):
 
         # This is > because a get_days_since_created of refund_period means that that many days have passed,
         # which should then make the entitlement no longer refundable
-        if entitlement.get_days_since_created() > self.refund_period.days:  # pylint: disable=no-member
+        if entitlement.get_days_since_created() > self.refund_period.days:
             return False
 
         if entitlement.enrollment_course_run:
@@ -135,7 +135,7 @@ class CourseEntitlementPolicy(models.Model):
         """
         # This is < because a get_days_since_created of expiration_period means that that many days have passed,
         # which should then expire the entitlement
-        return (entitlement.get_days_since_created() < self.expiration_period.days  # pylint: disable=no-member
+        return (entitlement.get_days_since_created() < self.expiration_period.days
                 and not entitlement.enrollment_course_run
                 and not entitlement.expired_at)
 

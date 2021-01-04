@@ -12,7 +12,7 @@
             return Backbone.View.extend({
 
                 errorMessage: gettext('An error occurred. Try again.'),
-                alreadyMemberMessage: gettext('You already belong to another team.'),
+                alreadyTeamsetMemberMessage: gettext('You already belong to another team in this team set.'),
                 teamFullMessage: gettext('This team is full.'),
                 notJoinInstructorManagedTeam: gettext('Cannot join instructor managed team'),
 
@@ -41,9 +41,9 @@
 
                         // if user is the member of current team then we wouldn't show anything
                         if (!info.memberOfCurrentTeam) {
-                            if (info.alreadyMember) {
+                            if (info.alreadyInTeamset) {
                                 showJoinButton = false;
-                                message = info.memberOfCurrentTeam ? '' : view.alreadyMemberMessage;
+                                message = info.memberOfCurrentTeam ? '' : view.alreadyTeamsetMemberMessage;
                             } else if (!teamHasSpace) {
                                 showJoinButton = false;
                                 message = view.teamFullMessage;
@@ -90,7 +90,7 @@
                 getUserTeamInfo: function(username, courseMaxTeamSize) {
                     var deferred = $.Deferred();
                     var info = {
-                        alreadyMember: false,
+                        alreadyInTeamset: false,
                         memberOfCurrentTeam: false,
                         teamHasSpace: false,
                         isAdminOrStaff: false,
@@ -108,7 +108,7 @@
                     info.isInstructorManagedTopic = isInstructorManagedTopic;
 
                     if (info.memberOfCurrentTeam) {
-                        info.alreadyMember = true;
+                        info.alreadyInTeamset = true;
                         info.memberOfCurrentTeam = true;
                         deferred.resolve(info);
                     } else {
@@ -117,9 +117,13 @@
                             $.ajax({
                                 type: 'GET',
                                 url: view.context.teamMembershipsUrl,
-                                data: {username: username, course_id: view.context.courseID}
+                                data: {
+                                    username: username,
+                                    course_id: view.context.courseID,
+                                    teamset_id: view.model.get('topic_id')
+                                }
                             }).done(function(data) {
-                                info.alreadyMember = (data.count > 0);
+                                info.alreadyInTeamset = (data.count > 0);
                                 info.memberOfCurrentTeam = false;
                                 info.teamHasSpace = teamHasSpace;
                                 deferred.resolve(info);

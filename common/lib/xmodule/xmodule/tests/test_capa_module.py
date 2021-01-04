@@ -2,7 +2,6 @@
 """
 Tests of the Capa XModule
 """
-# pylint: disable=missing-docstring
 # pylint: disable=invalid-name
 
 
@@ -861,7 +860,7 @@ class ProblemBlockTest(unittest.TestCase):
         # pylint: enable=line-too-long
 
         self.assertEqual(xqueue_interface._http_post.call_count, 1)
-        _, kwargs = xqueue_interface._http_post.call_args  # pylint: disable=unpacking-non-sequence
+        _, kwargs = xqueue_interface._http_post.call_args
         six.assertCountEqual(self, fpaths, list(kwargs['files'].keys()))
         for fpath, fileobj in six.iteritems(kwargs['files']):
             self.assertEqual(fpath, fileobj.name)
@@ -894,7 +893,7 @@ class ProblemBlockTest(unittest.TestCase):
         module.handle('xmodule_handler', request, 'problem_check')
 
         self.assertEqual(xqueue_interface._http_post.call_count, 1)
-        _, kwargs = xqueue_interface._http_post.call_args  # pylint: disable=unpacking-non-sequence
+        _, kwargs = xqueue_interface._http_post.call_args
         six.assertCountEqual(self, fnames, list(kwargs['files'].keys()))
         for fpath, fileobj in six.iteritems(kwargs['files']):
             self.assertEqual(fpath, fileobj.name)
@@ -1598,6 +1597,37 @@ class ProblemBlockTest(unittest.TestCase):
             </multiplechoiceresponse>
             <demandhint>
               <hint>Only demand hint</hint>
+            </demandhint>
+            </problem>"""
+        module = CapaFactory.create(xml=test_xml)
+        module.get_problem_html()  # ignoring html result
+        context = module.system.render_template.call_args[0][1]
+        self.assertTrue(context['demand_hint_possible'])
+        self.assertTrue(context['should_enable_next_hint'])
+
+        # Check the AJAX call that gets the hint by index
+        result = module.get_demand_hint(0)
+        self.assertEqual(result['hint_index'], 0)
+        self.assertFalse(result['should_enable_next_hint'])
+
+    def test_image_hint(self):
+        """
+        Test the hint button shows an image without the static url.
+        """
+        test_xml = """
+            <problem>
+            <p>That is the question</p>
+            <multiplechoiceresponse>
+              <choicegroup type="MultipleChoice">
+                <choice correct="false">Alpha <choicehint>A hint</choicehint>
+                </choice>
+                <choice correct="true">Beta</choice>
+              </choicegroup>
+            </multiplechoiceresponse>
+            <demandhint>
+              <hint>
+                <img src="/static/7b1d74b2383b7d25a70ae4991190c222_28-collection-of-dark-souls-bonfire-clipart-high-quality-free-_1200-1386.jpeg"> </img>
+                You can add an optional hint like this. Problems that have a hint include a hint button, and this text appears the first time learners select the button.</hint>
             </demandhint>
             </problem>"""
         module = CapaFactory.create(xml=test_xml)
@@ -2506,14 +2536,21 @@ class ProblemBlockXMLTest(unittest.TestCase):
         name = "Other Test Capa Problem"
         descriptor = self._create_descriptor(xml, name=name)
         self.assertEqual(descriptor.problem_types, {"multiplechoiceresponse", "optionresponse"})
-        six.assertCountEqual(
-            self, descriptor.index_dictionary(), {
+
+        # We are converting problem_types to a set to compare it later without taking into account the order
+        # the reasoning behind is that the problem_types (property) is represented by dict and when it is converted
+        # to list its ordering is different everytime.
+
+        indexing_result = descriptor.index_dictionary()
+        indexing_result['problem_types'] = set(indexing_result['problem_types'])
+        self.assertDictEqual(
+            indexing_result, {
                 'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': ["optionresponse", "multiplechoiceresponse"],
+                'problem_types': set(["optionresponse", "multiplechoiceresponse"]),
                 'content': {
                     'display_name': name,
-                    'capa_content': ' Label Some comment Donut Buggy '
-                }
+                    'capa_content': " Label Some comment Donut Buggy '1','2' "
+                },
             }
         )
 
@@ -2589,7 +2626,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
             Dropdown problems allow learners to select only one option from a list of options.
             Description
             You can use the following example problem as a model.
-            Which of the following countries celebrates its independence on August 15?
+            Which of the following countries celebrates its independence on August 15? 'India','Spain','China','Bermuda'
         """)
         self.assertEqual(descriptor.problem_types, {"optionresponse"})
         self.assertEqual(

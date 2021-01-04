@@ -1,16 +1,17 @@
 """Signal handlers for writing course dates into edx_when."""
-from __future__ import absolute_import, unicode_literals
+
 
 import logging
 
 from django.dispatch import receiver
+from edx_when.api import FIELDS_TO_EXTRACT, set_dates_for_course
 from six import text_type
 from xblock.fields import Scope
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, modulestore
+
 from .models import SelfPacedRelativeDatesConfig
-from .utils import get_expected_duration
-from edx_when.api import FIELDS_TO_EXTRACT, set_dates_for_course
+from .utils import spaced_out_sections
 
 log = logging.getLogger(__name__)
 
@@ -37,6 +38,29 @@ def _field_values(fields, xblock):
     return result
 
 
+def _gather_graded_items(root, due):
+    items = [root]
+    has_non_ora_scored_content = False
+    collected_items = []
+    while items:
+        next_item = items.pop()
+        if next_item.graded:
+            # TODO: Once studio can manually set relative dates, we would need to manually check for them here
+            collected_items.append((next_item.location, {'due': due}))
+            # TODO: This is pretty gross, and should maybe be configurable in the future,
+            # especially if we find ourselves needing more exceptions.
+            has_non_ora_scored_content = (
+                has_non_ora_scored_content or
+                (next_item.has_score and next_item.category != 'openassessment')
+            )
+
+        items.extend(next_item.get_children())
+
+    if has_non_ora_scored_content:
+        return collected_items
+    return []
+
+
 def extract_dates_from_course(course):
     """
     Extract all dates from the supplied course.
@@ -49,19 +73,16 @@ def extract_dates_from_course(course):
         date_items = [(course.location, metadata)]
 
         if SelfPacedRelativeDatesConfig.current(course_key=course.id).enabled:
-            duration = get_expected_duration(course)
-            sections = course.get_children()
-            time_per_week = duration / len(sections)
             # Apply the same relative due date to all content inside a section,
             # unless that item already has a relative date set
-            for idx, section in enumerate(sections):
-                items = [section]
-                while items:
-                    next_item = items.pop()
-                    # TODO: Once studio can manually set relative dates,
-                    # we would need to manually check for them here
-                    date_items.append((next_item.location, {'due': time_per_week * (idx + 1)}))
-                    items.extend(next_item.get_children())
+            for _, section, weeks_to_complete in spaced_out_sections(course):
+                section_date_items = []
+                for subsection in section.get_children():
+                    section_date_items.extend(_gather_graded_items(subsection, weeks_to_complete))
+
+                if section_date_items and section.graded:
+                    date_items.append((section.location, weeks_to_complete))
+                date_items.extend(section_date_items)
     else:
         date_items = []
         store = modulestore()

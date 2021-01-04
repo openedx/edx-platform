@@ -2,14 +2,12 @@
 Unit tests for course import and export
 """
 
-
 import copy
 import json
 import logging
 import os
 import re
 import shutil
-from six import StringIO
 import tarfile
 import tempfile
 from uuid import uuid4
@@ -28,14 +26,14 @@ from six.moves import zip
 from storages.backends.s3boto import S3BotoStorage
 from user_tasks.models import UserTaskStatus
 
-from contentstore.tests.test_libraries import LibraryTestCase
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url
-from models.settings.course_metadata import CourseMetadata
+from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url
+from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from openedx.core.lib.extract_tar import safetar_extractall
-from student import auth
-from student.roles import CourseInstructorRole, CourseStaffRole
-from util import milestones_helpers
+from common.djangoapps.student import auth
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.util import milestones_helpers
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import LIBRARY_ROOT, ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -56,6 +54,7 @@ class ImportEntranceExamTestCase(CourseTestCase, MilestonesTestCaseMixin):
     """
     Unit tests for importing a course with entrance exam
     """
+
     def setUp(self):
         super(ImportEntranceExamTestCase, self).setUp()
         self.url = reverse_course_url('import_handler', self.course.id)
@@ -142,7 +141,6 @@ class ImportTestCase(CourseTestCase):
     """
     Unit tests for importing a course or Library
     """
-
     CREATE_USER = True
 
     def setUp(self):
@@ -534,6 +532,7 @@ class ExportTestCase(CourseTestCase):
     """
     Tests for export_handler.
     """
+
     def setUp(self):
         """
         Sets up the test course.
@@ -786,12 +785,12 @@ class ExportTestCase(CourseTestCase):
         mock_artifact.file.storage.url.return_value = file_url
         return mock_artifact
 
-    @patch('contentstore.views.import_export._latest_task_status')
+    @patch('cms.djangoapps.contentstore.views.import_export._latest_task_status')
     @patch('user_tasks.models.UserTaskArtifact.objects.get')
     def test_export_status_handler_other(
-            self,
-            mock_get_user_task_artifact,
-            mock_latest_task_status,
+        self,
+        mock_get_user_task_artifact,
+        mock_latest_task_status,
     ):
         """
         Verify that the export status handler generates the correct export path
@@ -806,12 +805,12 @@ class ExportTestCase(CourseTestCase):
         result = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(result['ExportOutput'], '/path/to/testfile.tar.gz')
 
-    @patch('contentstore.views.import_export._latest_task_status')
+    @patch('cms.djangoapps.contentstore.views.import_export._latest_task_status')
     @patch('user_tasks.models.UserTaskArtifact.objects.get')
     def test_export_status_handler_s3(
-            self,
-            mock_get_user_task_artifact,
-            mock_latest_task_status,
+        self,
+        mock_get_user_task_artifact,
+        mock_latest_task_status,
     ):
         """
         Verify that the export status handler generates the correct export path
@@ -826,12 +825,12 @@ class ExportTestCase(CourseTestCase):
         result = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(result['ExportOutput'], '/s3/file/path/testfile.tar.gz')
 
-    @patch('contentstore.views.import_export._latest_task_status')
+    @patch('cms.djangoapps.contentstore.views.import_export._latest_task_status')
     @patch('user_tasks.models.UserTaskArtifact.objects.get')
     def test_export_status_handler_filesystem(
-            self,
-            mock_get_user_task_artifact,
-            mock_latest_task_status,
+        self,
+        mock_get_user_task_artifact,
+        mock_latest_task_status,
     ):
         """
         Verify that the export status handler generates the correct export path
@@ -850,6 +849,7 @@ class TestLibraryImportExport(CourseTestCase):
     """
     Tests for importing content libraries from XML and exporting them to XML.
     """
+
     def setUp(self):
         super(TestLibraryImportExport, self).setUp()
         self.export_dir = tempfile.mkdtemp()
@@ -907,6 +907,7 @@ class TestCourseExportImport(LibraryTestCase):
     """
     Tests for importing after exporting the course containing content libraries from XML.
     """
+
     def setUp(self):
         super(TestCourseExportImport, self).setUp()
         self.export_dir = tempfile.mkdtemp()
@@ -1023,18 +1024,20 @@ class TestCourseExportImport(LibraryTestCase):
         )
 
 
+@ddt.ddt
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class TestCourseExportImportProblem(CourseTestCase):
     """
     Tests for importing after exporting the course containing problem with pre tags from XML.
     """
+
     def setUp(self):
         super(TestCourseExportImportProblem, self).setUp()
         self.export_dir = tempfile.mkdtemp()
         self.source_course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
         self.addCleanup(shutil.rmtree, self.export_dir, ignore_errors=True)
 
-    def _setup_source_course_with_problem_content(self, publish_item=False):
+    def _setup_source_course_with_problem_content(self, data, publish_item=False):
         """
         Sets up course with problem content.
         """
@@ -1059,7 +1062,7 @@ class TestCourseExportImportProblem(CourseTestCase):
             category='problem',
             display_name='Test Problem',
             publish_item=publish_item,
-            data='<problem><pre><code>x=10</code></pre><multiplechoiceresponse></multiplechoiceresponse></problem>',
+            data=data,
         )
 
     def get_problem_content(self, block_location):
@@ -1071,22 +1074,38 @@ class TestCourseExportImportProblem(CourseTestCase):
 
         return self.get_problem_content(self.store.get_item(block_location).children[0])
 
-    def assert_problem_definition(self, course_location):
+    def assert_problem_definition(self, course_location, expected_problem_content):
         """
         Asserts that problems' data is as expected with pre-tag content maintained.
         """
-        expected_problem_content = '<problem>\n  <pre><code>x=10</code></pre>\n' \
-                                   '  <multiplechoiceresponse/>\n</problem>\n'
         problem_content = self.get_problem_content(course_location)
-
         self.assertEqual(expected_problem_content, problem_content)
 
-    def test_problem_content_on_course_export_import(self):
+    @ddt.data(
+        [
+            '<problem><pre><code>x=10 print("hello \n")</code></pre>'
+            '<pre><div><pre><code>x=10 print("hello \n")</code></pre></div></pre>'
+            '<multiplechoiceresponse></multiplechoiceresponse></problem>',
+
+            '<problem>\n  <pre>\n    <code>x=10 print("hello \n")</code>\n  </pre>\n  <pre>\n    <div>\n      <pre>\n '
+            '       <code>x=10 print("hello \n")</code>\n      </pre>\n    </div>\n  </pre>\n  '
+            '<multiplechoiceresponse/>\n</problem>\n'
+        ],
+        [
+            '<problem><pre><code>x=10 print("hello \n")</code></pre>'
+            '<multiplechoiceresponse></multiplechoiceresponse></problem>',
+
+            '<problem>\n  <pre>\n    <code>x=10 print("hello \n")</code>\n  </pre>\n  '
+            '<multiplechoiceresponse/>\n</problem>\n'
+        ]
+    )
+    @ddt.unpack
+    def test_problem_content_on_course_export_import(self, problem_data, expected_problem_content):
         """
         Verify that problem content in destination matches expected problem content,
         specifically concerned with pre tag data with problem.
         """
-        self._setup_source_course_with_problem_content()
+        self._setup_source_course_with_problem_content(problem_data)
 
         dest_course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
 
@@ -1110,4 +1129,4 @@ class TestCourseExportImportProblem(CourseTestCase):
             create_if_not_present=True,
         )
 
-        self.assert_problem_definition(dest_course.location)
+        self.assert_problem_definition(dest_course.location, expected_problem_content)

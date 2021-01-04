@@ -12,7 +12,7 @@ from django.test import TestCase
 from oauth2_provider.models import Application
 from openedx.core.djangoapps.oauth_dispatch.models import ApplicationAccess
 from openedx.core.djangoapps.theming.models import SiteTheme
-from student.models import UserProfile
+from common.djangoapps.student.models import UserProfile
 
 SITES = ["site_a", "site_b"]
 MANAGEMENT_COMMAND_PATH = "openedx.core.djangoapps.theming.management.commands.create_sites_and_configurations."
@@ -86,7 +86,7 @@ class TestCreateSiteAndConfiguration(TestCase):
         self.assertTrue(service_user[0].is_staff)
         self.assertTrue(service_user[0].is_superuser)
 
-        user_profile = UserProfile.objects.filter(user=service_user)
+        user_profile = UserProfile.objects.filter(user=service_user[0])
         self.assertEqual(len(user_profile), 1)
         return service_user
 
@@ -96,7 +96,7 @@ class TestCreateSiteAndConfiguration(TestCase):
         """
         service_user = self._assert_service_user_is_valid("ecommerce_worker")
 
-        clients = Application.objects.filter(user=service_user)
+        clients = Application.objects.filter(user=service_user[0])
 
         self.assertEqual(len(clients), len(SITES))
 
@@ -132,7 +132,7 @@ class TestCreateSiteAndConfiguration(TestCase):
         """
         service_user = self._assert_service_user_is_valid("lms_catalog_service_user")
 
-        clients = Application.objects.filter(user=service_user)
+        clients = Application.objects.filter(user=service_user[0])
 
         self.assertEqual(len(clients), len(SITES))
 

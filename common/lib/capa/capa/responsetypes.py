@@ -8,18 +8,15 @@ of a variety of types.
 Used by capa_problem.py
 """
 
-# pylint: disable=attribute-defined-outside-init
 # standard library imports
 
 
 import abc
 # TODO: Refactor this code and fix this issue.
-import cgi
 import inspect
 import json
 import logging
 import numbers
-import random2 as random
 import re
 import sys
 import textwrap
@@ -31,10 +28,12 @@ from sys import float_info
 
 import html5lib
 import numpy
+import random2 as random
 import requests
 import six
 # specific library imports
 from calc import UndefinedVariable, UnmatchedParenthesis, evaluator
+from django.utils import html
 from django.utils.encoding import python_2_unicode_compatible
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs  # uses Beautiful Soup!!! FIXME?
@@ -58,6 +57,7 @@ from .util import (
     convert_files_to_filenames,
     default_tolerance,
     find_with_default,
+    get_course_id_from_capa_module,
     get_inner_html_from_xpath,
     is_list_of_files
 )
@@ -488,6 +488,9 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
                     globals_dict,
                     python_path=self.context['python_path'],
                     extra_files=self.context['extra_files'],
+                    limit_overrides_context=get_course_id_from_capa_module(
+                        self.capa_module
+                    ),
                     slug=self.id,
                     random_seed=self.context['seed'],
                     unsafely=self.capa_system.can_execute_unsafe_code(),
@@ -1552,7 +1555,7 @@ class NumericalResponse(LoncapaResponse):
                 id=xml.get('id')
             )
             if tolerance_xml:  # If it isn't an empty list...
-                self.tolerance = contextualize_text(tolerance_xml[0], context)
+                self.tolerance = contextualize_text(tolerance_xml[0].strip(), context)
 
     def get_staff_ans(self, answer):
         """
@@ -1597,7 +1600,7 @@ class NumericalResponse(LoncapaResponse):
 
         _ = edx_six.get_gettext(self.capa_system.i18n)
         general_exception = StudentInputError(
-            _(u"Could not interpret '{student_answer}' as a number.").format(student_answer=cgi.escape(student_answer))
+            _(u"Could not interpret '{student_answer}' as a number.").format(student_answer=html.escape(student_answer))
         )
 
         # Begin `evaluator` block
@@ -1620,13 +1623,13 @@ class NumericalResponse(LoncapaResponse):
                 # `factorial() not defined for negative values`
                 raise StudentInputError(
                     _("Factorial function evaluated outside its domain:"
-                      "'{student_answer}'").format(student_answer=cgi.escape(student_answer))
+                      "'{student_answer}'").format(student_answer=html.escape(student_answer))
                 )
             else:
                 raise general_exception
         except ParseException:
             raise StudentInputError(
-                _(u"Invalid math syntax: '{student_answer}'").format(student_answer=cgi.escape(student_answer))
+                _(u"Invalid math syntax: '{student_answer}'").format(student_answer=html.escape(student_answer))
             )
         except Exception:
             raise general_exception
@@ -3058,7 +3061,7 @@ class FormulaResponse(LoncapaResponse):
             id=xml.get('id')
         )
         if tolerance_xml:  # If it isn't an empty list...
-            self.tolerance = contextualize_text(tolerance_xml[0], context)
+            self.tolerance = contextualize_text(tolerance_xml[0].strip(), context)
 
         types = xml.get('type')
         if types is None:
@@ -3104,7 +3107,7 @@ class FormulaResponse(LoncapaResponse):
             except UndefinedVariable as err:
                 log.debug(
                     'formularesponse: undefined variable in formula=%s',
-                    cgi.escape(answer)
+                    html.escape(answer)
                 )
                 raise StudentInputError(
                     err.args[0]
@@ -3112,7 +3115,7 @@ class FormulaResponse(LoncapaResponse):
             except UnmatchedParenthesis as err:
                 log.debug(
                     'formularesponse: unmatched parenthesis in formula=%s',
-                    cgi.escape(answer)
+                    html.escape(answer)
                 )
                 raise StudentInputError(
                     err.args[0]
@@ -3127,18 +3130,18 @@ class FormulaResponse(LoncapaResponse):
                         ('formularesponse: factorial function used in response '
                          'that tests negative and/or non-integer inputs. '
                          'Provided answer was: %s'),
-                        cgi.escape(answer)
+                        html.escape(answer)
                     )
                     raise StudentInputError(
                         _("Factorial function not permitted in answer "
                           "for this problem. Provided answer was: "
-                          "{bad_input}").format(bad_input=cgi.escape(answer))
+                          "{bad_input}").format(bad_input=html.escape(answer))
                     )
                 # If non-factorial related ValueError thrown, handle it the same as any other Exception
                 log.debug('formularesponse: error %s in formula', err)
                 raise StudentInputError(
                     _("Invalid input: Could not parse '{bad_input}' as a formula.").format(
-                        bad_input=cgi.escape(answer)
+                        bad_input=html.escape(answer)
                     )
                 )
             except Exception as err:
@@ -3146,7 +3149,7 @@ class FormulaResponse(LoncapaResponse):
                 log.debug('formularesponse: error %s in formula', err)
                 raise StudentInputError(
                     _("Invalid input: Could not parse '{bad_input}' as a formula").format(
-                        bad_input=cgi.escape(answer)
+                        bad_input=html.escape(answer)
                     )
                 )
         return out
@@ -3890,7 +3893,7 @@ class ChoiceTextResponse(LoncapaResponse):
                 # different type
                 __, __, trace = sys.exc_info()
                 msg = _("Could not interpret '{given_answer}' as a number.").format(
-                    given_answer=cgi.escape(answer_value)
+                    given_answer=html.escape(answer_value)
                 )
                 msg += " ({0})".format(trace)
                 raise StudentInputError(msg)

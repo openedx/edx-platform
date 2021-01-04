@@ -14,23 +14,24 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
-from six.moves.urllib.parse import quote_plus  # pylint: disable=import-error
+from six.moves.urllib.parse import quote_plus
 from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xblock.exceptions import NoSuchHandlerError
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
-from contentstore.utils import get_lms_link_for_item, get_sibling_urls, reverse_course_url
-from contentstore.views.helpers import get_parent_xblock, is_unit, xblock_type_display_name
-from contentstore.views.item import StudioEditModuleRuntime, add_container_page_publishing_info, create_xblock_info
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.lib.xblock_utils import get_aside_from_xblock, is_xblock_aside
-from student.auth import has_course_author_access
-from xblock_django.api import authorable_xblocks, disabled_xblocks
-from xblock_django.models import XBlockStudioConfigurationFlag
+from common.djangoapps.student.auth import has_course_author_access
+from common.djangoapps.xblock_django.api import authorable_xblocks, disabled_xblocks
+from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+
+from ..utils import get_lms_link_for_item, get_sibling_urls, reverse_course_url
+from .helpers import get_parent_xblock, is_unit, xblock_type_display_name
+from .item import StudioEditModuleRuntime, add_container_page_publishing_info, create_xblock_info
 
 __all__ = [
     'container_handler',
@@ -40,7 +41,7 @@ __all__ = [
 log = logging.getLogger(__name__)
 
 # NOTE: This list is disjoint from ADVANCED_COMPONENT_TYPES
-COMPONENT_TYPES = ['discussion', 'html', 'problem', 'video']
+COMPONENT_TYPES = ['discussion', 'html', 'openassessment', 'problem', 'video']
 
 ADVANCED_COMPONENT_TYPES = sorted(set(name for name, class_ in XBlock.load_classes()) - set(COMPONENT_TYPES))
 
@@ -259,7 +260,8 @@ def get_component_templates(courselike, library=False):
         'discussion': _("Discussion"),
         'html': _("HTML"),
         'problem': _("Problem"),
-        'video': _("Video")
+        'video': _("Video"),
+        'openassessment': _("Open Response")
     }
 
     component_templates = []
@@ -268,9 +270,11 @@ def get_component_templates(courselike, library=False):
     # by the components in the order listed in COMPONENT_TYPES.
     component_types = COMPONENT_TYPES[:]
 
-    # Libraries do not support discussions
+    # Libraries do not support discussions and openassessment
+    component_not_supported_by_library = ['discussion', 'openassessment']
     if library:
-        component_types = [component for component in component_types if component != 'discussion']
+        component_types = [component for component in component_types
+                           if component not in set(component_not_supported_by_library)]
 
     component_types = _filter_disabled_blocks(component_types)
 
@@ -287,9 +291,14 @@ def get_component_templates(courselike, library=False):
             # add the default template with localized display name
             # TODO: Once mixins are defined per-application, rather than per-runtime,
             # this should use a cms mixed-in class. (cpennington)
+            template_id = None
             display_name = xblock_type_display_name(category, _('Blank'))  # this is the Blank Advanced problem
+            # The first template that is given should be Blank Assessment Template
+            if category == 'openassessment':
+                display_name = _("Blank Open Response Assessment")
+                template_id = "blank-assessment"
             templates_for_category.append(
-                create_template_dict(display_name, category, support_level_without_template, None, 'advanced')
+                create_template_dict(display_name, category, support_level_without_template, template_id, 'advanced')
             )
             categories.add(category)
 

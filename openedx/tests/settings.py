@@ -10,11 +10,6 @@ import tempfile
 from django.utils.translation import ugettext_lazy as _
 from path import Path
 
-# TODO: Remove the rest of the sys.path modification here and in (cms|lms)/envs/common.py
-REPO_ROOT = Path(__file__).abspath().dirname().dirname().dirname()  # /edx-platform/
-sys.path.append(REPO_ROOT / 'common' / 'djangoapps')
-sys.path.append(REPO_ROOT / 'lms' / 'djangoapps')
-
 ALL_LANGUAGES = []
 
 BLOCK_STRUCTURES_SETTINGS = dict(
@@ -64,21 +59,24 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'djcelery',
     'django_sites_extensions',
+    'lti_consumer',
     'openedx.core.djangoapps.django_comment_common',
+    'openedx.core.djangoapps.discussions',
     'openedx.core.djangoapps.video_config',
     'openedx.core.djangoapps.video_pipeline',
     'openedx.core.djangoapps.bookmarks.apps.BookmarksConfig',
     'edxval',
     'lms.djangoapps.courseware',
-    'student',
+    'lms.djangoapps.instructor_task',
+    'common.djangoapps.student',
     'openedx.core.djangoapps.site_configuration',
     'lms.djangoapps.grades.apps.GradesConfig',
     'lms.djangoapps.certificates.apps.CertificatesConfig',
     'openedx.core.djangoapps.user_api',
-    'course_modes.apps.CourseModesConfig',
+    'common.djangoapps.course_modes.apps.CourseModesConfig',
     'lms.djangoapps.verify_student.apps.VerifyStudentConfig',
+    'openedx.core.djangoapps.content_libraries',
     'openedx.core.djangoapps.dark_lang',
     'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig',
     'openedx.core.djangoapps.content.block_structure.apps.BlockStructureConfig',
@@ -86,7 +84,10 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.self_paced',
     'openedx.core.djangoapps.schedules.apps.SchedulesConfig',
     'openedx.core.djangoapps.theming.apps.ThemingConfig',
-    'experiments',
+    'openedx.core.djangoapps.external_user_ids',
+    'openedx.core.djangoapps.demographics',
+
+    'lms.djangoapps.experiments',
     'openedx.features.content_type_gating',
     'openedx.features.course_duration_limits',
     'openedx.features.discounts',
@@ -98,7 +99,8 @@ INSTALLED_APPS = (
 
     # Django 1.11 demands to have imported models supported by installed apps.
     'completion',
-    'entitlements',
+    'common.djangoapps.entitlements',
+    'organizations',
 )
 
 LMS_ROOT_URL = "http://localhost:8000"
@@ -122,3 +124,12 @@ RETIREMENT_SERVICE_WORKER_USERNAME = 'RETIREMENT_SERVICE_USER'
 RETIRED_USERNAME_PREFIX = 'retired__user_'
 
 PROCTORING_SETTINGS = {}
+
+ROOT_URLCONF = None
+RUN_BLOCKSTORE_TESTS = False
+
+# Software Secure request retry settings
+# Time in seconds before a retry of the task should be 60 mints.
+SOFTWARE_SECURE_REQUEST_RETRY_DELAY = 60 * 60
+# Maximum of 6 retries before giving up.
+SOFTWARE_SECURE_RETRY_MAX_ATTEMPTS = 6

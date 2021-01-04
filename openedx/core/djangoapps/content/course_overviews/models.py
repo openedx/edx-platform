@@ -29,7 +29,7 @@ from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.cache_utils import request_cached, RequestCache
-from static_replace.models import AssetBaseUrlConfig
+from common.djangoapps.static_replace.models import AssetBaseUrlConfig
 from xmodule import block_metadata_utils, course_metadata_utils
 from xmodule.course_module import DEFAULT_START_DATE, CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
@@ -38,6 +38,10 @@ from xmodule.tabs import CourseTab
 
 
 log = logging.getLogger(__name__)
+
+
+class CourseOverviewCaseMismatchException(Exception):
+    pass
 
 
 @python_2_unicode_compatible
@@ -59,7 +63,7 @@ class CourseOverview(TimeStampedModel):
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 9
+    VERSION = 12  # this one goes to thirteen
 
     # Cache entry versioning.
     version = IntegerField()
@@ -82,6 +86,8 @@ class CourseOverview(TimeStampedModel):
     announcement = DateTimeField(null=True)
 
     # URLs
+    # Not allowing null per django convention; not sure why many TextFields in this model do allow null
+    banner_image_url = TextField()
     course_image_url = TextField()
     social_sharing_url = TextField(null=True)
     end_of_course_survey_url = TextField(null=True)
@@ -167,6 +173,11 @@ class CourseOverview(TimeStampedModel):
         if course_overview.exists():
             log.info(u'Updating course overview for %s.', six.text_type(course.id))
             course_overview = course_overview.first()
+            # MySQL ignores casing, but CourseKey doesn't. To prevent multiple
+            # courses with different cased keys from overriding each other, we'll
+            # check for equality here in python.
+            if course_overview.id != course.id:
+                raise CourseOverviewCaseMismatchException(course_overview.id, course.id)
         else:
             log.info(u'Creating course overview for %s.', six.text_type(course.id))
             course_overview = cls()
@@ -180,10 +191,14 @@ class CourseOverview(TimeStampedModel):
         course_overview.display_org_with_default = course.display_org_with_default
 
         course_overview.start = start
+        # Add writes to new fields 'start_date' & 'end_date'.
+        course_overview.start_date = start
         course_overview.end = end
+        course_overview.end_date = end
         course_overview.advertised_start = course.advertised_start
         course_overview.announcement = course.announcement
 
+        course_overview.banner_image_url = course_image_url(course, 'banner_image')
         course_overview.course_image_url = course_image_url(course)
         course_overview.social_sharing_url = course.social_sharing_url
 
@@ -245,8 +260,8 @@ class CourseOverview(TimeStampedModel):
         with store.bulk_operations(course_id):
             course = store.get_course(course_id)
             if isinstance(course, CourseDescriptor):
-                course_overview = cls._create_or_update(course)
                 try:
+                    course_overview = cls._create_or_update(course)
                     with transaction.atomic():
                         course_overview.save()
                         # Remove and recreate all the course tabs
@@ -258,6 +273,8 @@ class CourseOverview(TimeStampedModel):
                                 name=tab.name,
                                 course_staff_only=tab.course_staff_only,
                                 url_slug=tab.get('url_slug'),
+                                link=tab.get('link'),
+                                is_hidden=tab.get('is_hidden', False),
                                 course_overview=course_overview)
                             for tab in course.tabs
                         ])
@@ -714,6 +731,22 @@ class CourseOverview(TimeStampedModel):
         """
         return get_closest_released_language(self.language) if self.language else None
 
+    def apply_cdn_to_url(self, image_url):
+        """
+        Applies a new CDN/base URL to the given URLs if CDN configuration is
+        enabled.
+
+        If CDN does not exist or is disabled, just returns the original. The
+        URL that we store in CourseOverviewImageSet is already top level path,
+        so we don't need to go through the /static remapping magic that happens
+        with other course assets. We just need to add the CDN server if appropriate.
+        """
+        cdn_config = AssetBaseUrlConfig.current()
+        if not cdn_config.enabled:
+            return image_url
+
+        return self._apply_cdn_to_url(image_url, cdn_config.base_url)
+
     def apply_cdn_to_urls(self, image_urls):
         """
         Given a dict of resolutions -> urls, return a copy with CDN applied.
@@ -724,14 +757,8 @@ class CourseOverview(TimeStampedModel):
         happens with other course assets. We just need to add the CDN server if
         appropriate.
         """
-        cdn_config = AssetBaseUrlConfig.current()
-        if not cdn_config.enabled:
-            return image_urls
-
-        base_url = cdn_config.base_url
-
         return {
-            resolution: self._apply_cdn_to_url(url, base_url)
+            resolution: self.apply_cdn_to_url(url)
             for resolution, url in image_urls.items()
         }
 
@@ -762,7 +789,6 @@ class CourseOverview(TimeStampedModel):
         """
         Returns the course from the modulestore.
         """
-        log.warning('Falling back on modulestore to get course information for %s', self.id)
         return modulestore().get_course(self.id)
 
     @property
@@ -828,6 +854,20 @@ class CourseOverview(TimeStampedModel):
         """
         return self._original_course.teams_enabled
 
+    @property
+    def show_calculator(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.show_calculator
+
+    @property
+    def edxnotes_visibility(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.edxnotes_visibility
+
     def __str__(self):
         """Represent ourselves with the course key."""
         return six.text_type(self.id)
@@ -845,6 +885,8 @@ class CourseOverviewTab(models.Model):
     name = models.TextField(null=True)
     course_staff_only = models.BooleanField(default=False)
     url_slug = models.TextField(null=True)
+    link = models.TextField(null=True)
+    is_hidden = models.BooleanField(default=False)
 
     def __str__(self):
         return self.tab_id

@@ -2,9 +2,9 @@
 // Upgrade
 
 $notification-highlight-border-color: $uxpl-green-base !default;
-$notification-background: rgb(255, 255, 255) !default
+$notification-background: rgb(255, 255, 255) !default;
 
-  .home{
+.home {
   @include clearfix();
 
   max-width: map-get($container-max-widths, xl);
@@ -58,71 +58,21 @@ div.info-wrapper {
     width: 100%;
     display: block;
 
-    div.upgrade-banner {
-      // This banner uses the Pattern Library's defined variables
-      @include border-left(0);
-
-      border: 1px solid $border-color;
-      width: 100%;
-      display: table;
-
-      .notification-color-border {
-        width: 6px; //Value defined by UX team
-        min-height: 100%;
-        margin: 0;
-        display: table-cell;
-        background: $notification-highlight-border-color;
-      }
-
-      .notification-content {
-        display: inline-flex;
-        align-items: center;
-        align-content: flex-start;
-        flex-flow: row wrap;
-        background: $notification-background;
-        width: 100%;
-        padding: $baseline/2 0;
-        margin-bottom: 0;
-        justify-content: space-between;
-
-        .upgrade-icon {
-          margin: 0;
-          padding: $baseline/2 $baseline;
-          flex-flow: row nowrap;
-          align-items: center;
-          // flex: grow, shrink, base
-          // The 7 was the value that allowed the icon image to grow to the UX
-          // desired size.
-          flex: 7 1 50px;
-          // The following dimensions were added so that the
-          // icon will adjust as the notification is adjusted
-          // but will not be smaller or larger than UX requirements.
-          min-height: 50px;
-          min-width: 80px;
-          max-height: 90px;
-          max-width: 130px;
-
-          img {
-            min-height: 50px;
-            min-width: 80px;
-          }
-        }
-      }
-    }
-
     > p {
       margin-bottom: lh();
     }
 
-    > ol,section,div {
+    > ol,
+    section,
+    div {
       list-style: none;
       margin-bottom: lh();
       padding-left: 0;
 
       .updates-article {
-        border-radius:3px;
+        border-radius: 3px;
         background-color: $white;
-        border:1px solid transparent;
+        border: 1px solid transparent;
 
         &:hover {
           border: 1px solid $gray-l3;
@@ -142,14 +92,16 @@ div.info-wrapper {
         cursor: pointer;
         background: none;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           background-color: unset;
           color: $m-blue-d3;
           border: 1px solid black;
         }
       }
 
-      > li,article {
+      > li,
+      article {
         @extend .clearfix;
 
         padding: $baseline;
@@ -157,8 +109,10 @@ div.info-wrapper {
         margin-bottom: lh(1.5);
         background-color: $white;
 
-        ol, ul {
-          ol,ul {
+        ol,
+        ul {
+          ol,
+          ul {
             list-style-type: disc;
           }
         }
@@ -173,7 +127,7 @@ div.info-wrapper {
           @include padding-left($baseline);
           @include float(left);
         }
-      
+
 
         .toggle-visibility-button {
           @extend %t-title9;
@@ -189,8 +143,8 @@ div.info-wrapper {
         }
 
         .toggle-visibility-element {
-          content:'';
-          display:block;
+          content: '';
+          display: block;
           clear: both;
         }
 

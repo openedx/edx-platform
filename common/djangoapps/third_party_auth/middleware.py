@@ -1,7 +1,7 @@
 """Middleware classes for third_party_auth."""
 
 
-import six.moves.urllib.parse  # pylint: disable=import-error
+import six.moves.urllib.parse
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -10,7 +10,7 @@ from django.utils.translation import ugettext as _
 from requests import HTTPError
 from social_django.middleware import SocialAuthExceptionMiddleware
 
-from student.helpers import get_next_url_for_login_page
+from common.djangoapps.student.helpers import get_next_url_for_login_page
 
 from . import pipeline
 

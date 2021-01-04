@@ -17,7 +17,7 @@ class PaverXSSLintTest(PaverTestCase):
     """
 
     def setUp(self):
-        super(PaverXSSLintTest, self).setUp()
+        super().setUp()
         self.reset_task_messages()
 
     @patch.object(pavelib.quality, '_write_metric')

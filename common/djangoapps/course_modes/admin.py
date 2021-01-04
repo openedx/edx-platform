@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC, timezone
 
-from course_modes.models import CourseMode, CourseModeExpirationConfig
+from common.djangoapps.course_modes.models import CourseMode, CourseModeExpirationConfig
 # Technically, we shouldn't be doing this, since verify_student is defined
 # in LMS, and course_modes is defined in common.
 #
@@ -23,7 +23,7 @@ from course_modes.models import CourseMode, CourseModeExpirationConfig
 # the verification deadline table won't exist.
 from lms.djangoapps.verify_student import models as verification_models
 from openedx.core.lib.courses import clean_course_id
-from util.date_utils import get_time_display
+from common.djangoapps.util.date_utils import get_time_display
 
 COURSE_MODE_SLUG_CHOICES = [(key, enrollment_mode['display_name'])
                             for key, enrollment_mode in six.iteritems(settings.COURSE_ENROLLMENT_MODES)]
@@ -76,10 +76,10 @@ class CourseModeForm(forms.ModelForm):
 
         default_tz = timezone(settings.TIME_ZONE)
 
-        if self.instance._expiration_datetime:  # pylint: disable=protected-access
+        if self.instance._expiration_datetime:
             # django admin is using default timezone. To avoid time conversion from db to form
             # convert the UTC object to naive and then localize with default timezone.
-            _expiration_datetime = self.instance._expiration_datetime.replace(  # pylint: disable=protected-access
+            _expiration_datetime = self.instance._expiration_datetime.replace(
                 tzinfo=None
             )
             self.initial["_expiration_datetime"] = default_tz.localize(_expiration_datetime)

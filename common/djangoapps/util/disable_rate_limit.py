@@ -20,7 +20,7 @@ from functools import wraps
 
 from rest_framework.views import APIView
 
-from util.models import RateLimitConfiguration
+from common.djangoapps.util.models import RateLimitConfiguration
 
 LOGGER = logging.getLogger(__name__)
 

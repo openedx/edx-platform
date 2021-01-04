@@ -1,18 +1,17 @@
 """
 Tests for Course API forms.
 """
-# pylint: disable=missing-docstring
 
 from itertools import product
 
 import ddt
 import six
-from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
+from six.moves.urllib.parse import urlencode
 from django.contrib.auth.models import AnonymousUser
 from django.http import QueryDict
 
 from openedx.core.djangoapps.util.test_forms import FormTestMixin
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

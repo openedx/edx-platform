@@ -17,7 +17,7 @@ from social_core.backends.saml import OID_EDU_PERSON_ENTITLEMENT, SAMLAuth, SAML
 from social_core.exceptions import AuthForbidden
 
 from openedx.core.djangoapps.theming.helpers import get_current_request
-from third_party_auth.exceptions import IncorrectConfigurationException
+from common.djangoapps.third_party_auth.exceptions import IncorrectConfigurationException
 
 STANDARD_SAML_PROVIDER_KEY = u'standard_saml_provider'
 SAP_SUCCESSFACTORS_SAML_KEY = u'sap_success_factors'
@@ -26,7 +26,7 @@ log = logging.getLogger(__name__)
 
 class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
     """
-    Customized version of SAMLAuth that gets the list of IdPs from third_party_auth's list of
+    Customized version of SAMLAuth that gets the list of IdPs from common.djangoapps.third_party_auth's list of
     enabled providers.
     """
     name = "tpa-saml"
@@ -169,19 +169,24 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         from .models import SAMLProviderConfig
         if SAMLProviderConfig.current(idp.name).debug_mode:
 
-            def wrap_with_logging(method_name, action_description, xml_getter):
+            def wrap_with_logging(method_name, action_description, xml_getter, request_data, next_url):
                 """ Wrap the request and response handlers to add debug mode logging """
                 method = getattr(auth_inst, method_name)
 
                 def wrapped_method(*args, **kwargs):
                     """ Wrapped login or process_response method """
                     result = method(*args, **kwargs)
-                    log.info(u"SAML login %s for IdP %s. XML is:\n%s", action_description, idp.name, xml_getter())
+                    log.info(
+                        u"SAML login %s for IdP %s. Data: %s. Next url %s. XML is:\n%s",
+                        action_description, idp.name, request_data, next_url, xml_getter()
+                    )
                     return result
                 setattr(auth_inst, method_name, wrapped_method)
 
-            wrap_with_logging("login", "request", auth_inst.get_last_request_xml)
-            wrap_with_logging("process_response", "response", auth_inst.get_last_response_xml)
+            request_data = self.strategy.request_data()
+            next_url = self.strategy.session_get('next')
+            wrap_with_logging("login", "request", auth_inst.get_last_request_xml, request_data, next_url)
+            wrap_with_logging("process_response", "response", auth_inst.get_last_response_xml, request_data, next_url)
 
         return auth_inst
 

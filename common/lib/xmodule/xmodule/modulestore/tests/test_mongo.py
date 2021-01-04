@@ -13,7 +13,6 @@ import pymongo
 import pytest
 import six
 
-# pylint: disable=no-name-in-module
 # pylint: disable=bad-continuation
 # pylint: disable=protected-access
 from django.test import TestCase

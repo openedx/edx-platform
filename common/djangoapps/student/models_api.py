@@ -3,9 +3,10 @@ Provides Python APIs exposed from Student models.
 """
 import logging
 
-from student.models import CourseEnrollment as _CourseEnrollment
-from student.models import ManualEnrollmentAudit as _ManualEnrollmentAudit
-from student.models import (
+from common.djangoapps.student.models import CourseAccessRole as _CourseAccessRole
+from common.djangoapps.student.models import CourseEnrollment as _CourseEnrollment
+from common.djangoapps.student.models import ManualEnrollmentAudit as _ManualEnrollmentAudit
+from common.djangoapps.student.models import (
     ENROLLED_TO_ENROLLED as _ENROLLED_TO_ENROLLED,
     ENROLLED_TO_UNENROLLED as _ENROLLED_TO_UNENROLLED,
     UNENROLLED_TO_ENROLLED as _UNENROLLED_TO_ENROLLED,
@@ -15,7 +16,7 @@ from student.models import (
     ALLOWEDTOENROLL_TO_UNENROLLED as _ALLOWEDTOENROLL_TO_UNENROLLED,
     DEFAULT_TRANSITION_STATE as _DEFAULT_TRANSITION_STATE,
 )
-from student.models import UserProfile as _UserProfile
+from common.djangoapps.student.models import UserProfile as _UserProfile
 
 # This is done so that if these strings change within the app, we can keep exported constants the same
 ENROLLED_TO_ENROLLED = _ENROLLED_TO_ENROLLED
@@ -62,3 +63,33 @@ def get_phone_number(user_id):
         log.exception(exception)
         return None
     return student.phone_number or None
+
+
+def get_course_access_role(user, org, course_id, role):
+    """
+    Get a specific CourseAccessRole object. Return None if
+    it does not exist.
+
+    Arguments:
+        user: User object for the user who has access in a course
+        org: the org the course is in
+        course_id: the course_id of the CourseAccessRole
+        role: the role type of the role
+    """
+    try:
+        course_access_role = _CourseAccessRole.objects.get(
+            user=user,
+            org=org,
+            course_id=course_id,
+            role=role,
+        )
+    except _CourseAccessRole.DoesNotExist:
+        log.exception('No CourseAccessRole found for user_id=%(user_id)s, org=%(org)s, '
+                      'course_id=%(course_id)s, and role=%(role)s.', {
+                          'user': user.id,
+                          'org': org,
+                          'course_id': course_id,
+                          'role': role,
+                      })
+        return None
+    return course_access_role

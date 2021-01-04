@@ -14,7 +14,7 @@ from collections import Counter
 import six
 from celery.states import READY_STATES
 
-from bulk_email.models import CourseEmail
+from lms.djangoapps.bulk_email.models import CourseEmail
 from lms.djangoapps.certificates.models import CertificateGenerationHistory
 from lms.djangoapps.instructor_task.api_helper import (
     check_arguments_for_overriding,
@@ -34,9 +34,8 @@ from lms.djangoapps.instructor_task.tasks import (
     cohort_students,
     course_survey_report_csv,
     delete_problem_state,
-    enrollment_report_features_csv,
-    exec_summary_report_csv,
     export_ora2_data,
+    export_ora2_submission_files,
     generate_certificates,
     override_problem_score,
     proctored_exam_results_csv,
@@ -44,7 +43,7 @@ from lms.djangoapps.instructor_task.tasks import (
     reset_problem_attempts,
     send_bulk_course_email
 )
-from util import milestones_helpers
+from common.djangoapps.util import milestones_helpers
 from xmodule.modulestore.django import modulestore
 
 
@@ -324,7 +323,9 @@ def submit_bulk_course_email(request, course_key, email_id):
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
-def submit_calculate_problem_responses_csv(request, course_key, problem_location):
+def submit_calculate_problem_responses_csv(
+    request, course_key, problem_locations, problem_types_filter=None,
+):
     """
     Submits a task to generate a CSV file containing all student
     answers to a given problem.
@@ -333,7 +334,11 @@ def submit_calculate_problem_responses_csv(request, course_key, problem_location
     """
     task_type = 'problem_responses_csv'
     task_class = calculate_problem_responses_csv
-    task_input = {'problem_location': problem_location, 'user_id': request.user.pk}
+    task_input = {
+        'problem_locations': problem_locations,
+        'problem_types_filter': problem_types_filter,
+        'user_id': request.user.pk,
+    }
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
@@ -377,20 +382,6 @@ def submit_calculate_students_features_csv(request, course_key, features):
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
-def submit_detailed_enrollment_features_csv(request, course_key):
-    """
-    Submits a task to generate a CSV containing detailed enrollment info.
-
-    Raises AlreadyRunningError if said CSV is already being updated.
-    """
-    task_type = 'detailed_enrollment_report'
-    task_class = enrollment_report_features_csv
-    task_input = {}
-    task_key = ""
-
-    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
-
-
 def submit_calculate_may_enroll_csv(request, course_key, features):
     """
     Submits a task to generate a CSV file containing information about
@@ -401,20 +392,6 @@ def submit_calculate_may_enroll_csv(request, course_key, features):
     task_type = 'may_enroll_info_csv'
     task_class = calculate_may_enroll_csv
     task_input = {'features': features}
-    task_key = ""
-
-    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
-
-
-def submit_executive_summary_report(request, course_key):
-    """
-    Submits a task to generate a HTML File containing the executive summary report.
-
-    Raises AlreadyRunningError if HTML File is already being updated.
-    """
-    task_type = 'exec_summary_report'
-    task_class = exec_summary_report_csv
-    task_input = {}
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
@@ -468,6 +445,19 @@ def submit_export_ora2_data(request, course_key):
     """
     task_type = 'export_ora2_data'
     task_class = export_ora2_data
+    task_input = {}
+    task_key = ''
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def submit_export_ora2_submission_files(request, course_key):
+    """
+    Submits a task to download and compress all submissions
+    files (texts, attachments) for given course.
+    """
+    task_type = 'export_ora2_submission_files'
+    task_class = export_ora2_submission_files
     task_input = {}
     task_key = ''
 

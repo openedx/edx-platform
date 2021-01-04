@@ -13,7 +13,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from social_django.models import Partial
 
-from third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
+from common.djangoapps.third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 
 from ..forms import AccessTokenExchangeForm
 from .mixins import DOTAdapterMixin
@@ -66,6 +66,7 @@ class DOTAccessTokenExchangeFormTestFacebook(
     django-oauth-toolkit (DOT).
     """
     pass
+
 
 # This is necessary because cms does not implement third party auth
 @unittest.skipUnless(TPA_FEATURE_ENABLED, TPA_FEATURES_KEY + " not enabled")

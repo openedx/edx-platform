@@ -37,8 +37,8 @@ from openedx.core.djangoapps.django_comment_common.models import (
 )
 from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
 from openedx.core.lib.cache_utils import request_cached
-from student.models import get_user_by_username_or_email
-from student.roles import GlobalStaff
+from common.djangoapps.student.models import get_user_by_username_or_email
+from common.djangoapps.student.roles import GlobalStaff
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 from xmodule.partitions.partitions_service import PartitionService
@@ -691,10 +691,9 @@ def permalink(content):
     else:
         course_id = content['course_id']
     if content['type'] == 'thread':
-        return reverse('discussion.views.single_thread',
-                       args=[course_id, content['commentable_id'], content['id']])
+        return reverse('single_thread', args=[course_id, content['commentable_id'], content['id']])
     else:
-        return reverse('discussion.views.single_thread',
+        return reverse('single_thread',
                        args=[course_id, content['commentable_id'], content['thread_id']]) + '#' + content['id']
 
 

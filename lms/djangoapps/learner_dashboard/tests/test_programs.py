@@ -10,7 +10,7 @@ from uuid import uuid4
 
 import mock
 import six
-from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
+from six.moves.urllib.parse import urljoin
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.test import override_settings
@@ -27,7 +27,7 @@ from openedx.core.djangoapps.catalog.tests.factories import (
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
 

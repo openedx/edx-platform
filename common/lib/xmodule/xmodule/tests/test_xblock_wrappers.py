@@ -30,16 +30,16 @@ from xblock.core import XBlock
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-from xmodule.annotatable_module import AnnotatableDescriptor
-from xmodule.conditional_module import ConditionalDescriptor
+from xmodule.annotatable_module import AnnotatableBlock
+from xmodule.conditional_module import ConditionalBlock
 from xmodule.course_module import CourseDescriptor
 from xmodule.html_module import HtmlBlock
 from xmodule.poll_module import PollDescriptor
-from xmodule.randomize_module import RandomizeDescriptor
+from xmodule.randomize_module import RandomizeBlock
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.tests import get_test_descriptor_system, get_test_system
 from xmodule.vertical_block import VerticalBlock
-from xmodule.word_cloud_module import WordCloudDescriptor
+from xmodule.word_cloud_module import WordCloudBlock
 from xmodule.wrapper_module import WrapperBlock
 from xmodule.x_module import (
     PUBLIC_VIEW,
@@ -55,10 +55,10 @@ from xmodule.x_module import (
 # to a list of sample field values to test with.
 # TODO: Add more types of sample data
 LEAF_XMODULES = {
-    AnnotatableDescriptor: [{}],
+    AnnotatableBlock: [{}],
     HtmlBlock: [{}],
     PollDescriptor: [{'display_name': 'Poll Display Name'}],
-    WordCloudDescriptor: [{}],
+    WordCloudBlock: [{}],
 }
 
 
@@ -66,9 +66,9 @@ LEAF_XMODULES = {
 # to a list of sample field values to test with.
 # TODO: Add more types of sample data
 CONTAINER_XMODULES = {
-    ConditionalDescriptor: [{}],
+    ConditionalBlock: [{}],
     CourseDescriptor: [{}],
-    RandomizeDescriptor: [{'display_name': 'Test String Display'}],
+    RandomizeBlock: [{'display_name': 'Test String Display'}],
     SequenceDescriptor: [{'display_name': u'Test Unicode हिंदी Display'}],
     VerticalBlock: [{}],
     WrapperBlock: [{}],
@@ -184,7 +184,6 @@ class LeafDescriptorFactory(Factory):
     """
     Factory to generate leaf XModuleDescriptors.
     """
-    # pylint: disable=missing-docstring
 
     class Meta(object):
         model = XModuleDescriptor
@@ -276,7 +275,7 @@ class XBlockWrapperTestMixin(object):
         """
         pass
 
-    def check_property(self, descriptor):  # pylint: disable=unused-argument
+    def check_property(self, descriptor):
         """
         Execute assertions to verify that the property under test is true for
         the supplied descriptor.
@@ -296,7 +295,8 @@ class XBlockWrapperTestMixin(object):
         # pylint: disable=no-member
         descriptor.runtime.id_reader.get_definition_id = Mock(return_value='a')
         descriptor.runtime.modulestore = modulestore
-        descriptor._xmodule.graded = 'False'
+        if hasattr(descriptor, '_xmodule'):
+            descriptor._xmodule.graded = 'False'
         self.check_property(descriptor)
 
     # Test that when an xmodule is generated from descriptor_cls
@@ -306,20 +306,19 @@ class XBlockWrapperTestMixin(object):
         descriptor_cls, fields = cls_and_fields
         self.skip_if_invalid(descriptor_cls)
         descriptor = ContainerModuleFactory(descriptor_cls=descriptor_cls, depth=2, **fields)
-        # pylint: disable=no-member
         descriptor.runtime.id_reader.get_definition_id = Mock(return_value='a')
         self.check_property(descriptor)
 
     # Test that when an xmodule is generated from descriptor_cls
     # with mixed xmodule and xblock children, the test property holds
     @ddt.data(*flatten(CONTAINER_XMODULES))
-    def test_container_node_mixed(self, cls_and_fields):  # pylint: disable=unused-argument
+    def test_container_node_mixed(self, cls_and_fields):
         raise SkipTest("XBlock support in XDescriptor not yet fully implemented")
 
     # Test that when an xmodule is generated from descriptor_cls
     # with only xblock children, the test property holds
     @ddt.data(*flatten(CONTAINER_XMODULES))
-    def test_container_node_xblocks_only(self, cls_and_fields):  # pylint: disable=unused-argument
+    def test_container_node_xblocks_only(self, cls_and_fields):
         raise SkipTest("XBlock support in XModules not yet fully implemented")
 
 

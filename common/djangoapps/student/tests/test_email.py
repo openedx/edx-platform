@@ -14,27 +14,27 @@ from django.http import HttpResponse
 from django.test import TransactionTestCase, override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
+from django.utils.html import escape
 from mock import Mock, patch
 from six import text_type
 
-from edxmako.shortcuts import marketing_link, render_to_string
+from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_string
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
-from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase
 from openedx.core.lib.request_utils import safe_get_host
-from student.models import PendingEmailChange, Registration, UserProfile
-from student.tests.factories import PendingEmailChangeFactory, UserFactory
-from student.views import (
+from common.djangoapps.student.models import PendingEmailChange, Registration, UserProfile
+from common.djangoapps.student.tests.factories import PendingEmailChangeFactory, UserFactory
+from common.djangoapps.student.views import (
     SETTING_CHANGE_INITIATED,
     confirm_email_change,
     do_email_change_request,
     generate_activation_email_context,
     validate_new_email
 )
-from third_party_auth.views import inactive_user_view
-from util.testing import EventTestMixin
+from common.djangoapps.third_party_auth.views import inactive_user_view
+from common.djangoapps.util.testing import EventTestMixin
 
 
 class TestException(Exception):
@@ -189,18 +189,18 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
         Registration().register(user)
         request = RequestFactory().get(settings.SOCIAL_AUTH_INACTIVE_USER_URL)
         request.user = user
-        with patch('student.views.management.compose_and_send_activation_email') as email:
-            with patch('third_party_auth.provider.Registry.get_from_pipeline') as reg:
-                with patch('third_party_auth.pipeline.get', return_value=pipeline_partial):
-                    with patch('third_party_auth.pipeline.running', return_value=True):
-                        with patch('third_party_auth.is_enabled', return_value=True):
+        with patch('common.djangoapps.student.views.management.compose_and_send_activation_email') as email:
+            with patch('common.djangoapps.third_party_auth.provider.Registry.get_from_pipeline') as reg:
+                with patch('common.djangoapps.third_party_auth.pipeline.get', return_value=pipeline_partial):
+                    with patch('common.djangoapps.third_party_auth.pipeline.running', return_value=True):
+                        with patch('common.djangoapps.third_party_auth.is_enabled', return_value=True):
                             reg.skip_email_verification = True
                             inactive_user_view(request)
                             self.assertEqual(user.is_active, True)
                             self.assertEqual(email.called, False, msg='method should not have been called')
 
-    @patch('student.tasks.log')
-    def test_send_email_to_inactive_user(self, mock_log):
+    @patch('common.djangoapps.student.views.management.compose_activation_email')
+    def test_send_email_to_inactive_user(self, email):
         """
         Tests that when an inactive user logs-in using the social auth, system
         sends an activation email to the user.
@@ -209,14 +209,10 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
         Registration().register(inactive_user)
         request = RequestFactory().get(settings.SOCIAL_AUTH_INACTIVE_USER_URL)
         request.user = inactive_user
-        with patch('edxmako.request_context.get_current_request', return_value=request):
-            with patch('third_party_auth.pipeline.running', return_value=False):
+        with patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=request):
+            with patch('common.djangoapps.third_party_auth.pipeline.running', return_value=False):
                 inactive_user_view(request)
-                mock_log.info.assert_called_with(
-                    "Activation Email has been sent to User {user_email}".format(
-                        user_email=inactive_user.email
-                    )
-                )
+                self.assertEqual(email.called, True, msg='method should have been called')
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
@@ -225,7 +221,7 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
     Test changing a user's email address
     """
 
-    def setUp(self, tracker='student.views.management.tracker'):
+    def setUp(self, tracker='common.djangoapps.student.views.management.tracker'):
         super(EmailChangeRequestTests, self).setUp(tracker)
         self.user = UserFactory.create()
         self.new_email = 'new.email@edx.org'
@@ -261,7 +257,7 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
         self.assertEqual(expected_error, response_data['error'])
         self.assertFalse(self.user.email_user.called)
 
-    @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+    @patch('common.djangoapps.student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_duplicate_activation_key(self):
         """
         Assert that if two users change Email address simultaneously, no error is thrown
@@ -350,8 +346,8 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
 
 
 @ddt.ddt
-@patch('student.views.management.render_to_response', Mock(side_effect=mock_render_to_response, autospec=True))
-@patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+@patch('common.djangoapps.student.views.management.render_to_response', Mock(side_effect=mock_render_to_response, autospec=True))
+@patch('common.djangoapps.student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
 class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheIsolationMixin, TransactionTestCase):
     """
     Test that confirmation of email change requests function even in the face of exceptions thrown while sending email
@@ -476,7 +472,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
         self.assertFailedBeforeEmailing()
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
-    @patch('student.views.management.ace')
+    @patch('common.djangoapps.student.views.management.ace')
     def test_old_email_fails(self, ace_mail):
         ace_mail.send.side_effect = [Exception, None]
         self.check_confirm_email_change('email_change_failed.html', {
@@ -486,7 +482,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
         self.assertRolledBack()
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
-    @patch('student.views.management.ace')
+    @patch('common.djangoapps.student.views.management.ace')
     def test_new_email_fails(self, ace_mail):
         ace_mail.send.side_effect = [None, Exception]
         self.check_confirm_email_change('email_change_failed.html', {
@@ -517,15 +513,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
         )
         self.assertEqual(0, PendingEmailChange.objects.count())
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
-    def test_prevent_auth_user_writes(self):
-        with waffle().override(PREVENT_AUTH_USER_WRITES, True):
-            self.check_confirm_email_change('email_change_failed.html', {
-                'err_msg': SYSTEM_MAINTENANCE_MSG
-            })
-            self.assertRolledBack()
-
-    @patch('student.views.PendingEmailChange.objects.get', Mock(side_effect=TestException))
+    @patch('common.djangoapps.student.views.PendingEmailChange.objects.get', Mock(side_effect=TestException))
     def test_always_rollback(self):
         connection = transaction.get_connection()
         with patch.object(connection, 'rollback', wraps=connection.rollback) as mock_rollback:
@@ -541,7 +529,7 @@ class SecondaryEmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, Ca
     Test changing a user's email address
     """
 
-    def setUp(self, tracker='student.views.management.tracker'):
+    def setUp(self, tracker='common.djangoapps.student.views.management.tracker'):
         super(SecondaryEmailChangeRequestTests, self).setUp(tracker)
         self.user = UserFactory.create()
         self.new_secondary_email = 'new.secondary.email@edx.org'
@@ -613,9 +601,7 @@ class SecondaryEmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, Ca
         self._assert_email(
             subject=u'Confirm your recovery email for édX',
             body_fragments=[
-                u'You\'ve registered this recovery email address for édX.'.format(
-                    new_email=new_email,
-                ),
+                u'You\'ve registered this recovery email address for édX.',
                 u'If you set this email address, click "confirm email."',
                 u'If you didn\'t request this change, you can disregard this email.',
                 u'http://edx.org/activate_secondary_email/{key}'.format(key=registration_key),
@@ -636,6 +622,6 @@ class SecondaryEmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, Ca
 
         assert message.subject == subject
 
-        for body in text, html:
-            for fragment in body_fragments:
-                assert fragment in body
+        for fragment in body_fragments:
+            assert fragment in text
+            assert escape(fragment) in html

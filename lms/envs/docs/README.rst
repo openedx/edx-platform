@@ -4,7 +4,7 @@ LMS Configuration Settings
 The lms.envs module contains project-wide settings, defined in python modules
 using the standard `Django Settings`_ mechanism.
 
-.. _Django Settings: https://docs.djangoproject.com/en/1.11/topics/settings/
+.. _Django Settings: https://docs.djangoproject.com/en/2.2/topics/settings/
 
 Different python modules are used for different setting configuration options.
 To prevent duplication of settings, modules import values from other modules,
@@ -13,20 +13,16 @@ as shown in the diagram below.
 .. image:: images/lms_settings.png
 
 
-JSON Configuration Files
+YAML Configuration Files
 ------------------------
 
-In addition, there is a mechanism for reading and overriding configuration
-settings from JSON files on-disk. The :file:`/lms/envs/production.py` module loads
-settings from ``lms.env.json`` and ``lms.auth.json`` files. All
-security-sensitive settings and data belong in the ``lms.auth.json`` file, while
-the rest are configured via the ``lms.env.json`` file.
+In addition, there is a mechanism for reading and overriding configuration settings from YAML files on-disk. The :file:`/lms/envs/production.py` module loads settings from a YAML file.  The location of the YAML file is pulled from the value of the ``LMS_CFG`` environment variable.  Except for a limited set of exceptions, if a key exists in the YAML file, it will be injected into the settings module as it is defined in the YAML file.
 
-These JSON files allow open edX operators to configure the django runtime
+The YAML file allow open edX operators to configure the Django runtime
 without needing to make any changes to source-controlled python files in
 edx-platform. Therefore, they are not checked into the edx-platform repo.
 Rather, they are generated from the `edxapp playbook in the configuration
-repo`_ and available in the ``/edx/app/edxapp/`` folder on edX servers.
+repo`_ and available in the ``/edx/etc/`` folder on edX servers.
 
 .. _edxapp playbook in the configuration repo: https://github.com/edx/configuration/tree/master/playbooks/roles/edxapp
 
@@ -91,7 +87,7 @@ when nested within each other::
         },
         {
             'NAME': 'mako',
-            'BACKEND': 'edxmako.backend.Mako',
+            'BACKEND': 'common.djangoapps.edxmako.backend.Mako',
             'APP_DIRS': False,
             'DIRS': _make_mako_template_dirs,
         },

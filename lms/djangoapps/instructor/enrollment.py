@@ -24,7 +24,7 @@ from six import text_type
 from submissions import api as sub_api  # installed from the edx-submissions repository
 from submissions.models import score_set
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.grades.api import constants as grades_constants
 from lms.djangoapps.grades.api import disconnect_submissions_signal_receiver
@@ -43,8 +43,8 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangolib.markup import Text
-from student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user, is_email_retired
-from track.event_transaction_utils import (
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user, is_email_retired
+from common.djangoapps.track.event_transaction_utils import (
     create_new_event_transaction_id,
     get_event_transaction_id,
     set_event_transaction_type
@@ -137,16 +137,16 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
     """
     previous_state = EmailEnrollmentState(course_id, student_email)
     enrollment_obj = None
-    if previous_state.user:
+    if previous_state.user and User.objects.get(email=student_email).is_active:
         # if the student is currently unenrolled, don't enroll them in their
         # previous mode
 
-        # for now, White Labels use 'shoppingcart' which is based on the
+        # for now, White Labels use the
         # "honor" course_mode. Given the change to use "audit" as the default
         # course_mode in Open edX, we need to be backwards compatible with
         # how White Labels approach enrollment modes.
         if CourseMode.is_white_label(course_id):
-            course_mode = CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
+            course_mode = CourseMode.HONOR
         else:
             course_mode = None
 
@@ -247,6 +247,8 @@ def reset_student_attempts(course_id, student, module_state_key, requesting_user
     user_id = anonymous_id_for_user(student, course_id)
     requesting_user_id = anonymous_id_for_user(requesting_user, course_id)
     submission_cleared = False
+    teams_enabled = False
+    selected_teamset_id = None
     try:
         # A block may have children. Clear state on children first.
         block = modulestore().get_item(module_state_key)
@@ -270,6 +272,9 @@ def reset_student_attempts(course_id, student, module_state_key, requesting_user
                         requesting_user_id=requesting_user_id
                     )
                 submission_cleared = True
+        teams_enabled = getattr(block, 'teams_enabled', False)
+        if teams_enabled:
+            selected_teamset_id = getattr(block, 'selected_teamset_id', None)
     except ItemNotFoundError:
         block = None
         log.warning(u"Could not find %s in modulestore when attempting to reset attempts.", module_state_key)
@@ -286,36 +291,53 @@ def reset_student_attempts(course_id, student, module_state_key, requesting_user
             text_type(module_state_key),
         )
 
-    module_to_reset = StudentModule.objects.get(
-        student_id=student.id,
-        course_id=course_id,
-        module_state_key=module_state_key
-    )
-
-    if delete_module:
-        module_to_reset.delete()
-        create_new_event_transaction_id()
-        set_event_transaction_type(grades_events.STATE_DELETED_EVENT_TYPE)
-        tracker.emit(
-            six.text_type(grades_events.STATE_DELETED_EVENT_TYPE),
-            {
-                'user_id': six.text_type(student.id),
-                'course_id': six.text_type(course_id),
-                'problem_id': six.text_type(module_state_key),
-                'instructor_id': six.text_type(requesting_user.id),
-                'event_transaction_id': six.text_type(get_event_transaction_id()),
-                'event_transaction_type': six.text_type(grades_events.STATE_DELETED_EVENT_TYPE),
-            }
-        )
-        if not submission_cleared:
-            _fire_score_changed_for_block(
-                course_id,
-                student,
-                block,
-                module_state_key,
+    def _reset_or_delete_module(studentmodule):
+        if delete_module:
+            studentmodule.delete()
+            create_new_event_transaction_id()
+            set_event_transaction_type(grades_events.STATE_DELETED_EVENT_TYPE)
+            tracker.emit(
+                six.text_type(grades_events.STATE_DELETED_EVENT_TYPE),
+                {
+                    'user_id': six.text_type(student.id),
+                    'course_id': six.text_type(course_id),
+                    'problem_id': six.text_type(module_state_key),
+                    'instructor_id': six.text_type(requesting_user.id),
+                    'event_transaction_id': six.text_type(get_event_transaction_id()),
+                    'event_transaction_type': six.text_type(grades_events.STATE_DELETED_EVENT_TYPE),
+                }
             )
+            if not submission_cleared:
+                _fire_score_changed_for_block(
+                    course_id,
+                    student,
+                    block,
+                    module_state_key,
+                )
+        else:
+            _reset_module_attempts(studentmodule)
+
+    team = None
+    if teams_enabled:
+        from lms.djangoapps.teams.api import get_team_for_user_course_topic
+        team = get_team_for_user_course_topic(student, str(course_id), selected_teamset_id)
+    if team:
+        modules_to_reset = StudentModule.objects.filter(
+            student__teams=team,
+            course_id=course_id,
+            module_state_key=module_state_key
+        )
+        for module_to_reset in modules_to_reset:
+            _reset_or_delete_module(module_to_reset)
+        return
     else:
-        _reset_module_attempts(module_to_reset)
+        # Teams are not enabled or the user does not have a team
+        module_to_reset = StudentModule.objects.get(
+            student_id=student.id,
+            course_id=course_id,
+            module_state_key=module_state_key
+        )
+        _reset_or_delete_module(module_to_reset)
 
 
 def _reset_module_attempts(studentmodule):

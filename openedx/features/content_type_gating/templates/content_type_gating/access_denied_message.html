@@ -11,11 +11,12 @@
         </span>
         {% if not mobile_app and ecommerce_checkout_link %}
         <span class="certDIV_1" style="">
-            <a href="{{ecommerce_checkout_link}}" class="certA_1">
+            <a id="accessDeniedUpsell" href="{{ecommerce_checkout_link}}" class="certA_1">
                 {% trans "Upgrade to unlock" as tmsg %}{{tmsg|force_escape}} ({{min_price}})
             </a>
         </span>
         {% endif %}
     </div>
-    <img src="/static/images/edx-verified-mini-cert.png">
+    <img src="{% static 'images/edx-verified-mini-cert.png' %}"
+         alt="{% trans 'Example of a verified certificate' as tmsg %}{{ tmsg | force_escape }}">
 </div>

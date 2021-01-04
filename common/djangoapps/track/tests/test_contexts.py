@@ -1,11 +1,8 @@
-# pylint: disable=missing-docstring
-
-
 from unittest import TestCase
 
 import ddt
 
-from track import contexts
+from common.djangoapps.track import contexts
 
 
 @ddt.ddt

@@ -1,0 +1,23 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:5.7
+    container_name: edx.devstack.mysql57
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    volumes:
+      - ./init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+  edxapp:
+    image: edxops/edxapp:latest
+    command: bash -c 'source /edx/app/edxapp/edxapp_env && cd /edx/app/edxapp/edx-platform/ && paver update_db'
+    volumes:
+       - ../../:/edx/app/edxapp/edx-platform
+    depends_on:
+      - mysql

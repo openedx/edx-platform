@@ -26,11 +26,17 @@ from xblock.runtime import Mixologist
 
 # The below import is not used within this module, but ir is still needed becuase
 # other modules are imorting EdxJSONEncoder from here
-from openedx.core.lib.json_utils import EdxJSONEncoder  # pylint: disable=unused-import
+from openedx.core.lib.json_utils import EdxJSONEncoder
 from xmodule.assetstore import AssetMetadata
 from xmodule.errortracker import make_error_tracker
 
 from .exceptions import InsufficientSpecificationError, InvalidLocationError
+
+# The name of the type for patterns in re changed in Python 3.7.
+try:
+    Pattern = re._pattern_type  # pylint: disable=protected-access
+except AttributeError:
+    Pattern = re.Pattern  # pylint: disable=no-member
 
 log = logging.getLogger('edx.modulestore')
 
@@ -387,7 +393,7 @@ class EditInfo(object):
         self.original_usage_version = edit_info.get('original_usage_version', None)
 
     def __repr__(self):
-        # pylint: disable=bad-continuation, redundant-keyword-arg
+        # pylint: disable=bad-continuation
         return ("{classname}(previous_version={self.previous_version}, "
                 "update_version={self.update_version}, "
                 "source_version={source_version}, "
@@ -474,7 +480,7 @@ class BlockData(object):
         return self.asides
 
     def __repr__(self):
-        # pylint: disable=bad-continuation, redundant-keyword-arg
+        # pylint: disable=bad-continuation
         return ("{classname}(fields={self.fields}, "
                 "block_type={self.block_type}, "
                 "definition={self.definition}, "
@@ -899,7 +905,7 @@ class ModuleStoreRead(six.with_metaclass(ABCMeta, ModuleStoreAssetBase)):
         """
         if isinstance(target, list):
             return any(self._value_matches(ele, criteria) for ele in target)
-        elif isinstance(criteria, re._pattern_type):  # pylint: disable=protected-access
+        elif isinstance(criteria, Pattern):
             return criteria.search(target) is not None
         elif callable(criteria):
             return criteria(target)
@@ -1157,11 +1163,9 @@ class ModuleStoreWrite(six.with_metaclass(ABCMeta, ModuleStoreRead, ModuleStoreA
 
 # pylint: disable=abstract-method
 class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
-    '''
+    """
     Implement interface functionality that can be shared.
-    '''
-
-    # pylint: disable=invalid-name
+    """
     def __init__(
         self,
         contentstore=None,
@@ -1178,7 +1182,6 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
         '''
         super(ModuleStoreReadBase, self).__init__(**kwargs)
         self._course_errors = defaultdict(make_error_tracker)  # location -> ErrorLog
-        # pylint: disable=fixme
         # TODO move the inheritance_cache_subsystem to classes which use it
         self.metadata_inheritance_cache_subsystem = metadata_inheritance_cache_subsystem
         self.request_cache = request_cache
@@ -1194,7 +1197,6 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
         errors as get_item if course_key isn't present.
         """
         # check that item is present and raise the promised exceptions if needed
-        # pylint: disable=fixme
         # TODO (vshnayder): post-launch, make errors properties of items
         # self.get_item(location)
         assert isinstance(course_key, CourseKey)

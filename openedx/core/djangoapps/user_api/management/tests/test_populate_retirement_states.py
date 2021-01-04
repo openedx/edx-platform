@@ -10,7 +10,7 @@ from django.core.management import CommandError, call_command
 
 from openedx.core.djangoapps.user_api.management.commands.populate_retirement_states import START_STATE
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
 

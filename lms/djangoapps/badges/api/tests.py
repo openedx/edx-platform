@@ -9,10 +9,10 @@ from django.conf import settings
 from django.test.utils import override_settings
 from six.moves import range
 
-from badges.tests.factories import BadgeAssertionFactory, BadgeClassFactory, RandomBadgeClassFactory
+from lms.djangoapps.badges.tests.factories import BadgeAssertionFactory, BadgeClassFactory, RandomBadgeClassFactory
 from openedx.core.lib.api.test_utils import ApiTestCase
-from student.tests.factories import UserFactory
-from util.testing import UrlResetMixin
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -133,10 +133,10 @@ class TestUserCourseBadgeAssertions(UserAssertionTestCase):
         # Also should not be included, as they don't share the same user.
         for dummy in range(6):
             BadgeAssertionFactory.create(badge_class=badge_class)
-        response = self.get_json(self.url(), data={'course_id': course_key})
+        response = self.get_json(self.url(), data={'course_id': str(course_key)})
         self.assertEqual(len(response['results']), 3)
         unused_course = CourseFactory.create()
-        response = self.get_json(self.url(), data={'course_id': unused_course.location.course_key})
+        response = self.get_json(self.url(), data={'course_id': str(unused_course.location.course_key)})
         self.assertEqual(len(response['results']), 0)
 
     def test_assertion_structure(self):

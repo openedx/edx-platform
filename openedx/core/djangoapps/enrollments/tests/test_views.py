@@ -27,8 +27,8 @@ from rest_framework.test import APITestCase
 from six import text_type
 from six.moves import range
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
@@ -41,11 +41,11 @@ from openedx.core.djangoapps.user_api.models import RetirementState, UserOrgTag,
 from openedx.core.lib.django_test_client_utils import get_absolute_url
 from openedx.features.enterprise_support.tests import FAKE_ENTERPRISE_CUSTOMER
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
-from student.models import CourseEnrollment
-from student.roles import CourseStaffRole
-from student.tests.factories import AdminFactory, SuperuserFactory, UserFactory
-from util.models import RateLimitConfiguration
-from util.testing import UrlResetMixin
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import AdminFactory, SuperuserFactory, UserFactory
+from common.djangoapps.util.models import RateLimitConfiguration
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 
@@ -134,10 +134,10 @@ class EnrollmentTestMixin(object):
 
         return response
 
-    def assert_enrollment_activation(self, expected_activation, expected_mode):
+    def assert_enrollment_activation(self, expected_activation, expected_mode, as_server=True):
         """Change an enrollment's activation and verify its activation and mode are as expected."""
         self.assert_enrollment_status(
-            as_server=True,
+            as_server=as_server,
             mode=expected_mode,
             is_active=expected_activation,
             expected_status=status.HTTP_200_OK
@@ -854,6 +854,33 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             is_active=False,
             expected_status=expected_status,
         )
+
+    def test_deactivate_enrollment_with_global_staff(self):
+        """Without API key but Staff staff permissions, deactivate (i.e., unenroll from) an existing enrollment."""
+        # Configure a mode for the course.
+        mode = CourseMode.VERIFIED
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug=mode,
+            mode_display_name=mode,
+        )
+
+        # Create an enrollment with the selected mode.
+        self.assert_enrollment_status(as_server=True, mode=mode)
+
+        # Check that the enrollment has the correct mode and is active.
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
+        course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        self.assertTrue(is_active)
+        self.assertEqual(course_mode, mode)
+
+        username = 'global_staff'
+        AdminFactory(username=username, email='global_staff@example.com', password=self.PASSWORD)
+
+        self.client.login(username=username, password=self.PASSWORD)
+        # Verify that the enrollment has been deactivated, and the mode is
+        # unchanged even by passing the as_server=false which means no API-KEY
+        self.assert_enrollment_activation(False, mode, as_server=False)
 
     def test_deactivate_enrollment_expired_mode(self):
         """Verify that an enrollment in an expired mode can be deactivated."""
@@ -1672,12 +1699,12 @@ class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
 
     def test_user_not_authenticated(self):
         self.client.logout()
-        response = self.client.get(self.url, {'course_id': self.course.id})
+        response = self.client.get(self.url, {'course_id': str(self.course.id)})
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_user_not_authorized(self):
         self.client.login(username=self.student1.username, password='edx')
-        response = self.client.get(self.url, {'course_id': self.course.id})
+        response = self.client.get(self.url, {'course_id': str(self.course.id)})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     @ddt.data(

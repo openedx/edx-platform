@@ -19,9 +19,8 @@ from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
-from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -32,11 +31,12 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.certificates.queue import XQueueAddToQueueError, XQueueCertInterface
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
+from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
-from util.testing import EventTestMixin
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -199,23 +199,20 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
                 'is_downloadable': True,
                 'is_generating': False,
                 'is_unverified': False,
-                'download_url': '/certificates/user/{user_id}/course/{course_id}'.format(
-                    user_id=self.student.id,
-                    course_id=self.course.id,
-                ),
+                'download_url': '/certificates/{uuid}'.format(uuid=cert_status['uuid']),
                 'is_pdf_certificate': False,
                 'uuid': cert_status['uuid']
             }
         )
 
     @ddt.data(
-        (False, timedelta(days=2), False),
-        (False, -timedelta(days=2), True),
-        (True, timedelta(days=2), True)
+        (False, timedelta(days=2), False, True),
+        (False, -timedelta(days=2), True, None),
+        (True, timedelta(days=2), True, None)
     )
     @ddt.unpack
     @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
-    def test_cert_api_return(self, self_paced, cert_avail_delta, cert_downloadable_status):
+    def test_cert_api_return(self, self_paced, cert_avail_delta, cert_downloadable_status, earned_but_not_available):
         """
         Test 'downloadable status'
         """
@@ -229,10 +226,9 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
         with mock_passing_grade():
             certs_api.generate_user_certificates(self.student, self.course.id)
 
-        self.assertEqual(
-            certs_api.certificate_downloadable_status(self.student, self.course.id)['is_downloadable'],
-            cert_downloadable_status
-        )
+        downloadable_status = certs_api.certificate_downloadable_status(self.student, self.course.id)
+        self.assertEqual(downloadable_status['is_downloadable'], cert_downloadable_status)
+        self.assertEqual(downloadable_status.get('earned_but_not_available'), earned_but_not_available)
 
 
 @ddt.ddt
@@ -372,6 +368,11 @@ class CertificateGetTests(SharedModuleStoreTestCase):
             display_name='Verified Course 2',
             cert_html_view_enabled=False
         )
+        cls.no_cert_course = CourseFactory.create(
+            org='edx',
+            number='verified_3',
+            display_name='Verified Course 3',
+        )
         # certificate for the first course
         GeneratedCertificateFactory.create(
             user=cls.student,
@@ -442,6 +443,21 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         self.assertEqual(certs[0]['download_url'], 'www.google.com')
         self.assertEqual(certs[1]['download_url'], 'www.gmail.com')
 
+    def test_get_certificates_for_user_by_course_keys(self):
+        """
+        Test to get certificates for a user for certain course keys,
+        in a dictionary indexed by those course keys.
+        """
+        certs = certs_api.get_certificates_for_user_by_course_keys(
+            user=self.student,
+            course_keys={self.web_cert_course.id, self.no_cert_course.id},
+        )
+        assert set(certs.keys()) == {self.web_cert_course.id}
+        cert = certs[self.web_cert_course.id]
+        self.assertEqual(cert['username'], self.student.username)
+        self.assertEqual(cert['course_key'], self.web_cert_course.id)
+        self.assertEqual(cert['download_url'], 'www.google.com')
+
     def test_no_certificate_for_user(self):
         """
         Test the case when there is no certificate for a user for a specific course.
@@ -476,16 +492,14 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         self.assertEqual(expected_url, cert_url)
 
         expected_url = reverse(
-            'certificates:html_view',
-            kwargs={
-                "user_id": str(self.student.id),
-                "course_id": six.text_type(self.web_cert_course.id),
-            }
+            'certificates:render_cert_by_uuid',
+            kwargs=dict(certificate_uuid=self.uuid)
         )
 
         cert_url = certs_api.get_certificate_url(
             user_id=self.student.id,
-            course_id=self.web_cert_course.id
+            course_id=self.web_cert_course.id,
+            uuid=self.uuid
         )
         self.assertEqual(expected_url, cert_url)
 
@@ -675,7 +689,7 @@ class CertificateGenerationEnabledTest(EventTestMixin, TestCase):
         self.assertEqual(expect_enabled, actual_enabled)
 
 
-class GenerateExampleCertificatesTest(TestCase):
+class GenerateExampleCertificatesTest(ModuleStoreTestCase):
     """Test generation of example certificates. """
 
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')
@@ -739,7 +753,7 @@ class GenerateExampleCertificatesTest(TestCase):
 
 
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-class CertificatesBrandingTest(TestCase):
+class CertificatesBrandingTest(ModuleStoreTestCase):
     """Test certificates branding. """
 
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')

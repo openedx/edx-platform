@@ -6,7 +6,6 @@ Unittests for exporting to git via management command.
 import copy
 import os
 import shutil
-from six import StringIO
 import subprocess
 import unittest
 from uuid import uuid4
@@ -17,10 +16,11 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test.utils import override_settings
 from opaque_keys.edx.locator import CourseLocator
+from six import StringIO
 
-import contentstore.git_export_utils as git_export_utils
-from contentstore.git_export_utils import GitExportError
-from contentstore.tests.utils import CourseTestCase
+import cms.djangoapps.contentstore.git_export_utils as git_export_utils
+from cms.djangoapps.contentstore.git_export_utils import GitExportError
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 
 FEATURES_WITH_EXPORT_GIT = settings.FEATURES.copy()
 FEATURES_WITH_EXPORT_GIT['ENABLE_EXPORT_GIT'] = True

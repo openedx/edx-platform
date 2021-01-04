@@ -4,20 +4,23 @@
 
 import datetime
 import json
+import sys
 
 import ddt
 import mock
+import pytest
 import six
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from edx_django_utils.cache import RequestCache
 from mock import Mock, patch
+from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import text_type
 
 import lms.djangoapps.discussion.django_comment_client.utils as utils
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
@@ -44,8 +47,8 @@ from openedx.core.djangoapps.django_comment_common.utils import (
     set_course_discussion_settings
 )
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
-from student.roles import CourseStaffRole
-from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
@@ -359,11 +362,9 @@ class CategoryMapTestMixin(object):
         Call `get_discussion_category_map`, and verify that it returns
         what is expected.
         """
-
-        self.assertEqual(
-            utils.get_discussion_category_map(self.course, requesting_user or self.user),
-            expected
-        )
+        actual = utils.get_discussion_category_map(self.course, requesting_user or self.user)
+        actual['subcategories']['Week 1']['children'].sort()
+        self.assertEqual(actual, expected)
 
 
 class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
@@ -535,7 +536,6 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         )
 
     def test_get_unstarted_discussion_xblocks(self):
-
         self.create_discussion("Chapter 1", "Discussion 1", start=self.later)
 
         self.assert_category_map_equals(
@@ -572,7 +572,6 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter 3 / Section 1", "Discussion")
 
         def check_divided(is_divided):
-
             self.assert_category_map_equals(
                 {
                     "entries": {},
@@ -952,6 +951,74 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             }
         )
 
+    @pytest.mark.skipif(
+        sys.version_info < (3, 7),
+        reason="Python 3.7 sorted dict insertion is considered"
+    )
+    def test_sort_intermediates(self):
+        self.create_discussion("Chapter B", "Discussion 2")
+        self.create_discussion("Chapter C", "Discussion")
+        self.create_discussion("Chapter A", "Discussion 1")
+        self.create_discussion("Chapter B", "Discussion 1")
+        self.create_discussion("Chapter A", "Discussion 2")
+
+        self.assert_category_map_equals(
+            {
+                "children": [("Chapter A", TYPE_SUBCATEGORY), ("Chapter B", TYPE_SUBCATEGORY),
+                             ("Chapter C", TYPE_SUBCATEGORY)],
+                "entries": {},
+                "subcategories": {
+                    "Chapter A": {
+                        "children": [("Discussion 1", TYPE_ENTRY), ("Discussion 2", TYPE_ENTRY)],
+                        "entries": {
+                            "Discussion 1": {
+                                "id": "discussion3",
+                                "sort_key": None,
+                                "is_divided": False,
+                            },
+                            "Discussion 2": {
+                                "id": "discussion5",
+                                "sort_key": None,
+                                "is_divided": False,
+                            }
+                        },
+                        "subcategories": {},
+                    },
+                    "Chapter B": {
+                        "children": [("Discussion 2", TYPE_ENTRY), ("Discussion 1", TYPE_ENTRY)],
+                        "entries": {
+                            "Discussion 2": {
+                                "id": "discussion1",
+                                "sort_key": None,
+                                "is_divided": False,
+                            },
+                            "Discussion 1": {
+                                "id": "discussion4",
+                                "sort_key": None,
+                                "is_divided": False,
+                            }
+                        },
+                        "subcategories": {},
+                    },
+                    "Chapter C": {
+                        "entries": {
+                            "Discussion": {
+                                "id": "discussion2",
+                                "sort_key": None,
+                                "is_divided": False,
+                            }
+                        },
+                        "children": [("Discussion", TYPE_ENTRY)],
+                        "subcategories": {},
+                    }
+                },
+            }
+        )
+
+    @pytest.mark.skipif(
+        sys.version_info >= (3, 7),
+        reason="Python 3.7 sorted dict insertion is not considered"
+    )
     def test_sort_intermediates(self):
         self.create_discussion("Chapter B", "Discussion 2")
         self.create_discussion("Chapter C", "Discussion")
@@ -1152,43 +1219,35 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
         Verify that the beta user can access the beta and global
         discussion topics.
         """
-
-        children = [('Visible to Beta', 'entry'), ('Visible to Everyone', 'entry')]
-
-        if six.PY3:
-            children = [('Visible to Everyone', 'entry'), ('Visible to Beta', 'entry')]
-
-        expected = {
-            'subcategories': {
-                'Week 1': {
-                    'subcategories': {},
-                    'children': children,
-                    'entries': {
-                        'Visible to Beta': {
-                            'sort_key': None,
-                            'is_divided': False,
-                            'id': 'beta_group_discussion'
-                        },
-                        'Visible to Everyone': {
-                            'sort_key': None,
-                            'is_divided': False,
-                            'id': 'global_group_discussion'
+        self.assert_category_map_equals(
+            {
+                'subcategories': {
+                    'Week 1': {
+                        'subcategories': {},
+                        'children': [('Visible to Beta', 'entry'), ('Visible to Everyone', 'entry')],
+                        'entries': {
+                            'Visible to Beta': {
+                                'sort_key': None,
+                                'is_divided': False,
+                                'id': 'beta_group_discussion'
+                            },
+                            'Visible to Everyone': {
+                                'sort_key': None,
+                                'is_divided': False,
+                                'id': 'global_group_discussion'
+                            }
                         }
+                    }
+                },
+                'children': [('General', 'entry'), ('Week 1', 'subcategory')],
+                'entries': {
+                    'General': {
+                        'sort_key': 'General',
+                        'is_divided': False,
+                        'id': 'i4x-org-number-course-run'
                     }
                 }
             },
-            'children': [('General', 'entry'), ('Week 1', 'subcategory')],
-            'entries': {
-                'General': {
-                    'sort_key': 'General',
-                    'is_divided': False,
-                    'id': 'i4x-org-number-course-run'
-                }
-            }
-        }
-
-        self.assert_category_map_equals(
-            expected,
             requesting_user=self.beta_user
         )
 
@@ -1257,7 +1316,7 @@ class DiscussionTabTestCase(ModuleStoreTestCase):
             self.assertTrue(self.discussion_tab_present(self.enrolled_user))
             self.assertFalse(self.discussion_tab_present(self.unenrolled_user))
 
-    @mock.patch('ccx.overrides.get_current_ccx')
+    @mock.patch('lms.djangoapps.ccx.overrides.get_current_ccx')
     def test_tab_settings(self, mock_get_ccx):
         mock_get_ccx.return_value = True
         with self.settings(FEATURES={'ENABLE_DISCUSSION_SERVICE': False}):
@@ -1855,3 +1914,48 @@ def set_discussion_division_settings(
         always_divide_inline_discussions=always_divide_inline_discussions,
     )
     set_course_cohorted(course_key, enable_cohorts)
+
+
+@ddt.ddt
+class MiscUtilsTests(TestCase):
+    @ddt.data(
+        ('course-v1:edX+foo101+bar_t2', '99', '99'),
+        ('course-v1:edX+foo101+bar_t2', 99, 99)
+    )
+    @ddt.unpack
+    def test_permalink_does_not_break_for_thread(self, course_id, discussion_id, content_id):
+        """
+        Tests that the method does not break.
+
+        Test with permalink method for thread type of content data.
+        """
+        url_kwargs = {'course_id': course_id, 'discussion_id': discussion_id, 'thread_id': content_id}
+        thread_data = {'id': content_id, 'course_id': course_id, 'commentable_id': discussion_id, 'type': 'thread'}
+        expected_url = reverse('single_thread', kwargs=url_kwargs)
+
+        self.assertEqual(utils.permalink(thread_data), expected_url)
+
+        thread_data['course_id'] = CourseKey.from_string(course_id)
+        self.assertEqual(utils.permalink(thread_data), expected_url)
+
+    @ddt.data(
+        ('course-v1:edX+foo101+bar_t2', '99', '99'),
+        ('course-v1:edX+foo101+bar_t2', 99, 99)
+    )
+    @ddt.unpack
+    def test_permalink_does_not_break_for_non_thread(self, course_id, discussion_id, thread_id):
+        """
+        Tests that the method does not break.
+
+        Test with permalink method for non thread type of content data.
+        """
+        url_kwargs = {'course_id': course_id, 'discussion_id': discussion_id, 'thread_id': thread_id}
+        thread_data = {
+            'id': '101', 'thread_id': thread_id, 'course_id': course_id, 'commentable_id': discussion_id, 'type': 'foo'
+        }
+        expected_url = reverse('single_thread', kwargs=url_kwargs) + '#' + thread_data['id']
+
+        self.assertEqual(utils.permalink(thread_data), expected_url)
+
+        thread_data['course_id'] = CourseKey.from_string(course_id)
+        self.assertEqual(utils.permalink(thread_data), expected_url)

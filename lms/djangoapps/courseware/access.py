@@ -43,12 +43,12 @@ from lms.djangoapps.courseware.access_utils import (
 from lms.djangoapps.courseware.masquerade import get_masquerade_role, is_masquerading_as_student
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.ccx.models import CustomCourseForEdX
-from mobile_api.models import IgnoreMobileAvailableFlagConfig
+from lms.djangoapps.mobile_api.models import IgnoreMobileAvailableFlagConfig
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_duration_limits.access import check_course_expired
-from student import auth
-from student.models import CourseEnrollmentAllowed
-from student.roles import (
+from common.djangoapps.student import auth
+from common.djangoapps.student.models import CourseEnrollmentAllowed
+from common.djangoapps.student.roles import (
     CourseBetaTesterRole,
     CourseCcxCoachRole,
     CourseInstructorRole,
@@ -58,8 +58,8 @@ from student.roles import (
     OrgStaffRole,
     SupportStaffRole
 )
-from util import milestones_helpers as milestones_helpers
-from util.milestones_helpers import (
+from common.djangoapps.util import milestones_helpers as milestones_helpers
+from common.djangoapps.util.milestones_helpers import (
     any_unfulfilled_milestones,
     get_pre_requisite_courses_not_completed,
     is_prerequisite_courses_enabled
@@ -502,6 +502,7 @@ def _has_group_access(descriptor, user, course_key):
     # If missing_groups is empty, the user is granted access.
     # If missing_groups is NOT empty, we generate an error based on one of the particular groups they are missing.
     missing_groups = []
+    block_key = descriptor.scope_ids.usage_id
     for partition, groups in partition_groups:
         user_group = partition.scheme.get_group_for_user(
             course_key,
@@ -509,17 +510,25 @@ def _has_group_access(descriptor, user, course_key):
             partition,
         )
         if user_group not in groups:
-            missing_groups.append((partition, user_group, groups))
+            missing_groups.append((
+                partition,
+                user_group,
+                groups,
+                partition.access_denied_message(block_key, user, user_group, groups),
+                partition.access_denied_fragment(descriptor, user, user_group, groups),
+            ))
 
     if missing_groups:
-        partition, user_group, allowed_groups = missing_groups[0]
-        block_key = descriptor.scope_ids.usage_id
+        # Prefer groups with explanatory messages
+        # False < True, so the default order and `is None` results in groups with messages coming first
+        ordered_groups = sorted(missing_groups, key=lambda details: (details[3] is None, details[4] is None))
+        partition, user_group, allowed_groups, message, fragment = ordered_groups[0]
         return IncorrectPartitionGroupError(
             partition=partition,
             user_group=user_group,
             allowed_groups=allowed_groups,
-            user_message=partition.access_denied_message(block_key, user, user_group, allowed_groups),
-            user_fragment=partition.access_denied_fragment(descriptor, user, user_group, allowed_groups),
+            user_message=message,
+            user_fragment=fragment,
         )
 
     # all checks passed.

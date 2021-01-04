@@ -68,9 +68,6 @@ from smtplib import SMTPException
 from uuid import uuid4
 
 import six
-import six.moves.urllib.error  # pylint: disable=import-error
-import six.moves.urllib.parse  # pylint: disable=import-error
-import six.moves.urllib.request  # pylint: disable=import-error
 import social_django
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -83,15 +80,17 @@ from social_core.pipeline import partial
 from social_core.pipeline.social_auth import associate_by_email
 from social_core.utils import module_member, slugify
 
-import third_party_auth
-from edxmako.shortcuts import render_to_string
+from common.djangoapps import third_party_auth
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from lms.djangoapps.verify_student.models import SSOVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
-from third_party_auth.utils import user_exists
-from track import segment
-from util.json_request import JsonResponse
+from openedx.core.djangoapps.user_authn.utils import should_redirect_to_logistration_mircrofrontend
+from common.djangoapps.third_party_auth.utils import user_exists
+from common.djangoapps.track import segment
+from common.djangoapps.util.json_request import JsonResponse
 
 from . import provider
 
@@ -128,6 +127,9 @@ AUTH_ENTRY_REGISTER_API = 'register_api'
 # URL specified with this setting, rather than to the built-in
 # registration/login form/logic.
 AUTH_ENTRY_CUSTOM = getattr(settings, 'THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS', {})
+
+# If logistration MFE is enabled, the redirect should be to MFE instead of FE
+BASE_URL = settings.LOGISTRATION_MICROFRONTEND_URL if should_redirect_to_logistration_mircrofrontend() else ''
 
 
 def is_api(auth_entry):
@@ -561,11 +563,11 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
     # invariants have been violated and future misbehavior is likely.
     def dispatch_to_login():
         """Redirects to the login page."""
-        return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN])
+        return redirect(BASE_URL + AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN])
 
     def dispatch_to_register():
         """Redirects to the registration page."""
-        return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER])
+        return redirect(BASE_URL + AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER])
 
     def should_force_account_creation():
         """ For some third party providers, we auto-create user accounts """
@@ -853,7 +855,10 @@ def set_id_verification_status(auth_entry, strategy, details, user=None, *args, 
 
 def get_username(strategy, details, backend, user=None, *args, **kwargs):
     """
-    Copy of social_core.pipeline.user.get_username with additional logging and case insensitive username checks.
+    Copy of social_core.pipeline.user.get_username to achieve
+    1. additional logging
+    2. case insensitive username checks
+    3. enforce same maximum and minimum length restrictions we have in `user_api/accounts`
     """
     if 'username' not in backend.setting('USER_FIELDS', USER_FIELDS):
         return
@@ -862,7 +867,8 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):
     if not user:
         email_as_username = strategy.setting('USERNAME_IS_FULL_EMAIL', False)
         uuid_length = strategy.setting('UUID_LENGTH', 16)
-        max_length = storage.user.username_max_length()
+        min_length = strategy.setting('USERNAME_MIN_LENGTH', accounts.USERNAME_MIN_LENGTH)
+        max_length = strategy.setting('USERNAME_MAX_LENGTH', accounts.USERNAME_MAX_LENGTH)
         do_slugify = strategy.setting('SLUGIFY_USERNAMES', False)
         do_clean = strategy.setting('CLEAN_USERNAMES', True)
 
@@ -901,7 +907,7 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):
         # username is cut to avoid any field max_length.
         # The final_username may be empty and will skip the loop.
         # We are using our own version of user_exists to avoid possible case sensitivity issues.
-        while not final_username or user_exists({'username': final_username}):
+        while not final_username or len(final_username) < min_length or user_exists({'username': final_username}):
             username = short_username + uuid4().hex[:uuid_length]
             final_username = slug_func(clean_func(username[:max_length]))
             logger.info(u'[THIRD_PARTY_AUTH] New username generated. Username: {username}'.format(

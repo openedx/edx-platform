@@ -8,7 +8,7 @@ from bson.errors import BSONError
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 
-from track.backends import BaseBackend
+from common.djangoapps.track.backends import BaseBackend
 
 log = logging.getLogger(__name__)
 

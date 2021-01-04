@@ -15,9 +15,10 @@ from django.contrib.sites.models import Site
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 from edx_ace.utils import date
+from edx_django_utils.monitoring import set_code_owner_attribute
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
-from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
+from six.moves.urllib.parse import urljoin
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from lms.djangoapps.discussion.django_comment_client.utils import (
@@ -29,16 +30,16 @@ from openedx.core.djangoapps.ace_common.template_context import get_base_templat
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.django_comment_common.models import DiscussionsIdMapping
 from openedx.core.lib.celery.task_utils import emulate_http_request
-from track import segment
+from common.djangoapps.track import segment
 
 log = logging.getLogger(__name__)
 
 
 DEFAULT_LANGUAGE = 'en'
-ROUTING_KEY = getattr(settings, 'ACE_ROUTING_KEY', None)
 
 
 @task(base=LoggedTask)
+@set_code_owner_attribute
 def update_discussions_map(context):
     """
     Updates the mapping between discussion_id to discussion block usage key
@@ -60,7 +61,8 @@ class ResponseNotification(BaseMessageType):
     pass
 
 
-@task(base=LoggedTask, routing_key=ROUTING_KEY)
+@task(base=LoggedTask)
+@set_code_owner_attribute
 def send_ace_message(context):
     context['course_id'] = CourseKey.from_string(context['course_id'])
 

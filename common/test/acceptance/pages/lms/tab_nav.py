@@ -14,8 +14,8 @@ class TabNavPage(PageObject):
 
     url = None
 
-    def is_using_v1_style_tabs(self):
-        return self.q(css='ol.course-tabs').present
+    # def is_using_v1_style_tabs(self):
+    #     return self.q(css='ol.course-tabs').present
 
     def is_using_boostrap_style_tabs(self):
         return self.q(css='ul.navbar-nav').present
@@ -43,24 +43,6 @@ class TabNavPage(PageObject):
 
         self.wait_for_page()
         self._is_on_tab_promise(tab_name).fulfill()
-
-    def mathjax_has_rendered(self):
-        """
-        Check that MathJax has rendered in tab content
-        """
-        mathjax_container = self.q(css=".static_tab_wrapper .MathJax")
-        EmptyPromise(
-            lambda: mathjax_container.present and mathjax_container.visible,
-            "MathJax is not visible"
-        ).fulfill()
-
-    def is_on_tab(self, tab_name):
-        """
-        Return a boolean indicating whether the current tab is `tab_name`.
-        Because this is a public method, it checks that we're on the right page
-        before accessing the DOM.
-        """
-        return self._is_on_tab(tab_name)
 
     def _tab_css(self, tab_name):
         """
@@ -125,10 +107,3 @@ class TabNavPage(PageObject):
             lambda: self._is_on_tab(tab_name),
             u"{0} is the current tab".format(tab_name)
         )
-
-    def has_new_post_button_visible_on_tab(self):
-        """
-        Check if new post button present and visible on course tab page
-        """
-        new_post_btn = self.q(css='ol.course-tabs .new-post-btn')
-        return new_post_btn.present and new_post_btn.visible

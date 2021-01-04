@@ -2,32 +2,14 @@
 Course Duration Limit Configuration Models
 """
 
-# -*- coding: utf-8 -*-
-
-
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
-from course_modes.models import CourseMode
-from lms.djangoapps.courseware.masquerade import (
-    get_course_masquerade,
-    get_masquerade_role,
-    is_masquerading_as_specific_student
-)
 from openedx.core.djangoapps.config_model_utils.models import StackedConfigurationModel
-from openedx.core.djangoapps.config_model_utils.utils import is_in_holdback
-from openedx.features.content_type_gating.helpers import (
-    CONTENT_GATING_PARTITION_ID,
-    CONTENT_TYPE_GATE_GROUP_IDS,
-    correct_modes_for_fbe
-)
-from student.models import CourseEnrollment
-from student.role_helpers import has_staff_roles
-from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
+from openedx.features.content_type_gating.helpers import correct_modes_for_fbe, enrollment_date_for_fbe
 
 
 @python_2_unicode_compatible
@@ -36,6 +18,18 @@ class CourseDurationLimitConfig(StackedConfigurationModel):
     Configuration to manage the Course Duration Limit facility.
 
     .. no_pii:
+
+    .. toggle_name: CourseDurationLimitConfig.enabled
+    .. toggle_implementation: ConfigurationModel
+    .. toggle_default: False
+    .. toggle_description: When enabled, users will have a limited time to complete and audit the course. The exact
+       duration is given by the "weeks_to_complete" course detail. When enabled, it is necessary to also define the
+       "enabled_as_of" flag: only enrollments created after this date will be affected.
+    .. toggle_use_cases: opt_in
+    .. toggle_creation_date: 2018-11-02
+    .. toggle_target_removal_date: None
+    .. toggle_warnings: None
+    .. toggle_tickets: None
     """
 
     STACKABLE_FIELDS = ('enabled', 'enabled_as_of')
@@ -52,35 +46,7 @@ class CourseDurationLimitConfig(StackedConfigurationModel):
     )
 
     @classmethod
-    def has_full_access_role_in_masquerade(cls, user, course_key, course_masquerade):
-        """
-        When masquerading, the course duration limits will never trigger the course to expire, redirecting the user.
-        The roles of the masquerade user are still used to determine whether the course duration limit banner displays.
-        Another banner also displays if the course is expired for the masquerade user.
-        Both banners will appear if the masquerade user does not have any of the following roles:
-        Staff, Instructor, Beta Tester, Forum Community TA, Forum Group Moderator, Forum Moderator, Forum Administrator
-        """
-        masquerade_role = get_masquerade_role(user, course_key)
-        verified_mode_id = settings.COURSE_ENROLLMENT_MODES.get(CourseMode.VERIFIED, {}).get('id')
-        # Masquerading users can select the the role of a verified users without selecting a specific user
-        is_verified = (course_masquerade.user_partition_id == ENROLLMENT_TRACK_PARTITION_ID
-                       and course_masquerade.group_id == verified_mode_id)
-        # Masquerading users can select the role of staff without selecting a specific user
-        is_staff = masquerade_role == 'staff'
-        # Masquerading users can select other full access roles for which content type gating is disabled
-        is_full_access = (course_masquerade.user_partition_id == CONTENT_GATING_PARTITION_ID
-                          and course_masquerade.group_id == CONTENT_TYPE_GATE_GROUP_IDS['full_access'])
-        # When masquerading as a specific user, we can check that user's staff roles as we would with a normal user
-        is_staff_role = False
-        if course_masquerade.user_name:
-            is_staff_role = has_staff_roles(user, course_key)
-
-        if is_verified or is_full_access or is_staff or is_staff_role:
-            return True
-        return False
-
-    @classmethod
-    def enabled_for_enrollment(cls, user=None, course_key=None):
+    def enabled_for_enrollment(cls, user, course):
         """
         Return whether Course Duration Limits are enabled for this enrollment.
 
@@ -89,54 +55,15 @@ class CourseDurationLimitConfig(StackedConfigurationModel):
         such as the org, site, or globally), and if the configuration is specified to be
         ``enabled_as_of`` before the enrollment was created.
 
-        Only one of enrollment and (user, course_key) may be specified at a time.
-
         Arguments:
-            enrollment: The enrollment being queried.
             user: The user being queried.
             course_key: The CourseKey of the course being queried.
+            course: The CourseOverview object being queried.
         """
-
-        if user is None or course_key is None:
-            raise ValueError('Both user and course_key must be specified if no enrollment is provided')
-
-        enrollment = CourseEnrollment.get_enrollment(user, course_key, ['fbeenrollmentexclusion'])
-
-        if user is None and enrollment is not None:
-            user = enrollment.user
-
-        if user and user.id:
-            course_masquerade = get_course_masquerade(user, course_key)
-            if course_masquerade:
-                if cls.has_full_access_role_in_masquerade(user, course_key, course_masquerade):
-                    return False
-            elif has_staff_roles(user, course_key):
-                return False
-
-        is_masquerading = get_course_masquerade(user, course_key)
-        no_masquerade = is_masquerading is None
-        student_masquerade = is_masquerading_as_specific_student(user, course_key)
-
-        # check if user is in holdback
-        if (no_masquerade or student_masquerade) and is_in_holdback(user, enrollment):
+        target_datetime = enrollment_date_for_fbe(user, course=course)
+        if not target_datetime:
             return False
-
-        not_student_masquerade = is_masquerading and not student_masquerade
-
-        # enrollment might be None if the user isn't enrolled. In that case,
-        # return enablement as if the user enrolled today
-        # When masquerading as a user group rather than a specific learner,
-        # course duration limits will be on if they are on for the course.
-        # When masquerading as a specific learner, course duration limits
-        # will be on if they are currently on for the learner.
-        if enrollment is None or not_student_masquerade:
-            # we bypass enabled_for_course here and use enabled_as_of_datetime directly
-            # because the correct_modes_for_fbe for FBE check contained in enabled_for_course
-            # is redundant with checks done upstream of this code
-            target_datetime = timezone.now()
-        else:
-            target_datetime = enrollment.created
-        current_config = cls.current(course_key=course_key)
+        current_config = cls.current(course_key=course.id)
         return current_config.enabled_as_of_datetime(target_datetime=target_datetime)
 
     @classmethod

@@ -38,7 +38,7 @@ class AuthoringMixin(XBlockMixin):
             (Fragment): An HTML fragment for editing the visibility of this XBlock.
         """
         fragment = Fragment()
-        from contentstore.utils import reverse_course_url
+        from cms.djangoapps.contentstore.utils import reverse_course_url
         fragment.add_content(self.system.render_template('visibility_editor.html', {
             'xblock': self,
             'manage_groups_url': reverse_course_url('group_configurations_list_handler', self.location.course_key),

@@ -6,7 +6,7 @@ Utility methods for the account settings.
 import re
 
 import waffle
-from completion import waffle as completion_waffle
+from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from completion.models import BlockCompletion
 from django.conf import settings
 from django.utils.translation import ugettext as _
@@ -111,14 +111,14 @@ def _is_valid_social_username(value):
 def retrieve_last_sitewide_block_completed(user):
     """
     Completion utility
-    From a string 'username' or object User retrieve
+    From a given User object retrieve
     the last course block marked as 'completed' and construct a URL
 
     :param user: obj(User)
     :return: block_lms_url
 
     """
-    if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+    if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():
         return
 
     latest_completions_by_course = BlockCompletion.latest_blocks_completed_all_courses(user)
@@ -190,18 +190,6 @@ def is_secondary_email_feature_enabled():
         Boolean value representing switch status
     """
     return waffle.switch_is_active(ENABLE_SECONDARY_EMAIL_FEATURE_SWITCH)
-
-
-def is_secondary_email_feature_enabled_for_user(user):
-    """
-    Checks to see if secondary email feature is enabled for the given user.
-
-    Returns:
-        Boolean value representing the status of secondary email feature.
-    """
-    # import is placed here to avoid cyclic import.
-    from openedx.features.enterprise_support.utils import is_enterprise_learner
-    return is_secondary_email_feature_enabled() and is_enterprise_learner(user)
 
 
 def is_multiple_user_enterprises_feature_enabled():

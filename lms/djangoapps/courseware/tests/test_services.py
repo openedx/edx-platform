@@ -84,7 +84,7 @@ class TestUserStateService(ModuleStoreTestCase):
         Scenario:
             Given a user and a problem or block
             Then create a student module entry for the user
-            If the state is obtained from student module service
+            If the state is obtained from common.djangoapps.student module service
             Then the state is equal to previously created student module state
         """
         self._create_student_module(expected_state)
@@ -96,7 +96,8 @@ class TestUserStateService(ModuleStoreTestCase):
     @ddt.data(
         *itertools.product(
             [
-                ({'username_or_email': 'no_user', 'block_id': 'block-v1:myOrg+123+2030_T2+type@openassessment+block@hash'}),  # pylint: disable=line-too-long
+                ({'username_or_email': 'no_user', 'block_id':
+                    'block-v1:myOrg+123+2030_T2+type@openassessment+block@hash'}),
                 ({'username_or_email': 'no_user'}),
                 ({'block_id': 'block-v1:myOrg+1234+2030_T2+type@openassessment+block@hash'})
             ], [

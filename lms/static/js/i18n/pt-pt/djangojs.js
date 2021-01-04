@@ -27,8 +27,10 @@
     "(required):": "(obrigat\u00f3rio):",
     "6 a.m.": "6 a.m.",
     "6 p.m.": "6 p.m.",
+    "April": "Abril",
     "Assessment": "Avalia\u00e7\u00e3o",
     "Assessments": "Avalia\u00e7\u00f5es",
+    "August": "Agosto",
     "Available %s": "Dispon\u00edvel %s",
     "Back to Full List": "Voltar \u00e0 lista completa",
     "Block view is unavailable": "A visualiza\u00e7\u00e3o em grelha n\u00e3o est\u00e1 dispon\u00edvel",
@@ -47,12 +49,13 @@
     "Couldn't Save This Assignment": "N\u00e3o \u00e9 poss\u00edvel guardar esta tarefa",
     "Criterion Added": "Crit\u00e9rio Adicionado",
     "Criterion Deleted": "Crit\u00e9rio eliminado",
+    "December": "Dezembro",
     "Describe ": "Descreva",
     "Do you want to upload your file before submitting?": "Deseja carregar o seu ficheiro antes de submeter?",
     "Error": "Erro",
     "Error getting the number of ungraded responses": "Erro ao obter o n\u00famero de respostas sem classifica\u00e7\u00e3o",
+    "February": "Fevereiro",
     "Feedback available for selection.": "Coment\u00e1rio dispon\u00edvel para a sele\u00e7\u00e3o.",
-    "File type is not allowed.": "O tipo de ficheiro n\u00e3o \u00e9 permitido.",
     "File types can not be empty.": "Indique o tipo de ficheiro. ",
     "Filter": "Filtrar",
     "Final Grade Received": "Nota Final Recebida",
@@ -65,7 +68,12 @@
     "If you leave this page without submitting your peer assessment, you will lose any work you have done.": "Caso saia desta p\u00e1gina sem submeter o seu teste, ir\u00e1 perder todo o trabalho at\u00e9 aqui realizado.",
     "If you leave this page without submitting your self assessment, you will lose any work you have done.": "Caso saia desta p\u00e1gina sem submeter a sua auto-avalia\u00e7\u00e3o, ir\u00e1 perder todo o trabalho at\u00e9 aqui realizado.",
     "If you leave this page without submitting your staff assessment, you will lose any work you have done.": "Caso saia desta p\u00e1gina sem submeter a sua avalia\u00e7\u00e3o individual, ir\u00e1 perder todo o trabalho at\u00e9 aqui realizado.",
+    "January": "Janeiro",
+    "July": "Julho",
+    "June": "Junho",
     "List of Open Assessments is unavailable": "Lista de Avalia\u00e7\u00f5es Abertas n\u00e3o est\u00e1 dispon\u00edvel",
+    "March": "Mar\u00e7o",
+    "May": "Maio",
     "Midnight": "Meia-noite",
     "Noon": "Meio-dia",
     "Not Selected": "N\u00e3o Selecionado",
@@ -77,7 +85,9 @@
       "Nota: O use fuso hor\u00e1rio est\u00e1 %s hora atrasado em rela\u00e7\u00e3o ao servidor.",
       "Nota: O use fuso hor\u00e1rio est\u00e1 %s horas atrasado em rela\u00e7\u00e3o ao servidor."
     ],
+    "November": "Novembro",
     "Now": "Agora",
+    "October": "Outubro",
     "One or more rescheduling tasks failed.": "Ocorreu erro no reagendamento de uma ou mais tarefas.",
     "Option Deleted": "Op\u00e7\u00e3o eliminada",
     "Paragraph": "Par\u00e1grafo",
@@ -89,6 +99,7 @@
     "Remove all": "Remover todos",
     "Saving...": "A guardar...",
     "Self": "Auto",
+    "September": "Setembro",
     "Server error.": "Erro de servidor.",
     "Show": "Mostrar",
     "Staff": "Equipa",
@@ -123,7 +134,6 @@
     "Waiting": "A aguardar",
     "Warning": "Aviso",
     "Yesterday": "Ontem",
-    "You can upload files with these file types: ": "Pode fazer o carregamento de ficheiros dos seguintes tipos: ",
     "You have added a criterion. You will need to select an option for the criterion in the Learner Training step. To do this, click the Settings tab.": "Adicionou um novo crit\u00e9rio. Necessitar\u00e1 de selecionar uma op\u00e7\u00e3o para o crit\u00e9rio, na etapa de Forma\u00e7\u00e3o do Estudante. Para tal, clique no separador Configura\u00e7\u00f5es.",
     "You have deleted a criterion. The criterion has been removed from the example responses in the Learner Training step.": "Eliminou um crit\u00e9rio. O crit\u00e9rio foi removido dos exemplos de resposta da etapa de Forma\u00e7\u00e3o do Estudante.",
     "You have deleted all the options for this criterion. The criterion has been removed from the sample responses in the Learner Training step.": "Eliminou todas as op\u00e7\u00f5es para este crit\u00e9rio. O crit\u00e9rio foi removido dos exemplos de resposta da etapa de Forma\u00e7\u00e3o do Estudante.",
@@ -133,7 +143,14 @@
     "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "Tem mudan\u00e7as por guardar nos campos individuais. Se usar uma a\u00e7\u00e3o, as suas mudan\u00e7as por guardar ser\u00e3o perdidas.",
     "You must provide a learner name.": "Deve indicar o nome de um estudante.",
     "You're about to submit your response for this assignment. After you submit this response, you can't change it or submit a new response.": "Est\u00e1 prestes a submeter a sua resposta para esta tarefa. Depois de a submeter, n\u00e3o \u00e9 poss\u00edvel alter\u00e1-la ou submeter uma nova resposta.",
-    "Your file ": "O seu ficheiro "
+    "Your file ": "O seu ficheiro ",
+    "one letter Friday\u0004F": "S",
+    "one letter Monday\u0004M": "S",
+    "one letter Saturday\u0004S": "S",
+    "one letter Sunday\u0004S": "D",
+    "one letter Thursday\u0004T": "Q",
+    "one letter Tuesday\u0004T": "T",
+    "one letter Wednesday\u0004W": "Q"
   };
   for (var key in newcatalog) {
     django.catalog[key] = newcatalog[key];
@@ -155,7 +172,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -211,9 +228,9 @@
       "%d/%m/%y"
     ],
     "DECIMAL_SEPARATOR": ",",
-    "FIRST_DAY_OF_WEEK": "0",
+    "FIRST_DAY_OF_WEEK": 0,
     "MONTH_DAY_FORMAT": "j \\d\\e F",
-    "NUMBER_GROUPING": "3",
+    "NUMBER_GROUPING": 3,
     "SHORT_DATETIME_FORMAT": "d/m/Y H:i",
     "SHORT_DATE_FORMAT": "d/m/Y",
     "THOUSAND_SEPARATOR": ".",

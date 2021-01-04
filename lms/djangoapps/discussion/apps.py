@@ -6,9 +6,10 @@ Signal handlers are connected here.
 
 
 from django.apps import AppConfig
+from edx_django_utils.plugins import PluginSettings, PluginURLs
 
 from openedx.core.constants import COURSE_ID_PATTERN
-from openedx.core.djangoapps.plugins.constants import PluginSettings, PluginURLs, ProjectType, SettingsType
+from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 
 
 class DiscussionConfig(AppConfig):
@@ -39,4 +40,4 @@ class DiscussionConfig(AppConfig):
         """
         Connect handlers to send notifications about discussions.
         """
-        from .signals import handlers  # pylint: disable=unused-variable
+        from .signals import handlers  # pylint: disable=unused-import

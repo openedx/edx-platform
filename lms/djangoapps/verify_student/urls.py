@@ -8,6 +8,8 @@ from django.conf.urls import url
 
 from lms.djangoapps.verify_student import views
 
+IDV_RECEIPT_ID_PATTERN = r'(?P<receipt_id>[0-9a-z]{8}-([0-9a-z]{4}-){3}[0-9a-z]{12})'
+
 urlpatterns = [
     # The user is starting the verification / payment process,
     # most likely after enrolling in a course and selecting
@@ -62,20 +64,6 @@ urlpatterns = [
         }
     ),
 
-    # The user is returning to the flow after paying.
-    # This usually occurs after a redirect from the shopping cart
-    # once the order has been fulfilled.
-    url(
-        r'^payment-confirmation/{course}/$'.format(course=settings.COURSE_ID_PATTERN),
-        views.PayAndVerifyView.as_view(),
-        name="verify_student_payment_confirmation",
-        kwargs={
-            'always_show_payment': True,
-            'current_step': views.PayAndVerifyView.PAYMENT_CONFIRMATION_STEP,
-            'message': views.PayAndVerifyView.PAYMENT_CONFIRMATION_MSG
-        }
-    ),
-
     url(
         r'^create_order',
         views.create_order,
@@ -94,6 +82,13 @@ urlpatterns = [
         name="verify_student_submit_photos"
     ),
 
+    url(
+        r'^status/$',
+        views.VerificationStatusAPIView.as_view(),
+        name="verification_status_api"
+    ),
+
+
     # End-point for reverification
     # Reverification occurs when a user's initial verification attempt
     # is denied or expires.  The user is allowed to retry by submitting
@@ -104,6 +99,12 @@ urlpatterns = [
         r'^reverify$',
         views.ReverifyView.as_view(),
         name="verify_student_reverify"
+    ),
+
+    url(
+        r'^photo-urls/{receipt_id}$'.format(receipt_id=IDV_RECEIPT_ID_PATTERN),
+        views.PhotoUrlsView.as_view(),
+        name="verification_photo_urls"
     ),
 ]
 

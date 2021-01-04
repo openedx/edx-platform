@@ -10,8 +10,8 @@ from django.conf import settings
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from student.models import UserStanding
-from student.tests.factories import UserFactory, UserStandingFactory
+from common.djangoapps.student.models import UserStanding
+from common.djangoapps.student.tests.factories import UserFactory, UserStandingFactory
 
 
 class UserStandingTest(TestCase):

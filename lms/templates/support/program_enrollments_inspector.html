@@ -21,17 +21,15 @@ from openedx.core.djangolib.js_utils import js_escaped_string
 
 <%block name="content">
 	<section class="container outside-app">
-        <h3> Program Enrollments Inspector </h3>
+        <h1> Program Enrollments Inspector </h1>
             ${static.renderReact(
                 component="ProgramEnrollmentsInspectorPage",
-                id="entitlement-support-page",
+                id="program-enrollments-inspector-page",
                 props={
-                    'successes': successes,
-                    'errors': errors,
+                    'error': error,
                     'learnerInfo': learner_program_enrollments,
                     'orgKeys': org_keys
                 }
-            )
-            }
+            )}
 	</section>
 </%block>

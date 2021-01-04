@@ -17,8 +17,8 @@ from openedx.features.enterprise_support.tests import (
     factories
 )
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
-from student.tests.factories import UserFactory
-from util.testing import UrlResetMixin
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.util.testing import UrlResetMixin
 
 
 @ddt.ddt
@@ -46,6 +46,8 @@ class EnterpriseLogoutTests(EnterpriseServiceMockMixin, CacheIsolationTestCase, 
         ('invalid-url', False),
         ('/enterprise/c5dad9a7-741c-4841-868f-850aca3ff848/course/Microsoft+DAT206x/enroll/', True),
         ('%2Fenterprise%2Fc5dad9a7-741c-4841-868f-850aca3ff848%2Fcourse%2FMicrosoft%2BDAT206x%2Fenroll%2F', True),
+        ('/enterprise/handle_consent_enrollment/efd91463-dc40-4882-aeb9-38202131e7b2/course', True),
+        ('%2Fenterprise%2Fhandle_consent_enrollment%2Fefd91463-dc40-4882-aeb9-38202131e7b2%2Fcourse', True),
     )
     @ddt.unpack
     def test_logout_enterprise_target(self, redirect_url, enterprise_target):

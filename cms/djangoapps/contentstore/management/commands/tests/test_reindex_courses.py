@@ -3,12 +3,12 @@
 
 import ddt
 import mock
-from django.core.management import CommandError, call_command
 import six
+from django.core.management import CommandError, call_command
 from six import text_type
 
-from contentstore.courseware_index import SearchIndexingError
-from contentstore.management.commands.reindex_course import Command as ReindexCommand
+from cms.djangoapps.contentstore.courseware_index import SearchIndexingError
+from cms.djangoapps.contentstore.management.commands.reindex_course import Command as ReindexCommand
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -36,9 +36,11 @@ class TestReindexCourse(ModuleStoreTestCase):
             org="test", course="course2", display_name="run1"
         )
 
-    REINDEX_PATH_LOCATION = 'contentstore.management.commands.reindex_course.CoursewareSearchIndexer.do_course_reindex'
-    MODULESTORE_PATCH_LOCATION = 'contentstore.management.commands.reindex_course.modulestore'
-    YESNO_PATCH_LOCATION = 'contentstore.management.commands.reindex_course.query_yes_no'
+    REINDEX_PATH_LOCATION = (
+        'cms.djangoapps.contentstore.management.commands.reindex_course.CoursewareSearchIndexer.do_course_reindex'
+    )
+    MODULESTORE_PATCH_LOCATION = 'cms.djangoapps.contentstore.management.commands.reindex_course.modulestore'
+    YESNO_PATCH_LOCATION = 'cms.djangoapps.contentstore.management.commands.reindex_course.query_yes_no'
 
     def _get_lib_key(self, library):
         """ Get's library key as it is passed to indexer """
@@ -117,11 +119,3 @@ class TestReindexCourse(ModuleStoreTestCase):
 
                 patched_yes_no.assert_called_once_with(ReindexCommand.CONFIRMATION_PROMPT, default='no')
                 patched_index.assert_not_called()
-
-    def test_fail_fast_if_reindex_fails(self):
-        """ Test that fails on first reindexing exception """
-        with mock.patch(self.REINDEX_PATH_LOCATION) as patched_index:
-            patched_index.side_effect = SearchIndexingError("message", [])
-
-            with self.assertRaises(SearchIndexingError):
-                call_command('reindex_course', text_type(self.second_course.id))
