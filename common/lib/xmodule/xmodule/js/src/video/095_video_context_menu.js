@@ -217,7 +217,8 @@ function(Component) {
         },
 
         appendContent: function(content) {
-            this.getElement().append(content);
+            var $content = $(content);
+            this.getElement().append($content);
             return this;
         },
 
@@ -247,8 +248,8 @@ function(Component) {
         },
 
         open: function() {
-            var menu = (this.isRendered) ? this.getElement() : this.populateElement();
-            this.container.append(menu);
+            var $menu = (this.isRendered) ? this.getElement() : this.populateElement();
+            this.container.append($menu);
             AbstractItem.prototype.open.call(this);
             this.overlay.show(this.container);
             return this;
@@ -355,7 +356,8 @@ function(Component) {
         },
 
         show: function(container) {
-            $(container).append(this.getElement());
+            var $elem = $(this.getElement());
+            $(container).append($elem);
             this.delegateEvents();
             return this;
         },
@@ -390,7 +392,9 @@ function(Component) {
         },
 
         createElement: function() {
-            var $element = $('<li />', {
+            var $spanElem,
+                $listElem,
+                $element = $('<li />', {
                 class: ['submenu-item', 'menu-item', this.options.prefix + 'submenu-item'].join(' '),
                 'aria-expanded': 'false',
                 'aria-haspopup': 'true',
@@ -399,21 +403,25 @@ function(Component) {
                 tabindex: -1
             });
 
-            this.label = $('<span />', {
+            $spanElem = $('<span />', {
                 id: 'submenu-item-label-' + this.id,
                 text: this.options.label
-            }).appendTo($element);
+            });
+            this.label = $spanElem.appendTo($element);
 
-            this.list = $('<ol />', {
+            $listElem = $('<ol />', {
                 class: ['submenu', this.options.prefix + 'submenu'].join(' '),
                 role: 'menu'
-            }).appendTo($element);
+            });
+
+            this.list = $listElem.appendTo($element);
 
             return $element;
         },
 
         appendContent: function(content) {
-            this.list.append(content);
+            var $content = $(content);
+            this.list.append($content);
             return this;
         },
 
@@ -628,7 +636,7 @@ function(Component) {
                 }, {
                     label: i18n.Speed,
                     items: _.map(state.speeds, function(speed) {
-                        var isSelected = speed === state.speed;
+                        var isSelected = parseFloat(speed) === state.speed;
                         return {label: speed + 'x', callback: speedCallback, speed: speed, isSelected: isSelected};
                     }),
                     initialize: function(menuitem) {

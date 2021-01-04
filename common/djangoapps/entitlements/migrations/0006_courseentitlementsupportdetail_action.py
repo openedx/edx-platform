@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 from django.db import migrations, models
 
@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='courseentitlementsupportdetail',
             name='action',
-            field=models.CharField(default='CREATE', max_length=15, choices=[(b'REISSUE', b'Re-issue entitlement'), (b'CREATE', b'Create new entitlement')]),
+            field=models.CharField(default='CREATE', max_length=15, choices=[(u'REISSUE', u'Re-issue entitlement'), (u'CREATE', u'Create new entitlement')]),
             preserve_default=False,
         ),
     ]

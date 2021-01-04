@@ -4,6 +4,6 @@
 #
 #    make upgrade
 #
-click==7.0                # via pip-tools
-pip-tools==3.2.0
-six==1.11.0
+click==7.1.2              # via pip-tools
+pip-tools==4.5.1          # via -c requirements/edx/../constraints.txt, -r requirements/edx/pip-tools.in
+six==1.14.0               # via -r requirements/edx/pip-tools.in, pip-tools

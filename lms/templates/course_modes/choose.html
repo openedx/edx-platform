@@ -42,7 +42,7 @@ from openedx.core.djangolib.markup import HTML, Text
             });
 
             % if use_ecommerce_payment_flow:
-            $('input[name=verified_mode]').click(function(e){
+            $('button[name=verified_mode]').click(function(e){
                 e.preventDefault();
                 window.location.href = '${ecommerce_payment_page | n, js_escaped_string}?sku=' +
                 encodeURIComponent('${sku | n, js_escaped_string}');
@@ -76,6 +76,10 @@ from openedx.core.djangolib.markup import HTML, Text
                             ${title_content}
                         </h3>
                     </header>
+
+                    % if offer_banner_fragment:
+                        ${HTML(offer_banner_fragment.content)}
+                    % endif
 
                     <form class="form-register-choose" method="post" name="enrollment_mode_form" id="enrollment_mode_form">
                         <%
@@ -120,10 +124,7 @@ from openedx.core.djangolib.markup import HTML, Text
                                                 </div>
                                                 <div class="copy-inline list-actions">
                                                     <ul class="list-actions">
-                                                        <li class="action action-select">
-                                                            <input type="hidden" name="contribution" value="${min_price}" />
-                                                            <input type="submit" name="verified_mode" value="${_('Pursue a Verified Certificate')} ($${min_price} USD)" />
-                                                        </li>
+                                                        <%include file='_upgrade_button.html' args='content_gating_enabled=content_gating_enabled, course_duration_limit_enabled=course_duration_limit_enabled, currency=currency, currency_symbol=currency_symbol, min_price=min_price, price_before_discount=price_before_discount' />
                                                     </ul>
                                                 </div>
                                             </div>
@@ -164,18 +165,11 @@ from openedx.core.djangolib.markup import HTML, Text
                                                 </div>
                                                 <div class="copy-inline list-actions">
                                                     <ul class="list-actions">
-                                                        <li class="action action-select">
-                                                            <input type="hidden" name="contribution" value="${min_price}" />
-                                                            % if content_gating_enabled or course_duration_limit_enabled:
-                                                                <input type="submit" name="verified_mode" value="${_('Pursue the Verified Track')} ($${min_price} USD)" />
-                                                            % else:
-                                                                <input type="submit" name="verified_mode" value="${_('Pursue a Verified Certificate')} ($${min_price} USD)" />
-                                                            % endif
-                                                        </li>
+                                                        <%include file='_upgrade_button.html' args='content_gating_enabled=content_gating_enabled, course_duration_limit_enabled=course_duration_limit_enabled, currency=currency, currency_symbol=currency_symbol, min_price=min_price, price_before_discount=price_before_discount' />
                                                     </ul>
                                                 </div>
                                             </div>
-                                        </p>
+                                         </p>
                                     </div>
                                     % endif
                                 </div>

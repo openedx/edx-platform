@@ -3,20 +3,20 @@ Custom routers used by both lms and cms when routing tasks to worker queues.
 
 For more, see https://celery.readthedocs.io/en/latest/userguide/routing.html#routers
 """
+
 import logging
 from abc import ABCMeta, abstractproperty
 
 from django.conf import settings
+import six
 
 log = logging.getLogger(__name__)
 
 
-class AlternateEnvironmentRouter(object):
+class AlternateEnvironmentRouter(six.with_metaclass(ABCMeta, object)):
     """
     A custom Router class for use in routing celery tasks to non-default queues.
     """
-    # this is an abstract base class, implementations must provide alternate_env_tasks
-    __metaclass__ = ABCMeta
 
     @abstractproperty
     def alternate_env_tasks(self):

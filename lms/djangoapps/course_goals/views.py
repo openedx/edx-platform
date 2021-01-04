@@ -1,26 +1,25 @@
 """
 Course Goals Views - includes REST API
 """
-from __future__ import absolute_import
 
-from django.contrib.auth import get_user_model
+
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.http import JsonResponse
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.lib.api.permissions import IsStaffOrOwner
-from rest_framework import permissions, serializers, viewsets, status
+from rest_framework import permissions, serializers, status, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 
+from openedx.core.lib.api.permissions import IsStaffOrOwner
 from track import segment
 
 from .api import get_course_goal_options
-from .models import CourseGoal, GOAL_KEY_CHOICES
-
+from .models import GOAL_KEY_CHOICES, CourseGoal
 
 User = get_user_model()
 
@@ -66,14 +65,14 @@ class CourseGoalViewSet(viewsets.ModelViewSet):
         goal_key = post_data.data.get('goal_key')
         if not goal_key:
             return Response(
-                'Please provide a valid goal key from following options. (options= {goal_options}).'.format(
+                u'Please provide a valid goal key from following options. (options= {goal_options}).'.format(
                     goal_options=goal_options,
                 ),
                 status=status.HTTP_400_BAD_REQUEST,
             )
         elif goal_key not in goal_options:
             return Response(
-                'Provided goal key, {goal_key}, is not a valid goal key (options= {goal_options}).'.format(
+                u'Provided goal key, {goal_key}, is not a valid goal key (options= {goal_options}).'.format(
                     goal_key=goal_key,
                     goal_options=goal_options,
                 ),
@@ -84,7 +83,7 @@ class CourseGoalViewSet(viewsets.ModelViewSet):
         course_key = CourseKey.from_string(post_data.data['course_key'])
         if not course_key:
             return Response(
-                'Provided course_key ({course_key}) does not map to a course.'.format(
+                u'Provided course_key ({course_key}) does not map to a course.'.format(
                     course_key=course_key
                 ),
                 status=status.HTTP_400_BAD_REQUEST,

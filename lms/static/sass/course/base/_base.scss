@@ -41,7 +41,15 @@ body {
   background-color: $course-bg-color;
 }
 
-body, h1, h2, h3, h4, h5, h6, p, label {
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+label {
   @include text-align(left);
 
   font-family: $font-family-sans-serif;
@@ -58,6 +66,7 @@ table {
 
 .xblock table {
   table-layout: auto;
+  word-break: normal;
 }
 
 a {
@@ -100,9 +109,7 @@ input[type="password"] {
   border: 1px solid $border-color-2;
   border-radius: 0;
   box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6), inset 0 0 3px 0 $shadow-l1;
-
-  @include box-sizing(border-box);
-
+  box-sizing: border-box;
   font: normal 1em $font-family-sans-serif;
   height: 35px;
   padding: ($baseline/4) 12px;
@@ -199,7 +206,8 @@ img {
   opacity: 0;
   -webkit-transition: all 0.2s;
 
-  p, span {
+  p,
+  span {
     color: $white;
   }
 

@@ -1,5 +1,5 @@
 """Helper functions for working with Credentials."""
-from __future__ import unicode_literals
+
 
 from edx_rest_api_client.client import EdxRestApiClient
 

@@ -2,15 +2,18 @@
 Django admin dashboard configuration for Video XModule.
 """
 
+
 from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
 from django.contrib import admin
 
 from openedx.core.djangoapps.video_config.forms import (
     CourseHLSPlaybackFlagAdminForm,
+    CourseYoutubeBlockedFlagAdminForm,
     CourseVideoTranscriptFlagAdminForm,
 )
 from openedx.core.djangoapps.video_config.models import (
     CourseHLSPlaybackEnabledFlag, HLSPlaybackEnabledFlag,
+    CourseYoutubeBlockedFlag,
     CourseVideoTranscriptEnabledFlag, VideoTranscriptEnabledFlag,
     TranscriptMigrationSetting, MigrationEnqueuedCourse,
     VideoThumbnailSetting, UpdatedCourseVideos,
@@ -41,6 +44,14 @@ class CourseHLSPlaybackEnabledFlagAdmin(CourseSpecificEnabledFlagBaseAdmin):
     Allows searching by course id.
     """
     form = CourseHLSPlaybackFlagAdminForm
+
+
+class CourseYoutubeBlockedFlagAdmin(CourseSpecificEnabledFlagBaseAdmin):
+    """
+    Admin of youtube blocking feature on course-by-course basis.
+    Allows searching by course id.
+    """
+    form = CourseYoutubeBlockedFlagAdminForm
 
 
 class CourseVideoTranscriptEnabledFlagAdmin(CourseSpecificEnabledFlagBaseAdmin):
@@ -78,7 +89,7 @@ class UpdatedCourseVideosAdmin(admin.ModelAdmin):
 
 admin.site.register(HLSPlaybackEnabledFlag, ConfigurationModelAdmin)
 admin.site.register(CourseHLSPlaybackEnabledFlag, CourseHLSPlaybackEnabledFlagAdmin)
-
+admin.site.register(CourseYoutubeBlockedFlag, CourseYoutubeBlockedFlagAdmin)
 admin.site.register(VideoTranscriptEnabledFlag, ConfigurationModelAdmin)
 admin.site.register(CourseVideoTranscriptEnabledFlag, CourseVideoTranscriptEnabledFlagAdmin)
 admin.site.register(TranscriptMigrationSetting, ConfigurationModelAdmin)

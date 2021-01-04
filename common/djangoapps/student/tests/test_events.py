@@ -2,13 +2,15 @@
 """
 Test that various events are fired for models in the student app.
 """
+
+
 import mock
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from django_countries.fields import Country
 
 from student.models import CourseEnrollmentAllowed
-from student.tests.factories import UserFactory, CourseEnrollmentAllowedFactory
+from student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
 from student.tests.tests import UserSettingsEventTestMixin
 
 
@@ -162,11 +164,11 @@ class TestUserEvents(UserSettingsEventTestMixin, TestCase):
         pending_enrollment = CourseEnrollmentAllowedFactory(auto_enroll=True)
 
         # the e-mail will change to test@edx.org (from something else)
-        self.assertNotEquals(self.user.email, 'test@edx.org')
+        self.assertNotEqual(self.user.email, 'test@edx.org')
 
         # there's a CEA for the new e-mail
-        self.assertEquals(CourseEnrollmentAllowed.objects.count(), 1)
-        self.assertEquals(CourseEnrollmentAllowed.objects.filter(email='test@edx.org').count(), 1)
+        self.assertEqual(CourseEnrollmentAllowed.objects.count(), 1)
+        self.assertEqual(CourseEnrollmentAllowed.objects.filter(email='test@edx.org').count(), 1)
 
         # Changing the e-mail to the enrollment-allowed e-mail should enroll
         self.user.email = 'test@edx.org'
@@ -174,5 +176,5 @@ class TestUserEvents(UserSettingsEventTestMixin, TestCase):
         self.assert_user_enrollment_occurred('edX/toy/2012_Fall')
 
         # CEAs shouldn't have been affected
-        self.assertEquals(CourseEnrollmentAllowed.objects.count(), 1)
-        self.assertEquals(CourseEnrollmentAllowed.objects.filter(email='test@edx.org').count(), 1)
+        self.assertEqual(CourseEnrollmentAllowed.objects.count(), 1)
+        self.assertEqual(CourseEnrollmentAllowed.objects.filter(email='test@edx.org').count(), 1)

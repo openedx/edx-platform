@@ -1,21 +1,27 @@
 """
 Tests for paver quality tasks
 """
-from __future__ import print_function
+
+
 import os
 import shutil
 import tempfile
 import textwrap
 import unittest
 
-from ddt import ddt, file_data, data, unpack
+import six
+from ddt import data, ddt, file_data, unpack
 from mock import MagicMock, mock_open, patch
 from path import Path as path
-from paver.easy import BuildFailure  # pylint: disable=ungrouped-imports
+from paver.easy import BuildFailure
 
 import pavelib.quality
-from pavelib.paver_tests.utils import fail_on_eslint
-from pavelib.paver_tests.utils import PaverTestCase
+from pavelib.paver_tests.utils import PaverTestCase, fail_on_eslint
+
+if six.PY2:
+    OPEN_BUILTIN = '__builtin__.open'
+else:
+    OPEN_BUILTIN = 'builtins.open'
 
 
 @ddt
@@ -287,7 +293,7 @@ class TestPaverRunQuality(PaverTestCase):
         self.addCleanup(shutil.rmtree, self.report_dir)
         self.addCleanup(report_dir_patcher.stop)
 
-    @patch('__builtin__.open', mock_open())
+    @patch(OPEN_BUILTIN, mock_open())
     def test_failure_on_diffquality_pylint(self):
         """
         If diff-quality fails on pylint, the paver task should also fail, but
@@ -308,7 +314,7 @@ class TestPaverRunQuality(PaverTestCase):
         # of a diff-quality pylint failure, eslint is still called.
         self.assertEqual(self._mock_paver_sh.call_count, 2)
 
-    @patch('__builtin__.open', mock_open())
+    @patch(OPEN_BUILTIN, mock_open())
     def test_failure_on_diffquality_eslint(self):
         """
         If diff-quality fails on eslint, the paver task should also fail
@@ -319,7 +325,6 @@ class TestPaverRunQuality(PaverTestCase):
         with patch('pavelib.quality._get_pylint_violations', _mock_pylint_violations):
             with self.assertRaises(SystemExit):
                 pavelib.quality.run_quality("")
-                self.assertRaises(BuildFailure)
         print(self._mock_paver_sh.mock_calls)
 
         # Test that pylint is called
@@ -329,7 +334,7 @@ class TestPaverRunQuality(PaverTestCase):
         # and once for diff quality with eslint
         self.assertEqual(self._mock_paver_sh.call_count, 4)
 
-    @patch('__builtin__.open', mock_open())
+    @patch(OPEN_BUILTIN, mock_open())
     def test_other_exception(self):
         """
         If diff-quality fails for an unknown reason on the first run, then
@@ -338,16 +343,49 @@ class TestPaverRunQuality(PaverTestCase):
         self._mock_paver_sh.side_effect = [Exception('unrecognized failure!'), 0]
         with self.assertRaises(SystemExit):
             pavelib.quality.run_quality("")
-            self.assertRaises(Exception)
         # Test that pylint is NOT called by counting calls
         self.assertEqual(self._mock_paver_sh.call_count, 1)
 
-    @patch('__builtin__.open', mock_open())
+    @patch(OPEN_BUILTIN, mock_open())
     def test_no_diff_quality_failures(self):
         # Assert nothing is raised
         pavelib.quality.run_quality("")
-        # And assert that sh was called 7 times:
-        # 5 for pylint on each of the system directories
+        # And assert that sh was called 8 times:
+        # 6 for pylint on each of the system directories
         # 1 for diff_quality for pylint
         # 1 for diff_quality for eslint
-        self.assertEqual(self._mock_paver_sh.call_count, 7)
+        self.assertEqual(self._mock_paver_sh.call_count, 8)
+
+
+class TestPaverRunDiffQuality(PaverTestCase):
+    """
+    For testing the paver run_diff_quality task
+
+    Note: Although diff_quality is tested as part of quality, some
+    cases weren't tested properly.
+    """
+    def setUp(self):
+        super(TestPaverRunDiffQuality, self).setUp()
+
+        # mock the @needs decorator to skip it
+        patcher = patch('pavelib.quality.sh')
+        self._mock_paver_sh = patcher.start()
+        self.addCleanup(patcher.stop)
+
+    @patch(OPEN_BUILTIN, mock_open())
+    def test_percentage_failure(self):
+        """
+        When diff_quality is run with a threshold percentage, it ends with an exit code of 1.
+        This bubbles up to paver with a subprocess return code error and should return False.
+        """
+        self._mock_paver_sh.side_effect = [BuildFailure('Subprocess return code: 1')]
+        self.assertEqual(pavelib.quality.run_diff_quality(""), False)
+
+    @patch(OPEN_BUILTIN, mock_open())
+    def test_other_failures(self):
+        """
+        Run diff_quality with an exception that is not a percentage failure.
+        """
+        self._mock_paver_sh.side_effect = [BuildFailure('Some failure.')]
+        with self.assertRaisesRegex(BuildFailure, '.*Diff Quality Report.*Some failure.'):
+            pavelib.quality.run_diff_quality("")

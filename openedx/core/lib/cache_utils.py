@@ -1,14 +1,22 @@
 """
 Utilities related to caching.
 """
+
+
 import collections
-import cPickle as pickle
 import functools
 import itertools
 import zlib
 
+import six
+import wrapt
+from django.db.models.signals import post_save, post_delete
 from django.utils.encoding import force_text
-from edx_django_utils.cache import RequestCache
+
+from edx_django_utils.cache import RequestCache, TieredCache
+from six import iteritems
+from six.moves import cPickle as pickle
+from six.moves import map
 
 
 def request_cached(namespace=None, arg_map_function=None, request_cache_getter=None):
@@ -47,38 +55,32 @@ def request_cached(namespace=None, arg_map_function=None, request_cache_getter=N
               cache the value it returns, and return that cached value for subsequent calls with the
               same args/kwargs within a single request.
     """
-    def decorator(f):
+    @wrapt.decorator
+    def decorator(wrapped, instance, args, kwargs):
         """
         Arguments:
-            f (func): the function to wrap
+            args, kwargs: values passed into the wrapped function
         """
-        @functools.wraps(f)
-        def _decorator(*args, **kwargs):
-            """
-            Arguments:
-                args, kwargs: values passed into the wrapped function
-            """
-            # Check to see if we have a result in cache.  If not, invoke our wrapped
-            # function.  Cache and return the result to the caller.
-            if request_cache_getter:
-                request_cache = request_cache_getter(args, kwargs)
-            else:
-                request_cache = RequestCache(namespace)
+        # Check to see if we have a result in cache.  If not, invoke our wrapped
+        # function.  Cache and return the result to the caller.
+        if request_cache_getter:
+            request_cache = request_cache_getter(args if instance is None else (instance,) + args, kwargs)
+        else:
+            request_cache = RequestCache(namespace)
 
-            if request_cache:
-                cache_key = _func_call_cache_key(f, arg_map_function, *args, **kwargs)
-                cached_response = request_cache.get_cached_response(cache_key)
-                if cached_response.is_found:
-                    return cached_response.value
+        if request_cache:
+            cache_key = _func_call_cache_key(wrapped, arg_map_function, *args, **kwargs)
+            cached_response = request_cache.get_cached_response(cache_key)
+            if cached_response.is_found:
+                return cached_response.value
 
-            result = f(*args, **kwargs)
+        result = wrapped(*args, **kwargs)
 
-            if request_cache:
-                request_cache.set(cache_key, result)
+        if request_cache:
+            request_cache.set(cache_key, result)
 
-            return result
+        return result
 
-        return _decorator
     return decorator
 
 
@@ -90,10 +92,10 @@ def _func_call_cache_key(func, arg_map_function, *args, **kwargs):
     """
     arg_map_function = arg_map_function or force_text
 
-    converted_args = map(arg_map_function, args)
-    converted_kwargs = map(arg_map_function, _sorted_kwargs_list(kwargs))
+    converted_args = list(map(arg_map_function, args))
+    converted_kwargs = list(map(arg_map_function, _sorted_kwargs_list(kwargs)))
 
-    cache_keys = [func.__module__, func.func_name] + converted_args + converted_kwargs
+    cache_keys = [func.__module__, func.__name__] + converted_args + converted_kwargs
     return u'.'.join(cache_keys)
 
 
@@ -101,7 +103,7 @@ def _sorted_kwargs_list(kwargs):
     """
     Returns a unique and deterministic ordered list from the given kwargs.
     """
-    sorted_kwargs = sorted(kwargs.iteritems())
+    sorted_kwargs = sorted(iteritems(kwargs))
     sorted_kwargs_list = list(itertools.chain(*sorted_kwargs))
     return sorted_kwargs_list
 
@@ -151,14 +153,69 @@ class process_cached(object):  # pylint: disable=invalid-name
         return functools.partial(self.__call__, obj)
 
 
+class CacheInvalidationManager:
+    """
+    This class provides a decorator for simple functions, which can handle invalidation.
+
+    To use, instantiate with a namespace or django model class:
+    `manager = CacheInvalidationManager(model=User)`
+    One of namespace or model should be specified, but not both.
+
+    Then use it as a decorator on functions with no arguments
+    `@manager
+    def get_system_user():
+         ...
+    `
+    When the User model is saved or deleted, all cache keys used by
+    the decorator will be cleared.
+    """
+
+    def __init__(self, namespace=None, model=None, cache_time=86400):
+        if model:
+            post_save.connect(self.invalidate, sender=model)
+            post_delete.connect(self.invalidate, sender=model)
+            namespace = "{}.{}".format(model.__module__, model.__qualname__)
+        self.namespace = namespace
+        self.cache_time = cache_time
+        self.keys = set()
+
+    # pylint: disable=unused-argument
+    def invalidate(self, **kwargs):
+        """
+        Invalidate all keys tracked by the manager.
+        """
+        for key in self.keys:
+            TieredCache.delete_all_tiers(key)
+
+    def __call__(self, func):
+        """
+        Decorator for functions with no arguments.
+        """
+        cache_key = '{}.{}.{}'.format(self.namespace, func.__module__, func.__name__)
+        self.keys.add(cache_key)
+
+        @functools.wraps(func)
+        def decorator(*args, **kwargs):  # pylint: disable=unused-argument,missing-docstring
+            result = TieredCache.get_cached_response(cache_key)
+            if result.is_found:
+                return result.value
+            result = func()
+            TieredCache.set_all_tiers(cache_key, result, self.cache_time)
+            return result
+        return decorator
+
+
 def zpickle(data):
     """Given any data structure, returns a zlib compressed pickled serialization."""
-    return zlib.compress(pickle.dumps(data, pickle.HIGHEST_PROTOCOL))
+    return zlib.compress(pickle.dumps(data, 4))  # Keep this constant as we upgrade from python 2 to 3.
 
 
 def zunpickle(zdata):
     """Given a zlib compressed pickled serialization, returns the deserialized data."""
-    return pickle.loads(zlib.decompress(zdata))
+    if six.PY2:
+        return pickle.loads(zlib.decompress(zdata))
+    else:
+        return pickle.loads(zlib.decompress(zdata), encoding='latin1')
 
 
 def get_cache(name):

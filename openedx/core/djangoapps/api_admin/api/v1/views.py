@@ -1,13 +1,14 @@
 """
 API Views.
 """
+
 from django_filters.rest_framework import DjangoFilterBackend
 
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListAPIView
-from rest_framework_oauth.authentication import OAuth2Authentication
+from openedx.core.lib.api.authentication import BearerAuthentication
 
 from openedx.core.djangoapps.api_admin.api.v1 import serializers as api_access_serializers
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
@@ -49,11 +50,11 @@ class ApiAccessRequestView(ListAPIView):
             "previous": null
         }
     """
-    authentication_classes = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
+    authentication_classes = (JwtAuthentication, BearerAuthentication, SessionAuthentication,)
     permission_classes = (IsAuthenticated, )
     serializer_class = api_access_serializers.ApiAccessRequestSerializer
     filter_backends = (IsOwnerOrStaffFilterBackend, DjangoFilterBackend)
 
     queryset = ApiAccessRequest.objects.all()
 
-    filter_fields = ('user__username', 'status', 'company_name', 'site__domain', 'contacted')
+    filterset_fields = ('user__username', 'status', 'company_name', 'site__domain', 'contacted')

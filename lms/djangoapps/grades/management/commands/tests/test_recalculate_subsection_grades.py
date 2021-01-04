@@ -2,11 +2,14 @@
 Tests for reset_grades management command.
 """
 
+
 from datetime import datetime
 
 import ddt
+import six
 from django.conf import settings
 from mock import MagicMock, patch
+from opaque_keys.edx.keys import CourseKey
 from pytz import utc
 
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
@@ -16,7 +19,7 @@ from track.event_transaction_utils import get_event_transaction_id
 from util.date_utils import to_timestamp
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-DATE_FORMAT = "%Y-%m-%d %H:%M"
+DATE_FORMAT = u"%Y-%m-%d %H:%M"
 
 
 @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
@@ -25,7 +28,6 @@ class TestRecalculateSubsectionGrades(HasCourseWithProblemsMixin, ModuleStoreTes
     """
     Tests recalculate subsection grades management command.
     """
-    shard = 4
 
     def setUp(self):
         super(TestRecalculateSubsectionGrades, self).setUp()
@@ -38,7 +40,7 @@ class TestRecalculateSubsectionGrades(HasCourseWithProblemsMixin, ModuleStoreTes
         submission = MagicMock()
         submission.student_item = MagicMock(
             student_id="anonymousID",
-            course_id='x/y/z',
+            course_id=CourseKey.from_string('course-v1:x+y+z'),
             item_id='abc',
         )
         submission.created_at = utc.localize(datetime.strptime('2016-08-23 16:43', DATE_FORMAT))
@@ -53,7 +55,7 @@ class TestRecalculateSubsectionGrades(HasCourseWithProblemsMixin, ModuleStoreTes
     def test_csm(self, task_mock, id_mock, csm_mock):
         csm_record = MagicMock()
         csm_record.student_id = "ID"
-        csm_record.course_id = "x/y/z"
+        csm_record.course_id = CourseKey.from_string('course-v1:x+y+z')
         csm_record.module_state_key = "abc"
         csm_record.modified = utc.localize(datetime.strptime('2016-08-23 16:43', DATE_FORMAT))
         csm_mock.objects.filter.return_value = [csm_record]
@@ -65,12 +67,12 @@ class TestRecalculateSubsectionGrades(HasCourseWithProblemsMixin, ModuleStoreTes
         self.command.handle(modified_start='2016-08-25 16:42', modified_end='2018-08-25 16:44')
         kwargs = {
             "user_id": "ID",
-            "course_id": u'x/y/z',
+            "course_id": u'course-v1:x+y+z',
             "usage_id": u'abc',
             "only_if_higher": False,
             "expected_modified_time": to_timestamp(utc.localize(datetime.strptime('2016-08-23 16:43', DATE_FORMAT))),
             "score_deleted": False,
-            "event_transaction_id": unicode(get_event_transaction_id()),
+            "event_transaction_id": six.text_type(get_event_transaction_id()),
             "event_transaction_type": u'edx.grades.problem.submitted',
             "score_db_table": score_db_table,
         }

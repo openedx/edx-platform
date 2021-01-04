@@ -5,59 +5,109 @@ StackedConfigurationModel: A ConfigurationModel that can be overridden at site, 
 """
 
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 from collections import defaultdict
 from enum import Enum
 
+import crum
+from config_models.models import ConfigurationModel, cache
 from django.conf import settings
-from django.db import models
-from django.db.models import Q, F
 from django.contrib.sites.models import Site
 from django.contrib.sites.requests import RequestSite
 from django.core.exceptions import ValidationError
+from django.db import models
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
-import crum
 
-from config_models.models import ConfigurationModel, cache
-from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+from openedx.core.lib.cache_utils import request_cached
 
 
 class Provenance(Enum):
     """
     Provenance enum
     """
-    course = 'Course'
+    run = 'Course Run'
+    org_course = 'Org/Course'
     org = 'Org'
     site = 'Site'
     global_ = 'Global'
     default = 'Default'
 
 
+def validate_course_in_org(value):
+    if value.count('+') != 1:
+        raise ValidationError(
+            _('%(value)s should have the form ORG+COURSE'),
+            params={'value': value},
+        )
+
+
 class StackedConfigurationModel(ConfigurationModel):
     """
-    A ConfigurationModel that stacks Global, Site, Org, and Course level
+    A ConfigurationModel that stacks Global, Site, Org, Course, and Course Run level
     configuration values.
     """
     class Meta(object):
         abstract = True
+        indexes = [
+            # This index optimizes the .object.current_set() query
+            # by preventing a filesort
+            models.Index(fields=['site', 'org', 'course']),
+            models.Index(fields=['site', 'org', 'org_course', 'course'])
+        ]
 
-    KEY_FIELDS = ('site', 'org', 'course')
+    KEY_FIELDS = ('site', 'org', 'org_course', 'course')
     STACKABLE_FIELDS = ('enabled',)
 
     enabled = models.NullBooleanField(default=None, verbose_name=_("Enabled"))
-    site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True)
-    org = models.CharField(max_length=255, db_index=True, null=True, blank=True)
+    site = models.ForeignKey(
+        Site,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        help_text=_(
+            "Configure values for all course runs associated with this site."
+        ),
+    )
+    org = models.CharField(
+        max_length=255,
+        db_index=True,
+        null=True,
+        blank=True,
+        help_text=_(
+            "Configure values for all course runs associated with this "
+            "Organization. This is the organization string (i.e. edX, MITx)."
+        )
+    )
+    org_course = models.CharField(
+        max_length=255,
+        db_index=True,
+        null=True,
+        blank=True,
+        verbose_name=_("Course in Org"),
+        help_text=_(
+            "Configure values for all course runs associated with this course. "
+            "This is should be formatted as 'org+course' (i.e. MITx+6.002x, HarvardX+CS50)."
+        ),
+        validators=[validate_course_in_org],
+    )
     course = models.ForeignKey(
         CourseOverview,
         on_delete=models.DO_NOTHING,
         null=True,
         blank=True,
+        verbose_name=_("Course Run"),
+        help_text=_(
+            "Configure values for this course run. This should be "
+            "formatted as the CourseKey (i.e. course-v1://MITx+6.002x+2019_Q1)"
+        ),
     )
 
     @classmethod
-    def current(cls, site=None, org=None, course_key=None):  # pylint: disable=arguments-differ
+    def current(cls, site=None, org=None, org_course=None, course_key=None):  # pylint: disable=arguments-differ
         """
         Return the current overridden configuration at the specified level.
 
@@ -68,8 +118,9 @@ class StackedConfigurationModel(ConfigurationModel):
 
             Global: Feature Disabled
             edx.org (Site): Feature Enabled
-            Harvard (org): Feature Disabled
-            CS50 (course): Feature Enabled
+            HarvardX (org): Feature Disabled
+            HarvardX/CS50 (org_course): Feature Enabled
+            CS50 in 2018_Q1 (course run): Feature Disabled
 
         Assuming these values had been properly configured, these calls would result
 
@@ -78,10 +129,15 @@ class StackedConfigurationModel(ConfigurationModel):
             MyStackedConfig.current(site=Site(domain='whitelabel.edx.org')) # False -- value derived from global setting
             MyStackedConfig.current(org='HarvardX')  # False
             MyStackedConfig.current(org='MITx')  # True -- value derived from edx.org site
-            MyStackedConfig.current(course=CourseKey(org='HarvardX', course='CS50', run='2018_Q1'))  # True
+            MyStackedConfig.current(org_course='HarvardX/CS50')  # True
+            MyStackedConfig.current(org_course='HarvardX/Bio101')  # False -- value derived from HarvardX setting
+            MyStackedConfig.current(course_key=CourseKey(org='HarvardX', course='CS50', run='2018_Q1'))  # False
+            MyStackedConfig.current(
+                course_key=CourseKey(org='HarvardX', course='CS50', run='2019_Q1')
+            )  # True -- value derived from HarvardX/CS50 setting
 
-            cs50 = CourseKey(org='HarvardX', course='Bio101', run='2018_Q1')
-            MyStackedConfig.current(course=cs50)  # False -- value derived from HarvardX org
+            bio101 = CourseKey(org='HarvardX', course='Bio101', run='2018_Q1')
+            MyStackedConfig.current(course_key=cs50)  # False -- value derived from HarvardX org
 
         The following calls would result in errors due to overspecification:
 
@@ -92,25 +148,29 @@ class StackedConfigurationModel(ConfigurationModel):
         Arguments:
             site: The Site to check current values for
             org: The org to check current values for
-            course: The course to check current values for
+            org_course: The course in a specific org to check current values for
+            course_key: The course to check current values for
 
         Returns:
             An instance of :class:`cls.attribute_tuple()` with the overridden values
             specified down to the level of the supplied argument (or global values if
             no arguments are supplied).
         """
-        cache_key_name = cls.cache_key_name(site, org, course_key=course_key)
+        cache_key_name = cls.cache_key_name(site, org, org_course, course_key)
         cached = cache.get(cache_key_name)
 
         if cached is not None:
             return cached
 
         # Raise an error if more than one of site/org/course are specified simultaneously.
-        if len([arg for arg in [site, org, course_key] if arg is not None]) > 1:
-            raise ValueError("Only one of site, org, and course can be specified")
+        if len([arg for arg in [site, org, org_course, course_key] if arg is not None]) > 1:
+            raise ValueError("Only one of site, org, org_course, and course can be specified")
 
-        if org is None and course_key is not None:
-            org = cls._org_from_course_key(course_key)
+        if org_course is None and course_key is not None:
+            org_course = cls._org_course_from_course_key(course_key)
+
+        if org is None and org_course is not None:
+            org = cls._org_from_org_course(org_course)
 
         if site is None and org is not None:
             site = cls._site_from_org(org)
@@ -123,39 +183,49 @@ class StackedConfigurationModel(ConfigurationModel):
 
         values = field_defaults.copy()
 
-        global_override_q = Q(site=None, org=None, course_id=None)
-        site_override_q = Q(site=site, org=None, course_id=None)
-        org_override_q = Q(site=None, org=org, course_id=None)
-        course_override_q = Q(site=None, org=None, course_id=course_key)
+        # Build a multi_filter_query that defaults to querying for the global-level setting and adds queries
+        # for the stacked-level settings when applicable.
+        # Note: Django2+ requires checking for 'isnull' rather than passing 'None' in the queries.
+        multi_filter_query = Q(site__isnull=True, org__isnull=True, org_course__isnull=True, course_id__isnull=True)
+        if site:
+            multi_filter_query |= Q(site=site, org__isnull=True, org_course__isnull=True, course_id__isnull=True)
+        if org:
+            multi_filter_query |= Q(site__isnull=True, org=org, org_course__isnull=True, course_id__isnull=True)
+        if org_course:
+            multi_filter_query |= Q(site__isnull=True, org__isnull=True, org_course=org_course, course_id__isnull=True)
+        if course_key:
+            multi_filter_query |= Q(site__isnull=True, org__isnull=True, org_course__isnull=True, course_id=course_key)
 
-        overrides = cls.objects.current_set().filter(
-            global_override_q |
-            site_override_q |
-            org_override_q |
-            course_override_q
-        ).order_by(
-            # Sort nulls first, and in reverse specificity order
-            # so that the overrides are in the order of general to specific.
-            #
-            # Site | Org  | Course
-            # --------------------
-            # Null | Null | Null
-            # site | Null | Null
-            # Null | org  | Null
-            # Null | Null | Course
-            F('course').desc(nulls_first=True),
-            F('org').desc(nulls_first=True),
-            F('site').desc(nulls_first=True),
-        )
+        overrides = cls.objects.current_set().filter(multi_filter_query)
 
         provenances = defaultdict(lambda: Provenance.default)
-        for override in overrides:
+        # We are sorting in python to avoid doing a filesort in the database for
+        # what will only be 4 rows at maximum
+
+        def sort_key(override):
+            """
+            Sort overrides in increasing specificity.
+
+            This particular sort order sorts None before not-None (because False < True)
+            It sorts global first (because all entries are None), then site entries
+            (because course_id and org are None), then org, org_course and course (by the same logic)
+            """
+            return (
+                override.course_id is not None,
+                override.org_course is not None,
+                override.org is not None,
+                override.site_id is not None
+            )
+
+        for override in sorted(overrides, key=sort_key):
             for field in stackable_fields:
                 value = field.value_from_object(override)
                 if value != field_defaults[field.name]:
                     values[field.name] = value
                     if override.course_id is not None:
-                        provenances[field.name] = Provenance.course
+                        provenances[field.name] = Provenance.run
+                    elif override.org_course is not None:
+                        provenances[field.name] = Provenance.org_course
                     elif override.org is not None:
                         provenances[field.name] = Provenance.org
                     elif override.site_id is not None:
@@ -175,7 +245,7 @@ class StackedConfigurationModel(ConfigurationModel):
         """
         all_courses = CourseOverview.objects.all()
         all_site_configs = SiteConfiguration.objects.filter(
-            values__contains='course_org_filter', enabled=True
+            site_values__contains='course_org_filter', enabled=True
         ).select_related('site')
 
         try:
@@ -185,7 +255,7 @@ class StackedConfigurationModel(ConfigurationModel):
 
         sites_by_org = defaultdict(lambda: default_site)
         site_cfg_org_filters = (
-            (site_cfg.site, site_cfg.values['course_org_filter'])
+            (site_cfg.site, site_cfg.site_values['course_org_filter'])
             for site_cfg in all_site_configs
         )
         sites_by_org.update({
@@ -196,7 +266,7 @@ class StackedConfigurationModel(ConfigurationModel):
 
         all_overrides = cls.objects.current_set()
         overrides = {
-            (override.site_id, override.org, override.course_id): override
+            (override.site_id, override.org, override.org_course, override.course_id): override
             for override in all_overrides
         }
 
@@ -210,11 +280,15 @@ class StackedConfigurationModel(ConfigurationModel):
             """
             Return provenance for given field
             """
+            org_course = cls._org_course_from_course_key(course.id)
+            org = cls._org_from_org_course(org_course)
+
             for (config_key, provenance) in [
-                ((None, None, course.id), Provenance.course),
-                ((None, course.id.org, None), Provenance.org),
-                ((sites_by_org[course.id.org].id, None, None), Provenance.site),
-                ((None, None, None), Provenance.global_),
+                ((None, None, None, course.id), Provenance.run),
+                ((None, None, org_course, None), Provenance.org_course),
+                ((None, org, None, None), Provenance.org),
+                ((sites_by_org[course.id.org].id, None, None, None), Provenance.site),
+                ((None, None, None, None), Provenance.global_),
             ]:
                 config = overrides.get(config_key)
                 if config is None:
@@ -234,25 +308,26 @@ class StackedConfigurationModel(ConfigurationModel):
         }
 
     @classmethod
-    def cache_key_name(cls, site, org, course=None, course_key=None):  # pylint: disable=arguments-differ
-        if course is not None and course_key is not None:
-            raise ValueError("Only one of course and course_key can be specified at a time")
-        if course is not None:
-            course_key = course
-
+    def cache_key_name(cls, site, org, org_course, course_key):  # pylint: disable=arguments-differ
         if site is None:
             site_id = None
         else:
             site_id = site.id
 
-        return super(StackedConfigurationModel, cls).cache_key_name(site_id, org, course_key)
+        return super(StackedConfigurationModel, cls).cache_key_name(site_id, org, org_course, course_key)
 
     @classmethod
-    def _org_from_course_key(cls, course_key):
-        return course_key.org
+    def _org_from_org_course(cls, org_course):
+        return org_course.partition('+')[0]
 
     @classmethod
+    def _org_course_from_course_key(cls, course_key):
+        return u"{}+{}".format(course_key.org, course_key.course)
+
+    @classmethod
+    @request_cached()
     def _site_from_org(cls, org):
+
         configuration = SiteConfiguration.get_configuration_for_org(org, select_related=['site'])
         if configuration is None:
             try:
@@ -264,7 +339,7 @@ class StackedConfigurationModel(ConfigurationModel):
 
     def clean(self):
         # fail validation if more than one of site/org/course are specified simultaneously
-        if len([arg for arg in [self.site, self.org, self.course] if arg is not None]) > 1:
+        if len([arg for arg in [self.site, self.org, self.org_course, self.course] if arg is not None]) > 1:
             raise ValidationError(
                 _('Configuration may not be specified at more than one level at once.')
             )

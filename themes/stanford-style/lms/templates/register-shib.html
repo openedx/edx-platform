@@ -5,7 +5,6 @@ from django.utils.translation import ugettext as _
 from django.urls import reverse
 from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.djangolib.markup import HTML, Text
-
 %>
 
 <%block name="pagetitle">${_("Preferences for {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</%block>
@@ -112,7 +111,8 @@ from openedx.core.djangolib.markup import HTML, Text
           strong_close=HTML('</strong>')
         )}
       </p>
-
+      
+        
       <fieldset class="group group-form group-form-requiredinformation">
         <legend class="sr">${_('Required Information')}</legend>
 
@@ -161,10 +161,10 @@ from openedx.core.djangolib.markup import HTML, Text
 
             <div class="field required checkbox" id="field-tos">
               <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" required aria-required="true" />
-            <label for="tos-yes">${Text(_('I agree to the {link_start}Terms of Service{link_end}')).format(
-              link_start=HTML('<a href="{url}" class="new-vp">').format(url=marketing_link('TOS')),
-              link_end=HTML('</a>'))}</label>
-            </div>
+              <label for="tos-yes">${Text(_('I agree to the {link_start}Terms of Service{link_end}')).format(
+                link_start=HTML('<a href="{url}" class="new-vp">').format(url=marketing_link('TOS')),
+                link_end=HTML('</a>'))}</label>
+           </div>
 
             % endif
 

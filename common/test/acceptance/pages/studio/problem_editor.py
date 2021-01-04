@@ -1,9 +1,13 @@
 """
 Studio Problem Editor
 """
-from common.test.acceptance.pages.studio.xblock_editor import XBlockEditorView
-from common.test.acceptance.pages.common.utils import click_css
+
+
 from selenium.webdriver.support.ui import Select
+from six.moves import range
+
+from common.test.acceptance.pages.common.utils import click_css
+from common.test.acceptance.pages.studio.xblock_editor import XBlockEditorView
 
 
 class ProblemXBlockEditorView(XBlockEditorView):
@@ -24,7 +28,7 @@ class ProblemXBlockEditorView(XBlockEditorView):
         """
         If editing, set the value of a field.
         """
-        selector = '.xblock-studio_view li.field label:contains("{}") + input'.format(field_display_name)
+        selector = u'.metadata_edit li.field label:contains("{}") + input'.format(field_display_name)
         script = "$(arguments[0]).val(arguments[1]).change();"
         self.browser.execute_script(script, selector, field_value)
 
@@ -37,7 +41,7 @@ class ProblemXBlockEditorView(XBlockEditorView):
         Returns:
             (string): Value of the field
         """
-        script = "return $('.wrapper-comp-setting label:contains({}) + input').val();".format(field_display_name)
+        script = u"return $('.wrapper-comp-setting label:contains({}) + input').val();".format(field_display_name)
         return self.browser.execute_script(script)
 
     def get_default_dropdown_value(self, css):
@@ -60,9 +64,9 @@ class ProblemXBlockEditorView(XBlockEditorView):
             dropdown_name(string): Name of the dropdown to be opened
             value(string): Value to be selected
         """
-        self.q(css='select[class="input setting-input"][name="{}"]'.format(dropdown_name)).first.click()
-        self.wait_for_element_visibility('option[value="{}"]'.format(value), 'Dropdown is visible')
-        self.q(css='option[value="{}"]'.format(value)).click()
+        self.q(css=u'select[class="input setting-input"][name="{}"]'.format(dropdown_name)).first.click()
+        self.wait_for_element_visibility(u'option[value="{}"]'.format(value), 'Dropdown is visible')
+        self.q(css=u'option[value="{}"]'.format(value)).click()
 
     def get_value_from_the_dropdown(self, dropdown_name):
         """
@@ -74,7 +78,7 @@ class ProblemXBlockEditorView(XBlockEditorView):
 
         """
         dropdown = self.browser.find_element_by_css_selector(
-            'select[class="input setting-input"][name="{}"]'.format(dropdown_name)
+            u'select[class="input setting-input"][name="{}"]'.format(dropdown_name)
         )
         return Select(dropdown).first_selected_option.text
 
@@ -86,7 +90,7 @@ class ProblemXBlockEditorView(XBlockEditorView):
         """
         settings_dict = {}
         number_of_settings = len(self.q(css='.wrapper-comp-setting'))
-        css = '.list-input.settings-list .field.comp-setting-entry:nth-of-type({}) {}'
+        css = u'.list-input.settings-list .field.comp-setting-entry:nth-of-type({}) {}'
 
         for index in range(1, number_of_settings + 1):
             key = self.q(css=css.format(index, "label")).text[0]

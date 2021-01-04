@@ -1,3 +1,8 @@
+"""
+Instrutor Task runner
+"""
+
+
 import json
 import logging
 from time import time
@@ -27,6 +32,19 @@ class TaskProgress(object):
         self.failed = 0
         self.preassigned = 0
 
+    @property
+    def state(self):
+        return {
+            'action_name': self.action_name,
+            'attempted': self.attempted,
+            'succeeded': self.succeeded,
+            'skipped': self.skipped,
+            'failed': self.failed,
+            'total': self.total,
+            'preassigned': self.preassigned,
+            'duration_ms': int((time() - self.start_time) * 1000),
+        }
+
     def update_task_state(self, extra_meta=None):
         """
         Update the current celery task's state to the progress state
@@ -40,16 +58,7 @@ class TaskProgress(object):
         Returns:
             dict: The current task's progress dict
         """
-        progress_dict = {
-            'action_name': self.action_name,
-            'attempted': self.attempted,
-            'succeeded': self.succeeded,
-            'skipped': self.skipped,
-            'failed': self.failed,
-            'total': self.total,
-            'preassigned': self.preassigned,
-            'duration_ms': int((time() - self.start_time) * 1000),
-        }
+        progress_dict = self.state
         if extra_meta is not None:
             progress_dict.update(extra_meta)
         _get_current_task().update_state(state=PROGRESS, meta=progress_dict)

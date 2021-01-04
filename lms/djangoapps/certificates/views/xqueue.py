@@ -1,6 +1,8 @@
 """
 Views used by XQueue certificate generation.
 """
+
+
 import json
 import logging
 
@@ -19,8 +21,8 @@ from lms.djangoapps.certificates.models import (
     GeneratedCertificate,
     certificate_status_for_student
 )
-from util.request_rate_limiter import BadRequestRateLimiter
 from util.json_request import JsonResponse, JsonResponseBadRequest
+from util.request_rate_limiter import BadRequestRateLimiter
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
@@ -81,8 +83,8 @@ def update_certificate(request):
         except GeneratedCertificate.DoesNotExist:
             log.critical(
                 'Unable to lookup certificate\n'
-                'xqueue_body: %s\n'
-                'xqueue_header: %s',
+                u'xqueue_body: %s\n'
+                u'xqueue_header: %s',
                 xqueue_body,
                 xqueue_header
             )
@@ -117,7 +119,7 @@ def update_certificate(request):
                 cert.status = status.deleted
             else:
                 log.critical(
-                    'Invalid state for cert update: %s', cert.status
+                    u'Invalid state for cert update: %s', cert.status
                 )
                 return HttpResponse(
                     json.dumps({
@@ -222,7 +224,7 @@ def update_example_certificate(request):
             )
         else:
             cert.update_status(ExampleCertificate.STATUS_SUCCESS, download_url=download_url)
-            log.info("Successfully updated example certificate with uuid '%s'.", uuid)
+            log.info(u"Successfully updated example certificate with uuid '%s'.", uuid)
 
     # Let the XQueue know that we handled the response
     return JsonResponse({'return_code': 0})

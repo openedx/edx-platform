@@ -3,10 +3,12 @@
 Tests for util.date_utils
 """
 
+
 import unittest
 from datetime import datetime, timedelta, tzinfo
 
 import ddt
+import six
 from mock import patch
 from pytz import utc
 
@@ -100,7 +102,7 @@ def fake_ugettext(translations):
     """
     Create a fake implementation of ugettext, for testing.
     """
-    def _ugettext(text):                # pylint: disable=missing-docstring
+    def _ugettext(text):
         return translations.get(text, text)
     return _ugettext
 
@@ -109,7 +111,7 @@ def fake_pgettext(translations):
     """
     Create a fake implementation of pgettext, for testing.
     """
-    def _pgettext(context, text):       # pylint: disable=missing-docstring
+    def _pgettext(context, text):
         return translations.get((context, text), text)
     return _pgettext
 
@@ -128,11 +130,13 @@ class StrftimeLocalizedTest(unittest.TestCase):
         ("%I:%M:%S %p", "04:41:17 PM"),
         ("%A at %-I%P", "Thursday at 4pm"),
     )
-    def test_usual_strftime_behavior(self, (fmt, expected)):
-        dtime = datetime(2013, 02, 14, 16, 41, 17)
+    def test_usual_strftime_behavior(self, fmt_expected):
+        (fmt, expected) = fmt_expected
+        dtime = datetime(2013, 2, 14, 16, 41, 17)
         self.assertEqual(expected, strftime_localized(dtime, fmt))
         # strftime doesn't like Unicode, so do the work in UTF8.
-        self.assertEqual(expected, dtime.strftime(fmt.encode('utf8')).decode('utf8'))
+        self.assertEqual(expected.encode('utf-8') if six.PY2 else expected,
+                         dtime.strftime(fmt.encode('utf-8') if six.PY2 else fmt))
 
     @ddt.data(
         ("SHORT_DATE", "Feb 14, 2013"),
@@ -141,8 +145,9 @@ class StrftimeLocalizedTest(unittest.TestCase):
         ("DAY_AND_TIME", "Thursday at 4pm"),
         ("%x %X!", "Feb 14, 2013 04:41:17 PM!"),
     )
-    def test_shortcuts(self, (fmt, expected)):
-        dtime = datetime(2013, 02, 14, 16, 41, 17)
+    def test_shortcuts(self, fmt_expected):
+        (fmt, expected) = fmt_expected
+        dtime = datetime(2013, 2, 14, 16, 41, 17)
         self.assertEqual(expected, strftime_localized(dtime, fmt))
 
     @patch('util.date_utils.pgettext', fake_pgettext(translations={
@@ -159,8 +164,9 @@ class StrftimeLocalizedTest(unittest.TestCase):
         ("TIME", "04:41:17 XXpmXX"),
         ("%x %X!", "XXfebXX 14, 2013 04:41:17 XXpmXX!"),
     )
-    def test_translated_words(self, (fmt, expected)):
-        dtime = datetime(2013, 02, 14, 16, 41, 17)
+    def test_translated_words(self, fmt_expected):
+        (fmt, expected) = fmt_expected
+        dtime = datetime(2013, 2, 14, 16, 41, 17)
         self.assertEqual(expected, strftime_localized(dtime, fmt))
 
     @patch('util.date_utils.ugettext', fake_ugettext(translations={
@@ -178,8 +184,9 @@ class StrftimeLocalizedTest(unittest.TestCase):
         ("The time is: %X", "The time is: 16h.41m.17s"),
         ("%x %X", "date(2013.02.14) 16h.41m.17s"),
     )
-    def test_translated_formats(self, (fmt, expected)):
-        dtime = datetime(2013, 02, 14, 16, 41, 17)
+    def test_translated_formats(self, fmt_expected):
+        (fmt, expected) = fmt_expected
+        dtime = datetime(2013, 2, 14, 16, 41, 17)
         self.assertEqual(expected, strftime_localized(dtime, fmt))
 
     @patch('util.date_utils.ugettext', fake_ugettext(translations={
@@ -190,8 +197,9 @@ class StrftimeLocalizedTest(unittest.TestCase):
         ("SHORT_DATE", "Feb 14, 2013"),
         ("TIME", "04:41:17 PM"),
     )
-    def test_recursion_protection(self, (fmt, expected)):
-        dtime = datetime(2013, 02, 14, 16, 41, 17)
+    def test_recursion_protection(self, fmt_expected):
+        (fmt, expected) = fmt_expected
+        dtime = datetime(2013, 2, 14, 16, 41, 17)
         self.assertEqual(expected, strftime_localized(dtime, fmt))
 
     @ddt.data(
@@ -200,6 +208,6 @@ class StrftimeLocalizedTest(unittest.TestCase):
         "%Y/%m/%d%",
     )
     def test_invalid_format_strings(self, fmt):
-        dtime = datetime(2013, 02, 14, 16, 41, 17)
+        dtime = datetime(2013, 2, 14, 16, 41, 17)
         with self.assertRaises(ValueError):
             strftime_localized(dtime, fmt)

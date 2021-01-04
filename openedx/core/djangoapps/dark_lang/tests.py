@@ -1,6 +1,8 @@
 """
 Tests of DarkLangMiddleware
 """
+
+
 import unittest
 
 import ddt
@@ -75,7 +77,7 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
         Assert that the HTML_ACCEPT_LANGUAGE header in request
         is equal to value
         """
-        self.assertEquals(
+        self.assertEqual(
             value,
             request.META.get('HTTP_ACCEPT_LANGUAGE', UNSET)
         )
@@ -228,14 +230,14 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
 
         self.assertAcceptEquals(
             'es-419;q=1.0',
-            self.process_middleware_request(accept='{};q=1.0, pt;q=0.5'.format(latin_america_code))
+            self.process_middleware_request(accept=b'{};q=1.0, pt;q=0.5'.format(latin_america_code))
         )
 
     def assert_session_lang_equals(self, value, session):
         """
         Assert that the LANGUAGE_SESSION_KEY set in session is equal to value
         """
-        self.assertEquals(
+        self.assertEqual(
             value,
             session.get(LANGUAGE_SESSION_KEY, UNSET)
         )

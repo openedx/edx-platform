@@ -4,252 +4,262 @@
 #
 #    make upgrade
 #
--e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
--e common/lib/calc
--e common/lib/capa
--e common/lib/chem
--e git+https://github.com/edx/codejail.git@a320d43ce6b9c93b17636b2491f724d9e433be47#egg=codejail
-git+https://github.com/solashirai/crowdsourcehinter.git@518605f0a95190949fe77bd39158450639e2e1dc#egg=crowdsourcehinter-xblock==0.1
-git+https://github.com/mitodl/django-cas.git@afac57bc523f145ae826f4ed3d4fa8b2c86c5364#egg=django-cas==2.1.1
-git+https://github.com/edx/django-celery.git@756cb57aad765cb2b0d37372c1855b8f5f37e6b0#egg=django-celery==3.2.1+edx.2
-git+https://github.com/edx/django-oauth-plus.git@01ec2a161dfc3465f9d35b9211ae790177418316#egg=django-oauth-plus==2.2.9.edx-1
-git+https://github.com/edx/django-openid-auth.git@0.15.1#egg=django-openid-auth==0.15.1
-git+https://github.com/jazzband/django-pipeline.git@d068a019169c9de5ee20ece041a6dea236422852#egg=django-pipeline==1.5.3
--e git+https://github.com/edx/django-wiki.git@v0.0.21#egg=django-wiki
-git+https://github.com/edx/django-rest-framework-oauth.git@0a43e8525f1e3048efe4bc70c03de308a277197c#egg=djangorestframework-oauth==1.1.1
-git+https://github.com/edx/django-rest-framework.git@1ceda7c086fddffd1c440cc86856441bbf0bd9cb#egg=djangorestframework==3.6.3
--e git+https://github.com/edx/DoneXBlock.git@01a14f3bd80ae47dd08cdbbe2f88f3eb88d00fba#egg=done-xblock
--e git+https://github.com/edly-io/xblock-video.git@dev#egg=video_xblock
--e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
-git+https://github.com/mitodl/edx-sga.git@3828ba9e413080a81b907a3381e5ffa05e063f81#egg=edx-sga==0.8.3
-git+https://github.com/edx/xblock-lti-consumer.git@v1.1.8#egg=lti_consumer-xblock==1.1.8
-git+https://github.com/edx/MongoDBProxy.git@25b99097615bda06bd7cdfe5669ed80dc2a7fed0#egg=MongoDBProxy==0.1.0
--e .
-git+https://github.com/edx/edx-ora2.git@2.2.0#egg=ora2==2.2.0
--e git+https://github.com/dgrtwo/ParsePy.git@7949b9f754d1445eff8e8f20d0e967b9a6420639#egg=parse_rest
--e git+https://github.com/appliedsec/pygeoip.git@95e69341cebf5a6a9fbf7c4f5439d458898bdc3b#egg=pygeoip
--e git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
--e git+https://github.com/edx/RateXBlock.git@367e19c0f6eac8a5f002fd0f1559555f8e74bfff#egg=rate-xblock
-git+https://github.com/edx/RecommenderXBlock.git@1.4.0#egg=recommender-xblock==1.4.0
+-e git+https://github.com/edx/acid-block.git@98aecba94ecbfa934e2d00262741c0ea9f557fc9#egg=acid-xblock  # via -r requirements/edx/github.in
+-e common/lib/capa  # via -r requirements/edx/local.in
+-e git+https://github.com/edx/codejail.git@4127fc4bd5775cc72aee8d7f0a70e31405e22439#egg=codejail  # via -r requirements/edx/github.in
+-e git+https://github.com/jsocol/django-ratelimit.git@72edbe8949fbf6699848e5847645a1998f121d46#egg=ratelimit  # via -r requirements/edx/github.in
+-e git+https://github.com/edx/django-wiki.git@0.0.27#egg=django-wiki  # via -r requirements/edx/github.in
+-e git+https://github.com/edx/DoneXBlock.git@2.0.2#egg=done-xblock  # via -r requirements/edx/github.in
+-e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme  # via -r requirements/edx/github.in
+-e .  # via -r requirements/edx/local.in
+-e git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev  # via -r requirements/edx/github.in
+-e git+https://github.com/edx/RateXBlock.git@2.0#egg=rate-xblock  # via -r requirements/edx/github.in
+-e common/lib/safe_lxml  # via -r requirements/edx/local.in
+-e common/lib/sandbox-packages  # via -r requirements/edx/local.in
+-e git+https://github.com/python-social-auth/social-app-django.git@c00d23c2b45c3317bd35b15ad1b959338689cef8#egg=social-auth-app-django  # via -r requirements/edx/github.in
+-e common/lib/symmath  # via -r requirements/edx/local.in
+-e openedx/core/lib/xblock_builtin/xblock_discussion  # via -r requirements/edx/local.in
+-e git+https://github.com/edx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive  # via -r requirements/edx/github.in
+-e common/lib/xmodule  # via -r requirements/edx/local.in
+amqp==1.4.9               # via kombu
+analytics-python==1.2.9   # via -r requirements/edx/base.in
+aniso8601==8.0.0          # via edx-tincan-py35
+anyjson==0.3.3            # via kombu
+appdirs==1.4.4            # via fs
+attrs==19.3.0             # via -r requirements/edx/base.in, edx-ace
+babel==2.8.0              # via -r requirements/edx/base.in, django-babel, django-babel-underscore
+beautifulsoup4==4.9.1     # via pynliner
+billiard==3.3.0.23        # via celery
+bleach==3.1.5             # via -r requirements/edx/base.in, edx-enterprise, lti-consumer-xblock, ora2
+boto3==1.4.8              # via -r requirements/edx/base.in, fs-s3fs
+boto==2.39.0              # via -r requirements/edx/base.in, django-ses, edxval, ora2
+botocore==1.8.17          # via -r requirements/edx/base.in, boto3, s3transfer
+git+https://github.com/edx/bridgekeeper.git@2423e8d8788c2132ebeec509e1a7b17e1f5b9364#egg=bridgekeeper==0.0  # via -r requirements/edx/github.in
+celery==3.1.26.post2      # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, django-celery, django-user-tasks, edx-celeryutils, edx-enterprise
+certifi==2020.4.5.1       # via -r requirements/edx/paver.txt, requests
+cffi==1.14.0              # via -r requirements/edx/../edx-sandbox/shared.txt, cryptography
+chardet==3.0.4            # via -r requirements/edx/paver.txt, pdfminer.six, pysrt, requests
+git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0  # via -r requirements/edx/github.in
+click==7.1.2              # via -r requirements/edx/../edx-sandbox/shared.txt, code-annotations, nltk, user-util
+code-annotations==0.3.4   # via edx-enterprise
+contextlib2==0.6.0.post1  # via -r requirements/edx/base.in
+coreapi==2.3.3            # via drf-yasg
+coreschema==0.0.4         # via coreapi, drf-yasg
+git+https://github.com/edx/crowdsourcehinter.git@2178ac72891392106ffef389651aef374177d294#egg=crowdsourcehinter-xblock==0.4  # via -r requirements/edx/github.in
+cryptography==2.9.2       # via -r requirements/edx/../edx-sandbox/shared.txt, django-fernet-fields, edx-enterprise, social-auth-core
+cssutils==1.0.2           # via pynliner
+ddt==1.3.1                # via -c requirements/edx/../constraints.txt, xblock-drag-and-drop-v2, xblock-poll
+decorator==4.4.2          # via pycontracts
+defusedxml==0.6.0         # via -r requirements/edx/base.in, djangorestframework-xml, ora2, python3-openid, python3-saml, safe-lxml, social-auth-core
+git+https://github.com/django-compressor/django-appconf@1526a842ee084b791aa66c931b3822091a442853#egg=django-appconf  # via -r requirements/edx/github.in, django-statici18n
+git+https://github.com/edx/django-babel-underscore.git@37705f7377a4d0a4e673f1431895ce28a8860cd7#egg=django-babel-underscore==0.6.0  # via -r requirements/edx/github.in
+git+https://github.com/Zegocover/enmerkar.git@dbc113798aa4beabdfa2d00e6fef48248eb0f185#egg=django-babel==0.6.3.dev0  # via -r requirements/edx/github.in
+django-celery==3.3.1      # via -r requirements/edx/base.in
+django-classy-tags==1.0.0  # via django-sekizai
+django-config-models==2.0.2  # via -r requirements/edx/base.in, edx-enterprise
+django-cookies-samesite==0.5.1  # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
+django-cors-headers==2.5.3  # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
+django-countries==5.5     # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, edx-enterprise
+django-crum==0.7.6        # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring, edx-rbac, super-csv
+django-fernet-fields==0.6  # via -r requirements/edx/base.in, edx-enterprise, edxval
+django-filter==2.2.0      # via -r requirements/edx/base.in, edx-enterprise
+django-ipware==2.1.0      # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring
+django-js-asset==1.2.2    # via django-mptt
+django-method-override==1.0.4  # via -r requirements/edx/base.in
+django-model-utils==4.0.0  # via -r requirements/edx/base.in, django-user-tasks, edx-bulk-grades, edx-celeryutils, edx-completion, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-rbac, edx-submissions, edx-when, edxval, ora2, super-csv
+django-mptt==0.11.0       # via -r requirements/edx/base.in, django-wiki
+django-multi-email-field==0.6.1  # via edx-enterprise
+django-mysql==3.5.0       # via -r requirements/edx/base.in
+django-oauth-toolkit==1.3.2  # via -r requirements/edx/base.in
+django-object-actions==2.0.0  # via edx-enterprise
+django-pipeline==1.7.0    # via -r requirements/edx/base.in
+django-pyfs==2.1          # via -r requirements/edx/base.in
+django-ratelimit-backend==2.0  # via -r requirements/edx/base.in
+django-require==1.0.11    # via -r requirements/edx/base.in
+django-sekizai==1.1.0     # via -r requirements/edx/base.in, django-wiki
+django-ses==0.8.14        # via -r requirements/edx/base.in
+django-simple-history==2.10.0  # via -r requirements/edx/base.in, edx-enterprise, edx-organizations, ora2
+django-splash==0.2.9      # via -r requirements/edx/base.in
+django-statici18n==1.9.0  # via -r requirements/edx/base.in
+django-storages==1.8      # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, edxval
+django-user-tasks==1.1.0  # via -r requirements/edx/base.in
+django-waffle==0.18.0     # via -r requirements/edx/base.in, edx-django-utils, edx-drf-extensions, edx-enterprise, edx-proctoring
+django-webpack-loader==0.7.0  # via -r requirements/edx/base.in, edx-proctoring
+django==2.2.16            # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, code-annotations, django-appconf, django-babel, django-babel-underscore, django-celery, django-classy-tags, django-config-models, django-cors-headers, django-crum, django-fernet-fields, django-filter, django-method-override, django-model-utils, django-mptt, django-multi-email-field, django-mysql, django-oauth-toolkit, django-pyfs, django-ratelimit-backend, django-sekizai, django-splash, django-statici18n, django-storages, django-user-tasks, django-wiki, drf-jwt, drf-yasg, edx-ace, edx-api-doc-tools, edx-bulk-grades, edx-celeryutils, edx-completion, edx-django-release-util, edx-django-sites-extensions, edx-django-utils, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-milestones, edx-opaque-keys, edx-organizations, edx-proctoring, edx-rbac, edx-search, edx-submissions, edx-when, edxval, event-tracking, help-tokens, jsonfield2, ora2, rest-condition, super-csv, xss-utils
+djangorestframework-xml==2.0.0  # via edx-enterprise
+djangorestframework==3.9.4  # via -r requirements/edx/base.in, django-config-models, django-user-tasks, drf-jwt, drf-yasg, edx-api-doc-tools, edx-completion, edx-drf-extensions, edx-enterprise, edx-organizations, edx-proctoring, edx-submissions, ora2, rest-condition, super-csv
+docopt==0.6.2             # via xmodule
+docutils==0.16            # via botocore
+drf-jwt==1.14.0           # via -c requirements/edx/../constraints.txt, edx-drf-extensions
+drf-yasg==1.17.0          # via -c requirements/edx/../constraints.txt, edx-api-doc-tools
+edx-ace==0.1.15           # via -r requirements/edx/base.in
+edx-analytics-data-api-client==0.16.1  # via -r requirements/edx/base.in
+edx-api-doc-tools==1.3.0  # via -r requirements/edx/base.in
+edx-bulk-grades==0.6.8    # via -r requirements/edx/base.in, staff-graded-xblock
+edx-ccx-keys==1.1.0       # via -r requirements/edx/base.in
+edx-celeryutils==0.5.0    # via -r requirements/edx/base.in, super-csv
+edx-completion==3.2.0     # via -r requirements/edx/base.in
+edx-django-release-util==0.4.4  # via -r requirements/edx/base.in
+edx-django-sites-extensions==2.5.1  # via -r requirements/edx/base.in
+edx-django-utils==3.2.2   # via -r requirements/edx/base.in, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
+edx-drf-extensions==6.0.0  # via -r requirements/edx/base.in, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
+edx-enterprise==3.2.14    # via -r requirements/edx/base.in
+edx-i18n-tools==0.5.3     # via ora2
+edx-milestones==0.3.0     # via -r requirements/edx/base.in
+edx-opaque-keys[django]==2.1.0  # via -r requirements/edx/paver.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, xmodule
+edx-organizations==5.2.0  # via -r requirements/edx/base.in
+edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/base.in
+edx-proctoring==2.4.0     # via -r requirements/edx/base.in, edx-proctoring-proctortrack
+edx-rbac==1.2.1           # via edx-enterprise
+edx-rest-api-client==5.2.1  # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring
+edx-search==1.3.4         # via -r requirements/edx/base.in
+edx-sga==0.11.0           # via -r requirements/edx/base.in
+edx-submissions==3.1.7    # via -r requirements/edx/base.in, ora2
+edx-tincan-py35==0.0.5    # via edx-enterprise
+edx-user-state-client==1.2.0  # via -r requirements/edx/base.in
+edx-when==1.2.3           # via -r requirements/edx/base.in, edx-proctoring
+edxval==1.3.4             # via -r requirements/edx/base.in
+elasticsearch==1.9.0      # via edx-search
+enum34==1.1.10            # via edxval
+event-tracking==0.3.2     # via -r requirements/edx/base.in, edx-proctoring, edx-search
+fs-s3fs==0.1.8            # via -r requirements/edx/base.in, django-pyfs
+fs==2.0.18                # via -r requirements/edx/base.in, django-pyfs, fs-s3fs, xblock
+future==0.18.2            # via django-ses, edx-celeryutils, edx-enterprise, pycontracts, pyjwkest
+geoip2==3.0.0             # via -r requirements/edx/base.in
+glob2==0.7                # via -r requirements/edx/base.in
+gunicorn==20.0.4          # via -r requirements/edx/base.in
+help-tokens==1.1.2        # via -r requirements/edx/base.in
+html5lib==1.0.1           # via -r requirements/edx/base.in, ora2
+icalendar==4.0.6          # via -r requirements/edx/base.in
+idna==2.9                 # via -r requirements/edx/paver.txt, requests
+importlib-metadata==1.6.0  # via -r requirements/edx/paver.txt, path
+inflection==0.4.0         # via drf-yasg
+ipaddress==1.0.23         # via -r requirements/edx/base.in
+isodate==0.6.0            # via python3-saml
+itypes==1.2.0             # via coreapi
+jinja2==2.11.2            # via code-annotations, coreschema
+jmespath==0.10.0          # via boto3, botocore
+joblib==0.14.1            # via -c requirements/edx/../constraints.txt, -r requirements/edx/../edx-sandbox/shared.txt, nltk
+jsondiff==1.2.0           # via edx-enterprise
+jsonfield2==3.0.3         # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, edx-celeryutils, edx-enterprise, edx-proctoring, edx-submissions, ora2
+kombu==3.0.37             # via celery
+laboratory==1.0.2         # via -r requirements/edx/base.in
+lazy==1.4                 # via -r requirements/edx/paver.txt, acid-xblock, ora2
+lepl==5.1.3               # via rfc6266-parser
+libsass==0.10.0           # via -r requirements/edx/paver.txt, ora2
+loremipsum==1.0.5         # via ora2
+git+https://github.com/edx/xblock-lti-consumer.git@v1.2.6#egg=lti_consumer-xblock==1.2.6  # via -r requirements/edx/github.in
+lxml==4.5.0               # via -r requirements/edx/../edx-sandbox/shared.txt, capa, edxval, lti-consumer-xblock, ora2, safe-lxml, xblock, xmlsec
+mailsnake==1.6.4          # via -r requirements/edx/base.in
+mako==1.0.2               # via -r requirements/edx/base.in, acid-xblock, lti-consumer-xblock, xblock-google-drive, xblock-utils
+markdown==2.6.11          # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, django-wiki, staff-graded-xblock, xblock-poll
+markey==0.8               # via django-babel-underscore
+markupsafe==1.1.1         # via -r requirements/edx/paver.txt, chem, jinja2, mako, xblock
+maxminddb==1.5.4          # via geoip2
+mock==3.0.5               # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.txt, xblock-drag-and-drop-v2, xblock-poll
+git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a#egg=MongoDBProxy==0.1.0+edx.2  # via -r requirements/edx/github.in
+mongoengine==0.10.0       # via -r requirements/edx/base.in
+more-itertools==8.3.0     # via -r requirements/edx/paver.txt, zipp
+mpmath==1.1.0             # via sympy
+mysqlclient==1.4.6        # via -r requirements/edx/base.in
+newrelic==5.12.1.141      # via -r requirements/edx/base.in, edx-django-utils
+nltk==3.5                 # via -r requirements/edx/../edx-sandbox/shared.txt, chem
+nodeenv==1.3.5            # via -r requirements/edx/base.in
+numpy==1.18.4             # via chem, openedx-calc, scipy
+oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
+openedx-calc==1.0.9       # via -r requirements/edx/base.in
+git+https://github.com/edx/edx-ora2.git@2.7.6#egg=ora2==2.7.6  # via -r requirements/edx/github.in
+packaging==20.3           # via bleach, drf-yasg
+path.py==12.4.0           # via edx-enterprise, edx-i18n-tools, ora2, xmodule
+path==13.1.0              # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.txt, path.py
+pathtools==0.1.2          # via -r requirements/edx/paver.txt, watchdog
+paver==1.3.4              # via -r requirements/edx/paver.txt
+pbr==5.4.5                # via -r requirements/edx/paver.txt, stevedore
+pdfminer.six==20200517    # via -r requirements/edx/base.in
+piexif==1.1.3             # via -r requirements/edx/base.in
+pillow==7.1.2             # via -r requirements/edx/base.in, edx-enterprise, edx-organizations
+pkgconfig==1.5.1          # via xmlsec
+polib==1.1.0              # via edx-i18n-tools
+psutil==1.2.1             # via -r requirements/edx/paver.txt, edx-django-utils
+py2neo==3.1.2             # via -r requirements/edx/base.in
+pycontracts==1.8.12       # via -r requirements/edx/base.in, edx-user-state-client
+pycountry==19.8.18        # via -r requirements/edx/base.in
+pycparser==2.20           # via -r requirements/edx/../edx-sandbox/shared.txt, cffi
+pycryptodome==3.9.7       # via pdfminer.six
+pycryptodomex==3.9.7      # via -r requirements/edx/base.in, edx-proctoring, pyjwkest
+pygments==2.6.1           # via -r requirements/edx/base.in
+pyjwkest==1.4.2           # via -r requirements/edx/base.in, edx-drf-extensions
+pyjwt==1.5.2              # via -r requirements/edx/base.in, drf-jwt, edx-rest-api-client, social-auth-core
+pymongo==3.9.0            # via -r requirements/edx/base.in, -r requirements/edx/paver.txt, edx-opaque-keys, event-tracking, mongodbproxy, mongoengine
+pynliner==0.8.0           # via -r requirements/edx/base.in
+pyparsing==2.4.7          # via chem, openedx-calc, packaging, pycontracts
+pysrt==1.1.2              # via -r requirements/edx/base.in, edxval
+python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, analytics-python, botocore, edx-ace, edx-drf-extensions, edx-enterprise, edx-proctoring, icalendar, ora2, xblock
+python-levenshtein==0.12.0  # via -r requirements/edx/base.in
+python-memcached==1.59    # via -r requirements/edx/paver.txt
+python-slugify==4.0.0     # via code-annotations
+python-swiftclient==3.9.0  # via ora2
+python3-openid==3.1.0 ; python_version >= "3"  # via -r requirements/edx/base.in, social-auth-core
+python3-saml==1.9.0       # via -r requirements/edx/base.in
+pytz==2020.1              # via -r requirements/edx/base.in, babel, capa, celery, django, django-ses, edx-completion, edx-enterprise, edx-proctoring, edx-submissions, edx-tincan-py35, event-tracking, fs, icalendar, ora2, xblock
+pyuca==1.2                # via -r requirements/edx/base.in
+pyyaml==5.3.1             # via -r requirements/edx/base.in, code-annotations, edx-django-release-util, edx-i18n-tools, xblock
+random2==1.0.1            # via -r requirements/edx/base.in
+recommender-xblock==1.4.8  # via -r requirements/edx/base.in
+redis==2.10.6             # via -r requirements/edx/base.in
+regex==2020.5.14          # via -r requirements/edx/../edx-sandbox/shared.txt, nltk
+requests-oauthlib==1.3.0  # via -r requirements/edx/base.in, social-auth-core
+requests==2.23.0          # via -r requirements/edx/paver.txt, analytics-python, coreapi, django-oauth-toolkit, edx-analytics-data-api-client, edx-bulk-grades, edx-drf-extensions, edx-enterprise, edx-rest-api-client, geoip2, mailsnake, pyjwkest, python-swiftclient, requests-oauthlib, sailthru-client, slumber, social-auth-core
+rest-condition==1.0.3     # via -r requirements/edx/base.in, edx-drf-extensions
+rfc6266-parser==0.0.6     # via -r requirements/edx/base.in
+ruamel.yaml.clib==0.2.0   # via ruamel.yaml
+ruamel.yaml==0.16.10      # via drf-yasg
+rules==2.2                # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring
+s3transfer==0.1.13        # via boto3
+sailthru-client==2.2.3    # via -r requirements/edx/base.in, edx-ace
+scipy==1.4.1              # via chem, openedx-calc
+semantic-version==2.8.5   # via edx-drf-extensions
+shapely==1.7.0            # via -r requirements/edx/base.in
+simplejson==3.17.0        # via -r requirements/edx/base.in, sailthru-client, super-csv, xblock-utils
+six==1.14.0               # via -r requirements/edx/../edx-sandbox/shared.txt, -r requirements/edx/base.in, -r requirements/edx/paver.txt, analytics-python, bleach, cryptography, django-appconf, django-classy-tags, django-countries, django-pyfs, django-sekizai, django-simple-history, django-statici18n, drf-yasg, edx-ace, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-milestones, edx-opaque-keys, edx-rbac, edx-search, event-tracking, fs, fs-s3fs, help-tokens, html5lib, isodate, libsass, mock, openedx-calc, packaging, paver, pycontracts, pyjwkest, python-dateutil, python-memcached, python-swiftclient, social-auth-app-django, social-auth-core, stevedore, xblock
+slumber==0.7.1            # via edx-bulk-grades, edx-enterprise, edx-rest-api-client
+social-auth-core==3.3.3   # via -r requirements/edx/base.in, social-auth-app-django
+git+https://github.com/jazzband/sorl-thumbnail.git@13bedfb7d2970809eda597e3ef79318a6fa80ac2#egg=sorl-thumbnail  # via -r requirements/edx/github.in
+sortedcontainers==2.1.0   # via -r requirements/edx/base.in, pdfminer.six
+soupsieve==2.0.1          # via beautifulsoup4
+sqlparse==0.3.1           # via -r requirements/edx/base.in, django
+staff-graded-xblock==0.8  # via -r requirements/edx/base.in
+stevedore==1.32.0         # via -r requirements/edx/base.in, -r requirements/edx/paver.txt, code-annotations, edx-ace, edx-enterprise, edx-opaque-keys
+super-csv==0.9.8          # via -r requirements/edx/base.in, edx-bulk-grades
+sympy==1.5.1              # via symmath
+testfixtures==6.14.1      # via edx-enterprise
+text-unidecode==1.3       # via python-slugify
+tqdm==4.46.0              # via -r requirements/edx/../edx-sandbox/shared.txt, nltk
+unicodecsv==0.14.1        # via -r requirements/edx/base.in, edx-enterprise
+uritemplate==3.0.1        # via coreapi, drf-yasg
+urllib3==1.25.9           # via -r requirements/edx/paver.txt, elasticsearch, geoip2, requests
+user-util==0.2            # via -r requirements/edx/base.in
+voluptuous==0.11.7        # via ora2
+watchdog==0.10.2          # via -r requirements/edx/paver.txt
+web-fragments==0.3.2      # via -r requirements/edx/base.in, staff-graded-xblock, xblock, xblock-utils
+webencodings==0.5.1       # via bleach, html5lib
+webob==1.8.6              # via xblock, xmodule
+wrapt==1.11.2             # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.txt
+git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.10#egg=xblock-drag-and-drop-v2==2.2.10  # via -r requirements/edx/github.in
+git+https://github.com/open-craft/xblock-poll@da2d8fd21791a7af128595cf82bee83ee579e00f#egg=xblock-poll==1.9.6  # via -r requirements/edx/github.in
+xblock-utils==2.1.1       # via -r requirements/edx/base.in, edx-sga, lti-consumer-xblock, staff-graded-xblock, xblock-drag-and-drop-v2, xblock-google-drive
+xblock==1.3.1             # via -r requirements/edx/base.in, acid-xblock, crowdsourcehinter-xblock, done-xblock, edx-completion, edx-sga, edx-user-state-client, edx-when, lti-consumer-xblock, ora2, rate-xblock, staff-graded-xblock, xblock-discussion, xblock-drag-and-drop-v2, xblock-google-drive, xblock-poll, xblock-utils
+xmlsec==1.3.3             # via python3-saml
+xss-utils==0.1.3          # via -r requirements/edx/base.in
+zipp==1.0.0               # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.txt, importlib-metadata
+
+# edly forked apps
 -e git+https://github.com/edly-io/figures.git@edly-1.4.0#egg=figures==edly-1.4.0
 -e git+https://github.com/edly-io/edx_xblock_scorm.git@v1.0.5#egg=edx_xblock_scorm==v1.0.5
--e common/lib/safe_lxml
--e common/lib/sandbox-packages
--e common/lib/symmath
--e openedx/core/lib/xblock_builtin/xblock_discussion
-git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.1.6#egg=xblock-drag-and-drop-v2==2.1.6
--e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
-git+https://github.com/open-craft/xblock-poll@add89e14558c30f3c8dc7431e5cd6536fff6d941#egg=xblock-poll==1.5.1
+-e git+https://github.com/edly-io/figures.git@edly-1.4.0#egg=figures==edly-1.4.0
+-e git+https://github.com/edly-io/edx_xblock_scorm.git@v1.0.5#egg=edx_xblock_scorm==v1.0.5
 -e git+https://github.com/edly-io/xblock-pdf.git@edly-1.0.1#egg=xblock-pdf
 -e git+https://github.com/edly-io/xblock-video.git@dev#egg=video_xblock
--e common/lib/xmodule
-amqp==1.4.9               # via kombu
-analytics-python==1.2.9
-aniso8601==4.1.0          # via tincan
-anyjson==0.3.3            # via kombu
-appdirs==1.4.3            # via fs
-argh==0.26.2
-argparse==1.4.0
-asn1crypto==0.24.0
-attrs==17.4.0
-babel==1.3
-backports.functools-lru-cache==1.5  # via soupsieve
-beautifulsoup4==4.7.1     # via pynliner
-billiard==3.3.0.23        # via celery
-bleach==2.1.4
-boto3==1.4.8
-boto==2.39.0
-botocore==1.8.17
-celery==3.1.25
-certifi==2018.11.29
-cffi==1.11.5
-chardet==3.0.4
-click==7.0                # via user-util
-coreapi==2.3.3            # via django-rest-swagger, openapi-codec
-coreschema==0.0.4         # via coreapi
-cryptography==2.4.2
-cssutils==1.0.2           # via pynliner
-ddt==1.2.0
-decorator==4.3.0          # via dogapi, pycontracts
-defusedxml==0.4.1
-django-appconf==1.0.2     # via django-statici18n
-django-babel-underscore==0.5.2
-django-babel==0.6.2       # via django-babel-underscore
-django-classy-tags==0.8.0  # via django-sekizai
-django-config-models==0.2.2
-django-cookies-samesite==0.5.1  # via -r requirements/edx/base.in
-django-cors-headers==2.1.0
-django-countries==4.6.1
-django-crum==0.7.3
-django-fernet-fields==0.5
-django-filter==1.0.4
-django-ipware==2.1.0
-django-memcached-hashring==0.1.2
-django-method-override==0.1.0
-django-model-utils==3.0.0
-django-mptt==0.8.7
-django-multi-email-field==0.5.1  # via edx-enterprise
-django-mysql==2.4.1
-django-oauth-toolkit==1.1.3
-django-object-actions==0.10.0  # via edx-enterprise
-django-pyfs==2.0
-django-ratelimit-backend==1.1.1
-django-ratelimit==2.0.0
-django-require==1.0.11
-django-rest-swagger==2.2.0
-django-sekizai==0.10.0
-django-ses==0.8.4
-django-simple-history==2.7.0
-django-splash==0.2.2
-django-statici18n==1.4.0
-django-storages==1.4.1
-django-user-tasks==0.1.5
-django-waffle==0.12.0
-django-webpack-loader==0.6.0
-django==1.11.29
-djangorestframework-jwt==1.11.0
-djangorestframework-xml==1.3.0  # via edx-enterprise
-dm.xmlsec.binding==1.3.3  # via python-saml
-docopt==0.6.2
-docutils==0.14            # via botocore
-dogapi==1.2.1
-edx-ace==0.1.10
-edx-analytics-data-api-client==0.15.2
-edx-ccx-keys==0.2.1
-edx-celeryutils==0.2.7
-edx-completion==2.0.0
-edx-django-oauth2-provider==1.3.5
-edx-django-release-util==0.3.1
-edx-django-sites-extensions==2.3.1
-edx-django-utils==1.0.3
-edx-drf-extensions==2.0.1
-edx-enterprise==1.2.8
-edx-i18n-tools==0.4.6
-edx-milestones==0.1.13
-edx-oauth2-provider==1.2.2
-edx-opaque-keys[django]==0.4.4
-edx-organizations==1.0.0
-edx-proctoring-proctortrack==1.0.1
-edx-proctoring==1.5.7
-edx-rest-api-client==1.9.2
-edx-search==1.2.1
-edx-submissions==2.0.12
-edx-user-state-client==1.0.4
-edxval==1.1.25
-elasticsearch==1.9.0      # via edx-search
-enum34==1.1.6
-event-tracking==0.2.7
-feedparser==5.1.3
-firebase-token-generator==1.3.2
-fs-s3fs==0.1.8
-fs==2.0.18
-future==0.17.1            # via pyjwkest
-futures==3.2.0 ; python_version == "2.7"
-glob2==0.3
-gunicorn==19.0
-hash-ring==1.3.1          # via django-memcached-hashring
-help-tokens==1.0.3
-html5lib==1.0.1
-httplib2==0.12.0          # via oauth2, zendesk
-idna==2.8
-ipaddr==2.1.11
-ipaddress==1.0.22
-isodate==0.6.0            # via python-saml
-itypes==1.1.0             # via coreapi
-jinja2==2.10              # via coreschema
-jmespath==0.9.3           # via boto3, botocore
-jsondiff==1.1.1           # via edx-enterprise
-jsonfield==2.0.2
-kombu==3.0.37             # via celery
-lazy==1.1
-lepl==5.1.3               # via rfc6266-parser
-libsass==0.10.0
-loremipsum==1.0.5
-lxml==3.8.0
-mailsnake==1.6.2
-mako==1.0.2
-markdown==2.6.11
-markey==0.8               # via django-babel-underscore
-markupsafe==1.1.0
-mock==1.0.1
-mongoengine==0.10.0
-mysql-python==1.2.5
-networkx==1.7
-newrelic==4.10.0.112
-nltk==3.4
-nodeenv==1.1.1
-numpy==1.6.2
-oauth2==1.9.0.post1
-oauthlib==2.1.0
-openapi-codec==1.3.2      # via django-rest-swagger
-path.py==8.2.1
-pathtools==0.1.2
-paver==1.3.4
-pbr==5.1.1
-pdfminer==20140328
-piexif==1.0.2
-pillow==5.4.1
-polib==1.1.0              # via edx-i18n-tools
-psutil==1.2.1
-py2neo==3.1.2
-pycontracts==1.7.1
-pycountry==1.20
-pycparser==2.19
-pycryptodomex==3.4.7
-pygments==2.3.1
-pygraphviz==1.1
-pyjwkest==1.3.2
-pyjwt==1.5.2
-pymongo==2.9.1
-pynliner==0.8.0
-pyparsing==2.2.0
-pysrt==1.1.1
-python-dateutil==2.4.0
-python-levenshtein==0.12.0
-python-memcached==1.48
-python-openid==2.2.5
-python-saml==2.4.0
-python-swiftclient==3.6.0
-pytz==2018.9
-pyuca==1.1
-pyyaml==3.13
-redis==2.10.6
-reportlab==3.5.13
-requests-oauthlib==1.1.0
-requests==2.21.0
-rest-condition==1.0.3
-rfc6266-parser==0.0.5.post2
-rules==2.0.1
-s3transfer==0.1.13        # via boto3
-sailthru-client==2.2.3
-scipy==0.14.0
-semantic-version==2.6.0   # via edx-drf-extensions
-shapely==1.2.16
-shortuuid==0.5.0          # via edx-django-oauth2-provider
-simplejson==3.16.0        # via django-rest-swagger, dogapi, mailsnake, sailthru-client, zendesk
-singledispatch==3.4.0.3
-six==1.11.0
-slumber==0.7.1            # via edx-rest-api-client
-social-auth-app-django==2.1.0
-social-auth-core==3.2.0
-sorl-thumbnail==12.3
-sortedcontainers==0.9.2
-soupsieve==1.7.1          # via beautifulsoup4
-sqlparse==0.2.4
-stevedore==1.10.0
-sympy==0.7.1
-tincan==0.0.5             # via edx-enterprise
-unicodecsv==0.14.1
-uritemplate==3.0.0        # via coreapi
-urllib3==1.23
-user-util==0.1.5
-voluptuous==0.11.5
-watchdog==0.9.0
-web-fragments==0.2.2
-webencodings==0.5.1       # via html5lib
-webob==1.8.5              # via xblock
-wrapt==1.10.5
-xblock-review==1.1.5
-xblock-utils==1.2.0
-xblock==1.2.2
-zendesk==1.1.1
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools

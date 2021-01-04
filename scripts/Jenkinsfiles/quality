@@ -36,14 +36,16 @@ def getTargetBranch(job_name) {
 
 def qualityTestCleanup() {
     archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/**/*,test_root/log/**/*.log,*.log'
+    sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
     junit 'reports/quality_junitxml/*.xml'
 }
 
 pipeline {
-    agent { label "ironwood-jenkins-worker" }
+    agent { label "juniper-worker" }
     options {
+        sendSplunkConsoleLog()
         timestamps()
-        timeout(60)
+        timeout(120)
     }
     stages {
         stage('Mark build as pending on Github') {
@@ -72,7 +74,8 @@ pipeline {
         stage('Run Tests') {
             parallel {
                 stage("commonlib pylint") {
-                    agent { label "ironwood-jenkins-worker" }
+                    // "pylint common" requires 5.5 GB of RAM, so use js-worker (8 GB) instead of jenkins-worker (4 GB)
+                    agent { label "juniper-js-worker" }
                     environment {
                         TEST_SUITE = "quality"
                         SHARD = 1
@@ -91,7 +94,7 @@ pipeline {
                     }
                 }
                 stage("lms pylint") {
-                    agent { label "ironwood-jenkins-worker" }
+                    agent { label "juniper-worker" }
                     environment {
                         TEST_SUITE = "quality"
                         SHARD = 2
@@ -110,7 +113,7 @@ pipeline {
                     }
                 }
                 stage("cms/openedx/pavelib pylint") {
-                    agent { label "ironwood-jenkins-worker" }
+                    agent { label "juniper-worker" }
                     environment {
                         TEST_SUITE = "quality"
                         SHARD = 3
@@ -129,7 +132,7 @@ pipeline {
                     }
                 }
                 stage("Other quality checks") {
-                    agent { label "ironwood-jenkins-worker" }
+                    agent { label "juniper-worker" }
                     environment {
                         TEST_SUITE = "quality"
                         SHARD = 4
@@ -191,19 +194,16 @@ pipeline {
                     unstash 'quality-3-reports'
                     unstash 'quality-4-reports'
                     // Check for warnings
-                    warnings canComputeNew: false, canResolveRelativePaths: false, canRunOnFailed: true, categoriesPattern: '',
-                        defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', messagesPattern: '',
-                        parserConfigurations: [[parserName: 'Pep8', pattern: 'reports/pep8/pep8.report'], [parserName: 'PyLint', pattern: 'reports/**/pylint.report']],
-                        unHealthy: ''
+                    recordIssues enabledForFailure: true, tools: [pep8(pattern: 'reports/pep8/pep8.report'), pyLint(pattern: 'reports/**/pylint.report')]
                     // Publish Quality report
                     publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, keepAll: true,
                         reportDir: 'reports/metrics/',
-                        reportFiles: 'pylint/*view*/,pep8/*view*/,python_complexity/*view*/,xsscommitlint/*view*/,xsslint/*view*/,eslint/*view*/',
+                        reportFiles: 'pylint/*view*/,pep8/*view*/,python_complexity/*view*/,xsscommitlint/*view*/,xsslint/*view*/,eslint/*view*/,pii/*view*/',
                         reportName: 'Quality Report', reportTitles: ''])
                 } finally {
                     if (env.ghprbPullId != null) {
                         // For PR jobs, run the edx-platform-test-notifier for PR reporting
-                        build job: 'edx-platform-test-notifier', parameters: [string(name: 'PR_NUMBER', value: "${ghprbPullId}")], wait: false
+                        build job: 'edx-platform-test-notifier', parameters: [string(name: 'REPO', value: "${REPO_NAME}"), string(name: 'PR_NUMBER', value: "${ghprbPullId}")], wait: false
                     } else {
                         // For master jobs run github-build-status and report to slack when necessary
                         if (currentBuild.currentResult == "SUCCESS") {

@@ -2,6 +2,7 @@
 Tests of management command utility code
 """
 
+
 from unittest import TestCase
 
 import ddt

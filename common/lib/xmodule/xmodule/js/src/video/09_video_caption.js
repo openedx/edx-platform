@@ -36,13 +36,15 @@
                 'previousLanguageMenuItem', 'nextLanguageMenuItem', 'handleCaptionToggle',
                 'showClosedCaptions', 'hideClosedCaptions', 'toggleClosedCaptions',
                 'updateCaptioningCookie', 'handleCaptioningCookie', 'handleTranscriptToggle',
-                'listenForDragDrop'
+                'listenForDragDrop', 'handleTranscriptCookie', 'updateTranscriptCookie'
             );
+
             this.state = state;
             this.state.videoCaption = this;
             this.renderElements();
             this.handleCaptioningCookie();
             this.listenForDragDrop();
+            this.handleTranscriptCookie();
 
             return $.Deferred().resolve().promise();
         };
@@ -1142,11 +1144,12 @@
             */
             toggle: function(event) {
                 event.preventDefault();
-
                 if (this.state.el.hasClass('closed')) {
                     this.hideCaptions(false, true, true);
+                    this.updateTranscriptCookie(true);
                 } else {
                     this.hideCaptions(true, true, true);
+                    this.updateTranscriptCookie(false);
                 }
             },
 
@@ -1180,6 +1183,7 @@
             },
 
             showClosedCaptions: function() {
+                var text = gettext('Hide closed captions');
                 this.state.el.addClass('has-captions');
 
                 this.captionDisplayEl
@@ -1189,7 +1193,8 @@
 
                 this.captionControlEl
                     .addClass('is-active')
-                    .attr('title', gettext('Hide closed captions'));
+                    .attr('title', text)
+                    .attr('aria-label', text);
 
                 if (this.subtitlesEl.find('.current').text()) {
                     this.captionDisplayEl
@@ -1203,6 +1208,7 @@
             },
 
             hideClosedCaptions: function() {
+                var text = gettext('Turn on closed captioning');
                 this.state.el.removeClass('has-captions');
 
                 this.captionDisplayEl
@@ -1211,7 +1217,8 @@
 
                 this.captionControlEl
                     .removeClass('is-active')
-                    .attr('title', gettext('Turn on closed captioning'));
+                    .attr('title', text)
+                    .attr('aria-label', text);
 
                 this.state.el.trigger('captions:hide');
             },
@@ -1224,6 +1231,31 @@
                     });
                 } else {
                     $.cookie('show_closed_captions', null, {
+                        path: '/'
+                    });
+                }
+            },
+            handleTranscriptCookie: function() {
+                if ($.cookie('show_transcript') === null) {
+                    return;
+                }
+                if ($.cookie('show_transcript') !== 'false') {
+                    this.state.hideCaptions = false;
+                    // keep it going until turned off or in case of null initially change to true
+                    this.updateTranscriptCookie(true);
+                } else {
+                    this.state.hideCaptions = true;
+                }
+                this.hideCaptions(this.state.hideCaptions, true, true);
+            },
+            updateTranscriptCookie: function(showTranscript) {
+                if (showTranscript) {
+                    $.cookie('show_transcript', 'true', {
+                        expires: 3650,
+                        path: '/'
+                    });
+                } else {
+                    $.cookie('show_transcript', 'false', {
                         path: '/'
                     });
                 }
@@ -1266,7 +1298,8 @@
 
                     transcriptControlEl
                         .removeClass('is-active')
-                        .attr('title', gettext(text));
+                        .attr('title', gettext(text))
+                        .attr('aria-label', text);
                 } else {
                     state.captionsHidden = false;
                     state.el.removeClass('closed');
@@ -1278,7 +1311,8 @@
 
                     transcriptControlEl
                         .addClass('is-active')
-                        .attr('title', gettext(text));
+                        .attr('title', gettext(text))
+                        .attr('aria-label', text);
                 }
 
                 if (state.resizer) {

@@ -1,12 +1,14 @@
 """
 Defines a form for providing validation of HLS Playback course-specific configuration.
 """
+
 import logging
 
 from django import forms
 
 from openedx.core.djangoapps.video_config.models import (
     CourseHLSPlaybackEnabledFlag,
+    CourseYoutubeBlockedFlag,
     CourseVideoTranscriptEnabledFlag,
 )
 from openedx.core.lib.courses import clean_course_id
@@ -37,6 +39,16 @@ class CourseHLSPlaybackFlagAdminForm(CourseSpecificFlagAdminBaseForm):
 
     class Meta(object):
         model = CourseHLSPlaybackEnabledFlag
+        fields = '__all__'
+
+
+class CourseYoutubeBlockedFlagAdminForm(CourseSpecificFlagAdminBaseForm):
+    """
+    Form for course-specific youtube blocking configuration.
+    """
+
+    class Meta(object):
+        model = CourseYoutubeBlockedFlag
         fields = '__all__'
 
 

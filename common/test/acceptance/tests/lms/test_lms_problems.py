@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
 """
 Bok choy acceptance tests for problems in the LMS
-
-See also old lettuce tests in lms/djangoapps/courseware/features/problems.feature
 """
-from textwrap import dedent
+
+
 import time
+from datetime import datetime, timedelta
+from textwrap import dedent
+
 import ddt
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage
-from common.test.acceptance.pages.lms.problem import ProblemPage
+from common.test.acceptance.pages.lms.problem import ProblemPage, DragAndDropPage
 from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest
 from openedx.core.lib.tests import attr
 
@@ -76,7 +78,7 @@ class ProblemClarificationTest(ProblemsTest):
         """
         Create a problem with a <clarification>
         """
-        xml = dedent("""
+        xml = dedent(u"""
             <problem markdown="null">
                 <text>
                     <p>
@@ -413,7 +415,7 @@ class ProblemSubmitButtonPastDueTest(ProblemsTest):
         problem_page.wait_for_submit_disabled()
 
 
-@attr(shard=9)
+@attr(shard=19)
 class ProblemExtendedHintTest(ProblemHintTest, EventsTestMixin):
     """
     Test that extended hint features plumb through to the page html and tracking log.
@@ -705,7 +707,7 @@ class ProblemQuestionDescriptionTest(ProblemsTest):
         """
         Create a problem with question and description.
         """
-        xml = dedent("""
+        xml = dedent(u"""
             <problem>
                 <choiceresponse>
                     <label>Eggplant is a _____?</label>
@@ -881,6 +883,8 @@ class ProblemMetaGradedTest(ProblemsTest):
     """
     TestCase Class to verify that the graded variable is passed
     """
+    shard = 23
+
     def get_problem(self):
         """
         Problem structure
@@ -911,6 +915,8 @@ class ProblemMetaUngradedTest(ProblemsTest):
     """
     TestCase Class to verify that the ungraded variable is passed
     """
+    shard = 23
+
     def get_problem(self):
         """
         Problem structure
@@ -941,6 +947,8 @@ class FormulaProblemTest(ProblemsTest):
     """
     Test Class to verify the formula problem on LMS.
     """
+    shard = 23
+
     def setUp(self):
         """
         Setup the test suite to verify various behaviors involving formula problem type.
@@ -968,26 +976,6 @@ class FormulaProblemTest(ProblemsTest):
                     </problem>
                 """)
         return XBlockFixtureDesc('problem', 'TEST PROBLEM', data=xml, metadata={'show_reset_button': True})
-
-    def test_reset_problem_after_incorrect_submission(self):
-        """
-        Scenario: Verify that formula problem can be resetted after an incorrect submission.
-
-        Given I am attempting a formula response problem type
-        When I input an incorrect answer
-        Then the answer preview is generated using MathJax
-        When I submit the problem
-        Then I can see incorrect status and a reset button
-        When I click reset, the input pane contents get clear
-        """
-        problem_page = ProblemPage(self.browser)
-        problem_page.fill_answer_numerical('R_1*R_2')
-        problem_page.verify_mathjax_rendered_in_preview()
-        problem_page.click_submit()
-        self.assertFalse(problem_page.simpleprob_is_correct())
-        self.assertTrue(problem_page.is_reset_button_present())
-        problem_page.click_reset()
-        self.assertEqual(problem_page.get_numerical_input_value, '')
 
     def test_reset_button_not_rendered_after_correct_submission(self):
         """
@@ -1037,6 +1025,7 @@ class FormulaProblemRandomizeTest(ProblemsTest):
     """
     Test Class to verify the formula problem on LMS with Randomization enabled.
     """
+    shard = 23
 
     def setUp(self):
         """
@@ -1071,62 +1060,6 @@ class FormulaProblemRandomizeTest(ProblemsTest):
         )
 
     @ddt.data(
-        ('R_1*R_2', 'incorrect'),
-        ('R_1/R_3', 'incorrect'),
-        ('R_1*R_2/R_3', 'correct')
-    )
-    @ddt.unpack
-    def test_reset_problem_after_submission(self, input_value, correctness):
-        """
-        Scenario: Test that reset button works regardless the submission correctness status.
-
-        Given I am attempting a formula problem type with randomization:always configuration
-        When I input the answer
-        Then I should be able to see the MathJax generated preview
-        When I submit the problem
-        Then I should be able to see the reset button
-        When reset button is clicked
-        Then the input pane contents should be clear
-        """
-        problem_page = ProblemPage(self.browser)
-        problem_page.fill_answer_numerical(input_value)
-        problem_page.verify_mathjax_rendered_in_preview()
-        problem_page.click_submit()
-        self.assertEqual(problem_page.get_simpleprob_correctness(), correctness)
-        self.assertTrue(problem_page.is_reset_button_present())
-        problem_page.click_reset()
-        self.assertEqual(problem_page.get_numerical_input_value, '')
-
-    @ddt.data(
-        ('R_1*R_2', 'incorrect', '0/1 point (ungraded)', '0/1 point (ungraded)'),
-        ('R_1*R_2/R_3', 'correct', '1/1 point (ungraded)', '0/1 point (ungraded)'),
-        ('R_1/R_2', 'incorrect', '0/1 point (ungraded)', '0/1 point (ungraded)')
-    )
-    @ddt.unpack
-    def test_score_reset_after_resetting_problem(self, input_value, correctness, score_before_reset, score_after_reset):
-        """
-        Scenario: Test that score resets after the formula problem is resetted.
-
-        Given I am attempting a formula problem type with randomization:always configuration
-        When I input the answer
-        Then I should be able to see the MathJax generated preview
-        When I submit the problem
-        Then I should be able to view the score that I received
-        And The reset button should be present and is clickable
-        When the reset button is clicked
-        Then the score resets to zero
-        """
-        problem_page = ProblemPage(self.browser)
-        problem_page.fill_answer_numerical(input_value)
-        problem_page.verify_mathjax_rendered_in_preview()
-        problem_page.click_submit()
-        self.assertEqual(problem_page.get_simpleprob_correctness(), correctness)
-        self.assertIn(score_before_reset, problem_page.problem_progress_graded_value)
-        self.assertTrue(problem_page.is_reset_button_present())
-        problem_page.click_reset()
-        self.assertIn(score_after_reset, problem_page.problem_progress_graded_value)
-
-    @ddt.data(
         ('R_1*R_2', 'incorrect', 'R_1*R_2/R_3'),
         ('R_1*R_2/R_3', 'correct', 'R_1/R_3')
     )
@@ -1155,3 +1088,114 @@ class FormulaProblemRandomizeTest(ProblemsTest):
         self.assertTrue(problem_page.is_reset_button_present())
         problem_page.click_reset()
         self.assertEqual(problem_page.get_numerical_input_value, '')
+
+
+@ddt.ddt
+class DragAndDropXblockWithMixinsTest(UniqueCourseTest):
+    """
+    Test Suite to verify various behaviors of DragAndDrop Xblock on the LMS.
+    """
+
+    def setUp(self):
+        super(DragAndDropXblockWithMixinsTest, self).setUp()
+
+        self.username = "test_student_{uuid}".format(uuid=self.unique_id[0:8])
+        self.email = "{username}@example.com".format(username=self.username)
+        self.password = "keep it secret; keep it safe."
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
+
+        # Install a course with a hierarchy and problems
+        self.course_fixture = CourseFixture(
+            self.course_info['org'], self.course_info['number'],
+            self.course_info['run'], self.course_info['display_name'],
+            start_date=datetime.now() + timedelta(days=10)
+        )
+        self.browser.set_window_size(1024, 1024)
+
+    def setup_sequential(self, metadata):
+        """
+        Setup a sequential with DnD problem, alongwith the metadata provided.
+
+        This method will allow to customize the sequential, such as changing the
+        due date for individual tests.
+        """
+        problem = self.get_problem()
+        sequential = self.get_sequential(metadata=metadata)
+        self.course_fixture.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                sequential.add_children(problem)
+            )
+        ).install()
+
+        # Auto-auth register for the course.
+        AutoAuthPage(
+            self.browser,
+            username=self.username,
+            email=self.email,
+            password=self.password,
+            course_id=self.course_id,
+            staff=True
+        ).visit()
+
+    def format_date(self, date_value):
+        """
+        Get the date in isoformat as this is required format to add date data
+        in the sequential.
+        """
+        return date_value.isoformat()
+
+    def get_problem(self):
+        """
+        Creating a DnD problem with assessment mode
+        """
+        return XBlockFixtureDesc('drag-and-drop-v2', 'DnD', metadata={'mode': "assessment"})
+
+    def get_sequential(self, metadata=None):
+        return XBlockFixtureDesc('sequential', 'Test Subsection', metadata=metadata)
+
+    @ddt.data(
+        (datetime.now(), True),
+        (datetime.now() - timedelta(days=1), True),
+        (datetime.now() + timedelta(days=1), False)
+    )
+    @ddt.unpack
+    def test_submit_button_status_with_due_date(self, due_date, is_button_disabled):
+        """
+        Scenario: Test that DnD submit button will be enabled if section is not past due.
+
+        Given I have a sequential in instructor-paced course
+        And a DnD problem with assessment mode is present in the sequential
+        When I visit the problem
+        Then the submit button should be present
+        And button should be disabled as some item needs to be on a zone
+        When I drag an item to a zone
+        Then submit button will be enabled if due date has not passed, else disabled
+        """
+        problem_page = DragAndDropPage(self.browser)
+        self.setup_sequential(metadata={'due': self.format_date(due_date)})
+        self.courseware_page.visit()
+        self.assertTrue(problem_page.is_submit_button_present())
+        self.assertTrue(problem_page.is_submit_disabled())
+        problem_page.drag_item_to_zone(0, 'middle')
+        self.assertEqual(is_button_disabled, problem_page.is_submit_disabled())
+
+    def test_submit_button_when_pacing_change_self_paced(self):
+        """
+        Scenario: For a self-paced course, the submit button of DnD problems will be
+        be enabled, regardless of the subsection due date.
+
+        Given a DnD problem in a subsection with past due date
+        And the course is instructor-paced
+        Then the submit button will remain disabled after initial drag
+        When the pacing is changed to self-paced
+        Then the submit button is not disabled anymore
+        """
+        problem_page = DragAndDropPage(self.browser)
+        self.setup_sequential(metadata={'due': self.format_date(datetime.now())})
+        self.courseware_page.visit()
+        problem_page.drag_item_to_zone(0, 'middle')
+        self.assertTrue(problem_page.is_submit_disabled())
+        self.course_fixture.add_course_details({'self_paced': True})
+        self.course_fixture.configure_course()
+        self.courseware_page.visit()
+        self.assertFalse(problem_page.is_submit_disabled())

@@ -1,34 +1,33 @@
 """
 Helpers for the student app.
 """
+
+
 import json
 import logging
 import mimetypes
-import urllib
-import urlparse
+import urllib.parse
+from collections import OrderedDict
 from datetime import datetime
 
+from completion.exceptions import UnavailableCompletionData
+from completion.utilities import get_key_to_last_completed_block
 from django.conf import settings
-from django.core.exceptions import PermissionDenied
-from django.urls import NoReverseMatch, reverse
-from django.core.validators import ValidationError
 from django.contrib.auth import load_backend
 from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
+from django.core.validators import ValidationError
 from django.db import IntegrityError, transaction
+from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext as _
 from pytz import UTC
 from six import iteritems, text_type
+
 import third_party_auth
 from course_modes.models import CourseMode
-from lms.djangoapps.certificates.api import (
-    get_certificate_url,
-    has_html_certificates_enabled
-)
-from lms.djangoapps.certificates.models import (
-    CertificateStatuses,
-    certificate_status_for_student
-)
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.certificates.api import get_certificate_url, has_html_certificates_enabled
+from lms.djangoapps.certificates.models import CertificateStatuses, certificate_status_for_student
+from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.utils import is_verification_expiring_soon, verification_for_datetime
@@ -38,16 +37,16 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.theming.helpers import get_themes
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 from student.models import (
+    CourseEnrollment,
     LinkedInAddToProfileConfiguration,
     Registration,
     UserAttribute,
     UserProfile,
-    unique_id_for_user,
     email_exists_or_retired,
+    unique_id_for_user,
     username_exists_or_retired
 )
 from util.password_policy_validators import normalize_password
-
 
 # Enumeration of per-course verification statuses
 # we display on the student dashboard.
@@ -120,9 +119,9 @@ def check_verify_status_by_course(user, course_enrollments):
     verification_expiring_soon = is_verification_expiring_soon(expiration_datetime)
 
     # Retrieve verification deadlines for the enrolled courses
-    enrolled_course_keys = [enrollment.course_id for enrollment in course_enrollments]
-    course_deadlines = VerificationDeadline.deadlines_for_courses(enrolled_course_keys)
-
+    course_deadlines = VerificationDeadline.deadlines_for_enrollments(
+        CourseEnrollment.enrollments_for_user(user)
+    )
     recent_verification_datetime = None
 
     for enrollment in course_enrollments:
@@ -221,40 +220,6 @@ def check_verify_status_by_course(user, course_enrollments):
     return status_by_course
 
 
-def auth_pipeline_urls(auth_entry, redirect_url=None):
-    """Retrieve URLs for each enabled third-party auth provider.
-
-    These URLs are used on the "sign up" and "sign in" buttons
-    on the login/registration forms to allow users to begin
-    authentication with a third-party provider.
-
-    Optionally, we can redirect the user to an arbitrary
-    url after auth completes successfully.  We use this
-    to redirect the user to a page that required login,
-    or to send users to the payment flow when enrolling
-    in a course.
-
-    Args:
-        auth_entry (string): Either `pipeline.AUTH_ENTRY_LOGIN` or `pipeline.AUTH_ENTRY_REGISTER`
-
-    Keyword Args:
-        redirect_url (unicode): If provided, send users to this URL
-            after they successfully authenticate.
-
-    Returns:
-        dict mapping provider IDs to URLs
-
-    """
-    if not third_party_auth.is_enabled():
-        return {}
-
-    return {
-        provider.provider_id: third_party_auth.pipeline.get_login_url(
-            provider.provider_id, auth_entry, redirect_url=redirect_url
-        ) for provider in third_party_auth.provider.Registry.displayed_for_login()
-    }
-
-
 # Query string parameters that can be passed to the "finish_auth" view to manage
 # things like auto-enrollment.
 POST_AUTH_PARAMS = ('course_id', 'enrollment_action', 'course_mode', 'email_opt_in', 'purchase_workflow')
@@ -269,23 +234,31 @@ def get_next_url_for_login_page(request):
     /account/finish_auth/ view following login, which will take care of auto-enrollment in
     the specified course.
 
-    Otherwise, we go to the ?next= query param or to the dashboard if nothing else is
+    Otherwise, we go to the `next` param or to the dashboard if nothing else is
     specified.
 
     If THIRD_PARTY_AUTH_HINT is set, then `tpa_hint=<hint>` is added as a query parameter.
+
+    This works with both GET and POST requests.
     """
-    redirect_to = _get_redirect_to(request)
+    request_params = request.GET if request.method == 'GET' else request.POST
+    redirect_to = _get_redirect_to(
+        request_host=request.get_host(),
+        request_headers=request.META,
+        request_params=request_params,
+        request_is_https=request.is_secure(),
+    )
     if not redirect_to:
         try:
             redirect_to = reverse('dashboard')
         except NoReverseMatch:
             redirect_to = reverse('home')
 
-    if any(param in request.GET for param in POST_AUTH_PARAMS):
+    if any(param in request_params for param in POST_AUTH_PARAMS):
         # Before we redirect to next/dashboard, we need to handle auto-enrollment:
-        params = [(param, request.GET[param]) for param in POST_AUTH_PARAMS if param in request.GET]
+        params = [(param, request_params[param]) for param in POST_AUTH_PARAMS if param in request_params]
         params.append(('next', redirect_to))  # After auto-enrollment, user will be sent to payment page or to this URL
-        redirect_to = '{}?{}'.format(reverse('finish_auth'), urllib.urlencode(params))
+        redirect_to = '{}?{}'.format(reverse('finish_auth'), urllib.parse.urlencode(params))
         # Note: if we are resuming a third party auth pipeline, then the next URL will already
         # be saved in the session as part of the pipeline state. That URL will take priority
         # over this one.
@@ -299,26 +272,35 @@ def get_next_url_for_login_page(request):
         # Don't add tpa_hint if we're already in the TPA pipeline (prevent infinite loop),
         # and don't overwrite any existing tpa_hint params (allow tpa_hint override).
         running_pipeline = third_party_auth.pipeline.get(request)
-        (scheme, netloc, path, query, fragment) = list(urlparse.urlsplit(redirect_to))
+        (scheme, netloc, path, query, fragment) = list(urllib.parse.urlsplit(redirect_to))
         if not running_pipeline and 'tpa_hint' not in query:
-            params = urlparse.parse_qs(query)
+            params = urllib.parse.parse_qs(query)
             params['tpa_hint'] = [tpa_hint]
-            query = urllib.urlencode(params, doseq=True)
-            redirect_to = urlparse.urlunsplit((scheme, netloc, path, query, fragment))
+            query = urllib.parse.urlencode(params, doseq=True)
+            redirect_to = urllib.parse.urlunsplit((scheme, netloc, path, query, fragment))
 
     return redirect_to
 
 
-def _get_redirect_to(request):
+def _get_redirect_to(request_host, request_headers, request_params, request_is_https):
     """
     Determine the redirect url and return if safe
-    :argument
-        request: request object
 
-    :returns: redirect url if safe else None
+    Arguments:
+        request_host (str)
+        request_headers (dict)
+        request_params (QueryDict)
+        request_is_https (bool)
+
+    Returns: str
+        redirect url if safe else None
     """
-    redirect_to = request.GET.get('next')
-    header_accept = request.META.get('HTTP_ACCEPT', '')
+    redirect_to = request_params.get('next')
+    header_accept = request_headers.get('HTTP_ACCEPT', '')
+    accepts_text_html = any(
+        mime_type in header_accept
+        for mime_type in {'*/*', 'text/*', 'text/html'}
+    )
 
     # If we get a redirect parameter, make sure it's safe i.e. not redirecting outside our domain.
     # Also make sure that it is not redirecting to a static asset and redirected page is web page
@@ -326,41 +308,47 @@ def _get_redirect_to(request):
     # get information about a user on edx.org. In any such case drop the parameter.
     if redirect_to:
         mime_type, _ = mimetypes.guess_type(redirect_to, strict=False)
-        if not is_safe_login_or_logout_redirect(request, redirect_to):
+        safe_redirect = is_safe_login_or_logout_redirect(
+            redirect_to=redirect_to,
+            request_host=request_host,
+            dot_client_id=request_params.get('client_id'),
+            require_https=request_is_https,
+        )
+        if not safe_redirect:
             log.warning(
-                u'Unsafe redirect parameter detected after login page: %(redirect_to)r',
+                u"Unsafe redirect parameter detected after login page: '%(redirect_to)s'",
                 {"redirect_to": redirect_to}
             )
             redirect_to = None
-        elif 'text/html' not in header_accept:
+        elif not accepts_text_html:
             log.info(
-                u'Redirect to non html content %(content_type)r detected from %(user_agent)r'
-                u' after login page: %(redirect_to)r',
+                u"Redirect to non html content '%(content_type)s' detected from '%(user_agent)s'"
+                u" after login page: '%(redirect_to)s'",
                 {
                     "redirect_to": redirect_to, "content_type": header_accept,
-                    "user_agent": request.META.get('HTTP_USER_AGENT', '')
+                    "user_agent": request_headers.get('HTTP_USER_AGENT', '')
                 }
             )
             redirect_to = None
         elif mime_type:
             log.warning(
-                u'Redirect to url path with specified filed type %(mime_type)r not allowed: %(redirect_to)r',
+                u"Redirect to url path with specified filed type '%(mime_type)s' not allowed: '%(redirect_to)s'",
                 {"redirect_to": redirect_to, "mime_type": mime_type}
             )
             redirect_to = None
         elif settings.STATIC_URL in redirect_to:
             log.warning(
-                u'Redirect to static content detected after login page: %(redirect_to)r',
+                u"Redirect to static content detected after login page: '%(redirect_to)s'",
                 {"redirect_to": redirect_to}
             )
             redirect_to = None
         else:
             themes = get_themes()
-            next_path = urlparse.urlparse(redirect_to).path
+            next_path = urllib.parse.urlparse(redirect_to).path
             for theme in themes:
                 if theme.theme_dir_name in next_path:
                     log.warning(
-                        u'Redirect to theme content detected after login page: %(redirect_to)r',
+                        u"Redirect to theme content detected after login page: '%(redirect_to)s'",
                         {"redirect_to": redirect_to}
                     )
                     redirect_to = None
@@ -382,14 +370,16 @@ def generate_activation_email_context(user, registration):
         'key': registration.activation_key,
         'lms_url': configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
-        'support_url': configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
+        'support_url': configuration_helpers.get_value(
+            'ACTIVATION_EMAIL_SUPPORT_LINK', settings.ACTIVATION_EMAIL_SUPPORT_LINK
+        ) or settings.SUPPORT_SITE_LINK,
         'support_email': configuration_helpers.get_value('CONTACT_EMAIL', settings.CONTACT_EMAIL),
     }
 
 
 def create_or_set_user_attribute_created_on_site(user, site):
     """
-    Create or Set UserAttribute indicating the microsite site the user account was created on.
+    Create or Set UserAttribute indicating the site the user account was created on.
     User maybe created on 'courses.edx.org', or a white-label site. Due to the very high
     traffic on this table we now ignore the default site (eg. 'courses.edx.org') and
     code which comsumes this attribute should assume a 'created_on_site' which doesn't exist
@@ -526,6 +516,8 @@ def _cert_info(user, course_overview, cert_status):
                     'show_cert_web_view': True,
                     'cert_web_view_url': get_certificate_url(course_id=course_overview.id, uuid=cert_status['uuid'])
                 })
+            elif cert_status['download_url']:
+                status_dict['download_url'] = cert_status['download_url']
             else:
                 # don't show download certificate button if we don't have an active certificate for course
                 status_dict['status'] = 'unavailable'
@@ -569,8 +561,13 @@ def _cert_info(user, course_overview, cert_status):
             # who need to be regraded (we weren't tracking 'notpassing' at first).
             # We can add a log.warning here once we think it shouldn't happen.
             return default_info
-
-        status_dict['grade'] = text_type(max(cert_grade_percent, persisted_grade_percent))
+        grades_input = [cert_grade_percent, persisted_grade_percent]
+        max_grade = (
+            None
+            if all(grade is None for grade in grades_input)
+            else max(filter(lambda x: x is not None, grades_input))
+        )
+        status_dict['grade'] = text_type(max_grade)
 
     return status_dict
 
@@ -666,3 +663,32 @@ def do_create_account(form, custom_form=None):
         raise
 
     return user, profile, registration
+
+
+def get_resume_urls_for_enrollments(user, enrollments):
+    '''
+    For a given user, return a list of urls to the user's last completed block in
+    a course run for each course run in the user's enrollments.
+
+    Arguments:
+        user: the user object for which we want resume course urls
+        enrollments (list): a list of user enrollments
+
+    Returns:
+        resume_course_urls (OrderedDict): an OrderdDict of urls
+            key: CourseKey
+            value: url to the last completed block
+                if the value is '', then the user has not completed any blocks in the course run
+    '''
+    resume_course_urls = OrderedDict()
+    for enrollment in enrollments:
+        try:
+            block_key = get_key_to_last_completed_block(user, enrollment.course_id)
+            url_to_block = reverse(
+                'jump_to',
+                kwargs={'course_id': enrollment.course_id, 'location': block_key}
+            )
+        except UnavailableCompletionData:
+            url_to_block = ''
+        resume_course_urls[enrollment.course_id] = url_to_block
+    return resume_course_urls

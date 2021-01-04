@@ -1,5 +1,7 @@
 """Tests for the create_fake_certs management command. """
 
+
+import six
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
@@ -12,7 +14,6 @@ from student.tests.factories import UserFactory
 
 class CreateFakeCertTest(TestCase):
     """Tests for the create_fake_certs management command. """
-    shard = 1
     USERNAME = "test"
     COURSE_KEY = CourseLocator(org='edX', course='DemoX', run='Demo_Course')
 
@@ -45,7 +46,11 @@ class CreateFakeCertTest(TestCase):
         self.assertEqual(cert.mode, 'honor')
 
     def test_too_few_args(self):
-        with self.assertRaisesRegexp(CommandError, 'Error: too few arguments'):
+        if six.PY2:
+            errstring = 'Error: too few arguments'
+        else:
+            errstring = 'Error: the following arguments are required: COURSE_KEY'
+        with self.assertRaisesRegex(CommandError, errstring):
             self._run_command(self.USERNAME)
 
     def _run_command(self, *args, **kwargs):

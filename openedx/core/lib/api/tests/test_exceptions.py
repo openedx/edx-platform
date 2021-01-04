@@ -1,9 +1,11 @@
 """
 Test Custom Exceptions
 """
+
 import ddt
 from django.test import TestCase
 from rest_framework import exceptions as drf_exceptions
+import six
 
 
 @ddt.ddt
@@ -11,12 +13,11 @@ class TestDictExceptionsAllowDictDetails(TestCase):
     """
     Test that standard DRF exceptions can return dictionaries in error details.
     """
-    shard = 2
 
     def test_drf_errors_are_not_coerced_to_strings(self):
         # Demonstrate that dictionaries in exceptions are not coerced to strings.
         exc = drf_exceptions.AuthenticationFailed({u'error_code': -1})
-        self.assertNotIsInstance(exc.detail, basestring)
+        self.assertNotIsInstance(exc.detail, six.string_types)
 
     @ddt.data(
         drf_exceptions.AuthenticationFailed,

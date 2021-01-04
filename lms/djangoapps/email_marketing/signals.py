@@ -1,6 +1,8 @@
 """
 This module contains signals needed for email integration
 """
+
+
 import datetime
 import logging
 from random import randint
@@ -16,8 +18,8 @@ import third_party_auth
 from course_modes.models import CourseMode
 from email_marketing.models import EmailMarketingConfiguration
 from lms.djangoapps.email_marketing.tasks import get_email_cookies_via_sailthru, update_user, update_user_email
-from openedx.core.djangoapps.user_authn.cookies import CREATE_LOGON_COOKIE
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.user_authn.cookies import CREATE_LOGON_COOKIE
 from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from student.signals import SAILTHRU_AUDIT_PURCHASE
@@ -50,7 +52,7 @@ def update_sailthru(sender, user, mode, course_id, **kwargs):  # pylint: disable
         None
     """
     if WAFFLE_SWITCHES.is_enabled(SAILTHRU_AUDIT_PURCHASE_ENABLED) and mode in CourseMode.AUDIT_MODES:
-        email = str(user.email)
+        email = user.email.encode('utf-8')
         update_course_enrollment.delay(email, course_id, mode, site=_get_current_site())
 
 
@@ -95,17 +97,17 @@ def add_email_marketing_cookies(sender, response=None, user=None,
         _log_sailthru_api_call_time(time_before_call)
 
     except TimeoutError as exc:
-        log.error("Timeout error while attempting to obtain cookie from Sailthru: %s", text_type(exc))
+        log.error(u"Timeout error while attempting to obtain cookie from Sailthru: %s", text_type(exc))
         return response
     except SailthruClientError as exc:
-        log.error("Exception attempting to obtain cookie from Sailthru: %s", text_type(exc))
+        log.error(u"Exception attempting to obtain cookie from Sailthru: %s", text_type(exc))
         return response
     except Exception:
-        log.error("Exception Connecting to celery task for %s", user.email)
+        log.error(u"Exception Connecting to celery task for %s", user.email)
         return response
 
     if not cookie:
-        log.error("No cookie returned attempting to obtain cookie from Sailthru for %s", user.email)
+        log.error(u"No cookie returned attempting to obtain cookie from Sailthru for %s", user.email)
         return response
     else:
         response.set_cookie(
@@ -116,7 +118,7 @@ def add_email_marketing_cookies(sender, response=None, user=None,
             path='/',
             secure=request.is_secure()
         )
-        log.info("sailthru_hid cookie:%s successfully retrieved for user %s", cookie, user.email)
+        log.info(u"sailthru_hid cookie:%s successfully retrieved for user %s", cookie, user.email)
 
     return response
 
@@ -256,7 +258,7 @@ def _log_sailthru_api_call_time(time_before_call):
     time_after_call = datetime.datetime.now()
     delta_sailthru_api_call_time = time_after_call - time_before_call
 
-    log.info("Started at %s and ended at %s, time spent:%s milliseconds",
+    log.info(u"Started at %s and ended at %s, time spent:%s milliseconds",
              time_before_call.isoformat(' '),
              time_after_call.isoformat(' '),
              delta_sailthru_api_call_time.microseconds / 1000)

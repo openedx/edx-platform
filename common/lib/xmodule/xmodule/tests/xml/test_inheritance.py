@@ -1,16 +1,16 @@
 """
 Test that inherited fields work correctly when parsing XML
 """
+
+
 from xmodule.tests.xml import XModuleXmlImportTest
-from xmodule.tests.xml.factories import CourseFactory, SequenceFactory, ProblemFactory, XmlImportFactory
+from xmodule.tests.xml.factories import CourseFactory, ProblemFactory, SequenceFactory, XmlImportFactory
 
 
 class TestInheritedFieldParsing(XModuleXmlImportTest):
     """
     Test that inherited fields work correctly when parsing XML
-
     """
-    shard = 2
 
     def test_null_string(self):
         # Test that the string inherited fields are passed through 'deserialize_field',

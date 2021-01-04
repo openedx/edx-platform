@@ -9,7 +9,7 @@
         },
 
         render: function() {
-            this.$el.html(this.template({
+            this.$el.html(this.template({ // xss-lint: disable=javascript-jquery-html
                 type: this.model.get('type'),
                 title: this.model.get('title'),
                 message: this.model.get('message'),

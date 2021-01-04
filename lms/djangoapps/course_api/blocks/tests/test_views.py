@@ -1,11 +1,12 @@
 """
 Tests for Blocks Views
 """
-from datetime import datetime
-from string import join
-from urllib import urlencode
-from urlparse import urlunparse
 
+
+from datetime import datetime
+
+import six
+from six.moves.urllib.parse import urlencode, urlunparse
 from django.urls import reverse
 from opaque_keys.edx.locator import CourseLocator
 
@@ -21,7 +22,6 @@ class TestBlocksView(SharedModuleStoreTestCase):
     """
     Test class for BlocksView
     """
-    shard = 4
     requested_fields = ['graded', 'format', 'student_view_multi_device', 'children', 'not_a_field', 'due']
     BLOCK_TYPES_WITH_STUDENT_VIEW_DATA = ['video', 'discussion', 'html']
 
@@ -38,7 +38,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         cls.course_usage_key = cls.store.make_course_usage_key(cls.course_key)
 
         cls.non_orphaned_block_usage_keys = set(
-            unicode(item.location)
+            six.text_type(item.location)
             for item in cls.store.get_items(cls.course_key)
             # remove all orphaned items in the course, except for the root 'course' block
             if cls.store.get_parent_location(item.location) or item.category == 'course'
@@ -55,7 +55,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         # default values for url and query_params
         self.url = reverse(
             'blocks_in_block_tree',
-            kwargs={'usage_key_string': unicode(self.course_usage_key)}
+            kwargs={'usage_key_string': six.text_type(self.course_usage_key)}
         )
         self.query_params = {'depth': 'all', 'username': self.user.username}
 
@@ -77,7 +77,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         if params:
             self.query_params.update(params)
         response = self.client.get(url or self.url, self.query_params)
-        self.assertEquals(response.status_code, expected_status_code)
+        self.assertEqual(response.status_code, expected_status_code)
         return response
 
     def verify_response_block_list(self, response):
@@ -94,7 +94,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         Verify that the response contains the expected blocks
         """
         self.assertSetEqual(
-            set(response.data['blocks'].iterkeys()),
+            set(six.iterkeys(response.data['blocks'])),
             self.non_orphaned_block_usage_keys,
         )
 
@@ -103,7 +103,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         Verify the response has the expected structure
         """
         self.verify_response_block_dict(response)
-        for block_key_string, block_data in response.data['blocks'].iteritems():
+        for block_key_string, block_data in six.iteritems(response.data['blocks']):
             block_key = deserialize_usage_key(block_key_string, self.course_key)
             xblock = self.store.get_item(block_key)
 
@@ -116,7 +116,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
 
             if xblock.has_children:
                 self.assertSetEqual(
-                    set(unicode(child.location) for child in xblock.get_children()),
+                    set(six.text_type(child.location) for child in xblock.get_children()),
                     set(block_data['children']),
                 )
 
@@ -160,7 +160,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         usage_key = self.store.make_course_usage_key(CourseLocator('non', 'existent', 'course'))
         url = reverse(
             'blocks_in_block_tree',
-            kwargs={'usage_key_string': unicode(usage_key)}
+            kwargs={'usage_key_string': six.text_type(usage_key)}
         )
         self.verify_response(403, url=url)
 
@@ -181,13 +181,13 @@ class TestBlocksView(SharedModuleStoreTestCase):
 
     def test_basic(self):
         response = self.verify_response()
-        self.assertEquals(response.data['root'], unicode(self.course_usage_key))
+        self.assertEqual(response.data['root'], six.text_type(self.course_usage_key))
         self.verify_response_block_dict(response)
-        for block_key_string, block_data in response.data['blocks'].iteritems():
+        for block_key_string, block_data in six.iteritems(response.data['blocks']):
             block_key = deserialize_usage_key(block_key_string, self.course_key)
-            self.assertEquals(block_data['id'], block_key_string)
-            self.assertEquals(block_data['type'], block_key.block_type)
-            self.assertEquals(block_data['display_name'], self.store.get_item(block_key).display_name or '')
+            self.assertEqual(block_data['id'], block_key_string)
+            self.assertEqual(block_data['type'], block_key.block_type)
+            self.assertEqual(block_data['display_name'], self.store.get_item(block_key).display_name or '')
 
     def test_return_type_param(self):
         response = self.verify_response(params={'return_type': 'list'})
@@ -196,12 +196,12 @@ class TestBlocksView(SharedModuleStoreTestCase):
     def test_block_counts_param(self):
         response = self.verify_response(params={'block_counts': ['course', 'chapter']})
         self.verify_response_block_dict(response)
-        for block_data in response.data['blocks'].itervalues():
-            self.assertEquals(
+        for block_data in six.itervalues(response.data['blocks']):
+            self.assertEqual(
                 block_data['block_counts']['course'],
                 1 if block_data['type'] == 'course' else 0,
             )
-            self.assertEquals(
+            self.assertEqual(
                 block_data['block_counts']['chapter'],
                 (
                     1 if block_data['type'] == 'chapter' else
@@ -215,7 +215,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
             'student_view_data': self.BLOCK_TYPES_WITH_STUDENT_VIEW_DATA + ['chapter']
         })
         self.verify_response_block_dict(response)
-        for block_data in response.data['blocks'].itervalues():
+        for block_data in six.itervalues(response.data['blocks']):
             self.assert_in_iff(
                 'student_view_data',
                 block_data,
@@ -225,7 +225,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
     def test_navigation_param(self):
         response = self.verify_response(params={'nav_depth': 10})
         self.verify_response_block_dict(response)
-        for block_data in response.data['blocks'].itervalues():
+        for block_data in six.itervalues(response.data['blocks']):
             self.assertIn('descendants', block_data)
 
     def test_requested_fields_param(self):
@@ -235,10 +235,10 @@ class TestBlocksView(SharedModuleStoreTestCase):
         self.verify_response_with_requested_fields(response)
 
     def test_with_list_field_url(self):
-        query = urlencode(self.query_params.items() + [
+        query = urlencode(list(self.query_params.items()) + [
             ('requested_fields', self.requested_fields[0]),
             ('requested_fields', self.requested_fields[1]),
-            ('requested_fields', join(self.requested_fields[1:], ',')),
+            ('requested_fields', ",".join(self.requested_fields[1:])),
         ])
         self.query_params = None
         response = self.verify_response(
@@ -251,12 +251,11 @@ class TestBlocksInCourseView(TestBlocksView):
     """
     Test class for BlocksInCourseView
     """
-    shard = 4
 
     def setUp(self):
         super(TestBlocksInCourseView, self).setUp()
         self.url = reverse('blocks_in_course')
-        self.query_params['course_id'] = unicode(self.course_key)
+        self.query_params['course_id'] = six.text_type(self.course_key)
 
     def test_no_course_id(self):
         self.query_params.pop('course_id')
@@ -266,4 +265,4 @@ class TestBlocksInCourseView(TestBlocksView):
         self.verify_response(400, params={'course_id': 'invalid_course_id'})
 
     def test_non_existent_course(self):
-        self.verify_response(403, params={'course_id': unicode(CourseLocator('non', 'existent', 'course'))})
+        self.verify_response(403, params={'course_id': six.text_type(CourseLocator('non', 'existent', 'course'))})

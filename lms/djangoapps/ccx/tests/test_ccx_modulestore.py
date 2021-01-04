@@ -1,12 +1,15 @@
 """
 Test the CCXModulestoreWrapper
 """
+
+
 import datetime
 from collections import deque
-from itertools import chain, izip_longest
+from itertools import chain
 
 import pytz
 from ccx_keys.locator import CCXLocator
+from six.moves import range, zip_longest
 
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from student.tests.factories import AdminFactory, UserFactory
@@ -17,7 +20,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):
     """tests for a modulestore wrapped by CCXModulestoreWrapper
     """
-    shard = 7
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     @classmethod
@@ -28,18 +30,18 @@ class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):
         due = datetime.datetime(2010, 7, 7, 0, 0, tzinfo=pytz.UTC)
         # Create a course outline
         cls.chapters = chapters = [
-            ItemFactory.create(start=start, parent=cls.course) for _ in xrange(2)
+            ItemFactory.create(start=start, parent=cls.course) for _ in range(2)
         ]
         cls.sequentials = sequentials = [
-            ItemFactory.create(parent=c) for _ in xrange(2) for c in chapters
+            ItemFactory.create(parent=c) for _ in range(2) for c in chapters
         ]
         cls.verticals = verticals = [
             ItemFactory.create(
                 due=due, parent=s, graded=True, format='Homework'
-            ) for _ in xrange(2) for s in sequentials
+            ) for _ in range(2) for s in sequentials
         ]
         cls.blocks = [
-            ItemFactory.create(parent=v, category='html') for _ in xrange(2) for v in verticals
+            ItemFactory.create(parent=v, category='html') for _ in range(2) for v in verticals
         ]
 
     @classmethod
@@ -94,7 +96,7 @@ class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):
         course_key = self.ccx_locator.to_course_locator()
         course = self.get_course(course_key)
         ccx = self.get_course(self.ccx_locator)
-        test_fodder = izip_longest(
+        test_fodder = zip_longest(
             self.get_all_children_bf(course), self.get_all_children_bf(ccx)
         )
         for expected, actual in test_fodder:

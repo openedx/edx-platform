@@ -1,23 +1,25 @@
 """
 Tests for branding page
 """
+
+
 import datetime
 
+import six
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 from pytz import UTC
 
 from branding.views import index
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
-from openedx.core.lib.tests import attr
 from util.milestones_helpers import set_prerequisite_courses
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -37,7 +39,6 @@ def mock_render_to_response(*args, **kwargs):
 RENDER_MOCK = Mock(side_effect=mock_render_to_response)
 
 
-@attr(shard=1)
 class AnonymousIndexPageTest(ModuleStoreTestCase):
     """
     Tests that anonymous users can access the '/' page,  Need courses with start date
@@ -80,7 +81,7 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
 
         # check to see that the override value is honored
         resp = self.client.get('/')
-        self.assertEquals(resp['X-Frame-Options'], 'ALLOW')
+        self.assertEqual(resp['X-Frame-Options'], 'ALLOW')
 
     def test_deny_x_frame_options(self):
         """
@@ -89,7 +90,7 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
 
         # check to see that the default setting is to DENY iframing
         resp = self.client.get('/')
-        self.assertEquals(resp['X-Frame-Options'], 'DENY')
+        self.assertEqual(resp['X-Frame-Options'], 'DENY')
 
     def test_edge_redirect_to_login(self):
         """
@@ -109,7 +110,6 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
         self.assertEqual(response._headers.get("location")[1], "/login")  # pylint: disable=protected-access
 
 
-@attr(shard=1)
 class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase, MilestonesTestCaseMixin):
     """
     Test to simulate and verify fix for disappearing courses in
@@ -130,7 +130,7 @@ class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase, Mi
             emit_signals=True,
         )
 
-        pre_requisite_courses = [unicode(pre_requisite_course.id)]
+        pre_requisite_courses = [six.text_type(pre_requisite_course.id)]
 
         # for this failure to occur, the enrollment window needs to be in the past
         course = CourseFactory.create(
@@ -148,14 +148,12 @@ class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase, Mi
         set_prerequisite_courses(course.id, pre_requisite_courses)
 
         resp = self.client.get('/')
-        self.assertEqual(resp.status_code, 200)
 
         # make sure both courses are visible in the catalog
-        self.assertIn('pre requisite course', resp.content)
-        self.assertIn('course that has pre requisite', resp.content)
+        self.assertContains(resp, 'pre requisite course')
+        self.assertContains(resp, 'course that has pre requisite')
 
 
-@attr(shard=1)
 class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
     """
     Test for Index page course cards sorting
@@ -193,7 +191,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.factory = RequestFactory()
 
     @patch('student.views.management.render_to_response', RENDER_MOCK)
-    @patch('courseware.views.views.render_to_response', RENDER_MOCK)
+    @patch('lms.djangoapps.courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     def test_course_discovery_off(self):
         """
@@ -203,21 +201,21 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
         # assert that the course discovery UI is not present
-        self.assertNotIn('Search for a course', response.content)
+        self.assertNotContains(response, 'Search for a course')
 
         # check the /courses view
         response = self.client.get(reverse('courses'))
         self.assertEqual(response.status_code, 200)
 
         # assert that the course discovery UI is not present
-        self.assertNotIn('Search for a course', response.content)
-        self.assertNotIn('<aside aria-label="Refine Your Search" class="search-facets phone-menu">', response.content)
+        self.assertNotContains(response, 'Search for a course')
+        self.assertNotContains(response, '<aside aria-label="Refine Your Search" class="search-facets phone-menu">')
 
         # make sure we have the special css class on the section
-        self.assertIn('<div class="courses no-course-discovery"', response.content)
+        self.assertContains(response, '<div class="courses no-course-discovery"')
 
     @patch('student.views.management.render_to_response', RENDER_MOCK)
-    @patch('courseware.views.views.render_to_response', RENDER_MOCK)
+    @patch('lms.djangoapps.courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': True})
     def test_course_discovery_on(self):
         """
@@ -227,19 +225,19 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
         # assert that the course discovery UI is not present
-        self.assertIn('Search for a course', response.content)
+        self.assertContains(response, 'Search for a course')
 
         # check the /courses view
         response = self.client.get(reverse('courses'))
         self.assertEqual(response.status_code, 200)
 
         # assert that the course discovery UI is present
-        self.assertIn('Search for a course', response.content)
-        self.assertIn('<aside aria-label="Refine Your Search" class="search-facets phone-menu">', response.content)
-        self.assertIn('<div class="courses"', response.content)
+        self.assertContains(response, 'Search for a course')
+        self.assertContains(response, '<aside aria-label="Refine Your Search" class="search-facets phone-menu">')
+        self.assertContains(response, '<div class="courses"')
 
     @patch('student.views.management.render_to_response', RENDER_MOCK)
-    @patch('courseware.views.views.render_to_response', RENDER_MOCK)
+    @patch('lms.djangoapps.courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     def test_course_cards_sorted_by_default_sorting(self):
         response = self.client.get('/')
@@ -264,7 +262,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
 
     @patch('student.views.management.render_to_response', RENDER_MOCK)
-    @patch('courseware.views.views.render_to_response', RENDER_MOCK)
+    @patch('lms.djangoapps.courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_SORTING_BY_START_DATE': False})
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     def test_course_cards_sorted_by_start_date_disabled(self):
@@ -290,15 +288,14 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
 
 
-@attr(shard=1)
 class IndexPageProgramsTests(SiteMixin, ModuleStoreTestCase):
     """
     Tests for Programs List in Marketing Pages.
     """
     def test_get_programs_with_type_called(self):
         views = [
-            (reverse('root'), 'student.views.get_programs_with_type'),
-            (reverse('courses'), 'courseware.views.views.get_programs_with_type'),
+            (reverse('root'), 'student.views.management.get_programs_with_type'),
+            (reverse('courses'), 'lms.djangoapps.courseware.views.views.get_programs_with_type'),
         ]
         for url, dotted_path in views:
             with patch(dotted_path) as mock_get_programs_with_type:

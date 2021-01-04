@@ -2,6 +2,7 @@
 Test courseware search
 """
 
+
 import json
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc

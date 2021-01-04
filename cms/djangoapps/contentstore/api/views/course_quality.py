@@ -1,19 +1,20 @@
-# pylint: disable=missing-docstring
 import logging
 import time
+
 import numpy as np
-from scipy import stats
+import six
+from edxval.api import get_videos_for_course
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
+from scipy import stats
 
 from contentstore.views.item import highlights_setting
-from edxval.api import get_videos_for_course
-from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.graph_traversals import traverse_pre_order
 from xmodule.modulestore.django import modulestore
 
-from .utils import get_bool_param, course_author_access_required
+from .utils import course_author_access_required, get_bool_param
 
 log = logging.getLogger(__name__)
 
@@ -90,7 +91,7 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
             if log_time:
                 start_time = time.time()
                 output = func(*args)
-                log.info('[%s] completed in [%f]', func.__name__, (time.time() - start_time))
+                log.info(u'[%s] completed in [%f]', func.__name__, (time.time() - start_time))
             else:
                 output = func(*args)
             return output
@@ -153,25 +154,25 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
     def _subsections_quality(self, course, request):
         subsection_unit_dict = self._get_subsections_and_units(course, request)
         num_block_types_per_subsection_dict = {}
-        for subsection_key, unit_dict in subsection_unit_dict.iteritems():
+        for subsection_key, unit_dict in six.iteritems(subsection_unit_dict):
             leaf_block_types_in_subsection = (
                 unit_info['leaf_block_types']
-                for unit_info in unit_dict.itervalues()
+                for unit_info in six.itervalues(unit_dict)
             )
             num_block_types_per_subsection_dict[subsection_key] = len(set().union(*leaf_block_types_in_subsection))
 
         return dict(
             total_visible=len(num_block_types_per_subsection_dict),
-            num_with_one_block_type=list(num_block_types_per_subsection_dict.itervalues()).count(1),
-            num_block_types=self._stats_dict(list(num_block_types_per_subsection_dict.itervalues())),
+            num_with_one_block_type=list(six.itervalues(num_block_types_per_subsection_dict)).count(1),
+            num_block_types=self._stats_dict(list(six.itervalues(num_block_types_per_subsection_dict))),
         )
 
     def _units_quality(self, course, request):
         subsection_unit_dict = self._get_subsections_and_units(course, request)
         num_leaf_blocks_per_unit = [
             unit_info['num_leaf_blocks']
-            for unit_dict in subsection_unit_dict.itervalues()
-            for unit_info in unit_dict.itervalues()
+            for unit_dict in six.itervalues(subsection_unit_dict)
+            for unit_info in six.itervalues(unit_dict)
         ]
         return dict(
             total_visible=len(num_leaf_blocks_per_unit),

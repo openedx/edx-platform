@@ -1,6 +1,7 @@
 """
 Utilities for dealing with Javascript and JSON.
 """
+
 import json
 
 from django.utils.html import escapejs
@@ -68,6 +69,7 @@ def dump_js_escaped_json(obj, cls=EdxJSONEncoder):
         (string) Escaped encoded JSON.
 
     """
+    obj = list(obj) if isinstance(obj, type({}.values())) else obj
     json_string = json.dumps(obj, ensure_ascii=True, cls=cls)
     json_string = _escape_json_for_js(json_string)
     return json_string

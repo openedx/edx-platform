@@ -1,10 +1,11 @@
 """
 Tests for ace message module
 """
-import ddt
-from mock import patch
 
+
+import ddt
 from django.test import TestCase
+from mock import patch
 
 from openedx.core.djangoapps.ace_common.message import BaseMessageType
 

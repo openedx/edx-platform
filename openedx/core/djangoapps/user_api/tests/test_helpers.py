@@ -1,20 +1,19 @@
 """
 Tests for helper functions.
 """
+
+
 import json
 import re
-import mock
+
 import ddt
+import mock
 import pytest
 from django import forms
-from django.http import HttpRequest, HttpResponse
 from django.test import TestCase
 from six import text_type
 
-from ..helpers import (
-    intercept_errors, shim_student_view,
-    FormDescription, InvalidFieldError
-)
+from ..helpers import FormDescription, InvalidFieldError, intercept_errors
 
 
 class FakeInputException(Exception):
@@ -186,93 +185,6 @@ class FormDescriptionTest(TestCase):
 
             ]
         )
-
-
-@ddt.ddt
-class StudentViewShimTest(TestCase):
-    "Tests of the student view shim."
-    def setUp(self):
-        super(StudentViewShimTest, self).setUp()
-        self.captured_request = None
-
-    def test_strip_enrollment_action(self):
-        view = self._shimmed_view(HttpResponse())
-        request = HttpRequest()
-        request.POST["enrollment_action"] = "enroll"
-        request.POST["course_id"] = "edx/101/demo"
-        view(request)
-
-        # Expect that the enrollment action and course ID
-        # were stripped out before reaching the wrapped view.
-        self.assertNotIn("enrollment_action", self.captured_request.POST)
-        self.assertNotIn("course_id", self.captured_request.POST)
-
-    def test_include_analytics_info(self):
-        view = self._shimmed_view(HttpResponse())
-        request = HttpRequest()
-        request.POST["analytics"] = json.dumps({
-            "enroll_course_id": "edX/DemoX/Fall"
-        })
-        view(request)
-
-        # Expect that the analytics course ID was passed to the view
-        self.assertEqual(self.captured_request.POST.get("course_id"), "edX/DemoX/Fall")
-
-    def test_third_party_auth_login_failure(self):
-        view = self._shimmed_view(
-            HttpResponse(status=403),
-            check_logged_in=True
-        )
-        response = view(HttpRequest())
-        self.assertEqual(response.status_code, 403)
-        self.assertEqual(response.content, "third-party-auth")
-
-    def test_non_json_response(self):
-        view = self._shimmed_view(HttpResponse(content="Not a JSON dict"))
-        response = view(HttpRequest())
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, "Not a JSON dict")
-
-    @ddt.data("redirect", "redirect_url")
-    def test_ignore_redirect_from_json(self, redirect_key):
-        view = self._shimmed_view(
-            HttpResponse(content=json.dumps({
-                "success": True,
-                redirect_key: "/redirect"
-            }))
-        )
-        response = view(HttpRequest())
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, "")
-
-    def test_error_from_json(self):
-        view = self._shimmed_view(
-            HttpResponse(content=json.dumps({
-                "success": False,
-                "value": "Error!"
-            }))
-        )
-        response = view(HttpRequest())
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.content, "Error!")
-
-    def test_preserve_headers(self):
-        view_response = HttpResponse()
-        view_response["test-header"] = "test"
-        view = self._shimmed_view(view_response)
-        response = view(HttpRequest())
-        self.assertEqual(response["test-header"], "test")
-
-    def test_check_logged_in(self):
-        view = self._shimmed_view(HttpResponse(), check_logged_in=True)
-        response = view(HttpRequest())
-        self.assertEqual(response.status_code, 403)
-
-    def _shimmed_view(self, response, check_logged_in=False):
-        def stub_view(request):
-            self.captured_request = request
-            return response
-        return shim_student_view(stub_view, check_logged_in=check_logged_in)
 
 
 class DummyRegistrationExtensionModel(object):

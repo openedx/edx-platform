@@ -1,7 +1,7 @@
 """
 Signal handling functions for use with external commerce service.
 """
-from __future__ import unicode_literals
+
 
 import logging
 
@@ -11,6 +11,7 @@ from django.dispatch import receiver
 
 from openedx.core.djangoapps.commerce.utils import is_commerce_service_configured
 from student.signals import REFUND_ORDER
+
 from .utils import refund_seat
 
 log = logging.getLogger(__name__)

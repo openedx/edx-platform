@@ -2,6 +2,7 @@
 Fixture to configure XQueue response.
 """
 
+
 import json
 
 import requests
@@ -46,5 +47,5 @@ class XQueueResponseFixture(object):
 
         if not response.ok:
             raise XQueueResponseFixtureError(
-                "Could not configure XQueue stub for queue '{1}'.  Status code: {2}".format(
+                u"Could not configure XQueue stub for queue '{1}'.  Status code: {2}".format(
                     self._pattern, self._response_dict))

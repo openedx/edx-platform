@@ -11,7 +11,7 @@ from xmodule.partitions.partitions_service import get_all_partitions_for_course
 %>
 
 <%
-show_preview_menu = course and staff_access and supports_preview_menu
+show_preview_menu = course and can_masquerade and supports_preview_menu
 %>
 
 % if show_preview_menu:
@@ -28,7 +28,7 @@ show_preview_menu = course and staff_access and supports_preview_menu
     student_selected = selected(not staff_selected and not specific_student_selected and not masquerade_group_id)
     %>
     <nav class="wrapper-preview-menu" aria-label="${_('Course View')}">
-        <div class="preview-menu">
+        <div class="preview-menu" style="display: flex; align-items: center;">
             <ol class="preview-actions">
                 <li class="action-preview">
                     <form action="#" class="action-preview-form" method="post">
@@ -65,6 +65,13 @@ show_preview_menu = course and staff_access and supports_preview_menu
                         )}
                     </p>
                 </div>
+            % endif
+            % if microfrontend_link:
+            <div style="flex-grow: 1; text-align: right;">
+                <a class="btn btn-primary" style="border: solid 1px white;" href="${microfrontend_link}">
+                    ${_("View this unit in the new experience")}
+                </a>
+            </div>
             % endif
         </div>
     </nav>

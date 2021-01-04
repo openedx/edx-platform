@@ -14,7 +14,7 @@
     @include clearfix();
 
     max-width: grid-width(12);
-    min-width: 760px;
+    min-width: 320px;
     width: flex-grid(12);
     margin: 0 auto;
   }
@@ -23,6 +23,7 @@
   .msg-icon {
     display: inline-block;
     vertical-align: middle;
+    margin-right: 50px;
   }
 
   .msg-content {
@@ -51,12 +52,12 @@
 
   .has-actions {
     .msg-content {
-      width: flex-grid(10,12);
+      width: flex-grid(10, 12);
     }
 
     .nav-actions,
     .msg-actions {
-      width: flex-grid(2,12);
+      width: flex-grid(2, 12);
       display: inline-block;
       vertical-align: middle;
       text-align: right;
@@ -69,11 +70,11 @@
 
   .is-dismissable {
     .msg-content {
-      width: flex-grid(11,12);
+      width: flex-grid(11, 12);
     }
 
     .action-dismiss {
-      width: flex-grid(1,12);
+      width: flex-grid(1, 12);
       display: inline-block;
       vertical-align: top;
       text-align: right;
@@ -87,7 +88,8 @@
         text-shadow: none;
         color: inherit;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           color: $action-primary-bg;
         }
       }
@@ -97,6 +99,7 @@
   // object variations
   &.urgency-high {
     background: $notify-banner-bg-1;
+    margin-bottom: 5px;
 
     .msg {
       color: $white;
@@ -113,16 +116,18 @@
 
   &.recovery-email-alert {
     &#banner-msg {
-      background: $state-info-bg ;
+      background: $state-info-bg;
       box-shadow: none;
       border-top: 1px solid #579cc5;
       padding: 20px 20px 20px 40px;
-      margin-top: -16px;
+      margin: -16px 0 5px 0;
     }
+
     .fa-close {
       position: relative;
       float: right;
     }
+
     .fa-close:hover {
       cursor: pointer;
     }
@@ -131,6 +136,7 @@
   &.urgency-low {
     background: $notify-banner-bg-3;
     box-shadow: 0 1px 2px $shadow;
+
     .msg {
       color: $black;
     }
@@ -201,7 +207,8 @@
 
 .message-status {
   @include border-top-radius(2px);
-  @include box-sizing(border-box);
+
+  box-sizing: border-box;
 
   @extend %t-strong;
 
@@ -238,15 +245,19 @@
 // ====================
 
 // shared
-.wrapper-notification, .wrapper-alert, .prompt {
-  @include box-sizing(border-box);
+.wrapper-notification,
+.wrapper-alert,
+.prompt {
+  box-sizing: border-box;
 
   .copy {
     @extend %t-copy-sub1;
   }
 }
 
-.wrapper-notification, .wrapper-alert, .prompt {
+.wrapper-notification,
+.wrapper-alert,
+.prompt {
   background: $gray-d3;
 
   .copy {
@@ -264,7 +275,9 @@
   }
 }
 
-.alert, .notification, .prompt {
+.alert,
+.notification,
+.prompt {
 
   // types - confirm
   &.confirm {
@@ -532,14 +545,16 @@
     padding: ($baseline/2) $baseline;
 
     .notification {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
+
       @include clearfix();
 
       width: 100%;
       max-width: none;
       min-width: none;
 
-      .feedback-symbol, .copy {
+      .feedback-symbol,
+      .copy {
         float: none;
         display: inline-block;
         vertical-align: middle;
@@ -550,10 +565,6 @@
         height: ($baseline*1.25);
         margin-right: ($baseline/4);
         line-height: 3rem;
-      }
-
-      .copy {
-
       }
     }
   }
@@ -569,7 +580,8 @@
     padding: $baseline;
 
     .notification {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
+
       @include clearfix();
 
       width: 100%;
@@ -593,7 +605,8 @@
 }
 
 .notification {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
+
   @include clearfix();
 
   margin: 0 auto;
@@ -604,7 +617,8 @@
     @extend %t-strong;
   }
 
-  .feedback-symbol, .copy {
+  .feedback-symbol,
+  .copy {
     float: left;
     display: inline-block;
     vertical-align: middle;
@@ -722,8 +736,7 @@
 .wrapper-alert {
   @extend %ui-depth2;
 
-  @include box-sizing(border-box);
-
+  box-sizing: border-box;
   box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $blue;
   position: relative;
   overflow: hidden;
@@ -783,7 +796,8 @@
 
 // adopted alerts
 .alert:not(.pattern-library-shim) {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
+
   @include clearfix();
 
   margin: 0 auto;
@@ -795,7 +809,8 @@
     @extend %t-strong;
   }
 
-  .feedback-symbol, .copy {
+  .feedback-symbol,
+  .copy {
     float: left;
   }
 
@@ -903,10 +918,11 @@
       // Making this optional wouldn't cause any issue for confirmation dialog at-least.
       @extend %btn-secondary-white !optional;
 
-      padding:($baseline/4) ($baseline/2);
+      padding: ($baseline/4) ($baseline/2);
     }
 
-    .icon,.button-copy {
+    .icon,
+    .button-copy {
       display: inline-block;
       vertical-align: middle;
     }
@@ -932,10 +948,6 @@
   .wrapper-prompt {
     visibility: hidden;
     pointer-events: none;
-
-    .prompt {
-
-    }
   }
 
   // prompt showing
@@ -958,9 +970,6 @@
       }
     }
   }
-
-  // alert showing/hiding done by jQuery
-  .wrapper-alert { }
 
   // notification showing/hiding
   .wrapper-notification {
@@ -1048,9 +1057,9 @@
 
 // temporary
 body.uxdesign.alerts {
-  .content-primary, .content-supplementary {
-    @include box-sizing(border-box);
-
+  .content-primary,
+  .content-supplementary {
+    box-sizing: border-box;
     float: left;
   }
 
@@ -1109,9 +1118,8 @@ body.uxdesign.alerts {
     margin-bottom: ($baseline*1.5);
     border-radius: 3px;
     border: 1px solid #edbd3c;
-    border-radius: 3px;
     background: #fbf6e1;
-    // background: #edbd3c;
+
     @include clearfix();
 
     .alert-message {

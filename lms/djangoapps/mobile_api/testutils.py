@@ -11,18 +11,21 @@ Test utilities for mobile API tests:
 """
 # pylint: disable=no-member
 
-import ddt
+
 import datetime
+
+import ddt
+import pytz
+import six
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
-import pytz
 from rest_framework.test import APITestCase
 
-from courseware.access_response import MobileAvailabilityError, StartDateError, VisibilityError
-from courseware.tests.factories import UserFactory
+from lms.djangoapps.courseware.access_response import MobileAvailabilityError, StartDateError, VisibilityError
+from lms.djangoapps.courseware.tests.factories import UserFactory
 from mobile_api.models import IgnoreMobileAvailableFlagConfig
 from mobile_api.tests.test_milestones import MobileAPIMilestonesMixin
 from mobile_api.utils import API_V1
@@ -93,7 +96,7 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
         """Base implementation that returns URL for endpoint that's being tested."""
         reverse_args = reverse_args or {}
         if 'course_id' in self.REVERSE_INFO['params']:
-            reverse_args.update({'course_id': unicode(kwargs.get('course_id', self.course.id))})
+            reverse_args.update({'course_id': six.text_type(kwargs.get('course_id', self.course.id))})
         if 'username' in self.REVERSE_INFO['params']:
             reverse_args.update({'username': kwargs.get('username', self.user.username)})
         if 'api_version' in self.REVERSE_INFO['params']:

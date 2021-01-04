@@ -1,11 +1,14 @@
 """
 Support tool for changing course enrollments.
 """
+
+
+import six
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponseBadRequest
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 from opaque_keys import InvalidKeyError
@@ -15,13 +18,14 @@ from six import text_type
 
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
-from enrollment.api import get_enrollments, update_enrollment
-from enrollment.errors import CourseModeNotFoundError
-from enrollment.serializers import ModeSerializer
 from lms.djangoapps.support.decorators import require_support_permission
 from lms.djangoapps.support.serializers import ManualEnrollmentSerializer
 from lms.djangoapps.verify_student.models import VerificationDeadline
-from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, ManualEnrollmentAudit
+from openedx.core.djangoapps.credit.email_utils import get_credit_provider_attribute_values
+from openedx.core.djangoapps.enrollments.api import get_enrollments, update_enrollment
+from openedx.core.djangoapps.enrollments.errors import CourseModeNotFoundError
+from openedx.core.djangoapps.enrollments.serializers import ModeSerializer
+from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAttribute, ManualEnrollmentAudit
 from util.json_request import JsonResponse
 
 
@@ -91,8 +95,6 @@ class EnrollmentSupportListView(GenericAPIView):
                     username=user.username,
                     old_mode=old_mode
                 ))
-            if new_mode == CourseMode.CREDIT_MODE:
-                return HttpResponseBadRequest(u'Enrollment cannot be changed to credit mode.')
         except KeyError as err:
             return HttpResponseBadRequest(u'The field {} is required.'.format(text_type(err)))
         except InvalidKeyError:
@@ -101,7 +103,7 @@ class EnrollmentSupportListView(GenericAPIView):
             return HttpResponseBadRequest(
                 u'Could not find enrollment for user {username} in course {course}.'.format(
                     username=username_or_email,
-                    course=unicode(course_key)
+                    course=six.text_type(course_key)
                 )
             )
         try:
@@ -116,6 +118,16 @@ class EnrollmentSupportListView(GenericAPIView):
                     reason=reason,
                     enrollment=enrollment
                 )
+                if new_mode == CourseMode.CREDIT_MODE:
+                    provider_ids = get_credit_provider_attribute_values(course_key, 'id')
+                    credit_provider_attr = {
+                        'namespace': 'credit',
+                        'name': 'provider_id',
+                        'value': provider_ids[0],
+                    }
+                    CourseEnrollmentAttribute.add_enrollment_attr(
+                        enrollment=enrollment, data_list=[credit_provider_attr]
+                    )
                 return JsonResponse(ManualEnrollmentSerializer(instance=manual_enrollment).data)
         except CourseModeNotFoundError as err:
             return HttpResponseBadRequest(text_type(err))
@@ -175,7 +187,8 @@ class EnrollmentSupportListView(GenericAPIView):
         """
         course_modes = CourseMode.modes_for_course(
             course_key,
-            include_expired=True
+            include_expired=True,
+            exclude_credit=False
         )
         return [
             ModeSerializer(mode).data

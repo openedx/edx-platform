@@ -1,3 +1,6 @@
+"""Django admin for course_modes"""
+
+
 import six
 from django import forms
 from django.conf import settings
@@ -22,7 +25,8 @@ from lms.djangoapps.verify_student import models as verification_models
 from openedx.core.lib.courses import clean_course_id
 from util.date_utils import get_time_display
 
-COURSE_MODE_SLUG_CHOICES = [(key, enrollment_mode['display_name']) for key, enrollment_mode in six.iteritems(settings.COURSE_ENROLLMENT_MODES)]
+COURSE_MODE_SLUG_CHOICES = [(key, enrollment_mode['display_name'])
+                            for key, enrollment_mode in six.iteritems(settings.COURSE_ENROLLMENT_MODES)]
 
 
 class CourseModeForm(forms.ModelForm):
@@ -72,10 +76,10 @@ class CourseModeForm(forms.ModelForm):
 
         default_tz = timezone(settings.TIME_ZONE)
 
-        if self.instance._expiration_datetime:  # pylint: disable=protected-access
+        if self.instance._expiration_datetime:
             # django admin is using default timezone. To avoid time conversion from db to form
             # convert the UTC object to naive and then localize with default timezone.
-            _expiration_datetime = self.instance._expiration_datetime.replace(  # pylint: disable=protected-access
+            _expiration_datetime = self.instance._expiration_datetime.replace(
                 tzinfo=None
             )
             self.initial["_expiration_datetime"] = default_tz.localize(_expiration_datetime)
@@ -176,6 +180,8 @@ class CourseModeForm(forms.ModelForm):
 class CourseModeAdmin(admin.ModelAdmin):
     """Admin for course modes"""
     form = CourseModeForm
+
+    raw_id_fields = ['course']
 
     fields = (
         'course',

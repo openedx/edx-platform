@@ -1,6 +1,8 @@
 """
 Tests for Theming locales
 """
+
+
 import os
 
 from django.conf import settings

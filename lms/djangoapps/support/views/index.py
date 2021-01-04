@@ -1,6 +1,8 @@
 """
 Index view for the support app.
 """
+
+
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
@@ -41,11 +43,21 @@ SUPPORT_INDEX_URLS = [
         "name": _("Feature Based Enrollments"),
         "description": _("View feature based enrollment settings"),
     },
+    {
+        "url": reverse_lazy("support:link_program_enrollments"),
+        "name": _("Link Program Enrollments"),
+        "description": _("Link LMS users to program enrollments"),
+    },
+    {
+        "url": reverse_lazy("support:program_enrollments_inspector"),
+        "name": _("Program Enrollments Inspector Tool"),
+        "description": _("Find information related to a learner's program enrollments"),
+    },
 ]
 
 
 @require_support_permission
-def index(request):  # pylint: disable=unused-argument
+def index(request):
     """Render the support index view. """
     context = {
         "urls": SUPPORT_INDEX_URLS

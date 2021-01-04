@@ -2,7 +2,7 @@
 This module contains tasks for asynchronous execution of grade updates.
 """
 
-from datetime import timedelta
+
 from logging import getLogger
 
 import six
@@ -12,13 +12,12 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.utils import DatabaseError
-from django.utils import timezone
 from edx_django_utils.monitoring import set_custom_metric, set_custom_metrics_for_course_key
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import CourseLocator
 from submissions import api as sub_api
 
-from courseware.model_data import get_score
+from lms.djangoapps.courseware.model_data import get_score
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -27,11 +26,11 @@ from track.event_transaction_utils import set_event_transaction_id, set_event_tr
 from util.date_utils import from_timestamp
 from xmodule.modulestore.django import modulestore
 
-from .config.waffle import DISABLE_REGRADE_ON_POLICY_CHANGE, ENFORCE_FREEZE_GRADE_AFTER_COURSE_END, waffle, waffle_flags
+from .config.waffle import DISABLE_REGRADE_ON_POLICY_CHANGE, waffle
 from .constants import ScoreDatabaseTableEnum
 from .course_grade_factory import CourseGradeFactory
 from .exceptions import DatabaseNotReadyError
-from .services import GradesService
+from .grade_utils import are_grades_frozen
 from .signals.signals import SUBSECTION_SCORE_CHANGED
 from .subsection_grade_factory import SubsectionGradeFactory
 from .transformer import GradesTransformer
@@ -61,7 +60,7 @@ def compute_all_grades_for_course(**kwargs):
     else:
         course_key = CourseKey.from_string(kwargs.pop('course_key'))
         if are_grades_frozen(course_key):
-            log.info("Attempted compute_all_grades_for_course for course '%s', but grades are frozen.", course_key)
+            log.info(u"Attempted compute_all_grades_for_course for course '%s', but grades are frozen.", course_key)
             return
         for course_key_string, offset, batch_size in _course_task_args(course_key=course_key, **kwargs):
             kwargs.update({
@@ -116,7 +115,7 @@ def compute_grades_for_course(course_key, offset, batch_size, **kwargs):  # pyli
     """
     course_key = CourseKey.from_string(course_key)
     if are_grades_frozen(course_key):
-        log.info("Attempted compute_grades_for_course for course '%s', but grades are frozen.", course_key)
+        log.info(u"Attempted compute_grades_for_course for course '%s', but grades are frozen.", course_key)
         return
 
     enrollments = CourseEnrollment.objects.filter(course_id=course_key).order_by('created')
@@ -139,18 +138,21 @@ def recalculate_course_and_subsection_grades_for_user(self, **kwargs):  # pylint
     Recalculates the course grade and all subsection grades
     for the given ``user`` and ``course_key`` keyword arguments.
     """
+    if 'lms.djangoapps.grades.apps.GradesConfig' not in settings.INSTALLED_APPS:
+        # This task errors when run in-process during Studio tests, just skip it
+        return
     user_id = kwargs.get('user_id')
     course_key_str = kwargs.get('course_key')
 
     if not (user_id or course_key_str):
-        message = 'recalculate_course_and_subsection_grades_for_user missing "user" or "course_key" kwargs from {}'
+        message = u'recalculate_course_and_subsection_grades_for_user missing "user" or "course_key" kwargs from {}'
         raise Exception(message.format(kwargs))
 
     user = User.objects.get(id=user_id)
     course_key = CourseKey.from_string(course_key_str)
     if are_grades_frozen(course_key):
         log.info(
-            "Attempted recalculate_course_and_subsection_grades_for_user for course '%s', but grades are frozen.",
+            u"Attempted recalculate_course_and_subsection_grades_for_user for course '%s', but grades are frozen.",
             course_key,
         )
         return
@@ -206,13 +208,13 @@ def _recalculate_subsection_grade(self, **kwargs):
     try:
         course_key = CourseLocator.from_string(kwargs['course_id'])
         if are_grades_frozen(course_key):
-            log.info("Attempted _recalculate_subsection_grade for course '%s', but grades are frozen.", course_key)
+            log.info(u"Attempted _recalculate_subsection_grade for course '%s', but grades are frozen.", course_key)
             return
 
         scored_block_usage_key = UsageKey.from_string(kwargs['usage_id']).replace(course_key=course_key)
 
         set_custom_metrics_for_course_key(course_key)
-        set_custom_metric('usage_id', unicode(scored_block_usage_key))
+        set_custom_metric('usage_id', six.text_type(scored_block_usage_key))
 
         # The request cache is not maintained on celery workers,
         # where this code runs. So we take the values from the
@@ -241,7 +243,7 @@ def _recalculate_subsection_grade(self, **kwargs):
         )
     except Exception as exc:
         if not isinstance(exc, KNOWN_RETRY_ERRORS):
-            log.info("tnl-6244 grades unexpected failure: {}. task id: {}. kwargs={}".format(
+            log.info(u"tnl-6244 grades unexpected failure: {}. task id: {}. kwargs={}".format(
                 repr(exc),
                 self.request.id,
                 kwargs,
@@ -262,15 +264,16 @@ def _has_db_updated_with_new_score(self, scored_block_usage_key, **kwargs):
         score = sub_api.get_score(
             {
                 "student_id": kwargs['anonymous_user_id'],
-                "course_id": unicode(scored_block_usage_key.course_key),
-                "item_id": unicode(scored_block_usage_key),
+                "course_id": six.text_type(scored_block_usage_key.course_key),
+                "item_id": six.text_type(scored_block_usage_key),
                 "item_type": scored_block_usage_key.block_type,
             }
         )
         found_modified_time = score['created_at'] if score is not None else None
     else:
         assert kwargs['score_db_table'] == ScoreDatabaseTableEnum.overrides
-        score = GradesService().get_subsection_grade_override(
+        from . import api
+        score = api.get_subsection_grade_override(
             user_id=kwargs['user_id'],
             course_key_or_id=kwargs['course_id'],
             usage_key_or_id=kwargs['usage_id']
@@ -343,7 +346,7 @@ def _course_task_args(course_key, **kwargs):
     from_settings = kwargs.pop('from_settings', True)
     enrollment_count = CourseEnrollment.objects.filter(course_id=course_key).count()
     if enrollment_count == 0:
-        log.warning("No enrollments found for {}".format(course_key))
+        log.warning(u"No enrollments found for {}".format(course_key))
 
     if from_settings is False:
         batch_size = kwargs.pop('batch_size', 100)
@@ -352,14 +355,3 @@ def _course_task_args(course_key, **kwargs):
 
     for offset in six.moves.range(0, enrollment_count, batch_size):
         yield (six.text_type(course_key), offset, batch_size)
-
-
-def are_grades_frozen(course_key):
-    """ Returns whether grades are frozen for the given course. """
-    if waffle_flags()[ENFORCE_FREEZE_GRADE_AFTER_COURSE_END].is_enabled(course_key):
-        course = CourseOverview.get_from_id(course_key)
-        if course.end:
-            freeze_grade_date = course.end + timedelta(30)
-            now = timezone.now()
-            return now > freeze_grade_date
-    return False

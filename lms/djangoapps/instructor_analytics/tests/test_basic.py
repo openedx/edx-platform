@@ -1,23 +1,27 @@
+# coding=utf-8
 """
 Tests for instructor.basic
 """
 
+
+import ddt
 import datetime
 import json
 
 import pytz
-from django.urls import reverse
 from django.db.models import Q
+from django.urls import reverse
 from edx_proctoring.api import create_exam
 from edx_proctoring.models import ProctoredExamStudentAttempt
 from mock import MagicMock, Mock, patch
 from opaque_keys.edx.locator import UsageKey
 from six import text_type
+from six.moves import range, zip
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.tests.factories import InstructorFactory
-from instructor_analytics.basic import (
+from lms.djangoapps.courseware.tests.factories import InstructorFactory
+from lms.djangoapps.instructor_analytics.basic import (
     AVAILABLE_FEATURES,
     PROFILE_FEATURES,
     STUDENT_FEATURES,
@@ -26,6 +30,7 @@ from instructor_analytics.basic import (
     course_registration_features,
     enrolled_students_features,
     get_proctored_exam_results,
+    get_response_state,
     list_may_enroll,
     list_problem_responses,
     sale_order_record_features,
@@ -49,21 +54,21 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
+@ddt.ddt
 class TestAnalyticsBasic(ModuleStoreTestCase):
     """ Test basic analytics functions. """
-    shard = 3
 
     def setUp(self):
         super(TestAnalyticsBasic, self).setUp()
         self.course_key = self.store.make_course_key('robot', 'course', 'id')
-        self.users = tuple(UserFactory() for _ in xrange(30))
+        self.users = tuple(UserFactory() for _ in range(30))
         self.ces = tuple(CourseEnrollment.enroll(user, self.course_key)
                          for user in self.users)
         self.instructor = InstructorFactory(course_key=self.course_key)
         for user in self.users:
             user.profile.meta = json.dumps({
-                "position": "edX expert {}".format(user.id),
-                "company": "Open edX Inc {}".format(user.id),
+                "position": u"edX expert {}".format(user.id),
+                "company": u"Open edX Inc {}".format(user.id),
             })
             user.profile.save()
         self.students_who_may_enroll = list(self.users) + [UserFactory() for _ in range(5)]
@@ -71,6 +76,26 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             CourseEnrollmentAllowed.objects.create(
                 email=student.email, course_id=self.course_key
             )
+
+    @ddt.data(
+        (u'あなた', u'スの中'),
+        (u"ГЂіи lіиэ ъэтшээи", u"Ђэаvэи аиↁ Ђэѓэ")
+    )
+    @ddt.unpack
+    def test_get_response_state_with_ora(self, files_descriptions, saved_response):
+        """
+        Tests that ORA response state is transformed expectedly when the problem
+        state contains unicode characters.
+        """
+        payload_state = json.dumps({
+            'saved_response': json.dumps({'parts': [{'text': saved_response}]}),
+            'saved_files_descriptions': json.dumps([files_descriptions]),
+        })
+        response = Mock(module_type='openassessment', student=Mock(username='staff'), state=payload_state)
+
+        transformed_state = json.loads(get_response_state(response))
+        self.assertEqual(transformed_state['saved_files_descriptions'][0], files_descriptions)
+        self.assertEqual(transformed_state['saved_response']['parts'][0]['text'], saved_response)
 
     def test_list_problem_responses(self):
         def result_factory(result_id):
@@ -119,14 +144,14 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         userreports = enrolled_students_features(self.course_key, ['username'])
         self.assertEqual(len(userreports), len(self.users))
         for userreport in userreports:
-            self.assertEqual(userreport.keys(), ['username'])
+            self.assertEqual(list(userreport.keys()), ['username'])
             self.assertIn(userreport['username'], [user.username for user in self.users])
 
     def test_enrolled_students_features_keys(self):
         query_features = ('username', 'name', 'email', 'city', 'country',)
         for user in self.users:
-            user.profile.city = "Mos Eisley {}".format(user.id)
-            user.profile.country = "Tatooine {}".format(user.id)
+            user.profile.city = u"Mos Eisley {}".format(user.id)
+            user.profile.country = u"Tatooine {}".format(user.id)
             user.profile.save()
         for feature in query_features:
             self.assertIn(feature, AVAILABLE_FEATURES)
@@ -163,8 +188,8 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         self.assertEqual(len(userreports), len(self.users))
         for userreport in userreports:
             self.assertEqual(set(userreport.keys()), set(query_features))
-            self.assertIn(userreport['meta.position'], ["edX expert {}".format(user.id) for user in self.users])
-            self.assertIn(userreport['meta.company'], ["Open edX Inc {}".format(user.id) for user in self.users])
+            self.assertIn(userreport['meta.position'], [u"edX expert {}".format(user.id) for user in self.users])
+            self.assertIn(userreport['meta.company'], [u"Open edX Inc {}".format(user.id) for user in self.users])
 
     def test_enrolled_students_enrollment_verification(self):
         """
@@ -198,7 +223,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         course = CourseFactory.create(org="test", course="course1", display_name="run1")
         course.cohort_config = {'cohorted': True, 'auto_cohort': True, 'auto_cohort_groups': ['cohort']}
         self.store.update_item(course, self.instructor.id)
-        cohorted_students = [UserFactory.create() for _ in xrange(10)]
+        cohorted_students = [UserFactory.create() for _ in range(10)]
         cohort = CohortFactory.create(name='cohort', course_id=course.id, users=cohorted_students)
         cohorted_usernames = [student.username for student in cohorted_students]
         non_cohorted_student = UserFactory.create()
@@ -234,7 +259,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         self.assertEqual(len(may_enroll), len(self.students_who_may_enroll) - len(self.users))
         email_adresses = [student.email for student in self.students_who_may_enroll]
         for student in may_enroll:
-            self.assertEqual(student.keys(), ['email'])
+            self.assertEqual(list(student.keys()), ['email'])
             self.assertIn(student['email'], email_adresses)
 
     def test_get_student_exam_attempt_features(self):
@@ -250,6 +275,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             'Suspicious Comments',
             'Rules Violation Count',
             'Rules Violation Comments',
+            'track'
         ]
 
         proctored_exam_id = create_exam(self.course_key, 'Test Content', 'Test Exam', 1)

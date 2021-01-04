@@ -2,6 +2,7 @@
 OAuth2 wrapper urls
 """
 
+
 from django.conf import settings
 from django.conf.urls import url
 from django.views.decorators.csrf import csrf_exempt

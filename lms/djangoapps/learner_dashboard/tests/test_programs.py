@@ -2,23 +2,26 @@
 """
 Unit tests covering the program listing and detail pages.
 """
+
+
 import json
 import re
-from urlparse import urljoin
 from uuid import uuid4
 
 import mock
+import six
+from six.moves.urllib.parse import urljoin
 from bs4 import BeautifulSoup
 from django.conf import settings
-from django.urls import reverse, reverse_lazy
 from django.test import override_settings
+from django.urls import reverse, reverse_lazy
 
 from lms.envs.test import CREDENTIALS_PUBLIC_SERVICE_URL
 from openedx.core.djangoapps.catalog.constants import PathwayType
 from openedx.core.djangoapps.catalog.tests.factories import (
-    PathwayFactory,
     CourseFactory,
     CourseRunFactory,
+    PathwayFactory,
     ProgramFactory
 )
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
@@ -36,8 +39,8 @@ def load_serialized_data(response, key):
     """
     Extract and deserialize serialized data from the response.
     """
-    pattern = re.compile(r'{key}: (?P<data>\[.*\])'.format(key=key))
-    match = pattern.search(response.content)
+    pattern = re.compile(u'{key}: (?P<data>\\[.*\\])'.format(key=key))
+    match = pattern.search(response.content.decode('utf-8'))
     serialized = match.group('data')
 
     return json.loads(serialized)
@@ -48,7 +51,6 @@ def load_serialized_data(response, key):
 @mock.patch(PROGRAMS_UTILS_MODULE + '.get_programs')
 class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
     """Unit tests for the program listing page."""
-    shard = 4
     maxDiff = None
     password = 'test'
     url = reverse_lazy('program_listing_view')
@@ -58,7 +60,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         super(TestProgramListing, cls).setUpClass()
 
         cls.course = ModuleStoreCourseFactory()
-        course_run = CourseRunFactory(key=unicode(cls.course.id))
+        course_run = CourseRunFactory(key=six.text_type(cls.course.id))
         course = CourseFactory(course_runs=[course_run])
 
         cls.first_program = ProgramFactory(courses=[course])
@@ -160,6 +162,18 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         response = self.client.get(self.url)
         self.assertContains(response, marketing_root)
 
+    def test_mobile_marketing_url(self, mock_get_programs):
+        """
+        Verify that a link to a programs marketing for mobile appears in the response.
+        """
+        self.create_programs_config(marketing_path='bar')
+        mock_get_programs.return_value = self.data
+
+        mobile_marketing_url = 'edxapp://course?programs'
+
+        response = self.client.get('/dashboard/programs_fragment/?mobile_only=true')
+        self.assertContains(response, mobile_marketing_url)
+
     def test_links_to_detail_pages(self, mock_get_programs):
         """
         Verify that links to detail pages are present.
@@ -185,7 +199,6 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
 @mock.patch(PROGRAMS_UTILS_MODULE + '.get_programs')
 class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, SharedModuleStoreTestCase):
     """Unit tests for the program details page."""
-    shard = 4
     program_uuid = str(uuid4())
     password = 'test'
     url = reverse_lazy('program_details_view', kwargs={'program_uuid': program_uuid})
@@ -195,7 +208,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         super(TestProgramDetails, cls).setUpClass()
 
         modulestore_course = ModuleStoreCourseFactory()
-        course_run = CourseRunFactory(key=unicode(modulestore_course.id))
+        course_run = CourseRunFactory(key=six.text_type(modulestore_course.id))
         course = CourseFactory(course_runs=[course_run])
 
         cls.program_data = ProgramFactory(uuid=cls.program_uuid, courses=[course])
@@ -215,7 +228,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         self.assertContains(response, 'programData')
         self.assertContains(response, 'urls')
         self.assertContains(response,
-                            '"program_record_url": "{}/records/programs/'.format(CREDENTIALS_PUBLIC_SERVICE_URL))
+                            u'"program_record_url": "{}/records/programs/'.format(CREDENTIALS_PUBLIC_SERVICE_URL))
         self.assertContains(response, 'program_listing_url')
         self.assertContains(response, self.program_data['title'])
         self.assert_programs_tab_present(response)

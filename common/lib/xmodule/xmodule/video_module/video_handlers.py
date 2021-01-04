@@ -5,35 +5,36 @@ StudentViewHandlers are handlers for video module instance.
 StudioViewHandlers are handlers for video descriptor instance.
 """
 
+
 import json
 import logging
+import math
 
 import six
 from django.core.files.base import ContentFile
 from django.utils.timezone import now
+from edxval.api import create_external_video, create_or_update_video_transcript, delete_video_transcript
+from opaque_keys.edx.locator import CourseLocator
 from webob import Response
-
 from xblock.core import XBlock
 from xblock.exceptions import JsonHandlerError
 
 from xmodule.exceptions import NotFoundError
 from xmodule.fields import RelativeTime
-from opaque_keys.edx.locator import CourseLocator
 
-from edxval.api import create_or_update_video_transcript, create_external_video, delete_video_transcript
 from .transcripts_utils import (
-    clean_video_id,
-    get_or_create_sjson,
-    generate_sjson_for_all_speeds,
-    subs_filename,
     Transcript,
     TranscriptException,
     TranscriptsGenerationException,
-    youtube_speed_dict,
+    clean_video_id,
+    generate_sjson_for_all_speeds,
+    get_html5_ids,
+    get_or_create_sjson,
     get_transcript,
     get_transcript_from_contentstore,
     remove_subs_from_store,
-    get_html5_ids
+    subs_filename,
+    youtube_speed_dict
 )
 
 log = logging.getLogger(__name__)
@@ -88,6 +89,11 @@ class VideoStudentViewHandlers(object):
 
                     if key == 'bumper_last_view_date':
                         value = now()
+
+                    if key == 'speed' and math.isnan(value):
+                        message = u"Invalid speed value {}, must be a float.".format(value)
+                        log.warning(message)
+                        return json.dumps({'success': False, 'error': message})
 
                     setattr(self, key, value)
 
@@ -153,7 +159,7 @@ class VideoStudentViewHandlers(object):
                 generate_sjson_for_all_speeds(
                     self,
                     other_lang[self.transcript_language],
-                    {speed: youtube_id for youtube_id, speed in youtube_ids.iteritems()},
+                    {speed: youtube_id for youtube_id, speed in six.iteritems(youtube_ids)},
                     self.transcript_language
                 )
                 sjson_transcript = Transcript.asset(self.location, youtube_id, self.transcript_language).data
@@ -202,7 +208,7 @@ class VideoStudentViewHandlers(object):
         if transcript_name:
             # Get the asset path for course
             asset_path = None
-            course = self.descriptor.runtime.modulestore.get_course(self.course_id)
+            course = self.runtime.modulestore.get_course(self.course_id)
             if course.static_asset_path:
                 asset_path = course.static_asset_path
             else:
@@ -264,7 +270,10 @@ class VideoStudentViewHandlers(object):
 
         if add_attachment_header:
             headerlist.append(
-                ('Content-Disposition', 'attachment; filename="{}"'.format(filename.encode('utf-8')))
+                (
+                    'Content-Disposition',
+                    'attachment; filename="{}"'.format(filename.encode('utf-8') if six.PY2 else filename)
+                )
             )
 
         response = Response(
@@ -309,7 +318,7 @@ class VideoStudentViewHandlers(object):
                 log.info("Invalid /translation request: no language.")
                 return Response(status=400)
 
-            if language not in ['en'] + transcripts["transcripts"].keys():
+            if language not in ['en'] + list(transcripts["transcripts"].keys()):
                 log.info("Video: transcript facilities are not available for given language.")
                 return Response(status=404)
 
@@ -372,6 +381,19 @@ class VideoStudentViewHandlers(object):
             log.debug("Dispatch is not allowed")
             response = Response(status=404)
 
+        return response
+
+    @XBlock.handler
+    def yt_video_metadata(self, request, suffix=''):
+        """
+        Endpoint to get YouTube metadata.
+        This handler is only used in the Blockstore-based runtime. The old
+        runtime uses a similar REST API that's not an XBlock handler.
+        """
+        from lms.djangoapps.courseware.views.views import load_metadata_from_youtube
+        metadata, status_code = load_metadata_from_youtube(video_id=self.youtube_id_1_0, request=request)
+        response = Response(json.dumps(metadata), status=status_code)
+        response.content_type = 'application/json'
         return response
 
 
@@ -462,7 +484,7 @@ class VideoStudioViewHandlers(object):
                         # Convert SRT transcript into an SJSON format
                         # and upload it to S3.
                         sjson_subs = Transcript.convert(
-                            content=transcript_file.read(),
+                            content=transcript_file.read().decode('utf-8'),
                             input_format=Transcript.SRT,
                             output_format=Transcript.SJSON
                         )
@@ -530,7 +552,12 @@ class VideoStudioViewHandlers(object):
                         video=self, lang=language, output_format=Transcript.SRT
                     )
                     response = Response(transcript_content, headerlist=[
-                        ('Content-Disposition', 'attachment; filename="{}"'.format(transcript_name.encode('utf8'))),
+                        (
+                            'Content-Disposition',
+                            'attachment; filename="{}"'.format(
+                                transcript_name.encode('utf8') if six.PY2 else transcript_name
+                            )
+                        ),
                         ('Content-Language', language),
                         ('Content-Type', mime_type)
                     ])

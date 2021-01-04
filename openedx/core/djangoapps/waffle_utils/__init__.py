@@ -60,11 +60,12 @@ can't yet be deleted, for example if there are straggling course overrides.
     than implicit.
 
 """
-import crum
+
 import logging
 from abc import ABCMeta
 from contextlib import contextmanager
 
+import crum
 import six
 from opaque_keys.edx.keys import CourseKey
 from waffle import flag_is_active, switch_is_active
@@ -74,7 +75,7 @@ from openedx.core.lib.cache_utils import get_cache as get_request_cache
 log = logging.getLogger(__name__)
 
 
-class WaffleNamespace(object):
+class WaffleNamespace(six.with_metaclass(ABCMeta, object)):
     """
     A base class for a request cached namespace for waffle flags/switches.
 
@@ -82,7 +83,6 @@ class WaffleNamespace(object):
     (e.g. "course_experience"), and can be used to work with a set of
     flags or switches that will all share this namespace.
     """
-    __metaclass__ = ABCMeta
 
     def __init__(self, name, log_prefix=None):
         """
@@ -216,14 +216,13 @@ class WaffleSwitch(object):
             yield
 
 
-class WaffleFlagNamespace(WaffleNamespace):
+class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
     """
     Provides a single namespace for a set of waffle flags.
 
     All namespaced flag values are stored in a single request cache containing
     all flags for all namespaces.
     """
-    __metaclass__ = ABCMeta
 
     @property
     def _cached_flags(self):
@@ -283,7 +282,7 @@ class WaffleFlagNamespace(WaffleNamespace):
                     if request:
                         value = flag_is_active(request, namespaced_flag_name)
                     else:
-                        log.warn(u"%sFlag '%s' accessed without a request", self.log_prefix, namespaced_flag_name)
+                        log.warning(u"%sFlag '%s' accessed without a request", self.log_prefix, namespaced_flag_name)
                         # Return the default value if not in a request context.
                         # Note: this skips the cache as the value might be different
                         # in a normal request context. This case seems to occur when
@@ -305,12 +304,15 @@ class WaffleFlag(object):
         Initializes the waffle flag instance.
 
         Arguments:
-            waffle_namespace (WaffleFlagNamespace): Provides a cached namespace
-                for this flag.
+            waffle_namespace (WaffleFlagNamespace | String): Namespace for this flag.
             flag_name (String): The name of the flag (without namespacing).
             flag_undefined_default (Boolean): A default value to be returned if
                 the waffle flag is to be checked, but doesn't exist.
         """
+        if isinstance(waffle_namespace, six.string_types):
+            waffle_namespace = WaffleFlagNamespace(name=waffle_namespace)
+
+        self.waffle_namespace = waffle_namespace
         self.waffle_namespace = waffle_namespace
         self.flag_name = flag_name
         self.flag_undefined_default = flag_undefined_default
@@ -368,7 +370,7 @@ class CourseWaffleFlag(WaffleFlag):
             """
             # Import is placed here to avoid model import at project startup.
             from .models import WaffleFlagCourseOverrideModel
-            cache_key = u'{}.{}'.format(namespaced_flag_name, unicode(course_key))
+            cache_key = u'{}.{}'.format(namespaced_flag_name, six.text_type(course_key))
             force_override = self.waffle_namespace._cached_flags.get(cache_key)
 
             if force_override is None:
@@ -414,7 +416,7 @@ class CourseWaffleFlag(WaffleFlag):
             checking waffle.
         """
         # validate arguments
-        assert issubclass(type(course_key), CourseKey), "The course_key '{}' must be a CourseKey.".format(
+        assert issubclass(type(course_key), CourseKey), u"The course_key '{}' must be a CourseKey.".format(
             str(course_key)
         )
 

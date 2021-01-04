@@ -2,12 +2,15 @@
 Test the behavior of the GradesTransformer
 """
 
+
 import datetime
 import random
 from copy import deepcopy
 
 import ddt
 import pytz
+import six
+from six.moves import range
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
@@ -26,7 +29,6 @@ class GradesTransformerTestCase(CourseStructureTestCase):
     """
     Verify behavior of the GradesTransformer
     """
-    shard = 4
 
     TRANSFORMER_CLASS_TO_TEST = GradesTransformer
 
@@ -215,7 +217,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         }
         blocks = self.build_complicated_hypothetical_course()
         block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
-        for block_ref, expected_subsections in expected_subsections.iteritems():
+        for block_ref, expected_subsections in six.iteritems(expected_subsections):
             actual_subsections = block_structure.get_transformer_block_field(
                 blocks[block_ref].location,
                 self.TRANSFORMER_CLASS_TO_TEST,
@@ -345,6 +347,35 @@ class GradesTransformerTestCase(CourseStructureTestCase):
             max_score=2,
         )
 
+    def test_max_score_for_invalid_dropdown_problem(self):
+        """
+        Verify that for an invalid dropdown problem, the max score is set to zero.
+        """
+        problem_data = u'''
+        <problem>
+            <optionresponse>
+              <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for dropdown problems. Edit this component to replace this template with your own assessment.</p>
+            <label>Add the question text, or prompt, here. This text is required.</label>
+            <description>You can add an optional tip or note related to the prompt like this. </description>
+            <optioninput>
+                <option correct="False">an incorrect answer</option>
+                <option correct="True">the correct answer</option>
+                <option correct="True">an incorrect answer</option>
+              </optioninput>
+            </optionresponse>
+        </problem>
+        '''
+
+        blocks = self.build_course_with_problems(problem_data)
+        block_structure = get_course_blocks(self.student, blocks['course'].location, self.transformers)
+
+        self.assert_collected_transformer_block_fields(
+            block_structure,
+            blocks['problem'].location,
+            self.TRANSFORMER_CLASS_TO_TEST,
+            max_score=0,
+        )
+
     def test_course_version_not_collected_in_old_mongo(self):
         blocks = self.build_course_with_problems()
         block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
@@ -398,7 +429,6 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
     """
     Test mongo usage in GradesTransformer.
     """
-    shard = 4
 
     TRANSFORMER_CLASS_TO_TEST = GradesTransformer
 
@@ -429,7 +459,7 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
                 u'#children': [],
             },
         ]
-        for problem_number in xrange(random.randrange(10, 20)):
+        for problem_number in range(random.randrange(10, 20)):
             course[0][u'#children'].append(
                 {
                     u'metadata': {

@@ -1,6 +1,8 @@
 """
 Use the 'Dummy' auth provider for generic integration tests of third_party_auth.
 """
+
+
 import unittest
 from third_party_auth.tests import testutil
 

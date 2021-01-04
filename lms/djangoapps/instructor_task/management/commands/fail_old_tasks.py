@@ -1,6 +1,10 @@
-from __future__ import print_function, unicode_literals
+"""
+Commands to fail old tasks
+"""
+
 
 from datetime import datetime
+from textwrap import dedent
 
 from celery.states import FAILURE
 from django.core.management.base import BaseCommand, CommandError
@@ -18,6 +22,7 @@ class Command(BaseCommand):
     ./manage.py lms fail_old_tasks QUEUING --dry-run --after 2001-01-03 \
         --before 2001-01-06 --task-type bulk_course_email
     """
+    help = dedent(__doc__).strip()
 
     def add_arguments(self, parser):
         """

@@ -2,6 +2,7 @@
 Course Textbooks page.
 """
 
+
 import requests
 from path import Path as path
 
@@ -42,7 +43,7 @@ class TextbookUploadPage(CoursePage):
         Uploads a pdf textbook.
         """
         # If the pdf upload section has not yet been toggled on, click on the upload pdf button
-        test_dir = path(__file__).abspath().dirname().dirname().dirname().dirname()  # pylint:disable=no-value-for-parameter
+        test_dir = path(__file__).abspath().dirname().dirname().dirname().dirname()
         file_path = test_dir + '/data/uploads/' + file_name
 
         click_css(self, ".edit-textbook .action-upload", require_notification=False)
@@ -94,14 +95,14 @@ class TextbookUploadPage(CoursePage):
         Adds chapter name by taking the ordinal of the chapter.
         """
         index = ["first", "second", "third"].index(ordinal)
-        self.set_input_field_value('.textbook .chapter{i} input.chapter-name'.format(i=index + 1), chapter_name)
+        self.set_input_field_value(u'.textbook .chapter{i} input.chapter-name'.format(i=index + 1), chapter_name)
 
     def fill_chapter_asset(self, ordinal, chapter_asset):
         """
         Adds chapter asset by taking the ordinal of the chapter.
         """
         index = ["first", "second", "third"].index(ordinal)
-        self.set_input_field_value('.textbook .chapter{i} input.chapter-asset-path'.format(i=index + 1), chapter_asset)
+        self.set_input_field_value(u'.textbook .chapter{i} input.chapter-asset-path'.format(i=index + 1), chapter_asset)
 
     def submit_chapter(self):
         """

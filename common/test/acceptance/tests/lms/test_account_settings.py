@@ -2,14 +2,16 @@
 """
 End-to-end tests for the Account Settings page.
 """
+
+
 from datetime import datetime
 from unittest import skip
 
-import pytest
+import six
 from bok_choy.page_object import XSS_INJECTION
 from pytz import timezone, utc
 
-from common.test.acceptance.pages.common.auto_auth import AutoAuthPage, FULL_NAME
+from common.test.acceptance.pages.common.auto_auth import FULL_NAME, AutoAuthPage
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.tests.helpers import AcceptanceTest, EventsTestMixin
@@ -23,6 +25,8 @@ class AccountSettingsTestMixin(EventsTestMixin, AcceptanceTest):
     CHANGE_INITIATED_EVENT_NAME = u"edx.user.settings.change_initiated"
     USER_SETTINGS_CHANGED_EVENT_NAME = 'edx.user.settings.changed'
     ACCOUNT_SETTINGS_REFERER = u"/account/settings"
+
+    shard = 23
 
     def visit_account_settings_page(self, gdpr=False):
         """
@@ -191,11 +195,11 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             },
             {
                 'title': 'Social Media Links',
-                'fields': [
+                'fields': sorted([
                     'Twitter Link',
                     'Facebook Link',
                     'LinkedIn Link',
-                ]
+                ])
             },
             {
                 'title': 'Delete My Account',
@@ -203,7 +207,9 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             },
         ]
 
-        self.assertEqual(self.account_settings_page.sections_structure(), expected_sections_structure)
+        sections_structure = self.account_settings_page.sections_structure()
+        sections_structure[2]['fields'] = sorted(sections_structure[2]['fields'])
+        self.assertEqual(sections_structure, expected_sections_structure)
 
     def _test_readonly_field(self, field_id, title, value):
         """
@@ -288,7 +294,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             u'name',
             u'Full Name',
             self.full_name,
-            u'@',
+            u' ',
             [u'<h1>another name<h1>', u'<script>'],
             'Full Name cannot contain the following characters: < >',
             False
@@ -361,65 +367,6 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             reloads_on_save=True,
         )
 
-    def test_education_completed_field(self):
-        """
-        Test behaviour of "Education Completed" field.
-        """
-        self._test_dropdown_field(
-            u'level_of_education',
-            u'Education Completed',
-            u'',
-            [u'Bachelor\'s degree', u''],
-        )
-
-        actual_events = self.wait_for_events(event_filter=self.settings_changed_event_filter, number_of_matches=2)
-        self.assert_events_match(
-            [
-                self.expected_settings_changed_event('level_of_education', None, 'b'),
-                self.expected_settings_changed_event('level_of_education', 'b', None),
-            ],
-            actual_events
-        )
-
-    def test_gender_field(self):
-        """
-        Test behaviour of "Gender" field.
-        """
-        self._test_dropdown_field(
-            u'gender',
-            u'Gender',
-            u'',
-            [u'Female', u''],
-        )
-
-        actual_events = self.wait_for_events(event_filter=self.settings_changed_event_filter, number_of_matches=2)
-        self.assert_events_match(
-            [
-                self.expected_settings_changed_event('gender', None, 'f'),
-                self.expected_settings_changed_event('gender', 'f', None),
-            ],
-            actual_events
-        )
-
-    def test_year_of_birth_field(self):
-        """
-        Test behaviour of "Year of Birth" field.
-        """
-        # Note that when we clear the year_of_birth here we're firing an event.
-        self.assertEqual(self.account_settings_page.value_for_dropdown_field('year_of_birth', '', focus_out=True), '')
-
-        expected_events = [
-            self.expected_settings_changed_event('year_of_birth', None, 1980),
-            self.expected_settings_changed_event('year_of_birth', 1980, None),
-        ]
-        with self.assert_events_match_during(self.settings_changed_event_filter, expected_events):
-            self._test_dropdown_field(
-                u'year_of_birth',
-                u'Year of Birth',
-                u'',
-                [u'1980', u''],
-            )
-
     def test_country_field(self):
         """
         Test behaviour of "Country or Region" field.
@@ -461,12 +408,20 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         """
         Test behaviour of one of the social media links field.
         """
+        first_social_media_link = self.account_settings_page.get_social_first_element()
+
+        valid_value = 'https://www.twitter.com/edX'
+        if 'face' in first_social_media_link.lower():
+            valid_value = 'https://www.facebook.com/edX'
+        elif 'linked' in first_social_media_link.lower():
+            valid_value = 'https://www.linkedin.com/in/edX'
+
         self._test_text_field(
-            u'social_links',
-            u'Twitter Link',
+            'social_links',
+            first_social_media_link,
             self.social_link,
-            u'www.google.com/invalidlink',
-            [u'https://www.twitter.com/edX', self.social_link],
+            'www.google.com/invalidlink)',
+            [valid_value, self.social_link],
         )
 
     def test_linked_accounts(self):
@@ -506,12 +461,12 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             'price': 'Cost:\n$100.00',
         }
 
-        for field_name, value in expected_order_data_first_row.iteritems():
+        for field_name, value in six.iteritems(expected_order_data_first_row):
             self.assertEqual(
                 self.account_settings_page.get_value_of_order_history_row_item('order-Edx-123', field_name)[0], value
             )
 
-        for field_name, value in expected_order_data_second_row.iteritems():
+        for field_name, value in six.iteritems(expected_order_data_second_row):
             self.assertEqual(
                 self.account_settings_page.get_value_of_order_history_row_item('order-Edx-123', field_name)[1], value
             )
@@ -553,11 +508,11 @@ class AccountSettingsDeleteAccountTest(AccountSettingsTestMixin, AcceptanceTest)
         )
 
 
-@pytest.mark.a11y
 class AccountSettingsA11yTest(AccountSettingsTestMixin, AcceptanceTest):
     """
     Class to test account settings accessibility.
     """
+    a11y = True
 
     def test_account_settings_a11y(self):
         """
@@ -568,6 +523,7 @@ class AccountSettingsA11yTest(AccountSettingsTestMixin, AcceptanceTest):
         self.account_settings_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         self.account_settings_page.a11y_audit.check_for_accessibility_errors()

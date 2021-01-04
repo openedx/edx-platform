@@ -8,15 +8,17 @@
     }
   }
 
+  .safari-wrapper {
+    padding-bottom: 200px;
+  }
+
   header.course-profile {
     background: $course-profile-bg;
     background-image: $homepage-bg-image;
     background-size: cover;
-    box-shadow: 0 1px 80px 0 rgba(0, 0, 0, 0.5);
     border-bottom: 1px solid $border-color-3;
     box-shadow: inset 0 1px 5px 0 $shadow-l1;
-    height: 280px;
-    padding-top: 150px;
+    height: 100%;
     overflow: hidden;
     position: relative;
     width: 100%;
@@ -25,8 +27,8 @@
       background: $course-header-bg;
       border: 1px solid $border-color-3;
       box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
+      box-sizing: border-box;
 
-      @include box-sizing(border-box);
       @include clearfix();
 
       margin: 0 auto;
@@ -45,7 +47,8 @@
       }
 
       .intro {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
+
         @include clearfix();
 
         display: table-cell;
@@ -85,7 +88,8 @@
               color: $body-color !important;
               letter-spacing: 0 !important;
 
-              &:hover, &:focus {
+              &:hover,
+              &:focus {
                 color: $link-color;
               }
             }
@@ -102,7 +106,8 @@
               text-shadow: 0 1px rgba(255, 255, 255, 0.6);
               text-transform: none;
 
-              &:hover, &:focus {
+              &:hover,
+              &:focus {
                 color: $link-color;
               }
             }
@@ -117,10 +122,12 @@
 
           width: flex-grid(12);
 
-          > a.find-courses, a.register, a.add-to-cart {
+          > a.find-courses,
+          a.register,
+          a.add-to-cart {
             @include button(shiny, $button-color);
-            @include box-sizing(border-box);
 
+            box-sizing: border-box;
             border-radius: 3px;
             display: block;
             font: normal 1.2rem/1.6rem $font-family-sans-serif;
@@ -129,7 +136,8 @@
             text-align: center;
             width: flex-grid(6);
 
-            &:hover, &:focus {
+            &:hover,
+            &:focus {
               color: rgb(255, 255, 255);
             }
 
@@ -139,15 +147,17 @@
           }
 
           a {
-            &:hover, &:visited, &:focus {
+            &:hover,
+            &:visited,
+            &:focus {
               text-decoration: none;
             }
           }
 
           strong {
             @include button(shiny, $button-color);
-            @include box-sizing(border-box);
 
+            box-sizing: border-box;
             border-radius: 3px;
             display: block;
 
@@ -159,17 +169,17 @@
             text-align: center;
             width: flex-grid(3, 8);
 
-            &:hover, &:focus {
+            &:hover,
+            &:focus {
               color: rgb(255, 255, 255);
             }
           }
 
-          span.register, span.add-to-cart {
+          span.register,
+          span.add-to-cart {
             background: $button-archive-color;
             border: 1px solid darken($button-archive-color, 50%);
-
-            @include box-sizing(border-box);
-
+            box-sizing: border-box;
             color: darken($button-archive-color, 50%);
             display: block;
             letter-spacing: 1px;
@@ -185,8 +195,8 @@
 
           #register_error {
             background: $error-color;
-            border: 1px solid rgb(202, 17, 17);
-            color: rgb(143, 14, 14);
+            border: 1px $error-color;
+            color: $white;
             display: none;
             padding: 12px;
             margin-top: ($baseline/4);
@@ -196,9 +206,7 @@
 
       .media {
         background: transparent;
-
-        @include box-sizing(border-box);
-
+        box-sizing: border-box;
         display: table-cell;
         padding: 20px;
         position: relative;
@@ -251,7 +259,8 @@
           }
         }
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           text-decoration: none;
 
           .play-intro {
@@ -364,7 +373,8 @@
         }
       }
 
-      .prerequisites, .syllabus {
+      .prerequisites,
+      .syllabus {
         ul {
           li {
             font: normal 1em/1.6em $serif;
@@ -398,7 +408,8 @@
 
   .course-sidebar {
     @include media-breakpoint-up(dm) {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
+
       @include float(left);
 
       width: flex-grid(4);
@@ -478,13 +489,15 @@
         @include margin-right($baseline*0.75);
         @include padding-right(15px);
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           color: $lighter-base-font-color;
         }
       }
 
       .social-sharing {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
+
         @include float(left);
 
         height: 44px;
@@ -494,7 +507,8 @@
         z-index: 2;
         float: none;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           .sharing-message {
             opacity: 1;
             top: 56px;
@@ -508,9 +522,7 @@
           border: 1px solid rgba(0, 0, 0, 0.5);
           border-radius: 4px;
           box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
-
-          @include box-sizing(border-box);
-
+          box-sizing: border-box;
           color: rgb(255, 255, 255);
 
           @include float(right);
@@ -532,7 +544,8 @@
           top: 65px;
           width: 220px;
 
-          &:hover, &:focus {
+          &:hover,
+          &:focus {
             opacity: 0;
           }
         }
@@ -552,7 +565,8 @@
 
           @include transition(all 0.15s linear 0s);
 
-          &:hover, &:focus {
+          &:hover,
+          &:focus {
             opacity: 1;
           }
 
@@ -582,7 +596,8 @@
         margin-bottom: $baseline;
         padding-bottom: ($baseline/2);
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           .icon {
             opacity: 1;
           }

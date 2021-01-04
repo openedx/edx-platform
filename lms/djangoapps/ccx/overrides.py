@@ -2,6 +2,8 @@
 API related to providing field overrides for individual students.  This is used
 by the individual custom courses feature.
 """
+
+
 import json
 import logging
 
@@ -9,9 +11,9 @@ from ccx_keys.locator import CCXBlockUsageLocator, CCXLocator
 from django.db import transaction
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from openedx.core.lib.cache_utils import get_cache
-from lms.djangoapps.courseware.field_overrides import FieldOverrideProvider
 from lms.djangoapps.ccx.models import CcxFieldOverride, CustomCourseForEdX
+from lms.djangoapps.courseware.field_overrides import FieldOverrideProvider
+from openedx.core.lib.cache_utils import get_cache
 
 log = logging.getLogger(__name__)
 
@@ -38,7 +40,7 @@ class CustomCoursesForEdxOverrideProvider(FieldOverrideProvider):
         elif hasattr(block, 'location'):
             course_key = block.location.course_key
         else:
-            msg = "Unable to get course id when calculating ccx overide for block type %r"
+            msg = u"Unable to get course id when calculating ccx overide for block type %r"
             log.error(msg, type(block))
         if course_key is not None:
             ccx = get_current_ccx(course_key)
@@ -213,7 +215,7 @@ def bulk_delete_ccx_override_fields(ccx, ids):
     """
     Bulk delete for CcxFieldOverride model
     """
-    ids = filter(None, ids)
+    ids = [ccx_id for ccx_id in ids if ccx_id]
     ids = list(set(ids))
     if ids:
         CcxFieldOverride.objects.filter(ccx=ccx, id__in=ids).delete()

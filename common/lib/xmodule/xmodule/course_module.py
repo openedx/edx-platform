@@ -1,29 +1,34 @@
 """
 Django module container for classes and operations related to the "Course Module" content type
 """
+
+
 import json
 import logging
-from cStringIO import StringIO
 from datetime import datetime, timedelta
+from io import BytesIO
+
 import dateutil.parser
-
-from django.conf import settings
-
 import requests
+import six
+from django.conf import settings
 from lazy import lazy
 from lxml import etree
-from openedx.core.djangoapps.video_pipeline.models import VideoUploadsEnabledByDefault
-from openedx.core.lib.license import LicenseMixin
 from path import Path as path
 from pytz import utc
 from six import text_type
-from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
+from xblock.fields import Boolean, Dict, Float, Integer, List, Scope, String
 
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.video_pipeline.models import VideoUploadsEnabledByDefault
+from openedx.core.lib.license import LicenseMixin
+from openedx.core.lib.teams_config import TeamsConfig, DEFAULT_COURSE_RUN_MAX_TEAM_SIZE
 from xmodule import course_metadata_utils
-from xmodule.course_metadata_utils import DEFAULT_START_DATE, DEFAULT_GRADING_POLICY
+from xmodule.course_metadata_utils import DEFAULT_GRADING_POLICY, DEFAULT_START_DATE
 from xmodule.graders import grader_from_conf
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.tabs import CourseTabList, InvalidTabsException
+
 from .fields import Date
 
 log = logging.getLogger(__name__)
@@ -227,7 +232,7 @@ class ProctoringProvider(String):
 
         available_providers = get_available_providers()
 
-        if value and value not in available_providers:
+        if value is not None and value not in available_providers:
             errors.append(
                 _('The selected proctoring provider, {proctoring_provider}, is not a valid provider. '
                     'Please select from one of {available_providers}.')
@@ -264,6 +269,33 @@ def get_available_providers():
     available_providers = [provider for provider in proctoring_backend_settings if provider != 'DEFAULT']
     available_providers.sort()
     return available_providers
+
+
+class TeamsConfigField(Dict):
+    """
+    XBlock field for teams configuration, including definitions for teamsets.
+
+    Serializes to JSON dictionary.
+    """
+    _default = TeamsConfig({})
+
+    def from_json(self, value):
+        """
+        Return a TeamsConfig instance from a dict.
+        """
+        return TeamsConfig(value)
+
+    def to_json(self, value):
+        """
+        Convert a TeamsConfig instance back to a dict.
+
+        If we have the data that was used to build the TeamsConfig instance,
+        return that instead of `value.cleaned_data`, thus preserving the
+        data in the form that the user entered it.
+        """
+        if value.source_data is not None:
+            return value.source_data
+        return value.cleaned_data
 
 
 class CourseFields(object):
@@ -329,7 +361,7 @@ class CourseFields(object):
         help=_("Enter the name of the course as it should appear in the edX.org course list."),
         default="Empty",
         display_name=_("Course Display Name"),
-        scope=Scope.settings
+        scope=Scope.settings,
     )
     course_edit_method = String(
         display_name=_("Course Editor"),
@@ -547,7 +579,8 @@ class CourseFields(object):
         ),
         scope=Scope.settings,
         # Ensure that courses imported from XML keep their image
-        default="images_course_image.jpg"
+        default="images_course_image.jpg",
+        hide_on_enabled_publisher=True
     )
     banner_image = String(
         display_name=_("Course Banner Image"),
@@ -791,7 +824,7 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
-    teams_configuration = Dict(
+    teams_configuration = TeamsConfigField(
         display_name=_("Teams Configuration"),
         # Translators: please don't translate "id".
         help=_(
@@ -801,7 +834,10 @@ class CourseFields(object):
             'closing square brackets. '
             'For example, to specify that teams should have a maximum of 5 participants and provide a list of '
             '2 topics, enter the configuration in this format: {example_format}. '
+            'If no max_size is provided, it will default to {default_max}'
             'In "id" values, the only supported special characters are underscore, hyphen, and period.'
+            # Note that we also support space (" "), which may have been an accident, but it's in
+            # our DB now. Let's not advertise the fact, though.
         ),
         help_format_args=dict(
             # Put the sample JSON into a format variable so that translators
@@ -810,6 +846,7 @@ class CourseFields(object):
                 '{"topics": [{"name": "Topic1Name", "description": "Topic1Description", "id": "Topic1ID"}, '
                 '{"name": "Topic2Name", "description": "Topic2Description", "id": "Topic2ID"}], "max_team_size": 5}'
             ),
+            default_max=str(DEFAULT_COURSE_RUN_MAX_TEAM_SIZE),
         ),
         scope=Scope.settings,
     )
@@ -1043,7 +1080,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
             if not getattr(self, "tabs", []):
                 CourseTabList.initialize_default(self)
         except InvalidTabsException as err:
-            raise type(err)('{msg} For course: {course_id}'.format(msg=text_type(err), course_id=unicode(self.id)))
+            raise type(err)('{msg} For course: {course_id}'.format(msg=text_type(err), course_id=six.text_type(self.id)))
 
         self.set_default_certificate_available_date()
 
@@ -1103,7 +1140,9 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
 
         # bleh, have to parse the XML here to just pull out the url_name attribute
         # I don't think it's stored anywhere in the instance.
-        course_file = StringIO(xml_data.encode('ascii', 'ignore'))
+        if isinstance(xml_data, six.text_type):
+            xml_data = xml_data.encode('ascii', 'ignore')
+        course_file = BytesIO(xml_data)
         xml_obj = etree.parse(course_file, parser=edx_xml_parser).getroot()
 
         policy_dir = None
@@ -1331,7 +1370,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
                 return True
             else:
                 return False
-        elif isinstance(flag, basestring):
+        elif isinstance(flag, six.string_types):
             return flag.lower() in ['true', 'yes', 'y']
         else:
             return bool(flag)
@@ -1383,7 +1422,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
             ret = [
                 {"start": date_proxy.from_json(start), "end": date_proxy.from_json(end)}
                 for start, end
-                in filter(None, blackout_dates)
+                in [blackout_date for blackout_date in blackout_dates if blackout_date]
             ]
             for blackout in ret:
                 if not blackout["start"] or not blackout["end"]:
@@ -1466,27 +1505,29 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
     @property
     def teams_enabled(self):
         """
-        Returns whether or not teams has been enabled for this course.
+        Alias to `self.teams_configuration.is_enabled`, for convenience.
 
-        Currently, teams are considered enabled when at least one topic has been configured for the course.
+        Returns bool.
         """
-        if self.teams_configuration:
-            return len(self.teams_configuration.get('topics', [])) > 0
-        return False
+        return self.teams_configuration.is_enabled  # pylint: disable=no-member
 
     @property
-    def teams_max_size(self):
+    def teamsets(self):
         """
-        Returns the max size for teams if teams has been configured, else None.
+        Alias to `self.teams_configuration.teamsets`, for convenience.
+
+        Returns list[TeamsetConfig].
         """
-        return self.teams_configuration.get('max_team_size', None)
+        return self.teams_configuration.teamsets  # pylint: disable=no-member
 
     @property
-    def teams_topics(self):
+    def teamsets_by_id(self):
         """
-        Returns the topics that have been configured for teams for this course, else None.
+        Alias to `self.teams_configuration.teamsets_by_id`, for convenience.
+
+        Returns dict[str: TeamsetConfig].
         """
-        return self.teams_configuration.get('topics', None)
+        return self.teams_configuration.teamsets_by_id
 
     def set_user_partitions_for_scheme(self, partitions, scheme):
         """
@@ -1587,7 +1628,7 @@ class CourseSummary(object):
         except TypeError as e:
             log.warning(
                 "Course '{course_id}' has an improperly formatted end date '{end_date}'. Error: '{err}'.".format(
-                    course_id=unicode(self.id), end_date=self.end, err=e
+                    course_id=six.text_type(self.id), end_date=self.end, err=e
                 )
             )
             modified_end = self.end.replace(tzinfo=utc)

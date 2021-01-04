@@ -1,6 +1,7 @@
 """
 Test password policy utilities
 """
+
 from datetime import datetime, timedelta
 
 import pytz

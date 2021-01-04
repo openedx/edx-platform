@@ -1,5 +1,6 @@
 """Tests for util.db module."""
 
+
 import threading
 import time
 import unittest
@@ -12,8 +13,9 @@ from django.db.transaction import TransactionManagementError, atomic
 from django.test import TestCase, TransactionTestCase
 from django.test.utils import override_settings
 from django.utils.six import StringIO
+from six.moves import range
 
-from util.db import commit_on_success, enable_named_outer_atomic, generate_int_id, outer_atomic
+from util.db import enable_named_outer_atomic, generate_int_id, outer_atomic
 
 
 def do_nothing():
@@ -24,7 +26,7 @@ def do_nothing():
 @ddt.ddt
 class TransactionManagersTestCase(TransactionTestCase):
     """
-    Tests commit_on_success and outer_atomic.
+    Tests outer_atomic.
 
     Note: This TestCase only works with MySQL.
 
@@ -33,15 +35,11 @@ class TransactionManagersTestCase(TransactionTestCase):
     DECORATORS = {
         'outer_atomic': outer_atomic(),
         'outer_atomic_read_committed': outer_atomic(read_committed=True),
-        'commit_on_success': commit_on_success(),
-        'commit_on_success_read_committed': commit_on_success(read_committed=True),
     }
 
     @ddt.data(
         ('outer_atomic', IntegrityError, None, True),
         ('outer_atomic_read_committed', type(None), False, True),
-        ('commit_on_success', IntegrityError, None, True),
-        ('commit_on_success_read_committed', type(None), False, True),
     )
     @ddt.unpack
     def test_concurrent_requests(self, transaction_decorator_name, exception_class, created_in_1, created_in_2):
@@ -110,34 +108,13 @@ class TransactionManagersTestCase(TransactionTestCase):
         with outer_atomic():
             atomic()(do_nothing)()
 
-        with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+        with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
             with atomic():
                 outer_atomic()(do_nothing)()
 
-        with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+        with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
             with outer_atomic():
                 outer_atomic()(do_nothing)()
-
-    def test_commit_on_success_nesting(self):
-        """
-        Test that commit_on_success raises an error if it is nested inside
-        atomic or if the isolation level is changed when it is nested
-        inside another commit_on_success.
-        """
-        # pylint: disable=not-callable
-
-        if connection.vendor != 'mysql':
-            raise unittest.SkipTest('Only works on MySQL.')
-
-        commit_on_success(read_committed=True)(do_nothing)()
-
-        with self.assertRaisesRegexp(TransactionManagementError, 'Cannot change isolation level when nested.'):
-            with commit_on_success():
-                commit_on_success(read_committed=True)(do_nothing)()
-
-        with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
-            with atomic():
-                commit_on_success(read_committed=True)(do_nothing)()
 
     def test_named_outer_atomic_nesting(self):
         """
@@ -159,7 +136,7 @@ class TransactionManagersTestCase(TransactionTestCase):
             with atomic():
                 outer_atomic(name='pqr')(do_nothing)()  # Not enabled.
 
-            with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+            with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with atomic():
                     outer_atomic(name='abc')(do_nothing)()
 
@@ -170,19 +147,19 @@ class TransactionManagersTestCase(TransactionTestCase):
             with atomic():
                 outer_atomic(name='pqr')(do_nothing)()  # Not enabled.
 
-            with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+            with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with atomic():
                     outer_atomic(name='def')(do_nothing)()
 
-            with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+            with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with outer_atomic():
                     outer_atomic(name='def')(do_nothing)()
 
-            with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+            with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with atomic():
                     outer_atomic(name='abc')(do_nothing)()
 
-            with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+            with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with outer_atomic():
                     outer_atomic(name='abc')(do_nothing)()
 
@@ -199,7 +176,7 @@ class GenerateIntIdTestCase(TestCase):
         minimum = 1
         maximum = times
         for __ in range(times):
-            self.assertIn(generate_int_id(minimum, maximum), range(minimum, maximum + 1))
+            self.assertIn(generate_int_id(minimum, maximum), list(range(minimum, maximum + 1)))
 
     @ddt.data(10)
     def test_used_ids(self, times):
@@ -219,6 +196,7 @@ class MigrationTests(TestCase):
     """
     Tests for migrations.
     """
+
     @override_settings(MIGRATION_MODULES={})
     def test_migrations_are_in_sync(self):
         """
@@ -233,6 +211,6 @@ class MigrationTests(TestCase):
         release afterwards, this test doesn't fail.
         """
         out = StringIO()
-        call_command('makemigrations', dry_run=True, verbosity=3, stdout=out)
+        call_command("makemigrations", dry_run=True, verbosity=3, stdout=out)
         output = out.getvalue()
-        self.assertIn('No changes detected', output)
+        self.assertIn("No changes detected", output)

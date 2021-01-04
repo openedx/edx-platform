@@ -3,8 +3,11 @@
 Instructor (2) dashboard page.
 """
 
-import os
 
+import os
+import os.path
+
+import six
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise, Promise
 
@@ -120,7 +123,7 @@ class InstructorDashboardPage(CoursePage):
 
     def is_rescore_unsupported_message_visible(self):
         if (self.q(css='.request-response-error').present):
-            return u'This component cannot be rescored.' in unicode(
+            return u'This component cannot be rescored.' in six.text_type(
                 self.q(css='.request-response-error').html
             )
         return False
@@ -135,7 +138,7 @@ class InstructorDashboardPage(CoursePage):
         # Separate the list of folders in the path reaching to the current file,
         # e.g.  '... common/test/acceptance/pages/lms/instructor_dashboard.py' will result in
         #       [..., 'common', 'test', 'acceptance', 'pages', 'lms', 'instructor_dashboard.py']
-        folders_list_in_path = __file__.split(os.sep)
+        folders_list_in_path = os.path.abspath(__file__).split(os.sep)
 
         # Get rid of the last 4 elements: 'acceptance', 'pages', 'lms', and 'instructor_dashboard.py'
         # to point to the 'test' folder, a shared point in the path's tree.
@@ -162,7 +165,7 @@ class BulkEmailPage(PageObject):
         """
         Return `selector`, but limited to the bulk-email context.
         """
-        return '.send-email {}'.format(selector)
+        return u'.send-email {}'.format(selector)
 
     def _select_recipient(self, recipient):
         """
@@ -302,7 +305,7 @@ class CohortManagementSection(PageObject):
         """
         Return `selector`, but limited to the cohort management context.
         """
-        return '.cohort-management {}'.format(selector)
+        return u'.cohort-management {}'.format(selector)
 
     def _get_cohort_options(self):
         """
@@ -708,13 +711,13 @@ class DiscussionManagementSection(PageObject):
         """
         Return `selector`, but limited to the divided discussion management context.
         """
-        return '.discussions-management {}'.format(selector)
+        return u'.discussions-management {}'.format(selector)
 
     def is_save_button_disabled(self, key):
         """
         Returns the status for form's save button, enabled or disabled.
         """
-        save_button_css = '%s %s' % (self.discussion_form_selectors[key], '.action-save')
+        save_button_css = u'%s %s' % (self.discussion_form_selectors[key], '.action-save')
         disabled = self.q(css=self._bounded_selector(save_button_css)).attrs('disabled')
         return disabled[0] == 'true'
 
@@ -729,7 +732,7 @@ class DiscussionManagementSection(PageObject):
         """
         Returns the text of discussion topic headings if it exists, otherwise return False.
         """
-        form_heading_css = '%s %s' % (self.discussion_form_selectors[key], '.subsection-title')
+        form_heading_css = u'%s %s' % (self.discussion_form_selectors[key], '.subsection-title')
         discussion_heading = self.q(css=self._bounded_selector(form_heading_css))
 
         if len(discussion_heading) == 0:
@@ -753,7 +756,7 @@ class DiscussionManagementSection(PageObject):
         """
         Saves the discussion topics.
         """
-        save_button_css = '%s %s' % (self.discussion_form_selectors[key], '.action-save')
+        save_button_css = u'%s %s' % (self.discussion_form_selectors[key], '.action-save')
         self.q(css=self._bounded_selector(save_button_css)).first.click()
 
     def always_inline_discussion_selected(self):
@@ -791,7 +794,7 @@ class DiscussionManagementSection(PageObject):
         """
         Returns the message related to modifying discussion topics.
         """
-        title_css = "%s .message-%s .message-title" % (self.discussion_form_selectors[key], msg_type)
+        title_css = u"%s .message-%s .message-title" % (self.discussion_form_selectors[key], msg_type)
 
         EmptyPromise(
             lambda: self.q(css=self._bounded_selector(title_css)),
@@ -871,8 +874,8 @@ class MembershipPageAutoEnrollSection(PageObject):
                                        MembershipPageAutoEnrollSection.NOTIFICATION_ERROR
         Returns True if a {section_type} notification is displayed.
         """
-        notification_selector = '.auto_enroll_csv .results .message-%s' % section_type
-        self.wait_for_element_presence(notification_selector, "%s Notification" % section_type.title())
+        notification_selector = u'.auto_enroll_csv .results .message-%s' % section_type
+        self.wait_for_element_presence(notification_selector, u"%s Notification" % section_type.title())
         return self.q(css=notification_selector).is_present()
 
     def first_notification_message(self, section_type):
@@ -881,8 +884,8 @@ class MembershipPageAutoEnrollSection(PageObject):
                                        MembershipPageAutoEnrollSection.NOTIFICATION_ERROR
         Returns the first message from the list of messages in the {section_type} section.
         """
-        error_message_selector = '.auto_enroll_csv .results .message-%s li.summary-item' % section_type
-        self.wait_for_element_presence(error_message_selector, "%s message" % section_type.title())
+        error_message_selector = u'.auto_enroll_csv .results .message-%s li.summary-item' % section_type
+        self.wait_for_element_presence(error_message_selector, u"%s message" % section_type.title())
         return self.q(css=error_message_selector).text[0]
 
     def upload_correct_csv_file(self):
@@ -915,8 +918,8 @@ class MembershipPageAutoEnrollSection(PageObject):
         """
         Fill in the form with the provided email and submit it.
         """
-        email_selector = "{} textarea".format(self.batch_enrollment_selector)
-        enrollment_button = "{} .enrollment-button[data-action='enroll']".format(self.batch_enrollment_selector)
+        email_selector = u"{} textarea".format(self.batch_enrollment_selector)
+        enrollment_button = u"{} .enrollment-button[data-action='enroll']".format(self.batch_enrollment_selector)
 
         # Fill the email addresses after the email selector is visible.
         self.wait_for_element_visibility(email_selector, 'Email field is visible')
@@ -932,9 +935,9 @@ class MembershipPageAutoEnrollSection(PageObject):
         """
         Check notification div is visible and have message.
         """
-        notification_selector = '{} .request-response'.format(self.batch_enrollment_selector)
+        notification_selector = u'{} .request-response'.format(self.batch_enrollment_selector)
         self.wait_for_element_visibility(notification_selector, 'Notification div is visible')
-        return self.q(css="{} h3".format(notification_selector)).text
+        return self.q(css=u"{} h3".format(notification_selector)).text
 
 
 class MembershipPageBetaTesterSection(PageObject):
@@ -953,8 +956,8 @@ class MembershipPageBetaTesterSection(PageObject):
         """
         Fill in the form with the provided username and submit it.
         """
-        username_selector = "{} textarea".format(self.batch_beta_tester_selector)
-        enrollment_button = "{} .enrollment-button[data-action='add']".format(self.batch_beta_tester_selector)
+        username_selector = u"{} textarea".format(self.batch_beta_tester_selector)
+        enrollment_button = u"{} .enrollment-button[data-action='add']".format(self.batch_beta_tester_selector)
 
         # Fill the username  after the username selector is visible.
         self.wait_for_element_visibility(username_selector, 'username field is visible')
@@ -968,10 +971,10 @@ class MembershipPageBetaTesterSection(PageObject):
         """
         Check notification div is visible and have message.
         """
-        notification_selector = '{} .request-response'.format(self.batch_beta_tester_selector)
+        notification_selector = u'{} .request-response'.format(self.batch_beta_tester_selector)
         self.wait_for_element_visibility(notification_selector, 'Notification div is visible')
-        notification_header_text = self.q(css="{} h3".format(notification_selector)).text
-        notification_username = self.q(css="{} li".format(notification_selector)).text
+        notification_header_text = self.q(css=u"{} h3".format(notification_selector)).text
+        notification_username = self.q(css=u"{} li".format(notification_selector)).text
         return notification_header_text, notification_username
 
 
@@ -1198,7 +1201,7 @@ class StudentAdminPage(PageObject):
         Returns the input box with the given name
         for this object's container.
         """
-        return self.q(css='{} input[name={}]'.format(self.CONTAINER, input_name))
+        return self.q(css=u'{} input[name={}]'.format(self.CONTAINER, input_name))
 
     @property
     def problem_location_input(self):
@@ -1212,7 +1215,7 @@ class StudentAdminPage(PageObject):
         Returns input box for problem location
         """
         input_box = self.problem_location_input.first.results[0]
-        input_box.send_keys(unicode(problem_location))
+        input_box.send_keys(six.text_type(problem_location))
 
     @property
     def student_email_or_username_input(self):
@@ -1285,7 +1288,7 @@ class StudentAdminPage(PageObject):
             """
             Promise Check Function
             """
-            query = self.q(css="{} .{}".format(self.CONTAINER, self.TASK_HISTORY_TABLE_NAME))
+            query = self.q(css=u"{} .{}".format(self.CONTAINER, self.TASK_HISTORY_TABLE_NAME))
             return query.visible, query
 
         return Promise(check_func, "Waiting for student admin task history table to be visible.").fulfill()
@@ -1304,6 +1307,27 @@ class StudentAdminPage(PageObject):
 
         return EmptyPromise(check_func, "Waiting for student admin task to complete.").fulfill()
 
+    def click_grade_book_link(self):
+        self.wait_for_element_presence('.gradebook-link', "Grade book link is not present.")
+        self.q(css='.gradebook-link').first.click()
+
+
+class GradeBookPage(StudentAdminPage):
+    """
+    Grade Book section of the Instructor dashboard.
+    """
+    url = None
+
+    def is_browser_on_page(self):
+        """
+        Confirms grade book section is present
+        """
+        return self.q(css='.grade-table').present
+
+    def get_value_in_the_grade_book(self, title, index):
+        """Find the element with given CSS selector, index and return its text"""
+        return self.q(css='.grade-table td[title^="{}"]'.format(title)).text[index]
+
 
 class StudentSpecificAdmin(StudentAdminPage):
     """
@@ -1321,70 +1345,6 @@ class StudentSpecificAdmin(StudentAdminPage):
 
     BACKGROUND_TASKS_BUTTON_NAME = "task-history-single"
     TASK_HISTORY_TABLE_NAME = "task-history-single-table"
-
-
-class CourseSpecificAdmin(StudentAdminPage):
-    """
-    Course specific section of the Student Admin page.
-    """
-    CONTAINER = ".course-specific-container"
-
-    PROBLEM_INPUT_NAME = "problem-select-all"
-    STUDENT_EMAIL_INPUT_NAME = None
-
-    RESET_ATTEMPTS_BUTTON_NAME = "reset-attempts-all"
-    RESCORE_BUTTON_NAME = "rescore-problem-all"
-    RESCORE_IF_HIGHER_BUTTON_NAME = "rescore-problem-all-if-higher"
-    DELETE_STATE_BUTTON_NAME = None
-
-    BACKGROUND_TASKS_BUTTON_NAME = "task-history-all"
-    TASK_HISTORY_TABLE_NAME = "task-history-all-table"
-
-
-class EntranceExamAdmin(StudentAdminPage):
-    """
-    Entrance exam section of the Student Admin page.
-    """
-    CONTAINER = ".entrance-exam-grade-container"
-
-    STUDENT_EMAIL_INPUT_NAME = "entrance-exam-student-select-grade"
-    PROBLEM_INPUT_NAME = None
-
-    RESET_ATTEMPTS_BUTTON_NAME = "reset-entrance-exam-attempts"
-    RESCORE_BUTTON_NAME = "rescore-entrance-exam"
-    RESCORE_IF_HIGHER_BUTTON_NAME = "rescore-entrance-exam-if-higher"
-    DELETE_STATE_BUTTON_NAME = "delete-entrance-exam-state"
-
-    BACKGROUND_TASKS_BUTTON_NAME = "entrance-exam-task-history"
-    TASK_HISTORY_TABLE_NAME = "entrance-exam-task-history-table"
-
-    @property
-    def skip_entrance_exam_button(self):
-        """
-        Return Let Student Skip Entrance Exam button.
-        """
-        return self.q(css='{} input[name=skip-entrance-exam]'.format(self.CONTAINER))
-
-    @property
-    def top_notification(self):
-        """
-        Returns show background task history for student button.
-        """
-        return self.q(css='{} .request-response-error'.format(self.CONTAINER)).first
-
-    def are_all_buttons_visible(self):
-        """
-        Returns whether all buttons related to entrance exams
-        are visible.
-        """
-        return (
-            self.student_email_or_username_input.is_present() and
-            self.reset_attempts_button.is_present() and
-            self.rescore_button.is_present() and
-            self.rescore_if_higher_button.is_present() and
-            self.delete_state_button.is_present() and
-            self.task_history_button.is_present()
-        )
 
 
 class CertificatesPage(PageObject):

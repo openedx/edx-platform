@@ -2,10 +2,14 @@
 Top-level module for the Block Structure framework with a class for managing
 BlockStructures.
 """
+
+
 from contextlib import contextmanager
 
+import six
+
 from . import config
-from .exceptions import UsageKeyNotInBlockStructure, TransformerDataIncompatible, BlockStructureNotFound
+from .exceptions import BlockStructureNotFound, TransformerDataIncompatible, UsageKeyNotInBlockStructure
 from .factory import BlockStructureFactory
 from .store import BlockStructureStore
 from .transformers import BlockStructureTransformers
@@ -68,9 +72,9 @@ class BlockStructureManager(object):
             # as part of the transformation.
             if starting_block_usage_key not in block_structure:
                 raise UsageKeyNotInBlockStructure(
-                    "The requested usage_key '{0}' is not found in the block_structure with root '{1}'",
-                    unicode(starting_block_usage_key),
-                    unicode(self.root_block_usage_key),
+                    u"The requested usage_key '{0}' is not found in the block_structure with root '{1}'",
+                    six.text_type(starting_block_usage_key),
+                    six.text_type(self.root_block_usage_key),
                 )
             block_structure.set_root_block(starting_block_usage_key)
         transformers.transform(block_structure)

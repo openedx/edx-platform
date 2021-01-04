@@ -1,7 +1,9 @@
+<%page expression_filter="h"/>
 <%inherit file="../base.html" />
 <%!
+from django.conf import settings
 from django.utils.translation import ugettext as _
-from django.urls import reverse
+from openedx.core.djangolib.markup import HTML, Text
 %>
 
 <%namespace name='static' file='../static_content.html'/>
@@ -23,9 +25,14 @@ from django.urls import reverse
       %endif
 
       %if user_logged_in:
-        ${_("Visit your {link_start}dashboard{link_end} to see your courses.").format(link_start='<a href="/">', link_end='</a>')}
+        ${Text(_("Visit your {link_start}dashboard{link_end} to see your courses.")).format(
+            link_start=HTML('<a href="/">'),
+            link_end=HTML('</a>')
+        )}
       %else:
-        ${_("You can now {link_start}sign in{link_end}.").format(link_start='<a href="{url}">'.format(url=reverse('login')), link_end='</a>')}
+        ${Text(_("You can now {link_start}sign in{link_end}.")).format(
+            link_start=HTML('<a href="{url}">').format(url=settings.LOGIN_URL, link_end=HTML('</a>'))
+        )}
       %endif
     </p>
   </section>

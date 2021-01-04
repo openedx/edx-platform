@@ -2,23 +2,24 @@
 Set up lookup paths for mako templates.
 """
 
+
 import contextlib
 import hashlib
 import os
+import six
 
 import pkg_resources
 from django.conf import settings
 from mako.exceptions import TopLevelLookupException
 from mako.lookup import TemplateLookup
 
-from openedx.core.djangoapps.theming.helpers import get_template as themed_template
 from openedx.core.djangoapps.theming.helpers import get_template_path_with_theme, strip_site_theme_templates_path
 from openedx.core.lib.cache_utils import request_cached
 
 from . import LOOKUP
 
 
-class TopLevelTemplateURI(unicode):
+class TopLevelTemplateURI(six.text_type):
     """
     A marker class for template URIs used to signal the template lookup infrastructure that the template corresponding
     to the URI should be looked up straight in the standard edx-platform location instead of trying to locate an
@@ -53,14 +54,14 @@ class DynamicTemplateLookup(TemplateLookup):
         # and "foo.html.py" in the module directory has no way to know that.
         # Update the module_directory argument to point to a directory
         # specifically for this lookup path.
-        unique = hashlib.md5(":".join(str(d) for d in self.directories)).hexdigest()
+        unique = hashlib.md5(six.b(":".join(str(d) for d in self.directories))).hexdigest()
         self.template_args['module_directory'] = os.path.join(self.__original_module_directory, unique)
 
         # Also clear the internal caches. Ick.
         self._collection.clear()
         self._uri_cache.clear()
 
-    def adjust_uri(self, uri, calling_uri):
+    def adjust_uri(self, uri, relativeto):
         """
         This method is called by mako when including a template in another template or when inheriting an existing mako
         template. The method adjusts the `uri` to make it relative to the calling template's location.
@@ -73,12 +74,12 @@ class DynamicTemplateLookup(TemplateLookup):
         that template lookup skips the current theme and looks up the built-in template in standard locations.
         """
         # Make requested uri relative to the calling uri.
-        relative_uri = super(DynamicTemplateLookup, self).adjust_uri(uri, calling_uri)
-        # Is the calling template (calling_uri) which is including or inheriting current template (uri)
+        relative_uri = super(DynamicTemplateLookup, self).adjust_uri(uri, relativeto)
+        # Is the calling template (relativeto) which is including or inheriting current template (uri)
         # located inside a theme?
-        if calling_uri != strip_site_theme_templates_path(calling_uri):
+        if relativeto != strip_site_theme_templates_path(relativeto):
             # Is the calling template trying to include/inherit itself?
-            if calling_uri == get_template_path_with_theme(relative_uri):
+            if relativeto == get_template_path_with_theme(relative_uri):
                 return TopLevelTemplateURI(relative_uri)
         return relative_uri
 
@@ -93,20 +94,14 @@ class DynamicTemplateLookup(TemplateLookup):
         If still unable to find a template, it will fallback to the default template directories after stripping off
         the prefix path to theme.
         """
-        # try to get template for the given file from microsite
-        template = themed_template(uri)
-
-        # if microsite template is not present or request is not in microsite then
-        # let mako find and serve a template
-        if not template:
-            if isinstance(uri, TopLevelTemplateURI):
+        if isinstance(uri, TopLevelTemplateURI):
+            template = self._get_toplevel_template(uri)
+        else:
+            try:
+                # Try to find themed template, i.e. see if current theme overrides the template
+                template = super(DynamicTemplateLookup, self).get_template(get_template_path_with_theme(uri))
+            except TopLevelLookupException:
                 template = self._get_toplevel_template(uri)
-            else:
-                try:
-                    # Try to find themed template, i.e. see if current theme overrides the template
-                    template = super(DynamicTemplateLookup, self).get_template(get_template_path_with_theme(uri))
-                except TopLevelLookupException:
-                    template = self._get_toplevel_template(uri)
 
         return template
 

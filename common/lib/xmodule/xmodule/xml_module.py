@@ -1,15 +1,17 @@
+
+
 import copy
 import json
 import logging
 import os
 import sys
 
+import six
 from lxml import etree
 from lxml.etree import Element, ElementTree, XMLParser
 from xblock.core import XML_NAMESPACES
 from xblock.fields import Dict, Scope, ScopeIds
 from xblock.runtime import KvsFieldData
-
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
 from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModuleDescriptor
@@ -61,7 +63,7 @@ def serialize_field(value):
     If the value is a string, then we simply return what was passed in.
     Otherwise, we return json.dumps on the input value.
     """
-    if isinstance(value, basestring):
+    if isinstance(value, six.string_types):
         return value
 
     return json.dumps(value, cls=EdxJSONEncoder)
@@ -208,7 +210,7 @@ class XmlParserMixin(object):
             # Add info about where we are, but keep the traceback
             msg = 'Unable to load file contents at path %s for item %s: %s ' % (
                 filepath, def_id, err)
-            raise Exception, msg, sys.exc_info()[2]
+            six.reraise(Exception, msg, sys.exc_info()[2])
 
     @classmethod
     def load_definition(cls, xml_object, system, def_id, id_generator):
@@ -273,7 +275,7 @@ class XmlParserMixin(object):
         Returns a dictionary {key: value}.
         """
         metadata = {'xml_attributes': {}}
-        for attr, val in xml_object.attrib.iteritems():
+        for attr, val in six.iteritems(xml_object.attrib):
             # VS[compat].  Remove after all key translations done
             attr = cls._translate(attr)
 
@@ -293,7 +295,7 @@ class XmlParserMixin(object):
         Add the keys in policy to metadata, after processing them
         through the attrmap.  Updates the metadata dict in place.
         """
-        for attr, value in policy.iteritems():
+        for attr, value in six.iteritems(policy):
             attr = cls._translate(attr)
             if attr not in cls.fields:
                 # Store unknown attributes coming from policy.json
@@ -392,6 +394,17 @@ class XmlParserMixin(object):
         return xblock
 
     @classmethod
+    def parse_xml_new_runtime(cls, node, runtime, keys):
+        """
+        This XML lives within Blockstore and the new runtime doesn't need this
+        legacy XModule code. Use the "normal" XBlock parsing code.
+        """
+        try:
+            return super(XmlParserMixin, cls).parse_xml_new_runtime(node, runtime, keys)
+        except AttributeError:
+            return super(XmlParserMixin, cls).parse_xml(node, runtime, keys, id_generator=None)
+
+    @classmethod
     def _get_url_name(cls, node):
         """
         Reads url_name attribute from the node
@@ -429,6 +442,12 @@ class XmlParserMixin(object):
         """
         # Get the definition
         xml_object = self.definition_to_xml(self.runtime.export_fs)
+
+        # If xml_object is None, we don't know how to serialize this node, but
+        # we shouldn't crash out the whole export for it.
+        if xml_object is None:
+            return
+
         for aside in self.runtime.get_asides(self):
             if aside.needs_serialization():
                 aside_node = etree.Element("unknown_root", nsmap=XML_NAMESPACES)
@@ -506,7 +525,7 @@ class XmlParserMixin(object):
         return non_editable_fields
 
 
-class XmlDescriptor(XmlParserMixin, XModuleDescriptor):  # pylint: disable=abstract-method
+class XmlMixin(XmlParserMixin):
     """
     Mixin class for standardized parsing of XModule xml.
     """
@@ -532,7 +551,7 @@ class XmlDescriptor(XmlParserMixin, XModuleDescriptor):  # pylint: disable=abstr
         # This only exists to satisfy subclasses that both:
         #    a) define from_xml themselves
         #    b) call super(..).from_xml(..)
-        return super(XmlDescriptor, cls).parse_xml(
+        return super(XmlMixin, cls).parse_xml(
             etree.fromstring(xml_data),
             system,
             None,  # This is ignored by XmlParserMixin
@@ -544,12 +563,23 @@ class XmlDescriptor(XmlParserMixin, XModuleDescriptor):  # pylint: disable=abstr
         """
         Interpret the parsed XML in `node`, creating an XModuleDescriptor.
         """
-        if cls.from_xml != XmlDescriptor.from_xml:
+        if cls.from_xml != XmlMixin.from_xml:
             # Skip the parse_xml from XmlParserMixin to get the shim parse_xml
             # from XModuleDescriptor, which actually calls `from_xml`.
             return super(XmlParserMixin, cls).parse_xml(node, runtime, keys, id_generator)  # pylint: disable=bad-super-call
         else:
-            return super(XmlDescriptor, cls).parse_xml(node, runtime, keys, id_generator)
+            return super(XmlMixin, cls).parse_xml(node, runtime, keys, id_generator)
+
+    @classmethod
+    def parse_xml_new_runtime(cls, node, runtime, keys):
+        """
+        This XML lives within Blockstore and the new runtime doesn't need this
+        legacy XModule code. Use the "normal" XBlock parsing code.
+        """
+        try:
+            return super(XmlMixin, cls).parse_xml_new_runtime(node, runtime, keys)
+        except AttributeError:
+            return super(XmlMixin, cls).parse_xml(node, runtime, keys, id_generator=None)
 
     def export_to_xml(self, resource_fs):
         """
@@ -569,7 +599,7 @@ class XmlDescriptor(XmlParserMixin, XModuleDescriptor):  # pylint: disable=abstr
         #    a) define export_to_xml themselves
         #    b) call super(..).export_to_xml(..)
         node = Element(self.category)
-        super(XmlDescriptor, self).add_xml_to_node(node)
+        super(XmlMixin, self).add_xml_to_node(node)
         return etree.tostring(node)
 
     def add_xml_to_node(self, node):
@@ -577,9 +607,13 @@ class XmlDescriptor(XmlParserMixin, XModuleDescriptor):  # pylint: disable=abstr
         Export this :class:`XModuleDescriptor` as XML, by setting attributes on the provided
         `node`.
         """
-        if self.export_to_xml != XmlDescriptor.export_to_xml:
+        if self.export_to_xml != XmlMixin.export_to_xml:
             # Skip the add_xml_to_node from XmlParserMixin to get the shim add_xml_to_node
             # from XModuleDescriptor, which actually calls `export_to_xml`.
             super(XmlParserMixin, self).add_xml_to_node(node)  # pylint: disable=bad-super-call
         else:
-            super(XmlDescriptor, self).add_xml_to_node(node)
+            super(XmlMixin, self).add_xml_to_node(node)
+
+
+class XmlDescriptor(XmlMixin, XModuleDescriptor):
+    pass

@@ -2,11 +2,12 @@
 Cohort API URLs
 """
 
+
 from django.conf import settings
 from django.conf.urls import url
 
-import openedx.core.djangoapps.course_groups.views
 import lms.djangoapps.instructor.views.api
+import openedx.core.djangoapps.course_groups.views
 
 urlpatterns = [
     url(

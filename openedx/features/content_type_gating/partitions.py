@@ -5,20 +5,25 @@ These are used together to allow course content to be blocked for a subset
 of audit learners.
 """
 
+
+import datetime
 import logging
 
 import crum
-from django.apps import apps
+import pytz
+import six
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from web_fragments.fragment import Fragment
 
 from course_modes.models import CourseMode
 from lms.djangoapps.commerce.utils import EcommerceService
-from xmodule.partitions.partitions import UserPartition, UserPartitionError
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
-from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, FULL_ACCESS, LIMITED_ACCESS
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from openedx.features.discounts.utils import format_strikeout_price
+from xmodule.partitions.partitions import UserPartition, UserPartitionError
 
 LOG = logging.getLogger(__name__)
 
@@ -39,7 +44,7 @@ def create_content_gating_partition(course):
         content_gate_scheme = UserPartition.get_scheme(CONTENT_TYPE_GATING_SCHEME)
     except UserPartitionError:
         LOG.warning(
-            "No %r scheme registered, ContentTypeGatingPartitionScheme will not be created.",
+            u"No %r scheme registered, ContentTypeGatingPartitionScheme will not be created.",
             CONTENT_TYPE_GATING_SCHEME
         )
         return None
@@ -50,19 +55,21 @@ def create_content_gating_partition(course):
         # partition with id 51, it will collide with the Content Gating Partition. We'll catch that here, and
         # then fix the course content as needed (or get the course team to).
         LOG.warning(
-            "Can't add %r partition, as ID %r is assigned to %r in course %s.",
+            u"Can't add %r partition, as ID %r is assigned to %r in course %s.",
             CONTENT_TYPE_GATING_SCHEME,
             CONTENT_GATING_PARTITION_ID,
             _get_partition_from_id(course.user_partitions, CONTENT_GATING_PARTITION_ID).name,
-            unicode(course.id),
+            six.text_type(course.id),
         )
         return None
 
     partition = content_gate_scheme.create_user_partition(
         id=CONTENT_GATING_PARTITION_ID,
-        name=_(u"Feature-based Enrollments"),
+        # Content gating partition name should not be marked for translations
+        # edX mobile apps expect it in english
+        name=u"Feature-based Enrollments",
         description=_(u"Partition for segmenting users by access to gated content types"),
-        parameters={"course_id": unicode(course.id)}
+        parameters={"course_id": six.text_type(course.id)}
     )
     return partition
 
@@ -73,35 +80,56 @@ class ContentTypeGatingPartition(UserPartition):
     to gated content.
     """
     def access_denied_fragment(self, block, user, user_group, allowed_groups):
-        modes = CourseMode.modes_for_course_dict(block.scope_ids.usage_id.course_key)
+        course_key = self._get_course_key_from_course_block(block)
+        course = CourseOverview.get_from_id(course_key)
+        modes = CourseMode.modes_for_course_dict(course=course, include_expired=True)
         verified_mode = modes.get(CourseMode.VERIFIED)
-        if verified_mode is None or not self._is_audit_enrollment(user, block):
+        if (verified_mode is None or user_group == FULL_ACCESS or
+                user_group in allowed_groups):
             return None
-        ecommerce_checkout_link = self._get_checkout_link(user, verified_mode.sku)
+
+        expiration_datetime = verified_mode.expiration_datetime
+        if expiration_datetime and expiration_datetime < datetime.datetime.now(pytz.UTC):
+            ecommerce_checkout_link = None
+        else:
+            ecommerce_checkout_link = self._get_checkout_link(user, verified_mode.sku)
 
         request = crum.get_current_request()
+
+        upgrade_price, _ = format_strikeout_price(user, course)
+
         frag = Fragment(render_to_string('content_type_gating/access_denied_message.html', {
-            'mobile_app': is_request_from_mobile_app(request),
+            'mobile_app': request and is_request_from_mobile_app(request),
             'ecommerce_checkout_link': ecommerce_checkout_link,
-            'min_price': str(verified_mode.min_price)
+            'min_price': upgrade_price,
         }))
         return frag
 
-    def access_denied_message(self, block, user, user_group, allowed_groups):
-        if self._is_audit_enrollment(user, block):
-            return _(u"Graded assessments are available to Verified Track learners. Upgrade to Unlock.")
-        return None
+    def access_denied_message(self, block_key, user, user_group, allowed_groups):
+        course_key = block_key.course_key
+        modes = CourseMode.modes_for_course_dict(course_key)
+        verified_mode = modes.get(CourseMode.VERIFIED)
+        if (verified_mode is None or user_group == FULL_ACCESS or
+                user_group in allowed_groups):
+            return None
 
-    def _is_audit_enrollment(self, user, block):
-        course_enrollment = apps.get_model('student.CourseEnrollment')
-        mode_slug, is_active = course_enrollment.enrollment_mode_for_user(user, block.scope_ids.usage_id.course_key)
-        return mode_slug == CourseMode.AUDIT and is_active
+        request = crum.get_current_request()
+        if request and is_request_from_mobile_app(request):
+            return _(u"Graded assessments are available to Verified Track learners.")
+        else:
+            return _(u"Graded assessments are available to Verified Track learners. Upgrade to Unlock.")
 
     def _get_checkout_link(self, user, sku):
         ecomm_service = EcommerceService()
         ecommerce_checkout = ecomm_service.is_enabled(user)
         if ecommerce_checkout and sku:
             return ecomm_service.get_checkout_page_url(sku) or ''
+
+    def _get_course_key_from_course_block(self, block):
+        """
+        Extracts and returns `course_key` from `block`
+        """
+        return block.scope_ids.usage_id.course_key
 
 
 class ContentTypeGatingPartitionScheme(object):
@@ -120,51 +148,10 @@ class ContentTypeGatingPartitionScheme(object):
         """
         Returns the Group for the specified user.
         """
-
-        # For now, treat everyone as a Full-access user, until we have the rest of the
-        # feature gating logic in place.
-
         if not ContentTypeGatingConfig.enabled_for_enrollment(user=user, course_key=course_key,
                                                               user_partition=user_partition):
             return FULL_ACCESS
-
-        # If CONTENT_TYPE_GATING is enabled use the following logic to determine whether a user should have FULL_ACCESS
-        # or LIMITED_ACCESS
-
-        course_mode = apps.get_model('course_modes.CourseMode')
-        modes = course_mode.modes_for_course(course_key, include_expired=True, only_selectable=False)
-        modes_dict = {mode.slug: mode for mode in modes}
-
-        # If there is no verified mode, all users are granted FULL_ACCESS
-        if not course_mode.has_verified_mode(modes_dict):
-            return FULL_ACCESS
-
-        course_enrollment = apps.get_model('student.CourseEnrollment')
-
-        mode_slug, is_active = course_enrollment.enrollment_mode_for_user(user, course_key)
-
-        if mode_slug and is_active:
-            course_mode = course_mode.mode_for_course(
-                course_key,
-                mode_slug,
-                modes=modes,
-            )
-            if course_mode is None:
-                LOG.error(
-                    "User %s is in an unknown CourseMode '%s'"
-                    " for course %s. Granting full access to content for this user",
-                    user.username,
-                    mode_slug,
-                    course_key,
-                )
-                return FULL_ACCESS
-
-            if mode_slug == CourseMode.AUDIT:
-                return LIMITED_ACCESS
-            else:
-                return FULL_ACCESS
         else:
-            # Unenrolled users don't get gated content
             return LIMITED_ACCESS
 
     @classmethod
@@ -185,8 +172,8 @@ class ContentTypeGatingPartitionScheme(object):
         """
         return ContentTypeGatingPartition(
             id,
-            unicode(name),
-            unicode(description),
+            six.text_type(name),
+            six.text_type(description),
             [
                 LIMITED_ACCESS,
                 FULL_ACCESS,

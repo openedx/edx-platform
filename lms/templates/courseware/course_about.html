@@ -1,15 +1,17 @@
-<%page expression_filter="h" />
+<%page expression_filter="h"/>
 <%namespace name='static' file='../static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
 from django.utils.translation import pgettext
 from django.urls import reverse
-from courseware.courses import get_course_about_section
+from lms.djangoapps.courseware.courses import get_course_about_section
 from django.conf import settings
 from six import text_type
 from edxmako.shortcuts import marketing_link
-from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangolib.js_utils import js_escaped_string
+from openedx.core.djangolib.markup import clean_dangerous_html, HTML, Text
 from openedx.core.lib.courses import course_image_url
+
 from six import string_types
 %>
 
@@ -29,76 +31,24 @@ from six import string_types
       event.preventDefault();
     });
 
-    % if can_add_course_to_cart:
-      add_course_complete_handler = function(jqXHR, textStatus) {
-        if (jqXHR.status == 200) {
-          location.href = "${cart_link | n, decode.utf8}";
-        }
-        if (jqXHR.status == 400) {
-          $("#register_error").text(
-            jqXHR.responseText ? jqXHR.responseText : "${_("An error occurred. Please try again later.") | n, decode.utf8}")
-            .css("display", "block");
-        }
-        else if (jqXHR.status == 403) {
-            location.href = "${reg_then_add_to_cart_link | n, decode.utf8}";
-        }
-      };
-
-      $("#add_to_cart_post").click(function(event){
-        $.ajax({
-          url: "${reverse('add_course_to_cart', args=[text_type(course.id)]) | n, decode.utf8}",
-          type: "POST",
-          /* Rant: HAD TO USE COMPLETE B/C PROMISE.DONE FOR SOME REASON DOES NOT WORK ON THIS PAGE. */
-          complete: add_course_complete_handler
-        })
-        event.preventDefault();
-      });
-    % endif
-
-    ## making the conditional around this entire JS block for sanity
-    %if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-      <%
-        perms_error = Text(_('The currently logged-in user account does not have permission to enroll in this course. '
-                        'You may need to {start_logout_tag}log out{end_tag} then try the enroll button again. '
-                        'Please visit the {start_help_tag}help page{end_tag} for a possible solution.')).format(
-                          start_help_tag=HTML("<a href='{url}'>").format(url=marketing_link('FAQ')), end_tag=HTML('</a>'),
-                          start_logout_tag=HTML("<a href='{url}'>").format(url=reverse('logout'))
-                          )
-      %>
     $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
-      if(xhr.status == 200) {
-        location.href = "${reverse('dashboard') | n, decode.utf8}";
-      } else if (xhr.status == 403) {
-        location.href = "${reverse('course-specific-register', args=[text_type(course.id)]) | n, decode.utf8 }?course_id=${course.id | n, decode.utf8 }&enrollment_action=enroll";
-      } else if (xhr.status == 400) { //This means the user did not have permission
-        $('#register_error').text("${perms_error | n, decode.utf8}").css("display", "block");
-      } else {
-        $('#register_error').text(
-            (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.") | n, decode.utf8}")
-        ).css("display", "block");
-      }
-    });
-
-    %else:
-
-    $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
-      if(xhr.status == 200) {
+      if (xhr.status == 200) {
         if (xhr.responseText == "") {
-          location.href = "${reverse('dashboard') | n, decode.utf8}";
+          location.href = "${reverse('dashboard') | n, js_escaped_string}";
         }
         else {
           location.href = xhr.responseText;
         }
       } else if (xhr.status == 403) {
-          location.href = "${reverse('register_user') | n, decode.utf8  }?course_id=${course.id | n, decode.utf8 }&enrollment_action=enroll";
+        $('#register_error').text(
+            (xhr.responseText ? xhr.responseText : "${_("An error has occurred. Please ensure that you are logged in to enroll.") | n, js_escaped_string}")
+        ).css("display", "block");
       } else {
         $('#register_error').text(
-            (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.") | n, decode.utf8}")
+            (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.") | n, js_escaped_string}")
         ).css("display", "block");
       }
     });
-
-    %endif
 
   })(this)
   </script>
@@ -136,10 +86,6 @@ from six import string_types
             </a>
           %endif
 
-        %elif in_cart:
-          <span class="add-to-cart">
-            ${Text(_('This course is in your <a href="{cart_link}">cart</a>.')).format(cart_link=cart_link)}
-          </span>
         % elif is_course_full:
           <span class="register disabled">
             ${_("Course is full")}
@@ -151,27 +97,6 @@ from six import string_types
         ## so that they can register and become a real user that can enroll.
         % elif not is_shib_course and not can_enroll:
           <span class="register disabled">${_("Enrollment is Closed")}</span>
-        %elif can_add_course_to_cart:
-          <%
-          if user.is_authenticated:
-            reg_href = "#"
-            reg_element_id = "add_to_cart_post"
-          else:
-            reg_href = reg_then_add_to_cart_link
-            reg_element_id = "reg_then_add_to_cart"
-          %>
-          <% if ecommerce_checkout:
-              reg_href = ecommerce_checkout_link
-              reg_element_id = ""
-          %>
-          <a href="${reg_href}" class="add-to-cart" id="${reg_element_id}">
-            ${Text(_("Add {course_name} to Cart {start_span}({price} USD){end_span}")).format(
-                course_name=course.display_number_with_default,
-                start_span=HTML("<span>"),
-                end_span=HTML("</span>"),
-                price=course_price)}
-          </a>
-          <div id="register_error"></div>
         %elif allow_anonymous:
           %if show_courseware_link:
             <a href="${course_target}">
@@ -179,18 +104,18 @@ from six import string_types
             </a>
           %endif
         %else:
-          <% 
+          <%
             if ecommerce_checkout:
               reg_href = ecommerce_checkout_link
             else:
               reg_href="#"
-            if professional_mode:
+            if single_paid_mode:
               href_class = "add-to-cart"
             else:
               href_class = "register"
           %>
           <a href="${reg_href}" class="${href_class}">
-            ${_("Enroll in {course_name}").format(course_name=course.display_number_with_default)}
+            ${_("Enroll Now")}
           </a>
           <div id="register_error"></div>
         %endif
@@ -227,7 +152,7 @@ from six import string_types
       % endif
 
       <div class="inner-wrapper">
-        ${HTML(get_course_about_section(request, course, "overview"))}
+        ${clean_dangerous_html(get_course_about_section(request, course, "overview"))}
       </div>
     </div>
     </%block>
@@ -284,7 +209,7 @@ from six import string_types
 
           ##<li class="important-dates-item"><span class="icon fa fa-clock-o" aria-hidden="true"></span><p class="important-dates-item-title">${_('Course Length')}</p><span class="important-dates-item-text course-length">${_('{number} weeks').format(number=15)}</span></li>
 
-          %if course_price and (can_add_course_to_cart or is_cosmetic_price_enabled):
+          %if course_price and (is_cosmetic_price_enabled):
             <li class="important-dates-item">
               <span class="icon fa fa-money" aria-hidden="true"></span>
               <p class="important-dates-item-title">${_("Price")}</p>
@@ -293,7 +218,7 @@ from six import string_types
           %endif
 
           % if pre_requisite_courses:
-          <% prc_target = reverse('about_course', args=[unicode(pre_requisite_courses[0]['key'])]) %>
+          <% prc_target = reverse('about_course', args=[text_type(pre_requisite_courses[0]['key'])]) %>
           <li class="prerequisite-course important-dates-item">
             <span class="icon fa fa-list-ul" aria-hidden="true"></span>
             <p class="important-dates-item-title">${_("Prerequisites")}</p>
@@ -358,7 +283,7 @@ from six import string_types
     <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <fieldset class="enroll_fieldset">
         <legend class="sr">${pgettext("self","Enroll")}</legend>
-        <input name="course_id" type="hidden" value="${course.id }">
+        <input name="course_id" type="hidden" value="${course.id}">
         <input name="enrollment_action" type="hidden" value="enroll">
       </fieldset>
       <div class="submit">

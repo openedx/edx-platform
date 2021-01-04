@@ -2,18 +2,17 @@
 This file exposes a number of password validators which can be optionally added to
 account creation
 """
-from __future__ import unicode_literals
+
 
 import logging
 import unicodedata
 
-from django.contrib.auth.password_validation import (
-    get_default_password_validators,
-    validate_password as django_validate_password,
-    MinimumLengthValidator as DjangoMinimumLengthValidator,
-)
+from django.contrib.auth.password_validation import MinimumLengthValidator as DjangoMinimumLengthValidator
+from django.contrib.auth.password_validation import get_default_password_validators
+from django.contrib.auth.password_validation import validate_password as django_validate_password
 from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext as _, ungettext
+from django.utils.translation import ugettext as _
+from django.utils.translation import ungettext
 from six import text_type
 
 log = logging.getLogger(__name__)

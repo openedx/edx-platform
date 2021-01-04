@@ -1,14 +1,14 @@
 """ Tests for API endpoints. """
-from __future__ import unicode_literals
+
 
 import datetime
-import freezegun
 import json
 
+import freezegun
 from django.conf import settings
-from django.urls import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.urls import reverse
 
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from student.tests.factories import UserFactory
@@ -51,7 +51,7 @@ class PhotoVerificationStatusViewTests(TestCase):
             'expiration_datetime': '{}Z'.format(expected_expires.isoformat()),
             'is_verified': verified
         }
-        self.assertEqual(json.loads(response.content), expected)
+        self.assertEqual(json.loads(response.content.decode('utf-8')), expected)
 
     def test_non_existent_user(self):
         """ The endpoint should return HTTP 404 if the user does not exist. """

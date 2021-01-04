@@ -1,13 +1,16 @@
 """
 Tests for StartDateTransformer.
 """
+
+
 from datetime import timedelta
 
 import ddt
+import six
 from django.utils.timezone import now
 from mock import patch
 
-from courseware.tests.factories import BetaTesterFactory
+from lms.djangoapps.courseware.tests.factories import BetaTesterFactory
 
 from ..start_date import DEFAULT_START_DATE, StartDateTransformer
 from .helpers import BlockParentsMapTestCase, update_block
@@ -21,7 +24,6 @@ class StartDateTransformerTestCase(BlockParentsMapTestCase):
     STUDENT = 1
     BETA_USER = 2
     TRANSFORMER_CLASS_TO_TEST = StartDateTransformer
-    shard = 3
 
     class StartDateType(object):
         """
@@ -108,7 +110,7 @@ class StartDateTransformerTestCase(BlockParentsMapTestCase):
             expected_student_visible_blocks,
             blocks_with_differing_student_access
     ):
-        for idx, start_date_type in start_date_type_values.iteritems():
+        for idx, start_date_type in six.iteritems(start_date_type_values):
             block = self.get_block(idx)
             block.start = self.StartDateType.start(start_date_type)
             update_block(block)

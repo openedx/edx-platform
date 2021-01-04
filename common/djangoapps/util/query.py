@@ -1,4 +1,6 @@
 """ Utility functions related to database queries """
+
+
 from django.conf import settings
 
 
@@ -7,7 +9,6 @@ _READ_REPLICA_DB_ALIAS = "read_replica"
 
 def use_read_replica_if_available(queryset):
     """
-
     If there is a database called 'read_replica',
     use that database for the queryset / manager.
 

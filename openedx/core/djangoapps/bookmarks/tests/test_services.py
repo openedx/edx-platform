@@ -2,9 +2,11 @@
 Tests for bookmark services.
 """
 
+
 from opaque_keys.edx.keys import UsageKey
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+
 from ..services import BookmarksService
 from .test_models import BookmarksTestsBase
 
@@ -14,7 +16,6 @@ class BookmarksServiceTests(BookmarksTestsBase):
     """
     Tests the Bookmarks service.
     """
-    shard = 9
 
     def setUp(self):
         super(BookmarksServiceTests, self).setUp()

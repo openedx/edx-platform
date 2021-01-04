@@ -1,20 +1,25 @@
 """Tests for the backpopulate_program_credentials management command."""
+
+
 import ddt
 import mock
 from django.core.management import call_command
 from django.test import TestCase
+from opaque_keys.edx.keys import CourseKey
+from six.moves import range
 
-from lms.djangoapps.certificates.models import CertificateStatuses
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import MODES
+from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.factories import (
-    generate_course_run_key,
-    ProgramFactory,
     CourseFactory,
     CourseRunFactory,
+    ProgramFactory,
+    generate_course_run_key
 )
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
@@ -28,7 +33,9 @@ COMMAND_MODULE = 'openedx.core.djangoapps.programs.management.commands.backpopul
 @skip_unless_lms
 class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsApiConfigMixin, TestCase):
     """Tests for the backpopulate_program_credentials management command."""
-    course_run_key, alternate_course_run_key = (generate_course_run_key() for __ in range(2))
+    course_run_key, alternate_course_run_key, course_run_key_no_course_overview = (
+        generate_course_run_key() for __ in range(3)
+    )
     # Constants for the _get_programs_data hierarchy types used in test_flatten()
     SEPARATE_PROGRAMS = 'separate_programs'
     SEPARATE_COURSES = 'separate_courses'
@@ -39,6 +46,10 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
 
         self.alice = UserFactory()
         self.bob = UserFactory()
+
+        # We need CourseOverview instances to exist for the test courses
+        CourseOverviewFactory(id=CourseKey.from_string(self.course_run_key))
+        CourseOverviewFactory(id=CourseKey.from_string(self.alternate_course_run_key))
 
         # Disable certification to prevent the task from being triggered when
         # setting up test data (i.e., certificates with a passing status), thereby
@@ -293,6 +304,40 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
             course_id=self.course_run_key,
             mode=MODES.verified,
             status=failing_status,
+        )
+
+        call_command('backpopulate_program_credentials', commit=True)
+
+        mock_task.assert_called_once_with(self.alice.username)
+
+    def test_handle_no_course_overview(self, mock_task, mock_get_programs):
+        """
+        Verify that the task is not enqueued for a user whose only certificate
+        is for a course with no CourseOverview.
+        """
+        data = [
+            ProgramFactory(
+                courses=[
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=self.course_run_key),
+                        CourseRunFactory(key=self.course_run_key_no_course_overview),
+                    ]),
+                ]
+            ),
+        ]
+        mock_get_programs.return_value = data
+
+        GeneratedCertificateFactory(
+            user=self.alice,
+            course_id=self.course_run_key,
+            mode=MODES.verified,
+            status=CertificateStatuses.downloadable,
+        )
+        GeneratedCertificateFactory(
+            user=self.bob,
+            course_id=self.course_run_key_no_course_overview,
+            mode=MODES.verified,
+            status=CertificateStatuses.downloadable,
         )
 
         call_command('backpopulate_program_credentials', commit=True)

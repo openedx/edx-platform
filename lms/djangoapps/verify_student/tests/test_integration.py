@@ -2,6 +2,8 @@
 Integration tests of the payment flow, including course mode selection.
 """
 
+
+import six
 from django.urls import reverse
 
 from course_modes.tests.factories import CourseModeFactory
@@ -15,7 +17,6 @@ class TestProfEdVerification(ModuleStoreTestCase):
     """
     Integration test for professional ed verification, including course mode selection.
     """
-    shard = 4
 
     # Choose an uncommon number for the price so we can search for it on the page
     MIN_PRICE = 1438
@@ -37,12 +38,12 @@ class TestProfEdVerification(ModuleStoreTestCase):
         self.urls = {
             'course_modes_choose': reverse(
                 'course_modes_choose',
-                args=[unicode(self.course_key)]
+                args=[six.text_type(self.course_key)]
             ),
 
             'verify_student_start_flow': reverse(
                 'verify_student_start_flow',
-                args=[unicode(self.course_key)]
+                args=[six.text_type(self.course_key)]
             ) + purchase_workflow,
         }
 

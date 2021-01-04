@@ -4,27 +4,27 @@
 #
 #    make upgrade
 #
-argh==0.26.2              # via watchdog
-argparse==1.4.0           # via stevedore
-certifi==2018.11.29       # via requests
+certifi==2020.4.5.1       # via requests
 chardet==3.0.4            # via requests
-edx-opaque-keys==0.4.4
-idna==2.8                 # via requests
-lazy==1.1
-libsass==0.10.0
-markupsafe==1.1.0
-mock==1.0.1
-path.py==8.2.1
+edx-opaque-keys==2.1.0    # via -r requirements/edx/paver.in
+idna==2.9                 # via requests
+importlib-metadata==1.6.0  # via path
+lazy==1.4                 # via -r requirements/edx/paver.in
+libsass==0.10.0           # via -r requirements/edx/paver.in
+markupsafe==1.1.1         # via -r requirements/edx/paver.in
+mock==3.0.5               # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.in
+more-itertools==8.3.0     # via zipp
+path==13.1.0              # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.in
 pathtools==0.1.2          # via watchdog
-paver==1.3.4
-pbr==5.1.1                # via stevedore
-psutil==1.2.1
-pymongo==2.9.1
-python-memcached==1.48
-pyyaml==3.13              # via watchdog
-requests==2.21.0
-six==1.11.0
-stevedore==1.10.0
-urllib3==1.23             # via requests
-watchdog==0.9.0
-wrapt==1.10.5
+paver==1.3.4              # via -r requirements/edx/paver.in
+pbr==5.4.5                # via stevedore
+psutil==1.2.1             # via -r requirements/edx/paver.in
+pymongo==3.9.0            # via -r requirements/edx/paver.in, edx-opaque-keys
+python-memcached==1.59    # via -r requirements/edx/paver.in
+requests==2.23.0          # via -r requirements/edx/paver.in
+six==1.14.0               # via edx-opaque-keys, libsass, mock, paver, python-memcached, stevedore
+stevedore==1.32.0         # via -r requirements/edx/paver.in, edx-opaque-keys
+urllib3==1.25.9           # via requests
+watchdog==0.10.2          # via -r requirements/edx/paver.in
+wrapt==1.11.2             # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.in
+zipp==1.0.0               # via -c requirements/edx/../constraints.txt, importlib-metadata

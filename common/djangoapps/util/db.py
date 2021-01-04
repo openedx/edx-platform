@@ -1,6 +1,8 @@
 """
 Utility functions related to databases.
 """
+
+
 import random
 # TransactionManagementError used below actually *does* derive from the standard "Exception" class.
 # pylint: disable=nonstandard-exception
@@ -14,136 +16,6 @@ from openedx.core.lib.cache_utils import get_cache
 OUTER_ATOMIC_CACHE_NAME = 'db.outer_atomic'
 
 MYSQL_MAX_INT = (2 ** 31) - 1
-
-
-class CommitOnSuccessManager(object):
-    """
-    This class implements the commit_on_success() API that was available till Django 1.5.
-
-    An instance can be used either as a decorator or as a context manager. However, it
-    cannot be nested inside an atomic block.
-
-    It is mostly taken from https://github.com/django/django/blob/1.8.5/django/db/transaction.py#L110-L277
-    but instead of using save points commits all pending queries at the end of a block.
-
-    The goal is to behave as close as possible to:
-    https://github.com/django/django/blob/1.4.22/django/db/transaction.py#L263-L289
-    """
-
-    # Tests in TestCase subclasses are wrapped in an atomic block to speed up database restoration.
-    # So we must disabled this manager.
-    # https://github.com/django/django/blob/1.8.5/django/core/handlers/base.py#L129-L132
-    ENABLED = True
-
-    def __init__(self, using, read_committed=False):
-        self.using = using
-        self.read_committed = read_committed
-
-    def __enter__(self):
-
-        if not self.ENABLED:
-            return
-
-        connection = transaction.get_connection(self.using)
-
-        if connection.in_atomic_block:
-            raise transaction.TransactionManagementError('Cannot be inside an atomic block.')
-
-        if getattr(connection, 'commit_on_success_block_level', 0) == 0:
-            connection.commit_on_success_block_level = 1
-
-            # This will set the transaction isolation level to READ COMMITTED for the next transaction.
-            if self.read_committed is True:
-                if connection.vendor == 'mysql':
-                    cursor = connection.cursor()
-                    cursor.execute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED")
-
-            # We aren't in a transaction yet; create one.
-            # The usual way to start a transaction is to turn autocommit off.
-            # However, some database adapters (namely sqlite3) don't handle
-            # transactions and savepoints properly when autocommit is off.
-            # In such cases, start an explicit transaction instead, which has
-            # the side-effect of disabling autocommit.
-            if connection.features.autocommits_when_autocommit_is_off:
-                connection._start_transaction_under_autocommit()  # pylint: disable=protected-access
-                connection.autocommit = False
-            else:
-                connection.set_autocommit(False)
-        else:
-            if self.read_committed is True:
-                raise transaction.TransactionManagementError('Cannot change isolation level when nested.')
-
-            connection.commit_on_success_block_level += 1
-
-    def __exit__(self, exc_type, exc_value, traceback):
-
-        if not self.ENABLED:
-            return
-
-        connection = transaction.get_connection(self.using)
-
-        try:
-            if exc_type is None:
-                # Commit transaction
-                try:
-                    connection.commit()
-                except DatabaseError:
-                    try:
-                        connection.rollback()
-                    except Error:
-                        # An error during rollback means that something
-                        # went wrong with the connection. Drop it.
-                        connection.close()
-                    raise
-            else:
-                # Roll back transaction
-                try:
-                    connection.rollback()
-                except Error:
-                    # An error during rollback means that something
-                    # went wrong with the connection. Drop it.
-                    connection.close()
-
-        finally:
-            connection.commit_on_success_block_level -= 1
-
-            # Outermost block exit when autocommit was enabled.
-            if connection.commit_on_success_block_level == 0:
-                if connection.features.autocommits_when_autocommit_is_off:
-                    connection.autocommit = True
-                else:
-                    connection.set_autocommit(True)
-
-    def __call__(self, func):
-        @wraps(func)
-        def decorated(*args, **kwds):       # pylint: disable=missing-docstring
-            with self:
-                return func(*args, **kwds)
-        return decorated
-
-
-def commit_on_success(using=None, read_committed=False):
-    """
-    This function implements the commit_on_success() API that was available till Django 1.5.
-
-    It can be used either as a decorator or as a context manager. However, it
-    cannot be nested inside an atomic block.
-
-    If the wrapped function or block returns a response the transaction is committed
-    and if it raises an exception the transaction is rolled back.
-
-    Arguments:
-        using (str): the name of the database.
-        read_committed (bool): Whether to use read committed isolation level.
-
-    Raises:
-        TransactionManagementError: if already inside an atomic block.
-    """
-    if callable(using):
-        return CommitOnSuccessManager(DEFAULT_DB_ALIAS, read_committed)(using)
-    # Decorator: @commit_on_success(...) or context manager: with commit_on_success(...): ...
-    else:
-        return CommitOnSuccessManager(using, read_committed)
 
 
 @contextmanager
@@ -164,9 +36,11 @@ def enable_named_outer_atomic(*names):
 
     for name in names:
         cache[name] = True
-    yield
-    for name in names:
-        del cache[name]
+    try:
+        yield
+    finally:
+        for name in names:
+            del cache[name]
 
 
 class OuterAtomic(transaction.Atomic):

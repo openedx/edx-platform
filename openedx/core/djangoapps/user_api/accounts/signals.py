@@ -2,6 +2,7 @@
 Django Signal related functionality for user_api accounts
 """
 
+
 from django.dispatch import Signal
 
 # Signal to retire a user from LMS-initiated mailings (course mailings, etc)

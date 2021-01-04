@@ -2,8 +2,10 @@
 Utilities for use in Mako markup.
 """
 
+
 import markupsafe
 import bleach
+from lxml.html.clean import Cleaner
 from mako.filters import decode
 
 # Text() can be used to declare a string as plain text, as HTML() is used
@@ -54,3 +56,20 @@ def strip_all_tags_but_br(string_to_strip):
     string_to_strip = bleach.clean(string_to_strip, tags=['br'], strip=True)
 
     return HTML(string_to_strip)
+
+
+def clean_dangerous_html(html):
+    """
+    Mark a string as already HTML and remove unsafe tags, so that it won't be escaped before output.
+        Usage:
+        <%page expression_filter="h"/>
+        <%!
+        from openedx.core.djangolib.markup import clean_dangerous_html
+        %>
+        ${course_details.overview | n, clean_dangerous_html}
+    """
+    if not html:
+        return html
+    cleaner = Cleaner(style=True, inline_style=False, safe_attrs_only=False)
+    html = cleaner.clean_html(html)
+    return HTML(html)

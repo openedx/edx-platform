@@ -1,13 +1,15 @@
 """Tests for methods defined in util/django.py"""
-from xmodule.util.xmodule_django import get_current_request, get_current_request_hostname
+
+
 from unittest import TestCase
+
+from xmodule.util.xmodule_django import get_current_request, get_current_request_hostname
 
 
 class UtilDjangoTests(TestCase):
     """
     Tests for methods exposed in util/django
     """
-    shard = 1
 
     def test_get_current_request(self):
         """

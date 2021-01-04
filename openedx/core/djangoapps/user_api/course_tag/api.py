@@ -7,8 +7,11 @@ Stores global metadata using the UserPreference model, and per-course metadata u
 UserCourseTag model.
 """
 
+
 from collections import defaultdict
+
 from openedx.core.lib.cache_utils import get_cache
+
 from ..models import UserCourseTag
 
 # Scopes

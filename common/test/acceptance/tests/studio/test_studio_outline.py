@@ -2,27 +2,32 @@
 """
 Acceptance tests for studio related to the outline page.
 """
+
+
 import itertools
 import json
 from datetime import datetime, timedelta
 from unittest import skip
 
 from pytz import UTC
+import six
+from six.moves import range
 
-from base_studio_test import StudioCourseTest
 from common.test.acceptance.fixtures.config import ConfigModelFixture
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.progress import ProgressPage
+from common.test.acceptance.pages.studio.checklists import CourseChecklistsPage
 from common.test.acceptance.pages.studio.overview import ContainerPage, CourseOutlinePage, ExpandCollapseLinkState
 from common.test.acceptance.pages.studio.settings import SettingsPage
-from common.test.acceptance.pages.studio.checklists import CourseChecklistsPage
 from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettingsPage
 from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
 from common.test.acceptance.pages.studio.utils import add_discussion, drag, verify_ordering
 from common.test.acceptance.tests.helpers import disable_animations, load_data_str
 from openedx.core.lib.tests import attr
+
+from .base_studio_test import StudioCourseTest
 
 SECTION_NAME = 'Test Section'
 SUBSECTION_NAME = 'Test Subsection'
@@ -76,7 +81,7 @@ class CourseOutlineTest(StudioCourseTest):
         verify_ordering(self, outline_page, expected_ordering)
 
 
-@attr(shard=3)
+@attr(shard=20)
 class CourseOutlineDragAndDropTest(CourseOutlineTest):
     """
     Tests of drag and drop within the outline page.
@@ -112,7 +117,7 @@ class CourseOutlineDragAndDropTest(CourseOutlineTest):
     def drag_and_verify(self, source, target, expected_ordering, outline_page=None):
         self.do_action_and_verify(
             outline_page,
-            lambda (outline): drag(outline, source, target),
+            lambda outline: drag(outline, source, target),
             expected_ordering
         )
 
@@ -335,6 +340,7 @@ class WarningMessagesTest(CourseOutlineTest):
             subsection.add_unit()
             unit = ContainerPage(self.browser, None)
             unit.wait_for_page()
+            unit.set_name(name)
 
         if unit.is_staff_locked != unit_state.is_locked:
             unit.toggle_staff_lock()
@@ -918,7 +924,7 @@ class StaffLockTest(CourseOutlineTest):
         self._remove_staff_lock_and_verify_warning(subsection, False)
 
 
-@attr(shard=14)
+@attr(shard=20)
 class EditNamesTest(CourseOutlineTest):
     """
     Feature: Click-to-edit section/subsection names
@@ -1121,7 +1127,7 @@ class CreateSectionsTest(CourseOutlineTest):
         self.assertTrue(unit_page.is_inline_editing_display_name())
 
 
-@attr(shard=14)
+@attr(shard=4)
 class DeleteContentTest(CourseOutlineTest):
     """
     Feature: Deleting sections/subsections/units
@@ -1279,7 +1285,7 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
             And all sections are expanded
         """
         self.course_outline_page.visit()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
         self.verify_all_sections(collapsed=False)
 
     def test_no_expand_link_for_empty_course(self):
@@ -1295,7 +1301,7 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         self.course_outline_page.visit()
         for section in self.course_outline_page.sections():
             section.delete()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
         self.assertTrue(self.course_outline_page.has_no_content_message)
 
     def test_collapse_all_when_all_expanded(self):
@@ -1310,7 +1316,7 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         self.course_outline_page.visit()
         self.verify_all_sections(collapsed=False)
         self.course_outline_page.toggle_expand_collapse()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
         self.verify_all_sections(collapsed=True)
 
     def test_collapse_all_when_some_expanded(self):
@@ -1327,7 +1333,7 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         self.verify_all_sections(collapsed=False)
         self.course_outline_page.section_at(0).expand_subsection()
         self.course_outline_page.toggle_expand_collapse()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
         self.verify_all_sections(collapsed=True)
 
     def test_expand_all_when_all_collapsed(self):
@@ -1341,9 +1347,9 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         """
         self.course_outline_page.visit()
         self.course_outline_page.toggle_expand_collapse()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
         self.course_outline_page.toggle_expand_collapse()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
         self.verify_all_sections(collapsed=False)
 
     def test_expand_all_when_some_collapsed(self):
@@ -1361,11 +1367,11 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         # if that helps.
         disable_animations(self.course_outline_page)
         self.course_outline_page.toggle_expand_collapse()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
         self.verify_all_sections(collapsed=True)
         self.course_outline_page.section_at(0).expand_subsection()
         self.course_outline_page.toggle_expand_collapse()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
         self.verify_all_sections(collapsed=False)
 
 
@@ -1389,7 +1395,7 @@ class ExpandCollapseSingleSectionTest(CourseOutlineTest):
         """
         self.course_outline_page.visit()
         self.course_outline_page.section_at(0).delete()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
         self.assertTrue(self.course_outline_page.has_no_content_message)
 
     def test_old_subsection_stays_collapsed_after_creation(self):
@@ -1429,7 +1435,7 @@ class ExpandCollapseEmptyTest(CourseOutlineTest):
             Then I do not see the "Collapse All Sections" link
         """
         self.course_outline_page.visit()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
 
     def test_link_appears_after_section_creation(self):
         """
@@ -1441,13 +1447,13 @@ class ExpandCollapseEmptyTest(CourseOutlineTest):
             And all sections are expanded
         """
         self.course_outline_page.visit()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
         self.course_outline_page.add_section_from_top_button()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
         self.assertFalse(self.course_outline_page.section_at(0).is_collapsed)
 
 
-@attr(shard=14)
+@attr(shard=20)
 class DefaultStatesEmptyTest(CourseOutlineTest):
     """
     Feature: Misc course outline default states/actions when starting with an empty course
@@ -1472,7 +1478,7 @@ class DefaultStatesEmptyTest(CourseOutlineTest):
         self.assertTrue(self.course_outline_page.bottom_add_section_button.is_present())
 
 
-@attr(shard=14)
+@attr(shard=4)
 class DefaultStatesContentTest(CourseOutlineTest):
     """
     Feature: Misc course outline default states/actions when starting with a course with content
@@ -1628,7 +1634,7 @@ class PublishSectionTest(CourseOutlineTest):
         """
         Adds unpublished HTML content to first three units in the course.
         """
-        for index in xrange(3):
+        for index in range(3):
             self.course_fixture.create_xblock(
                 self.course_fixture.get_nested_xblocks(category="vertical")[index].locator,
                 XBlockFixtureDesc('html', 'Unpublished HTML Component ' + str(index)),
@@ -1709,7 +1715,7 @@ class DeprecationWarningMessageTest(CourseOutlineTest):
         self.assertEqual(self.course_outline_page.components_visible, components_present)
         if components_present:
             self.assertEqual(self.course_outline_page.components_list_heading, self.COMPONENT_LIST_HEADING)
-            self.assertItemsEqual(self.course_outline_page.components_display_names, components_display_name_list)
+            six.assertCountEqual(self, self.course_outline_page.components_display_names, components_display_name_list)
 
     def test_no_deprecation_warning_message_present(self):
         """
@@ -1870,6 +1876,7 @@ class SelfPacedOutlineTest(CourseOutlineTest):
 
 class CourseStatusOutlineTest(CourseOutlineTest):
     """Test the course outline status section."""
+    shard = 8
 
     def setUp(self):
         super(CourseStatusOutlineTest, self).setUp()

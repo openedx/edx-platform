@@ -2,16 +2,17 @@
 Test Help links in LMS
 """
 
+
 from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
 from common.test.acceptance.tests.discussion.helpers import CohortTestMixin
-from common.test.acceptance.tests.lms.test_lms_instructor_dashboard import BaseInstructorDashboardTest
-from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
 from common.test.acceptance.tests.helpers import (
     assert_opened_help_link_is_correct,
-    url_for_help,
-    click_and_wait_for_window
+    click_and_wait_for_window,
+    url_for_help
 )
+from common.test.acceptance.tests.lms.test_lms_instructor_dashboard import BaseInstructorDashboardTest
+from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
 from openedx.core.release import skip_unless_master
 
 # @skip_unless_master is used throughout this file because on named release
@@ -27,6 +28,8 @@ class TestCohortHelp(ContainerBase, CohortTestMixin):
     """
     Tests help links in Cohort page
     """
+    shard = 2
+
     def setUp(self, is_staff=True):
         super(TestCohortHelp, self).setUp(is_staff=is_staff)
         self.enable_cohorting(self.course_fixture)
@@ -85,28 +88,3 @@ class TestCohortHelp(ContainerBase, CohortTestMixin):
             '/course_features/cohorts/cohorts_overview.html#all-automated-assignment',
         )
         self.verify_help_link(href)
-
-
-@skip_unless_master         # See note at the top of the file.
-class InstructorDashboardHelp(BaseInstructorDashboardTest):
-    """
-    Tests opening help from the general Help button in the instructor dashboard.
-    """
-
-    def setUp(self):
-        super(InstructorDashboardHelp, self).setUp()
-        self.course_fixture = CourseFixture(**self.course_info).install()
-        self.log_in_as_instructor()
-        self.instructor_dashboard_page = self.visit_instructor_dashboard()
-
-    def test_instructor_dashboard_help(self):
-        """
-        Scenario: Help button opens staff help
-        Given that I am viewing the Instructor Dashboard
-        When I click "Help"
-        Then I see help about the instructor dashboard in a new tab
-        """
-        href = url_for_help('course_author', '/CA_instructor_dash_help.html')
-        help_element = self.instructor_dashboard_page.get_help_element()
-        click_and_wait_for_window(self, help_element)
-        assert_opened_help_link_is_correct(self, href)

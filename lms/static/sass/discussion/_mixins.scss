@@ -22,7 +22,8 @@
   background-color: $white;
   color: theme-color("gray-dark");
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     background-color: $white;
   }
 }
@@ -71,7 +72,8 @@
   width: auto;
   background-color: $forum-color-background-light;
 
-  ol, ul { // Fix up the RTL-only _reset.scss, but only in specific places
+  ol,
+  ul { // Fix up the RTL-only _reset.scss, but only in specific places
     @include padding-left($baseline*2);
     @include padding-right(0);
   }

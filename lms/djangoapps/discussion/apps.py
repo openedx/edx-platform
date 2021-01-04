@@ -4,15 +4,16 @@ Discussion Application Configuration
 Signal handlers are connected here.
 """
 
+
 from django.apps import AppConfig
 
 from openedx.core.constants import COURSE_ID_PATTERN
-from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType, PluginURLs, PluginSettings
+from openedx.core.djangoapps.plugins.constants import PluginSettings, PluginURLs, ProjectType, SettingsType
 
 
 class DiscussionConfig(AppConfig):
     """
-    Application Configuration for Grades.
+    Application Configuration for Discussion.
     """
 
     name = u'lms.djangoapps.discussion'
@@ -38,4 +39,4 @@ class DiscussionConfig(AppConfig):
         """
         Connect handlers to send notifications about discussions.
         """
-        from .signals import handlers  # pylint: disable=unused-variable
+        from .signals import handlers  # pylint: disable=unused-import

@@ -1,19 +1,21 @@
 """ Tests for DiscussionXBLock"""
-from __future__ import print_function
-from collections import namedtuple
-import ddt
+
+
 import itertools
-import mock
 import random
 import string
+from collections import namedtuple
 from unittest import TestCase
 
-from safe_lxml import etree
+import ddt
+import mock
+from six.moves import range
+from xblock.field_data import DictFieldData
+from xblock.fields import NO_CACHE_VALUE, UNIQUE_ID, ScopeIds
+from xblock.runtime import Runtime
 
 from openedx.core.lib.xblock_builtin.xblock_discussion.xblock_discussion import DiscussionXBlock
-from xblock.field_data import DictFieldData
-from xblock.fields import ScopeIds, UNIQUE_ID, NO_CACHE_VALUE
-from xblock.runtime import Runtime
+from safe_lxml import etree
 
 
 def attribute_pair_repr(self):
@@ -21,7 +23,7 @@ def attribute_pair_repr(self):
     Custom string representation for the AttributePair namedtuple which is
     consistent between test runs.
     """
-    return '<AttributePair name={}>'.format(self.name)
+    return u'<AttributePair name={}>'.format(self.name)
 
 
 AttributePair = namedtuple("AttributePair", ["name", "value"])
@@ -37,7 +39,7 @@ def _random_string():
     """
     Generates random string
     """
-    return ''.join(random.choice(string.lowercase, ) for _ in xrange(12))
+    return ''.join(random.choice(string.ascii_lowercase, ) for _ in range(12))
 
 
 def _make_attribute_test_cases():
@@ -59,7 +61,6 @@ class DiscussionXBlockImportExportTests(TestCase):
     Import and export tests
     """
     DISCUSSION_XBLOCK_LOCATION = "openedx.core.lib.xblock_builtin.xblock_discussion.xblock_discussion.DiscussionXBlock"
-    shard = 2
 
     def setUp(self):
         """
@@ -87,7 +88,7 @@ class DiscussionXBlockImportExportTests(TestCase):
         """
         Test that xblock export XML format can be parsed preserving field values
         """
-        xblock_xml = """
+        xblock_xml = u"""
         <discussion
             url_name="82bb87a2d22240b1adac2dfcc1e7e5e4" xblock-family="xblock.v1"
             {id_attr}="{id_value}"
@@ -120,7 +121,7 @@ class DiscussionXBlockImportExportTests(TestCase):
         Test that legacy export XML format can be parsed preserving field values
         """
         xblock_xml = """<discussion url_name="82bb87a2d22240b1adac2dfcc1e7e5e4"/>"""
-        xblock_definition_xml = """
+        xblock_definition_xml = u"""
         <discussion
             {id_attr}="{id_value}"
             {category_attr}="{category_value}"

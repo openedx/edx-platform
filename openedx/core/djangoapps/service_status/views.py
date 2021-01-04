@@ -2,13 +2,13 @@
 Django Views for service status app
 """
 
+
 import json
 import time
 
 from celery.exceptions import TimeoutError
 from django.http import HttpResponse
-from djcelery import celery
-
+from celery import current_app as celery
 from openedx.core.djangoapps.service_status.tasks import delayed_ping
 
 

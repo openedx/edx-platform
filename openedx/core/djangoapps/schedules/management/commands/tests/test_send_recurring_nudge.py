@@ -1,6 +1,8 @@
 """
 Tests for send_recurring_nudge management command.
 """
+
+
 from unittest import skipUnless
 
 import ddt
@@ -9,12 +11,12 @@ from django.conf import settings
 from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.management.commands import send_recurring_nudge as nudge
 from openedx.core.djangoapps.schedules.management.commands.tests.send_email_base import (
-    ScheduleSendEmailTestMixin,
     ExperienceTest,
+    ScheduleSendEmailTestMixin
 )
 from openedx.core.djangoapps.schedules.management.commands.tests.upsell_base import ScheduleUpsellTestMixin
 from openedx.core.djangoapps.schedules.models import ScheduleExperience
-from openedx.core.djangolib.testing.utils import skip_unless_lms, CacheIsolationTestCase
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 
 
 @ddt.ddt
@@ -24,7 +26,6 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms, CacheIsolation
     "Can't test schedules if the app isn't installed",
 )
 class TestSendRecurringNudge(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, CacheIsolationTestCase):
-    shard = 6
     __test__ = True
 
     # pylint: disable=protected-access

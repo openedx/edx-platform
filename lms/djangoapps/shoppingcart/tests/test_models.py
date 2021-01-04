@@ -1,6 +1,8 @@
 """
 Tests for the Shopping Cart Models
 """
+
+
 import copy
 import datetime
 import json
@@ -10,16 +12,18 @@ from decimal import Decimal
 
 import ddt
 import pytz
+import six
+from six.moves import range
 from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core import mail
 from django.core.mail.message import EmailMessage
-from django.urls import reverse
 from django.db import DatabaseError
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import Mock, MagicMock, patch
+from django.urls import reverse
+from mock import MagicMock, Mock, patch
 from opaque_keys.edx.locator import CourseLocator
 
 from course_modes.models import CourseMode
@@ -61,7 +65,6 @@ class OrderTest(ModuleStoreTestCase):
     Test shopping cart orders (e.g., cart contains various items,
     order is taken through various pieces of cart state, etc.)
     """
-    shard = 3
 
     def setUp(self):
         super(OrderTest, self).setUp()
@@ -70,7 +73,7 @@ class OrderTest(ModuleStoreTestCase):
         course = CourseFactory.create()
         self.course_key = course.id
         self.other_course_keys = []
-        for __ in xrange(1, 5):
+        for __ in range(1, 5):
             course_key = CourseFactory.create().id
             CourseMode.objects.create(
                 course_id=course_key,
@@ -98,7 +101,7 @@ class OrderTest(ModuleStoreTestCase):
         CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
         # should return the same cart
         cart2 = Order.get_cart_for_user(user=self.user)
-        self.assertEquals(cart2.orderitem_set.count(), 1)
+        self.assertEqual(cart2.orderitem_set.count(), 1)
 
     def test_user_cart_has_items(self):
         anon = AnonymousUser()
@@ -128,23 +131,23 @@ class OrderTest(ModuleStoreTestCase):
         cart = Order.get_cart_for_user(user=self.user)
         CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
         CertificateItem.add_to_order(cart, self.other_course_keys[0], self.cost, 'honor')
-        self.assertEquals(cart.orderitem_set.count(), 2)
+        self.assertEqual(cart.orderitem_set.count(), 2)
         self.assertTrue(cart.has_items())
         cart.clear()
-        self.assertEquals(cart.orderitem_set.count(), 0)
+        self.assertEqual(cart.orderitem_set.count(), 0)
         self.assertFalse(cart.has_items())
 
     def test_add_item_to_cart_currency_match(self):
         cart = Order.get_cart_for_user(user=self.user)
         CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor', currency='eur')
         # verify that a new item has been added
-        self.assertEquals(cart.orderitem_set.count(), 1)
+        self.assertEqual(cart.orderitem_set.count(), 1)
         # verify that the cart's currency was updated
-        self.assertEquals(cart.currency, 'eur')
+        self.assertEqual(cart.currency, 'eur')
         with self.assertRaises(InvalidCartItem):
             CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor', currency='usd')
         # assert that this item did not get added to the cart
-        self.assertEquals(cart.orderitem_set.count(), 1)
+        self.assertEqual(cart.orderitem_set.count(), 1)
 
     def test_total_cost(self):
         cart = Order.get_cart_for_user(user=self.user)
@@ -155,8 +158,8 @@ class OrderTest(ModuleStoreTestCase):
                         (self.other_course_keys[3], 20)]
         for course, cost in course_costs:
             CertificateItem.add_to_order(cart, course, cost, 'honor')
-        self.assertEquals(cart.orderitem_set.count(), len(course_costs))
-        self.assertEquals(cart.total_cost, sum(cost for _course, cost in course_costs))
+        self.assertEqual(cart.orderitem_set.count(), len(course_costs))
+        self.assertEqual(cart.total_cost, sum(cost for _course, cost in course_costs))
 
     def test_start_purchase(self):
         # Start the purchase, which will mark the cart as "paying"
@@ -263,10 +266,10 @@ class OrderTest(ModuleStoreTestCase):
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_key))
 
         # Test email sending
-        self.assertEquals(len(mail.outbox), 1)
-        self.assertEquals('Order Payment Confirmation', mail.outbox[0].subject)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual('Order Payment Confirmation', mail.outbox[0].subject)
         self.assertIn(settings.PAYMENT_SUPPORT_EMAIL, mail.outbox[0].body)
-        self.assertIn(unicode(cart.total_cost), mail.outbox[0].body)
+        self.assertIn(six.text_type(cart.total_cost), mail.outbox[0].body)
         self.assertIn(item.additional_instruction_text(), mail.outbox[0].body)
 
         # Verify Google Analytics event fired for purchase
@@ -281,8 +284,8 @@ class OrderTest(ModuleStoreTestCase):
                 'products': [
                     {
                         'sku': u'CertificateItem.honor',
-                        'name': unicode(self.course_key),
-                        'category': unicode(self.course_key.org),
+                        'name': six.text_type(self.course_key),
+                        'category': six.text_type(self.course_key.org),
                         'price': '40.00',
                         'id': 1,
                         'quantity': 1
@@ -302,7 +305,7 @@ class OrderTest(ModuleStoreTestCase):
                 # verify that we rolled back the entire transaction
                 self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_key))
                 # verify that e-mail wasn't sent
-                self.assertEquals(len(mail.outbox), 0)
+                self.assertEqual(len(mail.outbox), 0)
 
     def test_purchase_twice(self):
         cart = Order.get_cart_for_user(self.user)
@@ -310,7 +313,7 @@ class OrderTest(ModuleStoreTestCase):
         # purchase the cart more than once
         cart.purchase()
         cart.purchase()
-        self.assertEquals(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox), 1)
 
     @patch('shoppingcart.models.log.error')
     def test_purchase_item_email_smtp_failure(self, error_logger):
@@ -451,7 +454,7 @@ class OrderItemTest(TestCase):
         self.assertTrue(cart.has_items())
         (inst_dict, inst_set) = cart.generate_receipt_instructions()
         self.assertDictEqual({item.pk_with_subclass: set([])}, inst_dict)
-        self.assertEquals(set([]), inst_set)
+        self.assertEqual(set([]), inst_set)
 
     def test_is_discounted(self):
         """
@@ -493,7 +496,6 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
     """
     Paid Course Registration Tests.
     """
-    shard = 3
 
     def setUp(self):
         super(PaidCourseRegistrationTest, self).setUp()
@@ -881,8 +883,8 @@ class CertificateItemTest(ModuleStoreTestCase):
                 'products': [
                     {
                         'sku': u'CertificateItem.verified',
-                        'name': unicode(self.course_key),
-                        'category': unicode(self.course_key.org),
+                        'name': six.text_type(self.course_key),
+                        'category': six.text_type(self.course_key.org),
                         'price': '40.00',
                         'id': 1,
                         'quantity': 1
@@ -900,15 +902,15 @@ class CertificateItemTest(ModuleStoreTestCase):
         self.mock_tracker.reset_mock()
         cart.purchase()
         enrollment = CourseEnrollment.objects.get(user=self.user, course_id=self.course_key)
-        self.assertEquals(enrollment.mode, u'verified')
+        self.assertEqual(enrollment.mode, u'verified')
 
     def test_single_item_template(self):
         cart = Order.get_cart_for_user(user=self.user)
         cert_item = CertificateItem.add_to_order(cart, self.course_key, self.cost, 'verified')
-        self.assertEquals(cert_item.single_item_receipt_template, 'shoppingcart/receipt.html')
+        self.assertEqual(cert_item.single_item_receipt_template, 'shoppingcart/receipt.html')
 
         cert_item = CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
-        self.assertEquals(cert_item.single_item_receipt_template, 'shoppingcart/receipt.html')
+        self.assertEqual(cert_item.single_item_receipt_template, 'shoppingcart/receipt.html')
 
     @override_settings(LMS_SEGMENT_KEY="foobar")
     @patch.dict(settings.FEATURES, {'STORE_BILLING_INFO': True})
@@ -928,7 +930,7 @@ class CertificateItemTest(ModuleStoreTestCase):
         target_certs = CertificateItem.objects.filter(course_id=self.course_key, user_id=self.user, status='refunded', mode='verified')
         self.assertTrue(target_certs[0])
         self.assertTrue(target_certs[0].refund_requested_time)
-        self.assertEquals(target_certs[0].order.status, 'refunded')
+        self.assertEqual(target_certs[0].order.status, 'refunded')
         self._assert_refund_tracked()
 
     def test_no_refund_on_cert_callback(self):
@@ -947,7 +949,7 @@ class CertificateItemTest(ModuleStoreTestCase):
         )
         self.assertTrue(target_certs[0])
         self.assertFalse(target_certs[0].refund_requested_time)
-        self.assertEquals(target_certs[0].order.status, 'purchased')
+        self.assertEqual(target_certs[0].order.status, 'purchased')
 
     @override_settings(LMS_SEGMENT_KEY="foobar")
     @patch.dict(settings.FEATURES, {'STORE_BILLING_INFO': True})
@@ -978,7 +980,7 @@ class CertificateItemTest(ModuleStoreTestCase):
         target_certs = CertificateItem.objects.filter(course_id=self.course_key, user_id=self.user, status='refunded', mode='verified')
         self.assertTrue(target_certs[0])
         self.assertTrue(target_certs[0].refund_requested_time)
-        self.assertEquals(target_certs[0].order.status, 'refunded')
+        self.assertEqual(target_certs[0].order.status, 'refunded')
         self._assert_refund_tracked()
 
     @patch('student.models.CourseEnrollment.refund_cutoff_date')
@@ -1005,9 +1007,9 @@ class CertificateItemTest(ModuleStoreTestCase):
         with patch('shoppingcart.models.log.error') as mock_error_logger:
             CourseEnrollment.unenroll(self.user, course_key)
             self.assertFalse(mock_error_logger.called)
-            self.assertEquals(len(mail.outbox), 1)
-            self.assertEquals('[Refund] User-Requested Refund', mail.outbox[0].subject)
-            self.assertEquals(settings.PAYMENT_SUPPORT_EMAIL, mail.outbox[0].from_email)
+            self.assertEqual(len(mail.outbox), 1)
+            self.assertEqual('[Refund] User-Requested Refund', mail.outbox[0].subject)
+            self.assertEqual(settings.PAYMENT_SUPPORT_EMAIL, mail.outbox[0].from_email)
             self.assertIn('has requested a refund on Order', mail.outbox[0].body)
 
     @patch('student.models.CourseEnrollment.refund_cutoff_date')
@@ -1081,15 +1083,15 @@ class CertificateItemTest(ModuleStoreTestCase):
         self.mock_tracker.reset_mock()
         cart.purchase()
         enrollment = CourseEnrollment.objects.get(user=self.user, course_id=self.course_key)
-        self.assertEquals(enrollment.mode, u'no-id-professional')
+        self.assertEqual(enrollment.mode, u'no-id-professional')
 
         # Check that the tax-deduction information appears in the confirmation email
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
-        self.assertEquals('Order Payment Confirmation', email.subject)
+        self.assertEqual('Order Payment Confirmation', email.subject)
         self.assertNotIn("If you haven't verified your identity yet, please start the verification process", email.body)
         self.assertIn(
-            "You can unenroll in the course and receive a full refund for 2 days after the course start date. ",
+            "You can unenroll in the course and receive a full refund for 2 days after the course start date.\n",
             email.body
         )
 
@@ -1138,7 +1140,7 @@ class DonationTest(ModuleStoreTestCase):
         # Check that the tax-deduction information appears in the confirmation email
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
-        self.assertEquals('Order Payment Confirmation', email.subject)
+        self.assertEqual('Order Payment Confirmation', email.subject)
         self.assertIn("tax purposes", email.body)
 
     def test_donate_no_such_course(self):
@@ -1279,7 +1281,7 @@ class InvoiceHistoryTest(TestCase):
             'qty': 1,
             'unit_price': '123.45',
             'currency': 'usd',
-            'course_id': unicode(self.course_key)
+            'course_id': six.text_type(self.course_key)
         }])
 
         # Create a second invoice item
@@ -1294,13 +1296,13 @@ class InvoiceHistoryTest(TestCase):
                 'qty': 1,
                 'unit_price': '123.45',
                 'currency': 'usd',
-                'course_id': unicode(self.course_key)
+                'course_id': six.text_type(self.course_key)
             },
             {
                 'qty': 2,
                 'unit_price': '456.78',
                 'currency': 'usd',
-                'course_id': unicode(self.course_key)
+                'course_id': six.text_type(self.course_key)
             }
         ])
 
@@ -1368,18 +1370,18 @@ class InvoiceHistoryTest(TestCase):
     def _assert_history_contact_info(self, **kwargs):
         """Check contact info in the latest history record. """
         contact_info = self._latest_history()['contact_info']
-        for key, value in kwargs.iteritems():
+        for key, value in six.iteritems(kwargs):
             self.assertEqual(contact_info[key], value)
 
     def _assert_history_items(self, expected_items):
         """Check line item info in the latest history record. """
         items = self._latest_history()['items']
-        self.assertItemsEqual(items, expected_items)
+        six.assertCountEqual(self, items, expected_items)
 
     def _assert_history_transactions(self, expected_transactions):
         """Check transactions (payments/refunds) in the latest history record. """
         transactions = self._latest_history()['transactions']
-        self.assertItemsEqual(transactions, expected_transactions)
+        six.assertCountEqual(self, transactions, expected_transactions)
 
     def _latest_history(self):
         """Retrieve the snapshot from the latest history record. """

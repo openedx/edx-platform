@@ -1,13 +1,18 @@
 """
 Unittests for migrating a course to split mongo
 """
+
+
+import six
+
 from django.core.management import CommandError, call_command
 from django.test import TestCase
+
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class TestArgParsing(TestCase):
@@ -21,8 +26,11 @@ class TestArgParsing(TestCase):
         """
         Test the arg length error
         """
-        errstring = "Error: too few arguments"
-        with self.assertRaisesRegexp(CommandError, errstring):
+        if six.PY2:
+            errstring = "Error: too few arguments"
+        else:
+            errstring = "Error: the following arguments are required: course_key, email"
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command("migrate_to_split")
 
     def test_invalid_location(self):
@@ -30,7 +38,7 @@ class TestArgParsing(TestCase):
         Test passing an unparsable course id
         """
         errstring = "Invalid location string"
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command("migrate_to_split", "foo", "bar")
 
     def test_nonexistent_user_id(self):
@@ -38,7 +46,7 @@ class TestArgParsing(TestCase):
         Test error for using an unknown user primary key
         """
         errstring = "No user found identified by 99"
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command("migrate_to_split", "org/course/name", "99")
 
     def test_nonexistent_user_email(self):
@@ -46,7 +54,7 @@ class TestArgParsing(TestCase):
         Test error for using an unknown user email
         """
         errstring = "No user found identified by fake@example.com"
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command("migrate_to_split", "org/course/name", "fake@example.com")
 
 

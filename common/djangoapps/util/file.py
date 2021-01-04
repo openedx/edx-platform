@@ -2,9 +2,11 @@
 Utility methods related to file handling.
 """
 
+
 import os
 from datetime import datetime
 
+import six
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import DefaultStorage, get_valid_filename
 from django.utils.translation import ugettext as _
@@ -86,7 +88,6 @@ def store_uploaded_file(
     return file_storage, stored_file_name
 
 
-# pylint: disable=invalid-name
 def course_filename_prefix_generator(course_id, separator='_'):
     """
     Generates a course-identifying unicode string for use in a file
@@ -98,10 +99,9 @@ def course_filename_prefix_generator(course_id, separator='_'):
         str: A unicode string which can safely be inserted into a
             filename.
     """
-    return get_valid_filename(unicode(separator).join([course_id.org, course_id.course, course_id.run]))
+    return get_valid_filename(six.text_type(separator).join([course_id.org, course_id.course, course_id.run]))
 
 
-# pylint: disable=invalid-name
 def course_and_time_based_filename_generator(course_id, base_name):
     """
     Generates a filename (without extension) based on the current time and the supplied filename.
@@ -143,7 +143,9 @@ class UniversalNewlineIterator(object):
         """
         Replace CR and CRLF with LF within `string`.
         """
-        return string.replace('\r\n', '\n').replace('\r', '\n')
+        if six.PY2:
+            return string.replace('\r\n', '\n').replace('\r', '\n')
+        return string.replace('\r\n', '\n').replace('\r', '\n').encode('utf-8')
 
     def generate_lines(self):
         """
@@ -163,7 +165,7 @@ class UniversalNewlineIterator(object):
                     line = char
                     yield self.sanitize(last_line)
                 else:
-                    line += char
+                    line += six.text_type(char) if isinstance(char, int) else char
             buf = self.original_file.read(self.buffer_size)
             if not buf and line:
                 yield self.sanitize(line)

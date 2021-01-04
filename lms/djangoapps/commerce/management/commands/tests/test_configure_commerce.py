@@ -1,6 +1,8 @@
 """
 Tests for management command for enabling commerce configuration.
 """
+
+
 from django.core.management import call_command
 from django.test import TestCase
 
@@ -11,7 +13,6 @@ class TestCommerceConfigurationCommand(TestCase):
     """
     Test django management command for enabling commerce configuration.
     """
-    shard = 4
 
     def test_commerce_configuration(self):
         """

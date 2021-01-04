@@ -2,24 +2,23 @@
 Tests for minimum grade requirement status
 """
 
+
+from datetime import datetime, timedelta
+
 import ddt
 import pytz
-from datetime import timedelta, datetime
+from django.test.client import RequestFactory
 from mock import MagicMock
 
-from django.test.client import RequestFactory
 from course_modes.models import CourseMode
+from openedx.core.djangoapps.credit.api import get_credit_requirement_status, set_credit_requirements
+from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
+from openedx.core.djangoapps.credit.signals import listen_for_grade_calculation
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-from openedx.core.djangoapps.credit.api import (
-    set_credit_requirements, get_credit_requirement_status
-)
-from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
-from openedx.core.djangoapps.credit.signals import listen_for_grade_calculation
-from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 @skip_unless_lms
@@ -32,7 +31,6 @@ class TestMinGradedRequirementStatus(ModuleStoreTestCase):
     """
     VALID_DUE_DATE = datetime.now(pytz.UTC) + timedelta(days=20)
     EXPIRED_DUE_DATE = datetime.now(pytz.UTC) - timedelta(days=20)
-    shard = 2
 
     DATES = {
         'valid': VALID_DUE_DATE,

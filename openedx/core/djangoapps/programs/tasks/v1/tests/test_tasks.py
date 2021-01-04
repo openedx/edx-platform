@@ -1,28 +1,31 @@
 """
 Tests for programs celery tasks.
 """
+
+
 import json
 import logging
 from datetime import datetime, timedelta
+
 import ddt
 import httpretty
 import mock
 import pytz
-from waffle.testutils import override_switch
 from celery.exceptions import MaxRetriesExceededError
 from django.conf import settings
-from django.test import override_settings, TestCase
-from edx_oauth2_provider.tests.factories import ClientFactory
+from django.test import TestCase, override_settings
 from edx_rest_api_client import exceptions
 from edx_rest_api_client.client import EdxRestApiClient
+from waffle.testutils import override_switch
 
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
 from openedx.core.djangoapps.programs.tasks.v1 import tasks
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory, SiteConfigurationFactory
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 
@@ -106,7 +109,8 @@ class AwardProgramCertificateTestCase(TestCase):
                 }
             ]
         }
-        self.assertEqual(json.loads(httpretty.last_request().body), expected_body)
+        last_request_body = httpretty.last_request().body.decode('utf-8')
+        self.assertEqual(json.loads(last_request_body), expected_body)
 
 
 @skip_unless_lms
@@ -127,7 +131,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         self.site = SiteFactory()
         self.site_configuration = SiteConfigurationFactory(site=self.site)
         self.catalog_integration = self.create_catalog_integration()
-        ClientFactory.create(name='credentials')
+        ApplicationFactory.create(name='credentials')
         UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)
 
     def test_completion_check(
@@ -141,7 +145,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         programs.
         """
         tasks.award_program_certificates.delay(self.student.username).get()
-        mock_get_completed_programs.assert_called(self.site, self.student)
+        mock_get_completed_programs.assert_any_call(self.site, self.student)
 
     @ddt.data(
         ([1], [2, 3]),
@@ -192,7 +196,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         mock_get_certified_programs.return_value = [1]
 
         # programs to be skipped
-        self.site_configuration.values = {
+        self.site_configuration.site_values = {
             "programs_without_certificates": [2]
         }
         self.site_configuration.save()
@@ -319,7 +323,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
 
         self.assertEqual(mock_award_program_certificate.call_count, 3)
         mock_warning.assert_called_once_with(
-            'Failed to award certificate for program {uuid} to user {username}.'.format(
+            u'Failed to award certificate for program {uuid} to user {username}.'.format(
                 uuid=1,
                 username=self.student.username)
         )
@@ -468,7 +472,8 @@ class PostCourseCertificateTestCase(TestCase):
                 'value': visible_date.strftime('%Y-%m-%dT%H:%M:%SZ')  # text representation of date
             }]
         }
-        self.assertEqual(json.loads(httpretty.last_request().body), expected_body)
+        last_request_body = httpretty.last_request().body.decode('utf-8')
+        self.assertEqual(json.loads(last_request_body), expected_body)
 
 
 @skip_unless_lms
@@ -501,7 +506,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         self.create_credentials_config()
         self.site = SiteFactory()
 
-        ClientFactory.create(name='credentials')
+        ApplicationFactory.create(name='credentials')
         UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)
 
     @ddt.data(
@@ -586,3 +591,277 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
 
         tasks.award_course_certificate.delay(self.student.username, str(self.certificate.course_id)).get()
         self.assertFalse(mock_post_course_certificate.called)
+
+
+@skip_unless_lms
+class RevokeProgramCertificateTestCase(TestCase):
+    """
+    Test the revoke_program_certificate function
+    """
+
+    @httpretty.activate
+    def test_revoke_program_certificate(self):
+        """
+        Ensure the correct API call gets made
+        """
+        test_username = 'test-username'
+        test_client = EdxRestApiClient('http://test-server', jwt='test-token')
+
+        httpretty.register_uri(
+            httpretty.POST,
+            'http://test-server/credentials/',
+        )
+
+        tasks.revoke_program_certificate(test_client, test_username, 123)
+
+        expected_body = {
+            'username': test_username,
+            'status': 'revoked',
+            'credential': {
+                'program_uuid': 123,
+                'type': tasks.PROGRAM_CERTIFICATE,
+            }
+        }
+        last_request_body = httpretty.last_request().body.decode('utf-8')
+        self.assertEqual(json.loads(last_request_body), expected_body)
+
+
+@skip_unless_lms
+@ddt.ddt
+@mock.patch(TASKS_MODULE + '.revoke_program_certificate')
+@mock.patch(TASKS_MODULE + '.get_certified_programs')
+@mock.patch(TASKS_MODULE + '.get_inverted_programs')
+@override_settings(CREDENTIALS_SERVICE_USERNAME='test-service-username')
+class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiConfigMixin, TestCase):
+    """
+    Tests for the 'revoke_program_certificates' celery task.
+    """
+
+    def setUp(self):
+        super(RevokeProgramCertificatesTestCase, self).setUp()
+
+        self.student = UserFactory.create(username='test-student')
+        self.course_key = 'course-v1:testX+test101+2T2020'
+        self.site = SiteFactory()
+        self.site_configuration = SiteConfigurationFactory(site=self.site)
+        ApplicationFactory.create(name='credentials')
+        UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)
+        self.create_credentials_config()
+
+        self.inverted_programs = {self.course_key: [{'uuid': 1}, {'uuid': 2}]}
+
+    def test_inverted_programs(
+        self,
+        mock_get_inverted_programs,
+        mock_get_certified_programs,  # pylint: disable=unused-argument
+        mock_revoke_program_certificate,  # pylint: disable=unused-argument
+    ):
+        """
+        Checks that the Programs API is used correctly to determine completed
+        programs.
+        """
+        tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
+        mock_get_inverted_programs.assert_any_call(self.student)
+
+    def test_revokinging_certificate(
+        self,
+        mock_get_inverted_programs,
+        mock_get_certified_programs,
+        mock_revoke_program_certificate,
+    ):
+        """
+        Checks that the Credentials API is used to revoke certificates for
+        the proper programs.
+        """
+        expected_program_uuid = 1
+        mock_get_inverted_programs.return_value = {
+            self.course_key: [{'uuid': expected_program_uuid}]
+        }
+        mock_get_certified_programs.return_value = [expected_program_uuid]
+
+        tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
+
+        call_args, _ = mock_revoke_program_certificate.call_args
+        self.assertEqual(call_args[1], self.student.username)
+        self.assertEqual(call_args[2], expected_program_uuid)
+
+    @ddt.data(
+        ('credentials', 'enable_learner_issuance'),
+    )
+    @ddt.unpack
+    def test_retry_if_config_disabled(
+        self,
+        disabled_config_type,
+        disabled_config_attribute,
+        *mock_helpers
+    ):
+        """
+        Checks that the task is aborted if any relevant api configs are
+        disabled.
+        """
+        getattr(self, 'create_{}_config'.format(disabled_config_type))(**{disabled_config_attribute: False})
+        with mock.patch(TASKS_MODULE + '.LOGGER.warning') as mock_warning:
+            with self.assertRaises(MaxRetriesExceededError):
+                tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
+            self.assertTrue(mock_warning.called)
+        for mock_helper in mock_helpers:
+            self.assertFalse(mock_helper.called)
+
+    def test_abort_if_invalid_username(self, *mock_helpers):
+        """
+        Checks that the task will be aborted and not retried if the username
+        passed was not found, and that an exception is logged.
+        """
+        with mock.patch(TASKS_MODULE + '.LOGGER.exception') as mock_exception:
+            tasks.revoke_program_certificates.delay('nonexistent-username', self.course_key).get()
+            self.assertTrue(mock_exception.called)
+        for mock_helper in mock_helpers:
+            self.assertFalse(mock_helper.called)
+
+    def test_abort_if_no_program(
+        self,
+        mock_get_inverted_programs,
+        mock_get_certified_programs,
+        mock_revoke_program_certificate,
+    ):
+        """
+        Checks that the task will be aborted without further action if course is
+        not part of any program.
+        """
+        mock_get_inverted_programs.return_value = {}
+        tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
+        self.assertTrue(mock_get_inverted_programs.called)
+        self.assertFalse(mock_get_certified_programs.called)
+        self.assertFalse(mock_revoke_program_certificate.called)
+
+    def _make_side_effect(self, side_effects):
+        """
+        DRY helper.  Returns a side effect function for use with mocks that
+        will be called multiple times, permitting Exceptions to be raised
+        (or not) in a specified order.
+
+        See Also:
+            http://www.voidspace.org.uk/python/mock/examples.html#multiple-calls-with-different-effects
+            http://www.voidspace.org.uk/python/mock/mock.html#mock.Mock.side_effect
+
+        """
+
+        def side_effect(*_a):
+            if side_effects:
+                exc = side_effects.pop(0)
+                if exc:
+                    raise exc
+            return mock.DEFAULT
+
+        return side_effect
+
+    def test_continue_revoking_certs_if_error(
+        self,
+        mock_get_inverted_programs,
+        mock_get_certified_programs,
+        mock_revoke_program_certificate,
+    ):
+        """
+        Checks that a single failure to revoke one of several certificates
+        does not cause the entire task to fail.  Also ensures that
+        successfully revoked certs are logged as INFO and warning is logged
+        for failed requests if there are retries available.
+        """
+        mock_get_inverted_programs.return_value = self.inverted_programs
+        mock_get_certified_programs.side_effect = [[1], [1, 2]]
+        mock_revoke_program_certificate.side_effect = self._make_side_effect([Exception('boom'), None])
+
+        with mock.patch(TASKS_MODULE + '.LOGGER.info') as mock_info, \
+                mock.patch(TASKS_MODULE + '.LOGGER.warning') as mock_warning:
+            tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
+
+        self.assertEqual(mock_revoke_program_certificate.call_count, 3)
+        mock_warning.assert_called_once_with(
+            u'Failed to revoke certificate for program {uuid} of user {username}.'.format(
+                uuid=1,
+                username=self.student.username)
+        )
+        mock_info.assert_any_call(mock.ANY, 1, self.student.username)
+        mock_info.assert_any_call(mock.ANY, 2, self.student.username)
+
+    def test_retry_on_credentials_api_errors(
+        self,
+        mock_get_inverted_programs,
+        mock_get_certified_programs,
+        mock_revoke_program_certificate,
+    ):
+        """
+        Ensures that any otherwise-unhandled errors that arise while trying
+        to get existing program credentials (e.g. network issues or other
+        transient API errors) will cause the task to be failed and queued for
+        retry.
+        """
+        mock_get_inverted_programs.return_value = self.inverted_programs
+        mock_get_certified_programs.return_value = [1]
+        mock_get_certified_programs.side_effect = self._make_side_effect([Exception('boom'), None])
+        tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
+        self.assertEqual(mock_get_certified_programs.call_count, 2)
+        self.assertEqual(mock_revoke_program_certificate.call_count, 1)
+
+    def test_retry_on_credentials_api_429_error(
+        self,
+        mock_get_inverted_programs,
+        mock_get_certified_programs,
+        mock_revoke_program_certificate,
+    ):
+        """
+        Verify that a 429 error causes the task to fail and then retry.
+        """
+        exception = exceptions.HttpClientError()
+        exception.response = mock.Mock(status_code=429)
+        mock_get_inverted_programs.return_value = self.inverted_programs
+        mock_get_certified_programs.return_value = [1, 2]
+        mock_revoke_program_certificate.side_effect = self._make_side_effect(
+            [exception, None]
+        )
+
+        tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
+
+        self.assertEqual(mock_revoke_program_certificate.call_count, 3)
+
+    def test_no_retry_on_credentials_api_404_error(
+        self,
+        mock_get_inverted_programs,
+        mock_get_certified_programs,
+        mock_revoke_program_certificate,
+    ):
+        """
+        Verify that a 404 error causes the task to fail but there is no retry.
+        """
+        exception = exceptions.HttpNotFoundError()
+        exception.response = mock.Mock(status_code=404)
+        mock_get_inverted_programs.return_value = self.inverted_programs
+        mock_get_certified_programs.return_value = [1, 2]
+        mock_revoke_program_certificate.side_effect = self._make_side_effect(
+            [exception, None]
+        )
+
+        tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
+
+        self.assertEqual(mock_revoke_program_certificate.call_count, 2)
+
+    def test_no_retry_on_credentials_api_4XX_error(
+        self,
+        mock_get_inverted_programs,
+        mock_get_certified_programs,
+        mock_revoke_program_certificate,
+    ):
+        """
+        Verify that other 4XX errors cause task to fail but there is no retry.
+        """
+        exception = exceptions.HttpClientError()
+        exception.response = mock.Mock(status_code=418)
+        mock_get_inverted_programs.return_value = self.inverted_programs
+        mock_get_certified_programs.return_value = [1, 2]
+        mock_revoke_program_certificate.side_effect = self._make_side_effect(
+            [exception, None]
+        )
+
+        tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
+
+        self.assertEqual(mock_revoke_program_certificate.call_count, 2)

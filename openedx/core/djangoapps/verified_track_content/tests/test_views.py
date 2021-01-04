@@ -2,7 +2,9 @@
 Tests for verified track content views.
 """
 
+
 import json
+import six
 
 from django.http import Http404
 from django.test.client import RequestFactory
@@ -21,7 +23,6 @@ class CohortingSettingsTestCase(SharedModuleStoreTestCase):
     """
     Tests the `cohort_discussion_topics` view.
     """
-    shard = 2
 
     @classmethod
     def setUpClass(cls):
@@ -35,14 +36,14 @@ class CohortingSettingsTestCase(SharedModuleStoreTestCase):
         request = RequestFactory().get("dummy_url")
         request.user = UserFactory()
         with self.assertRaises(Http404):
-            cohorting_settings(request, unicode(self.course.id))
+            cohorting_settings(request, six.text_type(self.course.id))
 
     def test_cohorting_settings_enabled(self):
         """
         Verify that cohorting_settings is working for HTTP GET when verified track cohorting is enabled.
         """
         config = VerifiedTrackCohortedCourse.objects.create(
-            course_key=unicode(self.course.id), enabled=True, verified_cohort_name="Verified Learners"
+            course_key=six.text_type(self.course.id), enabled=True, verified_cohort_name="Verified Learners"
         )
         config.save()
 
@@ -65,6 +66,6 @@ class CohortingSettingsTestCase(SharedModuleStoreTestCase):
         """ Verify that the response was successful and matches the expected JSON payload. """
         request = RequestFactory().get("dummy_url")
         request.user = AdminFactory()
-        response = cohorting_settings(request, unicode(self.course.id))
+        response = cohorting_settings(request, six.text_type(self.course.id))
         self.assertEqual(200, response.status_code)
-        self.assertEqual(expected_response, json.loads(response.content))
+        self.assertEqual(expected_response, json.loads(response.content.decode('utf-8')))

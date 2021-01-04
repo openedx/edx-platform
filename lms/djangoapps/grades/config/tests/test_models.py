@@ -2,6 +2,8 @@
 Tests for the models that control the
 persistent grading feature.
 """
+
+
 import itertools
 
 import ddt
@@ -21,7 +23,6 @@ class PersistentGradesFeatureFlagTests(TestCase):
     Tests the behavior of the feature flags for persistent grading.
     These are set via Django admin settings.
     """
-    shard = 4
 
     def setUp(self):
         super(PersistentGradesFeatureFlagTests, self).setUp()

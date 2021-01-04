@@ -61,7 +61,7 @@ from openedx.core.release import RELEASE_LINE
     <script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="path_prefix" content="${EDX_ROOT_URL}">
-
+    <link rel="icon" type="image/x-icon" href="${static.url(static.get_value('favicon_path', settings.FAVICON_PATH))}" />
     <%static:css group='style-vendor'/>
     <%static:css group='style-vendor-tinymce-content'/>
     <%static:css group='style-vendor-tinymce-skin'/>
@@ -118,6 +118,7 @@ from openedx.core.release import RELEASE_LINE
       % endif
 
       <div id="page-alert">
+        <%include file="widgets/deprecated-course-key-warning.html" args="course=context_course" />
       <%block name="page_alert"></%block>
       </div>
 

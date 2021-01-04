@@ -1,27 +1,42 @@
 """
 Views to show a course outline.
 """
-import re
+
+
 import datetime
+import re
+import six
 
 from completion import waffle as completion_waffle
 from django.contrib.auth.models import User
+from django.db.models import Q
+from django.shortcuts import redirect
 from django.template.context_processors import csrf
 from django.template.loader import render_to_string
+from django.urls import reverse
+from django.utils import timezone
+from django.views.decorators.csrf import ensure_csrf_cookie
+import edx_when.api as edx_when_api
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from waffle.models import Switch
 from web_fragments.fragment import Fragment
 
-from courseware.courses import get_course_overview_with_access
+from course_modes.models import CourseMode
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_overview_with_access
+from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
+from lms.djangoapps.courseware.masquerade import setup_masquerade
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
+from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
+from openedx.features.course_experience import RELATIVE_DATES_FLAG
 from student.models import CourseEnrollment
-
 from util.milestones_helpers import get_course_content_milestones
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 from xmodule.modulestore.django import modulestore
-from ..utils import get_course_outline_block_tree, get_resume_block
 
+from ..utils import get_course_outline_block_tree, get_resume_block
 
 DEFAULT_COMPLETION_TRACKING_START = datetime.datetime(2018, 1, 24, tzinfo=UTC)
 
@@ -35,6 +50,9 @@ class CourseOutlineFragmentView(EdxFragmentView):
         """
         Renders the course outline as a fragment.
         """
+        from lms.urls import RESET_COURSE_DEADLINES_NAME
+        from openedx.features.course_experience.urls import COURSE_HOME_VIEW_NAME
+
         course_key = CourseKey.from_string(course_id)
         course_overview = get_course_overview_with_access(
             request.user, 'load', course_key, check_if_enrolled=user_is_enrolled
@@ -53,6 +71,7 @@ class CourseOutlineFragmentView(EdxFragmentView):
             'due_date_display_format': course.due_date_display_format,
             'blocks': course_block_tree,
             'enable_links': user_is_enrolled or course.course_visibility == COURSE_VISIBILITY_PUBLIC,
+            'course_key': course_key,
         }
 
         resume_block = get_resume_block(course_block_tree) if user_is_enrolled else None
@@ -66,6 +85,29 @@ class CourseOutlineFragmentView(EdxFragmentView):
         context['gated_content'] = gated_content
         context['xblock_display_names'] = xblock_display_names
 
+        page_context = kwargs.get('page_context', None)
+        if page_context:
+            context['self_paced'] = page_context.get('pacing_type', 'instructor_paced') == 'self_paced'
+
+        # We're using this flag to prevent old self-paced dates from leaking out on courses not
+        # managed by edx-when.
+        context['in_edx_when'] = edx_when_api.is_enabled_for_course(course_key)
+
+        reset_deadlines_url = reverse(RESET_COURSE_DEADLINES_NAME)
+        reset_deadlines_redirect_url_base = COURSE_HOME_VIEW_NAME
+
+        course_enrollment = None
+        if not request.user.is_anonymous:
+            course_enrollment = CourseEnrollment.objects.filter(course=course_overview, user=request.user).filter(
+                Q(mode=CourseMode.AUDIT) | Q(mode=CourseMode.VERIFIED)).first()
+
+        context['reset_deadlines_url'] = reset_deadlines_url
+        context['reset_deadlines_redirect_url_base'] = reset_deadlines_redirect_url_base
+        context['reset_deadlines_redirect_url_id_dict'] = {'course_id': str(course.id)}
+        context['enrollment_mode'] = getattr(course_enrollment, 'mode', None)
+        context['verified_upgrade_link'] = verified_upgrade_deadline_link(request.user, course=course),
+        context['on_course_outline_page'] = True,
+
         html = render_to_string('course_experience/course-outline-fragment.html', context)
         return Fragment(html)
 
@@ -76,12 +118,13 @@ class CourseOutlineFragmentView(EdxFragmentView):
         if xblock_display_names is None:
             xblock_display_names = {}
 
-        if course_block_tree.get('id'):
-            xblock_display_names[course_block_tree['id']] = course_block_tree['display_name']
+        if not course_block_tree.get('authorization_denial_reason'):
+            if course_block_tree.get('id'):
+                xblock_display_names[course_block_tree['id']] = course_block_tree['display_name']
 
-        if course_block_tree.get('children'):
-            for child in course_block_tree['children']:
-                self.create_xblock_id_and_name_dict(child, xblock_display_names)
+            if course_block_tree.get('children'):
+                for child in course_block_tree['children']:
+                    self.create_xblock_id_and_name_dict(child, xblock_display_names)
 
         return xblock_display_names
 

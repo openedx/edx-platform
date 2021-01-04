@@ -3,9 +3,10 @@ Tests for Verified Track Cohorting models
 """
 # pylint: disable=attribute-defined-outside-init
 
+
 import ddt
 import mock
-from mock import patch
+import six
 
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
@@ -52,7 +53,7 @@ class TestVerifiedTrackCohortedCourse(TestCase):
         # Enable for a course
         config = VerifiedTrackCohortedCourse.objects.create(course_key=course_key, enabled=True)
         config.save()
-        self.assertEqual(unicode(config), "Course: {}, enabled: True".format(self.SAMPLE_COURSE))
+        self.assertEqual(six.text_type(config), u"Course: {}, enabled: True".format(self.SAMPLE_COURSE))
 
     def test_verified_cohort_name(self):
         cohort_name = 'verified cohort'
@@ -83,7 +84,7 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
         super(TestMoveToVerified, self).setUp()
         self.user = UserFactory()
         # Spy on number of calls to celery task.
-        celery_task_patcher = patch.object(
+        celery_task_patcher = mock.patch.object(
             sync_cohort_with_mode, 'apply_async',
             mock.Mock(wraps=sync_cohort_with_mode.apply_async)
         )
@@ -179,7 +180,7 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
         self.assertTrue(VerifiedTrackCohortedCourse.is_verified_track_cohort_enabled(self.course.id))
         self._verify_no_automatic_cohorting()
         self.assertTrue(error_logger.called)
-        error_message = "cohort named '%s' does not exist"
+        error_message = u"cohort named '%s' does not exist"
         self.assertIn(error_message, error_logger.call_args[0][0])
 
     @ddt.data(CourseMode.VERIFIED, CourseMode.CREDIT_MODE)

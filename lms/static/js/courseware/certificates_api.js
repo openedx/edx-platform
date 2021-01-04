@@ -13,7 +13,7 @@ $(document).ready(function() {
                 location.reload();
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                $('#errors-info').html(jqXHR.responseText);
+                $('#errors-info').text(jqXHR.responseText);
                 $('.generate_certs').attr('disabled', false).removeClass('is-disabled').attr('aria-disabled', false);
             }
         });

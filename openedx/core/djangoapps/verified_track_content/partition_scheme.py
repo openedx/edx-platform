@@ -1,16 +1,20 @@
 """
 UserPartitionScheme for enrollment tracks.
 """
+
+
 import logging
 
+import six
+from django.conf import settings
+from opaque_keys.edx.keys import CourseKey
+
 from course_modes.models import CourseMode
-from courseware.masquerade import (
+from lms.djangoapps.courseware.masquerade import (
     get_course_masquerade,
     get_masquerading_user_group,
     is_masquerading_as_specific_student
 )
-from django.conf import settings
-from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
 from student.models import CourseEnrollment
 from xmodule.partitions.partitions import Group, UserPartition
@@ -45,7 +49,7 @@ class EnrollmentTrackUserPartition(UserPartition):
             return []
 
         return [
-            Group(ENROLLMENT_GROUP_IDS[mode.slug]["id"], unicode(mode.name))
+            Group(ENROLLMENT_GROUP_IDS[mode.slug]["id"], six.text_type(mode.name))
             for mode in CourseMode.modes_for_course(course_key, include_expired=True)
         ]
 
@@ -92,7 +96,7 @@ class EnrollmentTrackPartitionScheme(object):
                 course_mode = CourseMode.verified_mode_for_course(course_key, include_expired=True)
             if not course_mode:
                 course_mode = CourseMode.DEFAULT_MODE
-            return Group(ENROLLMENT_GROUP_IDS[course_mode.slug]["id"], unicode(course_mode.name))
+            return Group(ENROLLMENT_GROUP_IDS[course_mode.slug]["id"], six.text_type(course_mode.name))
         else:
             return None
 
@@ -112,7 +116,15 @@ class EnrollmentTrackPartitionScheme(object):
         Any group access rule referencing inactive partitions will be ignored
         when performing access checks.
         """
-        return EnrollmentTrackUserPartition(id, unicode(name), unicode(description), [], cls, parameters, active)
+        return EnrollmentTrackUserPartition(
+            id,
+            six.text_type(name),
+            six.text_type(description),
+            [],
+            cls,
+            parameters,
+            active
+        )
 
 
 def is_course_using_cohort_instead(course_key):

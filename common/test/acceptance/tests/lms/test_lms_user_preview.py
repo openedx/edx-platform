@@ -3,6 +3,7 @@
 Tests the "preview" selector in the LMS that allows changing between Staff, Learner, and Content Groups.
 """
 
+
 from textwrap import dedent
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
@@ -102,146 +103,6 @@ class StaffViewToggleTest(CourseWithoutContentGroupsTest):
 
 
 @attr(shard=20)
-class StaffDebugTest(CourseWithoutContentGroupsTest):
-    """
-    Tests that verify the staff debug info.
-    """
-    def test_reset_attempts_empty(self):
-        """
-        Test that we reset even when there is no student state
-        """
-
-        staff_debug_page = self._goto_staff_page().open_staff_debug_info()
-        staff_debug_page.reset_attempts()
-        msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(
-            u'Successfully reset the attempts for user {}'.format(self.USERNAME), msg,
-        )
-
-    def test_delete_state_empty(self):
-        """
-        Test that we delete properly even when there isn't state to delete.
-        """
-        staff_debug_page = self._goto_staff_page().open_staff_debug_info()
-        staff_debug_page.delete_state()
-        msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(
-            u'Successfully deleted student state for user {}'.format(self.USERNAME), msg,
-        )
-
-    def test_reset_attempts_state(self):
-        """
-        Successfully reset the student attempts
-        """
-        staff_page = self._goto_staff_page()
-        staff_page.answer_problem()
-
-        staff_debug_page = staff_page.open_staff_debug_info()
-        staff_debug_page.reset_attempts()
-        msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(
-            u'Successfully reset the attempts for user {}'.format(self.USERNAME), msg,
-        )
-
-    def test_rescore_problem(self):
-        """
-        Rescore the student
-        """
-        staff_page = self._goto_staff_page()
-        staff_page.answer_problem()
-
-        staff_debug_page = staff_page.open_staff_debug_info()
-        staff_debug_page.rescore()
-        msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully rescored problem for user {}'.format(self.USERNAME), msg)
-
-    def test_rescore_problem_if_higher(self):
-        """
-        Rescore the student
-        """
-        staff_page = self._goto_staff_page()
-        staff_page.answer_problem()
-
-        staff_debug_page = staff_page.open_staff_debug_info()
-        staff_debug_page.rescore_if_higher()
-        msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully rescored problem to improve score for user {}'.format(self.USERNAME), msg)
-
-    def test_student_state_delete(self):
-        """
-        Successfully delete the student state with an answer
-        """
-        staff_page = self._goto_staff_page()
-        staff_page.answer_problem()
-
-        staff_debug_page = staff_page.open_staff_debug_info()
-        staff_debug_page.delete_state()
-        msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully deleted student state for user {}'.format(self.USERNAME), msg)
-
-    def test_student_by_email(self):
-        """
-        Successfully reset the student attempts using their email address
-        """
-        staff_page = self._goto_staff_page()
-        staff_page.answer_problem()
-
-        staff_debug_page = staff_page.open_staff_debug_info()
-        staff_debug_page.reset_attempts(self.EMAIL)
-        msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully reset the attempts for user {}'.format(self.EMAIL), msg)
-
-    def test_bad_student(self):
-        """
-        Test negative response with invalid user
-        """
-        staff_page = self._goto_staff_page()
-        staff_page.answer_problem()
-        staff_debug_page = staff_page.open_staff_debug_info()
-        staff_debug_page.delete_state('INVALIDUSER')
-        msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Failed to delete student state for user. User does not exist.', msg)
-
-    def test_reset_attempts_for_problem_loaded_via_ajax(self):
-        """
-        Successfully reset the student attempts for problem loaded via ajax.
-        """
-        staff_page = self._goto_staff_page()
-        staff_page.load_problem_via_ajax()
-        staff_page.answer_problem()
-
-        staff_debug_page = staff_page.open_staff_debug_info()
-        staff_debug_page.reset_attempts()
-        msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully reset the attempts for user {}'.format(self.USERNAME), msg)
-
-    def test_rescore_state_for_problem_loaded_via_ajax(self):
-        """
-        Rescore the student for problem loaded via ajax.
-        """
-        staff_page = self._goto_staff_page()
-        staff_page.load_problem_via_ajax()
-        staff_page.answer_problem()
-
-        staff_debug_page = staff_page.open_staff_debug_info()
-        staff_debug_page.rescore()
-        msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully rescored problem for user {}'.format(self.USERNAME), msg)
-
-    def test_student_state_delete_for_problem_loaded_via_ajax(self):
-        """
-        Successfully delete the student state for problem loaded via ajax.
-        """
-        staff_page = self._goto_staff_page()
-        staff_page.load_problem_via_ajax()
-        staff_page.answer_problem()
-
-        staff_debug_page = staff_page.open_staff_debug_info()
-        staff_debug_page.delete_state()
-        msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully deleted student state for user {}'.format(self.USERNAME), msg)
-
-
 class CourseWithContentGroupsTest(StaffViewTest):
     """
     Verifies that changing the "View this course as" selector works properly for content groups.
@@ -322,7 +183,6 @@ class CourseWithContentGroupsTest(StaffViewTest):
             )
         )
 
-    @attr(shard=20)
     def test_staff_sees_all_problems(self):
         """
         Scenario: Staff see all problems
@@ -338,7 +198,6 @@ class CourseWithContentGroupsTest(StaffViewTest):
             [self.alpha_text, self.beta_text, self.audit_text, self.everyone_text]
         )
 
-    @attr(shard=3)
     def test_student_not_in_content_group(self):
         """
         Scenario: When previewing as a learner, only content visible to all is shown
@@ -352,7 +211,6 @@ class CourseWithContentGroupsTest(StaffViewTest):
         course_page.set_staff_view_mode('Learner')
         verify_expected_problem_visibility(self, course_page, [self.everyone_text])
 
-    @attr(shard=3)
     def test_as_student_in_alpha(self):
         """
         Scenario: When previewing as a learner in group alpha, only content visible to alpha is shown
@@ -366,7 +224,6 @@ class CourseWithContentGroupsTest(StaffViewTest):
         course_page.set_staff_view_mode('Learner in alpha')
         verify_expected_problem_visibility(self, course_page, [self.alpha_text, self.everyone_text])
 
-    @attr(shard=3)
     def test_as_student_in_beta(self):
         """
         Scenario: When previewing as a learner in group beta, only content visible to beta is shown
@@ -380,7 +237,6 @@ class CourseWithContentGroupsTest(StaffViewTest):
         course_page.set_staff_view_mode('Learner in beta')
         verify_expected_problem_visibility(self, course_page, [self.beta_text, self.everyone_text])
 
-    @attr(shard=3)
     def test_as_student_in_audit(self):
         """
         Scenario: When previewing as a learner in the audit enrollment track, only content visible to audit is shown
@@ -426,6 +282,7 @@ class CourseWithContentGroupsTest(StaffViewTest):
                 'color-contrast',  # TODO: AC-559
                 'link-href',  # TODO: AC-559
                 'section',  # TODO: AC-559
+                'region',  # TODO: AC-932
             ]
         })
         course_page.a11y_audit.check_for_accessibility_errors()

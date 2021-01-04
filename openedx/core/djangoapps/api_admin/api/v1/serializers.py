@@ -1,6 +1,7 @@
 """
 API v1 serializers.
 """
+
 from rest_framework import serializers
 
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest

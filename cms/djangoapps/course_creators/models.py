@@ -1,12 +1,15 @@
 """
 Table for storing information about whether or not Studio users have course creation privileges.
 """
+
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_init, post_save
 from django.dispatch import Signal, receiver
 from django.utils import timezone
-from django.utils.translation import ugettext as _
+from django.utils.encoding import python_2_unicode_compatible
+from django.utils.translation import ugettext_lazy as _
 
 # A signal that will be sent when users should be added or removed from the creator group
 update_creator_state = Signal(providing_args=["caller", "user", "state"])
@@ -18,14 +21,17 @@ send_admin_notification = Signal(providing_args=["user"])
 send_user_notification = Signal(providing_args=["user", "state"])
 
 
+@python_2_unicode_compatible
 class CourseCreator(models.Model):
     """
     Creates the database table model.
+
+    .. no_pii:
     """
-    UNREQUESTED = 'unrequested'
-    PENDING = 'pending'
-    GRANTED = 'granted'
-    DENIED = 'denied'
+    UNREQUESTED = u'unrequested'
+    PENDING = u'pending'
+    GRANTED = u'granted'
+    DENIED = u'denied'
 
     # Second value is the "human-readable" version.
     STATES = (
@@ -36,14 +42,14 @@ class CourseCreator(models.Model):
     )
 
     user = models.OneToOneField(User, help_text=_("Studio user"), on_delete=models.CASCADE)
-    state_changed = models.DateTimeField('state last updated', auto_now_add=True,
+    state_changed = models.DateTimeField(u'state last updated', auto_now_add=True,
                                          help_text=_("The date when state was last updated"))
     state = models.CharField(max_length=24, blank=False, choices=STATES, default=UNREQUESTED,
                              help_text=_("Current course creator state"))
     note = models.CharField(max_length=512, blank=True, help_text=_("Optional notes about this user (for example, "
                                                                     "why course creation access was denied)"))
 
-    def __unicode__(self):
+    def __str__(self):
         return u"{0} | {1} [{2}]".format(self.user, self.state, self.state_changed)
 
 

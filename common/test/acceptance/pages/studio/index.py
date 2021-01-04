@@ -1,6 +1,8 @@
 """
 Studio Index, home and dashboard pages. These are the starting pages for users.
 """
+
+
 from bok_choy.page_object import PageObject
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
@@ -114,7 +116,7 @@ class DashboardPage(PageObject, HelpMixin):
         Fill out the form to create a new library.
         Must have called click_new_library() first.
         """
-        field = lambda fn: self.q(css='.wrapper-create-library #new-library-{}'.format(fn))
+        field = lambda fn: self.q(css=u'.wrapper-create-library #new-library-{}'.format(fn))
         field('name').fill(display_name)
         field('org').fill(org)
         field('number').fill(number)
@@ -158,7 +160,7 @@ class DashboardPage(PageObject, HelpMixin):
         """
         Fill out the form to create a new course.
         """
-        field = lambda fn: self.q(css='.wrapper-create-course #new-course-{}'.format(fn))
+        field = lambda fn: self.q(css=u'.wrapper-create-course #new-course-{}'.format(fn))
         field('name').fill(display_name)
         field('org').fill(org)
         field('number').fill(number)
@@ -218,7 +220,7 @@ class DashboardPage(PageObject, HelpMixin):
         List all the courses found on the page's list of courses.
         """
         # Workaround Selenium/Firefox bug: `.text` property is broken on invisible elements
-        tab_selector = '#course-index-tabs .{} a'.format('archived-courses-tab' if archived else 'courses-tab')
+        tab_selector = u'#course-index-tabs .{} a'.format('archived-courses-tab' if archived else 'courses-tab')
         self.wait_for_element_presence(tab_selector, "Courses Tab")
         self.q(css=tab_selector).click()
         div2info = lambda element: {
@@ -228,7 +230,7 @@ class DashboardPage(PageObject, HelpMixin):
             'run': element.find_element_by_css_selector('.course-run .value').text,
             'url': element.find_element_by_css_selector('a.course-link').get_attribute('href'),
         }
-        course_list_selector = '.{} li.course-item'.format('archived-courses' if archived else 'courses')
+        course_list_selector = u'.{} li.course-item'.format('archived-courses' if archived else 'courses')
         return self.q(css=course_list_selector).map(div2info).results
 
     def has_course(self, org, number, run, archived=False):
@@ -364,7 +366,7 @@ class AccessibilityPage(IndexPage):
         """
         To simulate leaving a field blank, click on the field, then press TAB to move off focus off the field.
         """
-        field = self.q(css='#root {}#{}'.format(field_type, field_id))[0]
+        field = self.q(css=u'#root {}#{}'.format(field_type, field_id))[0]
         field.click()
         field.send_keys(Keys.TAB)
 
@@ -378,7 +380,7 @@ class AccessibilityPage(IndexPage):
         """
         Check that at least one error message is shown and at least one contains the specified text.
         """
-        selector = '#root div#error-{}'.format(field_id)
+        selector = u'#root div#error-{}'.format(field_id)
         self.wait_for_element_visibility(selector, 'An error message is visible')
         error_messages = self.q(css=selector)
         for message in error_messages:

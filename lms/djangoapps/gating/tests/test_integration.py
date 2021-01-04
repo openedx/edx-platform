@@ -1,15 +1,17 @@
 """
 Integration tests for gated content.
 """
+
+
 import ddt
-from crum import set_current_request
 from completion import waffle as completion_waffle
+from crum import set_current_request
 from edx_django_utils.cache import RequestCache
 from milestones import api as milestones_api
 from milestones.tests.utils import MilestonesTestCaseMixin
 
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import answer_problem
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
@@ -25,7 +27,6 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
     Base TestCase class for setting up a basic course structure
     and testing the gating feature
     """
-    shard = 3
 
     @classmethod
     def setUpClass(cls):
@@ -153,7 +154,7 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
         """
         Verifies whether or not the user has the prereq milestone
         """
-        self.assertEquals(
+        self.assertEqual(
             milestones_api.user_has_milestone({'id': user.id}, self.prereq_milestone),
             expected_has_milestone,
         )
@@ -169,7 +170,7 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
         for prob in [self.gating_prob1, self.gated_prob2, self.prob3]:
             self.assertIn(prob.location, course_grade.problem_scores)
 
-        self.assertEquals(course_grade.percent, expected_percent)
+        self.assertEqual(course_grade.percent, expected_percent)
 
     def test_gated_for_nonstaff(self):
         self.assert_user_has_prereq_milestone(self.non_staff_user, expected_has_milestone=False)

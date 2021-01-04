@@ -1,9 +1,12 @@
 """
 Tests for student enrollment.
 """
+
+
 import unittest
 
 import ddt
+import six
 from django.conf import settings
 from django.urls import reverse
 from mock import patch
@@ -12,10 +15,10 @@ from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from student.models import (
+    SCORE_RECALCULATION_DELAY_ON_ENROLLMENT_UPDATE,
     CourseEnrollment,
     CourseFullError,
-    EnrollmentClosedError,
-    SCORE_RECALCULATION_DELAY_ON_ENROLLMENT_UPDATE,
+    EnrollmentClosedError
 )
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
@@ -31,7 +34,6 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
     Test student enrollment, especially with different course modes.
     """
 
-    shard = 3
     USERNAME = "Bob"
     EMAIL = "bob@example.com"
     PASSWORD = "edx"
@@ -52,7 +54,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
         self.course_limited.max_student_enrollments_allowed = 1
         self.store.update_item(self.course_limited, self.user.id)
         self.urls = [
-            reverse('course_modes_choose', kwargs={'course_id': unicode(self.course.id)})
+            reverse('course_modes_choose', kwargs={'course_id': six.text_type(self.course.id)})
         ]
 
     @ddt.data(
@@ -95,14 +97,14 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
         # (otherwise, use an empty string, which the JavaScript client
         # interprets as a redirect to the dashboard)
         full_url = (
-            reverse(next_url, kwargs={'course_id': unicode(self.course.id)})
+            reverse(next_url, kwargs={'course_id': six.text_type(self.course.id)})
             if next_url else next_url
         )
 
         # Enroll in the course and verify the URL we get sent to
         resp = self._change_enrollment('enroll')
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.content, full_url)
+        self.assertEqual(resp.content.decode('utf-8'), full_url)
 
         # If we're not expecting to be enrolled, verify that this is the case
         if enrollment_mode is None:
@@ -169,7 +171,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
         with restrict_course(self.course.id) as redirect_url:
             response = self._change_enrollment('enroll')
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.content, redirect_url)
+            self.assertEqual(response.content.decode('utf-8'), redirect_url)
 
         # Verify that we weren't enrolled
         is_enrolled = CourseEnrollment.is_enrolled(self.user, self.course.id)
@@ -179,7 +181,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
     def test_embargo_allow(self):
         response = self._change_enrollment('enroll')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, '')
+        self.assertEqual(response.content.decode('utf-8'), '')
 
         # Verify that we were enrolled
         is_enrolled = CourseEnrollment.is_enrolled(self.user, self.course.id)
@@ -273,7 +275,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
 
         """
         if course_id is None:
-            course_id = unicode(self.course.id)
+            course_id = six.text_type(self.course.id)
 
         params = {
             'enrollment_action': action,

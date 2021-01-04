@@ -1,7 +1,8 @@
 """
 Script for exporting a content library from Mongo to a tar.gz file
 """
-from __future__ import print_function
+
+
 import os
 import shutil
 
@@ -9,9 +10,9 @@ from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
-from xmodule.modulestore.django import modulestore
 
 from cms.djangoapps.contentstore import tasks
+from xmodule.modulestore.django import modulestore
 
 
 class Command(BaseCommand):

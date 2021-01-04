@@ -3,12 +3,13 @@
 """
 Tests for import_course_from_xml using the mongo modulestore.
 """
-from __future__ import print_function
+
 
 import copy
 from uuid import uuid4
 
 import ddt
+import six
 from django.conf import settings
 from django.test.client import Client
 from django.test.utils import override_settings
@@ -134,7 +135,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         self.assertIsNotNone(content)
 
         # make sure course.static_asset_path is correct
-        print("static_asset_path = {0}".format(course.static_asset_path))
+        print(u"static_asset_path = {0}".format(course.static_asset_path))
         self.assertEqual(course.static_asset_path, 'test_import_course')
 
     def test_asset_import_nostatic(self):
@@ -173,7 +174,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
     def test_tab_name_imports_correctly(self):
         _module_store, _content_store, course = self.load_test_import_course()
-        print("course tabs = {0}".format(course.tabs))
+        print(u"course tabs = {0}".format(course.tabs))
         self.assertEqual(course.tabs[2]['name'], 'Syllabus')
 
     def test_import_performance_mongo(self):
@@ -268,7 +269,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         self.assertIsNotNone(split_test_module)
 
         remapped_verticals = {
-            key: target_id.make_usage_key('vertical', value) for key, value in groups_to_verticals.iteritems()
+            key: target_id.make_usage_key('vertical', value) for key, value in six.iteritems(groups_to_verticals)
         }
 
         self.assertEqual(remapped_verticals, split_test_module.group_id_to_child)

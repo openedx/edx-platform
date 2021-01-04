@@ -1,12 +1,14 @@
 # pylint: disable=missing-docstring
+
+
 from django.template import VariableDoesNotExist
 from django.test import override_settings
 
 from openedx.core.djangoapps.ace_common.templatetags.ace import (
+    _get_google_analytics_tracking_url,
     ensure_url_is_absolute,
-    with_link_tracking,
     google_analytics_tracking_pixel,
-    _get_google_analytics_tracking_url
+    with_link_tracking
 )
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin, QueryStringAssertionMixin
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory

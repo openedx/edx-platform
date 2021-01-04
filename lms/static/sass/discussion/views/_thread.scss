@@ -33,7 +33,8 @@
       display: inline;
     }
 
-    .timeago, .top-post-status {
+    .timeago,
+    .top-post-status {
       color: inherit;
     }
   }
@@ -59,7 +60,7 @@
   .response-header-content {
     display: inline-block;
     vertical-align: top;
-    width: flex-grid(11,12);
+    width: flex-grid(11, 12);
   }
 
   .response-header-actions {
@@ -81,9 +82,11 @@
   .response-body {
     @extend %t-copy-sub2;
 
+    @include padding(($baseline / 2), ($baseline * 1.5), 0, 0);
+
     display: inline-block;
-    margin-bottom: ($baseline/2);
-    width: flex-grid(10,12);
+    margin-top: ($baseline/2);
+    width: flex-grid(10, 12);
 
     p + p {
       margin-top: ($baseline/2);
@@ -95,7 +98,7 @@
     @include right($baseline / 2);
 
     position: absolute;
-    top: $baseline / 2;
+    top: 0;
   }
 }
 
@@ -107,7 +110,9 @@
 }
 
 // +thread - elements - shared styles
-.discussion-post, .discussion-response, .discussion-comment {
+.discussion-post,
+.discussion-response,
+.discussion-comment {
   @include clearfix();
 
   // thread - images

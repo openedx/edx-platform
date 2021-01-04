@@ -1,26 +1,26 @@
 """
 Views related to EdxNotes.
 """
-from __future__ import absolute_import
+
+
 import json
 import logging
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse
 from django.http import Http404, HttpResponse
+from django.urls import reverse
 from django.views.decorators.http import require_GET
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from opaque_keys.edx.keys import CourseKey
-from six import text_type
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from six import text_type
 
-
-from courseware.courses import get_course_with_access
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module_for_descriptor
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from lms.djangoapps.courseware.courses import get_course_with_access
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.module_render import get_module_for_descriptor
 from edxmako.shortcuts import render_to_response
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.helpers import (
@@ -31,12 +31,11 @@ from edxnotes.helpers import (
     get_course_position,
     get_edxnotes_id_token,
     get_notes,
-    is_feature_enabled,
+    is_feature_enabled
 )
 from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
 from openedx.core.djangoapps.user_api.models import RetirementStateError, UserRetirementStatus
 from util.json_request import JsonResponse, JsonResponseBadRequest
-
 
 log = logging.getLogger(__name__)
 
@@ -181,7 +180,6 @@ def notes(request, course_id):
     return HttpResponse(json.dumps(notes_info, cls=NoteJSONEncoder), content_type="application/json")
 
 
-# pylint: disable=unused-argument
 @login_required
 def get_token(request, course_id):
     """
@@ -206,13 +204,13 @@ def edxnotes_visibility(request, course_id):
         raise Http404
 
     try:
-        visibility = json.loads(request.body)["visibility"]
+        visibility = json.loads(request.body.decode('utf8'))["visibility"]
         course_module.edxnotes_visibility = visibility
         course_module.save()
         return JsonResponse(status=200)
     except (ValueError, KeyError):
         log.warning(
-            "Could not decode request body as JSON and find a boolean visibility field: '%s'", request.body
+            u"Could not decode request body as JSON and find a boolean visibility field: '%s'", request.body
         )
         return JsonResponseBadRequest()
 

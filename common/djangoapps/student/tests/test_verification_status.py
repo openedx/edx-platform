@@ -1,11 +1,16 @@
 """Tests for per-course verification status on the dashboard. """
+
+
 import unittest
 from datetime import datetime, timedelta
 
 import ddt
+import six
 from django.conf import settings
-from django.urls import reverse
 from django.test import override_settings
+from django.urls import reverse
+from django.utils.timezone import now
+
 from mock import patch
 from pytz import UTC
 
@@ -31,7 +36,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
     """Tests for per-course verification status on the dashboard. """
 
-    shard = 3
     PAST = 'past'
     FUTURE = 'future'
     DATES = {
@@ -128,6 +132,17 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         # Check that the "verification good until" date is displayed
         response = self.client.get(self.dashboard_url)
         self.assertContains(response, attempt.expiration_datetime.strftime("%m/%d/%Y"))
+
+    @patch("lms.djangoapps.verify_student.services.is_verification_expiring_soon")
+    def test_verify_resubmit_button_on_dashboard(self, mock_expiry):
+        mock_expiry.return_value = True
+        SoftwareSecurePhotoVerification.objects.create(user=self.user, status='approved', expiry_date=now())
+        response = self.client.get(self.dashboard_url)
+        self.assertContains(response, "Resubmit Verification")
+
+        mock_expiry.return_value = False
+        response = self.client.get(self.dashboard_url)
+        self.assertNotContains(response, "Resubmit Verification")
 
     def test_missed_verification_deadline(self):
         # Expiration date in the past
@@ -297,7 +312,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         self._assert_course_verification_status(VERIFY_STATUS_APPROVED)
         response2 = self.client.get(self.dashboard_url)
         self.assertContains(response2, attempt2.expiration_datetime.strftime("%m/%d/%Y"))
-        self.assertEqual(response2.content.count(attempt2.expiration_datetime.strftime("%m/%d/%Y")), 2)
+        self.assertContains(response2, attempt2.expiration_datetime.strftime("%m/%d/%Y"), count=2)
 
     def _setup_mode_and_enrollment(self, deadline, enrollment_mode):
         """Create a course mode and enrollment.
@@ -360,7 +375,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         response = self.client.get(self.dashboard_url)
 
         # Sanity check: verify that the course is on the page
-        self.assertContains(response, unicode(self.course.id))
+        self.assertContains(response, six.text_type(self.course.id))
 
         # Verify that the correct banner is rendered on the dashboard
         alt_text = self.BANNER_ALT_MESSAGES.get(status)
@@ -381,7 +396,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
                 # and fail if none of these are found.
                 found_msg = False
                 for message in self.NOTIFICATION_MESSAGES[status]:
-                    if message in response.content:
+                    if six.b(message) in response.content:
                         found_msg = True
                         break
 

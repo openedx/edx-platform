@@ -2,6 +2,7 @@
 Things commonly needed in Enterprise tests.
 """
 
+
 from django.conf import settings
 
 FEATURES_WITH_ENTERPRISE_ENABLED = settings.FEATURES.copy()

@@ -42,7 +42,7 @@ define([
             };
         };
 
-        createTeamProfileView = function(requests, options) {
+        createTeamProfileView = function(requests, options, isInstructorManagedTopic) {
             teamModel = new TeamModel(createTeamModelData(options), {parse: true});
             profileView = new TeamProfileView({
                 el: $('.profile-view'),
@@ -50,6 +50,9 @@ define([
                 courseID: TeamSpecHelpers.testCourseID,
                 context: TeamSpecHelpers.testContext,
                 model: teamModel,
+                topic: isInstructorManagedTopic ?
+                    TeamSpecHelpers.createMockInstructorManagedTopic() :
+                    TeamSpecHelpers.createMockTopic(),
                 setFocusToHeaderFunc: function() {
                     $('.teams-content').focus();
                 }
@@ -58,7 +61,7 @@ define([
             AjaxHelpers.expectRequest(
                 requests,
                 'GET',
-                interpolate(
+                interpolate( // eslint-disable-line no-undef
                     '/courses/%(courseID)s/discussion/forum/%(topicID)s/inline' +
                     '?page=1&sort_key=activity&sort_order=desc&ajax=1',
                     {
@@ -124,11 +127,21 @@ define([
         });
 
         describe('TeamDetailsView', function() {
-            var assertTeamDetails = function(view, members, memberOfTeam) {
+            var assertTeamDetails = function(view, members, memberOfTeam, isManagedTeam) {
+                var expectedMemberMsg;
                 expect(view.$('.team-detail-header').text()).toBe('Team Details');
                 expect(view.$('.team-country').text()).toContain('United States');
                 expect(view.$('.team-language').text()).toContain('English');
-                expect(view.$('.team-capacity').text()).toContain(members + ' / 6 Members');
+                if (isManagedTeam) {
+                    if (members === 1) {
+                        expectedMemberMsg = '1 Member';
+                    } else {
+                        expectedMemberMsg = members + ' Members';
+                    }
+                } else {
+                    expectedMemberMsg = members + ' / 6 Members';
+                }
+                expect(view.$('.team-capacity').text()).toContain(expectedMemberMsg);
                 expect(view.$('.team-member').length).toBe(members);
                 expect(Boolean(view.$('.leave-team-link').length)).toBe(memberOfTeam);
             };
@@ -140,7 +153,7 @@ define([
                         country: 'US',
                         language: 'en'
                     });
-                    assertTeamDetails(view, 0, false);
+                    assertTeamDetails(view, 0, false, false);
                     expect(view.$('.team-user-membership-status').length).toBe(0);
 
                     // Verify that the leave team link is not present.
@@ -163,7 +176,7 @@ define([
                         language: 'en',
                         membership: DEFAULT_MEMBERSHIP
                     });
-                    assertTeamDetails(view, 1, true);
+                    assertTeamDetails(view, 1, true, false);
                     expect(view.$('.team-user-membership-status').text().trim()).toBe('You are a member of this team.');
 
                     // assert tooltip text.
@@ -181,9 +194,19 @@ define([
                     var view = createTeamProfileView(
                         requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}
                     );
-                    assertTeamDetails(view, 1, true);
+                    assertTeamDetails(view, 1, true, false);
                     clickLeaveTeam(requests, view, {cancel: false});
-                    assertTeamDetails(view, 0, false);
+                    assertTeamDetails(view, 0, false, false);
+                });
+
+                it('student can not leave instructor managed team', function() {
+                    var requests = AjaxHelpers.requests(this);
+
+                    var view = createTeamProfileView(
+                        requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}, true
+                    );
+                    // When a student is in a team of an instructor-managed topic, he can't see the leave team button.
+                    assertTeamDetails(view, 1, false, true);
                 });
 
                 it("wouldn't do anything if user click on Cancel button on dialog", function() {
@@ -192,9 +215,9 @@ define([
                     var view = createTeamProfileView(
                         requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}
                     );
-                    assertTeamDetails(view, 1, true);
+                    assertTeamDetails(view, 1, true, false);
                     clickLeaveTeam(requests, view, {cancel: true});
-                    assertTeamDetails(view, 1, true);
+                    assertTeamDetails(view, 1, true, false);
                 });
 
                 it('shows correct error messages', function() {

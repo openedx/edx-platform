@@ -1,27 +1,34 @@
 """
 Tests that check that we ignore the appropriate files when importing courses.
 """
-import unittest
-from mock import Mock
 
-from xmodule.modulestore.xml_importer import StaticContentImporter
+
+import unittest
+
+from mock import Mock
 from opaque_keys.edx.locator import CourseLocator
-from xmodule.tests import DATA_DIR
+
 from xmodule.modulestore.tests.utils import (
-    add_temp_files_from_dict, remove_temp_files_from_list, DOT_FILES_DICT, TILDA_FILES_DICT
+    DOT_FILES_DICT,
+    TILDA_FILES_DICT,
+    add_temp_files_from_dict,
+    remove_temp_files_from_list
 )
+from xmodule.modulestore.xml_importer import StaticContentImporter
+from xmodule.tests import DATA_DIR
 
 
 class IgnoredFilesTestCase(unittest.TestCase):
-    "Tests for ignored files"
-    shard = 1
+    """
+    Tests for ignored files
+    """
     course_dir = DATA_DIR / "course_ignore"
     dict_list = [DOT_FILES_DICT, TILDA_FILES_DICT]
 
     def setUp(self):
         super(IgnoredFilesTestCase, self).setUp()
         for dictionary in self.dict_list:
-            self.addCleanup(remove_temp_files_from_list, dictionary.keys(), self.course_dir / "static")
+            self.addCleanup(remove_temp_files_from_list, list(dictionary.keys()), self.course_dir / "static")
             add_temp_files_from_dict(dictionary, self.course_dir / "static")
 
     def test_sample_static_files(self):
@@ -42,8 +49,8 @@ class IgnoredFilesTestCase(unittest.TestCase):
         name_val = {sc.name: sc.data for sc in saved_static_content}
         self.assertIn("example.txt", name_val)
         self.assertIn(".example.txt", name_val)
-        self.assertIn("GREEN", name_val["example.txt"])
-        self.assertIn("BLUE", name_val[".example.txt"])
+        self.assertIn(b"GREEN", name_val["example.txt"])
+        self.assertIn(b"BLUE", name_val[".example.txt"])
         self.assertNotIn("._example.txt", name_val)
         self.assertNotIn(".DS_Store", name_val)
         self.assertNotIn("example.txt~", name_val)

@@ -2,16 +2,20 @@
 Module for the dual-branch fall-back Draft->Published Versioning ModuleStore
 """
 
-from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore, EXCLUDE_ALL
+
+from contracts import contract
+from opaque_keys.edx.locator import CourseLocator, LibraryLocator, LibraryUsageLocator
+
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.exceptions import InsufficientSpecificationError, ItemNotFoundError
 from xmodule.modulestore.draft_and_published import (
-    ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES, UnsupportedRevisionError
+    DIRECT_ONLY_CATEGORIES,
+    ModuleStoreDraftAndPublished,
+    UnsupportedRevisionError
 )
-from opaque_keys.edx.locator import CourseLocator, LibraryLocator, LibraryUsageLocator
+from xmodule.modulestore.exceptions import InsufficientSpecificationError, ItemNotFoundError
 from xmodule.modulestore.split_mongo import BlockKey
-from contracts import contract
+from xmodule.modulestore.split_mongo.split import EXCLUDE_ALL, SplitMongoModuleStore
 
 
 class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPublished):
@@ -156,7 +160,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             descriptor.location = old_descriptor_locn
             return item
 
-    def create_item(self, user_id, course_key, block_type, block_id=None,     # pylint: disable=too-many-statements
+    def create_item(self, user_id, course_key, block_type, block_id=None,     # pylint: disable=W0221
                     definition_locator=None, fields=None, asides=None, force=False, skip_auto_publish=False, **kwargs):
         """
         See :py:meth `ModuleStoreDraftAndPublished.create_item`

@@ -2,18 +2,16 @@
 """
 Tests for the django management command `change_enterprise_user_username`.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import mock
-from pytest import mark
-
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.management import call_command
 from django.db.models.signals import post_save
 from django.test import TestCase
-
 from enterprise.models import EnterpriseCustomer, EnterpriseCustomerUser
+from pytest import mark
 
 
 @mark.django_db

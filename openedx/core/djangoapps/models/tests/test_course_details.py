@@ -2,15 +2,16 @@
 Tests for CourseDetails
 """
 
+
 import datetime
+
 import ddt
 from pytz import UTC
 
+from openedx.core.djangoapps.models.course_details import ABOUT_ATTRIBUTES, CourseDetails
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-from openedx.core.djangoapps.models.course_details import CourseDetails, ABOUT_ATTRIBUTES
 
 
 @ddt.ddt
@@ -18,7 +19,6 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
     """
     Tests the first course settings page (course dates, overview, etc.).
     """
-    shard = 2
 
     def setUp(self):
         super(CourseDetailsTestCase, self).setUp()
@@ -178,4 +178,4 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
             CourseDetails.update_about_video(self.course, video_value, self.user.id)
         self.assertEqual(CourseDetails.fetch_youtube_video_id(self.course.id), video_value)
         video_url = CourseDetails.fetch_video_url(self.course.id)
-        self.assertRegexpMatches(video_url, r'http://.*{}'.format(video_value))
+        self.assertRegex(video_url, r'http://.*{}'.format(video_value))

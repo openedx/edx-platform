@@ -2,6 +2,7 @@
 Test helper functions and base classes.
 """
 
+
 import functools
 import inspect
 import io
@@ -10,12 +11,12 @@ import operator
 import os
 import pprint
 import sys
-import urlparse
 from contextlib import contextmanager
 from datetime import datetime
 from unittest import SkipTest, TestCase
 
 import requests
+import six
 from bok_choy.javascript import js_defined
 from bok_choy.page_object import XSS_INJECTION
 from bok_choy.promise import EmptyPromise, Promise
@@ -28,6 +29,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
+from six.moves import range, zip
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
@@ -58,7 +60,7 @@ def skip_if_browser(browser):
         @functools.wraps(test_function)
         def wrapper(self, *args, **kwargs):
             if self.browser.name == browser:
-                raise SkipTest('Skipping as this test will not work with {}'.format(browser))
+                raise SkipTest(u'Skipping as this test will not work with {}'.format(browser))
             test_function(self, *args, **kwargs)
         return wrapper
     return decorator
@@ -86,7 +88,7 @@ def is_youtube_available():
         'transcript': 'http://video.google.com/timedtext?lang=en&v=3_yD_cEKoCk',
     }
 
-    for url in youtube_api_urls.itervalues():
+    for url in six.itervalues(youtube_api_urls):
         try:
             response = requests.get(url, allow_redirects=False)
         except requests.exceptions.ConnectionError:
@@ -102,7 +104,7 @@ def is_focused_on_element(browser, selector):
     """
     Check if the focus is on the element that matches the selector.
     """
-    return browser.execute_script("return $('{}').is(':focus')".format(selector))
+    return browser.execute_script(u"return $('{}').is(':focus')".format(selector))
 
 
 def load_data_str(rel_path):
@@ -110,7 +112,7 @@ def load_data_str(rel_path):
     Load a file from the "data" directory as a string.
     `rel_path` is the path relative to the data directory.
     """
-    full_path = path(__file__).abspath().dirname() / "data" / rel_path  # pylint: disable=no-value-for-parameter
+    full_path = path(__file__).abspath().dirname() / "data" / rel_path
     with open(full_path) as data_file:
         return data_file.read()
 
@@ -159,7 +161,7 @@ def disable_css_animations(page):
     """
     Disable CSS3 animations, transitions, transforms.
     """
-    page.browser.execute_script("""
+    page.browser.execute_script(u"""
         var id = 'no-transitions';
 
         // if styles were already added, just do nothing.
@@ -236,7 +238,7 @@ def select_option_by_text(select_browser_query, option_text, focus_out=False):
         except StaleElementReferenceException:
             return False
 
-    msg = 'Selected option {}'.format(option_text)
+    msg = u'Selected option {}'.format(option_text)
     EmptyPromise(lambda: select_option(select_browser_query, option_text), msg).fulfill()
 
 
@@ -350,7 +352,7 @@ def get_element_padding(page, selector):
         progress_page.get_element_padding('.wrapper-msg.wrapper-auto-cert')
 
     """
-    js_script = """
+    js_script = u"""
         var $element = $('%(selector)s');
 
         element_padding = {
@@ -380,7 +382,7 @@ def create_multiple_choice_xml(correct_choice=2, num_choices=4):
     choices[correct_choice] = True
 
     choice_names = ['choice_{}'.format(index) for index in range(num_choices)]
-    question_text = 'The correct answer is Choice {}'.format(correct_choice)
+    question_text = u'The correct answer is Choice {}'.format(correct_choice)
 
     return MultipleChoiceResponseXMLFactory().build_xml(
         question_text=question_text,
@@ -402,11 +404,11 @@ def create_multiple_choice_problem(problem_name):
     )
 
 
-def auto_auth(browser, username, email, staff, course_id):
+def auto_auth(browser, username, email, staff, course_id, **kwargs):
     """
     Logout and login with given credentials.
     """
-    AutoAuthPage(browser, username=username, email=email, course_id=course_id, staff=staff).visit()
+    AutoAuthPage(browser, username=username, email=email, course_id=course_id, staff=staff, **kwargs).visit()
 
 
 def assert_link(test, expected_link, actual_link):
@@ -434,7 +436,7 @@ def assert_opened_help_link_is_correct(test, url):
     # Check that the URL loads. Can't do this in the browser because it might
     # be loading a "Maze Found" missing content page.
     response = requests.get(url)
-    test.assertEqual(response.status_code, 200, "URL {!r} returned {}".format(url, response.status_code))
+    test.assertEqual(response.status_code, 200, u"URL {!r} returned {}".format(url, response.status_code))
 
 
 EDX_BOOKS = {
@@ -560,7 +562,7 @@ class EventsTestMixin(TestCase):
             # This is a bit of a hack, Promise calls str(description), so I set the description to an object with a
             # custom __str__ and have it do some intelligent stuff to generate a helpful error message.
             CollectedEventsDescription(
-                'Waiting for {number_of_matches} events to match the filter:\n{event_filter}'.format(
+                u'Waiting for {number_of_matches} events to match the filter:\n{event_filter}'.format(
                     number_of_matches=number_of_matches,
                     event_filter=self.event_filter_to_descriptive_string(event_filter),
                 ),
@@ -644,7 +646,7 @@ class EventsTestMixin(TestCase):
             lambda: matching_events
         )
 
-        self.assertEquals(len(matching_events), 0, description)
+        self.assertEqual(len(matching_events), 0, description)
 
     def assert_events_match(self, expected_events, actual_events, in_order=True):
         """Assert that each actual event matches one of the expected events.
@@ -656,11 +658,13 @@ class EventsTestMixin(TestCase):
         """
         if in_order:
             for expected_event, actual_event in zip(expected_events, actual_events):
-                assert_event_matches(
-                    expected_event,
-                    actual_event,
-                    tolerate=EventMatchTolerates.lenient()
-                )
+                expected_field = (None if expected_event.get('event') is None else
+                                  expected_event.get('event').get('field'))
+                has_field = expected_field is not None
+                actual_event_to_compare = (next(item for item in actual_events if item.get('event').get('field') ==
+                                                expected_field)) if has_field else actual_event
+
+                assert_event_matches(expected_event, actual_event_to_compare, tolerate=EventMatchTolerates.lenient())
         else:
             for expected_event in expected_events:
                 actual_event = next(event for event in actual_events if is_matching_event(expected_event, event))
@@ -672,7 +676,7 @@ class EventsTestMixin(TestCase):
 
     def relative_path_to_absolute_uri(self, relative_path):
         """Return an aboslute URI given a relative path taking into account the test context."""
-        return urlparse.urljoin(BASE_URL, relative_path)
+        return six.moves.urllib.parse.urljoin(BASE_URL, relative_path)
 
     def event_filter_to_descriptive_string(self, event_filter):
         """Find the source code of the callable or pretty-print the dictionary"""
@@ -817,7 +821,7 @@ class UniqueCourseTest(AcceptanceTest):
             self.course_info['run'],
             deprecated=(default_store == 'draft')
         )
-        return unicode(course_key)
+        return six.text_type(course_key)
 
 
 class YouTubeConfigError(Exception):
@@ -855,7 +859,7 @@ class YouTubeStubConfig(object):
 
         if not response.ok:
             raise YouTubeConfigError(
-                'YouTube Server Configuration Failed. URL {0}, Configuration Data: {1}, Status was {2}'.format(
+                u'YouTube Server Configuration Failed. URL {0}, Configuration Data: {1}, Status was {2}'.format(
                     youtube_stub_config_url, config, response.status_code))
 
     @classmethod
@@ -873,7 +877,7 @@ class YouTubeStubConfig(object):
 
         if not response.ok:
             raise YouTubeConfigError(
-                'YouTube Server Configuration Failed. URL: {0} Status was {1}'.format(
+                u'YouTube Server Configuration Failed. URL: {0} Status was {1}'.format(
                     youtube_stub_config_url, response.status_code))
 
     @classmethod
@@ -890,7 +894,7 @@ class YouTubeStubConfig(object):
         response = requests.get(youtube_stub_config_url)
 
         if response.ok:
-            return json.loads(response.content)
+            return json.loads(response.content.decode('utf-8'))
         else:
             return {}
 

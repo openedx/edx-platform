@@ -1,14 +1,17 @@
 """ User Authn related Exceptions. """
 
 
+from openedx.core.djangolib.markup import Text
+
+
 class AuthFailedError(Exception):
     """
-    This is a helper for the login view, allowing the various sub-methods to early out with an appropriate failure
+    This is a helper for the login view, allowing the various sub-methods to error out with an appropriate failure
     message.
     """
     def __init__(self, value=None, redirect=None, redirect_url=None):
         super(AuthFailedError, self).__init__()
-        self.value = value
+        self.value = Text(value)
         self.redirect = redirect
         self.redirect_url = redirect_url
 

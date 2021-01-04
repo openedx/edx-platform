@@ -1,3 +1,8 @@
+"""
+Commerce views
+"""
+
+
 import logging
 
 from django.contrib.auth.models import User
@@ -8,7 +13,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from rest_framework_oauth.authentication import OAuth2Authentication
+from openedx.core.lib.api.authentication import BearerAuthentication
 
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
@@ -25,7 +30,7 @@ log = logging.getLogger(__name__)
 
 class CourseListView(ListAPIView):
     """ List courses and modes. """
-    authentication_classes = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
+    authentication_classes = (JwtAuthentication, BearerAuthentication, SessionAuthentication,)
     permission_classes = (IsAuthenticated,)
     serializer_class = CourseSerializer
     pagination_class = None
@@ -39,7 +44,7 @@ class CourseRetrieveUpdateView(PutAsCreateMixin, RetrieveUpdateAPIView):
     lookup_field = 'id'
     lookup_url_kwarg = 'course_id'
     model = CourseMode
-    authentication_classes = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
+    authentication_classes = (JwtAuthentication, BearerAuthentication, SessionAuthentication,)
     permission_classes = (ApiKeyOrModelPermission,)
     serializer_class = CourseSerializer
 

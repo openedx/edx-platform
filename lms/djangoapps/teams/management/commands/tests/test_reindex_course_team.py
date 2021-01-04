@@ -1,6 +1,7 @@
 """
-Tests for course_team reindex command
+Tests for course_team reindex command.
 """
+
 
 import ddt
 from django.core.management import CommandError, call_command
@@ -21,7 +22,6 @@ class ReindexCourseTeamTest(SharedModuleStoreTestCase):
     """
     Tests for the ReindexCourseTeam command
     """
-    shard = 4
 
     def setUp(self):
         """
@@ -39,14 +39,14 @@ class ReindexCourseTeamTest(SharedModuleStoreTestCase):
         """
         Test that raises CommandError for incorrect arguments.
         """
-        with self.assertRaisesRegexp(CommandError, '.*At least one course_team_id or --all needs to be specified.*'):
+        with self.assertRaisesRegex(CommandError, '.*At least one course_team_id or --all needs to be specified.*'):
             call_command('reindex_course_team')
 
     def test_given_conflicting_arguments_raises_command_error(self):
         """
         Test that raises CommandError for incorrect arguments.
         """
-        with self.assertRaisesRegexp(CommandError, '.*Course teams cannot be specified when --all is also specified.*'):
+        with self.assertRaisesRegex(CommandError, '.*Course teams cannot be specified when --all is also specified.*'):
             call_command('reindex_course_team', self.team1.team_id, all=True)
 
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_TEAMS': False})
@@ -54,7 +54,7 @@ class ReindexCourseTeamTest(SharedModuleStoreTestCase):
         """
         Test that raises CommandError for disabled feature flag.
         """
-        with self.assertRaisesRegexp(CommandError, '.*ENABLE_TEAMS must be enabled.*'):
+        with self.assertRaisesRegex(CommandError, '.*ENABLE_TEAMS must be enabled.*'):
             call_command('reindex_course_team', self.team1.team_id)
 
     def test_given_invalid_team_id_raises_command_error(self):
@@ -62,8 +62,8 @@ class ReindexCourseTeamTest(SharedModuleStoreTestCase):
         Test that raises CommandError for invalid team id.
         """
         team_id = u'team4'
-        error_str = 'Argument {} is not a course_team team_id'.format(team_id)
-        with self.assertRaisesRegexp(CommandError, error_str):
+        error_str = u'Argument {} is not a course_team team_id'.format(team_id)
+        with self.assertRaisesRegex(CommandError, error_str):
             call_command('reindex_course_team', team_id)
 
     @patch.object(CourseTeamIndexer, 'index')

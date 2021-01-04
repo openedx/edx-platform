@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 """ Tests for transcripts_utils. """
+
+
 import copy
-import tempfile
-import ddt
 import json
+import tempfile
 import textwrap
 import unittest
 from uuid import uuid4
 
+import ddt
 import pytest
 from django.conf import settings
 from django.test.utils import override_settings
@@ -16,12 +18,12 @@ from mock import Mock, patch
 from six import text_type
 
 from contentstore.tests.utils import mock_requests_get
+from student.tests.factories import UserFactory
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from student.tests.factories import UserFactory
 from xmodule.video_module import transcripts_utils
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
@@ -234,7 +236,7 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
         self.clear_sub_content(good_youtube_sub)
 
         with patch('xmodule.video_module.transcripts_utils.requests.get') as mock_get:
-            mock_get.return_value = Mock(status_code=200, text=response, content=response)
+            mock_get.return_value = Mock(status_code=200, text=response, content=response.encode('utf-8'))
             # Check transcripts_utils.GetTranscriptsFromYouTubeException not thrown
             transcripts_utils.download_youtube_subs(good_youtube_sub, self.course, settings)
 
@@ -301,7 +303,7 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
             <track id="0" name="Custom1" lang_code="en-GB"/>
         </transcript_list>
         """
-        mock_get.return_value = Mock(status_code=200, text=response_success, content=response_success)
+        mock_get.return_value = Mock(status_code=200, text=response_success, content=response_success.encode('utf-8'))
 
         transcript_name = transcripts_utils.youtube_video_transcript_name(youtube_text_api)
         self.assertEqual(transcript_name, 'Custom')
@@ -314,7 +316,7 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
         youtube_text_api = copy.deepcopy(settings.YOUTUBE['TEXT_API'])
         youtube_text_api['params']['v'] = 'dummy_video_id'
         response_success = "<transcript_list></transcript_list>"
-        mock_get.return_value = Mock(status_code=200, text=response_success, content=response_success)
+        mock_get.return_value = Mock(status_code=200, text=response_success, content=response_success.encode('utf-8'))
 
         transcript_name = transcripts_utils.youtube_video_transcript_name(youtube_text_api)
         self.assertIsNone(transcript_name)
@@ -333,7 +335,7 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
             <track id="0" name="Custom1" lang_code="en-GB"/>
         </transcript_list>
         """
-        mock_get.return_value = Mock(status_code=200, text=response_success, content=response_success)
+        mock_get.return_value = Mock(status_code=200, text=response_success, content=response_success.encode('utf-8'))
 
         transcript_name = transcripts_utils.youtube_video_transcript_name(youtube_text_api)
         self.assertIsNone(transcript_name)
@@ -548,7 +550,7 @@ class TestYoutubeTranscripts(unittest.TestCase):
         }
         youtube_id = 'good_youtube_id'
         with patch('xmodule.video_module.transcripts_utils.requests.get') as mock_get:
-            mock_get.return_value = Mock(status_code=200, text=response, content=response)
+            mock_get.return_value = Mock(status_code=200, text=response, content=response.encode('utf-8'))
             transcripts = transcripts_utils.get_transcripts_from_youtube(youtube_id, settings, translation)
         self.assertEqual(transcripts, expected_transcripts)
         mock_get.assert_called_with('http://video.google.com/timedtext', params={'lang': 'en', 'v': 'good_youtube_id'})
@@ -871,7 +873,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         Verify that `get_transcript` function returns correct data when transcript is in content store.
         """
         base_filename = 'video_101.srt'
-        self.upload_file(self.create_srt_file(self.subs_srt), self.video.location, base_filename)
+        self.upload_file(self.create_srt_file(self.subs_srt.encode('utf-8')), self.video.location, base_filename)
         self.create_transcript(subs_id, language, base_filename, youtube_id_1_0, html5_sources)
         content, file_name, mimetype = transcripts_utils.get_transcript(
             self.video,
@@ -933,7 +935,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         """
         Verify that `get_transcript` function returns correct exception when transcript content is empty.
         """
-        self.upload_file(self.create_srt_file(''), self.video.location, 'ur_video_101.srt')
+        self.upload_file(self.create_srt_file(b''), self.video.location, 'ur_video_101.srt')
         self.create_transcript('', 'ur', 'ur_video_101.srt')
 
         with self.assertRaises(NotFoundError) as no_content_exception:

@@ -1,7 +1,18 @@
 # This file describes this Open edX repo, as described in OEP-2:
-# https://open-edx-proposals.readthedocs.io/en/latest/oeps/oep-0002.html#specification
+# https://open-edx-proposals.readthedocs.io/en/latest/oep-0002-bp-repo-metadata.html#specification
+
+owner: 'nasthagiri'
+supporting_teams:
+    - platform-core
 
 nick: edx
-oeps: {}
 openedx-release: {ref: release}
-track-pulls: true
+
+oeps:
+    oep-2: true
+    oep-18: true
+    oep-7: true
+
+tags:
+    - core
+    - webservice

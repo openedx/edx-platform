@@ -1,6 +1,8 @@
 """
 Configuration for course_overviews Django app
 """
+
+
 from django.apps import AppConfig
 
 

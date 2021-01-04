@@ -1,15 +1,17 @@
 """
 Mixins for the EnterpriseApiClient.
 """
+
+
 import json
+
 import mock
 
 import httpretty
 from django.conf import settings
 from django.core.cache import cache
-from django.urls import reverse
 from django.test import SimpleTestCase
-
+from django.urls import reverse
 from openedx.features.enterprise_support.tests import FAKE_ENTERPRISE_CUSTOMER
 
 
@@ -142,7 +144,6 @@ class EnterpriseServiceMockMixin(object):
 
     def mock_enterprise_learner_api(
             self,
-            catalog_id=1,
             entitlement_id=1,
             learner_id=1,
             enterprise_customer_uuid='cf246b88-d5f6-4908-a522-fc307e0b0c59',
@@ -161,7 +162,6 @@ class EnterpriseServiceMockMixin(object):
                     'enterprise_customer': {
                         'uuid': enterprise_customer_uuid,
                         'name': 'TestShib',
-                        'catalog': catalog_id,
                         'active': True,
                         'site': {
                             'domain': 'example.com',

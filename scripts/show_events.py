@@ -1,4 +1,8 @@
-from __future__ import print_function
+"""
+Show Event outputs.
+"""
+
+
 import json
 import sys
 import traceback

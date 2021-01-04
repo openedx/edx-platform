@@ -1,12 +1,14 @@
+
+
 import unittest
 
 import ddt
 from django.conf import settings
-from django.urls import reverse
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from edx_django_utils.cache import RequestCache
 from mock import Mock, patch
 
@@ -23,45 +25,78 @@ class ShortcutsTests(UrlResetMixin, TestCase):
     Test the edxmako shortcuts file
     """
     @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'ABOUT': '/about-us'})
-    @override_settings(MKTG_URL_LINK_MAP={'ABOUT': 'login'})
     def test_marketing_link(self):
-        # test marketing site on
-        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
-            expected_link = 'https://dummy-root/about-us'
-            link = marketing_link('ABOUT')
-            self.assertEquals(link, expected_link)
-        # test marketing site off
-        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
-            # we are using login because it is common across both cms and lms
-            expected_link = reverse('login')
-            link = marketing_link('ABOUT')
-            self.assertEquals(link, expected_link)
+        with override_settings(MKTG_URL_LINK_MAP={'ABOUT': self._get_test_url_name()}):
+            # test marketing site on
+            with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
+                expected_link = 'https://dummy-root/about-us'
+                link = marketing_link('ABOUT')
+                self.assertEqual(link, expected_link)
+            # test marketing site off
+            with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
+                expected_link = reverse(self._get_test_url_name())
+                link = marketing_link('ABOUT')
+                self.assertEqual(link, expected_link)
 
     @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'ABOUT': '/about-us'})
-    @override_settings(MKTG_URL_LINK_MAP={'ABOUT': 'login'})
     def test_is_marketing_link_set(self):
-        # test marketing site on
-        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
-            self.assertTrue(is_marketing_link_set('ABOUT'))
-            self.assertFalse(is_marketing_link_set('NOT_CONFIGURED'))
-        # test marketing site off
-        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
-            self.assertTrue(is_marketing_link_set('ABOUT'))
-            self.assertFalse(is_marketing_link_set('NOT_CONFIGURED'))
+        with override_settings(MKTG_URL_LINK_MAP={'ABOUT': self._get_test_url_name()}):
+            # test marketing site on
+            with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
+                self.assertTrue(is_marketing_link_set('ABOUT'))
+                self.assertFalse(is_marketing_link_set('NOT_CONFIGURED'))
+            # test marketing site off
+            with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
+                self.assertTrue(is_marketing_link_set('ABOUT'))
+                self.assertFalse(is_marketing_link_set('NOT_CONFIGURED'))
 
     @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'ABOUT': '/about-us'})
-    @override_settings(MKTG_URL_LINK_MAP={'ABOUT': 'login'})
     def test_is_any_marketing_link_set(self):
+        with override_settings(MKTG_URL_LINK_MAP={'ABOUT': self._get_test_url_name()}):
+            # test marketing site on
+            with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
+                self.assertTrue(is_any_marketing_link_set(['ABOUT']))
+                self.assertTrue(is_any_marketing_link_set(['ABOUT', 'NOT_CONFIGURED']))
+                self.assertFalse(is_any_marketing_link_set(['NOT_CONFIGURED']))
+            # test marketing site off
+            with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
+                self.assertTrue(is_any_marketing_link_set(['ABOUT']))
+                self.assertTrue(is_any_marketing_link_set(['ABOUT', 'NOT_CONFIGURED']))
+                self.assertFalse(is_any_marketing_link_set(['NOT_CONFIGURED']))
+
+    def _get_test_url_name(self):
+        if settings.ROOT_URLCONF == 'lms.urls':
+            # return any lms url name
+            return 'dashboard'
+        else:
+            # return any cms url name
+            return 'organizations'
+
+    @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'TOS': '/tos'})
+    @override_settings(MKTG_URL_OVERRIDES={'TOS': 'https://edx.org'})
+    def test_override_marketing_link_valid(self):
+        expected_link = 'https://edx.org'
         # test marketing site on
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
-            self.assertTrue(is_any_marketing_link_set(['ABOUT']))
-            self.assertTrue(is_any_marketing_link_set(['ABOUT', 'NOT_CONFIGURED']))
-            self.assertFalse(is_any_marketing_link_set(['NOT_CONFIGURED']))
+            link = marketing_link('TOS')
+            self.assertEqual(link, expected_link)
         # test marketing site off
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
-            self.assertTrue(is_any_marketing_link_set(['ABOUT']))
-            self.assertTrue(is_any_marketing_link_set(['ABOUT', 'NOT_CONFIGURED']))
-            self.assertFalse(is_any_marketing_link_set(['NOT_CONFIGURED']))
+            link = marketing_link('TOS')
+            self.assertEqual(link, expected_link)
+
+    @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'TOS': '/tos'})
+    @override_settings(MKTG_URL_OVERRIDES={'TOS': '123456'})
+    def test_override_marketing_link_invalid(self):
+        expected_link = '#'
+        # test marketing site on
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
+            link = marketing_link('TOS')
+            self.assertEqual(link, expected_link)
+        # test marketing site off
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
+            link = marketing_link('TOS')
+            self.assertEqual(link, expected_link)
 
 
 class AddLookupTests(TestCase):
@@ -123,9 +158,11 @@ class MakoRequestContextTest(TestCase):
             self.assertIsNotNone(get_template_request_context())
 
         mock_get_current_request = Mock()
-        with patch('edxmako.request_context.get_current_request', mock_get_current_request):
-            # requestcontext should not be None, because the cache is filled
-            self.assertIsNotNone(get_template_request_context())
+        with patch('edxmako.request_context.get_current_request'):
+            with patch('edxmako.request_context.RequestContext.__init__') as mock_context_init:
+                # requestcontext should not be None, because the cache is filled
+                self.assertIsNotNone(get_template_request_context())
+                mock_context_init.assert_not_called()
         mock_get_current_request.assert_not_called()
 
         RequestCache.clear_all_namespaces()

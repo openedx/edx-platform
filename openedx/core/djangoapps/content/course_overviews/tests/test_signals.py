@@ -1,4 +1,7 @@
+
+
 import datetime
+
 import ddt
 from mock import patch
 
@@ -17,7 +20,6 @@ class CourseOverviewSignalsTestCase(ModuleStoreTestCase):
     ENABLED_SIGNALS = ['course_deleted', 'course_published']
     TODAY = datetime.datetime.utcnow()
     NEXT_WEEK = TODAY + datetime.timedelta(days=7)
-    shard = 3
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_caching(self, modulestore_type):

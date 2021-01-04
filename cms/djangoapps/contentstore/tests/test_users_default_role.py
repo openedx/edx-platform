@@ -2,9 +2,11 @@
 Unit tests for checking default forum role "Student" of a user when he creates a course or
 after deleting it creates same course again
 """
+
+
 from contentstore.tests.utils import AjaxEnabledTestClient
 from contentstore.utils import delete_course, reverse_url
-from courseware.tests.factories import UserFactory
+from lms.djangoapps.courseware.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 

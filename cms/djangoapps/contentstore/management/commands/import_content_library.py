@@ -1,7 +1,7 @@
 """
 Script for importing a content library from a tar.gz file
 """
-from __future__ import print_function
+
 
 import base64
 import os
@@ -14,14 +14,15 @@ from django.core.management.base import BaseCommand, CommandError
 from lxml import etree
 from opaque_keys.edx.locator import LibraryLocator
 from path import Path
+from six.moves import input
+
+from cms.djangoapps.contentstore.utils import add_instructor
+from openedx.core.lib.extract_tar import safetar_extractall
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.xml_importer import import_library_from_xml
-
-from cms.djangoapps.contentstore.utils import add_instructor
-from openedx.core.lib.extract_tar import safetar_extractall
 
 
 class Command(BaseCommand):
@@ -76,7 +77,7 @@ class Command(BaseCommand):
         # Check if data would be overwritten
         ans = ''
         while not created and ans not in ['y', 'yes', 'n', 'no']:
-            inp = raw_input(u'Library "{0}" already exists, overwrite it? [y/n] '.format(courselike_key))
+            inp = input(u'Library "{0}" already exists, overwrite it? [y/n] '.format(courselike_key))
             ans = inp.lower()
         if ans.startswith('n'):
             print(u'Aborting import of "{0}"'.format(courselike_key))

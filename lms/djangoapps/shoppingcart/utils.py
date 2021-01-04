@@ -2,6 +2,7 @@
 Utility methods for the Shopping Cart app
 """
 
+
 from django.conf import settings
 from pdfminer.converter import PDFPageAggregator
 from pdfminer.layout import LAParams, LTFigure, LTTextBox, LTTextLine
@@ -67,7 +68,7 @@ def parse_lt_objects(lt_objects):
     for lt_object in lt_objects:
         if isinstance(lt_object, LTTextBox) or isinstance(lt_object, LTTextLine):
             # text
-            text_content.append(lt_object.get_text().encode('utf-8'))
+            text_content.append(lt_object.get_text())
         elif isinstance(lt_object, LTFigure):
             # LTFigure objects are containers for other LT* objects, so recurse through the children
             text_content.append(parse_lt_objects(lt_object._objs))  # pylint: disable=protected-access

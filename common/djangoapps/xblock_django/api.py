@@ -2,9 +2,14 @@
 API methods related to xblock state.
 """
 
+
+from openedx.core.lib.cache_utils import CacheInvalidationManager
 from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration
 
+cacher = CacheInvalidationManager(model=XBlockConfiguration)
 
+
+@cacher
 def deprecated_xblocks():
     """
     Return the QuerySet of deprecated XBlock types. Note that this method is independent of
@@ -13,6 +18,7 @@ def deprecated_xblocks():
     return XBlockConfiguration.objects.current_set().filter(deprecated=True)
 
 
+@cacher
 def disabled_xblocks():
     """
     Return the QuerySet of disabled XBlock types (which should not render in the LMS).

@@ -3,6 +3,8 @@ CCX Enrollment operations for use by Coach APIs.
 
 Does not include any access control, be sure to check access before calling.
 """
+
+
 import datetime
 import logging
 from contextlib import contextmanager
@@ -11,11 +13,12 @@ from smtplib import SMTPException
 import pytz
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.urls import reverse
 from django.core.validators import validate_email
+from django.urls import reverse
 from django.utils.translation import ugettext as _
+from six.moves import map
 
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.ccx.custom_exception import CCXUserValidationException
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import get_override_for_ccx
@@ -26,7 +29,6 @@ from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment, CourseEnrollmentException
 from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
-
 
 log = logging.getLogger("edx.ccx")
 
@@ -61,7 +63,7 @@ def get_ccx_from_ccx_locator(course_id):
         ccx = CustomCourseForEdX.objects.filter(id=ccx_id)
     if not ccx:
         log.warning(
-            "CCX does not exist for course with id %s",
+            u"CCX does not exist for course with id %s",
             course_id
         )
         return None
@@ -86,10 +88,10 @@ def get_date(ccx, node, date_type=None, parent_node=None):
 
     if date is not None:
         # Setting override date [start or due]
-        date = date.strftime('%Y-%m-%d %H:%M')
+        date = date.strftime(u'%Y-%m-%d %H:%M')
     elif not parent_node and master_date is not None:
         # Setting date from master course
-        date = master_date.strftime('%Y-%m-%d %H:%M')
+        date = master_date.strftime(u'%Y-%m-%d %H:%M')
     elif parent_node is not None:
         # Set parent date (vertical has same dates as subsections)
         date = get_date(ccx, node=parent_node, date_type=date_type)
@@ -143,8 +145,8 @@ def parse_date(datestring):
     """
     if datestring:
         date, time = datestring.split(' ')
-        year, month, day = map(int, date.split('-'))
-        hour, minute = map(int, time.split(':'))
+        year, month, day = list(map(int, date.split('-')))
+        hour, minute = list(map(int, time.split(':')))
         if validate_date(year, month, day, hour, minute):
             return datetime.datetime(
                 year, month, day, hour, minute, tzinfo=pytz.UTC)
@@ -224,7 +226,7 @@ def get_valid_student_with_email(identifier):
     try:
         validate_email(email)
     except ValidationError:
-        raise CCXUserValidationException('Could not find a user with name or email "{0}" '.format(identifier))
+        raise CCXUserValidationException(u'Could not find a user with name or email "{0}" '.format(identifier))
     return email, user
 
 
@@ -258,14 +260,14 @@ def ccx_students_enrolling_center(action, identifiers, email_students, course_ke
                 if student:
                     must_enroll = student in staff or student in admins or student == coach
             except CCXUserValidationException as exp:
-                log.info("%s", exp)
-                errors.append("{0}".format(exp))
+                log.info(u"%s", exp)
+                errors.append(u"{0}".format(exp))
                 continue
 
             if CourseEnrollment.objects.is_course_full(ccx_course_overview) and not must_enroll:
-                error = _('The course is full: the limit is {max_student_enrollments_allowed}').format(
+                error = _(u'The course is full: the limit is {max_student_enrollments_allowed}').format(
                     max_student_enrollments_allowed=ccx_course_overview.max_student_enrollments_allowed)
-                log.info("%s", error)
+                log.info(u"%s", error)
                 errors.append(error)
                 break
             enroll_email(course_key, email, auto_enroll=True, email_students=email_students, email_params=email_params)
@@ -274,8 +276,8 @@ def ccx_students_enrolling_center(action, identifiers, email_students, course_ke
             try:
                 email, __ = get_valid_student_with_email(identifier)
             except CCXUserValidationException as exp:
-                log.info("%s", exp)
-                errors.append("{0}".format(exp))
+                log.info(u"%s", exp)
+                errors.append(u"{0}".format(exp))
                 continue
             unenroll_email(course_key, email, email_students=email_students, email_params=email_params)
     return errors
@@ -355,7 +357,7 @@ def add_master_course_staff_to_ccx(master_course, ccx_key, display_name, send_em
                     allow_access(course_ccx, staff, 'staff')
                 except CourseEnrollmentException:
                     log.warning(
-                        "Unable to enroll staff %s to course with id %s",
+                        u"Unable to enroll staff %s to course with id %s",
                         staff.email,
                         ccx_key
                     )
@@ -380,7 +382,7 @@ def add_master_course_staff_to_ccx(master_course, ccx_key, display_name, send_em
                     allow_access(course_ccx, instructor, 'instructor')
                 except CourseEnrollmentException:
                     log.warning(
-                        "Unable to enroll instructor %s to course with id %s",
+                        u"Unable to enroll instructor %s to course with id %s",
                         instructor.email,
                         ccx_key
                     )

@@ -1,6 +1,8 @@
 """
 Tests for VisibilityTransformer.
 """
+
+
 import ddt
 
 from ..visibility import VisibilityTransformer
@@ -13,7 +15,6 @@ class VisibilityTransformerTestCase(BlockParentsMapTestCase):
     VisibilityTransformer Test
     """
     TRANSFORMER_CLASS_TO_TEST = VisibilityTransformer
-    shard = 3
 
     # Following test cases are based on BlockParentsMapTestCase.parents_map
     @ddt.data(

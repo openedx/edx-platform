@@ -1,3 +1,7 @@
+"""
+Test cases for cache_programs command.
+"""
+
 import json
 
 import httpretty
@@ -5,12 +9,16 @@ from django.core.cache import cache
 from django.core.management import call_command
 
 from openedx.core.djangoapps.catalog.cache import (
+    COURSE_PROGRAMS_CACHE_KEY_TPL,
+    PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL,
     PATHWAY_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
+    PROGRAMS_BY_TYPE_CACHE_KEY_TPL,
     SITE_PATHWAY_IDS_CACHE_KEY_TPL,
     SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 )
-from openedx.core.djangoapps.catalog.tests.factories import PathwayFactory, ProgramFactory
+from openedx.core.djangoapps.catalog.utils import normalize_program_type
+from openedx.core.djangoapps.catalog.tests.factories import OrganizationFactory, PathwayFactory, ProgramFactory
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
@@ -20,6 +28,9 @@ from student.tests.factories import UserFactory
 @skip_unless_lms
 @httpretty.activate
 class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMixin):
+    """
+    Defines tests for the ``cache_programs`` management command.
+    """
     ENABLED_CACHES = ['default']
 
     def setUp(self):
@@ -29,7 +40,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
 
         self.catalog_integration = self.create_catalog_integration()
         self.site_domain = 'testsite.com'
-        self.set_up_site(
+        self.site = self.set_up_site(
             self.site_domain,
             {
                 'COURSE_CATALOG_API_URL': self.catalog_integration.get_internal_api_url().rstrip('/')
@@ -42,6 +53,12 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
 
         self.programs = ProgramFactory.create_batch(3)
         self.pathways = PathwayFactory.create_batch(3)
+        self.child_program = ProgramFactory.create()
+
+        self.programs[0]['curricula'][0]['programs'].append(self.child_program)
+        self.programs.append(self.child_program)
+
+        self.programs[0]['authoring_organizations'] = OrganizationFactory.create_batch(2)
 
         for pathway in self.pathways:
             self.programs += pathway['programs']
@@ -53,7 +70,10 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         self.pathways[1]['programs'].append(self.programs[0])
 
     def mock_list(self):
+        """ Mock the data returned by the program listing API endpoint. """
+        # pylint: disable=unused-argument
         def list_callback(request, uri, headers):
+            """ The mock listing callback. """
             expected = {
                 'exclude_utm': ['1'],
                 'status': ['active', 'retired'],
@@ -71,7 +91,10 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         )
 
     def mock_detail(self, uuid, program):
+        """ Mock the data returned by the program detail API endpoint. """
+        # pylint: disable=unused-argument
         def detail_callback(request, uri, headers):
+            """ The mock detail callback. """
             expected = {
                 'exclude_utm': ['1'],
             }
@@ -87,13 +110,9 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         )
 
     def mock_pathways(self, pathways, page_number=1, final=True):
-        """
-        Mock the data for discovery's credit pathways endpoint
-        """
+        """ Mock the data for discovery's credit pathways endpoint. """
         def pathways_callback(request, uri, headers):  # pylint: disable=unused-argument
-            """
-            Mocks response
-            """
+            """ Mocks the pathways response. """
 
             expected = {
                 'exclude_utm': ['1'],
@@ -167,6 +186,30 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
             del program['pathway_ids']
             self.assertEqual(program, programs[key])
 
+        # the courses in the child program's first curriculum (the active one)
+        # should point to both the child program and the first program
+        # in the cache.
+        for course in self.child_program['curricula'][0]['courses']:
+            for course_run in course['course_runs']:
+                course_run_cache_key = COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_run_id=course_run['key'])
+                self.assertIn(self.programs[0]['uuid'], cache.get(course_run_cache_key))
+                self.assertIn(self.child_program['uuid'], cache.get(course_run_cache_key))
+
+        # for each program, assert that the program's UUID is in a cached list of
+        # program UUIDS by program type and a cached list of UUIDs by authoring organization
+        for program in self.programs:
+            program_type = normalize_program_type(program.get('type', 'None'))
+            program_type_cache_key = PROGRAMS_BY_TYPE_CACHE_KEY_TPL.format(
+                site_id=self.site.id, program_type=program_type
+            )
+            self.assertIn(program['uuid'], cache.get(program_type_cache_key))
+
+            for organization in program['authoring_organizations']:
+                organization_cache_key = PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL.format(
+                    org_key=organization['key']
+                )
+                self.assertIn(program['uuid'], cache.get(organization_cache_key))
+
     def test_handle_pathways(self):
         """
         Verify that the command requests and caches credit pathways
@@ -192,7 +235,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         call_command('cache_programs')
 
         cached_pathway_keys = cache.get(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=self.site_domain))
-        pathway_keys = pathways.keys()
+        pathway_keys = list(pathways.keys())
         self.assertEqual(
             set(cached_pathway_keys),
             set(pathway_keys)
@@ -244,7 +287,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         pathways_dict = {
             PATHWAY_CACHE_KEY_TPL.format(id=pathway['id']): pathway for pathway in pathways
         }
-        pathway_keys = pathways_dict.keys()
+        pathway_keys = list(pathways_dict.keys())
 
         cached_pathway_keys = cache.get(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=self.site_domain))
         self.assertEqual(

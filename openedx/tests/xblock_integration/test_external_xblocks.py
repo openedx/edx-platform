@@ -7,7 +7,8 @@ run v1 tests only.
 
 That be the dragon here.
 """
-from __future__ import print_function
+
+
 import pkg_resources
 
 

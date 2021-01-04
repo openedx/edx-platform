@@ -4,10 +4,10 @@ Tests for compute_grades management command.
 
 # pylint: disable=protected-access
 
-from __future__ import absolute_import, division, print_function, unicode_literals
 
 import ddt
 import six
+from six.moves import range
 from django.contrib.auth import get_user_model
 from django.core.management import CommandError, call_command
 from mock import ANY, patch
@@ -24,7 +24,6 @@ class TestComputeGrades(SharedModuleStoreTestCase):
     """
     Tests compute_grades management command.
     """
-    shard = 4
     num_users = 3
     num_courses = 5
 

@@ -14,12 +14,15 @@ There are two common use cases:
    used to show a success message to the use.
 """
 
+
 from abc import abstractmethod
 from enum import Enum
 
+import six
 from django.contrib import messages
 from django.utils.translation import ugettext as _
-from openedx.core.djangolib.markup import Text, HTML
+
+from openedx.core.djangolib.markup import HTML, Text
 
 
 class UserMessageType(Enum):
@@ -164,7 +167,7 @@ class UserMessageCollection():
             for __, type in UserMessageType.__members__.items():
                 if type.value is level:
                     return type
-            raise 'Unable to find UserMessageType for level {level}'.format(level=level)
+            raise Exception(u'Unable to find UserMessageType for level {level}'.format(level=level))
 
         def _create_user_message(message):
             """
@@ -172,7 +175,7 @@ class UserMessageCollection():
             """
             return UserMessage(
                 type=_get_message_type_for_level(message.level),
-                message_html=unicode(message.message),
+                message_html=six.text_type(message.message),
             )
 
         django_messages = messages.get_messages(request)
@@ -191,7 +194,7 @@ class PageLevelMessages(UserMessageCollection):
         Returns the entire HTML snippet for the message.
         """
         if title:
-            title_area = Text(_('{header_open}{title}{header_close}')).format(
+            title_area = Text(_(u'{header_open}{title}{header_close}')).format(
                 header_open=HTML('<div class="message-header">'),
                 title=title,
                 header_close=HTML('</div>')
@@ -200,11 +203,11 @@ class PageLevelMessages(UserMessageCollection):
             title_area = ''
         if dismissable:
             dismiss_button = HTML(
-                '<div class="message-actions">'
-                '<button class="btn-link action-dismiss">'
-                '<span class="sr">{dismiss_text}</span>'
-                '<span class="icon fa fa-times" aria-hidden="true"></span></button>'
-                '</div>'
+                u'<div class="message-actions">'
+                u'<button class="btn-link action-dismiss">'
+                u'<span class="sr">{dismiss_text}</span>'
+                u'<span class="icon fa fa-times" aria-hidden="true"></span></button>'
+                u'</div>'
             ).format(
                 dismiss_text=Text(_("Dismiss"))
             )
@@ -212,7 +215,7 @@ class PageLevelMessages(UserMessageCollection):
             dismiss_button = ''
         return Text('{title_area}{body_area}{dismiss_button}').format(
             title_area=title_area,
-            body_area=HTML('<div class="message-content">{body_html}</div>').format(
+            body_area=HTML(u'<div class="message-content">{body_html}</div>').format(
                 body_html=body_html,
             ),
             dismiss_button=dismiss_button,

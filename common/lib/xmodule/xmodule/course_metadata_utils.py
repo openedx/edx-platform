@@ -5,11 +5,14 @@ This is a place to put simple functions that operate on course metadata. It
 allows us to share code between the CourseDescriptor and CourseOverview
 classes, which both need these type of functions.
 """
+
+
 from base64 import b32encode
 from datetime import datetime, timedelta
 from math import exp
 
 import dateutil.parser
+import six
 from pytz import utc
 
 DEFAULT_START_DATE = datetime(2030, 1, 1, tzinfo=utc)
@@ -63,8 +66,9 @@ def clean_course_key(course_key, padding_char):
         padding_char (str): Character used for padding at end of the encoded
             string. The standard value for this is '='.
     """
+    encoded = b32encode(six.text_type(course_key).encode('utf8')).decode('utf8')
     return "course_{}".format(
-        b32encode(unicode(course_key)).replace('=', padding_char)
+        encoded.replace('=', padding_char)
     )
 
 
@@ -197,7 +201,7 @@ def sorting_dates(start, advertised_start, announcement):
         start = dateutil.parser.parse(advertised_start)
         if start.tzinfo is None:
             start = start.replace(tzinfo=utc)
-    except (ValueError, AttributeError):
+    except (TypeError, ValueError, AttributeError):
         start = start
 
     now = datetime.now(utc)

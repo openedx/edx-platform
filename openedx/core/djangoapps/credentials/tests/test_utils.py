@@ -1,17 +1,17 @@
 """Tests covering Credentials utilities."""
+
+
 import uuid
 
-from edx_oauth2_provider.tests.factories import ClientFactory
 import mock
-from provider.constants import CONFIDENTIAL
 
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
+from openedx.core.djangoapps.credentials.tests import factories
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 from openedx.core.djangoapps.credentials.utils import get_credentials
-from openedx.core.djangoapps.credentials.tests import factories
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from student.tests.factories import UserFactory
-
 
 UTILS_MODULE = 'openedx.core.djangoapps.credentials.utils'
 
@@ -20,14 +20,13 @@ UTILS_MODULE = 'openedx.core.djangoapps.credentials.utils'
 @mock.patch(UTILS_MODULE + '.get_edx_api_data')
 class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
     """ Tests for credentials utility functions. """
-    shard = 2
 
     ENABLED_CACHES = ['default']
 
     def setUp(self):
         super(TestGetCredentials, self).setUp()
 
-        ClientFactory(name=CredentialsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
+        ApplicationFactory(name=CredentialsApiConfig.OAUTH2_CLIENT_NAME)
 
         self.credentials_config = self.create_credentials_config(cache_ttl=1)
         self.user = UserFactory()

@@ -3,9 +3,10 @@ Tests for Course API forms.
 """
 
 from itertools import product
-from urllib import urlencode
 
 import ddt
+import six
+from six.moves.urllib.parse import urlencode
 from django.contrib.auth.models import AnonymousUser
 from django.http import QueryDict
 
@@ -14,14 +15,13 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..forms import CourseDetailGetForm, CourseListGetForm
+from ..forms import CourseDetailGetForm, CourseIdListGetForm, CourseListGetForm
 
 
 class UsernameTestMixin(object):
     """
     Tests the username Form field.
     """
-    shard = 4
 
     def test_no_user_param_anonymous_access(self):
         self.set_up_data(AnonymousUser())
@@ -39,7 +39,6 @@ class TestCourseListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreT
     """
     Tests for CourseListGetForm
     """
-    shard = 4
     FORM_CLASS = CourseListGetForm
 
     @classmethod
@@ -101,11 +100,46 @@ class TestCourseListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreT
         self.assert_valid(self.cleaned_data)
 
 
+class TestCourseIdListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreTestCase):
+    FORM_CLASS = CourseIdListGetForm
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestCourseIdListGetForm, cls).setUpClass()
+
+        cls.course = CourseFactory.create()
+
+    def setUp(self):
+        super(TestCourseIdListGetForm, self).setUp()
+
+        self.student = UserFactory.create()
+        self.set_up_data(self.student)
+
+    def set_up_data(self, user):
+        """
+        Sets up the initial form data and the expected clean data.
+        """
+        self.initial = {'requesting_user': user}
+        self.form_data = QueryDict(
+            urlencode({
+                'username': user.username,
+                'role': 'staff',
+            }),
+            mutable=True,
+        )
+        self.cleaned_data = {
+            'username': user.username,
+            'role': 'staff',
+        }
+
+    def test_basic(self):
+        self.assert_valid(self.cleaned_data)
+
+
 class TestCourseDetailGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreTestCase):
     """
     Tests for CourseDetailGetForm
     """
-    shard = 4
     FORM_CLASS = CourseDetailGetForm
 
     @classmethod
@@ -128,7 +162,7 @@ class TestCourseDetailGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStor
         self.form_data = QueryDict(
             urlencode({
                 'username': user.username,
-                'course_key': unicode(self.course.id),
+                'course_key': six.text_type(self.course.id),
             }),
             mutable=True,
         )

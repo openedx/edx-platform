@@ -1,6 +1,8 @@
 """
 Tests for Django template context processors.
 """
+
+
 from django.conf import settings
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -12,7 +14,6 @@ class MobileContextProcessorTests(TestCase):
     """
     Tests for the configuration context processor.
     """
-    shard = 4
 
     def test_is_from_mobile_app(self):
         """

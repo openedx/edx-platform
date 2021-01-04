@@ -1,18 +1,24 @@
 """
 Tests for manager.py
 """
+
+
 import ddt
+import six
 from django.test import TestCase
 
 from ..block_structure import BlockStructureBlockData
 from ..config import RAISE_ERROR_WHEN_NOT_FOUND, STORAGE_BACKING_FOR_CACHE, waffle
-from ..exceptions import UsageKeyNotInBlockStructure, BlockStructureNotFound
+from ..exceptions import BlockStructureNotFound, UsageKeyNotInBlockStructure
 from ..manager import BlockStructureManager
 from ..transformers import BlockStructureTransformers
 from .helpers import (
-    MockModulestoreFactory, MockCache, MockTransformer,
-    ChildrenMapTestMixin, UsageKeyFactoryMixin,
-    mock_registered_transformers,
+    ChildrenMapTestMixin,
+    MockCache,
+    MockModulestoreFactory,
+    MockTransformer,
+    UsageKeyFactoryMixin,
+    mock_registered_transformers
 )
 
 
@@ -85,7 +91,7 @@ class TestTransformer1(MockTransformer):
         Returns a unique deterministic value for the given block key
         and data key.
         """
-        return data_key + 't1.val1.' + unicode(block_key)
+        return data_key + 't1.val1.' + six.text_type(block_key)
 
 
 @ddt.ddt
@@ -93,7 +99,6 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
     """
     Test class for BlockStructureManager.
     """
-    shard = 2
 
     def setUp(self):
         super(TestBlockStructureManager, self).setUp()
@@ -122,8 +127,9 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
         if expect_modulestore_called:
             self.assertGreater(self.modulestore.get_items_call_count, 0)
         else:
-            self.assertEquals(self.modulestore.get_items_call_count, 0)
-        self.assertEquals(self.cache.set_call_count, 1 if expect_cache_updated else 0)
+            assert self.modulestore.get_items_call_count == 0
+        expected_count = 1 if expect_cache_updated else 0
+        assert self.cache.set_call_count == expected_count
 
     def test_get_transformed(self):
         with mock_registered_transformers(self.registered_transformers):
@@ -169,7 +175,7 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
     def test_get_collected_cached(self):
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
         self.collect_and_verify(expect_modulestore_called=False, expect_cache_updated=False)
-        self.assertEquals(TestTransformer1.collect_call_count, 1)
+        assert TestTransformer1.collect_call_count == 1
 
     def test_get_collected_error_raised(self):
         with waffle().override(RAISE_ERROR_WHEN_NOT_FOUND, active=True):
@@ -181,13 +187,14 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
     def test_update_collected_if_needed(self, with_storage_backing):
         with waffle().override(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
             with mock_registered_transformers(self.registered_transformers):
-                self.assertEquals(TestTransformer1.collect_call_count, 0)
+                assert TestTransformer1.collect_call_count == 0
 
                 self.bs_manager.update_collected_if_needed()
-                self.assertEquals(TestTransformer1.collect_call_count, 1)
+                assert TestTransformer1.collect_call_count == 1
 
                 self.bs_manager.update_collected_if_needed()
-                self.assertEquals(TestTransformer1.collect_call_count, 1 if with_storage_backing else 2)
+                expected_count = 1 if with_storage_backing else 2
+                assert TestTransformer1.collect_call_count == expected_count
 
                 self.collect_and_verify(expect_modulestore_called=False, expect_cache_updated=False)
 
@@ -206,16 +213,16 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
         TestTransformer1.READ_VERSION -= 1
         self.collect_and_verify(expect_modulestore_called=False, expect_cache_updated=False)
 
-        self.assertEquals(TestTransformer1.collect_call_count, 2)
+        assert TestTransformer1.collect_call_count == 2
 
     def test_get_collected_structure_version(self):
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
         BlockStructureBlockData.VERSION += 1
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
-        self.assertEquals(TestTransformer1.collect_call_count, 2)
+        assert TestTransformer1.collect_call_count == 2
 
     def test_clear(self):
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
         self.bs_manager.clear()
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
-        self.assertEquals(TestTransformer1.collect_call_count, 2)
+        assert TestTransformer1.collect_call_count == 2

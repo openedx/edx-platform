@@ -2,17 +2,22 @@
 """
 End-to-end tests for the main LMS Dashboard (aka, Student Dashboard).
 """
+
+
 import datetime
-
-import pytest
-
-from common.test.acceptance.fixtures.course import CourseFixture
+import re
+import six
+from six.moves.urllib.parse import unquote
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
+from common.test.acceptance.pages.lms.problem import ProblemPage
+from common.test.acceptance.pages.lms.staff_view import StaffPreviewPage
 from common.test.acceptance.tests.helpers import UniqueCourseTest, generate_course_key
 
-DEFAULT_SHORT_DATE_FORMAT = '{dt:%b} {dt.day}, {dt.year}'
-TEST_DATE_FORMAT = '{dt:%b} {dt.day}, {dt.year} {dt.hour:02}:{dt.minute:02}'
+DEFAULT_SHORT_DATE_FORMAT = u'{dt:%b} {dt.day}, {dt.year}'
+TEST_DATE_FORMAT = u'{dt:%b} {dt.day}, {dt.year} {dt.hour:02}:{dt.minute:02}'
 
 
 class BaseLmsDashboardTest(UniqueCourseTest):
@@ -104,7 +109,7 @@ class BaseLmsDashboardTestMultiple(UniqueCourseTest):
         self.course_keys = {}
         self.course_fixtures = {}
 
-        for key, value in self.courses.iteritems():
+        for key, value in six.iteritems(self.courses):
             course_key = generate_course_key(
                 value['org'],
                 value['number'],
@@ -122,8 +127,24 @@ class BaseLmsDashboardTestMultiple(UniqueCourseTest):
                 u"social_sharing_url": {u"value": "http://custom/course/url"},
                 u"cert_name_long": {u"value": value['cert_name_long']}
             })
-
-            course_fixture.install()
+            course_fixture.add_children(
+                XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
+                    XBlockFixtureDesc('sequential', 'Test Subsection 1,1').add_children(
+                        XBlockFixtureDesc('problem', 'Test Problem 1', data='<problem>problem 1 dummy body</problem>'),
+                        XBlockFixtureDesc('html', 'html 1', data="<html>html 1 dummy body</html>"),
+                        XBlockFixtureDesc('problem', 'Test Problem 2', data="<problem>problem 2 dummy body</problem>"),
+                        XBlockFixtureDesc('html', 'html 2', data="<html>html 2 dummy body</html>"),
+                    ),
+                    XBlockFixtureDesc('sequential', 'Test Subsection 1,2').add_children(
+                        XBlockFixtureDesc('problem', 'Test Problem 3', data='<problem>problem 3 dummy body</problem>'),
+                    ),
+                    XBlockFixtureDesc(
+                        'sequential', 'Test HIDDEN Subsection', metadata={'visible_to_staff_only': True}
+                    ).add_children(
+                        XBlockFixtureDesc('problem', 'Test HIDDEN Problem', data='<problem>hidden problem</problem>'),
+                    ),
+                )
+            ).install()
 
             self.course_keys[key] = course_key
             self.course_fixtures[key] = course_fixture
@@ -168,25 +189,36 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         self.assertEqual(twitter_widget.attrs('title')[0], 'Share on Twitter')
         self.assertEqual(twitter_widget.attrs('data-tooltip')[0], 'Share on Twitter')
         self.assertEqual(twitter_widget.attrs('target')[0], '_blank')
-        self.assertIn(twitter_url, twitter_widget.attrs('href')[0])
-        self.assertIn(twitter_url, twitter_widget.attrs('onclick')[0])
+        self._assert_social_url(twitter_widget.attrs('href')[0], unquote(twitter_url), r"\'(.*?)\'\,")
+        self._assert_social_url(twitter_widget.attrs('onclick')[0], unquote(twitter_url), r"\'(.*?)\'\,")
 
         facebook_widget = self.dashboard_page.get_course_social_sharing_widget('facebook')
         facebook_url = ("https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fcustom%2Fcourse%2Furl%3F"
                         "utm_campaign%3Dsocial-sharing-db%26utm_medium%3Dsocial%26utm_source%3Dfacebook&"
-                        "quote=I%27m+taking+Test")
+                        "quote=I%27m+taking+Test+Course")
         self.assertEqual(facebook_widget.attrs('title')[0], 'Share on Facebook')
         self.assertEqual(facebook_widget.attrs('data-tooltip')[0], 'Share on Facebook')
         self.assertEqual(facebook_widget.attrs('target')[0], '_blank')
-        self.assertIn(facebook_url, facebook_widget.attrs('href')[0])
-        self.assertIn(facebook_url, facebook_widget.attrs('onclick')[0])
+        self._assert_social_url(facebook_widget.attrs('onclick')[0], unquote(facebook_url), r"\'(.*?);")
+        self._assert_social_url(facebook_widget.attrs('href')[0], unquote(facebook_url), r"^(.*)\;")
+
+    def _assert_social_url(self, url, expected_url, pattern):
+        """
+        will remove byte characters from specific query parameter
+        """
+        url = unquote(url)
+        social_url_search = re.search(pattern, url)
+        url_split = (social_url_search.group(1) if social_url_search else url).split('?')
+        query_parameters = url_split[2].split('&')
+        urls = url_split[:2] + query_parameters
+        for query_parameter in urls:
+            self.assertIn(query_parameter.strip("'"), expected_url)
 
     def test_ended_course_date(self):
         """
         Scenario:
             Course Date should have the format 'Ended - Sep 23, 2015'
             if the course on student dashboard has ended.
-
         As a Student,
         Given that I have enrolled to a course
         And the course has ended in the past
@@ -203,7 +235,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         self.course_fixture.configure_course()
 
         end_date = DEFAULT_SHORT_DATE_FORMAT.format(dt=course_end_date)
-        expected_course_date = "Ended - {end_date}".format(end_date=end_date)
+        expected_course_date = u"Ended - {end_date}".format(end_date=end_date)
 
         # reload the page for changes to course date changes to appear in dashboard
         self.dashboard_page.visit()
@@ -218,7 +250,6 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         Scenario:
             Course Date should have the format 'Started - Sep 23, 2015'
             if the course on student dashboard is running.
-
         As a Student,
         Given that I have enrolled to a course
         And the course has started
@@ -236,7 +267,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         self.course_fixture.configure_course()
 
         start_date = DEFAULT_SHORT_DATE_FORMAT.format(dt=course_start_date)
-        expected_course_date = "Started - {start_date}".format(start_date=start_date)
+        expected_course_date = u"Started - {start_date}".format(start_date=start_date)
 
         # reload the page for changes to course date changes to appear in dashboard
         self.dashboard_page.visit()
@@ -251,7 +282,6 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         Scenario:
             Course Date should have the format 'Starts - Sep 23, 2015'
             if the course on student dashboard starts in future.
-
         As a Student,
         Given that I have enrolled to a course
         And the course starts in future
@@ -269,7 +299,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         self.course_fixture.configure_course()
 
         start_date = DEFAULT_SHORT_DATE_FORMAT.format(dt=course_start_date)
-        expected_course_date = "Starts - {start_date}".format(start_date=start_date)
+        expected_course_date = u"Starts - {start_date}".format(start_date=start_date)
 
         # reload the page for changes to course date changes to appear in dashboard
         self.dashboard_page.visit()
@@ -285,7 +315,6 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         Scenario:
             Course Date should have the format 'Starts - Wednesday at 5am UTC'
             if the course on student dashboard starts within 5 days.
-
         As a Student,
         Given that I have enrolled to a course
         And the course starts within 5 days
@@ -303,7 +332,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         self.course_fixture.configure_course()
 
         start_date = TEST_DATE_FORMAT.format(dt=course_start_date)
-        expected_course_date = "Starts - {start_date} UTC".format(start_date=start_date)
+        expected_course_date = u"Starts - {start_date} UTC".format(start_date=start_date)
 
         # reload the page for changes to course date changes to appear in dashboard
         self.dashboard_page.visit()
@@ -315,7 +344,6 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         self.assertEqual(course_date, expected_course_date)
 
     def test_advertised_start_date(self):
-
         """
         Scenario:
             Course Date should be advertised start date
@@ -340,7 +368,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         })
         self.course_fixture._add_advanced_settings()
 
-        expected_course_date = "Starts - {start_date}".format(start_date=course_advertised_start)
+        expected_course_date = u"Starts - {start_date}".format(start_date=course_advertised_start)
 
         self.dashboard_page.visit()
         course_date = self.dashboard_page.get_course_date()
@@ -359,6 +387,7 @@ class LmsDashboardCourseUnEnrollDialogMessageTest(BaseLmsDashboardTestMultiple):
     """
         Class to test lms student dashboard unenroll dialog messages.
     """
+    shard = 23
 
     def test_audit_course_run_unenroll_dialog_msg(self):
         """
@@ -390,7 +419,7 @@ class LmsDashboardCourseUnEnrollDialogMessageTest(BaseLmsDashboardTestMultiple):
 
         expected_track_message = u'Are you sure you want to unenroll from the verified' + \
                                  u' <span id="unenroll_cert_name">' + cert_long_name + u'</span>' + \
-                                 u' track of <span id="unenroll_course_name">' + course_name + u'</span>' +  \
+                                 u' track of <span id="unenroll_course_name">' + course_name + u'</span>' + \
                                  u' (<span id="unenroll_course_number">' + course_number + u'</span>)?'
 
         expected_refund_message = u'The refund deadline for this course has passed,so you will not receive a refund.'
@@ -399,11 +428,11 @@ class LmsDashboardCourseUnEnrollDialogMessageTest(BaseLmsDashboardTestMultiple):
         self.assertEqual(dialog_message['refund-info'][0], expected_refund_message)
 
 
-@pytest.mark.a11y
 class LmsDashboardA11yTest(BaseLmsDashboardTestMultiple):
     """
     Class to test lms student dashboard accessibility.
     """
+    a11y = True
 
     def test_dashboard_course_listings_a11y(self):
         """
@@ -412,8 +441,58 @@ class LmsDashboardA11yTest(BaseLmsDashboardTestMultiple):
         self.dashboard_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'button-name',  # TODO: AC-935
+                'landmark-no-duplicate-banner',  # TODO: AC-934
+                'landmark-complementary-is-top-level',  # TODO: AC-939
+                'region'  # TODO: AC-932
             ]
         })
         course_listings = self.dashboard_page.get_courses()
         self.assertEqual(len(course_listings), 3)
         self.dashboard_page.a11y_audit.check_for_accessibility_errors()
+
+
+class TestMasqueradeAndSwitchCourse(BaseLmsDashboardTestMultiple):
+    """
+    Class to test lms dashboard accessibility of courses when masquerading as learner.
+    """
+
+    def test_masquerade_and_switch_course(self):
+        """
+        Scenario:
+            Staff user should be able to access other courses after
+            masquerading as student in one course
+
+        As Staff user, Select a course
+        When I click to change view from Staff to Learner
+        Then the first subsection from course outline should be visible as Learner
+        When I click to select a different course
+        Then the first subsection from new course outline should be visible as Staff
+        """
+        AutoAuthPage(
+            self.browser,
+            username=self.username,
+            email=self.email,
+            staff=True
+        ).visit()
+        self.dashboard_page.visit()
+
+        section_title = 'Test Section 1'
+        subsection_title = 'Test Subsection 1,1'
+        course_page = CourseHomePage(self.browser, str(self.course_keys['A']))
+        course_page.visit()
+
+        problem_name = u'Test Problem 1'
+
+        staff_page = StaffPreviewPage(self.browser)
+        staff_page.set_staff_view_mode('Learner')
+
+        course_page.outline.go_to_section(section_title, subsection_title)
+        self.assertEqual(staff_page.staff_view_mode, 'Learner')
+        self.assertEqual(ProblemPage(self.browser).problem_name, problem_name)
+
+        course_page.course_id = str(self.course_keys['B'])
+        course_page.visit()
+        course_page.outline.go_to_section(section_title, subsection_title)
+        self.assertNotEqual(staff_page.staff_view_mode, 'Learner')
+        self.assertEqual(ProblemPage(self.browser).problem_name, problem_name)

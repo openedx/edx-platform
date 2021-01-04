@@ -1,5 +1,6 @@
 """Tests for request_utils module."""
 
+
 import unittest
 
 from django.conf import settings

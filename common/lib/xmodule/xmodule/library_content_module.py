@@ -2,17 +2,21 @@
 """
 LibraryContent: The XBlock used to include blocks from a library in a course.
 """
+
+
 import json
 import logging
 import random
 from copy import copy
 from gettext import ngettext
 
+import six
 from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.locator import LibraryLocator
 from pkg_resources import resource_string
 from six import text_type
+from six.moves import zip
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock
@@ -198,7 +202,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         Helper method to publish an event for analytics purposes
         """
         event_data = {
-            "location": unicode(self.location),
+            "location": six.text_type(self.location),
             "result": result,
             "previous_count": getattr(self, "_last_event_result_count", len(self.selected)),
             "max_count": self.max_count,
@@ -233,7 +237,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
                 Function that handles the actual publishing.  Must have
                 the signature:
 
-                    <'removed'|'assigned'> -> result:T -> removed:T -> reason:basestring -> None
+                    <'removed'|'assigned'> -> result:T -> removed:T -> reason:str -> None
 
                 Where T is a collection of block_keys as returned by
                 `format_block_keys`.
@@ -414,7 +418,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         return user_id
 
     @XBlock.handler
-    def refresh_children(self, request=None, suffix=None):  # pylint: disable=unused-argument
+    def refresh_children(self, request=None, suffix=None):
         """
         Refresh children:
         This method is to be used when any of the libraries that this block
@@ -439,7 +443,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         """
         Copy any overrides the user has made on blocks in this library.
         """
-        for field in source.fields.itervalues():
+        for field in six.itervalues(source.fields):
             if field.scope == Scope.settings and field.is_set_on(source):
                 setattr(dest, field.name, field.read_from(source))
         if source.has_children:
@@ -476,7 +480,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         """
         latest_version = lib_tools.get_library_version(library_key)
         if latest_version is not None:
-            if version is None or version != unicode(latest_version):
+            if version is None or version != six.text_type(latest_version):
                 validation.set_summary(
                     StudioValidationMessage(
                         StudioValidationMessage.WARNING,
@@ -586,13 +590,13 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         all_libraries = [
             (key, name) for key, name in lib_tools.list_available_libraries()
-            if user_perms.can_read(key) or self.source_library_id == unicode(key)
+            if user_perms.can_read(key) or self.source_library_id == six.text_type(key)
         ]
         all_libraries.sort(key=lambda entry: entry[1])  # Sort by name
         if self.source_library_id and self.source_library_key not in [entry[0] for entry in all_libraries]:
             all_libraries.append((self.source_library_id, _(u"Invalid Library")))
         all_libraries = [(u"", _("No Library Selected"))] + all_libraries
-        values = [{"display_name": name, "value": unicode(key)} for key, name in all_libraries]
+        values = [{"display_name": name, "value": six.text_type(key)} for key, name in all_libraries]
         return values
 
     def editor_saved(self, user, old_metadata, old_content):
@@ -645,11 +649,11 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         for child in self.get_children():
             self.runtime.add_block_as_child_node(child, xml_object)
         # Set node attributes based on our fields.
-        for field_name, field in self.fields.iteritems():  # pylint: disable=no-member
+        for field_name, field in six.iteritems(self.fields):
             if field_name in ('children', 'parent', 'content'):
                 continue
             if field.is_set_on(self):
-                xml_object.set(field_name, unicode(field.read_from(self)))
+                xml_object.set(field_name, six.text_type(field.read_from(self)))
         return xml_object
 
 

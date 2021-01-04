@@ -3,26 +3,32 @@ xModule implementation of a learning sequence
 """
 
 # pylint: disable=abstract-method
+
+
 import collections
 import json
 import logging
 from datetime import datetime
+from functools import reduce
 
+from pkg_resources import resource_string
+
+import six
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
-from pkg_resources import resource_string
 from pytz import UTC
 from six import text_type
 from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
+from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Boolean, Integer, List, Scope, String
 
 from .exceptions import NotFoundError
 from .fields import Date
 from .mako_module import MakoModuleDescriptor
 from .progress import Progress
-from .x_module import STUDENT_VIEW, PUBLIC_VIEW, XModule
+from .x_module import AUTHOR_VIEW, PUBLIC_VIEW, STUDENT_VIEW, XModule
 from .xml_module import XmlDescriptor
 
 log = logging.getLogger(__name__)
@@ -120,6 +126,15 @@ class ProctoringFields(object):
         display_name=_("Is Practice Exam"),
         help=_(
             "This setting indicates whether this exam is for testing purposes only. Practice exams are not verified."
+        ),
+        default=False,
+        scope=Scope.settings,
+    )
+
+    is_onboarding_exam = Boolean(
+        display_name=_("Is Onboarding Exam"),
+        help=_(
+            "This setting indicates whether this exam is an onboarding exam."
         ),
         default=False,
         scope=Scope.settings,
@@ -223,6 +238,22 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             return json.dumps({
                 'complete': complete
             })
+        elif dispatch == 'metadata':
+            context = {'exclude_units': True}
+            prereq_met = True
+            prereq_meta_info = {}
+            banner_text = None
+            display_items = self.get_display_items()
+
+            if self._required_prereq():
+                if self.runtime.user_is_staff:
+                    banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')
+                else:
+                    # check if prerequisite has been met
+                    prereq_met, prereq_meta_info = self._compute_is_prereq_met(True)
+            meta = self._get_render_metadata(context, display_items, prereq_met, prereq_meta_info, banner_text, STUDENT_VIEW)
+            meta['display_name'] = self.display_name_with_default
+            return json.dumps(meta)
         raise NotFoundError('Unexpected dispatch type')
 
     @classmethod
@@ -271,6 +302,13 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         if self._required_prereq():
             prereq_met, prereq_meta_info = self._compute_is_prereq_met(True)
         return self._student_or_public_view(context or {}, prereq_met, prereq_meta_info, None, PUBLIC_VIEW)
+
+    def author_view(self, context):
+        context = context or {}
+        context['exclude_units'] = True
+        if 'position' in context:
+            context['position'] = int(context['position'])
+        return self._student_or_public_view(context, True, {}, view=AUTHOR_VIEW)
 
     def _special_exam_student_view(self):
         """
@@ -324,6 +362,31 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         # NOTE (CCB): We default to true to maintain the behavior in place prior to allowing anonymous access access.
         return context.get('user_authenticated', True)
 
+    def _get_render_metadata(self, context, display_items, prereq_met, prereq_meta_info, banner_text=None, view=STUDENT_VIEW, fragment=None):
+        if prereq_met and not self._is_gate_fulfilled():
+            banner_text = _(
+                'This section is a prerequisite. You must complete this section in order to unlock additional content.'
+            )
+
+        items = self._render_student_view_for_items(context, display_items, fragment, view) if prereq_met else []
+        params = {
+            'items': items,
+            'element_id': self.location.html_id(),
+            'item_id': text_type(self.location),
+            'is_time_limited': self.is_time_limited,
+            'position': self.position,
+            'tag': self.location.block_type,
+            'ajax_url': self.system.ajax_url,
+            'next_url': context.get('next_url'),
+            'prev_url': context.get('prev_url'),
+            'banner_text': banner_text,
+            'save_position': view != PUBLIC_VIEW,
+            'show_completion': view != PUBLIC_VIEW,
+            'gated_content': self._get_gated_content_info(prereq_met, prereq_meta_info),
+            'exclude_units': context.get('exclude_units', False)
+        }
+        return params
+
     def _student_or_public_view(self, context, prereq_met, prereq_meta_info, banner_text=None, view=STUDENT_VIEW):
         """
         Returns the rendered student view of the content of this
@@ -334,27 +397,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         display_items = self.get_display_items()
         self._update_position(context, len(display_items))
 
-        if prereq_met and not self._is_gate_fulfilled():
-            banner_text = _(
-                'This section is a prerequisite. You must complete this section in order to unlock additional content.'
-            )
-
         fragment = Fragment()
-        items = self._render_student_view_for_items(context, display_items, fragment, view) if prereq_met else []
-        params = {
-            'items': items,
-            'element_id': self.location.html_id(),
-            'item_id': text_type(self.location),
-            'position': self.position,
-            'tag': self.location.block_type,
-            'ajax_url': self.system.ajax_url,
-            'next_url': context.get('next_url'),
-            'prev_url': context.get('prev_url'),
-            'banner_text': banner_text,
-            'save_position': view != PUBLIC_VIEW,
-            'show_completion': view != PUBLIC_VIEW,
-            'gated_content': self._get_gated_content_info(prereq_met, prereq_meta_info)
-        }
+        params = self._get_render_metadata(context, display_items, prereq_met, prereq_meta_info, banner_text, view, fragment)
         fragment.add_content(self.system.render_template("seq_module.html", params))
 
         self._capture_full_seq_item_metrics(display_items)
@@ -366,11 +410,18 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         """
         Returns a dict of information about gated_content context
         """
-        gated_content = {}
-        gated_content['gated'] = not prereq_met
-        gated_content['prereq_url'] = prereq_meta_info['url'] if not prereq_met else None
-        gated_content['prereq_section_name'] = prereq_meta_info['display_name'] if not prereq_met else None
-        gated_content['gated_section_name'] = self.display_name
+        gated_content = {
+            'prereq_id': None,
+            'prereq_url': None,
+            'prereq_section_name': None,
+            'gated': False,
+            'gated_section_name': self.display_name,
+        }
+        if not prereq_met:
+            gated_content['gated'] = True
+            gated_content['prereq_url'] = prereq_meta_info['url']
+            gated_content['prereq_section_name'] = prereq_meta_info['display_name']
+            gated_content['prereq_id'] = prereq_meta_info['id']
 
         return gated_content
 
@@ -450,9 +501,13 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         display_items.  Returns a list of dict objects with information about
         the given display_items.
         """
+        render_items = not context.get('exclude_units', False)
         is_user_authenticated = self.is_user_authenticated(context)
-        bookmarks_service = self.runtime.service(self, 'bookmarks')
         completion_service = self.runtime.service(self, 'completion')
+        try:
+            bookmarks_service = self.runtime.service(self, 'bookmarks')
+        except NoSuchServiceError:
+            bookmarks_service = None
         context['username'] = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(
             'edx-platform.username')
         display_names = [
@@ -468,18 +523,21 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             show_bookmark_button = False
             is_bookmarked = False
 
-            if is_user_authenticated:
+            if is_user_authenticated and bookmarks_service:
                 show_bookmark_button = True
                 is_bookmarked = bookmarks_service.is_bookmarked(usage_key=usage_id)
 
             context['show_bookmark_button'] = show_bookmark_button
             context['bookmarked'] = is_bookmarked
 
-            rendered_item = item.render(view, context)
-            fragment.add_fragment_resources(rendered_item)
-
+            if render_items:
+                rendered_item = item.render(view, context)
+                fragment.add_fragment_resources(rendered_item)
+                content = rendered_item.content
+            else:
+                content = ''
             iteminfo = {
-                'content': rendered_item.content,
+                'content': content,
                 'page_title': getattr(item, 'tooltip_title', ''),
                 'type': item_type,
                 'id': text_type(usage_id),
@@ -487,11 +545,13 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 'path': " > ".join(display_names + [item.display_name_with_default]),
                 'graded': item.graded
             }
-
+            if not render_items:
+                # The item url format can be defined in the template context like so:
+                # context['item_url'] = '/my/item/path/{usage_key}/whatever'
+                iteminfo['href'] = context.get('item_url', '').format(usage_key=usage_id)
             if is_user_authenticated:
-                if item.location.block_type == 'vertical':
-                    if completion_service:
-                        iteminfo['complete'] = completion_service.vertical_is_complete(item)
+                if item.location.block_type == 'vertical' and completion_service:
+                    iteminfo['complete'] = completion_service.vertical_is_complete(item)
 
             contents.append(iteminfo)
 
@@ -520,7 +580,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         """
         if not newrelic:
             return
-        newrelic.agent.add_custom_parameter('seq.block_id', unicode(self.location))
+        newrelic.agent.add_custom_parameter('seq.block_id', six.text_type(self.location))
         newrelic.agent.add_custom_parameter('seq.display_name', self.display_name or '')
         newrelic.agent.add_custom_parameter('seq.position', self.position)
         newrelic.agent.add_custom_parameter('seq.is_time_limited', self.is_time_limited)
@@ -559,7 +619,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         if 1 <= self.position <= len(display_items):
             # Basic info about the Unit...
             current = display_items[self.position - 1]
-            newrelic.agent.add_custom_parameter('seq.current.block_id', unicode(current.location))
+            newrelic.agent.add_custom_parameter('seq.current.block_id', six.text_type(current.location))
             newrelic.agent.add_custom_parameter('seq.current.display_name', current.display_name or '')
 
             # Examining all items inside the Unit (or split_test, conditional, etc.)
@@ -604,7 +664,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 ),
                 'is_practice_exam': self.is_practice_exam,
                 'allow_proctoring_opt_out': self.allow_proctoring_opt_out,
-                'due_date': self.due
+                'due_date': self.due,
+                'grace_period': self.graceperiod,
             }
 
             # inject the user's credit requirements and fulfillments
@@ -657,6 +718,7 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule
     resources_dir = None
+    has_author_view = True
 
     show_in_read_only_mode = True
 

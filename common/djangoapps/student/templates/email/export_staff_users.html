@@ -1,0 +1,15 @@
+{% extends "email/email_base.html" %}
+{% block body %}
+<!-- Message Body -->
+        <p>
+            Dear Admin,
+        <p>
+        <p>
+            Please find the attached CSV containing a list of all staff users
+            who have logged in within the last {{ time_period }} days
+        </p>
+
+        <p>Thanks,</p>
+        <p>The edX Team</p>
+<!-- End Message Body -->
+{% endblock body %}

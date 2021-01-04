@@ -7,10 +7,10 @@ each as a separate output file containing the json representation
 of each of its fields (including those fields that are set as default values).
 """
 
-from __future__ import print_function
 
 import json
 
+import six
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from path import Path as path
@@ -28,7 +28,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if len(args) != 1:
-            raise CommandError('Must called with arguments: {}'.format(self.args))
+            raise CommandError(u'Must called with arguments: {}'.format(self.args))
 
         xml_module_store = XMLModuleStore(
             data_dir=settings.DATA_DIR,
@@ -40,12 +40,12 @@ class Command(BaseCommand):
 
         export_dir = path(args[0])
 
-        for course_id, course_modules in xml_module_store.modules.iteritems():
+        for course_id, course_modules in six.iteritems(xml_module_store.modules):
             course_path = course_id.replace('/', '_')
-            for location, descriptor in course_modules.iteritems():
+            for location, descriptor in six.iteritems(course_modules):
                 location_path = text_type(location).replace('/', '_')
                 data = {}
-                for field_name, field in descriptor.fields.iteritems():
+                for field_name, field in six.iteritems(descriptor.fields):
                     try:
                         data[field_name] = field.read_json(descriptor)
                     except Exception as exc:  # pylint: disable=broad-except

@@ -1,14 +1,15 @@
 """Tests for user API middleware"""
-from mock import Mock, patch
+
 
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory
+from mock import Mock, patch
 
-from student.tests.factories import UserFactory, AnonymousUserFactory
+from student.tests.factories import AnonymousUserFactory, UserFactory
 
-from ..tests.factories import UserCourseTagFactory
 from ..middleware import UserTagsEventContextMiddleware
+from ..tests.factories import UserCourseTagFactory
 
 
 class TagsMiddlewareTest(TestCase):
@@ -41,7 +42,7 @@ class TagsMiddlewareTest(TestCase):
         so that the request continues.
         """
         # Middleware should pass request through
-        self.assertEquals(self.middleware.process_request(self.request), None)
+        self.assertEqual(self.middleware.process_request(self.request), None)
 
     def assertContextSetTo(self, context):
         """Asserts UserTagsEventContextMiddleware.CONTEXT_NAME matches ``context``"""
@@ -113,7 +114,7 @@ class TagsMiddlewareTest(TestCase):
         exit_context = get_tracker.return_value.exit_context
 
         # The middleware should clean up the context when the request is done
-        self.assertEquals(
+        self.assertEqual(
             self.middleware.process_response(self.request, self.response),
             self.response
         )
@@ -122,7 +123,7 @@ class TagsMiddlewareTest(TestCase):
 
         # Even if the tracker blows up, the middleware should still return the response
         get_tracker.side_effect = Exception
-        self.assertEquals(
+        self.assertEqual(
             self.middleware.process_response(self.request, self.response),
             self.response
         )

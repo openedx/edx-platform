@@ -2,9 +2,9 @@
 Django URLs for service status app
 """
 
-from django.conf.urls import url
 
-from openedx.core.djangoapps.service_status.views import index, celery_status, celery_ping
+from django.conf.urls import url
+from openedx.core.djangoapps.service_status.views import celery_ping, celery_status, index
 
 urlpatterns = [
     url(r'^$', index, name='status.service.index'),

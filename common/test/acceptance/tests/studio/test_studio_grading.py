@@ -1,16 +1,21 @@
 """
 Acceptance tests for grade settings in Studio.
 """
+
+
+from bok_choy.promise import EmptyPromise
+from six.moves import range
+
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.studio.settings_graders import GradingPage
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
-from common.test.acceptance.fixtures.course import XBlockFixtureDesc
-from bok_choy.promise import EmptyPromise
 
 
 class GradingPageTest(StudioCourseTest):
     """
     Bockchoy tests to add/edit grade settings in studio.
     """
+    shard = 23
 
     url = None
     GRACE_FIELD_CSS = "#course-grading-graceperiod"
@@ -140,7 +145,7 @@ class GradingPageTest(StudioCourseTest):
         self.assertIn(
             '0-3',
             grade_ranges,
-            'expected range: 0-3, not found in grade ranges:{}'.format(grade_ranges)
+            u'expected range: 0-3, not found in grade ranges:{}'.format(grade_ranges)
         )
 
     def test_settings_are_persisted_on_save_only(self):
@@ -241,43 +246,3 @@ class GradingPageTest(StudioCourseTest):
         """
         self.grading_page.try_edit_fail_grade('Failure')
         self.assertNotEqual(self.grading_page.lowest_grade_name, 'Failure')
-
-    def test_grace_period_wrapped_to_correct_time(self):
-        """
-        Scenario: Grace periods of more than 59 minutes are wrapped to the correct time
-            Given I have populated a new course in Studio
-            And I am viewing the grading settings
-            When I change the grace period to "01:99"
-            And I press the "Save" notification button
-            And I reload the page
-            Then I see the grace period is "02:39"
-        """
-        self.ensure_input_fields_are_loaded()
-        self.grading_page.check_field_value('00:00')
-        self.grading_page.set_grace_period('01:99')
-        self.grading_page.check_field_value('01:99')
-        self.grading_page.click_button("save")
-        self.grading_page.refresh_and_wait_for_load()
-        self.ensure_input_fields_are_loaded()
-        grace_time = self.grading_page.grace_period_value
-        self.assertEqual(grace_time, '02:39')
-
-    def test_setting_grace_period_greater_than_one_day(self):
-        """
-        Scenario: User can set a grace period greater than one day
-            Given I have populated a new course in Studio
-            And I am viewing the grading settings
-            When I change the grace period to "48:00"
-            And I press the "Save" notification button
-            And I reload the page
-            Then I see the grace period is "48:00"
-        """
-        self.ensure_input_fields_are_loaded()
-        self.grading_page.check_field_value('00:00')
-        self.grading_page.set_grace_period('48:00')
-        self.grading_page.check_field_value('48:00')
-        self.grading_page.click_button("save")
-        self.grading_page.refresh_and_wait_for_load()
-        self.ensure_input_fields_are_loaded()
-        grace_time = self.grading_page.grace_period_value
-        self.assertEqual(grace_time, '48:00')

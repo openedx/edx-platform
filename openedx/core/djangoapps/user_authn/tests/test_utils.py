@@ -1,15 +1,18 @@
 """ Test User Authentication utilities """
 
-from collections import namedtuple
-import ddt
 
+from collections import namedtuple
+
+import ddt
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
 
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
-from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
+from openedx.core.djangoapps.user_authn.utils import (
+    generate_password, is_safe_login_or_logout_redirect
+)
 
 
 @ddt.ddt
@@ -21,6 +24,15 @@ class TestRedirectUtils(TestCase):
         self.request = RequestFactory()
 
     RedirectCase = namedtuple('RedirectCase', ['url', 'host', 'req_is_secure', 'expected_is_safe'])
+
+    @staticmethod
+    def _is_safe_redirect(req, url):
+        return is_safe_login_or_logout_redirect(
+            redirect_to=url,
+            request_host=req.get_host(),
+            dot_client_id=req.GET.get('client_id'),
+            require_https=req.is_secure(),
+        )
 
     @ddt.data(
         RedirectCase('/dashboard', 'testserver', req_is_secure=True, expected_is_safe=True),
@@ -41,7 +53,7 @@ class TestRedirectUtils(TestCase):
         """ Test safe next parameter """
         req = self.request.get('/login', HTTP_HOST=host)
         req.is_secure = lambda: req_is_secure
-        actual_is_safe = is_safe_login_or_logout_redirect(req, url)
+        actual_is_safe = self._is_safe_redirect(req, url)
         self.assertEqual(actual_is_safe, expected_is_safe)
 
     @ddt.data(
@@ -57,5 +69,31 @@ class TestRedirectUtils(TestCase):
             'redirect_url': redirect_url,
         }
         req = self.request.get('/logout?{}'.format(urlencode(params)), HTTP_HOST=host)
-        actual_is_safe = is_safe_login_or_logout_redirect(req, redirect_url)
+        actual_is_safe = self._is_safe_redirect(req, redirect_url)
         self.assertEqual(actual_is_safe, expected_is_safe)
+
+
+class GeneratePasswordTest(TestCase):
+    """Tests formation of randomly generated passwords."""
+
+    def test_default_args(self):
+        password = generate_password()
+        self.assertEqual(12, len(password))
+        self.assertTrue(any(c.isdigit for c in password))
+        self.assertTrue(any(c.isalpha for c in password))
+
+    def test_length(self):
+        length = 25
+        self.assertEqual(length, len(generate_password(length=length)))
+
+    def test_chars(self):
+        char = '!'
+        password = generate_password(length=12, chars=(char,))
+
+        self.assertTrue(any(c.isdigit for c in password))
+        self.assertTrue(any(c.isalpha for c in password))
+        self.assertEqual(char * 10, password[2:])
+
+    def test_min_length(self):
+        with self.assertRaises(ValueError):
+            generate_password(length=7)

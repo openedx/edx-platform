@@ -1,4 +1,6 @@
 """Helper functions for working with the catalog service."""
+
+
 import copy
 import datetime
 import logging
@@ -10,18 +12,28 @@ from django.core.exceptions import ObjectDoesNotExist
 from edx_rest_api_client.client import EdxRestApiClient
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
+from six import text_type
 
 from entitlements.utils import is_course_run_entitlement_fulfillable
 from openedx.core.constants import COURSE_PUBLISHED
-from openedx.core.djangoapps.catalog.cache import (PATHWAY_CACHE_KEY_TPL, PROGRAM_CACHE_KEY_TPL,
-                                                   SITE_PATHWAY_IDS_CACHE_KEY_TPL,
-                                                   SITE_PROGRAM_UUIDS_CACHE_KEY_TPL)
+from openedx.core.djangoapps.catalog.cache import (
+    COURSE_PROGRAMS_CACHE_KEY_TPL,
+    CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL,
+    PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL,
+    PATHWAY_CACHE_KEY_TPL,
+    PROGRAM_CACHE_KEY_TPL,
+    PROGRAMS_BY_TYPE_CACHE_KEY_TPL,
+    SITE_PATHWAY_IDS_CACHE_KEY_TPL,
+    SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
+)
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from student.models import CourseEnrollment
 
 logger = logging.getLogger(__name__)
+
+missing_details_msg_tpl = u'Failed to get details for program {uuid} from the cache.'
 
 
 def create_catalog_api_client(user, site=None):
@@ -58,8 +70,8 @@ def check_catalog_integration_and_get_user(error_message_field):
             user = catalog_integration.get_service_user()
         except ObjectDoesNotExist:
             logger.error(
-                'Catalog service user with username [{username}] does not exist. '
-                '{field} will not be retrieved.'.format(
+                u'Catalog service user with username [{username}] does not exist. '
+                u'{field} will not be retrieved.'.format(
                     username=catalog_integration.service_username,
                     field=error_message_field,
                 )
@@ -68,29 +80,33 @@ def check_catalog_integration_and_get_user(error_message_field):
         return user, catalog_integration
     else:
         logger.error(
-            'Unable to retrieve details about {field} because Catalog Integration is not enabled'.format(
+            u'Unable to retrieve details about {field} because Catalog Integration is not enabled'.format(
                 field=error_message_field,
             )
         )
         return None, catalog_integration
 
 
-def get_programs(site, uuid=None):
+# pylint: disable=redefined-outer-name
+def get_programs(site=None, uuid=None, uuids=None, course=None, catalog_course_uuid=None, organization=None):
     """Read programs from the cache.
 
     The cache is populated by a management command, cache_programs.
 
-    Arguments:
-        site (Site): django.contrib.sites.models object
-
     Keyword Arguments:
+        site (Site): django.contrib.sites.models object to fetch programs of.
         uuid (string): UUID identifying a specific program to read from the cache.
+        uuids (list of string): UUIDs identifying a specific programs to read from the cache.
+        course (string): course run id identifying a specific course run to read from the cache.
+        catalog_course_uuid (string): Catalog Course UUID
+        organization (string): short name for specific organization to read from the cache.
 
     Returns:
         list of dict, representing programs.
         dict, if a specific program is requested.
     """
-    missing_details_msg_tpl = 'Failed to get details for program {uuid} from the cache.'
+    if len([arg for arg in (site, uuid, uuids, course, catalog_course_uuid, organization) if arg is not None]) != 1:
+        raise TypeError('get_programs takes exactly one argument')
 
     if uuid:
         program = cache.get(PROGRAM_CACHE_KEY_TPL.format(uuid=uuid))
@@ -98,11 +114,63 @@ def get_programs(site, uuid=None):
             logger.warning(missing_details_msg_tpl.format(uuid=uuid))
 
         return program
-    uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [])
-    if not uuids:
-        logger.warning('Failed to get program UUIDs from the cache for site {}.'.format(site.domain))
+    elif course:
+        uuids = cache.get(COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_run_id=course))
+        if not uuids:
+            # Currently, the cache does not differentiate between a cache miss and a course
+            # without programs. After this is changed, log any cache misses here.
+            return []
+    elif catalog_course_uuid:
+        uuids = cache.get(CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_uuid=catalog_course_uuid))
+        if not uuids:
+            # Currently, the cache does not differentiate between a cache miss and a course
+            # without programs. After this is changed, log any cache misses here.
+            return []
+    elif site:
+        site_config = getattr(site, 'configuration', None)
+        catalog_url = site_config.get_value('COURSE_CATALOG_API_URL') if site_config else None
+        if site_config and catalog_url:
+            uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [])
+            if not uuids:
+                logger.warning(u'Failed to get program UUIDs from the cache for site {}.'.format(site.domain))
+        else:
+            uuids = []
+    elif organization:
+        uuids = get_programs_for_organization(organization)
+        if not uuids:
+            return []
 
-    programs = cache.get_many([PROGRAM_CACHE_KEY_TPL.format(uuid=uuid) for uuid in uuids])
+    return get_programs_by_uuids(uuids)
+
+
+def get_programs_by_type(site, program_type):
+    """
+    Keyword Arguments:
+        site (Site): The corresponding Site object to fetch programs for.
+        program_type (string): The program_type that matching programs must have.
+
+    Returns:
+        A list of programs for the given site with the given program_type.
+    """
+    program_type_cache_key = PROGRAMS_BY_TYPE_CACHE_KEY_TPL.format(
+        site_id=site.id, program_type=normalize_program_type(program_type)
+    )
+    uuids = cache.get(program_type_cache_key, [])
+    if not uuids:
+        logger.warning(text_type(
+            'Failed to get program UUIDs from cache for site {} and type {}'.format(site.id, program_type)
+        ))
+    return get_programs_by_uuids(uuids)
+
+
+def get_programs_by_uuids(uuids):
+    """
+    Gets a list of programs for the provided uuids
+    """
+    # a list of UUID objects would be a perfectly reasonable parameter to provide
+    uuid_strings = [text_type(handle) for handle in uuids]
+
+    programs = cache.get_many([PROGRAM_CACHE_KEY_TPL.format(uuid=handle) for handle in uuid_strings])
     programs = list(programs.values())
 
     # The get_many above sometimes fails to bring back details cached on one or
@@ -113,16 +181,16 @@ def get_programs(site, uuid=None):
     # immediately afterwards will succeed in bringing back all the keys. This
     # behavior can be mitigated by trying again for the missing keys, which is
     # what we do here. Splitting the get_many into smaller chunks may also help.
-    missing_uuids = set(uuids) - set(program['uuid'] for program in programs)
+    missing_uuids = set(uuid_strings) - set(program['uuid'] for program in programs)
     if missing_uuids:
         logger.info(
-            'Failed to get details for {count} programs. Retrying.'.format(count=len(missing_uuids))
+            u'Failed to get details for {count} programs. Retrying.'.format(count=len(missing_uuids))
         )
 
         retried_programs = cache.get_many([PROGRAM_CACHE_KEY_TPL.format(uuid=uuid) for uuid in missing_uuids])
         programs += list(retried_programs.values())
 
-        still_missing_uuids = set(uuids) - set(program['uuid'] for program in programs)
+        still_missing_uuids = set(uuid_strings) - set(program['uuid'] for program in programs)
         for uuid in still_missing_uuids:
             logger.warning(missing_details_msg_tpl.format(uuid=uuid))
 
@@ -133,7 +201,7 @@ def get_program_types(name=None):
     """Retrieve program types from the catalog service.
 
     Keyword Arguments:
-        name (string): Name identifying a specific program.
+        name (string): Name identifying a specific program type.
 
     Returns:
         list of dict, representing program types.
@@ -171,7 +239,7 @@ def get_pathways(site, pathway_id=None):
         list of dict, representing pathways.
         dict, if a specific pathway is requested.
     """
-    missing_details_msg_tpl = 'Failed to get details for credit pathway {id} from the cache.'
+    missing_details_msg_tpl = u'Failed to get details for credit pathway {id} from the cache.'
 
     if pathway_id:
         pathway = cache.get(PATHWAY_CACHE_KEY_TPL.format(id=pathway_id))
@@ -184,7 +252,7 @@ def get_pathways(site, pathway_id=None):
         logger.warning('Failed to get credit pathway ids from the cache.')
 
     pathways = cache.get_many([PATHWAY_CACHE_KEY_TPL.format(id=pathway_id) for pathway_id in pathway_ids])
-    pathways = pathways.values()
+    pathways = list(pathways.values())
 
     # The get_many above sometimes fails to bring back details cached on one or
     # more Memcached nodes. It doesn't look like these keys are being evicted.
@@ -197,13 +265,13 @@ def get_pathways(site, pathway_id=None):
     missing_ids = set(pathway_ids) - set(pathway['id'] for pathway in pathways)
     if missing_ids:
         logger.info(
-            'Failed to get details for {count} pathways. Retrying.'.format(count=len(missing_ids))
+            u'Failed to get details for {count} pathways. Retrying.'.format(count=len(missing_ids))
         )
 
         retried_pathways = cache.get_many(
             [PATHWAY_CACHE_KEY_TPL.format(id=pathway_id) for pathway_id in missing_ids]
         )
-        pathways += retried_pathways.values()
+        pathways += list(retried_pathways.values())
 
         still_missing_ids = set(pathway_ids) - set(pathway['id'] for pathway in pathways)
         for missing_id in still_missing_ids:
@@ -240,8 +308,8 @@ def format_price(price, symbol='$', code='USD'):
     :return: A formatted price string, i.e. '$10 USD', '$10.52 USD'.
     """
     if int(price) == price:
-        return '{}{} {}'.format(symbol, int(price), code)
-    return '{}{:0.2f} {}'.format(symbol, price, code)
+        return u'{}{} {}'.format(symbol, int(price), code)
+    return u'{}{:0.2f} {}'.format(symbol, price, code)
 
 
 def get_localized_price_text(price, request):
@@ -263,8 +331,8 @@ def get_localized_price_text(price, request):
     # Override default user_currency if location is available
     if user_location and get_currency_data:
         currency_data = get_currency_data()
-        user_country = pycountry.countries.get(alpha2=user_location)
-        user_currency = currency_data.get(user_country.alpha3, user_currency)
+        user_country = pycountry.countries.get(alpha_2=user_location)
+        user_currency = currency_data.get(user_country.alpha_3, user_currency)
 
     return format_price(
         price=(price * user_currency['rate']),
@@ -399,7 +467,7 @@ def get_course_uuid_for_course(course_run_key):
         course_run_data = get_edx_api_data(
             catalog_integration,
             'course_runs',
-            resource_id=unicode(course_run_key),
+            resource_id=text_type(course_run_key),
             api=api,
             cache_key=run_cache_key if catalog_integration.is_cache_enabled else None,
             long_term_cache=True,
@@ -486,9 +554,9 @@ def get_fulfillable_course_runs_for_entitlement(entitlement, course_runs):
             # this will ensure it is available for the UI
             enrollable_sessions.append(course_run)
         elif (course_run.get('status') == COURSE_PUBLISHED and not
-              is_enrolled_in_mode and
-              is_course_run_entitlement_fulfillable(course_id, entitlement, search_time)):
-                enrollable_sessions.append(course_run)
+                is_enrolled_in_mode and
+                is_course_run_entitlement_fulfillable(course_id, entitlement, search_time)):
+            enrollable_sessions.append(course_run)
 
     enrollable_sessions.sort(key=lambda session: session.get('start'))
     return enrollable_sessions
@@ -506,7 +574,7 @@ def get_course_run_details(course_run_key, fields):
     """
     course_run_details = dict()
     user, catalog_integration = check_catalog_integration_and_get_user(
-        error_message_field='Data for course_run {}'.format(course_run_key)
+        error_message_field=u'Data for course_run {}'.format(course_run_key)
     )
     if user:
         api = create_catalog_api_client(user)
@@ -516,3 +584,118 @@ def get_course_run_details(course_run_key, fields):
         course_run_details = get_edx_api_data(catalog_integration, 'course_runs', api, resource_id=course_run_key,
                                               cache_key=cache_key, many=False, traverse_pagination=False, fields=fields)
     return course_run_details
+
+
+def is_course_run_in_program(course_run_key, program):
+    """
+    Check if a course run is part of a program.
+
+    Arguments:
+        program (dict): program data, as returned by get_programs()
+        course_run_key (CourseKey|str)
+
+    Returns: bool
+        Whether the program exists AND the course run is part of it.
+    """
+    # Right now, this function simply loads all the program data from the cache,
+    # walks the structure to collect the set of course run keys,
+    # and then sees if `course_run_key` is in that set.
+    # If we need to optimize this later, we can.
+    course_run_key_str = (
+        str(course_run_key) if isinstance(course_run_key, CourseKey)
+        else course_run_key
+    )
+    course_run_keys = course_run_keys_for_program(program)
+    return course_run_key_str in course_run_keys
+
+
+def course_run_keys_for_program(parent_program):
+    """
+    All of the course run keys associated with this ``parent_program``, either
+    via its ``curriculum`` field (looking at both the curriculum's courses
+    and child programs), or through the many-to-many ``courses`` field on the program.
+    """
+    keys = set()
+    for program in [parent_program] + child_programs(parent_program):
+        curriculum = _primary_active_curriculum(program)
+        if curriculum:
+            keys.update(_course_runs_from_container(curriculum))
+        keys.update(_course_runs_from_container(program))
+    return keys
+
+
+def course_uuids_for_program(parent_program):
+    """
+    All of the course uuids associated with this ``parent_program``, either
+    via its ``curriculum`` field (looking at both the curriculum's courses
+    and child programs), or through the many-to-many ``courses`` field on the program.
+    """
+    uuids = set()
+    for program in [parent_program] + child_programs(parent_program):
+        curriculum = _primary_active_curriculum(program)
+        if curriculum:
+            uuids.update(_courses_from_container(curriculum))
+        uuids.update(_courses_from_container(program))
+    return uuids
+
+
+def child_programs(program):
+    """
+    Given a program, recursively find all child programs related
+    to this program through its curricula.
+    """
+    curriculum = _primary_active_curriculum(program)
+    if not curriculum:
+        return []
+    result = []
+    for child in curriculum.get('programs', []):
+        result.append(child)
+        result.extend(child_programs(child))
+    return result
+
+
+def _primary_active_curriculum(program):
+    """
+    Returns the first active curriculum in the given program, or None.
+    """
+    try:
+        return next(c for c in program.get('curricula', []) if c.get('is_active'))
+    except StopIteration:
+        return
+
+
+def _course_runs_from_container(container):
+    """
+    Pluck nested course runs out of a ``container`` dictionary,
+    which is either the ``curriculum`` field of a program, or
+    a program itself (since either may contain a ``courses`` list).
+    """
+    return [
+        course_run.get('key')
+        for course in container.get('courses', [])
+        for course_run in course.get('course_runs', [])
+    ]
+
+
+def _courses_from_container(container):
+    """
+    Pluck nested courses out of a ``container`` dictionary,
+    which is either the ``curriculum`` field of a program, or
+    a program itself (since either may contain a ``courses`` list).
+    """
+    return [
+        course.get('uuid')
+        for course in container.get('courses', [])
+    ]
+
+
+def normalize_program_type(program_type):
+    """ Function that normalizes a program type string for use in a cache key. """
+    return str(program_type).lower()
+
+
+def get_programs_for_organization(organization):
+    """
+    Retrieve list of program uuids authored by a given organization
+    """
+    return cache.get(PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL.format(org_key=organization))

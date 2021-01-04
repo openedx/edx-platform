@@ -2,16 +2,20 @@
 Unit tests for the course_mode signals
 """
 
+
 from datetime import datetime, timedelta
 
 import ddt
+from django.conf import settings
 from mock import patch
 from pytz import UTC
 
 from course_modes.models import CourseMode
 from course_modes.signals import _listen_for_course_publish
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 
 
 @ddt.ddt
@@ -87,3 +91,31 @@ class CourseModeSignalTest(ModuleStoreTestCase):
             course_mode.refresh_from_db()
 
             self.assertEqual(course_mode.expiration_datetime, self.end - timedelta(days=verification_window))
+
+    def test_masters_mode(self):
+        # create an xblock with verified group access
+        AUDIT_ID = settings.COURSE_ENROLLMENT_MODES['audit']['id']
+        VERIFIED_ID = settings.COURSE_ENROLLMENT_MODES['verified']['id']
+        MASTERS_ID = settings.COURSE_ENROLLMENT_MODES['masters']['id']
+        verified_section = ItemFactory.create(
+            category="sequential",
+            metadata={'group_access': {ENROLLMENT_TRACK_PARTITION_ID: [VERIFIED_ID]}}
+        )
+        # and a section with no restriction
+        section2 = ItemFactory.create(
+            category="sequential",
+        )
+        section3 = ItemFactory.create(
+            category='sequential',
+            metadata={'group_access': {ENROLLMENT_TRACK_PARTITION_ID: [AUDIT_ID]}}
+        )
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+            # create the master's mode. signal will add masters to the verified section
+            self.create_mode('masters', 'masters')
+            verified_section_ret = self.store.get_item(verified_section.location)
+            section2_ret = self.store.get_item(section2.location)
+            section3_ret = self.store.get_item(section3.location)
+            # the verified section will now also be visible to master's
+            assert verified_section_ret.group_access[ENROLLMENT_TRACK_PARTITION_ID] == [VERIFIED_ID, MASTERS_ID]
+            assert section2_ret.group_access == {}
+            assert section3_ret.group_access == {ENROLLMENT_TRACK_PARTITION_ID: [AUDIT_ID]}

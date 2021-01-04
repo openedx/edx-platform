@@ -3,10 +3,13 @@ Views that are only activated when the project is running in development mode.
 These views will NOT be shown on production: trying to access them will result
 in a 404 error.
 """
+
+
 import bleach
 from django.http import HttpResponseNotFound
 from django.template import TemplateDoesNotExist
 from django.utils.translation import ugettext as _
+
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 
@@ -53,4 +56,4 @@ def show_reference_template(request, template):
 
         return render_to_response(template, context)
     except TemplateDoesNotExist:
-        return HttpResponseNotFound('Missing template {template}'.format(template=bleach.clean(template, strip=True)))
+        return HttpResponseNotFound(u'Missing template {template}'.format(template=bleach.clean(template, strip=True)))

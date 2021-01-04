@@ -1,35 +1,38 @@
 """
 Test the student dashboard view.
 """
+
+
 import itertools
 import json
 import re
 import unittest
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 
 import ddt
-from completion.test_utils import submit_completions_for_testing, CompletionWaffleTestMixin
+import six
+from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
-from django.urls import reverse
-from django.test import RequestFactory, TestCase
+from django.test import TestCase
 from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils.timezone import now
+from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from pyquery import PyQuery as pq
+from six.moves import range
 
-from bulk_email.models import BulkEmailFlag
 from course_modes.models import CourseMode
 from entitlements.tests.factories import CourseEntitlementFactory
-from milestones.tests.utils import MilestonesTestCaseMixin
-from opaque_keys.edx.keys import CourseKey
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
-from pyquery import PyQuery as pq
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
-from openedx.core.djangoapps.user_authn.cookies import _get_user_info_cookie_data
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
@@ -37,9 +40,7 @@ from student.helpers import DISABLE_UNENROLL_CERT_STATES
 from student.models import CourseEnrollment, UserProfile
 from student.signals import REFUND_ORDER
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.milestones_helpers import (get_course_milestones,
-                                     remove_prerequisite_course,
-                                     set_prerequisite_courses)
+from util.milestones_helpers import get_course_milestones, remove_prerequisite_course, set_prerequisite_courses
 from util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -140,13 +141,13 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
         with patch('student.models.CourseEnrollment.refundable', return_value=True):
             response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
 
-        self.assertEquals(json.loads(response.content), {'course_refundable_status': True})
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {'course_refundable_status': True})
         self.assertEqual(response.status_code, 200)
 
         with patch('student.models.CourseEnrollment.refundable', return_value=False):
             response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
 
-        self.assertEquals(json.loads(response.content), {'course_refundable_status': False})
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {'course_refundable_status': False})
         self.assertEqual(response.status_code, 200)
 
     def test_course_run_refund_status_invalid_course_key(self):
@@ -156,7 +157,7 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
                                                         InvalidKeyError during look up.')
             response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
 
-        self.assertEquals(json.loads(response.content), {'course_refundable_status': ''})
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {'course_refundable_status': ''})
         self.assertEqual(response.status_code, 406)
 
 
@@ -213,19 +214,6 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         course_overview.save()
 
-    def test_user_info_cookie(self):
-        """
-        Verify visiting the learner dashboard sets the user info cookie.
-        """
-        self.assertNotIn(settings.EDXMKTG_USER_INFO_COOKIE_NAME, self.client.cookies)
-
-        request = RequestFactory().get(self.path)
-        request.user = self.user
-        expected = json.dumps(_get_user_info_cookie_data(request, self.user))
-        self.client.get(self.path)
-        actual = self.client.cookies[settings.EDXMKTG_USER_INFO_COOKIE_NAME].value
-        self.assertEqual(actual, expected)
-
     def test_redirect_account_settings(self):
         """
         Verify if user does not have profile he/she is redirected to account_settings.
@@ -233,6 +221,39 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         UserProfile.objects.get(user=self.user).delete()
         response = self.client.get(self.path)
         self.assertRedirects(response, reverse('account_settings'))
+
+    def test_grade_appears_before_course_end_date(self):
+        """
+        Verify that learners are not able to see their final grade before the end
+        of course in the learner dashboard
+        """
+        self.course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')
+        self.course = CourseOverviewFactory.create(id=self.course_key, end_date=self.TOMORROW,
+                                                   certificate_available_date=self.THREE_YEARS_AGO,
+                                                   lowest_passing_grade=0.3)
+        self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
+        GeneratedCertificateFactory(status='notpassing', course_id=self.course.id, user=self.user, grade=0.45)
+
+        response = self.client.get(reverse('dashboard'))
+        # The final grade does not appear before the course has ended
+        self.assertContains(response, 'Your final grade:')
+        self.assertContains(response, '<span class="grade-value">45%</span>')
+
+    def test_grade_not_appears_before_cert_available_date(self):
+        """
+        Verify that learners are able to see their final grade of the course in
+        the learner dashboard after the course had ended
+        """
+        self.course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')
+        self.course = CourseOverviewFactory.create(id=self.course_key, end_date=self.THREE_YEARS_AGO,
+                                                   certificate_available_date=self.TOMORROW,
+                                                   lowest_passing_grade=0.3)
+        self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
+        GeneratedCertificateFactory(status='notpassing', course_id=self.course.id, user=self.user, grade=0.45)
+
+        response = self.client.get(reverse('dashboard'))
+        self.assertNotContains(response, 'Your final grade:')
+        self.assertNotContains(response, '<span class="grade-value">45%</span>')
 
     @patch.multiple('django.conf.settings', **MOCK_SETTINGS)
     @ddt.data(
@@ -254,8 +275,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         # Assert course sharing icons
         response = self.client.get(reverse('dashboard'))
-        self.assertEqual('Share on Twitter' in response.content, set_marketing or set_social_sharing)
-        self.assertEqual('Share on Facebook' in response.content, set_marketing or set_social_sharing)
+        self.assertEqual('Share on Twitter' in response.content.decode('utf-8'), set_marketing or set_social_sharing)
+        self.assertEqual('Share on Facebook' in response.content.decode('utf-8'), set_marketing or set_social_sharing)
 
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
     def test_pre_requisites_appear_on_dashboard(self):
@@ -269,17 +290,17 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             org='edx',
             number='998',
             display_name='Test Course',
-            pre_requisite_courses=[unicode(self.pre_requisite_course.id)]
+            pre_requisite_courses=[six.text_type(self.pre_requisite_course.id)]
         )
         self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
 
-        set_prerequisite_courses(self.course.id, [unicode(self.pre_requisite_course.id)])
+        set_prerequisite_courses(self.course.id, [six.text_type(self.pre_requisite_course.id)])
         response = self.client.get(reverse('dashboard'))
-        self.assertIn('<div class="prerequisites">', response.content)
+        self.assertContains(response, '<div class="prerequisites">')
 
         remove_prerequisite_course(self.course.id, get_course_milestones(self.course.id)[0])
         response = self.client.get(reverse('dashboard'))
-        self.assertNotIn('<div class="prerequisites">', response.content)
+        self.assertNotContains(response, '<div class="prerequisites">')
 
     @patch('openedx.core.djangoapps.programs.utils.get_programs')
     @patch('student.views.dashboard.get_visible_sessions_for_entitlement')
@@ -301,7 +322,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         mock_course_overview.return_value = CourseOverviewFactory.create(start=self.TOMORROW, id=course_key)
         mock_course_runs.return_value = [
             {
-                'key': unicode(course_key),
+                'key': six.text_type(course_key),
                 'enrollment_end': str(self.TOMORROW),
                 'pacing_type': 'instructor_paced',
                 'type': 'verified',
@@ -309,18 +330,18 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             }
         ]
         mock_pseudo_session.return_value = {
-            'key': unicode(course_key),
+            'key': six.text_type(course_key),
             'type': 'verified'
         }
         response = self.client.get(self.path)
-        self.assertIn('class="course-target-link enter-course hidden"', response.content)
-        self.assertIn('You must select a session to access the course.', response.content)
-        self.assertIn('<div class="course-entitlement-selection-container ">', response.content)
-        self.assertIn('Related Programs:', response.content)
+        self.assertContains(response, 'class="course-target-link enter-course hidden"')
+        self.assertContains(response, 'You must select a session to access the course.')
+        self.assertContains(response, '<div class="course-entitlement-selection-container ">')
+        self.assertContains(response, 'Related Programs:')
 
         # If an entitlement has already been redeemed by the user for a course run, do not let the run be selectable
         enrollment = CourseEnrollmentFactory(
-            user=self.user, course_id=unicode(mock_course_overview.return_value.id), mode=CourseMode.VERIFIED
+            user=self.user, course=mock_course_overview.return_value, mode=CourseMode.VERIFIED
         )
         CourseEntitlementFactory.create(
             user=self.user, course_uuid=program['courses'][0]['uuid'], enrollment_course_run=enrollment
@@ -338,9 +359,9 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         response = self.client.get(self.path)
         # There should be two entitlements on the course page, one prompting for a mandatory session, but no
         # select option for the courses as there is only the single course run which has already been redeemed
-        self.assertEqual(response.content.count('<li class="course-item">'), 2)
-        self.assertIn('You must select a session to access the course.', response.content)
-        self.assertNotIn('To access the course, select a session.', response.content)
+        self.assertContains(response, '<li class="course-item">', count=2)
+        self.assertContains(response, 'You must select a session to access the course.')
+        self.assertNotContains(response, 'To access the course, select a session.')
 
     @patch('student.views.dashboard.get_visible_sessions_for_entitlement')
     @patch.object(CourseOverview, 'get_from_id')
@@ -366,7 +387,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             }
         ]
         response = self.client.get(self.path)
-        self.assertEqual(response.content.count('<li class="course-item">'), 0)
+        self.assertNotContains(response, '<li class="course-item">')
 
     @patch('entitlements.api.v1.views.get_course_runs_for_course')
     @patch.object(CourseOverview, 'get_from_id')
@@ -386,7 +407,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             start=self.TOMORROW, end=self.THREE_YEARS_FROM_NOW, self_paced=True, enrollment_end=self.THREE_YEARS_AGO
         )
         mock_course_overview.return_value = mocked_course_overview
-        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=unicode(mocked_course_overview.id))
+        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=six.text_type(mocked_course_overview.id))
         mock_course_runs.return_value = [
             {
                 'key': str(mocked_course_overview.id),
@@ -450,7 +471,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
         )
         mock_course_overview.return_value = mocked_course_overview
-        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=unicode(mocked_course_overview.id))
+        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=six.text_type(mocked_course_overview.id))
         mock_course_runs.return_value = [
             {
                 'key': str(mocked_course_overview.id),
@@ -462,13 +483,13 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         ]
         entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment)
         program = ProgramFactory()
-        program['courses'][0]['course_runs'] = [{'key': unicode(mocked_course_overview.id)}]
+        program['courses'][0]['course_runs'] = [{'key': six.text_type(mocked_course_overview.id)}]
         program['courses'][0]['uuid'] = entitlement.course_uuid
         mock_get_programs.return_value = [program]
         response = self.client.get(self.path)
-        self.assertEqual(response.content.count('<li class="course-item">'), 1)
-        self.assertIn('<button class="change-session btn-link "', response.content)
-        self.assertIn('Related Programs:', response.content)
+        self.assertContains(response, '<li class="course-item">', count=1)
+        self.assertContains(response, '<button class="change-session btn-link "')
+        self.assertContains(response, 'Related Programs:')
 
     @patch('openedx.core.djangoapps.programs.utils.get_programs')
     @patch('student.views.dashboard.get_visible_sessions_for_entitlement')
@@ -485,7 +506,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
         )
         mock_course_overview.return_value = mocked_course_overview
-        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=unicode(mocked_course_overview.id), created=self.THREE_YEARS_AGO)
+        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=six.text_type(mocked_course_overview.id), created=self.THREE_YEARS_AGO)
         mock_course_runs.return_value = [
             {
                 'key': str(mocked_course_overview.id),
@@ -497,16 +518,16 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         ]
         entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment, created=self.THREE_YEARS_AGO)
         program = ProgramFactory()
-        program['courses'][0]['course_runs'] = [{'key': unicode(mocked_course_overview.id)}]
+        program['courses'][0]['course_runs'] = [{'key': six.text_type(mocked_course_overview.id)}]
         program['courses'][0]['uuid'] = entitlement.course_uuid
         mock_get_programs.return_value = [program]
         response = self.client.get(self.path)
-        self.assertEqual(response.content.count('<li class="course-item">'), 1)
-        self.assertIn('You can no longer change sessions.', response.content)
-        self.assertIn('Related Programs:', response.content)
+        self.assertContains(response, '<li class="course-item">', count=1)
+        self.assertContains(response, 'You can no longer change sessions.')
+        self.assertContains(response, 'Related Programs:')
 
     @patch('openedx.core.djangoapps.catalog.utils.get_course_runs_for_course')
-    @patch.object(BulkEmailFlag, 'feature_enabled')
+    @patch('student.views.dashboard.is_bulk_email_feature_enabled')
     def test_email_settings_fulfilled_entitlement(self, mock_email_feature, mock_get_course_runs):
         """
         Assert that the Email Settings action is shown when the user has a fulfilled entitlement.
@@ -515,10 +536,10 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         course_overview = CourseOverviewFactory(
             start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
         )
-        course_enrollment = CourseEnrollmentFactory(user=self.user)
+        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=course_overview.id)
         entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment)
         course_runs = [{
-            'key': unicode(course_overview.id),
+            'key': six.text_type(course_overview.id),
             'uuid': entitlement.course_uuid
         }]
         mock_get_course_runs.return_value = course_runs
@@ -527,7 +548,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         self.assertEqual(pq(response.content)(self.EMAIL_SETTINGS_ELEMENT_ID).length, 1)
 
     @patch.object(CourseOverview, 'get_from_id')
-    @patch.object(BulkEmailFlag, 'feature_enabled')
+    @patch('student.views.dashboard.is_bulk_email_feature_enabled')
     def test_email_settings_unfulfilled_entitlement(self, mock_email_feature, mock_course_overview):
         """
         Assert that the Email Settings action is not shown when the entitlement is not fulfilled.
@@ -547,13 +568,13 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         # Ensure active users see the course list
         self.assertTrue(self.user.is_active)
         response = self.client.get(reverse('dashboard'))
-        self.assertIn('You are not enrolled in any courses yet.', response.content)
+        self.assertContains(response, 'You are not enrolled in any courses yet.')
 
         # Ensure inactive users don't see the course list
         self.user.is_active = False
         self.user.save()
         response = self.client.get(reverse('dashboard'))
-        self.assertNotIn('You are not enrolled in any courses yet.', response.content)
+        self.assertNotContains(response, 'You are not enrolled in any courses yet.')
 
     def test_show_empty_dashboard_message(self):
         """
@@ -562,19 +583,40 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         """
         empty_dashboard_message = "Check out our lovely <i>free</i> courses!"
         response = self.client.get(reverse('dashboard'))
-        self.assertIn('You are not enrolled in any courses yet.', response.content)
-        self.assertNotIn(empty_dashboard_message, response.content)
+        self.assertContains(response, 'You are not enrolled in any courses yet.')
+        self.assertNotContains(response, empty_dashboard_message)
 
         with with_site_configuration_context(configuration={
             "EMPTY_DASHBOARD_MESSAGE": empty_dashboard_message,
         }):
             response = self.client.get(reverse('dashboard'))
-            self.assertIn('You are not enrolled in any courses yet.', response.content)
-            self.assertIn(empty_dashboard_message, response.content)
+            self.assertContains(response, 'You are not enrolled in any courses yet.')
+            self.assertContains(response, empty_dashboard_message)
+
+    @patch('django.conf.settings.DASHBOARD_COURSE_LIMIT', 1)
+    def test_course_limit_on_dashboard(self):
+        course = CourseFactory.create()
+        CourseEnrollmentFactory(
+            user=self.user,
+            course_id=course.id
+        )
+
+        course_v1 = CourseFactory.create()
+        CourseEnrollmentFactory(
+            user=self.user,
+            course_id=course_v1.id
+        )
+
+        response = self.client.get(reverse('dashboard'))
+        self.assertContains(response, '1 results successfully populated')
 
     @staticmethod
     def _remove_whitespace_from_html_string(html):
         return ''.join(html.split())
+
+    @staticmethod
+    def _remove_whitespace_from_response(response):
+        return ''.join(response.content.decode('utf-8').split())
 
     @staticmethod
     def _pull_course_run_from_course_key(course_key_string):
@@ -660,7 +702,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         view_button_html = self._remove_whitespace_from_html_string(view_button_html)
         resume_button_html = self._remove_whitespace_from_html_string(resume_button_html)
-        dashboard_html = self._remove_whitespace_from_html_string(response.content)
+        dashboard_html = self._remove_whitespace_from_response(response)
 
         self.assertIn(
             view_button_html,
@@ -689,12 +731,12 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             ItemFactory.create(
                 category='video',
                 parent_location=course.location,
-                display_name='Video {0}'.format(unicode(number))
+                display_name='Video {0}'.format(six.text_type(number))
             ).location
-            for number in xrange(5)
+            for number in range(5)
         ]
 
-        submit_completions_for_testing(self.user, course_key, block_keys)
+        submit_completions_for_testing(self.user, block_keys)
 
         response = self.client.get(reverse('dashboard'))
 
@@ -714,7 +756,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         view_button_html = self._remove_whitespace_from_html_string(view_button_html)
         resume_button_html = self._remove_whitespace_from_html_string(resume_button_html)
-        dashboard_html = self._remove_whitespace_from_html_string(response.content)
+        dashboard_html = self._remove_whitespace_from_response(response)
 
         self.assertIn(
             resume_button_html,
@@ -741,10 +783,12 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             user=self.user,
             course_id=course.id
         )
-        schedule = ScheduleFactory(start=self.THREE_YEARS_AGO, enrollment=enrollment)
+
+        # pylint: disable=unused-variable
+        schedule = ScheduleFactory(start_date=self.THREE_YEARS_AGO + timedelta(days=1), enrollment=enrollment)
 
         response = self.client.get(reverse('dashboard'))
-        dashboard_html = self._remove_whitespace_from_html_string(response.content)
+        dashboard_html = self._remove_whitespace_from_response(response)
         access_expired_substring = 'Accessexpired'
         course_link_class = 'course-target-link'
 
@@ -801,13 +845,13 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                     ItemFactory.create(
                         category='video',
                         parent_location=course.location,
-                        display_name='Video {0}'.format(unicode(number))
+                        display_name='Video {0}'.format(six.text_type(number))
                     ).location
-                    for number in xrange(5)
+                    for number in range(5)
                 ]
                 last_completed_block_string = str(block_keys[-1])
 
-                submit_completions_for_testing(self.user, course_key, block_keys)
+                submit_completions_for_testing(self.user, block_keys)
 
             html_for_view_buttons.append(
                 self._get_html_for_view_course_button(
@@ -843,7 +887,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             for button in html_for_entitlement
         ]
 
-        dashboard_html = self._remove_whitespace_from_html_string(response.content)
+        dashboard_html = self._remove_whitespace_from_response(response)
 
         for i in range(num_course_cards):
             expected_button = None

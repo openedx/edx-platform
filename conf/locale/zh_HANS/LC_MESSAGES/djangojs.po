@@ -143,6 +143,17 @@
 # 熊冬升 <xdsnet@gmail.com>, 2013
 # 竹轩 <fmyzjs@gmail.com>, 2014
 # 肖寒 <bookman@vip.163.com>, 2013
+# #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
+# edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/open-edx/teams/6205/zh_CN/).
+# Copyright (C) 2020 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2020.
+#
+# Translators:
+# jsgang <jsgang9@gmail.com>, 2019
+# abby li <yc.li@eliteu.cn>, 2019
+# ifLab <webmaster@iflab.org>, 2019
+#
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)
 # Copyright (C) 2020 edX
@@ -214,8 +225,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
+<<<<<<< HEAD
 "POT-Creation-Date: 2020-02-16 20:42+0000\n"
 "PO-Revision-Date: 2019-09-29 20:43+0000\n"
+=======
+"POT-Creation-Date: 2020-05-03 20:42+0000\n"
+"PO-Revision-Date: 2020-04-27 09:13+0000\n"
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
 "Language: zh_CN\n"
@@ -272,6 +288,10 @@ msgstr "删除"
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/signatory-actions.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
+<<<<<<< HEAD
+=======
+#: common/static/common/templates/discussion/templates.underscore
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
@@ -295,6 +315,10 @@ msgstr "上传中"
 #: lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
 #: common/static/common/templates/image-modal.underscore
+<<<<<<< HEAD
+=======
+#: common/static/common/templates/discussion/templates.underscore
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Close"
 msgstr "关闭"
@@ -323,6 +347,10 @@ msgstr "选择文件"
 #: cms/static/js/views/course_info_update.js cms/static/js/views/tabs.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/js/Markdown.Editor.js
+<<<<<<< HEAD
+=======
+#: common/static/common/templates/discussion/templates.underscore
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/templates/learner_dashboard/verification_popover.underscore
 msgid "OK"
 msgstr "是的"
@@ -1342,6 +1370,10 @@ msgstr "新建窗口"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
+<<<<<<< HEAD
+=======
+#: common/static/common/templates/discussion/templates.underscore
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Next"
 msgstr "下一个"
 
@@ -2505,9 +2537,15 @@ msgid "Not specific to a course"
 msgstr "不针对特定课程"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+<<<<<<< HEAD
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Subject"
 msgstr "标题"
+=======
+#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
+msgid "Topic"
+msgstr "主题"
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
@@ -2578,9 +2616,14 @@ msgid "The more you tell us, the more quickly and helpfully we can respond!"
 msgstr "您提供的信息越详细，我们越能快速并有效地帮助到您！"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+<<<<<<< HEAD
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Submit"
 msgstr "提交"
+=======
+msgid "Create Support Ticket"
+msgstr ""
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
@@ -2598,7 +2641,11 @@ msgid ""
 msgstr "选择一门课程或选择“不针对特定课程”选项。"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+<<<<<<< HEAD
 msgid "Select a subject for your support request."
+=======
+msgid "Select a topic for your support request."
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -2606,6 +2653,21 @@ msgid "Enter some details for your support request."
 msgstr "输入您所需要的支持的细节。"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+<<<<<<< HEAD
+=======
+msgid ""
+"Due to the recent increase in interest in online education and edX, we are "
+"currently experiencing an unusually high volume of support requests. We "
+"appreciate your patience as we work to review each request. Please check the"
+" "
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid " as many questions may have already been answered."
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid "Contact Us"
 msgstr "联系我们"
@@ -2628,8 +2690,14 @@ msgstr "前往{platform}主页"
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid ""
+<<<<<<< HEAD
 "Thank you for submitting a request! We will contact you within 24 hours."
 msgstr "感谢您提交的申请！我们会在24小时内联系您。"
+=======
+"Thank you for submitting a request! We appreciate your patience while we "
+"work to review your request."
+msgstr ""
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
 msgid "Cancel upload"
@@ -2825,8 +2893,13 @@ msgid "Confirm"
 msgstr "确认"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
+<<<<<<< HEAD
 msgid "You already belong to another team."
 msgstr "您已经属于另一个团队。"
+=======
+msgid "You already belong to another team in this team set."
+msgstr ""
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "This team is full."
@@ -2837,8 +2910,13 @@ msgid "Cannot join instructor managed team"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
+<<<<<<< HEAD
 msgid "{memberCount} / {maxMemberCount} Member"
 msgid_plural "{memberCount} / {maxMemberCount} Members"
+=======
+msgid " Member"
+msgid_plural " Members"
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr[0] ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
@@ -2854,8 +2932,13 @@ msgid "Topics"
 msgstr "主题"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+<<<<<<< HEAD
 msgid "My Team"
 msgstr "我的团队"
+=======
+msgid "My Teams"
+msgstr ""
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
@@ -2923,6 +3006,23 @@ msgid "Search teams"
 msgstr "搜索团队"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"See all teams you belong to and all public teams in your course, organized "
+"by topic. Join an open public team to collaborate with other learners who "
+"are interested in the same topic as you are."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"See all teams you belong to and all public teams in your course, organized "
+"by topic."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "See all teams you belong to."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 #: lms/djangoapps/discussion/static/discussion/templates/fake-breadcrumbs.underscore
 msgid "All Topics"
 msgstr "所有主题"
@@ -2943,10 +3043,13 @@ msgstr "无法找到\"{team}\"团队。"
 msgid "{team_count} Team"
 msgid_plural "{team_count} Teams"
 msgstr[0] ""
+<<<<<<< HEAD
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "Topic"
 msgstr "主题"
+=======
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the {topic_name} Topic"
@@ -3282,6 +3385,10 @@ msgid "There has been an error processing your survey."
 msgstr "在处理您的调查时出现了一个错误。"
 
 #: lms/static/js/courseware/credit_progress.js
+<<<<<<< HEAD
+=======
+#: common/static/common/templates/discussion/templates.underscore
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
 msgid "More"
@@ -5136,25 +5243,6 @@ msgid ""
 "release date."
 msgstr "在此课程公开之前，您无法以学生或测试者身份查看该课程。"
 
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "%(num_students)s student opened Subsection"
-msgid_plural "%(num_students)s students opened Subsection"
-msgstr[0] "%(num_students)s 个学生已打开分项"
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "%(num_students)s student"
-msgid_plural "%(num_students)s students"
-msgstr[0] "%(num_students)s 个学生"
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "%(num_questions)s question"
-msgid_plural "%(num_questions)s questions"
-msgstr[0] "%(num_questions)s 个问题"
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "Number of Students"
-msgstr "学生数目"
-
 #: lms/templates/courseware/progress_graph.js
 msgid "Overall Score"
 msgstr "总成绩"
@@ -5185,6 +5273,17 @@ msgstr "展开全部"
 msgid "Collapse All"
 msgstr "折叠全部"
 
+<<<<<<< HEAD
+=======
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr "显示更多"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr "查看收起"
+
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
@@ -6695,6 +6794,28 @@ msgstr "新建 {component_type}"
 msgid "Updating Tags"
 msgstr "更新标签中"
 
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Account Information"
+msgstr "账号信息"
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Order History"
+msgstr "订单记录"
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid ""
+"You have set your language to {beta_language}, which is currently not fully "
+"translated. You can help us translate this language fully by joining the "
+"Transifex community and adding translations from English for learners that "
+"speak {beta_language}."
+msgstr ""
+"您已将语言设置为{beta_language}，目前尚未完全翻译。 "
+"您可以加入Transifex社区，并为使用{beta_language}的学员添加英语翻译，从而帮助我们充分翻译这门语言。"
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Help Translate into {beta_language}"
+msgstr "Help Translate into {beta_language}"
+
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
@@ -6715,6 +6836,10 @@ msgstr "日期"
 
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
+<<<<<<< HEAD
+=======
+#: common/static/common/templates/discussion/templates.underscore
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Previous"
 msgstr "上一步"
 
@@ -6762,6 +6887,312 @@ msgstr "清空搜索结果"
 msgid "Search"
 msgstr "搜索"
 
+<<<<<<< HEAD
+=======
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Add a Response"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "This thread is closed."
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Add a response:"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
+msgstr "提交"
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "discussion posted %(time_ago)s by %(author)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "question posted %(time_ago)s by %(author)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Pinned"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Reported"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Closed"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "Related to: %(courseware_title_linked)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "This post is visible only to %(group_name)s."
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "This post is visible to everyone."
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Editing post"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid ""
+"Add a clear and descriptive title to encourage participation. (Required)"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Edit your post below."
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Update post"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "Show Comment (%(num_comments)s)"
+msgid_plural "Show Comments (%(num_comments)s)"
+msgstr[0] ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Add a comment"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "marked as answer %(time_ago)s by %(user)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "marked as answer %(time_ago)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "endorsed %(time_ago)s by %(user)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "endorsed %(time_ago)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Editing response"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Update response"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "posted %(time_ago)s by %(author)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Editing comment"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Update comment"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "discussion"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "answered question"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "unanswered question"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Following"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Community TA"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "{unread_comments_count} new"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid ""
+"%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
+"unread comments)%(span_close)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Add a Post"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Visible to"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid ""
+"Discussion admins, moderators, and TAs can make their posts visible to all "
+"students or specify a single group."
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "All Groups"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "follow this post"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "post anonymously"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "post anonymously to classmates"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Error posting your message."
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "This post will be visible only to %(group_name)s."
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "This post will be visible to everyone."
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Topic area"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Add your post to a relevant topic to help others find it. (Required)"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "(Community TA)"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "(Staff)"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
+msgid "All Posts"
+msgstr "所有讨论帖"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Return to all posts"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "View discussion"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Load more"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Post type"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid ""
+"Questions raise issues that need answers. Discussions share ideas and start "
+"conversations. (Required)"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Question"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Discussion"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Endorse"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Unendorse"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Mark as Answer"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Unmark as Answer"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Follow"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Unfollow"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Vote for this post,"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Report abuse"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Report"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Unreport"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Pin"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Unpin"
+msgstr ""
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Open"
+msgstr ""
+
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Discussion Home"
 msgstr "讨论区"
@@ -6817,10 +7248,6 @@ msgid ""
 "Check this box to receive an email digest once a day notifying you about "
 "new, unread activity from posts you are following."
 msgstr "勾选此项，每天接收一封邮件，通知您所关注的讨论帖的最新未读情况。"
-
-#: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
-msgid "All Posts"
-msgstr "所有讨论帖"
 
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 msgid "username or email"
@@ -7250,6 +7677,7 @@ msgid ""
 msgstr "在点击 “结束我的考试” 之前，您必须点击 \"提交\" 按钮以获得学分。"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
+<<<<<<< HEAD
 msgid "Show More"
 msgstr "显示更多"
 
@@ -7258,6 +7686,8 @@ msgid "Show Less"
 msgstr "查看收起"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
+=======
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Exam timer and end exam button"
 msgstr "考试计时器和结束考试按钮"
 
@@ -7363,8 +7793,8 @@ msgstr "关于您"
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
 "The following information is already a part of your {platform} profile. "
-"We\\'ve included it here for your application."
-msgstr "以下信息已经是您的 {platform} 简述的一部分。我们已将其列入您的申请中。"
+"We've included it here for your application."
+msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Email address"
@@ -8151,17 +8581,18 @@ msgid "What You Need for Verification"
 msgstr "认证所需"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/make_payment_step.underscore
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Webcam"
-msgstr "摄像头"
+msgid "Device with Camera"
+msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
+<<<<<<< HEAD
 "You need a computer or cell phone that has a webcam. When you receive a "
 "browser prompt, make sure that you allow access to the camera."
+=======
+"You need a device that has a webcam. If you receive a browser prompt for "
+"access to your camera, please make sure to click 'Allow'."
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8169,10 +8600,8 @@ msgid "Photo Identification"
 msgstr "照片识别"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-msgid ""
-"You need a driver's license, passport, or other government-issued ID that "
-"has your name and photo."
-msgstr "您需要驾照、护照或者其他由政府签发的带有您姓名和照片的身份证件。"
+msgid "You need a valid ID that contains your full name and photo."
+msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -8198,13 +8627,14 @@ msgid "Your entire face fits inside the frame."
 msgstr "您的整张脸都在框内。"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-msgid "The photo of your face matches the photo on your ID."
-msgstr "您的面部照片与您身份证件上的照片相符。"
-
-#: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
+<<<<<<< HEAD
 "To use the current photo, select the Take Photo button {icon}. To take "
 "another photo, select the Retake Photo button {icon}."
+=======
+"To take the photo of your face, click on the camera button {icon}. If you "
+"need to try again, click 'Retake Photo'."
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8221,14 +8651,10 @@ msgid "Why does %(platformName)s need my photo?"
 msgstr "为什么%(platformName)s需要我的照片？"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
 msgid ""
-"As part of the verification process, you take a photo of both your face and "
-"a government-issued photo ID. Our authorization service confirms your "
-"identity by comparing the photo you take with the photo on your ID."
+"We use your verification photos to confirm your identity and ensure the "
+"validity of your certificate."
 msgstr ""
-"作为认证过程中一部分，您需要拍摄两张照片：您的面部以及您的身份证件（该证件须由政府签发且有您的照片）。我们的授权服务部将通过对比您的面部照片和您的证件上的照片来确认您的身份。"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8239,14 +8665,57 @@ msgstr "%(platformName)s用这张照片做什么？"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
+#, python-format
+msgid ""
+"We securely encrypt your photo and send it to our authorization service for "
+"review. Your photo and information are not saved or visible anywhere on "
+"%(platformName)s after the verification process is complete."
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"What if I can't see the camera image, or if I can't see my photo do "
+"determine which side is visible?"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"You may be able to complete the image capture procedure without assistance, "
+"but it may take a couple of submission attempts to get the camera "
+"positioning right.  Optimal camera positioning varies with each computer, "
+"but generally the best position for a headshot is approximately 12-18 inches"
+" (30-45 centimeters) from the camera, with your head centered relative to "
+"the computer screen. "
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"If the photos you submit are rejected, try moving the computer or camera "
+"orientation to change the lighting angle.  The most common reason for "
+"rejection is inability to read the text on the ID card."
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"What if I have difficulty holding my head in position relative to the "
+"camera?"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
 #, python-format
 msgid ""
-"We use the highest levels of security available to encrypt your photo and "
-"send it to our authorization service for review. Your photo and information "
-"are not saved or visible anywhere on %(platformName)s after the verification"
-" process is complete."
+"If you require assistance with taking either photo for submission, contact "
+"%(platformName)s support for additional suggestions."
 msgstr ""
+<<<<<<< HEAD
 "我们会采用最高级别的安全技术来加密您的照片并发送到我们的授权服务用于审核目的；一旦完成了认证过程，%(platformName)s不会继续保存这些照片和信息。"
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8292,6 +8761,8 @@ msgid ""
 "If you require assistance with taking either photo for submission, contact "
 "%(platformName)s support for additional suggestions."
 msgstr ""
+=======
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8306,16 +8777,21 @@ msgid "Take a Photo of Your ID"
 msgstr "拍摄您的身份证件"
 
 #: lms/templates/verify_student/id_photo_step.underscore
+<<<<<<< HEAD
 msgid ""
 "Use your webcam to take a photo of your ID. We will match this photo with "
 "the photo of your face and the name on your account."
 msgstr "请用摄像头拍摄一张您身份证件的照片，我们将查看该照片是否与您的面部照片及您在账号中填写的姓名匹配。"
+=======
+msgid "Use your webcam to take a photo of your ID."
+msgstr ""
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
-"You need an ID with your name and photo. A driver's license, passport, or "
-"other government-issued IDs are all acceptable."
-msgstr "您需要一份带有您姓名和照片的身份证件，我们可以接受驾照、护照以及其他由政府签发的身份证件。"
+"You need an ID with your name and photo. A driver's license, passport, or ID"
+" are all acceptable."
+msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -8341,6 +8817,16 @@ msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
+<<<<<<< HEAD
+=======
+"As part of the verification process, you take a photo of both your face and "
+"a photo ID. Our authorization service confirms your identity by comparing "
+"the photo you take with the photo on your ID."
+msgstr ""
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid ""
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 "You may be able to complete the image capture procedure without assistance, "
 "but it may take a couple of submission attempts to get the camera "
 "positioning right.  Optimal camera positioning varies with each computer, "
@@ -8385,6 +8871,24 @@ msgstr ""
 msgid "Can we match the photo you took with the one on your ID?"
 msgstr "我们能否将您拍的照片与您身份证件上的照片进行比对？"
 
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"As part of the verification process, you take a photo of both your face and "
+"a government-issued photo ID. Our authorization service confirms your "
+"identity by comparing the photo you take with the photo on your ID."
+msgstr ""
+"作为认证过程中一部分，您需要拍摄两张照片：您的面部以及您的身份证件（该证件须由政府签发且有您的照片）。我们的授权服务部将通过对比您的面部照片和您的证件上的照片来确认您的身份。"
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+#, python-format
+msgid ""
+"We use the highest levels of security available to encrypt your photo and "
+"send it to our authorization service for review. Your photo and information "
+"are not saved or visible anywhere on %(platformName)s after the verification"
+" process is complete."
+msgstr ""
+"我们会采用最高级别的安全技术来加密您的照片并发送到我们的授权服务用于审核目的；一旦完成了认证过程，%(platformName)s不会继续保存这些照片和信息。"
+
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: {courseName}"
 msgstr "感谢您返回认证您在 {courseName} 中的 ID"
@@ -8412,6 +8916,13 @@ msgid ""
 "A driver's license, passport, or other government-issued ID with your name "
 "and photo"
 msgstr "驾照、护照或者其他由政府签发的带有您姓名和照片的身份证件"
+
+#: lms/templates/verify_student/intro_step.underscore
+#: lms/templates/verify_student/make_payment_step.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Webcam"
+msgstr "摄像头"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
@@ -8610,10 +9121,13 @@ msgstr "照片要求："
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Does the photo of you show your whole face?"
 msgstr "这张照片中有您的整张脸吗？"
+<<<<<<< HEAD
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Does the photo of you match your ID photo?"
 msgstr "这张照片和您身份证件上的照片相匹配吗？"
+=======
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Is your name on your ID readable?"

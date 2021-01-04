@@ -1,28 +1,33 @@
 # -*- coding: utf-8 -*-
 """Tests for course home page date summary blocks."""
+
+
 from datetime import datetime, timedelta
 
+import crum
 import ddt
 import waffle
 from django.contrib.messages.middleware import MessageMiddleware
-from django.urls import reverse
 from django.test import RequestFactory
+from django.urls import reverse
 from freezegun import freeze_time
 from mock import patch
 from pytz import utc
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.courses import get_course_date_blocks
-from courseware.date_summary import (
+from lms.djangoapps.courseware.courses import get_course_date_blocks
+from lms.djangoapps.courseware.date_summary import (
     CertificateAvailableDate,
+    CourseAssignmentDate,
     CourseEndDate,
+    CourseExpiredDate,
     CourseStartDate,
     TodaysDate,
     VerificationDeadlineDate,
     VerifiedUpgradeDeadlineDate
 )
-from courseware.models import (
+from lms.djangoapps.courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
     DynamicUpgradeDeadlineConfiguration,
     OrgDynamicUpgradeDeadlineConfiguration
@@ -36,14 +41,16 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from openedx.core.lib.tests import attr
-from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, UPGRADE_DEADLINE_MESSAGE, CourseHomeMessages
+from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from openedx.features.course_experience import (
+    RELATIVE_DATES_FLAG, UNIFIED_COURSE_TAB_FLAG, UPGRADE_DEADLINE_MESSAGE, CourseHomeMessages
+)
 from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
-@attr(shard=1)
 @ddt.ddt
 class CourseDateSummaryTest(SharedModuleStoreTestCase):
     """Tests for course date summary blocks."""
@@ -51,6 +58,13 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     def setUp(self):
         super(CourseDateSummaryTest, self).setUp()
         SelfPacedConfiguration.objects.create(enable_course_home_improvements=True)
+
+    def make_request(self, user):
+        request = RequestFactory().request()
+        request.user = user
+        self.addCleanup(crum.set_current_request, None)
+        crum.set_current_request(request)
+        return request
 
     def test_course_info_feature_flag(self):
         SelfPacedConfiguration(enable_course_home_improvements=False).save()
@@ -61,7 +75,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.client.login(username=user.username, password=TEST_PASSWORD)
         url = reverse('info', args=(course.id,))
         response = self.client.get(url)
-        self.assertNotIn('date-summary', response.content)
+        self.assertNotContains(response, 'date-summary', status_code=302)
 
     def test_course_home_logged_out(self):
         course = create_course_run()
@@ -129,6 +143,160 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
         self.assert_block_types(course, user, expected_blocks)
 
+    @RELATIVE_DATES_FLAG.override(active=True)
+    def test_enabled_block_types_with_assignments(self):  # pylint: disable=too-many-statements
+        """
+        Creates a course with multiple subsections to test all of the different
+        cases for assignment dates showing up. Mocks out calling the edx-when
+        service and then validates the correct data is set and returned.
+        """
+        course = create_course_run(days_till_start=-100)
+        user = create_user()
+        request = self.make_request(user)
+        CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
+        now = datetime.now(utc)
+        assignment_title_html = ['<a href=', '</a>']
+        with self.store.bulk_operations(course.id):
+            section = ItemFactory.create(category='chapter', parent_location=course.location)
+            ItemFactory.create(
+                category='sequential',
+                display_name='Released',
+                parent_location=section.location,
+                start=now - timedelta(days=1),
+                due=now + timedelta(days=6),
+                graded=True,
+            )
+            ItemFactory.create(
+                category='sequential',
+                display_name='Not released',
+                parent_location=section.location,
+                start=now + timedelta(days=1),
+                due=now + timedelta(days=7),
+                graded=True,
+            )
+            ItemFactory.create(
+                category='sequential',
+                display_name='Third nearest assignment',
+                parent_location=section.location,
+                start=now + timedelta(days=1),
+                due=now + timedelta(days=8),
+                graded=True,
+            )
+            ItemFactory.create(
+                category='sequential',
+                display_name='Past due date',
+                parent_location=section.location,
+                start=now - timedelta(days=14),
+                due=now - timedelta(days=7),
+                graded=True,
+            )
+            ItemFactory.create(
+                category='sequential',
+                display_name='Not returned since we do not get non-graded subsections',
+                parent_location=section.location,
+                start=now + timedelta(days=1),
+                due=now - timedelta(days=7),
+                graded=False,
+            )
+            ItemFactory.create(
+                category='sequential',
+                display_name='No start date',
+                parent_location=section.location,
+                start=None,
+                due=now + timedelta(days=9),
+                graded=True,
+            )
+            ItemFactory.create(
+                category='sequential',
+                # Setting display name to None should set the assignment title to 'Assignment'
+                display_name=None,
+                parent_location=section.location,
+                start=now - timedelta(days=14),
+                due=now + timedelta(days=10),
+                graded=True,
+            )
+            dummy_subsection = ItemFactory.create(category='sequential', graded=True, due=now + timedelta(days=11))
+
+        # We are deleting this subsection right after creating it because we need to pass in a real
+        # location object (dummy_subsection.location), but do not want this to exist inside of the modulestore
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course.id):
+            self.store.delete_item(dummy_subsection.location, user.id)
+
+        # Standard widget case where we restrict the number of assignments.
+        expected_blocks = (
+            TodaysDate, CourseAssignmentDate, CourseAssignmentDate, CourseEndDate, VerificationDeadlineDate
+        )
+        blocks = get_course_date_blocks(course, user, request, num_assignments=2)
+        self.assertEqual(len(blocks), len(expected_blocks))
+        self.assertEqual(set(type(b) for b in blocks), set(expected_blocks))
+        assignment_blocks = filter(lambda b: isinstance(b, CourseAssignmentDate), blocks)
+        for assignment in assignment_blocks:
+            assignment_title = str(assignment.title_html) or str(assignment.title)
+            self.assertNotEqual(assignment_title, 'Third nearest assignment')
+            self.assertNotEqual(assignment_title, 'Past due date')
+            self.assertNotEqual(assignment_title, 'Not returned since we do not get non-graded subsections')
+            # checking if it is _in_ the title instead of being the title since released assignments
+            # are actually links. Unreleased assignments are just the string of the title.
+            if 'Released' in assignment_title:
+                for html_tag in assignment_title_html:
+                    self.assertIn(html_tag, assignment_title)
+            elif assignment_title == 'Not released':
+                for html_tag in assignment_title_html:
+                    self.assertNotIn(html_tag, assignment_title)
+
+        # No restrictions on number of assignments to return
+        expected_blocks = (
+            CourseStartDate, TodaysDate, CourseAssignmentDate, CourseAssignmentDate, CourseAssignmentDate,
+            CourseAssignmentDate, CourseAssignmentDate, CourseAssignmentDate, CourseEndDate,
+            VerificationDeadlineDate
+        )
+        blocks = get_course_date_blocks(course, user, request, include_past_dates=True)
+        self.assertEqual(len(blocks), len(expected_blocks))
+        self.assertEqual(set(type(b) for b in blocks), set(expected_blocks))
+        assignment_blocks = filter(lambda b: isinstance(b, CourseAssignmentDate), blocks)
+        for assignment in assignment_blocks:
+            assignment_title = str(assignment.title_html) or str(assignment.title)
+            self.assertNotEqual(assignment_title, 'Not returned since we do not get non-graded subsections')
+            # checking if it is _in_ the title instead of being the title since released assignments
+            # are actually links. Unreleased assignments are just the string of the title.
+            if 'Released' in assignment_title:
+                for html_tag in assignment_title_html:
+                    self.assertIn(html_tag, assignment_title)
+            elif assignment_title == 'Not released':
+                for html_tag in assignment_title_html:
+                    self.assertNotIn(html_tag, assignment_title)
+            elif assignment_title == 'Third nearest assignment':
+                # It's still not released
+                for html_tag in assignment_title_html:
+                    self.assertNotIn(html_tag, assignment_title)
+            elif 'Past due date' in assignment_title:
+                self.assertGreater(now, assignment.date)
+                for html_tag in assignment_title_html:
+                    self.assertIn(html_tag, assignment_title)
+            elif 'No start date' == assignment_title:
+                # Can't determine if it is released so it does not get a link
+                for html_tag in assignment_title_html:
+                    self.assertNotIn(html_tag, assignment_title)
+            # This is the item with no display name where we set one ourselves.
+            elif 'Assignment' in assignment_title:
+                # Can't determine if it is released so it does not get a link
+                for html_tag in assignment_title_html:
+                    self.assertIn(html_tag, assignment_title)
+
+    @RELATIVE_DATES_FLAG.override(active=True)
+    def test_enabled_block_types_with_expired_course(self):
+        course = create_course_run(days_till_start=-100)
+        user = create_user()
+        self.make_request(user)
+        # These two lines are to trigger the course expired block to be rendered
+        CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.AUDIT)
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=utc))
+
+        expected_blocks = (
+            TodaysDate, CourseEndDate, CourseExpiredDate, VerifiedUpgradeDeadlineDate
+        )
+        self.assert_block_types(course, user, expected_blocks)
+
     @ddt.data(
         # Course not started
         ({}, (CourseStartDate, TodaysDate, CourseEndDate)),
@@ -176,12 +344,9 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             self.client.login(username=user.username, password=TEST_PASSWORD)
 
             html_elements = [
-                '<h3 class="hd hd-6 handouts-header">Important Course Dates</h3>',
-                '<div class="date-summary-container">',
-                '<div class="date-summary date-summary-todays-date">',
-                '<span class="hd hd-6 heading localized-datetime"',
-                'data-datetime="2015-01-02 00:00:00+00:00"',
-                'data-string="Today is {date}"',
+                '<h3 class="hd hd-6 handouts-header">Upcoming Dates</h3>',
+                '<div class="date-summary',
+                '<p class="hd hd-6 date localized-datetime"',
                 'data-timezone="None"'
             ]
             url = reverse(url_name, args=(course.id,))
@@ -204,12 +369,9 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             response = self.client.get(url, follow=True)
 
             html_elements = [
-                '<h3 class="hd hd-6 handouts-header">Important Course Dates</h3>',
-                '<div class="date-summary-container">',
-                '<div class="date-summary date-summary-todays-date">',
-                '<span class="hd hd-6 heading localized-datetime"',
-                'data-datetime="2015-01-02 00:00:00+00:00"',
-                'data-string="Today is {date}"',
+                '<h3 class="hd hd-6 handouts-header">Upcoming Dates</h3>',
+                '<div class="date-summary',
+                '<p class="hd hd-6 date localized-datetime"',
                 'data-timezone="America/Los_Angeles"'
             ]
             for html in html_elements:
@@ -235,7 +397,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             url = reverse(url_name, args=(course.id,))
             response = self.client.get(url, follow=True)
             html_elements = [
-                'data-string="in 1 day - {date}"',
                 'data-datetime="2015-01-03 00:00:00+00:00"'
             ]
             for html in html_elements:
@@ -255,7 +416,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             url = reverse(url_name, args=(course.id,))
             response = self.client.get(url, follow=True)
             html_elements = [
-                'data-string="in 1 day - {date}"',
                 'data-datetime="2015-01-03 00:00:00+00:00"',
                 'data-timezone="America/Los_Angeles"'
             ]
@@ -294,6 +454,34 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             'This course is archived, which means you can review course content but it is no longer active.'
         )
         self.assertEqual(block.title, 'Course End')
+
+    @ddt.data(
+        {'weeks_to_complete': 7},  # Weeks to complete > time til end (end date shown)
+        {'weeks_to_complete': 4},  # Weeks to complete < time til end (end date not shown)
+    )
+    @RELATIVE_DATES_FLAG.override(active=True)
+    def test_course_end_date_self_paced(self, cr_details):
+        """
+        In self-paced courses, the end date will now only show up if the learner
+        views the course within the course's weeks to complete (as defined in
+        the course-discovery service). E.g. if the weeks to complete is 5 weeks
+        and the course doesn't end for 10 weeks, there will be no end date, but
+        if the course ends in 3 weeks, the end date will appear.
+        """
+        now = datetime.now(utc)
+        end_timedelta_number = 5
+        course = CourseFactory.create(
+            start=now + timedelta(days=-7), end=now + timedelta(weeks=end_timedelta_number), self_paced=True)
+        user = create_user()
+        self.make_request(user)
+        with patch('lms.djangoapps.courseware.date_summary.get_course_run_details') as mock_get_cr_details:
+            mock_get_cr_details.return_value = cr_details
+            block = CourseEndDate(course, user)
+            self.assertEqual(block.title, 'Course End')
+            if cr_details['weeks_to_complete'] > end_timedelta_number:
+                self.assertEqual(block.date, course.end)
+            else:
+                self.assertIsNone(block.date)
 
     def test_ecommerce_checkout_redirect(self):
         """Verify the block link redirects to ecommerce checkout if it's enabled."""
@@ -436,8 +624,8 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             self.assertEqual(block.link, '')
 
     @ddt.data(
-        (-1, '1 day ago - {date}'),
-        (1, 'in 1 day - {date}')
+        (-1, u'1 day ago - {date}'),
+        (1, u'in 1 day - {date}')
     )
     @ddt.unpack
     def test_render_date_string_past(self, delta, expected_date_string):
@@ -450,7 +638,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             self.assertEqual(block.relative_datestring, expected_date_string)
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestDateAlerts(SharedModuleStoreTestCase):
     """
@@ -567,7 +754,6 @@ class TestDateAlerts(SharedModuleStoreTestCase):
 
 
 @ddt.ddt
-@attr(shard=1)
 class TestScheduleOverrides(SharedModuleStoreTestCase):
 
     def setUp(self):
@@ -599,7 +785,7 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
             'Don\'t miss the opportunity to highlight your new knowledge and skills by earning a verified'
             ' certificate.'
         )
-        self.assertEqual(upgrade_date_summary.relative_datestring, 'by {date}')
+        self.assertEqual(upgrade_date_summary.relative_datestring, u'by {date}')
 
     @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def test_date_with_self_paced_with_enrollment_after_course_start(self):

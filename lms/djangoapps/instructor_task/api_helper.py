@@ -4,6 +4,8 @@ Helper lib for instructor_tasks API.
 Includes methods to check args for rescoring task, encoding student input,
 and task submission logic, including handling the Celery backend.
 """
+
+
 import hashlib
 import json
 import logging
@@ -12,10 +14,11 @@ from celery.result import AsyncResult
 from celery.states import FAILURE, READY_STATES, REVOKED, SUCCESS
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import UsageKey
+import six
 from six import text_type
 
-from courseware.courses import get_problems_in_section
-from courseware.module_render import get_xqueue_callback_url_prefix
+from lms.djangoapps.courseware.courses import get_problems_in_section
+from lms.djangoapps.courseware.module_render import get_xqueue_callback_url_prefix
 from lms.djangoapps.instructor_task.models import PROGRESS, InstructorTask
 from util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
@@ -75,7 +78,7 @@ def _reserve_task(course_id, task_type, task_key, task_input, requester):
     """
 
     if _task_is_running(course_id, task_type, task_key):
-        log.warning("Duplicate task found for task_type %s and task_key %s", task_type, task_key)
+        log.warning(u"Duplicate task found for task_type %s and task_key %s", task_type, task_key)
         error_message = generate_already_running_error_message(task_type)
         raise AlreadyRunningError(error_message)
 
@@ -85,7 +88,7 @@ def _reserve_task(course_id, task_type, task_key, task_input, requester):
         most_recent_id = "None found"
     finally:
         log.warning(
-            "No duplicate tasks found: task_type %s, task_key %s, and most recent task_id = %s",
+            u"No duplicate tasks found: task_type %s, task_key %s, and most recent task_id = %s",
             task_type,
             task_key,
             most_recent_id
@@ -118,7 +121,7 @@ def generate_already_running_error_message(task_type):
     if report_types.get(task_type):
 
         message = _(
-            "The {report_type} report is being created. "
+            u"The {report_type} report is being created. "
             "To view the status of the report, see Pending Tasks below. "
             "You will be able to download the report when it is complete."
         ).format(report_type=report_types.get(task_type))
@@ -138,7 +141,7 @@ def _get_xmodule_instance_args(request, task_id):
     request_info = {'username': request.user.username,
                     'user_id': request.user.id,
                     'ip': request.META['REMOTE_ADDR'],
-                    'agent': request.META.get('HTTP_USER_AGENT', '').decode('latin1'),
+                    'agent': request.META.get('HTTP_USER_AGENT', '').encode().decode('latin1'),
                     'host': request.META['SERVER_NAME'],
                     }
 
@@ -213,20 +216,20 @@ def _update_instructor_task(instructor_task, task_result):
     elif result_state in [PROGRESS, SUCCESS]:
         # construct a status message directly from the task result's result:
         # it needs to go back with the entry passed in.
-        log.info("background task (%s), state %s:  result: %s", task_id, result_state, returned_result)
+        log.info(u"background task (%s), state %s:  result: %s", task_id, result_state, returned_result)
         task_output = InstructorTask.create_output_for_success(returned_result)
     elif result_state == FAILURE:
         # on failure, the result's result contains the exception that caused the failure
         exception = returned_result
         traceback = result_traceback if result_traceback is not None else ''
-        log.warning("background task (%s) failed: %s %s", task_id, returned_result, traceback)
+        log.warning(u"background task (%s) failed: %s %s", task_id, returned_result, traceback)
         task_output = InstructorTask.create_output_for_failure(exception, result_traceback)
     elif result_state == REVOKED:
         # on revocation, the result's result doesn't contain anything
         # but we cannot rely on the worker thread to set this status,
         # so we set it here.
         entry_needs_saving = True
-        log.warning("background task (%s) revoked.", task_id)
+        log.warning(u"background task (%s) revoked.", task_id)
         task_output = InstructorTask.create_output_for_revoked()
 
     # save progress and state into the entry, even if it's not being saved:
@@ -256,10 +259,17 @@ def _handle_instructor_task_failure(instructor_task, error):
     """
     Do required operations if task creation was not complete.
     """
-    log.info("instructor task (%s) failed, result: %s", instructor_task.task_id, text_type(error))
+    log.info(u"instructor task (%s) failed, result: %s", instructor_task.task_id, text_type(error))
     _update_instructor_task_state(instructor_task, FAILURE, text_type(error))
 
     raise QueueConnectionError()
+
+
+def _get_async_result(task_id):
+    """
+    Use this minor indirection to facilitate mocking the AsyncResult in tests.
+    """
+    return AsyncResult(task_id)
 
 
 def get_updated_instructor_task(task_id):
@@ -273,13 +283,13 @@ def get_updated_instructor_task(task_id):
     try:
         instructor_task = InstructorTask.objects.get(task_id=task_id)
     except InstructorTask.DoesNotExist:
-        log.warning("query for InstructorTask status failed: task_id=(%s) not found", task_id)
+        log.warning(u"query for InstructorTask status failed: task_id=(%s) not found", task_id)
         return None
 
     # if the task is not already known to be done, then we need to query
     # the underlying task's result object:
     if instructor_task.task_state not in READY_STATES:
-        result = AsyncResult(task_id)
+        result = _get_async_result(task_id)
         _update_instructor_task(instructor_task, result)
 
     return instructor_task
@@ -364,7 +374,7 @@ def check_entrance_exam_problems_for_rescoring(exam_key):  # pylint: disable=inv
     descriptor doesn't exist for exam_key. NotImplementedError is raised if
     any of the problem in entrance exam doesn't support re-scoring calls.
     """
-    problems = get_problems_in_section(exam_key).values()
+    problems = list(get_problems_in_section(exam_key).values())
     if any(not _supports_rescore(problem) for problem in problems):
         msg = _("Not all problems in entrance exam support re-scoring.")
         raise NotImplementedError(msg)
@@ -388,7 +398,7 @@ def encode_problem_and_student_input(usage_key, student=None):
         task_key_stub = "_{problem}".format(problem=text_type(usage_key))
 
     # create the key value by using MD5 hash:
-    task_key = hashlib.md5(task_key_stub).hexdigest()
+    task_key = hashlib.md5(six.b(task_key_stub)).hexdigest()
 
     return task_input, task_key
 
@@ -410,7 +420,7 @@ def encode_entrance_exam_and_student_input(usage_key, student=None):
         task_key_stub = "_{entranceexam}".format(entranceexam=text_type(usage_key))
 
     # create the key value by using MD5 hash:
-    task_key = hashlib.md5(task_key_stub).hexdigest()
+    task_key = hashlib.md5(task_key_stub.encode('utf-8')).hexdigest()
 
     return task_input, task_key
 

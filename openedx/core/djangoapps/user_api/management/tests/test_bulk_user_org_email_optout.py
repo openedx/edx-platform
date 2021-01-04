@@ -1,18 +1,21 @@
 """
 Test the test_bulk_user_org_email_optout management command
 """
+
+
+import io
 import os
 import tempfile
 from contextlib import contextmanager
+
 import mock
 import pytest
-
 from django.core.management import call_command
 
 pytestmark = pytest.mark.django_db
 
 
-CSV_DATA = """1,UniversityX
+CSV_DATA = u"""1,UniversityX
 2,CollegeX
 3,StateUX
 """
@@ -24,10 +27,12 @@ def _create_test_csv(csv_data):
     Context manager to create and populate a CSV file - and delete it after usage.
     """
     __, file_name = tempfile.mkstemp(text=True)
-    with open(file_name, 'w') as file_pointer:
-        file_pointer.write(csv_data.encode('utf-8'))
-    yield file_name
-    os.unlink(file_name)
+    with io.open(file_name, 'w') as file_pointer:
+        file_pointer.write(csv_data)
+    try:
+        yield file_name
+    finally:
+        os.unlink(file_name)
 
 
 @mock.patch('openedx.core.djangoapps.user_api.management.commands.bulk_user_org_email_optout.log.info')
@@ -39,9 +44,9 @@ def test_successful_dry_run(mock_logger):
         args = ['--dry_run', '--optout_csv_path={}'.format(tmp_csv_file)]
         call_command('bulk_user_org_email_optout', *args)
         assert mock_logger.call_count == 3
-        mock_logger.assert_any_call("Read %s opt-out rows from CSV file '%s'.", 3, tmp_csv_file)
+        mock_logger.assert_any_call(u"Read %s opt-out rows from CSV file '%s'.", 3, tmp_csv_file)
         mock_logger.assert_any_call(
-            'Attempting opt-out for rows (%s, %s) through (%s, %s)...', '1', 'UniversityX', '3', 'StateUX'
+            u'Attempting opt-out for rows (%s, %s) through (%s, %s)...', '1', 'UniversityX', '3', 'StateUX'
         )
         mock_logger.assert_any_call(
             'INSERT INTO user_api_userorgtag (`user_id`, `org`, `key`, `value`, `created`, `modified`) \

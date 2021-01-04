@@ -1,6 +1,8 @@
 """
 Acceptance tests for the certificate web view feature.
 """
+
+
 from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
 from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage

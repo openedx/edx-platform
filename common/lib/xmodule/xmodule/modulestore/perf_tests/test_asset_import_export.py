@@ -1,33 +1,25 @@
 """
 Performance test for asset metadata in the modulestore.
 """
-from path import Path as path
-import unittest
-from tempfile import mkdtemp
-import itertools
-from shutil import rmtree
-from bson.code import Code
+
+
 import datetime
+import itertools
+import unittest
+from shutil import rmtree
+from tempfile import mkdtemp
+
 import ddt
 import pytest
+from bson.code import Code
+from path import Path as path
 
 from xmodule.assetstore import AssetMetadata
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.modulestore.perf_tests.generate_asset_xml import ASSET_XSD_FILE, make_asset_xml, validate_xml
+from xmodule.modulestore.tests.utils import MODULESTORE_SETUPS, SHORT_NAME_MAP, TEST_DATA_DIR
 from xmodule.modulestore.xml_exporter import export_course_to_xml
-from xmodule.modulestore.tests.utils import (
-    MODULESTORE_SETUPS,
-    SHORT_NAME_MAP,
-    TEST_DATA_DIR,
-)
-from xmodule.modulestore.perf_tests.generate_asset_xml import make_asset_xml, validate_xml, ASSET_XSD_FILE
-
-# The dependency below needs to be installed manually from the development.txt file, which doesn't
-# get installed during unit tests!
-try:
-    from code_block_timer import CodeBlockTimer
-except ImportError:
-    CodeBlockTimer = None
+from xmodule.modulestore.xml_importer import import_course_from_xml
 
 # Number of assets saved in the modulestore per test run.
 ASSET_AMOUNT_PER_TEST = (0, 1, 10, 100, 1000, 10000)
@@ -45,7 +37,6 @@ ALL_SORTS = (
     ('uploadDate', ModuleStoreEnum.SortOrder.descending),
 )
 
-# pylint: disable=invalid-name
 TEST_DIR = path(__file__).dirname()
 PLATFORM_ROOT = TEST_DIR.parent.parent.parent.parent.parent.parent
 TEST_DATA_ROOT = PLATFORM_ROOT / TEST_DATA_DIR
@@ -136,86 +127,6 @@ class CrossStoreXMLRoundtrip(unittest.TestCase):
                             target_id=dest_course_key,
                             create_if_not_present=True,
                             raise_on_failure=True,
-                        )
-
-
-@ddt.ddt
-@unittest.skip
-class FindAssetTest(unittest.TestCase):
-    """
-    This class exists to time asset finding in different modulestore
-    classes with different amounts of asset metadata.
-    """
-
-    # Use this attr to skip this test on regular unittest CI runs.
-    perf_test = True
-
-    def setUp(self):
-        super(FindAssetTest, self).setUp()
-        self.export_dir = mkdtemp()
-        self.addCleanup(rmtree, self.export_dir, ignore_errors=True)
-
-    @ddt.data(*itertools.product(
-        MODULESTORE_SETUPS,
-        ASSET_AMOUNT_PER_TEST,
-    ))
-    @ddt.unpack
-    def test_generate_find_timings(self, source_ms, num_assets):
-        """
-        Generate timings for different amounts of asset metadata and different modulestores.
-        """
-        if CodeBlockTimer is None:
-            pytest.skip("CodeBlockTimer undefined.")
-
-        desc = "FindAssetTest:{}:{}".format(
-            SHORT_NAME_MAP[source_ms],
-            num_assets,
-        )
-
-        with CodeBlockTimer(desc):
-
-            with CodeBlockTimer("fake_assets"):
-                # First, make the fake asset metadata.
-                make_asset_xml(num_assets, ASSET_XML_PATH)
-                validate_xml(ASSET_XSD_PATH, ASSET_XML_PATH)
-
-            with source_ms.build() as (source_content, source_store):
-                source_course_key = source_store.make_course_key('a', 'course', 'course')
-                asset_key = source_course_key.make_asset_key(
-                    AssetMetadata.GENERAL_ASSET_TYPE, 'silly_cat_picture.gif'
-                )
-
-                with CodeBlockTimer("initial_import"):
-                    import_course_from_xml(
-                        source_store,
-                        'test_user',
-                        TEST_DATA_ROOT,
-                        source_dirs=TEST_COURSE,
-                        static_content_store=source_content,
-                        target_id=source_course_key,
-                        create_if_not_present=True,
-                        raise_on_failure=True,
-                    )
-
-                with CodeBlockTimer("find_nonexistent_asset"):
-                    # More correct would be using the AssetManager.find() - but since the test
-                    # has created its own test modulestore, the AssetManager can't be used.
-                    __ = source_store.find_asset_metadata(asset_key)
-
-                # Perform get_all_asset_metadata for each sort.
-                for sort in ALL_SORTS:
-                    with CodeBlockTimer("get_asset_list:{}-{}".format(
-                        sort[0],
-                        'asc' if sort[1] == ModuleStoreEnum.SortOrder.ascending else 'desc'
-                    )):
-                        # Grab two ranges of 50 assets using different sorts.
-                        # Why 50? That's how many are displayed on the current Studio "Files & Uploads" page.
-                        start_middle = num_assets / 2
-                        __ = source_store.get_all_asset_metadata(
-                            source_course_key, 'asset', start=0, sort=sort, maxresults=50
-                        )
-                        __ = source_store.get_all_asset_metadata(
-                            source_course_key, 'asset', start=start_middle, sort=sort, maxresults=50
                         )
 
 

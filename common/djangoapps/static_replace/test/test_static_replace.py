@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """Tests for static_replace"""
-from __future__ import print_function
+
 
 import re
-from cStringIO import StringIO
-from urlparse import parse_qsl, urlparse, urlunparse
+from six import BytesIO
+from six.moves.urllib.parse import parse_qsl, urlparse, urlunparse
 
 import ddt
 import pytest
@@ -61,7 +61,7 @@ def test_multi_replace():
 
 
 def test_process_url():
-    def processor(__, prefix, quote, rest):  # pylint: disable=missing-docstring
+    def processor(__, prefix, quote, rest):
         return quote + 'test' + prefix + rest + quote
 
     assert process_static_urls(STATIC_SOURCE, processor) == '"test/static/file.png"'
@@ -70,7 +70,7 @@ def test_process_url():
 def test_process_url_data_dir_exists():
     base = '"/static/{data_dir}/file.png"'.format(data_dir=DATA_DIRECTORY)
 
-    def processor(original, prefix, quote, rest):  # pylint: disable=unused-argument,missing-docstring
+    def processor(original, prefix, quote, rest):  # pylint: disable=unused-argument
         return quote + 'test' + rest + quote
 
     assert process_static_urls(base, processor, data_dir=DATA_DIRECTORY) == base
@@ -78,7 +78,7 @@ def test_process_url_data_dir_exists():
 
 def test_process_url_no_match():
 
-    def processor(__, prefix, quote, rest):  # pylint: disable=missing-docstring
+    def processor(__, prefix, quote, rest):
         return quote + 'test' + prefix + rest + quote
 
     assert process_static_urls(STATIC_SOURCE, processor) == '"test/static/file.png"'
@@ -192,7 +192,9 @@ def test_static_paths_out(mock_modulestore, mock_storage):
     static_course_url = '/c4x/org/course/asset/LAlec04_controller.swf?csConfigFile=%2Fc4x%2Forg%2Fcourse%2Fasset%2FLAlec04_config.xml&name1=value1&name2=value2'
     raw_url = '/static/js/capa/protex/protex.nocache.js?raw'
     xblock_url = '/static/xblock/resources/babys_first.lil_xblock/public/images/pacifier.png'
+    # xss-lint: disable=python-wrap-html
     pre_text = 'EMBED src ="{}" xblock={} text <tag a="{}"/><div class="'.format(static_url, xblock_url, raw_url)
+    # xss-lint: disable=python-wrap-html
     post_text = 'EMBED src ="{}" xblock={} text <tag a="{}"/><div class="'.format(static_course_url, xblock_url, raw_url)
     static_paths = []
     assert replace_static_urls(pre_text, DATA_DIRECTORY, COURSE_KEY, static_paths_out=static_paths) == post_text
@@ -329,7 +331,7 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
             StaticContent: the StaticContent object for the created image
         """
         new_image = Image.new('RGB', dimensions, color)
-        new_buf = StringIO()
+        new_buf = BytesIO()
         new_image.save(new_buf, format='png')
         new_buf.seek(0)
         new_name = name.format(prefix)
@@ -353,7 +355,7 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
             StaticContent: the StaticContent object for the created content
 
         """
-        new_buf = StringIO('testingggggggggggg')
+        new_buf = BytesIO(b'testingggggggggggg')
         new_name = name.format(prefix)
         new_key = StaticContent.compute_location(cls.courses[prefix].id, new_name)
         new_content = StaticContent(new_key, new_name, 'application/octet-stream', new_buf.getvalue(), locked=locked)
@@ -586,8 +588,6 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
 
         with check_mongo_calls(mongo_calls):
             asset_path = StaticContent.get_canonicalized_asset_path(self.courses[prefix].id, start, base_url, exts)
-            print(expected)
-            print(asset_path)
             self.assertIsNotNone(re.match(expected, asset_path))
 
     @ddt.data(
@@ -784,6 +784,4 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
 
         with check_mongo_calls(mongo_calls):
             asset_path = StaticContent.get_canonicalized_asset_path(self.courses[prefix].id, start, base_url, exts)
-            print(expected)
-            print(asset_path)
             self.assertIsNotNone(re.match(expected, asset_path))

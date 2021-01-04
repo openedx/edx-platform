@@ -1,6 +1,8 @@
 """
 Tests related to the cohorting feature.
 """
+
+
 from uuid import uuid4
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
@@ -24,7 +26,7 @@ class NonCohortedDiscussionTestMixin(BaseDiscussionMixin):
 
     def test_non_cohort_visibility_label(self):
         self.setup_thread(1)
-        self.assertEquals(self.thread_page.get_group_visibility_label(), "This post is visible to everyone.")
+        self.assertEqual(self.thread_page.get_group_visibility_label(), "This post is visible to everyone.")
 
 
 class CohortedDiscussionTestMixin(BaseDiscussionMixin, CohortTestMixin):
@@ -48,15 +50,15 @@ class CohortedDiscussionTestMixin(BaseDiscussionMixin, CohortTestMixin):
         self.enable_cohorting(self.course_fixture)
         self.enable_always_divide_inline_discussions(self.course_fixture)
         self.refresh_thread_page(self.thread_id)
-        self.assertEquals(
+        self.assertEqual(
             self.thread_page.get_group_visibility_label(),
-            "This post is visible only to {}.".format(self.cohort_1_name)
+            u"This post is visible only to {}.".format(self.cohort_1_name)
         )
 
         # Disable cohorts and verify that the post now shows as visible to everyone.
         self.disable_cohorting(self.course_fixture)
         self.refresh_thread_page(self.thread_id)
-        self.assertEquals(self.thread_page.get_group_visibility_label(), "This post is visible to everyone.")
+        self.assertEqual(self.thread_page.get_group_visibility_label(), "This post is visible to everyone.")
 
 
 class DiscussionTabSingleThreadTest(BaseDiscussionTestCase):

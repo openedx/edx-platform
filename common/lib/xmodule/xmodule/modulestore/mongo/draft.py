@@ -6,24 +6,34 @@ returns the i4x://org/course/cat/name@draft object if that exists,
 and otherwise returns i4x://org/course/cat/name).
 """
 
-import pymongo
+
 import logging
 
+import pymongo
+import six
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from six import text_type
-from openedx.core.lib.cache_utils import request_cached
 from xblock.core import XBlock
+
+from openedx.core.lib.cache_utils import request_cached
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES, UnsupportedRevisionError
 from xmodule.modulestore.exceptions import (
-    ItemNotFoundError, DuplicateItemError, DuplicateCourseError, InvalidBranchSetting
+    DuplicateCourseError,
+    DuplicateItemError,
+    InvalidBranchSetting,
+    ItemNotFoundError
 )
 from xmodule.modulestore.mongo.base import (
-    MongoModuleStore, MongoRevisionKey, as_draft, as_published, SORT_REVISION_FAVOR_DRAFT
+    SORT_REVISION_FAVOR_DRAFT,
+    MongoModuleStore,
+    MongoRevisionKey,
+    as_draft,
+    as_published
 )
 from xmodule.modulestore.store_utilities import rewrite_nonportable_content_links
-from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, DIRECT_ONLY_CATEGORIES
 
 log = logging.getLogger(__name__)
 
@@ -151,7 +161,7 @@ class DraftModuleStore(MongoModuleStore):
         elif revision is None:
             key = usage_key.to_deprecated_son(prefix='_id.')
             del key['_id.revision']
-            return self.collection.find(key).count() > 0
+            return self.collection.count_documents(key) > 0
         else:
             raise UnsupportedRevisionError()
 
@@ -167,7 +177,7 @@ class DraftModuleStore(MongoModuleStore):
 
         # delete all of the db records for the course
         course_query = self._course_key_to_son(course_key)
-        self.collection.remove(course_query, multi=True)
+        self.collection.delete_many(course_query)
         self.delete_all_asset_metadata(course_key, user_id)
 
         self._emit_course_deleted_signal(course_key)
@@ -186,7 +196,7 @@ class DraftModuleStore(MongoModuleStore):
             # b/c we don't want the payload, I'm copying the guts of get_items here
             query = self._course_key_to_son(dest_course_id)
             query['_id.category'] = {'$nin': ['course', 'about']}
-            if self.collection.find(query).limit(1).count() > 0:
+            if self.collection.count_documents(query, limit=1) > 0:
                 raise DuplicateCourseError(
                     dest_course_id,
                     "Course at destination {0} is not an empty course. "
@@ -207,7 +217,7 @@ class DraftModuleStore(MongoModuleStore):
                 )
             else:
                 # update fields on existing course
-                for key, value in fields.iteritems():
+                for key, value in six.iteritems(fields):
                     setattr(new_course, key, value)
                 self.update_item(new_course, user_id)
 
@@ -232,7 +242,7 @@ class DraftModuleStore(MongoModuleStore):
 
             log.info("Cloning module %s to %s....", original_loc, module.location)
 
-            if 'data' in module.fields and module.fields['data'].is_set_on(module) and isinstance(module.data, basestring):
+            if 'data' in module.fields and module.fields['data'].is_set_on(module) and isinstance(module.data, six.string_types):
                 module.data = rewrite_nonportable_content_links(
                     original_loc.course_key, dest_course_id, module.data
                 )
@@ -437,7 +447,7 @@ class DraftModuleStore(MongoModuleStore):
             bulk_record = self._get_bulk_ops_record(location.course_key)
             bulk_record.dirty = True
             try:
-                self.collection.insert(item)
+                self.collection.insert_one(item)
             except pymongo.errors.DuplicateKeyError:
                 # prevent re-creation of DRAFT versions, unless explicitly requested to ignore
                 if not ignore_if_draft:
@@ -547,7 +557,7 @@ class DraftModuleStore(MongoModuleStore):
                 # see if other version of to-be-deleted root exists
                 query = location.to_deprecated_son(prefix='_id.')
                 del query['_id.revision']
-                if self.collection.find(query).count() > 1:
+                if self.collection.count_documents(query) > 1:
                     continue
 
             parent_block = super(DraftModuleStore, self).get_item(parent_location)
@@ -640,7 +650,7 @@ class DraftModuleStore(MongoModuleStore):
         if len(to_be_deleted) > 0:
             bulk_record = self._get_bulk_ops_record(root_usages[0].course_key)
             bulk_record.dirty = True
-            self.collection.remove({'_id': {'$in': to_be_deleted}}, safe=self.collection.safe)
+            self.collection.delete_many({'_id': {'$in': to_be_deleted}})
 
     def has_changes(self, xblock):
         """
@@ -653,7 +663,7 @@ class DraftModuleStore(MongoModuleStore):
 
     @request_cached(
         # use the XBlock's location value in the cache key
-        arg_map_function=lambda arg: unicode(arg.location if isinstance(arg, XBlock) else arg),
+        arg_map_function=lambda arg: six.text_type(arg.location if isinstance(arg, XBlock) else arg),
         # use this store's request_cache
         request_cache_getter=lambda args, kwargs: args[1],
     )
@@ -755,7 +765,7 @@ class DraftModuleStore(MongoModuleStore):
         bulk_record = self._get_bulk_ops_record(course_key)
         if len(to_be_deleted) > 0:
             bulk_record.dirty = True
-            self.collection.remove({'_id': {'$in': to_be_deleted}})
+            self.collection.delete_many({'_id': {'$in': to_be_deleted}})
 
         self._flag_publish_event(course_key)
 
@@ -807,9 +817,10 @@ class DraftModuleStore(MongoModuleStore):
             versions_found = self.collection.find(
                 query, {'_id': True, 'definition.children': True}, sort=[SORT_REVISION_FAVOR_DRAFT]
             )
+            versions_found = list(versions_found)
             # If 2 versions versions exist, we can assume one is a published version. Go ahead and do the delete
             # of the draft version.
-            if versions_found.count() > 1:
+            if len(versions_found) > 1:
                 # Moving a child from published parent creates a draft of the parent and moved child.
                 published_version = [
                     version
@@ -820,7 +831,7 @@ class DraftModuleStore(MongoModuleStore):
                     # This change makes sure that parents are updated too i.e. an item will have only one parent.
                     self.update_parent_if_moved(root_location, published_version[0], delete_draft_only, user_id)
                 self._delete_subtree(root_location, [as_draft], draft_only=True)
-            elif versions_found.count() == 1:
+            elif len(versions_found) == 1:
                 # Since this method cannot be called on something in DIRECT_ONLY_CATEGORIES and we call
                 # delete_subtree as soon as we find an item with a draft version, if there is only 1 version
                 # it must be published (since adding a child to a published item creates a draft of the parent).
@@ -847,7 +858,7 @@ class DraftModuleStore(MongoModuleStore):
             try:
                 source_item = self.get_item(item_location)
             except ItemNotFoundError:
-                log.error('Unable to find the item %s', unicode(item_location))
+                log.error('Unable to find the item %s', six.text_type(item_location))
                 return
 
             if source_item.parent and source_item.parent.block_id != original_parent_location.block_id:
@@ -886,7 +897,7 @@ class DraftModuleStore(MongoModuleStore):
                         to_process_dict[draft_as_non_draft_loc] = draft
 
         # convert the dict - which is used for look ups - back into a list
-        queried_children = to_process_dict.values()
+        queried_children = list(to_process_dict.values())
 
         return queried_children
 

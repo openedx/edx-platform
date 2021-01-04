@@ -29,22 +29,6 @@ from django.utils.translation import ugettext as _
           </a>
         </li>
       % endif
-      % if show_journal_listing:
-        <li class="tab-nav-item">
-          <a class="${'active ' if reverse('openedx.journals.dashboard') in request.path else ''}tab-nav-link" href="${reverse('openedx.journals.dashboard')}">
-            ${_("Journals")}
-          </a>
-        </li>
-      % endif
-      <%
-        self.real_user = getattr(user, 'real_user', user)
-        is_on_profile_page = data and data.get('profile_user_id') is not None
-      %>
-      <li class="tab-nav-item">
-        <a class="${'active ' if is_on_profile_page else ''}tab-nav-link" href="${reverse('learner_profile', args=[self.real_user.username])}">
-          ${_("Profile")}
-        </a>
-      </li>
     % endif
     % if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD','') and user.is_staff:
       <li class="item">
@@ -58,7 +42,7 @@ from django.utils.translation import ugettext as _
 <%include file="../user_dropdown.html"/>
 
 <a href="${get_online_help_info(online_help_token)['doc_url']}"
-         rel="noopener"
+        rel="noopener"
          target="_blank"
          class="doc-link">${_("Help")}</a>
 

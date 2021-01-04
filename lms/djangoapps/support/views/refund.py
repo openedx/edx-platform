@@ -10,6 +10,8 @@ with an E-Commerce service that supports automatic refunds.  Once that
 transition is complete, we can remove this view.
 
 """
+
+
 import logging
 
 from django import forms
@@ -60,7 +62,7 @@ class RefundForm(forms.Form):
         if user and course_id:
             self.cleaned_data['enrollment'] = enrollment = CourseEnrollment.get_or_create_enrollment(user, course_id)
             if enrollment.refundable():
-                msg = _("Course {course_id} not past the refund window.").format(course_id=course_id)
+                msg = _(u"Course {course_id} not past the refund window.").format(course_id=course_id)
                 raise forms.ValidationError(msg)
             try:
                 self.cleaned_data['cert'] = enrollment.certificateitem_set.filter(
@@ -68,7 +70,7 @@ class RefundForm(forms.Form):
                     status='purchased'
                 )[0]
             except IndexError:
-                msg = _("No order found for {user} in course {course_id}").format(user=user, course_id=course_id)
+                msg = _(u"No order found for {user} in course {course_id}").format(user=user, course_id=course_id)
                 raise forms.ValidationError(msg)
         return self.cleaned_data
 
@@ -81,7 +83,7 @@ class RefundForm(forms.Form):
             # this is a two-step form: first look up the data, then issue the refund.
             # first time through, set the hidden "confirmed" field to true and then redisplay the form
             # second time through, do the unenrollment/refund.
-            data = dict(self.data.items())
+            data = dict(list(self.data.items()))
             self.cleaned_data['confirmed'] = data['confirmed'] = 'true'
             self.data = data
             is_valid = False
@@ -125,14 +127,14 @@ class RefundSupportView(FormView):
         log.info(u"%s manually refunded %s %s", self.request.user, user, course_id)
         messages.success(
             self.request,
-            _("Unenrolled {user} from {course_id}").format(
+            _(u"Unenrolled {user} from {course_id}").format(
                 user=user,
                 course_id=course_id
             )
         )
         messages.success(
             self.request,
-            _("Refunded {cost} for order id {order_id}").format(
+            _(u"Refunded {cost} for order id {order_id}").format(
                 cost=cert.unit_cost,
                 order_id=cert.order.id
             )

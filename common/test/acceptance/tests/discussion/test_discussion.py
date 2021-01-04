@@ -2,6 +2,7 @@
 Tests for discussion pages
 """
 
+
 import datetime
 import time
 from unittest import skip
@@ -9,6 +10,8 @@ from uuid import uuid4
 
 import pytest
 from pytz import UTC
+import six
+from six.moves import map
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.fixtures.discussion import (
@@ -35,8 +38,7 @@ from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin,
 from common.test.acceptance.tests.helpers import UniqueCourseTest, get_modal_alert, skip_if_browser
 from openedx.core.lib.tests import attr
 
-
-THREAD_CONTENT_WITH_LATEX = """Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+THREAD_CONTENT_WITH_LATEX = u"""Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
                                ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
                                ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
                                reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.
@@ -123,7 +125,7 @@ class DiscussionResponsePaginationTestMixin(BaseDiscussionMixin):
             (
                 None if response_total == 0 else
                 "Showing all responses" if response_total == displayed_responses else
-                "Showing first {} responses".format(displayed_responses)
+                u"Showing first {} responses".format(displayed_responses)
             )
         )
         self.assertEqual(
@@ -229,6 +231,7 @@ class DiscussionHomePageTest(BaseDiscussionTestCase):
                 'section',  # TODO: AC-491
                 'aria-required-children',  # TODO: AC-534
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region'  # TODO: AC-932
             ]
         })
         self.page.a11y_audit.check_for_accessibility_errors()
@@ -467,6 +470,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase, BaseDiscussionMixi
                 'section',  # TODO: AC-491
                 'aria-required-children',  # TODO: AC-534
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
 
@@ -476,6 +480,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase, BaseDiscussionMixi
             "ignore": [
                 'section',  # TODO: AC-491
                 'aria-required-children',  # TODO: AC-534
+                'region'  # TODO: AC-932
             ]
         })
 
@@ -540,6 +545,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
                 'aria-required-children',  # TODO: AC-534
                 'color-contrast',  # Commented out for now because they reproducibly fail on Jenkins but not locally
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -551,6 +557,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
                 'aria-required-children',  # TODO: AC-534
                 'color-contrast',  # Commented out for now because they reproducibly fail on Jenkins but not locally
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -574,16 +581,6 @@ class DiscussionCommentDeletionTest(BaseDiscussionTestCase):
             ]
         )
         view.push()
-
-    def test_comment_deletion_as_student(self):
-        self.setup_user()
-        self.setup_view()
-        page = self.create_single_thread_page("comment_deletion_test_thread")
-        page.visit()
-        self.assertTrue(page.is_comment_deletable("comment_self_author"))
-        self.assertTrue(page.is_comment_visible("comment_other_author"))
-        self.assertFalse(page.is_comment_deletable("comment_other_author"))
-        page.delete_comment("comment_self_author")
 
     def test_comment_deletion_as_moderator(self):
         self.setup_user(roles=['Moderator'])
@@ -648,10 +645,10 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.submit_response_edit(response_id, description)
 
         expected_response_html = (
-            '<p><a href="{}">{}</a></p>'.format(url, description)
+            u'<p><a href="{}">{}</a></p>'.format(url, description)
         )
         actual_response_html = page.q(
-            css=".response_{} .response-body".format(response_id)
+            css=u".response_{} .response-body".format(response_id)
         ).html[0]
         self.assertEqual(expected_response_html, actual_response_html)
 
@@ -682,10 +679,10 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.submit_response_edit(response_id, '')
 
         expected_response_html = (
-            '<p><img src="{}" alt="{}" title=""></p>'.format(url, description)
+            u'<p><img src="{}" alt="{}" title=""></p>'.format(url, description)
         )
         actual_response_html = page.q(
-            css=".response_{} .response-body".format(response_id)
+            css=u".response_{} .response-body".format(response_id)
         ).html[0]
         self.assertEqual(expected_response_html, actual_response_html)
 
@@ -737,11 +734,11 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.submit_response_edit(response_id, "Some content")
 
         expected_response_html = (
-            '<p>Some content<img src="{}" alt="{}" title=""></p>'.format(
+            u'<p>Some content<img src="{}" alt="{}" title=""></p>'.format(
                 url, description)
         )
         actual_response_html = page.q(
-            css=".response_{} .response-body".format(response_id)
+            css=u".response_{} .response-body".format(response_id)
         ).html[0]
         self.assertEqual(expected_response_html, actual_response_html)
 
@@ -845,6 +842,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
                 'section',  # TODO: AC-491
                 'aria-required-children',  # TODO: AC-534
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         page.visit()
@@ -947,6 +945,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
                 'section',  # TODO: AC-491
                 'aria-required-children',  # TODO: AC-534
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -1001,7 +1000,9 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
             'Text line 2 \n'
             '$$e[n]=d_2$$'
         )
-        self.assertEqual(self.page.get_new_post_preview_text(), 'Text line 1\nText line 2')
+        self.assertEqual(self.page.get_new_post_preview_text(),
+                         'Text line 1\ne[n]=\nd\n1\nText line 2\ne[n]=\nd\n2'
+                         )
 
     def test_inline_mathjax_rendering_in_order(self):
         """
@@ -1016,7 +1017,9 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
             'Text line 2 \n'
             '$e[n]=d_2$'
         )
-        self.assertEqual(self.page.get_new_post_preview_text('.wmd-preview > p'), 'Text line 1 Text line 2')
+        self.assertEqual(self.page.get_new_post_preview_text('.wmd-preview > p'),
+                         'Text line 1\ne[n]=\nd\n1\nText line 2\ne[n]=\nd\n2'
+                         )
 
     def test_mathjax_not_rendered_after_post_cancel(self):
         """
@@ -1027,9 +1030,11 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
         appear in the preview box
         """
         self.page.set_new_post_editor_value(
-            r'\begin{equation}'
-            r'\tau_g(\omega) = - \frac{d}{d\omega}\phi(\omega) \hspace{2em} (1) '
-            r'\end{equation}'
+            six.text_type(
+                r'\begin{equation}'
+                r'\tau_g(\omega) = - \frac{d}{d\omega}\phi(\omega) \hspace{2em} (1) '
+                r'\end{equation}'
+            )
         )
         self.assertIsNotNone(self.page.get_new_post_preview_text())
         self.page.click_element(".cancel")
@@ -1392,6 +1397,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
                 'section',  # TODO: AC-491
                 'aria-required-children',  # TODO: AC-534
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         self.page.a11y_audit.check_for_accessibility_errors()

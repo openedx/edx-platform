@@ -1,14 +1,16 @@
+
+
 import logging
 import re
 
-from django.contrib.staticfiles.storage import staticfiles_storage
-from django.contrib.staticfiles import finders
+import six
 from django.conf import settings
-
-from xmodule.contentstore.content import StaticContent
-
+from django.contrib.staticfiles import finders
+from django.contrib.staticfiles.storage import staticfiles_storage
 from opaque_keys.edx.locator import AssetLocator
 from six import text_type
+
+from xmodule.contentstore.content import StaticContent
 
 log = logging.getLogger(__name__)
 XBLOCK_STATIC_RESOURCE_PREFIX = '/static/xblock'
@@ -21,9 +23,9 @@ def _url_replace_regex(prefix):
     To anyone contemplating making this more complicated:
     http://xkcd.com/1171/
     """
-    return ur"""
+    return u"""
         (?x)                      # flags=re.VERBOSE
-        (?P<quote>\\?['"])        # the opening quotes
+        (?P<quote>\\\\?['"])      # the opening quotes
         (?P<prefix>{prefix})      # the prefix
         (?P<rest>.*?)             # everything else in the url
         (?P=quote)                # the first matching closing quote
@@ -113,7 +115,7 @@ def process_static_urls(text, replacement_function, data_dir=None):
         # works for actual static assets and for magical course asset URLs....
         full_url = prefix + rest
 
-        starts_with_static_url = full_url.startswith(unicode(settings.STATIC_URL))
+        starts_with_static_url = full_url.startswith(six.text_type(settings.STATIC_URL))
         starts_with_prefix = full_url.startswith(XBLOCK_STATIC_RESOURCE_PREFIX)
         contains_prefix = XBLOCK_STATIC_RESOURCE_PREFIX in full_url
         if starts_with_prefix or (starts_with_static_url and contains_prefix):

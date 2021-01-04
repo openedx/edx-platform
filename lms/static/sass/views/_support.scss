@@ -16,7 +16,7 @@
   }
 }
 
-.manage-user-search{
+.manage-user-search {
   margin: 40px 0;
 
   input[name="query"] {
@@ -164,7 +164,7 @@
     text-align: center;
   }
 
-  td{
+  td {
     padding: 0 23px;
   }
 
@@ -181,7 +181,7 @@
   }
 }
 
-.manage-user-content{
+.manage-user-content {
   text-align: center;
 }
 
@@ -196,21 +196,25 @@
     text-align: center;
   }
 
-  td{
+  td {
     padding: 0 23px;
   }
 }
 
-.fb-enrollments-content{
+.fb-enrollments-content {
   text-align: center;
 }
 
-.fb-enrollments-search{
+.fb-enrollments-search {
   margin: 40px 0;
 
   input[name="course_key"] {
     width: 350px;
   }
+}
+
+.fb-enrollments-gating-col {
+  background-color: #eee;
 }
 
 .contact-us-wrapper {
@@ -237,7 +241,7 @@
     font-weight: $font-regular;
   }
 
-  .help-button {
+  .help-button, .btn-secondary {
     margin-bottom: $baseline;
     height: $baseline * 2;
     font-weight: $font-regular;

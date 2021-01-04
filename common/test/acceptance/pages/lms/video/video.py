@@ -2,6 +2,7 @@
 Video player in the courseware.
 """
 
+
 import json
 import logging
 import time
@@ -11,6 +12,7 @@ from bok_choy.javascript import js_defined, wait_for_js
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise, Promise
 from selenium.webdriver.common.action_chains import ActionChains
+from six.moves import zip
 
 log = logging.getLogger('VideoPage')
 
@@ -34,13 +36,13 @@ CSS_CLASS_NAMES = {
     'captions_rendered': '.video.is-captions-rendered',
     'captions': '.subtitles',
     'captions_text': '.subtitles li span',
-    'captions_text_getter': '.subtitles li span[role="link"][data-index="{}"]',
+    'captions_text_getter': u'.subtitles li span[role="link"][data-index="{}"]',
     'closed_captions': '.closed-captions',
     'error_message': '.video .video-player .video-error',
     'video_container': '.video',
     'video_sources': '.video-player video source',
     'video_spinner': '.video-wrapper .spinner',
-    'video_xmodule': '.xmodule_VideoModule',
+    'video_xmodule': '.xmodule_VideoBlock',
     'video_init': '.is-initialized',
     'video_time': '.vidtime',
     'video_display_name': '.vert h3',
@@ -121,7 +123,7 @@ class VideoPage(PageObject):
             video_player_buttons.append('play')
 
         for button in video_player_buttons:
-            self.wait_for_element_visibility(VIDEO_BUTTONS[button], '{} button is visible'.format(button))
+            self.wait_for_element_visibility(VIDEO_BUTTONS[button], u'{} button is visible'.format(button))
 
         def _is_finished_loading():
             """
@@ -148,7 +150,7 @@ class VideoPage(PageObject):
 
         video_player_buttons = ['do_not_show_again', 'skip_bumper', 'volume']
         for button in video_player_buttons:
-            self.wait_for_element_visibility(VIDEO_BUTTONS[button], '{} button is visible'.format(button))
+            self.wait_for_element_visibility(VIDEO_BUTTONS[button], u'{} button is visible'.format(button))
 
     @property
     def is_poster_shown(self):
@@ -179,7 +181,7 @@ class VideoPage(PageObject):
         if video_display_name:
             video_display_names = self.q(css=CSS_CLASS_NAMES['video_display_name']).text
             if video_display_name not in video_display_names:
-                raise ValueError("Incorrect Video Display Name: '{0}'".format(video_display_name))
+                raise ValueError(u"Incorrect Video Display Name: '{0}'".format(video_display_name))
             return '.vert.vert-{}'.format(video_display_names.index(video_display_name))
         else:
             return '.vert.vert-0'
@@ -197,7 +199,7 @@ class VideoPage(PageObject):
 
         """
         if vertical:
-            return '{vertical} {video_element}'.format(
+            return u'{vertical} {video_element}'.format(
                 vertical=self.get_video_vertical_selector(self.current_video_display_name),
                 video_element=class_name)
         else:
@@ -245,7 +247,7 @@ class VideoPage(PageObject):
                 is_present = href_src.startswith('blob:') or href_src.startswith('mediasource:')
             return is_present, is_present
 
-        return Promise(_is_element_present, 'Video Rendering Failed in {0} mode.'.format(mode)).fulfill()
+        return Promise(_is_element_present, u'Video Rendering Failed in {0} mode.'.format(mode)).fulfill()
 
     @property
     def video_download_url(self):
@@ -387,7 +389,7 @@ class VideoPage(PageObject):
 
             # Verify that captions state is toggled/changed
             EmptyPromise(lambda: self.is_captions_visible() == captions_new_state,
-                         "Transcripts are {state}".format(state=state)).fulfill()
+                         u"Transcripts are {state}".format(state=state)).fulfill()
 
     @wait_for_js
     def _closed_captions_visibility(self, closed_captions_new_state):
@@ -404,7 +406,7 @@ class VideoPage(PageObject):
 
         # Make sure that the captions are visible
         EmptyPromise(lambda: self.is_closed_captions_visible() == closed_captions_new_state,
-                     "Closed captions are {state}".format(state=state)).fulfill()
+                     u"Closed captions are {state}".format(state=state)).fulfill()
 
     @property
     def captions_text(self):
@@ -485,7 +487,7 @@ class VideoPage(PageObject):
         hover = ActionChains(self.browser).move_to_element(element_to_hover_over)
         hover.perform()
 
-        speed_selector = self.get_element_selector('li[data-speed="{speed}"] .control'.format(speed=speed))
+        speed_selector = self.get_element_selector(u'li[data-speed="{speed}"] .control'.format(speed=speed))
         self.q(css=speed_selector).first.click()
         # Click triggers an ajax event
         self.wait_for_ajax()
@@ -677,7 +679,7 @@ class VideoPage(PageObject):
         element_to_hover_over = self.q(css=cc_button_selector).results[0]
         ActionChains(self.browser).move_to_element(element_to_hover_over).perform()
 
-        language_selector = VIDEO_MENUS["language"] + ' li[data-lang-code="{code}"]'.format(code=code)
+        language_selector = VIDEO_MENUS["language"] + u' li[data-lang-code="{code}"]'.format(code=code)
         language_selector = self.get_element_selector(language_selector)
         self.wait_for_element_visibility(language_selector, 'language menu is visible')
         hover_target = self.q(css=language_selector).results[0]
@@ -746,7 +748,7 @@ class VideoPage(PageObject):
         language_codes = self.q(css=languages_selector).attrs('data-lang-code')
         language_names = self.q(css=languages_selector).attrs('textContent')
 
-        return dict(zip(language_codes, language_names))
+        return dict(list(zip(language_codes, language_names)))
 
     @property
     def position(self):
@@ -786,7 +788,7 @@ class VideoPage(PageObject):
 
         # For troubleshooting purposes show what the current state is.
         # The debug statements will only be displayed in the event of a failure.
-        logging.debug("Current state of '{}' element is '{}'".format(state_selector, current_state))
+        logging.debug(u"Current state of '{}' element is '{}'".format(state_selector, current_state))
 
         # See the JS video player's onStateChange function
         if 'is-playing' in current_state:
@@ -824,7 +826,7 @@ class VideoPage(PageObject):
         """
         self._wait_for(
             lambda: self.state == state,
-            'State is {state}'.format(state=state)
+            u'State is {state}'.format(state=state)
         )
 
     def seek(self, seek_value):
@@ -837,7 +839,7 @@ class VideoPage(PageObject):
         """
         seek_time = _parse_time_str(seek_value)
         seek_selector = self.get_element_selector(' .video')
-        js_code = "$('{seek_selector}').data('video-player-state').videoPlayer.onSlideSeek({{time: {seek_time}}})".format(
+        js_code = u"$('{seek_selector}').data('video-player-state').videoPlayer.onSlideSeek({{time: {seek_time}}})".format(
             seek_selector=seek_selector, seek_time=seek_time)
         self.browser.execute_script(js_code)
 
@@ -887,7 +889,7 @@ class VideoPage(PageObject):
         """
         self._wait_for(
             lambda: self.position == position,
-            'Position is {position}'.format(position=position)
+            u'Position is {position}'.format(position=position)
         )
 
     @property

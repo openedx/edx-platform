@@ -2,16 +2,21 @@
 Unit tests for Block Structure models.
 """
 # pylint: disable=protected-access
+
+
+import errno
+from itertools import product
+from uuid import uuid4
+
 import ddt
+import six
+from six.moves import range
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.test import TestCase
 from django.utils.timezone import now
-from itertools import product
-from mock import patch, Mock
-from uuid import uuid4
-
-from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
+from mock import Mock, patch
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from ..exceptions import BlockStructureNotFound
 from ..models import BlockStructureModel, _directory_name, _storage_error_handling
@@ -24,7 +29,7 @@ class BlockStructureModelTestCase(TestCase):
     """
     def setUp(self):
         super(BlockStructureModelTestCase, self).setUp()
-        self.course_key = CourseLocator('org', 'course', unicode(uuid4()))
+        self.course_key = CourseLocator('org', 'course', six.text_type(uuid4()))
         self.usage_key = BlockUsageLocator(course_key=self.course_key, block_type='course', block_id='course')
 
         self.params = self._create_bsm_params()
@@ -38,10 +43,10 @@ class BlockStructureModelTestCase(TestCase):
         Verifies that the field values and serialized data
         on the given bsm are as expected.
         """
-        for field_name, field_value in self.params.iteritems():
+        for field_name, field_value in six.iteritems(self.params):
             self.assertEqual(field_value, getattr(bsm, field_name))
 
-        self.assertEqual(bsm.get_serialized_data(), expected_serialized_data)
+        self.assertEqual(bsm.get_serialized_data().decode('utf-8'), expected_serialized_data)
         self.assertIn(_directory_name(self.usage_key), bsm.data.name)
 
     def _assert_file_count_equal(self, expected_count):
@@ -60,7 +65,7 @@ class BlockStructureModelTestCase(TestCase):
             data_version='DV',
             data_edit_timestamp=now(),
             transformers_schema_version='TV',
-            block_structure_schema_version=unicode(1),
+            block_structure_schema_version=six.text_type(1),
         )
 
     def _verify_update_or_create_call(self, serialized_data, mock_log=None, expect_created=None):
@@ -123,8 +128,8 @@ class BlockStructureModelTestCase(TestCase):
 
     @ddt.data(
         *product(
-            range(1, 3),  # prune_keep_count
-            range(4),  # num_prior_edits
+            list(range(1, 3)),  # prune_keep_count
+            list(range(4)),  # num_prior_edits
         )
     )
     @ddt.unpack
@@ -143,23 +148,27 @@ class BlockStructureModelTestCase(TestCase):
             self._assert_file_count_equal(min(num_prior_edits + 1, prune_keep_count))
 
     @ddt.data(
-        (IOError, BlockStructureNotFound, True),
-        (IOError, IOError, False),
-        (SuspiciousOperation, BlockStructureNotFound, True),
-        (SuspiciousOperation, SuspiciousOperation, False),
-        (OSError, OSError, True),
-        (OSError, OSError, False),
+        (IOError, errno.ENOENT, u'No such file or directory', BlockStructureNotFound, True),
+        (IOError, errno.ENOENT, u'No such file or directory', IOError, False),
+        (SuspiciousOperation, None, None, BlockStructureNotFound, True),
+        (SuspiciousOperation, None, None, SuspiciousOperation, False),
+        (OSError, errno.EACCES, u'Permission denied', OSError, True),
+        (OSError, errno.EACCES, u'Permission denied', OSError, False),
     )
     @ddt.unpack
-    def test_error_handling(self, error_raised_in_operation, expected_error_raised, is_read_operation):
+    def test_error_handling(self, error_raised_in_operation, errno_raised, message_raised,
+                            expected_error_raised, is_read_operation):
         bs_model, _ = BlockStructureModel.update_or_create('test data', **self.params)
         with self.assertRaises(expected_error_raised):
             with _storage_error_handling(bs_model, 'operation', is_read_operation):
-                raise error_raised_in_operation
+                if errno_raised is not None:
+                    raise error_raised_in_operation(errno_raised, message_raised)
+                else:
+                    raise error_raised_in_operation
 
     @patch('openedx.core.djangoapps.content.block_structure.models.log')
     def test_old_mongo_keys(self, mock_log):
-        self.course_key = CourseLocator('org2', 'course2', unicode(uuid4()), deprecated=True)
+        self.course_key = CourseLocator('org2', 'course2', six.text_type(uuid4()), deprecated=True)
         self.usage_key = BlockUsageLocator(course_key=self.course_key, block_type='course', block_id='course')
         serialized_data = 'test data for old course'
         self.params['data_usage_key'] = self.usage_key

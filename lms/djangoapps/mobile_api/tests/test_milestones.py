@@ -1,12 +1,15 @@
 """
 Milestone related tests for the mobile_api
 """
+
+
+import six
+from crum import set_current_request
 from django.conf import settings
 from mock import patch
-from crum import set_current_request
 
-from courseware.access_response import MilestoneAccessError
-from courseware.tests.test_entrance_exam import add_entrance_exam_milestone, answer_entrance_exam_problem
+from lms.djangoapps.courseware.access_response import MilestoneAccessError
+from lms.djangoapps.courseware.tests.test_entrance_exam import add_entrance_exam_milestone, answer_entrance_exam_problem
 from openedx.core.djangolib.testing.utils import get_mock_request
 from util.milestones_helpers import add_prerequisite_course, fulfill_course_milestone
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -21,7 +24,6 @@ class MobileAPIMilestonesMixin(object):
     the mobile api will appropriately block content until the milestone is
     fulfilled.
     """
-    shard = 4
 
     ALLOW_ACCESS_TO_MILESTONE_COURSE = False
 
@@ -112,7 +114,7 @@ class MobileAPIMilestonesMixin(object):
             add_entrance_exam_milestone(self.course, self.entrance_exam)
 
             self.course.entrance_exam_minimum_score_pct = 0.50
-            self.course.entrance_exam_id = unicode(self.entrance_exam.location)
+            self.course.entrance_exam_id = six.text_type(self.entrance_exam.location)
             self.store.update_item(self.course, self.user.id)
 
     def _add_prerequisite_course(self):

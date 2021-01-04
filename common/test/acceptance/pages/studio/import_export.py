@@ -1,12 +1,15 @@
 """
 Import/Export pages.
 """
+
+
 import os
 import re
 import time
 from datetime import datetime
 
 import requests
+import six
 from bok_choy.promise import EmptyPromise
 
 from common.test.acceptance.pages.common.utils import click_css
@@ -53,8 +56,8 @@ class ImportExportMixin(object):
         """
         Return python datetime object from the parsed timestamp tuple (date, time)
         """
-        timestamp = "{0} {1}".format(*self.timestamp)
-        formatted_timestamp = time.strptime(timestamp, "%m/%d/%Y %H:%M")
+        timestamp = u"{0} {1}".format(*self.timestamp)
+        formatted_timestamp = time.strptime(timestamp, u"%m/%d/%Y %H:%M")
         return datetime.fromtimestamp(time.mktime(formatted_timestamp))
 
     @property
@@ -65,7 +68,7 @@ class ImportExportMixin(object):
         """
         string = self.q(css='.item-progresspoint-success-date').text[0]
 
-        return re.match(r'\(([^ ]+).+?(\d{2}:\d{2})', string).groups()
+        return re.match(six.text_type(r'\(([^ ]+).+?(\d{2}:\d{2})'), string).groups()
 
     def wait_for_tasks(self, completed=False, fail_on=None):
         """
@@ -80,11 +83,11 @@ class ImportExportMixin(object):
         for desc, css_class in self.task_classes.items():
             desc_text = desc_template.format(desc)
             # pylint: disable=cell-var-from-loop
-            EmptyPromise(lambda: self.q(css='.{}.{}'.format(css_class, state)).present, desc_text, timeout=30)
+            EmptyPromise(lambda: self.q(css=u'.{}.{}'.format(css_class, state)).present, desc_text, timeout=30)
             if fail_on == desc:
                 EmptyPromise(
-                    lambda: self.q(css='.{}.is-complete.has-error'.format(css_class)).present,
-                    "{} checkpoint marked as failed".format(desc),
+                    lambda: self.q(css=u'.{}.is-complete.has-error'.format(css_class)).present,
+                    u"{} checkpoint marked as failed".format(desc),
                     timeout=30
                 )
                 # The rest should never run.
@@ -102,9 +105,9 @@ class ImportExportMixin(object):
         Outputs the CSS class and promise description for task states based on completion.
         """
         if completed:
-            return 'is-complete', "'{}' is marked complete"
+            return 'is-complete', u"'{}' is marked complete"
         else:
-            return 'is-not-started', "'{}' is in not-yet-started status"
+            return 'is-not-started', u"'{}' is in not-yet-started status"
 
 
 class ExportMixin(ImportExportMixin):
@@ -216,7 +219,7 @@ class LibraryLoader(object):
         but is used for import/export.
         """
         # pylint: disable=no-member
-        return "/".join([BASE_URL, self.url_path, unicode(self.locator)])
+        return "/".join([BASE_URL, self.url_path, six.text_type(self.locator)])
 
 
 class ExportCoursePage(ExportMixin, TemplateCheckMixin, CoursePage):

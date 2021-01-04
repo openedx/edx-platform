@@ -2,19 +2,20 @@
 Tests i18n in courseware
 """
 
+
 import json
 import re
+import six
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.urls import reverse, reverse_lazy
 from django.test.client import Client
+from django.urls import reverse, reverse_lazy
 from django.utils import translation
 
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from openedx.core.lib.tests import attr
 from student.tests.factories import UserFactory
 
 
@@ -35,9 +36,10 @@ class BaseI18nTestCase(CacheIsolationTestCase):
 
     def assert_tag_has_attr(self, content, tag, attname, value):
         """Assert that a tag in `content` has a certain value in a certain attribute."""
-        regex = r"""<{tag} [^>]*\b{attname}=['"]([\w\d\- ]+)['"][^>]*>""".format(tag=tag, attname=attname)
+        regex_string = six.text_type(r"""<{tag} [^>]*\b{attname}=['"]([\w\d\- ]+)['"][^>]*>""")  # noqa: W605,E501
+        regex = regex_string.format(tag=tag, attname=attname)
         match = re.search(regex, content)
-        self.assertTrue(match, "Couldn't find desired tag '%s' with attr '%s' in %r" % (tag, attname, content))
+        self.assertTrue(match, u"Couldn't find desired tag '%s' with attr '%s' in %r" % (tag, attname, content))
         attvalues = match.group(1).split()
         self.assertIn(value, attvalues)
 
@@ -70,7 +72,6 @@ class BaseI18nTestCase(CacheIsolationTestCase):
         self.client.login(username=self.user.username, password=self.pwd)
 
 
-@attr(shard=1)
 class I18nTestCase(BaseI18nTestCase):
     """
     Tests for i18n
@@ -78,33 +79,32 @@ class I18nTestCase(BaseI18nTestCase):
     def test_default_is_en(self):
         self.release_languages('fr')
         response = self.client.get('/')
-        self.assert_tag_has_attr(response.content, "html", "lang", "en")
+        self.assert_tag_has_attr(response.content.decode('utf-8'), "html", "lang", "en")
         self.assertEqual(response['Content-Language'], 'en')
-        self.assert_tag_has_attr(response.content, "body", "class", "lang_en")
+        self.assert_tag_has_attr(response.content.decode('utf-8'), "body", "class", "lang_en")
 
     def test_esperanto(self):
         self.release_languages('fr, eo')
         response = self.client.get('/', HTTP_ACCEPT_LANGUAGE='eo')
-        self.assert_tag_has_attr(response.content, "html", "lang", "eo")
+        self.assert_tag_has_attr(response.content.decode('utf-8'), "html", "lang", "eo")
         self.assertEqual(response['Content-Language'], 'eo')
-        self.assert_tag_has_attr(response.content, "body", "class", "lang_eo")
+        self.assert_tag_has_attr(response.content.decode('utf-8'), "body", "class", "lang_eo")
 
     def test_switching_languages_bidi(self):
         self.release_languages('ar, eo')
         response = self.client.get('/')
-        self.assert_tag_has_attr(response.content, "html", "lang", "en")
+        self.assert_tag_has_attr(response.content.decode('utf-8'), "html", "lang", "en")
         self.assertEqual(response['Content-Language'], 'en')
-        self.assert_tag_has_attr(response.content, "body", "class", "lang_en")
-        self.assert_tag_has_attr(response.content, "body", "class", "ltr")
+        self.assert_tag_has_attr(response.content.decode('utf-8'), "body", "class", "lang_en")
+        self.assert_tag_has_attr(response.content.decode('utf-8'), "body", "class", "ltr")
 
         response = self.client.get('/', HTTP_ACCEPT_LANGUAGE='ar')
-        self.assert_tag_has_attr(response.content, "html", "lang", "ar")
+        self.assert_tag_has_attr(response.content.decode('utf-8'), "html", "lang", "ar")
         self.assertEqual(response['Content-Language'], 'ar')
-        self.assert_tag_has_attr(response.content, "body", "class", "lang_ar")
-        self.assert_tag_has_attr(response.content, "body", "class", "rtl")
+        self.assert_tag_has_attr(response.content.decode('utf-8'), "body", "class", "lang_ar")
+        self.assert_tag_has_attr(response.content.decode('utf-8'), "body", "class", "rtl")
 
 
-@attr(shard=1)
 class I18nRegressionTests(BaseI18nTestCase):
     """
     Tests for i18n
@@ -113,7 +113,7 @@ class I18nRegressionTests(BaseI18nTestCase):
         # Regression test; LOC-72, and an issue with Django
         self.release_languages('es-419')
         response = self.client.get('/', HTTP_ACCEPT_LANGUAGE='es-419')
-        self.assert_tag_has_attr(response.content, "html", "lang", "es-419")
+        self.assert_tag_has_attr(response.content.decode('utf-8'), "html", "lang", "es-419")
 
     def test_unreleased_lang_resolution(self):
         # Regression test; LOC-85
@@ -125,12 +125,12 @@ class I18nRegressionTests(BaseI18nTestCase):
         # in the http request (NOT with the ?preview-lang query param) should
         # receive files for 'fa'
         response = self.client.get(self.url, HTTP_ACCEPT_LANGUAGE='fa-ir')
-        self.assert_tag_has_attr(response.content, "html", "lang", "fa")
+        self.assert_tag_has_attr(response.content.decode('utf-8'), "html", "lang", "fa")
 
         # Now try to access with dark lang
         self.client.post(self.preview_language_url, {'preview_language': 'fa-ir', 'action': 'set_preview_language'})
         response = self.client.get(self.url)
-        self.assert_tag_has_attr(response.content, "html", "lang", "fa-ir")
+        self.assert_tag_has_attr(response.content.decode('utf-8'), "html", "lang", "fa-ir")
 
     def test_preview_lang(self):
         self.user_login()
@@ -140,26 +140,25 @@ class I18nRegressionTests(BaseI18nTestCase):
         site_lang = settings.LANGUAGE_CODE
         # Visit the front page; verify we see site default lang
         response = self.client.get(self.url)
-        self.assert_tag_has_attr(response.content, "html", "lang", site_lang)
+        self.assert_tag_has_attr(response.content.decode('utf-8'), "html", "lang", site_lang)
 
         # Verify we can switch language using the preview-lang query param
         # Set the language
         self.client.post(self.preview_language_url, {'preview_language': 'eo', 'action': 'set_preview_language'})
 
         response = self.client.get(self.url)
-        self.assert_tag_has_attr(response.content, "html", "lang", "eo")
+        self.assert_tag_has_attr(response.content.decode('utf-8'), "html", "lang", "eo")
         # We should be able to see released languages using preview-lang, too
         self.client.post(self.preview_language_url, {'preview_language': 'es-419', 'action': 'set_preview_language'})
         response = self.client.get(self.url)
-        self.assert_tag_has_attr(response.content, "html", "lang", "es-419")
+        self.assert_tag_has_attr(response.content.decode('utf-8'), "html", "lang", "es-419")
 
         # Clearing the language should go back to site default
         self.client.post(self.preview_language_url, {'action': 'reset_preview_language'})
         response = self.client.get(self.url)
-        self.assert_tag_has_attr(response.content, "html", "lang", site_lang)
+        self.assert_tag_has_attr(response.content.decode('utf-8'), "html", "lang", site_lang)
 
 
-@attr(shard=1)
 class I18nLangPrefTests(BaseI18nTestCase):
     """
     Regression tests of language presented to the user, when they
@@ -187,18 +186,18 @@ class I18nLangPrefTests(BaseI18nTestCase):
 
         # Visit the front page; verify we see site default lang
         response = self.client.get(self.url)
-        self.assert_tag_has_attr(response.content, "html", "lang", self.site_lang)
+        self.assert_tag_has_attr(response.content.decode('utf-8'), "html", "lang", self.site_lang)
 
         # Set user language preference
         self.set_lang_preference('ar')
         # and verify we now get an ar response
         response = self.client.get(self.url)
-        self.assert_tag_has_attr(response.content, "html", "lang", 'ar')
+        self.assert_tag_has_attr(response.content.decode('utf-8'), "html", "lang", 'ar')
 
         # Verify that switching language preference gives the right language
         self.set_lang_preference('es-419')
         response = self.client.get(self.url)
-        self.assert_tag_has_attr(response.content, "html", "lang", 'es-419')
+        self.assert_tag_has_attr(response.content.decode('utf-8'), "html", "lang", 'es-419')
 
     def test_preview_precedence(self):
         # Regression test; LOC-87
@@ -210,13 +209,13 @@ class I18nLangPrefTests(BaseI18nTestCase):
         self.client.post(self.preview_language_url, {'preview_language': 'eo', 'action': 'set_preview_language'})
         response = self.client.get(self.url)
 
-        self.assert_tag_has_attr(response.content, "html", "lang", 'eo')
+        self.assert_tag_has_attr(response.content.decode('utf-8'), "html", "lang", 'eo')
         # Hitting another page should keep the dark language set.
         response = self.client.get(reverse('courses'))
-        self.assert_tag_has_attr(response.content, "html", "lang", "eo")
+        self.assert_tag_has_attr(response.content.decode('utf-8'), "html", "lang", "eo")
 
         # Clearing language must set language back to preference language
         self.client.post(self.preview_language_url, {'action': 'reset_preview_language'})
         response = self.client.get(self.url)
 
-        self.assert_tag_has_attr(response.content, "html", "lang", 'ar')
+        self.assert_tag_has_attr(response.content.decode('utf-8'), "html", "lang", 'ar')

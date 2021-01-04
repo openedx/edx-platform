@@ -3,19 +3,17 @@ This is a service-like API that assigns tracks which groups users are in for var
 user partitions.  It uses the user_service key/value store provided by the LMS runtime to
 persist the assignments.
 """
-from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+
+
 import logging
 
-from openedx.core.lib.cache_utils import request_cached
-from openedx.features.content_type_gating.partitions import create_content_gating_partition
-from xmodule.partitions.partitions import (
-    UserPartition,
-    UserPartitionError,
-    ENROLLMENT_TRACK_PARTITION_ID,
-)
-from xmodule.modulestore.django import modulestore
+import six
+from django.conf import settings
 
+from openedx.core.lib.cache_utils import request_cached
+from openedx.core.lib.dynamic_partitions_generators import DynamicPartitionGeneratorsPluginManager
+from xmodule.modulestore.django import modulestore
+from xmodule.partitions.partitions import get_partition_from_id
 
 log = logging.getLogger(__name__)
 
@@ -75,48 +73,14 @@ def _get_dynamic_partitions(course):
     Return the dynamic user partitions for this course.
     If none exists, returns an empty array.
     """
-    return [
-        partition
-        for partition in [
-            _create_enrollment_track_partition(course),
-            create_content_gating_partition(course),
-        ]
-        if partition
-    ]
+    dynamic_partition_generators = DynamicPartitionGeneratorsPluginManager.get_available_plugins().values()
+    generated_partitions = []
+    for generator in dynamic_partition_generators:
+        generated_partition = generator(course)
+        if generated_partition:
+            generated_partitions.append(generated_partition)
 
-
-def _create_enrollment_track_partition(course):
-    """
-    Create and return the dynamic enrollment track user partition.
-    If it cannot be created, None is returned.
-    """
-    if not FEATURES.get('ENABLE_ENROLLMENT_TRACK_USER_PARTITION'):
-        return None
-
-    try:
-        enrollment_track_scheme = UserPartition.get_scheme("enrollment_track")
-    except UserPartitionError:
-        log.warning("No 'enrollment_track' scheme registered, EnrollmentTrackUserPartition will not be created.")
-        return None
-
-    used_ids = set(p.id for p in course.user_partitions)
-    if ENROLLMENT_TRACK_PARTITION_ID in used_ids:
-        log.warning(
-            "Can't add 'enrollment_track' partition, as ID {id} is assigned to {partition} in course {course}.".format(
-                id=ENROLLMENT_TRACK_PARTITION_ID,
-                partition=_get_partition_from_id(course.user_partitions, ENROLLMENT_TRACK_PARTITION_ID).name,
-                course=unicode(course.id)
-            )
-        )
-        return None
-
-    partition = enrollment_track_scheme.create_user_partition(
-        id=ENROLLMENT_TRACK_PARTITION_ID,
-        name=_(u"Enrollment Track Groups"),
-        description=_(u"Partition for segmenting users by enrollment track"),
-        parameters={"course_id": unicode(course.id)}
-    )
-    return partition
+    return generated_partitions
 
 
 class PartitionService(object):
@@ -125,16 +89,17 @@ class PartitionService(object):
     with a given course.
     """
 
-    def __init__(self, course_id, cache=None):
+    def __init__(self, course_id, cache=None, course=None):
         self._course_id = course_id
         self._cache = cache
+        self.course = course
 
     def get_course(self):
         """
         Return the course instance associated with this PartitionService.
         This default implementation looks up the course from the modulestore.
         """
-        return modulestore().get_course(self._course_id)
+        return self.course or modulestore().get_course(self._course_id)
 
     @property
     def course_partitions(self):
@@ -193,7 +158,7 @@ class PartitionService(object):
         Returns:
             A UserPartition, or None if not found.
         """
-        return _get_partition_from_id(self.course_partitions, user_partition_id)
+        return get_partition_from_id(self.course_partitions, user_partition_id)
 
     def get_group(self, user, user_partition, assign=True):
         """
@@ -204,17 +169,3 @@ class PartitionService(object):
         return user_partition.scheme.get_group_for_user(
             self._course_id, user, user_partition, assign=assign,
         )
-
-
-def _get_partition_from_id(partitions, user_partition_id):
-    """
-    Look for a user partition with a matching id in the provided list of partitions.
-
-    Returns:
-        A UserPartition, or None if not found.
-    """
-    for partition in partitions:
-        if partition.id == user_partition_id:
-            return partition
-
-    return None

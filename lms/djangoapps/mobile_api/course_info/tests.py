@@ -2,17 +2,18 @@
 Tests for course_info
 """
 
+
 import ddt
 from django.conf import settings
 from milestones.tests.utils import MilestonesTestCaseMixin
+from six.moves import range
 
-from xmodule.html_module import CourseInfoModule
+from mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
+from mobile_api.utils import API_V1, API_V05
+from xmodule.html_module import CourseInfoBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_importer import import_course_from_xml
-
-from mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
-from mobile_api.utils import API_V05, API_V1
 
 
 @ddt.ddt
@@ -21,7 +22,6 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTest
     Tests for /api/mobile/{api_version}/course_info/{course_id}/updates
     """
     REVERSE_INFO = {'name': 'course-updates-list', 'params': ['course_id', 'api_version']}
-    shard = 3
 
     def verify_success(self, response):
         super(TestUpdates, self).verify_success(response)
@@ -59,7 +59,7 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTest
                         "id": num,
                         "date": "Date" + str(num),
                         "content": "<a href=\"/static/\">Update" + str(num) + "</a>",
-                        "status": CourseInfoModule.STATUS_VISIBLE
+                        "status": CourseInfoBlock.STATUS_VISIBLE
                     }
                 )
         else:
@@ -74,7 +74,7 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTest
         response = self.api_response(api_version=api_version)
 
         # verify static URLs are replaced in the content returned by the API
-        self.assertNotIn("\"/static/", response.content)
+        self.assertNotContains(response, "\"/static/")
 
         # verify static URLs remain in the underlying content
         underlying_updates = modulestore().get_item(updates_usage_key)
@@ -84,8 +84,8 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTest
         # verify content and sort order of updates (most recent first)
         for num in range(1, num_updates + 1):
             update_data = response.data[num_updates - num]
-            self.assertEquals(num, update_data['id'])
-            self.assertEquals("Date" + str(num), update_data['date'])
+            self.assertEqual(num, update_data['id'])
+            self.assertEqual("Date" + str(num), update_data['date'])
             self.assertIn("Update" + str(num), update_data['content'])
 
 
@@ -95,7 +95,6 @@ class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTes
     Tests for /api/mobile/{api_version}/course_info/{course_id}/handouts
     """
     REVERSE_INFO = {'name': 'course-handouts-list', 'params': ['course_id', 'api_version']}
-    shard = 3
 
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, API_V05),

@@ -1,14 +1,17 @@
 """
 A script to create some dummy users
 """
-from __future__ import print_function
+
+
 import uuid
 
 from django.core.management.base import BaseCommand
-from student.models import CourseEnrollment
 from opaque_keys.edx.keys import CourseKey
-from student.forms import AccountCreationForm
+from six.moves import range
+
+from openedx.core.djangoapps.user_authn.views.registration_form import AccountCreationForm
 from student.helpers import do_create_account
+from student.models import CourseEnrollment
 
 
 def make_random_form():

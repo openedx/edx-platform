@@ -2,12 +2,14 @@
 """
 Tests for cache_utils.py
 """
+
 from unittest import TestCase
 
 import ddt
+import six
+from edx_django_utils.cache import RequestCache
 from mock import Mock
 
-from edx_django_utils.cache import RequestCache
 from openedx.core.lib.cache_utils import request_cached
 
 
@@ -175,7 +177,7 @@ class TestRequestCachedDecorator(TestCase):
             A dummy function that expects an str and unicode arguments.
             """
             assert isinstance(arg1, str), 'First parameter has to be of type `str`'
-            assert isinstance(arg2, unicode), 'Second parameter has to be of type `unicode`'
+            assert isinstance(arg2, six.text_type), 'Second parameter has to be of type `unicode`'
             return True
 
         self.assertTrue(dummy_function('Hello', u'World'), 'Should be callable with ASCII chars')
@@ -274,7 +276,7 @@ class TestRequestCachedDecorator(TestCase):
             """Simple wrapper to let us decorate our mock."""
             return to_be_wrapped(*args, **kwargs)
 
-        arg_map_function = lambda arg: unicode(arg == 1)
+        arg_map_function = lambda arg: six.text_type(arg == 1)
         wrapped = request_cached(arg_map_function=arg_map_function)(mock_wrapper)
 
         # This will be a miss, and make an underlying call.

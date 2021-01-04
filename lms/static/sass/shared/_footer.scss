@@ -14,12 +14,16 @@
 
   footer#footer-openedx {
     @include clearfix();
-    @include box-sizing(border-box);
+
+    box-sizing: border-box;
+
     @include outer-container;
 
     margin: 0 auto;
 
-    p, ol, ul {
+    p,
+    ol,
+    ul {
       font-family: $font-family-sans-serif;
 
       // override needed for poorly scoped font-family styling on p a:link {}
@@ -35,7 +39,9 @@
       color: $link-color;
       text-decoration: none !important;
 
-      &:hover, &:focus, &:active {
+      &:hover,
+      &:focus,
+      &:active {
         border-bottom: 1px dotted $link-color;
       }
     }
@@ -71,7 +77,9 @@
           a {
             color: tint($black, 20%);
 
-            &:hover, &:focus, &:active {
+            &:hover,
+            &:focus,
+            &:active {
               color: $link-color;
             }
           }
@@ -94,7 +102,7 @@
 
         p {
           float: left;
-          width: flex-grid(6,8);
+          width: flex-grid(6, 8);
           margin-left: $baseline;
           padding-left: $baseline;
           font-size: em(13);
@@ -106,7 +114,7 @@
     // references
     .references {
       margin: -10px 0 0 0;
-      width: flex-grid(4,12);
+      width: flex-grid(4, 12);
       display: inline-block;
     }
 
@@ -159,7 +167,9 @@
         a {
           display: block;
 
-          &:hover, &:focus, &:active {
+          &:hover,
+          &:focus,
+          &:active {
             border: none;
           }
         }
@@ -202,6 +212,19 @@
         cursor: initial;
       }
     }
+
+    .select-lang-button {
+      padding: 5px;
+      color: $m-blue-d3 !important;
+      height: 30px;
+
+      &:hover,
+      &:active,
+      &:focus {
+        background: $m-blue-d3 !important;
+        color: white !important;
+      }
+    }
   }
 
   // edx theme overrides
@@ -219,7 +242,9 @@
 }
 
 // marketing site design syncing
-.view-register, .view-login, .view-passwordreset {
+.view-register,
+.view-login,
+.view-passwordreset {
   .wrapper-footer footer {
     width: 960px;
 

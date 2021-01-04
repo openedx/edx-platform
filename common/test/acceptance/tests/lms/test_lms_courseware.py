@@ -3,10 +3,12 @@
 End-to-end tests for the LMS.
 """
 
+
 import json
 from datetime import datetime, timedelta
 
 import ddt
+from six.moves import range
 
 from openedx.core.lib.tests import attr
 
@@ -17,7 +19,7 @@ from ...pages.lms.course_home import CourseHomePage
 from ...pages.lms.courseware import CoursewarePage, CoursewareSequentialTabPage
 from ...pages.lms.create_mode import ModeCreationPage
 from ...pages.lms.dashboard import DashboardPage
-from ...pages.lms.pay_and_verify import FakePaymentPage, FakeSoftwareSecureVerificationPage, PaymentAndVerificationFlow
+from ...pages.lms.pay_and_verify import FakePaymentPage, PaymentAndVerificationFlow
 from ...pages.lms.problem import ProblemPage
 from ...pages.lms.progress import ProgressPage
 from ...pages.lms.track_selection import TrackSelectionPage
@@ -113,9 +115,9 @@ class CoursewareTest(UniqueCourseTest):
         """
         xblocks = self.course_fix.get_nested_xblocks(category="problem")
         for index in range(1, len(xblocks) + 1):
-            test_section_title = 'Test Section {}'.format(index)
-            test_subsection_title = 'Test Subsection {}'.format(index)
-            test_unit_title = 'Test Problem {}'.format(index)
+            test_section_title = u'Test Section {}'.format(index)
+            test_subsection_title = u'Test Subsection {}'.format(index)
+            test_unit_title = u'Test Problem {}'.format(index)
             self.course_home_page.visit()
             self.course_home_page.outline.go_to_section(test_section_title, test_subsection_title)
             course_nav = self.courseware_page.nav
@@ -153,6 +155,9 @@ class ProctoredExamTest(UniqueCourseTest):
         course_fix.add_advanced_settings({
             "enable_proctored_exams": {"value": "true"}
         })
+        course_fix.add_advanced_settings({
+            "show_review_rules": {"value": "true"}
+        })
 
         course_fix.add_children(
             XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
@@ -186,7 +191,14 @@ class ProctoredExamTest(UniqueCourseTest):
         login as a verififed user
         """
 
-        auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
+        auto_auth(
+            self.browser,
+            self.USERNAME,
+            self.EMAIL,
+            False,
+            self.course_id,
+            should_manually_verify=True
+        )
 
         # the track selection page cannot be visited. see the other tests to see if any prereq is there.
         # Navigate to the track selection page
@@ -201,28 +213,6 @@ class ProctoredExamTest(UniqueCourseTest):
         # Submit payment
         self.fake_payment_page.submit_payment()
 
-    def _verify_user(self):
-        """
-        Takes user through the verification flow and then marks the verification as 'approved'.
-        """
-        # Immediately verify the user
-        self.immediate_verification_page.immediate_verification()
-
-        # Take face photo and proceed to the ID photo step
-        self.payment_and_verification_flow.webcam_capture()
-        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
-
-        # Take ID photo and proceed to the review photos step
-        self.payment_and_verification_flow.webcam_capture()
-        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
-
-        # Submit photos and proceed to the enrollment confirmation step
-        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
-
-        # Mark the verification as passing.
-        verification = FakeSoftwareSecureVerificationPage(self.browser).visit()
-        verification.mark_approved()
-
     def test_can_create_proctored_exam_in_studio(self):
         """
         Given that I am a staff member
@@ -236,6 +226,30 @@ class ProctoredExamTest(UniqueCourseTest):
 
         self.studio_course_outline.open_subsection_settings_dialog()
         self.assertTrue(self.studio_course_outline.proctoring_items_are_displayed())
+
+    def test_proctored_exam_flow(self):
+        """
+        Given that I am a staff member on the exam settings section
+        select advanced settings tab
+        When I Make the exam proctored.
+        And I login as a verified student.
+        And I verify the user's ID.
+        And visit the courseware as a verified student.
+        Then I can see an option to take the exam as a proctored exam.
+        """
+        LogoutPage(self.browser).visit()
+        auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
+        self.studio_course_outline.visit()
+        self.studio_course_outline.open_subsection_settings_dialog()
+
+        self.studio_course_outline.select_advanced_tab()
+        self.studio_course_outline.make_exam_proctored()
+
+        LogoutPage(self.browser).visit()
+        self._login_as_a_verified_user()
+
+        self.courseware_page.visit()
+        self.assertTrue(self.courseware_page.can_start_proctored_exam)
 
     def _setup_and_take_timed_exam(self, hide_after_due=False):
         """
@@ -323,7 +337,6 @@ class ProctoredExamTest(UniqueCourseTest):
 
         self.studio_course_outline.select_proctored_exam()
         self.assertTrue(self.studio_course_outline.time_allotted_field_visible())
-        self.assertTrue(self.studio_course_outline.exam_review_rules_field_visible())
 
         self.studio_course_outline.select_practice_exam()
         self.assertTrue(self.studio_course_outline.time_allotted_field_visible())
@@ -516,9 +529,9 @@ class CoursewareMultipleVerticalsTest(CoursewareMultipleVerticalsTestBase):
         Verifies that the navigation state is as expected.
         """
         self.assertTrue(self.courseware_page.nav.is_on_section(section_title, subsection_title))
-        self.assertEquals(self.courseware_page.sequential_position, subsection_position)
-        self.assertEquals(self.courseware_page.is_next_button_enabled, next_enabled)
-        self.assertEquals(self.courseware_page.is_previous_button_enabled, prev_enabled)
+        self.assertEqual(self.courseware_page.sequential_position, subsection_position)
+        self.assertEqual(self.courseware_page.is_next_button_enabled, next_enabled)
+        self.assertEqual(self.courseware_page.is_previous_button_enabled, prev_enabled)
 
     def test_tab_position(self):
         # test that using the position in the url direct to correct tab in courseware
@@ -853,76 +866,3 @@ class CompletionTestCase(UniqueCourseTest, EventsTestMixin):
         # Auto-auth register for the course.
         AutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL,
                      course_id=self.course_id, staff=False).visit()
-
-
-@attr(shard=9)
-class WordCloudTests(UniqueCourseTest):
-    """
-    Tests the Word Cloud.
-    """
-    USERNAME = "STUDENT_TESTER"
-    EMAIL = "student101@example.com"
-
-    def setUp(self):
-        super(WordCloudTests, self).setUp()
-
-        self.courseware_page = CoursewarePage(self.browser, self.course_id)
-
-        self.studio_course_outline = StudioCourseOutlinePage(
-            self.browser,
-            self.course_info['org'],
-            self.course_info['number'],
-            self.course_info['run']
-        )
-
-        # Install a course
-        course_fix = CourseFixture(
-            self.course_info['org'], self.course_info['number'],
-            self.course_info['run'], self.course_info['display_name']
-        )
-        # Set word cloud value against advanced modules in advanced settings
-        course_fix.add_advanced_settings({
-            "advanced_modules": {"value": ["word_cloud"]},
-        })
-
-        course_fix.add_children(
-            XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
-                XBlockFixtureDesc('sequential', 'Test Subsection 1').add_children(
-                    XBlockFixtureDesc('vertical', 'Test Unit').add_children(
-                        XBlockFixtureDesc(
-                            'word_cloud', 'advanced WORDCLOUD'
-                        )
-                    )
-                )
-            )
-        ).install()
-
-        auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
-        self.courseware_page.visit()
-
-    def test_word_cloud_is_rendered_with_empty_result(self):
-        """
-        Scenario: Word Cloud component in LMS is rendered with empty result
-        Given the course has a Word Cloud component
-            Then I view the word cloud and it has rendered
-        When I press the Save button
-            Then I see the empty result
-        """
-        self.assertTrue(self.courseware_page.is_word_cloud_rendered)
-        self.courseware_page.save_word_cloud()
-        self.assertEqual(self.courseware_page.word_cloud_answer_list, '')
-
-    def test_word_cloud_is_rendered_with_result(self):
-        """
-        Scenario: Word Cloud component in LMS is rendered with result
-        Given the course has a Word Cloud component
-            Then I view the word cloud and it has rendered
-        When I fill inputs
-        And I press the Save button
-            Then I see the result with words count
-        """
-        expected_data = ['test_wordcloud1', 'test_wordcloud2', 'test_wordcloud3', 'test_wordcloud4', 'test_wordcloud5']
-        self.assertTrue(self.courseware_page.is_word_cloud_rendered)
-        self.courseware_page.input_word_cloud('test_wordcloud')
-        self.courseware_page.save_word_cloud()
-        self.assertItemsEqual(expected_data, self.courseware_page.word_cloud_answer_list)

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 import pytest
-from django.core.management import call_command, CommandError
+from django.core.management import CommandError, call_command
 
 
 def test_without_args(capsys):
-    with pytest.raises(CommandError, message='Error: too few arguments'):
+    with pytest.raises(CommandError, match='Error: the following arguments are required: setting'):
         call_command('print_setting')
 
 

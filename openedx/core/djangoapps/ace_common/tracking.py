@@ -1,8 +1,10 @@
 # pylint: disable=missing-docstring
-from urlparse import parse_qs
+
 
 import attr
+import six
 from django.utils.http import urlencode
+from six.moves.urllib.parse import parse_qs  # pylint: disable=import-error, ungrouped-imports
 
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings
 
@@ -38,7 +40,7 @@ class CampaignTrackingInfo(object):
         if existing_query_string is not None:
             parameters = parse_qs(existing_query_string)
 
-        for attribute, value in attr.asdict(self).iteritems():
+        for attribute, value in six.iteritems(attr.asdict(self)):
             if value is not None:
                 parameters['utm_' + attribute] = [value]
         return urlencode(parameters, doseq=True)
@@ -104,7 +106,7 @@ class GoogleAnalyticsTrackingPixel(object):
 
         if self.course_id is not None and self.event_label is None:
             param_name = fields.event_label.metadata['param_name']
-            parameters[param_name] = unicode(self.course_id)
+            parameters[param_name] = six.text_type(self.course_id)
 
         return u"https://www.google-analytics.com/collect?{params}".format(params=urlencode(parameters))
 

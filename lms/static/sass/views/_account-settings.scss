@@ -5,6 +5,7 @@
 // * +Container - Account Settings
 // * +Main - Header
 // * +Settings Section
+// * +Alert Messages
 
 
 // +Container - Account Settings
@@ -132,60 +133,8 @@
 
     .account-settings-header-subtitle-warning {
       @extend .account-settings-header-subtitle;
+
       color: $alert-color;
-    }
-
-    .account-settings-section-message {
-      font-size: 16px;
-      line-height: 22px;
-      margin-top: 15px;
-      margin-bottom: 30px;
-
-      .alert-message {
-        color: #292b2c;
-        font-family: $font-family-sans-serif;
-        position: relative;
-        padding: 10px 10px 10px 35px;
-        border: 1px solid transparent;
-        border-radius: 0;
-        box-shadow: none;
-        margin-bottom: 8px;
-
-        & > .fa {
-          position: absolute;
-          left: 11px;
-          top: 13px;
-          font-size: 16px;
-        }
-
-        span {
-          display: block;
-
-          a {
-            text-decoration: underline;
-          }
-        }
-      }
-
-      .success {
-        background-color: #ecfaec;
-        border-color: #b9edb9;
-      }
-
-      .info {
-        background-color: #d8edf8;
-        border-color: #bbdff2;
-      }
-
-      .warning {
-        background-color: #fcf8e3;
-        border-color: #faebcc;
-      }
-
-      .error {
-        background-color: #f2dede;
-        border-color: #ebccd1;
-      }
     }
 
     .account-settings-section-body {
@@ -449,7 +398,8 @@
       }
 
       .u-field {
-        &.u-field-dropdown, &.editable-never &.mode-display {
+        &.u-field-dropdown,
+        &.editable-never &.mode-display {
           .u-field-value {
             margin-bottom: ($baseline);
 
@@ -634,6 +584,100 @@
 
     &:last-child {
       border-bottom: none;
+    }
+  }
+}
+
+// * +Alert Messages
+.account-settings-message,
+.account-settings-section-message {
+  font-size: 16px;
+  line-height: 22px;
+  margin-top: 15px;
+  margin-bottom: 30px;
+
+  .alert-message {
+    color: #292b2c;
+    font-family: $font-family-sans-serif;
+    position: relative;
+    padding: 10px 10px 10px 35px;
+    border: 1px solid transparent;
+    border-radius: 0;
+    box-shadow: none;
+    margin-bottom: 8px;
+
+    & > .fa {
+      position: absolute;
+      left: 11px;
+      top: 13px;
+      font-size: 16px;
+    }
+
+    span {
+      display: block;
+
+      a {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .success {
+    background-color: #ecfaec;
+    border-color: #b9edb9;
+  }
+
+  .info {
+    background-color: #d8edf8;
+    border-color: #bbdff2;
+  }
+
+  .warning {
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+  }
+
+  .error {
+    background-color: #f2dede;
+    border-color: #ebccd1;
+  }
+}
+
+.account-settings-message {
+  margin-bottom: 0;
+
+  .alert-message {
+    padding: 10px;
+
+    .alert-actions {
+      margin-top: 10px;
+
+      .btn-alert-primary {
+        @extend %btn-primary-blue;
+
+        @include font-size(18);
+
+        border: 1px solid $m-blue-d3;
+        border-radius: 3px;
+        box-shadow: none;
+        padding: 11px 14px;
+        line-height: normal;
+      }
+
+      .btn-alert-secondary {
+        @extend %ui-clear-button;
+
+        // set styles
+        @extend %btn-pl-default-base;
+
+        @include font-size(18);
+
+        background-color: white;
+        border: 1px solid $blue;
+        color: $blue;
+        padding: 11px 14px;
+        line-height: normal;
+      }
     }
   }
 }

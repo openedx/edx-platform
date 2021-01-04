@@ -1,5 +1,6 @@
 """Map new event context values to old top-level field values. Ensures events can be parsed by legacy parsers."""
 
+
 import json
 
 from .transformers import EventTransformerRegistry

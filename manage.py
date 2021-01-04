@@ -11,7 +11,7 @@ by passing the --settings flag, you can specify what environment specific settin
 Any arguments not understood by this manage.py will be passed to django-admin.py
 """
 # pylint: disable=wrong-import-order, wrong-import-position
-from __future__ import absolute_import, print_function
+
 
 from openedx.core.lib.logsettings import log_python_warnings
 log_python_warnings()
@@ -48,7 +48,7 @@ def parse_args():
         '--service-variant',
         choices=['lms', 'lms-xml', 'lms-preview'],
         default='lms',
-        help='Which service variant to run, when using the aws environment')
+        help='Which service variant to run, when using the production environment')
     lms.add_argument(
         '--contracts',
         action='store_true',

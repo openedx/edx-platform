@@ -3,10 +3,11 @@ This file contains the logic for cohorts, as exposed internally to the
 forums, and to the cohort admin views.
 """
 
+
 import logging
 import random
 
-from courseware import courses
+import six
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -15,8 +16,10 @@ from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver
 from django.http import Http404
 from django.utils.translation import ugettext as _
-from eventtracking import tracker
 from edx_django_utils.cache import RequestCache
+from eventtracking import tracker
+
+from lms.djangoapps.courseware import courses
 from openedx.core.lib.cache_utils import request_cached
 from student.models import get_user_by_username_or_email
 
@@ -184,9 +187,9 @@ def bulk_cache_cohorts(course_key, users):
             for membership in
             CohortMembership.objects.filter(user__in=users, course_id=course_key).select_related('user')
         }
-        for user, membership in cohorts_by_user.iteritems():
+        for user, membership in six.iteritems(cohorts_by_user):
             cache[_cohort_cache_key(user.id, course_key)] = membership.course_user_group
-        uncohorted_users = filter(lambda u: u not in cohorts_by_user, users)
+        uncohorted_users = [u for u in users if u not in cohorts_by_user]
     else:
         uncohorted_users = users
 
@@ -215,7 +218,7 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
     Raises:
        ValueError if the CourseKey doesn't exist.
     """
-    if user.is_anonymous:
+    if user is None or user.is_anonymous:
         return None
     cache = RequestCache(COHORT_CACHE_NAMESPACE).data
     cache_key = _cohort_cache_key(user.id, course_key)
@@ -264,8 +267,8 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
         # create the same row in one of the cohort model entries:
         # CourseCohort, CohortMembership.
         log.info(
-            "HANDLING_INTEGRITY_ERROR: IntegrityError encountered for course '%s' and user '%s': %s",
-            course_key, user.id, unicode(integrity_error)
+            u"HANDLING_INTEGRITY_ERROR: IntegrityError encountered for course '%s' and user '%s': %s",
+            course_key, user.id, six.text_type(integrity_error)
         )
         return get_cohort(user, course_key, assign, use_cached)
 
@@ -316,7 +319,7 @@ def migrate_cohort_settings(course):
     return cohort_settings
 
 
-def get_course_cohorts(course, assignment_type=None):
+def get_course_cohorts(course=None, course_id=None, assignment_type=None):
     """
     Get a list of all the cohorts in the given course. This will include auto cohorts,
     regardless of whether or not the auto cohorts include any users.
@@ -329,11 +332,14 @@ def get_course_cohorts(course, assignment_type=None):
         A list of CourseUserGroup objects. Empty if there are no cohorts. Does
         not check whether the course is cohorted.
     """
+    assert bool(course) ^ bool(course_id), "course or course_id required"
     # Migrate cohort settings for this course
-    migrate_cohort_settings(course)
+    if course:
+        migrate_cohort_settings(course)
+        course_id = course.location.course_key
 
     query_set = CourseUserGroup.objects.filter(
-        course_id=course.location.course_key,
+        course_id=course_id,
         group_type=CourseUserGroup.COHORT
     )
     query_set = query_set.filter(cohort__assignment_type=assignment_type) if assignment_type else query_set
@@ -377,7 +383,7 @@ def add_cohort(course_key, name, assignment_type):
     Add a cohort to a course.  Raises ValueError if a cohort of the same name already
     exists.
     """
-    log.debug("Adding cohort %s to %s", name, course_key)
+    log.debug(u"Adding cohort %s to %s", name, course_key)
     if is_cohort_exists(course_key, name):
         raise ValueError(_("You cannot create two cohorts with the same name"))
 
@@ -426,7 +432,7 @@ def remove_user_from_cohort(cohort, username_or_email):
         membership.delete()
         COHORT_MEMBERSHIP_UPDATED.send(sender=None, user=user, course_key=course_key)
     except CohortMembership.DoesNotExist:
-        raise ValueError("User {} was not present in cohort {}".format(username_or_email, cohort))
+        raise ValueError(u"User {} was not present in cohort {}".format(username_or_email, cohort))
 
 
 def add_user_to_cohort(cohort, username_or_email_or_user):
@@ -517,7 +523,7 @@ def get_group_info_for_cohort(cohort, use_cached=False):
     database.
     """
     cache = RequestCache(u"cohorts.get_group_info_for_cohort").data
-    cache_key = unicode(cohort.id)
+    cache_key = six.text_type(cohort.id)
 
     if use_cached and cache_key in cache:
         return cache[cache_key]

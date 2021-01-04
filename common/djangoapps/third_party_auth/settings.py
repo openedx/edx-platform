@@ -10,6 +10,8 @@ If true, it:
     b) calls apply_settings(), passing in the Django settings
 """
 
+
+from django.conf import settings
 from openedx.features.enterprise_support.api import insert_enterprise_pipeline_elements
 
 
@@ -21,7 +23,7 @@ def apply_settings(django_settings):
     django_settings.FIELDS_STORED_IN_SESSION = ['auth_entry', 'next']
 
     # Inject exception middleware to make redirects fire.
-    django_settings.MIDDLEWARE_CLASSES.extend(
+    django_settings.MIDDLEWARE.extend(
         ['third_party_auth.middleware.ExceptionMiddleware']
     )
 
@@ -40,6 +42,9 @@ def apply_settings(django_settings):
     # Adding extra key value pair in the url query string for microsoft as per request
     django_settings.SOCIAL_AUTH_AZUREAD_OAUTH2_AUTH_EXTRA_ARGUMENTS = {'msafed': 0}
 
+    # Avoid default username check to allow non-ascii characters
+    django_settings.SOCIAL_AUTH_CLEAN_USERNAMES = not settings.FEATURES.get("ENABLE_UNICODE_USERNAME")
+
     # Inject our customized auth pipeline. All auth backends must work with
     # this pipeline.
     django_settings.SOCIAL_AUTH_PIPELINE = [
@@ -49,7 +54,7 @@ def apply_settings(django_settings):
         'social_core.pipeline.social_auth.auth_allowed',
         'social_core.pipeline.social_auth.social_user',
         'third_party_auth.pipeline.associate_by_email_if_login_api',
-        'social_core.pipeline.user.get_username',
+        'third_party_auth.pipeline.get_username',
         'third_party_auth.pipeline.set_pipeline_timeout',
         'third_party_auth.pipeline.ensure_user_information',
         'social_core.pipeline.user.create_user',
@@ -75,6 +80,9 @@ def apply_settings(django_settings):
     # instead of a Django error page. During development you may want to
     # enable this when you want to get stack traces rather than redirections.
     django_settings.SOCIAL_AUTH_RAISE_EXCEPTIONS = False
+
+    # Clean username to make sure username is compatible with our system requirements
+    django_settings.SOCIAL_AUTH_CLEAN_USERNAME_FUNCTION = 'third_party_auth.models.clean_username'
 
     # Allow users to login using social auth even if their account is not verified yet
     # This is required since we [ab]use django's 'is_active' flag to indicate verified

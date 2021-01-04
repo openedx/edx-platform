@@ -1,7 +1,8 @@
 """
 Verify the structure of courseware as to it's suitability for import
 """
-from __future__ import print_function
+
+
 from argparse import REMAINDER
 
 from django.core.management.base import BaseCommand
@@ -26,7 +27,7 @@ class Command(BaseCommand):
         data_dir = options['data_dir']
         source_dirs = options['source_dirs']
 
-        print("Importing.  Data_dir={data}, source_dirs={courses}".format(
+        print(u"Importing.  Data_dir={data}, source_dirs={courses}".format(
             data=data_dir,
             courses=source_dirs))
 

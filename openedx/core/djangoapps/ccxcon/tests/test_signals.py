@@ -2,11 +2,12 @@
 Test for contentstore signals receiver
 """
 
-import mock
 
+import mock
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore.django import modulestore, SignalHandler
+
+from xmodule.modulestore.django import SignalHandler, modulestore
 
 
 class CCXConSignalTestCase(TestCase):
@@ -15,7 +16,6 @@ class CCXConSignalTestCase(TestCase):
     the call for the ccxcon update are performed correctly by the
     course_published signal handler
     """
-    shard = 2
 
     @mock.patch('openedx.core.djangoapps.ccxcon.tasks.update_ccxcon.delay')
     def test_course_published_ccxcon_call(self, mock_upc):

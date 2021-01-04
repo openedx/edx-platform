@@ -1,6 +1,7 @@
 """
 Adds support for first class plugins that can be added to the edX platform.
 """
+
 from collections import OrderedDict
 
 from stevedore.extension import ExtensionManager
@@ -39,7 +40,7 @@ class PluginManager(object):
         """
         plugins = cls.get_available_plugins(namespace)
         if name not in plugins:
-            raise PluginError("No such plugin {name} for entry point {namespace}".format(
+            raise PluginError(u"No such plugin {name} for entry point {namespace}".format(
                 name=name,
                 namespace=namespace or cls.NAMESPACE,  # pylint: disable=no-member
             ))

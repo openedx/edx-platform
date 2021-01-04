@@ -10,40 +10,41 @@ Note: The access control logic in this file does NOT check for enrollment in
   If enrollment is to be checked, use get_course_with_access in courseware.courses.
   It is a wrapper around has_access that additionally checks for enrollment.
 """
+
+
 import logging
 from datetime import datetime
 
-from django.conf import settings
+import six
+from django.conf import settings  # pylint: disable=unused-import
 from django.contrib.auth.models import AnonymousUser
-from pytz import UTC
+from edx_django_utils.monitoring import function_trace
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from pytz import UTC
 from six import text_type
 from xblock.core import XBlock
 
-from courseware.access_response import (
+from lms.djangoapps.courseware.access_response import (
+    IncorrectPartitionGroupError,
     MilestoneAccessError,
     MobileAvailabilityError,
-    VisibilityError,
+    NoAllowedPartitionGroupsError,
+    VisibilityError
 )
-from courseware.access_utils import (
+from lms.djangoapps.courseware.access_utils import (
     ACCESS_DENIED,
     ACCESS_GRANTED,
     adjust_start_date,
+    check_course_open_for_learner,
     check_start_date,
     debug,
-    in_preview_mode,
-    check_course_open_for_learner,
+    in_preview_mode
 )
-from courseware.access_response import (
-    NoAllowedPartitionGroupsError,
-    IncorrectPartitionGroupError,
-)
-from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
+from lms.djangoapps.courseware.masquerade import get_masquerade_role, is_masquerading_as_student
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from mobile_api.models import IgnoreMobileAvailableFlagConfig
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.features.course_duration_limits.access import check_course_expired
 from openedx.features.subscriptions.utils import is_course_accessible_with_subscription
 from student import auth
@@ -101,6 +102,7 @@ def has_ccx_coach_role(user, course_key):
     return False
 
 
+@function_trace('has_access')
 def has_access(user, action, obj, course_key=None):
     """
     Check whether a user has the access to do action on obj.  Handles any magic
@@ -164,12 +166,12 @@ def has_access(user, action, obj, course_key=None):
     if isinstance(obj, UsageKey):
         return _has_access_location(user, action, obj, course_key)
 
-    if isinstance(obj, basestring):
+    if isinstance(obj, six.string_types):
         return _has_access_string(user, action, obj)
 
     # Passing an unknown object here is a coding error, so rather than
     # returning a default, complain.
-    raise TypeError("Unknown object type in has_access(): '{0}'"
+    raise TypeError(u"Unknown object type in has_access(): '{0}'"
                     .format(type(obj)))
 
 
@@ -212,6 +214,7 @@ def _can_view_courseware_with_prerequisites(user, course):
     )
 
 
+@function_trace('_can_load_course_on_mobile')
 def _can_load_course_on_mobile(user, course):
     """
     Checks if a user can view the given course on a mobile device.
@@ -249,21 +252,9 @@ def _can_enroll_courselike(user, courselike):
     Returns:
         AccessResponse, indicating whether the user can enroll.
     """
-    enrollment_domain = courselike.enrollment_domain
     # Courselike objects (e.g., course descriptors and CourseOverviews) have an attribute named `id`
     # which actually points to a CourseKey. Sigh.
     course_key = courselike.id
-
-    # If using a registration method to restrict enrollment (e.g., Shibboleth)
-    if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and enrollment_domain:
-        if user is not None and user.is_authenticated and \
-                ExternalAuthMap.objects.filter(user=user, external_domain=enrollment_domain):
-            debug("Allow: external_auth of " + enrollment_domain)
-            reg_method_ok = True
-        else:
-            reg_method_ok = False
-    else:
-        reg_method_ok = True
 
     # If the user appears in CourseEnrollmentAllowed paired with the given course key,
     # they may enroll, except if the CEA has already been used by a different user.
@@ -274,7 +265,7 @@ def _can_enroll_courselike(user, courselike):
         if cea and cea.valid_for_user(user):
             return ACCESS_GRANTED
         elif cea:
-            debug("Deny: CEA was already consumed by a different user {} and can't be used again by {}".format(
+            debug(u"Deny: CEA was already consumed by a different user {} and can't be used again by {}".format(
                 cea.user.id,
                 user.id,
             ))
@@ -290,13 +281,14 @@ def _can_enroll_courselike(user, courselike):
     now = datetime.now(UTC)
     enrollment_start = courselike.enrollment_start or datetime.min.replace(tzinfo=UTC)
     enrollment_end = courselike.enrollment_end or datetime.max.replace(tzinfo=UTC)
-    if reg_method_ok and enrollment_start < now < enrollment_end:
+    if enrollment_start < now < enrollment_end:
         debug("Allow: in enrollment period")
         return ACCESS_GRANTED
 
     return ACCESS_DENIED
 
 
+@function_trace('_has_access_course')
 def _has_access_course(user, action, courselike):
     """
     Check if user has access to a course.
@@ -318,6 +310,7 @@ def _has_access_course(user, action, courselike):
     'see_in_catalog' -- user is able to see the course listed in the course catalog.
     'see_about_page' -- user is able to see the course about page.
     """
+    @function_trace('can_load')
     def can_load():
         """
         Can this user load this course?
@@ -379,12 +372,14 @@ def _has_access_course(user, action, courselike):
 
         return ACCESS_GRANTED
 
+    @function_trace('can_enroll')
     def can_enroll():
         """
         Returns whether the user can enroll in the course.
         """
         return _can_enroll_courselike(user, courselike)
 
+    @function_trace('see_exists')
     def see_exists():
         """
         Can see if can enroll, but also if can load it: if user enrolled in a course and now
@@ -392,6 +387,7 @@ def _has_access_course(user, action, courselike):
         """
         return ACCESS_GRANTED if (can_load() or can_enroll()) else ACCESS_DENIED
 
+    @function_trace('can_see_in_catalog')
     def can_see_in_catalog():
         """
         Implements the "can see course in catalog" logic if a course should be visible in the main course catalog
@@ -403,6 +399,7 @@ def _has_access_course(user, action, courselike):
             or _has_staff_access_to_descriptor(user, courselike, courselike.id)
         )
 
+    @function_trace('can_see_about_page')
     def can_see_about_page():
         """
         Implements the "can see course about page" logic if a course about page should be visible
@@ -483,7 +480,7 @@ def _has_group_access(descriptor, user, course_key):
                     partitions.append(partition)
             else:
                 log.debug(
-                    "Skipping partition with ID %s in course %s because it is no longer active",
+                    u"Skipping partition with ID %s in course %s because it is no longer active",
                     partition.id, course_key
                 )
         except NoSuchUserPartitionError:
@@ -525,11 +522,12 @@ def _has_group_access(descriptor, user, course_key):
 
     if missing_groups:
         partition, user_group, allowed_groups = missing_groups[0]
+        block_key = descriptor.scope_ids.usage_id
         return IncorrectPartitionGroupError(
             partition=partition,
             user_group=user_group,
             allowed_groups=allowed_groups,
-            user_message=partition.access_denied_message(descriptor, user, user_group, allowed_groups),
+            user_message=partition.access_denied_message(block_key, user, user_group, allowed_groups),
             user_fragment=partition.access_denied_fragment(descriptor, user, user_group, allowed_groups),
         )
 
@@ -570,10 +568,16 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
             return staff_access_response
 
         return (
-            _visible_to_nonstaff_users(descriptor) and
+            _visible_to_nonstaff_users(descriptor, display_error_to_user=False) and
             (
                 _has_detached_class_tag(descriptor) or
-                check_start_date(user, descriptor.days_early_for_beta, descriptor.start, course_key)
+                check_start_date(
+                    user,
+                    descriptor.days_early_for_beta,
+                    descriptor.start,
+                    course_key,
+                    display_error_to_user=False
+                )
             )
         )
 
@@ -649,7 +653,7 @@ def _has_access_string(user, action, perm):
         Checks for staff access
         """
         if perm != 'global':
-            debug("Deny: invalid permission '%s'", perm)
+            debug(u"Deny: invalid permission '%s'", perm)
             return ACCESS_DENIED
         return ACCESS_GRANTED if GlobalStaff().has_user(user) else ACCESS_DENIED
 
@@ -681,7 +685,7 @@ def _dispatch(table, action, user, obj):
     """
     if action in table:
         result = table[action]()
-        debug("%s user %s, object %s, action %s",
+        debug(u"%s user %s, object %s, action %s",
               'ALLOWED' if result else 'DENIED',
               user,
               text_type(obj.location) if isinstance(obj, XBlock) else str(obj),
@@ -750,7 +754,7 @@ def _has_access_to_course(user, access_level, course_key):
         return ACCESS_GRANTED
 
     if access_level not in ('staff', 'instructor'):
-        log.debug("Error in access._has_access_to_course access_level=%s unknown", access_level)
+        log.debug(u"Error in access._has_access_to_course access_level=%s unknown", access_level)
         debug("Deny: unknown access level")
         return ACCESS_DENIED
 
@@ -785,6 +789,7 @@ def administrative_accesses_to_course_for_user(user, course_key):
     return global_staff, staff_access, instructor_access
 
 
+@function_trace('_has_instructor_access_to_descriptor')
 def _has_instructor_access_to_descriptor(user, descriptor, course_key):
     """Helper method that checks whether the user has staff access to
     the course of the location.
@@ -794,6 +799,7 @@ def _has_instructor_access_to_descriptor(user, descriptor, course_key):
     return _has_instructor_access_to_location(user, descriptor.location, course_key)
 
 
+@function_trace('_has_staff_access_to_descriptor')
 def _has_staff_access_to_descriptor(user, descriptor, course_key):
     """Helper method that checks whether the user has staff access to
     the course of the location.
@@ -803,14 +809,19 @@ def _has_staff_access_to_descriptor(user, descriptor, course_key):
     return _has_staff_access_to_location(user, descriptor.location, course_key)
 
 
-def _visible_to_nonstaff_users(descriptor):
+def _visible_to_nonstaff_users(descriptor, display_error_to_user=True):
     """
     Returns if the object is visible to nonstaff users.
 
     Arguments:
         descriptor: object to check
+        display_error_to_user: If True, show an error message to the user say the content was hidden. Otherwise,
+            hide the content silently.
     """
-    return VisibilityError() if descriptor.visible_to_staff_only else ACCESS_GRANTED
+    if descriptor.visible_to_staff_only:
+        return VisibilityError(display_error_to_user=display_error_to_user)
+    else:
+        return ACCESS_GRANTED
 
 
 def _can_access_descriptor_with_milestones(user, descriptor, course_key):
@@ -822,7 +833,12 @@ def _can_access_descriptor_with_milestones(user, descriptor, course_key):
         descriptor: the object being accessed
         course_key: key for the course for this descriptor
     """
-    if milestones_helpers.get_course_content_milestones(course_key, unicode(descriptor.location), 'requires', user.id):
+    if milestones_helpers.get_course_content_milestones(
+        course_key,
+        six.text_type(descriptor.location),
+        'requires',
+        user.id
+    ):
         debug("Deny: user has not completed all milestones for content")
         return ACCESS_DENIED
     else:

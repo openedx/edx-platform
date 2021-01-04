@@ -1,19 +1,25 @@
 """ Tests for auto auth. """
+
+
 import json
 
 import ddt
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.client import Client
-from mock import patch, Mock
+from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
 
-from django_comment_common.models import (
-    Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_STUDENT
+from openedx.core.djangoapps.django_comment_common.models import (
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_MODERATOR,
+    FORUM_ROLE_STUDENT,
+    Role
 )
-from django_comment_common.utils import seed_permissions_roles
-from student.models import anonymous_id_for_user, CourseAccessRole, CourseEnrollment, UserProfile
+from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
+from student.models import CourseAccessRole, CourseEnrollment, UserProfile, anonymous_id_for_user
 from util.testing import UrlResetMixin
 
 
@@ -175,7 +181,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
     def test_json_response(self):
         """ The view should return JSON. """
         response = self._auto_auth()
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         for key in ['created_status', 'username', 'email', 'password', 'user_id', 'anonymous_id']:
             self.assertIn(key, response_data)
         user = User.objects.get(username=response_data['username'])
@@ -207,7 +213,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
         if settings.ROOT_URLCONF == 'lms.urls':
             url_pattern = '/course/'
         else:
-            url_pattern = '/course/{}'.format(unicode(course_key))
+            url_pattern = '/course/{}'.format(six.text_type(course_key))
 
         self.assertTrue(response.url.endswith(url_pattern))
 
@@ -282,7 +288,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
             'course_access_roles': ','.join(expected_roles)
         }
         response = self._auto_auth(params)
-        user_info = json.loads(response.content)
+        user_info = json.loads(response.content.decode('utf-8'))
 
         for role in expected_roles:
             self.assertTrue(

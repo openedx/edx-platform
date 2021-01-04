@@ -3,20 +3,33 @@ Management command `manage_user` is used to idempotently create or remove
 Django users, set/unset permission bits, and associate groups by name.
 """
 
+
 from django.contrib.auth import get_user_model
-from django.contrib.auth.hashers import is_password_usable
+from django.contrib.auth.hashers import is_password_usable, identify_hasher
 from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.utils.translation import gettext as _
 
-from openedx.core.djangoapps.user_api.accounts.utils import generate_password
+from openedx.core.djangoapps.user_authn.utils import generate_password
 from student.models import UserProfile
 
 
-class Command(BaseCommand):
-    # pylint: disable=missing-docstring
+def is_valid_django_hash(encoded):
+    """
+    Starting with django 2.1, the function is_password_usable no longer checks whether encode
+    is a valid password created by a django hasher (hasher in  PASSWORD_HASHERS setting)
 
+    Adding this function to create constant behavior as we upgrade django versions
+    """
+    try:
+        identify_hasher(encoded)
+    except ValueError:
+        return False
+    return True
+
+
+class Command(BaseCommand):
     help = 'Creates the specified user, if it does not exist, and sets its groups.'
 
     def add_arguments(self, parser):
@@ -86,7 +99,7 @@ class Command(BaseCommand):
 
         if created:
             if initial_password_hash:
-                if not is_password_usable(initial_password_hash):
+                if not (is_password_usable(initial_password_hash) and is_valid_django_hash(initial_password_hash)):
                     raise CommandError('The password hash provided for user {} is invalid.'.format(username))
                 user.password = initial_password_hash
             else:
@@ -120,7 +133,7 @@ class Command(BaseCommand):
         for group_name in groups or set():
 
             try:
-                group = Group.objects.get(name=group_name)  # pylint: disable=no-member
+                group = Group.objects.get(name=group_name)
                 new_groups.add(group)
             except Group.DoesNotExist:
                 # warn, but move on.
@@ -146,5 +159,5 @@ class Command(BaseCommand):
             )
         )
 
-        user.groups = new_groups
+        user.groups.set(new_groups)
         user.save()

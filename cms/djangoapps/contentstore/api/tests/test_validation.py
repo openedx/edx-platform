@@ -1,8 +1,11 @@
 """
 Tests for the course import API views
 """
+
+
 from datetime import datetime
-from django.core.urlresolvers import reverse
+
+from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 

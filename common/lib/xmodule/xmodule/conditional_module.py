@@ -2,18 +2,20 @@
 some xmodules by conditions.
 """
 
+
 import json
 import logging
 
+import six
 from lazy import lazy
 from lxml import etree
+from opaque_keys.edx.locator import BlockUsageLocator
 from pkg_resources import resource_string
 from six import text_type
-
-from opaque_keys.edx.locator import BlockUsageLocator
 from web_fragments.fragment import Fragment
 from xblock.fields import ReferenceList, Scope, String
 
+from openedx.core.djangolib.markup import HTML, Text
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.studio_editable import StudioEditableDescriptor, StudioEditableModule
@@ -164,7 +166,7 @@ class ConditionalModule(ConditionalFields, XModule, StudioEditableModule):
                     if module is not None:
                         # We do not want to log when module is None, and it is when requester
                         # does not have access to the requested required module.
-                        log.warn('Error in conditional module: \
+                        log.warning('Error in conditional module: \
                             required module {module} has no {module_attr}'.format(module=module, module_attr=attr_name))
                     return False
 
@@ -264,7 +266,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor, StudioEditabl
         # Convert sources xml_attribute to a ReferenceList field type so Location/Locator
         # substitution can be done.
         if not self.sources_list:
-            if 'sources' in self.xml_attributes and isinstance(self.xml_attributes['sources'], basestring):
+            if 'sources' in self.xml_attributes and isinstance(self.xml_attributes['sources'], six.string_types):
                 self.sources_list = [
                     # TODO: it is not clear why we are replacing the run here (which actually is a no-op
                     # for old-style course locators. However, this is the implementation of
@@ -302,7 +304,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor, StudioEditabl
         children = []
         show_tag_list = []
         definition = {}
-        for conditional_attr in ConditionalModule.conditions_map.iterkeys():
+        for conditional_attr in six.iterkeys(ConditionalModule.conditions_map):
             conditional_value = xml_object.get(conditional_attr)
             if conditional_value is not None:
                 definition.update({
@@ -317,7 +319,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor, StudioEditabl
                     show_tag_list.append(location)
             else:
                 try:
-                    descriptor = system.process_xml(etree.tostring(child))
+                    descriptor = system.process_xml(etree.tostring(child, encoding='unicode'))
                     children.append(descriptor.scope_ids.usage_id)
                 except:
                     msg = "Unable to load child when parsing Conditional."
@@ -336,13 +338,13 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor, StudioEditabl
                 self.runtime.add_block_as_child_node(child, xml_object)
 
         if self.show_tag_list:
-            show_str = u'<{tag_name} sources="{sources}" />'.format(
-                tag_name='show', sources=';'.join(text_type(location) for location in self.show_tag_list))
+            show_str = HTML(u'<show sources="{sources}" />').format(
+                sources=Text(';'.join(text_type(location) for location in self.show_tag_list)))
             xml_object.append(etree.fromstring(show_str))
 
         # Overwrite the original sources attribute with the value from sources_list, as
         # Locations may have been changed to Locators.
-        stringified_sources_list = map(lambda loc: text_type(loc), self.sources_list)
+        stringified_sources_list = [text_type(loc) for loc in self.sources_list]
         self.xml_attributes['sources'] = ';'.join(stringified_sources_list)
         self.xml_attributes[self.conditional_attr] = self.conditional_value
         self.xml_attributes['message'] = self.conditional_message

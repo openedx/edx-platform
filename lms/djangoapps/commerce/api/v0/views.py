@@ -1,8 +1,12 @@
 """ API v0 views. """
+
+
 import logging
 
+import six
 from django.urls import reverse
 from edx_rest_api_client import exceptions
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.authentication import SessionAuthentication
@@ -12,14 +16,14 @@ from rest_framework.views import APIView
 from six import text_type
 
 from course_modes.models import CourseMode
-from courseware import courses
-from enrollment.api import add_enrollment
-from enrollment.views import EnrollmentCrossDomainSessionAuth
+from lms.djangoapps.courseware import courses
 from entitlements.models import CourseEntitlement
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.embargo import api as embargo_api
+from openedx.core.djangoapps.enrollments.api import add_enrollment
+from openedx.core.djangoapps.enrollments.views import EnrollmentCrossDomainSessionAuth
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from student.models import CourseEnrollment
 from student.signals import SAILTHRU_AUDIT_PURCHASE
 from util.json_request import JsonResponse
@@ -35,7 +39,9 @@ class BasketsView(APIView):
     """ Creates a basket with a course seat and enrolls users. """
 
     # LMS utilizes User.user_is_active to indicate email verification, not whether an account is active. Sigh!
-    authentication_classes = (EnrollmentCrossDomainSessionAuth, OAuth2AuthenticationAllowInactiveUser)
+    authentication_classes = (JwtAuthentication,
+                              BearerAuthenticationAllowInactiveUser,
+                              EnrollmentCrossDomainSessionAuth)
     permission_classes = (IsAuthenticated,)
 
     def _is_data_valid(self, request):
@@ -56,7 +62,7 @@ class BasketsView(APIView):
         try:
             course_key = CourseKey.from_string(course_id)
             courses.get_course(course_key)
-        except (InvalidKeyError, ValueError)as ex:
+        except (InvalidKeyError, ValueError) as ex:
             log.exception(u'Unable to locate course matching %s.', course_id)
             return False, None, text_type(ex)
 
@@ -64,7 +70,7 @@ class BasketsView(APIView):
 
     def _enroll(self, course_key, user, mode=CourseMode.DEFAULT_MODE_SLUG):
         """ Enroll the user in the course. """
-        add_enrollment(user.username, unicode(course_key), mode)
+        add_enrollment(user.username, six.text_type(course_key), mode)
 
     def _handle_marketing_opt_in(self, request, course_key, user):
         """
@@ -79,7 +85,7 @@ class BasketsView(APIView):
             except Exception:  # pylint: disable=broad-except
                 # log the error, return silently
                 log.exception(
-                    'Failed to handle marketing opt-in flag: user="%s", course="%s"', user.username, course_key
+                    u'Failed to handle marketing opt-in flag: user="%s", course="%s"', user.username, course_key
                 )
 
     def post(self, request, *args, **kwargs):
@@ -97,7 +103,7 @@ class BasketsView(APIView):
             return embargo_response
 
         # Don't do anything if an enrollment already exists
-        course_id = unicode(course_key)
+        course_id = six.text_type(course_key)
         enrollment = CourseEnrollment.get_enrollment(user, course_key)
         if enrollment and enrollment.is_active:
             msg = Messages.ENROLLMENT_EXISTS.format(course_id=course_id, username=user.username)
@@ -120,13 +126,18 @@ class BasketsView(APIView):
         if CourseEntitlement.check_for_existing_entitlement_and_enroll(user=user, course_run_key=course_key):
             return JsonResponse(
                 {
-                    'redirect_destination': reverse('courseware', args=[unicode(course_id)]),
+                    'redirect_destination': reverse('courseware', args=[six.text_type(course_id)]),
                 },
             )
 
         # Accept either honor or audit as an enrollment mode to
         # maintain backwards compatibility with existing courses
         default_enrollment_mode = audit_mode or honor_mode
+        course_name = None
+        course_announcement = None
+        if course is not None:
+            course_name = course.display_name
+            course_announcement = course.announcement
         if default_enrollment_mode:
             msg = Messages.ENROLL_DIRECTLY.format(
                 username=user.username,
@@ -137,7 +148,9 @@ class BasketsView(APIView):
                 msg = Messages.NO_SKU_ENROLLED.format(
                     enrollment_mode=default_enrollment_mode.slug,
                     course_id=course_id,
-                    username=user.username
+                    course_name=course_name,
+                    username=user.username,
+                    announcement=course_announcement
                 )
             log.info(msg)
             self._enroll(course_key, user, default_enrollment_mode.slug)

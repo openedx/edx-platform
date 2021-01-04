@@ -7,8 +7,6 @@ from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.features.learner_analytics import INCLUDE_UPSELL_MODAL
-from openedx.features.portfolio_project import INCLUDE_PORTFOLIO_UPSELL_MODAL
 %>
 
 <%namespace name='static' file='/static_content.html'/>
@@ -47,14 +45,9 @@ from openedx.features.portfolio_project import INCLUDE_PORTFOLIO_UPSELL_MODAL
             });
 
             % if use_ecommerce_payment_flow:
-            $('input[name=verified_mode]').click(function(e){
+            $('button[name=verified_mode]').click(function(e){
                 e.preventDefault();
                 window.location.href = '${ecommerce_payment_page | n, js_escaped_string}?sku=' +
-                encodeURIComponent('${sku | n, js_escaped_string}');
-            });
-            $('.v2 button[name=verified_mode]').click(function(e){
-                e.preventDefault();
-                window.location.href = 'https://ecommerce.edx.org/coupons/redeem/?code=EDXTSV35&sku=' +
                 encodeURIComponent('${sku | n, js_escaped_string}');
             });
             % endif
@@ -85,35 +78,14 @@ from openedx.features.portfolio_project import INCLUDE_PORTFOLIO_UPSELL_MODAL
     %endif
 
     <div id="currency_data" value="${currency_data}"></div>
-    <script type="application/json" id="bundle-data">
-        ${bundle_data | n, dump_js_escaped_json}
-    </script>
-    <div class="container">
-       % if INCLUDE_UPSELL_MODAL.is_enabled():
-            ${static.renderReact(
-              component="UpsellExperimentModal",
-              id="upsell-modal",
-              props={},
-            )}
-        % endif
 
-        % if INCLUDE_PORTFOLIO_UPSELL_MODAL.is_enabled():
-            ${static.renderReact(
-                component="PortfolioExperimentUpsellModal",
-                id="portfolio-experiment-upsell-modal",
-                props={}
-            )}
-        % endif
+    <div class="container">
         <section class="wrapper">
             <div class="wrapper-register-choose wrapper-content-main">
                 <article class="register-choose content-main">
                     <header class="page-header content-main">
-                        <h3 class="title v1">
+                        <h3 class="title">
                             ${title_content}
-                        </h3>
-                        <!-- This div was added as part of the LEARNER-1726 experiment. The v2 class should be removed if the experiment is implemented-->
-                        <h3 class="title v2 hidden">
-                            Next, Select Your Learning Path
                         </h3>
                     </header>
 
@@ -122,35 +94,7 @@ from openedx.features.portfolio_project import INCLUDE_PORTFOLIO_UPSELL_MODAL
                         b_tag_kwargs = {'b_start': HTML('<b>'), 'b_end': HTML('</b>')}
                         %>
                         % if "verified" in modes:
-                            <!-- This div was added as part of the LEARNER-1726 experiment. The v2 class should be removed if the experiment is implemented-->
-                            <div class="register-choice register-choice-certificate v2 hidden">
-                                <h4 class="title">Pursue a Verified Certificate</h4>
-                                <div class="wrapper-copy-inline">
-                                  <div class="wrapper-copy-inline">
-                                    <div class="wrapper-copy">
-                                        Get premium level support throughout the course and commit to completion up front.
-                                    </div>
-                                        <img src="/static/images/cert-verified-thumb.png" class="visual-reference img-certificate" alt="Visual representation of a Certificate"/>
-                                  </div>
-                                </div>
-                                <div class="copy-inline">
-                                  <ul class="list-actions">
-                                    <li class="action action-select">
-                                      <input type="hidden" name="contribution" value="${min_price}" />
-                                      <!-- The class verified_mode should be added to this selector if the experiment is implemented-->
-                                      <div class="upgradev1">
-                                        <input type="submit" name="verified_mode" value="Upgrade to a Certificate ($${min_price} USD)" />
-                                      </div>
-                                      <div class="upgradev2 hidden">
-                                          <button type="submit" name="verified_mode">Upgrade to a Certificate (<del>$${min_price} USD</del>)</button>
-                                          <br>
-                                          <div class="savings-message">Save 5% if you upgrade now! ($${int(min_price * .95)} USD)</div>
-                                      </div>
-                                    </li>
-                                  </ul>
-                                </div>
-                            </div>
-                            <div class="register-choice register-choice-certificate v1">
+                            <div class="register-choice register-choice-certificate">
                                 <div class="wrapper-copy">
                                     <span class="deco-ribbon"></span>
                                     % if has_credit_upsell:
@@ -189,10 +133,7 @@ from openedx.features.portfolio_project import INCLUDE_PORTFOLIO_UPSELL_MODAL
                                                 </div>
                                                 <div class="copy-inline list-actions">
                                                     <ul class="list-actions">
-                                                        <li class="action action-select">
-                                                            <input type="hidden" name="contribution" value="${min_price}" />
-                                                            <input type="submit" name="verified_mode" value="${_('Pursue a Verified Certificate')} ($${min_price} USD)" />
-                                                        </li>
+                                                        <%include file='_upgrade_button.html' args='content_gating_enabled=content_gating_enabled, course_duration_limit_enabled=course_duration_limit_enabled, min_price=min_price, price_before_discount=price_before_discount' />
                                                     </ul>
                                                 </div>
                                             </div>
@@ -235,14 +176,7 @@ from openedx.features.portfolio_project import INCLUDE_PORTFOLIO_UPSELL_MODAL
                                                 </div>
                                                 <div class="copy-inline list-actions">
                                                     <ul class="list-actions">
-                                                        <li class="action action-select">
-                                                            <input type="hidden" name="contribution" value="${min_price}" />
-                                                            % if content_gating_enabled or course_duration_limit_enabled:
-                                                                <input type="submit" name="verified_mode" value="${_('Pursue the Verified Track')} ($${min_price} USD)" />
-                                                            % else:
-                                                                <input type="submit" name="verified_mode" value="${_('Pursue a Verified Certificate')} ($${min_price} USD)" />
-                                                            % endif
-                                                        </li>
+                                                        <%include file='_upgrade_button.html' args='content_gating_enabled=content_gating_enabled, course_duration_limit_enabled=course_duration_limit_enabled, min_price=min_price, price_before_discount=price_before_discount' />
                                                     </ul>
                                                 </div>
                                             </div>
@@ -274,50 +208,11 @@ from openedx.features.portfolio_project import INCLUDE_PORTFOLIO_UPSELL_MODAL
                                 </ul>
                             </div>
                         % elif "audit" in modes:
-                            <span class="deco-divider v1">
-                                <span class="copy">${_("or")}</span>
-                            </span>
-                            <!-- This div was added as part of the LEARNER-1726 experiment. The v2 class should be removed if the experiment is implemented-->
-                            <span class="deco-divider v2 hidden">
+                            <span class="deco-divider">
                                 <span class="copy">${_("or")}</span>
                             </span>
 
-                            <!-- This div was added as part of the LEARNER-1726 experiment. The v2 class should be removed if the experiment is implemented-->
-                            <div class="register-choice register-choice-continue v2 hidden">
-                                <h4 class="title">
-                                    I Don't Want to Upgrade or Donate Today
-                                </h4>
-                                <div class="wrapper-copy-inline">
-                                    <div class="wrapper-copy">
-                                        If you do not want to add a certificate or donate to edX's mission today, you can skip this step for now and continue to the course.
-                                    </div>
-                                    <img src="/static/images/edx-home-graphic.png" class="visual-reference img-donate" alt="Visual of two hands forming a heart shape" >
-                                </div>
-                                <div class="copy-inline">
-                                    <ul class="list-actions">
-                                      <li class="action action-select">
-                                        <a class="continue-link" href="/dashboard">Continue to Course</a>
-                                      </li>
-                                    </ul>
-                                </div>
-                            </div>
-
-                            <!-- This div was added as part of the LEARNER-1726 experiment. The v2 class should be removed if the experiment is implemented-->
-                            <div class="register-choice register-choice-v2-donate register-choice-view v2 hidden">
-                              <h4 class="title">Donate to Support our Non-Profit Mission</h4>
-                              <div class="wrapper-copy-inline">
-                                <div class="wrapper-copy">
-                                    Even if you are not interested in pursuing a Verified Certificate, a donation helps edX continue to work towards its non-profit mission of making the world's best education more accessible to learners everywhere.
-                                </div>
-                                <div class="copy-inline">
-                                <ul class="list-actions">
-                                    <a class="donation-link" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=AG9VK2LC29L5Y">Donate and Continue to Course</a>
-                                </ul>
-                              </div>
-                              </div>
-                            </div>
-
-                            <div class="register-choice register-choice-audit v1">
+                            <div class="register-choice register-choice-audit">
                                 <div class="wrapper-copy">
                                     <span class="deco-ribbon"></span>
                                     <h4 class="title">${_("Audit This Course (No Certificate)")}</h4>

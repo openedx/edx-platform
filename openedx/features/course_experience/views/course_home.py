@@ -2,18 +2,20 @@
 Views for the course home page.
 """
 
-from django.urls import reverse
+
+import six
+from django.conf import settings
 from django.template.context_processors import csrf
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
-from course_modes.models import get_cosmetic_verified_display_price
-from courseware.access import has_access
-from courseware.courses import can_self_enroll_in_course, get_course_info_section, get_course_with_access
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import can_self_enroll_in_course, get_course_info_section, get_course_with_access
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.api import (
     get_course_goal,
@@ -22,17 +24,24 @@ from lms.djangoapps.course_goals.api import (
     has_course_goal_permission
 )
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from lms.djangoapps.courseware.utils import can_show_verified_upgrade, verified_upgrade_deadline_link
 from lms.djangoapps.courseware.views.views import CourseTabView
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
-from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
+from openedx.features.course_experience.course_tools import CourseToolsPluginManager
+from openedx.features.discounts.utils import get_first_purchase_offer_banner_fragment
+from openedx.features.discounts.utils import format_strikeout_price
 from student.models import CourseEnrollment
 from util.views import ensure_valid_course_key
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC_OUTLINE, COURSE_VISIBILITY_PUBLIC
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 
 from .. import (
-    LATEST_UPDATE_FLAG, SHOW_UPGRADE_MSG_ON_COURSE_HOME, USE_BOOTSTRAP_FLAG, COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
+    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
+    LATEST_UPDATE_FLAG,
+    SHOW_UPGRADE_MSG_ON_COURSE_HOME,
+    USE_BOOTSTRAP_FLAG
 )
 from ..utils import get_course_outline_block_tree, get_resume_block
 from .course_dates import CourseDatesFragmentView
@@ -40,8 +49,8 @@ from .course_home_messages import CourseHomeMessageFragmentView
 from .course_outline import CourseOutlineFragmentView
 from .course_sock import CourseSockFragmentView
 from .latest_update import LatestUpdateFragmentView
+from .next_up_banner import NextUpBannerFragmentView
 from .welcome_message import WelcomeMessageFragmentView
-
 
 EMPTY_HANDOUTS_HTML = u'<ol></ol>'
 
@@ -67,7 +76,7 @@ class CourseHomeView(CourseTabView):
         return USE_BOOTSTRAP_FLAG.is_enabled(course.id)
 
     def render_to_fragment(self, request, course=None, tab=None, **kwargs):
-        course_id = unicode(course.id)
+        course_id = six.text_type(course.id)
         home_fragment_view = CourseHomeFragmentView()
         return home_fragment_view.render_to_fragment(request, course_id=course_id, **kwargs)
 
@@ -81,10 +90,11 @@ class CourseHomeFragmentView(EdxFragmentView):
         """
         Returns information relevant to resume course functionality.
 
-        Returns a tuple: (has_visited_course, resume_course_url)
-            has_visited_course: True if the user has ever visted the course, False otherwise.
+        Returns a tuple: (has_visited_course, resume_course_url, resume_course_title)
+            has_visited_course: True if the user has ever visited the course, False otherwise.
             resume_course_url: The URL of the 'resume course' block if the user has visited the course,
                 otherwise the URL of the course root.
+            resume_course_title: The display_name of the resume course block, otherwise the display_name of course root
 
         """
         course_outline_root_block = get_course_outline_block_tree(request, course_id, request.user)
@@ -92,10 +102,12 @@ class CourseHomeFragmentView(EdxFragmentView):
         has_visited_course = bool(resume_block)
         if resume_block:
             resume_course_url = resume_block['lms_web_url']
+            resume_course_title = resume_block['display_name']
         else:
             resume_course_url = course_outline_root_block['lms_web_url'] if course_outline_root_block else None
+            resume_course_title = course_outline_root_block['display_name'] if course_outline_root_block else None
 
-        return has_visited_course, resume_course_url
+        return has_visited_course, resume_course_url, resume_course_title
 
     def _get_course_handouts(self, request, course):
         """
@@ -133,11 +145,14 @@ class CourseHomeFragmentView(EdxFragmentView):
         outline_fragment = None
         update_message_fragment = None
         course_sock_fragment = None
+        offer_banner_fragment = None
+        next_up_banner_fragment = None
         course_expiration_fragment = None
         has_visited_course = None
         resume_course_url = None
         handouts_html = None
 
+        course_overview = CourseOverview.get_from_id(course.id)
         if user_access['is_enrolled'] or user_access['is_staff']:
             outline_fragment = CourseOutlineFragmentView().render_to_fragment(
                 request, course_id=course_id, **kwargs
@@ -150,10 +165,27 @@ class CourseHomeFragmentView(EdxFragmentView):
                 update_message_fragment = WelcomeMessageFragmentView().render_to_fragment(
                     request, course_id=course_id, **kwargs
                 )
-            course_sock_fragment = CourseSockFragmentView().render_to_fragment(request, course=course, **kwargs)
-            has_visited_course, resume_course_url = self._get_resume_course_info(request, course_id)
+            course_sock_fragment = CourseSockFragmentView().render_to_fragment(
+                request, course=course, **kwargs
+            )
+            has_visited_course, resume_course_url, resume_course_title = self._get_resume_course_info(
+                request, course_id
+            )
             handouts_html = self._get_course_handouts(request, course)
-            course_expiration_fragment = generate_course_expired_fragment(request.user, course)
+
+            offer_banner_fragment = get_first_purchase_offer_banner_fragment(
+                request.user,
+                course_overview
+            )
+            course_expiration_fragment = generate_course_expired_fragment(
+                request.user,
+                course_overview
+            )
+
+            next_up_banner_fragment = NextUpBannerFragmentView().render_to_fragment(
+                assignment_title=resume_course_title, resume_course_url=resume_course_url, assignment_duration='10 min'
+            )
+
         elif allow_public_outline or allow_public:
             outline_fragment = CourseOutlineFragmentView().render_to_fragment(
                 request, course_id=course_id, user_is_enrolled=False, **kwargs
@@ -188,12 +220,21 @@ class CourseHomeFragmentView(EdxFragmentView):
         # Get info for upgrade messaging
         upgrade_price = None
         upgrade_url = None
+        has_discount = False
 
         # TODO Add switch to control deployment
-        if SHOW_UPGRADE_MSG_ON_COURSE_HOME.is_enabled(course_key) and enrollment and enrollment.upgrade_deadline:
-            upgrade_url = EcommerceService().upgrade_url(request.user, course_key)
-            upgrade_price = get_cosmetic_verified_display_price(course)
+        if SHOW_UPGRADE_MSG_ON_COURSE_HOME.is_enabled(course_key) and can_show_verified_upgrade(
+            request.user,
+            enrollment,
+            course
+        ):
+            upgrade_url = verified_upgrade_deadline_link(request.user, course_id=course_key)
+            upgrade_price, has_discount = format_strikeout_price(request.user, course_overview)
 
+        show_search = (
+            settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH') or
+            (settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF') and user_access['is_staff'])
+        )
         # Render the course home fragment
         context = {
             'request': request,
@@ -203,7 +244,9 @@ class CourseHomeFragmentView(EdxFragmentView):
             'outline_fragment': outline_fragment,
             'handouts_html': handouts_html,
             'course_home_message_fragment': course_home_message_fragment,
+            'offer_banner_fragment': offer_banner_fragment,
             'course_expiration_fragment': course_expiration_fragment,
+            'next_up_banner_fragment': next_up_banner_fragment,
             'has_visited_course': has_visited_course,
             'resume_course_url': resume_course_url,
             'course_tools': course_tools,
@@ -219,6 +262,8 @@ class CourseHomeFragmentView(EdxFragmentView):
             'uses_pattern_library': True,
             'upgrade_price': upgrade_price,
             'upgrade_url': upgrade_url,
+            'has_discount': has_discount,
+            'show_search': show_search,
         }
         html = render_to_string('course_experience/course-home-fragment.html', context)
         return Fragment(html)

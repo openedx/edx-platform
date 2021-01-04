@@ -2,20 +2,18 @@
 """
 This test file will verify proper password policy enforcement, which is an option feature
 """
-import json
-from importlib import import_module
 
-from django.conf import settings
+
+import json
+
 from django.contrib.auth.models import AnonymousUser
-from django.urls import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch
 
-from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from openedx.core.djangoapps.user_authn.views.deprecated import create_account
 from util.password_policy_validators import create_validator_config
 
 
@@ -42,9 +40,9 @@ class TestPasswordPolicy(TestCase):
         self.url_params['password'] = 'aaa'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 400)
-        obj = json.loads(response.content)
+        obj = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
-            obj['value'],
+            obj['password'][0]['user_message'],
             "This password is too short. It must contain at least 6 characters.",
         )
 
@@ -55,7 +53,7 @@ class TestPasswordPolicy(TestCase):
         self.url_params['password'] = 'ThisIsALongerPassword'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 200)
-        obj = json.loads(response.content)
+        obj = json.loads(response.content.decode('utf-8'))
         self.assertTrue(obj['success'])
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
@@ -65,9 +63,9 @@ class TestPasswordPolicy(TestCase):
         self.url_params['password'] = 'ThisPasswordIsWayTooLong'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 400)
-        obj = json.loads(response.content)
+        obj = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
-            obj['value'],
+            obj['password'][0]['user_message'],
             "This password is too long. It must contain no more than 12 characters.",
         )
 
@@ -78,9 +76,9 @@ class TestPasswordPolicy(TestCase):
         self.url_params['password'] = 'thisshouldfail'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 400)
-        obj = json.loads(response.content)
+        obj = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
-            obj['value'],
+            obj['password'][0]['user_message'],
             "This password must contain at least 3 uppercase letters.",
         )
 
@@ -91,7 +89,7 @@ class TestPasswordPolicy(TestCase):
         self.url_params['password'] = 'ThisShouldPass'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 200)
-        obj = json.loads(response.content)
+        obj = json.loads(response.content.decode('utf-8'))
         self.assertTrue(obj['success'])
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
@@ -101,9 +99,9 @@ class TestPasswordPolicy(TestCase):
         self.url_params['password'] = 'THISSHOULDFAIL'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 400)
-        obj = json.loads(response.content)
+        obj = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
-            obj['value'],
+            obj['password'][0]['user_message'],
             "This password must contain at least 3 lowercase letters.",
         )
 
@@ -114,7 +112,7 @@ class TestPasswordPolicy(TestCase):
         self.url_params['password'] = 'ThisShouldPass'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 200)
-        obj = json.loads(response.content)
+        obj = json.loads(response.content.decode('utf-8'))
         self.assertTrue(obj['success'])
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
@@ -124,9 +122,9 @@ class TestPasswordPolicy(TestCase):
         self.url_params['password'] = 'thisshouldfail'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 400)
-        obj = json.loads(response.content)
+        obj = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
-            obj['value'],
+            obj['password'][0]['user_message'],
             "This password must contain at least 3 punctuation marks.",
         )
 
@@ -137,7 +135,7 @@ class TestPasswordPolicy(TestCase):
         self.url_params['password'] = 'Th!sSh.uldPa$*'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 200)
-        obj = json.loads(response.content)
+        obj = json.loads(response.content.decode('utf-8'))
         self.assertTrue(obj['success'])
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
@@ -148,9 +146,9 @@ class TestPasswordPolicy(TestCase):
         self.url_params['password'] = u'thisShouldFail២٧'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 400)
-        obj = json.loads(response.content)
+        obj = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
-            obj['value'],
+            obj['password'][0]['user_message'],
             "This password must contain at least 3 numbers.",
         )
 
@@ -162,7 +160,7 @@ class TestPasswordPolicy(TestCase):
         self.url_params['password'] = u'thisShouldPass២33'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 200)
-        obj = json.loads(response.content)
+        obj = json.loads(response.content.decode('utf-8'))
         self.assertTrue(obj['success'])
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
@@ -172,9 +170,9 @@ class TestPasswordPolicy(TestCase):
         self.url_params['password'] = '123456ab'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 400)
-        obj = json.loads(response.content)
+        obj = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
-            obj['value'],
+            obj['password'][0]['user_message'],
             "This password must contain at least 3 letters.",
         )
 
@@ -185,7 +183,7 @@ class TestPasswordPolicy(TestCase):
         self.url_params['password'] = u'𝒯𝓗Ï𝓼𝒫å𝓼𝓼𝔼𝓼'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 200)
-        obj = json.loads(response.content)
+        obj = json.loads(response.content.decode('utf-8'))
         self.assertTrue(obj['success'])
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
@@ -198,13 +196,14 @@ class TestPasswordPolicy(TestCase):
         self.url_params['password'] = 'thisshouldfail'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 400)
-        obj = json.loads(response.content)
-        errstring = (
-            "This password must contain at least 3 uppercase letters. "
-            "This password must contain at least 3 numbers. "
-            "This password must contain at least 3 punctuation marks."
-        )
-        self.assertEqual(obj['value'], errstring)
+        obj = json.loads(response.content.decode('utf-8'))
+        error_strings = [
+            "This password must contain at least 3 uppercase letters.",
+            "This password must contain at least 3 numbers.",
+            "This password must contain at least 3 punctuation marks.",
+        ]
+        for i in range(3):
+            self.assertEqual(obj['password'][i]['user_message'], error_strings[i])
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         create_validator_config('util.password_policy_validators.MinimumLengthValidator', {'min_length': 3}),
@@ -217,7 +216,7 @@ class TestPasswordPolicy(TestCase):
         self.url_params['password'] = u'tH1s Sh0u!d P3#$!'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 200)
-        obj = json.loads(response.content)
+        obj = json.loads(response.content.decode('utf-8'))
         self.assertTrue(obj['success'])
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
@@ -227,9 +226,9 @@ class TestPasswordPolicy(TestCase):
         self.url_params['password'] = 'password'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 400)
-        obj = json.loads(response.content)
+        obj = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
-            obj['value'],
+            obj['password'][0]['user_message'],
             "This password is too common.",
         )
 
@@ -240,7 +239,7 @@ class TestPasswordPolicy(TestCase):
         self.url_params['password'] = 'this_is_ok'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 200)
-        obj = json.loads(response.content)
+        obj = json.loads(response.content.decode('utf-8'))
         self.assertTrue(obj['success'])
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
@@ -251,32 +250,7 @@ class TestPasswordPolicy(TestCase):
         self.url_params['password'] = u'四節比分和七年前'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 200)
-        obj = json.loads(response.content)
-        self.assertTrue(obj['success'])
-
-    @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        create_validator_config('util.password_policy_validators.MinimumLengthValidator', {'min_length': 6})
-    ], SESSION_ENGINE='django.contrib.sessions.backends.cache')
-    def test_ext_auth_password_length_too_short(self):
-        """
-        Tests that even if password policy is enforced, ext_auth registrations aren't subject to it
-        """
-        self.url_params['password'] = u'aaa'  # shouldn't pass validation
-        request = self.request_factory.post(self.url, self.url_params)
-        request.site = SiteFactory.create()
-        # now indicate we are doing ext_auth by setting 'ExternalAuthMap' in the session.
-        request.session = import_module(settings.SESSION_ENGINE).SessionStore()  # empty session
-        extauth = ExternalAuthMap(external_id='withmap@stanford.edu',
-                                  external_email='withmap@stanford.edu',
-                                  internal_password=self.url_params['password'],
-                                  external_domain='shib:https://idp.stanford.edu/')
-        request.session['ExternalAuthMap'] = extauth
-        request.user = AnonymousUser()
-
-        with patch('edxmako.request_context.get_current_request', return_value=request):
-            response = create_account(request)
-        self.assertEqual(response.status_code, 200)
-        obj = json.loads(response.content)
+        obj = json.loads(response.content.decode('utf-8'))
         self.assertTrue(obj['success'])
 
 
@@ -303,10 +277,10 @@ class TestUsernamePasswordNonmatch(TestCase):
         self.url_params['username'] = "foobar"
         self.url_params['password'] = "foobar"
         response = self.client.post(self.url, self.url_params)
-        self.assertEquals(response.status_code, 400)
-        obj = json.loads(response.content)
+        self.assertEqual(response.status_code, 400)
+        obj = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
-            obj['value'],
+            obj['password'][0]['user_message'],
             "The password is too similar to the username.",
         )
 
@@ -317,6 +291,6 @@ class TestUsernamePasswordNonmatch(TestCase):
         self.url_params['username'] = "foobar"
         self.url_params['password'] = "nonmatch"
         response = self.client.post(self.url, self.url_params)
-        self.assertEquals(response.status_code, 200)
-        obj = json.loads(response.content)
+        self.assertEqual(response.status_code, 200)
+        obj = json.loads(response.content.decode('utf-8'))
         self.assertTrue(obj['success'])

@@ -1,10 +1,13 @@
 """
 Pages page for a course.
 """
-from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
-from common.test.acceptance.pages.studio.course_page import CoursePage
+
+
 from bok_choy.promise import EmptyPromise
 from selenium.webdriver import ActionChains
+
+from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
+from common.test.acceptance.pages.studio.course_page import CoursePage
 
 
 class PagesPage(CoursePage):
@@ -37,7 +40,7 @@ class PagesPage(CoursePage):
             description="Static tab is added"
         )
         self.wait_for_element_visibility(
-            '.tab-list :nth-child({}) .xblock-student_view'.format(total_tabs),
+            u'.tab-list :nth-child({}) .xblock-student_view'.format(total_tabs),
             'Static tab is visible'
         )
         # self.wait_for_ajax()
@@ -94,7 +97,7 @@ class PagesPage(CoursePage):
             '.wrapper-component-action-header .component-actions',
             "Tab's edit button is visible"
         )
-        return self.q(css='div.xmodule_StaticTabModule').text
+        return self.q(css='div.xmodule_StaticTabBlock').text
 
     @property
     def built_in_page_titles(self):
@@ -121,7 +124,7 @@ class PagesPage(CoursePage):
             true(bool): if tab is visible
             false(bool): if tab is not visible
         """
-        css_selector = '[data-tab-id="{}"] .toggle-checkbox'.format(tab_name)
+        css_selector = u'[data-tab-id="{}"] .toggle-checkbox'.format(tab_name)
         return True if not self.q(css=css_selector).selected else False
 
     def toggle_tab(self, tab_name):
@@ -130,7 +133,7 @@ class PagesPage(CoursePage):
         Args:
             tab_name(string): Name of the tab to be toggled
         """
-        css_selector = '[data-tab-id="{}"] .action-visible'.format(tab_name)
+        css_selector = u'[data-tab-id="{}"] .action-visible'.format(tab_name)
         return self.q(css=css_selector).first.click()
 
     def set_field_val(self, field_display_name, field_value):
@@ -141,7 +144,7 @@ class PagesPage(CoursePage):
             field_display_name(str): Display name of the field for which the value is to be changed
             field_value(str): New value for the field
         """
-        selector = '.xblock-studio_view li.field label:contains("{}") + input'.format(field_display_name)
+        selector = u'.xblock-studio_view li.field label:contains("{}") + input'.format(field_display_name)
         script = '$(arguments[0]).val(arguments[1]).change();'
         self.browser.execute_script(script, selector, field_value)
 

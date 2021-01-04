@@ -1,10 +1,15 @@
+"""Grading policy"""
+
+
+import json
 from base64 import b64encode
 from datetime import timedelta
 from hashlib import sha1
-import json
+
+import six
+from eventtracking import tracker
 
 from contentstore.signals.signals import GRADING_POLICY_CHANGED
-from eventtracking import tracker
 from track.event_transaction_utils import create_new_event_transaction_id
 from xmodule.modulestore.django import modulestore
 
@@ -183,7 +188,7 @@ class CourseGradingModel(object):
         descriptor = modulestore().get_item(location)
         return {
             "graderType": descriptor.format if descriptor.format is not None else 'notgraded',
-            "location": unicode(location),
+            "location": six.text_type(location),
         }
 
     @staticmethod
@@ -256,12 +261,12 @@ class CourseGradingModel(object):
 def _grading_event_and_signal(course_key, user_id):
     name = GRADING_POLICY_CHANGED_EVENT_TYPE
     course = modulestore().get_course(course_key)
-    grading_policy_hash = unicode(hash_grading_policy(course.grading_policy))
+    grading_policy_hash = six.text_type(hash_grading_policy(course.grading_policy))
     data = {
-        "course_id": unicode(course_key),
-        "user_id": unicode(user_id),
+        "course_id": six.text_type(course_key),
+        "user_id": six.text_type(user_id),
         "grading_policy_hash": grading_policy_hash,
-        "event_transaction_id": unicode(create_new_event_transaction_id()),
+        "event_transaction_id": six.text_type(create_new_event_transaction_id()),
         "event_transaction_type": GRADING_POLICY_CHANGED_EVENT_TYPE,
     }
     tracker.emit(name, data)
@@ -279,4 +284,4 @@ def hash_grading_policy(grading_policy):
         separators=(',', ':'),  # Remove spaces from separators for more compact representation
         sort_keys=True,
     )
-    return b64encode(sha1(ordered_policy).digest())
+    return b64encode(sha1(ordered_policy.encode("utf-8")).digest()).decode('utf-8')

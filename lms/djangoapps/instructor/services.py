@@ -2,6 +2,7 @@
 Implementation of "Instructor" service
 """
 
+
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -10,7 +11,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 import lms.djangoapps.instructor.enrollment as enrollment
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.commerce.utils import create_zendesk_ticket
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from student import auth
@@ -44,7 +45,7 @@ class InstructorService(object):
         except ObjectDoesNotExist:
             err_msg = (
                 'Error occurred while attempting to reset student attempts for user '
-                '{student_identifier} for content_id {content_id}. '
+                u'{student_identifier} for content_id {content_id}. '
                 'User does not exist!'.format(
                     student_identifier=student_identifier,
                     content_id=content_id
@@ -57,7 +58,7 @@ class InstructorService(object):
             module_state_key = UsageKey.from_string(content_id)
         except InvalidKeyError:
             err_msg = (
-                'Invalid content_id {content_id}!'.format(content_id=content_id)
+                u'Invalid content_id {content_id}!'.format(content_id=content_id)
             )
             log.error(err_msg)
             return
@@ -74,7 +75,7 @@ class InstructorService(object):
             except (StudentModule.DoesNotExist, enrollment.sub_api.SubmissionError):
                 err_msg = (
                     'Error occurred while attempting to reset student attempts for user '
-                    '{student_identifier} for content_id {content_id}.'.format(
+                    u'{student_identifier} for content_id {content_id}.'.format(
                         student_identifier=student_identifier,
                         content_id=content_id
                     )
@@ -106,8 +107,8 @@ class InstructorService(object):
             subject = _(u"Proctored Exam Review: {review_status}").format(review_status=review_status)
             body = _(
                 u"A proctored exam attempt for {exam_name} in {course_name} by username: {student_username} "
-                "was reviewed as {review_status} by the proctored exam review provider.\n"
-                "Review link: {review_url}"
+                u"was reviewed as {review_status} by the proctored exam review provider.\n"
+                u"Review link: {review_url}"
             ).format(
                 exam_name=exam_name,
                 course_name=course.display_name,

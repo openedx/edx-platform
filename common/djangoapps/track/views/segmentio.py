@@ -1,5 +1,6 @@
 """Handle events that were forwarded from the Segment webhook integration"""
 
+
 import json
 import logging
 
@@ -9,10 +10,10 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from eventtracking import tracker
 from util.json_request import expect_json
 
 log = logging.getLogger(__name__)

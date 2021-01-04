@@ -1,32 +1,37 @@
+"""Views for assets"""
+
+
 import json
 import logging
 import math
-from functools import partial
 import re
+from functools import partial
 
+import six
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_POST, require_http_methods
+from django.views.decorators.http import require_http_methods, require_POST
 from opaque_keys.edx.keys import AssetKey, CourseKey
 from pymongo import ASCENDING, DESCENDING
 from six import text_type
-from xmodule.contentstore.content import StaticContent
-from xmodule.contentstore.django import contentstore
-from xmodule.exceptions import NotFoundError
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from contentstore.utils import reverse_course_url
 from contentstore.views.exception import AssetNotFoundException, AssetSizeTooLargeException
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.contentserver.caching import del_cached_content
 from student.auth import has_course_author_access
 from util.date_utils import get_default_time_display
 from util.json_request import JsonResponse
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
+from xmodule.exceptions import NotFoundError
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
+
+from ..utils import reverse_course_url
 
 __all__ = ['assets_handler']
 
@@ -186,6 +191,7 @@ def _get_requested_attribute(request, attribute):
 
 
 def _get_error_if_invalid_parameters(requested_filter):
+    """Function for returning error messages on filters"""
     requested_file_types = _get_requested_file_types_from_requested_filter(requested_filter)
     invalid_filters = []
 
@@ -200,9 +206,9 @@ def _get_error_if_invalid_parameters(requested_filter):
     if invalid_filters:
         error_message = {
             'error_code': 'invalid_asset_type_filter',
-            'developer_message': 'The asset_type parameter to the request is invalid. '
-                                 'The {} filters are not described in the settings.FILES_AND_UPLOAD_TYPE_FILTERS '
-                                 'dictionary.'.format(invalid_filters)
+            'developer_message': u'The asset_type parameter to the request is invalid. '
+                                 u'The {} filters are not described in the settings.FILES_AND_UPLOAD_TYPE_FILTERS '
+                                 u'dictionary.'.format(invalid_filters)
         }
         return JsonResponse({'error': error_message}, status=400)
 
@@ -295,6 +301,7 @@ def _get_sort_type_and_direction(request_options):
 
 
 def _get_mongo_sort_from_requested_sort(requested_sort):
+    """Function returns sorts dataset based on the key provided"""
     if requested_sort == 'date_added':
         sort = 'uploadDate'
     elif requested_sort == 'display_name':
@@ -320,6 +327,7 @@ def _get_first_asset_index(current_page, page_size):
 
 
 def _get_assets_for_page(course_key, options):
+    """returns course content for given course and options"""
     current_page = options['current_page']
     page_size = options['page_size']
     sort = options['sort']
@@ -331,10 +339,12 @@ def _get_assets_for_page(course_key, options):
 
 
 def _update_options_to_requery_final_page(query_options, total_asset_count):
+    """sets current_page value based on asset count and page_size"""
     query_options['current_page'] = int(math.floor((total_asset_count - 1) / query_options['page_size']))
 
 
 def _get_assets_in_json_format(assets, course_key):
+    """returns assets information in JSON Format"""
     assets_in_json_format = []
     for asset in assets:
         thumbnail_asset_key = _get_thumbnail_asset_key(asset, course_key)
@@ -355,6 +365,7 @@ def _get_assets_in_json_format(assets, course_key):
 
 
 def update_course_run_asset(course_key, upload_file):
+    """returns contents of the uploaded file"""
     course_exists_response = _get_error_if_course_does_not_exist(course_key)
 
     if course_exists_response is not None:
@@ -388,6 +399,7 @@ def update_course_run_asset(course_key, upload_file):
 @ensure_csrf_cookie
 @login_required
 def _upload_asset(request, course_key):
+    """uploads the file in request and returns JSON response"""
     course_exists_error = _get_error_if_course_does_not_exist(course_key)
 
     if course_exists_error is not None:
@@ -424,7 +436,7 @@ def _get_error_if_course_does_not_exist(course_key):
     try:
         modulestore().get_course(course_key)
     except ItemNotFoundError:
-        logging.error('Could not find course: %s', course_key)
+        logging.error(u'Could not find course: %s', course_key)
         return HttpResponseBadRequest()
 
 
@@ -442,11 +454,13 @@ def _get_file_metadata_as_dictionary(upload_file):
 
 
 def get_file_size(upload_file):
+    """returns the size of the uploaded file"""
     # can be used for mocking test file sizes.
     return upload_file.size
 
 
 def _check_file_size_is_too_large(file_metadata):
+    """verifies whether file size is greater than allowed file size"""
     upload_file_size = file_metadata['upload_file_size']
     maximum_file_size_in_megabytes = settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB
     maximum_file_size_in_bytes = maximum_file_size_in_megabytes * 1000 ** 2
@@ -455,9 +469,11 @@ def _check_file_size_is_too_large(file_metadata):
 
 
 def _get_file_too_large_error_message(filename):
+    """returns formatted error message for large files"""
+
     return _(
-        'File {filename} exceeds maximum size of '
-        '{maximum_size_in_megabytes} MB.'
+        u'File {filename} exceeds maximum size of '
+        u'{maximum_size_in_megabytes} MB.'
     ).format(
         filename=filename,
         maximum_size_in_megabytes=settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB,
@@ -465,6 +481,7 @@ def _get_file_too_large_error_message(filename):
 
 
 def _get_file_content_and_path(file_metadata, course_key):
+    """returns contents of the uploaded file and path for temporary uploaded file"""
     content_location = StaticContent.compute_location(course_key, file_metadata['filename'])
     upload_file = file_metadata['upload_file']
 
@@ -483,10 +500,12 @@ def _get_file_content_and_path(file_metadata, course_key):
 
 
 def _check_thumbnail_uploaded(thumbnail_content):
+    """returns whether thumbnail is None"""
     return thumbnail_content is not None
 
 
 def _get_thumbnail_asset_key(asset, course_key):
+    """returns thumbnail asset key"""
     # note, due to the schema change we may not have a 'thumbnail_location' in the result set
     thumbnail_location = asset.get('thumbnail_location', None)
     thumbnail_asset_key = None
@@ -501,12 +520,12 @@ def _get_thumbnail_asset_key(asset, course_key):
 @login_required
 @ensure_csrf_cookie
 def _update_asset(request, course_key, asset_key):
-    '''
+    """
     restful CRUD operations for a course asset.
     Currently only DELETE, POST, and PUT methods are implemented.
 
     asset_path_encoding: the odd /c4x/org/course/category/name repr of the asset (used by Backbone as the id)
-    '''
+    """
     if request.method == 'DELETE':
         try:
             delete_asset(course_key, asset_key)
@@ -520,7 +539,7 @@ def _update_asset(request, course_key, asset_key):
 
         # update existing asset
         try:
-            modified_asset = json.loads(request.body)
+            modified_asset = json.loads(request.body.decode('utf8'))
         except ValueError:
             return HttpResponseBadRequest()
         contentstore().set_attr(asset_key, 'locked', modified_asset['locked'])
@@ -530,10 +549,12 @@ def _update_asset(request, course_key, asset_key):
 
 
 def _save_content_to_trash(content):
+    """saves the content to trash"""
     contentstore('trashcan').save(content)
 
 
 def delete_asset(course_key, asset_key):
+    """deletes the cached content based on asset key"""
     content = _check_existence_and_get_asset_content(asset_key)
 
     _save_content_to_trash(content)
@@ -564,7 +585,7 @@ def _delete_thumbnail(thumbnail_location, course_key, asset_key):
             contentstore().delete(thumbnail_content.get_id())
             del_cached_content(thumbnail_location)
         except Exception:  # pylint: disable=broad-except
-            logging.warning('Could not delete thumbnail: %s', thumbnail_location)
+            logging.warning(u'Could not delete thumbnail: %s', thumbnail_location)
 
 
 def _get_asset_json(display_name, content_type, date, location, thumbnail_location, locked):
@@ -583,5 +604,5 @@ def _get_asset_json(display_name, content_type, date, location, thumbnail_locati
         'thumbnail': StaticContent.serialize_asset_key_with_slash(thumbnail_location) if thumbnail_location else None,
         'locked': locked,
         # needed for Backbone delete/update.
-        'id': unicode(location)
+        'id': six.text_type(location)
     }

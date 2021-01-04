@@ -2,30 +2,34 @@
 Defines asynchronous celery task for sending email notification (through edx-ace)
 pertaining to new discussion forum comments.
 """
-import logging
-from urlparse import urljoin
 
+
+import logging
+
+import six
 from celery import task
+from celery_utils.logged_task import LoggedTask
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-
-from celery_utils.logged_task import LoggedTask
-from django_comment_common.models import DiscussionsIdMapping
 from edx_ace import ace
-from edx_ace.utils import date
 from edx_ace.recipient import Recipient
+from edx_ace.utils import date
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
-from lms.djangoapps.django_comment_client.utils import permalink, get_accessible_discussion_xblocks_by_course_id
-import lms.lib.comment_client as cc
+from six.moves.urllib.parse import urljoin
 
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
+import openedx.core.djangoapps.django_comment_common.comment_client as cc
+from lms.djangoapps.discussion.django_comment_client.utils import (
+    get_accessible_discussion_xblocks_by_course_id,
+    permalink
+)
 from openedx.core.djangoapps.ace_common.message import BaseMessageType
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.django_comment_common.models import DiscussionsIdMapping
 from openedx.core.lib.celery.task_utils import emulate_http_request
 from track import segment
-
 
 log = logging.getLogger(__name__)
 
@@ -46,7 +50,7 @@ def update_discussions_map(context):
     course_key = CourseKey.from_string(context['course_id'])
     discussion_blocks = get_accessible_discussion_xblocks_by_course_id(course_key, include_all=True)
     discussions_id_map = {
-        discussion_block.discussion_id: unicode(discussion_block.location)
+        discussion_block.discussion_id: six.text_type(discussion_block.location)
         for discussion_block in discussion_blocks
     }
     DiscussionsIdMapping.update_mapping(course_key, discussions_id_map)
@@ -70,7 +74,7 @@ def send_ace_message(context):
                 _get_course_language(context['course_id']),
                 message_context
             )
-            log.info('Sending forum comment email notification with context %s', message_context)
+            log.info(u'Sending forum comment email notification with context %s', message_context)
             ace.send(message)
             _track_notification_sent(message, context)
 
@@ -83,10 +87,10 @@ def _track_notification_sent(message, context):
         'app_label': 'discussion',
         'name': 'responsenotification',  # This is 'Campaign' in GA
         'language': message.language,
-        'uuid': unicode(message.uuid),
-        'send_uuid': unicode(message.send_uuid),
+        'uuid': six.text_type(message.uuid),
+        'send_uuid': six.text_type(message.send_uuid),
         'thread_id': context['thread_id'],
-        'course_id': unicode(context['course_id']),
+        'course_id': six.text_type(context['course_id']),
         'thread_created_at': date.deserialize(context['thread_created_at']),
         'nonInteraction': 1,
     }
@@ -121,12 +125,6 @@ def _is_first_comment(comment_id, thread_id):
         first_comment = thread.children[0]
         return first_comment.get('id') == comment_id
     else:
-        log.info(
-            "EDUCATOR-3385: No child exists for thread_id %s | course_id %s | username %s ",
-            thread.get('id'),
-            thread['course_id'],
-            thread['username']
-        )
         return False
 
 

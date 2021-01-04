@@ -1,7 +1,9 @@
 """
 Tests for User deactivation API permissions
 """
-from django.test import TestCase, RequestFactory
+
+
+from django.test import RequestFactory, TestCase
 
 from openedx.core.djangoapps.user_api.accounts.permissions import CanDeactivateUser, CanRetireUser
 from student.tests.factories import ContentTypeFactory, PermissionFactory, SuperuserFactory, UserFactory

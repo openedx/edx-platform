@@ -1,14 +1,17 @@
 """
 Management command for creating a Django OAuth Toolkit Application model.
+
+Also creates an oauth_dispatch application access if scopes are provided.
 """
 
-from __future__ import unicode_literals
 
 import logging
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from oauth2_provider.models import get_application_model
+
+from openedx.core.djangoapps.oauth_dispatch.models import ApplicationAccess
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +48,10 @@ class Command(BaseCommand):
                             dest='public',
                             default=False,
                             help='Make the application public?  Confidential by default.')
+        parser.add_argument('--skip-authorization',
+                            action='store_true',
+                            dest='skip_authorization',
+                            help='Skip the in-browser user authorization?  False by default.')
         parser.add_argument('--client-id',
                             action='store',
                             dest='client_id',
@@ -55,42 +62,111 @@ class Command(BaseCommand):
                             dest='client_secret',
                             default='',
                             help='The client_secret for this application. If omitted, one will be generated.')
+        parser.add_argument('--scopes',
+                            action='store',
+                            dest='scopes',
+                            default='',
+                            help='Comma-separated list of scopes that this application will be allowed to request.')
+        parser.add_argument('--update',
+                            action='store_true',
+                            dest='update',
+                            help='If application and/or access already exist, update values.')
 
-    def handle(self, *args, **options):
-        app_name = options['name']
-        username = options['username']
-        grant_type = options['grant_type']
-        redirect_uris = options['redirect_uris']
-        client_type = Application.CLIENT_PUBLIC if options['public'] else Application.CLIENT_CONFIDENTIAL
-        client_id = options['client_id']
-        client_secret = options['client_secret']
-
-        user = User.objects.get(username=username)
-
-        if Application.objects.filter(user=user, name=app_name).exists():
-            logger.info('Application with name {} and user {} already exists.'.format(
-                app_name,
-                username
-            ))
-            return
-
-        create_kwargs = dict(
-            name=app_name,
-            user=user,
-            redirect_uris=redirect_uris,
-            client_type=client_type,
-            authorization_grant_type=grant_type
+    def _create_application(self, user, app_name, application_kwargs):
+        """
+        Create new application with given User, name, and option values.
+        """
+        application = Application.objects.create(
+            user=user, name=app_name, **application_kwargs
         )
-        if client_id:
-            create_kwargs['client_id'] = client_id
-        if client_secret:
-            create_kwargs['client_secret'] = client_secret
-
-        application = Application.objects.create(**create_kwargs)
-        application.save()
         logger.info('Created {} application with id: {}, client_id: {}, and client_secret: {}'.format(
             app_name,
             application.id,
             application.client_id,
-            application.client_secret
+            application.client_secret,
         ))
+        return application
+
+    def _update_application(self, application, application_kwargs):
+        """
+        Update given application with option values.
+        """
+        for key, value in application_kwargs.items():
+            setattr(application, key, value)
+        application.save()
+        logger.info('Updated {} application with id: {}, client_id: {}, and client_secret: {}'.format(
+            application.name,
+            application.id,
+            application.client_id,
+            application.client_secret,
+        ))
+
+    def _create_or_update_access(self, application, scopes, update):
+        """
+        Create application access with specified scopes.
+
+        If application access already exists, then:
+          * Update with specified scopes if update=True,
+          * Otherwise do nothing.
+        """
+        access = ApplicationAccess.objects.filter(application_id=application.id).first()
+
+        if access and update:
+            access.scopes = scopes
+            access.save()
+            logger.info('Updated application access for {} with scopes: {}'.format(
+                application.name,
+                scopes,
+            ))
+        elif access:
+            logger.info('Application access for application {} already exists.'.format(
+                application.name,
+            ))
+        else:
+            application_access = ApplicationAccess.objects.create(
+                application_id=application.id,
+                scopes=scopes,
+            )
+            logger.info('Created application access for {} with scopes: {}'.format(
+                application.name,
+                application_access.scopes,
+            ))
+
+    def handle(self, *args, **options):
+        username = options['username']
+        user = User.objects.get(username=username)
+        app_name = options['name']
+        update = options['update']
+
+        redirect_uris = options['redirect_uris']
+        client_type = Application.CLIENT_PUBLIC if options['public'] else Application.CLIENT_CONFIDENTIAL
+        grant_type = options['grant_type']
+        skip_authorization = options['skip_authorization']
+        client_id = options['client_id']
+        client_secret = options['client_secret']
+
+        application_kwargs = dict(
+            redirect_uris=redirect_uris,
+            client_type=client_type,
+            authorization_grant_type=grant_type,
+            skip_authorization=skip_authorization
+        )
+        if client_id:
+            application_kwargs['client_id'] = client_id
+        if client_secret:
+            application_kwargs['client_secret'] = client_secret
+
+        application = Application.objects.filter(user=user, name=app_name).first()
+        if application and update:
+            self._update_application(application, application_kwargs)
+        elif application:
+            logger.info('Application with name {} and user {} already exists.'.format(
+                app_name,
+                username
+            ))
+        else:
+            application = self._create_application(user, app_name, application_kwargs)
+
+        scopes = options['scopes']
+        if scopes:
+            self._create_or_update_access(application, scopes, update)

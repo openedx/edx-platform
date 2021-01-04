@@ -2,15 +2,17 @@
 Helper functions for the account/profile Python APIs.
 This is NOT part of the public API.
 """
+
+
 import json
 import logging
 import traceback
 from collections import defaultdict
 from functools import wraps
 
+import six
 from django import forms
 from django.core.serializers.json import DjangoJSONEncoder
-from django.http import HttpResponseBadRequest, HttpRequest
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
 
@@ -58,7 +60,7 @@ def intercept_errors(api_error, ignore_errors=None):
                             u"with arguments '{args}' and keyword arguments '{kwargs}': "
                             u"{exception}"
                         ).format(
-                            func_name=func.func_name,
+                            func_name=func.__name__,
                             args=args,
                             kwargs=kwargs,
                             exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex)
@@ -74,7 +76,7 @@ def intercept_errors(api_error, ignore_errors=None):
                     u"with arguments '{args}' and keyword arguments '{kwargs}' from {caller}: "
                     u"{exception}"
                 ).format(
-                    func_name=func.func_name,
+                    func_name=func.__name__,
                     args=args,
                     kwargs=kwargs,
                     exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex),
@@ -82,34 +84,6 @@ def intercept_errors(api_error, ignore_errors=None):
                 )
                 LOGGER.exception(msg)
                 raise api_error(msg)
-        return _wrapped
-    return _decorator
-
-
-def require_post_params(required_params):
-    """
-    View decorator that ensures the required POST params are
-    present.  If not, returns an HTTP response with status 400.
-
-    Args:
-        required_params (list): The required parameter keys.
-
-    Returns:
-        HttpResponse
-
-    """
-    def _decorator(func):  # pylint: disable=missing-docstring
-        @wraps(func)
-        def _wrapped(*args, **_kwargs):
-            request = args[0]
-            missing_params = set(required_params) - set(request.POST.keys())
-            if len(missing_params) > 0:
-                msg = u"Missing POST parameters: {missing}".format(
-                    missing=", ".join(missing_params)
-                )
-                return HttpResponseBadRequest(msg)
-            else:
-                return func(request)
         return _wrapped
     return _decorator
 
@@ -264,11 +238,11 @@ class FormDescription(object):
 
         if restrictions is not None:
             allowed_restrictions = self.ALLOWED_RESTRICTIONS.get(field_type, [])
-            for key, val in restrictions.iteritems():
+            for key, val in six.iteritems(restrictions):
                 if key in allowed_restrictions:
                     field_dict["restrictions"][key] = val
                 else:
-                    msg = "Restriction '{restriction}' is not allowed for field type '{field_type}'".format(
+                    msg = u"Restriction '{restriction}' is not allowed for field type '{field_type}'".format(
                         restriction=key,
                         field_type=field_type
                     )
@@ -361,7 +335,7 @@ class FormDescription(object):
 
         self._field_overrides[field_name].update({
             property_name: property_value
-            for property_name, property_value in kwargs.iteritems()
+            for property_name, property_value in six.iteritems(kwargs)
             if property_name in self.OVERRIDE_FIELD_PROPERTIES
         })
 
@@ -378,149 +352,6 @@ class LocalizedJSONEncoder(DjangoJSONEncoder):
         if isinstance(obj, Promise):
             return force_text(obj)
         super(LocalizedJSONEncoder, self).default(obj)
-
-
-def shim_student_view(view_func, check_logged_in=False):
-    """Create a "shim" view for a view function from the student Django app.
-
-    Specifically, we need to:
-    * Strip out enrollment params, since the client for the new registration/login
-        page will communicate with the enrollment API to update enrollments.
-
-    * Return responses with HTTP status codes indicating success/failure
-        (instead of always using status 200, but setting "success" to False in
-        the JSON-serialized content of the response)
-
-    * Use status code 403 to indicate a login failure.
-
-    The shim will preserve any cookies set by the view.
-
-    Arguments:
-        view_func (function): The view function from the student Django app.
-
-    Keyword Args:
-        check_logged_in (boolean): If true, check whether the user successfully
-            authenticated and if not set the status to 403.
-
-    Returns:
-        function
-
-    """
-    @wraps(view_func)
-    def _inner(request):  # pylint: disable=missing-docstring
-        # Make a copy of the current POST request to modify.
-        modified_request = request.POST.copy()
-        if isinstance(request, HttpRequest):
-            # Works for an HttpRequest but not a rest_framework.request.Request.
-            request.POST = modified_request
-        else:
-            # The request must be a rest_framework.request.Request.
-            request._data = modified_request
-
-        # The login and registration handlers in student view try to change
-        # the user's enrollment status if these parameters are present.
-        # Since we want the JavaScript client to communicate directly with
-        # the enrollment API, we want to prevent the student views from
-        # updating enrollments.
-        if "enrollment_action" in modified_request:
-            del modified_request["enrollment_action"]
-        if "course_id" in modified_request:
-            del modified_request["course_id"]
-
-        # Include the course ID if it's specified in the analytics info
-        # so it can be included in analytics events.
-        if "analytics" in modified_request:
-            try:
-                analytics = json.loads(modified_request["analytics"])
-                if "enroll_course_id" in analytics:
-                    modified_request["course_id"] = analytics.get("enroll_course_id")
-            except (ValueError, TypeError):
-                LOGGER.error(
-                    u"Could not parse analytics object sent to user API: {analytics}".format(
-                        analytics=analytics
-                    )
-                )
-
-        # Call the original view to generate a response.
-        # We can safely modify the status code or content
-        # of the response, but to be safe we won't mess
-        # with the headers.
-        response = view_func(request)
-
-        # Most responses from this view are JSON-encoded
-        # dictionaries with keys "success", "value", and
-        # (sometimes) "redirect_url".
-        #
-        # We want to communicate some of this information
-        # using HTTP status codes instead.
-        #
-        # We ignore the "redirect_url" parameter, because we don't need it:
-        # 1) It's used to redirect on change enrollment, which
-        # our client will handle directly
-        # (that's why we strip out the enrollment params from the request)
-        # 2) It's used by third party auth when a user has already successfully
-        # authenticated and we're not sending login credentials.  However,
-        # this case is never encountered in practice: on the old login page,
-        # the login form would be submitted directly, so third party auth
-        # would always be "trumped" by first party auth.  If a user has
-        # successfully authenticated with us, we redirect them to the dashboard
-        # regardless of how they authenticated; and if a user is completing
-        # the third party auth pipeline, we redirect them from the pipeline
-        # completion end-point directly.
-        try:
-            response_dict = json.loads(response.content)
-            msg = response_dict.get("value", u"")
-            success = response_dict.get("success")
-        except (ValueError, TypeError):
-            msg = response.content
-            success = True
-
-        # If the user is not authenticated when we expect them to be
-        # send the appropriate status code.
-        # We check whether the user attribute is set to make
-        # it easier to test this without necessarily running
-        # the request through authentication middleware.
-        is_authenticated = (
-            getattr(request, 'user', None) is not None
-            and request.user.is_authenticated
-        )
-        if check_logged_in and not is_authenticated:
-            # If we get a 403 status code from the student view
-            # this means we've successfully authenticated with a
-            # third party provider, but we don't have a linked
-            # EdX account.  Send a helpful error code so the client
-            # knows this occurred.
-            if response.status_code == 403:
-                response.content = "third-party-auth"
-
-            # Otherwise, it's a general authentication failure.
-            # Ensure that the status code is a 403 and pass
-            # along the message from the view.
-            else:
-                response.status_code = 403
-                response.content = msg
-
-        # If an error condition occurs, send a status 400
-        elif response.status_code != 200 or not success:
-            # The student views tend to send status 200 even when an error occurs
-            # If the JSON-serialized content has a value "success" set to False,
-            # then we know an error occurred.
-            if response.status_code == 200:
-                response.status_code = 400
-            response.content = msg
-
-        # If the response is successful, then return the content
-        # of the response directly rather than including it
-        # in a JSON-serialized dictionary.
-        else:
-            response.content = msg
-
-        # Return the response, preserving the original headers.
-        # This is really important, since the student views set cookies
-        # that are used elsewhere in the system (such as the marketing site).
-        return response
-
-    return _inner
 
 
 def serializer_is_dirty(preference_serializer):

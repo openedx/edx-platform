@@ -2,6 +2,7 @@
 Tests for create_video_pipeline_integration management command.
 """
 
+
 import ddt
 from django.core.management import call_command
 from django.test import TestCase

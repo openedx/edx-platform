@@ -3,8 +3,10 @@ Tests related to the basic footer-switching based off SITE_NAME to ensure
 edx.org uses an edx footer but other instances use an Open edX footer.
 """
 
+
 import unittest
 
+import six
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -17,11 +19,10 @@ class TestFooter(TestCase):
     """
     Tests for edx and OpenEdX footer
     """
-    shard = 1
 
     SOCIAL_MEDIA_NAMES = [
         "facebook",
-        "google_plus",
+        "instagram",
         "twitter",
         "linkedin",
         "tumblr",
@@ -32,7 +33,7 @@ class TestFooter(TestCase):
 
     SOCIAL_MEDIA_URLS = {
         "facebook": "http://www.facebook.com/",
-        "google_plus": "https://plus.google.com/",
+        "instagram": "https://instagram.com/",
         "twitter": "https://twitter.com/",
         "linkedin": "http://www.linkedin.com/",
         "tumblr": "http://www.tumblr.com/",
@@ -66,7 +67,7 @@ class TestFooter(TestCase):
     )
     def test_edx_footer_social_links(self):
         resp = self.client.get('/')
-        for name, url in self.SOCIAL_MEDIA_URLS.iteritems():
+        for name, url in six.iteritems(self.SOCIAL_MEDIA_URLS):
             self.assertContains(resp, url)
             self.assertContains(resp, settings.SOCIAL_MEDIA_FOOTER_DISPLAY[name]['title'])
             self.assertContains(resp, settings.SOCIAL_MEDIA_FOOTER_DISPLAY[name]['icon'])

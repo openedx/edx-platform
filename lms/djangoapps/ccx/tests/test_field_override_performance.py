@@ -2,31 +2,36 @@
 """
 Performance tests for field overrides.
 """
+
+
 import itertools
 from datetime import datetime
 
 import ddt
 import mock
 import pytest
+import six
+from six.moves import range
 from ccx_keys.locator import CCXLocator
-from lms.djangoapps.courseware.field_overrides import OverrideFieldData
-from courseware.testutils import FieldOverrideTestMixin
-from courseware.views.views import progress
 from django.conf import settings
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.cache import caches
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from edx_django_utils.cache import RequestCache
-from lms.djangoapps.ccx.tests.factories import CcxFactory
 from opaque_keys.edx.keys import CourseKey
+from pytz import UTC
+from xblock.core import XBlock
+
+from lms.djangoapps.courseware.testutils import FieldOverrideTestMixin
+from lms.djangoapps.courseware.views.views import progress
+from lms.djangoapps.ccx.tests.factories import CcxFactory
+from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from pytz import UTC
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-from xblock.core import XBlock
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MONGO_MODULESTORE,
     TEST_DATA_SPLIT_MODULESTORE,
@@ -53,7 +58,6 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
     __test__ = False
     # Tell Django to clean out all databases, not just default
     multi_db = True
-    shard = 7
 
     # TEST_DATA must be overridden by subclasses
     TEST_DATA = None
@@ -135,7 +139,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
             self.student,
             course_key
         )
-        return CourseKey.from_string(unicode(course_key))
+        return CourseKey.from_string(six.text_type(course_key))
 
     def grade_course(self, course_key):
         """
@@ -143,7 +147,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
         """
         return progress(
             self.request,
-            course_id=unicode(course_key),
+            course_id=six.text_type(course_key),
             student_id=self.student.id
         )
 
@@ -192,7 +196,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
                         with self.assertXBlockInstantiations(1):
                             self.grade_course(course_key)
 
-    @ddt.data(*itertools.product(('no_overrides', 'ccx'), range(1, 4), (True, False), (True, False)))
+    @ddt.data(*itertools.product(('no_overrides', 'ccx'), list(range(1, 4)), (True, False), (True, False)))
     @ddt.unpack
     @override_settings(
         XBLOCK_FIELD_DATA_WRAPPERS=[],
@@ -240,7 +244,7 @@ class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     # TODO: decrease query count as part of REVO-28
-    QUERY_COUNT = 36
+    QUERY_COUNT = 33
     TEST_DATA = {
         # (providers, course_width, enable_ccx, view_as_ccx): (
         #     # of sql queries to default,
@@ -269,7 +273,8 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     # TODO: decrease query count as part of REVO-28
-    QUERY_COUNT = 36
+    QUERY_COUNT = 33
+
     TEST_DATA = {
         ('no_overrides', 1, True, False): (QUERY_COUNT, 3),
         ('no_overrides', 2, True, False): (QUERY_COUNT, 3),

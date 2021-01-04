@@ -1,6 +1,10 @@
 """
 Tests the course meta badging events
 """
+
+
+import six
+from six.moves import range, zip
 from ddt import data, ddt, unpack
 from django.conf import settings
 from django.test.utils import override_settings
@@ -21,7 +25,6 @@ class CourseEnrollmentBadgeTest(ModuleStoreTestCase):
     """
     Tests the event which awards badges based on number of courses a user is enrolled in.
     """
-    shard = 4
 
     def setUp(self):
         super(CourseEnrollmentBadgeTest, self).setUp()
@@ -72,7 +75,6 @@ class CourseCompletionBadgeTest(ModuleStoreTestCase):
     """
     Tests the event which awards badges based on the number of courses completed.
     """
-    shard = 4
 
     def setUp(self):
         super(CourseCompletionBadgeTest, self).setUp()
@@ -127,7 +129,6 @@ class CourseGroupBadgeTest(ModuleStoreTestCase):
     """
     Tests the event which awards badges when a user completes a set of courses.
     """
-    shard = 4
 
     def setUp(self):
         super(CourseGroupBadgeTest, self).setUp()
@@ -145,11 +146,11 @@ class CourseGroupBadgeTest(ModuleStoreTestCase):
         self.courses = []
         for _badge_class in self.badge_classes:
             self.courses.append([CourseFactory().location.course_key for _i in range(3)])
-        lines = [badge_class.slug + ',' + ','.join([unicode(course_key) for course_key in keys])
+        lines = [badge_class.slug + ',' + ','.join([six.text_type(course_key) for course_key in keys])
                  for badge_class, keys in zip(self.badge_classes, self.courses)]
         config = '\r'.join(lines)
         self.config = CourseEventBadgesConfigurationFactory(course_groups=config)
-        self.config_map = dict(zip(self.badge_classes, self.courses))
+        self.config_map = dict(list(zip(self.badge_classes, self.courses)))
 
     def test_no_match(self):
         """

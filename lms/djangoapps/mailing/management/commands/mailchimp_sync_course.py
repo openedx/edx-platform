@@ -1,6 +1,8 @@
 """
 Synchronizes a mailchimp list with the students of a course.
 """
+
+
 import itertools
 import logging
 import math
@@ -8,9 +10,12 @@ import random
 from collections import namedtuple
 from itertools import chain
 
+import six
+from six.moves import range
 from django.core.management.base import BaseCommand
 from mailsnake import MailSnake
 from opaque_keys.edx.keys import CourseKey
+
 from student.models import UserProfile, unique_id_for_user
 
 BATCH_SIZE = 15000
@@ -54,7 +59,7 @@ class Command(BaseCommand):
         course_id = options['course_id']
         num_segments = options['num_segments']
 
-        log.info('Syncronizing email list for %s', course_id)
+        log.info(u'Syncronizing email list for %s', course_id)
 
         mailchimp = connect_mailchimp(key)
 
@@ -68,7 +73,7 @@ class Command(BaseCommand):
         exclude = subscribed.union(non_subscribed)
         to_subscribe = get_student_data(enrolled, exclude=exclude)
 
-        tag_names = set(chain.from_iterable(d.keys() for d in to_subscribe))
+        tag_names = set(chain.from_iterable(list(d.keys()) for d in to_subscribe))
         update_merge_tags(mailchimp, list_id, tag_names)
 
         subscribe_with_data(mailchimp, list_id, to_subscribe)
@@ -106,7 +111,7 @@ def verify_list(mailchimp, list_id, course_id):
 
     list_name = lists[0]['name']
 
-    log.debug('list name: %s', list_name)
+    log.debug(u'list name: %s', list_name)
 
     # check that we are connecting to the correct list
     parts = course_id.replace('_', ' ').replace('/', ' ').split()
@@ -130,7 +135,7 @@ def get_student_data(students, exclude=None):
     """
     # To speed the query, we won't retrieve the full User object, only
     # two of its values. The namedtuple simulates the User object.
-    FakeUser = namedtuple('Fake', 'id username is_anonymous')  # pylint: disable=invalid-name
+    FakeUser = namedtuple('Fake', 'id username is_anonymous')
 
     exclude = exclude if exclude else set()
 
@@ -283,7 +288,7 @@ def subscribe_with_data(mailchimp, list_id, user_data):
 
     Returns None
     """
-    format_entry = lambda e: {name_to_tag(k): v for k, v in e.iteritems()}
+    format_entry = lambda e: {name_to_tag(k): v for k, v in six.iteritems(e)}
     formated_data = list(format_entry(e) for e in user_data)
 
     # send the updates in batches of a fixed size
@@ -294,7 +299,7 @@ def subscribe_with_data(mailchimp, list_id, user_data):
                                               update_existing=True)
 
         log.debug(
-            "Added: %s Error on: %s", result['add_count'], result['error_count']
+            u"Added: %s Error on: %s", result['add_count'], result['error_count']
         )
 
 
@@ -328,7 +333,7 @@ def make_segments(mailchimp, list_id, count, emails):
         chunks = list(chunk(emails, chunk_size))
 
         # create segments and add emails
-        for seg in xrange(count):
+        for seg in range(count):
             name = 'random_{0:002}'.format(seg)
             seg_id = mailchimp.listStaticSegmentAdd(id=list_id, name=name)
             for batch in chunk(chunks[seg], BATCH_SIZE):
@@ -354,5 +359,5 @@ def chunk(elist, size):
     Generator. Yields a list of size `size` of the given list `elist`,
     or a shorter list if at the end of the input.
     """
-    for i in xrange(0, len(elist), size):
+    for i in range(0, len(elist), size):
         yield elist[i:i + size]

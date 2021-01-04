@@ -8,6 +8,7 @@ Utility classes for testing django applications.
     A TestCase baseclass that has per-test isolated caches.
 """
 
+
 import copy
 import re
 from unittest import skipUnless
@@ -48,6 +49,22 @@ class CacheIsolationMixin(object):
     __old_settings = []
 
     @classmethod
+    def setUpClass(cls):
+        super(CacheIsolationMixin, cls).setUpClass()
+        cls.start_cache_isolation()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.end_cache_isolation()
+        super(CacheIsolationMixin, cls).tearDownClass()
+
+    def setUp(self):
+        super(CacheIsolationMixin, self).setUp()
+
+        self.clear_caches()
+        self.addCleanup(self.clear_caches)
+
+    @classmethod
     def start_cache_isolation(cls):
         """
         Start cache isolation by overriding the settings.CACHES and
@@ -73,6 +90,9 @@ class CacheIsolationMixin(object):
                     'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
                     'LOCATION': cache_name,
                     'KEY_FUNCTION': 'util.memcache.safe_key',
+                    'OPTIONS': {
+                        'MAX_ENTRIES': 1000,
+                    },
                 } for cache_name in cls.ENABLED_CACHES
             })
 
@@ -127,21 +147,6 @@ class CacheIsolationTestCase(CacheIsolationMixin, TestCase):
     :py:class:`CacheIsolationMixin`) at class setup, and flushes the cache
     between every test.
     """
-    @classmethod
-    def setUpClass(cls):
-        super(CacheIsolationTestCase, cls).setUpClass()
-        cls.start_cache_isolation()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.end_cache_isolation()
-        super(CacheIsolationTestCase, cls).tearDownClass()
-
-    def setUp(self):
-        super(CacheIsolationTestCase, self).setUp()
-
-        self.clear_caches()
-        self.addCleanup(self.clear_caches)
 
 
 class _AssertNumQueriesContext(CaptureQueriesContext):
@@ -187,7 +192,7 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
         executed = len(filtered_queries)
         self.test_case.assertEqual(
             executed, self.num,
-            "%d queries executed, %d expected\nCaptured queries were:\n%s" % (
+            u"%d queries executed, %d expected\nCaptured queries were:\n%s" % (
                 executed, self.num,
                 '\n'.join(
                     query['sql'] for query in filtered_queries

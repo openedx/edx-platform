@@ -2,7 +2,9 @@
 Views for user API
 """
 
-import json
+
+import six
+from django.contrib.auth.signals import user_logged_in
 from django.shortcuts import redirect
 from django.utils import dateparse
 from opaque_keys import InvalidKeyError
@@ -12,13 +14,13 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from xblock.fields import Scope
 from xblock.runtime import KeyValueStore
+from django.contrib.auth.models import User
 
-from courseware.access import is_mobile_available_for_user
-from courseware.courses import get_current_child
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module_for_descriptor
-from courseware.views.index import save_positions_recursively_up
-from experiments.models import ExperimentData, ExperimentKeyValue
+from lms.djangoapps.courseware.access import is_mobile_available_for_user
+from lms.djangoapps.courseware.courses import get_current_child
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.module_render import get_module_for_descriptor
+from lms.djangoapps.courseware.views.index import save_positions_recursively_up
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
 from mobile_api.utils import API_V05
 from openedx.features.course_duration_limits.access import check_course_expired
@@ -141,7 +143,7 @@ class UserCourseStatus(views.APIView):
         Returns the course status
         """
         path = self._last_visited_module_path(request, course)
-        path_ids = [unicode(module.location) for module in path]
+        path_ids = [six.text_type(module.location) for module in path]
         return Response({
             "last_visited_module_id": path_ids[0],
             "last_visited_module_path": path_ids,
@@ -177,7 +179,7 @@ class UserCourseStatus(views.APIView):
         return self._get_course_info(request, course)
 
     @mobile_course_access(depth=2)
-    def get(self, request, course, *args, **kwargs):  # pylint: disable=unused-argument
+    def get(self, request, course, *args, **kwargs):
         """
         Get the ID of the module that the specified user last visited in the specified course.
         """
@@ -185,7 +187,7 @@ class UserCourseStatus(views.APIView):
         return self._get_course_info(request, course)
 
     @mobile_course_access(depth=2)
-    def patch(self, request, course, *args, **kwargs):  # pylint: disable=unused-argument
+    def patch(self, request, course, *args, **kwargs):
         """
         Update the ID of the module that the specified user last visited in the specified course.
         """
@@ -289,44 +291,6 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         """
         return check_org is None or (check_org.lower() == course_org.lower())
 
-    def hide_course_for_enrollment_fee_experiment(self, user, enrollment, experiment_id=9):
-        """
-        Hide enrolled courses from mobile app as part of REV-73/REV-19
-        """
-        course_key = enrollment.course_overview.id
-        try:
-            courses_excluded_from_mobile = ExperimentKeyValue.objects.get(
-                experiment_id=10,
-                key="mobile_app_exclusion"
-            ).value
-            courses_excluded_from_mobile = json.loads(courses_excluded_from_mobile.replace('\r', '').replace('\n', ''))
-            if enrollment.mode == 'audit' and str(course_key) in courses_excluded_from_mobile.keys():
-                activationTime = dateparse.parse_datetime(courses_excluded_from_mobile[str(course_key)])
-                if activationTime and enrollment.created and enrollment.created > activationTime:
-                    return True
-        except (ExperimentKeyValue.DoesNotExist, AttributeError):
-            pass
-
-        try:
-            ExperimentData.objects.get(
-                user=user,
-                experiment_id=experiment_id,
-                key='enrolled_{0}'.format(course_key),
-            )
-        except ExperimentData.DoesNotExist:
-            return False
-
-        try:
-            ExperimentData.objects.get(
-                user=user,
-                experiment_id=experiment_id,
-                key='paid_{0}'.format(course_key),
-            )
-        except ExperimentData.DoesNotExist:
-            return True
-
-        return False
-
     def get_serializer_context(self):
         context = super(UserCourseEnrollmentsList, self).get_serializer_context()
         context['api_version'] = self.kwargs.get('api_version')
@@ -354,12 +318,8 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
             enrollment for enrollment in same_org
             if is_mobile_available_for_user(self.request.user, enrollment.course_overview)
         )
-        not_hidden_for_experiments = (
-            enrollment for enrollment in mobile_available
-            if not self.hide_course_for_enrollment_fee_experiment(self.request.user, enrollment)
-        )
         not_duration_limited = (
-            enrollment for enrollment in not_hidden_for_experiments
+            enrollment for enrollment in mobile_available
             if check_course_expired(self.request.user, enrollment.course) == ACCESS_GRANTED
         )
 
@@ -377,4 +337,7 @@ def my_user_info(request, api_version):
     """
     Redirect to the currently-logged-in user's info page
     """
+    # update user's last logged in from here because
+    # updating it from the oauth2 related code is too complex
+    user_logged_in.send(sender=User, user=request.user, request=request)
     return redirect("user-detail", api_version=api_version, username=request.user.username)

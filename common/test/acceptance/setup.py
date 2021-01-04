@@ -4,6 +4,7 @@
 Install bok-choy page objects for acceptance and end-to-end tests.
 """
 
+
 import os
 
 from setuptools import setup

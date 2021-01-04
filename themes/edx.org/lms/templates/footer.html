@@ -1,4 +1,5 @@
 ## mako
+<%page expression_filter="h"/>
 <%!
   import datetime
 
@@ -6,7 +7,8 @@
   from branding.api import get_footer
   from openedx.core.djangoapps.lang_pref.api import footer_language_selector_is_enabled
 %>
-<% footer = get_footer(is_secure=is_secure) %>
+<% footer = get_footer(is_secure=is_secure, language=language) %>
+<% icp_license_info = getattr(settings, 'ICP_LICENSE_INFO', {})%>
 <%namespace name='static' file='static_content.html'/>
 
 
@@ -23,7 +25,7 @@
 
 <div class="container">
     <div class="row main-row"><!-- row -->
-        <div class="col-xl-2 col-lg-12 col-md-3 col-sm-8 col-xs-10 column-1 flex-column column-styles">
+        <div class="col-xl-2 col-lg-12 col-md-2 col-sm-8 col-xs-10 column-1 flex-column column-styles">
             <div class="row">
                 <div class="col-12 column-2-2 column-styles">
                 <div class="edx-footer-logo">
@@ -74,7 +76,7 @@
                  <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-xs-12 column-2-1 third-div-border column-styles">
                       <div class="row full-height">
                         <div class="col-lg-12 col-md-12 col-sm-10 full-height column-2-2 column-styles">
-                              <h2 class="heading">Connect</h2>
+                              <h2 class="heading">${_(u"Connect")}</h2>
                               <ul class="list-unstyled clear-margins  ">
                                 % for link in footer["connect_links"]:
                                 <li>
@@ -130,14 +132,14 @@
                                 ## \u2013 is the en-dash. It looks like a year, but it isn't.
                               <!--"EdX, Open edX, and MicroMasters are trademarks of edX Inc. registered in the U.S. and other countries-->
                               <p class="copyright">${_(
-                                  u"\u00A9 2012\u2013{year} edX Inc. ").format(year=datetime.datetime.now().year)}
+                                  u"\u00A9 {year} edX Inc. All rights reserved.").format(year=datetime.datetime.now().year)}
                                   <br/>
-                                  ${_(
-
-                                  u"edX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
-
-                                  )}
-                                  ${u" | {icp}".format(icp=getattr(settings,'ICP_LICENSE')) if getattr(settings,'ICP_LICENSE',False) else ""}
+                                 % if icp_license_info.get('icp_license'):
+                                    ${u" | {text}".format(text=icp_license_info.get('text'))}
+                                    <a href="${icp_license_info.get('icp_license_link', '#')}">
+                                        ${u" {icp}".format(icp=icp_license_info.get('icp_license'))}
+                                    </a>
+                                  % endif
                               </p>
                         </div>
                   </div>
@@ -152,7 +154,6 @@
 
 
 </div>
-
 
 </footer>
 

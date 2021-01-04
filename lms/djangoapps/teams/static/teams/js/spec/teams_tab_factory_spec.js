@@ -4,8 +4,11 @@ define(['jquery', 'backbone', 'teams/js/teams_tab_factory', 'teams/js/views/team
         'use strict';
 
         describe('Teams Tab Factory', function() {
-            var initializeTeamsTabFactory = function() {
-                TeamsTabFactory(TeamSpecHelpers.createMockContext());
+            var initializeTeamsTabFactory = function(hasOpenTopic, hasPublicManagedTopic) {
+                var context = TeamSpecHelpers.createMockContext();
+                context.hasOpenTopic = hasOpenTopic;
+                context.hasPublicManagedTopic = hasPublicManagedTopic;
+                TeamsTabFactory(context);
             };
 
             beforeEach(function() {
@@ -18,9 +21,31 @@ define(['jquery', 'backbone', 'teams/js/teams_tab_factory', 'teams/js/views/team
                 $(document).off('ajaxError', TeamsTabView.prototype.errorHandler);
             });
 
-            it('can render the "Teams" tab', function() {
-                initializeTeamsTabFactory();
-                expect($('.teams-content').text()).toContain('See all teams in your course, organized by topic');
+            describe('can render the "Teams" tab', function() {
+                it('when there are no private or open teamsets', function() {
+                    initializeTeamsTabFactory(false, false);
+                    expect($('.teams-content').text()).toContain('See all teams you belong to');
+                    expect($('.teams-content').text()).not.toContain('and all public teams in your course');
+                    expect($('.teams-content').text()).not.toContain('Join an open public team');
+                });
+                it('when there are no open teamsets but there are public teamsets', function() {
+                    initializeTeamsTabFactory(false, true);
+                    expect($('.teams-content').text()).toContain('See all teams you belong to');
+                    expect($('.teams-content').text()).toContain('and all public teams in your course');
+                    expect($('.teams-content').text()).not.toContain('Join an open public team');
+                });
+                it('when there are open teamsets but no public teamsets', function() {
+                    initializeTeamsTabFactory(true, false);
+                    expect($('.teams-content').text()).toContain('See all teams you belong to');
+                    expect($('.teams-content').text()).toContain('and all public teams in your course');
+                    expect($('.teams-content').text()).toContain('Join an open public team');
+                });
+                it('when there are both open and public teamsets', function() {
+                    initializeTeamsTabFactory(true, true);
+                    expect($('.teams-content').text()).toContain('See all teams you belong to');
+                    expect($('.teams-content').text()).toContain('and all public teams in your course');
+                    expect($('.teams-content').text()).toContain('Join an open public team');
+                });
             });
         });
     }

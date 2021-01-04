@@ -1,7 +1,11 @@
 """
 Helper functions for configuration parsing
 """
+
+
 import collections
+
+import six
 
 
 def convert_tokens(tokens):
@@ -15,7 +19,7 @@ def convert_tokens(tokens):
 
     if tokens == 'None':
         return None
-    elif isinstance(tokens, basestring) or (not isinstance(tokens, collections.Iterable)):
+    elif isinstance(tokens, six.string_types) or (not isinstance(tokens, collections.Iterable)):
         return tokens
     elif isinstance(tokens, dict):
         return {

@@ -3,8 +3,10 @@
 End-to-end tests for the LMS Instructor Dashboard.
 """
 
+
 import ddt
 from bok_choy.promise import EmptyPromise
+from six.moves import range
 
 from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
@@ -15,7 +17,6 @@ from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.pages.lms.instructor_dashboard import (
-    EntranceExamAdmin,
     InstructorDashboardPage,
     StudentAdminPage,
     StudentSpecificAdmin
@@ -80,6 +81,7 @@ class LMSInstructorDashboardA11yTest(BaseInstructorDashboardTest):
         self.instructor_dashboard_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         self.instructor_dashboard_page.a11y_audit.check_for_accessibility_errors()
@@ -90,6 +92,8 @@ class BulkEmailTest(BaseInstructorDashboardTest):
     """
     End-to-end tests for bulk emailing from instructor dash.
     """
+    shard = 23
+
     def setUp(self):
         super(BulkEmailTest, self).setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
@@ -113,12 +117,15 @@ class BulkEmailTest(BaseInstructorDashboardTest):
         self.send_email_page.a11y_audit.config.set_rules({
             "ignore": [
                 'button-name',  # TODO: TNL-5830
+                'aria-allowed-role',  # TODO: AC-936
+                'color-contrast',  # TODO: AC-938
+                'listitem'  # TODO: AC-937
             ]
         })
         self.send_email_page.a11y_audit.check_for_accessibility_errors()
 
 
-@attr(shard=3)
+@attr(shard=20)
 class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
     """
     End-to-end tests for Auto-Registration and enrollment functionality via CSV file.
@@ -171,7 +178,7 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
             favorite_movie="Harry Potter",
         )
         course_names = self.dashboard_page.wait_for_page().available_courses
-        self.assertEquals(len(course_names), 1)
+        self.assertEqual(len(course_names), 1)
         self.assertIn(self.course_info["display_name"], course_names)
 
     def test_clicking_file_upload_button_without_file_shows_error(self):
@@ -230,58 +237,9 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
         Auto-enrollment with CSV accessibility tests
         """
         self.auto_enroll_section.a11y_audit.config.set_scope([
-            '#member-list-widget-template'
+            '#membership-list-widget-tpl'
         ])
         self.auto_enroll_section.a11y_audit.check_for_accessibility_errors()
-
-
-class BatchBetaTestersTest(BaseInstructorDashboardTest):
-    """
-    End-to-end tests for Batch beta testers functionality.
-    """
-
-    def setUp(self):
-        super(BatchBetaTestersTest, self).setUp()
-        self.username = "test_{uuid}".format(uuid=self.unique_id[0:6])
-        self.email = "{user}@example.com".format(user=self.username)
-        AutoAuthPage(self.browser, username=self.username, email=self.email, is_active=False).visit()
-        self.course_fixture = CourseFixture(**self.course_info).install()
-        self.instructor_username = self.log_in_as_instructor()
-        instructor_dashboard_page = self.visit_instructor_dashboard()
-        self.batch_beta_tester_section = instructor_dashboard_page.select_membership().batch_beta_tester_addition()
-        self.inactive_user_message = 'These users could not be added as beta testers ' \
-                                     'because their accounts are not yet activated:'
-
-    def test_enroll_inactive_beta_tester(self):
-        """
-        Scenario: On the Membership tab of the Instructor Dashboard, Batch Beta tester div is visible.
-            Given that I am on the Membership tab on the Instructor Dashboard
-            Then I enter the username and add it into beta testers.
-            Then I see the inactive user is not added in beta testers.
-        """
-        self.batch_beta_tester_section.fill_batch_beta_tester_addition_text_box(self.username)
-        header_text, username = self.batch_beta_tester_section.get_notification_text()
-        self.assertIn(self.inactive_user_message, header_text[0])
-        self.assertEqual(self.username, username[0])
-
-    def test_enroll_active_and_inactive_beta_tester(self):
-        """
-        Scenario: On the Membership tab of the Instructor Dashboard, Batch Beta tester div is visible.
-            Given that I am on the Membership tab on the Instructor Dashboard
-            Then I enter the active and inactive usernames and add it into beta testers.
-            Then I see the different messages related to active and inactive users.
-        """
-        active_and_inactive_username = self.username + ',' + self.instructor_username[0]
-        self.batch_beta_tester_section.fill_batch_beta_tester_addition_text_box(active_and_inactive_username)
-        header_text, username = self.batch_beta_tester_section.get_notification_text()
-
-        # Verify that Inactive username and message.
-        self.assertIn(self.inactive_user_message, header_text[1])
-        self.assertEqual(self.username, username[1])
-
-        # Verify that active username and message.
-        self.assertIn('These users were successfully added as beta testers:', header_text[0])
-        self.assertEqual(self.instructor_username[0], username[0])
 
 
 @attr(shard=10)
@@ -427,154 +385,6 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
 
 
 @attr(shard=10)
-@ddt.ddt
-class EntranceExamGradeTest(BaseInstructorDashboardTest):
-    """
-    Tests for Entrance exam specific student grading tasks.
-    """
-    admin_buttons = (
-        'reset_attempts_button',
-        'rescore_button',
-        'rescore_if_higher_button',
-        'delete_state_button',
-    )
-
-    def setUp(self):
-        super(EntranceExamGradeTest, self).setUp()
-        self.course_info.update({"settings": {"entrance_exam_enabled": "true"}})
-        CourseFixture(**self.course_info).install()
-        self.student_identifier = "johndoe_saee@example.com"
-        # Create the user (automatically logs us in)
-        AutoAuthPage(
-            self.browser,
-            username="johndoe_saee",
-            email=self.student_identifier,
-            course_id=self.course_id,
-            staff=False
-        ).visit()
-
-        LogoutPage(self.browser).visit()
-
-        # go to the student admin page on the instructor dashboard
-        self.log_in_as_instructor()
-        self.entrance_exam_admin = self.visit_instructor_dashboard().select_student_admin(EntranceExamAdmin)
-
-    def test_input_text_and_buttons_are_visible(self):
-        """
-        Scenario: On the Student admin tab of the Instructor Dashboard, Student Email input box,
-        Reset Student Attempt, Rescore Student Submission, Delete Student State for entrance exam
-            and Show Background Task History for Student buttons are visible
-            Given that I am on the Student Admin tab on the Instructor Dashboard
-            Then I see Student Email input box, Reset Student Attempt, Rescore Student Submission,
-            Delete Student State for entrance exam and Show Background Task History for Student buttons
-        """
-        self.assertTrue(self.entrance_exam_admin.are_all_buttons_visible())
-
-    @ddt.data(*admin_buttons)
-    def test_admin_button_without_email_shows_error(self, button_to_test):
-        """
-        Scenario: Clicking on the requested button without entering student email
-        address or username results in error.
-            Given that I am on the Student Admin tab on the Instructor Dashboard
-            When I click the requested button under Entrance Exam Grade
-            Adjustment without enter an email address
-            Then I should be shown an Error Notification
-            And The Notification message should read 'Please enter a student email address or username.'
-        """
-        getattr(self.entrance_exam_admin, button_to_test).click()
-        self.assertEqual(
-            'Please enter a student email address or username.',
-            self.entrance_exam_admin.top_notification.text[0]
-        )
-
-    @ddt.data(*admin_buttons)
-    def test_admin_button_with_success(self, button_to_test):
-        """
-        Scenario: Clicking on the requested button with valid student email
-        address or username should result in success prompt.
-            Given that I am on the Student Admin tab on the Instructor Dashboard
-            When I click the requested button under Entrance Exam Grade
-            Adjustment after entering a valid student
-            email address or username
-            Then I should be shown an alert with success message
-        """
-        self.entrance_exam_admin.set_student_email_or_username(self.student_identifier)
-        getattr(self.entrance_exam_admin, button_to_test).click()
-        alert = get_modal_alert(self.entrance_exam_admin.browser)
-        alert.dismiss()
-
-    @ddt.data(*admin_buttons)
-    def test_admin_button_with_error(self, button_to_test):
-        """
-        Scenario: Clicking on the requested button with email address or username
-        of a non existing student should result in error message.
-            Given that I am on the Student Admin tab on the Instructor Dashboard
-            When I click the requested Button under Entrance Exam Grade
-            Adjustment after non existing student email address or username
-            Then I should be shown an error message
-        """
-        self.entrance_exam_admin.set_student_email_or_username('non_existing@example.com')
-        getattr(self.entrance_exam_admin, button_to_test).click()
-        self.entrance_exam_admin.wait_for_ajax()
-        self.assertGreater(len(self.entrance_exam_admin.top_notification.text[0]), 0)
-
-    def test_skip_entrance_exam_button_with_success(self):
-        """
-        Scenario: Clicking on the  Let Student Skip Entrance Exam button with
-        valid student email address or username should result in success prompt.
-            Given that I am on the Student Admin tab on the Instructor Dashboard
-            When I click the  Let Student Skip Entrance Exam Button under
-            Entrance Exam Grade Adjustment after entering a valid student
-            email address or username
-            Then I should be shown an alert with success message
-        """
-        self.entrance_exam_admin.set_student_email_or_username(self.student_identifier)
-        self.entrance_exam_admin.skip_entrance_exam_button.click()
-
-        #first we have window.confirm
-        alert = get_modal_alert(self.entrance_exam_admin.browser)
-        alert.accept()
-
-        # then we have alert confirming action
-        alert = get_modal_alert(self.entrance_exam_admin.browser)
-        alert.dismiss()
-
-    def test_skip_entrance_exam_button_with_error(self):
-        """
-        Scenario: Clicking on the Let Student Skip Entrance Exam button with
-        email address or username of a non existing student should result in error message.
-            Given that I am on the Student Admin tab on the Instructor Dashboard
-            When I click the Let Student Skip Entrance Exam Button under
-            Entrance Exam Grade Adjustment after entering non existing
-            student email address or username
-            Then I should be shown an error message
-        """
-        self.entrance_exam_admin.set_student_email_or_username('non_existing@example.com')
-        self.entrance_exam_admin.skip_entrance_exam_button.click()
-
-        #first we have window.confirm
-        alert = get_modal_alert(self.entrance_exam_admin.browser)
-        alert.accept()
-
-        self.entrance_exam_admin.wait_for_ajax()
-        self.assertGreater(len(self.entrance_exam_admin.top_notification.text[0]), 0)
-
-    def test_task_history_button_with_success(self):
-        """
-        Scenario: Clicking on the Show Background Task History for Student
-        with valid student email address or username should result in table of tasks.
-            Given that I am on the Student Admin tab on the Instructor Dashboard
-            When I click the Show Background Task History for Student Button
-            under Entrance Exam Grade Adjustment after entering a valid student
-            email address or username
-            Then I should be shown a table listing all background tasks
-        """
-        self.entrance_exam_admin.set_student_email_or_username(self.student_identifier)
-        self.entrance_exam_admin.task_history_button.click()
-        self.entrance_exam_admin.wait_for_task_history_table()
-
-
-@attr(shard=10)
 class DataDownloadsTest(BaseInstructorDashboardTest):
     """
     Bok Choy tests for the "Data Downloads" tab.
@@ -582,7 +392,9 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
     def setUp(self):
         super(DataDownloadsTest, self).setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
-        self.instructor_username, self.instructor_id, __, __ = self.log_in_as_instructor()
+        self.instructor_username, self.instructor_id, __, __ = self.log_in_as_instructor(
+            course_access_roles=['data_researcher']
+        )
         instructor_dashboard_page = self.visit_instructor_dashboard()
         self.data_download_section = instructor_dashboard_page.select_data_download()
 
@@ -607,7 +419,7 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         Verifies that a report can be downloaded and an event fired.
         """
         download_links = self.data_download_section.report_download_links
-        self.assertEquals(len(download_links), 1)
+        self.assertEqual(len(download_links), 1)
         download_links[0].click()
         expected_url = download_links.attrs('href')[0]
         self.assertIn(report_name, expected_url)
@@ -681,52 +493,17 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         self.data_download_section.wait_for_available_report()
         self.verify_report_download(report_name)
 
-    @attr('a11y')
-    def test_data_download_a11y(self):
-        """
-        Data download page accessibility tests
-        """
-        self.data_download_section.a11y_audit.config.set_scope([
-            '.data-download-container'
-        ])
-        self.data_download_section.a11y_audit.check_for_accessibility_errors()
-
 
 @ddt.ddt
 class DataDownloadsWithMultipleRoleTests(BaseInstructorDashboardTest):
     """
     Bok Choy tests for the "Data Downloads" tab with multiple user roles.
     """
+    shard = 23
+
     def setUp(self):
         super(DataDownloadsWithMultipleRoleTests, self).setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
-
-    @ddt.data(['staff'], ['instructor'])
-    def test_list_student_profile_information(self, role):
-        """
-        Scenario: List enrolled students' profile information
-        Given I am "<Role>" for a course
-        When I click "List enrolled students' profile information"
-            Then I see a table of student profiles
-            Examples:
-            | Role          |
-            | instructor    |
-            | staff         |
-        """
-        username, user_id, email, __ = self.log_in_as_instructor(
-            global_staff=False,
-            course_access_roles=role
-        )
-        instructor_dashboard_page = self.visit_instructor_dashboard()
-        data_download_section = instructor_dashboard_page.select_data_download()
-
-        data_download_section.enrolled_student_profile_button.click()
-        student_profile_info = data_download_section.student_profile_information
-
-        self.assertNotIn(student_profile_info, [u'', u'Loading'])
-        expected_data = [user_id, username, email]
-        for datum in expected_data:
-            self.assertIn(str(datum), student_profile_info[0].split('\n'))
 
     @ddt.data(['staff'], ['instructor'])
     def test_list_student_profile_information_for_large_course(self, role):
@@ -994,7 +771,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.add_certificate_exception(self.user_name, '')
 
         self.assertIn(
-            '{user} already in exception list.'.format(user=self.user_name),
+            u'{user} already in exception list.'.format(user=self.user_name),
             self.certificates_section.message.text
         )
 
@@ -1041,7 +818,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.wait_for_ajax()
 
         self.assertIn(
-            "{user} does not exist in the LMS. Please check your spelling and retry.".format(user=invalid_user),
+            u"{user} does not exist in the LMS. Please check your spelling and retry.".format(user=invalid_user),
             self.certificates_section.message.text
         )
 
@@ -1074,7 +851,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.wait_for_ajax()
 
         self.assertIn(
-            "{user} is not enrolled in this course. Please check your spelling and retry.".format(user=new_user),
+            u"{user} is not enrolled in this course. Please check your spelling and retry.".format(user=new_user),
             self.certificates_section.message.text
         )
 
@@ -1135,6 +912,11 @@ class CertificatesTest(BaseInstructorDashboardTest):
         """
         Certificates page accessibility tests
         """
+        self.certificates_section.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-hidden-focus'  # TODO: AC-938
+            ]
+        })
         self.certificates_section.a11y_audit.config.set_scope([
             '.certificates-wrapper'
         ])
@@ -1212,7 +994,7 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
 
         # Validate success message
         self.assertIn(
-            "Certificate has been successfully invalidated for {user}.".format(user=self.student_name),
+            u"Certificate has been successfully invalidated for {user}.".format(user=self.student_name),
             self.certificates_section.certificate_invalidation_message.text
         )
 
@@ -1344,6 +1126,11 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
         """
         Certificate invalidation accessibility tests
         """
+        self.certificates_section.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-hidden-focus'  # TODO: AC-938
+            ]
+        })
         self.certificates_section.a11y_audit.config.set_scope([
             '.certificates-wrapper'
         ])
@@ -1449,6 +1236,8 @@ class StudentAdminTest(BaseInstructorDashboardTest):
     SUBSECTION_NAME = 'Test Subsection 1'
     UNIT_NAME = 'Test Unit 1'
     PROBLEM_NAME = 'Test Problem 1'
+
+    shard = 23
 
     def setUp(self):
         super(StudentAdminTest, self).setUp()

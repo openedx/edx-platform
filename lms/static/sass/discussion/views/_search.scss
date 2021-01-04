@@ -21,10 +21,9 @@
     position: absolute;
     display: block;
     color: #495057;
-    transition: all .1s ease-in-out;
+    transition: all 0.1s ease-in-out;
     padding-left: 10px;
     padding-top: 10px;
-
   }
 
   input::placeholder {
@@ -33,10 +32,9 @@
 
   input:not(:placeholder-shown) {
     & ~ label {
-      padding-top: .15rem;
+      padding-top: 0.15rem;
       font-size: 10px;
     }
-
   }
 }
 

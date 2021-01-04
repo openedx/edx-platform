@@ -1,10 +1,14 @@
 """
 Content library unit tests that require the CMS runtime.
 """
+
+
 import ddt
+import six
 from django.test.utils import override_settings
 from mock import Mock, patch
 from opaque_keys.edx.locator import CourseKey, LibraryLocator
+from six.moves import range
 
 from contentstore.tests.utils import AjaxEnabledTestClient, parse_json
 from contentstore.utils import reverse_library_url, reverse_url, reverse_usage_url
@@ -35,7 +39,6 @@ class LibraryTestCase(ModuleStoreTestCase):
     """
     Common functionality for content libraries tests
     """
-    shard = 1
 
     def setUp(self):
         super(LibraryTestCase, self).setUp()
@@ -82,7 +85,7 @@ class LibraryTestCase(ModuleStoreTestCase):
             parent_location=course.location,
             user_id=self.user.id,
             publish_item=publish_item,
-            source_library_id=unicode(library_key),
+            source_library_id=six.text_type(library_key),
             **(other_settings or {})
         )
 
@@ -149,7 +152,6 @@ class TestLibraries(LibraryTestCase):
     """
     High-level tests for libraries
     """
-    shard = 1
 
     @ddt.data(
         (2, 1, 1),
@@ -187,7 +189,7 @@ class TestLibraries(LibraryTestCase):
         # Create many blocks in the library and add them to a course:
         for num in range(8):
             ItemFactory.create(
-                data="This is #{}".format(num + 1),
+                data=u"This is #{}".format(num + 1),
                 category="html", parent_location=self.library.location, user_id=self.user.id, publish_item=False
             )
 
@@ -483,7 +485,6 @@ class TestLibraryAccess(LibraryTestCase):
     """
     Test Roles and Permissions related to Content Libraries
     """
-    shard = 1
 
     def setUp(self):
         """ Create a library, staff user, and non-staff user """
@@ -514,11 +515,11 @@ class TestLibraryAccess(LibraryTestCase):
 
         `library` can be a LibraryLocator or the library's root XBlock
         """
-        if isinstance(library, (basestring, LibraryLocator)):
+        if isinstance(library, (six.string_types, LibraryLocator)):
             lib_key = library
         else:
             lib_key = library.location.library_key
-        response = self.client.get(reverse_library_url('library_handler', unicode(lib_key)))
+        response = self.client.get(reverse_library_url('library_handler', six.text_type(lib_key)))
         self.assertIn(response.status_code, (200, 302, 403))
         return response.status_code == 200
 
@@ -582,7 +583,7 @@ class TestLibraryAccess(LibraryTestCase):
         # Now non_staff_user should be able to access library2_key only:
         lib_list = self._list_libraries()
         self.assertEqual(len(lib_list), 1)
-        self.assertEqual(lib_list[0]["library_key"], unicode(library2_key))
+        self.assertEqual(lib_list[0]["library_key"], six.text_type(library2_key))
         self.assertTrue(self._can_access_library(library2_key))
         self.assertFalse(self._can_access_library(self.library))
 
@@ -609,7 +610,7 @@ class TestLibraryAccess(LibraryTestCase):
         # Now non_staff_user should be able to access lib_key_pacific only:
         lib_list = self._list_libraries()
         self.assertEqual(len(lib_list), 1)
-        self.assertEqual(lib_list[0]["library_key"], unicode(lib_key_pacific))
+        self.assertEqual(lib_list[0]["library_key"], six.text_type(lib_key_pacific))
         self.assertTrue(self._can_access_library(lib_key_pacific))
         self.assertFalse(self._can_access_library(lib_key_atlantic))
         self.assertFalse(self._can_access_library(self.lib_key))
@@ -649,8 +650,8 @@ class TestLibraryAccess(LibraryTestCase):
         def can_copy_block():
             """ Check if studio lets us duplicate the XBlock in the library """
             response = self.client.ajax_post(reverse_url('xblock_handler'), {
-                'parent_locator': unicode(self.library.location),
-                'duplicate_source_locator': unicode(block.location),
+                'parent_locator': six.text_type(self.library.location),
+                'duplicate_source_locator': six.text_type(block.location),
             })
             self.assertIn(response.status_code, (200, 403))  # 400 would be ambiguous
             return response.status_code == 200
@@ -658,7 +659,7 @@ class TestLibraryAccess(LibraryTestCase):
         def can_create_block():
             """ Check if studio lets us make a new XBlock in the library """
             response = self.client.ajax_post(reverse_url('xblock_handler'), {
-                'parent_locator': unicode(self.library.location), 'category': 'html',
+                'parent_locator': six.text_type(self.library.location), 'category': 'html',
             })
             self.assertIn(response.status_code, (200, 403))  # 400 would be ambiguous
             return response.status_code == 200
@@ -711,8 +712,8 @@ class TestLibraryAccess(LibraryTestCase):
 
         # Copy block to the course:
         response = self.client.ajax_post(reverse_url('xblock_handler'), {
-            'parent_locator': unicode(course.location),
-            'duplicate_source_locator': unicode(block.location),
+            'parent_locator': six.text_type(course.location),
+            'duplicate_source_locator': six.text_type(block.location),
         })
         self.assertIn(response.status_code, (200, 403))  # 400 would be ambiguous
         duplicate_action_allowed = (response.status_code == 200)
@@ -789,7 +790,7 @@ class TestLibraryAccess(LibraryTestCase):
             edit_view_url = reverse_usage_url("xblock_view_handler", lib_block.location, {"view_name": STUDIO_VIEW})
 
             resp = self.client.get_json(edit_view_url)
-            self.assertEquals(resp.status_code, 200)
+            self.assertEqual(resp.status_code, 200)
 
             return parse_json(resp)['html']
 
@@ -803,7 +804,7 @@ class TestLibraryAccess(LibraryTestCase):
         self._login_as_non_staff_user()
         response = self.client.get_json(LIBRARY_REST_URL)
         staff_libs = parse_json(response)
-        self.assertEquals(2, len(staff_libs))
+        self.assertEqual(2, len(staff_libs))
 
         non_staff_settings_html = _get_settings_html()
         self.assertIn('staff_lib_1', non_staff_settings_html)
@@ -818,7 +819,6 @@ class TestOverrides(LibraryTestCase):
     """
     Test that overriding block Scope.settings fields from a library in a specific course works
     """
-    shard = 1
 
     def setUp(self):
         super(TestOverrides, self).setUp()
@@ -1004,7 +1004,6 @@ class TestIncompatibleModuleStore(LibraryTestCase):
     """
     Tests for proper validation errors with an incompatible course modulestore.
     """
-    shard = 1
 
     def setUp(self):
         super(TestIncompatibleModuleStore, self).setUp()

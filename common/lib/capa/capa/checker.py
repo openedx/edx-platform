@@ -2,18 +2,17 @@
 """
 Commandline tool for doing operations on Problems
 """
-from __future__ import unicode_literals
-from __future__ import print_function
+
 
 import argparse
 import logging
 import sys
-from cStringIO import StringIO
+from io import BytesIO
 
+from calc import UndefinedVariable
 from mako.lookup import TemplateLookup
 from path import Path as path
 
-from calc import UndefinedVariable
 from capa.capa_problem import LoncapaProblem
 
 logging.basicConfig(format="%(levelname)s %(message)s")
@@ -75,8 +74,8 @@ def command_test(problem):
     # We're going to trap stdout/stderr from the problems (yes, some print)
     old_stdout, old_stderr = sys.stdout, sys.stderr
     try:
-        sys.stdout = StringIO()
-        sys.stderr = StringIO()
+        sys.stdout = BytesIO()
+        sys.stderr = BytesIO()
 
         check_that_suggested_answers_work(problem)
         check_that_blanks_fail(problem)

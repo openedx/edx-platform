@@ -2,8 +2,10 @@
 Tests for the course completion helper functions.
 """
 from datetime import datetime
+from uuid import uuid4
 
 from badges.events import course_complete
+from lms.djangoapps.certificates.models import GeneratedCertificate
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -13,7 +15,6 @@ class CourseCompleteTestCase(ModuleStoreTestCase):
     """
     Tests for the course completion helper functions.
     """
-    shard = 4
 
     def setUp(self):
         super(CourseCompleteTestCase, self).setUp()
@@ -63,9 +64,19 @@ class CourseCompleteTestCase(ModuleStoreTestCase):
         Make sure the evidence URL points to the right place.
         """
         user = UserFactory.create()
+        cert = GeneratedCertificate.eligible_certificates.create(
+            user=user,
+            course_id=self.course_key,
+            download_uuid=uuid4(),
+            grade="0.95",
+            key='the_key',
+            distinction=True,
+            status='downloadable',
+            mode='honor',
+            name=user.profile.name,
+            verify_uuid=uuid4().hex
+        )
         self.assertEqual(
-            'https://edx.org/certificates/user/{user_id}/course/{course_key}?evidence_visit=1'.format(
-                user_id=user.id, course_key=self.course_key
-            ),
+            'https://edx.org/certificates/{}?evidence_visit=1'.format(cert.verify_uuid),
             course_complete.evidence_url(user.id, self.course_key)
         )

@@ -2,8 +2,11 @@
 """
 Student dashboard page.
 """
+
+
 from bok_choy.page_object import PageObject
 from opaque_keys.edx.keys import CourseKey
+from six.moves import range
 
 from common.test.acceptance.pages.lms import BASE_URL
 
@@ -75,7 +78,7 @@ class DashboardPage(PageObject):
             # and the other being the enrollment mode.
             enrollment_mode = course_listing[0].get_attribute('class').split('course ')[1]
         else:
-            raise Exception("No course named {} was found on the dashboard".format(course_name))
+            raise Exception(u"No course named {} was found on the dashboard".format(course_name))
 
         return enrollment_mode
 
@@ -103,7 +106,7 @@ class DashboardPage(PageObject):
 
             upgrade_page.wait_for_page()
         else:
-            raise Exception("No enrollment for {} is visible on the dashboard.".format(course_name))
+            raise Exception(u"No enrollment for {} is visible on the dashboard.".format(course_name))
 
     def view_course(self, course_id):
         """
@@ -114,7 +117,7 @@ class DashboardPage(PageObject):
         if link_css is not None:
             self.q(css=link_css).first.click()
         else:
-            msg = "No links found for course {0}".format(course_id)
+            msg = u"No links found for course {0}".format(course_id)
             self.warning(msg)
 
     def _link_css(self, course_id):
@@ -156,7 +159,7 @@ class DashboardPage(PageObject):
             }
 
         else:
-            msg = "No links found for course {0}".format(course_id)
+            msg = u"No links found for course {0}".format(course_id)
             self.warning(msg)
 
     def get_course_actions_link_css(self, course_id):

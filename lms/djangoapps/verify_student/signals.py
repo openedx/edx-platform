@@ -1,6 +1,8 @@
 """
 Signal handler for setting default course verification dates
 """
+
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.dispatch.dispatcher import receiver
 

@@ -1,12 +1,18 @@
+"""
+Check that view authentication works properly.
+"""
+
+
 import datetime
 
 import pytz
 from django.urls import reverse
 from mock import patch
 from six import text_type
+from six.moves import range
 
-from courseware.access import has_access
-from courseware.tests.factories import (
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
     GlobalStaffFactory,
     InstructorFactory,
@@ -14,7 +20,7 @@ from courseware.tests.factories import (
     OrgStaffFactory,
     StaffFactory
 )
-from courseware.tests.helpers import CourseAccessTestMixin, LoginEnrollmentTestCase
+from lms.djangoapps.courseware.tests.helpers import CourseAccessTestMixin, LoginEnrollmentTestCase
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.django import modulestore
@@ -29,7 +35,6 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
 
     ACCOUNT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
     ENABLED_SIGNALS = ['course_published']
-    shard = 1
 
     @staticmethod
     def _reverse_urls(names, course):
@@ -85,7 +90,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         urls.extend([
             reverse('book', kwargs={'course_id': text_type(course.id),
                                     'book_index': index})
-            for index in xrange(len(course.textbooks))
+            for index in range(len(course.textbooks))
         ])
         for url in urls:
             self.assert_request_status_code(200, url)
@@ -301,7 +306,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         for url in urls:
             self.assert_request_status_code(200, url)
 
-    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_dark_launch_enrolled_student(self):
         """
         Make sure that before course start, students can't access course
@@ -328,7 +333,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         self._check_non_staff_light(self.test_course)
         self._check_non_staff_dark(self.test_course)
 
-    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_dark_launch_instructor(self):
         """
         Make sure that before course start instructors can access the
@@ -351,7 +356,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         self._check_non_staff_light(self.test_course)
         self._check_non_staff_dark(self.test_course)
 
-    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_dark_launch_global_staff(self):
         """
         Make sure that before course start staff can access
@@ -373,7 +378,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         self._check_staff(self.course)
         self._check_staff(self.test_course)
 
-    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_enrollment_period(self):
         """
         Check that enrollment periods work.
@@ -413,7 +418,6 @@ class TestBetatesterAccess(ModuleStoreTestCase, CourseAccessTestMixin):
     """
     Tests for the beta tester feature
     """
-    shard = 1
 
     def setUp(self):
         super(TestBetatesterAccess, self).setUp()
@@ -427,7 +431,7 @@ class TestBetatesterAccess(ModuleStoreTestCase, CourseAccessTestMixin):
         self.normal_student = UserFactory()
         self.beta_tester = BetaTesterFactory(course_key=self.course.id)
 
-    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_course_beta_period(self):
         """
         Check that beta-test access works for courses.
@@ -436,7 +440,7 @@ class TestBetatesterAccess(ModuleStoreTestCase, CourseAccessTestMixin):
         self.assertCannotAccessCourse(self.normal_student, 'load', self.course)
         self.assertCanAccessCourse(self.beta_tester, 'load', self.course)
 
-    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_content_beta_period(self):
         """
         Check that beta-test access works for content.

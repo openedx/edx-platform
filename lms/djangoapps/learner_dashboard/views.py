@@ -1,12 +1,12 @@
 """Learner dashboard views"""
+
+
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_GET
 
 from edxmako.shortcuts import render_to_response
-
-from lms.djangoapps.learner_dashboard.programs import ProgramsFragmentView, ProgramDetailsFragmentView
+from lms.djangoapps.learner_dashboard.programs import ProgramDetailsFragmentView, ProgramsFragmentView
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.features.journals.api import journals_enabled
 
 
 @login_required
@@ -22,8 +22,7 @@ def program_listing(request):
         'nav_hidden': True,
         'show_dashboard_tabs': True,
         'show_program_listing': programs_config.enabled,
-        'show_journal_listing': journals_enabled(),  # TODO: Dashboard Plugin required
-        'uses_pattern_library': True,
+        'uses_bootstrap': True,
     }
 
     return render_to_response('learner_dashboard/programs.html', context)
@@ -44,7 +43,7 @@ def program_details(request, program_uuid):
         'show_dashboard_tabs': True,
         'nav_hidden': True,
         'disable_courseware_js': True,
-        'uses_pattern_library': True,
+        'uses_bootstrap': True,
     }
 
     return render_to_response('learner_dashboard/program_details.html', context)

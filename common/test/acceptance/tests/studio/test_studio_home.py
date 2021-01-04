@@ -1,13 +1,16 @@
 """
 Acceptance tests for Home Page (My Courses / My Libraries).
 """
+
+
 import datetime
 
-from base_studio_test import StudioCourseTest
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
 from common.test.acceptance.pages.studio.index import DashboardPage
 from common.test.acceptance.tests.helpers import AcceptanceTest, get_selected_option_text, select_option_by_text
+
+from .base_studio_test import StudioCourseTest
 
 
 class CreateLibraryTest(AcceptanceTest):

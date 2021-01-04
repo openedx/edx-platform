@@ -1,7 +1,8 @@
 """
 Views related to operations on course objects
 """
-from collections import defaultdict
+
+
 import copy
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
@@ -11,6 +12,7 @@ import pytz
 import random
 import re
 import string
+from collections import defaultdict
 
 import django.utils
 import six
@@ -18,21 +20,18 @@ from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.urls import reverse
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
+from milestones import api as milestones_api
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
-from openedx.features.course_experience.waffle import waffle as course_experience_waffle
-from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
-from openedx.features.edly.utils import filter_courses_based_on_org, get_edx_org_from_cookie, get_enabled_organizations
 from six import text_type
+from six.moves import filter
 
 from contentstore.course_group_config import (
     COHORT_SCHEME,
@@ -43,7 +42,6 @@ from contentstore.course_group_config import (
 )
 from contentstore.course_info_model import delete_course_update, get_course_updates, update_course_updates
 from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
-from contentstore.push_notification import push_notification_enabled
 from contentstore.tasks import rerun_course as rerun_course_task
 from contentstore.utils import (
     add_instructor,
@@ -59,20 +57,25 @@ from contentstore.views.entrance_exam import create_entrance_exam, delete_entran
 from course_action_state.managers import CourseActionStateItemNotFoundError
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from course_creators.views import add_user_with_status_unrequested, get_course_creator_status
+from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
-from milestones import api as milestones_api
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.core.lib.courses import course_image_url
-from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
+from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
+from openedx.features.course_experience.waffle import waffle as course_experience_waffle
+from openedx.features.edly.utils import filter_courses_based_on_org, get_edx_org_from_cookie, get_enabled_organizations
 from student import auth
 from student.auth import has_course_author_access, has_studio_read_access, has_studio_write_access
 from student.roles import (
@@ -110,6 +113,7 @@ from .item import create_xblock_info
 from .library import LIBRARIES_ENABLED, get_library_creator_status
 
 log = logging.getLogger(__name__)
+
 
 __all__ = ['course_info_handler', 'course_handler', 'course_listing',
            'course_archive_handler', 'course_unarchive_handler',
@@ -215,7 +219,7 @@ def _course_notifications_json_get(course_action_state_id):
     return JsonResponse(action_state_info)
 
 
-def _dismiss_notification(request, course_action_state_id):  # pylint: disable=unused-argument
+def _dismiss_notification(request, course_action_state_id):
     """
     Update the display of the course notification
     """
@@ -429,7 +433,6 @@ def _accessible_courses_summary_iter(request, org=None):
         """
         Filter out unusable and inaccessible courses
         """
-        # pylint: disable=fixme
         # TODO remove this condition when templates purged from db
         if course_summary.location.course == 'templates':
             return False
@@ -460,7 +463,6 @@ def _accessible_courses_iter(request):
         if isinstance(course.id, CCXLocator):
             return False
 
-        # pylint: disable=fixme
         # TODO remove this condition when templates purged from db
         if course.location.course == 'templates':
             return False
@@ -489,7 +491,6 @@ def _accessible_courses_iter_for_tests(request):
         if isinstance(course.id, CCXLocator):
             return False
 
-        # pylint: disable=fixme
         # TODO remove this condition when templates purged from db
         if course.location.course == 'templates':
             return False
@@ -523,7 +524,7 @@ def _accessible_courses_list_from_groups(request):
             raise AccessListFallback
         course_keys[course_access.course_id] = course_access.course_id
 
-    course_keys = course_keys.values()
+    course_keys = list(course_keys.values())
 
     if course_keys:
         courses_list = modulestore().get_course_summaries(course_keys=course_keys)
@@ -574,7 +575,7 @@ def course_listing(request):
         """
         return {
             u'display_name': uca.display_name,
-            u'course_key': unicode(uca.course_key),
+            u'course_key': six.text_type(uca.course_key),
             u'org': uca.course_key.org,
             u'number': uca.course_key.course,
             u'run': uca.course_key.run,
@@ -596,8 +597,8 @@ def course_listing(request):
 
         return {
             u'display_name': library.display_name,
-            u'library_key': unicode(library.location.library_key),
-            u'url': reverse_library_url(u'library_handler', unicode(library.location.library_key)),
+            u'library_key': six.text_type(library.location.library_key),
+            u'url': reverse_library_url(u'library_handler', six.text_type(library.location.library_key)),
             u'org': library.display_org_with_default,
             u'number': library.display_number_with_default,
             u'can_edit': has_studio_write_access(request.user, library.location.library_key),
@@ -684,7 +685,8 @@ def course_index(request, course_key):
         lms_link = get_lms_link_for_item(course_module.location)
         reindex_link = None
         if settings.FEATURES.get('ENABLE_COURSEWARE_INDEX', False):
-            reindex_link = "/course/{course_id}/search_reindex".format(course_id=unicode(course_key))
+            if GlobalStaff().has_user(request.user):
+                reindex_link = "/course/{course_id}/search_reindex".format(course_id=six.text_type(course_key))
         sections = course_module.get_children()
         course_structure = _course_outline_json(request, course_module)
         locator_to_show = request.GET.get('show', None)
@@ -705,6 +707,12 @@ def course_index(request, course_key):
         deprecated_block_names = [block.name for block in deprecated_xblocks()]
         deprecated_blocks_info = _deprecated_blocks_info(course_module, deprecated_block_names)
 
+        frontend_app_publisher_url = configuration_helpers.get_value_for_org(
+            course_module.location.org,
+            'FRONTEND_APP_PUBLISHER_URL',
+            settings.FEATURES.get('FRONTEND_APP_PUBLISHER_URL', False)
+        )
+
         return render_to_response('course_outline.html', {
             'language_code': request.LANGUAGE_CODE,
             'context_course': course_module,
@@ -724,6 +732,7 @@ def course_index(request, course_key):
                     'action_state_id': current_action.id,
                 },
             ) if current_action else None,
+            'frontend_app_publisher_url': frontend_app_publisher_url,
         })
 
 
@@ -768,7 +777,7 @@ def _process_courses_list(courses_iter, in_process_course_actions, split_archive
         """
         return {
             'display_name': course.display_name,
-            'course_key': unicode(course.location.course_key),
+            'course_key': six.text_type(course.location.course_key),
             'url': reverse_course_url('course_handler', course.id),
             'lms_link': get_lms_link_for_item(course.location),
             'rerun_link': _get_rerun_link_for_item(course.id),
@@ -885,14 +894,14 @@ def _create_or_rerun_course(request):
             destination_course_key = rerun_course(request.user, source_course_key, org, course, run, fields)
             return JsonResponse({
                 'url': reverse_url('course_handler'),
-                'destination_course_key': unicode(destination_course_key)
+                'destination_course_key': six.text_type(destination_course_key)
             })
         else:
             try:
                 new_course = create_new_course(request.user, org, course, run, fields)
                 return JsonResponse({
                     'url': reverse_course_url('course_handler', new_course.id),
-                    'course_key': unicode(new_course.id),
+                    'course_key': six.text_type(new_course.id),
                 })
             except ValidationError as ex:
                 return JsonResponse({'error': text_type(ex)}, status=400)
@@ -912,7 +921,7 @@ def _create_or_rerun_course(request):
         })
     except InvalidKeyError as error:
         return JsonResponse({
-            "ErrMsg": _("Unable to create course '{name}'.\n\n{err}").format(name=display_name, err=text_type(error))}
+            "ErrMsg": _(u"Unable to create course '{name}'.\n\n{err}").format(name=display_name, err=text_type(error))}
         )
 
 
@@ -994,7 +1003,7 @@ def rerun_course(user, source_course_key, org, number, run, fields, background=T
     fields['video_upload_pipeline'] = {}
 
     json_fields = json.dumps(fields, cls=EdxJSONEncoder)
-    args = [unicode(source_course_key), unicode(destination_course_key), user.id, json_fields]
+    args = [six.text_type(source_course_key), six.text_type(destination_course_key), user.id, json_fields]
 
     if background:
         rerun_course_task.delay(*args)
@@ -1029,7 +1038,6 @@ def course_info_handler(request, course_key_string):
                     'updates_url': reverse_course_url('course_info_update_handler', course_key),
                     'handouts_locator': course_key.make_usage_key('course_info', 'handouts'),
                     'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_module.id),
-                    'push_notification_enabled': push_notification_enabled()
                 }
             )
         else:
@@ -1110,7 +1118,12 @@ def settings_handler(request, course_key_string):
 
             # see if the ORG of this course can be attributed to a defined configuration . In that case, the
             # course about page should be editable in Studio
-            marketing_site_enabled = configuration_helpers.get_value_for_org(
+            publisher_enabled = configuration_helpers.get_value_for_org(
+                course_module.location.org,
+                'ENABLE_PUBLISHER',
+                settings.FEATURES.get('ENABLE_PUBLISHER', False)
+            )
+            marketing_enabled = configuration_helpers.get_value_for_org(
                 course_module.location.org,
                 'ENABLE_MKTG_SITE',
                 settings.FEATURES.get('ENABLE_MKTG_SITE', False)
@@ -1121,12 +1134,12 @@ def settings_handler(request, course_key_string):
                 settings.FEATURES.get('ENABLE_EXTENDED_COURSE_DETAILS', False)
             )
 
-            about_page_editable = not marketing_site_enabled
+            about_page_editable = not publisher_enabled
             enrollment_end_editable = GlobalStaff().has_user(
                 request.user
             ) or CourseCreatorRole().has_user(
                 request.user
-            ) or not marketing_site_enabled
+            ) or not publisher_enabled
 
             short_description_editable = configuration_helpers.get_value_for_org(
                 course_module.location.org,
@@ -1135,6 +1148,10 @@ def settings_handler(request, course_key_string):
             )
             sidebar_html_enabled = course_experience_waffle().is_enabled(ENABLE_COURSE_ABOUT_SIDEBAR_HTML)
             # self_paced_enabled = SelfPacedConfiguration.current().enabled
+
+            verified_mode = CourseMode.verified_mode_for_course(course_key, include_expired=True)
+            upgrade_deadline = (verified_mode and verified_mode.expiration_datetime and
+                                verified_mode.expiration_datetime.isoformat())
 
             settings_context = {
                 'context_course': course_module,
@@ -1145,6 +1162,7 @@ def settings_handler(request, course_key_string):
                 'video_thumbnail_image_url': course_image_url(course_module, 'video_thumbnail_image'),
                 'details_url': reverse_course_url('settings_handler', course_key),
                 'about_page_editable': about_page_editable,
+                'marketing_enabled': marketing_enabled,
                 'short_description_editable': short_description_editable,
                 'sidebar_html_enabled': sidebar_html_enabled,
                 'upload_asset_url': upload_asset_url,
@@ -1156,7 +1174,8 @@ def settings_handler(request, course_key_string):
                 'enrollment_end_editable': enrollment_end_editable,
                 'is_prerequisite_courses_enabled': is_prerequisite_courses_enabled(),
                 'is_entrance_exams_enabled': is_entrance_exams_enabled(),
-                'enable_extended_course_details': enable_extended_course_details
+                'enable_extended_course_details': enable_extended_course_details,
+                'upgrade_deadline': upgrade_deadline,
             }
             if is_prerequisite_courses_enabled():
                 courses, in_process_course_actions = get_courses_accessible_to_user(request)
@@ -1292,7 +1311,7 @@ def grading_handler(request, course_key_string, grader_index=None):
                 # update credit course requirements if 'minimum_grade_credit'
                 # field value is changed
                 if 'minimum_grade_credit' in request.json:
-                    update_credit_course_requirements.delay(unicode(course_key))
+                    update_credit_course_requirements.delay(six.text_type(course_key))
 
                 # None implies update the whole model (cutoffs, graceperiod, and graders) not a specific grader
                 if grader_index is None:
@@ -1362,12 +1381,24 @@ def advanced_settings_handler(request, course_key_string):
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)
+
+        advanced_dict = CourseMetadata.fetch(course_module)
+        if settings.FEATURES.get('DISABLE_MOBILE_COURSE_AVAILABLE', False):
+            advanced_dict.get('mobile_available')['deprecated'] = True
+
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
+            publisher_enabled = configuration_helpers.get_value_for_org(
+                course_module.location.org,
+                'ENABLE_PUBLISHER',
+                settings.FEATURES.get('ENABLE_PUBLISHER', False)
+            )
 
             return render_to_response('settings_advanced.html', {
                 'context_course': course_module,
-                'advanced_dict': CourseMetadata.fetch(course_module),
-                'advanced_settings_url': reverse_course_url('advanced_settings_handler', course_key)
+                'advanced_dict': advanced_dict,
+                'advanced_settings_url': reverse_course_url('advanced_settings_handler', course_key),
+                'publisher_enabled': publisher_enabled,
+
             })
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
@@ -1420,6 +1451,8 @@ def validate_textbooks_json(text):
     """
     Validate the given text as representing a single PDF textbook
     """
+    if isinstance(text, (bytes, bytearray)):  # data appears as bytes
+        text = text.decode('utf-8')
     try:
         textbooks = json.loads(text)
     except ValueError:
@@ -1440,7 +1473,9 @@ def validate_textbook_json(textbook):
     """
     Validate the given text as representing a list of PDF textbooks
     """
-    if isinstance(textbook, basestring):
+    if isinstance(textbook, (bytes, bytearray)):  # data appears as bytes
+        textbook = textbook.decode('utf-8')
+    if isinstance(textbook, six.string_types):
         try:
             textbook = json.loads(textbook)
         except ValueError:
@@ -1449,7 +1484,7 @@ def validate_textbook_json(textbook):
         raise TextbookValidationError("must be JSON object")
     if not textbook.get("tab_title"):
         raise TextbookValidationError("must have tab_title")
-    tid = unicode(textbook.get("id", ""))
+    tid = six.text_type(textbook.get("id", ""))
     if tid and not tid[0].isdigit():
         raise TextbookValidationError("textbook ID must start with a digit")
     return textbook
@@ -1566,7 +1601,7 @@ def textbooks_detail_handler(request, course_key_string, textbook_id):
     with store.bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)
         matching_id = [tb for tb in course_module.pdf_textbooks
-                       if unicode(tb.get("id")) == unicode(textbook_id)]
+                       if six.text_type(tb.get("id")) == six.text_type(textbook_id)]
         if matching_id:
             textbook = matching_id[0]
         else:
@@ -1576,8 +1611,7 @@ def textbooks_detail_handler(request, course_key_string, textbook_id):
             if not textbook:
                 return JsonResponse(status=404)
             return JsonResponse(textbook)
-        elif request.method in ('POST', 'PUT'):  # can be either and sometimes
-                                            # django is rewriting one to the other
+        elif request.method in ('POST', 'PUT'):  # can be either and sometimes django is rewriting one to the other
             try:
                 new_textbook = validate_textbook_json(request.body)
             except TextbookValidationError as err:
@@ -1755,14 +1789,13 @@ def group_configurations_detail_handler(request, course_key_string, group_config
     with store.bulk_operations(course_key):
         course = get_course_and_check_access(course_key, request.user)
         matching_id = [p for p in course.user_partitions
-                       if unicode(p.id) == unicode(group_configuration_id)]
+                       if six.text_type(p.id) == six.text_type(group_configuration_id)]
         if matching_id:
             configuration = matching_id[0]
         else:
             configuration = None
 
-        if request.method in ('POST', 'PUT'):  # can be either and sometimes
-                                            # django is rewriting one to the other
+        if request.method in ('POST', 'PUT'):  # can be either and sometimes django is rewriting one to the other
             try:
                 new_configuration = GroupConfiguration(request.body, course, group_configuration_id).get_user_partition()
             except GroupConfigurationsValidationError as err:

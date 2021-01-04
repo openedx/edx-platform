@@ -1,10 +1,14 @@
 """
 Serializers for Bulk Enrollment.
 """
+
+
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.course_groups.cohorts import is_cohort_exists
 from rest_framework import serializers
+from six.moves import zip
+
+from openedx.core.djangoapps.course_groups.cohorts import is_cohort_exists
 
 
 class StringListField(serializers.ListField):
@@ -43,7 +47,7 @@ class BulkEnrollmentSerializer(serializers.Serializer):
             try:
                 CourseKey.from_string(course)
             except InvalidKeyError:
-                raise serializers.ValidationError("Course key not valid: {}".format(course))
+                raise serializers.ValidationError(u"Course key not valid: {}".format(course))
         return value
 
     def validate(self, attrs):
@@ -59,7 +63,7 @@ class BulkEnrollmentSerializer(serializers.Serializer):
 
             for course_id, cohort_name in zip(attrs['courses'], attrs['cohorts']):
                 if not is_cohort_exists(course_key=CourseKey.from_string(course_id), name=cohort_name):
-                    raise serializers.ValidationError("cohort {cohort_name} not found in course {course_id}.".format(
+                    raise serializers.ValidationError(u"cohort {cohort_name} not found in course {course_id}.".format(
                         cohort_name=cohort_name, course_id=course_id)
                     )
 

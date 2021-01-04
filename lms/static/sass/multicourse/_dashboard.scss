@@ -55,7 +55,8 @@
 
       // UI: individual course item
       .course {
-        @include box-sizing(box);
+        box-sizing: box;
+
         @include transition(all 0.15s linear 0s);
         @include clearfix();
 
@@ -73,7 +74,8 @@
             overflow: hidden;
 
             .cover {
-              @include box-sizing(border-box);
+              box-sizing: border-box;
+
               @include transition(all 0.15s linear 0s);
               @include float(left);
 
@@ -135,8 +137,10 @@
               flex-basis: 100%;
               padding-top: $baseline/2;
 
-              a, span {
+              a,
+              span {
                 font: -apple-system-short-headline !important;
+
                 @extend %t-title3;
                 @extend %t-regular;
 
@@ -164,8 +168,9 @@
               .info-date-block-container {
                 display: block;
 
-                .info-date-block{
+                .info-date-block {
                   font: -apple-system-short-subheadline !important;
+
                   @extend %t-title7;
 
                   color: $gray; // WCAG 2.0 AA compliant
@@ -224,7 +229,8 @@
 
             // UI: course item actions
             .action {
-              @include box-sizing(border-box);
+              box-sizing: border-box;
+
               @include margin-right($baseline/2);
               @include float(right);
 
@@ -235,7 +241,8 @@
               border: 1px solid $white;
               text-align: center;
 
-              &:hover, &:focus {
+              &:hover,
+              &:focus {
                 color: $gray-d3;
                 border: 1px solid $gray-l4;
               }
@@ -295,8 +302,7 @@
                 .actions-dropdown-list {
                   @extend %ui-no-list;
 
-                  @include box-sizing(border-box);
-
+                  box-sizing: border-box;
                   display: table;
                   box-shadow: 0 1px 1px $shadow-l1;
                   position: relative;
@@ -372,7 +378,8 @@
             width: flex-grid(8);
 
             @include float(left);
-            @include box-sizing(border-box);
+
+            box-sizing: border-box;
 
             p {
               color: $lighter-base-font-color;
@@ -397,6 +404,7 @@
 
           .enter-course {
             font: -apple-system-short-subheadline !important;
+
             @extend %btn-pl-white-base;
 
             @include float(right);
@@ -531,7 +539,7 @@
           margin-bottom: $baseline;
         }
 
-        .ad-link {
+        .marketing-link {
           @include text-align(center);
 
           .btn-neutral {
@@ -568,6 +576,30 @@
       }
     }
 
+    .wrapper-coaching {
+      border: 1px solid $border-color-l3;
+      margin: 20px 0;
+
+      .coaching-signup {
+        padding: 20px;
+
+        .coaching-prompt {
+          font-size: 20px;
+          line-height: 28px;
+          font-weight: bold;
+        }
+
+        .coaching-link .btn-neutral {
+          display: block;
+          text-align: center;
+          margin: 20px 20px 0;
+          border-radius: 20px;
+          padding: 10px;
+          border: 1px solid theme-color('primary');
+        }
+      }
+    }
+
     .profile-sidebar {
       ul {
         padding: 0;
@@ -591,7 +623,7 @@
 
   // Responsive behavior
   @include media-breakpoint-down(md) {
-    flex-direction: column;
+    flex-direction: column-reverse;
   }
 }
 
@@ -793,7 +825,8 @@
           color: $white; // nasty but needed override for poor <span> styling
         }
 
-        .copy, .copy-sub {
+        .copy,
+        .copy-sub {
           display: inline-block;
           vertical-align: middle;
         }
@@ -845,7 +878,7 @@
           @include float(right);
           @include margin-right(5px);
 
-          background-image: none ;
+          background-image: none;
           text-shadow: none;
           box-shadow: none;
           text-transform: none;
@@ -862,7 +895,8 @@
           }
 
           .btn {
-            @include box-sizing(border-box);
+            box-sizing: border-box;
+
             @include float(left);
 
             border-radius: 3px;
@@ -874,7 +908,8 @@
             &.disabled {
               cursor: default !important;
 
-              &:hover, &:focus {
+              &:hover,
+              &:focus {
                 @include background-image(linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%));
 
                 background: #eee;
@@ -934,7 +969,8 @@
         font-weight: bold;
         letter-spacing: 0;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           text-decoration: none;
         }
       }
@@ -975,8 +1011,7 @@
           .action-certificate .btn {
             @extend %btn-inherited-primary;
 
-            @include box-sizing(border-box);
-
+            box-sizing: border-box;
             padding: 7px $baseline*0.75;
             float: none;
             border-radius: 3px;
@@ -1112,7 +1147,7 @@
 
     color: $lighter-base-font-color;
     margin-bottom: $baseline;
-    text-shadow: 0 1px rgba(255,255,255, 0.6);
+    text-shadow: 0 1px rgba(255, 255, 255, 0.6);
   }
 
   p.custom-message {
@@ -1125,9 +1160,7 @@
     background-color: theme-color('primary');
     border: 1px solid theme-color('primary');
     box-shadow: 0 1px 8px 0 $shadow-l1;
-
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     color: $white;
     font-family: $font-family-sans-serif;
     display: inline-block;
@@ -1136,8 +1169,9 @@
     margin-left: ($baseline/4);
     padding: $baseline*0.75 $baseline;
 
-    &:hover, &:focus {
-      background: theme-color('primary')-l2;
+    &:hover,
+    &:focus {
+      background: theme-color('primary')-l2; /* stylelint-disable-line */
       text-decoration: none;
     }
   }
@@ -1250,6 +1284,19 @@
       border-bottom-color: $verified-color-lvl4;
     }
 
+    .action-reverify {
+      @extend %btn-primary-error;
+      @extend %t-weight4;
+
+      display: block;
+
+      @include font-size(14);
+    }
+
+    .btn-reverify {
+      margin-top: ($baseline/2);
+    }
+
     .deco-arrow {
       @include triangle(($baseline/2), $verified-color-lvl4, up);
     }
@@ -1292,7 +1339,6 @@
       color: #fff;
       background-color: #0079bc;
     }
-
   }
 }
 
@@ -1343,11 +1389,11 @@ p.course-block {
   padding: ($baseline/4);
   border-width: 1px;
   background: #fdfbe4;
-
 }
 
 .enter-course-blocked {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
+
   @include float(right);
 
   display: block;
@@ -1368,7 +1414,8 @@ p.course-block {
     font: normal 15px/1.6rem $font-family-sans-serif;
     padding: 6px 32px 7px;
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       text-decoration: none;
     }
   }
@@ -1592,7 +1639,9 @@ a.fade-cover {
     color: theme-color("inverse");
   }
 
-  .survey_button:visited, .survey_button:hover, .survey_button:focus {
+  .survey_button:visited,
+  .survey_button:hover,
+  .survey_button:focus {
     color: theme-color("inverse");
     text-decoration: none;
   }

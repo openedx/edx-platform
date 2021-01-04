@@ -1,0 +1,31 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <h1>
+                {% trans "Create Recovery Email" as create_recovery_text %}{{ create_recovery_text | force_escape }}
+            </h1>
+            <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
+                {% blocktrans %}You've registered this recovery email address for {{ platform_name }}.{% endblocktrans %}
+                {% endfilter %}
+                <br/>
+                {% filter force_escape %}
+                {% blocktrans %}If you set this email address, click "confirm email."  If you didn't request this change, you can disregard this email.{% endblocktrans %}
+                {% endfilter %}
+                <br />
+            </p>
+
+            {% filter force_escape %}
+                {% blocktrans asvar course_cta_text %}Confirm Email{% endblocktrans %}
+            {% endfilter %}
+            {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=confirm_link %}
+
+        </td>
+    </tr>
+</table>
+{% endblock %}

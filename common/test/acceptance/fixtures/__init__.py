@@ -1,5 +1,9 @@
-import os
+"""
+Envirement Setup for fixtures.
+"""
 
+
+import os
 
 HOSTNAME = os.environ.get('BOK_CHOY_HOSTNAME', 'localhost')
 CMS_PORT = os.environ.get('BOK_CHOY_CMS_PORT', '8031')

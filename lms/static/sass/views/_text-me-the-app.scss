@@ -1,5 +1,6 @@
 .text-me-content {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
+
   @include outer-container;
 
   width: 100%;
@@ -15,10 +16,7 @@
 
     background: $white;
     min-height: 100%;
-    padding-left: ($baseline/2);
-    padding-right: ($baseline/2);
-    padding-top: ($baseline*6);
-    padding-bottom: ($baseline*6);
+    padding: ($baseline*6) ($baseline/2);
     display: block;
     max-width: 350px;
     min-width: 250px;
@@ -58,7 +56,8 @@
       width: 100%;
       margin: ($baseline/2) 0 0 0;
 
-      label, input {
+      label,
+      input {
         width: 100%;
         height: auto;
         line-height: 1.5em;

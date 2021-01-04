@@ -1,6 +1,8 @@
 """
 Tests for third_party_auth decorators.
 """
+
+
 import unittest
 
 import ddt

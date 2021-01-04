@@ -25,12 +25,14 @@ Usage:
     configure a whitelist or blacklist of countries for that course.
 
 """
+
 import logging
 import re
 
 from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
 from django.urls import reverse
+from django.utils.deprecation import MiddlewareMixin
 from django.shortcuts import redirect
 from ipware.ip import get_ip
 
@@ -42,7 +44,7 @@ from .models import IPFilter
 log = logging.getLogger(__name__)
 
 
-class EmbargoMiddleware(object):
+class EmbargoMiddleware(MiddlewareMixin):
     """Middleware for embargoing site and courses. """
 
     ALLOW_URL_PATTERNS = [
@@ -56,10 +58,11 @@ class EmbargoMiddleware(object):
         re.compile(r'^/admin/'),
     ]
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         # If embargoing is turned off, make this middleware do nothing
         if not settings.FEATURES.get('EMBARGO'):
             raise MiddlewareNotUsed()
+        super(EmbargoMiddleware, self).__init__(*args, **kwargs)
 
     def process_request(self, request):
         """Block requests based on embargo rules.

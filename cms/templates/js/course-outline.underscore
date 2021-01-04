@@ -84,15 +84,19 @@ if (xblockInfo.get('graded')) {
 
 var is_proctored_exam = xblockInfo.get('is_proctored_exam');
 var is_practice_exam = xblockInfo.get('is_practice_exam');
+var is_onboarding_exam = xblockInfo.get('is_onboarding_exam');
+var exam_value;
 if (is_proctored_exam) {
-    if (is_practice_exam) {
-        var exam_value = gettext('Practice proctored Exam');
+    if (is_onboarding_exam) {
+        exam_value = gettext('Onboarding Exam');
+    } else if (is_practice_exam) {
+        exam_value = gettext('Practice proctored Exam');
     } else {
-        var exam_value = gettext('Proctored Exam');
+        exam_value = gettext('Proctored Exam');
     }
 
 } else {
-    var exam_value = gettext('Timed Exam');
+    exam_value = gettext('Timed Exam');
 }
 %>
 <% if (parentInfo) { %>
@@ -114,7 +118,9 @@ if (is_proctored_exam) {
         <% } %>
                 <% if (xblockInfo.isVertical()) { %>
                     <span class="unit-title item-title">
-                        <a href="<%- xblockInfo.get('studio_url') %>"><%- xblockInfo.get('display_name') %></a>
+                    <span class="wrapper-<%- xblockType %>-title wrapper-xblock-field incontext-editor is-editable" data-field="display_name" data-field-display-name="<%- gettext("Display Name") %>">
+                        <a class="<%- xblockType %>-title item-title xblock-field-value incontext-editor-value" href="<%- xblockInfo.get('studio_url') %>"><%- xblockInfo.get('display_name') %></a>
+                    </span>
                     </span>
                 <% } else { %>
                     <span class="wrapper-<%- xblockType %>-title wrapper-xblock-field incontext-editor is-editable" data-field="display_name" data-field-display-name="<%- gettext("Display Name") %>">
@@ -126,7 +132,7 @@ if (is_proctored_exam) {
             <ul class="actions-list">
                 <% if (xblockInfo.isSequential() && xblockInfo.get('proctoring_exam_configuration_link')) { %>
                 <li class="action-item">
-                    <a href="<%- xblockInfo.get('proctoring_exam_configuration_link') %>" data-tooltip="<%- gettext('Proctoring Settings') %>" class="proctoring-configuration-button" target="_blank">
+                    <a href="<%- xblockInfo.get('proctoring_exam_configuration_link') %>" data-tooltip="<%- gettext('Proctoring Settings') %>" class="proctoring-configuration-button" rel="noopener" target="_blank">
                         <span class="action-button-text"><%- gettext('Proctoring Settings') %></span>
                     </a>
                 </li>
@@ -206,7 +212,7 @@ if (is_proctored_exam) {
                 </p>
               </div>
             <% } %>
-            <% if (xblockInfo.get('highlights_enabled') && course.get('self_paced') && xblockInfo.isChapter()) { %>
+            <% if (xblockInfo.get('highlights_enabled') && xblockInfo.isChapter()) { %>
                 <div class="block-highlights">
                     <% var number_of_highlights = (xblockInfo.get('highlights') || []).length; %>
                         <button class="block-highlights-value highlights-button action-button">

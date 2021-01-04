@@ -1,7 +1,14 @@
+""" Course run serializers. """
+
+
+import logging
+import time  # pylint: disable=unused-import
+
 import six
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
+from opaque_keys import InvalidKeyError
 from rest_framework import serializers
 from rest_framework.fields import empty
 
@@ -16,6 +23,7 @@ IMAGE_TYPES = {
     'image/png': 'png',
 }
 User = get_user_model()
+log = logging.getLogger(__name__)
 
 
 class CourseAccessRoleSerializer(serializers.ModelSerializer):
@@ -78,9 +86,9 @@ class CourseRunTeamSerializerMixin(serializers.Serializer):
 
 def image_is_jpeg_or_png(value):
     content_type = value.content_type
-    if content_type not in IMAGE_TYPES.keys():
+    if content_type not in list(IMAGE_TYPES.keys()):
         raise serializers.ValidationError(
-            'Only JPEG and PNG image types are supported. {} is not valid'.format(content_type))
+            u'Only JPEG and PNG image types are supported. {} is not valid'.format(content_type))
 
 
 class CourseRunImageField(serializers.ImageField):
@@ -121,7 +129,7 @@ class CourseRunImageSerializer(serializers.Serializer):
 class CourseRunSerializerCommonFieldsMixin(serializers.Serializer):
     schedule = CourseRunScheduleSerializer(source='*', required=False)
     pacing_type = CourseRunPacingTypeField(source='self_paced', required=False,
-                                           choices=(('instructor_paced', False), ('self_paced', True),))
+                                           choices=((False, 'instructor_paced'), (True, 'self_paced'),))
 
 
 class CourseRunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTeamSerializerMixin, serializers.Serializer):
@@ -161,28 +169,40 @@ class CourseRunCreateSerializer(CourseRunSerializer):
 class CourseRunRerunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTeamSerializerMixin,
                                serializers.Serializer):
     title = serializers.CharField(source='display_name', required=False)
+    number = serializers.CharField(source='id.course', required=False)
     run = serializers.CharField(source='id.run')
 
-    def validate_run(self, value):
+    def validate(self, attrs):
         course_run_key = self.instance.id
+        _id = attrs.get('id')
+        number = _id.get('course', course_run_key.course)
+        run = _id['run']
         store = modulestore()
-        with store.default_store('split'):
-            new_course_run_key = store.make_course_key(course_run_key.org, course_run_key.course, value)
+        try:
+            with store.default_store('split'):
+                new_course_run_key = store.make_course_key(course_run_key.org, number, run)
+        except InvalidKeyError:
+            raise serializers.ValidationError(
+                u'Invalid key supplied. Ensure there are no special characters in the Course Number.'
+            )
         if store.has_course(new_course_run_key, ignore_case=True):
-            raise serializers.ValidationError('Course run {key} already exists'.format(key=new_course_run_key))
-        return value
+            raise serializers.ValidationError(
+                {'run': u'Course run {key} already exists'.format(key=new_course_run_key)}
+            )
+        return attrs
 
     def update(self, instance, validated_data):
         course_run_key = instance.id
         _id = validated_data.pop('id')
+        number = _id.get('course', course_run_key.course)
+        run = _id['run']
         team = validated_data.pop('team', [])
         user = self.context['request'].user
         fields = {
             'display_name': instance.display_name
         }
         fields.update(validated_data)
-        new_course_run_key = rerun_course(user, course_run_key, course_run_key.org, course_run_key.course, _id['run'],
-                                          fields, background=False)
+        new_course_run_key = rerun_course(user, course_run_key, course_run_key.org, number, run, fields, False)
 
         course_run = get_course_and_check_access(new_course_run_key, user)
         self.update_team(course_run, team)

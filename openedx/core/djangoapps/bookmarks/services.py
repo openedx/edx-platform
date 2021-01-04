@@ -1,8 +1,11 @@
 """
 Bookmarks service.
 """
+
+
 import logging
 
+import six
 from django.core.exceptions import ObjectDoesNotExist
 from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
 
@@ -77,7 +80,7 @@ class BookmarksService(object):
         Returns:
             Bool
         """
-        usage_id = unicode(usage_key)
+        usage_id = six.text_type(usage_key)
         bookmarks_cache = self._bookmarks_cache(usage_key.course_key, fetch=True)
         for bookmark in bookmarks_cache:
             if bookmark['usage_id'] == usage_id:
@@ -126,7 +129,7 @@ class BookmarksService(object):
         bookmarks_cache = self._bookmarks_cache(usage_key.course_key)
         if bookmarks_cache is not None:
             deleted_bookmark_index = None
-            usage_id = unicode(usage_key)
+            usage_id = six.text_type(usage_key)
             for index, bookmark in enumerate(bookmarks_cache):
                 if bookmark['usage_id'] == usage_id:
                     deleted_bookmark_index = index

@@ -30,12 +30,15 @@ Search for the courseware_verified_certificate_upsell promotion ID.
 }
 
 .section-upgrade .upgrade-container {
-  float: right;
-  text-align: center;
   margin-top: 15px;
 }
 
-@media only screen and (max-width: 991px) and (min-width: 768px)  {
+.section-upgrade.no-discount .upgrade-container {
+  float: right;
+  text-align: center;
+}
+
+@media only screen and (max-width: 991px) and (min-width: 768px) {
   .section-upgrade .upgrade-container {
     float: none;
   }
@@ -43,6 +46,10 @@ Search for the courseware_verified_certificate_upsell promotion ID.
 
 .section.section-upgrade p {
   margin: 0.5em 0;
+}
+
+.section.section-upgrade.discount p {
+  display: inline-block;
 }
 
 .section-upgrade .btn-brand.btn-upgrade {

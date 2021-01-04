@@ -2,19 +2,21 @@
 """
 End-to-end tests for the LMS.
 """
-import json
 
+
+import json
 from datetime import datetime, timedelta
 from textwrap import dedent
 
 import pytz
 
-from common.test.acceptance.fixtures.course import CourseFixture, CourseUpdateDesc, XBlockFixtureDesc
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.common.utils import enroll_user_track
 from common.test.acceptance.pages.lms import BASE_URL
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
+from common.test.acceptance.pages.lms.course_about import CourseAboutPage
 from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.course_wiki import (
     CourseWikiChildrenPage,
@@ -25,23 +27,17 @@ from common.test.acceptance.pages.lms.course_wiki import (
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
+from common.test.acceptance.pages.lms.discovery import CourseDiscoveryPage
 from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage, ResetPasswordPage
 from common.test.acceptance.pages.lms.pay_and_verify import FakePaymentPage, PaymentAndVerificationFlow
 from common.test.acceptance.pages.lms.problem import ProblemPage
-from common.test.acceptance.pages.lms.progress import ProgressPage
 from common.test.acceptance.pages.lms.tab_nav import TabNavPage
-from common.test.acceptance.pages.lms.video.video import VideoPage
-from common.test.acceptance.pages.lms.discovery import CourseDiscoveryPage
-from common.test.acceptance.pages.lms.course_about import CourseAboutPage
-from common.test.acceptance.pages.studio.settings import SettingsPage
 from common.test.acceptance.tests.helpers import (
     EventsTestMixin,
     UniqueCourseTest,
-    element_has_text,
     get_selected_option_text,
-    load_data_str,
-    select_option_by_text,
-    remove_file
+    remove_file,
+    select_option_by_text
 )
 from openedx.core.lib.tests import attr
 
@@ -263,8 +259,8 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         """
         Create a new user with a unique name and email.
         """
-        username = "test_{uuid}".format(uuid=self.unique_id[0:6])
-        email = "{user}@example.com".format(user=username)
+        username = u"test_{uuid}".format(uuid=self.unique_id[0:6])
+        email = u"{user}@example.com".format(user=username)
         password = "password"
 
         # Create the user (automatically logs us in)
@@ -306,8 +302,8 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         self.register_page.visit()
 
         # Fill in the form and submit it
-        username = "test_{uuid}".format(uuid=self.unique_id[0:6])
-        email = "{user}@example.com".format(user=username)
+        username = u"test_{uuid}".format(uuid=self.unique_id[0:6])
+        email = u"{user}@example.com".format(user=username)
         self.register_page.register(
             email=email,
             password="password",
@@ -329,8 +325,8 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         # Don't agree to the terms of service / honor code.
         # Don't specify a country code, which is required.
         # Don't specify a favorite movie.
-        username = "test_{uuid}".format(uuid=self.unique_id[0:6])
-        email = "{user}@example.com".format(user=username)
+        username = u"test_{uuid}".format(uuid=self.unique_id[0:6])
+        email = u"{user}@example.com".format(user=username)
         self.register_page.register(
             email=email,
             password="password",
@@ -533,6 +529,7 @@ class CourseWikiA11yTest(UniqueCourseTest):
         self.course_wiki_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         self.course_wiki_page.a11y_audit.check_for_accessibility_errors()
@@ -545,6 +542,7 @@ class CourseWikiA11yTest(UniqueCourseTest):
         self.course_wiki_edit_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         self.course_wiki_edit_page.a11y_audit.check_for_accessibility_errors()
@@ -558,6 +556,7 @@ class CourseWikiA11yTest(UniqueCourseTest):
         history_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         history_page.wait_for_page()
@@ -572,171 +571,11 @@ class CourseWikiA11yTest(UniqueCourseTest):
         children_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         children_page.wait_for_page()
         children_page.a11y_audit.check_for_accessibility_errors()
-
-
-@attr(shard=1)
-class HighLevelTabTest(UniqueCourseTest):
-    """
-    Tests that verify each of the high-level tabs available within a course.
-    """
-
-    def setUp(self):
-        """
-        Initialize pages and install a course fixture.
-        """
-        super(HighLevelTabTest, self).setUp()
-
-        # self.course_info['number'] must be shorter since we are accessing the wiki. See TNL-1751
-        self.course_info['number'] = self.unique_id[0:6]
-
-        self.course_home_page = CourseHomePage(self.browser, self.course_id)
-        self.progress_page = ProgressPage(self.browser, self.course_id)
-        self.courseware_page = CoursewarePage(self.browser, self.course_id)
-        self.tab_nav = TabNavPage(self.browser)
-        self.video = VideoPage(self.browser)
-
-        # Install a course with sections/problems, tabs, updates, and handouts
-        course_fix = CourseFixture(
-            self.course_info['org'], self.course_info['number'],
-            self.course_info['run'], self.course_info['display_name']
-        )
-
-        course_fix.add_update(
-            CourseUpdateDesc(date='January 29, 2014', content='Test course update1')
-        )
-
-        course_fix.add_handout('demoPDF.pdf')
-
-        course_fix.add_children(
-            XBlockFixtureDesc('static_tab', 'Test Static Tab', data=r"static tab data with mathjax \(E=mc^2\)"),
-            XBlockFixtureDesc('chapter', 'Test Section').add_children(
-                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
-                    XBlockFixtureDesc('problem', 'Test Problem 1', data=load_data_str('multiple_choice.xml')),
-                    XBlockFixtureDesc('problem', 'Test Problem 2', data=load_data_str('formula_problem.xml')),
-                    XBlockFixtureDesc('html', 'Test HTML'),
-                )
-            ),
-            XBlockFixtureDesc('chapter', 'Test Section 2').add_children(
-                XBlockFixtureDesc('sequential', 'Test Subsection 2'),
-                XBlockFixtureDesc('sequential', 'Test Subsection 3').add_children(
-                    XBlockFixtureDesc('problem', 'Test Problem A', data=load_data_str('multiple_choice.xml'))
-                ),
-            )
-        ).install()
-
-        # Auto-auth register for the course
-        AutoAuthPage(self.browser, course_id=self.course_id).visit()
-
-    def test_progress(self):
-        """
-        Navigate to the progress page.
-        """
-        # Navigate to the progress page from the info page
-        self.course_home_page.visit()
-        self.tab_nav.go_to_tab('Progress')
-
-        # We haven't answered any problems yet, so assume scores are zero
-        # Only problems should have scores; so there should be 2 scores.
-        CHAPTER = 'Test Section'
-        SECTION = 'Test Subsection'
-        EXPECTED_SCORES = [(0, 3), (0, 1)]
-
-        actual_scores = self.progress_page.scores(CHAPTER, SECTION)
-        self.assertEqual(actual_scores, EXPECTED_SCORES)
-
-    def test_static_tab(self):
-        """
-        Navigate to a static tab (course content)
-        """
-        # From the course info page, navigate to the static tab
-        self.course_home_page.visit()
-        self.tab_nav.go_to_tab('Test Static Tab')
-        self.assertTrue(self.tab_nav.is_on_tab('Test Static Tab'))
-
-    def test_static_tab_with_mathjax(self):
-        """
-        Navigate to a static tab (course content)
-        """
-        # From the course info page, navigate to the static tab
-        self.course_home_page.visit()
-        self.tab_nav.go_to_tab('Test Static Tab')
-        self.assertTrue(self.tab_nav.is_on_tab('Test Static Tab'))
-
-        # Verify that Mathjax has rendered
-        self.tab_nav.mathjax_has_rendered()
-
-    def test_wiki_tab_first_time(self):
-        """
-        Navigate to the course wiki tab. When the wiki is accessed for
-        the first time, it is created on the fly.
-        """
-
-        course_wiki = CourseWikiPage(self.browser, self.course_id)
-        # From the course info page, navigate to the wiki tab
-        self.course_home_page.visit()
-        self.tab_nav.go_to_tab('Wiki')
-        self.assertTrue(self.tab_nav.is_on_tab('Wiki'))
-
-        # Assert that a default wiki is created
-        expected_article_name = "{course_name}".format(
-            course_name=self.course_info['display_name']
-        )
-        self.assertEqual(expected_article_name, course_wiki.article_name)
-
-    def test_course_home_tab(self):
-        """
-        Navigate to the course home page using the tab.
-        """
-        self.course_home_page.visit()
-        self.tab_nav.go_to_tab('Course')
-
-        # Check that the tab lands on the course home page.
-        self.assertTrue(self.course_home_page.is_browser_on_page())
-
-
-@attr(shard=1)
-class PDFTextBooksTabTest(UniqueCourseTest):
-    """
-    Tests that verify each of the textbook tabs available within a course.
-    """
-
-    def setUp(self):
-        """
-        Initialize pages and install a course fixture.
-        """
-        super(PDFTextBooksTabTest, self).setUp()
-
-        self.course_home_page = CourseHomePage(self.browser, self.course_id)
-        self.tab_nav = TabNavPage(self.browser)
-
-        # Install a course with TextBooks
-        course_fix = CourseFixture(
-            self.course_info['org'], self.course_info['number'],
-            self.course_info['run'], self.course_info['display_name']
-        )
-
-        # Add PDF textbooks to course fixture.
-        for i in range(1, 3):
-            course_fix.add_textbook("PDF Book {}".format(i), [{"title": "Chapter Of Book {}".format(i), "url": ""}])
-
-        course_fix.install()
-
-        # Auto-auth register for the course
-        AutoAuthPage(self.browser, course_id=self.course_id).visit()
-
-    def test_verify_textbook_tabs(self):
-        """
-        Test multiple pdf textbooks loads correctly in lms.
-        """
-        self.course_home_page.visit()
-
-        # Verify each PDF textbook tab by visiting, it will fail if correct tab is not loaded.
-        for i in range(1, 3):
-            self.tab_nav.go_to_tab("PDF Book {}".format(i))
 
 
 @attr(shard=1)
@@ -803,50 +642,6 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
         self.course_home_page.outline.go_to_section("Test Section", "Unlocked Subsection")
         self.courseware_page.wait_for_page()
         self.assertEqual([u'Test Unit'], self.courseware_page.nav.sequence_items)
-
-
-@attr(shard=1)
-class TooltipTest(UniqueCourseTest):
-    """
-    Tests that tooltips are displayed
-    """
-
-    def setUp(self):
-        """
-        Initialize pages and install a course fixture.
-        """
-        super(TooltipTest, self).setUp()
-
-        self.course_home_page = CourseHomePage(self.browser, self.course_id)
-        self.tab_nav = TabNavPage(self.browser)
-
-        course_fix = CourseFixture(
-            self.course_info['org'], self.course_info['number'],
-            self.course_info['run'], self.course_info['display_name']
-        )
-
-        course_fix.add_children(
-            XBlockFixtureDesc('static_tab', 'Test Static Tab'),
-            XBlockFixtureDesc('chapter', 'Test Section').add_children(
-                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
-                    XBlockFixtureDesc('problem', 'Test Problem 1', data=load_data_str('multiple_choice.xml')),
-                    XBlockFixtureDesc('problem', 'Test Problem 2', data=load_data_str('formula_problem.xml')),
-                    XBlockFixtureDesc('html', 'Test HTML'),
-                )
-            )
-        ).install()
-
-        self.courseware_page = CoursewarePage(self.browser, self.course_id)
-        # Auto-auth register for the course
-        AutoAuthPage(self.browser, course_id=self.course_id).visit()
-
-    def test_tooltip(self):
-        """
-        Verify that tooltips are displayed when you hover over the sequence nav bar.
-        """
-        self.courseware_page.visit()
-
-        self.courseware_page.verify_tooltips_displayed()
 
 
 @attr(shard=1)
@@ -924,110 +719,6 @@ class ProblemExecutionTest(UniqueCourseTest):
         problem_page.fill_answer("4")
         problem_page.click_submit()
         self.assertFalse(problem_page.is_correct())
-
-
-@attr(shard=1)
-class EntranceExamTest(UniqueCourseTest):
-    """
-    Tests that course has an entrance exam.
-    """
-
-    def setUp(self):
-        """
-        Initialize pages and install a course fixture.
-        """
-        super(EntranceExamTest, self).setUp()
-
-        CourseFixture(
-            self.course_info['org'], self.course_info['number'],
-            self.course_info['run'], self.course_info['display_name']
-        ).install()
-
-        self.course_home_page = CourseHomePage(self.browser, self.course_id)
-        self.settings_page = SettingsPage(
-            self.browser,
-            self.course_info['org'],
-            self.course_info['number'],
-            self.course_info['run']
-        )
-
-        # Auto-auth register for the course
-        AutoAuthPage(self.browser, course_id=self.course_id).visit()
-
-    def test_entrance_exam_section(self):
-        """
-         Scenario: Any course that is enabled for an entrance exam, should have
-         entrance exam section in the course outline.
-            Given that I visit the course outline
-            And entrance exams are not yet enabled
-            Then I should not see an "Entrance Exam" section
-            When I log in as staff
-            And enable entrance exams
-            And I visit the course outline again as student
-            Then there should be an "Entrance Exam" chapter.'
-        """
-        # visit the course outline and make sure there is no "Entrance Exam" section.
-        self.course_home_page.visit()
-        self.assertFalse('Entrance Exam' in self.course_home_page.outline.sections.keys())
-
-        # Logout and login as a staff.
-        LogoutPage(self.browser).visit()
-        AutoAuthPage(self.browser, course_id=self.course_id, staff=True).visit()
-
-        # visit course settings page and set/enabled entrance exam for that course.
-        self.settings_page.visit()
-        self.settings_page.require_entrance_exam()
-        self.settings_page.save_changes()
-
-        # Logout and login as a student.
-        LogoutPage(self.browser).visit()
-        AutoAuthPage(self.browser, course_id=self.course_id, staff=False).visit()
-
-        # visit the course outline and make sure there is an "Entrance Exam" section.
-        self.course_home_page.visit()
-        self.assertTrue('Entrance Exam' in self.course_home_page.outline.sections.keys())
-
-    # TODO: TNL-6546: Remove test
-    def test_entrance_exam_section_2(self):
-        """
-         Scenario: Any course that is enabled for an entrance exam, should have entrance exam chapter at course
-         page.
-            Given that I am on the course page
-            When I view the course that has an entrance exam
-            Then there should be an "Entrance Exam" chapter.'
-        """
-        courseware_page = CoursewarePage(self.browser, self.course_id)
-        entrance_exam_link_selector = '.accordion .course-navigation .chapter .group-heading'
-        # visit course page and make sure there is not entrance exam chapter.
-        courseware_page.visit()
-        courseware_page.wait_for_page()
-        self.assertFalse(element_has_text(
-            page=courseware_page,
-            css_selector=entrance_exam_link_selector,
-            text='Entrance Exam'
-        ))
-
-        # Logout and login as a staff.
-        LogoutPage(self.browser).visit()
-        AutoAuthPage(self.browser, course_id=self.course_id, staff=True).visit()
-
-        # visit course settings page and set/enabled entrance exam for that course.
-        self.settings_page.visit()
-        self.settings_page.require_entrance_exam()
-        self.settings_page.save_changes()
-
-        # Logout and login as a student.
-        LogoutPage(self.browser).visit()
-        AutoAuthPage(self.browser, course_id=self.course_id, staff=False).visit()
-
-        # visit course info page and make sure there is an "Entrance Exam" section.
-        courseware_page.visit()
-        courseware_page.wait_for_page()
-        self.assertTrue(element_has_text(
-            page=courseware_page,
-            css_selector=entrance_exam_link_selector,
-            text='Entrance Exam'
-        ))
 
 
 @attr(shard=1)
@@ -1118,53 +809,6 @@ class EnrollmentClosedRedirectTest(UniqueCourseTest):
         url = BASE_URL + "/course_modes/choose/" + self.course_id
         self.browser.get(url)
         self._assert_dashboard_message()
-
-
-@attr(shard=1)
-class LMSLanguageTest(UniqueCourseTest):
-    """ Test suite for the LMS Language """
-    def setUp(self):
-        super(LMSLanguageTest, self).setUp()
-        self.dashboard_page = DashboardPage(self.browser)
-        self.account_settings = AccountSettingsPage(self.browser)
-        AutoAuthPage(self.browser).visit()
-
-    def test_lms_language_change(self):
-        """
-        Scenario: Ensure that language selection is working fine.
-        First I go to the user dashboard page in LMS. I can see 'English' is selected by default.
-        Then I choose 'Dummy Language' from drop down (at top of the page).
-        Then I visit the student account settings page and I can see the language has been updated to 'Dummy Language'
-        in both drop downs.
-        After that I select the 'English' language and visit the dashboard page again.
-        Then I can see that top level language selector persist its value to 'English'.
-        """
-        self.dashboard_page.visit()
-        language_selector = self.dashboard_page.language_selector
-        self.assertEqual(
-            get_selected_option_text(language_selector),
-            u'English'
-        )
-
-        select_option_by_text(language_selector, 'Dummy Language (Esperanto)')
-        self.dashboard_page.wait_for_ajax()
-        self.account_settings.visit()
-        self.assertEqual(self.account_settings.value_for_dropdown_field('pref-lang'), u'Dummy Language (Esperanto)')
-        self.assertEqual(
-            get_selected_option_text(language_selector),
-            u'Dummy Language (Esperanto)'
-        )
-
-        # changed back to English language.
-        select_option_by_text(language_selector, 'English')
-        self.account_settings.wait_for_ajax()
-        self.assertEqual(self.account_settings.value_for_dropdown_field('pref-lang'), u'English')
-
-        self.dashboard_page.visit()
-        self.assertEqual(
-            get_selected_option_text(language_selector),
-            u'English'
-        )
 
 
 @attr(shard=19)

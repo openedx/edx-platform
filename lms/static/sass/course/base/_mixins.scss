@@ -45,6 +45,23 @@
   }
 }
 
+@mixin white-button-flat-outline {
+  display: block;
+  border-radius: 2px;
+  border: solid 1px #0175b4;
+  background: white;
+  color: #2d323e;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 24px;
+
+  &:hover,
+  &:focus,
+  &:active {
+    box-shadow: 0 2px 1px $shadow;
+  }
+}
+
 @mixin dark-grey-button {
   display: block;
   height: 35px;

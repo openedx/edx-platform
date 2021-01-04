@@ -1,38 +1,40 @@
 """
 Helper methods related to EdxNotes.
 """
+
+
 import json
 import logging
-import urlparse
 from datetime import datetime
 from json import JSONEncoder
-from urllib import urlencode
 from uuid import uuid4
 
 import requests
+import six
+from six.moves.urllib.parse import urlencode, urlparse, parse_qs
 from dateutil.parser import parse as dateutil_parse
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+from oauth2_provider.models import Application
 from opaque_keys.edx.keys import UsageKey
-from provider.oauth2.models import Client
 from requests.exceptions import RequestException
 
-from courseware.access import has_access
-from courseware.courses import get_current_child
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_current_child
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.plugins import EdxNotesTab
 from lms.lib.utils import get_parent_unit
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
+from openedx.core.djangolib.markup import Text
 from student.models import anonymous_id_for_user
 from util.date_utils import get_default_time_display
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger(__name__)
-# OAuth2 Client name for edxnotes
-CLIENT_NAME = "edx-notes"
+
 DEFAULT_PAGE = 1
 DEFAULT_PAGE_SIZE = 25
 
@@ -52,14 +54,15 @@ def get_edxnotes_id_token(user):
     """
     Returns generated ID Token for edxnotes.
     """
-    # TODO: Use the system's JWT_AUDIENCE and JWT_SECRET_KEY instead of client ID and name.
     try:
-        client = Client.objects.get(name=CLIENT_NAME)
-    except Client.DoesNotExist:
+        notes_application = Application.objects.get(name=settings.EDXNOTES_CLIENT_NAME)
+    except Application.DoesNotExist:
         raise ImproperlyConfigured(
-            'OAuth2 Client with name [{}] does not exist.'.format(CLIENT_NAME)
+            u'OAuth2 Client with name [{}] does not exist.'.format(settings.EDXNOTES_CLIENT_NAME)
         )
-    return create_jwt_for_user(user, secret=client.client_secret, aud=client.client_id)
+    return create_jwt_for_user(
+        user, secret=notes_application.client_secret, aud=notes_application.client_id
+    )
 
 
 def get_token_url(course_id):
@@ -67,7 +70,7 @@ def get_token_url(course_id):
     Returns token url for the course.
     """
     return reverse("get_token", kwargs={
-        "course_id": unicode(course_id),
+        "course_id": six.text_type(course_id),
     })
 
 
@@ -89,7 +92,7 @@ def send_request(user, course_id, page, page_size, path="", text=None):
     url = get_internal_endpoint(path)
     params = {
         "user": anonymous_id_for_user(user, None),
-        "course_id": unicode(course_id).encode("utf-8"),
+        "course_id": six.text_type(course_id),
         "page": page,
         "page_size": page_size,
     }
@@ -110,7 +113,7 @@ def send_request(user, course_id, page, page_size, path="", text=None):
             timeout=(settings.EDXNOTES_CONNECT_TIMEOUT, settings.EDXNOTES_READ_TIMEOUT)
         )
     except RequestException:
-        log.error("Failed to connect to edx-notes-api: url=%s, params=%s", url, str(params))
+        log.error(u"Failed to connect to edx-notes-api: url=%s, params=%s", url, str(params))
         raise EdxNotesServiceUnavailable(_("EdxNotes Service is unavailable. Please try again in a few minutes."))
 
     return response
@@ -141,7 +144,7 @@ def delete_all_notes_for_user(user):
             timeout=(settings.EDXNOTES_CONNECT_TIMEOUT, settings.EDXNOTES_READ_TIMEOUT)
         )
     except RequestException:
-        log.error("Failed to connect to edx-notes-api: url=%s, params=%s", url, str(headers))
+        log.error(u"Failed to connect to edx-notes-api: url=%s, params=%s", url, str(headers))
         raise EdxNotesServiceUnavailable(_("EdxNotes Service is unavailable. Please try again in a few minutes."))
 
     return response
@@ -171,7 +174,7 @@ def preprocess_collection(user, course, collection):
 
             model.update(update)
             usage_id = model["usage_id"]
-            if usage_id in cache:
+            if usage_id in list(cache.keys()):
                 model.update(cache[usage_id])
                 filtered_collection.append(model)
                 continue
@@ -183,45 +186,45 @@ def preprocess_collection(user, course, collection):
             try:
                 item = store.get_item(usage_key)
             except ItemNotFoundError:
-                log.debug("Module not found: %s", usage_key)
+                log.debug(u"Module not found: %s", usage_key)
                 continue
 
             if not has_access(user, "load", item, course_key=course.id):
-                log.debug("User %s does not have an access to %s", user, item)
+                log.debug(u"User %s does not have an access to %s", user, item)
                 continue
 
             unit = get_parent_unit(item)
             if unit is None:
-                log.debug("Unit not found: %s", usage_key)
+                log.debug(u"Unit not found: %s", usage_key)
                 continue
 
             if include_path_info:
                 section = unit.get_parent()
                 if not section:
-                    log.debug("Section not found: %s", usage_key)
+                    log.debug(u"Section not found: %s", usage_key)
                     continue
-                if section in cache:
-                    usage_context = cache[section]
+                if section.location in list(cache.keys()):
+                    usage_context = cache[section.location]
                     usage_context.update({
                         "unit": get_module_context(course, unit),
                     })
                     model.update(usage_context)
-                    cache[usage_id] = cache[unit] = usage_context
+                    cache[usage_id] = cache[unit.location] = usage_context
                     filtered_collection.append(model)
                     continue
 
                 chapter = section.get_parent()
                 if not chapter:
-                    log.debug("Chapter not found: %s", usage_key)
+                    log.debug(u"Chapter not found: %s", usage_key)
                     continue
-                if chapter in cache:
-                    usage_context = cache[chapter]
+                if chapter.location in list(cache.keys()):
+                    usage_context = cache[chapter.location]
                     usage_context.update({
                         "unit": get_module_context(course, unit),
                         "section": get_module_context(course, section),
                     })
                     model.update(usage_context)
-                    cache[usage_id] = cache[unit] = cache[section] = usage_context
+                    cache[usage_id] = cache[unit.location] = cache[section.location] = usage_context
                     filtered_collection.append(model)
                     continue
 
@@ -232,9 +235,9 @@ def preprocess_collection(user, course, collection):
             }
             model.update(usage_context)
             if include_path_info:
-                cache[section] = cache[chapter] = usage_context
+                cache[section.location] = cache[chapter.location] = usage_context
 
-            cache[usage_id] = cache[unit] = usage_context
+            cache[usage_id] = cache[unit.location] = usage_context
             filtered_collection.append(model)
 
     return filtered_collection
@@ -245,8 +248,8 @@ def get_module_context(course, item):
     Returns dispay_name and url for the parent module.
     """
     item_dict = {
-        'location': unicode(item.location),
-        'display_name': item.display_name_with_default_escaped,
+        'location': six.text_type(item.location),
+        'display_name': Text(item.display_name_with_default),
     }
     if item.category == 'chapter' and item.get_parent():
         # course is a locator w/o branch and version
@@ -257,15 +260,15 @@ def get_module_context(course, item):
         section = item.get_parent()
         chapter = section.get_parent()
         # Position starts from 1, that's why we add 1.
-        position = get_index(unicode(item.location), section.children) + 1
+        position = get_index(six.text_type(item.location), section.children) + 1
         item_dict['url'] = reverse('courseware_position', kwargs={
-            'course_id': unicode(course.id),
+            'course_id': six.text_type(course.id),
             'chapter': chapter.url_name,
             'section': section.url_name,
             'position': position,
         })
     if item.category in ('chapter', 'sequential'):
-        item_dict['children'] = [unicode(child) for child in item.children]
+        item_dict['children'] = [six.text_type(child) for child in item.children]
 
     return item_dict
 
@@ -274,7 +277,7 @@ def get_index(usage_key, children):
     """
     Returns an index of the child with `usage_key`.
     """
-    children = [unicode(child) for child in children]
+    children = [six.text_type(child) for child in children]
     return children.index(usage_key)
 
 
@@ -302,8 +305,8 @@ def construct_pagination_urls(request, course_id, api_next_url, api_previous_url
             return None
 
         keys = ('page', 'page_size', 'text')
-        parsed = urlparse.urlparse(url)
-        query_params = urlparse.parse_qs(parsed.query)
+        parsed = urlparse(url)
+        query_params = parse_qs(parsed.query)
 
         encoded_query_params = urlencode({key: query_params.get(key)[0] for key in keys if key in query_params})
         return "{}?{}".format(request.build_absolute_uri(base_url), encoded_query_params)
@@ -340,16 +343,16 @@ def get_notes(request, course, page=DEFAULT_PAGE, page_size=DEFAULT_PAGE_SIZE, t
     response = send_request(request.user, course.id, page, page_size, path, text)
 
     try:
-        collection = json.loads(response.content)
+        collection = json.loads(response.content.decode('utf-8'))
     except ValueError:
-        log.error("Invalid JSON response received from notes api: response_content=%s", response.content)
+        log.error(u"Invalid JSON response received from notes api: response_content=%s", response.content)
         raise EdxNotesParseError(_("Invalid JSON response received from notes api."))
 
     # Verify response dict structure
     expected_keys = ['total', 'rows', 'num_pages', 'start', 'next', 'previous', 'current_page']
-    keys = collection.keys()
+    keys = list(collection.keys())
     if not keys or not all(key in expected_keys for key in keys):
-        log.error("Incorrect data received from notes api: collection_data=%s", str(collection))
+        log.error(u"Incorrect data received from notes api: collection_data=%s", str(collection))
         raise EdxNotesParseError(_("Incorrect data received from notes api."))
 
     filtered_results = preprocess_collection(request.user, course, collection['rows'])
@@ -416,7 +419,7 @@ def get_course_position(course_module):
     If there is no current position in the course or chapter, then selects
     the first child.
     """
-    urlargs = {'course_id': unicode(course_module.id)}
+    urlargs = {'course_id': six.text_type(course_module.id)}
     chapter = get_current_child(course_module, min_depth=1)
     if chapter is None:
         log.debug("No chapter found when loading current position in course")
@@ -425,7 +428,7 @@ def get_course_position(course_module):
     urlargs['chapter'] = chapter.url_name
     if course_module.position is not None:
         return {
-            'display_name': chapter.display_name_with_default_escaped,
+            'display_name': Text(chapter.display_name_with_default),
             'url': reverse('courseware_chapter', kwargs=urlargs),
         }
 
@@ -437,7 +440,7 @@ def get_course_position(course_module):
 
     urlargs['section'] = section.url_name
     return {
-        'display_name': section.display_name_with_default_escaped,
+        'display_name': Text(section.display_name_with_default),
         'url': reverse('courseware_section', kwargs=urlargs)
     }
 
@@ -446,7 +449,7 @@ def generate_uid():
     """
     Generates unique id.
     """
-    return uuid4().int  # pylint: disable=no-member
+    return uuid4().int
 
 
 def is_feature_enabled(course, user):

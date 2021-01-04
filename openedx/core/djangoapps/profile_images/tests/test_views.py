@@ -1,6 +1,7 @@
 """
 Test cases for the HTTP endpoints of the profile image api.
 """
+
 from contextlib import closing
 import datetime
 from pytz import UTC
@@ -22,15 +23,14 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import (
     get_profile_image_storage,
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from openedx.core.lib.tests import attr
 
 from ..images import create_profile_images, ImageValidationError
 from ..views import LOG_MESSAGE_CREATE, LOG_MESSAGE_DELETE
 from .helpers import make_image_file
 
 TEST_PASSWORD = "test"
-TEST_UPLOAD_DT = datetime.datetime(2002, 1, 9, 15, 43, 01, tzinfo=UTC)
-TEST_UPLOAD_DT2 = datetime.datetime(2003, 1, 9, 15, 43, 01, tzinfo=UTC)
+TEST_UPLOAD_DT = datetime.datetime(2002, 1, 9, 15, 43, 1, tzinfo=UTC)
+TEST_UPLOAD_DT2 = datetime.datetime(2003, 1, 9, 15, 43, 1, tzinfo=UTC)
 
 
 class ProfileImageEndpointMixin(UserSettingsEventTestMixin):
@@ -116,7 +116,6 @@ class ProfileImageEndpointMixin(UserSettingsEventTestMixin):
         self.assert_no_events_were_emitted()
 
 
-@attr(shard=2)
 @skip_unless_lms
 @mock.patch('openedx.core.djangoapps.profile_images.views.log')
 class ProfileImageViewGeneralTestCase(ProfileImageEndpointMixin, APITestCase):
@@ -136,7 +135,6 @@ class ProfileImageViewGeneralTestCase(ProfileImageEndpointMixin, APITestCase):
         self.assert_no_events_were_emitted()
 
 
-@attr(shard=2)
 @ddt.ddt
 @skip_unless_lms
 @mock.patch('openedx.core.djangoapps.profile_images.views.log')
@@ -181,7 +179,7 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
             self.check_has_profile_image()
         mock_log.info.assert_called_once_with(
             LOG_MESSAGE_CREATE,
-            {'image_names': get_profile_image_names(self.user.username).values(), 'user_id': self.user.id}
+            {'image_names': list(get_profile_image_names(self.user.username).values()), 'user_id': self.user.id}
         )
         self.check_upload_event_emitted()
 
@@ -220,7 +218,7 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
             self.check_has_profile_image()
         mock_log.info.assert_called_once_with(
             LOG_MESSAGE_CREATE,
-            {'image_names': get_profile_image_names(self.user.username).values(), 'user_id': self.user.id}
+            {'image_names': list(get_profile_image_names(self.user.username).values()), 'user_id': self.user.id}
         )
         self.check_upload_event_emitted()
 
@@ -359,7 +357,6 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
         self.assert_no_events_were_emitted()
 
 
-@attr(shard=2)
 @skip_unless_lms
 @mock.patch('openedx.core.djangoapps.profile_images.views.log')
 class ProfileImageViewDeleteTestCase(ProfileImageEndpointMixin, APITestCase):
@@ -404,7 +401,7 @@ class ProfileImageViewDeleteTestCase(ProfileImageEndpointMixin, APITestCase):
         self.check_has_profile_image(False)
         mock_log.info.assert_called_once_with(
             LOG_MESSAGE_DELETE,
-            {'image_names': get_profile_image_names(self.user.username).values(), 'user_id': self.user.id}
+            {'image_names': list(get_profile_image_names(self.user.username).values()), 'user_id': self.user.id}
         )
         self.check_remove_event_emitted()
 
@@ -439,7 +436,7 @@ class ProfileImageViewDeleteTestCase(ProfileImageEndpointMixin, APITestCase):
         self.check_has_profile_image(False)
         mock_log.info.assert_called_once_with(
             LOG_MESSAGE_DELETE,
-            {'image_names': get_profile_image_names(self.user.username).values(), 'user_id': self.user.id}
+            {'image_names': list(get_profile_image_names(self.user.username).values()), 'user_id': self.user.id}
         )
         self.check_remove_event_emitted()
 
@@ -490,7 +487,6 @@ class DeprecatedProfileImageTestMixin(ProfileImageEndpointMixin):
         self.assert_no_events_were_emitted()
 
 
-@attr(shard=2)
 @skip_unless_lms
 @mock.patch('openedx.core.djangoapps.profile_images.views.log')
 class DeprecatedProfileImageUploadTestCase(DeprecatedProfileImageTestMixin, APITestCase):
@@ -503,7 +499,6 @@ class DeprecatedProfileImageUploadTestCase(DeprecatedProfileImageTestMixin, APIT
     _replacement_method = 'openedx.core.djangoapps.profile_images.views.ProfileImageView.post'
 
 
-@attr(shard=2)
 @skip_unless_lms
 @mock.patch('openedx.core.djangoapps.profile_images.views.log')
 class DeprecatedProfileImageRemoveTestCase(DeprecatedProfileImageTestMixin, APITestCase):

@@ -1,6 +1,8 @@
 """
 Theming aware template loaders.
 """
+
+
 from django.template.loaders.filesystem import Loader as FilesystemLoader
 
 from edxmako.makoloader import MakoLoader
@@ -25,21 +27,13 @@ class ThemeFilesystemLoader(FilesystemLoader):
     is_usable = True
     _accepts_engine_in_init = True
 
-    def get_template_sources(self, template_name, template_dirs=None):
-        """
-        Returns the absolute paths to "template_name", when appended to each
-        directory in "template_dirs". Any paths that don't lie inside one of the
-        template dirs are excluded from the result set, for security reasons.
-        """
-        if not template_dirs:
-            template_dirs = self.engine.dirs
+    def __init__(self, engine, dirs=None):
+        if not dirs:
+            self.dirs = engine.dirs
         theme_dirs = self.get_theme_template_sources()
-
-        # append theme dirs to the beginning so templates are looked up inside theme dir first
         if isinstance(theme_dirs, list):
-            template_dirs = theme_dirs + template_dirs
-
-        return list(super(ThemeFilesystemLoader, self).get_template_sources(template_name, template_dirs))
+            self.dirs = theme_dirs + self.dirs
+        super(ThemeFilesystemLoader, self).__init__(engine, self.dirs)
 
     @staticmethod
     def get_theme_template_sources():

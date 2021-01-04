@@ -4,28 +4,28 @@ Utilities for writing third_party_auth tests.
 Used by Django and non-Django tests; must not have Django deps.
 """
 
+
 import os.path
 from contextlib import contextmanager
 
 import django.test
 import mock
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from mako.template import Template
-from provider import constants
-from provider.oauth2.models import Client as OAuth2Client
-from storages.backends.overwrite import OverwriteStorage
+from oauth2_provider.models import Application
+from openedx.core.djangolib.testing.utils import CacheIsolationMixin
+from openedx.core.storage import OverwriteStorage
 
-from third_party_auth.models import cache as config_cache
 from third_party_auth.models import (
     LTIProviderConfig,
     OAuth2ProviderConfig,
-    ProviderApiPermissions,
     SAMLConfiguration,
     SAMLProviderConfig
 )
-from third_party_auth.saml import EdXSAMLIdentityProvider, get_saml_idp_class
+from third_party_auth.models import cache as config_cache
 
 AUTH_FEATURES_KEY = 'ENABLE_THIRD_PARTY_AUTH'
 AUTH_FEATURE_ENABLED = AUTH_FEATURES_KEY in settings.FEATURES
@@ -48,7 +48,7 @@ class FakeDjangoSettings(object):
 
     def __init__(self, mappings):
         """Initializes the fake from mappings dict."""
-        for key, value in mappings.iteritems():
+        for key, value in six.iteritems(mappings):
             setattr(self, key, value)
 
 
@@ -158,6 +158,12 @@ class ThirdPartyAuthTestMixin(object):
         return cls.configure_oauth_provider(**kwargs)
 
     @classmethod
+    def configure_identityServer3_provider(cls, **kwargs):
+        kwargs.setdefault("name", "identityServer3TestConfig")
+        kwargs.setdefault("backend_name", "identityServer3")
+        return cls.configure_oauth_provider(**kwargs)
+
+    @classmethod
     def verify_user_email(cls, email):
         """ Mark the user with the given email as verified """
         user = User.objects.get(email=email)
@@ -165,14 +171,9 @@ class ThirdPartyAuthTestMixin(object):
         user.save()
 
     @staticmethod
-    def configure_oauth_client():
-        """ Configure a oauth client for testing """
-        return OAuth2Client.objects.create(client_type=constants.CONFIDENTIAL)
-
-    @staticmethod
-    def configure_api_permission(client, provider_id):
-        """ Configure the client and provider_id pair. This will give the access to a client for that provider. """
-        return ProviderApiPermissions.objects.create(client=client, provider_id=provider_id)
+    def configure_oauth_dot_client():
+        """ Configure an oauth DOP client for testing """
+        return Application.objects.create(client_type=Application.CLIENT_CONFIDENTIAL)
 
     @staticmethod
     def read_data_file(filename):
@@ -181,9 +182,10 @@ class ThirdPartyAuthTestMixin(object):
             return f.read()
 
 
-class TestCase(ThirdPartyAuthTestMixin, django.test.TestCase):
+class TestCase(ThirdPartyAuthTestMixin, CacheIsolationMixin, django.test.TestCase):
     """Base class for auth test cases."""
-    def setUp(self):
+
+    def setUp(self):  # pylint: disable=arguments-differ
         super(TestCase, self).setUp()
         # Explicitly set a server name that is compatible with all our providers:
         # (The SAML lib we use doesn't like the default 'testserver' as a domain)
@@ -214,16 +216,6 @@ class SAMLTestCase(TestCase):
             kwargs['public_key'] = self._get_public_key()
         kwargs.setdefault('entity_id', "https://saml.example.none")
         super(SAMLTestCase, self).enable_saml(**kwargs)
-
-    @mock.patch('third_party_auth.saml.log')
-    def test_get_saml_idp_class_with_fake_identifier(self, log_mock):
-        error_mock = log_mock.error
-        idp_class = get_saml_idp_class('fake_idp_class_option')
-        error_mock.assert_called_once_with(
-            '%s is not a valid EdXSAMLIdentityProvider subclass; using EdXSAMLIdentityProvider base class.',
-            'fake_idp_class_option'
-        )
-        self.assertIs(idp_class, EdXSAMLIdentityProvider)
 
 
 @contextmanager

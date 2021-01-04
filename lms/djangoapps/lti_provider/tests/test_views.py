@@ -2,13 +2,15 @@
 Tests for the LTI provider views
 """
 
-from django.urls import reverse
+
+import six
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.urls import reverse
 from mock import MagicMock, patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
-from courseware.testutils import RenderXBlockTestMixin
+from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
 from lti_provider import models, views
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -42,7 +44,7 @@ COURSE_PARAMS = {
 }
 
 
-ALL_PARAMS = dict(LTI_DEFAULT_PARAMS.items() + COURSE_PARAMS.items())
+ALL_PARAMS = dict(list(LTI_DEFAULT_PARAMS.items()) + list(COURSE_PARAMS.items()))
 
 
 def build_launch_request(extra_post_data=None, param_to_delete=None):
@@ -51,7 +53,7 @@ def build_launch_request(extra_post_data=None, param_to_delete=None):
     """
     if extra_post_data is None:
         extra_post_data = {}
-    post_data = dict(LTI_DEFAULT_PARAMS.items() + extra_post_data.items())
+    post_data = dict(list(LTI_DEFAULT_PARAMS.items()) + list(extra_post_data.items()))
     if param_to_delete:
         del post_data[param_to_delete]
     request = RequestFactory().post('/', data=post_data)
@@ -92,7 +94,7 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         Verifies that the LTI launch succeeds when passed a valid request.
         """
         request = build_launch_request()
-        views.lti_launch(request, unicode(COURSE_KEY), unicode(USAGE_KEY))
+        views.lti_launch(request, six.text_type(COURSE_KEY), six.text_type(USAGE_KEY))
         render.assert_called_with(request, USAGE_KEY)
 
     @patch('lti_provider.views.render_courseware')
@@ -103,9 +105,9 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         Verifies that the LTI launch succeeds when passed a valid request.
         """
         request = build_launch_request(extra_post_data=LTI_OPTIONAL_PARAMS)
-        views.lti_launch(request, unicode(COURSE_KEY), unicode(USAGE_KEY))
+        views.lti_launch(request, six.text_type(COURSE_KEY), six.text_type(USAGE_KEY))
         store_params.assert_called_with(
-            dict(ALL_PARAMS.items() + LTI_OPTIONAL_PARAMS.items()),
+            dict(list(ALL_PARAMS.items()) + list(LTI_OPTIONAL_PARAMS.items())),
             request.user,
             self.consumer
         )
@@ -120,8 +122,8 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         request = build_launch_request()
         views.lti_launch(
             request,
-            unicode(COURSE_PARAMS['course_key']),
-            unicode(COURSE_PARAMS['usage_key'])
+            six.text_type(COURSE_PARAMS['course_key']),
+            six.text_type(COURSE_PARAMS['usage_key'])
         )
         store_params.assert_called_with(ALL_PARAMS, request.user, self.consumer)
 
@@ -186,7 +188,6 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
     the tests defined in RenderXBlockTestMixin.
     """
     SUCCESS_ENROLLED_STAFF_MONGO_COUNT = 9
-    shard = 3
 
     def get_response(self, usage_key, url_encoded_params=None):
         """
@@ -195,8 +196,8 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
         lti_launch_url = reverse(
             'lti_provider_launch',
             kwargs={
-                'course_id': unicode(self.course.id),
-                'usage_id': unicode(usage_key)
+                'course_id': six.text_type(self.course.id),
+                'usage_id': six.text_type(usage_key)
             }
         )
         if url_encoded_params:

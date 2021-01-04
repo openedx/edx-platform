@@ -1,18 +1,21 @@
 """Test safe_exec.py"""
 
+
 import hashlib
 import os
 import os.path
-import random
 import textwrap
 import unittest
 
 import pytest
-from six import text_type
+import random2 as random
+import six
+from codejail.jail_code import is_configured
+from codejail.safe_exec import SafeExecException
+from six import text_type, unichr
+from six.moves import range
 
 from capa.safe_exec import safe_exec, update_hash
-from codejail.safe_exec import SafeExecException
-from codejail.jail_code import is_configured
 
 
 class TestSafeExec(unittest.TestCase):
@@ -36,7 +39,7 @@ class TestSafeExec(unittest.TestCase):
     def test_random_seeding(self):
         g = {}
         r = random.Random(17)
-        rnums = [r.randint(0, 999) for _ in xrange(100)]
+        rnums = [r.randint(0, 999) for _ in range(100)]
 
         # Without a seed, the results are unpredictable
         safe_exec("rnums = [random.randint(0, 999) for _ in xrange(100)]", g)
@@ -49,7 +52,7 @@ class TestSafeExec(unittest.TestCase):
     def test_random_is_still_importable(self):
         g = {}
         r = random.Random(17)
-        rnums = [r.randint(0, 999) for _ in xrange(100)]
+        rnums = [r.randint(0, 999) for _ in range(100)]
 
         # With a seed, the results are predictable even from the random module
         safe_exec(
@@ -119,10 +122,10 @@ class TestSafeExecCaching(unittest.TestCase):
         safe_exec("a = int(math.pi)", g, cache=DictCache(cache))
         self.assertEqual(g['a'], 3)
         # A result has been cached
-        self.assertEqual(cache.values()[0], (None, {'a': 3}))
+        self.assertEqual(list(cache.values())[0], (None, {'a': 3}))
 
         # Fiddle with the cache, then try it again.
-        cache[cache.keys()[0]] = (None, {'a': 17})
+        cache[list(cache.keys())[0]] = (None, {'a': 17})
 
         g = {}
         safe_exec("a = int(math.pi)", g, cache=DictCache(cache))
@@ -149,21 +152,21 @@ class TestSafeExecCaching(unittest.TestCase):
 
         # The exception should be in the cache now.
         self.assertEqual(len(cache), 1)
-        cache_exc_msg, cache_globals = cache.values()[0]
+        cache_exc_msg, cache_globals = list(cache.values())[0]
         self.assertIn("ZeroDivisionError", cache_exc_msg)
 
         # Change the value stored in the cache, the result should change.
-        cache[cache.keys()[0]] = ("Hey there!", {})
+        cache[list(cache.keys())[0]] = ("Hey there!", {})
 
         with self.assertRaises(SafeExecException):
             safe_exec(code, g, cache=DictCache(cache))
 
         self.assertEqual(len(cache), 1)
-        cache_exc_msg, cache_globals = cache.values()[0]
+        cache_exc_msg, cache_globals = list(cache.values())[0]
         self.assertEqual("Hey there!", cache_exc_msg)
 
         # Change it again, now no exception!
-        cache[cache.keys()[0]] = (None, {'a': 17})
+        cache[list(cache.keys())[0]] = (None, {'a': 17})
         safe_exec(code, g, cache=DictCache(cache))
         self.assertEqual(g['a'], 17)
 
@@ -171,7 +174,7 @@ class TestSafeExecCaching(unittest.TestCase):
         # Check that using non-ASCII unicode does not raise an encoding error.
         # Try several non-ASCII unicode characters.
         for code in [129, 500, 2 ** 8 - 1, 2 ** 16 - 1]:
-            code_with_unichr = unicode("# ") + unichr(code)
+            code_with_unichr = six.text_type("# ") + unichr(code)
             try:
                 safe_exec(code_with_unichr, {}, cache=DictCache({}))
             except UnicodeEncodeError:
@@ -197,14 +200,14 @@ class TestUpdateHash(unittest.TestCase):
         """
         d1 = {k: 1 for k in "abcdefghijklmnopqrstuvwxyz"}
         d2 = dict(d1)
-        for i in xrange(10000):
+        for i in range(10000):
             d2[i] = 1
-        for i in xrange(10000):
+        for i in range(10000):
             del d2[i]
 
         # Check that our dicts are equal, but with different key order.
         self.assertEqual(d1, d2)
-        self.assertNotEqual(d1.keys(), d2.keys())
+        self.assertNotEqual(list(d1.keys()), list(d2.keys()))
 
         return d1, d2
 

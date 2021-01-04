@@ -2,6 +2,8 @@
 """
 tests for overrides
 """
+
+
 import datetime
 
 import mock
@@ -9,13 +11,14 @@ import pytz
 from ccx_keys.locator import CCXLocator
 from django.test.utils import override_settings
 from edx_django_utils.cache import RequestCache
+from six.moves import range
 
-from courseware.courses import get_course_by_id
-from lms.djangoapps.courseware.field_overrides import OverrideFieldData
-from courseware.testutils import FieldOverrideTestMixin
+from lms.djangoapps.courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.testutils import FieldOverrideTestMixin
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import override_field_for_ccx
 from lms.djangoapps.ccx.tests.utils import flatten, iter_blocks
+from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.courseware.tests.test_field_overrides import inject_field_overrides
 from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
@@ -31,7 +34,6 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
     Make sure field overrides behave in the expected manner.
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
-    shard = 7
 
     @classmethod
     def setUpClass(cls):
@@ -46,15 +48,15 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
         start = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=pytz.UTC)
         due = datetime.datetime(2010, 7, 7, 0, 0, tzinfo=pytz.UTC)
         chapters = [ItemFactory.create(start=start, parent=cls.course)
-                    for _ in xrange(2)]
+                    for _ in range(2)]
         sequentials = flatten([
-            [ItemFactory.create(parent=chapter) for _ in xrange(2)]
+            [ItemFactory.create(parent=chapter) for _ in range(2)]
             for chapter in chapters])
         verticals = flatten([
-            [ItemFactory.create(due=due, parent=sequential) for _ in xrange(2)]
+            [ItemFactory.create(due=due, parent=sequential) for _ in range(2)]
             for sequential in sequentials])
         blocks = flatten([  # pylint: disable=unused-variable
-            [ItemFactory.create(parent=vertical) for _ in xrange(2)]
+            [ItemFactory.create(parent=vertical) for _ in range(2)]
             for vertical in verticals])
 
     def setUp(self):
@@ -96,7 +98,7 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
         chapter = self.ccx_course.get_children()[0]
         override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
-        self.assertEquals(chapter.start, ccx_start)
+        self.assertEqual(chapter.start, ccx_start)
 
     def test_override_num_queries_new_field(self):
         """
@@ -154,8 +156,8 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
         chapter = self.ccx_course.get_children()[0]
         override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
-        self.assertEquals(chapter.get_children()[0].start, ccx_start)
-        self.assertEquals(chapter.get_children()[1].start, ccx_start)
+        self.assertEqual(chapter.get_children()[0].start, ccx_start)
+        self.assertEqual(chapter.get_children()[1].start, ccx_start)
 
     def test_override_is_inherited_even_if_set_in_mooc(self):
         """

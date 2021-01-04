@@ -1,10 +1,12 @@
 """
 Utility classes for reporting linter results.
 """
-from __future__ import print_function
+
 
 import os
 import re
+
+from six.moves import range
 
 from xsslint.utils import StringLines
 

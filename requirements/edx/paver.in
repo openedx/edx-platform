@@ -11,18 +11,16 @@
 -c ../constraints.txt
 
 edx-opaque-keys                     # Create and introspect course and xblock identities
-lazy==1.1                           # Lazily-evaluated attributes for Python objects
+lazy                                # Lazily-evaluated attributes for Python objects
 libsass==0.10.0                     # Python bindings for the LibSass CSS compiler
 markupsafe                          # XML/HTML/XHTML Markup safe strings
-mock==1.0.1                         # Stub out code with mock objects and make assertions about how they have been used
-path.py==8.2.1                      # Easier manipulation of filesystem paths
+mock                                # Stub out code with mock objects and make assertions about how they have been used
+path                                # Easier manipulation of filesystem paths
 paver                               # Build, distribution and deployment scripting tool
 psutil==1.2.1                       # Library for retrieving information on running processes and system utilization
-pymongo==2.9.1                      # via edx-opaque-keys
-python-memcached==1.48              # Python interface to the memcached memory cache daemon
+pymongo==3.9.0                      # via edx-opaque-keys
+python-memcached                    # Python interface to the memcached memory cache daemon
 requests                            # Simple interface for making HTTP requests
-stevedore==1.10.0                   # via edx-opaque-keys
+stevedore                           # Support for runtime plugins, used for XBlocks and edx-platform Django app plugins
 watchdog                            # Used in paver watch_assets
-wrapt==1.10.5                       # Decorator utilities used in the @timed paver task decorator
-
-six==1.11.0                         # Pinned because a few things here need it, but later transifex-client says ==1.11.0
+wrapt                               # Decorator utilities used in the @timed paver task decorator

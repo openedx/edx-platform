@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 
-from django.db import migrations, models
-import lms.djangoapps.verify_student.models
-import model_utils.fields
+
 import django.db.models.deletion
 import django.utils.timezone
+import model_utils.fields
 from django.conf import settings
+from django.db import migrations, models
 from opaque_keys.edx.django.models import CourseKeyField
+
+import lms.djangoapps.verify_student.models
 
 
 class Migration(migrations.Migration):
@@ -74,7 +75,7 @@ class Migration(migrations.Migration):
             name='SoftwareSecurePhotoVerification',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('status', model_utils.fields.StatusField(default=b'created', max_length=100, verbose_name='status', no_check_for_status=True, choices=[(b'created', b'created'), (b'ready', b'ready'), (b'submitted', b'submitted'), (b'must_retry', b'must_retry'), (b'approved', b'approved'), (b'denied', b'denied')])),
+                ('status', model_utils.fields.StatusField(default=u'created', max_length=100, verbose_name='status', no_check_for_status=True, choices=[(u'created', u'created'), (u'ready', u'ready'), (u'submitted', u'submitted'), (u'must_retry', u'must_retry'), (u'approved', u'approved'), (u'denied', u'denied')])),
                 ('status_changed', model_utils.fields.MonitorField(default=django.utils.timezone.now, verbose_name='status changed', monitor='status')),
                 ('name', models.CharField(max_length=255, blank=True)),
                 ('face_image_url', models.URLField(max_length=255, blank=True)),
@@ -123,7 +124,7 @@ class Migration(migrations.Migration):
             name='VerificationStatus',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('status', models.CharField(db_index=True, max_length=32, choices=[(b'submitted', b'submitted'), (b'approved', b'approved'), (b'denied', b'denied'), (b'error', b'error')])),
+                ('status', models.CharField(db_index=True, max_length=32, choices=[(u'submitted', u'submitted'), (u'approved', u'approved'), (u'denied', u'denied'), (u'error', u'error')])),
                 ('timestamp', models.DateTimeField(auto_now_add=True)),
                 ('response', models.TextField(null=True, blank=True)),
                 ('error', models.TextField(null=True, blank=True)),

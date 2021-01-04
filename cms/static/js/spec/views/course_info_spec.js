@@ -25,7 +25,7 @@ define(["js/views/course_info_handout", "js/views/course_info_update", "js/model
             delete window.course_location_analytics;
         });
 
-        describe("Course Updates without Push notification", function() {
+        describe("Course Updates", function() {
             const courseInfoTemplate = readFixtures('course_info_update.underscore');
 
             beforeEach(function() {
@@ -136,10 +136,7 @@ define(["js/views/course_info_handout", "js/views/course_info_update", "js/model
                 this.courseInfoEdit.$el.find('.save-button').click();
                 expect(model.save).toHaveBeenCalled();
 
-                // Verify push_notification_selected is set to false.
                 const requestSent = JSON.parse(requests[requests.length - 1].requestBody);
-                expect(requestSent.push_notification_selected).toEqual(false);
-
                 // Verify the link is not rewritten when saved.
                 expect(requestSent.content).toEqual('/static/image.jpg');
 
@@ -189,54 +186,6 @@ define(["js/views/course_info_handout", "js/views/course_info_update", "js/model
             });
         });
 
-
-        describe("Course Updates WITH Push notification", function() {
-            const courseInfoTemplate = readFixtures('course_info_update.underscore');
-
-            beforeEach(function() {
-                setFixtures($("<script>", {id: "course_info_update-tpl", type: "text/template"}).text(courseInfoTemplate));
-                appendSetFixtures(courseInfoPage);
-                this.collection = new CourseUpdateCollection();
-                this.collection.url = 'course_info_update/';
-                this.courseInfoEdit = new CourseInfoUpdateView({
-                    el: $('.course-updates'),
-                    collection: this.collection,
-                    base_asset_url : 'base-asset-url/',
-                    push_notification_enabled : true
-                });
-                this.courseInfoEdit.render();
-                this.event = {preventDefault() { return 'no op'; }};
-                this.courseInfoEdit.onNew(this.event);
-            });
-
-            it("shows push notification checkbox as selected by default", function() {
-                expect(this.courseInfoEdit.$el.find('.toggle-checkbox')).toBeChecked();
-            });
-
-            it("sends correct default value for push_notification_selected", function() {
-                const requests = AjaxHelpers.requests(this);
-                this.courseInfoEdit.$el.find('.save-button').click();
-                const requestSent = JSON.parse(requests[requests.length - 1].requestBody);
-                expect(requestSent.push_notification_selected).toEqual(true);
-
-		// Check that analytics send push_notification info
-                const analytics_payload = window.analytics.track.calls.first().args[1];
-                expect(analytics_payload).toEqual(jasmine.objectContaining({'push_notification_selected': true}));
-            });
-
-            it("sends correct value for push_notification_selected when it is unselected", function() {
-                const requests = AjaxHelpers.requests(this);
-                // unselect push notification
-                this.courseInfoEdit.$el.find('.toggle-checkbox').attr('checked', false);
-                this.courseInfoEdit.$el.find('.save-button').click();
-                const requestSent = JSON.parse(requests[requests.length - 1].requestBody);
-                expect(requestSent.push_notification_selected).toEqual(false);
-
-		// Check that analytics send push_notification info
-                const analytics_payload = window.analytics.track.calls.first().args[1];
-                expect(analytics_payload).toEqual(jasmine.objectContaining({'push_notification_selected': false}));
-            });
-        });
 
         describe("Course Handouts", function() {
             const handoutsTemplate = readFixtures('course_info_handouts.underscore');

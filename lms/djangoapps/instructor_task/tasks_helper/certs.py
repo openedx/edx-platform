@@ -1,6 +1,8 @@
 """
 Instructor tasks related to certificates.
 """
+
+
 from time import time
 
 from django.contrib.auth.models import User
@@ -132,7 +134,7 @@ def invalidate_generated_certificates(course_id, enrolled_students, certificate_
     :param enrolled_students: (queryset or list) students enrolled in the course
     :param certificate_statuses: certificates statuses for whom to remove generated certificate
     """
-    certificates = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
+    certificates = GeneratedCertificate.objects.filter(
         user__in=enrolled_students,
         course_id=course_id,
         status__in=certificate_statuses,

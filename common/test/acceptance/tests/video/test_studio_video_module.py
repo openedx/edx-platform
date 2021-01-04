@@ -3,13 +3,13 @@
 """
 Acceptance tests for CMS Video Module.
 """
+
+
 import os
 from unittest import skipIf
 
-import pytest
-from mock import patch
-
 from bok_choy.promise import EmptyPromise
+from mock import patch
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -288,6 +288,22 @@ class CMSVideoTest(CMSVideoBaseTest):
 
         self.assertTrue(self.video.is_captions_visible())
 
+    def test_transcript_state_is_saved_on_reload(self):
+        """
+        Scenario: Transcripts state is preserved
+        Given I have created a Video component with subtitles
+        And I have toggled off the transcript
+        After page reload transcript is already off
+        Then when I view the video it does show the captions
+        """
+        self._create_course_unit(subtitles=True)
+        self.video.click_player_button('transcript_button')
+        self.assertFalse(self.video.is_captions_visible())
+        self.video.click_player_button('transcript_button')
+        self.assertTrue(self.video.is_captions_visible())
+        self.browser.refresh()
+        self.assertTrue(self.video.is_captions_visible())
+
     def test_caption_line_focus(self):
         """
         Scenario: When enter key is pressed on a caption, an outline shows around it
@@ -334,11 +350,11 @@ class CMSVideoTest(CMSVideoBaseTest):
         self.video.click_player_button('play')
 
 
-@pytest.mark.a11y
 class CMSVideoA11yTest(CMSVideoBaseTest):
     """
     CMS Video Accessibility Test Class
     """
+    a11y = True
 
     def setUp(self):
         browser = os.environ.get('SELENIUM_BROWSER', 'firefox')

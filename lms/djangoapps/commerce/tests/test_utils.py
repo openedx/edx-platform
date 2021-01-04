@@ -1,6 +1,7 @@
 """Tests of commerce utilities."""
+
+
 import json
-from urllib import urlencode
 
 import ddt
 import httpretty
@@ -10,9 +11,8 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import patch
 from opaque_keys.edx.locator import CourseLocator
+from six.moves.urllib.parse import urlencode
 from waffle.testutils import override_switch
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -21,7 +21,9 @@ from lms.djangoapps.commerce.utils import EcommerceService, refund_entitlement, 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.lib.log_utils import audit_log
 from student.models import CourseEnrollment
-from student.tests.factories import (TEST_PASSWORD, UserFactory)
+from student.tests.factories import TEST_PASSWORD, UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
@@ -38,7 +40,6 @@ def update_commerce_config(enabled=False, checkout_page='/test_basket/add/'):
 
 class AuditLogTests(TestCase):
     """Tests of the commerce audit logging helper."""
-    shard = 4
 
     @patch('openedx.core.lib.log_utils.log')
     def test_log_message(self, mock_log):
@@ -54,7 +55,6 @@ class AuditLogTests(TestCase):
 @ddt.ddt
 class EcommerceServiceTests(TestCase):
     """Tests for the EcommerceService helper class."""
-    shard = 4
 
     def setUp(self):
         self.request_factory = RequestFactory()
@@ -83,9 +83,9 @@ class EcommerceServiceTests(TestCase):
         self.assertTrue(is_enabled)
 
     @patch('openedx.core.djangoapps.theming.helpers.is_request_in_themed_site')
-    def test_is_enabled_for_microsites(self, is_microsite):
-        """Verify that is_enabled() returns True if used for a microsite."""
-        is_microsite.return_value = True
+    def test_is_enabled_for_sites(self, is_site):
+        """Verify that is_enabled() returns True if used for a site."""
+        is_site.return_value = True
         is_enabled = EcommerceService().is_enabled(self.user)
         self.assertTrue(is_enabled)
 
@@ -185,7 +185,6 @@ class EcommerceServiceTests(TestCase):
 @skip_unless_lms
 class RefundUtilMethodTests(ModuleStoreTestCase):
     """Tests for Refund Utilities"""
-    shard = 4
 
     def setUp(self):
         super(RefundUtilMethodTests, self).setUp()

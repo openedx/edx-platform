@@ -7,6 +7,8 @@
 # and so should not be destroyed by "make clean".
 # start-noclean
 requirements/private.txt
+requirements/edx/private.in
+requirements/edx/private.txt
 lms/envs/private.py
 cms/envs/private.py
 # end-noclean
@@ -85,6 +87,7 @@ test_root/uploads/
 django-pyfs
 .tox/
 common/test/db_cache/bok_choy_*.yaml
+common/test/data/badges/*.png
 
 ### Installation artifacts
 *.egg-info
@@ -132,7 +135,7 @@ build
 /src/
 \#*\#
 .env/
-lms/lib/comment_client/python
+openedx/core/djangoapps/django_comment_common/comment_client/python
 autodeploy.properties
 .ws_migrations_complete
 dist
@@ -140,3 +143,6 @@ dist
 
 # Visual Studio Code
 .vscode
+
+# Locally generated PII reports
+pii_report

@@ -3,12 +3,12 @@
 Tests for the service classes in verify_student.
 """
 
+
 import ddt
 from django.conf import settings
 from mock import patch
 
-from common.test.utils import MockS3Mixin
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSOVerification, ManualVerification
+from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 from lms.djangoapps.verify_student.services import IDVerificationService
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -21,11 +21,10 @@ FAKE_SETTINGS = {
 
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @ddt.ddt
-class TestIDVerificationService(MockS3Mixin, ModuleStoreTestCase):
+class TestIDVerificationService(ModuleStoreTestCase):
     """
     Tests for IDVerificationService.
     """
-    shard = 4
 
     def test_user_is_verified(self):
         """
@@ -70,12 +69,14 @@ class TestIDVerificationService(MockS3Mixin, ModuleStoreTestCase):
         # test for correct status when no error returned
         user = UserFactory.create()
         status = IDVerificationService.user_status(user)
-        self.assertDictEqual(status, {'status': 'none', 'error': '', 'should_display': True})
+        expected_status = {'status': 'none', 'error': '', 'should_display': True, 'verification_expiry': ''}
+        self.assertDictEqual(status, expected_status)
 
         # test for when photo verification has been created
         SoftwareSecurePhotoVerification.objects.create(user=user, status='approved')
         status = IDVerificationService.user_status(user)
-        self.assertDictEqual(status, {'status': 'approved', 'error': '', 'should_display': True})
+        expected_status = {'status': 'approved', 'error': '', 'should_display': True, 'verification_expiry': ''}
+        self.assertDictEqual(status, expected_status)
 
         # create another photo verification for the same user, make sure the denial
         # is handled properly
@@ -83,23 +84,29 @@ class TestIDVerificationService(MockS3Mixin, ModuleStoreTestCase):
             user=user, status='denied', error_msg='[{"photoIdReasons": ["Not provided"]}]'
         )
         status = IDVerificationService.user_status(user)
-        self.assertDictEqual(status, {'status': 'must_reverify', 'error': ['id_image_missing'], 'should_display': True})
+        expected_status = {
+            'status': 'must_reverify', 'error': ['id_image_missing'], 'should_display': True, 'verification_expiry': ''
+        }
+        self.assertDictEqual(status, expected_status)
 
         # test for when sso verification has been created
         SSOVerification.objects.create(user=user, status='approved')
         status = IDVerificationService.user_status(user)
-        self.assertDictEqual(status, {'status': 'approved', 'error': '', 'should_display': False})
+        expected_status = {'status': 'approved', 'error': '', 'should_display': False, 'verification_expiry': ''}
+        self.assertDictEqual(status, expected_status)
 
         # create another sso verification for the same user, make sure the denial
         # is handled properly
         SSOVerification.objects.create(user=user, status='denied')
         status = IDVerificationService.user_status(user)
-        self.assertDictEqual(status, {'status': 'must_reverify', 'error': '', 'should_display': False})
+        expected_status = {'status': 'must_reverify', 'error': '', 'should_display': False, 'verification_expiry': ''}
+        self.assertDictEqual(status, expected_status)
 
         # test for when manual verification has been created
         ManualVerification.objects.create(user=user, status='approved')
         status = IDVerificationService.user_status(user)
-        self.assertDictEqual(status, {'status': 'approved', 'error': '', 'should_display': False})
+        expected_status = {'status': 'approved', 'error': '', 'should_display': False, 'verification_expiry': ''}
+        self.assertDictEqual(status, expected_status)
 
     @ddt.unpack
     @ddt.data(

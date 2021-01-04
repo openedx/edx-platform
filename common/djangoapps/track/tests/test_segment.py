@@ -1,12 +1,12 @@
 """Ensure emitted events contain the fields legacy processors expect to find."""
 
-import ddt
 
+import ddt
 from django.test import TestCase
 from django.test.utils import override_settings
 from eventtracking import tracker
 from eventtracking.django import DjangoTracker
-from mock import sentinel, patch
+from mock import patch, sentinel
 
 from track import segment
 

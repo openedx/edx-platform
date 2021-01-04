@@ -11,8 +11,7 @@
   .modal-window {
     @extend %ui-depth3;
 
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     position: absolute;
     width: 50%;
     box-shadow: 0 0 7px $shadow-d1;
@@ -219,6 +218,12 @@
           color: $blue-d4;
         }
       }
+
+      .clipboard-button {
+        position: absolute;
+        right: 30px;
+        bottom: 30px;
+      }
     }
   }
 
@@ -248,7 +253,7 @@
   // large modals - component editors and interactives
   // ------------------------
   .modal-lg {
-    width: 70%;
+    width: 95%;
     min-width: ($baseline*27.5);
     height: auto;
 
@@ -266,7 +271,7 @@
         }
 
         .editor-modes {
-          width: 48%;
+          width: 49%;
           display: inline-block;
 
           @include text-align(right);
@@ -378,7 +383,6 @@
     }
   }
 
-
   // MODAL TYPE: component - video modal (includes special overrides for xblock-related editing view)
   .modal-lg.modal-type-video {
     .modal-content {
@@ -424,7 +428,7 @@
       }
     }
 
-    .xmodule_edit.xmodule_VideoDescriptor .editor-with-tabs {
+    .xmodule_edit.xmodule_VideoBlock .editor-with-tabs {
       .edit-header {
         border: 0;
         background-color: $gray-l4;

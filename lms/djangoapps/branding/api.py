@@ -12,17 +12,19 @@ are consistent across the LMS and other sites (such as
 the marketing site and blog).
 
 """
-import logging
-import urlparse
 
+
+import logging
+
+import six
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+from six.moves.urllib.parse import urljoin
 
 from branding.models import BrandingApiConfig
 from edxmako.shortcuts import marketing_link
-
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger("edx.footer")
@@ -34,7 +36,7 @@ def is_enabled():
     return BrandingApiConfig.current().enabled
 
 
-def get_footer(is_secure=True):
+def get_footer(is_secure=True, language=settings.LANGUAGE_CODE):
     """Retrieve information used to render the footer.
 
     This will handle both the Open edX and edX.org versions
@@ -99,15 +101,18 @@ def get_footer(is_secure=True):
         "copyright": _footer_copyright(),
         "logo_image": _footer_logo_img(is_secure),
         "social_links": _footer_social_links(),
-        "business_links": _footer_business_links(),
+        "business_links": _footer_business_links(language),
         "mobile_links": _footer_mobile_links(is_secure),
-        "more_info_links": _footer_more_info_links(),
-        "connect_links": _footer_connect_links(),
+        "more_info_links": _footer_more_info_links(language),
+        "connect_links": _footer_connect_links(language),
         "openedx_link": _footer_openedx_link(),
-        "navigation_links": _footer_navigation_links(),
-        "legal_links": _footer_legal_links(),
+        "navigation_links": _footer_navigation_links(language),
+        "legal_links": _footer_legal_links(language),
         "edx_org_link": {
-            "url": "https://www.edx.org/?utm_medium=affiliate_partner&utm_source=opensource-partner&utm_content=open-edx-partner-footer-link&utm_campaign=open-edx-footer",
+            "url": "https://www.edx.org/?utm_medium=affiliate_partner"
+                   "&utm_source=opensource-partner"
+                   "&utm_content=open-edx-partner-footer-link"
+                   "&utm_campaign=open-edx-footer",
             "text": _("Take free online courses at edX.org"),
         },
     }
@@ -161,17 +166,92 @@ def _footer_social_links():
         links.append(
             {
                 "name": social_name,
-                "title": unicode(display.get("title", "")),
+                "title": six.text_type(display.get("title", "")),
                 "url": settings.SOCIAL_MEDIA_FOOTER_URLS.get(social_name, "#"),
                 "icon-class": display.get("icon", ""),
-                "action": unicode(display.get("action", "")).format(platform_name=platform_name),
+                "action": six.text_type(display.get("action", "")).format(platform_name=platform_name),
             }
         )
     return links
 
 
-def _footer_connect_links():
+def _build_support_form_url(full_path=False):
+    """
+    Return the support form path
+
+    Returns url of support form, which can have 3 possible values:
+    - '' if the contact form is disabled (by setting SiteConfiguration
+      `CONTACT_US_ENABLE = False`)
+
+    - The normal edx support form path using reverse("support:contact_us") if
+      `CONTACT_US_ENABLE = True` and a custom link isn't set on
+      CONTACT_US_CUSTOM_LINK. There's the optional parameter `full_path`, that
+      if set to True will append the LMS base url to the relative path before
+      returning.
+
+    - CONTACT_US_CUSTOM_LINK if the the user has set a custom URL redirect
+      for support forms (by setting `CONTACT_US_ENABLE = True` and
+      `CONTACT_US_CUSTOM_LINK = http://some.url/for/contact`).
+      If this is set, the returned link is the content of
+      CONTACT_US_CUSTOM_LINK and the `full_path` variable is ignored since this
+      is a path outside the LMS
+
+    Parameters:
+        - full_path: bool. Appends base_url to returned value if
+                     `CONTACT_US_ENABLE = True`and no link is set on
+                     `CONTACT_US_CUSTOM_LINK`
+
+    Returns: string
+
+    """
+    contact_us_page = ''
+
+    if configuration_helpers.get_value('CONTACT_US_ENABLE', True):
+        # Gets custom url ad check if it's enabled
+        contact_us_page = configuration_helpers.get_value('CONTACT_US_CUSTOM_LINK', '')
+
+        # If no custom link is set, get default support form using reverse
+        if not contact_us_page:
+            contact_us_page = reverse("support:contact_us")
+
+            # Prepend with lms base_url if specified by `full_path`
+            if full_path:
+                contact_us_page = '{}{}'.format(settings.LMS_ROOT_URL, contact_us_page)
+
+    return contact_us_page
+
+
+def _build_help_center_url(language):
+    """
+    Return the help-center URL based on the language selected on the homepage.
+
+    :param language: selected language
+    :return: help-center URL
+    """
+    support_url = settings.SUPPORT_SITE_LINK
+    # Changing the site url only for the Edx.org and not for OpenEdx.
+    if support_url and 'support.edx.org' in support_url:
+        enabled_languages = {
+            'en': 'hc/en-us',
+            'es-419': 'hc/es-419'
+        }
+        if language in enabled_languages:
+            support_url = urljoin(support_url, enabled_languages[language])
+
+    return support_url
+
+
+def _footer_connect_links(language=settings.LANGUAGE_CODE):
     """Return the connect links to display in the footer. """
+    links = [
+        ("blog", (marketing_link("BLOG"), _("Blog"))),
+        ("contact", (_build_support_form_url(full_path=True), _("Contact Us"))),
+        ("help-center", (_build_help_center_url(language), _("Help Center"))),
+    ]
+
+    if language == settings.LANGUAGE_CODE:
+        links.append(("media_kit", (marketing_link("MEDIA_KIT"), _("Media Kit"))))
+        links.append(("donate", (marketing_link("DONATE"), _("Donate"))))
 
     return [
         {
@@ -179,54 +259,57 @@ def _footer_connect_links():
             "title": link_title,
             "url": link_url,
         }
-        for link_name, link_url, link_title in [
-            ("blog", marketing_link("BLOG"), _("Blog")),
-            ("contact", _build_support_form_url(), _("Contact Us")),
-            ("help-center", settings.SUPPORT_SITE_LINK, _("Help Center")),
-            ("media_kit", marketing_link("MEDIA_KIT"), _("Media Kit")),
-            ("donate", marketing_link("DONATE"), _("Donate")),
-        ]
+        for link_name, (link_url, link_title) in links
         if link_url and link_url != "#"
     ]
 
 
-def _build_support_form_url():
-    return '{base_url}/support/contact_us'.format(base_url=settings.LMS_ROOT_URL)
+def _find_position_of_link(links, key):
+    "Returns position of the link to be inserted"
+    for link in links:
+        if link[0] == key:
+            return links.index(link) + 1
 
 
-def _footer_navigation_links():
+def _footer_navigation_links(language=settings.LANGUAGE_CODE):
     """Return the navigation links to display in the footer. """
     platform_name = configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
+    links = [
+        ("about", (marketing_link("ABOUT"), _("About"))),
+        ("enterprise", (
+            marketing_link("ENTERPRISE"),
+            _(u"{platform_name} for Business").format(platform_name=platform_name)
+        )),
+        ("blog", (marketing_link("BLOG"), _("Blog"))),
+        ("help-center", (_build_help_center_url(language), _("Help Center"))),
+        ("contact", (_build_support_form_url(), _("Contact"))),
+        ("careers", (marketing_link("CAREERS"), _("Careers"))),
+        ("donate", (marketing_link("DONATE"), _("Donate"))),
+    ]
+
+    if language == settings.LANGUAGE_CODE:
+        position = _find_position_of_link(links, 'blog')
+        links.insert(position, ("news", (marketing_link("NEWS"), _("News"))))
+
     return [
         {
             "name": link_name,
             "title": link_title,
             "url": link_url,
         }
-        for link_name, link_url, link_title in [
-            ("about", marketing_link("ABOUT"), _("About")),
-            ("enterprise", marketing_link("ENTERPRISE"),
-             _("{platform_name} for Business").format(platform_name=platform_name)),
-            ("blog", marketing_link("BLOG"), _("Blog")),
-            ("news", marketing_link("NEWS"), _("News")),
-            ("help-center", settings.SUPPORT_SITE_LINK, _("Help Center")),
-            ("contact", reverse("support:contact_us"), _("Contact")),
-            ("careers", marketing_link("CAREERS"), _("Careers")),
-            ("donate", marketing_link("DONATE"), _("Donate")),
-        ]
+        for link_name, (link_url, link_title) in links
         if link_url and link_url != "#"
     ]
 
 
-def _footer_legal_links():
+def _footer_legal_links(language=settings.LANGUAGE_CODE):
     """Return the legal footer links (e.g. terms of service). """
 
     links = [
-        ("terms_of_service_and_honor_code", marketing_link("TOS_AND_HONOR"), _("Terms of Service & Honor Code")),
-        ("privacy_policy", marketing_link("PRIVACY"), _("Privacy Policy")),
-        ("accessibility_policy", marketing_link("ACCESSIBILITY"), _("Accessibility Policy")),
-        ("sitemap", marketing_link("SITE_MAP"), _("Sitemap")),
-        ("media_kit", marketing_link("MEDIA_KIT"), _("Media Kit")),
+        ("terms_of_service_and_honor_code", (marketing_link("TOS_AND_HONOR"), _("Terms of Service & Honor Code"))),
+        ("privacy_policy", (marketing_link("PRIVACY"), _("Privacy Policy"))),
+        ("accessibility_policy", (marketing_link("ACCESSIBILITY"), _("Accessibility Policy"))),
+        ("media_kit", (marketing_link("MEDIA_KIT"), _("Media Kit"))),
     ]
 
     # Backwards compatibility: If a combined "terms of service and honor code"
@@ -234,24 +317,52 @@ def _footer_legal_links():
     tos_and_honor_link = marketing_link("TOS_AND_HONOR")
     if not (tos_and_honor_link and tos_and_honor_link != "#"):
         links.extend([
-            ("terms_of_service", marketing_link("TOS"), _("Terms of Service")),
-            ("honor_code", marketing_link("HONOR"), _("Honor Code")),
+            ("terms_of_service", (marketing_link("TOS"), _("Terms of Service"))),
+            ("honor_code", (marketing_link("HONOR"), _("Honor Code"))),
         ])
 
+    if language == settings.LANGUAGE_CODE:
+        position = _find_position_of_link(links, 'accessibility_policy')
+        links.insert(position, ("sitemap", (marketing_link("SITE_MAP"), _("Sitemap"))))
+
     return [
         {
             "name": link_name,
             "title": link_title,
             "url": link_url,
         }
-        for link_name, link_url, link_title in links
+        for link_name, (link_url, link_title) in links
         if link_url and link_url != "#"
     ]
 
 
-def _footer_business_links():
+def _add_enterprise_marketing_footer_query_params(url):
+    """Add query params to url if they exist in the settings"""
+    params = settings.ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS
+    if params:
+        return "{url}/?{params}".format(
+            url=url,
+            params=six.moves.urllib.parse.urlencode(params),
+        )
+    return url
+
+
+def _footer_business_links(language=settings.LANGUAGE_CODE):
     """Return the business links to display in the footer. """
     platform_name = configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
+    links = [
+        ("about", (marketing_link("ABOUT"), _("About"))),
+        ("enterprise", (
+            _add_enterprise_marketing_footer_query_params(marketing_link("ENTERPRISE")),
+            _(u"{platform_name} for Business").format(platform_name=platform_name)
+        )),
+    ]
+
+    if language == settings.LANGUAGE_CODE:
+        links.append(('affiliates', (marketing_link("AFFILIATES"), _("Affiliates"))))
+        links.append(('openedx', (_footer_openedx_link()["url"], _("Open edX"))))
+        links.append(('careers', (marketing_link("CAREERS"), _("Careers"))))
+        links.append(("news", (marketing_link("NEWS"), _("News"))))
 
     return [
         {
@@ -259,28 +370,18 @@ def _footer_business_links():
             "title": link_title,
             "url": link_url,
         }
-        for link_name, link_url, link_title in [
-            ("about", marketing_link("ABOUT"), _("About")),
-            ("enterprise", marketing_link("ENTERPRISE"),
-             _("{platform_name} for Business").format(platform_name=platform_name)),
-            ("affiliates", marketing_link("AFFILIATES"), _("Affiliates")),
-            ("openedx", _footer_openedx_link()["url"], _("Open edX")),
-            ("careers", marketing_link("CAREERS"), _("Careers")),
-            ("news", marketing_link("NEWS"), _("News")),
-        ]
+        for link_name, (link_url, link_title) in links
         if link_url and link_url != "#"
     ]
 
 
-def _footer_more_info_links():
+def _footer_more_info_links(language=settings.LANGUAGE_CODE):
     """Return the More Information footer links (e.g. terms of service). """
 
     links = [
-        ("terms_of_service_and_honor_code", marketing_link("TOS_AND_HONOR"), _("Terms of Service & Honor Code")),
-        ("privacy_policy", marketing_link("PRIVACY"), _("Privacy Policy")),
-        ("accessibility_policy", marketing_link("ACCESSIBILITY"), _("Accessibility Policy")),
-        ("trademarks", marketing_link("TRADEMARKS"), _("Trademark Policy")),
-        ("sitemap", marketing_link("SITE_MAP"), _("Sitemap")),
+        ("terms_of_service_and_honor_code", (marketing_link("TOS_AND_HONOR"), _("Terms of Service & Honor Code"))),
+        ("privacy_policy", (marketing_link("PRIVACY"), _("Privacy Policy"))),
+        ("accessibility_policy", (marketing_link("ACCESSIBILITY"), _("Accessibility Policy"))),
     ]
 
     # Backwards compatibility: If a combined "terms of service and honor code"
@@ -288,9 +389,13 @@ def _footer_more_info_links():
     tos_and_honor_link = marketing_link("TOS_AND_HONOR")
     if not (tos_and_honor_link and tos_and_honor_link != "#"):
         links.extend([
-            ("terms_of_service", marketing_link("TOS"), _("Terms of Service")),
-            ("honor_code", marketing_link("HONOR"), _("Honor Code")),
+            ("terms_of_service", (marketing_link("TOS"), _("Terms of Service"))),
+            ("honor_code", (marketing_link("HONOR"), _("Honor Code"))),
         ])
+
+    if language == settings.LANGUAGE_CODE:
+        links.append(("trademarks", (marketing_link("TRADEMARKS"), _("Trademark Policy"))))
+        links.append(("sitemap", (marketing_link("SITE_MAP"), _("Sitemap"))))
 
     return [
         {
@@ -298,7 +403,7 @@ def _footer_more_info_links():
             "title": link_title,
             "url": link_url,
         }
-        for link_name, link_url, link_title in links
+        for link_name, (link_url, link_title) in links
         if link_url and link_url != "#"
     ]
 
@@ -320,7 +425,7 @@ def _footer_mobile_links(is_secure):
             {
                 "name": "apple",
                 "title": _(
-                    "Download the {platform_name} mobile app from the Apple App Store"
+                    u"Download the {platform_name} mobile app from the Apple App Store"
                 ).format(platform_name=platform_name),
                 "url": settings.MOBILE_STORE_URLS.get('apple', '#'),
                 "image": _absolute_url_staticfile(is_secure, 'images/app/app_store_badge_135x40.svg'),
@@ -328,7 +433,7 @@ def _footer_mobile_links(is_secure):
             {
                 "name": "google",
                 "title": _(
-                    "Download the {platform_name} mobile app from Google Play"
+                    u"Download the {platform_name} mobile app from Google Play"
                 ).format(platform_name=platform_name),
                 "url": settings.MOBILE_STORE_URLS.get('google', '#'),
                 "image": _absolute_url_staticfile(is_secure, 'images/app/google_play_badge_45.png'),
@@ -367,7 +472,7 @@ def _footer_logo_img(is_secure):
         # We can log when this happens:
         default_logo = "images/logo.png"
         log.info(
-            "Failed to find footer logo at '%s', using '%s' instead",
+            u"Failed to find footer logo at '%s', using '%s' instead",
             logo_name,
             default_logo,
         )
@@ -390,7 +495,7 @@ def _absolute_url(is_secure, url_path):
     """
     site_name = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
     parts = ("https" if is_secure else "http", site_name, url_path, '', '', '')
-    return urlparse.urlunparse(parts)
+    return six.moves.urllib.parse.urlunparse(parts)
 
 
 def _absolute_url_staticfile(is_secure, name):
@@ -409,7 +514,7 @@ def _absolute_url_staticfile(is_secure, name):
     # In production, the static files URL will be an absolute
     # URL pointing to a CDN.  If this happens, we can just
     # return the URL.
-    if urlparse.urlparse(url_path).netloc:
+    if six.moves.urllib.parse.urlparse(url_path).netloc:
         return url_path
 
     # For local development, the returned URL will be relative,
@@ -505,12 +610,6 @@ def get_about_url():
 
 def get_home_url():
     """
-    Lookup and return home page url, lookup is performed in the following order
-
-    1. return marketing root URL, If marketing is enabled
-    2. Otherwise return dashboard URL.
+    Return Dashboard page url
     """
-    if settings.FEATURES.get('ENABLE_MKTG_SITE', False):
-        return marketing_link('ROOT')
-
     return reverse('dashboard')

@@ -2,24 +2,25 @@
 """
 Unit tests for instructor.enrollment methods.
 """
-from __future__ import print_function
+
 
 import json
 from abc import ABCMeta
 
 import ddt
-import mock
+import six
 from ccx_keys.locator import CCXLocator
+from crum import set_current_request
 from django.conf import settings
-from django.utils.translation import override as override_language
 from django.utils.translation import get_language
+from django.utils.translation import override as override_language
 from mock import patch
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
-from crum import set_current_request
+from submissions import api as sub_api
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 from grades.subsection_grade_factory import SubsectionGradeFactory
 from grades.tests.utils import answer_problem
 from lms.djangoapps.ccx.tests.factories import CcxFactory
@@ -35,16 +36,13 @@ from lms.djangoapps.instructor.enrollment import (
 )
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, get_mock_request
-from openedx.core.lib.tests import attr
 from student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
 from student.roles import CourseCcxCoachRole
 from student.tests.factories import AdminFactory, UserFactory
-from submissions import api as sub_api
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
-@attr(shard=1)
 class TestSettableEnrollmentState(CacheIsolationTestCase):
     """ Test the basis class for enrollment tests. """
     def setUp(self):
@@ -67,7 +65,7 @@ class TestSettableEnrollmentState(CacheIsolationTestCase):
         self.assertEqual(mes, ees)
 
 
-class TestEnrollmentChangeBase(CacheIsolationTestCase):
+class TestEnrollmentChangeBase(six.with_metaclass(ABCMeta, CacheIsolationTestCase)):
     """
     Test instructor enrollment administration against database effects.
 
@@ -75,8 +73,6 @@ class TestEnrollmentChangeBase(CacheIsolationTestCase):
     `action` is a function which is run
     the test will pass if `action` mutates state from `before_ideal` to `after_ideal`
     """
-
-    __metaclass__ = ABCMeta
 
     def setUp(self):
         super(TestEnrollmentChangeBase, self).setUp()
@@ -108,7 +104,6 @@ class TestEnrollmentChangeBase(CacheIsolationTestCase):
         self.assertEqual(after, after_ideal)
 
 
-@attr(shard=1)
 class TestInstructorEnrollDB(TestEnrollmentChangeBase):
     """ Test instructor.enrollment.enroll_email """
     def test_enroll(self):
@@ -226,7 +221,6 @@ class TestInstructorEnrollDB(TestEnrollmentChangeBase):
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
 
-@attr(shard=1)
 class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
     """ Test instructor.enrollment.unenroll_email """
     def test_unenroll(self):
@@ -306,7 +300,6 @@ class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
 
-@attr(shard=1)
 class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
     """ Test student module manipulations. """
     @classmethod
@@ -377,7 +370,7 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
         reset_student_attempts(self.course_key, self.user, msk, requesting_user=self.user)
         self.assertEqual(json.loads(module().state)['attempts'], 0)
 
-    @mock.patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
+    @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
     def test_delete_student_attempts(self, _mock_signal):
         msk = self.course_key.make_usage_key('dummy', 'module')
         original_state = json.dumps({'attempts': 32, 'otherstuff': 'alsorobots'})
@@ -403,10 +396,8 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
 
     # Disable the score change signal to prevent other components from being
     # pulled into tests.
-    @mock.patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
-    @mock.patch('lms.djangoapps.grades.signals.handlers.submissions_score_set_handler')
-    @mock.patch('lms.djangoapps.grades.signals.handlers.submissions_score_reset_handler')
-    def test_delete_submission_scores(self, _mock_send_signal, mock_set_receiver, mock_reset_receiver):
+    @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
+    def test_delete_submission_scores(self, mock_send_signal):
         user = UserFactory()
         problem_location = self.course_key.make_usage_key('dummy', 'module')
 
@@ -429,6 +420,7 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
         sub_api.set_score(submission['uuid'], 1, 2)
 
         # Delete student state using the instructor dash
+        mock_send_signal.reset_mock()
         reset_student_attempts(
             self.course_key, user, problem_location,
             requesting_user=user,
@@ -436,8 +428,8 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
         )
 
         # Make sure our grades signal receivers handled the reset properly
-        mock_set_receiver.assert_not_called()
-        mock_reset_receiver.assert_called_once()
+        mock_send_signal.assert_called_once()
+        assert mock_send_signal.call_args[1]['weighted_earned'] == 0
 
         # Verify that the student's scores have been reset in the submissions API
         score = sub_api.get_score(student_item)
@@ -654,7 +646,6 @@ class SettableEnrollmentState(EmailEnrollmentState):
             return EnrollmentObjects(email, None, None, None)
 
 
-@attr(shard=1)
 class TestSendBetaRoleEmail(CacheIsolationTestCase):
     """
     Test edge cases for `send_beta_role_email`
@@ -667,12 +658,11 @@ class TestSendBetaRoleEmail(CacheIsolationTestCase):
 
     def test_bad_action(self):
         bad_action = 'beta_tester'
-        error_msg = "Unexpected action received '{}' - expected 'add' or 'remove'".format(bad_action)
-        with self.assertRaisesRegexp(ValueError, error_msg):
+        error_msg = u"Unexpected action received '{}' - expected 'add' or 'remove'".format(bad_action)
+        with self.assertRaisesRegex(ValueError, error_msg):
             send_beta_role_email(bad_action, self.user, self.email_params)
 
 
-@attr(shard=1)
 class TestGetEmailParamsCCX(SharedModuleStoreTestCase):
     """
     Test what URLs the function get_email_params for CCX student enrollment.
@@ -721,7 +711,6 @@ class TestGetEmailParamsCCX(SharedModuleStoreTestCase):
         self.assertEqual(result['course_url'], self.course_url)
 
 
-@attr(shard=1)
 class TestGetEmailParams(SharedModuleStoreTestCase):
     """
     Test what URLs the function get_email_params returns under different
@@ -754,7 +743,7 @@ class TestGetEmailParams(SharedModuleStoreTestCase):
     def test_marketing_params(self):
         # For a site with a marketing front end, what do we expect to get for the URLs?
         # Also make sure `auto_enroll` is properly passed through.
-        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
             result = get_email_params(self.course, True)
 
         self.assertEqual(result['auto_enroll'], True)
@@ -764,7 +753,6 @@ class TestGetEmailParams(SharedModuleStoreTestCase):
         self.assertEqual(result['course_url'], self.course_url)
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestRenderMessageToString(EmailTemplateTagMixin, SharedModuleStoreTestCase):
     """

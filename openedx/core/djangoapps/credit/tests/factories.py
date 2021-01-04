@@ -1,20 +1,22 @@
 # pylint:disable=missing-docstring
+
+
 import datetime
 import json
 import uuid
 
-from django.contrib.auth.models import User
 import factory
 from factory.fuzzy import FuzzyText
 import pytz
+from django.contrib.auth.models import User
 
 from openedx.core.djangoapps.credit.models import (
-    CreditProvider,
-    CreditEligibility,
     CreditCourse,
+    CreditEligibility,
+    CreditProvider,
     CreditRequest,
     CreditRequirement,
-    CreditRequirementStatus,
+    CreditRequirementStatus
 )
 from util.date_utils import to_timestamp
 

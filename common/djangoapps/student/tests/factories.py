@@ -1,9 +1,11 @@
 """Provides factories for student models."""
 
+
 from datetime import datetime
 from uuid import uuid4
 
 import factory
+import six
 from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from factory.django import DjangoModelFactory
@@ -25,7 +27,6 @@ from student.models import (
 )
 
 # Factories are self documenting
-# pylint: disable=missing-docstring
 
 TEST_PASSWORD = 'test'
 
@@ -66,7 +67,7 @@ class RegistrationFactory(DjangoModelFactory):
         model = Registration
 
     user = None
-    activation_key = uuid4().hex.decode('ascii')
+    activation_key = six.text_type(uuid4().hex)
 
 
 class UserFactory(DjangoModelFactory):
@@ -88,7 +89,7 @@ class UserFactory(DjangoModelFactory):
     date_joined = datetime(2011, 1, 1, tzinfo=UTC)
 
     @factory.post_generation
-    def profile(obj, create, extracted, **kwargs):  # pylint: disable=unused-argument, no-self-argument
+    def profile(obj, create, extracted, **kwargs):  # pylint: disable=unused-argument, missing-function-docstring
         if create:
             obj.save()
             return UserProfileFactory.create(user=obj, **kwargs)
@@ -102,7 +103,7 @@ class UserFactory(DjangoModelFactory):
         if extracted is None:
             return
 
-        if isinstance(extracted, basestring):
+        if isinstance(extracted, six.string_types):
             extracted = [extracted]
 
         for group_name in extracted:
@@ -132,7 +133,7 @@ class CourseEnrollmentFactory(DjangoModelFactory):
     def _create(cls, model_class, *args, **kwargs):
         manager = cls._get_manager(model_class)
         course_kwargs = {}
-        for key in kwargs.keys():
+        for key in list(kwargs):
             if key.startswith('course__'):
                 course_kwargs[key.split('__')[1]] = kwargs.pop(key)
 
@@ -140,7 +141,12 @@ class CourseEnrollmentFactory(DjangoModelFactory):
             course_id = kwargs.get('course_id')
             course_overview = None
             if course_id is not None:
-                if isinstance(course_id, basestring):
+                # 'course_id' is not needed by the model when course is passed.
+                # This arg used to be called course_id before we added the CourseOverview
+                # foreign key constraint to CourseEnrollment.
+                del kwargs['course_id']
+
+                if isinstance(course_id, six.string_types):
                     course_id = CourseKey.from_string(course_id)
                     course_kwargs.setdefault('id', course_id)
 
@@ -150,6 +156,9 @@ class CourseEnrollmentFactory(DjangoModelFactory):
                     pass
 
             if course_overview is None:
+                if 'id' not in course_kwargs and course_id:
+                    course_kwargs['id'] = course_id
+
                 course_overview = CourseOverviewFactory(**course_kwargs)
             kwargs['course'] = course_overview
 

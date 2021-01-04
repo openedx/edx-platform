@@ -2,6 +2,7 @@
 TestCases verifying proper behavior of custom DRF request parsers.
 """
 
+
 from collections import namedtuple
 from io import BytesIO
 
@@ -15,7 +16,6 @@ class TestTypedFileUploadParser(APITestCase):
     """
     Tests that verify the behavior of TypedFileUploadParser
     """
-    shard = 2
 
     def setUp(self):
         super(TestTypedFileUploadParser, self).setUp()
@@ -35,10 +35,10 @@ class TestTypedFileUploadParser(APITestCase):
             HTTP_CONTENT_DISPOSITION='attachment; filename="file.PNG"',
         )
         context = {'view': self.view, 'request': request}
-        result = self.parser.parse(stream=BytesIO('abcdefgh'), media_type='image/png', parser_context=context)
+        result = self.parser.parse(stream=BytesIO(b'abcdefgh'), media_type='image/png', parser_context=context)
         self.assertEqual(result.data, {})
         self.assertIn('file', result.files)
-        self.assertEqual(result.files['file'].read(), 'abcdefgh')
+        self.assertEqual(result.files['file'].read(), b'abcdefgh')
 
     def test_parse_unsupported_type(self):
         """
@@ -52,7 +52,7 @@ class TestTypedFileUploadParser(APITestCase):
         )
         context = {'view': self.view, 'request': request}
         with self.assertRaises(exceptions.UnsupportedMediaType):
-            self.parser.parse(stream=BytesIO('abcdefgh'), media_type='image/tiff', parser_context=context)
+            self.parser.parse(stream=BytesIO(b'abcdefgh'), media_type='image/tiff', parser_context=context)
 
     def test_parse_unconstrained_type(self):
         """
@@ -66,11 +66,11 @@ class TestTypedFileUploadParser(APITestCase):
         )
         context = {'view': self.view, 'request': request}
         result = self.parser.parse(
-            stream=BytesIO('abcdefgh'), media_type='application/octet-stream', parser_context=context
+            stream=BytesIO(b'abcdefgh'), media_type='application/octet-stream', parser_context=context
         )
         self.assertEqual(result.data, {})
         self.assertIn('file', result.files)
-        self.assertEqual(result.files['file'].read(), 'abcdefgh')
+        self.assertEqual(result.files['file'].read(), b'abcdefgh')
 
     def test_parse_mismatched_filename_and_mimetype(self):
         """
@@ -85,7 +85,7 @@ class TestTypedFileUploadParser(APITestCase):
         )
         context = {'view': self.view, 'request': request}
         with self.assertRaises(exceptions.ParseError) as err:
-            self.parser.parse(stream=BytesIO('abcdefgh'), media_type='image/png', parser_context=context)
+            self.parser.parse(stream=BytesIO(b'abcdefgh'), media_type='image/png', parser_context=context)
             self.assertIn('developer_message', err.detail)
             self.assertNotIn('user_message', err.detail)
 
@@ -104,6 +104,6 @@ class TestTypedFileUploadParser(APITestCase):
         )
         context = {'view': view, 'request': request}
         with self.assertRaises(exceptions.UnsupportedMediaType) as err:
-            self.parser.parse(stream=BytesIO('abcdefgh'), media_type='image/png', parser_context=context)
+            self.parser.parse(stream=BytesIO(b'abcdefgh'), media_type='image/png', parser_context=context)
             self.assertIn('developer_message', err.detail)
             self.assertIn('user_message', err.detail)

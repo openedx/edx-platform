@@ -1,17 +1,20 @@
 """
 Django admin configuration pages for the user_api app
 """
+
+
 from django.conf.urls import url
 from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.template.response import TemplateResponse
+from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import ugettext as _
 
 from openedx.core.djangoapps.user_api.accounts.forms import RetirementQueueDeletionForm
-from .models import UserRetirementPartnerReportingStatus, RetirementState, UserRetirementStatus, UserRetirementRequest
+
+from .models import RetirementState, UserRetirementPartnerReportingStatus, UserRetirementRequest, UserRetirementStatus
 
 
 @admin.register(RetirementState)
@@ -102,7 +105,7 @@ class UserRetirementStatusAdmin(admin.ModelAdmin):
         try:
             if obj.current_state.state_name == 'PENDING':
                 return format_html(
-                    '<a class="button" href="{}">{}</a>&nbsp;',
+                    u'<a class="button" href="{}">{}</a>&nbsp;',
                     reverse('admin:cancel-retirement', args=[obj.pk]),
                     _('Cancel')
                 )
@@ -112,7 +115,6 @@ class UserRetirementStatusAdmin(admin.ModelAdmin):
             return format_html('')
 
     retirement_actions.short_description = _('Actions')
-    retirement_actions.allow_tags = True
 
     def get_actions(self, request):
         """
@@ -190,7 +192,7 @@ class UserRetirementPartnerReportingStatusAdmin(admin.ModelAdmin):
         if rows_updated == 1:
             message_bit = "one user was"
         else:
-            message_bit = "%s users were" % rows_updated
-        self.message_user(request, "%s successfully reset." % message_bit)
+            message_bit = u"%s users were" % rows_updated
+        self.message_user(request, u"%s successfully reset." % message_bit)
 
     reset_state.short_description = 'Reset is_being_processed to False'

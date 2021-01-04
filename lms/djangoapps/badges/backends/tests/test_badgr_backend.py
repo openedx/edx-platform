@@ -1,9 +1,12 @@
 """
 Tests for BadgrBackend
 """
+
+
 from datetime import datetime
 
 import ddt
+import six
 from django.db.models.fields.files import ImageFieldFile
 from django.test.utils import override_settings
 from lazy.lazy import lazy
@@ -35,7 +38,6 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
     """
     Tests the BadgeHandler object
     """
-    shard = 4
 
     def setUp(self):
         """
@@ -197,7 +199,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
             'name': 'edx.badge.assertion.created',
             'data': {
                 'user_id': self.user.id,
-                'course_id': unicode(self.course.location.course_key),
+                'course_id': six.text_type(self.course.location.course_key),
                 'enrollment_mode': 'honor',
                 'assertion_id': assertion.id,
                 'badge_name': 'Test Badge',

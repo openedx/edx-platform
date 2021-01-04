@@ -1,5 +1,6 @@
 """Get log settings."""
 
+
 import logging
 import platform
 import sys
@@ -13,7 +14,6 @@ def get_logger_config(log_dir,
                       logging_env="no_env",
                       local_loglevel='INFO',
                       service_variant=""):
-
     """
 
     Return the appropriate logging config dictionary. You should assign the
@@ -28,20 +28,20 @@ def get_logger_config(log_dir,
         local_loglevel = 'INFO'
 
     hostname = platform.node().split(".")[0]
-    syslog_format = ("[service_variant={service_variant}]"
-                     "[%(name)s][env:{logging_env}] %(levelname)s "
-                     "[{hostname}  %(process)d] [%(filename)s:%(lineno)d] "
-                     "- %(message)s").format(service_variant=service_variant,
-                                             logging_env=logging_env,
-                                             hostname=hostname)
+    syslog_format = (u"[service_variant={service_variant}]"
+                     u"[%(name)s][env:{logging_env}] %(levelname)s "
+                     u"[{hostname}  %(process)d] [user %(userid)s] [%(filename)s:%(lineno)d] "
+                     u"- %(message)s").format(service_variant=service_variant,
+                                              logging_env=logging_env,
+                                              hostname=hostname)
 
     logger_config = {
         'version': 1,
         'disable_existing_loggers': False,
         'formatters': {
             'standard': {
-                'format': '%(asctime)s %(levelname)s %(process)d '
-                          '[%(name)s] %(filename)s:%(lineno)d - %(message)s',
+                'format': u'%(asctime)s %(levelname)s %(process)d '
+                          u'[%(name)s] [user %(userid)s] %(filename)s:%(lineno)d - %(message)s',
             },
             'syslog_format': {'format': syslog_format},
             'raw': {'format': '%(message)s'},
@@ -49,6 +49,9 @@ def get_logger_config(log_dir,
         'filters': {
             'require_debug_false': {
                 '()': 'django.utils.log.RequireDebugFalse',
+            },
+            'userid_context': {
+                '()': 'openedx.core.djangoapps.util.log_utils.UserIdFilter',
             }
         },
         'handlers': {
@@ -56,6 +59,7 @@ def get_logger_config(log_dir,
                 'level': 'INFO',
                 'class': 'logging.StreamHandler',
                 'formatter': 'standard',
+                'filters': ['userid_context'],
                 'stream': sys.stderr,
             },
             'mail_admins': {
@@ -68,6 +72,7 @@ def get_logger_config(log_dir,
                 'class': 'logging.handlers.SysLogHandler',
                 'address': '/dev/log',
                 'formatter': 'syslog_format',
+                'filters': ['userid_context'],
                 'facility': SysLogHandler.LOG_LOCAL0,
             },
             'tracking': {
@@ -117,6 +122,7 @@ def log_python_warnings():
     warnings.filterwarnings('ignore', 'Not importing directory ')
     warnings.filterwarnings('ignore', 'Setting _field_data is deprecated')
     warnings.filterwarnings('ignore', 'Setting _field_data via the constructor is deprecated')
+    warnings.filterwarnings('ignore', '.*unclosed.*', category=ResourceWarning)
     try:
         # There are far too many of these deprecation warnings in startup to output for every management command;
         # suppress them until we've fixed at least the most common ones as reported by the test suite

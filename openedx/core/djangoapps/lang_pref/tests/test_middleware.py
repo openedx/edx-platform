@@ -2,24 +2,28 @@
 Tests for lang_pref middleware.
 """
 
+
 import itertools
-import mock
 
 import ddt
+import mock
+import six
 from django.conf import settings
-from django.urls import reverse
-from django.test.client import RequestFactory
-from django.http import HttpResponse
 from django.contrib.sessions.middleware import SessionMiddleware
+from django.http import HttpResponse
+from django.test.client import Client, RequestFactory
+from django.urls import reverse
 from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.utils.translation.trans_real import parse_accept_lang_header
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-
-from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY, COOKIE_DURATION
+from openedx.core.djangoapps.lang_pref import COOKIE_DURATION, LANGUAGE_KEY
 from openedx.core.djangoapps.lang_pref.middleware import LanguagePreferenceMiddleware
-from openedx.core.djangoapps.user_api.preferences.api import set_user_preference, get_user_preference, delete_user_preference
-from student.tests.factories import UserFactory
-from student.tests.factories import AnonymousUserFactory
+from openedx.core.djangoapps.user_api.preferences.api import (
+    delete_user_preference,
+    get_user_preference,
+    set_user_preference
+)
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from student.tests.factories import AnonymousUserFactory, UserFactory
 
 
 @ddt.ddt
@@ -38,6 +42,7 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
         self.request.user = self.user
         self.request.META['HTTP_ACCEPT_LANGUAGE'] = 'ar;q=1.0'
         self.session_middleware.process_request(self.request)
+        self.client = Client()
 
     def test_logout_shouldnt_remove_cookie(self):
 
@@ -146,11 +151,11 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
             accept_lang_out = parse_accept_lang_header(accept_lang_out)
 
         if accept_lang_out and accept_lang_result:
-            self.assertItemsEqual(accept_lang_result, accept_lang_out)
+            six.assertCountEqual(self, accept_lang_result, accept_lang_out)
         else:
             self.assertEqual(accept_lang_result, accept_lang_out)
 
-        self.assertEquals(self.request.session.get(LANGUAGE_SESSION_KEY), lang_session_out)
+        self.assertEqual(self.request.session.get(LANGUAGE_SESSION_KEY), lang_session_out)
 
     @ddt.data(None, 'es', 'en')
     def test_logout_preserves_cookie(self, lang_cookie):
@@ -184,24 +189,14 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
 
         # Use an actual call to the login endpoint, to validate that the middleware
         # stack does the right thing
-        if settings.FEATURES.get('ENABLE_COMBINED_LOGIN_REGISTRATION'):
-            response = self.client.post(
-                reverse('user_api_login_session'),
-                data={
-                    'email': self.user.email,
-                    'password': UserFactory._DEFAULT_PASSWORD,
-                    'remember': True,
-                }
-            )
-        else:
-            response = self.client.post(
-                reverse('login_post'),
-                data={
-                    'email': self.user.email,
-                    'password': UserFactory._DEFAULT_PASSWORD,
-                    'honor_code': True,
-                }
-            )
+        response = self.client.post(
+            reverse('user_api_login_session'),
+            data={
+                'email': self.user.email,
+                'password': UserFactory._DEFAULT_PASSWORD,  # pylint: disable=protected-access
+                'remember': True,
+            }
+        )
 
         self.assertEqual(response.status_code, 200)
 
@@ -260,3 +255,21 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
 
         with self.assertNumQueries(1):
             self.middleware.process_response(self.request, response)
+
+    @mock.patch('openedx.core.djangoapps.lang_pref.middleware.is_request_from_mobile_app')
+    @mock.patch('openedx.core.djangoapps.lang_pref.middleware.get_user_preference')
+    def test_remove_lang_cookie_for_mobile_app(self, mock_get_user_preference, mock_is_mobile_request):
+        """
+        Test to verify language preference cookie removed for mobile app requests.
+        """
+        mock_get_user_preference.return_value = 'en'
+        mock_is_mobile_request.return_value = False
+        response = mock.Mock(spec=HttpResponse)
+
+        response = self.middleware.process_response(self.request, response)
+        response.delete_cookie.assert_not_called()
+        response.set_cookie.assert_called()
+
+        mock_is_mobile_request.return_value = True
+        response = self.middleware.process_response(self.request, response)
+        response.delete_cookie.assert_called()

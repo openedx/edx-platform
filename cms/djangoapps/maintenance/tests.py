@@ -1,13 +1,17 @@
 """
 Tests for the maintenance app views.
 """
+
+
 import json
 
 import ddt
+import six
 from django.conf import settings
 from django.urls import reverse
 
 from contentstore.management.commands.utils import get_course_versions
+from openedx.features.announcements.models import Announcement
 from student.tests.factories import AdminFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -77,8 +81,7 @@ class MaintenanceViewAccessTests(MaintenanceViewTestCase):
     """
     Tests for access control of maintenance views.
     """
-    @ddt.data(MAINTENANCE_URLS)
-    @ddt.unpack
+    @ddt.data(*MAINTENANCE_URLS)
     def test_require_login(self, url):
         """
         Test that maintenance app requires user login.
@@ -89,14 +92,14 @@ class MaintenanceViewAccessTests(MaintenanceViewTestCase):
 
         # Expect a redirect to the login page
         redirect_url = '{login_url}?next={original_url}'.format(
-            login_url=reverse('login'),
+            login_url=settings.LOGIN_URL,
             original_url=url,
         )
 
-        self.assertRedirects(response, redirect_url)
+        # Studio login redirects to LMS login
+        self.assertRedirects(response, redirect_url, target_status_code=302)
 
-    @ddt.data(MAINTENANCE_URLS)
-    @ddt.unpack
+    @ddt.data(*MAINTENANCE_URLS)
     def test_global_staff_access(self, url):
         """
         Test that all maintenance app views are accessible to global staff user.
@@ -104,8 +107,7 @@ class MaintenanceViewAccessTests(MaintenanceViewTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-    @ddt.data(MAINTENANCE_URLS)
-    @ddt.unpack
+    @ddt.data(*MAINTENANCE_URLS)
     def test_non_global_staff_access(self, url):
         """
         Test that all maintenance app views are not accessible to non-global-staff user.
@@ -175,7 +177,7 @@ class TestForcePublish(MaintenanceViewTestCase):
         # validate non split error message
         course = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
         self.verify_error_message(
-            data={'course-id': unicode(course.id)},
+            data={'course-id': six.text_type(course.id)},
             error_message='Force publishing course is not supported with old mongo courses.'
         )
 
@@ -187,7 +189,7 @@ class TestForcePublish(MaintenanceViewTestCase):
         # validate non split error message
         course = CourseFactory.create(org='e', number='d', run='X', default_store=ModuleStoreEnum.Type.mongo)
         self.verify_error_message(
-            data={'course-id': unicode(course.id)},
+            data={'course-id': six.text_type(course.id)},
             error_message='Force publishing course is not supported with old mongo courses.'
         )
         # Now search for the course key in split version.
@@ -208,7 +210,7 @@ class TestForcePublish(MaintenanceViewTestCase):
 
         # now course is published, we should get `already published course` error.
         self.verify_error_message(
-            data={'course-id': unicode(course.id)},
+            data={'course-id': six.text_type(course.id)},
             error_message='Course is already in published state.'
         )
 
@@ -220,7 +222,7 @@ class TestForcePublish(MaintenanceViewTestCase):
             course (object): a course object.
         """
         # get draft and publish branch versions
-        versions = get_course_versions(unicode(course.id))
+        versions = get_course_versions(six.text_type(course.id))
 
         # verify that draft and publish point to different versions
         self.assertNotEqual(versions['draft-branch'], versions['published-branch'])
@@ -240,10 +242,10 @@ class TestForcePublish(MaintenanceViewTestCase):
 
         # force publish course view
         data = {
-            'course-id': unicode(course.id)
+            'course-id': six.text_type(course.id)
         }
         response = self.client.post(self.view_url, data=data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         return response_data
 
     def test_force_publish_dry_run(self):
@@ -260,3 +262,80 @@ class TestForcePublish(MaintenanceViewTestCase):
 
         # verify that both branch versions are still different
         self.verify_versions_are_different(course)
+
+
+@ddt.ddt
+class TestAnnouncementsViews(MaintenanceViewTestCase):
+    """
+    Tests for the announcements edit view.
+    """
+
+    def setUp(self):
+        super(TestAnnouncementsViews, self).setUp()
+        self.admin = AdminFactory.create(
+            email='staff@edx.org',
+            username='admin',
+            password='pass'
+        )
+        self.client.login(username=self.admin.username, password='pass')
+        self.non_staff_user = UserFactory.create(
+            email='test@edx.org',
+            username='test',
+            password='pass'
+        )
+
+    def test_index(self):
+        """
+        Test create announcement view
+        """
+        url = reverse("maintenance:announcement_index")
+        response = self.client.get(url)
+        self.assertContains(response, '<div class="announcement-container">')
+
+    def test_create(self):
+        """
+        Test create announcement view
+        """
+        url = reverse("maintenance:announcement_create")
+        self.client.post(url, {"content": "Test Create Announcement", "active": True})
+        result = Announcement.objects.filter(content="Test Create Announcement").exists()
+        self.assertTrue(result)
+
+    def test_edit(self):
+        """
+        Test edit announcement view
+        """
+        announcement = Announcement.objects.create(content="test")
+        announcement.save()
+        url = reverse("maintenance:announcement_edit", kwargs={"pk": announcement.pk})
+        response = self.client.get(url)
+        self.assertContains(response, '<div class="wrapper-form announcement-container">')
+        self.client.post(url, {"content": "Test Edit Announcement", "active": True})
+        announcement = Announcement.objects.get(pk=announcement.pk)
+        self.assertEqual(announcement.content, "Test Edit Announcement")
+
+    def test_delete(self):
+        """
+        Test delete announcement view
+        """
+        announcement = Announcement.objects.create(content="Test Delete")
+        announcement.save()
+        url = reverse("maintenance:announcement_delete", kwargs={"pk": announcement.pk})
+        self.client.post(url)
+        result = Announcement.objects.filter(content="Test Edit Announcement").exists()
+        self.assertFalse(result)
+
+    def _test_403(self, viewname, kwargs=None):
+        url = reverse("maintenance:%s" % viewname, kwargs=kwargs)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_authorization(self):
+        self.client.login(username=self.non_staff_user, password='pass')
+        announcement = Announcement.objects.create(content="Test Delete")
+        announcement.save()
+
+        self._test_403("announcement_index")
+        self._test_403("announcement_create")
+        self._test_403("announcement_edit", {"pk": announcement.pk})
+        self._test_403("announcement_delete", {"pk": announcement.pk})

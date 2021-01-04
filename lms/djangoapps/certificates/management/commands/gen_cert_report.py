@@ -1,7 +1,7 @@
 """
 Generate a report of certificate statuses
 """
-from __future__ import print_function
+
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
@@ -57,7 +57,7 @@ class Command(BaseCommand):
 
         # find students who are active
         # number of enrolled students = downloadable + notpassing
-        print("Looking up certificate states for {0}".format(options['course']))
+        print(u"Looking up certificate states for {0}".format(options['course']))
         enrolled_current = User.objects.filter(
             courseenrollment__course_id=course_id,
             courseenrollment__is_active=True
@@ -65,15 +65,15 @@ class Command(BaseCommand):
         enrolled_total = User.objects.filter(
             courseenrollment__course_id=course_id
         )
-        verified_enrolled = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
+        verified_enrolled = GeneratedCertificate.objects.filter(
             course_id__exact=course_id,
             mode__exact='verified'
         )
-        honor_enrolled = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
+        honor_enrolled = GeneratedCertificate.objects.filter(
             course_id__exact=course_id,
             mode__exact='honor'
         )
-        audit_enrolled = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
+        audit_enrolled = GeneratedCertificate.objects.filter(
             course_id__exact=course_id,
             mode__exact='audit'
         )
@@ -86,7 +86,7 @@ class Command(BaseCommand):
             'audit_enrolled': audit_enrolled.count()
         }
 
-        status_tally = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
+        status_tally = GeneratedCertificate.objects.filter(
             course_id__exact=course_id
         ).values('status').annotate(
             dcount=Count('status')
@@ -98,7 +98,7 @@ class Command(BaseCommand):
             }
         )
 
-        mode_tally = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
+        mode_tally = GeneratedCertificate.objects.filter(
             course_id__exact=course_id,
             status__exact='downloadable'
         ).values('mode').annotate(

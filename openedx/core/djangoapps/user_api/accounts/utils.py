@@ -1,22 +1,25 @@
 """
 Utility methods for the account settings.
 """
-from __future__ import unicode_literals
 
-import random
+
 import re
-import string
-from urlparse import urlparse
 
 import waffle
+from completion import waffle as completion_waffle
+from completion.models import BlockCompletion
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from six import text_type
+from six.moves import range
+from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
-from completion import waffle as completion_waffle
-from completion.models import BlockCompletion
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings, get_current_site
+from openedx.core.djangoapps.user_api.config.waffle import (
+    ENABLE_MULTIPLE_USER_ENTERPRISES_FEATURE,
+    waffle as user_api_waffle
+)
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -37,10 +40,9 @@ def validate_social_link(platform_name, new_social_link):
     # Ensure that the new link is valid.
     if formatted_social_link is None:
         required_url_stub = settings.SOCIAL_PLATFORMS[platform_name]['url_stub']
-        raise ValueError(_(
-            ' Make sure that you are providing a valid username or a URL that contains "' +
-            required_url_stub + '". To remove the link from your edX profile, leave this field blank.'
-        ))
+        raise ValueError(_('Make sure that you are providing a valid username or a URL that contains "{url_stub}". '
+                           'To remove the link from your edX profile, '
+                           'leave this field blank.').format(url_stub=required_url_stub))
 
 
 def format_social_link(platform_name, new_social_link):
@@ -109,7 +111,7 @@ def _is_valid_social_username(value):
 def retrieve_last_sitewide_block_completed(user):
     """
     Completion utility
-    From a string 'username' or object User retrieve
+    From a given User object retrieve
     the last course block marked as 'completed' and construct a URL
 
     :param user: obj(User)
@@ -180,20 +182,6 @@ def retrieve_last_sitewide_block_completed(user):
     )
 
 
-def generate_password(length=12, chars=string.letters + string.digits):
-    """Generate a valid random password"""
-    if length < 8:
-        raise ValueError("password must be at least 8 characters")
-
-    choice = random.SystemRandom().choice
-
-    password = ''
-    password += choice(string.digits)
-    password += choice(string.letters)
-    password += ''.join([choice(chars) for _i in xrange(length - 2)])
-    return password
-
-
 def is_secondary_email_feature_enabled():
     """
     Checks to see if the django-waffle switch for enabling the secondary email feature is active
@@ -204,13 +192,11 @@ def is_secondary_email_feature_enabled():
     return waffle.switch_is_active(ENABLE_SECONDARY_EMAIL_FEATURE_SWITCH)
 
 
-def is_secondary_email_feature_enabled_for_user(user):
+def is_multiple_user_enterprises_feature_enabled():
     """
-    Checks to see if secondary email feature is enabled for the given user.
+    Checks to see if the django-waffle switch for enabling the multiple user enterprises feature is active
 
     Returns:
-        Boolean value representing the status of secondary email feature.
+        Boolean value representing switch status
     """
-    # import is placed here to avoid cyclic import.
-    from openedx.features.enterprise_support.utils import is_enterprise_learner
-    return is_secondary_email_feature_enabled() and is_enterprise_learner(user)
+    return user_api_waffle().is_enabled(ENABLE_MULTIPLE_USER_ENTERPRISES_FEATURE)

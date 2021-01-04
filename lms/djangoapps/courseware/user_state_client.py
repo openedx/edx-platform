@@ -3,21 +3,23 @@ An implementation of :class:`XBlockUserStateClient`, which stores XBlock Scope.u
 data in a Django ORM model.
 """
 
+
 import itertools
 import logging
 from operator import attrgetter
 from time import time
 
+import six
 from django.conf import settings
-from django.core.paginator import Paginator
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.utils import IntegrityError
 from edx_django_utils import monitoring as monitoring_utils
 from edx_user_state_client.interface import XBlockUserState, XBlockUserStateClient
 from xblock.fields import Scope
 
-from courseware.models import BaseStudentModuleHistory, StudentModule
+from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
 
 try:
     import simplejson as json
@@ -164,7 +166,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             field_state is a dict mapping field names to values.
         """
         if scope != Scope.user_state:
-            raise ValueError("Only Scope.user_state is supported, not {}".format(scope))
+            raise ValueError(u"Only Scope.user_state is supported, not {}".format(scope))
 
         total_block_count = 0
         evt_time = time()
@@ -245,7 +247,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             try:
                 student_module, created = StudentModule.objects.get_or_create(
                     student=user,
-                    course_id=usage_key.course_key,
+                    course_id=usage_key.context_key,
                     module_state_key=usage_key,
                     defaults={
                         'state': json.dumps(state),
@@ -257,8 +259,8 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                 # on get_or_create to be able to see rows created in another
                 # process. This seems to happen frequently, and ignoring it is the
                 # best course of action for now
-                log.warning("set_many: IntegrityError for student {} - course_id {} - usage key {}".format(
-                    user, repr(unicode(usage_key.course_key)), usage_key
+                log.warning(u"set_many: IntegrityError for student {} - course_id {} - usage key {}".format(
+                    user, repr(six.text_type(usage_key.context_key)), usage_key
                 ))
                 return
 
@@ -280,11 +282,11 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                 except IntegrityError:
                     # The UPDATE above failed. Log information - but ignore the error.
                     # See https://openedx.atlassian.net/browse/TNL-5365
-                    log.warning("set_many: IntegrityError for student {} - course_id {} - usage key {}".format(
-                        user, repr(unicode(usage_key.course_key)), usage_key
+                    log.warning(u"set_many: IntegrityError for student {} - course_id {} - usage key {}".format(
+                        user, repr(six.text_type(usage_key.context_key)), usage_key
                     ))
-                    log.warning("set_many: All {} block keys: {}".format(
-                        len(block_keys_to_state), block_keys_to_state.keys()
+                    log.warning(u"set_many: All {} block keys: {}".format(
+                        len(block_keys_to_state), list(block_keys_to_state.keys())
                     ))
 
             # DataDog and New Relic reporting

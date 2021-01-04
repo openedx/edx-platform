@@ -1,5 +1,6 @@
-#pylint: disable=missing-docstring
 import warnings
 
 if __name__ == 'courseware':
-    warnings.warn("Importing 'lms.djangoapps.courseware' as 'courseware' is no longer supported", DeprecationWarning)
+    # Show the call stack that imported us wrong.
+    msg = "Importing 'lms.djangoapps.courseware' as 'courseware' is no longer supported"
+    warnings.warn(msg, DeprecationWarning)

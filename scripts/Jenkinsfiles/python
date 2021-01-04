@@ -1,31 +1,37 @@
 def runPythonTests() {
     // Determine git refspec, branch, and clone type
-    if (env.ghprbActualCommit) {
-        git_branch = "${ghprbActualCommit}"
-        git_refspec = "+refs/pull/${ghprbPullId}/*:refs/remotes/origin/pr/${ghprbPullId}/*"
-    } else {
-        git_branch = "${BRANCH_NAME}"
-        git_refspec = "+refs/heads/${BRANCH_NAME}:refs/remotes/origin/${BRANCH_NAME}"
-    }
+    git_branch = xdist_git_branch()
+    git_refspec = xdist_git_refspec()
     sshagent(credentials: ['jenkins-worker', 'jenkins-worker-pem'], ignoreMissing: true) {
         checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: git_branch]],
             doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', honorRefspec: true,
             noTags: true, shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
             refspec: git_refspec, url: "git@github.com:edx/${REPO_NAME}.git"]]]
-        console_output = sh(returnStdout: true, script: 'bash scripts/all-tests.sh').trim()
-        dir('stdout') {
-            writeFile file: "${TEST_SUITE}-stdout.log", text: console_output
-        }
-        stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}-reports"
+        sh 'bash scripts/all-tests.sh'
+        stash includes: 'reports/**/*coverage*,test_root/log/*.json', name: "${TEST_SUITE}-reports"
     }
 }
 
 def pythonTestCleanup() {
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/**/*,test_root/log/**/*.log,**/nosetests.xml,stdout/*.log,*.log'
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/**/*,test_root/log/**/*.log,test_root/log/*.json,**/nosetests.xml,*.log'
+    sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
     junit '**/nosetests.xml'
-    sh '''source $HOME/edx-venv/bin/activate
+    sh '''source $HOME/edx-venv-$PYTHON_VERSION/edx-venv/bin/activate
     bash scripts/xdist/terminate_xdist_nodes.sh'''
 }
+
+def createWarningsReport(fileExtension){
+    println "Creating warnings report for ${fileExtension}"
+    warning_filename = "warning_report_${fileExtension}.html"
+    sh """source $HOME/edx-venv-$PYTHON_VERSION/edx-venv/bin/activate
+    python openedx/core/process_warnings.py --dir-path test_root/log --html-path reports/pytest_warnings/${warning_filename}"""
+
+    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
+                            reportDir: 'reports/pytest_warnings', reportFiles: "${warning_filename}",
+                            reportName: "${warning_filename}", reportTitles: ''])
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/pytest_warnings/*.html'
+}
+
 
 def xdist_git_branch() {
     if (env.ghprbActualCommit) {
@@ -35,17 +41,31 @@ def xdist_git_branch() {
     }
 }
 
+def xdist_git_refspec() {
+    if (env.ghprbActualCommit) {
+        return "+refs/pull/${ghprbPullId}/*:refs/remotes/origin/pr/${ghprbPullId}/*"
+    } else {
+        return "+refs/heads/${BRANCH_NAME}:refs/remotes/origin/${BRANCH_NAME}"
+    }
+}
+
 pipeline {
-    agent { label "ironwood-jenkins-worker" }
+    agent { label "juniper-worker" }
     options {
+        sendSplunkConsoleLog()
         timestamps()
         timeout(60)
     }
     environment {
-        XDIST_CONTAINER_SUBNET = credentials('XDIST_CONTAINER_SUBNET')
-        XDIST_CONTAINER_SECURITY_GROUP = credentials('XDIST_CONTAINER_SECURITY_GROUP')
-        XDIST_CONTAINER_TASK_NAME = "ironwood-jenkins-worker-task"
         XDIST_GIT_BRANCH = xdist_git_branch()
+        XDIST_GIT_REFSPEC = xdist_git_refspec()
+        XDIST_INSTANCE_TYPE = "c5d.large"
+        XDIST_WORKER_AMI = credentials('XDIST_WORKER_AMI')
+        XDIST_WORKER_IAM_PROFILE_ARN = credentials('XDIST_WORKER_IAM_PROFILE_ARN')
+        XDIST_WORKER_KEY_NAME = "jenkins-worker"
+        XDIST_WORKER_SUBNET = credentials('XDIST_WORKER_SUBNET')
+        XDIST_WORKER_SECURITY_GROUP = credentials('XDIST_WORKER_SECURITY_GROUP')
+        WTW_CONTEXT = "python"
     }
     stages {
         stage('Mark build as pending on Github') {
@@ -74,10 +94,10 @@ pipeline {
         stage('Run Tests') {
             parallel {
                 stage("lms-unit") {
-                    agent { label "ironwood-jenkins-worker" }
+                    agent { label "juniper-worker" }
                     environment {
                         TEST_SUITE = "lms-unit"
-                        XDIST_NUM_TASKS = 10
+                        XDIST_NUM_WORKERS = 10
                         XDIST_REMOTE_NUM_PROCESSES = 1
                     }
                     steps {
@@ -94,10 +114,10 @@ pipeline {
                     }
                 }
                 stage("cms-unit") {
-                    agent { label "ironwood-jenkins-worker" }
+                    agent { label "juniper-worker" }
                     environment {
                         TEST_SUITE = "cms-unit"
-                        XDIST_NUM_TASKS = 3
+                        XDIST_NUM_WORKERS = 3
                         XDIST_REMOTE_NUM_PROCESSES = 1
                     }
                     steps {
@@ -114,10 +134,10 @@ pipeline {
                     }
                 }
                 stage("commonlib-unit") {
-                    agent { label "ironwood-jenkins-worker" }
+                    agent { label "juniper-worker" }
                     environment {
                         TEST_SUITE = "commonlib-unit"
-                        XDIST_NUM_TASKS = 3
+                        XDIST_NUM_WORKERS = 3
                         XDIST_REMOTE_NUM_PROCESSES = 1
                     }
                     steps {
@@ -135,10 +155,13 @@ pipeline {
                 }
             }
         }
+
+
         stage('Run coverage') {
             environment {
                 CODE_COV_TOKEN = credentials('CODE_COV_TOKEN')
                 SUBSET_JOB = "null" // Keep this variable until we can remove the $SUBSET_JOB path from .coveragerc
+                COLLECT_WHO_TESTS_WHAT = "${COLLECT_WHO_TESTS_WHAT}"
             }
             steps {
                 script {
@@ -165,12 +188,15 @@ pipeline {
                         sh """export CI_BRANCH=$ci_branch
                         export TARGET_BRANCH=$target_branch
                         ./scripts/jenkins-report.sh"""
+                        createWarningsReport("all")
                     }
                 }
             }
             post {
                 always {
                     script {
+                        archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.coverage'
+                        sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
                         publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
                             reportDir: 'reports/cover', reportFiles: 'index.html',
                             reportName: 'Coverage.py Report', reportTitles: ''])
@@ -187,10 +213,10 @@ pipeline {
     }
     post {
         always {
-            script{
+            script {
                 if (env.ghprbPullId != null) {
                     // For PR jobs, run the edx-platform-test-notifier for PR reporting
-                    build job: 'edx-platform-test-notifier', parameters: [string(name: 'PR_NUMBER', value: "${ghprbPullId}")], wait: false
+                    build job: 'edx-platform-test-notifier', parameters: [string(name: 'REPO', value: "${REPO_NAME}"), string(name: 'PR_NUMBER', value: "${ghprbPullId}")], wait: false
                 } else {
                     // For master jobs run github-build-status and report to slack when necessary
                     if (currentBuild.currentResult == "SUCCESS") {

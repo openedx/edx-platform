@@ -1,7 +1,10 @@
 """
 Linter classes containing logic for checking various filetypes.
 """
+
+
 import ast
+import io
 import os
 import re
 import textwrap
@@ -10,6 +13,7 @@ from xsslint import visitors
 from xsslint.reporting import ExpressionRuleViolation, FileResults, RuleViolation
 from xsslint.rules import RuleSet
 from xsslint.utils import Expression, ParseString, StringLines, is_skip_dir
+from xsslint.django_linter import TransExpression, BlockTransExpression, HtmlInterpolateExpression
 
 
 class BaseLinter(object):
@@ -49,9 +53,9 @@ class BaseLinter(object):
             A string containing the files contents.
 
         """
-        with open(file_full_path, 'r') as input_file:
+        with io.open(file_full_path, 'r') as input_file:
             file_contents = input_file.read()
-            return file_contents.decode(encoding='utf-8')
+            return file_contents
 
     def _load_and_check_file_is_safe(self, file_full_path, lint_function, results):
         """
@@ -268,6 +272,7 @@ class UnderscoreTemplateLinter(BaseLinter):
 
         Safe examples::
 
+            <%= edx.HtmlUtils.ensureHtml(message) %>
             <%= HtmlUtils.ensureHtml(message) %>
             <%= _.escape(message) %>
 
@@ -278,6 +283,8 @@ class UnderscoreTemplateLinter(BaseLinter):
             True if the Expression has been safely escaped, and False otherwise.
 
         """
+        if expression.expression_inner.startswith('edx.HtmlUtils.'):
+            return True
         if expression.expression_inner.startswith('HtmlUtils.'):
             return True
         if expression.expression_inner.startswith('_.escape('):
@@ -1084,7 +1091,7 @@ class MakoTemplateLinter(BaseLinter):
         javascript_start_index = None
         for context in contexts:
             if context['type'] == 'javascript':
-                if javascript_start_index < 0:
+                if javascript_start_index is None:
                     javascript_start_index = context['index']
             else:
                 if javascript_start_index is not None:
@@ -1343,7 +1350,8 @@ class MakoTemplateLinter(BaseLinter):
         while True:
             parse_string = ParseString(scrubbed_lines, start_index, len(scrubbed_lines))
             # check for validly parsed string
-            if 0 <= parse_string.start_index < parse_string.end_index:
+            if (parse_string.start_index is not None and parse_string.end_index is not None) \
+                    and (0 <= parse_string.start_index < parse_string.end_index):
                 # check if expression is contained in the given string
                 if parse_string.start_index < adjusted_start_index < parse_string.end_index:
                     return parse_string
@@ -1479,3 +1487,156 @@ class MakoTemplateLinter(BaseLinter):
                 start_index = expression.end_index
             expressions.append(expression)
         return expressions
+
+
+class DjangoTemplateLinter(BaseLinter):
+    """
+    The linter for Django template files
+    """
+    LINE_COMMENT_DELIM = "{#"
+
+    ruleset = RuleSet(
+        django_trans_missing_escape='django-trans-missing-escape',
+        django_trans_invalid_escape_filter='django-trans-invalid-escape-filter',
+        django_trans_escape_variable_mismatch='django-trans-escape-variable-mismatch',
+        django_blocktrans_missing_escape_filter='django-blocktrans-missing-escape-filter',
+        django_blocktrans_parse_error='django-blocktrans-parse-error',
+        django_blocktrans_escape_filter_parse_error='django-blocktrans-escape-filter-parse-error',
+        django_html_interpolation_missing_safe_filter='django-html-interpolation-missing-safe-filter',
+        django_html_interpolation_missing='django-html-interpolation-missing',
+        django_html_interpolation_invalid_tag='django-html-interpolation-invalid-tag',
+    )
+
+    def __init__(self, skip_dirs=None):
+        """
+        Init method.
+        """
+        super(DjangoTemplateLinter, self).__init__()
+        self._skip_django_dirs = skip_dirs or ()
+
+    def process_file(self, directory, file_name):
+        """
+        Process file to determine if it is a Django template file and
+        if it is safe.
+        Arguments:
+            directory (string): The directory of the file to be checked
+            file_name (string): A filename for a potential Django file
+        Returns:
+            The file results containing any violations.
+        """
+        django_file_full_path = os.path.normpath(directory + '/' + file_name)
+        results = FileResults(django_file_full_path)
+
+        if not results.is_file:
+            return results
+
+        if not self._is_valid_directory(directory):
+            return results
+
+        if not (file_name.lower().endswith('.html')):
+            return results
+
+        return self._load_and_check_file_is_safe(django_file_full_path, self._check_django_file_is_safe, results)
+
+    def _is_valid_directory(self, directory):
+        """
+        Determines if the provided directory is a directory that could contain
+        Django template files that need to be linted.
+        Arguments:
+            directory: The directory to be linted.
+        Returns:
+            True if this directory should be linted for Django template violations
+            and False otherwise.
+        """
+        if is_skip_dir(self._skip_django_dirs, directory):
+            return False
+
+        if ('/templates/' in directory) or directory.endswith('/templates'):
+            return True
+
+        return False
+
+    def _is_django_template(self, django_template):
+        """
+            Determines if the template is actually a Django template.
+        Arguments:
+            mako_template: The template code.
+        Returns:
+            True if this is really a Django template, and False otherwise.
+        """
+        if re.search('({%.*%})|({{.*}})|({#.*#})', django_template) is not None:
+            return True
+        return False
+
+    def _check_django_file_is_safe(self, django_template, results):
+        if not self._is_django_template(django_template):
+            return
+        self._check_django_expression(django_template, results)
+        results.prepare_results(django_template, line_comment_delim=self.LINE_COMMENT_DELIM)
+
+    def _check_django_expression(self, django_template, results):
+        """
+        Searches for django trans and blocktrans expression and then checks
+        if they contain violations
+        Arguments:
+            django_template: The contents of the Django template.
+            results: A list of results into which violations will be added.
+        """
+        expressions = []
+        self._find_django_expressions(django_template, results, expressions)
+        for expr in expressions:
+            expr.validate_expression(django_template, expressions)
+
+    def _find_django_expressions(self, django_template, results, expressions):
+        """
+        Finds all the Django trans/blocktrans expressions in a Django template
+        and creates a list of dicts for each expression.
+        Arguments:
+            django_template: The content of the Django template.
+        Returns:
+            A list of Expressions.
+        """
+
+        comments = list(re.finditer(r'{% comment .*%}', django_template, re.I))
+        endcomments = list(re.finditer(r'{% endcomment .*%}', django_template, re.I))
+
+        trans_iterator = re.finditer(r'{% trans .*?%}', django_template, re.I)
+        for t in trans_iterator:
+            if self._check_expression_not_commented(t, comments, endcomments):
+                continue
+            trans_expr = TransExpression(self.ruleset, results, t.start(), t.end(),
+                                         start_delim='{%', end_delim='%}',
+                                         template=django_template)
+            if trans_expr:
+                expressions.append(trans_expr)
+
+        block_trans_iterator = re.finditer(r'{% blocktrans .*?%}', django_template, re.I)
+        for bt in block_trans_iterator:
+            if self._check_expression_not_commented(bt, comments, endcomments):
+                continue
+            trans_expr = BlockTransExpression(self.ruleset, results, bt.start(), bt.end(),
+                                              start_delim='{%', end_delim='%}',
+                                              template=django_template)
+            if trans_expr:
+                expressions.append(trans_expr)
+
+        interpolation_iterator = re.finditer(r'{% interpolate_html .*?%}', django_template, re.I)
+        for it in interpolation_iterator:
+            if self._check_expression_not_commented(it, comments, endcomments):
+                continue
+            trans_expr = HtmlInterpolateExpression(self.ruleset, results,
+                                                   it.start(), it.end(),
+                                                   start_delim='{%', end_delim='%}',
+                                                   template=django_template)
+            if trans_expr:
+                expressions.append(trans_expr)
+
+    def _check_expression_not_commented(self, expr, comments, endcomments):
+
+        for i in range(len(endcomments)):
+            start_comment = comments[i]
+            end_comment = endcomments[i]
+
+            if (expr.start() >= start_comment.start()) and \
+                    (expr.start() <= end_comment.start()):
+                return True

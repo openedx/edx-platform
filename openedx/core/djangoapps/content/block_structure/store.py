@@ -2,8 +2,13 @@
 Module for the Storage of BlockStructure objects.
 """
 # pylint: disable=protected-access
+
+
 from logging import getLogger
 
+import six
+
+from django.utils.encoding import python_2_unicode_compatible
 from openedx.core.lib.cache_utils import zpickle, zunpickle
 
 from . import config
@@ -13,10 +18,10 @@ from .factory import BlockStructureFactory
 from .models import BlockStructureModel
 from .transformer_registry import TransformerRegistry
 
-
 logger = getLogger(__name__)  # pylint: disable=C0103
 
 
+@python_2_unicode_compatible
 class StubModel(object):
     """
     Stub model to use when storage backing is disabled.
@@ -26,8 +31,8 @@ class StubModel(object):
     def __init__(self, root_block_usage_key):
         self.data_usage_key = root_block_usage_key
 
-    def __unicode__(self):
-        return unicode(self.data_usage_key)
+    def __str__(self):
+        return six.text_type(self.data_usage_key)
 
     def delete(self):
         """
@@ -109,7 +114,7 @@ class BlockStructureStore(object):
         bs_model = self._get_model(root_block_usage_key)
         self._cache.delete(self._encode_root_cache_key(bs_model))
         bs_model.delete()
-        logger.info("BlockStructure: Deleted from cache and store; %s.", bs_model)
+        logger.info(u"BlockStructure: Deleted from cache and store; %s.", bs_model)
 
     def is_up_to_date(self, root_block_usage_key, modulestore):
         """
@@ -158,7 +163,7 @@ class BlockStructureStore(object):
         """
         cache_key = self._encode_root_cache_key(bs_model)
         self._cache.set(cache_key, serialized_data, timeout=config.cache_timeout_in_seconds())
-        logger.info("BlockStructure: Added to cache; %s, size: %d", bs_model, len(serialized_data))
+        logger.info(u"BlockStructure: Added to cache; %s, size: %d", bs_model, len(serialized_data))
 
     def _get_from_cache(self, bs_model):
         """
@@ -171,7 +176,7 @@ class BlockStructureStore(object):
         serialized_data = self._cache.get(cache_key)
 
         if not serialized_data:
-            logger.info("BlockStructure: Not found in cache; %s.", bs_model)
+            logger.info(u"BlockStructure: Not found in cache; %s.", bs_model)
             raise BlockStructureNotFound(bs_model.data_usage_key)
         return serialized_data
 
@@ -202,7 +207,15 @@ class BlockStructureStore(object):
         """
         Deserializes the given data and returns the parsed block_structure.
         """
-        block_relations, transformer_data, block_data_map = zunpickle(serialized_data)
+
+        try:
+            block_relations, transformer_data, block_data_map = zunpickle(serialized_data)
+        except Exception:
+            # Somehow failed to de-serialized the data, assume it's corrupt.
+            bs_model = self._get_model(root_block_usage_key)
+            logger.exception(u"BlockStructure: Failed to load data from cache for %s", bs_model)
+            raise BlockStructureNotFound(bs_model.data_usage_key)
+
         return BlockStructureFactory.create_new(
             root_block_usage_key,
             block_relations,
@@ -217,12 +230,12 @@ class BlockStructureStore(object):
         BlockStructureModel or StubModel.
         """
         if _is_storage_backing_enabled():
-            return unicode(bs_model)
+            return six.text_type(bs_model)
 
         else:
             return "v{version}.root.key.{root_usage_key}".format(
-                version=unicode(BlockStructureBlockData.VERSION),
-                root_usage_key=unicode(bs_model.data_usage_key),
+                version=six.text_type(BlockStructureBlockData.VERSION),
+                root_usage_key=six.text_type(bs_model.data_usage_key),
             )
 
     @staticmethod
@@ -235,7 +248,7 @@ class BlockStructureStore(object):
             data_version=getattr(root_block, 'course_version', None),
             data_edit_timestamp=getattr(root_block, 'subtree_edited_on', None),
             transformers_schema_version=TransformerRegistry.get_write_version_hash(),
-            block_structure_schema_version=unicode(BlockStructureBlockData.VERSION),
+            block_structure_schema_version=six.text_type(BlockStructureBlockData.VERSION),
         )
 
     @staticmethod

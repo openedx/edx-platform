@@ -1,15 +1,19 @@
 """
 Unittests for populate_created_on_site_user_attribute management command.
 """
+
+
 import ddt
 import mock
-from django.test import TestCase
 from django.contrib.auth.models import User
-from django.core.management import call_command, CommandError
+from django.core.management import CommandError, call_command
+from django.test import TestCase
+from six.moves import range
 
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from student.models import Registration, UserAttribute
 from student.tests.factories import UserFactory
-from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+
 CREATED_ON_SITE = 'created_on_site'
 
 
@@ -133,7 +137,7 @@ class TestPopulateUserAttribute(SiteMixin, TestCase):
         Test management command with invalid site domain.
         """
         fake_site_domain = 'fake-site-domain'
-        with mock.patch('__builtin__.raw_input', return_value=populate):
+        with mock.patch('six.moves.input', return_value=populate):
             call_command(
                 "populate_created_on_site_user_attribute",
                 "--users", self.user_ids,

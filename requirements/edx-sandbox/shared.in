@@ -10,18 +10,5 @@
 -c ../constraints.txt
 
 cryptography                        # Implementations of assorted cryptography algorithms
-lxml==3.8.0                         # XML parser
-networkx==1.7                       # Utilities for creating, manipulating, and studying network graphs
+lxml                                # XML parser
 nltk                                # Natural language processing; used by the chem package
-numpy==1.6.2                        # Numeric array processing utilities; used by calc, chem, and scipy
-pyparsing                           # Python parsing library; used by the calc package
-sympy==0.7.1                        # Symbolic math library; used by the calc package
-scipy==0.14.0                       # Math, science, and engineering library; used by the calc package
-
-# Install these packages from the edx-platform working tree
-# NOTE: if you change code in these packages, you MUST change the version
-# number in its setup.py or the code WILL NOT be installed during deploy.
--e common/lib/calc
--e common/lib/chem
--e common/lib/sandbox-packages
--e common/lib/symmath

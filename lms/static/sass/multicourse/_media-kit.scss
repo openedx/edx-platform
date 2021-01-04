@@ -3,17 +3,14 @@ $baseline: 20px;
 $white: rgb(255, 255, 255);
 
 .mediakit {
-  @include box-sizing(border-box);
-
+  box-sizing: border-box;
   margin: 0 auto;
   padding: ($baseline*3) 0;
   width: 980px;
 
   .wrapper-mediakit {
     border-radius: 4px;
-
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     box-shadow: 0 1px 10px 0 $shadow-l1;
     margin: ($baseline*3) 0 0 0;
     border: 1px solid $border-color;
@@ -24,10 +21,6 @@ $white: rgb(255, 255, 255);
 
       &:last-child {
         margin-bottom: 0;
-      }
-
-      header {
-
       }
     }
   }
@@ -86,7 +79,8 @@ $white: rgb(255, 255, 255);
       }
     }
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       .note {
         color: shade($blue, 25%);
       }
@@ -114,8 +108,7 @@ $white: rgb(255, 255, 255);
     }
 
     article {
-      @include box-sizing(border-box);
-
+      box-sizing: border-box;
       width: 500px;
 
       @include margin-right($baseline);
@@ -124,9 +117,7 @@ $white: rgb(255, 255, 255);
 
     aside {
       border-radius: 2px;
-
-      @include box-sizing(border-box);
-
+      box-sizing: border-box;
       box-shadow: 0 1px 4px 0 $shadow;
       width: 330px;
 
@@ -159,8 +150,7 @@ $white: rgb(255, 255, 255);
       }
 
       figure {
-        @include box-sizing(border-box);
-
+        box-sizing: border-box;
         background: $white;
         width: 100%;
 
@@ -185,13 +175,11 @@ $white: rgb(255, 255, 255);
   // library section
   .library {
     border-radius: 2px;
-
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     box-shadow: 0 1px 4px 0 $shadow;
-    border: 3px solid tint($light-gray,50%);
+    border: 3px solid tint($light-gray, 50%);
     padding: 0;
-    background: tint($light-gray,50%);
+    background: tint($light-gray, 50%);
 
     header {
       padding: ($baseline*0.75) $baseline;
@@ -222,8 +210,7 @@ $white: rgb(255, 255, 255);
       list-style: none;
 
       li {
-        @include box-sizing(border-box);
-
+        box-sizing: border-box;
         overflow-y: auto;
 
         @include float(left);
@@ -240,23 +227,22 @@ $white: rgb(255, 255, 255);
       figure {
         a {
           border-radius: 2px;
-
-          @include box-sizing(border-box);
-
+          box-sizing: border-box;
           box-shadow: 0 1px 2px 0 $shadow-l1;
           display: block;
           min-height: 380px;
-          border: 2px solid tint($light-gray,75%);
+          border: 2px solid tint($light-gray, 75%);
           padding: $baseline;
 
-          &:hover, &:focus {
+          &:hover,
+          &:focus {
             border-color: $blue;
           }
         }
 
         img {
           display: block;
-          border: 2px solid tint($light-gray,80%);
+          border: 2px solid tint($light-gray, 80%);
           margin: 0 auto ($baseline*0.75);
         }
 
@@ -272,10 +258,5 @@ $white: rgb(255, 255, 255);
         }
       }
     }
-  }
-
-  // share
-  .share {
-
   }
 }

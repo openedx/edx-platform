@@ -1,6 +1,8 @@
 """
 This file contains celery tasks for programs-related functionality.
 """
+
+
 from celery import task
 from celery.exceptions import MaxRetriesExceededError
 from celery.utils.log import get_task_logger
@@ -16,12 +18,13 @@ from openedx.core.djangoapps.certificates.api import available_date_for_certific
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.utils import get_credentials, get_credentials_api_client
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 LOGGER = get_task_logger(__name__)
 # Under cms the following setting is not defined, leading to errors during tests.
 ROUTING_KEY = getattr(settings, 'CREDENTIALS_GENERATION_ROUTING_KEY', None)
+PROGRAM_CERTIFICATES_ROUTING_KEY = getattr(settings, 'PROGRAM_CERTIFICATES_ROUTING_KEY', None)
 # Maximum number of retries before giving up on awarding credentials.
 # For reference, 11 retries with exponential backoff yields a maximum waiting
 # time of 2047 seconds (about 30 minutes). Setting this to None could yield
@@ -47,6 +50,25 @@ def get_completed_programs(site, student):
     """
     meter = ProgramProgressMeter(site, student)
     return meter.completed_programs_with_available_dates
+
+
+def get_inverted_programs(student):
+    """
+    Get programs keyed by course run ID.
+
+    Args:
+        student (User): Representing the student whose programs to check for.
+
+    Returns:
+        dict, programs keyed by course run ID
+
+    """
+    inverted_programs = {}
+    for site in Site.objects.all():
+        meter = ProgramProgressMeter(site, student)
+        inverted_programs.update(meter.invert_programs())
+
+    return inverted_programs
 
 
 def get_certified_programs(student):
@@ -101,7 +123,7 @@ def award_program_certificate(client, username, program_uuid, visible_date):
     })
 
 
-@task(bind=True, ignore_result=True, routing_key=ROUTING_KEY)
+@task(bind=True, ignore_result=True, routing_key=PROGRAM_CERTIFICATES_ROUTING_KEY)
 def award_program_certificates(self, username):
     """
     This task is designed to be called whenever a student's completion status
@@ -123,7 +145,7 @@ def award_program_certificates(self, username):
         None
 
     """
-    LOGGER.info('Running task award_program_certificates for username %s', username)
+    LOGGER.info(u'Running task award_program_certificates for username %s', username)
     programs_without_certificates = configuration_helpers.get_value('programs_without_certificates', [])
     if programs_without_certificates:
         if str(programs_without_certificates[0]).lower() == "all":
@@ -146,7 +168,7 @@ def award_program_certificates(self, username):
         try:
             student = User.objects.get(username=username)
         except User.DoesNotExist:
-            LOGGER.exception('Task award_program_certificates was called with invalid username %s', username)
+            LOGGER.exception(u'Task award_program_certificates was called with invalid username %s', username)
             # Don't retry for this case - just conclude the task.
             return
         completed_programs = {}
@@ -155,7 +177,7 @@ def award_program_certificates(self, username):
         if not completed_programs:
             # No reason to continue beyond this point unless/until this
             # task gets updated to support revocation of program certs.
-            LOGGER.info('Task award_program_certificates was called for user %s with no completed programs', username)
+            LOGGER.info(u'Task award_program_certificates was called for user %s with no completed programs', username)
             return
 
         # Determine which program certificates the user has already been awarded, if any.
@@ -166,7 +188,7 @@ def award_program_certificates(self, username):
         awarded_and_skipped_program_uuids = list(set(existing_program_uuids + list(programs_without_certificates)))
 
     except Exception as exc:
-        LOGGER.exception('Failed to determine program certificates to be awarded for user %s', username)
+        LOGGER.exception(u'Failed to determine program certificates to be awarded for user %s', username)
         raise self.retry(exc=exc, countdown=countdown, max_retries=MAX_RETRIES)
 
     # For each completed program for which the student doesn't already have a
@@ -190,11 +212,13 @@ def award_program_certificates(self, username):
         for program_uuid in new_program_uuids:
             visible_date = completed_programs[program_uuid]
             try:
+                LOGGER.info(u'Visible date for user %s : program %s is %s', username, program_uuid,
+                            visible_date)
                 award_program_certificate(credentials_client, username, program_uuid, visible_date)
-                LOGGER.info('Awarded certificate for program %s to user %s', program_uuid, username)
+                LOGGER.info(u'Awarded certificate for program %s to user %s', program_uuid, username)
             except exceptions.HttpNotFoundError:
                 LOGGER.exception(
-                    """Certificate for program {uuid} could not be found. Unable to award certificate to user
+                    u"""Certificate for program {uuid} could not be found. Unable to award certificate to user
                     {username}. The program might not be configured.""".format(uuid=program_uuid, username=username)
                 )
             except exceptions.HttpClientError as exc:
@@ -205,39 +229,39 @@ def award_program_certificates(self, username):
                 if exc.response.status_code == 429:  # pylint: disable=no-member
                     rate_limit_countdown = 60
                     LOGGER.info(
-                        """Rate limited. Retrying task to award certificates to user {username} in {countdown}
+                        u"""Rate limited. Retrying task to award certificates to user {username} in {countdown}
                         seconds""".format(username=username, countdown=rate_limit_countdown)
                     )
                     # Retry after 60 seconds, when we should be in a new throttling window
                     raise self.retry(exc=exc, countdown=rate_limit_countdown, max_retries=MAX_RETRIES)
                 else:
                     LOGGER.exception(
-                        """Unable to award certificate to user {username} for program {uuid}. The program might not be
+                        u"""Unable to award certificate to user {username} for program {uuid}. The program might not be
                         configured.""".format(username=username, uuid=program_uuid)
                     )
             except Exception:  # pylint: disable=broad-except
                 # keep trying to award other certs, but retry the whole task to fix any missing entries
-                LOGGER.warning('Failed to award certificate for program {uuid} to user {username}.'.format(
+                LOGGER.warning(u'Failed to award certificate for program {uuid} to user {username}.'.format(
                     uuid=program_uuid, username=username))
                 failed_program_certificate_award_attempts.append(program_uuid)
 
         if failed_program_certificate_award_attempts:
             # N.B. This logic assumes that this task is idempotent
-            LOGGER.info('Retrying task to award failed certificates to user %s', username)
+            LOGGER.info(u'Retrying task to award failed certificates to user %s', username)
             # The error message may change on each reattempt but will never be raised until
             # the max number of retries have been exceeded. It is unlikely that this list
             # will change by the time it reaches its maximimum number of attempts.
             exception = MaxRetriesExceededError(
-                "Failed to award certificate for user {} for programs {}".format(
+                u"Failed to award certificate for user {} for programs {}".format(
                     username, failed_program_certificate_award_attempts))
             raise self.retry(
                 exc=exception,
                 countdown=countdown,
                 max_retries=MAX_RETRIES)
     else:
-        LOGGER.info('User %s is not eligible for any new program certificates', username)
+        LOGGER.info(u'User %s is not eligible for any new program certificates', username)
 
-    LOGGER.info('Successfully completed the task award_program_certificates for username %s', username)
+    LOGGER.info(u'Successfully completed the task award_program_certificates for username %s', username)
 
 
 def post_course_certificate(client, username, certificate, visible_date):
@@ -267,7 +291,7 @@ def award_course_certificate(self, username, course_run_key):
     This task is designed to be called whenever a student GeneratedCertificate is updated.
     It can be called independently for a username and a course_run, but is invoked on each GeneratedCertificate.save.
     """
-    LOGGER.info('Running task award_course_certificate for username %s', username)
+    LOGGER.info(u'Running task award_course_certificate for username %s', username)
 
     countdown = 2 ** self.request.retries
 
@@ -287,7 +311,7 @@ def award_course_certificate(self, username, course_run_key):
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
-            LOGGER.exception('Task award_course_certificate was called with invalid username %s', username)
+            LOGGER.exception(u'Task award_course_certificate was called with invalid username %s', username)
             # Don't retry for this case - just conclude the task.
             return
         # Get the cert for the course key and username if it's both passing and available in professional/verified
@@ -298,17 +322,17 @@ def award_course_certificate(self, username, course_run_key):
             )
         except GeneratedCertificate.DoesNotExist:
             LOGGER.exception(
-                'Task award_course_certificate was called without Certificate found for %s to user %s',
+                u'Task award_course_certificate was called without Certificate found for %s to user %s',
                 course_key,
                 username
             )
             return
-        if certificate.mode in CourseMode.CREDIT_ELIGIBLE_MODES + CourseMode.CREDIT_MODES:
+        if certificate.mode in CourseMode.CERTIFICATE_RELEVANT_MODES:
             try:
                 course_overview = CourseOverview.get_from_id(course_key)
             except (CourseOverview.DoesNotExist, IOError):
                 LOGGER.exception(
-                    'Task award_course_certificate was called without course overview data for course %s',
+                    u'Task award_course_certificate was called without course overview data for course %s',
                     course_key
                 )
                 return
@@ -322,7 +346,177 @@ def award_course_certificate(self, username, course_run_key):
             visible_date = available_date_for_certificate(course_overview, certificate)
             post_course_certificate(credentials_client, username, certificate, visible_date)
 
-            LOGGER.info('Awarded certificate for course %s to user %s', course_key, username)
+            LOGGER.info(u'Awarded certificate for course %s to user %s', course_key, username)
     except Exception as exc:
-        LOGGER.exception('Failed to determine course certificates to be awarded for user %s', username)
+        LOGGER.exception(u'Failed to determine course certificates to be awarded for user %s', username)
         raise self.retry(exc=exc, countdown=countdown, max_retries=MAX_RETRIES)
+
+
+def get_revokable_program_uuids(course_specific_programs, student):
+    """
+    Get program uuids for which certificate to be revoked.
+
+    Checks for existing learner certificates and filter out the program UUIDS
+    for which a certificate needs to be revoked.
+
+    Args:
+        course_specific_programs (dict[]): list of programs specific to a course
+        student (User): Representing the student whose programs to check for.
+
+    Returns:
+        list if program UUIDs for which certificates to be revoked
+
+    """
+    program_uuids_to_revoke = []
+    existing_program_uuids = get_certified_programs(student)
+    for program in course_specific_programs:
+        if program['uuid'] in existing_program_uuids:
+            program_uuids_to_revoke.append(program['uuid'])
+
+    return program_uuids_to_revoke
+
+
+def revoke_program_certificate(client, username, program_uuid):
+    """
+    Revoke a certificate of the given student for the given program.
+
+    Args:
+        client: credentials API client (EdxRestApiClient)
+        username: The username of the student
+        program_uuid: uuid of the program
+
+    Returns:
+        None
+
+    """
+    client.credentials.post({
+        'username': username,
+        'status': 'revoked',
+        'credential': {
+            'type': PROGRAM_CERTIFICATE,
+            'program_uuid': program_uuid
+        }
+    })
+
+
+@task(bind=True, ignore_result=True, routing_key=PROGRAM_CERTIFICATES_ROUTING_KEY)
+def revoke_program_certificates(self, username, course_key):
+    """
+    This task is designed to be called whenever a student's course certificate is
+    revoked.
+
+    It will consult with a variety of APIs to determine whether or not the
+    specified user's certificate should be revoked in one or more programs, and
+    use the credentials service to revoke the said certificates if so.
+
+    Args:
+        username (str): The username of the student
+        course_key (str|CourseKey): The course identifier
+
+    Returns:
+        None
+
+    """
+    countdown = 2 ** self.request.retries
+    # If the credentials config model is disabled for this
+    # feature, it may indicate a condition where processing of such tasks
+    # has been temporarily disabled.  Since this is a recoverable situation,
+    # mark this task for retry instead of failing it altogether.
+
+    if not CredentialsApiConfig.current().is_learner_issuance_enabled:
+        LOGGER.warning(
+            'Task revoke_program_certificates cannot be executed when credentials issuance is disabled in API config',
+        )
+        raise self.retry(countdown=countdown, max_retries=MAX_RETRIES)
+
+    try:
+        student = User.objects.get(username=username)
+    except User.DoesNotExist:
+        LOGGER.exception(u'Task revoke_program_certificates was called with invalid username %s', username)
+        # Don't retry for this case - just conclude the task.
+        return
+
+    try:
+        inverted_programs = get_inverted_programs(student)
+        course_specific_programs = inverted_programs.get(str(course_key))
+        if not course_specific_programs:
+            # No reason to continue beyond this point
+            LOGGER.info(
+                u'Task revoke_program_certificates was called for user %s and course %s with no engaged programs',
+                username,
+                course_key
+            )
+            return
+
+        # Determine which program certificates the user has already been awarded, if any.
+        program_uuids_to_revoke = get_revokable_program_uuids(course_specific_programs, student)
+    except Exception as exc:
+        LOGGER.exception(
+            u'Failed to determine program certificates to be revoked for user %s with course %s',
+            username,
+            course_key
+        )
+        raise self.retry(exc=exc, countdown=countdown, max_retries=MAX_RETRIES)
+
+    if program_uuids_to_revoke:
+        try:
+            credentials_client = get_credentials_api_client(
+                User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME),
+            )
+        except Exception as exc:
+            LOGGER.exception('Failed to create a credentials API client to revoke program certificates')
+            # Retry because a misconfiguration could be fixed
+            raise self.retry(exc=exc, countdown=countdown, max_retries=MAX_RETRIES)
+
+        failed_program_certificate_revoke_attempts = []
+        for program_uuid in program_uuids_to_revoke:
+            try:
+                revoke_program_certificate(credentials_client, username, program_uuid)
+                LOGGER.info(u'Revoked certificate for program %s for user %s', program_uuid, username)
+            except exceptions.HttpNotFoundError:
+                LOGGER.exception(
+                    u"""Certificate for program {uuid} could not be found. Unable to revoke certificate for user
+                    {username}.""".format(uuid=program_uuid, username=username)
+                )
+            except exceptions.HttpClientError as exc:
+                # Grab the status code from the client error, because our API
+                # client handles all 4XX errors the same way. In the future,
+                # we may want to fork slumber, add 429 handling, and use that
+                # in edx_rest_api_client.
+                if exc.response.status_code == 429:  # pylint: disable=no-member, no-else-raise
+                    rate_limit_countdown = 60
+                    LOGGER.info(
+                        u"""Rate limited. Retrying task to revoke certificates for user {username} in {countdown}
+                        seconds""".format(username=username, countdown=rate_limit_countdown)
+                    )
+                    # Retry after 60 seconds, when we should be in a new throttling window
+                    raise self.retry(exc=exc, countdown=rate_limit_countdown, max_retries=MAX_RETRIES)
+                else:
+                    LOGGER.exception(
+                        u"Unable to revoke certificate for user {username} for program {uuid}.".format(
+                            username=username, uuid=program_uuid
+                        )
+                    )
+            except Exception:  # pylint: disable=broad-except
+                # keep trying to revoke other certs, but retry the whole task to fix any missing entries
+                LOGGER.warning(u'Failed to revoke certificate for program {uuid} of user {username}.'.format(
+                    uuid=program_uuid, username=username))
+                failed_program_certificate_revoke_attempts.append(program_uuid)
+
+        if failed_program_certificate_revoke_attempts:
+            # N.B. This logic assumes that this task is idempotent
+            LOGGER.info(u'Retrying task to revoke failed certificates to user %s', username)
+            # The error message may change on each reattempt but will never be raised until
+            # the max number of retries have been exceeded. It is unlikely that this list
+            # will change by the time it reaches its maximimum number of attempts.
+            exception = MaxRetriesExceededError(
+                u"Failed to revoke certificate for user {} for programs {}".format(
+                    username, failed_program_certificate_revoke_attempts))
+            raise self.retry(
+                exc=exception,
+                countdown=countdown,
+                max_retries=MAX_RETRIES)
+    else:
+        LOGGER.info(u'There is no program certificates for user %s to revoke', username)
+
+    LOGGER.info(u'Successfully completed the task revoke_program_certificates for username %s', username)

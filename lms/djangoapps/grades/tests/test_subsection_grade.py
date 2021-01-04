@@ -1,17 +1,18 @@
 """
 Tests of the SubsectionGrade classes.
 """
+
+
 from ddt import data, ddt, unpack
 
 from ..models import PersistentSubsectionGrade
 from ..subsection_grade import CreateSubsectionGrade, ReadSubsectionGrade
-from .utils import mock_get_score
 from .base import GradeTestBase
+from .utils import mock_get_score
 
 
 @ddt
 class SubsectionGradeTest(GradeTestBase):
-    shard = 4
 
     @data((50, 100, .50), (59.49, 100, .59), (59.51, 100, .60), (59.50, 100, .60), (60.5, 100, .60))
     @unpack

@@ -1,12 +1,16 @@
 """Integration tests for Google providers."""
+
+
 import base64
 import hashlib
 import hmac
+import json
+
 from django.conf import settings
 from django.urls import reverse
-import json
 from mock import patch
 from social_core.exceptions import AuthException
+
 from student.tests.factories import UserFactory
 from third_party_auth import pipeline
 from third_party_auth.tests.specs import base
@@ -76,8 +80,8 @@ class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):
 
         response = self.client.get(response['Location'])
         self.assertEqual(response.status_code, 200)
-        self.assertIn('action="/misc/my-custom-registration-form" method="post"', response.content)
-        data_decoded = base64.b64decode(response.context['data'])
+        self.assertIn('action="/misc/my-custom-registration-form" method="post"', response.content.decode('utf-8'))
+        data_decoded = base64.b64decode(response.context['data']).decode('utf-8')
         data_parsed = json.loads(data_decoded)
         # The user's details get passed to the custom page as a base64 encoded query parameter:
         self.assertEqual(data_parsed, {
@@ -94,13 +98,17 @@ class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):
         })
         # Check the hash that is used to confirm the user's data in the GET parameter is correct
         secret_key = settings.THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS['custom1']['secret_key']
-        hmac_expected = hmac.new(secret_key, msg=data_decoded, digestmod=hashlib.sha256).digest()
+        hmac_expected = hmac.new(
+            secret_key.encode('utf-8'),
+            msg=data_decoded.encode('utf-8'),
+            digestmod=hashlib.sha256
+        ).digest()
         self.assertEqual(base64.b64decode(response.context['hmac']), hmac_expected)
 
         # Now our custom registration form creates or logs in the user:
         email, password = data_parsed['user_details']['email'], 'random_password'
         created_user = UserFactory(email=email, password=password)
-        login_response = self.client.post(reverse('login'), {'email': email, 'password': password})
+        login_response = self.client.post(reverse('login_api'), {'email': email, 'password': password})
         self.assertEqual(login_response.status_code, 200)
 
         # Now our custom login/registration page must resume the pipeline:

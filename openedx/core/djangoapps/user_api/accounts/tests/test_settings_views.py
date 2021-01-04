@@ -1,27 +1,37 @@
 """ Tests for views related to account settings. """
 # -*- coding: utf-8 -*-
+
+
 import mock
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.messages.middleware import MessageMiddleware
-from django.urls import reverse
 from django.http import HttpRequest
 from django.test import TestCase
+from django.test.utils import override_settings
+from django.urls import reverse
 from edx_rest_api_client import exceptions
 
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.tests import factories
 from lms.djangoapps.commerce.tests.mocks import mock_get_orders
+from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
+from openedx.core.djangoapps.lang_pref.tests.test_api import EN, LT_LT
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from openedx.core.djangolib.testing.utils import skip_unless_lms
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context, get_user_orders
+from openedx.core.djangoapps.user_api.accounts.toggles import REDIRECT_TO_ACCOUNT_MICROFRONTEND
+from openedx.core.djangoapps.user_api.tests.factories import UserPreferenceFactory
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
+from openedx.features.enterprise_support.utils import get_enterprise_readonly_account_fields
 
 
 @skip_unless_lms
-class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConfigMixin):
+class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiConfigMixin, TestCase):
     """ Tests for the account settings view. """
 
     USERNAME = 'student'
@@ -57,50 +67,63 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         MessageMiddleware().process_request(self.request)
         messages.error(self.request, 'Facebook is already in use.', extra_tags='Auth facebook')
 
-    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_customer_for_learner')
-    def test_context(self, mock_get_enterprise_customer_for_learner):
+    @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
+    def test_context(self, mock_enterprise_customer_for_request):
         self.request.site = SiteFactory.create()
-        mock_get_enterprise_customer_for_learner.return_value = {}
-        context = account_settings_context(self.request)
+        UserPreferenceFactory(user=self.user, key='pref-lang', value='lt-lt')
+        DarkLangConfig(
+            released_languages='en',
+            changed_by=self.user,
+            enabled=True,
+            beta_languages='lt-lt',
+            enable_beta_languages=True
+        ).save()
+        mock_enterprise_customer_for_request.return_value = {}
 
-        user_accounts_api_url = reverse("accounts_api", kwargs={'username': self.user.username})
-        self.assertEqual(context['user_accounts_api_url'], user_accounts_api_url)
+        with override_settings(LANGUAGES=[EN, LT_LT], LANGUAGE_CODE='en'):
+            context = account_settings_context(self.request)
 
-        user_preferences_api_url = reverse('preferences_api', kwargs={'username': self.user.username})
-        self.assertEqual(context['user_preferences_api_url'], user_preferences_api_url)
+            user_accounts_api_url = reverse("accounts_api", kwargs={'username': self.user.username})
+            self.assertEqual(context['user_accounts_api_url'], user_accounts_api_url)
 
-        for attribute in self.FIELDS:
-            self.assertIn(attribute, context['fields'])
+            user_preferences_api_url = reverse('preferences_api', kwargs={'username': self.user.username})
+            self.assertEqual(context['user_preferences_api_url'], user_preferences_api_url)
 
-        self.assertEqual(
-            context['user_accounts_api_url'], reverse("accounts_api", kwargs={'username': self.user.username})
-        )
-        self.assertEqual(
-            context['user_preferences_api_url'], reverse('preferences_api', kwargs={'username': self.user.username})
-        )
+            for attribute in self.FIELDS:
+                self.assertIn(attribute, context['fields'])
 
-        self.assertEqual(context['duplicate_provider'], 'facebook')
-        self.assertEqual(context['auth']['providers'][0]['name'], 'Facebook')
-        self.assertEqual(context['auth']['providers'][1]['name'], 'Google')
+            self.assertEqual(
+                context['user_accounts_api_url'], reverse("accounts_api", kwargs={'username': self.user.username})
+            )
+            self.assertEqual(
+                context['user_preferences_api_url'], reverse('preferences_api', kwargs={'username': self.user.username})
+            )
 
-        self.assertEqual(context['sync_learner_profile_data'], False)
-        self.assertEqual(context['edx_support_url'], settings.SUPPORT_SITE_LINK)
-        self.assertEqual(context['enterprise_name'], None)
-        self.assertEqual(
-            context['enterprise_readonly_account_fields'], {'fields': settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS}
-        )
+            self.assertEqual(context['duplicate_provider'], 'facebook')
+            self.assertEqual(context['auth']['providers'][0]['name'], 'Facebook')
+            self.assertEqual(context['auth']['providers'][1]['name'], 'Google')
 
-    @mock.patch('openedx.core.djangoapps.user_api.accounts.settings_views.get_enterprise_customer_for_learner')
+            self.assertEqual(context['sync_learner_profile_data'], False)
+            self.assertEqual(context['edx_support_url'], settings.SUPPORT_SITE_LINK)
+            self.assertEqual(context['enterprise_name'], None)
+            self.assertEqual(
+                context['enterprise_readonly_account_fields'],
+                {'fields': list(get_enterprise_readonly_account_fields(self.user))}
+            )
+            expected_beta_language = {'code': 'lt-lt', 'name': settings.LANGUAGE_DICT.get('lt-lt')}
+            self.assertEqual(context['beta_language'], expected_beta_language)
+
+    @mock.patch('openedx.core.djangoapps.user_api.accounts.settings_views.enterprise_customer_for_request')
     @mock.patch('openedx.features.enterprise_support.utils.third_party_auth.provider.Registry.get')
     def test_context_for_enterprise_learner(
-            self, mock_get_auth_provider, mock_get_enterprise_customer_for_learner
+            self, mock_get_auth_provider, mock_enterprise_customer_for_request
     ):
         dummy_enterprise_customer = {
             'uuid': 'real-ent-uuid',
             'name': 'Dummy Enterprise',
             'identity_provider': 'saml-ubc'
         }
-        mock_get_enterprise_customer_for_learner.return_value = dummy_enterprise_customer
+        mock_enterprise_customer_for_request.return_value = dummy_enterprise_customer
         self.request.site = SiteFactory.create()
         mock_get_auth_provider.return_value.sync_learner_profile_data = True
         context = account_settings_context(self.request)
@@ -131,18 +154,19 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         self.assertEqual(context['edx_support_url'], settings.SUPPORT_SITE_LINK)
         self.assertEqual(context['enterprise_name'], dummy_enterprise_customer['name'])
         self.assertEqual(
-            context['enterprise_readonly_account_fields'], {'fields': settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS}
+            context['enterprise_readonly_account_fields'],
+            {'fields': list(get_enterprise_readonly_account_fields(self.user))}
         )
 
     def test_view(self):
         """
-        Test that all fields are  visible
+        Test that all fields are visible
         """
         view_path = reverse('account_settings')
         response = self.client.get(path=view_path)
 
         for attribute in self.FIELDS:
-            self.assertIn(attribute, response.content)
+            self.assertContains(response, attribute)
 
     def test_header_with_programs_listing_enabled(self):
         """
@@ -227,3 +251,22 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
             order_detail = get_user_orders(self.user)
 
         self.assertEqual(len(order_detail), 1)
+
+    def test_redirect_view(self):
+        with override_waffle_flag(REDIRECT_TO_ACCOUNT_MICROFRONTEND, active=True):
+            old_url_path = reverse('account_settings')
+
+            # Test with waffle flag active and site setting disabled, does not redirect
+            response = self.client.get(path=old_url_path)
+            for attribute in self.FIELDS:
+                self.assertContains(response, attribute)
+
+            # Test with waffle flag active and site setting enabled, redirects to microfrontend
+            site_domain = 'othersite.example.com'
+            self.set_up_site(site_domain, {
+                'SITE_NAME': site_domain,
+                'ENABLE_ACCOUNT_MICROFRONTEND': True
+            })
+            self.client.login(username=self.USERNAME, password=self.PASSWORD)
+            response = self.client.get(path=old_url_path)
+            self.assertRedirects(response, settings.ACCOUNT_MICROFRONTEND_URL, fetch_redirect_response=False)

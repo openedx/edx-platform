@@ -10,8 +10,8 @@ from social_django.strategy import DjangoStrategy
 from openedx.core.djangoapps.theming.helpers import get_current_request
 
 from .models import OAuth2ProviderConfig
-from .pipeline import get as get_pipeline_from_request
 from .pipeline import AUTH_ENTRY_CUSTOM
+from .pipeline import get as get_pipeline_from_request
 from .provider import Registry
 
 

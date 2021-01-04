@@ -1,13 +1,16 @@
 """
 Functionality for problem scores.
 """
+
+
 from logging import getLogger
 
+import six
+from numpy import around
 from xblock.core import XBlock
 
 from openedx.core.lib.cache_utils import process_cached
 from xmodule.graders import ProblemScore
-from numpy import around
 
 from .transformer import GradesTransformer
 
@@ -100,6 +103,10 @@ def get_score(submissions_scores, csm_scores, persisted_block, block):
             weight, graded - retrieved from the latest block content
     """
     weight = _get_weight_from_block(persisted_block, block)
+    # TODO: Remove as part of EDUCATOR-4602.
+    if str(block.location.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+        log.info(u'Weight for block: ***{}*** is {}'
+                 .format(str(block.location), weight))
 
     # Priority order for retrieving the scores:
     # submissions API -> CSM -> grades persisted block -> latest block content
@@ -108,6 +115,13 @@ def get_score(submissions_scores, csm_scores, persisted_block, block):
         _get_score_from_csm(csm_scores, block, weight) or
         _get_score_from_persisted_or_latest_block(persisted_block, block, weight)
     )
+
+    # TODO: Remove as part of EDUCATOR-4602.
+    if str(block.location.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+        log.info(u'Calculated raw-earned: {}, raw_possible: {}, weighted_earned: '
+                 u'{}, weighted_possible: {}, first_attempted: {} for block: ***{}***.'
+                 .format(raw_earned, raw_possible, weighted_earned,
+                         weighted_possible, first_attempted, str(block.location)))
 
     if weighted_possible is None or weighted_earned is None:
         return None
@@ -160,7 +174,7 @@ def _get_score_from_submissions(submissions_scores, block):
     Returns the score values from the submissions API if found.
     """
     if submissions_scores:
-        submission_value = submissions_scores.get(unicode(block.location))
+        submission_value = submissions_scores.get(six.text_type(block.location))
         if submission_value:
             first_attempted = submission_value['created_at']
             weighted_earned = submission_value['points_earned']
@@ -206,6 +220,11 @@ def _get_score_from_persisted_or_latest_block(persisted_block, block, weight):
     Uses the raw_possible value from the persisted_block if found, else from
     the latest block content.
     """
+    # TODO: Remove as part of EDUCATOR-4602.
+    if str(block.location.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+        log.info(u'Using _get_score_from_persisted_or_latest_block to calculate score for block: ***{}***.'.format(
+            str(block.location)
+        ))
     raw_earned = 0.0
     first_attempted = None
 
@@ -213,6 +232,10 @@ def _get_score_from_persisted_or_latest_block(persisted_block, block, weight):
         raw_possible = persisted_block.raw_possible
     else:
         raw_possible = block.transformer_data[GradesTransformer].max_score
+        # TODO: Remove as part of EDUCATOR-4602.
+        if str(block.location.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+            log.info(u'Using latest block content to calculate score for block: ***{}***.')
+            log.info(u'weight for block: ***{}*** is {}.'.format(str(block.location), raw_possible))
 
     # TODO TNL-5982 remove defensive code for scorables without max_score
     if raw_possible is None:

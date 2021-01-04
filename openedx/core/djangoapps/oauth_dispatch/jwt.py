@@ -1,17 +1,19 @@
 """Utilities for working with ID tokens."""
+
+
 import json
 from time import time
 
 from django.conf import settings
+from edx_django_utils.monitoring import set_custom_metric
+from edx_rbac.utils import create_role_auth_claim_for_user
 from jwkest import jwk
 from jwkest.jws import JWS
 
-from edx_django_utils.monitoring import set_custom_metric
-from openedx.core.djangoapps.oauth_dispatch.toggles import ENFORCE_JWT_SCOPES
 from student.models import UserProfile, anonymous_id_for_user
 
 
-def create_jwt_for_user(user, secret=None, aud=None, additional_claims=None):
+def create_jwt_for_user(user, secret=None, aud=None, additional_claims=None, scopes=None):
     """
     Returns a JWT to identify the given user.
 
@@ -22,6 +24,8 @@ def create_jwt_for_user(user, secret=None, aud=None, additional_claims=None):
 
     Arguments:
         user (User): User for which to generate the JWT.
+        scopes (list): Optional. Scopes that limit access to the token bearer and
+            controls which optional claims are included in the token.
 
     Deprecated Arguments (to be removed):
         secret (string): Overrides configured JWT secret (signing) key.
@@ -31,6 +35,7 @@ def create_jwt_for_user(user, secret=None, aud=None, additional_claims=None):
     expires_in = settings.OAUTH_ID_TOKEN_EXPIRATION
     return _create_jwt(
         user,
+        scopes=scopes,
         expires_in=expires_in,
         aud=aud,
         additional_claims=additional_claims,
@@ -52,7 +57,7 @@ def create_jwt_from_token(token_dict, oauth_adapter, use_asymmetric_key=None):
             provide the given token's information.
         use_asymmetric_key (Boolean): Optional. Whether the JWT should be signed
             with this app's private key. If not provided, defaults to whether
-            ENFORCE_JWT_SCOPES is enabled and the OAuth client is restricted.
+            the OAuth client is restricted.
     """
     access_token = oauth_adapter.get_access_token(token_dict['access_token'])
     client = oauth_adapter.get_client_for_token(access_token)
@@ -96,10 +101,13 @@ def _create_jwt(
         additional_claims (dict): Optional. Additional claims to include in the token.
         use_asymmetric_key (Boolean): Optional. Whether the JWT should be signed
             with this app's private key. If not provided, defaults to whether
-            ENFORCE_JWT_SCOPES is enabled and the OAuth client is restricted.
+            the OAuth client is restricted.
         secret (string): Overrides configured JWT secret (signing) key.
     """
     use_asymmetric_key = _get_use_asymmetric_key_value(is_restricted, use_asymmetric_key)
+    # Default scopes should only contain non-privileged data.
+    # Do not be misled by the fact that `email` and `profile` are default scopes. They
+    # were included for legacy compatibility, even though they contain privileged data.
     scopes = scopes or ['email', 'profile']
     iat, exp = _compute_time_fields(expires_in)
 
@@ -119,6 +127,9 @@ def _create_jwt(
     }
     payload.update(additional_claims or {})
     _update_from_additional_handlers(payload, user, scopes)
+    role_claims = create_role_auth_claim_for_user(user)
+    if role_claims:
+        payload['roles'] = role_claims
     return _encode_and_sign(payload, use_asymmetric_key, secret)
 
 
@@ -126,18 +137,7 @@ def _get_use_asymmetric_key_value(is_restricted, use_asymmetric_key):
     """
     Returns the value to use for use_asymmetric_key.
     """
-    # TODO: (ARCH-162)
-    # If JWT scope enforcement is enabled, we need to sign tokens
-    # given to restricted applications with a key that
-    # other IDAs do not have access to. This prevents restricted
-    # applications from getting access to API endpoints available
-    # on other IDAs which have not yet been protected with the
-    # scope-related DRF permission classes. Once all endpoints have
-    # been protected, we can enable all IDAs to use the same new
-    # (asymmetric) key.
-    if use_asymmetric_key is None:
-        use_asymmetric_key = ENFORCE_JWT_SCOPES.is_enabled() and is_restricted
-    return use_asymmetric_key
+    return use_asymmetric_key or is_restricted
 
 
 def _compute_time_fields(expires_in):
@@ -156,13 +156,19 @@ def _update_from_additional_handlers(payload, user, scopes):
     requested by the given scopes.
     """
     _claim_handlers = {
+        'user_id': _attach_user_id_claim,
         'email': _attach_email_claim,
-        'profile': _attach_profile_claim
+        'profile': _attach_profile_claim,
     }
     for scope in scopes:
         handler = _claim_handlers.get(scope)
         if handler:
             handler(payload, user)
+
+
+def _attach_user_id_claim(payload, user):
+    """Add the user_id claim details to the JWT payload."""
+    payload['user_id'] = user.id
 
 
 def _attach_email_claim(payload, user):

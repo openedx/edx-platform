@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 """Tests for tracking middleware."""
+
+
 import ddt
+import six
 from django.contrib.auth.models import User
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from eventtracking import tracker
 from mock import patch, sentinel
 
-from eventtracking import tracker
 from track.middleware import TrackMiddleware
 
 
@@ -42,13 +45,10 @@ class TrackMiddlewareTestCase(TestCase):
         When HTTP headers contains latin1 characters.
         """
         request = self.request_factory.get('/somewhere')
-        # pylint: disable=no-member
-        request.META[meta_key] = 'test latin1 \xd3 \xe9 \xf1'  # pylint: disable=no-member
+        request.META[meta_key] = 'test latin1 \xd3 \xe9 \xf1'
 
         context = self.get_context_for_request(request)
-        # The bytes in the string on the right are utf8 encoded in the source file, so we decode them to construct
-        # a valid unicode string.
-        self.assertEqual(context[context_key], 'test latin1 Ó é ñ'.decode('utf8'))
+        self.assertEqual(context[context_key], u'test latin1 Ó é ñ')
 
     def test_default_filters_do_not_render_view(self):
         for url in ['/event', '/event/1', '/login', '/heartbeat']:
@@ -76,7 +76,7 @@ class TrackMiddlewareTestCase(TestCase):
 
     def test_default_request_context(self):
         context = self.get_context_for_path('/courses/')
-        self.assertEquals(context, {
+        self.assertEqual(context, {
             'accept_language': '',
             'referer': '',
             'user_id': '',
@@ -98,7 +98,7 @@ class TrackMiddlewareTestCase(TestCase):
         request.META['REMOTE_ADDR'] = remote_addr
         context = self.get_context_for_request(request)
 
-        self.assertEquals(context['ip'], remote_addr)
+        self.assertEqual(context['ip'], remote_addr)
 
     def test_single_forward_for_header_ip_context(self):
         request = self.request_factory.get('/courses/')
@@ -109,7 +109,7 @@ class TrackMiddlewareTestCase(TestCase):
         request.META['HTTP_X_FORWARDED_FOR'] = forwarded_ip
         context = self.get_context_for_request(request)
 
-        self.assertEquals(context['ip'], forwarded_ip)
+        self.assertEqual(context['ip'], forwarded_ip)
 
     def test_multiple_forward_for_header_ip_context(self):
         request = self.request_factory.get('/courses/')
@@ -120,7 +120,7 @@ class TrackMiddlewareTestCase(TestCase):
         request.META['HTTP_X_FORWARDED_FOR'] = forwarded_ip
         context = self.get_context_for_request(request)
 
-        self.assertEquals(context['ip'], '11.22.33.44')
+        self.assertEqual(context['ip'], '11.22.33.44')
 
     def get_context_for_path(self, path):
         """Extract the generated event tracking context for a given request for the given path."""
@@ -135,7 +135,7 @@ class TrackMiddlewareTestCase(TestCase):
         finally:
             self.track_middleware.process_response(request, None)
 
-        self.assertEquals(
+        self.assertEqual(
             tracker.get_tracker().resolve_context(),
             {}
         )
@@ -152,8 +152,8 @@ class TrackMiddlewareTestCase(TestCase):
 
     def assert_dict_subset(self, superset, subset):
         """Assert that the superset dict contains all of the key-value pairs found in the subset dict."""
-        for key, expected_value in subset.iteritems():
-            self.assertEquals(superset[key], expected_value)
+        for key, expected_value in six.iteritems(subset):
+            self.assertEqual(superset[key], expected_value)
 
     def test_request_with_user(self):
         user_id = 1
@@ -174,7 +174,7 @@ class TrackMiddlewareTestCase(TestCase):
         request.session.save()
         session_key = request.session.session_key
         expected_session_key = self.track_middleware.encrypt_session_key(session_key)
-        self.assertEquals(len(session_key), len(expected_session_key))
+        self.assertEqual(len(session_key), len(expected_session_key))
         context = self.get_context_for_request(request)
         self.assert_dict_subset(context, {
             'session': expected_session_key,
@@ -185,7 +185,7 @@ class TrackMiddlewareTestCase(TestCase):
         session_key = '665924b49a93e22b46ee9365abf28c2a'
         expected_session_key = '3b81f559d14130180065d635a4f35dd2'
         encrypted_session_key = self.track_middleware.encrypt_session_key(session_key)
-        self.assertEquals(encrypted_session_key, expected_session_key)
+        self.assertEqual(encrypted_session_key, expected_session_key)
 
     def test_request_headers(self):
         ip_address = '10.0.0.0'

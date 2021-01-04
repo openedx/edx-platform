@@ -1,7 +1,11 @@
-from __future__ import absolute_import
+"""
+Studio component views
+"""
+
 
 import logging
 
+import six
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -10,17 +14,18 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
+from six.moves.urllib.parse import quote_plus
 from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xblock.exceptions import NoSuchHandlerError
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
-from contentstore.utils import get_lms_link_for_item, reverse_course_url
+from contentstore.utils import get_lms_link_for_item, get_sibling_urls, reverse_course_url
 from contentstore.views.helpers import get_parent_xblock, is_unit, xblock_type_display_name
 from contentstore.views.item import StudioEditModuleRuntime, add_container_page_publishing_info, create_xblock_info
 from edxmako.shortcuts import render_to_response
-from openedx.core.lib.xblock_utils import is_xblock_aside, get_aside_from_xblock
+from openedx.core.lib.xblock_utils import get_aside_from_xblock, is_xblock_aside
 from student.auth import has_course_author_access
 from xblock_django.api import authorable_xblocks, disabled_xblocks
 from xblock_django.models import XBlockStudioConfigurationFlag
@@ -47,7 +52,8 @@ CONTAINER_TEMPLATES = [
     "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu",
     "add-xblock-component-support-legend", "add-xblock-component-support-level", "add-xblock-component-menu-problem",
     "xblock-string-field-editor", "xblock-access-editor", "publish-xblock", "publish-history",
-    "unit-outline", "container-message", "container-access", "license-selector",
+    "unit-outline", "container-message", "container-access", "license-selector", "copy-clipboard-button",
+    "edit-title-button",
 ]
 
 
@@ -115,24 +121,33 @@ def container_handler(request, usage_key_string):
 
             component_templates = get_component_templates(course)
             ancestor_xblocks = []
-            parent = get_parent_xblock(xblock)
             action = request.GET.get('action', 'view')
 
             is_unit_page = is_unit(xblock)
-            unit = xblock if is_unit_page else None
-
-            while parent and parent.category != 'course':
-                if unit is None and is_unit(parent):
-                    unit = parent
-                ancestor_xblocks.append(parent)
-                parent = get_parent_xblock(parent)
-            ancestor_xblocks.reverse()
+            unit = xblock if is_unit_page else get_parent_xblock(xblock)
 
             assert unit is not None, "Could not determine unit page"
             subsection = get_parent_xblock(unit)
-            assert subsection is not None, "Could not determine parent subsection from unit " + unicode(unit.location)
+            assert subsection is not None, "Could not determine parent subsection from unit " + six.text_type(
+                unit.location)
             section = get_parent_xblock(subsection)
-            assert section is not None, "Could not determine ancestor section from unit " + unicode(unit.location)
+            assert section is not None, "Could not determine ancestor section from unit " + six.text_type(unit.location)
+
+            # build the breadcrumbs
+            for block in (section, subsection):
+                parent = get_parent_xblock(block)
+                ancestor_xblocks.append({
+                    'title': block.display_name_with_default,
+                    'children': parent.get_children(),
+                    'is_last': block.category == 'sequential'
+                })
+
+            # for the sequence navigator
+            prev_url, next_url = get_sibling_urls(subsection)
+            # these are quoted here because they'll end up in a query string on the page,
+            # and quoting with mako will trigger the xss linter...
+            prev_url = quote_plus(prev_url) if prev_url else None
+            next_url = quote_plus(next_url) if next_url else None
 
             # Fetch the XBlock info for use by the container page. Note that it includes information
             # about the block's ancestors and siblings for use by the Unit Outline.
@@ -159,6 +174,9 @@ def container_handler(request, usage_key_string):
                 'is_unit_page': is_unit_page,
                 'subsection': subsection,
                 'section': section,
+                'position': index,
+                'prev_url': prev_url,
+                'next_url': next_url,
                 'new_unit_category': 'vertical',
                 'outline_url': '{url}?format=concise'.format(url=reverse_course_url('course_handler', course.id)),
                 'ancestor_xblocks': ancestor_xblocks,
@@ -234,7 +252,7 @@ def get_component_templates(courselike, library=False):
         return {
             "show_legend": XBlockStudioConfigurationFlag.is_enabled(),
             "allow_unsupported_xblocks": allow_unsupported,
-            "documentation_label": _("{platform_name} Support Levels:").format(platform_name=settings.PLATFORM_NAME)
+            "documentation_label": _(u"{platform_name} Support Levels:").format(platform_name=settings.PLATFORM_NAME)
         }
 
     component_display_names = {
@@ -323,7 +341,7 @@ def get_component_templates(courselike, library=False):
                     try:
                         component_display_name = xblock_type_display_name(component)
                     except PluginMissingError:
-                        log.warning('Unable to load xblock type %s to read display_name', component, exc_info=True)
+                        log.warning(u'Unable to load xblock type %s to read display_name', component, exc_info=True)
                     else:
                         templates_for_category.append(
                             create_template_dict(
@@ -381,15 +399,15 @@ def get_component_templates(courselike, library=False):
                     # prevents any authors from trying to instantiate the
                     # non-existent component type by not showing it in the menu
                     log.warning(
-                        "Advanced component %s does not exist. It will not be added to the Studio new component menu.",
+                        u"Advanced component %s does not exist. It will not be added to the Studio new component menu.",
                         category
                     )
     else:
         log.error(
-            "Improper format for course advanced keys! %s",
+            u"Improper format for course advanced keys! %s",
             course_advanced_keys
         )
-    if len(advanced_component_templates['templates']) > 0:
+    if advanced_component_templates['templates']:
         component_templates.insert(0, advanced_component_templates)
 
     return component_templates
@@ -459,7 +477,7 @@ def component_handler(request, usage_key_string, handler, suffix=''):
         handler_descriptor.xmodule_runtime = StudioEditModuleRuntime(request.user)
         resp = handler_descriptor.handle(handler, req, suffix)
     except NoSuchHandlerError:
-        log.info("XBlock %s attempted to access missing handler %r", handler_descriptor, handler, exc_info=True)
+        log.info(u"XBlock %s attempted to access missing handler %r", handler_descriptor, handler, exc_info=True)
         raise Http404
 
     # unintentional update to handle any side effects of handle call

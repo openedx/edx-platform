@@ -1,19 +1,29 @@
 # -*- coding: utf-8 -*-
 """Tests for certificates views. """
 
+
 import datetime
 import json
 from collections import OrderedDict
-from urllib import urlencode
 from uuid import uuid4
 
+import ddt
+import six
 from django.conf import settings
-from django.urls import reverse
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch
+from six.moves import range
+from six.moves.urllib.parse import urlencode
 
-import ddt
+from course_modes.models import CourseMode
+from lms.djangoapps.badges.events.course_complete import get_completion_badge
+from lms.djangoapps.badges.tests.factories import (
+    BadgeAssertionFactory,
+    BadgeClassFactory,
+    CourseCompleteImageConfigurationFactory
+)
 from lms.djangoapps.certificates.api import get_certificate_url
 from lms.djangoapps.certificates.models import (
     CertificateGenerationCourseSetting,
@@ -29,19 +39,16 @@ from lms.djangoapps.certificates.tests.factories import (
     GeneratedCertificateFactory,
     LinkedInAddToProfileConfigurationFactory
 )
-from course_modes.models import CourseMode
-from lms.djangoapps.badges.events.course_complete import get_completion_badge
-from lms.djangoapps.badges.tests.factories import (
-    BadgeAssertionFactory,
-    BadgeClassFactory,
-    CourseCompleteImageConfigurationFactory
-)
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
-from openedx.core.lib.tests.assertions.events import assert_event_matches
+from openedx.core.djangoapps.site_configuration.tests.test_util import (
+    with_site_configuration,
+    with_site_configuration_context
+)
 from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from openedx.core.lib.tests.assertions.events import assert_event_matches
 from student.roles import CourseStaffRole
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from track.tests import EventTrackingTestCase
@@ -62,13 +69,6 @@ FEATURES_WITH_CUSTOM_CERTS_ENABLED = {
     "CUSTOM_CERTIFICATE_TEMPLATES_ENABLED": True
 }
 FEATURES_WITH_CUSTOM_CERTS_ENABLED.update(FEATURES_WITH_CERTS_ENABLED)
-
-
-def _fake_is_request_in_microsite():
-    """
-    Mocked version of microsite helper method to always return true
-    """
-    return True
 
 
 class CommonCertificatesTestCase(ModuleStoreTestCase):
@@ -97,12 +97,12 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
         self.user.profile.save()
         self.client.login(username=self.user.username, password='foo')
         self.request = RequestFactory().request()
-        self.linkedin_url = 'http://www.linkedin.com/profile/add?{params}'
+        self.linkedin_url = u'http://www.linkedin.com/profile/add?{params}'
 
         self.cert = GeneratedCertificateFactory.create(
             user=self.user,
             course_id=self.course_id,
-            download_uuid=uuid4(),
+            download_uuid=uuid4().hex,
             download_url="http://www.example.com/certificates/download",
             grade="0.95",
             key='the_key',
@@ -129,9 +129,9 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
                 'name': 'Signatory_Name ' + str(i),
                 'title': 'Signatory_Title ' + str(i),
                 'organization': 'Signatory_Organization ' + str(i),
-                'signature_image_path': '/static/certificates/images/demo-sig{}.png'.format(i),
+                'signature_image_path': u'/static/certificates/images/demo-sig{}.png'.format(i),
                 'id': i
-            } for i in xrange(signatory_count)
+            } for i in range(signatory_count)
 
         ]
 
@@ -141,11 +141,11 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
                 'name': 'Name ' + str(i),
                 'description': 'Description ' + str(i),
                 'course_title': 'course_title_' + str(i),
-                'org_logo_path': '/t4x/orgX/testX/asset/org-logo-{}.png'.format(i),
+                'org_logo_path': u'/t4x/orgX/testX/asset/org-logo-{}.png'.format(i),
                 'signatories': signatories,
                 'version': 1,
                 'is_active': is_active
-            } for i in xrange(count)
+            } for i in range(count)
         ]
 
         self.course.certificates = {'certificates': certificates}
@@ -157,7 +157,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
         """
         Creates a custom certificate template entry in DB.
         """
-        template_html = """
+        template_html = u"""
             <%namespace name='static' file='static_content.html'/>
             <html>
             <body>
@@ -185,12 +185,12 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
         """
         Creates a custom certificate template entry in DB.
         """
-        template_html = """
+        template_html = u"""
             <%namespace name='static' file='static_content.html'/>
             <html>
             <body>
                 lang: ${LANGUAGE_CODE}
-                course name: """ + template_name + """
+                course name: """ + template_name + u"""
                 mode: ${course_mode}
                 ${accomplishment_copy_course_description}
                 ${twitter_url}
@@ -213,7 +213,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
         """
         Creates a custom certificate template entry in DB that includes hours of effort.
         """
-        template_html = """
+        template_html = u"""
             <%namespace name='static' file='static_content.html'/>
             <html>
             <body>
@@ -246,7 +246,6 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
     """
     Tests for the certificates web/html views
     """
-    shard = 1
 
     def setUp(self):
         super(CertificatesViewsTests, self).setUp()
@@ -267,53 +266,59 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self.assertEqual(response.status_code, 200)
         params = OrderedDict([
             ('_ed', '0_0dPSPyS070e0HsE9HNz_13_d11_',),
-            ('pfCertificationName', '{platform_name} Honor Code Certificate for {course_name}'.format(
-                platform_name=settings.PLATFORM_NAME.encode('utf-8'),
+            ('pfCertificationName', u'{platform_name} Honor Code Certificate for {course_name}'.format(
+                platform_name=settings.PLATFORM_NAME,
                 course_name=self.course.display_name,
-            ),),
+            ).encode('utf-8'),),
             ('pfCertificationUrl', self.request.build_absolute_uri(test_url),),
         ])
-        self.assertIn(
+        self.assertContains(
+            response,
             js_escaped_string(self.linkedin_url.format(params=urlencode(params))),
-            response.content.decode('utf-8')
         )
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_linkedin_share_microsites(self):
+    @with_site_configuration(
+        configuration={
+            'platform_name': 'My Platform Site', 'LINKEDIN_COMPANY_ID': 'test_linkedin_my_site',
+        },
+    )
+    def test_linkedin_share_url_site(self):
         """
-        Test: LinkedIn share URL should be visible when called from within a microsite.
+        Test: LinkedIn share URL should be visible when called from within a site.
         """
         self._add_course_certificates(count=1, signatory_count=1, is_active=True)
         test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
-        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        response = self.client.get(test_url, HTTP_HOST='test.localhost')
         self.assertEqual(response.status_code, 200)
         # the linkedIn share URL with appropriate parameters should be present
         params = OrderedDict([
-            ('_ed', settings.MICROSITE_CONFIGURATION['test_site']['LINKEDIN_COMPANY_ID'],),
-            ('pfCertificationName', '{platform_name} Honor Code Certificate for {course_name}'.format(
-                platform_name=settings.MICROSITE_CONFIGURATION['test_site']['platform_name'],
+            ('_ed', 'test_linkedin_my_site',),
+            ('pfCertificationName', u'My Platform Site Honor Code Certificate for {course_name}'.format(
                 course_name=self.course.display_name,
-            ),),
-            ('pfCertificationUrl', 'http://' + settings.MICROSITE_TEST_HOSTNAME + test_url,),
+            ).encode('utf-8'),),
+            ('pfCertificationUrl', 'http://test.localhost' + test_url,),
         ])
-        self.assertIn(
+        self.assertContains(
+            response,
             js_escaped_string(self.linkedin_url.format(params=urlencode(params))),
-            response.content
         )
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     @patch.dict("django.conf.settings.SOCIAL_SHARING_SETTINGS", {"CERTIFICATE_FACEBOOK": True})
-    def test_facebook_share_microsites(self):
+    @with_site_configuration(
+        configuration={'FACEBOOK_APP_ID': 'test_facebook_my_site'},
+    )
+    def test_facebook_share_url_site(self):
         """
         Test: Facebook share URL should be visible when web cert called from within a white label
         site and it should use white label site's FACEBOOK_APP_ID.
         """
         self._add_course_certificates(count=1, signatory_count=1, is_active=True)
         test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
-        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn("Post on Facebook", response.content)
-        self.assertIn(settings.MICROSITE_CONFIGURATION['test_site']['FACEBOOK_APP_ID'], response.content)
+        response = self.client.get(test_url, HTTP_HOST='test.localhost')
+        self.assertContains(response, "Post on Facebook")
+        self.assertContains(response, 'test_facebook_my_site')
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     @ddt.data(
@@ -324,9 +329,9 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         (True, True, False),
     )
     @ddt.unpack
-    def test_social_sharing_availablity_microsites(self, facebook_sharing, twitter_sharing, linkedin_sharing):
+    def test_social_sharing_availability_site(self, facebook_sharing, twitter_sharing, linkedin_sharing):
         """
-        Test: Facebook, Twitter and LinkedIn sharing availability for microsites.
+        Test: Facebook, Twitter and LinkedIn sharing availability for sites.
         """
         self._add_course_certificates(count=1, signatory_count=1, is_active=True)
         test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
@@ -335,22 +340,22 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             CERTIFICATE_TWITTER=twitter_sharing,
             CERTIFICATE_LINKEDIN=linkedin_sharing,
         )
-        with patch("django.conf.settings.MICROSITE_CONFIGURATION", {
-            "test_site": dict(
-                settings.MICROSITE_CONFIGURATION['test_site'],
-                SOCIAL_SHARING_SETTINGS=social_sharing_settings,
-            )
-        }):
-            response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        with with_site_configuration_context(
+            configuration={
+                'platform_name': 'My Platform Site',
+                'SOCIAL_SHARING_SETTINGS': social_sharing_settings,
+            },
+        ):
+            response = self.client.get(test_url, HTTP_HOST='test.localhost')
             self.assertEqual(response.status_code, 200)
-            self.assertEqual("Post on Facebook" in response.content, facebook_sharing)
-            self.assertEqual("Share on Twitter" in response.content, twitter_sharing)
-            self.assertEqual("Add to LinkedIn Profile" in response.content, linkedin_sharing)
+            self.assertEqual("Post on Facebook" in response.content.decode('utf-8'), facebook_sharing)
+            self.assertEqual("Share on Twitter" in response.content.decode('utf-8'), twitter_sharing)
+            self.assertEqual("Add to LinkedIn Profile" in response.content.decode('utf-8'), linkedin_sharing)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_facebook_default_text_microsites(self):
+    def test_facebook_default_text_site(self):
         """
-        Test: Facebook sharing default text for microsites.
+        Test: Facebook sharing default text for sites.
         """
         self._add_course_certificates(count=1, signatory_count=1, is_active=True)
         test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
@@ -359,19 +364,18 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             CERTIFICATE_FACEBOOK=True,
             CERTIFICATE_FACEBOOK_TEXT=facebook_text,
         )
-        with patch("django.conf.settings.MICROSITE_CONFIGURATION", {
-            "test_site": dict(
-                settings.MICROSITE_CONFIGURATION['test_site'],
-                SOCIAL_SHARING_SETTINGS=social_sharing_settings,
-            )
-        }):
-            response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        with with_site_configuration_context(
+            configuration={
+                'SOCIAL_SHARING_SETTINGS': social_sharing_settings,
+            },
+        ):
+            response = self.client.get(test_url, HTTP_HOST='test.localhost')
             self.assertContains(response, facebook_text)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_twitter_default_text_microsites(self):
+    def test_twitter_default_text_site(self):
         """
-        Test: Twitter sharing default text for microsites.
+        Test: Twitter sharing default text for sites.
         """
         self._add_course_certificates(count=1, signatory_count=1, is_active=True)
         test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
@@ -380,13 +384,12 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             CERTIFICATE_TWITTER=True,
             CERTIFICATE_TWITTER_TEXT=twitter_text,
         )
-        with patch("django.conf.settings.MICROSITE_CONFIGURATION", {
-            "test_site": dict(
-                settings.MICROSITE_CONFIGURATION['test_site'],
-                SOCIAL_SHARING_SETTINGS=social_sharing_settings,
-            )
-        }):
-            response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        with with_site_configuration_context(
+            configuration={
+                'SOCIAL_SHARING_SETTINGS': social_sharing_settings,
+            },
+        ):
+            response = self.client.get(test_url, HTTP_HOST='test.localhost')
             self.assertContains(response, twitter_text)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
@@ -402,67 +405,61 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             'logo': '/logo_test1.png/'
         }
         test_org = organizations_api.add_organization(organization_data=test_organization_data)
-        organizations_api.add_organization_course(organization_data=test_org, course_id=unicode(self.course.id))
+        organizations_api.add_organization_course(organization_data=test_org, course_id=six.text_type(self.course.id))
         self._add_course_certificates(count=1, signatory_count=1, is_active=True)
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
         response = self.client.get(test_url)
-        self.assertIn(
+        self.assertContains(
+            response,
             'a course of study offered by test_organization, an online learning initiative of test organization',
-            response.content
         )
-        self.assertNotIn(
-            'a course of study offered by testorg',
-            response.content
-        )
-        self.assertIn(
-            '<title>test_organization {} Certificate |'.format(self.course.number, ),
-            response.content
-        )
-        self.assertIn('logo_test1.png', response.content)
+        self.assertNotContains(response, 'a course of study offered by testorg')
+        self.assertContains(response, u'<title>test_organization {} Certificate |'.format(self.course.number, ))
+        self.assertContains(response, 'logo_test1.png')
 
     @ddt.data(True, False)
     @patch('lms.djangoapps.certificates.views.webview.get_completion_badge')
-    @override_settings(FEATURES=FEATURES_WITH_BADGES_ENABLED)
     def test_fetch_badge_info(self, issue_badges, mock_get_completion_badge):
         """
         Test: Fetch badge class info if badges are enabled.
         """
-        badge_class = BadgeClassFactory(course_id=self.course_id, mode=self.cert.mode)
-        mock_get_completion_badge.return_value = badge_class
+        if issue_badges:
+            features = FEATURES_WITH_BADGES_ENABLED
+        else:
+            features = FEATURES_WITH_CERTS_ENABLED
+        with override_settings(FEATURES=features):
+            badge_class = BadgeClassFactory(course_id=self.course_id, mode=self.cert.mode)
+            mock_get_completion_badge.return_value = badge_class
 
-        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
-        test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
-        response = self.client.get(test_url)
-        self.assertEqual(response.status_code, 200)
+            self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+            test_url = get_certificate_url(user_id=self.user.id, course_id=self.cert.course_id,
+                                           uuid=self.cert.verify_uuid)
+            response = self.client.get(test_url)
+            self.assertEqual(response.status_code, 200)
 
         if issue_badges:
-            mock_get_completion_badge.assertCalled()
+            mock_get_completion_badge.assert_called()
         else:
-            mock_get_completion_badge.assertNotCalled()
+            mock_get_completion_badge.assert_not_called()
 
     @override_settings(FEATURES=FEATURES_WITH_BADGES_ENABLED)
     @patch.dict("django.conf.settings.SOCIAL_SHARING_SETTINGS", {
         "CERTIFICATE_TWITTER": True,
         "CERTIFICATE_FACEBOOK": True,
     })
-    @patch.dict("django.conf.settings.MICROSITE_CONFIGURATION", {
-        "test_site": dict(
-            settings.MICROSITE_CONFIGURATION['test_site'],
+    @with_site_configuration(
+        configuration=dict(
+            platform_name='My Platform Site',
+            SITE_NAME='test_site.localhost',
             urls=dict(
-                ABOUT=None,
-                PRIVACY=None,
-                TOS_AND_HONOR=None,
+                ABOUT='http://www.test-site.org/about-us',
             ),
-        )
-    })
-    @patch.dict("django.conf.settings.MKTG_URL_LINK_MAP", {
-        'ABOUT': None,
-        'PRIVACY': None,
-        'TOS_AND_HONOR': None,
-    })
+        ),
+    )
     def test_rendering_maximum_data(self):
         """
         Tests at least one data item from different context update methods to
@@ -478,7 +475,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             'logo': '/logo_test1.png'
         }
         test_org = organizations_api.add_organization(organization_data=test_organization_data)
-        organizations_api.add_organization_course(organization_data=test_org, course_id=unicode(self.course.id))
+        organizations_api.add_organization_course(organization_data=test_org, course_id=six.text_type(self.course.id))
         self._add_course_certificates(count=1, signatory_count=1, is_active=True)
         badge_class = get_completion_badge(course_id=self.course_id, user=self.user)
         BadgeAssertionFactory.create(
@@ -493,90 +490,62 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
 
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
-        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        response = self.client.get(test_url, HTTP_HOST='test.localhost')
 
         # Test an item from basic info
-        self.assertIn(
-            'Terms of Service &amp; Honor Code',
-            response.content
-        )
-        self.assertIn(
-            'Certificate ID Number',
-            response.content
-        )
+        self.assertContains(response, 'Terms of Service &amp; Honor Code')
+        self.assertContains(response, 'Certificate ID Number')
         # Test an item from html cert configuration
-        self.assertIn(
-            '<a class="logo" href="http://test_site.localhost">',
-            response.content
-        )
+        self.assertContains(response, '<a class="logo" href="http://test_site.localhost">')
         # Test an item from course info
-        self.assertIn(
-            'course_title_0',
-            response.content
-        )
+        self.assertContains(response, 'course_title_0')
         # Test an item from user info
-        self.assertIn(
-            "{fullname}, you earned a certificate!".format(fullname=self.user.profile.name),
-            response.content
-        )
+        self.assertContains(response, u"{fullname}, you earned a certificate!".format(fullname=self.user.profile.name))
         # Test an item from social info
-        self.assertIn(
-            "Post on Facebook",
-            response.content
-        )
-        self.assertIn(
-            "Share on Twitter",
-            response.content
-        )
+        self.assertContains(response, "Post on Facebook")
+        self.assertContains(response, "Share on Twitter")
         # Test an item from certificate/org info
-        self.assertIn(
-            "a course of study offered by {partner_short_name}, "
+        self.assertContains(
+            response,
+            u"a course of study offered by {partner_short_name}, "
             "an online learning initiative of "
             "{partner_long_name}.".format(
                 partner_short_name=short_org_name,
                 partner_long_name=long_org_name,
             ),
-            response.content
         )
         # Test item from badge info
-        self.assertIn(
-            "Add to Mozilla Backpack",
-            response.content
-        )
-        # Test item from microsite info
-        self.assertIn(
-            "http://www.test-site.org/about-us",
-            response.content
-        )
+        self.assertContains(response, "Add to Mozilla Backpack")
+        # Test item from site configuration
+        self.assertContains(response, "http://www.test-site.org/about-us")
         # Test course overrides
-        self.assertIn(
-            "/static/certificates/images/course_override_logo.png",
-            response.content
-        )
+        self.assertContains(response, "/static/certificates/images/course_override_logo.png")
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_valid_certificate(self):
         self._add_course_certificates(count=1, signatory_count=2)
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
         response = self.client.get(test_url)
-        self.assertIn(str(self.cert.verify_uuid), response.content)
+        self.assertContains(response, str(self.cert.verify_uuid))
 
         # Hit any "verified" mode-specific branches
         self.cert.mode = 'verified'
         self.cert.save()
         response = self.client.get(test_url)
-        self.assertIn(str(self.cert.verify_uuid), response.content)
+        self.assertContains(response, str(self.cert.verify_uuid))
 
         # Hit any 'xseries' mode-specific branches
         self.cert.mode = 'xseries'
         self.cert.save()
         response = self.client.get(test_url)
-        self.assertIn(str(self.cert.verify_uuid), response.content)
+        self.assertContains(response, str(self.cert.verify_uuid))
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_certificate_only_for_downloadable_status(self):
@@ -587,20 +556,19 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self._add_course_certificates(count=1, signatory_count=2)
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
 
         # Validate certificate
         response = self.client.get(test_url)
-        self.assertIn(str(self.cert.verify_uuid), response.content)
+        self.assertContains(response, str(self.cert.verify_uuid))
 
         # Change status to 'generating' and validate that Certificate Web View returns "Invalid Certificate"
         self.cert.status = CertificateStatuses.generating
         self.cert.save()
         response = self.client.get(test_url)
-        self.assertIn("Invalid Certificate", response.content)
-        self.assertIn("Cannot Find Certificate", response.content)
-        self.assertIn("We cannot find a certificate with this URL or ID number.", response.content)
+        self.assertEqual(response.status_code, 404)
 
     @ddt.data(
         (CertificateStatuses.downloadable, True),
@@ -622,62 +590,58 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self._add_course_certificates(count=1, signatory_count=2)
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
         response = self.client.get(test_url)
-
         if eligible_for_certificate:
-            self.assertIn(str(self.cert.verify_uuid), response.content)
+            self.assertContains(response, str(self.cert.verify_uuid))
         else:
-            self.assertIn("Invalid Certificate", response.content)
-            self.assertIn("Cannot Find Certificate", response.content)
-            self.assertIn("We cannot find a certificate with this URL or ID number.", response.content)
-            self.assertNotIn(str(self.cert.verify_uuid), response.content)
+            self.assertEqual(response.status_code, 404)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_html_view_for_invalid_certificate(self):
+    def test_html_view_returns_404_for_invalid_certificate(self):
         """
-        Tests that Certificate HTML Web View returns "Cannot Find Certificate" if certificate has been invalidated.
+        Tests that Certificate HTML Web View successfully retrieves certificate only
+        if the certificate is not invalidated otherwise returns 404
         """
         self._add_course_certificates(count=1, signatory_count=2)
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
 
         # Validate certificate
         response = self.client.get(test_url)
-        self.assertIn(str(self.cert.verify_uuid), response.content)
+        self.assertContains(response, str(self.cert.verify_uuid))
 
         # invalidate certificate and verify that "Cannot Find Certificate" is returned
         self.cert.invalidate()
         response = self.client.get(test_url)
-        self.assertIn("Invalid Certificate", response.content)
-        self.assertIn("Cannot Find Certificate", response.content)
-        self.assertIn("We cannot find a certificate with this URL or ID number.", response.content)
+        self.assertEqual(response.status_code, 404)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_html_lang_attribute_is_dynamic_for_invalid_certificate_html_view(self):
+    def test_html_lang_attribute_is_dynamic_for_certificate_html_view(self):
         """
         Tests that Certificate HTML Web View's lang attribute is based on user language.
         """
         self._add_course_certificates(count=1, signatory_count=2)
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
-
-        self.cert.invalidate()
 
         user_language = 'fr'
         self.client.cookies[settings.LANGUAGE_COOKIE] = user_language
         response = self.client.get(test_url)
-        self.assertIn('<html class="no-js" lang="fr">', response.content)
+        self.assertContains(response, '<html class="no-js" lang="fr">')
 
         user_language = 'ar'
         self.client.cookies[settings.LANGUAGE_COOKIE] = user_language
         response = self.client.get(test_url)
-        self.assertIn('<html class="no-js" lang="ar">', response.content)
+        self.assertContains(response, '<html class="no-js" lang="ar">')
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_html_view_for_non_viewable_certificate_and_for_student_user(self):
@@ -701,27 +665,29 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
 
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
         response = self.client.get(test_url)
-        self.assertIn("Invalid Certificate", response.content)
-        self.assertIn("Cannot Find Certificate", response.content)
-        self.assertIn("We cannot find a certificate with this URL or ID number.", response.content)
+        self.assertContains(response, "Invalid Certificate")
+        self.assertContains(response, "Cannot Find Certificate")
+        self.assertContains(response, "We cannot find a certificate with this URL or ID number.")
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_with_valid_signatories(self):
         self._add_course_certificates(count=1, signatory_count=2)
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
 
         response = self.client.get(test_url)
-        self.assertIn('course_title_0', response.content)
-        self.assertIn('Signatory_Name 0', response.content)
-        self.assertIn('Signatory_Title 0', response.content)
-        self.assertIn('Signatory_Organization 0', response.content)
-        self.assertIn('/static/certificates/images/demo-sig0.png', response.content)
+        self.assertContains(response, 'course_title_0')
+        self.assertContains(response, 'Signatory_Name 0')
+        self.assertContains(response, 'Signatory_Title 0')
+        self.assertContains(response, 'Signatory_Organization 0')
+        self.assertContains(response, '/static/certificates/images/demo-sig0.png')
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_course_display_name_not_override_with_course_title(self):
@@ -742,12 +708,13 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self.store.update_item(self.course, self.user.id)
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
 
         response = self.client.get(test_url)
-        self.assertNotIn('test_course_title_0', response.content)
-        self.assertIn('refundable course', response.content)
+        self.assertNotContains(response, 'test_course_title_0')
+        self.assertContains(response, 'refundable course')
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_course_display_overrides(self):
@@ -760,7 +727,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self._add_course_certificates(count=1, signatory_count=2)
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
 
         self.course.display_coursenumber = "overridden_number"
@@ -768,8 +736,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self.store.update_item(self.course, self.user.id)
 
         response = self.client.get(test_url)
-        self.assertIn('overridden_number', response.content)
-        self.assertIn('overridden_org', response.content)
+        self.assertContains(response, 'overridden_number')
+        self.assertContains(response, 'overridden_org')
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_certificate_view_without_org_logo(self):
@@ -789,7 +757,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
 
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
         response = self.client.get(test_url)
         # make sure response html has only one organization logo container for edX
@@ -800,11 +769,12 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self._add_course_certificates(count=1, signatory_count=0)
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
         response = self.client.get(test_url)
-        self.assertNotIn('Signatory_Name 0', response.content)
-        self.assertNotIn('Signatory_Title 0', response.content)
+        self.assertNotContains(response, 'Signatory_Name 0')
+        self.assertNotContains(response, 'Signatory_Title 0')
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_is_html_escaped(self):
@@ -828,17 +798,19 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
 
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
         response = self.client.get(test_url)
-        self.assertNotIn('<script>', response.content)
-        self.assertIn('&lt;script&gt;course_title&lt;/script&gt;', response.content)
+        self.assertNotContains(response, '<script>')
+        self.assertContains(response, '&lt;script&gt;course_title&lt;/script&gt;')
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_DISABLED)
     def test_render_html_view_disabled_feature_flag_returns_static_url(self):
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
         self.assertIn(str(self.cert.download_url), test_url)
 
@@ -849,40 +821,21 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             course_id="missing/course/key"
         )
         response = self.client.get(test_url)
-        self.assertIn('invalid', response.content)
-
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_render_html_view_invalid_user(self):
-        self._add_course_certificates(count=1, signatory_count=0)
-        test_url = get_certificate_url(
-            user_id=111,
-            course_id=unicode(self.course.id)
-        )
-        response = self.client.get(test_url)
-        self.assertIn('invalid', response.content)
-
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_render_html_view_non_int_user(self):
-        self._add_course_certificates(count=1, signatory_count=0)
-        test_url = get_certificate_url(
-            user_id="Good tests make good neighbors",
-            course_id=unicode(self.course.id)
-        )
-        response = self.client.get(test_url)
-        self.assertEqual(response.status_code, 404)
+        self.assertContains(response, 'invalid')
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_invalid_user_certificate(self):
         self._add_course_certificates(count=1, signatory_count=0)
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
         self.cert.delete()
         self.assertListEqual(list(GeneratedCertificate.eligible_certificates.all()), [])
 
         response = self.client.get(test_url)
-        self.assertIn('invalid', response.content)
+        self.assertEqual(response.status_code, 404)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED, PLATFORM_NAME=u'Űńíćődé Űńívéŕśítӳ')
     def test_render_html_view_with_unicode_platform_name(self):
@@ -890,42 +843,47 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
 
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
         response = self.client.get(test_url)
         self.assertEqual(response.status_code, 200)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_render_html_view_with_preview_mode(self):
+    def test_user_id_cert_url_not_supported(self):
         """
-        test certificate web view should render properly along with its signatories information when accessing it in
-        preview mode. Either the certificate is marked active or not.
+        tests the user id based certificate url is no longer supported
         """
-        self.cert.delete()
-        self.assertListEqual(list(GeneratedCertificate.eligible_certificates.all()), [])
-        self._add_course_certificates(count=1, signatory_count=2)
-        test_url = get_certificate_url(
-            user_id=self.user.id,
-            course_id=unicode(self.course.id)
+        test_url = reverse(
+            'certificates:unsupported_url', kwargs={'user_id': self.user.id, 'course_id': self.course_id}
         )
         response = self.client.get(test_url + '?preview=honor')
         # accessing certificate web view in preview mode without
         # staff or instructor access should show invalid certificate
-        self.assertIn('Cannot Find Certificate', response.content)
+        self.assertContains(response, 'URL Not Supported')
 
-        CourseStaffRole(self.course.id).add_users(self.user)
-
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_render_html_view_with_preview_mode(self):
+        """
+        test certificate web view should render properly along with its signatories information when accessing it in
+        preview mode only for the staff users. Either the certificate is marked active or not.
+        """
+        self._add_course_certificates(count=1, signatory_count=2)
+        self.user.is_staff = True
+        self.user.save()
+        test_url = reverse('certificates:preview_cert', kwargs={'course_id': self.course_id})
         response = self.client.get(test_url + '?preview=honor')
-        self.assertNotIn(self.course.display_name.encode('utf-8'), response.content)
-        self.assertIn('course_title_0', response.content)
-        self.assertIn('Signatory_Title 0', response.content)
+
+        self.assertNotContains(response, self.course.display_name.encode('utf-8'))
+        self.assertContains(response, 'course_title_0')
+        self.assertContains(response, 'Signatory_Title 0')
 
         # mark certificate inactive but accessing in preview mode.
         self._add_course_certificates(count=1, signatory_count=2, is_active=False)
         response = self.client.get(test_url + '?preview=honor')
-        self.assertNotIn(self.course.display_name.encode('utf-8'), response.content)
-        self.assertIn('course_title_0', response.content)
-        self.assertIn('Signatory_Title 0', response.content)
+        self.assertNotContains(response, self.course.display_name.encode('utf-8'))
+        self.assertContains(response, 'course_title_0')
+        self.assertContains(response, 'Signatory_Title 0')
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_with_preview_mode_when_user_already_has_cert(self):
@@ -939,14 +897,15 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
 
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
         # user has already has certificate generated for 'honor' mode
         # so let's try to preview in 'verified' mode.
         response = self.client.get(test_url + '?preview=verified')
-        self.assertNotIn(self.course.display_name.encode('utf-8'), response.content)
-        self.assertIn('course_title_0', response.content)
-        self.assertIn('Signatory_Title 0', response.content)
+        self.assertNotContains(response, self.course.display_name.encode('utf-8'))
+        self.assertContains(response, 'course_title_0')
+        self.assertContains(response, 'Signatory_Title 0')
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     @ddt.data(
@@ -966,7 +925,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self._add_course_certificates(count=1, signatory_count=1, is_active=True)
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
 
         if self_paced or self.course.certificate_available_date > today:
@@ -975,12 +935,12 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             expected_date = self.course.certificate_available_date
         with waffle.waffle().override(waffle.AUTO_CERTIFICATE_GENERATION, active=True):
             response = self.client.get(test_url)
-        date = '{month} {day}, {year}'.format(
+        date = u'{month} {day}, {year}'.format(
             month=strftime_localized(expected_date, "%B"),
             day=expected_date.day,
             year=expected_date.year
         )
-        self.assertIn(date, response.content)
+        self.assertContains(response, date)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_invalid_certificate_configuration(self):
@@ -990,10 +950,11 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
 
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
         response = self.client.get(test_url)
-        self.assertIn("Invalid Certificate", response.content)
+        self.assertContains(response, "Invalid Certificate")
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_500_view_invalid_certificate_configuration(self):
@@ -1002,10 +963,11 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
 
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
         response = self.client.get(test_url + "?preview=honor")
-        self.assertIn("Invalid Certificate Configuration", response.content)
+        self.assertContains(response, "Invalid Certificate Configuration")
 
         # Verify that Exception is raised when certificate is not in the preview mode
         with self.assertRaises(Exception):
@@ -1016,9 +978,9 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self.cert.status = CertificateStatuses.unavailable
         self.cert.save()
         request_certificate_url = reverse('request_certificate')
-        response = self.client.post(request_certificate_url, {'course_id': unicode(self.course.id)})
+        response = self.client.post(request_certificate_url, {'course_id': six.text_type(self.course.id)})
         self.assertEqual(response.status_code, 200)
-        response_json = json.loads(response.content)
+        response_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(CertificateStatuses.notpassing, response_json['add_status'])
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_DISABLED)
@@ -1030,9 +992,9 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
             mock_queue.return_value = (0, "Successfully queued")
             with mock_passing_grade():
-                response = self.client.post(request_certificate_url, {'course_id': unicode(self.course.id)})
+                response = self.client.post(request_certificate_url, {'course_id': six.text_type(self.course.id)})
                 self.assertEqual(response.status_code, 200)
-                response_json = json.loads(response.content)
+                response_json = json.loads(response.content.decode('utf-8'))
                 self.assertEqual(CertificateStatuses.generating, response_json['add_status'])
 
     #TEMPLATES WITHOUT LANGUAGE TESTS
@@ -1047,15 +1009,16 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         mock_get_course_run_details.return_value = self.mock_course_run_details
         self._add_course_certificates(count=1, signatory_count=2)
         self._create_custom_named_template(
-            'test_template_1_course', org_id=1, mode='honor', course_key=unicode(self.course.id),
+            'test_template_1_course', org_id=1, mode='honor', course_key=six.text_type(self.course.id),
         )
         self._create_custom_named_template(
-            'test_template_2_course', org_id=1, mode='verified', course_key=unicode(self.course.id),
+            'test_template_2_course', org_id=1, mode='verified', course_key=six.text_type(self.course.id),
         )
         self._create_custom_named_template('test_template_3_course', org_id=2, mode='honor')
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
 
         with patch('lms.djangoapps.certificates.api.get_course_organization_id') as mock_get_org_id:
@@ -1089,13 +1052,14 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             'test_template_2_course',
             org_id=1,
             mode='honor',
-            course_key=unicode(othercourse.id)
+            course_key=six.text_type(othercourse.id)
         )
         self._create_custom_named_template('test_template_3_course', org_id=1, mode='verified')  # wrong mode
         self._create_custom_named_template('test_template_4_course', org_id=2, mode='honor')  # wrong org
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
 
         with patch('lms.djangoapps.certificates.api.get_course_organization_id') as mock_get_org_id:
@@ -1118,7 +1082,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self._create_custom_named_template('test_template_3_course', org_id=2, mode=None)  # wrong org
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
 
         with patch('lms.djangoapps.certificates.api.get_course_organization_id') as mock_get_org_id:
@@ -1142,14 +1107,15 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self._create_custom_named_template('test_template_3_course', org_id=2, mode=mode)  # wrong org
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
 
         with patch('lms.djangoapps.certificates.api.get_course_organization_id') as mock_get_org_id:
             mock_get_org_id.return_value = None
             response = self.client.get(test_url)
             self.assertEqual(response.status_code, 200)
-            self.assertContains(response, 'mode: {}'.format(mode))
+            self.assertContains(response, u'mode: {}'.format(mode))
             self.assertContains(response, 'course name: test_template_1_course')
 
     ## Templates With Language tests
@@ -1187,11 +1153,12 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
 
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
         #create a org_mode_and_coursekey template language=null
         self._create_custom_named_template(
-            'test_null_lang_template', org_id=1, mode='honor', course_key=unicode(self.course.id), language=None,
+            'test_null_lang_template', org_id=1, mode='honor', course_key=six.text_type(self.course.id), language=None,
         )
         #verify return template lang = null
         response = self.client.get(test_url)
@@ -1203,7 +1170,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             'test_wrong_lang_template',
             org_id=1,
             mode='honor',
-            course_key=unicode(self.course.id),
+            course_key=six.text_type(self.course.id),
             language=wrong_language,
         )
         #verify returns null lang template
@@ -1213,7 +1180,11 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
 
         #create an org_mode_and_coursekey template language=''
         self._create_custom_named_template(
-            'test_all_languages_template', org_id=1, mode='honor', course_key=unicode(self.course.id), language='',
+            'test_all_languages_template',
+            org_id=1,
+            mode='honor',
+            course_key=six.text_type(self.course.id),
+            language='',
         )
         #verify returns null lang template
         response = self.client.get(test_url)
@@ -1225,7 +1196,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             'test_right_lang_template',
             org_id=1,
             mode='honor',
-            course_key=unicode(self.course.id),
+            course_key=six.text_type(self.course.id),
             language=right_language,
         )
         # verify return right_language template
@@ -1262,7 +1233,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
 
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
         #create a org and mode template language=null
         self._create_custom_named_template('test_null_lang_template', org_id=1, mode='honor', language=None)
@@ -1319,7 +1291,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self._add_course_certificates(count=1, signatory_count=2)
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
         #create a org template language=null
         self._create_custom_named_template('test_null_lang_template', org_id=1, language=None)
@@ -1377,7 +1350,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
 
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
         #create a mode template language=null
         self._create_custom_named_template('test_null_lang_template', mode='honor', language=None)
@@ -1438,7 +1412,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
 
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
         #create a mode template language=null
         self._create_custom_named_template('test_null_lang_template', org_id=1, mode='honor', language=None)
@@ -1494,14 +1469,15 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self._create_custom_template_with_hours_of_effort(org_id=1, language=None)
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
         response = self.client.get(test_url)
         self.assertEqual(response.status_code, 200)
         if include_effort:
-            self.assertIn('hours of effort: 40', response.content)
+            self.assertContains(response, 'hours of effort: 40')
         else:
-            self.assertNotIn('hours of effort', response.content)
+            self.assertNotContains(response, 'hours of effort')
 
     @ddt.data(True, False)
     @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
@@ -1519,7 +1495,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         }):
             test_url = get_certificate_url(
                 user_id=self.user.id,
-                course_id=unicode(self.course.id)
+                course_id=six.text_type(self.course.id),
+                uuid=self.cert.verify_uuid
             )
             with patch.dict("django.conf.settings.SOCIAL_SHARING_SETTINGS", {
                 "CERTIFICATE_TWITTER": True,
@@ -1532,7 +1509,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
                         response = self.client.get(test_url)
                         self.assertEqual(response.status_code, 200)
                         if custom_certs_enabled:
-                            self.assertContains(response, 'mode: {}'.format(mode))
+                            self.assertContains(response, u'mode: {}'.format(mode))
                         else:
                             self.assertContains(response, "Tweet this Accomplishment")
                         self.assertContains(response, 'https://twitter.com/intent/tweet')
@@ -1548,7 +1525,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self._create_custom_template(mode='honor')
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
 
         # render certificate without template asset
@@ -1569,152 +1547,16 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             mock_get_org_id.return_value = None
             response = self.client.get(test_url)
             self.assertContains(
-                response, '<img class="custom-logo" src="{}certificate_template_assets/32/test_logo.png" />'.format(
+                response, u'<img class="custom-logo" src="{}certificate_template_assets/32/test_logo.png" />'.format(
                     settings.MEDIA_URL
                 )
             )
-
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_certificate_branding(self):
-        """
-        Test that link urls in certificate web view are customized according to site branding and
-        microsite configuration.
-        """
-        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
-
-        self.course.save()
-        self.store.update_item(self.course, self.user.id)
-
-        test_url = get_certificate_url(
-            user_id=self.user.id,
-            course_id=unicode(self.course.id)
-        )
-        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
-        # logo_image_url Tis present in MICROSITE_CONFIGURATION['test_site']["urls"],
-        #  so web certificate will use that.
-        self.assertContains(
-            response,
-            settings.MICROSITE_CONFIGURATION['test_site']['logo_image_url'],
-        )
-        # ABOUT is present in MICROSITE_CONFIGURATION['test_site']["urls"] so web certificate will use that url.
-        self.assertContains(
-            response,
-            settings.MICROSITE_CONFIGURATION['test_site']["urls"]['ABOUT'],
-        )
-        # PRIVACY is present in MICROSITE_CONFIGURATION['test_site']["urls"] so web certificate will use that url.
-        self.assertContains(
-            response,
-            settings.MICROSITE_CONFIGURATION['test_site']["urls"]['PRIVACY'],
-        )
-        # TOS_AND_HONOR is present in MICROSITE_CONFIGURATION['test_site']["urls"],
-        #  so web certificate will use that url.
-        self.assertContains(
-            response,
-            settings.MICROSITE_CONFIGURATION['test_site']["urls"]['TOS_AND_HONOR'],
-        )
-
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    @patch.dict("django.conf.settings.MICROSITE_CONFIGURATION", {
-        "test_site": dict(
-            settings.MICROSITE_CONFIGURATION['test_site'],
-            urls=dict(
-                ABOUT=None,
-                PRIVACY=None,
-                TOS_AND_HONOR=None,
-            ),
-        )
-    })
-    def test_certificate_branding_without_microsite_urls(self):
-        """
-        Test that links from MKTG_URL_LINK_MAP setting are used if corresponding microsite urls are not present.
-        microsite configuration.
-        """
-        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
-        self.course.save()
-        self.store.update_item(self.course, self.user.id)
-        configuration = CertificateHtmlViewConfiguration.get_config()
-        test_url = get_certificate_url(
-            user_id=self.user.id,
-            course_id=unicode(self.course.id)
-        )
-        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
-        # ABOUT is not present in MICROSITE_CONFIGURATION['test_site']["urls"],
-        #  so web certificate will use MKTG_URL_LINK_MAP['ABOUT'] url.
-        self.assertContains(
-            response,
-            settings.MKTG_URL_LINK_MAP['ABOUT'],
-        )
-        # PRIVACY is not present in MICROSITE_CONFIGURATION['test_site']["urls"],
-        # so web certificate will use MKTG_URL_LINK_MAP['PRIVACY'] url.
-        self.assertContains(
-            response,
-            settings.MKTG_URL_LINK_MAP['PRIVACY'],
-        )
-        # TOS_AND_HONOR is not present in MICROSITE_CONFIGURATION['test_site']["urls"] or MKTG_URL_LINK_MAP,
-        # so web certificate will use CertificateHtmlViewConfiguration url.
-        self.assertContains(
-            response,
-            configuration['microsites']['test-site']['company_tos_url'],
-        )
-
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    @patch.dict("django.conf.settings.MICROSITE_CONFIGURATION", {
-        "test_site": dict(
-            settings.MICROSITE_CONFIGURATION['test_site'],
-            urls=dict(
-                ABOUT=None,
-                PRIVACY=None,
-                TOS_AND_HONOR=None,
-            ),
-        )
-    })
-    @patch.dict("django.conf.settings.MKTG_URL_LINK_MAP", {
-        'ABOUT': None,
-        'PRIVACY': None,
-        'TOS_AND_HONOR': None,
-    })
-    def test_certificate_without_branding_urls(self):
-        """
-        Test that links from CertificateHtmlViewConfiguration are used if
-        corresponding microsite or marketing urls are not present.
-        """
-        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
-
-        self.course.save()
-        self.store.update_item(self.course, self.user.id)
-        configuration = CertificateHtmlViewConfiguration.get_config()
-
-        test_url = get_certificate_url(
-            user_id=self.user.id,
-            course_id=unicode(self.course.id)
-        )
-        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
-
-        # ABOUT is not present in MICROSITE_CONFIGURATION['test_site']["urls"] or MKTG_URL_LINK_MAP,
-        #  so web certificate will use CertificateHtmlViewConfiguration url.
-        self.assertContains(
-            response,
-            configuration['microsites']['test-site']['company_about_url'],
-        )
-        # PRIVACY is not present in MICROSITE_CONFIGURATION['test_site']["urls"] or MKTG_URL_LINK_MAP,
-        # so web certificate will use CertificateHtmlViewConfiguration url.
-        self.assertContains(
-            response,
-            configuration['microsites']['test-site']['company_privacy_url'],
-        )
-        # TOS_AND_HONOR is not present in MICROSITE_CONFIGURATION['test_site']["urls"] or MKTG_URL_LINK_MAP,
-        # so web certificate will use CertificateHtmlViewConfiguration url.
-        self.assertContains(
-            response,
-            configuration['microsites']['test-site']['company_tos_url'],
-        )
 
 
 class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):
     """
     Test events emitted by certificate handling.
     """
-    shard = 1
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_certificate_evidence_event_emitted(self):
@@ -1723,7 +1565,8 @@ class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):
         self.recreate_tracker()
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
         response = self.client.get(test_url)
         self.assertEqual(response.status_code, 200)
@@ -1732,10 +1575,10 @@ class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):
         assert_event_matches(
             {
                 'user_id': self.user.id,
-                'certificate_id': unicode(self.cert.verify_uuid),
+                'certificate_id': six.text_type(self.cert.verify_uuid),
                 'enrollment_mode': self.cert.mode,
                 'certificate_url': test_url,
-                'course_id': unicode(self.course.id),
+                'course_id': six.text_type(self.course.id),
                 'social_network': CertificateSocialNetworks.linkedin
             },
             actual_event['data']
@@ -1747,7 +1590,8 @@ class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):
 
         cert_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=self.course_id
+            course_id=self.course_id,
+            uuid=self.cert.verify_uuid
         )
         test_url = '{}?evidence_visit=1'.format(cert_url)
         self.recreate_tracker()

@@ -3,10 +3,12 @@ Classes used to model the roles used in the courseware. Each role is responsible
 adding users, removing users, and listing members
 """
 
+
 import logging
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 
+import six
 from django.contrib.auth.models import User
 from opaque_keys.edx.django.models import CourseKeyField
 
@@ -47,7 +49,7 @@ class BulkRoleCache(object):
         for role in CourseAccessRole.objects.filter(user__in=users).select_related('user'):
             roles_by_user[role.user.id].add(role)
 
-        users_without_roles = filter(lambda u: u.id not in roles_by_user, users)
+        users_without_roles = [u for u in users if u.id not in roles_by_user]
         for user in users_without_roles:
             roles_by_user[user.id] = set()
 
@@ -80,11 +82,10 @@ class RoleCache(object):
         )
 
 
-class AccessRole(object):
+class AccessRole(six.with_metaclass(ABCMeta, object)):
     """
     Object representing a role with particular access to a resource
     """
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def has_user(self, user):
@@ -328,6 +329,15 @@ class CourseCcxCoachRole(CourseRole):
         super(CourseCcxCoachRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
+@register_access_role
+class CourseDataResearcherRole(CourseRole):
+    """A Data Researcher"""
+    ROLE = 'data_researcher'
+
+    def __init__(self, *args, **kwargs):
+        super(CourseDataResearcherRole, self).__init__(self.ROLE, *args, **kwargs)
+
+
 class OrgStaffRole(OrgRole):
     """An organization staff member"""
     def __init__(self, *args, **kwargs):
@@ -349,6 +359,14 @@ class OrgLibraryUserRole(OrgRole):
 
     def __init__(self, *args, **kwargs):
         super(OrgLibraryUserRole, self).__init__(self.ROLE, *args, **kwargs)
+
+
+class OrgDataResearcherRole(OrgRole):
+    """A Data Researcher"""
+    ROLE = 'data_researcher'
+
+    def __init__(self, *args, **kwargs):
+        super(OrgDataResearcherRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
 @register_access_role

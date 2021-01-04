@@ -1,47 +1,47 @@
 """
 Unit tests for the Mongo modulestore
 """
-# pylint: disable=protected-access
-# pylint: disable=no-name-in-module
-# pylint: disable=bad-continuation
-from django.test import TestCase
-# pylint: enable=E0611
-from path import Path as path
-import pymongo
-import pytest
+
+
 import logging
 import shutil
+from datetime import datetime
 from tempfile import mkdtemp
 from uuid import uuid4
-from datetime import datetime
-from pytz import UTC
+
+import pymongo
+import pytest
+import six
+
+# pylint: disable=bad-continuation
+# pylint: disable=protected-access
+from django.test import TestCase
+# pylint: enable=E0611
 from mock import patch
-from xblock.core import XBlock
-
-from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
-from xblock.runtime import KeyValueStore
-from xblock.exceptions import InvalidScopeError
-
-from xmodule.tests import DATA_DIR
-from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.mongo import MongoKeyValueStore
-from xmodule.modulestore.draft import DraftModuleStore
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import AssetLocator, BlockUsageLocator, CourseLocator, LibraryLocator
-from opaque_keys.edx.keys import UsageKey
-from xmodule.modulestore.xml_exporter import export_course_to_xml
-from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
-from xmodule.contentstore.mongo import MongoContentStore
+from path import Path as path
+from pytz import UTC
+from xblock.core import XBlock
+from xblock.exceptions import InvalidScopeError
+from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope
+from xblock.runtime import KeyValueStore
 
+from xmodule.contentstore.mongo import MongoContentStore
 from xmodule.exceptions import NotFoundError
-from xmodule.x_module import XModuleMixin
-from xmodule.modulestore.mongo.base import as_draft
-from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
-from xmodule.modulestore.tests.utils import LocationMixin, mock_tab_from_json
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.draft import DraftModuleStore
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import InheritanceMixin
-
+from xmodule.modulestore.mongo import MongoKeyValueStore
+from xmodule.modulestore.mongo.base import as_draft
+from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
+from xmodule.modulestore.tests.utils import LocationMixin, mock_tab_from_json
+from xmodule.modulestore.xml_exporter import export_course_to_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
+from xmodule.tests import DATA_DIR
+from xmodule.x_module import XModuleMixin
 
 log = logging.getLogger(__name__)
 
@@ -76,7 +76,6 @@ class TestMongoModuleStoreBase(TestCase):
     '''
     Basic setup for all tests
     '''
-    shard = 2
     # Explicitly list the courses to load (don't want the big one)
     courses = ['toy', 'simple', 'simple_with_draft', 'test_unicode']
 
@@ -180,7 +179,6 @@ class TestMongoModuleStoreBase(TestCase):
 
 class TestMongoModuleStore(TestMongoModuleStoreBase):
     '''Module store tests'''
-    shard = 2
 
     @classmethod
     def add_asset_collection(cls, doc_store_config):
@@ -528,7 +526,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
             for ref in refele.reference_list:
                 assert isinstance(ref, UsageKey)
             assert len(refele.reference_dict) > 0
-            for ref in refele.reference_dict.itervalues():
+            for ref in six.itervalues(refele.reference_dict):
                 assert isinstance(ref, UsageKey)
 
         def check_mongo_fields():
@@ -537,17 +535,17 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
             def check_children(payload):
                 for child in payload['definition']['children']:
-                    assert isinstance(child, basestring)
+                    assert isinstance(child, six.string_types)
 
             refele = get_item(self.refloc)
             check_children(refele)
-            assert isinstance(refele['definition']['data']['reference_link'], basestring)
+            assert isinstance(refele['definition']['data']['reference_link'], six.string_types)
             assert len(refele['definition']['data']['reference_list']) > 0
             for ref in refele['definition']['data']['reference_list']:
-                assert isinstance(ref, basestring)
+                assert isinstance(ref, six.string_types)
             assert len(refele['metadata']['reference_dict']) > 0
-            for ref in refele['metadata']['reference_dict'].itervalues():
-                assert isinstance(ref, basestring)
+            for ref in six.itervalues(refele['metadata']['reference_dict']):
+                assert isinstance(ref, six.string_types)
 
         setup_test()
         check_xblock_fields()
@@ -706,8 +704,8 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
         # First child should have been moved to second position, and better child takes the lead
         course = self.draft_store.get_course(course.id)
-        self.assertEqual(unicode(course.children[1]), unicode(first_child.location))
-        self.assertEqual(unicode(course.children[0]), unicode(second_child.location))
+        self.assertEqual(six.text_type(course.children[1]), six.text_type(first_child.location))
+        self.assertEqual(six.text_type(course.children[0]), six.text_type(second_child.location))
 
         # Clean up the data so we don't break other tests which apparently expect a particular state
         self.draft_store.delete_course(course.id, self.dummy_user)
@@ -724,7 +722,6 @@ class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
     '''
     Tests a situation where no asset_collection is specified.
     '''
-    shard = 2
 
     @classmethod
     def add_asset_collection(cls, doc_store_config):
@@ -745,7 +742,7 @@ class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
         courses = self.draft_store.get_courses()
         course = courses[0]
         # Confirm that no specified asset collection name means empty asset metadata.
-        self.assertEquals(self.draft_store.get_all_asset_metadata(course.id, 'asset'), [])
+        self.assertEqual(self.draft_store.get_all_asset_metadata(course.id, 'asset'), [])
 
     def test_no_asset_invalid_key(self):
         course_key = CourseLocator(org="edx3", course="test_course", run=None, deprecated=True)
@@ -757,7 +754,6 @@ class TestMongoKeyValueStore(TestCase):
     """
     Tests for MongoKeyValueStore.
     """
-    shard = 2
 
     def setUp(self):
         super(TestMongoKeyValueStore, self).setUp()

@@ -201,6 +201,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
       left: 50%;
       font-size: 4em;
       cursor: pointer;
+      opacity: 0.1;
 
       &::after {
         background: $white;
@@ -573,7 +574,8 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
               color: rgb(231, 236, 238); // UXPL grayscale-cool x-light
 
               @media (max-width: 1120px) {
-                display: none;
+                  position: absolute;
+                  clip: rect(1px, 1px, 1px, 1px);
               }
             }
 
@@ -926,7 +928,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
       width: 25%;
       padding: lh();
 
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       @include transition(none);
 
       background: $black;

@@ -3,11 +3,13 @@ Modules that get shown to the users when an error has occurred while
 loading or rendering other modules
 """
 
+
 import hashlib
 import json
 import logging
 import sys
 
+import six
 from lxml import etree
 from xblock.field_data import DictFieldData
 from xblock.fields import Scope, ScopeIds, String
@@ -111,7 +113,7 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
 
         # real metadata stays in the content, but add a display name
         field_data = DictFieldData({
-            'error_msg': unicode(error_msg),
+            'error_msg': six.text_type(error_msg),
             'contents': contents,
             'location': location,
             'category': 'error'

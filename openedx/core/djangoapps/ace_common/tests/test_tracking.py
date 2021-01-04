@@ -1,14 +1,17 @@
 # pylint: disable=missing-docstring
+
+
 from unittest import TestCase
 
 from django.test import override_settings
 
 from openedx.core.djangoapps.ace_common.tests.mixins import QueryStringAssertionMixin
 from openedx.core.djangoapps.ace_common.tracking import (
-    CampaignTrackingInfo,
-    DEFAULT_CAMPAIGN_SOURCE,
     DEFAULT_CAMPAIGN_MEDIUM,
-    GoogleAnalyticsTrackingPixel)
+    DEFAULT_CAMPAIGN_SOURCE,
+    CampaignTrackingInfo,
+    GoogleAnalyticsTrackingPixel
+)
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
@@ -119,7 +122,7 @@ class TestGoogleAnalyticsTrackingPixel(QueryStringAssertionMixin, CacheIsolation
     @override_settings(GOOGLE_ANALYTICS_TRACKING_ID='UA-123456-1')
     def test_site_config_override(self):
         site_config = SiteConfigurationFactory.create(
-            values=dict(
+            site_values=dict(
                 GOOGLE_ANALYTICS_ACCOUNT='UA-654321-1'
             )
         )

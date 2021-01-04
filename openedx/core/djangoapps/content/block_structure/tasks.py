@@ -1,19 +1,20 @@
 """
 Asynchronous tasks related to the Course Blocks sub-application.
 """
+
+
 import logging
 
-from capa.responsetypes import LoncapaProblemError
 from celery.task import task
 from django.conf import settings
-from lxml.etree import XMLSyntaxError
-
 from edxval.api import ValInternalError
+from lxml.etree import XMLSyntaxError
 from opaque_keys.edx.keys import CourseKey
 
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from capa.responsetypes import LoncapaProblemError
 from openedx.core.djangoapps.content.block_structure import api
 from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, waffle
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger('edx.celery.task')
 
@@ -102,18 +103,18 @@ def _call_and_retry_if_needed(self, api_method, **kwargs):
     except NO_RETRY_TASKS:
         # Known unrecoverable errors
         log.exception(
-            "BlockStructure: %s encountered unrecoverable error in course %s, task_id %s",
+            u"BlockStructure: %s encountered unrecoverable error in course %s, task_id %s",
             self.__name__,
             kwargs.get('course_id'),
             self.request.id,
         )
         raise
     except RETRY_TASKS as exc:
-        log.exception("%s encountered expected error, retrying.", self.__name__)
+        log.exception(u"%s encountered expected error, retrying.", self.__name__)
         raise self.retry(kwargs=kwargs, exc=exc)
     except Exception as exc:
         log.exception(
-            "BlockStructure: %s encountered unknown error in course %s, task_id %s. Retry #%d",
+            u"BlockStructure: %s encountered unknown error in course %s, task_id %s. Retry #%d",
             self.__name__,
             kwargs.get('course_id'),
             self.request.id,

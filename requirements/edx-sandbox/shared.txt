@@ -4,24 +4,13 @@
 #
 #    make upgrade
 #
--e common/lib/calc
--e common/lib/chem
--e common/lib/sandbox-packages
--e common/lib/symmath
-asn1crypto==0.24.0        # via cryptography
-cffi==1.11.5              # via cryptography
-cryptography==2.4.2
-enum34==1.1.6             # via cryptography
-idna==2.8                 # via cryptography
-ipaddress==1.0.22         # via cryptography
-lxml==3.8.0
-markupsafe==1.1.0
-networkx==1.7
-nltk==3.4
-numpy==1.6.2
-pycparser==2.19           # via cffi
-pyparsing==2.2.0
-scipy==0.14.0
-singledispatch==3.4.0.3   # via nltk
-six==1.11.0               # via cryptography, nltk, singledispatch
-sympy==0.7.1
+cffi==1.14.0              # via cryptography
+click==7.1.2              # via nltk
+cryptography==2.9.2       # via -r requirements/edx-sandbox/shared.in
+joblib==0.14.1            # via -c requirements/edx-sandbox/../constraints.txt, nltk
+lxml==4.5.0               # via -r requirements/edx-sandbox/shared.in
+nltk==3.5                 # via -r requirements/edx-sandbox/shared.in
+pycparser==2.20           # via cffi
+regex==2020.5.14          # via nltk
+six==1.14.0               # via cryptography
+tqdm==4.46.0              # via nltk

@@ -2,6 +2,7 @@
 Course about page (with registration button)
 """
 
+
 from common.test.acceptance.pages.lms.course_page import CoursePage
 from common.test.acceptance.pages.lms.login_and_register import RegisterPage
 

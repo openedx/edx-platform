@@ -1,7 +1,7 @@
 """
 Run and manage servers for local development.
 """
-from __future__ import print_function
+
 
 import argparse
 import sys
@@ -9,7 +9,7 @@ import sys
 from paver.easy import call_task, cmdopts, consume_args, needs, sh, task
 
 from .assets import collect_assets
-from .utils.cmd import django_cmd
+from .utils.cmd import cmd, django_cmd
 from .utils.envs import Env
 from .utils.process import run_multi_processes, run_process
 from .utils.timer import timed
@@ -159,7 +159,9 @@ def celery(options):
     Runs Celery workers.
     """
     settings = getattr(options, 'settings', 'devstack_with_worker')
-    run_process(django_cmd('lms', settings, 'celery', 'worker', '--beat', '--loglevel=INFO', '--pythonpath=.'))
+    run_process(cmd('DJANGO_SETTINGS_MODULE=lms.envs.{}'.format(settings),
+                    'celery', 'worker', '--app=lms.celery:APP',
+                    '--beat', '--loglevel=INFO', '--pythonpath=.'))
 
 
 @task
@@ -234,8 +236,10 @@ def run_all_servers(options):
         django_cmd(
             'studio', settings_cms, 'runserver', '--traceback', '--pythonpath=.', *cms_runserver_args
         ),
-        django_cmd(
-            'lms', worker_settings, 'celery', 'worker', '--beat', '--loglevel=INFO', '--pythonpath=.'
+        cmd(
+            'DJANGO_SETTINGS_MODULE=lms.envs.{}'.format(worker_settings),
+            'celery', 'worker', '--app=lms.celery:APP',
+            '--beat', '--loglevel=INFO', '--pythonpath=.'
         )
     ])
 
@@ -255,7 +259,7 @@ def update_db(options):
     fake = "--fake-initial" if getattr(options, 'fake_initial', False) else ""
     for system in ('lms', 'cms'):
         # pylint: disable=line-too-long
-        sh("NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{system} --traceback --pythonpath=. {fake}".format(
+        sh(u"NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{system} --traceback --pythonpath=. {fake}".format(
             settings=settings,
             system=system,
             fake=fake))
@@ -278,9 +282,9 @@ def check_settings(args):
     settings = args.settings[0]
 
     try:
-        import_cmd = "echo 'import {system}.envs.{settings}'".format(system=system, settings=settings)
+        import_cmd = u"echo 'import {system}.envs.{settings}'".format(system=system, settings=settings)
         django_shell_cmd = django_cmd(system, settings, 'shell', '--plain', '--pythonpath=.')
-        sh("{import_cmd} | {shell_cmd}".format(import_cmd=import_cmd, shell_cmd=django_shell_cmd))
+        sh(u"{import_cmd} | {shell_cmd}".format(import_cmd=import_cmd, shell_cmd=django_shell_cmd))
 
     except:  # pylint: disable=bare-except
         print("Failed to import settings", file=sys.stderr)

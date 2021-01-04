@@ -2,9 +2,9 @@
 Hide Empty Transformer implementation.
 """
 # TODO: Remove this file after REVE-52 lands and old-mobile-app traffic falls to < 5% of mobile traffic
-from openedx.core.djangoapps.content.block_structure.transformer import (
-    BlockStructureTransformer
-)
+
+
+from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 
 
 class HideEmptyTransformer(BlockStructureTransformer):

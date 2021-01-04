@@ -4,11 +4,14 @@ lists of each pytest worker.
 Assumes the following format:
 [test-suite] [worker] RESULT test
 """
-import click
+
+
 import io
-import re
 import os
+import re
 import shutil
+
+import click
 
 
 @click.command()
@@ -29,14 +32,14 @@ def main(log_file, test_suite):
     worker_test_dict = {}
     with io.open(log_file, 'r') as console_file:
         for line in console_file:
-            regex_search = re.search(r'\[{}] \[gw(\d+)] (PASSED|FAILED|SKIPPED|ERROR)'.format(test_suite), line)
+            regex_search = re.search(r'\[gw(\d+)] (PASSED|FAILED|SKIPPED|ERROR) (\S+)'.format(test_suite), line)
             if regex_search:
                 worker_num_string = regex_search.group(1)
                 if worker_num_string not in worker_test_dict:
                     worker_test_dict[worker_num_string] = []
-                test = line.split()[3]
+                test = regex_search.group(3)
                 if test_suite == "commonlib-unit":
-                    if "pavelib" not in test:
+                    if "pavelib" not in test and not test.startswith('scripts'):
                         test = u"common/lib/{}".format(test)
                 worker_test_dict[worker_num_string].append(test)
 

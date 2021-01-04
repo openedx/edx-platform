@@ -2,6 +2,7 @@
 Test overrides to support Safe Cookies with Test Clients.
 """
 
+
 from django.test.client import Client
 
 
@@ -19,7 +20,7 @@ def safe_cookie_test_session_patch():
         used, by checking the middleware settings.
         """
         return (
-            'openedx.core.djangoapps.safe_sessions.middleware.SafeSessionMiddleware' in settings.MIDDLEWARE_CLASSES
+            'openedx.core.djangoapps.safe_sessions.middleware.SafeSessionMiddleware' in settings.MIDDLEWARE
         )
 
     ## session_id --> safe_cookie_data ##

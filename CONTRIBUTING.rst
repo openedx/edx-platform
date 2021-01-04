@@ -22,10 +22,9 @@ JIRA
 ----
 
 If you've got an idea for a new feature or new functionality for an existing feature,
-please start a discussion on the `edx-code`_ mailing list to get feedback from
-the community about the idea and your implementation choices.
-
-.. _edx-code: https://groups.google.com/forum/#!forum/edx-code
+please start a discussion in the `development <https://discuss.openedx.org/c/development>`__
+category of the discussion forum list to get feedback from the community about the idea
+and your implementation choices.
 
 If you then plan to contribute your code upstream, please `start a discussion on JIRA`_
 (you may first need to `create a free JIRA account`_).
@@ -33,13 +32,30 @@ Start a discussion by visiting the JIRA website and clicking the "Create" button
 top of the page. Choose the project "Open Source Pull Requests" and the issue type
 "Feature Proposal". In the description give us as much detail as you can for the feature
 or functionality you are thinking about implementing. Include a link to any relevant
-edx-code mailing list discussions about your idea. We encourage you to do this before
-you begin implementing your feature, in order to get valuable feedback from the edX
-product team early on in your journey and increase the likelihood of a successful
-pull request.
+forum discussions about your idea. We encourage you to do this before you begin
+implementing your feature, in order to get valuable feedback from the edX product team
+early on in your journey and increase the likelihood of a successful pull request.
 
 .. _start a discussion on JIRA: https://openedx.atlassian.net/secure/Dashboard.jspa
 .. _create a free JIRA account: https://openedx.atlassian.net/admin/users/sign-up
+
+.. _forum:
+
+Discussion forum
+----------------
+
+To ask technical questions and chat with the community, do not hesitate to join the
+`Open edX discussion forum <https://discuss.openedx.org/>`__. There are different
+categories for different topics:
+
+- `Devops <https://discuss.openedx.org/c/devops>`__ for installation help
+- `Development <https://discuss.openedx.org/c/development>`__, where Open edX developers
+  unite
+- `Community <https://discuss.openedx.org/c/community>`__ to discuss organizational
+  matters in the open source community
+- `Announcements <https://discuss.openedx.org/c/announcements>`__ where official Open edX
+  announcement are made
+- `Educators <https://discuss.openedx.org/c/educators>`__, to discuss online learning in general
 
 Slack
 -----
@@ -51,33 +67,16 @@ between 13:00 and 21:00 UTC (9am to 5pm US Eastern time),
 but interesting conversations can happen at any time.
 There are many different channels available for different topics, including:
 
-* ``#ops`` for installation help
 * ``#events`` for upcoming events related to Open edX
 * ``#content`` for discussions about course content and creating the best courses
 
 And lots more! You can also make your own channels to discuss new topics.
 
+Note that Slack is no longer the recommended communication channel to ask about
+technical issues. To do so, you should instead join the `official forum <#forum>`__.
+
 .. _Slack: https://slack.com/
 .. _Sign up for a free account: https://openedx-slack-invite.herokuapp.com/
-
-Mailing Lists
--------------
-
-For asynchronous conversation, we have several mailing lists on Google Groups:
-
-* `openedx-ops`_: everything related to *running* Open edX. This includes
-  installation issues, server management, cost analysis, and so on.
-* `openedx-translation`_: everything related to *translating* Open edX into
-  other languages. This includes volunteer translators, our internationalization
-  infrastructure, issues related to Transifex, and so on.
-* `openedx-analytics`_: everything related to *analytics* in Open edX.
-* `edx-code`_: everything related to the *code* in Open edX. This includes
-  feature requests, idea proposals, refactorings, and so on.
-
-.. _openedx-ops: https://groups.google.com/forum/#!forum/openedx-ops
-.. _openedx-translation: https://groups.google.com/forum/#!forum/openedx-translation
-.. _openedx-analytics: https://groups.google.com/forum/#!forum/openedx-analytics
-.. _edx-code: https://groups.google.com/forum/#!forum/edx-code
 
 Byte-sized Tasks & Bugs
 -----------------------
@@ -110,14 +109,6 @@ signed agreement and email it to the email address indicated on the agreement.
 Alternatively, you're also free to physically mail the agreement to the street
 address on the agreement. Once we have your agreement in hand, we can begin
 reviewing and merging your work.
-
-You'll also need to add yourself to the `AUTHORS` file when you submit your
-first pull request.  You should add your full name as well as the email address
-associated with your GitHub account.  Please update `AUTHORS` in an individual
-commit, distinct from other changes in the pull request (it's OK for a pull
-request to contain multiple commits, including a commit to `AUTHORS`).
-Alternatively, you can open up a separate PR just to have your name added to
-the `AUTHORS` file, and link that PR to the PR with your changes.
 
 Step 2: Fork, Commit, and Pull Request
 ======================================
@@ -203,7 +194,7 @@ By opening up a pull request, we expect the following things:
    unable to participate in the review process.
 
 3. If you have questions, you will ask them by either commenting on the pull
-   request or asking us in Slack or on the mailing list.
+   request or asking us in the discussion forum or on Slack.
 
 4. If you do not respond to comments on your pull request within 7 days, we
    will close it. You are welcome to re-open it when you are ready to engage.
@@ -224,4 +215,4 @@ Expectations You Have of Us
 3. Once we have determined through visual review that your code is not
    malicious, we will run a Jenkins build on your branch.
 
-.. _individual contributor agreement: http://open.edx.org/sites/default/files/wysiwyg/individual-contributor-agreement.pdf
+.. _individual contributor agreement: https://open.edx.org/wp-content/uploads/2019/01/individual-contributor-agreement.pdf

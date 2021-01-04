@@ -2,6 +2,7 @@
 Custom forms-related types
 """
 
+
 from django.core.exceptions import ValidationError
 from django.forms import Field, MultipleHiddenInput, NullBooleanField, Select
 

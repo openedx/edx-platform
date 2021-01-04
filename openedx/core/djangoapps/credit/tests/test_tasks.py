@@ -2,8 +2,12 @@
 Tests for credit course tasks.
 """
 
-import mock
+
 from datetime import datetime
+
+import mock
+import six
+from edx_proctoring.api import create_exam
 
 from openedx.core.djangoapps.credit.api import get_credit_requirements
 from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements
@@ -11,8 +15,6 @@ from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.djangoapps.credit.signals import on_course_publish
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-
-from edx_proctoring.api import create_exam
 
 
 class TestTaskExecution(ModuleStoreTestCase):
@@ -23,7 +25,6 @@ class TestTaskExecution(ModuleStoreTestCase):
     allows us to ensure that when the listener is executed, it is done as
     expected.
     """
-    shard = 2
 
     def mocked_set_credit_requirements(course_key, requirements):  # pylint: disable=no-self-argument, unused-argument
         """Used as a side effect when mocking method credit api method
@@ -72,8 +73,8 @@ class TestTaskExecution(ModuleStoreTestCase):
         self.add_credit_course(self.course.id)
 
         create_exam(
-            course_id=unicode(self.course.id),
-            content_id=unicode(self.subsection.location),
+            course_id=six.text_type(self.course.id),
+            content_id=six.text_type(self.subsection.location),
             exam_name='A Proctored Exam',
             time_limit_mins=10,
             is_proctored=True,
@@ -88,7 +89,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         requirements = get_credit_requirements(self.course.id)
         self.assertEqual(len(requirements), 2)
         self.assertEqual(requirements[1]['namespace'], 'proctored_exam')
-        self.assertEqual(requirements[1]['name'], unicode(self.subsection.location))
+        self.assertEqual(requirements[1]['name'], six.text_type(self.subsection.location))
         self.assertEqual(requirements[1]['display_name'], 'A Proctored Exam')
         self.assertEqual(requirements[1]['criteria'], {})
 
@@ -100,7 +101,7 @@ class TestTaskExecution(ModuleStoreTestCase):
 
         self.add_credit_course(self.course.id)
         create_exam(
-            course_id=unicode(self.course.id),
+            course_id=six.text_type(self.course.id),
             content_id='foo',
             exam_name='A Proctored Exam',
             time_limit_mins=10,
@@ -124,7 +125,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         ])
 
         create_exam(
-            course_id=unicode(self.course.id),
+            course_id=six.text_type(self.course.id),
             content_id='foo2',
             exam_name='A Proctored Exam',
             time_limit_mins=10,
@@ -146,7 +147,7 @@ class TestTaskExecution(ModuleStoreTestCase):
 
         # practice proctored exams aren't requirements
         create_exam(
-            course_id=unicode(self.course.id),
+            course_id=six.text_type(self.course.id),
             content_id='foo3',
             exam_name='A Proctored Exam',
             time_limit_mins=10,
@@ -196,8 +197,8 @@ class TestTaskExecution(ModuleStoreTestCase):
         self.add_credit_course(self.course.id)
         subsection = ItemFactory.create(parent=self.section, category='sequential', display_name='Dummy Subsection')
         create_exam(
-            course_id=unicode(self.course.id),
-            content_id=unicode(subsection.location),
+            course_id=six.text_type(self.course.id),
+            content_id=six.text_type(subsection.location),
             exam_name='A Proctored Exam',
             time_limit_mins=10,
             is_proctored=True,
@@ -211,7 +212,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         requirements = get_credit_requirements(self.course.id)
         self.assertEqual(len(requirements), 2)
         self.assertEqual(requirements[1]['namespace'], 'proctored_exam')
-        self.assertEqual(requirements[1]['name'], unicode(subsection.location))
+        self.assertEqual(requirements[1]['name'], six.text_type(subsection.location))
         self.assertEqual(requirements[1]['display_name'], 'A Proctored Exam')
         self.assertEqual(requirements[1]['criteria'], {})
 

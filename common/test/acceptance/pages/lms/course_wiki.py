@@ -2,8 +2,9 @@
 Wiki tab on courses
 """
 
+
 from common.test.acceptance.pages.lms.course_page import CoursePage
-from common.test.acceptance.pages.studio.utils import type_in_codemirror, get_codemirror_value
+from common.test.acceptance.pages.studio.utils import get_codemirror_value, type_in_codemirror
 
 
 class CourseWikiPage(CoursePage):

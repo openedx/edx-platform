@@ -1,4 +1,6 @@
 """Tests for the resubmit_error_certificates management command. """
+
+
 import ddt
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -6,14 +8,14 @@ from django.test.utils import override_settings
 from mock import patch
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
+from six.moves import range
 
 from badges.events.course_complete import get_completion_badge
 from badges.models import BadgeAssertion
 from badges.tests.factories import BadgeAssertionFactory, CourseCompleteImageConfigurationFactory
-from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from course_modes.models import CourseMode
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
-from openedx.core.lib.tests import attr
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
@@ -60,7 +62,6 @@ class CertificateManagementTest(ModuleStoreTestCase):
         self.assertEqual(cert.status, expected_status)
 
 
-@attr(shard=1)
 @ddt.ddt
 class ResubmitErrorCertificatesTest(CertificateManagementTest):
     """Tests for the resubmit_error_certificates management command. """
@@ -135,7 +136,7 @@ class ResubmitErrorCertificatesTest(CertificateManagementTest):
 
     def test_invalid_course_key(self):
         invalid_key = u"invalid/"
-        with self.assertRaisesRegexp(CommandError, invalid_key):
+        with self.assertRaisesRegex(CommandError, invalid_key):
             call_command(self.command, course_key_list=[invalid_key])
 
     def test_course_does_not_exist(self):
@@ -149,7 +150,6 @@ class ResubmitErrorCertificatesTest(CertificateManagementTest):
 
 
 @ddt.ddt
-@attr(shard=1)
 class RegenerateCertificatesTest(CertificateManagementTest):
     """
     Tests for regenerating certificates.
@@ -182,7 +182,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         self.course.issue_badges = issue_badges
         self.store.update_item(self.course, None)
 
-        args = '-u {} -c {}'.format(self.user.email, text_type(key))
+        args = u'-u {} -c {}'.format(self.user.email, text_type(key))
         call_command(self.command, *args.split(' '))
 
         xqueue.return_value.regen_cert.assert_called_with(
@@ -193,7 +193,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
             template_file=None,
             generate_pdf=True
         )
-        self.assertEquals(
+        self.assertEqual(
             bool(BadgeAssertion.objects.filter(user=self.user, badge_class=badge_class)), not issue_badges
         )
 
@@ -208,7 +208,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         key = self.course.location.course_key
         self._create_cert(key, self.user, CertificateStatuses.downloadable)
 
-        args = '-u {} -c {} --insecure'.format(self.user.email, text_type(key))
+        args = u'-u {} -c {} --insecure'.format(self.user.email, text_type(key))
         call_command(self.command, *args.split(' '))
 
         certificate = GeneratedCertificate.eligible_certificates.get(
@@ -219,7 +219,6 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         self.assertFalse(mock_send_to_queue.called)
 
 
-@attr(shard=1)
 class UngenerateCertificatesTest(CertificateManagementTest):
     """
     Tests for generating certificates.
@@ -246,7 +245,7 @@ class UngenerateCertificatesTest(CertificateManagementTest):
         self._create_cert(key, self.user, CertificateStatuses.unavailable)
 
         with mock_passing_grade():
-            args = '-c {} --insecure'.format(text_type(key))
+            args = u'-c {} --insecure'.format(text_type(key))
             call_command(self.command, *args.split(' '))
 
         self.assertTrue(mock_send_to_queue.called)

@@ -1,32 +1,40 @@
 """ Views related to Account Settings. """
 
-from datetime import datetime
+
 import logging
+from datetime import datetime
+
+import six
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.utils.translation import ugettext as _
+from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
 
+import third_party_auth
 from edxmako.shortcuts import render_to_response
-
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref.api import all_languages, released_languages
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.accounts.toggles import (
+    should_redirect_to_account_microfrontend,
+    should_redirect_to_order_history_microfrontend
+)
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
-from openedx.features.enterprise_support.api import get_enterprise_customer_for_learner
+from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from openedx.features.enterprise_support.utils import update_account_settings_context_for_enterprise
 from student.models import UserProfile
-import third_party_auth
 from third_party_auth import pipeline
 from util.date_utils import strftime_localized
-
 
 log = logging.getLogger(__name__)
 
@@ -49,6 +57,20 @@ def account_settings(request):
         GET /account/settings
 
     """
+    if should_redirect_to_account_microfrontend():
+        url = settings.ACCOUNT_MICROFRONTEND_URL
+
+        duplicate_provider = pipeline.get_duplicate_provider(messages.get_messages(request))
+        if duplicate_provider:
+            url = '{url}?{params}'.format(
+                url=url,
+                params=six.moves.urllib.parse.urlencode({
+                    'duplicate_provider': duplicate_provider,
+                }),
+            )
+
+        return redirect(url)
+
     context = account_settings_context(request)
     return render_to_response('student_account/account_settings.html', context)
 
@@ -65,7 +87,7 @@ def account_settings_context(request):
     """
     user = request.user
 
-    year_of_birth_options = [(unicode(year), unicode(year)) for year in UserProfile.VALID_YEARS]
+    year_of_birth_options = [(six.text_type(year), six.text_type(year)) for year in UserProfile.VALID_YEARS]
     try:
         user_orders = get_user_orders(user)
     except:  # pylint: disable=bare-except
@@ -73,6 +95,15 @@ def account_settings_context(request):
         # Return empty order list as account settings page expect a list and
         # it will be broken if exception raised
         user_orders = []
+
+    beta_language = {}
+    dark_lang_config = DarkLangConfig.current()
+    if dark_lang_config.enable_beta_languages:
+        user_preferences = get_user_preferences(user)
+        pref_language = user_preferences.get('pref-lang')
+        if pref_language in dark_lang_config.beta_languages_list:
+            beta_language['code'] = pref_language
+            beta_language['name'] = settings.LANGUAGE_DICT.get(pref_language)
 
     context = {
         'auth': {},
@@ -107,14 +138,16 @@ def account_settings_context(request):
         'show_program_listing': ProgramsApiConfig.is_enabled(),
         'show_dashboard_tabs': True,
         'order_history': user_orders,
+        'disable_order_history_tab': should_redirect_to_order_history_microfrontend(),
         'enable_account_deletion': configuration_helpers.get_value(
             'ENABLE_ACCOUNT_DELETION', settings.FEATURES.get('ENABLE_ACCOUNT_DELETION', False)
         ),
         'extended_profile_fields': _get_extended_profile_fields(),
+        'beta_language': beta_language,
     }
 
-    enterprise_customer = get_enterprise_customer_for_learner(site=request.site, user=request.user)
-    update_account_settings_context_for_enterprise(context, enterprise_customer)
+    enterprise_customer = enterprise_customer_for_request(request)
+    update_account_settings_context_for_enterprise(context, enterprise_customer, user)
 
     if third_party_auth.is_enabled():
         # If the account on the third party provider is already connected with another edX account,

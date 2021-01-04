@@ -2,9 +2,12 @@
 Tests for graph traversal generator functions.
 """
 
+
 from collections import defaultdict
 from unittest import TestCase
 
+import six
+from six.moves import range
 from ..graph_traversals import traverse_post_order, traverse_pre_order, traverse_topologically
 
 
@@ -12,7 +15,6 @@ class TestGraphTraversals(TestCase):
     """
     Test Class for graph traversal generator functions.
     """
-    shard = 2
 
     def setUp(self):
         # Creates a test graph with the following disconnected
@@ -63,7 +65,7 @@ class TestGraphTraversals(TestCase):
                 will be [].
         """
         result = defaultdict(list)
-        for parent, children in parent_to_children_map.iteritems():
+        for parent, children in six.iteritems(parent_to_children_map):
             for child in children:
                 result[child].append(parent)
         return result

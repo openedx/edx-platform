@@ -1,12 +1,15 @@
 """
 Test scenarios for the crowdsource hinter xblock.
 """
-import json
+
+
 import unittest
 
+import simplejson as json
 from django.conf import settings
 from django.urls import reverse
 from six import text_type
+from six.moves import range
 
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
@@ -139,7 +142,6 @@ class TestHinterFunctions(TestCrowdsourceHinter):
     Tests cover the basic process of receiving a hint, adding a new hint,
     and rating/reporting hints.
     """
-    shard = 6
 
     def test_get_hint_with_no_hints(self):
         """

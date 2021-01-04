@@ -1,3 +1,8 @@
+"""
+Package of common page objects for acceptance tests
+"""
+
+
 import os
 
 HOSTNAME = os.environ.get('BOK_CHOY_HOSTNAME', 'localhost')

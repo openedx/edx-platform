@@ -2,10 +2,12 @@
 Defines the URL routes for the Team API.
 """
 
+
 from django.conf import settings
 from django.conf.urls import url
 
 from .views import (
+    MembershipBulkManagementView,
     MembershipDetailView,
     MembershipListView,
     TeamsDetailView,
@@ -55,5 +57,12 @@ urlpatterns = [
         ),
         MembershipDetailView.as_view(),
         name="team_membership_detail"
+    ),
+    url(
+        r'^v0/bulk_team_membership/{course_id_pattern}$'.format(
+            course_id_pattern=settings.COURSE_ID_PATTERN,
+        ),
+        MembershipBulkManagementView.as_view(),
+        name="team_membership_bulk_management"
     )
 ]

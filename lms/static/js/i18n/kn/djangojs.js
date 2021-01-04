@@ -20,23 +20,34 @@
   django.catalog = django.catalog || {};
   
   var newcatalog = {
-    "6 a.m.": "\u0cac\u0cc6\u0cb3\u0c97\u0cbf\u0ca8 \u0cec \u0c97\u0c82\u0c9f\u0cc6 ", 
-    "Available %s": "\u0cb2\u0cad\u0ccd\u0caf %s ", 
-    "Cancel": "\u0cb0\u0ca6\u0ccd\u0ca6\u0cc1\u0c97\u0cca\u0cb3\u0cbf\u0cb8\u0cbf", 
-    "Choose a time": "\u0cb8\u0cae\u0caf\u0cb5\u0cca\u0c82\u0ca6\u0ca8\u0ccd\u0ca8\u0cc1 \u0c86\u0cb0\u0cbf\u0cb8\u0cbf", 
-    "Choose all": "\u0c8e\u0cb2\u0ccd\u0cb2\u0cb5\u0ca8\u0ccd\u0ca8\u0cc2  \u0c86\u0caf\u0ccd\u0ca6\u0cc1\u0c95\u0cca\u0cb3\u0ccd\u0cb3\u0cbf", 
-    "Chosen %s": "%s \u0c86\u0caf\u0ccd\u0ca6\u0cc1\u0c95\u0cca\u0cb3\u0ccd\u0cb3\u0cb2\u0cbe\u0c97\u0cbf\u0ca6\u0cc6", 
-    "Filter": "\u0cb6\u0cca\u0cd5\u0ca7\u0c95", 
-    "Hide": "\u0cae\u0cb0\u0cc6\u0cae\u0cbe\u0ca1\u0cb2\u0cc1", 
-    "Midnight": "\u0cae\u0ca7\u0ccd\u0caf\u0cb0\u0cbe\u0ca4\u0ccd\u0cb0\u0cbf", 
-    "Noon": "\u0cae\u0ca7\u0ccd\u0caf\u0cbe\u0cb9\u0ccd\u0ca8", 
-    "Now": "\u0c88\u0c97", 
-    "Remove": "\u0ca4\u0cc6\u0c97\u0cc6\u0ca6\u0cc1 \u0cb9\u0cbe\u0c95\u0cbf", 
-    "Remove all": "\u0c8e\u0cb2\u0ccd\u0cb2\u0cbe \u0ca4\u0cc6\u0c97\u0cc6\u0ca6\u0cc1\u0cb9\u0cbe\u0c95\u0cbf", 
-    "Show": "\u0caa\u0ccd\u0cb0\u0ca6\u0cb0\u0ccd\u0cb6\u0ca8", 
-    "Today": "\u0c88 \u0ca6\u0cbf\u0ca8", 
-    "Tomorrow": "\u0ca8\u0cbe\u0cb3\u0cc6", 
-    "Yesterday": "\u0ca8\u0cbf\u0ca8\u0ccd\u0ca8\u0cc6", 
+    "%(sel)s of %(cnt)s selected": [
+      "%(sel)s of %(cnt)s selected"
+    ],
+    "6 a.m.": "\u0cac\u0cc6\u0cb3\u0c97\u0cbf\u0ca8 \u0cec \u0c97\u0c82\u0c9f\u0cc6 ",
+    "Available %s": "\u0cb2\u0cad\u0ccd\u0caf %s ",
+    "Cancel": "\u0cb0\u0ca6\u0ccd\u0ca6\u0cc1\u0c97\u0cca\u0cb3\u0cbf\u0cb8\u0cbf",
+    "Choose": "Choose",
+    "Choose a time": "\u0cb8\u0cae\u0caf\u0cb5\u0cca\u0c82\u0ca6\u0ca8\u0ccd\u0ca8\u0cc1 \u0c86\u0cb0\u0cbf\u0cb8\u0cbf",
+    "Choose all": "\u0c8e\u0cb2\u0ccd\u0cb2\u0cb5\u0ca8\u0ccd\u0ca8\u0cc2  \u0c86\u0caf\u0ccd\u0ca6\u0cc1\u0c95\u0cca\u0cb3\u0ccd\u0cb3\u0cbf",
+    "Chosen %s": "%s \u0c86\u0caf\u0ccd\u0ca6\u0cc1\u0c95\u0cca\u0cb3\u0ccd\u0cb3\u0cb2\u0cbe\u0c97\u0cbf\u0ca6\u0cc6",
+    "Click to choose all %s at once.": "Click to choose all %s at once.",
+    "Click to remove all chosen %s at once.": "Click to remove all chosen %s at once.",
+    "Filter": "\u0cb6\u0cca\u0cd5\u0ca7\u0c95",
+    "Hide": "\u0cae\u0cb0\u0cc6\u0cae\u0cbe\u0ca1\u0cb2\u0cc1",
+    "Midnight": "\u0cae\u0ca7\u0ccd\u0caf\u0cb0\u0cbe\u0ca4\u0ccd\u0cb0\u0cbf",
+    "Noon": "\u0cae\u0ca7\u0ccd\u0caf\u0cbe\u0cb9\u0ccd\u0ca8",
+    "Now": "\u0c88\u0c97",
+    "Remove": "\u0ca4\u0cc6\u0c97\u0cc6\u0ca6\u0cc1 \u0cb9\u0cbe\u0c95\u0cbf",
+    "Remove all": "\u0c8e\u0cb2\u0ccd\u0cb2\u0cbe \u0ca4\u0cc6\u0c97\u0cc6\u0ca6\u0cc1\u0cb9\u0cbe\u0c95\u0cbf",
+    "Show": "\u0caa\u0ccd\u0cb0\u0ca6\u0cb0\u0ccd\u0cb6\u0ca8",
+    "This is the list of available %s. You may choose some by selecting them in the box below and then clicking the \"Choose\" arrow between the two boxes.": "This is the list of available %s. You may choose some by selecting them in the box below and then clicking the \"Choose\" arrow between the two boxes.",
+    "This is the list of chosen %s. You may remove some by selecting them in the box below and then clicking the \"Remove\" arrow between the two boxes.": "This is the list of chosen %s. You may remove some by selecting them in the box below and then clicking the \"Remove\" arrow between the two boxes.",
+    "Today": "\u0c88 \u0ca6\u0cbf\u0ca8",
+    "Tomorrow": "\u0ca8\u0cbe\u0cb3\u0cc6",
+    "Type into this box to filter down the list of available %s.": "Type into this box to filter down the list of available %s.",
+    "Yesterday": "\u0ca8\u0cbf\u0ca8\u0ccd\u0ca8\u0cc6",
+    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.",
+    "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.",
     "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "\u0ca8\u0cbf\u0cd5\u0cb5\u0cc1 \u0caa\u0ccd\u0cb0\u0ca4\u0ccd\u0caf\u0cc6\u0cd5\u0c95 \u0ca4\u0cbf\u0ca6\u0ccd\u0ca6\u0cac\u0cb2\u0ccd\u0cb2 \u0c95\u0ccd\u0cb7\u0cc6\u0cd5\u0ca4\u0ccd\u0cb0\u0c97\u0cb3\u0cb2\u0ccd\u0cb2\u0cbf \u0cac\u0ca6\u0cb2\u0cbe\u0cb5\u0ca3\u0cc6 \u0c89\u0cb3\u0cbf\u0cb8\u0cbf\u0cb2\u0ccd\u0cb2. \u0ca8\u0cbf\u0cae\u0ccd\u0cae \u0c89\u0cb3\u0cbf\u0cb8\u0ca6 \u0cac\u0ca6\u0cb2\u0cbe\u0cb5\u0ca3\u0cc6\u0c97\u0cb3\u0cc1 \u0ca8\u0cbe\u0cb6\u0cb5\u0cbe\u0c97\u0cc1\u0ca4\u0ccd\u0ca4\u0cb5\u0cc6"
   };
   for (var key in newcatalog) {
@@ -59,7 +70,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -93,48 +104,48 @@
     /* formatting library */
 
     django.formats = {
-    "DATETIME_FORMAT": "N j, Y, P", 
+    "DATETIME_FORMAT": "N j, Y, P",
     "DATETIME_INPUT_FORMATS": [
-      "%Y-%m-%d %H:%M:%S", 
-      "%Y-%m-%d %H:%M:%S.%f", 
-      "%Y-%m-%d %H:%M", 
-      "%Y-%m-%d", 
-      "%m/%d/%Y %H:%M:%S", 
-      "%m/%d/%Y %H:%M:%S.%f", 
-      "%m/%d/%Y %H:%M", 
-      "%m/%d/%Y", 
-      "%m/%d/%y %H:%M:%S", 
-      "%m/%d/%y %H:%M:%S.%f", 
-      "%m/%d/%y %H:%M", 
+      "%Y-%m-%d %H:%M:%S",
+      "%Y-%m-%d %H:%M:%S.%f",
+      "%Y-%m-%d %H:%M",
+      "%Y-%m-%d",
+      "%m/%d/%Y %H:%M:%S",
+      "%m/%d/%Y %H:%M:%S.%f",
+      "%m/%d/%Y %H:%M",
+      "%m/%d/%Y",
+      "%m/%d/%y %H:%M:%S",
+      "%m/%d/%y %H:%M:%S.%f",
+      "%m/%d/%y %H:%M",
       "%m/%d/%y"
-    ], 
-    "DATE_FORMAT": "j F Y", 
+    ],
+    "DATE_FORMAT": "j F Y",
     "DATE_INPUT_FORMATS": [
-      "%Y-%m-%d", 
-      "%m/%d/%Y", 
-      "%m/%d/%y", 
-      "%b %d %Y", 
-      "%b %d, %Y", 
-      "%d %b %Y", 
-      "%d %b, %Y", 
-      "%B %d %Y", 
-      "%B %d, %Y", 
-      "%d %B %Y", 
+      "%Y-%m-%d",
+      "%m/%d/%Y",
+      "%m/%d/%y",
+      "%b %d %Y",
+      "%b %d, %Y",
+      "%d %b %Y",
+      "%d %b, %Y",
+      "%B %d %Y",
+      "%B %d, %Y",
+      "%d %B %Y",
       "%d %B, %Y"
-    ], 
-    "DECIMAL_SEPARATOR": ".", 
-    "FIRST_DAY_OF_WEEK": "0", 
-    "MONTH_DAY_FORMAT": "j F", 
-    "NUMBER_GROUPING": "0", 
-    "SHORT_DATETIME_FORMAT": "m/d/Y P", 
-    "SHORT_DATE_FORMAT": "j M Y", 
-    "THOUSAND_SEPARATOR": ",", 
-    "TIME_FORMAT": "h:i A", 
+    ],
+    "DECIMAL_SEPARATOR": ".",
+    "FIRST_DAY_OF_WEEK": 0,
+    "MONTH_DAY_FORMAT": "j F",
+    "NUMBER_GROUPING": 0,
+    "SHORT_DATETIME_FORMAT": "m/d/Y P",
+    "SHORT_DATE_FORMAT": "j M Y",
+    "THOUSAND_SEPARATOR": ",",
+    "TIME_FORMAT": "h:i A",
     "TIME_INPUT_FORMATS": [
-      "%H:%M:%S", 
-      "%H:%M:%S.%f", 
+      "%H:%M:%S",
+      "%H:%M:%S.%f",
       "%H:%M"
-    ], 
+    ],
     "YEAR_MONTH_FORMAT": "F Y"
   };
 

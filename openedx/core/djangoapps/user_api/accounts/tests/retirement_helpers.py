@@ -1,6 +1,8 @@
 """
 Helpers for testing retirement functionality
 """
+
+
 import datetime
 
 import pytest
@@ -8,15 +10,9 @@ import pytz
 from django.test import TestCase
 from social_django.models import UserSocialAuth
 
-from enrollment import api
-from openedx.core.djangoapps.user_api.models import (
-    RetirementState,
-    UserRetirementStatus
-)
-from student.models import (
-    get_retired_username_by_username,
-    get_retired_email_by_email,
-)
+from openedx.core.djangoapps.enrollments import api
+from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
+from student.models import get_retired_email_by_email, get_retired_username_by_username
 from student.tests.factories import UserFactory
 
 from ..views import AccountRetirementView

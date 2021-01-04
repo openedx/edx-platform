@@ -1,4 +1,6 @@
 """ Views related to auto auth. """
+
+
 import datetime
 import uuid
 
@@ -6,21 +8,24 @@ from django.conf import settings
 from django.contrib.auth import login as django_login
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
-from django.urls import NoReverseMatch, reverse
 from django.core.validators import ValidationError
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
 from django.template.context_processors import csrf
+from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext as _
-from django_comment_common.models import assign_role
-
 from opaque_keys.edx.locator import CourseLocator
-from openedx.core.djangoapps.user_api.accounts.utils import generate_password
+
+from lms.djangoapps.verify_student.models import ManualVerification
+from openedx.core.djangoapps.django_comment_common.models import assign_role
+from openedx.core.djangoapps.user_authn.utils import generate_password
+from openedx.core.djangoapps.user_authn.views.registration_form import AccountCreationForm
 from openedx.features.course_experience import course_home_url_name
-from student.forms import AccountCreationForm
 from student.helpers import (
     AccountValidationError,
+    authenticate_new_user,
     create_or_set_user_attribute_created_on_site,
+    do_create_account
 )
 from student.models import (
     CourseAccessRole,
@@ -30,7 +35,6 @@ from student.models import (
     anonymous_id_for_user,
     create_comments_service_user
 )
-from student.helpers import authenticate_new_user, do_create_account
 from util.json_request import JsonResponse
 
 
@@ -52,6 +56,7 @@ def auto_auth(request):  # pylint: disable=too-many-statements
         course home page if course_id is defined, otherwise it will redirect to dashboard
     * `redirect_to`: will redirect to to this url
     * `is_active` : make/update account with status provided as 'is_active'
+    * `should_manually_verify`: Whether the created user should have their identification verified
     If username, email, or password are not provided, use
     randomly generated credentials.
     """
@@ -73,6 +78,10 @@ def auto_auth(request):  # pylint: disable=too-many-statements
 
     # Valid modes: audit, credit, honor, no-id-professional, professional, verified
     enrollment_mode = request.GET.get('enrollment_mode', 'honor')
+
+    # Whether to add a manual ID verification record for the user (can
+    # be helpful for bypassing certain gated features)
+    should_manually_verify = _str2bool(request.GET.get('should_manually_verify', False))
 
     # Parse roles, stripping whitespace, and filtering out empty strings
     roles = _clean_roles(request.GET.get('roles', '').split(','))
@@ -121,6 +130,9 @@ def auto_auth(request):  # pylint: disable=too-many-statements
     if is_active:
         reg.activate()
         reg.save()
+
+    if should_manually_verify:
+        ManualVerification.objects.get_or_create(user=user, status="approved")
 
     # ensure parental consent threshold is met
     year = datetime.date.today().year

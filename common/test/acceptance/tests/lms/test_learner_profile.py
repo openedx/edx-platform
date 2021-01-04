@@ -2,16 +2,16 @@
 """
 End-to-end tests for Student's Profile Page.
 """
+
+
 from contextlib import contextmanager
 from datetime import datetime
-from unittest import skip
 
-import pytest
+import six
 
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
-from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
 from common.test.acceptance.tests.helpers import AcceptanceTest, EventsTestMixin
 
@@ -133,7 +133,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
                     'event': {
                         'user_id': int(profile_user_id),
                         'page': 'profile',
-                        'visibility': unicode(visibility)
+                        'visibility': six.text_type(visibility)
                     }
                 }
             ],
@@ -182,508 +182,11 @@ class LearnerProfileTestMixin(EventsTestMixin):
         return username, user_id
 
 
-class OwnLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTest):
-    """
-    Tests that verify a student's own profile page.
-    """
-    shard = 4
-
-    def verify_profile_forced_private_message(self, username, birth_year, message=None):
-        """
-        Verify age limit messages for a user.
-        """
-        if birth_year is None:
-            birth_year = ""
-        self.set_birth_year(birth_year=birth_year)
-        profile_page = self.visit_profile_page(username)
-        self.assertTrue(profile_page.privacy_field_visible)
-        if message:
-            self.assertTrue(profile_page.age_limit_message_present)
-        else:
-            self.assertFalse(profile_page.age_limit_message_present)
-        self.assertIn(message, profile_page.profile_forced_private_message)
-
-    @skip("failing on Jenkins")
-    def test_profile_defaults_to_public(self):
-        """
-        Scenario: Verify that a new user's profile defaults to public.
-
-        Given that I am a new user.
-        When I go to my profile page.
-        Then I see that the profile visibility is set to public.
-        """
-        username, __ = self.log_in_as_unique_user()
-        profile_page = self.visit_profile_page(username)
-        self.verify_profile_page_is_public(profile_page)
-
-    def assert_default_image_has_public_access(self, profile_page):
-        """
-        Assert that profile image has public access.
-        """
-        self.assertTrue(profile_page.profile_has_default_image)
-        self.assertTrue(profile_page.profile_has_image_with_public_access())
-
-    @skip("failing on Jenkins")
-    def test_make_profile_public(self):
-        """
-        Scenario: Verify that the user can change their privacy.
-
-        Given that I am a registered user
-        And I visit my private profile page
-        And I set the profile visibility to public
-        Then a user preference changed event should be recorded
-        When I reload the page
-        Then the profile visibility should be shown as public
-        """
-        username, user_id = self.log_in_as_unique_user()
-        profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PRIVATE)
-        with self.verify_pref_change_event_during(
-            username, user_id, 'account_privacy', old=self.PRIVACY_PRIVATE, new=self.PRIVACY_PUBLIC
-        ):
-            profile_page.privacy = self.PRIVACY_PUBLIC
-
-        # Reload the page and verify that the profile is now public
-        self.browser.refresh()
-        profile_page.wait_for_page()
-        self.verify_profile_page_is_public(profile_page)
-
-    def test_make_profile_private(self):
-        """
-        Scenario: Verify that the user can change their privacy.
-
-        Given that I am a registered user
-        And I visit my public profile page
-        And I set the profile visibility to private
-        Then a user preference changed event should be recorded
-        When I reload the page
-        Then the profile visibility should be shown as private
-        """
-        username, user_id = self.log_in_as_unique_user()
-        profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
-        with self.verify_pref_change_event_during(
-            username, user_id, 'account_privacy', old=None, new=self.PRIVACY_PRIVATE
-        ):
-            profile_page.privacy = self.PRIVACY_PRIVATE
-
-        # Reload the page and verify that the profile is now private
-        self.browser.refresh()
-        profile_page.wait_for_page()
-        self.verify_profile_page_is_private(profile_page)
-
-    def test_dashboard_learner_profile_link(self):
-        """
-        Scenario: Verify that my profile link is present on dashboard page and we can navigate to correct page.
-
-        Given that I am a registered user.
-        When I go to Dashboard page.
-        And I click on username dropdown.
-        Then I see Profile link in the dropdown menu.
-        When I click on Profile link.
-        Then I will be navigated to Profile page.
-        """
-        username, __ = self.log_in_as_unique_user()
-        dashboard_page = DashboardPage(self.browser)
-        dashboard_page.visit()
-        self.assertIn('Profile', dashboard_page.tabs_link_text)
-        dashboard_page.click_my_profile_link()
-        my_profile_page = LearnerProfilePage(self.browser, username)
-        my_profile_page.wait_for_page()
-
-    def test_fields_on_my_private_profile(self):
-        """
-        Scenario: Verify that desired fields are shown when looking at her own private profile.
-
-        Given that I am a registered user.
-        And I visit my Profile page.
-        And I set the profile visibility to private.
-        And I reload the page.
-        Then I should see the profile visibility selector dropdown.
-        Then I see some of the profile fields are shown.
-        """
-        username, user_id = self.log_in_as_unique_user()
-        profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PRIVATE)
-        self.verify_profile_page_is_private(profile_page)
-        self.verify_profile_page_view_event(username, user_id, visibility=self.PRIVACY_PRIVATE)
-
-    @skip("failing on Jenkins")
-    def test_fields_on_my_public_profile(self):
-        """
-        Scenario: Verify that desired fields are shown when looking at her own public profile.
-
-        Given that I am a registered user.
-        And I visit my Profile page.
-        And I set the profile visibility to public.
-        And I reload the page.
-        Then I should see the profile visibility selector dropdown.
-        Then I see all the profile fields are shown.
-        And `location`, `language` and `about me` fields are editable.
-        """
-        username, user_id = self.log_in_as_unique_user()
-        profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
-        self.verify_profile_page_is_public(profile_page)
-        self.verify_profile_page_view_event(username, user_id, visibility=self.PRIVACY_PUBLIC)
-
-    def _test_dropdown_field(self, profile_page, field_id, new_value, displayed_value, mode):
-        """
-        Test behaviour of a dropdown field.
-        """
-        profile_page.value_for_dropdown_field(field_id, new_value, focus_out=True)
-        self.assertEqual(profile_page.get_non_editable_mode_value(field_id), displayed_value)
-        self.assertTrue(profile_page.mode_for_field(field_id), mode)
-
-        self.browser.refresh()
-        profile_page.wait_for_page()
-
-        self.assertEqual(profile_page.get_non_editable_mode_value(field_id), displayed_value)
-        self.assertTrue(profile_page.mode_for_field(field_id), mode)
-
-    def _test_textarea_field(self, profile_page, field_id, new_value, displayed_value, mode):
-        """
-        Test behaviour of a textarea field.
-        """
-        profile_page.set_value_for_textarea_field(field_id, new_value)
-        self.assertEqual(profile_page.get_non_editable_mode_value(field_id), displayed_value)
-        self.assertTrue(profile_page.mode_for_field(field_id), mode)
-
-        self.browser.refresh()
-        profile_page.wait_for_page()
-
-        self.assertEqual(profile_page.get_non_editable_mode_value(field_id), displayed_value)
-        self.assertTrue(profile_page.mode_for_field(field_id), mode)
-
-    def test_birth_year_not_set(self):
-        """
-        Verify message if birth year is not set.
-
-        Given that I am a registered user.
-        And birth year is not set for the user.
-        And I visit my profile page.
-        Then I should see a message that the profile is private until the year of birth is set.
-        """
-        username, user_id = self.log_in_as_unique_user()
-        message = "You must specify your birth year before you can share your full profile."
-        self.verify_profile_forced_private_message(username, birth_year=None, message=message)
-        self.verify_profile_page_view_event(username, user_id, visibility=self.PRIVACY_PRIVATE)
-
-    def test_user_is_under_age(self):
-        """
-        Verify message if user is under age.
-
-        Given that I am a registered user.
-        And birth year is set so that age is less than 13.
-        And I visit my profile page.
-        Then I should see a message that the profile is private as I am under thirteen.
-        """
-        username, user_id = self.log_in_as_unique_user()
-        under_age_birth_year = datetime.now().year - 10
-        self.verify_profile_forced_private_message(
-            username,
-            birth_year=under_age_birth_year,
-            message='You must be over 13 to share a full profile.'
-        )
-        self.verify_profile_page_view_event(username, user_id, visibility=self.PRIVACY_PRIVATE)
-
-    def test_user_can_only_see_default_image_for_private_profile(self):
-        """
-        Scenario: Default profile image behaves correctly for under age user.
-
-        Given that I am on my profile page with private access
-        And I can see default image
-        When I move my cursor to the image
-        Then i cannot see the upload/remove image text
-        And i cannot upload/remove the image.
-        """
-        year_of_birth = datetime.now().year - 5
-        username, __ = self.log_in_as_unique_user()
-        profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PRIVATE)
-
-        self.verify_profile_forced_private_message(
-            username,
-            year_of_birth,
-            message='You must be over 13 to share a full profile.'
-        )
-        self.assertTrue(profile_page.profile_has_default_image)
-        self.assertFalse(profile_page.profile_has_image_with_private_access())
-
-    def test_user_can_see_default_image_for_public_profile(self):
-        """
-        Scenario: Default profile image behaves correctly for public profile.
-
-        Given that I am on my profile page with public access
-        And I can see default image
-        When I move my cursor to the image
-        Then i can see the upload/remove image text
-        And i am able to upload new image
-        """
-        username, __ = self.log_in_as_unique_user()
-        profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
-
-        self.assert_default_image_has_public_access(profile_page)
-
-    def test_user_can_upload_the_profile_image_with_success(self):
-        """
-        Scenario: Upload profile image works correctly.
-
-        Given that I am on my profile page with public access
-        And I can see default image
-        When I move my cursor to the image
-        Then i can see the upload/remove image text
-        When i upload new image via file uploader
-        Then i can see the changed image
-        And i can also see the latest image after reload.
-        """
-        username, user_id = self.log_in_as_unique_user()
-        profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
-
-        self.assert_default_image_has_public_access(profile_page)
-
-        with self.verify_pref_change_event_during(
-            username, user_id, 'profile_image_uploaded_at', table='auth_userprofile'
-        ):
-            profile_page.upload_file(filename='image.jpg')
-        self.assertTrue(profile_page.image_upload_success)
-        profile_page.visit()
-        self.assertTrue(profile_page.image_upload_success)
-
-    def test_user_can_see_error_for_exceeding_max_file_size_limit(self):
-        """
-        Scenario: Upload profile image does not work for > 1MB image file.
-
-        Given that I am on my profile page with public access
-        And I can see default image
-        When I move my cursor to the image
-        Then i can see the upload/remove image text
-        When i upload new > 1MB image via file uploader
-        Then i can see the error message for file size limit
-        And i can still see the default image after page reload.
-        """
-        username, user_id = self.log_in_as_unique_user()
-        profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
-
-        self.assert_default_image_has_public_access(profile_page)
-
-        profile_page.upload_file(filename='larger_image.jpg')
-        self.assertEqual(profile_page.profile_image_message, "The file must be smaller than 1 MB in size.")
-        profile_page.visit()
-        self.assertTrue(profile_page.profile_has_default_image)
-
-        self.assert_no_matching_events_were_emitted({
-            'event_type': self.USER_SETTINGS_CHANGED_EVENT_NAME,
-            'event': {
-                'setting': 'profile_image_uploaded_at',
-                'user_id': int(user_id),
-            }
-        })
-
-    def test_user_can_see_error_for_file_size_below_the_min_limit(self):
-        """
-        Scenario: Upload profile image does not work for < 100 Bytes image file.
-
-        Given that I am on my profile page with public access
-        And I can see default image
-        When I move my cursor to the image
-        Then i can see the upload/remove image text
-        When i upload new < 100 Bytes image via file uploader
-        Then i can see the error message for minimum file size limit
-        And i can still see the default image after page reload.
-        """
-        username, user_id = self.log_in_as_unique_user()
-        profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
-
-        self.assert_default_image_has_public_access(profile_page)
-
-        profile_page.upload_file(filename='list-icon-visited.png')
-        self.assertEqual(profile_page.profile_image_message, "The file must be at least 100 bytes in size.")
-        profile_page.visit()
-        self.assertTrue(profile_page.profile_has_default_image)
-
-        self.assert_no_matching_events_were_emitted({
-            'event_type': self.USER_SETTINGS_CHANGED_EVENT_NAME,
-            'event': {
-                'setting': 'profile_image_uploaded_at',
-                'user_id': int(user_id),
-            }
-        })
-
-    def test_user_can_see_error_for_wrong_file_type(self):
-        """
-        Scenario: Upload profile image does not work for wrong file types.
-
-        Given that I am on my profile page with public access
-        And I can see default image
-        When I move my cursor to the image
-        Then i can see the upload/remove image text
-        When i upload new csv file via file uploader
-        Then i can see the error message for wrong/unsupported file type
-        And i can still see the default image after page reload.
-        """
-        username, user_id = self.log_in_as_unique_user()
-        profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
-
-        self.assert_default_image_has_public_access(profile_page)
-
-        profile_page.upload_file(filename='generic_csv.csv')
-        self.assertEqual(
-            profile_page.profile_image_message,
-            "The file must be one of the following types: .gif, .png, .jpeg, .jpg."
-        )
-        profile_page.visit()
-        self.assertTrue(profile_page.profile_has_default_image)
-
-        self.assert_no_matching_events_were_emitted({
-            'event_type': self.USER_SETTINGS_CHANGED_EVENT_NAME,
-            'event': {
-                'setting': 'profile_image_uploaded_at',
-                'user_id': int(user_id),
-            }
-        })
-
-    def test_user_can_remove_profile_image(self):
-        """
-        Scenario: Remove profile image works correctly.
-
-        Given that I am on my profile page with public access
-        And I can see default image
-        When I move my cursor to the image
-        Then i can see the upload/remove image text
-        When i click on the remove image link
-        Then i can see the default image
-        And i can still see the default image after page reload.
-        """
-        username, user_id = self.log_in_as_unique_user()
-        profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
-
-        self.assert_default_image_has_public_access(profile_page)
-
-        with self.verify_pref_change_event_during(
-            username, user_id, 'profile_image_uploaded_at', table='auth_userprofile'
-        ):
-            profile_page.upload_file(filename='image.jpg')
-        self.assertTrue(profile_page.image_upload_success)
-
-        with self.verify_pref_change_event_during(
-            username, user_id, 'profile_image_uploaded_at', table='auth_userprofile'
-        ):
-            self.assertTrue(profile_page.remove_profile_image())
-
-        self.assertTrue(profile_page.profile_has_default_image)
-        profile_page.visit()
-        self.assertTrue(profile_page.profile_has_default_image)
-
-    def test_user_cannot_remove_default_image(self):
-        """
-        Scenario: Remove profile image does not works for default images.
-
-        Given that I am on my profile page with public access
-        And I can see default image
-        When I move my cursor to the image
-        Then i can see only the upload image text
-        And i cannot see the remove image text
-        """
-        username, __ = self.log_in_as_unique_user()
-        profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
-
-        self.assert_default_image_has_public_access(profile_page)
-        self.assertFalse(profile_page.remove_link_present)
-
-    def test_eventing_after_multiple_uploads(self):
-        """
-        Scenario: An event is fired when a user with a profile image uploads another image
-
-        Given that I am on my profile page with public access
-        And I upload a new image via file uploader
-        When I upload another image via the file uploader
-        Then two upload events have been emitted
-        """
-        username, user_id = self.log_in_as_unique_user()
-        profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
-        self.assert_default_image_has_public_access(profile_page)
-
-        with self.verify_pref_change_event_during(
-            username, user_id, 'profile_image_uploaded_at', table='auth_userprofile'
-        ):
-            profile_page.upload_file(filename='image.jpg')
-        self.assertTrue(profile_page.image_upload_success)
-
-        with self.verify_pref_change_event_during(
-            username, user_id, 'profile_image_uploaded_at', table='auth_userprofile'
-        ):
-            profile_page.upload_file(filename='image.jpg', wait_for_upload_button=False)
-
-
-class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTest):
-    """
-    Tests that verify viewing the profile page of a different user.
-    """
-    shard = 4
-
-    def test_different_user_private_profile(self):
-        """
-        Scenario: Verify that desired fields are shown when looking at a different user's private profile.
-
-        Given that I am a registered user.
-        And I visit a different user's private profile page.
-        Then I shouldn't see the profile visibility selector dropdown.
-        Then I see some of the profile fields are shown.
-        """
-        different_username, different_user_id = self.initialize_different_user(privacy=self.PRIVACY_PRIVATE)
-        username, __ = self.log_in_as_unique_user()
-        profile_page = self.visit_profile_page(different_username)
-        self.verify_profile_page_is_private(profile_page, is_editable=False)
-        self.verify_profile_page_view_event(username, different_user_id, visibility=self.PRIVACY_PRIVATE)
-
-    def test_different_user_under_age(self):
-        """
-        Scenario: Verify that an under age user's profile is private to others.
-
-        Given that I am a registered user.
-        And I visit an under age user's profile page.
-        Then I shouldn't see the profile visibility selector dropdown.
-        Then I see that only the private fields are shown.
-        """
-        under_age_birth_year = datetime.now().year - 10
-        different_username, different_user_id = self.initialize_different_user(
-            privacy=self.PRIVACY_PUBLIC,
-            birth_year=under_age_birth_year
-        )
-        username, __ = self.log_in_as_unique_user()
-        profile_page = self.visit_profile_page(different_username)
-        self.verify_profile_page_is_private(profile_page, is_editable=False)
-        self.verify_profile_page_view_event(username, different_user_id, visibility=self.PRIVACY_PRIVATE)
-
-    def test_different_user_public_profile(self):
-        """
-        Scenario: Verify that desired fields are shown when looking at a different user's public profile.
-
-        Given that I am a registered user.
-        And I visit a different user's public profile page.
-        Then I shouldn't see the profile visibility selector dropdown.
-        Then all the profile fields are shown.
-        Then I shouldn't see the profile visibility selector dropdown.
-        Also `location`, `language` and `about me` fields are not editable.
-        """
-        different_username, different_user_id = self.initialize_different_user(privacy=self.PRIVACY_PUBLIC)
-        username, __ = self.log_in_as_unique_user()
-        profile_page = self.visit_profile_page(different_username)
-        profile_page.wait_for_public_fields()
-        self.verify_profile_page_is_public(profile_page, is_editable=False)
-        self.verify_profile_page_view_event(username, different_user_id, visibility=self.PRIVACY_PUBLIC)
-
-    def test_badge_share_modal(self):
-        username = 'testcert'
-        AutoAuthPage(self.browser, username=username).visit()
-        profile_page = self.visit_profile_page(username)
-        profile_page.display_accomplishments()
-        badge = profile_page.badges[0]
-        badge.display_modal()
-        badge.close_modal()
-
-
-@pytest.mark.a11y
 class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
     """
     Class to test learner profile accessibility.
     """
+    a11y = True
 
     def test_editable_learner_profile_a11y(self):
         """
@@ -696,6 +199,7 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         profile_page.a11y_audit.check_for_accessibility_errors()
@@ -722,6 +226,7 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         profile_page.a11y_audit.check_for_accessibility_errors()
@@ -737,6 +242,8 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
+                'color-contrast'  # AC-938
             ]
         })
         profile_page.display_accomplishments()

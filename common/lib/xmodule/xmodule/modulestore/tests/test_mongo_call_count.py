@@ -3,20 +3,25 @@ Tests to verify correct number of MongoDB calls during course import/export and 
 when using the Split modulestore.
 """
 
-from tempfile import mkdtemp
+
 from shutil import rmtree
+from tempfile import mkdtemp
 from unittest import TestCase, skip
+
 import ddt
+import six
 from django.test import TestCase
 
-from xmodule.modulestore.xml_importer import import_course_from_xml
-from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.modulestore.tests.utils import (
-    MixedModulestoreBuilder, VersioningModulestoreBuilder,
-    MongoModulestoreBuilder, TEST_DATA_DIR,
+    TEST_DATA_DIR,
     MemoryCache,
+    MixedModulestoreBuilder,
+    MongoModulestoreBuilder,
+    VersioningModulestoreBuilder
 )
+from xmodule.modulestore.xml_exporter import export_course_to_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml
 
 MIXED_OLD_MONGO_MODULESTORE_BUILDER = MixedModulestoreBuilder([('draft', MongoModulestoreBuilder())])
 MIXED_SPLIT_MODULESTORE_BUILDER = MixedModulestoreBuilder([('split', VersioningModulestoreBuilder())])
@@ -28,7 +33,6 @@ class CountMongoCallsXMLRoundtrip(TestCase):
     """
     This class exists to test XML import and export to/from Split.
     """
-    shard = 2
 
     def setUp(self):
         super(CountMongoCallsXMLRoundtrip, self).setUp()
@@ -89,7 +93,6 @@ class CountMongoCallsCourseTraversal(TestCase):
     Tests the number of Mongo calls made when traversing a course tree from the top course root
     to the leaf nodes.
     """
-    shard = 2
 
     def _traverse_blocks_in_course(self, course, access_all_block_fields):
         """
@@ -109,7 +112,7 @@ class CountMongoCallsCourseTraversal(TestCase):
         if access_all_block_fields:
             # Read the fields on each block in order to ensure each block and its definition is loaded.
             for xblock in all_blocks:
-                for __, field in xblock.fields.iteritems():
+                for __, field in six.iteritems(xblock.fields):
                     if field.is_set_on(xblock):
                         __ = field.read_from(xblock)
 
@@ -151,11 +154,11 @@ class CountMongoCallsCourseTraversal(TestCase):
         (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, True, False, 359),
         # The line below shows the way this traversal *should* be done
         # (if you'll eventually access all the fields and load all the definitions anyway).
-        (MIXED_SPLIT_MODULESTORE_BUILDER, None, False, True, 4),
+        (MIXED_SPLIT_MODULESTORE_BUILDER, None, False, True, 3),
         (MIXED_SPLIT_MODULESTORE_BUILDER, None, True, True, 38),
         (MIXED_SPLIT_MODULESTORE_BUILDER, 0, False, True, 38),
         (MIXED_SPLIT_MODULESTORE_BUILDER, 0, True, True, 38),
-        (MIXED_SPLIT_MODULESTORE_BUILDER, None, False, False, 4),
+        (MIXED_SPLIT_MODULESTORE_BUILDER, None, False, False, 3),
         (MIXED_SPLIT_MODULESTORE_BUILDER, None, True, False, 3),
         (MIXED_SPLIT_MODULESTORE_BUILDER, 0, False, False, 3),
         (MIXED_SPLIT_MODULESTORE_BUILDER, 0, True, False, 3)
@@ -166,8 +169,6 @@ class CountMongoCallsCourseTraversal(TestCase):
         with store_builder.build(request_cache=request_cache) as (content_store, modulestore):
             course_key = self._import_course(content_store, modulestore)
 
-            # Course traversal modeled after the traversal done here:
-            # lms/djangoapps/mobile_api/video_outlines/serializers.py:BlockOutline
             # Starting at the root course block, do a breadth-first traversal using
             # get_children() to retrieve each block's children.
             with check_mongo_calls(num_mongo_calls):
@@ -177,7 +178,7 @@ class CountMongoCallsCourseTraversal(TestCase):
 
     @ddt.data(
         (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 176),
-        (MIXED_SPLIT_MODULESTORE_BUILDER, 5),
+        (MIXED_SPLIT_MODULESTORE_BUILDER, 4),
     )
     @ddt.unpack
     def test_lazy_when_course_previously_cached(self, store_builder, num_mongo_calls):

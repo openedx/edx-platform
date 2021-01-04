@@ -1,35 +1,29 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
+
 import datetime
 from tempfile import mkdtemp
 
 import ddt
-
 from django.test import TestCase
-
 from fs.osfs import OSFS
 from lxml import etree
 from mock import Mock, patch
-
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC
 from six import text_type
-
-from xmodule.xml_module import is_pointer_tag
-from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from xmodule.modulestore import only_xmodules
-from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, LibraryXMLModuleStore
-from xmodule.modulestore.inheritance import compute_inherited_metadata
-from xmodule.x_module import XModuleMixin
-from xmodule.fields import Date
-from xmodule.tests import DATA_DIR
-from xmodule.modulestore.inheritance import InheritanceMixin
-from opaque_keys.edx.keys import CourseKey
-
 from xblock.core import XBlock
-from xblock.fields import Scope, String, Integer
-from xblock.runtime import KvsFieldData, DictKeyValueStore
+from xblock.fields import Integer, Scope, String
+from xblock.runtime import DictKeyValueStore, KvsFieldData
 
+from xmodule.fields import Date
+from xmodule.modulestore import only_xmodules
+from xmodule.modulestore.inheritance import InheritanceMixin, compute_inherited_metadata
+from xmodule.modulestore.xml import ImportSystem, LibraryXMLModuleStore, XMLModuleStore
+from xmodule.tests import DATA_DIR
+from xmodule.x_module import XModuleMixin
+from xmodule.xml_module import is_pointer_tag
 
 ORG = 'test_org'
 COURSE = 'test_course'
@@ -65,7 +59,6 @@ class DummySystem(ImportSystem):
 
 class BaseCourseTestCase(TestCase):
     '''Make sure module imports work properly, including for malformed inputs'''
-    shard = 1
 
     @staticmethod
     def get_system(load_error_modules=True, library=False):
@@ -83,7 +76,7 @@ class BaseCourseTestCase(TestCase):
             xblock_select=only_xmodules,
         )
         courses = modulestore.get_courses()
-        self.assertEquals(len(courses), 1)
+        self.assertEqual(len(courses), 1)
         return courses[0]
 
 
@@ -99,7 +92,6 @@ class PureXBlockImportTest(BaseCourseTestCase):
     """
     Tests of import pure XBlocks (not XModules) from xml
     """
-    shard = 1
 
     def assert_xblocks_are_good(self, block):
         """Assert a number of conditions that must be true for `block` to be good."""
@@ -127,7 +119,6 @@ class PureXBlockImportTest(BaseCourseTestCase):
 
 
 class ImportTestCase(BaseCourseTestCase):
-    shard = 1
     date = Date()
 
     def test_fallback(self):
@@ -530,7 +521,7 @@ class ImportTestCase(BaseCourseTestCase):
         # Not using get_courses because we need the modulestore object too afterward
         modulestore = XMLModuleStore(DATA_DIR, source_dirs=['toy'])
         courses = modulestore.get_courses()
-        self.assertEquals(len(courses), 1)
+        self.assertEqual(len(courses), 1)
         course = courses[0]
 
         print("course errors:")
@@ -539,20 +530,20 @@ class ImportTestCase(BaseCourseTestCase):
             print(err)
 
         chapters = course.get_children()
-        self.assertEquals(len(chapters), 5)
+        self.assertEqual(len(chapters), 5)
 
         ch2 = chapters[1]
-        self.assertEquals(ch2.url_name, "secret:magic")
+        self.assertEqual(ch2.url_name, "secret:magic")
 
         print("Ch2 location: ", ch2.location)
 
         also_ch2 = modulestore.get_item(ch2.location)
-        self.assertEquals(ch2, also_ch2)
+        self.assertEqual(ch2, also_ch2)
 
         print("making sure html loaded")
         loc = course.id.make_usage_key('html', 'secret:toylab')
         html = modulestore.get_item(loc)
-        self.assertEquals(html.display_name, "Toy lab")
+        self.assertEqual(html.display_name, "Toy lab")
 
     def test_unicode(self):
         """Check that courses with unicode characters in filenames and in
@@ -564,7 +555,7 @@ class ImportTestCase(BaseCourseTestCase):
         print("Starting import")
         modulestore = XMLModuleStore(DATA_DIR, source_dirs=['test_unicode'])
         courses = modulestore.get_courses()
-        self.assertEquals(len(courses), 1)
+        self.assertEqual(len(courses), 1)
         course = courses[0]
 
         print("course errors:")
@@ -572,7 +563,7 @@ class ImportTestCase(BaseCourseTestCase):
         # Expect to find an error/exception about characters in "®esources"
         expect = "InvalidKeyError"
         errors = [
-            (msg.encode("utf-8"), err.encode("utf-8"))
+            (msg, err)
             for msg, err
             in modulestore.get_course_errors(course.id)
         ]

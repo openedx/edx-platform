@@ -1,19 +1,22 @@
 """
 Tests for the Split Testing Module
 """
+
+
 import ddt
 import lxml
-from mock import Mock, patch
+import six
 from fs.memoryfs import MemoryFS
+from mock import Mock, patch
 
-from xmodule.partitions.tests.test_partitions import MockPartitionService, PartitionTestCase, MockUserPartitionScheme
-from xmodule.tests.xml import factories as xml
-from xmodule.tests.xml import XModuleXmlImportTest
-from xmodule.tests import get_test_system
-from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
-from xmodule.validation import StudioValidationMessage
+from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, Group, UserPartition
+from xmodule.partitions.tests.test_partitions import MockPartitionService, MockUserPartitionScheme, PartitionTestCase
 from xmodule.split_test_module import SplitTestDescriptor, SplitTestFields, get_split_user_partitions
-from xmodule.partitions.partitions import Group, UserPartition, MINIMUM_STATIC_PARTITION_ID
+from xmodule.tests import get_test_system
+from xmodule.tests.xml import XModuleXmlImportTest
+from xmodule.tests.xml import factories as xml
+from xmodule.validation import StudioValidationMessage
+from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
 
 
 class SplitTestModuleFactory(xml.XmlImportFactory):
@@ -27,7 +30,6 @@ class SplitTestUtilitiesTest(PartitionTestCase):
     """
     Tests for utility methods related to split_test module.
     """
-    shard = 1
 
     def test_split_user_partitions(self):
         """
@@ -70,7 +72,8 @@ class SplitTestModuleTest(XModuleXmlImportTest, PartitionTestCase):
             parent=sequence,
             attribs={
                 'user_partition_id': '0',
-                'group_id_to_child': '{"0": "i4x://edX/xml_test_course/html/split_test_cond0", "1": "i4x://edX/xml_test_course/html/split_test_cond1"}'  # pylint: disable=line-too-long
+                'group_id_to_child': '{"0": "i4x://edX/xml_test_course/html/split_test_cond0", "1":'
+                                     ' "i4x://edX/xml_test_course/html/split_test_cond1"}'
             }
         )
         xml.HtmlFactory(parent=split_test, url_name='split_test_cond0', text='HTML FOR GROUP 0')
@@ -89,8 +92,8 @@ class SplitTestModuleTest(XModuleXmlImportTest, PartitionTestCase):
             UserPartition(
                 MINIMUM_STATIC_PARTITION_ID, 'second_partition', 'Second Partition',
                 [
-                    Group(unicode(MINIMUM_STATIC_PARTITION_ID + 1), 'abel'),
-                    Group(unicode(MINIMUM_STATIC_PARTITION_ID + 2), 'baker'), Group("103", 'charlie')
+                    Group(six.text_type(MINIMUM_STATIC_PARTITION_ID + 1), 'abel'),
+                    Group(six.text_type(MINIMUM_STATIC_PARTITION_ID + 2), 'baker'), Group("103", 'charlie')
                 ],
                 MockUserPartitionScheme()
             )
@@ -125,7 +128,6 @@ class SplitTestModuleLMSTest(SplitTestModuleTest):
     """
     Test the split test module
     """
-    shard = 1
 
     def setUp(self):
         super(SplitTestModuleLMSTest, self).setUp()
@@ -140,7 +142,7 @@ class SplitTestModuleLMSTest(SplitTestModuleTest):
     @ddt.unpack
     def test_child(self, user_tag, child_url_name):
         self.user_partition.scheme.current_group = self.user_partition.groups[user_tag]
-        self.assertEquals(self.split_test_module.child_descriptor.url_name, child_url_name)
+        self.assertEqual(self.split_test_module.child_descriptor.url_name, child_url_name)
 
     @ddt.data((0, 'HTML FOR GROUP 0'), (1, 'HTML FOR GROUP 1'))
     @ddt.unpack
@@ -161,15 +163,15 @@ class SplitTestModuleLMSTest(SplitTestModuleTest):
         # If a user_tag has a missing value, a group should be saved/persisted for that user.
         # So, we check that we get the same url_name when we call on the url_name twice.
         # We run the test ten times so that, if our storage is failing, we'll be most likely to notice it.
-        self.assertEquals(
+        self.assertEqual(
             self.split_test_module.child_descriptor.url_name,
             self.split_test_module.child_descriptor.url_name
         )
 
     # Patch the definition_to_xml for the html children.
-    @patch('xmodule.html_module.HtmlDescriptor.definition_to_xml')
+    @patch('xmodule.html_module.HtmlBlock.definition_to_xml')
     def test_export_import_round_trip(self, def_to_xml):
-        # The HtmlDescriptor definition_to_xml tries to write to the filesystem
+        # The HtmlBlock definition_to_xml tries to write to the filesystem
         # before returning an xml object. Patch this to just return the xml.
         def_to_xml.return_value = lxml.etree.Element('html')
 
@@ -180,21 +182,20 @@ class SplitTestModuleLMSTest(SplitTestModuleTest):
         # Write out the xml.
         xml_obj = self.split_test_module.definition_to_xml(MemoryFS())
 
-        self.assertEquals(xml_obj.get('user_partition_id'), '0')
+        self.assertEqual(xml_obj.get('user_partition_id'), '0')
         self.assertIsNotNone(xml_obj.get('group_id_to_child'))
 
         # Read the xml back in.
         fields, children = SplitTestDescriptor.definition_from_xml(xml_obj, self.module_system)
-        self.assertEquals(fields.get('user_partition_id'), '0')
+        self.assertEqual(fields.get('user_partition_id'), '0')
         self.assertIsNotNone(fields.get('group_id_to_child'))
-        self.assertEquals(len(children), 2)
+        self.assertEqual(len(children), 2)
 
 
 class SplitTestModuleStudioTest(SplitTestModuleTest):
     """
     Unit tests for how split test interacts with Studio.
     """
-    shard = 1
 
     @patch('xmodule.split_test_module.SplitTestDescriptor.group_configuration_url', return_value='http://example.com')
     def test_render_author_view(self, group_configuration_url):

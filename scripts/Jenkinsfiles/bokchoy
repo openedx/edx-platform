@@ -13,23 +13,28 @@ def runBokchoyTests() {
             doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', honorRefspec: true,
             noTags: true, shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
             refspec: git_refspec, url: "git@github.com:edx/${REPO_NAME}.git"]]]
-        console_output = sh(returnStdout: true, script: 'bash scripts/all-tests.sh').trim()
-        dir('stdout') {
-            writeFile file: "${TEST_SUITE}-${SHARD}-stdout.log", text: console_output
-        }
+        sh 'bash scripts/all-tests.sh'
+        stash includes: 'reports/bok_choy/*coverage*', name: "${TEST_SUITE}-reports-${SHARD}", allowEmpty: true
     }
 }
 
 def bokchoyTestCleanup() {
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'test_root/log/**/*.log,stdout/*.log'
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/bok_choy/*.coverage*,test_root/log/**/*.log,test_root/log/**/*.png,reports/bok_choy/**/xunit.xml'
     junit '**/reports/bok_choy/**/xunit.xml'
+    sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
 }
+
+def shardCount = 25
 
 pipeline {
     agent { label "ironwood-jenkins-worker" }
     options {
+        sendSplunkConsoleLog()
         timestamps()
         timeout(60)
+    }
+    environment {
+        WTW_CONTEXT = "bokchoy"
     }
     stages {
         stage('Mark build as pending on Github') {
@@ -59,7 +64,7 @@ pipeline {
             steps {
                 script {
                     def parallel_stages = [:]
-                    for (int i = 1; i <= 22; i++) {
+                    for (int i = 1; i <= shardCount; i++) {
                         int index = i
                         parallel_stages["${index}"] = {
                             node('ironwood-jenkins-worker') {
@@ -79,13 +84,44 @@ pipeline {
                 }
             }
         }
+        stage("Combine Coverage") {
+            when {
+                // Only combine coverage during context-collection
+                environment name: 'COLLECT_WHO_TESTS_WHAT', value: 'true'
+            }
+            steps {
+                script {
+                    sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+                        try {
+                            checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: git_branch]],
+                                doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', honorRefspec: true,
+                                noTags: true, shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                                refspec: git_refspec, url: "git@github.com:edx/${REPO_NAME}.git"]]]
+
+                            for (int i = 1; i <= shardCount; i++) {
+                                unstash "bok-choy-reports-${i}"
+                            }
+                            sh """
+                            export TEST_SUITE=bok-choy
+                            source scripts/jenkins-common.sh
+                            paver coverage --rcfile=common/test/acceptance/.coveragerc
+                            paver upload_coverage_to_s3
+                            """
+                        } finally {
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.coverage'
+                            sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
+                        }
+                    }
+                }
+            }
+        }
     }
     post {
         always {
-            script{
+            script {
                 if (env.ghprbPullId != null) {
                     // For PR jobs, run the edx-platform-test-notifier for PR reporting
-                    build job: 'edx-platform-test-notifier', parameters: [string(name: 'PR_NUMBER', value: "${ghprbPullId}")], wait: false
+                    build job: 'edx-platform-test-notifier', parameters: [string(name: 'REPO', value: "${REPO_NAME}"), string(name: 'PR_NUMBER', value: "${ghprbPullId}")], wait: false
                 } else {
                     // For master jobs run github-build-status and report to slack when necessary
                     if (currentBuild.currentResult == "SUCCESS") {

@@ -1,3 +1,5 @@
+$proctoring-banner-text-size: 14px;
+
 .wrapper-preview-menu {
   @include clearfix();
 
@@ -62,12 +64,13 @@
 
     box-shadow: 0 3px 3px $shadow-d1;
     position: fixed;
+    z-index: 100;
     top: 0;
     width: 100%;
   }
 
   .exam-timer {
-    font-size: 14px;
+    font-size: $proctoring-banner-text-size;
     background-color: rgb(229, 234, 236);
     padding: $baseline ($baseline*2);
     border-left: 4px solid theme-color("primary");
@@ -189,6 +192,11 @@
         border-bottom-left-radius: 0;
         border-top-left-radius: 0;
         margin-right: 0;
+      }
+
+      h3 {
+        display: inline;
+        font-size: $proctoring-banner-text-size;
       }
 
       b {

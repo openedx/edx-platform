@@ -1,4 +1,7 @@
-""" Search index used to load data into elasticsearch"""
+"""
+Search index used to load data into elasticsearch.
+"""
+
 
 import logging
 from functools import wraps
@@ -120,7 +123,7 @@ class CourseTeamIndexer(object):
         try:
             return SearchEngine.get_search_engine(index=cls.INDEX_NAME)
         except ConnectionError as err:
-            logging.error('Error connecting to elasticsearch: %s', err)
+            logging.error(u'Error connecting to elasticsearch: %s', err)
             raise ElasticSearchConnectionError
 
     @classmethod

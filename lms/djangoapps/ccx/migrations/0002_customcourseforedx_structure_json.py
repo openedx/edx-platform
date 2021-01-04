@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 from django.db import migrations, models
 
@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='customcourseforedx',
             name='structure_json',
-            field=models.TextField(null=True, verbose_name=b'Structure JSON', blank=True),
+            field=models.TextField(null=True, verbose_name=u'Structure JSON', blank=True),
         ),
     ]

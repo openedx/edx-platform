@@ -382,14 +382,30 @@
 # Yu-Hua Hsieh <beiluo.shimen@icloud.com>, 2014
 # zhoubizhang <zbzcool@163.com>, 2014
 # 汤和果 <hgtang93@163.com>, 2015
+# #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
+# edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/open-edx/teams/6205/zh_CN/)
+# Copyright (C) 2020 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2020.
+#
+# Translators:
+# ifLab <webmaster@iflab.org>, 2019
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: edx-platform\n"
+"Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
+<<<<<<< HEAD
 "POT-Creation-Date: 2020-02-16 20:42+0000\n"
 "PO-Revision-Date: 2019-01-15 02:36+0000\n"
 "Last-Translator: abby li <yc.li@eliteu.cn>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
+=======
+"POT-Creation-Date: 2020-05-03 20:42+0000\n"
+"PO-Revision-Date: 2019-01-20 20:43+0000\n"
+"Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
+"Language-Team: Chinese (China) (https://www.transifex.com/open-edx/teams/6205/zh_CN/)\n"
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -409,11 +425,6 @@ msgid "Discussion"
 msgstr "讨论"
 
 #: cms/djangoapps/contentstore/views/component.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "Problem"
-msgstr "问题"
-
-#: cms/djangoapps/contentstore/views/component.py
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Advanced"
 msgstr "高级"
@@ -424,16 +435,10 @@ msgid "Entrance Exam"
 msgstr "入学考试"
 
 #: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: cms/templates/course_outline.html lms/templates/seq_module.html
+#: common/lib/xmodule/xmodule/unit_block.py
+#: lms/djangoapps/instructor/views/tools.py lms/templates/seq_module.html
 #: lms/templates/ccx/schedule.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Section"
-msgstr "章"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/templates/ccx/schedule.html
+<<<<<<< HEAD
 msgid "Subsection"
 msgstr "节"
 
@@ -441,6 +446,8 @@ msgstr "节"
 #: common/lib/xmodule/xmodule/unit_block.py
 #: lms/djangoapps/instructor/views/tools.py lms/templates/seq_module.html
 #: lms/templates/ccx/schedule.html
+=======
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Unit"
 msgstr "单元"
 
@@ -476,10 +483,12 @@ msgid ""
 msgstr "该字幕文件有问题，请尝试上传其他文件。"
 
 #: cms/djangoapps/contentstore/views/videos.py
+<<<<<<< HEAD
 #: lms/djangoapps/class_dashboard/dashboard_data.py
+=======
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/djangoapps/instructor/views/api.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/shoppingcart/billing_details.html
 #: lms/templates/shoppingcart/receipt.html
 msgid "Name"
@@ -740,7 +749,11 @@ msgstr[0] "%(count)d学生账户未被解锁。"
 #, python-brace-format
 msgid ""
 "Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' in"
+<<<<<<< HEAD
 " SiteConfiguration model's values field."
+=======
+" SiteConfiguration model's site_values field."
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: common/djangoapps/student/admin.py
@@ -1011,6 +1024,16 @@ msgid ""
 "and password. And if any employee's email doesn't exist in this model then "
 "that employee can login via third party authentication backend only."
 msgstr ""
+<<<<<<< HEAD
+=======
+
+#: common/djangoapps/student/models.py
+msgid ""
+"It expect that the data will be provided in a csv file format with"
+"                     first row being the header and columns will be as "
+"follows:                     username, email, new_email"
+msgstr ""
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: common/djangoapps/student/views/dashboard.py
 msgid " and "
@@ -1878,9 +1901,8 @@ msgid "Cannot rescore problems with possible file submissions"
 msgstr "无法对可能的文件提交重新评分"
 
 #: common/lib/capa/capa/capa_problem.py
-#, python-brace-format
-msgid "Question {0}"
-msgstr "问题{0}"
+msgid "Question {}"
+msgstr ""
 
 #: common/lib/capa/capa/capa_problem.py
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -3468,11 +3490,10 @@ msgid ""
 "for each topic, and another comma after the closing square brackets. For "
 "example, to specify that teams should have a maximum of 5 participants and "
 "provide a list of 2 topics, enter the configuration in this format: "
-"{example_format}. In \"id\" values, the only supported special characters "
-"are underscore, hyphen, and period."
+"{example_format}. If no max_size is provided, it will default to "
+"{default_max}In \"id\" values, the only supported special characters are "
+"underscore, hyphen, and period."
 msgstr ""
-"将指定最大规模的团队和主题放置于大括号内。请确认您所有主题字段皆放置于中括号之内，每个主题大括号后加注逗号，而另一个逗号放加於中括号后。例如，指定团队应该最多5人为限，并提供2个主题，以这种形式进入配置"
-" {example_format}。 \"id\"字段只支援特定符合，包括底线、破折号及句点。"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable Proctored Exams"
@@ -4832,7 +4853,10 @@ msgstr "解锁账户"
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
+<<<<<<< HEAD
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
+=======
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: themes/edx.org/lms/templates/dashboard.html
@@ -4898,6 +4922,7 @@ msgstr ""
 #, python-format
 msgid "Action Required: Activate your %(platform_name)s account"
 msgstr ""
+<<<<<<< HEAD
 
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 msgid "Create Password"
@@ -4936,6 +4961,46 @@ msgid ""
 "not yet reset your password."
 msgstr "如您本人并没有请求该变更，请忽略本邮件——我们尚未重置您的密码。"
 
+=======
+
+#: common/templates/student/edx_ace/accountrecovery/email/body.html
+msgid "Create Password"
+msgstr "创建密码"
+
+#: common/templates/student/edx_ace/accountrecovery/email/body.html
+#: common/templates/student/edx_ace/accountrecovery/email/body.txt
+#, python-format
+msgid ""
+"You're receiving this e-mail because you requested to create a password for "
+"your user account at %(platform_name)s."
+msgstr "您收到此电子邮件是因为您在%(platform_name)s申请了账户密码创建"
+
+#: common/templates/student/edx_ace/accountrecovery/email/body.html
+#: common/templates/student/edx_ace/accountrecovery/email/body.txt
+#, python-format
+msgid ""
+"We've restored access to your %(platform_name)s account using the recovery "
+"email you provided at registration."
+msgstr "我们已使用您在注册时提供的验证邮箱恢复了对您的%(platform_name)s账户的访问权限"
+
+#: common/templates/student/edx_ace/accountrecovery/email/body.html
+#: common/templates/student/edx_ace/accountrecovery/email/body.txt
+#, python-format
+msgid ""
+"Once you've created a password [below], you will be able to log in to "
+"%(platform_name)s with this email (%(email)s) and your new password."
+msgstr "[below]创建密码后，您将可以使用此电子邮件（%(email)s）和新密码登录%(platform_name)s。"
+
+#: common/templates/student/edx_ace/accountrecovery/email/body.html
+#: common/templates/student/edx_ace/accountrecovery/email/body.txt
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
+msgid ""
+"If you didn't request this change, you can disregard this email - we have "
+"not yet reset your password."
+msgstr "如您本人并没有请求该变更，请忽略本邮件——我们尚未重置您的密码。"
+
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: common/templates/student/edx_ace/accountrecovery/email/body.txt
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
 msgid "Thanks for using our site!"
@@ -5677,53 +5742,6 @@ msgstr "恭喜！本页总结了您所获得的成就。在您的社交网络向
 msgid "More about {fullname}'s accomplishment"
 msgstr "了解更多有关{fullname}的成就"
 
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor/views/tools.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/schedules/admin.py
-#: lms/templates/staff_problem_info.html
-#: lms/templates/api_admin/catalogs/search.html
-#: lms/templates/ccx/enrollment.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Username"
-msgstr "用户名"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Grade"
-msgstr "成绩"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Percent"
-msgstr "百分比"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "Opened by this number of students"
-msgstr "打开过的学生"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "subsections"
-msgstr "节"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "Count of Students"
-msgstr "学生数量"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "Percent of Students"
-msgstr "学生百分比"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Score"
-msgstr "分数"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "problems"
-msgstr "问题"
-
 #: lms/djangoapps/commerce/api/v1/serializers.py
 #, python-brace-format
 msgid "{course_id} is not a valid course key."
@@ -5881,10 +5899,22 @@ msgstr "您无权访问学习该课程"
 msgid "You do not have access to this course on a mobile device"
 msgstr "您无法在移动设备上学习该课程"
 
+#: lms/djangoapps/courseware/access_response.py
+msgid "You must be enrolled in the course"
+msgstr ""
+
+#: lms/djangoapps/courseware/access_response.py
+msgid "You must be logged in to see this course"
+msgstr ""
+
 #: lms/djangoapps/courseware/course_tools.py
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade to Verified"
 msgstr "升级到验证"
+
+#: lms/djangoapps/courseware/courses.py
+msgid "Assignment"
+msgstr ""
 
 #. Translators: 'absolute' is a date such as "Jan 01,
 #. 2020". 'relative' is a fuzzy description of the time until
@@ -5947,6 +5977,14 @@ msgstr "课程结束日期：{course_end_date}，即{time_remaining_string}后�
 #, python-brace-format
 msgid "This course is ending in {time_remaining_string} at {course_end_time}."
 msgstr "课程结束时间：{course_end_time}，即{time_remaining_string}后结束。"
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "You lose all access to this course, including your progress."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "Audit Access Expires"
+msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Certificate Available"
@@ -6109,6 +6147,10 @@ msgstr "进度"
 #: cms/templates/widgets/header.html
 msgid "Textbooks"
 msgstr "教材"
+
+#: lms/djangoapps/courseware/tabs.py
+msgid "Dates"
+msgstr ""
 
 #: lms/djangoapps/courseware/views/index.py
 #, python-brace-format
@@ -6812,6 +6854,16 @@ msgstr "已报名学员的资料"
 msgid "User ID"
 msgstr "用户ID"
 
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/tools.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: openedx/core/djangoapps/schedules/admin.py
+#: lms/templates/staff_problem_info.html
+#: lms/templates/api_admin/catalogs/search.html
+#: lms/templates/ccx/enrollment.html
+msgid "Username"
+msgstr "用户名"
+
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a field on the login form
 #. meant to hold the user's email address.
@@ -7352,10 +7404,6 @@ msgid "Analytics"
 msgstr "分析"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "Metrics"
-msgstr "度量"
-
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Open Responses"
 msgstr "开放性题目"
 
@@ -7420,6 +7468,10 @@ msgstr "不能解析日期"
 #, python-brace-format
 msgid "Couldn't find module for url: {0}"
 msgstr "不能为url {0} 找到合适的模块"
+
+#: lms/djangoapps/instructor/views/tools.py
+msgid "Could not find student enrollment in the course."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
 #, python-brace-format
@@ -7981,10 +8033,12 @@ msgid "{mode_name} for course {course}"
 msgstr "课程{course}的{mode_name} "
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid ""
-"You can unenroll in the course and receive a full refund for 14 days after "
-"the course start date. "
-msgstr "您可以取消注册课程，并在开课后14天内可全额退费。"
+"To receive a refund you may unenroll from the course on your edX Dashboard "
+"({dashboard_url}) up to 14 days after your payment or 14 days after your "
+"course starts (up to six months after your payment).\n"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
@@ -7996,18 +8050,15 @@ msgstr "如果您还没有验证您的身份，请立即开始验证吧（{verif
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
 "You can unenroll in the course and receive a full refund for 2 days after "
-"the course start date. "
-msgstr "您可以取消注册课程，并在开课后2天收到全额退费。"
+"the course start date.\n"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
 msgid ""
-"{refund_reminder_msg}To receive your refund, contact {billing_email}. Please"
-" include your order number in your email. Please do NOT include your credit "
-"card information."
+"{refund_reminder_msg}For help unenrolling, Please see How do I unenroll from"
+" a course? ({how_to_unenroll_link}) in our edX HelpCenter."
 msgstr ""
-"{refund_reminder_msg} 如要收到退费请联系 "
-"{billing_email}。请包含您的订单号码及您的email。请不要提供您的信用卡讯息。"
 
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
@@ -8673,6 +8724,17 @@ msgstr ""
 msgid "Link LMS users to program enrollments"
 msgstr ""
 
+<<<<<<< HEAD
+=======
+#: lms/djangoapps/support/views/index.py
+msgid "Program Enrollments Inspector Tool"
+msgstr ""
+
+#: lms/djangoapps/support/views/index.py
+msgid "Find information related to a learner's program enrollments"
+msgstr ""
+
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
 msgstr "user_support_url"
@@ -8736,6 +8798,10 @@ msgstr "放弃选修{course_id}的{user}"
 msgid "Refunded {cost} for order id {order_id}"
 msgstr "订单{order_id}已退款{cost}"
 
+#: lms/djangoapps/survey/utils.py
+msgid "You must complete a survey"
+msgstr ""
+
 #: lms/djangoapps/teams/models.py
 msgid "Optional language the team uses as ISO 639-1 code."
 msgstr "团队所使用之选择性语言的代码为 ISO 639-1 。"
@@ -8782,16 +8848,40 @@ msgid "The supplied course_id {course_id} is not valid."
 msgstr "提供的课程编号{course_id}无效。"
 
 #: lms/djangoapps/teams/views.py
+<<<<<<< HEAD
 msgid "You are already in a team in this course."
 msgstr "您已经加入了该课程中的一个小组。"
+=======
+msgid "topic_id is required"
+msgstr ""
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/djangoapps/teams/views.py
 msgid "You can't create a team in an instructor managed topic."
 msgstr ""
+<<<<<<< HEAD
+=======
 
 #: lms/djangoapps/teams/views.py
-msgid "username or team_id must be specified."
-msgstr "必须制定用户名和team_id。"
+msgid "You are already in a team in this teamset."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "teamset_id and team_id are mutually exclusive options."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "teamset_id requires course_id to also be provided."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "No teamset found in given course with given id"
+msgstr ""
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
+
+#: lms/djangoapps/teams/views.py
+msgid "username or (team_id or teamset_id) must be specified."
+msgstr ""
 
 #: lms/djangoapps/teams/views.py
 msgid "Username is required."
@@ -8963,6 +9053,10 @@ msgid "It is recommended that you change your password."
 msgstr "建议您修改密码"
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
+msgid "You may access your course."
+msgstr ""
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
 msgid "Sincerely yours, The %(course_name)s Team"
@@ -8974,6 +9068,14 @@ msgid ""
 "To get started, please visit https://%(site_name)s. The login information "
 "for your account follows."
 msgstr "开始请访问https://%(site_name)s 。您的账号登录信息如下。"
+<<<<<<< HEAD
+=======
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
+#, python-format
+msgid "You may access your course at: %(course_url)s."
+msgstr ""
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/subject.txt
 #: lms/templates/instructor/edx_ace/enrollenrolled/email/subject.txt
@@ -10014,6 +10116,11 @@ msgid ""
 "Service{link_end}."
 msgstr "我和我的组织均同意此{link_start}{platform_name}API服务条款{link_end}。"
 
+#: openedx/core/djangoapps/auth_exchange/forms.py
+#, python-format
+msgid "'%s' is not a valid scope."
+msgstr ""
+
 #: openedx/core/djangoapps/bookmarks/apps.py
 #: openedx/features/course_bookmarks/plugins.py
 #: openedx/features/course_bookmarks/views/course_bookmarks.py
@@ -10098,6 +10205,31 @@ msgid ""
 "catalog service."
 msgstr "对目录服务的单个请求的最大记录数量，表现形式为分页回复。"
 
+#: openedx/core/djangoapps/config_model_utils/admin.py
+#, python-brace-format
+msgid ""
+"These define the context to enable this configuration on. If no values are "
+"set, then the configuration applies globally. If a single value is set, then"
+" the configuration applies to all courses within that context. At most one "
+"value can be set at a time.{br}If multiple contexts apply to a course (for "
+"example, if configuration is specified for the course specifically, and for "
+"the org that the course is in, then the more specific context overrides the "
+"more general context."
+msgstr ""
+
+#: openedx/core/djangoapps/config_model_utils/admin.py
+msgid ""
+"If any of these values are left empty or \"Unknown\", then their value at "
+"runtime will be retrieved from the next most specific context that applies. "
+"For example, if \"Enabled\" is left as \"Unknown\" in the course context, "
+"then that course will be Enabled only if the org that it is in is Enabled."
+msgstr ""
+
+#: openedx/core/djangoapps/config_model_utils/models.py
+#, python-format
+msgid "%(value)s should have the form ORG+COURSE"
+msgstr "%(value)s应该为ORG+COURSE格式"
+
 #: openedx/core/djangoapps/config_model_utils/models.py
 #, python-format
 msgid "%(value)s should have the form ORG+COURSE"
@@ -10110,6 +10242,7 @@ msgstr "已启用"
 #: openedx/core/djangoapps/config_model_utils/models.py
 msgid "Configure values for all course runs associated with this site."
 msgstr "配置与此站点关联的所有课程运行的参数。"
+<<<<<<< HEAD
 
 #: openedx/core/djangoapps/config_model_utils/models.py
 msgid ""
@@ -10153,6 +10286,58 @@ msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "Read-only"
+msgstr ""
+
+#: openedx/core/djangoapps/cors_csrf/models.py
+=======
+
+#: openedx/core/djangoapps/config_model_utils/models.py
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
+msgid ""
+"Configure values for all course runs associated with this Organization. This"
+" is the organization string (i.e. edX, MITx)."
+msgstr "配置与此站点关联的所有课程运行的参数。这是组织字符串（例如edX，MITx）。"
+
+#: openedx/core/djangoapps/config_model_utils/models.py
+msgid "Course in Org"
+msgstr "课程组织"
+
+#: openedx/core/djangoapps/config_model_utils/models.py
+msgid ""
+"Configure values for all course runs associated with this course. This is "
+"should be formatted as 'org+course' (i.e. MITx+6.002x, HarvardX+CS50)."
+msgstr "配置与此站点关联的所有课程运行的参数。格式为 'org+course' （例如MITx+6.002x, HarvardX+CS50）"
+
+#: openedx/core/djangoapps/config_model_utils/models.py
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/settings.html
+msgid "Course Run"
+msgstr "课程开课"
+
+#: openedx/core/djangoapps/config_model_utils/models.py
+msgid ""
+"Configure values for this course run. This should be formatted as the "
+"CourseKey (i.e. course-v1://MITx+6.002x+2019_Q1)"
+msgstr "配置此课程运行的参数。格式为CourseKey（例如course-v1://MITx+6.002x+2019_Q1）"
+
+#: openedx/core/djangoapps/config_model_utils/models.py
+msgid "Configuration may not be specified at more than one level at once."
+msgstr "不能一次在多个级别指定配置。"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Administer users and author content"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Author content"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Read-only"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "One and only one of 'user' and 'group' must be set."
 msgstr ""
 
 #: openedx/core/djangoapps/cors_csrf/models.py
@@ -10421,6 +10606,12 @@ msgid ""
 "Comma-separated list of scopes that this application will be allowed to "
 "request."
 msgstr "此应用可申请范围列表用逗号隔开。"
+
+#: openedx/core/djangoapps/oauth_dispatch/models.py
+msgid ""
+"Comma-separated list of filters that this application will be allowed to "
+"request."
+msgstr ""
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid "Content Provider"
@@ -11165,6 +11356,7 @@ msgid ""
 "{link_start}{provider} account{link_end}."
 msgstr ""
 
+<<<<<<< HEAD
 #. Translators: This example email address is used as a placeholder in
 #. a field on the login form meant to hold the user's email address.
 #. Translators: This example email address is used as a placeholder in
@@ -11174,6 +11366,8 @@ msgstr ""
 msgid "username@domain.com"
 msgstr "username@domain.com"
 
+=======
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #. Translators: These instructions appear on the login form, immediately
 #. below a field meant to hold the user's email address.
 #. Translators: These instructions appear on the password reset form,
@@ -11189,6 +11383,15 @@ msgstr "您在{platform_name}上注册的邮箱"
 msgid "Create Account"
 msgstr "创建账号"
 
+<<<<<<< HEAD
+=======
+#. Translators: This example email address is used as a placeholder in
+#. a field on the password reset form meant to hold the user's email address.
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "username@domain.com"
+msgstr "username@domain.com"
+
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
@@ -11202,6 +11405,14 @@ msgid ""
 msgstr "与此邮箱关联的用户账号无法重新设置密码。"
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
+<<<<<<< HEAD
+=======
+msgid ""
+"Your previous request is in progress, please try again in a few moments."
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Password reset unsuccessful"
 msgstr "重新设置密码不成功"
 
@@ -11222,11 +11433,14 @@ msgstr ""
 "{html_start}密码创建完成{html_end}已经创建了您的密码。{bold_start}{email}{bold_end}现在是您的主登录电子邮件。"
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
+<<<<<<< HEAD
 msgid ""
 "Your previous request is in progress, please try again in a few moments."
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
+=======
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Some error occured during password change. Please try again"
 msgstr "重设密码时发生错误，请重试"
 
@@ -11312,6 +11526,16 @@ msgstr "您遗漏了一个或多个必须填写字段"
 msgid "Unauthorized email address."
 msgstr "未经授权的邮箱"
 
+<<<<<<< HEAD
+=======
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid ""
+"It looks like {email} belongs to an existing account. Try again with a "
+"different email address."
+msgstr "邮箱 {email} 已被其他账号关联。请使用另一个邮箱重试。"
+
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's email address.
@@ -11524,30 +11748,54 @@ msgid ""
 "{register_link}, and enroll in this course."
 msgstr "您尚未登录，如需查看此讨论内容，请{sign_in_link}或{register_link}，并加入此门课程。"
 
-#: openedx/features/content_type_gating/admin.py
-#: openedx/features/course_duration_limits/admin.py
-msgid ""
-"These define the context to enable course duration limits on. If no values "
-"are set, then the configuration applies globally. If a single value is set, "
-"then the configuration applies to all courses within that context. At most "
-"one value can be set at a time.<br>If multiple contexts apply to a course "
-"(for example, if configuration is specified for the course specifically, and"
-" for the org that the course is in, then the more specific context overrides"
-" the more general context."
+#: openedx/features/calendar_sync/ics.py
+#, python-brace-format
+msgid "{assignment} is due for {course}."
 msgstr ""
-"这些选项规定了启用课程持续时间限制的场景。如果未设置任何值，则配置将全局应用。 如果设置了单个值，则配置将应用于该场景中的所有课程。 "
-"一次最多只能设置一个值。<br>如果课程适用于多个场景（例如，如果课程有自身特定的配置，并且课程所在的组织也有特定配置，则更具体化的场景会覆盖通用场景。"
 
-#: openedx/features/content_type_gating/admin.py
-#: openedx/features/course_duration_limits/admin.py
-msgid ""
-"If any of these values is left empty or \"Unknown\", then their value at "
-"runtime will be retrieved from the next most specific context that applies. "
-"For example, if \"Enabled\" is left as \"Unknown\" in the course context, "
-"then that course will be Enabled only if the org that it is in is Enabled."
+#: openedx/features/calendar_sync/plugins.py
+msgid "Calendar Sync"
 msgstr ""
-"如果这些值中的任何一个为空或“未知”，则运行时的值将恢复到下一个最具体化场景应用的值。 "
-"例如，如果在课程场景中“已启用”被保留为“未知”，则仅当其所在的组织已启用时，该课程才会启用。"
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Unsubscribe from calendar updates"
+msgstr ""
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Subscribe to calendar updates"
+msgstr ""
+
+#: openedx/features/calendar_sync/views/management.py
+#, python-brace-format
+msgid "Updates for Your {course} Schedule"
+msgstr ""
+
+#: openedx/features/calendar_sync/views/management.py
+msgid "Update Your Calendar"
+msgstr ""
+
+#: openedx/features/calendar_sync/views/management.py
+#, python-brace-format
+msgid ""
+"Your assignment due dates for {course} were recently adjusted. Update your "
+"calendarwith your new schedule to ensure that you stay on track!"
+msgstr ""
+
+#: openedx/features/calendar_sync/views/management.py
+msgid "Stay on Track"
+msgstr ""
+
+#: openedx/features/calendar_sync/views/management.py
+msgid "Mark Your Calendar"
+msgstr ""
+
+#: openedx/features/calendar_sync/views/management.py
+#, python-brace-format
+msgid ""
+"Sticking to a schedule is the best way to ensure that you successfully "
+"complete your self-paced course. This schedule of assignment due dates for "
+"{course} will help you stay on track!"
+msgstr ""
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
@@ -12036,6 +12284,10 @@ msgstr "{platform_name} 支持等级:"
 msgid "HTML"
 msgstr "HTML"
 
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Problem"
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/component.py lms/templates/video.html
 msgid "Video"
 msgstr "视频"
@@ -12122,6 +12374,15 @@ msgstr "课程成功被导出到Git源"
 #: cms/djangoapps/contentstore/views/helpers.py
 msgid "Vertical"
 msgstr "纵列块"
+
+#: cms/templates/course_outline.html lms/templates/seq_module.html
+#: lms/templates/ccx/schedule.html
+msgid "Section"
+msgstr "章"
+
+#: lms/templates/ccx/schedule.html
+msgid "Subsection"
+msgstr "节"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "File upload corrupted. Please try again"
@@ -12386,6 +12647,12 @@ msgstr "字幕转载进行中"
 msgid "Transcript Ready"
 msgstr "字幕完成"
 
+#. Translators: This is the status for a video whose transcription job was
+#. failed for some languages
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Partial Failure"
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "An image file is required."
 msgstr "必须提供图片文件。"
@@ -12541,7 +12808,6 @@ msgstr "设置"
 #: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
 #: lms/templates/edxnotes/edxnotes.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "Loading"
 msgstr "正在加载"
@@ -13261,7 +13527,6 @@ msgstr "{platform_name} 平台的服务器发生了错误"
 
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
-#: lms/templates/courseware/error-message.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
 " fix it as soon as possible. Please email us at {tech_support_email} to "
@@ -13305,6 +13570,10 @@ msgstr "设为预览模式"
 msgid "You are now viewing the course as {i_start}{user_name}{i_end}."
 msgstr "您正在以 {i_start}{user_name}{i_end} 身份查看课程。"
 
+#: lms/templates/preview_menu.html
+msgid "View this unit in the new experience"
+msgstr ""
+
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
 msgid_plural "You have used {num_used} of {num_total} attempts"
@@ -13335,6 +13604,7 @@ msgstr ""
 #: lms/templates/problem_notifications.html
 msgid "Next Hint"
 msgstr "下个提示"
+<<<<<<< HEAD
 
 #: lms/templates/problem_notifications.html
 #: lms/templates/shoppingcart/shopping_cart_flow.html
@@ -13362,6 +13632,57 @@ msgstr "邮箱"
 #, python-format
 msgid "Return To %s"
 msgstr "返回%s"
+=======
+
+#: lms/templates/problem_notifications.html
+#: lms/templates/shoppingcart/shopping_cart_flow.html
+msgid "Review"
+msgstr "检查"
+
+#: lms/templates/provider_login.html
+msgid "Log In"
+msgstr "登录"
+
+#: lms/templates/provider_login.html
+msgid ""
+"Your username, email, and full name will be sent to {destination}, where the"
+" collection and use of this information will be governed by their terms of "
+"service and privacy policy."
+msgstr "您的用户名、邮箱地址及全名将发送到 {destination}，收集和使用这些信息将遵循他们的服务和隐私保护条款。"
+
+#: lms/templates/provider_login.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "E-mail"
+msgstr "邮箱"
+
+#: lms/templates/provider_login.html
+#, python-format
+msgid "Return To %s"
+msgstr "返回%s"
+
+#: lms/templates/reset_deadlines_banner.html
+msgid "It looks like you've missed some important deadlines. Visit "
+msgstr ""
+
+#: lms/templates/reset_deadlines_banner.html
+msgid "edx.org"
+msgstr ""
+
+#: lms/templates/reset_deadlines_banner.html
+msgid " to reset your deadlines and get started today."
+msgstr ""
+
+#: lms/templates/reset_deadlines_banner.html
+msgid ""
+"It looks like you've missed some important deadlines. Reset your deadlines "
+"and get started today."
+msgstr ""
+
+#: lms/templates/reset_deadlines_banner.html
+msgid "Reset my deadlines"
+msgstr ""
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
@@ -13453,6 +13774,23 @@ msgstr "已完成"
 #: lms/templates/signup_modal.html
 msgid "Goals in signing up for {platform_name}"
 msgstr "注册加入{platform_name}的目标"
+
+#: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "I agree to the {link_start}Terms of Service{link_end}"
+msgstr "我同意{link_start}服务条款{link_end}"
+
+#: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "I agree to the {link_start}Honor Code{link_end}"
+msgstr "我同意{link_start}诚信准则{link_end}"
+
+#: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Create My Account"
+msgstr "创建我的账号"
 
 #: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -15246,8 +15584,12 @@ msgid "You are enrolled in this course"
 msgstr "您选修了本课程"
 
 #: lms/templates/courseware/course_about.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
 #: lms/templates/shoppingcart/registration_code_receipt.html
+<<<<<<< HEAD
+=======
+#: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "View Course"
 msgstr "查看课程"
 
@@ -15411,6 +15753,42 @@ msgstr "如需访问课程材料，您本次考试成绩必须为{required_score
 msgid "Your score is {current_score}%. You have passed the entrance exam."
 msgstr "您的分数为 {current_score}%，通过了入门测试"
 
+#: lms/templates/courseware/dates.html lms/templates/courseware/syllabus.html
+msgid "{course.display_number_with_default} Course Info"
+msgstr "{course.display_number_with_default}课程信息"
+
+#: lms/templates/courseware/dates.html
+msgid "Important Dates"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid "You are auditing this course."
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid "This means that you are unable to participate in graded assignments."
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid ""
+"To complete graded assignments as part of this course, you can upgrade "
+"today."
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid "Due Today"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid "Verified Only"
+msgstr ""
+
+#: lms/templates/courseware/error-message.html
+msgid ""
+"We're sorry, this module is temporarily unavailable. Our staff is working to"
+" fix it as soon as possible."
+msgstr ""
+
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
 msgstr "成绩簿"
@@ -15461,8 +15839,9 @@ msgid "Welcome to {course_title}!"
 msgstr "欢迎来到{course_title}！"
 
 #: lms/templates/courseware/info.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
 msgid "Resume Course"
 msgstr "继续课程"
 
@@ -15725,10 +16104,6 @@ msgstr "不显示模拟考试成绩。"
 #: lms/templates/courseware/progress.html
 msgid "No problem scores in this section"
 msgstr "这部分中没有问题得分"
-
-#: lms/templates/courseware/syllabus.html
-msgid "{course.display_number_with_default} Course Info"
-msgstr "{course.display_number_with_default}课程信息"
 
 #: lms/templates/courseware/welcome-back.html
 msgid ""
@@ -16270,6 +16645,54 @@ msgid ""
 "The {provider_name} account you selected is already linked to another "
 "{platform_name} account."
 msgstr "您选择的 {provider_name}账号已经和{platform_name}账号相关联。"
+<<<<<<< HEAD
+=======
+
+#: lms/templates/dashboard/_entitlement_reason_survey.html
+msgid ""
+"We're sorry to see you go! Read the following statements and rate your level"
+" of agreement."
+msgstr "很遗憾您要退选课程！ 阅读以下声明并评估您的协议级别。"
+
+#: lms/templates/dashboard/_entitlement_reason_survey.html
+msgid "Price is too high for me"
+msgstr "对我而言价格过高"
+
+#: lms/templates/dashboard/_entitlement_reason_survey.html
+msgid "I was not satisfied with my experience taking the courses"
+msgstr "我对参加课程的经历不满意"
+
+#: lms/templates/dashboard/_entitlement_reason_survey.html
+msgid "Content of the courses was too difficult"
+msgstr "课程内容太难"
+
+#: lms/templates/dashboard/_entitlement_reason_survey.html
+msgid "I did not have enough time to complete the courses"
+msgstr "我没有足够的时间完成课程"
+
+#: lms/templates/dashboard/_entitlement_reason_survey.html
+msgid "The content was not available when I wanted to start"
+msgstr "当我想开始的时候，内容不可用"
+
+#: lms/templates/dashboard/_entitlement_reason_survey.html
+msgid "Can we contact you via email for follow up?"
+msgstr "我们可以通过电子邮件与您联系以便跟进吗？"
+
+#: lms/templates/dashboard/_entitlement_reason_survey.html
+#: lms/templates/dashboard/_reason_survey.html
+msgid "Thank you for sharing your reasons for unenrolling."
+msgstr "感谢您告知我们原因。"
+
+#: lms/templates/dashboard/_entitlement_reason_survey.html
+#: lms/templates/dashboard/_reason_survey.html
+msgid "You are unenrolled from"
+msgstr "您已退选"
+
+#: lms/templates/dashboard/_entitlement_reason_survey.html
+#: lms/templates/dashboard/_reason_survey.html
+msgid "Return To Dashboard"
+msgstr "返回面板"
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 msgid ""
@@ -16317,6 +16740,10 @@ msgid "Return To Dashboard"
 msgstr "返回面板"
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
+#: lms/templates/dashboard/_reason_survey.html
+msgid "Browse Courses"
+msgstr "浏览课程"
+
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Browse Courses"
 msgstr "浏览课程"
@@ -17102,6 +17529,14 @@ msgstr "学校"
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
 msgstr "继续上门课程的学习"
+
+#: lms/templates/header/user_dropdown.html
+msgid "Profile"
+msgstr "用户资料"
+
+#: lms/templates/header/user_dropdown.html
+msgid "Order History"
+msgstr "订单记录"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Profile"
@@ -18348,6 +18783,7 @@ msgstr "CCX指导员可以根据本课程创建自己的定制课程，利用本
 msgid "Add CCX Coach"
 msgstr "添加CCX指导员"
 
+<<<<<<< HEAD
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "There is no data available to display at this time."
 msgstr "目前没有可用的数据"
@@ -18420,6 +18856,8 @@ msgstr "这是一个部分列表，查看所有以CSV格式下载的学生信息
 msgid "There are no problems in this section."
 msgstr "本章没有问题"
 
+=======
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Send to:"
 msgstr "发至："
@@ -18632,6 +19070,10 @@ msgstr "覆盖学员在某个题目的分数。"
 msgid ""
 "New score for problem, out of the total points available for the problem"
 msgstr "题目的新分数，不可超过题目的分数范围"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Score"
+msgstr "分数"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Override Learner's Score"
@@ -18945,6 +19387,7 @@ msgstr "维持举报"
 msgid "Go Back"
 msgstr "返回"
 
+<<<<<<< HEAD
 #: lms/templates/provider/authorize.html
 msgid ""
 "{start_strong}{application_name}{end_strong} would like to access your data "
@@ -18979,6 +19422,8 @@ msgstr "查看您是否是全球工作人员"
 msgid "Manage your data: {permission}"
 msgstr "管理您的数据：{permission}"
 
+=======
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/templates/registration/account_activation_sidebar_notice.html
 msgid "Account Activation Info"
 msgstr "账号激活信息"
@@ -19420,9 +19865,8 @@ msgstr "确认"
 #: lms/templates/static_templates/404.html
 msgid ""
 "The page that you were looking for was not found. Go back to the "
-"{link_start}homepage{link_end} or let us know about any pages that may have "
-"been moved at {email}."
-msgstr "未能找到您查找的页面。返回到{link_start}主页{link_end}或发电子邮件至{email}告诉我们可能被移除的页面。"
+"{link_start}homepage{link_end} ."
+msgstr ""
 
 #: lms/templates/static_templates/about.html
 #: lms/templates/static_templates/blog.html
@@ -19472,19 +19916,15 @@ msgstr "目前{platform_name} 平台的服务器非正常运行"
 #: lms/templates/static_templates/server-overloaded.html
 msgid ""
 "Our staff is currently working to get the site back up as soon as possible. "
-"Please email us at {tech_support_email} to report any problems or downtime."
 msgstr ""
-"我们的工作人员正在努力尽快恢复网站的正常运行。要报告您发现的任何问题或遇到网站非正常运行，请发送邮件至{tech_support_email}。"
 
 #: lms/templates/static_templates/server-error.html
 msgid "There has been a 500 error on the {platform_name} servers"
 msgstr "{platform_name} 平台的服务器发生代码为500的错误"
 
 #: lms/templates/static_templates/server-error.html
-msgid ""
-"Please wait a few seconds and then reload the page. If the problem persists,"
-" please email us at {email}."
-msgstr "请等待几秒钟后再刷新该页面。如果问题照旧，请向{email}发邮件。"
+msgid "Please wait a few seconds and then reload the page."
+msgstr ""
 
 #: lms/templates/static_templates/server-overloaded.html
 msgid "Currently the {platform_name} servers are overloaded"
@@ -19547,6 +19987,10 @@ msgstr "未找到结果"
 #: lms/templates/support/manage_user.html
 msgid "Student Support: Manage User"
 msgstr "学员帮助：管理用户"
+
+#: lms/templates/support/program_enrollments_inspector.html
+msgid "Program Enrollments Inspector"
+msgstr ""
 
 #: lms/templates/support/refund.html
 msgid "About to refund this order:"
@@ -19840,6 +20284,11 @@ msgid "Expand All"
 msgstr "展开全部"
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "({number} Question)"
+msgid_plural "({number} Questions)"
+msgstr[0] ""
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Prerequisite: "
 msgstr "先修条件："
 
@@ -19931,6 +20380,14 @@ msgstr "此门课程没有任何更新。"
 msgid "Latest Update"
 msgstr "最近更新"
 
+#: openedx/features/course_experience/templates/course_experience/next-up-banner-fragment.html
+msgid "Get started on what's next: "
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
+msgid "Show More"
+msgstr ""
+
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
 msgid "Search Results"
 msgstr "搜索结果"
@@ -20015,6 +20472,14 @@ msgid ""
 "subjects."
 msgstr "浏览最新开办的课程，看看您最喜欢的科目中有了什么新内容"
 
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Take advantage of free coaching!"
+msgstr ""
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Get Started"
+msgstr ""
+
 #: themes/edx.org/lms/templates/footer.html
 msgid "Page Footer"
 msgstr "页脚"
@@ -20072,6 +20537,208 @@ msgstr ""
 "您已经努力学习并从{accomplishment_copy_course_org} "
 "{dash}获得了证书，与同事，朋友和家人分享吧，让他们了解您在{accomplishment_course_title}中掌握的内容。"
 
+#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
+msgid "Share this certificate on Facebook (opens a new tab/window)"
+msgstr "分享此证书至Facebook（打开新标签页/窗口）"
+
+#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
+msgid "Tweet this certificate (opens a new tab/window)"
+msgstr "在Twitter上分享此证书（打开新标签页/窗口）"
+
+#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
+msgid "Add this certificate to your LinkedIn profile (opens a new tab/window)"
+msgstr "添加此证书至您的LinkedIn资料（打开新标签页/窗口）"
+
+#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
+msgid "Print"
+msgstr "打印"
+
+#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
+msgid "Print this certificate"
+msgstr "打印此证书"
+
+#: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
+msgid "edX Inc."
+msgstr "edX Inc."
+
+#: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
+msgid ""
+"All rights reserved except where noted. edX, Open edX and the edX and Open "
+"edX logos are registered trademarks of edX Inc."
+msgstr ""
+
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Support our Mission: {b_end}EdX, a non-profit, relies on verified "
+"certificates to help fund affordable education to everyone globally."
+msgstr "{b_start}支持我们的使命：{b_end} EdX 是一个非营利组织，依靠已经过身份认证的证书来来资助人人可享的全球免费教育"
+
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Support our Mission: {b_end} EdX, a non-profit, relies on verified "
+"certificates to help fund free education for everyone globally"
+msgstr "{b_start}支持我们的使命：{b_end} EdX 是一个非营利组织，依靠认证证书来来资助人人可享的全球免费教育"
+
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Find Courses"
+msgstr "查找课程"
+
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Schools & Partners"
+msgstr "学校 & 伙伴"
+
+#: themes/red-theme/lms/templates/footer.html
+msgid ""
+"{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor "
+"Code{honor_link_end}"
+msgstr ""
+"{tos_link_start}服务条款{tos_link_end}以及{honor_link_start}诚信准则{honor_link_end}"
+
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/tos.html
+msgid "Copyright"
+msgstr "版权"
+
+#: themes/stanford-style/lms/templates/footer.html
+msgid "Copyright {year}. All rights reserved."
+msgstr "版权 {year}。保留所有权利。"
+
+#: themes/stanford-style/lms/templates/index.html
+msgid "For anyone, anywhere, anytime"
+msgstr "任何人，任何地点，任何时间"
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid ""
+"We're sorry, but this version of your browser is not supported. Try again "
+"using a different browser or a newer version of your browser."
+msgstr "很抱歉，我们不支持您的浏览器版本。请使用不同的浏览器或您的浏览器的较新版本重试。"
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "The following errors occurred while processing your registration:"
+msgstr "在处理您的注册信息时发生了下列错误："
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Sign up with {provider_name}"
+msgstr "使用 {provider_name} 账号登录"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Create your own {platform_name} account below"
+msgstr "在下面创建您的 {platform_name} 账号"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid ""
+"Required fields are noted by <strong class=\"indicator\">bold text and an "
+"asterisk (*)</strong>."
+msgstr "必需的字段已经被<strong class=\"indicator\">粗体和星号(*)</strong>所标记。"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "You've successfully signed in with {selected_provider}."
+msgstr "您已成功地以{selected_provider}登录。"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid ""
+"We just need a little more information before you start learning with "
+"{platform_name}."
+msgstr "您只需再多提供一点信息就可以开始在{platform_name}学习了。"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Please complete the following fields to register for an account. "
+msgstr "请将以下字段补充完整以完成账号注册。"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "example: Jane Doe"
+msgstr "例：Jane Doe"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Your legal name, used for any certificates you earn."
+msgstr "将在您获得的所有证书上显示的法定姓名"
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "example: JaneDoe"
+msgstr "例：JaneDoe"
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Will be shown in any discussions or forums you participate in"
+msgstr "将会在您参加的任何讨论或论坛上显示"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "cannot be changed later"
+msgstr "以后不能更改"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Welcome {username}"
+msgstr "欢迎 {username}"
+
+<<<<<<< HEAD
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Enter a Public Display Name:"
+msgstr "输入一个公开的显示名称："
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Public Display Name"
+msgstr "公开显示名称"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Additional Personal Information"
+msgstr "更多个人信息"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "example: New York"
+msgstr "例：北京"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Highest Level of Education Completed"
+msgstr "最高教育程度"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Please share with us your reasons for registering with {platform_name}"
+msgstr "请告诉我们您注册 {platform_name}的原因"
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Account Acknowledgements"
+msgstr "账号确认"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Preferences for {platform_name}"
+msgstr "{platform_name}偏好设置"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Update my {platform_name} Account"
+msgstr "更新我的{platform_name}账号"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Processing your account information"
+msgstr "正在处理您的账号信息"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Welcome {username}!  Please set your preferences below"
+msgstr "欢迎 {username}！接下来请进行您的偏好设置"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid ""
+"Required fields are noted by {strong_indicator}bold text and an asterisk "
+"(*).{strong_close}"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Update My Account"
+msgstr "更新我的账号"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Registration Help"
+msgstr "注册帮助"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Already registered?"
+msgstr "已经注册过了？"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+=======
 #: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
 msgid "Share this certificate on Facebook (opens a new tab/window)"
 msgstr "分享此证书至Facebook（打开新标签页/窗口）"
@@ -20272,6 +20939,7 @@ msgid "Already registered?"
 msgstr "已经注册过了？"
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
+>>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
 #: wiki/templates/wiki/accounts/signup.html
 msgid "Log in"
@@ -24502,3 +25170,25 @@ msgid ""
 "A new revision was created: Merge between Revision #%(r1)d and Revision "
 "#%(r2)d"
 msgstr "产生新的修订版本：合并修订版本#%(r1)d与#%(r2)d"
+
+#: edx_proctoring_proctortrack/backends/proctortrack_rest.py
+msgid ""
+"Click on the \"Start System Check\" link below to download and run the "
+"proctoring software."
+msgstr "点击下面的“启动系统检查”链接下载并运行监控软件。"
+
+#: edx_proctoring_proctortrack/backends/proctortrack_rest.py
+msgid ""
+"Once you have verified your identity and reviewed the exam guidelines in "
+"Proctortrack, you will be redirected back to this page."
+msgstr "一旦您验证了自己的身份并查看了Proctortrack中的考试指南，您将被重定向回到此页面。"
+
+#: edx_proctoring_proctortrack/backends/proctortrack_rest.py
+msgid ""
+"To confirm that proctoring has started, make sure your webcam feed and the "
+"blue Proctortrack box are both visible on your screen."
+msgstr "要确认已开始监控，请确保您的网络摄像头源和蓝色的Proctortrack框都在屏幕上可见。"
+
+#: edx_proctoring_proctortrack/backends/proctortrack_rest.py
+msgid "Click on the \"Start Proctored Exam\" button below to continue."
+msgstr "点击下方的“开始监考考试”按钮继续"

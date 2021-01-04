@@ -1,21 +1,29 @@
 """
 Utilities related to API views
 """
+
+from collections import Sequence
+from functools import wraps
+
 from django.core.exceptions import NON_FIELD_ERRORS, ObjectDoesNotExist, ValidationError
-from django.http import Http404
+from django.http import Http404, HttpResponseBadRequest
 from django.utils.translation import ugettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import APIException, ErrorDetail
 from rest_framework.generics import GenericAPIView
 from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import clone_request
 from rest_framework.response import Response
-from six import text_type
+from rest_framework.views import APIView
+from six import text_type, iteritems
 
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.permissions import IsUserInUrl
 
 
@@ -112,7 +120,7 @@ def view_auth_classes(is_user=False, is_authenticated=True):
         """
         func_or_class.authentication_classes = (
             JwtAuthentication,
-            OAuth2AuthenticationAllowInactiveUser,
+            BearerAuthenticationAllowInactiveUser,
             SessionAuthenticationAllowInactiveUser
         )
         func_or_class.permission_classes = ()
@@ -124,11 +132,28 @@ def view_auth_classes(is_user=False, is_authenticated=True):
     return _decorator
 
 
+def clean_errors(error):
+    """
+    DRF error messages are of type ErrorDetail and serialize out as such.
+    We want to coerce the strings into the message only.
+
+    This cursively handles the nesting of errors.
+    """
+    if isinstance(error, ErrorDetail):
+        return text_type(error)
+    if isinstance(error, list):
+        return [clean_errors(el) for el in error]
+    else:
+        # We assume that it's a nested dictionary if it's not a list.
+        return {key: clean_errors(value) for key, value in error.items()}
+
+
 def add_serializer_errors(serializer, data, field_errors):
     """Adds errors from serializer validation to field_errors. data is the original data to deserialize."""
     if not serializer.is_valid():
         errors = serializer.errors
-        for key, error in errors.iteritems():
+        for key, error in iteritems(errors):
+            error = clean_errors(error)
             field_errors[key] = {
                 'developer_message': u"Value '{field_value}' is not valid for field '{field_name}': {error}".format(
                     field_value=data.get(key, ''), field_name=key, error=error
@@ -205,3 +230,199 @@ class RetrievePatchAPIView(RetrieveModelMixin, UpdateModelMixin, GenericAPIView)
                 # PATCH requests where the object does not exist should still
                 # return a 404 response.
                 raise
+
+
+class LazySequence(Sequence):
+    """
+    This class provides an immutable Sequence interface on top of an existing
+    iterable.
+
+    It is immutable, and accepts an estimated length in order to support __len__
+    without exhausting the underlying sequence
+    """
+    def __init__(self, iterable, est_len=None):
+        self.iterable = iterable
+        self.est_len = est_len
+        self._data = []
+        self._exhausted = False
+
+    def __len__(self):
+        # Return the actual data length if we know it exactly (because
+        # the underlying sequence is exhausted), or it's greater than
+        # the initial estimated length
+        if len(self._data) > self.est_len or self._exhausted:
+            return len(self._data)
+        else:
+            return self.est_len
+
+    def __iter__(self):
+        # Yield all the known data first
+        for item in self._data:
+            yield item
+
+        # Capture and yield data from the underlying iterator
+        # until it is exhausted
+        while True:
+            try:
+                item = next(self.iterable)
+                self._data.append(item)
+                yield item
+            except StopIteration:
+                self._exhausted = True
+                return
+
+    def __getitem__(self, index):
+        if isinstance(index, int):
+            # For a single index, if we haven't already loaded enough
+            # data, we can load data until we have enough, and then
+            # return the value from the loaded data
+            if index < 0:
+                raise IndexError("Negative indexes aren't supported")
+
+            while len(self._data) <= index:
+                try:
+                    self._data.append(next(self.iterable))
+                except StopIteration:
+                    self._exhausted = True
+                    raise IndexError("Underlying sequence exhausted")
+
+            return self._data[index]
+        elif isinstance(index, slice):
+            # For a slice, we can load data until we reach 'stop'.
+            # Once we have data including 'stop', then we can use
+            # the underlying list to actually understand the mechanics
+            # of the slicing operation.
+            if index.start is not None and index.start < 0:
+                raise IndexError("Negative indexes aren't supported")
+            if index.stop is not None and index.stop < 0:
+                raise IndexError("Negative indexes aren't supported")
+
+            if index.step is not None and index.step < 0:
+                largest_value = index.start + 1
+            else:
+                largest_value = index.stop
+
+            if largest_value is not None:
+                while len(self._data) <= largest_value:
+                    try:
+                        self._data.append(next(self.iterable))
+                    except StopIteration:
+                        self._exhausted = True
+                        break
+            else:
+                self._data.extend(self.iterable)
+            return self._data[index]
+        else:
+            raise TypeError("Unsupported index type")
+
+    def __repr__(self):
+        if self._exhausted:
+            return u"LazySequence({!r}, {!r})".format(
+                self._data,
+                self.est_len,
+            )
+        else:
+            return u"LazySequence(itertools.chain({!r}, {!r}), {!r})".format(
+                self._data,
+                self.iterable,
+                self.est_len,
+            )
+
+
+class PaginatedAPIView(APIView):
+    """
+    An `APIView` class enhanced with the pagination methods of `GenericAPIView`.
+    """
+    # pylint: disable=attribute-defined-outside-init
+    @property
+    def paginator(self):
+        """
+        The paginator instance associated with the view, or `None`.
+        """
+        if not hasattr(self, '_paginator'):
+            if self.pagination_class is None:
+                self._paginator = None
+            else:
+                self._paginator = self.pagination_class()
+        return self._paginator
+
+    def paginate_queryset(self, queryset):
+        """
+        Return a single page of results, or `None` if pagination is disabled.
+        """
+        if self.paginator is None:
+            return None
+        return self.paginator.paginate_queryset(queryset, self.request, view=self)
+
+    def get_paginated_response(self, data, *args, **kwargs):
+        """
+        Return a paginated style `Response` object for the given output data.
+        """
+        assert self.paginator is not None
+        return self.paginator.get_paginated_response(data, *args, **kwargs)
+
+
+def require_post_params(required_params):
+    """
+    View decorator that ensures the required POST params are
+    present.  If not, returns an HTTP response with status 400.
+
+    Args:
+        required_params (list): The required parameter keys.
+
+    Returns:
+        HttpResponse
+
+    """
+    def _decorator(func):  # pylint: disable=missing-docstring
+        @wraps(func)
+        def _wrapped(*args, **_kwargs):
+            request = args[0]
+            missing_params = set(required_params) - set(request.POST.keys())
+            if missing_params:
+                msg = u"Missing POST parameters: {missing}".format(
+                    missing=", ".join(missing_params)
+                )
+                return HttpResponseBadRequest(msg)
+            else:
+                return func(request)
+        return _wrapped
+    return _decorator
+
+
+def get_course_key(request, course_id=None):
+    if not course_id:
+        return CourseKey.from_string(request.GET.get('course_id'))
+    return CourseKey.from_string(course_id)
+
+
+def verify_course_exists(view_func):
+    """
+    A decorator to wrap a view function that takes `course_key` as a parameter.
+
+    Raises:
+        An API error if the `course_key` is invalid, or if no `CourseOverview` exists for the given key.
+    """
+    @wraps(view_func)
+    def wrapped_function(self, request, **kwargs):
+        """
+        Wraps the given view_function.
+        """
+        try:
+            course_key = get_course_key(request, kwargs.get('course_id'))
+        except InvalidKeyError:
+            raise self.api_error(
+                status_code=status.HTTP_404_NOT_FOUND,
+                developer_message='The provided course key cannot be parsed.',
+                error_code='invalid_course_key'
+            )
+
+        if not CourseOverview.course_exists(course_key):
+            raise self.api_error(
+                status_code=status.HTTP_404_NOT_FOUND,
+                developer_message=u"Requested grade for unknown course {course}".format(course=text_type(course_key)),
+                error_code='course_does_not_exist'
+            )
+
+        return view_func(self, request, **kwargs)
+    return wrapped_function

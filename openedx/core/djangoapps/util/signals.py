@@ -2,6 +2,8 @@
 Signal handler for exceptions.
 """
 # pylint: disable=unused-argument
+
+
 import logging
 
 from celery.signals import task_postrun
@@ -17,7 +19,7 @@ def record_request_exception(sender, **kwargs):
     Logs the stack trace whenever an exception
     occurs in processing a request.
     """
-    logging.exception("Uncaught exception from {sender}".format(
+    logging.exception(u"Uncaught exception from {sender}".format(
         sender=sender
     ))
 

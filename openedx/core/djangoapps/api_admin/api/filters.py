@@ -1,3 +1,8 @@
+"""
+Filters for api_admin api
+"""
+
+
 from rest_framework import filters
 
 

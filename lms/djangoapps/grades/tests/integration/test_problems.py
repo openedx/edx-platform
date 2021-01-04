@@ -4,8 +4,10 @@ import itertools
 import ddt
 import pytz
 from crum import set_current_request
+from six.moves import range
+
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
+from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangolib.testing.utils import get_mock_request
 from student.models import CourseEnrollment
@@ -26,7 +28,6 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
     """
     Test grading of different problem types.
     """
-    shard = 4
 
     SCORED_BLOCK_COUNT = 7
     ACTUAL_TOTAL_POSSIBLE = 17.0
@@ -101,7 +102,6 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
     Test that changing the metadata on a block has the desired effect on the
     persisted score.
     """
-    shard = 4
     default_problem_metadata = {
         u'graded': True,
         u'weight': 2.5,
@@ -210,7 +210,6 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
     """
     Test scores and grades with various problem weight values.
     """
-    shard = 4
 
     @classmethod
     def setUpClass(cls):
@@ -275,11 +274,11 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
             problem_score = subsection_grade.problem_scores[problem.location]
             self.assertEqual(type(expected_score.first_attempted), type(problem_score.first_attempted))
             expected_score.first_attempted = problem_score.first_attempted
-            self.assertEquals(problem_score, expected_score)
+            self.assertEqual(problem_score, expected_score)
 
         # verify subsection grades
-        self.assertEquals(subsection_grade.all_total.earned, expected_score.earned * len(self.problems))
-        self.assertEquals(subsection_grade.all_total.possible, expected_score.possible * len(self.problems))
+        self.assertEqual(subsection_grade.all_total.earned, expected_score.earned * len(self.problems))
+        self.assertEqual(subsection_grade.all_total.possible, expected_score.possible * len(self.problems))
 
     @ddt.data(
         *itertools.product(

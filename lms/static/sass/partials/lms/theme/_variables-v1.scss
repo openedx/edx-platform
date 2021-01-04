@@ -481,7 +481,7 @@ $shadow-color: $blue !default;
 $modal-bg-color: rgb(245, 245, 245) !default;
 
 // courseware elements
-$courseware-header-image: linear-gradient(top, rgb(255, 255, 255), rgb(238, 238, 238)) !default;
+$courseware-header-image: linear-gradient(top, rgb(255, 255, 255), rgb(238, 238, 238)) !default; /* stylelint-disable-line */
 $courseware-header-bg: transparent !default;
 $courseware-footer-border: none !default;
 $courseware-footer-shadow: none !default;
@@ -541,7 +541,7 @@ $result-highlight-color-base: rgba($highlight-color, 0.25) !default;
 $sidebar-chapter-bg-top: rgba(255, 255, 255, 0.5) !default;
 $sidebar-chapter-bg-bottom: rgba(255, 255, 255, 0) !default;
 $sidebar-chapter-bg: rgb(246, 246, 246) !default;
-$sidebar-active-image: linear-gradient(top, rgb(230, 230, 230), rgb(214, 214, 214)) !default;
+$sidebar-active-image: linear-gradient(top, rgb(230, 230, 230), rgb(214, 214, 214)) !default; /* stylelint-disable-line */
 
 
 // student notes

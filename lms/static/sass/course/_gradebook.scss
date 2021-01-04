@@ -27,9 +27,7 @@ div.gradebook-wrapper {
       width: 100%;
       height: 27px;
       padding: 0 ($baseline*0.75) 0 35px;
-
-      @include box-sizing(border-box);
-
+      box-sizing: border-box;
       border-radius: 13px;
       border: 1px solid $table-border-color;
       background: url('#{$static-path}/images/search-icon.png') no-repeat 9px center $gray-l6;

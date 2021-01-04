@@ -2,11 +2,13 @@
 These are tests for disabling and enabling student accounts, and for making sure
 that students with disabled accounts are unable to access the courseware.
 """
+
+
 import unittest
 
 from django.conf import settings
-from django.urls import reverse
 from django.test import Client, TestCase
+from django.urls import reverse
 
 from student.models import UserStanding
 from student.tests.factories import UserFactory, UserStandingFactory

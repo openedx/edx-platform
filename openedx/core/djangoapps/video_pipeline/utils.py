@@ -1,6 +1,7 @@
 """
 Utils for video_pipeline app.
 """
+
 from edx_rest_api_client.client import EdxRestApiClient
 
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user

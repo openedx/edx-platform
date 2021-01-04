@@ -1,10 +1,11 @@
 """Unit tests for settings.py."""
 
+
 import unittest
 
+from mock import patch
 from third_party_auth import provider, settings
 from third_party_auth.tests import testutil
-
 
 _ORIGINAL_AUTHENTICATION_BACKENDS = ['first_authentication_backend']
 _ORIGINAL_INSTALLED_APPS = ['first_installed_app']
@@ -13,7 +14,7 @@ _ORIGINAL_TEMPLATE_CONTEXT_PROCESSORS = ['first_template_context_preprocessor']
 _SETTINGS_MAP = {
     'AUTHENTICATION_BACKENDS': _ORIGINAL_AUTHENTICATION_BACKENDS,
     'INSTALLED_APPS': _ORIGINAL_INSTALLED_APPS,
-    'MIDDLEWARE_CLASSES': _ORIGINAL_MIDDLEWARE_CLASSES,
+    'MIDDLEWARE': _ORIGINAL_MIDDLEWARE_CLASSES,
     'TEMPLATES': [{
         'OPTIONS': {
             'context_processors': _ORIGINAL_TEMPLATE_CONTEXT_PROCESSORS
@@ -27,9 +28,7 @@ _SETTINGS_MAP['DEFAULT_TEMPLATE_ENGINE'] = _SETTINGS_MAP['TEMPLATES'][0]
 class SettingsUnitTest(testutil.TestCase):
     """Unit tests for settings management code."""
 
-    # Allow access to protected methods (or module-protected methods) under test.
-    # pylint: disable=protected-access
-    # Suppress sprurious no-member warning on fakes.
+    # Suppress spurious no-member warning on fakes.
     # pylint: disable=no-member
 
     def setUp(self):
@@ -38,7 +37,7 @@ class SettingsUnitTest(testutil.TestCase):
 
     def test_apply_settings_adds_exception_middleware(self):
         settings.apply_settings(self.settings)
-        self.assertIn('third_party_auth.middleware.ExceptionMiddleware', self.settings.MIDDLEWARE_CLASSES)
+        self.assertIn('third_party_auth.middleware.ExceptionMiddleware', self.settings.MIDDLEWARE)
 
     def test_apply_settings_adds_fields_stored_in_session(self):
         settings.apply_settings(self.settings)
@@ -59,3 +58,12 @@ class SettingsUnitTest(testutil.TestCase):
     def test_apply_settings_turns_off_redirect_sanitization(self):
         settings.apply_settings(self.settings)
         self.assertFalse(self.settings.SOCIAL_AUTH_SANITIZE_REDIRECTS)
+
+    def test_apply_settings_avoids_default_username_check(self):
+        # Avoid the default username check where non-ascii characters are not
+        # allowed when unicode username is enabled
+        settings.apply_settings(self.settings)
+        self.assertTrue(self.settings.SOCIAL_AUTH_CLEAN_USERNAMES)   # verify default behavior
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_UNICODE_USERNAME': True}):
+            settings.apply_settings(self.settings)
+            self.assertFalse(self.settings.SOCIAL_AUTH_CLEAN_USERNAMES)

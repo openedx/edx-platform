@@ -1,5 +1,6 @@
 """Unit tests for the Paver JavaScript testing tasks."""
 
+
 import ddt
 from mock import patch
 from paver.easy import call_task
@@ -146,4 +147,4 @@ class TestPaverJavaScriptTestTasks(PaverTestCase):
 
             expected_messages.append(expected_test_tool_command)
 
-        self.assertEquals(self.task_messages, expected_messages)
+        self.assertEqual(self.task_messages, expected_messages)

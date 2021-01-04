@@ -17,9 +17,12 @@
 
     li {
       margin: 5px 0;
+
+      .alert.alert-warning .message-content .enroll-btn.btn-link {
+        color: #004368;
+      }
     }
   }
-
 }
 
 // Alerts

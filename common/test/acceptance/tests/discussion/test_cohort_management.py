@@ -3,10 +3,14 @@
 End-to-end tests related to the cohort management on the LMS Instructor Dashboard
 """
 
+
+import csv
 import os
+import os.path
 import uuid
 from datetime import datetime
 
+import six
 import unicodecsv
 from bok_choy.promise import EmptyPromise
 from pytz import UTC, utc
@@ -72,7 +76,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         Selects the cohort with the given name and verifies the expected description is presented.
         """
         self.cohort_management_page.select_cohort(cohort_name)
-        self.assertEquals(self.cohort_management_page.get_selected_cohort(), cohort_name)
+        self.assertEqual(self.cohort_management_page.get_selected_cohort(), cohort_name)
         self.assertIn(expected_description, self.cohort_management_page.get_cohort_group_setup())
 
     def test_cohort_description(self):
@@ -243,7 +247,6 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
             new_assignment_type=None,
             verify_updated=False
     ):
-
         """
         Create a new cohort and verify the new and existing settings.
         """
@@ -319,7 +322,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         """
         filename = self.instructor_dashboard_page.get_asset_path(filename)
         with open(filename, 'w+') as csv_file:
-            writer = unicodecsv.writer(csv_file)
+            writer = csv.writer(csv_file) if six.PY3 else unicodecsv.writer(csv_file)
             for line in csv_text_as_lists:
                 writer.writerow(line)
         self.addCleanup(os.remove, filename)
@@ -331,21 +334,6 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         unique_username = 'user' + str(uuid.uuid4().hex)[:12]
         unique_email = unique_username + "@example.com"
         return unique_username, unique_email
-
-    def test_add_new_cohort(self):
-        """
-        Scenario: A new manual cohort can be created, and a student assigned to it.
-
-        Given I have a course with a user in the course
-        When I add a new manual cohort to the course via the LMS instructor dashboard
-        Then the new cohort is displayed and has no users in it
-        And assignment type of displayed cohort to "manual" because this is the default
-        And when I add the user to the new cohort
-        Then the cohort has 1 user
-        And appropriate events have been emitted
-        """
-        cohort_name = str(uuid.uuid4().get_hex()[0:20])
-        self._verify_cohort_settings(cohort_name=cohort_name, assignment_type=None)
 
     def test_add_new_cohort_with_manual_assignment_type(self):
         """
@@ -359,7 +347,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         Then the cohort has 1 user
         And appropriate events have been emitted
         """
-        cohort_name = str(uuid.uuid4().get_hex()[0:20])
+        cohort_name = str(uuid.uuid4().hex[0:20])
         self._verify_cohort_settings(cohort_name=cohort_name, assignment_type='manual')
 
     def test_add_new_cohort_with_random_assignment_type(self):
@@ -374,7 +362,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         Then the cohort has 1 user
         And appropriate events have been emitted
         """
-        cohort_name = str(uuid.uuid4().get_hex()[0:20])
+        cohort_name = str(uuid.uuid4().hex[0:20])
         self._verify_cohort_settings(cohort_name=cohort_name, assignment_type='random')
 
     def test_update_existing_cohort_settings(self):
@@ -394,7 +382,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         And cohort with new name is present in cohorts dropdown list
         And cohort assignment type should be "manual"
         """
-        cohort_name = str(uuid.uuid4().get_hex()[0:20])
+        cohort_name = str(uuid.uuid4().hex[0:20])
         new_cohort_name = '{old}__NEW'.format(old=cohort_name)
         self._verify_cohort_settings(
             cohort_name=cohort_name,
@@ -420,7 +408,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         And I click on Save button
         Then I should see an error message
         """
-        cohort_name = str(uuid.uuid4().get_hex()[0:20])
+        cohort_name = str(uuid.uuid4().hex[0:20])
         new_cohort_name = ''
         self._verify_cohort_settings(
             cohort_name=cohort_name,
@@ -578,7 +566,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         start_time = datetime.now(UTC)
         self.cohort_management_page.upload_cohort_file(filename)
         self._verify_cohort_by_csv_notification(
-            "Your file '{}' has been uploaded. Allow a few minutes for processing.".format(filename)
+            u"Your file '{}' has been uploaded. Allow a few minutes for processing.".format(filename)
         )
 
         if not skip_events:
@@ -683,7 +671,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
             lambda: 1 == len(self.cohort_management_page.get_csv_messages()), 'Waiting for notification'
         ).fulfill()
         messages = self.cohort_management_page.get_csv_messages()
-        self.assertEquals(expected_message, messages[0])
+        self.assertEqual(expected_message, messages[0])
 
     @attr('a11y')
     def test_cohorts_management_a11y(self):
@@ -693,12 +681,13 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         self.cohort_management_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         self.cohort_management_page.a11y_audit.check_for_accessibility_errors()
 
 
-@attr(shard=6)
+@attr(shard=15)
 class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
     """
     Tests for linking between content groups and cohort in the instructor dashboard.
@@ -755,7 +744,7 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
         self.cohort_management_page.select_cohort(self.cohort_name)
         self.assertIsNone(self.cohort_management_page.get_cohort_associated_content_group())
         self.assertIsNone(self.cohort_management_page.get_cohort_related_content_group_message())
-        self.assertEquals(["Apples", "Bananas"], self.cohort_management_page.get_all_content_groups())
+        self.assertEqual(["Apples", "Bananas"], self.cohort_management_page.get_all_content_groups())
 
     def test_link_to_content_group(self):
         """
@@ -845,7 +834,7 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
         self.cohort_management_page.wait_for_page()
         self.cohort_management_page.select_cohort(new_cohort)
         self.assertEqual("Deleted Content Group", self.cohort_management_page.get_cohort_associated_content_group())
-        self.assertEquals(
+        self.assertEqual(
             ["Bananas", "Pears", "Deleted Content Group"],
             self.cohort_management_page.get_all_content_groups()
         )
@@ -857,7 +846,7 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
         confirmation_messages = self.cohort_management_page.get_cohort_settings_messages()
         self.assertEqual(["Saved cohort"], confirmation_messages)
         self.assertIsNone(self.cohort_management_page.get_cohort_related_content_group_message())
-        self.assertEquals(["Bananas", "Pears"], self.cohort_management_page.get_all_content_groups())
+        self.assertEqual(["Bananas", "Pears"], self.cohort_management_page.get_all_content_groups())
 
     def _create_new_cohort_linked_to_content_group(self, new_cohort, cohort_group):
         """

@@ -1,42 +1,46 @@
 """
 Grades related signals.
 """
+
+
 from contextlib import contextmanager
 from logging import getLogger
 
 import six
-from courseware.model_data import get_score, set_score
 from django.dispatch import receiver
+from opaque_keys.edx.keys import LearningContextKey
 from submissions.models import score_reset, score_set
 from xblock.scorable import ScorableXBlockMixin, Score
 
+from lms.djangoapps.courseware.model_data import get_score, set_score
 from openedx.core.djangoapps.course_groups.signals.signals import COHORT_MEMBERSHIP_UPDATED
 from openedx.core.lib.grade_utils import is_score_higher_or_equal
 from student.models import user_by_anonymous_id
 from student.signals import ENROLLMENT_TRACK_UPDATED
 from track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 from util.date_utils import to_timestamp
-from .signals import (
-    PROBLEM_RAW_SCORE_CHANGED,
-    PROBLEM_WEIGHTED_SCORE_CHANGED,
-    SCORE_PUBLISHED,
-    SUBSECTION_SCORE_CHANGED,
-    SUBSECTION_OVERRIDE_CHANGED,
-)
+
 from .. import events
 from ..constants import ScoreDatabaseTableEnum
 from ..course_grade_factory import CourseGradeFactory
 from ..scores import weighted_score
 from ..tasks import (
     RECALCULATE_GRADE_DELAY_SECONDS,
-    recalculate_subsection_grade_v3,
-    recalculate_course_and_subsection_grades_for_user
+    recalculate_course_and_subsection_grades_for_user,
+    recalculate_subsection_grade_v3
+)
+from .signals import (
+    PROBLEM_RAW_SCORE_CHANGED,
+    PROBLEM_WEIGHTED_SCORE_CHANGED,
+    SCORE_PUBLISHED,
+    SUBSECTION_OVERRIDE_CHANGED,
+    SUBSECTION_SCORE_CHANGED
 )
 
 log = getLogger(__name__)
 
 
-@receiver(score_set)
+@receiver(score_set, dispatch_uid='submissions_score_set_handler')
 def submissions_score_set_handler(sender, **kwargs):  # pylint: disable=unused-argument
     """
     Consume the score_set signal defined in the Submissions API, and convert it
@@ -76,7 +80,7 @@ def submissions_score_set_handler(sender, **kwargs):  # pylint: disable=unused-a
     )
 
 
-@receiver(score_reset)
+@receiver(score_reset, dispatch_uid='submissions_score_reset_handler')
 def submissions_score_reset_handler(sender, **kwargs):  # pylint: disable=unused-argument
     """
     Consume the score_reset signal defined in the Submissions API, and convert
@@ -117,16 +121,18 @@ def disconnect_submissions_signal_receiver(signal):
     """
     if signal == score_set:
         handler = submissions_score_set_handler
+        dispatch_uid = 'submissions_score_set_handler'
     else:
         if signal != score_reset:
             raise ValueError("This context manager only handles score_set and score_reset signals.")
         handler = submissions_score_reset_handler
+        dispatch_uid = 'submissions_score_reset_handler'
 
-    signal.disconnect(handler)
+    signal.disconnect(dispatch_uid=dispatch_uid)
     try:
         yield
     finally:
-        signal.connect(handler)
+        signal.connect(handler, dispatch_uid=dispatch_uid)
 
 
 @receiver(SCORE_PUBLISHED)
@@ -166,8 +172,8 @@ def score_published_handler(sender, block, user, raw_earned, raw_possible, only_
             raw_possible=raw_possible,
             weight=getattr(block, 'weight', None),
             user_id=user.id,
-            course_id=unicode(block.location.course_key),
-            usage_id=unicode(block.location),
+            course_id=six.text_type(block.location.course_key),
+            usage_id=six.text_type(block.location),
             only_if_higher=only_if_higher,
             modified=score_modified_time,
             score_db_table=ScoreDatabaseTableEnum.courseware_student_module,
@@ -215,6 +221,9 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
     enqueueing a subsection update operation to occur asynchronously.
     """
     events.grade_updated(**kwargs)
+    context_key = LearningContextKey.from_string(kwargs['course_id'])
+    if not context_key.is_course:
+        return  # If it's not a course, it has no subsections, so skip the subsection grading update
     recalculate_subsection_grade_v3.apply_async(
         kwargs=dict(
             user_id=kwargs['user_id'],
@@ -224,8 +233,8 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
             only_if_higher=kwargs.get('only_if_higher'),
             expected_modified_time=to_timestamp(kwargs['modified']),
             score_deleted=kwargs.get('score_deleted', False),
-            event_transaction_id=unicode(get_event_transaction_id()),
-            event_transaction_type=unicode(get_event_transaction_type()),
+            event_transaction_id=six.text_type(get_event_transaction_id()),
+            event_transaction_type=six.text_type(get_event_transaction_type()),
             score_db_table=kwargs['score_db_table'],
             force_update_subsections=kwargs.get('force_update_subsections', False),
         ),

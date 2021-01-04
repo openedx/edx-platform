@@ -1,17 +1,18 @@
 """
 Django management command to create a course in a specific modulestore
 """
+
+
 from datetime import datetime, timedelta
-from six import text_type
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
+from six import text_type
 
 from contentstore.management.commands.utils import user_from_str
 from contentstore.views.course import create_new_course_in_store
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import DuplicateCourseError
-
 
 MODULESTORE_CHOICES = (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
 
@@ -22,12 +23,12 @@ class Command(BaseCommand):
     """
 
     # can this query modulestore for the list of write accessible stores or does that violate command pattern?
-    help = "Create a course in one of {}".format([ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split])
+    help = u"Create a course in one of {}".format([ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split])
 
     def add_arguments(self, parser):
         parser.add_argument('modulestore',
                             choices=MODULESTORE_CHOICES,
-                            help="Modulestore must be one of {}".format(MODULESTORE_CHOICES))
+                            help=u"Modulestore must be one of {}".format(MODULESTORE_CHOICES))
         parser.add_argument('user',
                             help="The instructor's email address or integer ID.")
         parser.add_argument('org',
@@ -52,7 +53,7 @@ class Command(BaseCommand):
         try:
             user_object = user_from_str(user)
         except User.DoesNotExist:
-            raise CommandError("No user {user} found.".format(user=user))
+            raise CommandError(u"No user {user} found.".format(user=user))
         return user_object
 
     def handle(self, *args, **options):

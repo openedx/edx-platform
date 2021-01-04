@@ -1,22 +1,20 @@
+
+
 import datetime
 import json
 
 import pytz
-
+import six
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import redirect
-
 from django.views.decorators.csrf import ensure_csrf_cookie
-
-from edxmako.shortcuts import render_to_response
+from eventtracking import tracker as eventtracker
 from ipware.ip import get_ip
 
-from track import tracker
-from track import contexts
-from track import shim
-from track.models import TrackingLog
-from eventtracking import tracker as eventtracker
+from edxmako.shortcuts import render_to_response
+from track import contexts, shim, tracker
 
 
 def log_event(event):
@@ -50,6 +48,22 @@ def _get_request_value(request, value_name, default=''):
     return default
 
 
+def _add_user_id_for_username(data):
+    """
+    If data contains a username, adds the corresponding user_id to the data.
+
+    In certain use cases, the caller may have the username and not the
+    user_id. This enables us to standardize on user_id in event data,
+    even when the caller only has access to the username.
+    """
+    if data and ('username' in data) and ('user_id' not in data):
+        try:
+            user = User.objects.get(username=data.get('username'))
+            data['user_id'] = user.id
+        except User.DoesNotExist:
+            pass
+
+
 def user_track(request):
     """
     Log when POST call to "event" URL is made by a user.
@@ -65,9 +79,10 @@ def user_track(request):
     data = _get_request_value(request, 'event', {})
     page = _get_request_value(request, 'page')
 
-    if isinstance(data, basestring) and len(data) > 0:
+    if isinstance(data, six.string_types) and len(data) > 0:
         try:
             data = json.loads(data)
+            _add_user_id_for_username(data)
         except ValueError:
             pass
 
@@ -105,7 +120,7 @@ def server_track(request, event_type, event, page=None):
         "event_source": "server",
         "event_type": event_type,
         "event": event,
-        "agent": _get_request_header(request, 'HTTP_USER_AGENT').decode('latin1'),
+        "agent": _get_request_header(request, 'HTTP_USER_AGENT').encode().decode('latin1'),
         "page": page,
         "time": datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
         "host": _get_request_header(request, 'SERVER_NAME'),
@@ -143,8 +158,7 @@ def task_track(request_info, task_info, event_type, event, page=None):
     # about the task in which it is running.
     full_event = dict(event, **task_info)
 
-    # All fields must be specified, in case the tracking information is
-    # also saved to the TrackingLog model.  Get values from the task-level
+    # Get values from the task-level
     # information, or just add placeholder values.
     with eventtracker.get_tracker().context('edx.course.task', contexts.course_context_from_url(page)):
         event = {
@@ -161,31 +175,3 @@ def task_track(request_info, task_info, event_type, event, page=None):
         }
 
     log_event(event)
-
-
-@login_required
-@ensure_csrf_cookie
-def view_tracking_log(request, args=''):
-    """View to output contents of TrackingLog model.  For staff use only."""
-    if not request.user.is_staff:
-        return redirect('/')
-    nlen = 100
-    username = ''
-    if args:
-        for arg in args.split('/'):
-            if arg.isdigit():
-                nlen = int(arg)
-            if arg.startswith('username='):
-                username = arg[9:]
-
-    record_instances = TrackingLog.objects.all().order_by('-time')
-    if username:
-        record_instances = record_instances.filter(username=username)
-    record_instances = record_instances[0:nlen]
-
-    # fix dtstamp
-    fmt = '%a %d-%b-%y %H:%M:%S'  # "%Y-%m-%d %H:%M:%S %Z%z"
-    for rinst in record_instances:
-        rinst.dtstr = rinst.time.replace(tzinfo=pytz.utc).astimezone(pytz.timezone('US/Eastern')).strftime(fmt)
-
-    return render_to_response('tracking_log.html', {'records': record_instances})

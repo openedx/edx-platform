@@ -1,10 +1,13 @@
 """
 The main function for the XSS linter.
 """
+
+
 import argparse
 import importlib
 import os
 import sys
+from functools import reduce
 
 from xsslint.reporting import SummaryResults
 from xsslint.rules import RuleSet

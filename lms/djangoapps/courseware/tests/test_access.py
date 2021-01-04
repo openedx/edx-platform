@@ -2,35 +2,37 @@
 """
 Test the access control framework
 """
+
+
 import datetime
 import itertools
 
 import ddt
 import pytz
+import six
 from ccx_keys.locator import CCXLocator
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.urls import reverse
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
 
-import courseware.access as access
-import courseware.access_response as access_response
-from courseware.masquerade import CourseMasquerade
-from courseware.tests.factories import (
+import lms.djangoapps.courseware.access as access
+import lms.djangoapps.courseware.access_response as access_response
+from lms.djangoapps.courseware.masquerade import CourseMasquerade
+from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
     GlobalStaffFactory,
     InstructorFactory,
     StaffFactory,
     UserFactory
 )
-from courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_group_member
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_group_member
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
-from openedx.core.lib.tests import attr
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from student.models import CourseEnrollment
 from student.roles import CourseCcxCoachRole, CourseStaffRole
@@ -101,7 +103,7 @@ class CoachAccessTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         )
         ccx.save()
 
-        ccx_locator = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
+        ccx_locator = CCXLocator.from_course_locator(self.course.id, six.text_type(ccx.id))
         role = CourseCcxCoachRole(ccx_locator)
         role.add_users(self.coach)
         CourseEnrollment.enroll(self.coach, ccx_locator)
@@ -148,16 +150,15 @@ class CoachAccessTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         CourseEnrollment.enroll(student, ccx_locator)
 
         # Test for access of a coach
-        resp = self.client.get(reverse('student_progress', args=[unicode(ccx_locator), student.id]))
+        resp = self.client.get(reverse('student_progress', args=[six.text_type(ccx_locator), student.id]))
         self.assertEqual(resp.status_code, 200)
 
         # Assert access of a student
         self.client.login(username=student.username, password='test')
-        resp = self.client.get(reverse('student_progress', args=[unicode(ccx_locator), self.coach.id]))
+        resp = self.client.get(reverse('student_progress', args=[six.text_type(ccx_locator), self.coach.id]))
         self.assertEqual(resp.status_code, 404)
 
 
-@attr(shard=1)
 @ddt.ddt
 class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
@@ -214,7 +215,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         # Note that self.student now have access to preview mode,
         # `is_masquerading_as_student == True` means user is staff and is
         # masquerading as a student.
-        with patch('courseware.access.is_masquerading_as_student') as mock_masquerade:
+        with patch('lms.djangoapps.courseware.access.is_masquerading_as_student') as mock_masquerade:
             mock_masquerade.return_value = True
             for user in [self.global_staff, self.course_staff, self.course_instructor, self.student]:
                 self.assertTrue(access.has_staff_access_to_preview_mode(user, course_key))
@@ -250,17 +251,17 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
             overview,
             chapter,
         ]
-        with patch('courseware.access.in_preview_mode') as mock_preview:
+        with patch('lms.djangoapps.courseware.access.in_preview_mode') as mock_preview:
             mock_preview.return_value = False
             for obj in modules:
                 self.assertTrue(bool(access.has_access(self.student, 'load', obj, course_key=self.course.id)))
 
-        with patch('courseware.access.in_preview_mode') as mock_preview:
+        with patch('lms.djangoapps.courseware.access.in_preview_mode') as mock_preview:
             mock_preview.return_value = True
             for obj in modules:
                 self.assertFalse(bool(access.has_access(self.student, 'load', obj, course_key=self.course.id)))
 
-    @patch('courseware.access.in_preview_mode', Mock(return_value=True))
+    @patch('lms.djangoapps.courseware.access.in_preview_mode', Mock(return_value=True))
     def test_has_access_with_preview_mode(self):
         """
         Tests particular user's can access content via has_access in preview mode.
@@ -274,7 +275,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         self.assertFalse(bool(access.has_access(self.student, 'load', self.course, course_key=self.course.id)))
 
         # When masquerading is true, user should not be able to access staff content
-        with patch('courseware.access.is_masquerading_as_student') as mock_masquerade:
+        with patch('lms.djangoapps.courseware.access.is_masquerading_as_student') as mock_masquerade:
             mock_masquerade.return_value = True
             self.assertFalse(
                 bool(access.has_access(self.global_staff, 'staff', self.course, course_key=self.course.id))
@@ -283,7 +284,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
                 bool(access.has_access(self.student, 'staff', self.course, course_key=self.course.id))
             )
 
-    @patch('courseware.access_utils.in_preview_mode', Mock(return_value=True))
+    @patch('lms.djangoapps.courseware.access_utils.in_preview_mode', Mock(return_value=True))
     def test_has_access_in_preview_mode_with_group(self):
         """
         Test that a user masquerading as a member of a group sees appropriate content in preview mode.
@@ -307,7 +308,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         modulestore().update_item(self.course, ModuleStoreEnum.UserID.test)
 
         # User should not be able to preview when masquerading as student (and not in the group above).
-        with patch('courseware.access.get_user_role') as mock_user_role:
+        with patch('lms.djangoapps.courseware.access.get_user_role') as mock_user_role:
             mock_user_role.return_value = 'student'
             self.assertFalse(
                 bool(access.has_access(self.global_staff, 'load', chapter, course_key=self.course.id))
@@ -315,7 +316,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
 
         # Should be able to preview when in staff or instructor role.
         for mocked_role in ['staff', 'instructor']:
-            with patch('courseware.access.get_user_role') as mock_user_role:
+            with patch('lms.djangoapps.courseware.access.get_user_role') as mock_user_role:
                 mock_user_role.return_value = mocked_role
                 self.assertTrue(
                     bool(access.has_access(self.global_staff, 'load', chapter, course_key=self.course.id))
@@ -406,7 +407,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
                 (self.course_staff, expected_staff),
                 (self.course_instructor, expected_instructor)
         ):
-            self.assertEquals(
+            self.assertEqual(
                 bool(access._has_access_error_desc(user, action, descriptor, self.course.id)),
                 expected_response
             )
@@ -463,7 +464,10 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
 
     @ddt.data(None, YESTERDAY, TOMORROW)
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    @patch('courseware.access_utils.get_current_request_hostname', Mock(return_value='preview.localhost'))
+    @patch(
+        'lms.djangoapps.courseware.access_utils.get_current_request_hostname',
+        Mock(return_value='preview.localhost')
+    )
     def test__has_access_descriptor_in_preview_mode(self, start):
         """
         Tests that descriptor has access in preview mode.
@@ -483,7 +487,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
     )  # ddt throws an error if I don't put the None argument there
     @ddt.unpack
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    @patch('courseware.access_utils.get_current_request_hostname', Mock(return_value='localhost'))
+    @patch('lms.djangoapps.courseware.access_utils.get_current_request_hostname', Mock(return_value='localhost'))
     def test__has_access_descriptor_when_not_in_preview_mode(self, start, expected_error_type):
         """
         Tests that descriptor has no access when start date in future & without preview.
@@ -593,7 +597,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
             org='test_org', number='788', run='test_run'
         )
 
-        pre_requisite_courses = [unicode(pre_requisite_course.id)]
+        pre_requisite_courses = [six.text_type(pre_requisite_course.id)]
         course = CourseFactory.create(
             org='test_org', number='786', run='test_run', pre_requisite_courses=pre_requisite_courses
         )
@@ -642,7 +646,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
             run='test_run',
         )
 
-        pre_requisite_courses = [unicode(pre_requisite_course.id)]
+        pre_requisite_courses = [six.text_type(pre_requisite_course.id)]
         course = CourseFactory.create(
             org='edX',
             course='1000',
@@ -658,7 +662,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         self.login(user.email, test_password)
         CourseEnrollmentFactory(user=user, course_id=course.id)
 
-        url = reverse('courseware', args=[unicode(course.id)])
+        url = reverse('courseware', args=[six.text_type(course.id)])
         response = self.client.get(url)
         self.assertRedirects(
             response,
@@ -673,7 +677,6 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         self.assertEqual(response.status_code, 200)
 
 
-@attr(shard=1)
 class UserRoleTestCase(TestCase):
     """
     Tests for user roles.
@@ -730,7 +733,6 @@ class UserRoleTestCase(TestCase):
         )
 
 
-@attr(shard=5)
 @ddt.ddt
 class CourseOverviewAccessTestCase(ModuleStoreTestCase):
     """
@@ -847,7 +849,7 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
                 num_queries = 1
         elif user_attr_name == 'user_normal' and action == 'see_exists':
             if course_attr_name == 'course_started':
-                num_queries = 7
+                num_queries = 6
             else:
                 # checks staff role and enrollment data
                 num_queries = 2

@@ -2,15 +2,17 @@
 Tests for DOT Adapter
 """
 
+
 import unittest
 from datetime import timedelta
 
+import ddt
+import six
 from django.conf import settings
 from django.test import TestCase
 from django.utils.timezone import now
-
-import ddt
 from oauth2_provider import models
+
 from student.tests.factories import UserFactory
 
 # oauth_dispatch is not in CMS' INSTALLED_APPS so these imports will error during test collection
@@ -54,7 +56,7 @@ class DOTAdapterTestCase(TestCase):
         """
         Make sure unicode representation of RestrictedApplication is correct
         """
-        self.assertEqual(unicode(self.restricted_app), u"<RestrictedApplication '{name}'>".format(
+        self.assertEqual(six.text_type(self.restricted_app), u"<RestrictedApplication '{name}'>".format(
             name=self.restricted_client.name
         ))
 

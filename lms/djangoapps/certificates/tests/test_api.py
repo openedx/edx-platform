@@ -1,23 +1,26 @@
 """Tests for the certificates Python API. """
+
+
 import uuid
 from contextlib import contextmanager
-from functools import wraps
+from datetime import datetime, timedelta
 
 import ddt
-from datetime import datetime
-from datetime import timedelta
+import pytz
+import six
 from config_models.models import cache
 from django.conf import settings
-from django.urls import reverse
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
-import pytz
 
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -28,12 +31,9 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.certificates.queue import XQueueAddToQueueError, XQueueCertInterface
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
-from courseware.tests.factories import GlobalStaffFactory
+from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
-from microsite_configuration import microsite
-from openedx.core.lib.tests import attr
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from util.testing import EventTestMixin
@@ -83,7 +83,6 @@ class WebCertificateTestMixin(object):
         self.store.update_item(self.course, self.user.id)
 
 
-@attr(shard=1)
 @ddt.ddt
 class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTestCase):
     """Tests for the `certificate_downloadable_status` helper function. """
@@ -174,6 +173,7 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
                 'is_generating': False,
                 'is_unverified': False,
                 'download_url': 'www.google.com',
+                'is_pdf_certificate': True,
                 'uuid': cert.verify_uuid
             }
         )
@@ -199,10 +199,8 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
                 'is_downloadable': True,
                 'is_generating': False,
                 'is_unverified': False,
-                'download_url': '/certificates/user/{user_id}/course/{course_id}'.format(
-                    user_id=self.student.id,
-                    course_id=self.course.id,
-                ),
+                'download_url': '/certificates/{uuid}'.format(uuid=cert_status['uuid']),
+                'is_pdf_certificate': False,
                 'uuid': cert_status['uuid']
             }
         )
@@ -234,7 +232,6 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
         )
 
 
-@attr(shard=1)
 @ddt.ddt
 class CertificateisInvalid(WebCertificateTestMixin, ModuleStoreTestCase):
     """Tests for the `is_certificate_invalid` helper function. """
@@ -346,7 +343,6 @@ class CertificateisInvalid(WebCertificateTestMixin, ModuleStoreTestCase):
         )
 
 
-@attr(shard=1)
 class CertificateGetTests(SharedModuleStoreTestCase):
     """Tests for the `test_get_certificate_for_user` helper function. """
     now = timezone.now()
@@ -372,6 +368,11 @@ class CertificateGetTests(SharedModuleStoreTestCase):
             number='verified_2',
             display_name='Verified Course 2',
             cert_html_view_enabled=False
+        )
+        cls.no_cert_course = CourseFactory.create(
+            org='edx',
+            number='verified_3',
+            display_name='Verified Course 3',
         )
         # certificate for the first course
         GeneratedCertificateFactory.create(
@@ -443,6 +444,21 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         self.assertEqual(certs[0]['download_url'], 'www.google.com')
         self.assertEqual(certs[1]['download_url'], 'www.gmail.com')
 
+    def test_get_certificates_for_user_by_course_keys(self):
+        """
+        Test to get certificates for a user for certain course keys,
+        in a dictionary indexed by those course keys.
+        """
+        certs = certs_api.get_certificates_for_user_by_course_keys(
+            user=self.student,
+            course_keys={self.web_cert_course.id, self.no_cert_course.id},
+        )
+        assert set(certs.keys()) == {self.web_cert_course.id}
+        cert = certs[self.web_cert_course.id]
+        self.assertEqual(cert['username'], self.student.username)
+        self.assertEqual(cert['course_key'], self.web_cert_course.id)
+        self.assertEqual(cert['download_url'], 'www.google.com')
+
     def test_no_certificate_for_user(self):
         """
         Test the case when there is no certificate for a user for a specific course.
@@ -477,16 +493,14 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         self.assertEqual(expected_url, cert_url)
 
         expected_url = reverse(
-            'certificates:html_view',
-            kwargs={
-                "user_id": str(self.student.id),
-                "course_id": unicode(self.web_cert_course.id),
-            }
+            'certificates:render_cert_by_uuid',
+            kwargs=dict(certificate_uuid=self.uuid)
         )
 
         cert_url = certs_api.get_certificate_url(
             user_id=self.student.id,
-            course_id=self.web_cert_course.id
+            course_id=self.web_cert_course.id,
+            uuid=self.uuid
         )
         self.assertEqual(expected_url, cert_url)
 
@@ -514,7 +528,6 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         )
 
 
-@attr(shard=1)
 @override_settings(CERT_QUEUE='certificates')
 class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, ModuleStoreTestCase):
     """Tests for generating certificates for students. """
@@ -551,7 +564,7 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
         self.assert_event_emitted(
             'edx.certificate.created',
             user_id=self.student.id,
-            course_id=unicode(self.course.id),
+            course_id=six.text_type(self.course.id),
             certificate_url=certs_api.get_certificate_url(self.student.id, self.course.id),
             certificate_id=cert.verify_uuid,
             enrollment_mode=cert.mode,
@@ -610,7 +623,6 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
         self.assertEqual(url, "")
 
 
-@attr(shard=1)
 @ddt.ddt
 class CertificateGenerationEnabledTest(EventTestMixin, TestCase):
     """Test enabling/disabling self-generated certificates for a course. """
@@ -643,7 +655,7 @@ class CertificateGenerationEnabledTest(EventTestMixin, TestCase):
             event_name = '.'.join(['edx', 'certificate', 'generation', cert_event_type])
             self.assert_event_emitted(
                 event_name,
-                course_id=unicode(self.COURSE_KEY),
+                course_id=six.text_type(self.COURSE_KEY),
             )
 
         self._assert_enabled_for_course(self.COURSE_KEY, expect_enabled)
@@ -678,8 +690,7 @@ class CertificateGenerationEnabledTest(EventTestMixin, TestCase):
         self.assertEqual(expect_enabled, actual_enabled)
 
 
-@attr(shard=1)
-class GenerateExampleCertificatesTest(TestCase):
+class GenerateExampleCertificatesTest(ModuleStoreTestCase):
     """Test generation of example certificates. """
 
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')
@@ -742,37 +753,22 @@ class GenerateExampleCertificatesTest(TestCase):
         self.assertEqual(list(expected_statuses), actual_status)
 
 
-def set_microsite(domain):
-    """
-    returns a decorator that can be used on a test_case to set a specific microsite for the current test case.
-    :param domain: Domain of the new microsite
-    """
-    def decorator(func):
-        """
-        Decorator to set current microsite according to domain
-        """
-        @wraps(func)
-        def inner(request, *args, **kwargs):
-            """
-            Execute the function after setting up the microsite.
-            """
-            try:
-                microsite.set_by_domain(domain)
-                return func(request, *args, **kwargs)
-            finally:
-                microsite.clear()
-        return inner
-    return decorator
-
-
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-@attr(shard=1)
-class CertificatesBrandingTest(TestCase):
+class CertificatesBrandingTest(ModuleStoreTestCase):
     """Test certificates branding. """
 
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')
+    configuration = {
+        'logo_image_url': 'test_site/images/header-logo.png',
+        'SITE_NAME': 'test_site.localhost',
+        'urls': {
+            'ABOUT': 'test-site/about',
+            'PRIVACY': 'test-site/privacy',
+            'TOS_AND_HONOR': 'test-site/tos-and-honor',
+        },
+    }
 
-    @set_microsite(settings.MICROSITE_CONFIGURATION['test_site']['domain_prefix'])
+    @with_site_configuration(configuration=configuration)
     def test_certificate_header_data(self):
         """
         Test that get_certificate_header_context from lms.djangoapps.certificates api
@@ -783,21 +779,22 @@ class CertificatesBrandingTest(TestCase):
         data = certs_api.get_certificate_header_context(is_secure=True)
 
         # Make sure there are not unexpected keys in dict returned by 'get_certificate_header_context'
-        self.assertItemsEqual(
-            data.keys(),
+        six.assertCountEqual(
+            self,
+            list(data.keys()),
             ['logo_src', 'logo_url']
         )
         self.assertIn(
-            settings.MICROSITE_CONFIGURATION['test_site']['logo_image_url'],
+            self.configuration['logo_image_url'],
             data['logo_src']
         )
 
         self.assertIn(
-            settings.MICROSITE_CONFIGURATION['test_site']['SITE_NAME'],
+            self.configuration['SITE_NAME'],
             data['logo_url']
         )
 
-    @set_microsite(settings.MICROSITE_CONFIGURATION['test_site']['domain_prefix'])
+    @with_site_configuration(configuration=configuration)
     def test_certificate_footer_data(self):
         """
         Test that get_certificate_footer_context from lms.djangoapps.certificates api returns
@@ -808,26 +805,20 @@ class CertificatesBrandingTest(TestCase):
         data = certs_api.get_certificate_footer_context()
 
         # Make sure there are not unexpected keys in dict returned by 'get_certificate_footer_context'
-        self.assertItemsEqual(
-            data.keys(),
+        six.assertCountEqual(
+            self,
+            list(data.keys()),
             ['company_about_url', 'company_privacy_url', 'company_tos_url']
         )
-
-        # ABOUT is present in MICROSITE_CONFIGURATION['test_site']["urls"] so web certificate will use that url
         self.assertIn(
-            settings.MICROSITE_CONFIGURATION['test_site']["urls"]['ABOUT'],
+            self.configuration['urls']['ABOUT'],
             data['company_about_url']
         )
-
-        # PRIVACY is present in MICROSITE_CONFIGURATION['test_site']["urls"] so web certificate will use that url
         self.assertIn(
-            settings.MICROSITE_CONFIGURATION['test_site']["urls"]['PRIVACY'],
+            self.configuration['urls']['PRIVACY'],
             data['company_privacy_url']
         )
-
-        # TOS_AND_HONOR is present in MICROSITE_CONFIGURATION['test_site']["urls"],
-        # so web certificate will use that url
         self.assertIn(
-            settings.MICROSITE_CONFIGURATION['test_site']["urls"]['TOS_AND_HONOR'],
+            self.configuration['urls']['TOS_AND_HONOR'],
             data['company_tos_url']
         )

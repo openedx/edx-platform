@@ -1,5 +1,6 @@
 """ Command line script to change user enrollments. """
 
+
 import logging
 
 from django.core.management.base import BaseCommand, CommandError
@@ -8,9 +9,8 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-from student.models import CourseEnrollment, User
-
-from student.models import CourseEnrollmentAttribute
+from openedx.core.djangoapps.credit.email_utils import get_credit_provider_attribute_values
+from student.models import CourseEnrollment, CourseEnrollmentAttribute, User
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -102,6 +102,17 @@ class Command(BaseCommand):
         """ Update enrollments for a specific user identifier (email or username). """
         users = options[identifier].split(",")
 
+        credit_provider_attr = {}
+        if options['to_mode'] == 'credit':
+            provider_ids = get_credit_provider_attribute_values(
+                enrollment_args.get('course_id'), 'id'
+            )
+            credit_provider_attr = {
+                'namespace': 'credit',
+                'name': 'provider_id',
+                'value': provider_ids[0],
+            }
+
         for identified_user in users:
             logger.info(identified_user)
 
@@ -119,13 +130,10 @@ class Command(BaseCommand):
                         enrollment.update_enrollment(mode=options['to_mode'])
                         enrollment.save()
                         if options['to_mode'] == 'credit':
-                            enrollment_attrs.append({
-                                'namespace': 'credit',
-                                'name': 'provider_id',
-                                'value': enrollment_args['course_id'].org,
-                            })
-                            CourseEnrollmentAttribute.add_enrollment_attr(enrollment=enrollment,
-                                                                          data_list=enrollment_attrs)
+                            enrollment_attrs.append(credit_provider_attr)
+                            CourseEnrollmentAttribute.add_enrollment_attr(
+                                enrollment=enrollment, data_list=enrollment_attrs
+                            )
 
                     if options['noop']:
                         raise RollbackException('Forced rollback.')

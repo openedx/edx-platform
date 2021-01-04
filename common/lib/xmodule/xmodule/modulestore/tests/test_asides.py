@@ -1,12 +1,16 @@
 """
 Tests for Asides
 """
+
+
+from unittest import TestCase
+
+from mock import patch
 from web_fragments.fragment import Fragment
 from xblock.core import XBlockAside
 from xblock.fields import Scope, String
-from unittest import TestCase
+
 from xmodule.modulestore.tests.utils import XmlModulestoreBuilder
-from mock import patch
 
 
 class AsideTestType(XBlockAside):
@@ -28,7 +32,6 @@ class TestAsidesXmlStore(TestCase):
     """
     Test Asides sourced from xml store
     """
-    shard = 1
 
     @patch('xmodule.modulestore.xml.ImportSystem.applicable_aside_types', lambda self, block: ['test_aside'])
     @XBlockAside.register_temp_plugin(AsideTestType, 'test_aside')

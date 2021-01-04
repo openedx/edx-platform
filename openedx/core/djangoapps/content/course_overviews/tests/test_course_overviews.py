@@ -1,19 +1,24 @@
 """
 Tests for course_overviews app.
 """
-from cStringIO import StringIO
+
+
 import datetime
-import ddt
 import itertools
 import math
+from six import BytesIO
+
+import ddt
 import mock
 import pytz
-
+import six
 from django.conf import settings
 from django.db.utils import IntegrityError
 from django.test.utils import override_settings
 from django.utils import timezone
+from opaque_keys.edx.keys import CourseKey
 from PIL import Image
+from six.moves import range  # pylint: disable=ungrouped-imports
 
 from lms.djangoapps.certificates.api import get_active_web_certificate
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
@@ -23,13 +28,13 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.lib.courses import course_image_url
 from static_replace.models import AssetBaseUrlConfig
 from xmodule.assetstore.assetmgr import AssetManager
-from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 from xmodule.course_module import (
-    CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
     CATALOG_VISIBILITY_ABOUT,
-    CATALOG_VISIBILITY_NONE,
+    CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
+    CATALOG_VISIBILITY_NONE
 )
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
@@ -37,7 +42,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 
-from ..models import CourseOverview, CourseOverviewImageSet, CourseOverviewImageConfig
+from ..models import CourseOverview, CourseOverviewImageConfig, CourseOverviewImageSet
 from .factories import CourseOverviewFactory
 
 
@@ -46,7 +51,6 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
     """
     Tests for CourseOverview model.
     """
-    shard = 3
     TODAY = timezone.now()
     LAST_MONTH = 'last_month'
     LAST_WEEK = 'last_week'
@@ -198,7 +202,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
 
         # test tabs for both cached miss and cached hit courses
         for course_overview in [course_overview_cache_miss, course_overview_cache_hit]:
-            course_overview_tabs = course_overview.tabs.all()
+            course_overview_tabs = course_overview.tab_set.all()
             course_resp_tabs = {tab.tab_id for tab in course_overview_tabs}
             self.assertEqual(self.COURSE_OVERVIEW_TABS, course_resp_tabs)
 
@@ -318,6 +322,37 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         store = modulestore()._get_modulestore_by_type(modulestore_type)  # pylint: disable=protected-access
         with self.assertRaises(CourseOverview.DoesNotExist):
             CourseOverview.get_from_id(store.make_course_key('Non', 'Existent', 'Course'))
+
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_course_with_course_overview_exists(self, modulestore_type):
+        """
+        Tests that calling course_exists on an existent course
+        that is cached in CourseOverview table returns True.
+        """
+        course = CourseFactory.create(default_store=modulestore_type)
+        CourseOverview.get_from_id(course.id)  # Ensure course in cached in CourseOverviews
+        self.assertTrue(CourseOverview.objects.filter(id=course.id).exists())
+        self.assertTrue(CourseOverview.course_exists(course.id))
+
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_course_without_overview_exists(self, modulestore_type):
+        """
+        Tests that calling course_exists on an existent course
+        that is NOT cached in CourseOverview table returns True.
+        """
+        course = CourseFactory.create(default_store=modulestore_type)
+        CourseOverview.objects.filter(id=course.id).delete()
+        self.assertTrue(CourseOverview.course_exists(course.id))
+        self.assertFalse(CourseOverview.objects.filter(id=course.id).exists())
+
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_nonexistent_course_does_not_exists(self, modulestore_type):
+        """
+        Tests that calling course_exists on an non-existent course returns False.
+        """
+        store = modulestore()._get_modulestore_by_type(modulestore_type)  # pylint: disable=protected-access
+        course_id = store.make_course_key('Non', 'Existent', 'Course')
+        self.assertFalse(CourseOverview.course_exists(course_id))
 
     def test_get_errored_course(self):
         """
@@ -454,7 +489,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
             'openedx.core.djangoapps.content.course_overviews.models.CourseOverview.get_from_id'
         ) as mock_get_from_id:
             CourseOverview.update_select_courses(select_course_ids)
-            self.assertEquals(mock_get_from_id.call_count, len(select_course_ids))
+            self.assertEqual(mock_get_from_id.call_count, len(select_course_ids))
 
     def test_get_all_courses(self):
         course_ids = [CourseFactory.create(emit_signals=True).id for __ in range(3)]
@@ -473,7 +508,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         org_courses = []  # list of lists of courses
         for index in range(3):
             org_courses.append([
-                CourseFactory.create(org='test_org_' + unicode(index), emit_signals=True)
+                CourseFactory.create(org='test_org_' + six.text_type(index), emit_signals=True)
                 for __ in range(3)
             ])
 
@@ -512,50 +547,52 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
                     CourseOverview.get_all_courses(filter_=filter_)
                 },
                 expected_courses,
-                "testing CourseOverview.get_all_courses with filter_={}"
+                u"testing CourseOverview.get_all_courses with filter_={}"
                 .format(filter_),
             )
 
-    def test_get_from_ids_if_exists(self):
+    def test_get_from_ids(self):
+        """
+        Assert that CourseOverviews.get_from_ids works as expected.
+
+        We expect that if we have four courses, of which:
+        * two have cached course overviews,
+        * one does *not* have a cache course overview, and
+        * one has an *out-of-date* course overview, that
+        all four course overviews will appear in teh resulting dictionary,
+        with the former two coming from the CourseOverviews SQL cache
+        and the latter two coming from the modulestore.
+        """
         course_with_overview_1 = CourseFactory.create(emit_signals=True)
         course_with_overview_2 = CourseFactory.create(emit_signals=True)
         course_without_overview = CourseFactory.create(emit_signals=False)
+        course_with_old_overview = CourseFactory.create(emit_signals=True)
+        old_overview = CourseOverview.objects.get(id=course_with_old_overview.id)
+        old_overview.version = CourseOverview.VERSION - 1
+        old_overview.save()
 
-        courses = [course_with_overview_1, course_with_overview_2, course_without_overview]
-        course_ids_to_overviews = CourseOverview.get_from_ids_if_exists(
-            course.id for course in courses
-        )
+        courses = [
+            course_with_overview_1,
+            course_with_overview_2,
+            course_without_overview,
+            course_with_old_overview,
+        ]
+        non_existent_course_key = CourseKey.from_string('course-v1:This+Course+IsFake')
+        course_ids = [course.id for course in courses] + [non_existent_course_key]
 
-        # We should see the ones that have published CourseOverviews
-        # (when the signals were emitted), but not the one that didn't issue
-        # a publish signal.
-        self.assertEqual(len(course_ids_to_overviews), 2)
-        self.assertIn(course_with_overview_1.id, course_ids_to_overviews)
-        self.assertIn(course_with_overview_2.id, course_ids_to_overviews)
-        self.assertNotIn(course_without_overview.id, course_ids_to_overviews)
-
-        # But if we set a CourseOverview to be an old version, it shouldn't be
-        # returned by get_from_ids_if_exists()
-        overview_2 = course_ids_to_overviews[course_with_overview_2.id]
-        overview_2.version = CourseOverview.VERSION - 1
-        overview_2.save()
-        course_ids_to_overviews = CourseOverview.get_from_ids_if_exists(
-            course.id for course in courses
-        )
-        self.assertEqual(len(course_ids_to_overviews), 1)
-        self.assertIn(course_with_overview_1.id, course_ids_to_overviews)
-
-    def test_get_from_id_if_exists(self):
-        course_with_overview = CourseFactory.create(emit_signals=True)
-        course_id_to_overview = CourseOverview.get_from_id_if_exists(course_with_overview.id)
-        self.assertEqual(course_with_overview.id, course_id_to_overview.id)
-
-        overview_prev_version = CourseOverview.get_from_id_if_exists(course_with_overview.id)
-        overview_prev_version.version = CourseOverview.VERSION - 1
-        overview_prev_version.save()
-
-        course_id_to_overview = CourseOverview.get_from_id_if_exists(course_with_overview.id)
-        self.assertEqual(course_id_to_overview, None)
+        with mock.patch.object(
+            CourseOverview,
+            'load_from_module_store',
+            wraps=CourseOverview.load_from_module_store
+        ) as mock_load_from_modulestore:
+            overviews_by_id = CourseOverview.get_from_ids(course_ids)
+        assert len(overviews_by_id) == 5
+        assert overviews_by_id[course_with_overview_1.id].id == course_with_overview_1.id
+        assert overviews_by_id[course_with_overview_2.id].id == course_with_overview_2.id
+        assert overviews_by_id[course_with_old_overview.id].id == course_with_old_overview.id
+        assert overviews_by_id[old_overview.id].id == old_overview.id
+        assert overviews_by_id[non_existent_course_key] is None
+        assert mock_load_from_modulestore.call_count == 3
 
 
 @ddt.ddt
@@ -564,7 +601,6 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
     Course thumbnail generation tests.
     """
     ENABLED_SIGNALS = ['course_published']
-    shard = 3
 
     def setUp(self):
         """Create an active CourseOverviewImageConfig with non-default values."""
@@ -577,7 +613,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
         """
         # Create a source image...
         image = Image.new('RGB', (800, 400), 'blue')
-        image_buff = StringIO()
+        image_buff = BytesIO()
         image.save(image_buff, format='PNG')
         image_buff.seek(0)
 
@@ -810,7 +846,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
         """
         # Create a real (oversized) image...
         image = Image.new("RGB", (800, 400), "blue")
-        image_buff = StringIO()
+        image_buff = BytesIO()
         image.save(image_buff, format="JPEG")
         image_buff.seek(0)
         image_name = "big_course_image.jpeg"
@@ -855,7 +891,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
             for image_url, expected_size in [(image_urls['small'], config.small), (image_urls['large'], config.large)]:
                 image_key = StaticContent.get_location_from_path(image_url)
                 image_content = AssetManager.find(image_key)
-                image = Image.open(StringIO(image_content.data))
+                image = Image.open(BytesIO(image_content.data))
                 self.assertEqual(image.size, expected_size)
 
     @ddt.data(
@@ -887,7 +923,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
         """
         # Create a source image...
         image = Image.new("RGB", src_dimensions, "blue")
-        image_buff = StringIO()
+        image_buff = BytesIO()
         image.save(image_buff, format="PNG")
         image_buff.seek(0)
         image_name = "src_course_image.png"
@@ -907,7 +943,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
         for image_url, target in [(image_urls['small'], config.small), (image_urls['large'], config.large)]:
             image_key = StaticContent.get_location_from_path(image_url)
             image_content = AssetManager.find(image_key)
-            image = Image.open(StringIO(image_content.data))
+            image = Image.open(BytesIO(image_content.data))
 
             # Naming convention for thumbnail
             self.assertTrue(image_url.endswith('src_course_image-png-{}x{}.jpg'.format(*target)))
@@ -1042,7 +1078,6 @@ class CourseOverviewTabTestCase(ModuleStoreTestCase):
     """
     Tests for CourseOverviewTab model.
     """
-    shard = 3
 
     ENABLED_SIGNALS = ['course_published']
 
@@ -1054,7 +1089,7 @@ class CourseOverviewTabTestCase(ModuleStoreTestCase):
         """
         course = CourseFactory.create(default_store=modulestore_type)
         course_overview = CourseOverview.get_from_id(course.id)
-        expected_tabs = {tab.tab_id for tab in course_overview.tabs.all()}
+        expected_tabs = {tab.tab_id for tab in course_overview.tab_set.all()}
 
         with mock.patch(
             'openedx.core.djangoapps.content.course_overviews.models.CourseOverviewTab.objects.bulk_create'
@@ -1070,6 +1105,6 @@ class CourseOverviewTabTestCase(ModuleStoreTestCase):
 
             # Asserts that the tabs deletion is properly rolled back to a save point and
             # the course overview is not updated.
-            actual_tabs = {tab.tab_id for tab in course_overview.tabs.all()}
+            actual_tabs = {tab.tab_id for tab in course_overview.tab_set.all()}
             self.assertEqual(actual_tabs, expected_tabs)
             self.assertNotEqual(course_overview.display_name, course.display_name)

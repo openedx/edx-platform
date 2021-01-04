@@ -3,11 +3,15 @@
 Unit tests for SafeCookieData
 """
 
-import ddt
-from django.test import TestCase
+
 import itertools
-from mock import patch
 from time import time
+
+import ddt
+import six
+from django.test import TestCase
+from mock import patch
+from six.moves import range  # pylint: disable=ungrouped-imports
 
 from ..middleware import SafeCookieData, SafeCookieError
 from .test_utils import TestSafeSessionsLogMixin
@@ -18,7 +22,6 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
     """
     Test class for SafeCookieData
     """
-    shard = 2
 
     def setUp(self):
         super(TestSafeCookieData, self).setUp()
@@ -48,7 +51,7 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
         self.assertTrue(safe_cookie_data_1.verify(user_id))
 
         # serialize
-        serialized_value = unicode(safe_cookie_data_1)
+        serialized_value = six.text_type(safe_cookie_data_1)
 
         # parse and verify
         safe_cookie_data_2 = SafeCookieData.parse(serialized_value)
@@ -58,12 +61,12 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
         self.assert_cookie_data_equal(safe_cookie_data_1, safe_cookie_data_2)
 
     def test_version(self):
-        self.assertEquals(self.safe_cookie_data.version, SafeCookieData.CURRENT_VERSION)
+        self.assertEqual(self.safe_cookie_data.version, SafeCookieData.CURRENT_VERSION)
 
     def test_serialize(self):
-        serialized_value = unicode(self.safe_cookie_data)
-        for field_value in self.safe_cookie_data.__dict__.itervalues():
-            self.assertIn(unicode(field_value), serialized_value)
+        serialized_value = six.text_type(self.safe_cookie_data)
+        for field_value in six.itervalues(self.safe_cookie_data.__dict__):
+            self.assertIn(six.text_type(field_value), serialized_value)
 
     #---- Test Parse ----#
 
@@ -75,7 +78,7 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
         )
 
     def test_parse_success_serialized(self):
-        serialized_value = unicode(self.safe_cookie_data)
+        serialized_value = six.text_type(self.safe_cookie_data)
         self.assert_cookie_data_equal(
             SafeCookieData.parse(serialized_value),
             self.safe_cookie_data,
@@ -149,8 +152,8 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
 
     @ddt.data(
         *itertools.product(
-            range(0, 100, 25),
-            range(5, 20, 5),
+            list(range(0, 100, 25)),
+            list(range(5, 20, 5)),
         )
     )
     @ddt.unpack

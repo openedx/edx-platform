@@ -5,6 +5,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { StatusAlert } from '@edx/paragon';
 
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 
@@ -13,102 +14,158 @@ import LoggedInUser from './logged_in_user';
 import LoggedOutUser from './logged_out_user';
 import Success from './success';
 
+const initialFormErrors = {
+  course: undefined,
+  subject: undefined,
+  message: undefined,
+  request: undefined,
+};
 
 class RenderForm extends React.Component {
   constructor(props) {
     super(props);
+    this.submitFormUrl = this.props.context.submitFormUrl;
+    this.userInformation = this.props.context.user;
+    const course = this.userInformation ? this.userInformation.course_id : '';
+    this.courseDiscussionURL = '/courses/{course_id}/discussion/forum';
     this.state = {
       currentRequest: null,
-      errorList: [],
+      errorList: initialFormErrors,
       success: false,
+      formData: {
+        course,
+        subject: '',
+        message: '',
+      },
+    };
+    this.formValidationErrors = {
+      course: gettext('Select a course or select "Not specific to a course" for your support request.'),
+      subject: gettext('Select a subject for your support request.'),
+      message: gettext('Enter some details for your support request.'),
+      request: gettext('Something went wrong. Please try again later.'),
     };
     this.submitForm = this.submitForm.bind(this);
-    this.setErrorState = this.setErrorState.bind(this);
+    this.reDirectUser = this.reDirectUser.bind(this);
+    this.formOnChangeCallback = this.formOnChangeCallback.bind(this);
   }
 
-  setErrorState(errors) {
-    this.setState({
-      errorList: errors,
+  getFormDataFromState() {
+    return this.state.formData;
+  }
+
+  getFormErrorsFromState() {
+    return this.state.errorList;
+  }
+
+  clearErrorState() {
+    const formErrorsInState = this.getFormErrorsFromState();
+    Object.keys(formErrorsInState).map((index) => {
+      formErrorsInState[index] = undefined;
+      return formErrorsInState;
     });
   }
 
-  submitForm() {
-    const url = this.props.context.submitFormUrl,
-      $userInfo = $('.user-info'),
+  // eslint-disable-next-line class-methods-use-this
+  scrollToTop() {
+    return window.scrollTo(0, 0);
+  }
+
+  formHasErrors() {
+    const errorsList = this.getFormErrorsFromState();
+    return Object.keys(errorsList).filter(err => errorsList[err] !== undefined).length > 0;
+  }
+
+  updateErrorInState(key, error) {
+    const errorList = this.getFormErrorsFromState();
+    errorList[key] = error;
+    this.setState({
+      errorList,
+    });
+  }
+
+  formOnChangeCallback(event) {
+    const formData = this.getFormDataFromState();
+    formData[event.target.id] = event.target.value;
+    this.setState({ formData });
+  }
+
+  showWarningMessage() {
+    const formData = this.getFormDataFromState(),
+      selectedSubject = formData.subject;
+    return formData && selectedSubject === 'Course Content';
+  }
+
+  showDiscussionButton() {
+    const formData = this.getFormDataFromState(),
+      selectedCourse = formData.course;
+    return formData && (selectedCourse !== '' && selectedCourse !== 'Not specific to a course');
+  }
+
+  reDirectUser(event) {
+    event.preventDefault();
+    const formData = this.getFormDataFromState();
+    window.location.href = this.courseDiscussionURL.replace('{course_id}', formData.course);
+  }
+
+  submitForm(event) {
+    event.preventDefault();
+    const formData = this.getFormDataFromState();
+    this.clearErrorState();
+    this.validateFormData(formData);
+    if (this.formHasErrors()) {
+      return this.scrollToTop();
+    }
+    this.createZendeskTicket(formData);
+  }
+
+  createZendeskTicket(formData) {
+    const url = this.submitFormUrl,
       request = new XMLHttpRequest(),
-      $course = $('#course'),
       data = {
-        subject: $('#subject').val(),
         comment: {
-          body: $('#message').val(),
+          body: formData.message,
         },
+        subject: formData.subject, // Zendesk API requires 'subject'
+        custom_fields: [{
+          id: this.props.context.customFields.course_id,
+          value: formData.course,
+        }],
         tags: this.props.context.tags,
-      },
-      errors = [];
+        requester: {
+          email: this.userInformation.email,
+          name: this.userInformation.username,
+        },
+      };
+    request.open('POST', url, true);
+    request.setRequestHeader('Content-type', 'application/json;charset=UTF-8');
+    request.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'));
+    request.send(JSON.stringify(data));
+    request.onreadystatechange = function success() {
+      if (request.readyState === 4 && request.status === 201) {
+        this.setState({
+          success: true,
+        });
+      }
+    }.bind(this);
 
-    let course;
-    this.clearErrors();
-
-    data.requester = {
-      email: $userInfo.data('email'),
-      name: $userInfo.data('username'),
-    };
-
-    course = $course.find(':selected').val();
-    if (!course) {
-      course = $course.val();
-    }
-    if (!course) {
-      $('#course').closest('.form-group').addClass('has-error');
-      errors.push(gettext('Select a course or select "Not specific to a course" for your support request.'));
-    }
-    data.custom_fields = [{
-      id: this.props.context.customFields.course_id,
-      value: course,
-    }];
-
-    if (this.validateData(data, errors)) {
-      request.open('POST', url, true);
-      request.setRequestHeader('Content-type', 'application/json;charset=UTF-8');
-      request.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'));
-
-      request.send(JSON.stringify(data));
-
-      request.onreadystatechange = function success() {
-        if (request.readyState === 4 && request.status === 201) {
-          this.setState({
-            success: true,
-          });
-        }
-      }.bind(this);
-
-      request.onerror = function error() {
-        this.setErrorState([gettext('Something went wrong. Please try again later.')]);
-      }.bind(this);
-    }
+    request.onerror = function error() {
+      this.updateErrorInState('request', this.formValidationErrors.request);
+      this.scrollToTop();
+    }.bind(this);
   }
+  validateFormData(formData) {
+    const { course, subject, message } = formData;
 
-  clearErrors() {
-    this.setErrorState([]);
-    $('.form-group').removeClass('has-error');
-  }
+    let courseError,
+      subjectError,
+      messageError;
 
-  validateData(data, errors) {
-    if (!data.subject) {
-      errors.push(gettext('Enter a subject for your support request.'));
-      $('#subject').closest('.form-group').addClass('has-error');
-    }
-    if (!data.comment.body) {
-      errors.push(gettext('Enter some details for your support request.'));
-      $('#message').closest('.form-group').addClass('has-error');
-    }
-
-    if (!errors.length) {
-      return true;
-    }
-
-    this.setErrorState(errors);
-    return false;
+    courseError = (course === '') ? this.formValidationErrors.course : undefined;
+    this.updateErrorInState('course', courseError);
+    subjectError = (subject === '') ? this.formValidationErrors.subject : undefined;
+    this.updateErrorInState('subject', subjectError);
+    messageError = (message === '') ? this.formValidationErrors.message : undefined;
+    this.updateErrorInState('message', messageError);
   }
 
   renderSuccess() {
@@ -117,19 +174,22 @@ class RenderForm extends React.Component {
         platformName={this.props.context.platformName}
         homepageUrl={this.props.context.homepageUrl}
         dashboardUrl={this.props.context.dashboardUrl}
-        isLoggedIn={this.props.context.user !== undefined}
+        isLoggedIn={this.userInformation !== undefined}
       />
     );
   }
 
   renderSupportForm() {
     let userElement;
-    if (this.props.context.user) {
+    if (this.userInformation) {
       userElement = (<LoggedInUser
-        userInformation={this.props.context.user}
-        submitFormUrl={this.props.context.submitFormUrl}
-        setErrorState={this.setErrorState}
+        userInformation={this.userInformation}
+        onChangeCallback={this.formOnChangeCallback}
         submitForm={this.submitForm}
+        showWarning={this.showWarningMessage()}
+        showDiscussionButton={this.showDiscussionButton()}
+        reDirectUser={this.reDirectUser}
+        errorList={this.getFormErrorsFromState()}
       />);
     } else {
       userElement = (<LoggedOutUser
@@ -142,14 +202,19 @@ class RenderForm extends React.Component {
     return (
       <div className="contact-us-wrapper">
 
+        {/* Note: not using Paragon bc component shows in the DOM but not rendered, even when using
+         version 2.6.4. */}
+        <div className="alert alert-warning" role="alert" style={{ marginBottom: '1rem', padding: '1.5rem', left: '0px', fontSize: '16px', backgroundColor: '#fffaed', color: '#171C29', border: '1px solid #FFD875', borderRadius: '0.3rem' }}>
+          <div>{gettext('Due to the recent increase in interest in online education and edX, we are currently experiencing an unusually high volume of support requests. We appreciate your patience as we work to review each request. Please check the ')}<a href="https://support.edx.org/hc/en-us" className="alert-link">Help Center</a>{gettext(' as many questions may have already been answered.')}</div>
+        </div>
+
         <div className="row">
           <div className="col-sm-12">
             <h2>{gettext('Contact Us')}</h2>
           </div>
         </div>
-
         <div className="row form-errors">
-          <ShowErrors errorList={this.state.errorList} />
+          <ShowErrors errorList={this.getFormErrorsFromState()} hasErrors={this.formHasErrors()} />
         </div>
 
         <div className="row">
@@ -181,13 +246,23 @@ class RenderForm extends React.Component {
     if (this.state.success) {
       return this.renderSuccess();
     }
-
     return this.renderSupportForm();
   }
 }
 
 RenderForm.propTypes = {
-  context: PropTypes.arrayOf(PropTypes.object).isRequired,
+  context: PropTypes.shape({
+    customFields: PropTypes.object,
+    dashboardUrl: PropTypes.string,
+    homepageUrl: PropTypes.string,
+    marketingUrl: PropTypes.string,
+    loginQuery: PropTypes.string,
+    platformName: PropTypes.string,
+    submitFormUrl: PropTypes.string,
+    supportEmail: PropTypes.string,
+    tags: PropTypes.arrayOf(PropTypes.string),
+    user: PropTypes.object,
+  }).isRequired,
 };
 
 export class SingleSupportForm {

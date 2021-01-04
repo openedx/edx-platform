@@ -16,22 +16,39 @@ If the user/org combo does not currently exist in the table, a row will be creat
 will be have the 'email-optin' tag set to 'False'.
 """
 
-from __future__ import print_function
+
 import csv
 import logging
 import time
+from textwrap import dedent
 
+from django.core.management.base import BaseCommand, CommandError
 from django.db import connections
 from django.db.utils import DatabaseError
-from django.core.management.base import BaseCommand, CommandError
+from six.moves import range
 
 log = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
     """
-    Implementation of the bulk_user_org_email_optout command.
+    One-off script to opt-out users for email from orgs.
+
+    Input: A CSV file with a user_id,org pair per line. For example:
+
+    1962921,FooX
+    5506350,BarX
+    5709986,FooX
+
+    Lines formatted with a double-quoted org also work fine, such as:
+
+    5506350,"BarX"
+
+    Opts-out every specified user/org combo row from email by setting the 'email-optin' tag to 'False'.
+    If the user/org combo does not currently exist in the table, a row will be created for it which
+    will be have the 'email-optin' tag set to 'False'.
     """
+    help = dedent(__doc__).strip()
     # Default number of user/org opt-outs to perform in each DB transaction.
     DEFAULT_CHUNK_SIZE = 1000
 
@@ -72,15 +89,15 @@ class Command(BaseCommand):
         optout_path = options['optout_csv_path']
 
         if chunk_size <= 0:
-            raise CommandError('Only positive chunk size is allowed ({}).'.format(chunk_size))
+            raise CommandError(u'Only positive chunk size is allowed ({}).'.format(chunk_size))
         if sleep_between < 0:
-            raise CommandError('Only non-negative sleep between seconds is allowed ({}).'.format(sleep_between))
+            raise CommandError(u'Only non-negative sleep between seconds is allowed ({}).'.format(sleep_between))
 
         # Read the CSV file. Log the number of user/org rows read.
         with open(optout_path, 'r') as csv_file:
             optout_reader = csv.reader(csv_file)
             optout_rows = list(optout_reader)
-        log.info("Read %s opt-out rows from CSV file '%s'.", len(optout_rows), optout_path)
+        log.info(u"Read %s opt-out rows from CSV file '%s'.", len(optout_rows), optout_path)
 
         cursor = connections['default'].cursor()
 
@@ -91,7 +108,7 @@ class Command(BaseCommand):
             start_idx = curr_row_idx
             end_idx = min(start_idx + chunk_size - 1, len(optout_rows) - 1)
 
-            log.info("Attempting opt-out for rows (%s, %s) through (%s, %s)...",
+            log.info(u"Attempting opt-out for rows (%s, %s) through (%s, %s)...",
                      optout_rows[start_idx][0], optout_rows[start_idx][1],
                      optout_rows[end_idx][0], optout_rows[end_idx][1])
 
@@ -114,16 +131,16 @@ class Command(BaseCommand):
                     cursor.execute(query)
                 except DatabaseError as err:
                     cursor.execute('ROLLBACK;')
-                    log.error("Rolled-back opt-out for rows (%s, %s) through (%s, %s): %s",
+                    log.error(u"Rolled-back opt-out for rows (%s, %s) through (%s, %s): %s",
                               optout_rows[start_idx][0], optout_rows[start_idx][1],
                               optout_rows[end_idx][0], optout_rows[end_idx][1],
                               str(err))
                     raise
                 else:
                     cursor.execute('COMMIT;')
-                    log.info("Committed opt-out for rows (%s, %s) through (%s, %s).",
+                    log.info(u"Committed opt-out for rows (%s, %s) through (%s, %s).",
                              optout_rows[start_idx][0], optout_rows[start_idx][1],
                              optout_rows[end_idx][0], optout_rows[end_idx][1])
-                log.info("Sleeping %s seconds...", sleep_between)
+                log.info(u"Sleeping %s seconds...", sleep_between)
                 time.sleep(sleep_between)
             curr_row_idx += chunk_size

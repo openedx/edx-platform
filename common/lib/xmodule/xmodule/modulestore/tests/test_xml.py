@@ -2,22 +2,22 @@
 Tests around our XML modulestore, including importing
 well-formed and not-well-formed XML.
 """
+
+
 import os.path
-from django.test import TestCase
 from glob import glob
-from mock import patch, Mock
 
-from xmodule.modulestore.xml import XMLModuleStore
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.x_module import XModuleMixin
-
-from xmodule.tests import DATA_DIR
+from django.test import TestCase
+from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
+
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
-from xmodule.modulestore.tests.utils import (
-    add_temp_files_from_dict, remove_temp_files_from_list, TILDA_FILES_DICT
-)
+from xmodule.modulestore.tests.utils import TILDA_FILES_DICT, add_temp_files_from_dict, remove_temp_files_from_list
+from xmodule.modulestore.xml import XMLModuleStore
+from xmodule.tests import DATA_DIR
+from xmodule.x_module import XModuleMixin
 
 
 def glob_tildes_at_end(path):
@@ -35,7 +35,6 @@ class TestXMLModuleStore(TestCase):
     """
     Test around the XML modulestore
     """
-    shard = 2
 
     @patch('xmodule.tabs.CourseTabList.initialize_default', Mock())
     def test_unicode_chars_in_xml_content(self):
@@ -43,7 +42,7 @@ class TestXMLModuleStore(TestCase):
         # uniquification of names, would raise a UnicodeError. It no longer does.
 
         # Ensure that there really is a non-ASCII character in the course.
-        with open(os.path.join(DATA_DIR, "toy/sequential/vertical_sequential.xml")) as xmlf:
+        with open(os.path.join(DATA_DIR, "toy/sequential/vertical_sequential.xml"), 'rb') as xmlf:
             xml = xmlf.read()
             with self.assertRaises(UnicodeDecodeError):
                 xml.decode('ascii')
@@ -134,7 +133,7 @@ class TestXMLModuleStore(TestCase):
         self.assertIsNotNone(parent, "get_parent failed to return a value")
         parent_loc = course_key.make_usage_key('vertical', 'vertical_test')
         self.assertEqual(parent.location, parent_loc)
-        self.assertIn(shared_item, parent.get_children())
+        self.assertIn(shared_item.location, [x.location for x in parent.get_children()])
         # ensure it's still a child of the other parent even tho it doesn't claim the other parent as its parent
         other_parent_loc = course_key.make_usage_key('vertical', 'zeta')
         other_parent = store.get_item(other_parent_loc)
@@ -143,12 +142,11 @@ class TestXMLModuleStore(TestCase):
 
 
 class TestModuleStoreIgnore(TestXMLModuleStore):
-    shard = 2
     course_dir = DATA_DIR / "course_ignore"
 
     def setUp(self):
         super(TestModuleStoreIgnore, self).setUp()
-        self.addCleanup(remove_temp_files_from_list, TILDA_FILES_DICT.keys(), self.course_dir / "static")
+        self.addCleanup(remove_temp_files_from_list, list(TILDA_FILES_DICT.keys()), self.course_dir / "static")
         add_temp_files_from_dict(TILDA_FILES_DICT, self.course_dir / "static")
 
     @patch("xmodule.modulestore.xml.glob.glob", side_effect=glob_tildes_at_end)

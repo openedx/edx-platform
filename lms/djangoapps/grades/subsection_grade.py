@@ -1,26 +1,28 @@
 """
 SubsectionGrade Class
 """
+
+
 from abc import ABCMeta
 from collections import OrderedDict
 from logging import getLogger
 
+import six
 from django.utils.html import escape
 from lazy import lazy
 
 from lms.djangoapps.grades.models import BlockRecord, PersistentSubsectionGrade
-from lms.djangoapps.grades.scores import get_score, possibly_scored, compute_percent
+from lms.djangoapps.grades.scores import compute_percent, get_score, possibly_scored
 from xmodule import block_metadata_utils, graders
 from xmodule.graders import AggregatedScore, ShowCorrectness
 
 log = getLogger(__name__)
 
 
-class SubsectionGradeBase(object):
+class SubsectionGradeBase(six.with_metaclass(ABCMeta, object)):
     """
     Abstract base class for Subsection Grades.
     """
-    __metaclass__ = ABCMeta
 
     def __init__(self, subsection):
         self.location = subsection.location
@@ -110,7 +112,7 @@ class ZeroSubsectionGrade(SubsectionGradeBase):
 
     @lazy
     def _aggregate_scores(self):
-        return graders.aggregate_scores(self.problem_scores.values())
+        return graders.aggregate_scores(list(self.problem_scores.values()))
 
     @lazy
     def problem_scores(self):
@@ -137,12 +139,11 @@ class ZeroSubsectionGrade(SubsectionGradeBase):
         return locations
 
 
-class NonZeroSubsectionGrade(SubsectionGradeBase):
+class NonZeroSubsectionGrade(six.with_metaclass(ABCMeta, SubsectionGradeBase)):
     """
     Abstract base class for Subsection Grades with
     possibly NonZero values.
     """
-    __metaclass__ = ABCMeta
 
     def __init__(self, subsection, all_total, graded_total, override=None):
         super(NonZeroSubsectionGrade, self).__init__(subsection)
@@ -166,21 +167,39 @@ class NonZeroSubsectionGrade(SubsectionGradeBase):
             csm_scores,
             persisted_block=None,
     ):
+        # TODO: Remove as part of EDUCATOR-4602.
+        if str(block_key.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+            log.info(u'Computing block score for block: ***{}*** in course: ***{}***.'.format(
+                str(block_key),
+                str(block_key.course_key),
+            ))
         try:
             block = course_structure[block_key]
         except KeyError:
+            # TODO: Remove as part of EDUCATOR-4602.
+            if str(block_key.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+                log.info(u'User\'s access to block: ***{}*** in course: ***{}*** has changed. '
+                         u'No block score calculated.'.format(str(block_key), str(block_key.course_key)))
             # It's possible that the user's access to that
             # block has changed since the subsection grade
             # was last persisted.
-            pass
         else:
             if getattr(block, 'has_score', False):
+                # TODO: Remove as part of EDUCATOR-4602.
+                if str(block_key.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+                    log.info(u'Block: ***{}*** in course: ***{}*** HAS has_score attribute. Continuing.'
+                             .format(str(block_key), str(block_key.course_key)))
                 return get_score(
                     submissions_scores,
                     csm_scores,
                     persisted_block,
                     block,
                 )
+            # TODO: Remove as part of EDUCATOR-4602.
+            if str(block_key.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+                log.info(u'Block: ***{}*** in course: ***{}*** DOES NOT HAVE has_score attribute. '
+                         u'No block score calculated.'
+                         .format(str(block_key), str(block_key.course_key)))
 
     @staticmethod
     def _aggregated_score_from_model(grade_model, is_graded):
@@ -191,13 +210,22 @@ class NonZeroSubsectionGrade(SubsectionGradeBase):
         used instead.
         """
         score_type = 'graded' if is_graded else 'all'
-        grade_object = grade_model
+        earned_value = getattr(grade_model, 'earned_{}'.format(score_type))
+        possible_value = getattr(grade_model, 'possible_{}'.format(score_type))
         if hasattr(grade_model, 'override'):
             score_type = 'graded_override' if is_graded else 'all_override'
-            grade_object = grade_model.override
+
+            earned_override = getattr(grade_model.override, 'earned_{}'.format(score_type))
+            if earned_override is not None:
+                earned_value = earned_override
+
+            possible_override = getattr(grade_model.override, 'possible_{}'.format(score_type))
+            if possible_override is not None:
+                possible_value = possible_override
+
         return AggregatedScore(
-            tw_earned=getattr(grade_object, 'earned_{}'.format(score_type)),
-            tw_possible=getattr(grade_object, 'possible_{}'.format(score_type)),
+            tw_earned=earned_value,
+            tw_possible=possible_value,
             graded=is_graded,
             first_attempted=grade_model.first_attempted,
         )
@@ -252,10 +280,22 @@ class CreateSubsectionGrade(NonZeroSubsectionGrade):
                 start_node=subsection.location,
         ):
             problem_score = self._compute_block_score(block_key, course_structure, submissions_scores, csm_scores)
+
+            # TODO: Remove as part of EDUCATOR-4602.
+            if str(block_key.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+                log.info(u'Calculated problem score ***{}*** for block ***{!s}***'
+                         u' in subsection ***{}***.'
+                         .format(problem_score, block_key, subsection.location))
             if problem_score:
                 self.problem_scores[block_key] = problem_score
 
-        all_total, graded_total = graders.aggregate_scores(self.problem_scores.values())
+        all_total, graded_total = graders.aggregate_scores(list(self.problem_scores.values()))
+
+        # TODO: Remove as part of EDUCATOR-4602.
+        if str(subsection.location.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+            log.info(u'Calculated aggregate all_total ***{}***'
+                     u' and grade_total ***{}*** for subsection ***{}***'
+                     .format(all_total, graded_total, subsection.location))
 
         super(CreateSubsectionGrade, self).__init__(subsection, all_total, graded_total)
 
@@ -264,6 +304,11 @@ class CreateSubsectionGrade(NonZeroSubsectionGrade):
         Saves or updates the subsection grade in a persisted model.
         """
         if self._should_persist_per_attempted(score_deleted, force_update_subsections):
+            # TODO: Remove as part of EDUCATOR-4602.
+            if str(self.location.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+                log.info(u'Updating PersistentSubsectionGrade for student ***{}*** in'
+                         u' subsection ***{}*** with params ***{}***.'
+                         .format(student.id, self.location, self._persisted_model_params(student)))
             model = PersistentSubsectionGrade.update_or_create_grade(**self._persisted_model_params(student))
 
             if hasattr(model, 'override'):
@@ -334,5 +379,5 @@ class CreateSubsectionGrade(NonZeroSubsectionGrade):
         return [
             BlockRecord(location, score.weight, score.raw_possible, score.graded)
             for location, score in
-            self.problem_scores.iteritems()
+            six.iteritems(self.problem_scores)
         ]

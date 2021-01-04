@@ -2,9 +2,10 @@
 Unit tests for the course bookmarks feature.
 """
 
-import ddt
 
+import ddt
 from django.test import RequestFactory
+
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import CourseUserType, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

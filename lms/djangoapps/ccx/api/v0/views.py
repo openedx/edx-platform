@@ -1,10 +1,12 @@
 """ API v0 views. """
 
+
 import datetime
 import json
 import logging
 
 import pytz
+import six
 from ccx_keys.locator import CCXLocator
 from django.contrib.auth.models import User
 from django.db import transaction
@@ -18,14 +20,10 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from courseware import courses
+from lms.djangoapps.courseware import courses
 from lms.djangoapps.ccx.models import CcxFieldOverride, CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import override_field_for_ccx
-from lms.djangoapps.ccx.utils import (
-    add_master_course_staff_to_ccx,
-    assign_staff_role_to_ccx,
-    is_email
-)
+from lms.djangoapps.ccx.utils import add_master_course_staff_to_ccx, assign_staff_role_to_ccx, is_email
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api import authentication, permissions
@@ -68,14 +66,14 @@ def get_valid_course(course_id, is_ccx=False, advanced_course_check=False):
     try:
         course_key = CourseKey.from_string(course_id)
     except InvalidKeyError:
-        log.info('Course ID string "%s" is not valid', course_id)
+        log.info(u'Course ID string "%s" is not valid', course_id)
         return None, None, 'course_id_not_valid', status.HTTP_400_BAD_REQUEST
 
     if not is_ccx:
         try:
             course_object = courses.get_course_by_id(course_key)
         except Http404:
-            log.info('Master Course with ID "%s" not found', course_id)
+            log.info(u'Master Course with ID "%s" not found', course_id)
             return None, None, 'course_id_does_not_exist', status.HTTP_404_NOT_FOUND
         if advanced_course_check:
             if course_object.id.deprecated:
@@ -87,7 +85,7 @@ def get_valid_course(course_id, is_ccx=False, advanced_course_check=False):
         try:
             ccx_id = course_key.ccx
         except AttributeError:
-            log.info('Course ID string "%s" is not a valid CCX ID', course_id)
+            log.info(u'Course ID string "%s" is not a valid CCX ID', course_id)
             return None, None, 'course_id_not_valid_ccx_id', status.HTTP_400_BAD_REQUEST
         # get the master_course key
         master_course_key = course_key.to_course_locator()
@@ -95,7 +93,7 @@ def get_valid_course(course_id, is_ccx=False, advanced_course_check=False):
             ccx_course = CustomCourseForEdX.objects.get(id=ccx_id, course_id=master_course_key)
             return ccx_course, course_key, None, None
         except CustomCourseForEdX.DoesNotExist:
-            log.info('CCX Course with ID "%s" not found', course_id)
+            log.info(u'CCX Course with ID "%s" not found', course_id)
             return None, None, 'ccx_course_id_does_not_exist', status.HTTP_404_NOT_FOUND
 
 
@@ -355,7 +353,7 @@ class CCXListView(GenericAPIView):
     """
     authentication_classes = (
         JwtAuthentication,
-        authentication.OAuth2AuthenticationAllowInactiveUser,
+        authentication.BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (IsAuthenticated, permissions.IsMasterCourseStaffInstructor)
@@ -492,7 +490,10 @@ class CCXListView(GenericAPIView):
             make_user_coach(coach, master_course_key)
 
             # pull the ccx course key
-            ccx_course_key = CCXLocator.from_course_locator(master_course_object.id, unicode(ccx_course_object.id))
+            ccx_course_key = CCXLocator.from_course_locator(
+                master_course_object.id,
+                six.text_type(ccx_course_object.id)
+            )
             # enroll the coach in the newly created ccx
             email_params = get_email_params(
                 master_course_object,
@@ -525,7 +526,7 @@ class CCXListView(GenericAPIView):
             course_key=ccx_course_key
         )
         for rec, response in responses:
-            log.info('Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
+            log.info(u'Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
         return Response(
             status=status.HTTP_201_CREATED,
             data=serializer.data
@@ -611,7 +612,7 @@ class CCXDetailView(GenericAPIView):
 
     authentication_classes = (
         JwtAuthentication,
-        authentication.OAuth2AuthenticationAllowInactiveUser,
+        authentication.BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (IsAuthenticated, permissions.IsCourseStaffInstructor)
@@ -647,7 +648,7 @@ class CCXDetailView(GenericAPIView):
         serializer = self.get_serializer(ccx_course_object)
         return Response(serializer.data)
 
-    def delete(self, request, ccx_course_id=None):  # pylint: disable=unused-argument
+    def delete(self, request, ccx_course_id=None):
         """
         Deletes a CCX course.
 
@@ -693,7 +694,7 @@ class CCXDetailView(GenericAPIView):
             )
 
         master_course_id = request.data.get('master_course_id')
-        if master_course_id is not None and unicode(ccx_course_object.course_id) != master_course_id:
+        if master_course_id is not None and six.text_type(ccx_course_object.course_id) != master_course_id:
             return Response(
                 status=status.HTTP_403_FORBIDDEN,
                 data={
@@ -711,7 +712,7 @@ class CCXDetailView(GenericAPIView):
             )
 
         # get the master course key and master course object
-        master_course_object, master_course_key, _, _ = get_valid_course(unicode(ccx_course_object.course_id))
+        master_course_object, master_course_key, _, _ = get_valid_course(six.text_type(ccx_course_object.course_id))
 
         with transaction.atomic():
             # update the display name
@@ -779,7 +780,7 @@ class CCXDetailView(GenericAPIView):
             course_key=ccx_course_key
         )
         for rec, response in responses:
-            log.info('Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
+            log.info(u'Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
 
         return Response(
             status=status.HTTP_204_NO_CONTENT,

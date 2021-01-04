@@ -1,13 +1,21 @@
+"""Tests for Course run views"""
+
+
 import datetime
 
 import ddt
 import pytz
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.urls import reverse
 from django.test import RequestFactory
+from django.urls import reverse
+from mock import patch
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.lib.courses import course_image_url
 from rest_framework.test import APIClient
+
+from openedx.core.lib.courses import course_image_url
+from student.models import CourseAccessRole
+from student.tests.factories import TEST_PASSWORD, AdminFactory, UserFactory
+from util.organizations_helpers import add_organization, get_course_organizations
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
@@ -15,10 +23,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ToyCourseFactory
 
-from student.models import CourseAccessRole
-from student.tests.factories import AdminFactory, TEST_PASSWORD, UserFactory
-from ..utils import serialize_datetime
 from ...serializers.course_runs import CourseRunSerializer
+from ..utils import serialize_datetime
 
 
 @ddt.ddt
@@ -315,19 +321,25 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         # There should now be an image stored
         contentstore().find(content_key)
 
+    @patch.dict('django.conf.settings.FEATURES', {'ORGANIZATIONS_APP': True})
     @ddt.data(
-        ('instructor_paced', False),
-        ('self_paced', True),
+        ('instructor_paced', False, 'NotOriginalNumber1x'),
+        ('self_paced', True, None),
     )
     @ddt.unpack
-    def test_rerun(self, pacing_type, expected_self_paced_value):
-        course_run = ToyCourseFactory()
+    def test_rerun(self, pacing_type, expected_self_paced_value, number):
+        original_course_run = ToyCourseFactory()
+        add_organization({
+            'name': 'Test Organization',
+            'short_name': original_course_run.id.org,
+            'description': 'Testing Organization Description',
+        })
         start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
         end = start + datetime.timedelta(days=30)
         user = UserFactory()
         role = 'instructor'
         run = '3T2017'
-        url = reverse('api:v1:course_run-rerun', kwargs={'pk': str(course_run.id)})
+        url = reverse('api:v1:course_run-rerun', kwargs={'pk': str(original_course_run.id)})
         data = {
             'run': run,
             'schedule': {
@@ -342,16 +354,31 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
             ],
             'pacing_type': pacing_type,
         }
+        # If number is supplied, this should become the course number used in the course run key
+        # If not, it should default to the original course run number that the rerun is based on.
+        if number:
+            data.update({'number': number})
         response = self.client.post(url, data, format='json')
         assert response.status_code == 201
 
         course_run_key = CourseKey.from_string(response.data['id'])
         course_run = modulestore().get_course(course_run_key)
+
         assert course_run.id.run == run
         assert course_run.self_paced is expected_self_paced_value
+
+        if number:
+            assert course_run.id.course == number
+            assert course_run.id.course != original_course_run.id.course
+        else:
+            assert course_run.id.course == original_course_run.id.course
+
         self.assert_course_run_schedule(course_run, start, end)
         self.assert_access_role(course_run, user, role)
         self.assert_course_access_role_count(course_run, 1)
+        course_orgs = get_course_organizations(course_run_key)
+        self.assertEqual(len(course_orgs), 1)
+        self.assertEqual(course_orgs[0]['short_name'], original_course_run.id.org)
 
     def test_rerun_duplicate_run(self):
         course_run = ToyCourseFactory()
@@ -361,4 +388,17 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         }
         response = self.client.post(url, data, format='json')
         assert response.status_code == 400
-        assert response.data == {'run': ['Course run {key} already exists'.format(key=course_run.id)]}
+        assert response.data == {'run': [u'Course run {key} already exists'.format(key=course_run.id)]}
+
+    def test_rerun_invalid_number(self):
+        course_run = ToyCourseFactory()
+        url = reverse('api:v1:course_run-rerun', kwargs={'pk': str(course_run.id)})
+        data = {
+            'run': '2T2019',
+            'number': '!@#$%^&*()',
+        }
+        response = self.client.post(url, data, format='json')
+        assert response.status_code == 400
+        assert response.data == {'non_field_errors': [
+            u'Invalid key supplied. Ensure there are no special characters in the Course Number.'
+        ]}

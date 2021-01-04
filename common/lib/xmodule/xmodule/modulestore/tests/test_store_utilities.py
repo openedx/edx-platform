@@ -1,13 +1,14 @@
 """
 Tests for store_utilities.py
 """
-import unittest
-from mock import Mock
-import ddt
 
-from xmodule.modulestore.store_utilities import (
-    get_draft_subtree_roots, draft_node_constructor
-)
+
+import unittest
+
+import ddt
+from mock import Mock
+
+from xmodule.modulestore.store_utilities import draft_node_constructor, get_draft_subtree_roots
 
 
 @ddt.ddt
@@ -49,7 +50,6 @@ class TestUtils(unittest.TestCase):
                 /        \
             child_3    child_4
     """
-    shard = 2
 
     ONLY_ROOTS = [
         ('url1', 'vertical'),

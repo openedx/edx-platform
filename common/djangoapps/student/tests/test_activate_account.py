@@ -1,14 +1,16 @@
 """Tests for account activation"""
+
+
 import unittest
 from uuid import uuid4
 
 from django.conf import settings
-from django.urls import reverse
+from django.contrib.auth.models import User
 from django.test import TestCase, override_settings
+from django.urls import reverse
 from mock import patch
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from student.models import Registration
 from student.tests.factories import UserFactory
 
@@ -68,49 +70,6 @@ class TestActivateAccount(TestCase):
         self.assertTrue(self.user.is_active)
         self.assertFalse(mock_segment_identify.called)
 
-    @override_settings(
-        LMS_SEGMENT_KEY="testkey",
-        MAILCHIMP_NEW_USER_LIST_ID="listid"
-    )
-    @patch('student.models.segment.identify')
-    def test_activation_with_keys(self, mock_segment_identify):
-        expected_segment_payload = {
-            'email': self.email,
-            'username': self.username,
-            'activated': 1,
-        }
-        expected_segment_mailchimp_list = {
-            "MailChimp": {
-                "listId": settings.MAILCHIMP_NEW_USER_LIST_ID
-            }
-        }
-
-        # Ensure that the user starts inactive
-        self.assertFalse(self.user.is_active)
-
-        # Until you explicitly activate it
-        self.registration.activate()
-        self.assertTrue(self.user.is_active)
-        mock_segment_identify.assert_called_with(
-            self.user.id,
-            expected_segment_payload,
-            expected_segment_mailchimp_list
-        )
-
-    @override_settings(LMS_SEGMENT_KEY="testkey")
-    @patch('student.models.segment.identify')
-    def test_activation_without_mailchimp_key(self, mock_segment_identify):
-        self.assert_no_tracking(mock_segment_identify)
-
-    @override_settings(MAILCHIMP_NEW_USER_LIST_ID="listid")
-    @patch('student.models.segment.identify')
-    def test_activation_without_segment_key(self, mock_segment_identify):
-        self.assert_no_tracking(mock_segment_identify)
-
-    @patch('student.models.segment.identify')
-    def test_activation_without_keys(self, mock_segment_identify):
-        self.assert_no_tracking(mock_segment_identify)
-
     def test_account_activation_message(self):
         """
         Verify that account correct activation message is displayed.
@@ -144,6 +103,10 @@ class TestActivateAccount(TestCase):
         response = self.client.get(reverse('dashboard'))
         self.assertNotContains(response, expected_message)
 
+    def _assert_user_active_state(self, expected_active_state):
+        user = User.objects.get(username=self.user.username)
+        self.assertEqual(user.is_active, expected_active_state)
+
     def test_account_activation_notification_on_logistration(self):
         """
         Verify that logistration page displays success/error/info messages
@@ -153,29 +116,22 @@ class TestActivateAccount(TestCase):
             login_url=reverse('signin_user'),
             redirect_url=reverse('dashboard'),
         )
+        self._assert_user_active_state(expected_active_state=False)
+
         # Access activation link, message should say that account has been activated.
         response = self.client.get(reverse('activate', args=[self.registration.activation_key]), follow=True)
         self.assertRedirects(response, login_page_url)
         self.assertContains(response, 'Success! You have activated your account.')
+        self._assert_user_active_state(expected_active_state=True)
 
         # Access activation link again, message should say that account is already active.
         response = self.client.get(reverse('activate', args=[self.registration.activation_key]), follow=True)
         self.assertRedirects(response, login_page_url)
         self.assertContains(response, 'This account has already been activated.')
+        self._assert_user_active_state(expected_active_state=True)
 
         # Open account activation page with an invalid activation link,
         # there should be an error message displayed.
         response = self.client.get(reverse('activate', args=[uuid4().hex]), follow=True)
         self.assertRedirects(response, login_page_url)
         self.assertContains(response, 'Your account could not be activated')
-
-    def test_account_activation_prevent_auth_user_writes(self):
-        login_page_url = "{login_url}?next={redirect_url}".format(
-            login_url=reverse('signin_user'),
-            redirect_url=reverse('dashboard'),
-        )
-        with waffle().override(PREVENT_AUTH_USER_WRITES, True):
-            response = self.client.get(reverse('activate', args=[self.registration.activation_key]), follow=True)
-            self.assertRedirects(response, login_page_url)
-            self.assertContains(response, SYSTEM_MAINTENANCE_MSG)
-            assert not self.user.is_active

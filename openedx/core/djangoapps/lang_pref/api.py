@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """ Python API for language and translation management. """
 
+
 from collections import namedtuple
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
-
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.site_configuration.helpers import get_value
 
@@ -46,12 +46,20 @@ def released_languages():
         [Language(code='en', name=u'English'), Language(code='fr', name=u'Français')]
 
     """
-    released_language_codes = DarkLangConfig.current().released_languages_list
+    dark_lang_config = DarkLangConfig.current()
+    released_language_codes = dark_lang_config.released_languages_list
     default_language_code = settings.LANGUAGE_CODE
 
     if default_language_code not in released_language_codes:
         released_language_codes.append(default_language_code)
-        released_language_codes.sort()
+
+    if dark_lang_config.enable_beta_languages:
+        beta_language_codes = dark_lang_config.beta_languages_list
+
+        if beta_language_codes not in released_language_codes:
+            released_language_codes = released_language_codes + beta_language_codes
+
+    released_language_codes.sort()
 
     # Intersect the list of valid language tuples with the list
     # of released language codes

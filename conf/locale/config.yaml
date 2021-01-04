@@ -14,13 +14,13 @@ locales:
     # - bn_BD  # Bengali (Bangladesh)
     # - bn_IN  # Bengali (India)
     # - bs  # Bosnian
-    # - ca  # Catalan
+    - ca  # Catalan
     # - ca@valencia  # Catalan (Valencia)
     # - cs  # Czech
     # - cy  # Welsh
     # - da  # Danish
-    # - de_DE  # German (Germany)
-    # - el  # Greek
+    - de_DE  # German (Germany)
+    - el  # Greek
     # - en_GB  # English (United Kingdom)
     # # Don't pull these until we figure out why pages randomly display in these locales,
     # # when the user's browser is in English and the user is not logged in.
@@ -33,7 +33,7 @@ locales:
     # - es_MX  # Spanish (Mexico)
     # - es_PE  # Spanish (Peru)
     # - et_EE  # Estonian (Estonia)
-    # - eu_ES  # Basque (Spain)
+    - eu_ES  # Basque (Spain)
     # - fa  # Persian
     # - fa_IR  # Persian (Iran)
     # - fi_FI  # Finnish (Finland)
@@ -46,14 +46,16 @@ locales:
     # - hr  # Croatian
     # - hu  # Hungarian
     # - hy_AM  # Armenian (Armenia)
-    # - id  # Indonesian
-    # - it_IT  # Italian (Italy)
-    # - ja_JP  # Japanese (Japan)
+    - id  # Indonesian
+    - it_IT  # Italian (Italy)
+    - ja_JP  # Japanese (Japan)
+    - ka  # Georgian
     # - kk_KZ  # Kazakh (Kazakhstan)
     # - km_KH  # Khmer (Cambodia)
     # - kn  # Kannada
     - ko_KR  # Korean (Korea)
-    # - lt_LT  # Lithuanian (Lithuania)
+    - lt_LT  # Lithuanian (Lithuania)
+    - lv  # Latvian
     # - ml  # Malayalam
     - mn  # Mongolian
     # - mr  # Marathi
@@ -62,29 +64,31 @@ locales:
     # - ne  # Nepali
     # - nl_NL  # Dutch (Netherlands)
     # - or  # Oriya
-    # - pl  # Polish
+    - pl  # Polish
     - pt_BR  # Portuguese (Brazil)
     # - pt_PT  # Portuguese (Portugal)
     # - ro  # Romanian
     - ru  # Russian
     # - si  # Sinhala
-    # - sk  # Slovak
+    - sk  # Slovak
     # - sl  # Slovenian
     # - sq  # Albanian
     # - sr  # Serbian
     # - sv  # Swedish
     # - sw  # Swahili
+    - sw_KE  # Swahili (Kenya)
+
     # - ta  # Tamil
     # - te  # Telugu
-    # - th  # Thai
-    # - tr_TR  # Turkish (Turkey)
-    # - uk  # Ukranian
+    - th  # Thai
+    - tr_TR  # Turkish (Turkey)
+    - uk  # Ukranian
     # - ur  # Urdu
     # - uz  # Uzbek
-    # - vi  # Vietnamese
+    - vi  # Vietnamese
     - zh_CN  # Chinese (China)
     # - zh_HK  # Chinese (Hong Kong)
-    # - zh_TW  # Chinese (Taiwan)
+    - zh_TW  # Chinese (Taiwan)
 
 
 # The locales used for fake-accented English, for testing.
@@ -128,7 +132,7 @@ ignore_dirs:
     - src/done-xblock
     - src/edx-jsme
     - src/parse-rest
-    - src/pygeoip
+    - src/geoip2
     - src/pystache-custom
     - src/rate-xblock
     - src/xblock-google-drive
@@ -157,6 +161,10 @@ segment:
     djangojs-partial.po:
         djangojs-studio.po:
             - cms/*
+        djangojs-account-settings-view.po:
+            - lms/static/js/student_account/views/account_settings_view.js
+        # Segregating student account settings view strings, so that beta language message
+        # can be translated for wide set of partially supported languages.
     mako.po:
         mako-studio.po:
             - cms/*
@@ -172,8 +180,10 @@ generate_merge:
         - mako.po
         - mako-studio.po
         - wiki.po
+        - edx_proctoring_proctortrack.po
     djangojs.po:
         - djangojs-partial.po
         - djangojs-studio.po
+        - djangojs-account-settings-view.po
         - underscore.po
         - underscore-studio.po

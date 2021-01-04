@@ -1,11 +1,9 @@
 """
 Context dictionary for templates that use the ace_common base template.
 """
-from math import floor
 
 from django.conf import settings
-from django.core.urlresolvers import NoReverseMatch
-from django.urls import reverse
+from django.urls import NoReverseMatch, reverse
 
 from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers

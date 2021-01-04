@@ -1,6 +1,8 @@
 <%page expression_filter="h"/>
 <%namespace name='static' file='static_content.html'/>
 <%!
+from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangolib.js_utils import js_escaped_string
 from django.conf import settings
 from django.urls import reverse
 from django_countries import countries
@@ -51,11 +53,10 @@ from openedx.core.djangolib.js_utils import js_escaped_string
           <label data-field="name" for="signup_fullname">${_('Full Name')} + ' *'</label>
 	    <input id="signup_fullname" type="text" name="name" placeholder="${_('e.g. Your Name (for certificates)')}" required />
 	  % else:
-	  <p>${Text(_('{italic_start}Welcome{italic_end} {name}')).format(
-      italic_start=HTML('<i>'),
-      italic_end=HTML('</i>'),
-      name=extauth_id
-      )}</p><br/>
+	  <p>${Text(_('{start_li}Welcome{end_li} {name}')).format(
+                start_li=HTML('<i>'),
+                end_li=HTML('</i>'),
+                name=extauth_id)}</p><br/>
 	  <p><i>${_('Enter a public username:')}</i></p>
 
           <label data-field="username" for="signup_username">${_('Public Username')} + ' *'</label>
@@ -135,9 +136,9 @@ from openedx.core.djangolib.js_utils import js_escaped_string
         <div class="input-group">
           <label data-field="terms_of_service" class="terms-of-service" for="signup_tos">
             <input id="signup_tos" name="terms_of_service" type="checkbox" value="true">
-              ${Text(_('I agree to the {link_start}Terms of Service{link_end}')).format(
-                link_start=HTML('<a href="{url}" rel="noopener" target="_blank">').format(url=reverse('tos')),
-                link_end=HTML('</a>'))} *
+            ${Text(_('I agree to the {link_start}Terms of Service{link_end}')).format(
+              link_start=HTML('<a href="{url}" rel="noopener" target="_blank">').format(url=reverse('tos')),
+              link_end=HTML('</a>'))} *
           </label>
 
           % if settings.REGISTRATION_EXTRA_FIELDS['honor_code'] != 'hidden':

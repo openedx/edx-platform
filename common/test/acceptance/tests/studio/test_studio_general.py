@@ -1,11 +1,12 @@
 """
 Acceptance tests for Studio.
 """
+
+
 import uuid
 
 from selenium.webdriver.common.keys import Keys
 
-from base_studio_test import StudioCourseTest
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio import LMS_URL
@@ -13,7 +14,7 @@ from common.test.acceptance.pages.studio.asset_index import AssetIndexPageStudio
 from common.test.acceptance.pages.studio.course_info import CourseUpdatesPage
 from common.test.acceptance.pages.studio.edit_tabs import PagesPage
 from common.test.acceptance.pages.studio.import_export import ExportCoursePage, ImportCoursePage
-from common.test.acceptance.pages.studio.index import DashboardPage, HomePage, IndexPage, AccessibilityPage
+from common.test.acceptance.pages.studio.index import AccessibilityPage, DashboardPage, HomePage, IndexPage
 from common.test.acceptance.pages.studio.login import CourseOutlineSignInRedirectPage, LoginPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 from common.test.acceptance.pages.studio.settings import SettingsPage
@@ -23,6 +24,8 @@ from common.test.acceptance.pages.studio.signup import SignupPage
 from common.test.acceptance.pages.studio.textbook_upload import TextbookUploadPage
 from common.test.acceptance.pages.studio.users import CourseTeamPage
 from common.test.acceptance.tests.helpers import AcceptanceTest, UniqueCourseTest
+
+from .base_studio_test import StudioCourseTest
 
 
 class LoggedOutTest(AcceptanceTest):
@@ -154,8 +157,8 @@ class SignUpAndSignInTest(UniqueCourseTest):
         Given I have opened a new course in Studio
         And I am not logged in
         And I visit the url "/course/slashes:MITx+999+Robot_Super_Course"
-        And I should see that the path is "/signin?next=/course/slashes%3AMITx%2B999%2BRobot_Super_Course"
-        When I fill in and submit the signin form
+        And I should see the path is "/signin_redirect_to_lms?next=/course/slashes%3AMITx%2B999%2BRobot_Super_Course"
+        When I fill in and submit the LMS login form
         Then I should see that the path is "/course/slashes:MITx+999+Robot_Super_Course"
         """
         self.install_course_fixture()
@@ -167,65 +170,6 @@ class SignUpAndSignInTest(UniqueCourseTest):
         self.course_outline_page.wait_for_page()
         # Verify that correct course is displayed after sign in.
         self.assertEqual(self.browser.current_url, course_url)
-
-    def test_login_with_invalid_redirect(self):
-        """
-        Scenario: Login with an invalid redirect
-        Given I have opened a new course in Studio
-        And I am not logged in
-        And I visit the url "/signin?next=http://www.google.com/"
-        When I fill in and submit the signin form
-        Then I should see that the path is "/home/"
-        """
-        self.install_course_fixture()
-        # Visit course
-        self.course_outline_sign_in_redirect_page.visit()
-        # Change redirect url
-        self.browser.get(self.browser.current_url.split('=')[0] + '=http://www.google.com')
-        # Login
-        self.course_outline_sign_in_redirect_page.login(self.user['email'], self.user['password'])
-        # Verify that we land in LMS instead of the invalid redirect url
-        self.assertEqual(self.browser.current_url, LMS_URL + "/dashboard")
-
-    def test_login_with_mistyped_credentials(self):
-        """
-        Given I have opened a new course in Studio
-        And I am not logged in
-        And I visit the Studio homepage
-        When I click the link with the text "Sign In"
-        Then I should see that the path is "/signin"
-        And I should not see a login error message
-        And I fill in and submit the signin form incorrectly
-        Then I should see a login error message
-        And I edit the password field
-        Then I should not see a login error message
-        And I submit the signin form
-        And I wait for "2" seconds
-        Then I should see that the path is "/course/slashes:MITx+999+Robot_Super_Course"
-        """
-        self.install_course_fixture()
-        self.course_outline_sign_in_redirect_page.visit()
-        # Verify login_error is not present
-        self.course_outline_sign_in_redirect_page.wait_for_element_absence(
-            '#login_error',
-            'Login error not be present'
-        )
-        # Login with wrong credentials
-        self.course_outline_sign_in_redirect_page.login(
-            self.user['email'],
-            'wrong_password',
-            expect_success=False
-        )
-        # Verify that login error is shown
-        self.course_outline_sign_in_redirect_page.wait_for_element_visibility(
-            ".js-form-errors.status.submission-error",
-            'Login error is visible'
-        )
-        # Login with correct credentials
-        self.course_outline_sign_in_redirect_page.login(self.user['email'], self.user['password'])
-        self.course_outline_page.wait_for_page()
-        # Verify that correct course is displayed after sign in.
-        self.assertEqual(self.browser.current_url, self.course_outline_page.url)
 
 
 class CoursePagesTest(StudioCourseTest):

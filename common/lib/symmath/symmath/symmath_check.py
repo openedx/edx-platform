@@ -8,6 +8,7 @@
 #
 # Takes in math expressions given as Presentation MathML (from ASCIIMathML), converts to Content MathML using SnuggleTeX
 
+
 import logging
 import traceback
 
@@ -46,7 +47,7 @@ def symmath_check_simple(expect, ans, adict={}, symtab=None, extra_options=None)
                     abcsym=options['__ABC__'],
                     symtab=symtab,
                     )
-    except Exception, err:
+    except Exception as err:
         return {'ok': False,
                 'msg': 'Error %s<br/>Failed in evaluating check(%s,%s)' % (err, expect, ans)
                 }
@@ -92,22 +93,22 @@ def check(expect, given, numerical=False, matrix=False, normphase=False, abcsym=
 
     try:
         xgiven = my_sympify(given, normphase, matrix, do_qubit=do_qubit, abcsym=abcsym, symtab=symtab)
-    except Exception, err:
+    except Exception as err:
         return {'ok': False, 'msg': 'Error %s<br/> in evaluating your expression "%s"' % (err, given)}
 
     try:
         xexpect = my_sympify(expect, normphase, matrix, do_qubit=do_qubit, abcsym=abcsym, symtab=symtab)
-    except Exception, err:
+    except Exception as err:
         return {'ok': False, 'msg': 'Error %s<br/> in evaluating OUR expression "%s"' % (err, expect)}
 
     if 'autonorm' in flags:	 # normalize trace of matrices
         try:
             xgiven /= xgiven.trace()
-        except Exception, err:
+        except Exception as err:
             return {'ok': False, 'msg': 'Error %s<br/> in normalizing trace of your expression %s' % (err, to_latex(xgiven))}
         try:
             xexpect /= xexpect.trace()
-        except Exception, err:
+        except Exception as err:
             return {'ok': False, 'msg': 'Error %s<br/> in normalizing trace of OUR expression %s' % (err, to_latex(xexpect))}
 
     msg = 'Your expression was evaluated as ' + to_latex(xgiven)
@@ -208,7 +209,7 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
     # parse expected answer
     try:
         fexpect = my_sympify(str(expect), matrix=do_matrix, do_qubit=do_qubit)
-    except Exception, err:
+    except Exception as err:
         msg += '<p>Error %s in parsing OUR expected answer "%s"</p>' % (err, expect)
         return {'ok': False, 'msg': make_error_message(msg)}
 
@@ -216,7 +217,7 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
     # if expected answer is a number, try parsing provided answer as a number also
     try:
         fans = my_sympify(str(ans), matrix=do_matrix, do_qubit=do_qubit)
-    except Exception, err:
+    except Exception as err:
         fans = None
 
     # do a numerical comparison if both expected and answer are numbers
@@ -243,7 +244,7 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
     # convert mathml answer to formula
     try:
         mmlans = dynamath[0] if dynamath else None
-    except Exception, err:
+    except Exception as err:
         mmlans = None
     if not mmlans:
         return {'ok': False, 'msg': '[symmath_check] failed to get MathML for input; dynamath=%s' % dynamath}
@@ -255,7 +256,7 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
     try:
         fsym = f.sympy
         msg += '<p>You entered: %s</p>' % to_latex(f.sympy)
-    except Exception, err:
+    except Exception as err:
         log.exception("Error evaluating expression '%s' as a valid equation", ans)
         msg += "<p>Error in evaluating your expression '%s' as a valid equation</p>" % (ans)
         if "Illegal math" in str(err):
@@ -298,7 +299,7 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
         except sympy.ShapeError:
             msg += "<p>Error - your input vector or matrix has the wrong dimensions"
             return {'ok': False, 'msg': make_error_message(msg)}
-        except Exception, err:
+        except Exception as err:
             msg += "<p>Error %s in comparing expected (a list) and your answer</p>" % str(err).replace('<', '&lt;')
             if DEBUG:
                 msg += "<p/><pre>%s</pre>" % traceback.format_exc()
@@ -309,7 +310,7 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
     #fexpect = fexpect.simplify()
     try:
         diff = (fexpect - fsym)
-    except Exception, err:
+    except Exception as err:
         diff = None
 
     if DEBUG:

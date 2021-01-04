@@ -1,7 +1,8 @@
 """
 Test the publish code (mostly testing that publishing doesn't result in orphans)
 """
-import ddt
+
+
 import itertools
 import os
 import re
@@ -12,20 +13,26 @@ from contextlib import contextmanager
 from shutil import rmtree
 from tempfile import mkdtemp
 
+import ddt
+import six
+from six.moves import range
+
 from openedx.core.lib.tests import attr
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.xml_exporter import export_course_to_xml
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls, mongo_uses_error_check
 from xmodule.modulestore.tests.test_split_w_old_mongo import SplitWMongoCourseBootstrapper
-from xmodule.modulestore.tests.factories import check_mongo_calls, mongo_uses_error_check, CourseFactory, ItemFactory
 from xmodule.modulestore.tests.utils import (
-    MongoContentstoreBuilder, MODULESTORE_SETUPS,
-    DRAFT_MODULESTORE_SETUP, SPLIT_MODULESTORE_SETUP, MongoModulestoreBuilder,
+    DRAFT_MODULESTORE_SETUP,
+    MODULESTORE_SETUPS,
+    SPLIT_MODULESTORE_SETUP,
+    MongoContentstoreBuilder,
+    MongoModulestoreBuilder
 )
+from xmodule.modulestore.xml_exporter import export_course_to_xml
 
 
-@attr(shard=1)
 @attr('mongo')
 class TestPublish(SplitWMongoCourseBootstrapper):
     """
@@ -157,7 +164,6 @@ class TestPublish(SplitWMongoCourseBootstrapper):
         self.assertTrue(self.draft_mongo.has_item(other_child_loc), "Oops, lost moved item")
 
 
-@attr(shard=1)
 class DraftPublishedOpTestCourseSetup(unittest.TestCase):
     """
     This class exists to test XML import and export between different modulestore
@@ -210,9 +216,9 @@ class DraftPublishedOpTestCourseSetup(unittest.TestCase):
             Add a level of the binary course structure by creating the items as children of the proper parents.
             """
             parent_id = 'course'
-            for idx in xrange(num_items):
+            for idx in range(num_items):
                 if parent_type != 'course':
-                    parent_id = _make_block_id(parent_type, idx / 2)
+                    parent_id = _make_block_id(parent_type, idx // 2)
                 parent_item = getattr(self, parent_id)
                 block_id = _make_block_id(block_type, idx)
                 setattr(self, block_id, ItemFactory.create(
@@ -246,13 +252,13 @@ class DraftPublishedOpTestCourseSetup(unittest.TestCase):
 
         # Create a list of all verticals for convenience.
         block_type = 'vertical'
-        for idx in xrange(8):
+        for idx in range(8):
             block_id = _make_block_id(block_type, idx)
             self.all_verticals.append((block_type, block_id))
 
         # Create a list of all html units for convenience.
         block_type = 'html'
-        for idx in xrange(16):
+        for idx in range(16):
             block_id = _make_block_id(block_type, idx)
             self.all_units.append((block_type, block_id))
 
@@ -272,7 +278,6 @@ class DraftPublishedOpTestCourseSetup(unittest.TestCase):
         super(DraftPublishedOpTestCourseSetup, self).setUp()
 
 
-@attr(shard=1)
 class OLXFormatChecker(unittest.TestCase):
     """
     Examines the on-disk course export to verify that specific items are present/missing
@@ -359,7 +364,7 @@ class OLXFormatChecker(unittest.TestCase):
                 to match against the named attribute.
         """
         for attribute, regex in attrs.items():
-            self.assertRegexpMatches(element.get(attribute), regex)
+            self.assertRegex(element.get(attribute), regex)
 
     def parse_olx(self, block_type, block_id, **kwargs):
         """
@@ -409,7 +414,7 @@ class OLXFormatChecker(unittest.TestCase):
         parent_key = course_key.make_usage_key(parent_type, parent_id)
 
         self.assertElementAttrsSubset(element, {
-            'parent_url': re.escape(unicode(parent_key)),
+            'parent_url': re.escape(six.text_type(parent_key)),
             'index_in_children_list': re.escape(str(index_in_children_list)),
         })
 
@@ -567,7 +572,7 @@ class DraftPublishedOpBaseTestSetup(OLXFormatChecker, DraftPublishedOpTestCourse
         """
         Make a unique name for the new export dir.
         """
-        return self.EXPORTED_COURSE_AFTER_DIR_NAME.format(unicode(uuid.uuid4())[:8])
+        return self.EXPORTED_COURSE_AFTER_DIR_NAME.format(six.text_type(uuid.uuid4())[:8])
 
     def publish(self, block_list):
         """
@@ -645,7 +650,6 @@ class DraftPublishedOpBaseTestSetup(OLXFormatChecker, DraftPublishedOpTestCourse
         self.export_dir = self._make_new_export_dir_name()
 
 
-@attr(shard=1)
 @ddt.ddt
 class ElementalPublishingTests(DraftPublishedOpBaseTestSetup):
     """
@@ -820,7 +824,6 @@ class ElementalPublishingTests(DraftPublishedOpBaseTestSetup):
             self.assertOLXIsDraftOnly(block_list_untouched)
 
 
-@attr(shard=1)
 @ddt.ddt
 class ElementalUnpublishingTests(DraftPublishedOpBaseTestSetup):
     """
@@ -940,7 +943,6 @@ class ElementalUnpublishingTests(DraftPublishedOpBaseTestSetup):
                 self.unpublish(block_list_to_unpublish)
 
 
-@attr(shard=1)
 @ddt.ddt
 class ElementalDeleteItemTests(DraftPublishedOpBaseTestSetup):
     """
@@ -1138,7 +1140,6 @@ class ElementalDeleteItemTests(DraftPublishedOpBaseTestSetup):
             self.assertOLXIsDeleted(block_list_draft_children)
 
 
-@attr(shard=1)
 @ddt.ddt
 class ElementalConvertToDraftTests(DraftPublishedOpBaseTestSetup):
     """
@@ -1196,7 +1197,6 @@ class ElementalConvertToDraftTests(DraftPublishedOpBaseTestSetup):
                 raise Exception("Must test either Old Mongo or Split modulestore!")
 
 
-@attr(shard=1)
 @ddt.ddt
 class ElementalRevertToPublishedTests(DraftPublishedOpBaseTestSetup):
     """

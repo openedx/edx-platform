@@ -1,22 +1,24 @@
+<%page expression_filter="h"/>
 <%namespace name='static' file='/static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
-from django.template.defaultfilters import escapejs
+from openedx.core.djangolib.markup import HTML
+from openedx.core.djangolib.js_utils import js_escaped_string
 from six import text_type
 %>
 
 ## The JS for this is defined in xqa_interface.html
-${block_content}
+${block_content | n, decode.utf8}
 %if 'detached' not in tags:
 %  if edit_link:
   <div>
       <a href="${edit_link}">Edit</a>
       % if xqa_key:
           / <a href="#${element_id}_xqa-modal" onclick="javascript:getlog('${element_id}', {
-          'location': '${location | h}',
-          'xqa_key': '${xqa_key | h}',
-          'category': '${category | h}',
-          'user': '${user | h}'
+          'location': '${location}',
+          'xqa_key': '${xqa_key}',
+          'category': '${category}',
+          'user': '${user}'
        })" id="${element_id}_xqa_log">QA</a>
       % endif
   </div>
@@ -42,7 +44,7 @@ ${block_content}
       <label for="${element_id}_xqa_entry">${_("Comment")}</label>
       <input tabindex="0" id="${element_id}_xqa_entry" type="text" placeholder="${_('comment')}">
       <label for="${element_id}_xqa_tag">${_("Tag")}</label>
-      <span style="color:black;vertical-align: -10pt">${_('Optional tag (eg "done" or "broken"):') + '&nbsp; '}      </span>
+      <span style="color:black;vertical-align: -10pt">${_('Optional tag (eg "done" or "broken"):')}&nbsp;</span>
       <input id="${element_id}_xqa_tag" type="text" placeholder="${_('tag')}" style="width:80px;display:inline">
       <div class="submit">
         <button name="submit" type="submit">${_('Add comment')}</button>
@@ -64,17 +66,17 @@ ${block_content}
     <div class="staff_actions">
       <h3>${_('Actions')}</h3>
       <div>
-        <label for="sd_fu_${location.block_id | h}">${_('Username')}:</label>
-        <input type="text" tabindex="0" id="sd_fu_${location.block_id | h}" placeholder="${user.username}"/>
+        <label for="sd_fu_${location.block_id}">${_('Username')}:</label>
+        <input type="text" tabindex="0" id="sd_fu_${location.block_id}" placeholder="${user.username}"/>
       </div>
       % if can_override_problem_score:
       <div>
-        <label for="sd_fs_${location.block_id | h}">${_('Score (for override only)')}:</label>
-        <input type="text" tabindex="0" id="sd_fs_${location.block_id | h}" placeholder="0"/>
-        <label for="sd_fs_${location.block_id | h}"> / ${max_problem_score}</label>
+        <label for="sd_fs_${location.block_id}">${_('Score (for override only)')}:</label>
+        <input type="text" tabindex="0" id="sd_fs_${location.block_id}" placeholder="0"/>
+        <label for="sd_fs_${location.block_id}"> / ${max_problem_score}</label>
       </div>
       % endif
-      <div data-location="${location | h}" data-location-name="${location.block_id | h}">
+      <div data-location="${location}" data-location-name="${location.block_id}">
         [
         % if can_reset_attempts:
         <button type="button" class="btn-link staff-debug-reset">${_('Reset Learner\'s Attempts to Zero')}</button>
@@ -93,26 +95,26 @@ ${block_content}
         % endif
         ]
       </div>
-      <div id="result_${location.block_id | h}"></div>
+      <div id="result_${location.block_id}"></div>
     </div>
 
     <div class="staff_info" style="display:block">
       is_released = ${is_released}
-      location = ${text_type(location) | h}
+      location = ${text_type(location)}
 
       <table summary="${_('Module Fields')}">
         <tr><th>${_('Module Fields')}</th></tr>
         %for name, field in fields:
-        <tr><td style="width:25%">${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
+        <tr><td style="width:25%">${name}</td><td><pre style="display:inline-block; margin: 0;">${field}</pre></td></tr>
         %endfor
       </table>
       <table>
         <tr><th>${_('XML attributes')}</th></tr>
         %for name, field in xml_attributes.items():
-        <tr><td style="width:25%">${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
+        <tr><td style="width:25%">${name}</td><td><pre style="display:inline-block; margin: 0;">${field}</pre></td></tr>
         %endfor
       </table>
-      category = ${category | h}
+      category = ${category}
     </div>
     %if render_histogram:
     <div id="histogram_${element_id}" class="histogram" data-histogram="${histogram}"></div>
@@ -128,7 +130,7 @@ ${block_content}
     <form id="${element_id}_history_form">
       <label for="${element_id}_history_student_username">${_("User:")}</label>
       <input tabindex="0" id="${element_id}_history_student_username" type="text" placeholder=""/>
-      <input type="hidden" id="${element_id}_history_location" value="${location | h}"/>
+      <input type="hidden" id="${element_id}_history_location" value="${location}"/>
       <div class="submit">
         <button name="submit" type="submit">${_("View History")}</button>
       </div>
@@ -142,17 +144,17 @@ ${block_content}
 <script type="text/javascript">
 // assumes courseware.html's loaded this method.
 $(function () {
-    setup_debug('${element_id}',
+    setup_debug('${element_id | n, js_escaped_string}',
         %if edit_link:
-        '${edit_link}',
+        '${edit_link | n, js_escaped_string}',
         %else:
         null,
         %endif
         {
-            'location': '${location | escapejs}',
-            'xqa_key': '${xqa_key}',
-            'category': '${category}',
-            'user': '${user}'
+            'location': '${location | n, js_escaped_string}',
+            'xqa_key': '${xqa_key | n, js_escaped_string}',
+            'category': '${category | n, js_escaped_string}',
+            'user': '${user | n, js_escaped_string}'
         }
     );
 });

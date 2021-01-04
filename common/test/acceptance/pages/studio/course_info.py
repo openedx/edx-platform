@@ -1,6 +1,8 @@
 """
 Course Updates page.
 """
+
+
 from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
 from common.test.acceptance.pages.studio.course_page import CoursePage
 from common.test.acceptance.pages.studio.utils import set_input_value, type_in_codemirror

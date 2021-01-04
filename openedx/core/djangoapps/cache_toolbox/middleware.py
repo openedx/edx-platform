@@ -78,6 +78,7 @@ choice for most environments but you may be happy with the trade-offs of the
 
 """
 
+
 from logging import getLogger
 
 from django.conf import settings
@@ -85,6 +86,7 @@ from django.contrib.auth import HASH_SESSION_KEY
 from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.auth.models import AnonymousUser, User
 from django.utils.crypto import constant_time_compare
+from django.utils.deprecation import MiddlewareMixin
 
 from openedx.core.djangoapps.safe_sessions.middleware import SafeSessionMiddleware
 
@@ -93,12 +95,13 @@ from .model import cache_model
 log = getLogger(__name__)
 
 
-class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware):
+class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware, MiddlewareMixin):
     """
     See documentation above.
     """
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         cache_model(User)
+        super(CacheBackedAuthenticationMiddleware, self).__init__(*args, **kwargs)
 
     def process_request(self, request):
         try:
@@ -107,7 +110,7 @@ class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware):
             request.user = User.get_cached(session_user_id)
             if request.user.id != session_user_id:
                 log.error(
-                    "CacheBackedAuthenticationMiddleware cached user '%s' does not match requested user '%s'.",
+                    u"CacheBackedAuthenticationMiddleware cached user '%s' does not match requested user '%s'.",
                     request.user.id,
                     session_user_id,
                 )

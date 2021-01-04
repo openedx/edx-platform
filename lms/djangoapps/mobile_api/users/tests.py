@@ -1,10 +1,13 @@
 """
 Tests for users API
 """
+
+
 import datetime
 
 import ddt
 import pytz
+import six
 from django.conf import settings
 from django.template import defaultfilters
 from django.test import RequestFactory, override_settings
@@ -12,23 +15,24 @@ from django.utils import timezone
 from django.utils.timezone import now
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
+from six.moves import range
+from six.moves.urllib.parse import parse_qs
 
+from course_modes.models import CourseMode
+from lms.djangoapps.courseware.access_response import MilestoneAccessError, StartDateError, VisibilityError
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
-from course_modes.models import CourseMode
-from courseware.access_response import MilestoneAccessError, StartDateError, VisibilityError
 from mobile_api.testutils import (
     MobileAPITestCase,
     MobileAuthTestMixin,
     MobileAuthUserTestMixin,
     MobileCourseAccessTestMixin
 )
-from mobile_api.utils import API_V05, API_V1
-from openedx.core.lib.courses import course_image_url
-from openedx.core.lib.tests import attr
+from mobile_api.utils import API_V1, API_V05
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
+from openedx.core.lib.courses import course_image_url
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from student.models import CourseEnrollment
@@ -42,7 +46,6 @@ from .. import errors
 from .serializers import CourseEnrollmentSerializer, CourseEnrollmentSerializerv05
 
 
-@attr(shard=9)
 @ddt.ddt
 class TestUserDetailApi(MobileAPITestCase, MobileAuthUserTestMixin):
     """
@@ -59,7 +62,6 @@ class TestUserDetailApi(MobileAPITestCase, MobileAuthUserTestMixin):
         self.assertEqual(response.data['email'], self.user.email)
 
 
-@attr(shard=9)
 @ddt.ddt
 class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
     """
@@ -75,8 +77,22 @@ class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
         response = self.api_response(expected_response_code=302, api_version=api_version)
         self.assertIn(self.username, response['location'])
 
+    @ddt.data(API_V05, API_V1)
+    def test_last_loggedin_updated(self, api_version):
+        """Verify that a user's last logged in value updates after hitting the my_user_info endpoint"""
+        self.login()
 
-@attr(shard=9)
+        self.user.refresh_from_db()
+        last_login_before = self.user.last_login
+
+        # just hit the api endpoint; we don't care about the response here (tested previously)
+        self.api_response(expected_response_code=302, api_version=api_version)
+
+        self.user.refresh_from_db()
+        last_login_after = self.user.last_login
+        assert last_login_after > last_login_before
+
+
 @ddt.ddt
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
 class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTestMixin,
@@ -115,8 +131,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertIn('courses/{}/about'.format(self.course.id), found_course['course_about'])
         self.assertIn('course_info/{}/updates'.format(self.course.id), found_course['course_updates'])
         self.assertIn('course_info/{}/handouts'.format(self.course.id), found_course['course_handouts'])
-        self.assertIn('video_outlines/courses/{}'.format(self.course.id), found_course['video_outline'])
-        self.assertEqual(found_course['id'], unicode(self.course.id))
+        self.assertEqual(found_course['id'], six.text_type(self.course.id))
         self.assertEqual(courses[0]['mode'], CourseMode.DEFAULT_MODE_SLUG)
         self.assertEqual(courses[0]['course']['subscription_id'], self.course.clean_id(padding_char='_'))
 
@@ -146,7 +161,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         for course_index in range(num_courses):
             self.assertEqual(
                 response.data[course_index]['course']['id'],
-                unicode(courses[num_courses - course_index - 1].id)
+                six.text_type(courses[num_courses - course_index - 1].id)
             )
 
     @ddt.data(API_V05, API_V1)
@@ -160,7 +175,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
 
         course_with_prereq = CourseFactory.create(start=self.LAST_WEEK, mobile_available=True)
         prerequisite_course = CourseFactory.create()
-        set_prerequisite_courses(course_with_prereq.id, [unicode(prerequisite_course.id)])
+        set_prerequisite_courses(course_with_prereq.id, [six.text_type(prerequisite_course.id)])
 
         # Create list of courses with various expected courseware_access responses and corresponding expected codes
         courses = [
@@ -265,7 +280,10 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
                 user=self.user,
                 course_id=course.id
             )
-            ScheduleFactory(start=self.THREE_YEARS_AGO, enrollment=enrollment)
+            ScheduleFactory(
+                start_date=self.THREE_YEARS_AGO + datetime.timedelta(days=1),
+                enrollment=enrollment
+            )
         else:
             course = CourseFactory.create(start=self.LAST_WEEK, mobile_available=True)
             self.enroll(course.id)
@@ -321,7 +339,6 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self._assert_enrollment_results(api_version, courses, num_courses_returned, False)
 
 
-@attr(shard=9)
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
 class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, MilestonesTestCaseMixin):
     """
@@ -348,7 +365,7 @@ class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, Milestone
 
         response = self.api_response()
         certificate_data = response.data[0]['certificate']
-        self.assertEquals(certificate_data['url'], certificate_url)
+        self.assertEqual(certificate_data['url'], certificate_url)
 
     @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
     def test_no_certificate(self):
@@ -388,16 +405,12 @@ class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, Milestone
 
         response = self.api_response()
         certificate_data = response.data[0]['certificate']
-        self.assertRegexpMatches(
+        self.assertRegex(
             certificate_data['url'],
-            r'http.*/certificates/user/{user_id}/course/{course_id}'.format(
-                user_id=self.user.id,
-                course_id=self.course.id,
-            )
+            r'http.*/certificates/[0-9a-f]{32}'
         )
 
 
-@attr(shard=9)
 class CourseStatusAPITestCase(MobileAPITestCase):
     """
     Base test class for /api/mobile/{api_version}/users/<user_name>/course_status_info/{course_id}
@@ -432,7 +445,6 @@ class CourseStatusAPITestCase(MobileAPITestCase):
         )
 
 
-@attr(shard=9)
 class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
                           MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
@@ -444,15 +456,14 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         response = self.api_response()
         self.assertEqual(
             response.data["last_visited_module_id"],
-            unicode(self.sub_section.location)
+            six.text_type(self.sub_section.location)
         )
         self.assertEqual(
             response.data["last_visited_module_path"],
-            [unicode(module.location) for module in [self.sub_section, self.section, self.course]]
+            [six.text_type(module.location) for module in [self.sub_section, self.section, self.course]]
         )
 
 
-@attr(shard=9)
 class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
                             MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
@@ -464,10 +475,10 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
 
     def test_success(self):
         self.login_and_enroll()
-        response = self.api_response(data={"last_visited_module_id": unicode(self.other_unit.location)})
+        response = self.api_response(data={"last_visited_module_id": six.text_type(self.other_unit.location)})
         self.assertEqual(
             response.data["last_visited_module_id"],
-            unicode(self.other_sub_section.location)
+            six.text_type(self.other_sub_section.location)
         )
 
     def test_invalid_module(self):
@@ -492,7 +503,7 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         past_date = datetime.datetime.now()
         response = self.api_response(
             data={
-                "last_visited_module_id": unicode(self.other_unit.location),
+                "last_visited_module_id": six.text_type(self.other_unit.location),
                 "modification_date": past_date.isoformat()
             },
             expected_response_code=400
@@ -510,18 +521,18 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         self.login_and_enroll()
 
         # save something so we have an initial date
-        self.api_response(data={"last_visited_module_id": unicode(initial_unit.location)})
+        self.api_response(data={"last_visited_module_id": six.text_type(initial_unit.location)})
 
         # now actually update it
         response = self.api_response(
             data={
-                "last_visited_module_id": unicode(update_unit.location),
+                "last_visited_module_id": six.text_type(update_unit.location),
                 "modification_date": date.isoformat()
             }
         )
         self.assertEqual(
             response.data["last_visited_module_id"],
-            unicode(expected_subsection.location)
+            six.text_type(expected_subsection.location)
         )
 
     def test_old_date(self):
@@ -538,13 +549,13 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         self.login_and_enroll()
         response = self.api_response(
             data={
-                "last_visited_module_id": unicode(self.other_unit.location),
+                "last_visited_module_id": six.text_type(self.other_unit.location),
                 "modification_date": timezone.now().isoformat()
             }
         )
         self.assertEqual(
             response.data["last_visited_module_id"],
-            unicode(self.other_sub_section.location)
+            six.text_type(self.other_sub_section.location)
         )
 
     def test_invalid_date(self):
@@ -556,7 +567,6 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         )
 
 
-@attr(shard=9)
 @ddt.ddt
 @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
@@ -605,11 +615,11 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin)
         self._expiration_in_response(serialized, api_version)
 
         # Assert utm parameters
-        expected_utm_parameters = {
-            'twitter': 'utm_campaign=social-sharing-db&utm_medium=social&utm_source=twitter',
-            'facebook': 'utm_campaign=social-sharing-db&utm_medium=social&utm_source=facebook'
-        }
-        self.assertEqual(serialized['course']['course_sharing_utm_parameters'], expected_utm_parameters)
+        qstwitter = parse_qs('utm_campaign=social-sharing-db&utm_medium=social&utm_source=twitter')
+        qsfacebook = parse_qs('utm_campaign=social-sharing-db&utm_medium=social&utm_source=facebook')
+
+        self.assertDictEqual(qsfacebook, parse_qs(serialized['course']['course_sharing_utm_parameters']['facebook']))
+        self.assertDictEqual(qstwitter, parse_qs(serialized['course']['course_sharing_utm_parameters']['twitter']))
 
     @ddt.data(API_V05, API_V1)
     def test_with_display_overrides(self, api_version):

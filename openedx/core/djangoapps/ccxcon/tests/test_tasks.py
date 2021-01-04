@@ -2,11 +2,11 @@
 Tests for the CCXCon celery tasks
 """
 
+
 import mock
-
 from django.test import TestCase
-
 from opaque_keys.edx.keys import CourseKey
+
 from openedx.core.djangoapps.ccxcon import api, tasks
 
 
@@ -14,7 +14,6 @@ class CCXConTaskTestCase(TestCase):
     """
     Tests for CCXCon tasks.
     """
-    shard = 2
 
     @mock.patch('openedx.core.djangoapps.ccxcon.api.course_info_to_ccxcon')
     def test_update_ccxcon_task_ok(self, mock_citc):

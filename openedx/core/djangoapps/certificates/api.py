@@ -1,12 +1,15 @@
 """
 The public API for certificates.
 """
+
+
 import logging
 from datetime import datetime
 
+import six
 from pytz import UTC
 
-from lms.djangoapps.certificates.models import CertificateWhitelist
+from lms.djangoapps.certificates.models import CertificateStatuses, CertificateWhitelist
 from openedx.core.djangoapps.certificates.config import waffle
 from student.models import CourseEnrollment
 
@@ -63,7 +66,7 @@ def can_show_certificate_message(course, student, course_grade, certificates_ena
     certificates_are_viewable = certificates_viewable_for_course(course)
 
     # Adding a temporary logging for EDUCATOR-2017.
-    if unicode(course.id) == u'course-v1:RITx+PM9004x+3T2017':
+    if six.text_type(course.id) == u'course-v1:RITx+PM9004x+3T2017':
         log.info(
             (
                 u'can_show_certificate_message called with:'
@@ -109,3 +112,7 @@ def display_date_for_certificate(course, certificate):
     if _course_uses_available_date(course) and course.certificate_available_date < datetime.now(UTC):
         return course.certificate_available_date
     return certificate.modified_date
+
+
+def is_valid_pdf_certificate(cert_data):
+    return cert_data.cert_status == CertificateStatuses.downloadable and cert_data.download_url

@@ -2,6 +2,8 @@
 FieldOverride that forces graded components to be only accessible to
 students in the Unlocked Group of the ContentTypeGating partition.
 """
+
+
 from django.conf import settings
 
 from lms.djangoapps.courseware.field_overrides import FieldOverrideProvider
@@ -46,6 +48,16 @@ class ContentTypeGatingFieldOverride(FieldOverrideProvider):
 
         if original_group_access is None:
             original_group_access = {}
+
+            # For Feature Based Enrollments, we want to inherit group access configurations
+            # from parent blocks. The use case is to allow granting access
+            # to all graded problems in a unit at the unit level
+            parent = block.get_parent()
+            if parent is not None:
+                merged_group_access = parent.merged_group_access
+                if merged_group_access and CONTENT_GATING_PARTITION_ID in merged_group_access:
+                    return original_group_access
+
         original_group_access.setdefault(
             CONTENT_GATING_PARTITION_ID,
             [settings.CONTENT_TYPE_GATE_GROUP_IDS['full_access']]

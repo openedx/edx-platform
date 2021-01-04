@@ -6,17 +6,20 @@ tests for functionalities that require django API, and lms specific
 functionalities.
 """
 
+
 import json
 import uuid
 
 import ddt
 import mock
+import six
 from django.urls import reverse
+from six.moves import range
 from web_fragments.fragment import Fragment
 from xblock.field_data import DictFieldData
 
 from course_api.blocks.tests.helpers import deserialize_usage_key
-from courseware.module_render import get_module_for_descriptor_internal
+from lms.djangoapps.courseware.module_render import get_module_for_descriptor_internal
 from lms.djangoapps.courseware.tests.helpers import XModuleRenderingTestBase
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xblock_discussion import DiscussionXBlock, loader
@@ -31,7 +34,6 @@ class TestDiscussionXBlock(XModuleRenderingTestBase):
     Base class for tests
     """
 
-    shard = 4
     PATCH_DJANGO_USER = True
 
     def setUp(self):
@@ -85,7 +87,6 @@ class TestGetDjangoUser(TestDiscussionXBlock):
     Tests for the django_user property.
     """
 
-    shard = 4
     PATCH_DJANGO_USER = False
 
     def setUp(self):
@@ -123,7 +124,6 @@ class TestViews(TestDiscussionXBlock):
     """
     Tests for student_view and author_view.
     """
-    shard = 4
 
     def setUp(self):
         """
@@ -210,14 +210,16 @@ class TestTemplates(TestDiscussionXBlock):
     """
     Tests rendering of templates.
     """
-    shard = 4
 
     def test_has_permission(self):
         """
         Test for has_permission method.
         """
         permission_canary = object()
-        with mock.patch('django_comment_client.permissions.has_permission', return_value=permission_canary) as has_perm:
+        with mock.patch(
+            'lms.djangoapps.discussion.django_comment_client.permissions.has_permission',
+            return_value=permission_canary,
+        ) as has_perm:
             actual_permission = self.block.has_permission("test_permission")
         self.assertEqual(actual_permission, permission_canary)
         has_perm.assert_called_once_with(self.django_user_canary, 'test_permission', 'test_course')
@@ -256,7 +258,6 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
     """
     Test the discussion xblock as rendered in the course and course API.
     """
-    shard = 4
 
     @classmethod
     def setUpClass(cls):
@@ -358,7 +359,7 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
         Tests that course block api returns student_view_data for discussion xblock
         """
         self.client.login(username=self.user.username, password='test')
-        url = reverse('blocks_in_block_tree', kwargs={'usage_key_string': unicode(self.course_usage_key)})
+        url = reverse('blocks_in_block_tree', kwargs={'usage_key_string': six.text_type(self.course_usage_key)})
         query_params = {
             'depth': 'all',
             'username': self.user.username,
@@ -366,13 +367,13 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
             'student_view_data': 'discussion'
         }
         response = self.client.get(url, query_params)
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.data['root'], unicode(self.course_usage_key))
-        for block_key_string, block_data in response.data['blocks'].iteritems():
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['root'], six.text_type(self.course_usage_key))
+        for block_key_string, block_data in six.iteritems(response.data['blocks']):
             block_key = deserialize_usage_key(block_key_string, self.course_key)
-            self.assertEquals(block_data['id'], block_key_string)
-            self.assertEquals(block_data['type'], block_key.block_type)
-            self.assertEquals(block_data['display_name'], self.store.get_item(block_key).display_name or '')
+            self.assertEqual(block_data['id'], block_key_string)
+            self.assertEqual(block_data['type'], block_key.block_type)
+            self.assertEqual(block_data['display_name'], self.store.get_item(block_key).display_name or '')
             self.assertEqual(block_data['student_view_data'], {"topic_id": self.discussion_id})
 
 
@@ -380,7 +381,6 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
     """
     Test the number of queries executed when rendering the XBlock.
     """
-    shard = 4
 
     def test_permissions_query_load(self):
         """

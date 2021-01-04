@@ -1,16 +1,17 @@
 """
 Test the heartbeat
 """
-from __future__ import print_function
+
+
 import json
 
-from django.urls import reverse
 from django.db.utils import DatabaseError
 from django.test.client import Client
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from django.urls import reverse
 from mock import patch
 
 from xmodule.exceptions import HeartbeatFailure
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class HeartbeatTestCase(ModuleStoreTestCase):
@@ -34,7 +35,7 @@ class HeartbeatTestCase(ModuleStoreTestCase):
             mock_connection.cursor.return_value.execute.side_effect = DatabaseError
             response = self.client.get(self.heartbeat_url)
             self.assertEqual(response.status_code, 503)
-            response_dict = json.loads(response.content)
+            response_dict = json.loads(response.content.decode('utf-8'))
             self.assertIn('sql', response_dict)
 
     def test_modulestore_fail(self):

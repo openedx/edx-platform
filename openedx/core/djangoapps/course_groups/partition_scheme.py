@@ -1,9 +1,11 @@
 """
 Provides a UserPartition driver for cohorts.
 """
+
+
 import logging
 
-from courseware.masquerade import (
+from lms.djangoapps.courseware.masquerade import (
     get_course_masquerade,
     get_masquerading_user_group,
     is_masquerading_as_specific_student
@@ -11,7 +13,6 @@ from courseware.masquerade import (
 from xmodule.partitions.partitions import NoSuchUserPartitionGroupError
 
 from .cohorts import get_cohort, get_group_info_for_cohort
-
 
 log = logging.getLogger(__name__)
 
@@ -61,7 +62,7 @@ class CohortPartitionScheme(object):
             # one it means the mapping is invalid.  the previous state of the
             # partition configuration may have been modified.
             log.warn(
-                "partition mismatch in CohortPartitionScheme: %r",
+                u"partition mismatch in CohortPartitionScheme: %r",
                 {
                     "requested_partition_id": user_partition.id,
                     "found_partition_id": partition_id,
@@ -79,7 +80,7 @@ class CohortPartitionScheme(object):
             # it means the mapping is invalid.  the previous state of the
             # partition configuration may have been modified.
             log.warn(
-                "group not found in CohortPartitionScheme: %r",
+                u"group not found in CohortPartitionScheme: %r",
                 {
                     "requested_partition_id": user_partition.id,
                     "requested_group_id": group_id,

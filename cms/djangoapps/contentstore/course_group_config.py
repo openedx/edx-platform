@@ -1,9 +1,11 @@
 """
 Class for manipulating groups configuration on a course object.
 """
-from collections import defaultdict
+
+
 import json
 import logging
+from collections import defaultdict
 
 from django.utils.translation import ugettext as _
 
@@ -58,7 +60,7 @@ class GroupConfiguration(object):
         Deserialize given json that represents group configuration.
         """
         try:
-            configuration = json.loads(json_string)
+            configuration = json.loads(json_string.decode("utf-8"))
         except ValueError:
             raise GroupConfigurationsValidationError(_("invalid JSON"))
         configuration["version"] = UserPartition.VERSION
@@ -194,7 +196,7 @@ class GroupConfiguration(object):
         for split_test in split_tests:
             unit = split_test.get_parent()
             if not unit:
-                log.warning("Unable to find parent for split_test %s", split_test.location)
+                log.warning(u"Unable to find parent for split_test %s", split_test.location)
                 # Make sure that this user_partition appears in the output even though it has no content
                 usage_info[split_test.user_partition_id] = []
                 continue
@@ -234,7 +236,7 @@ class GroupConfiguration(object):
         for item, partition_id, group_id in GroupConfiguration._iterate_items_and_group_ids(course, items):
             unit = item.get_parent()
             if not unit:
-                log.warning("Unable to find parent for component %s", item.location)
+                log.warning(u"Unable to find parent for component %s", item.location)
                 continue
 
             usage_info[partition_id][group_id].append(GroupConfiguration._get_usage_dict(

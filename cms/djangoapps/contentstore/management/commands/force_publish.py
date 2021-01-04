@@ -1,7 +1,8 @@
 """
 Script for force publishing a course
 """
-from __future__ import print_function
+
+
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -11,7 +12,6 @@ from xmodule.modulestore.django import modulestore
 
 from .prompt import query_yes_no
 from .utils import get_course_versions
-
 
 # To run from command line: ./manage.py cms force_publish course-v1:org+course+run
 
@@ -45,10 +45,10 @@ class Command(BaseCommand):
         owning_store = modulestore()._get_modulestore_for_courselike(course_key)  # pylint: disable=protected-access
         if hasattr(owning_store, 'force_publish_course'):
             versions = get_course_versions(options['course_key'])
-            print("Course versions : {0}".format(versions))
+            print(u"Course versions : {0}".format(versions))
 
             if options['commit']:
-                if query_yes_no("Are you sure to publish the {0} course forcefully?".format(course_key), default="no"):
+                if query_yes_no(u"Are you sure to publish the {0} course forcefully?".format(course_key), default="no"):
                     # publish course forcefully
                     updated_versions = owning_store.force_publish_course(
                         course_key, ModuleStoreEnum.UserID.mgmt_command, options['commit']
@@ -56,20 +56,20 @@ class Command(BaseCommand):
                     if updated_versions:
                         # if publish and draft were different
                         if versions['published-branch'] != versions['draft-branch']:
-                            print("Success! Published the course '{0}' forcefully.".format(course_key))
-                            print("Updated course versions : \n{0}".format(updated_versions))
+                            print(u"Success! Published the course '{0}' forcefully.".format(course_key))
+                            print(u"Updated course versions : \n{0}".format(updated_versions))
                         else:
-                            print("Course '{0}' is already in published state.".format(course_key))
+                            print(u"Course '{0}' is already in published state.".format(course_key))
                     else:
-                        print("Error! Could not publish course {0}.".format(course_key))
+                        print(u"Error! Could not publish course {0}.".format(course_key))
             else:
                 # if publish and draft were different
                 if versions['published-branch'] != versions['draft-branch']:
                     print("Dry run. Following would have been changed : ")
-                    print("Published branch version {0} changed to draft branch version {1}".format(
+                    print(u"Published branch version {0} changed to draft branch version {1}".format(
                         versions['published-branch'], versions['draft-branch'])
                     )
                 else:
-                    print("Dry run. Course '{0}' is already in published state.".format(course_key))
+                    print(u"Dry run. Course '{0}' is already in published state.".format(course_key))
         else:
             raise CommandError("The owning modulestore does not support this command.")

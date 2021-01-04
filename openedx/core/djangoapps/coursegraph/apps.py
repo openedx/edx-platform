@@ -4,6 +4,7 @@ Coursegraph Application Configuration
 Signal handlers are connected here.
 """
 
+
 from django.apps import AppConfig
 
 

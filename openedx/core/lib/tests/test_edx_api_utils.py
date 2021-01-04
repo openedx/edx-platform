@@ -1,5 +1,6 @@
 """Tests covering edX API utilities."""
 # pylint: disable=missing-docstring
+
 import json
 
 import httpretty
@@ -23,7 +24,6 @@ TEST_API_URL = 'http://www-internal.example.com/api'
 class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, CacheIsolationTestCase):
     """Tests for edX API data retrieval utility."""
     ENABLED_CACHES = ['default']
-    shard = 2
 
     def setUp(self):
         super(TestGetEdxApiData, self).setUp()
@@ -174,6 +174,46 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
         actual_resource = get_edx_api_data(catalog_integration, 'programs', api=api, resource_id=resource_id)
         self.assertEqual(actual_resource, expected_resource)
 
+        self._assert_num_requests(1)
+
+    def test_get_specific_fields_from_cache_response(self):
+        """Verify that resource response is cached and get required fields from cached response"""
+        catalog_integration = self.create_catalog_integration(cache_ttl=5)
+        api = create_catalog_api_client(self.user)
+
+        response = {'lang': 'en', 'weeks_to_complete': '5'}
+
+        resource_id = 'course-v1:testX+testABC+1T2019'
+        url = '{api_root}/course_runs/{resource_id}/'.format(
+            api_root=CatalogIntegration.current().get_internal_api_url().strip('/'),
+            resource_id=resource_id,
+        )
+
+        expected_resource_for_lang = {'lang': 'en'}
+        expected_resource_for_weeks_to_complete = {'weeks_to_complete': '5'}
+
+        self._mock_catalog_api(
+            [httpretty.Response(body=json.dumps(response), content_type='application/json')],
+            url=url
+        )
+
+        cache_key = CatalogIntegration.current().CACHE_KEY
+
+        # get response and set the cache.
+        actual_resource_for_lang = get_edx_api_data(
+            catalog_integration, 'course_runs', resource_id=resource_id, api=api, cache_key=cache_key, fields=['lang']
+        )
+        self.assertEqual(actual_resource_for_lang, expected_resource_for_lang)
+
+        # Hit the cache
+        actual_resource = get_edx_api_data(
+            catalog_integration, 'course_runs', api=api, resource_id=resource_id, cache_key=cache_key,
+            fields=['weeks_to_complete']
+        )
+
+        self.assertEqual(actual_resource, expected_resource_for_weeks_to_complete)
+
+        # Verify that only one requests were made, not three.
         self._assert_num_requests(1)
 
     def test_cache_utilization(self):

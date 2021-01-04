@@ -1,7 +1,8 @@
 """
 Command-line utility to start a stub service.
 """
-from __future__ import print_function
+
+
 import logging
 import sys
 import time
@@ -47,7 +48,7 @@ def get_args():
 
     if service_name not in SERVICES:
         print("Unrecognized service '{0}'.  Valid choices are: {1}".format(
-            service_name, ", ".join(SERVICES.keys())))
+            service_name, ", ".join(list(SERVICES.keys()))))
         sys.exit(1)
 
     try:

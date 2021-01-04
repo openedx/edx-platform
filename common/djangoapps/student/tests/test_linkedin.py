@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """Tests for LinkedIn Add to Profile configuration. """
 
-from urllib import quote, urlencode
 
 import ddt
 from django.conf import settings
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
+from six.moves.urllib.parse import quote, urlencode
 
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from student.models import LinkedInAddToProfileConfiguration
