@@ -81,6 +81,8 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
 
         # pylint: disable=no-member
         for child in child_blocks:
+            if context.get('hide_access_error_blocks') and getattr(child, 'has_access_error', False):
+                continue
             child_block_context = copy(child_context)
             if child in list(child_blocks_to_complete_on_view):
                 child_block_context['wrap_xblock_data'] = {

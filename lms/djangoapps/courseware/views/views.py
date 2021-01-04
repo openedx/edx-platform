@@ -1647,13 +1647,22 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             raise Http404("Course not found.")
 
         # get the block, which verifies whether the user has access to the block.
+        recheck_access = request.GET.get('recheck_access') == '1'
         block, _ = get_module_by_usage_id(
-            request, text_type(course_key), text_type(usage_key), disable_staff_debug_info=True, course=course
+            request, str(course_key), str(usage_key), disable_staff_debug_info=True, course=course,
+            will_recheck_access=recheck_access
         )
 
         student_view_context = request.GET.dict()
         student_view_context['show_bookmark_button'] = request.GET.get('show_bookmark_button', '0') == '1'
         student_view_context['show_title'] = request.GET.get('show_title', '1') == '1'
+
+        is_learning_mfe = is_request_from_learning_mfe(request)
+        # Right now, we only care about this in regards to the Learning MFE because it results
+        # in a bad UX if we display blocks with access errors (repeated upgrade messaging).
+        # If other use cases appear, consider removing the is_learning_mfe check or switching this
+        # to be its own query parameter that can toggle the behavior.
+        student_view_context['hide_access_error_blocks'] = is_learning_mfe and recheck_access
 
         enable_completion_on_view_service = False
         completion_service = block.runtime.service(block, 'completion')
@@ -1684,7 +1693,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'web_app_course_url': reverse(COURSE_HOME_VIEW_NAME, args=[course.id]),
             'on_courseware_page': True,
             'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
-            'is_learning_mfe': is_request_from_learning_mfe(request),
+            'is_learning_mfe': is_learning_mfe,
             'is_mobile_app': is_request_from_mobile_app(request),
             'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
         }
