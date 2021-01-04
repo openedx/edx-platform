@@ -15,15 +15,15 @@
 -c ../constraints.txt
 
 -r shared.txt                       # Dependencies in common with LMS and Studio
-chem
+chem                                # A helper library for chemistry calculations
 matplotlib==2.2.4                   # 2D plotting library
 networkx==2.2                       # Utilities for creating, manipulating, and studying network graphs
 numpy==1.16.5                       # Numeric array processing utilities; used by scipy
-openedx-calc
+openedx-calc<2.0.0
 pyparsing==2.2.0                    # Python Parsing module
 random2                             # Implementation of random module that works identically under Python 2 and 3
 scipy==1.2.1                        # Math, science, and engineering library
-sympy==1.6.2                         # Symbolic math library
+sympy==1.6.2                        # Symbolic math library
 
 # Install these packages from the edx-platform working tree
 # NOTE: if you change code in these packages, you MUST change the version
