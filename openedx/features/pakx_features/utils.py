@@ -195,5 +195,6 @@ def get_course_progress_percentage(request, course_key):
             0
         ),
     )
-    total_completed_blocks = sum(total_completed_block_types.values())
+    total_completed_blocks = sum(list(filter(lambda value: value is not None, total_completed_block_types.values()))) \
+        if total_completed_block_types and total_completed_block_types.values() else 0
     return format((total_completed_blocks/total_blocks)*100, '.0f')
