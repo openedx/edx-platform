@@ -242,13 +242,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2020-02-16 20:42+0000\n"
-"PO-Revision-Date: 2019-09-29 20:43+0000\n"
-=======
 "POT-Creation-Date: 2020-05-03 20:42+0000\n"
 "PO-Revision-Date: 2020-04-27 09:13+0000\n"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
 "Language: pt_BR\n"
@@ -305,10 +300,7 @@ msgstr "Apagar"
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/signatory-actions.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
-<<<<<<< HEAD
-=======
 #: common/static/common/templates/discussion/templates.underscore
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
@@ -332,10 +324,7 @@ msgstr "Carregando"
 #: lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
 #: common/static/common/templates/image-modal.underscore
-<<<<<<< HEAD
-=======
 #: common/static/common/templates/discussion/templates.underscore
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Close"
 msgstr "Fechar"
@@ -965,10 +954,7 @@ msgstr ""
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
-<<<<<<< HEAD
-=======
 #: common/static/common/templates/discussion/templates.underscore
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Edit"
 msgstr ""
 
@@ -1363,10 +1349,7 @@ msgstr ""
 
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
-<<<<<<< HEAD
-=======
 #: common/static/common/templates/discussion/templates.underscore
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Next"
 msgstr "Próximo"
 
@@ -1700,10 +1683,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/signatory-details.underscore
-<<<<<<< HEAD
-=======
 #: common/static/common/templates/discussion/templates.underscore
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Title"
 msgstr ""
 
@@ -2527,15 +2507,9 @@ msgid "Not specific to a course"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-<<<<<<< HEAD
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr "Assunto"
-=======
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "Topic"
 msgstr "Tópicos"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
@@ -2605,15 +2579,9 @@ msgstr ""
 msgid "The more you tell us, the more quickly and helpfully we can respond!"
 msgstr ""
 
-<<<<<<< HEAD
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr "Enviar"
-=======
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Create Support Ticket"
 msgstr ""
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
@@ -2631,11 +2599,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-<<<<<<< HEAD
-msgid "Select a subject for your support request."
-=======
 msgid "Select a topic for your support request."
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -2643,8 +2607,6 @@ msgid "Enter some details for your support request."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-<<<<<<< HEAD
-=======
 msgid ""
 "Due to the recent increase in interest in online education and edX, we are "
 "currently experiencing an unusually high volume of support requests. We "
@@ -2657,7 +2619,6 @@ msgid " as many questions may have already been answered."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid "Contact Us"
 msgstr ""
@@ -2680,12 +2641,8 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid ""
-<<<<<<< HEAD
-"Thank you for submitting a request! We will contact you within 24 hours."
-=======
 "Thank you for submitting a request! We appreciate your patience while we "
 "work to review your request."
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
@@ -2896,13 +2853,8 @@ msgid "Cannot join instructor managed team"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
-<<<<<<< HEAD
-msgid "{memberCount} / {maxMemberCount} Member"
-msgid_plural "{memberCount} / {maxMemberCount} Members"
-=======
 msgid " Member"
 msgid_plural " Members"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr[0] ""
 msgstr[1] ""
 
@@ -2919,13 +2871,8 @@ msgid "Topics"
 msgstr "Tópicos"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-<<<<<<< HEAD
-msgid "My Team"
-msgstr "Minha equipe"
-=======
 msgid "My Teams"
 msgstr ""
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Browse"
@@ -3036,13 +2983,6 @@ msgid "{team_count} Team"
 msgid_plural "{team_count} Teams"
 msgstr[0] ""
 msgstr[1] ""
-<<<<<<< HEAD
-
-#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "Topic"
-msgstr "Tópicos"
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the {topic_name} Topic"
@@ -3380,10 +3320,7 @@ msgid "There has been an error processing your survey."
 msgstr "Ocorreu um erro ao processar a sua enquete."
 
 #: lms/static/js/courseware/credit_progress.js
-<<<<<<< HEAD
-=======
 #: common/static/common/templates/discussion/templates.underscore
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
 msgid "More"
@@ -3400,10 +3337,7 @@ msgid "HTML preview of post"
 msgstr ""
 
 #: lms/static/js/customwmd.js
-<<<<<<< HEAD
-=======
 #: common/static/common/templates/discussion/templates.underscore
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Your question or idea (required)"
 msgstr ""
 
@@ -5343,8 +5277,6 @@ msgstr "Expandir Tudo"
 msgid "Collapse All"
 msgstr "Retrair Tudo"
 
-<<<<<<< HEAD
-=======
 #: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "Show More"
@@ -5355,7 +5287,6 @@ msgstr ""
 msgid "Show Less"
 msgstr ""
 
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
@@ -5651,7 +5582,6 @@ msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Run:"
-<<<<<<< HEAD
 msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
@@ -5659,15 +5589,6 @@ msgid "(Read-only)"
 msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-=======
-msgstr ""
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-msgid "(Read-only)"
-msgstr ""
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Re-run Course"
 msgstr ""
 
@@ -6936,10 +6857,7 @@ msgstr "Data"
 
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
-<<<<<<< HEAD
-=======
 #: common/static/common/templates/discussion/templates.underscore
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Previous"
 msgstr "Anterior"
 
@@ -6987,8 +6905,6 @@ msgstr "Limpar pesquisa"
 msgid "Search"
 msgstr "Busca"
 
-<<<<<<< HEAD
-=======
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Add a Response"
 msgstr ""
@@ -7293,7 +7209,6 @@ msgstr ""
 msgid "Open"
 msgstr ""
 
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Discussion Home"
 msgstr ""
@@ -7791,17 +7706,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
-<<<<<<< HEAD
-msgid "Show More"
-msgstr ""
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show Less"
-msgstr ""
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Exam timer and end exam button"
 msgstr ""
 
@@ -8720,13 +8624,8 @@ msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-<<<<<<< HEAD
-"You need a computer or cell phone that has a webcam. When you receive a "
-"browser prompt, make sure that you allow access to the camera."
-=======
 "You need a device that has a webcam. If you receive a browser prompt for "
 "access to your camera, please make sure to click 'Allow'."
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8762,13 +8661,8 @@ msgstr "Seu rosto inteiro cabe dentro do quadro."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-<<<<<<< HEAD
-"To use the current photo, select the Take Photo button {icon}. To take "
-"another photo, select the Retake Photo button {icon}."
-=======
 "To take the photo of your face, click on the camera button {icon}. If you "
 "need to try again, click 'Retake Photo'."
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8941,8 +8835,6 @@ msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
-<<<<<<< HEAD
-=======
 "As part of the verification process, you take a photo of both your face and "
 "a photo ID. Our authorization service confirms your identity by comparing "
 "the photo you take with the photo on your ID."
@@ -8950,7 +8842,6 @@ msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 "You may be able to complete the image capture procedure without assistance, "
 "but it may take a couple of submission attempts to get the camera "
 "positioning right.  Optimal camera positioning varies with each computer, "

@@ -321,9 +321,10 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         )
 
     def test_hinted_login(self):
-        params = [("next", "/courses/something/?tpa_hint=oa2-google-oauth2")]
+        tpa_hint = self.google_provider.provider_id
+        params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
         response = self.client.get(reverse('signin_user'), params, HTTP_ACCEPT="text/html")
-        self.assertContains(response, '"third_party_auth_hint": "oa2-google-oauth2"')
+        self.assertContains(response, '"third_party_auth_hint": "{0}"'.format(tpa_hint))
 
         tpa_hint = self.hidden_enabled_provider.provider_id
         params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
@@ -344,10 +345,11 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         """Test that the dialog doesn't show up for hinted logins when disabled. """
         self.google_provider.skip_hinted_login_dialog = True
         self.google_provider.save()
-        params = [("next", "/courses/something/?tpa_hint=oa2-google-oauth2")]
+        tpa_hint = self.google_provider.provider_id
+        params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
         response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
         expected_url = '/auth/login/google-oauth2/?auth_entry={}&next=%2Fcourses'\
-                       '%2Fsomething%2F%3Ftpa_hint%3Doa2-google-oauth2'.format(auth_entry)
+                       '%2Fsomething%2F%3Ftpa_hint%3D{}'.format(auth_entry, tpa_hint)
         self.assertRedirects(
             response,
             expected_url,
@@ -391,8 +393,9 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         self.google_provider.save()
         params = [("next", "/courses/something/")]
         response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
+        tpa_hint = self.google_provider.provider_id
         expected_url = '/auth/login/google-oauth2/?auth_entry={}&next=%2Fcourses'\
-                       '%2Fsomething%2F%3Ftpa_hint%3Doa2-google-oauth2'.format(auth_entry)
+                       '%2Fsomething%2F%3Ftpa_hint%3D{}'.format(auth_entry, tpa_hint)
         self.assertRedirects(
             response,
             expected_url,

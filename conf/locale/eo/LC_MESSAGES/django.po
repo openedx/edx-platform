@@ -27,27 +27,19 @@
 # Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2020.
-<<<<<<< HEAD
-=======
 #
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2020.
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2020-02-18 11:25+0000\n"
-"PO-Revision-Date: 2020-02-18 11:25:05.511559\n"
-=======
 "POT-Creation-Date: 2020-06-02 20:31+0000\n"
 "PO-Revision-Date: 2020-06-02 20:31:50.769435\n"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -231,13 +223,7 @@ msgstr ""
 "¢σηѕє¢тєтυя#"
 
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
-<<<<<<< HEAD
-#: openedx/core/djangoapps/user_api/api.py
-#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/footer.html
-#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/footer.html
-=======
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -995,61 +981,6 @@ msgstr ""
 "σƒƒι¢ια#"
 
 #: common/djangoapps/student/views/management.py
-<<<<<<< HEAD
-msgid ""
-"Your previous request is in progress, please try again in a few moments."
-msgstr ""
-"Ýöür prévïöüs réqüést ïs ïn prögréss, pléäsé trý ägäïn ïn ä féw möménts. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: common/djangoapps/student/views/management.py
-msgid "Some error occured during password change. Please try again"
-msgstr ""
-"Sömé érrör öççüréd dürïng pässwörd çhängé. Pléäsé trý ägäïn Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/djangoapps/student/views/management.py
-msgid "No email address provided."
-msgstr "Nö émäïl äddréss prövïdéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: common/djangoapps/student/views/management.py
-msgid "Password reset unsuccessful"
-msgstr "Pässwörd rését ünsüççéssfül Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
-
-#: common/djangoapps/student/views/management.py
-msgid "Error in resetting your password."
-msgstr ""
-"Érrör ïn réséttïng ýöür pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: common/djangoapps/student/views/management.py
-msgid "Error in resetting your password. Please try again."
-msgstr ""
-"Érrör ïn réséttïng ýöür pässwörd. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/djangoapps/student/views/management.py
-msgid "Password creation unsuccessful"
-msgstr "Pässwörd çréätïön ünsüççéssfül Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: common/djangoapps/student/views/management.py
-msgid "Error in creating your password. Please try again."
-msgstr ""
-"Érrör ïn çréätïng ýöür pässwörd. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid ""
-"{html_start}Password Creation Complete{html_end}Your password has been "
-"created. {bold_start}{email}{bold_end} is now your primary login email."
-msgstr ""
-"{html_start}Pässwörd Çréätïön Çömplété{html_end}Ýöür pässwörd häs ßéén "
-"çréätéd. {bold_start}{email}{bold_end} ïs nöw ýöür prïmärý lögïn émäïl. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
-
-#: common/djangoapps/student/views/management.py
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Valid e-mail address required."
 msgstr "Välïd é-mäïl äddréss réqüïréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
@@ -2725,11 +2656,6 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
 #: cms/templates/index.html cms/templates/videos_index_pagination.html
-<<<<<<< HEAD
-#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
-#: lms/templates/register-shib.html
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/manage_user_standing.html
@@ -5812,8 +5738,6 @@ msgstr ""
 "{display_name} ïs önlý äççéssïßlé tö énrölléd léärnérs. Sïgn ïn ör régïstér,"
 " änd énröll ïn thïs çöürsé tö vïéw ït. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
-<<<<<<< HEAD
-=======
 #: common/templates/admin/student/loginfailures/change_form_template.html
 msgid "Unlock Account"
 msgstr "Ûnlöçk Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
@@ -5920,7 +5844,6 @@ msgstr ""
 "Àçtïön Réqüïréd: Àçtïväté ýöür %(platform_name)s äççöünt Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 msgid "Create Password"
 msgstr "Çréäté Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
@@ -6034,14 +5957,6 @@ msgstr ""
 "Réqüést tö çhängé %(platform_name)s äççöünt é-mäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυ#"
 
-<<<<<<< HEAD
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-#: themes/st-lutherx/lms/templates/student/edx_ace/passwordreset/email/body.html
-#: themes/st-normanx/lms/templates/student/edx_ace/passwordreset/email/body.html
-#: lms/templates/forgot_password_modal.html
-msgid "Password Reset"
-msgstr "Pässwörd Rését Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-=======
 #: common/templates/student/edx_ace/emailchangeconfirmation/email/body.html
 #: common/templates/student/edx_ace/emailchangeconfirmation/email/subject.txt
 #, python-format
@@ -6049,7 +5964,6 @@ msgid "Email Change Confirmation for %(platform_name)s"
 msgstr ""
 "Émäïl Çhängé Çönfïrmätïön för %(platform_name)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
 " ¢σηѕє¢тє#"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: common/templates/student/edx_ace/emailchangeconfirmation/email/body.html
 #: common/templates/student/edx_ace/emailchangeconfirmation/email/body.txt
@@ -6070,17 +5984,9 @@ msgstr ""
 " єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυ#"
 
-<<<<<<< HEAD
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
-#: themes/st-lutherx/lms/templates/student/edx_ace/passwordreset/email/body.html
-#: themes/st-normanx/lms/templates/student/edx_ace/passwordreset/email/body.html
-#, python-format
-=======
 #: common/templates/student/edx_ace/emailchangeconfirmation/email/body.html
 #: common/templates/student/edx_ace/emailchangeconfirmation/email/body.txt
 #: themes/stanford-style/lms/templates/emails/confirm_email_change.txt
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid ""
 "We keep a log of old e-mails, so if this request was unintentional, we can "
 "investigate."
@@ -6088,13 +5994,6 @@ msgstr ""
 "Wé kéép ä lög öf öld é-mäïls, sö ïf thïs réqüést wäs ünïnténtïönäl, wé çän "
 "ïnvéstïgäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
-<<<<<<< HEAD
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
-#: themes/st-lutherx/lms/templates/student/edx_ace/passwordreset/email/body.html
-#: themes/st-normanx/lms/templates/student/edx_ace/passwordreset/email/body.html
-msgid "If you did not request this change, you can ignore this email."
-=======
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
 msgid "Create Recovery Email"
 msgstr "Çréäté Réçövérý Émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
@@ -6103,7 +6002,6 @@ msgstr "Çréäté Réçövérý Émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕ
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.txt
 #, python-format
 msgid "You've registered this recovery email address for %(platform_name)s."
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 "Ýöü'vé régïstéréd thïs réçövérý émäïl äddréss för %(platform_name)s. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
@@ -6117,20 +6015,12 @@ msgstr ""
 "Ìf ýöü sét thïs émäïl äddréss, çlïçk \"çönfïrm émäïl.\"  Ìf ýöü dïdn't "
 "réqüést thïs çhängé, ýöü çän dïsrégärd thïs émäïl. Ⱡ'σяєм ιρѕυм#"
 
-<<<<<<< HEAD
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-#: themes/st-lutherx/lms/templates/student/edx_ace/passwordreset/email/body.html
-#: themes/st-normanx/lms/templates/student/edx_ace/passwordreset/email/body.html
-msgid "Change my Password"
-msgstr "Çhängé mý Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-=======
 #. Translators: This label appears above a field on the registration form
 #. meant to confirm the user's email address.
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Confirm Email"
 msgstr "Çönfïrm Émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: common/templates/student/edx_ace/recoveryemailcreate/email/subject.txt
 #, python-format
@@ -6314,11 +6204,6 @@ msgstr "Dönäté Ⱡ'σяєм ιρѕυ#"
 #: lms/djangoapps/branding/api.py lms/templates/footer.html
 #: lms/templates/static_templates/about.html
 #: themes/red-theme/lms/templates/footer.html
-<<<<<<< HEAD
-#: themes/st-lutherx/lms/templates/footer.html
-#: themes/st-normanx/lms/templates/footer.html
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "About"
@@ -6329,15 +6214,6 @@ msgstr "Àßöüt Ⱡ'σяєм ιρѕ#"
 msgid "{platform_name} for Business"
 msgstr "{platform_name} för Büsïnéss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
-<<<<<<< HEAD
-#: lms/djangoapps/branding/api.py themes/red-theme/lms/templates/footer.html
-#: themes/st-lutherx/lms/templates/footer.html
-#: themes/st-normanx/lms/templates/footer.html
-msgid "News"
-msgstr "Néws Ⱡ'σяєм ι#"
-
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/contact.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/st-lutherx/lms/templates/footer.html
@@ -6392,14 +6268,8 @@ msgstr "Àççéssïßïlïtý Pölïçý Ⱡ'σяєм ιρѕυм ∂σłσя ѕ
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
-<<<<<<< HEAD
-#: lms/djangoapps/branding/api.py openedx/core/djangoapps/user_api/api.py
-#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/footer.html
-#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/footer.html
-=======
 #: lms/djangoapps/branding/api.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/st-lutherx/cms/templates/widgets/footer.html
@@ -9903,88 +9773,6 @@ msgstr "Dönätïön för {course} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α
 msgid "Donation for {platform_name}"
 msgstr "Dönätïön för {platform_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
-<<<<<<< HEAD
-#: lms/djangoapps/shoppingcart/pdf.py
-#, python-brace-format
-msgid "Page {page_number} of {page_count}"
-msgstr "Pägé {page_number} öf {page_count} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/templates/shoppingcart/receipt.html
-msgid "Invoice"
-msgstr "Ìnvöïçé Ⱡ'σяєм ιρѕυм #"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Order"
-msgstr "Ördér Ⱡ'σяєм ιρѕ#"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#, python-brace-format
-msgid "{id_label} # {item_id}"
-msgstr "{id_label} # {item_id} Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-#, python-brace-format
-msgid "Date: {date}"
-msgstr "Däté: {date} Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/djangoapps/shoppingcart/reports.py
-#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
-#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
-#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
-#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
-msgid "Quantity"
-msgstr "Qüäntïtý Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid ""
-"List Price\n"
-"per item"
-msgstr ""
-"Lïst Prïçé\n"
-"pér ïtém Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid ""
-"Discount\n"
-"per item"
-msgstr ""
-"Dïsçöünt\n"
-"pér ïtém Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Amount"
-msgstr "Àmöünt Ⱡ'σяєм ιρѕυ#"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/templates/courseware/gradebook.html
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "Total"
-msgstr "Tötäl Ⱡ'σяєм ιρѕ#"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Payment Received"
-msgstr "Päýmént Réçéïvéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Balance"
-msgstr "Bälänçé Ⱡ'σяєм ιρѕυм #"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Billing Address"
-msgstr "Bïllïng Àddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Disclaimer"
-msgstr "Dïsçläïmér Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "TERMS AND CONDITIONS"
-msgstr "TÉRMS ÀND ÇÖNDÌTÌÖNS Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #. Translators: this text appears when an unfamiliar error code occurs during
 #. payment,
 #. for which we don't know a user-friendly message to display in advance.
@@ -11560,11 +11348,6 @@ msgstr "Sïgnéd Öüt Ⱡ'σяєм ιρѕυм ∂σłσ#"
 msgid "You have signed out."
 msgstr "Ýöü hävé sïgnéd öüt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
-<<<<<<< HEAD
-#: lms/templates/logout.html themes/st-lutherx/lms/templates/logout.html
-#: themes/st-normanx/lms/templates/logout.html
-#, python-format
-=======
 #: lms/templates/logout.html
 #, python-brace-format
 msgid ""
@@ -11590,7 +11373,6 @@ msgstr ""
 
 #: lms/templates/logout.html
 #, python-brace-format
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid ""
 "If you are not redirected within 5 seconds, {start_anchor}click here to go "
 "to the home page{end_anchor}."
@@ -11854,31 +11636,6 @@ msgstr "Sävé çhängés Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 msgid "Preview"
 msgstr "Prévïéw Ⱡ'σяєм ιρѕυм #"
 
-<<<<<<< HEAD
-#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
-#. Translators: this is a control to allow users to exit out of this modal
-#. interface (a menu or piece of UI that takes the full focus of the screen)
-#: lms/templates/wiki/edit.html lms/templates/wiki/history.html
-#: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
-#: lms/templates/forgot_password_modal.html lms/templates/help_modal.html
-#: lms/templates/signup_modal.html lms/templates/ccx/schedule.html
-#: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-#: lms/templates/modal/_modal-settings-language.html
-#: themes/edx.org/lms/templates/dashboard.html
-#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
-#: themes/st-lutherx/lms/templates/dashboard.html
-#: themes/st-normanx/lms/templates/dashboard.html
-msgid "Close"
-msgstr "Çlösé Ⱡ'σяєм ιρѕ#"
-
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/templates/wiki/edit.html
 msgid "Wiki Preview"
 msgstr "Wïkï Prévïéw Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -12295,14 +12052,7 @@ msgstr "Gö tö %(platform_name)s Hömé Pägé Ⱡ'σяєм ιρѕυм ∂σł�
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-<<<<<<< HEAD
-#: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
-#: cms/templates/login.html cms/templates/widgets/header.html
-#: themes/red-theme/cms/templates/login.html
-=======
 #: cms/templates/widgets/header.html
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Sign In"
 msgstr "Sïgn Ìn Ⱡ'σяєм ιρѕυм #"
 
@@ -14748,15 +14498,6 @@ msgstr ""
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: openedx/features/course_experience/views/course_home_messages.py
-<<<<<<< HEAD
-#: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
-#: themes/st-lutherx/lms/templates/header/navbar-not-authenticated.html
-#: themes/st-normanx/lms/templates/header/navbar-not-authenticated.html
-msgid "Sign in"
-msgstr "Sïgn ïn Ⱡ'σяєм ιρѕυм #"
-=======
 #, python-brace-format
 msgid "Welcome to {course_display_name}"
 msgstr "Wélçömé tö {course_display_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
@@ -14774,7 +14515,6 @@ msgstr ""
 "¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
 "ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσя#"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
@@ -16372,43 +16112,6 @@ msgstr "Çöürsé Rün: Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
-<<<<<<< HEAD
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-#: themes/st-lutherx/lms/templates/footer.html
-#: themes/st-lutherx/lms/templates/header/navbar-authenticated.html
-#: themes/st-lutherx/lms/templates/header/navbar-not-authenticated.html
-#: themes/st-normanx/lms/templates/footer.html
-#: themes/st-normanx/lms/templates/header/navbar-authenticated.html
-#: themes/st-normanx/lms/templates/header/navbar-not-authenticated.html
-msgid "Courses"
-msgstr "Çöürsés Ⱡ'σяєм ιρѕυм #"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Sign In to {studio_name}"
-msgstr "Sïgn Ìn tö {studio_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr ""
-"Dön't hävé ä {studio_name} Àççöünt? Sïgn üp! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєт#"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Required Information to Sign In to {studio_name}"
-msgstr ""
-"Réqüïréd Ìnförmätïön tö Sïgn Ìn tö {studio_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя#"
-
-#: cms/templates/login.html cms/templates/register.html
-#: lms/templates/help_modal.html lms/templates/login.html
-#: lms/templates/provider_login.html lms/templates/register-form.html
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: themes/red-theme/cms/templates/login.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "E-mail"
-msgstr "É-mäïl Ⱡ'σяєм ιρѕυ#"
-=======
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: lms/templates/sysadmin_dashboard.html
@@ -16416,7 +16119,6 @@ msgstr "É-mäïl Ⱡ'σяєм ιρѕυ#"
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Courses"
 msgstr "Çöürsés Ⱡ'σяєм ιρѕυм #"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -16520,15 +16222,8 @@ msgstr ""
 msgid "Choose Language"
 msgstr "Çhöösé Längüägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
-<<<<<<< HEAD
-#: cms/templates/widgets/header.html lms/templates/user_dropdown.html
-#: lms/templates/header/user_dropdown.html
-#: themes/st-lutherx/lms/templates/header/user_dropdown.html
-#: themes/st-normanx/lms/templates/header/user_dropdown.html
-=======
 #: cms/templates/widgets/header.html lms/templates/header/user_dropdown.html
 #: lms/templates/user_dropdown.html
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Account"
 msgstr "Àççöünt Ⱡ'σяєм ιρѕυм #"
 
@@ -16616,15 +16311,8 @@ msgstr "Ûsérménü Ⱡ'σяєм ιρѕυм ∂#"
 msgid "Usermenu dropdown"
 msgstr "Ûsérménü dröpdöwn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
-<<<<<<< HEAD
-#: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
-#: lms/templates/header/user_dropdown.html
-#: themes/st-lutherx/lms/templates/header/user_dropdown.html
-#: themes/st-normanx/lms/templates/header/user_dropdown.html
-=======
 #: cms/templates/widgets/user_dropdown.html
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Sign Out"
 msgstr "Sïgn Öüt Ⱡ'σяєм ιρѕυм ∂#"
 
@@ -16815,10 +16503,6 @@ msgid "Dashboard"
 msgstr "Däshßöärd Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-<<<<<<< HEAD
-#: themes/st-lutherx/lms/templates/dashboard.html
-#: themes/st-normanx/lms/templates/dashboard.html
-=======
 msgid "results successfully populated,"
 msgstr "résülts süççéssfüllý pöpülätéd, Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
@@ -16828,7 +16512,6 @@ msgstr ""
 "Çlïçk tö löäd äll énrölléd çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "You are not enrolled in any courses yet."
 msgstr ""
 "Ýöü äré nöt énrölléd ïn äný çöürsés ýét. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
@@ -16881,17 +16564,6 @@ msgid "Account Status Info"
 msgstr "Àççöünt Stätüs Ìnfö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-<<<<<<< HEAD
-#: themes/st-lutherx/lms/templates/dashboard.html
-#: themes/st-normanx/lms/templates/dashboard.html
-msgid "Order History"
-msgstr "Ördér Hïstörý Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-#: themes/st-lutherx/lms/templates/dashboard.html
-#: themes/st-normanx/lms/templates/dashboard.html
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Email Settings for {course_number}"
 msgstr "Émäïl Séttïngs för {course_number} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
@@ -17218,11 +16890,7 @@ msgstr ""
 msgid "Search for a course"
 msgstr "Séärçh för ä çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
-<<<<<<< HEAD
-#: lms/templates/index_overlay.html lms/templates/register-sidebar.html
-=======
 #: lms/templates/index_overlay.html
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Welcome to {platform_name}"
 msgstr "Wélçömé tö {platform_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
@@ -17503,282 +17171,6 @@ msgstr "Révïéw Ⱡ'σяєм ιρѕυ#"
 #: lms/templates/provider_login.html
 msgid "Log In"
 msgstr "Lög Ìn Ⱡ'σяєм ιρѕυ#"
-<<<<<<< HEAD
-
-#: lms/templates/provider_login.html
-msgid ""
-"Your username, email, and full name will be sent to {destination}, where the"
-" collection and use of this information will be governed by their terms of "
-"service and privacy policy."
-msgstr ""
-"Ýöür üsérnämé, émäïl, änd füll nämé wïll ßé sént tö {destination}, whéré thé"
-" çölléçtïön änd üsé öf thïs ïnförmätïön wïll ßé gövérnéd ßý théïr térms öf "
-"sérvïçé änd prïväçý pölïçý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
-" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
-"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
-"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
-"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι "
-"σƒƒ#"
-
-#: lms/templates/provider_login.html
-#, python-format
-msgid "Return To %s"
-msgstr "Rétürn Tö %s Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid ""
-"We're sorry, but this version of your browser is not supported. Try again "
-"using a different browser or a newer version of your browser."
-msgstr ""
-"Wé'ré sörrý, ßüt thïs vérsïön öf ýöür ßröwsér ïs nöt süppörtéd. Trý ägäïn "
-"üsïng ä dïfférént ßröwsér ör ä néwér vérsïön öf ýöür ßröwsér. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσяυ#"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "The following errors occurred while processing your registration:"
-msgstr ""
-"Thé föllöwïng érrörs öççürréd whïlé pröçéssïng ýöür régïsträtïön: Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Sign up with {provider_name}"
-msgstr "Sïgn üp wïth {provider_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Create your own {platform_name} account below"
-msgstr ""
-"Çréäté ýöür öwn {platform_name} äççöünt ßélöw Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тє#"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid ""
-"Required fields are noted by <strong class=\"indicator\">bold text and an "
-"asterisk (*)</strong>."
-msgstr ""
-"Réqüïréd fïélds äré nötéd ßý <strong class=\"indicator\">ßöld téxt änd än "
-"ästérïsk (*)</strong>. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#. Translators: selected_provider is the name of an external, third-party user
-#. authentication service (like Google or LinkedIn).
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "You've successfully signed in with {selected_provider}."
-msgstr ""
-"Ýöü'vé süççéssfüllý sïgnéd ïn wïth {selected_provider}. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid ""
-"We just need a little more information before you start learning with "
-"{platform_name}."
-msgstr ""
-"Wé jüst nééd ä lïttlé möré ïnförmätïön ßéföré ýöü stärt léärnïng wïth "
-"{platform_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Please complete the following fields to register for an account. "
-msgstr ""
-"Pléäsé çömplété thé föllöwïng fïélds tö régïstér för än äççöünt.  Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Your legal name, used for any certificates you earn."
-msgstr ""
-"Ýöür légäl nämé, üséd för äný çértïfïçätés ýöü éärn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Will be shown in any discussions or forums you participate in"
-msgstr ""
-"Wïll ßé shöwn ïn äný dïsçüssïöns ör förüms ýöü pärtïçïpäté ïn Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "cannot be changed later"
-msgstr "çännöt ßé çhängéd lätér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Welcome {username}"
-msgstr "Wélçömé {username} Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Enter a Public Display Name:"
-msgstr "Éntér ä Püßlïç Dïspläý Nämé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Public Display Name"
-msgstr "Püßlïç Dïspläý Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Additional Personal Information"
-msgstr "Àddïtïönäl Pérsönäl Ìnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "example: New York"
-msgstr "éxämplé: Néw Ýörk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Highest Level of Education Completed"
-msgstr ""
-"Hïghést Lévél öf Édüçätïön Çömplétéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Please share with us your reasons for registering with {platform_name}"
-msgstr ""
-"Pléäsé shäré wïth üs ýöür réäsöns för régïstérïng wïth {platform_name} "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Account Acknowledgements"
-msgstr "Àççöünt Àçknöwlédgéménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "I agree to the {link_start}Terms of Service{link_end}"
-msgstr ""
-"Ì ägréé tö thé {link_start}Térms öf Sérvïçé{link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
-" αмєт, ¢σηѕє¢тєтυ#"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "I agree to the {link_start}Honor Code{link_end}"
-msgstr ""
-"Ì ägréé tö thé {link_start}Hönör Çödé{link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
-" ¢σηѕє¢т#"
-
-#: lms/templates/register-form.html lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Create My Account"
-msgstr "Çréäté Mý Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Preferences for {platform_name}"
-msgstr "Préférénçés för {platform_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Update my {platform_name} Account"
-msgstr "Ûpdäté mý {platform_name} Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Welcome {username}!  Please set your preferences below"
-msgstr ""
-"Wélçömé {username}!  Pléäsé sét ýöür préférénçés ßélöw Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Enter a public username:"
-msgstr "Éntér ä püßlïç üsérnämé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Update My Account"
-msgstr "Ûpdäté Mý Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Registration Help"
-msgstr "Régïsträtïön Hélp Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Already registered?"
-msgstr "Àlréädý régïstéréd? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-#: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
-#: wiki/templates/wiki/accounts/signup.html
-msgid "Log in"
-msgstr "Lög ïn Ⱡ'σяєм ιρѕυ#"
-
-#: lms/templates/register-sidebar.html
-msgid ""
-"Registering with {platform_name} gives you access to all of our current and "
-"future free courses. Not ready to take a course just yet? Registering puts "
-"you on our mailing list - we will update you as courses are added."
-msgstr ""
-"Régïstérïng wïth {platform_name} gïvés ýöü äççéss tö äll öf öür çürrént änd "
-"fütüré fréé çöürsés. Nöt réädý tö täké ä çöürsé jüst ýét? Régïstérïng püts "
-"ýöü ön öür mäïlïng lïst - wé wïll üpdäté ýöü äs çöürsés äré äddéd. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт #"
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Next Steps"
-msgstr "Néxt Stéps Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: lms/templates/register-sidebar.html
-msgid ""
-"As part of joining {platform_name}, you will receive an email message with "
-"instructions for activating your account. Don't see the email? Check your "
-"spam folder and mark {platform_name} emails as 'not spam'. At "
-"{platform_name}, we communicate mostly through email."
-msgstr ""
-"Às pärt öf jöïnïng {platform_name}, ýöü wïll réçéïvé än émäïl méssägé wïth "
-"ïnstrüçtïöns för äçtïvätïng ýöür äççöünt. Dön't séé thé émäïl? Çhéçk ýöür "
-"späm földér änd märk {platform_name} émäïls äs 'nöt späm'. Àt "
-"{platform_name}, wé çömmünïçäté möstlý thröügh émäïl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
-" αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
-"łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
-"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
-"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ #"
-
-#: lms/templates/register-sidebar.html
-msgid "Need help registering with {platform_name}?"
-msgstr ""
-"Nééd hélp régïstérïng wïth {platform_name}? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢т#"
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "View our FAQs for answers to commonly asked questions."
-msgstr ""
-"Vïéw öür FÀQs för änswérs tö çömmönlý äskéd qüéstïöns. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/templates/provider_login.html
 msgid ""
@@ -18248,26 +17640,16 @@ msgstr ""
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
 "ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕ#"
 
-<<<<<<< HEAD
-=======
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Dashboard for:"
 msgstr "Däshßöärd för: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/templates/user_dropdown.html
 msgid "More options"
 msgstr "Möré öptïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
-<<<<<<< HEAD
-#: lms/templates/user_dropdown.html lms/templates/header/header.html
-#: lms/templates/header/user_dropdown.html
-#: themes/st-lutherx/lms/templates/header/user_dropdown.html
-#: themes/st-normanx/lms/templates/header/user_dropdown.html
-=======
 #: lms/templates/header/header.html lms/templates/header/user_dropdown.html
 #: lms/templates/user_dropdown.html
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "More Options"
 msgstr "Möré Öptïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
@@ -20239,13 +19621,7 @@ msgstr "Ýöü äré énrölléd ïn thïs çöürsé Ⱡ'σяєм ιρѕυм �
 #: lms/templates/courseware/course_about.html
 #: lms/templates/dashboard/_dashboard_course_resume.html
 #: lms/templates/shoppingcart/registration_code_receipt.html
-<<<<<<< HEAD
-#: openedx/features/journals/templates/journals/bundle_about.html
-#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
-#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
-=======
 #: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "View Course"
 msgstr "Vïéw Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
@@ -20264,19 +19640,8 @@ msgid "Enrollment is Closed"
 msgstr "Énröllmént ïs Çlöséd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/courseware/course_about.html
-<<<<<<< HEAD
-msgid "Add {course_name} to Cart {start_span}({price} USD){end_span}"
-msgstr ""
-"Àdd {course_name} tö Çärt {start_span}({price} ÛSD){end_span} Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/courseware/course_about.html
-msgid "Enroll in {course_name}"
-msgstr "Énröll ïn {course_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-=======
 msgid "Enroll Now"
 msgstr "Énröll Nöw Ⱡ'σяєм ιρѕυм ∂σłσ#"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/templates/courseware/course_about.html
 msgid "View About Page in studio"
@@ -20523,12 +19888,7 @@ msgstr "Wélçömé tö {course_title}! Ⱡ'σяєм ιρѕυм ∂σłσя ѕι
 #: lms/templates/courseware/info.html
 #: lms/templates/dashboard/_dashboard_course_resume.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-<<<<<<< HEAD
-#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
-#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
-=======
 #: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Resume Course"
 msgstr "Résümé Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
@@ -21944,58 +21304,6 @@ msgstr "Hïdé nötés Ⱡ'σяєм ιρѕυм ∂σłσ#"
 msgid "Show notes"
 msgstr "Shöw nötés Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
-<<<<<<< HEAD
-#: lms/templates/emails/activation_email.txt
-#: themes/st-lutherx/lms/templates/emails/activation_email.txt
-#: themes/st-normanx/lms/templates/emails/activation_email.txt
-msgid ""
-"You're almost there! Use the link to activate your account to access "
-"engaging, high-quality {platform_name} courses. Note that you will not be "
-"able to log back into your account until you have activated it."
-msgstr ""
-"Ýöü'ré älmöst théré! Ûsé thé lïnk tö äçtïväté ýöür äççöünt tö äççéss "
-"éngägïng, hïgh-qüälïtý {platform_name} çöürsés. Nöté thät ýöü wïll nöt ßé "
-"äßlé tö lög ßäçk ïntö ýöür äççöünt üntïl ýöü hävé äçtïvätéd ït. Ⱡ'σяєм ιρѕυм"
-" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт#"
-
-#: lms/templates/emails/activation_email.txt
-#: themes/st-lutherx/lms/templates/emails/activation_email.txt
-#: themes/st-normanx/lms/templates/emails/activation_email.txt
-msgid "Enjoy learning with {platform_name}."
-msgstr ""
-"Énjöý léärnïng wïth {platform_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"If you need help, please use our web form at {support_url} or email "
-"{support_email}."
-msgstr ""
-"Ìf ýöü nééd hélp, pléäsé üsé öür wéß förm ät {support_url} ör émäïl "
-"{support_email}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/emails/activation_email.txt
-#: themes/st-lutherx/lms/templates/emails/activation_email.txt
-#: themes/st-normanx/lms/templates/emails/activation_email.txt
-msgid ""
-"This email message was automatically sent by {lms_url} because someone "
-"attempted to create an account on {platform_name} using this email address."
-msgstr ""
-"Thïs émäïl méssägé wäs äütömätïçällý sént ßý {lms_url} ßéçäüsé söméöné "
-"ättémptéd tö çréäté än äççöünt ön {platform_name} üsïng thïs émäïl äddréss. "
-"Ⱡ'σя#"
-
-#: lms/templates/emails/activation_email_subject.txt
-msgid "Action Required: Activate your {platform_name} account"
-msgstr ""
-"Àçtïön Réqüïréd: Àçtïväté ýöür {platform_name} äççöünt Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Thank you for your purchase of "
 msgstr "Thänk ýöü för ýöür pürçhäsé öf  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
@@ -22705,12 +22013,7 @@ msgstr "Àpplý för Fïnänçïäl Àssïstänçé Ⱡ'σяєм ιρѕυм ∂�
 #: lms/templates/header/brand.html
 #: lms/templates/header/navbar-logo-header.html
 #: lms/templates/navigation/bootstrap/navbar-logo-header.html
-<<<<<<< HEAD
-#: themes/st-lutherx/lms/templates/header/navbar-logo-header.html
-#: themes/st-normanx/lms/templates/header/navbar-logo-header.html
-=======
 #: lms/templates/navigation/navbar-logo-header.html
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "{platform_name} Home Page"
 msgstr "{platform_name} Hömé Pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
@@ -22731,15 +22034,6 @@ msgstr ""
 
 #: lms/templates/header/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
-<<<<<<< HEAD
-#: themes/st-lutherx/lms/templates/header/user_dropdown.html
-#: themes/st-normanx/lms/templates/header/user_dropdown.html
-msgid "Profile"
-msgstr "Pröfïlé Ⱡ'σяєм ιρѕυм #"
-
-#: lms/templates/header/navbar-authenticated.html
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Discover New"
 msgstr "Dïsçövér Néw Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
@@ -26347,17 +25641,10 @@ msgid "Connect"
 msgstr "Çönnéçt Ⱡ'σяєм ιρѕυм #"
 
 #: themes/edx.org/lms/templates/footer.html
-<<<<<<< HEAD
-msgid "edX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
-msgstr ""
-"édX, Öpén édX, änd MïçröMästérs äré régïstéréd trädémärks öf édX Ìnç.  "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-=======
 msgid "© {year} edX Inc. All rights reserved."
 msgstr ""
 "© {year} édX Ìnç. Àll rïghts résérvéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєт#"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
 msgid "About edX Verified Certificates"
@@ -26637,151 +25924,11 @@ msgstr "Préférénçés för {platform_name} Ⱡ'σяєм ιρѕυм ∂σłσ�
 msgid "Update my {platform_name} Account"
 msgstr "Ûpdäté mý {platform_name} Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
-<<<<<<< HEAD
-#: themes/red-theme/lms/templates/footer.html
-msgid ""
-"{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor "
-"Code{honor_link_end}"
-msgstr ""
-"{tos_link_start}Térms öf Sérvïçé{tos_link_end} änd {honor_link_start}Hönör "
-"Çödé{honor_link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: themes/st-lutherx/cms/templates/widgets/footer.html
-#: themes/st-lutherx/lms/templates/footer.html
-#: themes/st-normanx/cms/templates/widgets/footer.html
-#: themes/st-normanx/lms/templates/footer.html
-msgid "Edly"
-msgstr "Édlý Ⱡ'σяєм ι#"
-
-#: themes/st-lutherx/cms/templates/widgets/footer.html
-#: themes/st-lutherx/lms/templates/footer.html
-#: themes/st-normanx/cms/templates/widgets/footer.html
-#: themes/st-normanx/lms/templates/footer.html
-msgid "All rights reserved."
-msgstr "Àll rïghts résérvéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: themes/st-lutherx/lms/templates/dashboard.html
-#: themes/st-normanx/lms/templates/dashboard.html
-msgid ""
-"Please wait for the confirmation email as your request is being processed. "
-"Course: {course_name} will be upgraded soon."
-msgstr ""
-"Pléäsé wäït för thé çönfïrmätïön émäïl äs ýöür réqüést ïs ßéïng pröçésséd. "
-"Çöürsé: {course_name} wïll ßé üpgrädéd söön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: themes/st-lutherx/lms/templates/dashboard.html
-#: themes/st-normanx/lms/templates/dashboard.html
-msgid "Past Courses"
-msgstr "Päst Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: themes/st-lutherx/lms/templates/footer.html
-#: themes/st-normanx/lms/templates/footer.html
-msgid "COMPANY"
-msgstr "ÇÖMPÀNÝ Ⱡ'σяєм ιρѕυм #"
-
-#: themes/st-lutherx/lms/templates/footer.html
-#: themes/st-normanx/lms/templates/footer.html
-msgid "FAQs"
-msgstr "FÀQs Ⱡ'σяєм ι#"
-
-#: themes/st-lutherx/lms/templates/footer.html
-#: themes/st-normanx/lms/templates/footer.html
-msgid "GET INVOLVED"
-msgstr "GÉT ÌNVÖLVÉD Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: themes/st-lutherx/lms/templates/footer.html
-#: themes/st-normanx/lms/templates/footer.html
-msgid "CONNECT"
-msgstr "ÇÖNNÉÇT Ⱡ'σяєм ιρѕυм #"
-
-#. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
-#. Please do not translate any of these trademarks and company names.
-#: themes/st-lutherx/lms/templates/footer.html
-#: themes/st-normanx/lms/templates/footer.html
-msgid ""
-"EdX, Open edX, and the edX and Open edX logos are registered trademarks or "
-"trademarks of {link_start}edX Inc.{link_end}"
-=======
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Processing your account information"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 "Pröçéssïng ýöür äççöünt ïnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
-<<<<<<< HEAD
-#: themes/st-lutherx/lms/templates/footer.html
-#: themes/st-normanx/lms/templates/footer.html
-msgid ""
-"{tos_link_start}Terms of Service{tos_link_end} {honor_link_start}Honor "
-"Code{honor_link_end}"
-msgstr ""
-"{tos_link_start}Térms öf Sérvïçé{tos_link_end} {honor_link_start}Hönör "
-"Çödé{honor_link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: themes/st-lutherx/lms/templates/emails/activation_email.txt
-#: themes/st-normanx/lms/templates/emails/activation_email.txt
-msgid "If you need help, please use our email {support_email}."
-msgstr ""
-"Ìf ýöü nééd hélp, pléäsé üsé öür émäïl {support_email}. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: themes/st-lutherx/lms/templates/header/navbar-authenticated.html
-#: themes/st-lutherx/lms/templates/header/navbar-not-authenticated.html
-#: themes/st-normanx/lms/templates/header/navbar-authenticated.html
-#: themes/st-normanx/lms/templates/header/navbar-not-authenticated.html
-msgid "About Us"
-msgstr "Àßöüt Ûs Ⱡ'σяєм ιρѕυм ∂#"
-
-#: themes/st-lutherx/lms/templates/static_templates/404.html
-#: themes/st-normanx/lms/templates/static_templates/404.html
-msgid "Page not found!"
-msgstr "Pägé nöt föünd! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: themes/st-lutherx/lms/templates/static_templates/404.html
-#: themes/st-normanx/lms/templates/static_templates/404.html
-msgid ""
-"The page you are looking for may have been moved or renamed. {line_break}If "
-"you continue to have issues, please visit our  {link_start}FAQ{link_end} "
-"page or contact {support_link_start}Support{link_end}."
-msgstr ""
-"Thé pägé ýöü äré löökïng för mäý hävé ßéén mövéd ör rénäméd. {line_break}Ìf "
-"ýöü çöntïnüé tö hävé ïssüés, pléäsé vïsït öür  {link_start}FÀQ{link_end} "
-"pägé ör çöntäçt {support_link_start}Süppört{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
-"łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
-"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
-"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
-"ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт "
-"ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłł#"
-
-#: themes/st-lutherx/lms/templates/static_templates/server-error.html
-#: themes/st-normanx/lms/templates/static_templates/server-error.html
-msgid "Internal Server Error!"
-msgstr "Ìntérnäl Sérvér Érrör! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: themes/st-lutherx/lms/templates/static_templates/server-error.html
-#: themes/st-normanx/lms/templates/static_templates/server-error.html
-msgid ""
-"There seems to be a small problem with our servers. We apologize for the "
-"inconvenience.{line_break}Please refresh this page after a few seconds."
-msgstr ""
-"Théré sééms tö ßé ä smäll prößlém wïth öür sérvérs. Wé äpölögïzé för thé "
-"ïnçönvénïénçé.{line_break}Pléäsé réfrésh thïs pägé äftér ä féw séçönds. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
-" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσяυ#"
-
-#: themes/st-normanx/lms/templates/footer.html
-msgid ""
-"St. NormanX is an initiative of St. NormanX University, Inc., a tax-exempt "
-"501(c)(3) nonprofit organization based in McKinney, Texas."
-msgstr ""
-"St. NörmänX ïs än ïnïtïätïvé öf St. NörmänX Ûnïvérsïtý, Ìnç., ä täx-éxémpt "
-"501(ç)(3) nönpröfït örgänïzätïön ßäséd ïn MçKïnnéý, Téxäs.#"
-=======
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Welcome {username}!  Please set your preferences below"
 msgstr ""
@@ -26795,7 +25942,6 @@ msgid ""
 msgstr ""
 "Réqüïréd fïélds äré nötéd ßý {strong_indicator}ßöld téxt änd än ästérïsk "
 "(*).{strong_close} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Update My Account"
@@ -30901,15 +30047,6 @@ msgstr ""
 "Rétürn tö thé {link_start}hömé pägé{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢т#"
 
-<<<<<<< HEAD
-#: cms/templates/registration/reg_complete.html
-msgid ""
-"We've sent an email message to {email} with instructions for activating your"
-" account."
-msgstr ""
-"Wé'vé sént än émäïl méssägé tö {email} wïth ïnstrüçtïöns för äçtïvätïng ýöür"
-" äççöünt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-=======
 #: cms/templates/widgets/footer.html
 msgid "Policies"
 msgstr "Pölïçïés Ⱡ'σяєм ιρѕυм ∂#"
@@ -30922,7 +30059,6 @@ msgstr ""
 #: cms/templates/widgets/footer.html
 msgid "LMS"
 msgstr "LMS Ⱡ'σяєм#"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: cms/templates/widgets/header.html
 msgid "Current Course:"

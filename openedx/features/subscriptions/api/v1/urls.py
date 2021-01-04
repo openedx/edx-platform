@@ -5,6 +5,8 @@ from openedx.features.subscriptions.api.v1.views import (
     SubscriptionRetrieveUpdateView,
 )
 
+app_name = 'subscriptions_api'
+
 SUBSCRIPTION_URLS = ([
     url(r'^$', SubscriptionsListView.as_view(), name='list'),
     url(r'^(?P<subscription_id>.*)/$', SubscriptionRetrieveUpdateView.as_view(), name='retrieve-update'),

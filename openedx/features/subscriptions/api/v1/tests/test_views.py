@@ -7,7 +7,7 @@ from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.urls import reverse, reverse_lazy
 from django.utils.http import urlencode
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.test.utils import override_settings
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
@@ -29,6 +29,8 @@ class SubscriptionListViewTests(TestCase):
     def setUp(self):
         super(SubscriptionListViewTests, self).setUp()
         self.user = UserFactory(is_staff=True)
+        self.site = SiteFactory()
+        self.client = Client(SERVER_NAME=self.site.domain)
         self.client.login(username=self.user.username, password=PASSWORD)
 
     def test_authentication_required(self):
@@ -43,7 +45,7 @@ class SubscriptionListViewTests(TestCase):
         """
         Verify the view lists the available courses and modes.
         """
-        user_subscription = UserSubscriptionFactory(user=self.user)
+        user_subscription = UserSubscriptionFactory(user=self.user, site=self.site)
         response = self.client.get(self.path)
 
         self.assertEqual(response.status_code, 200)
@@ -60,7 +62,7 @@ class SubscriptionRetrieveUpdateViewTests(TestCase):
         super(SubscriptionRetrieveUpdateViewTests, self).setUp()
         self.user = UserFactory(is_staff=True)
         self.user_subscription = UserSubscriptionFactory(user=self.user)
-        self.path = reverse('subscriptions_api:v1:retrieve-update', args=[unicode(self.user_subscription.subscription_id)])
+        self.path = reverse('subscriptions_api:v1:retrieve-update', args=[self.user_subscription.subscription_id])
         self.client.login(username=self.user.username, password=PASSWORD)
 
     @ddt.data('get', 'post', 'put')
@@ -108,7 +110,7 @@ class SubscriptionRetrieveUpdateViewTests(TestCase):
         expected_data = {
             'subscription_id': subscription_id,
             'expiration_date': str(date.today() + timedelta(days=1)),
-            'user': self.user.id,
+            'user': self.user.username,
             'max_allowed_courses': 4,
             'subscription_type': UserSubscription.LIMITED_ACCESS,
         }

@@ -1,6 +1,6 @@
 machine:
   python:
-    version: 2.7.10
+    version: 3.5.2
 
 general:
   artifacts:

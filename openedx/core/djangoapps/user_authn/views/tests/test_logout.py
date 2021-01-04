@@ -80,7 +80,11 @@ class LogoutTests(TestCase):
         self.assertDictContainsSubset(expected, response.context_data)
 
     def test_no_redirect_supplied(self):
+        response = self.client.get(reverse('logout'), HTTP_HOST='testserver')
+        expected = {
+            'target': '/',
         }
+        self.assertDictContainsSubset(expected, response.context_data)
 
     @ddt.data(
         ('https://www.amazon.org', 'edx.org'),
@@ -136,56 +140,6 @@ class LogoutTests(TestCase):
         self.assertDictContainsSubset(expected, response.context_data)
 
     @mock.patch(
-        'django.conf.settings.IDA_LOGOUT_URI_LIST',
-        ['http://fake.ida1/logout', 'http://fake.ida2/accounts/logout', ]
-    )
-    def test_client_logout_with_dot_idas_and_no_oidc_idas(self):
-        """
-        Verify the context includes a list of the logout URIs of the OAuth2/DOT clients, even if there are no currently
-        authenticated OpenID Connect clients.
-
-        The list should include URIs of all the configured DOT clients.
-        """
-        response = self.client.get(reverse('logout'))
-        # Add the logout endpoints for the IDAs where auth was established via DOT/OAuth2.
-        expected_logout_uris = [
-            'http://fake.ida1/logout?no_redirect=1',
-            'http://fake.ida2/accounts/logout?no_redirect=1',
-        ]
-        expected = {
-            'logout_uris': expected_logout_uris,
-            'target': '/',
-        }
-        self.assertDictContainsSubset(expected, response.context_data)
-
-    @patch(
-        'django.conf.settings.IDA_LOGOUT_URI_LIST',
-        ['http://fake.ida1/logout', 'http://fake.ida2/accounts/logout', ]
-    )
-    def test_client_logout_with_dot_idas(self):
-        """
-        Verify the context includes a list of the logout URIs of the authenticated OpenID Connect clients AND OAuth2/DOT
-        clients.
-
-        The list should only include URIs of the OIDC clients for which the user has been authenticated, and all the
-        configured DOT clients regardless of login status..
-        """
-        client = self._create_oauth_client()
-        response = self._assert_session_logged_out(client)
-        # Add the logout endpoints for the IDAs where auth was established via OIDC.
-        expected_logout_uris = [client.logout_uri + '?no_redirect=1']
-        # Add the logout endpoints for the IDAs where auth was established via DOT/OAuth2.
-        expected_logout_uris += [
-            'http://fake.ida1/logout?no_redirect=1',
-            'http://fake.ida2/accounts/logout?no_redirect=1',
-        ]
-        expected = {
-            'logout_uris': expected_logout_uris,
-            'target': '/',
-        }
-        self.assertDictContainsSubset(expected, response.context_data)
-
-    @patch(
         'django.conf.settings.IDA_LOGOUT_URI_LIST',
         ['http://fake.ida1/logout', 'http://fake.ida2/accounts/logout', ]
     )

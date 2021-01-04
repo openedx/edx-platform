@@ -60,7 +60,7 @@ git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752
 -e git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
 -e git+https://github.com/edly-io/figures.git@edly-1.4.0#egg=figures==edly-1.4.0
--e git+https://github.com/edly-io/edx_xblock_scorm.git@v1.0.5#egg=edx_xblock_scorm==v1.0.5
+-e git+https://github.com/edly-io/edx_xblock_scorm.git@v1.0.8#egg=edx_xblock_scorm==v1.0.8
 
 # The latest 2.0.0 release doesn't yet support Django 2.2, this commit from master does
 -e git+https://github.com/jsocol/django-ratelimit.git@72edbe8949fbf6699848e5847645a1998f121d46#egg=ratelimit

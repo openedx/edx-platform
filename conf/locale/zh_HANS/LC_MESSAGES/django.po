@@ -395,17 +395,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2020-02-16 20:42+0000\n"
-"PO-Revision-Date: 2019-01-15 02:36+0000\n"
-"Last-Translator: abby li <yc.li@eliteu.cn>\n"
-"Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
-=======
 "POT-Creation-Date: 2020-05-03 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/open-edx/teams/6205/zh_CN/)\n"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -438,16 +431,6 @@ msgstr "入学考试"
 #: common/lib/xmodule/xmodule/unit_block.py
 #: lms/djangoapps/instructor/views/tools.py lms/templates/seq_module.html
 #: lms/templates/ccx/schedule.html
-<<<<<<< HEAD
-msgid "Subsection"
-msgstr "节"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: common/lib/xmodule/xmodule/unit_block.py
-#: lms/djangoapps/instructor/views/tools.py lms/templates/seq_module.html
-#: lms/templates/ccx/schedule.html
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Unit"
 msgstr "单元"
 
@@ -483,10 +466,6 @@ msgid ""
 msgstr "该字幕文件有问题，请尝试上传其他文件。"
 
 #: cms/djangoapps/contentstore/views/videos.py
-<<<<<<< HEAD
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/djangoapps/instructor/views/api.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/billing_details.html
@@ -749,11 +728,7 @@ msgstr[0] "%(count)d学生账户未被解锁。"
 #, python-brace-format
 msgid ""
 "Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' in"
-<<<<<<< HEAD
-" SiteConfiguration model's values field."
-=======
 " SiteConfiguration model's site_values field."
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: common/djangoapps/student/admin.py
@@ -1024,8 +999,6 @@ msgid ""
 "and password. And if any employee's email doesn't exist in this model then "
 "that employee can login via third party authentication backend only."
 msgstr ""
-<<<<<<< HEAD
-=======
 
 #: common/djangoapps/student/models.py
 msgid ""
@@ -1033,7 +1006,6 @@ msgid ""
 "                     first row being the header and columns will be as "
 "follows:                     username, email, new_email"
 msgstr ""
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: common/djangoapps/student/views/dashboard.py
 msgid " and "
@@ -4853,10 +4825,6 @@ msgstr "解锁账户"
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
-<<<<<<< HEAD
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: themes/edx.org/lms/templates/dashboard.html
@@ -4922,7 +4890,6 @@ msgstr ""
 #, python-format
 msgid "Action Required: Activate your %(platform_name)s account"
 msgstr ""
-<<<<<<< HEAD
 
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 msgid "Create Password"
@@ -4961,46 +4928,6 @@ msgid ""
 "not yet reset your password."
 msgstr "如您本人并没有请求该变更，请忽略本邮件——我们尚未重置您的密码。"
 
-=======
-
-#: common/templates/student/edx_ace/accountrecovery/email/body.html
-msgid "Create Password"
-msgstr "创建密码"
-
-#: common/templates/student/edx_ace/accountrecovery/email/body.html
-#: common/templates/student/edx_ace/accountrecovery/email/body.txt
-#, python-format
-msgid ""
-"You're receiving this e-mail because you requested to create a password for "
-"your user account at %(platform_name)s."
-msgstr "您收到此电子邮件是因为您在%(platform_name)s申请了账户密码创建"
-
-#: common/templates/student/edx_ace/accountrecovery/email/body.html
-#: common/templates/student/edx_ace/accountrecovery/email/body.txt
-#, python-format
-msgid ""
-"We've restored access to your %(platform_name)s account using the recovery "
-"email you provided at registration."
-msgstr "我们已使用您在注册时提供的验证邮箱恢复了对您的%(platform_name)s账户的访问权限"
-
-#: common/templates/student/edx_ace/accountrecovery/email/body.html
-#: common/templates/student/edx_ace/accountrecovery/email/body.txt
-#, python-format
-msgid ""
-"Once you've created a password [below], you will be able to log in to "
-"%(platform_name)s with this email (%(email)s) and your new password."
-msgstr "[below]创建密码后，您将可以使用此电子邮件（%(email)s）和新密码登录%(platform_name)s。"
-
-#: common/templates/student/edx_ace/accountrecovery/email/body.html
-#: common/templates/student/edx_ace/accountrecovery/email/body.txt
-#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
-#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
-msgid ""
-"If you didn't request this change, you can disregard this email - we have "
-"not yet reset your password."
-msgstr "如您本人并没有请求该变更，请忽略本邮件——我们尚未重置您的密码。"
-
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: common/templates/student/edx_ace/accountrecovery/email/body.txt
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
 msgid "Thanks for using our site!"
@@ -8724,8 +8651,6 @@ msgstr ""
 msgid "Link LMS users to program enrollments"
 msgstr ""
 
-<<<<<<< HEAD
-=======
 #: lms/djangoapps/support/views/index.py
 msgid "Program Enrollments Inspector Tool"
 msgstr ""
@@ -8734,7 +8659,6 @@ msgstr ""
 msgid "Find information related to a learner's program enrollments"
 msgstr ""
 
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
 msgstr "user_support_url"
@@ -8848,19 +8772,12 @@ msgid "The supplied course_id {course_id} is not valid."
 msgstr "提供的课程编号{course_id}无效。"
 
 #: lms/djangoapps/teams/views.py
-<<<<<<< HEAD
-msgid "You are already in a team in this course."
-msgstr "您已经加入了该课程中的一个小组。"
-=======
 msgid "topic_id is required"
 msgstr ""
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/djangoapps/teams/views.py
 msgid "You can't create a team in an instructor managed topic."
 msgstr ""
-<<<<<<< HEAD
-=======
 
 #: lms/djangoapps/teams/views.py
 msgid "You are already in a team in this teamset."
@@ -8877,7 +8794,6 @@ msgstr ""
 #: lms/djangoapps/teams/views.py
 msgid "No teamset found in given course with given id"
 msgstr ""
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/djangoapps/teams/views.py
 msgid "username or (team_id or teamset_id) must be specified."
@@ -9068,14 +8984,11 @@ msgid ""
 "To get started, please visit https://%(site_name)s. The login information "
 "for your account follows."
 msgstr "开始请访问https://%(site_name)s 。您的账号登录信息如下。"
-<<<<<<< HEAD
-=======
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
 msgid "You may access your course at: %(course_url)s."
 msgstr ""
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/subject.txt
 #: lms/templates/instructor/edx_ace/enrollenrolled/email/subject.txt
@@ -10242,57 +10155,8 @@ msgstr "已启用"
 #: openedx/core/djangoapps/config_model_utils/models.py
 msgid "Configure values for all course runs associated with this site."
 msgstr "配置与此站点关联的所有课程运行的参数。"
-<<<<<<< HEAD
 
 #: openedx/core/djangoapps/config_model_utils/models.py
-msgid ""
-"Configure values for all course runs associated with this Organization. This"
-" is the organization string (i.e. edX, MITx)."
-msgstr "配置与此站点关联的所有课程运行的参数。这是组织字符串（例如edX，MITx）。"
-
-#: openedx/core/djangoapps/config_model_utils/models.py
-msgid "Course in Org"
-msgstr "课程组织"
-
-#: openedx/core/djangoapps/config_model_utils/models.py
-msgid ""
-"Configure values for all course runs associated with this course. This is "
-"should be formatted as 'org+course' (i.e. MITx+6.002x, HarvardX+CS50)."
-msgstr "配置与此站点关联的所有课程运行的参数。格式为 'org+course' （例如MITx+6.002x, HarvardX+CS50）"
-
-#: openedx/core/djangoapps/config_model_utils/models.py
-#: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/settings.html
-msgid "Course Run"
-msgstr "课程开课"
-
-#: openedx/core/djangoapps/config_model_utils/models.py
-msgid ""
-"Configure values for this course run. This should be formatted as the "
-"CourseKey (i.e. course-v1://MITx+6.002x+2019_Q1)"
-msgstr "配置此课程运行的参数。格式为CourseKey（例如course-v1://MITx+6.002x+2019_Q1）"
-
-#: openedx/core/djangoapps/config_model_utils/models.py
-msgid "Configuration may not be specified at more than one level at once."
-msgstr "不能一次在多个级别指定配置。"
-
-#: openedx/core/djangoapps/content_libraries/models.py
-msgid "Administer users and author content"
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/models.py
-msgid "Author content"
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/models.py
-msgid "Read-only"
-msgstr ""
-
-#: openedx/core/djangoapps/cors_csrf/models.py
-=======
-
-#: openedx/core/djangoapps/config_model_utils/models.py
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid ""
 "Configure values for all course runs associated with this Organization. This"
 " is the organization string (i.e. edX, MITx)."
@@ -11356,18 +11220,6 @@ msgid ""
 "{link_start}{provider} account{link_end}."
 msgstr ""
 
-<<<<<<< HEAD
-#. Translators: This example email address is used as a placeholder in
-#. a field on the login form meant to hold the user's email address.
-#. Translators: This example email address is used as a placeholder in
-#. a field on the password reset form meant to hold the user's email address.
-#: openedx/core/djangoapps/user_authn/views/login_form.py
-#: openedx/core/djangoapps/user_authn/views/password_reset.py
-msgid "username@domain.com"
-msgstr "username@domain.com"
-
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #. Translators: These instructions appear on the login form, immediately
 #. below a field meant to hold the user's email address.
 #. Translators: These instructions appear on the password reset form,
@@ -11383,15 +11235,12 @@ msgstr "您在{platform_name}上注册的邮箱"
 msgid "Create Account"
 msgstr "创建账号"
 
-<<<<<<< HEAD
-=======
 #. Translators: This example email address is used as a placeholder in
 #. a field on the password reset form meant to hold the user's email address.
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "username@domain.com"
 msgstr "username@domain.com"
 
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
@@ -11405,14 +11254,11 @@ msgid ""
 msgstr "与此邮箱关联的用户账号无法重新设置密码。"
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
-<<<<<<< HEAD
-=======
 msgid ""
 "Your previous request is in progress, please try again in a few moments."
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Password reset unsuccessful"
 msgstr "重新设置密码不成功"
 
@@ -11433,14 +11279,6 @@ msgstr ""
 "{html_start}密码创建完成{html_end}已经创建了您的密码。{bold_start}{email}{bold_end}现在是您的主登录电子邮件。"
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
-<<<<<<< HEAD
-msgid ""
-"Your previous request is in progress, please try again in a few moments."
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/password_reset.py
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Some error occured during password change. Please try again"
 msgstr "重设密码时发生错误，请重试"
 
@@ -11526,8 +11364,6 @@ msgstr "您遗漏了一个或多个必须填写字段"
 msgid "Unauthorized email address."
 msgstr "未经授权的邮箱"
 
-<<<<<<< HEAD
-=======
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #, python-brace-format
 msgid ""
@@ -11535,7 +11371,6 @@ msgid ""
 "different email address."
 msgstr "邮箱 {email} 已被其他账号关联。请使用另一个邮箱重试。"
 
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's email address.
@@ -13604,35 +13439,6 @@ msgstr ""
 #: lms/templates/problem_notifications.html
 msgid "Next Hint"
 msgstr "下个提示"
-<<<<<<< HEAD
-
-#: lms/templates/problem_notifications.html
-#: lms/templates/shoppingcart/shopping_cart_flow.html
-msgid "Review"
-msgstr "检查"
-
-#: lms/templates/provider_login.html
-msgid "Log In"
-msgstr "登录"
-
-#: lms/templates/provider_login.html
-msgid ""
-"Your username, email, and full name will be sent to {destination}, where the"
-" collection and use of this information will be governed by their terms of "
-"service and privacy policy."
-msgstr "您的用户名、邮箱地址及全名将发送到 {destination}，收集和使用这些信息将遵循他们的服务和隐私保护条款。"
-
-#: lms/templates/provider_login.html lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "E-mail"
-msgstr "邮箱"
-
-#: lms/templates/provider_login.html
-#, python-format
-msgid "Return To %s"
-msgstr "返回%s"
-=======
 
 #: lms/templates/problem_notifications.html
 #: lms/templates/shoppingcart/shopping_cart_flow.html
@@ -13682,7 +13488,6 @@ msgstr ""
 #: lms/templates/reset_deadlines_banner.html
 msgid "Reset my deadlines"
 msgstr ""
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
@@ -15586,10 +15391,7 @@ msgstr "您选修了本课程"
 #: lms/templates/courseware/course_about.html
 #: lms/templates/dashboard/_dashboard_course_resume.html
 #: lms/templates/shoppingcart/registration_code_receipt.html
-<<<<<<< HEAD
-=======
 #: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "View Course"
 msgstr "查看课程"
 
@@ -16645,8 +16447,6 @@ msgid ""
 "The {provider_name} account you selected is already linked to another "
 "{platform_name} account."
 msgstr "您选择的 {provider_name}账号已经和{platform_name}账号相关联。"
-<<<<<<< HEAD
-=======
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 msgid ""
@@ -16692,7 +16492,6 @@ msgstr "您已退选"
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Return To Dashboard"
 msgstr "返回面板"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 msgid ""
@@ -18783,81 +18582,6 @@ msgstr "CCX指导员可以根据本课程创建自己的定制课程，利用本
 msgid "Add CCX Coach"
 msgstr "添加CCX指导员"
 
-<<<<<<< HEAD
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "There is no data available to display at this time."
-msgstr "目前没有可用的数据"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Use Reload Graphs to refresh the graphs."
-msgstr "使用重新加载图片来刷新"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Reload Graphs"
-msgstr "重新载入图片"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Subsection Data"
-msgstr "小节数据"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Each bar shows the number of students that opened the subsection."
-msgstr "每个条形图显示了打开小节的学生数量"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid ""
-"You can click on any of the bars to list the students that opened the "
-"subsection."
-msgstr "您可以点击任一栏目去查看打开小节的学生名单"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "You can also download this data as a CSV file."
-msgstr "您也可以以CSV文件下载这些数据"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Download Subsection Data for all Subsections as a CSV"
-msgstr "所有的小节数据以CSV文件下载"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Grade Distribution Data"
-msgstr "成绩分布数据"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Each bar shows the grade distribution for that problem."
-msgstr "每个条形图显示该问题的成绩分布区间"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid ""
-"You can click on any of the bars to list the students that attempted the "
-"problem, along with the grades they received."
-msgstr "您可以点击任一每个条形图去查看所有尝试回答问题的学生名单以及他们获得的成绩"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Download Problem Data for all Problems as a CSV"
-msgstr "以CSV文件下载所有问题数据"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Grade Distribution per Problem"
-msgstr "每个问题的成绩分布"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Download Student Opened as a CSV"
-msgstr "以CSV格式下载学生开放数据"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Download Student Grades as a CSV"
-msgstr "以CSV格式下载被评分的学生信息"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "This is a partial list, to view all students download as a csv."
-msgstr "这是一个部分列表，查看所有以CSV格式下载的学生信息"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "There are no problems in this section."
-msgstr "本章没有问题"
-
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Send to:"
 msgstr "发至："
@@ -19387,43 +19111,6 @@ msgstr "维持举报"
 msgid "Go Back"
 msgstr "返回"
 
-<<<<<<< HEAD
-#: lms/templates/provider/authorize.html
-msgid ""
-"{start_strong}{application_name}{end_strong} would like to access your data "
-"with the following permissions:"
-msgstr "{start_strong}{application_name}{end_strong} 想要凭借以下权限访问您的数据："
-
-#: lms/templates/provider/authorize.html
-msgid "Read your user ID"
-msgstr "查看您的用户ID"
-
-#: lms/templates/provider/authorize.html
-msgid "Read your user profile"
-msgstr "查看您的用户资料"
-
-#: lms/templates/provider/authorize.html
-msgid "Read your email address"
-msgstr "查看您的邮箱"
-
-#: lms/templates/provider/authorize.html
-msgid "Read the list of courses in which you are a staff member."
-msgstr "查看您是工作人员的课程列表"
-
-#: lms/templates/provider/authorize.html
-msgid "Read the list of courses in which you are an instructor."
-msgstr "查看您是教师的课程列表"
-
-#: lms/templates/provider/authorize.html
-msgid "To see if you are a global staff user"
-msgstr "查看您是否是全球工作人员"
-
-#: lms/templates/provider/authorize.html
-msgid "Manage your data: {permission}"
-msgstr "管理您的数据：{permission}"
-
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/templates/registration/account_activation_sidebar_notice.html
 msgid "Account Activation Info"
 msgstr "账号激活信息"
@@ -20673,72 +20360,6 @@ msgstr "以后不能更改"
 msgid "Welcome {username}"
 msgstr "欢迎 {username}"
 
-<<<<<<< HEAD
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Enter a Public Display Name:"
-msgstr "输入一个公开的显示名称："
-
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Public Display Name"
-msgstr "公开显示名称"
-
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Additional Personal Information"
-msgstr "更多个人信息"
-
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "example: New York"
-msgstr "例：北京"
-
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Highest Level of Education Completed"
-msgstr "最高教育程度"
-
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Please share with us your reasons for registering with {platform_name}"
-msgstr "请告诉我们您注册 {platform_name}的原因"
-
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Account Acknowledgements"
-msgstr "账号确认"
-
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Preferences for {platform_name}"
-msgstr "{platform_name}偏好设置"
-
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Update my {platform_name} Account"
-msgstr "更新我的{platform_name}账号"
-
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Processing your account information"
-msgstr "正在处理您的账号信息"
-
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Welcome {username}!  Please set your preferences below"
-msgstr "欢迎 {username}！接下来请进行您的偏好设置"
-
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid ""
-"Required fields are noted by {strong_indicator}bold text and an asterisk "
-"(*).{strong_close}"
-msgstr ""
-
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Update My Account"
-msgstr "更新我的账号"
-
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Registration Help"
-msgstr "注册帮助"
-
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Already registered?"
-msgstr "已经注册过了？"
-
-#: themes/stanford-style/lms/templates/register-sidebar.html
-=======
 #: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
 msgid "Share this certificate on Facebook (opens a new tab/window)"
 msgstr "分享此证书至Facebook（打开新标签页/窗口）"
@@ -20939,7 +20560,6 @@ msgid "Already registered?"
 msgstr "已经注册过了？"
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
 #: wiki/templates/wiki/accounts/signup.html
 msgid "Log in"

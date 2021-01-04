@@ -1,10 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/).
-<<<<<<< HEAD
-# Copyright (C) 2020 EdX
-=======
 # Copyright (C) 2019 EdX
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -12,13 +8,8 @@
 # Bentsi Magidovich <magidovich@gmail.com>, 2015
 # dana bublil <dana.bublil@gmail.com>, 2016
 # Danit Keren <danitK@mse.gov.il>, 2019
-<<<<<<< HEAD
-# dotan laks <dotanlaks6@gmail.com>, 2014
-# dotan laks <dotanlaks6@gmail.com>, 2014
-=======
 # dotanlaks <dotanlaks6@gmail.com>, 2014
 # dotanlaks <dotanlaks6@gmail.com>, 2014
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 # e2f_HE c1 <e2f_HE_c1@outlook.com>, 2016-2017
 # da4b3b3e32ebb4f0ec5430359fde7fbb, 2016
 # Hodaya Zada <hodayaz@mse.gov.il>, 2019
@@ -32,11 +23,7 @@
 # yaaqov, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/).
-<<<<<<< HEAD
-# Copyright (C) 2020 EdX
-=======
 # Copyright (C) 2019 EdX
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -54,11 +41,7 @@
 # Yoav Caspin <yoavc@pmo.gov.il>, 2017
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)
-<<<<<<< HEAD
-# Copyright (C) 2020 edX
-=======
 # Copyright (C) 2019 edX
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -77,11 +60,7 @@
 # yuval zana, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)
-<<<<<<< HEAD
-# Copyright (C) 2020 edX
-=======
 # Copyright (C) 2019 edX
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -98,13 +77,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2020-02-16 20:42+0000\n"
-"PO-Revision-Date: 2019-09-29 20:43+0000\n"
-=======
 "POT-Creation-Date: 2019-02-17 20:42+0000\n"
 "PO-Revision-Date: 2019-02-10 20:45+0000\n"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
 "Language: he\n"
@@ -4948,8 +4922,6 @@ msgstr "מקשר"
 msgid "Successfully unlinked."
 msgstr "הסרת הקישור בוצעה בהצלחה."
 
-<<<<<<< HEAD
-=======
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Account Information"
 msgstr "פרטי חשבון"
@@ -4970,7 +4942,6 @@ msgstr ""
 msgid "Help Translate into {beta_language}"
 msgstr ""
 
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/static/js/verify_student/views/image_input_view.js
 msgid "Image Upload Error"
 msgstr "שגיאה בהעלאת תמונה"
@@ -7315,23 +7286,12 @@ msgid "Mark Exam As Completed"
 msgstr "סמן מבחן כהושלם"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
-<<<<<<< HEAD
-msgid "You are taking \"{exam_link}\" as {exam_type}. "
-msgstr ""
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "a timed exam"
 msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "The timer on the right shows the time remaining in the exam."
-<<<<<<< HEAD
-msgstr "השעון מימין מראה את הזמן הנותר לסיום המבחן"
-=======
 msgstr ""
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid ""
@@ -8072,13 +8032,10 @@ msgstr "שנה את כתובת הדואר האלקטרוני שלי"
 msgid "Reset Password"
 msgstr "איפוס סיסמה"
 
-<<<<<<< HEAD
-=======
 #: lms/templates/student_account/account_settings.underscore
 msgid "Switch Language Back"
 msgstr ""
 
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/templates/student_account/account_settings.underscore
 msgid "Switch Language Back"
 msgstr ""
@@ -8090,14 +8047,6 @@ msgstr "אירעה שגיאה. נא טען מחדש את העמוד."
 #: lms/templates/student_account/form_field.underscore
 msgid "Need help logging in?"
 msgstr ""
-<<<<<<< HEAD
-
-#: lms/templates/student_account/hinted_login.underscore
-#: lms/templates/student_account/login.underscore
-msgid "Sign in"
-msgstr "כניסה"
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/templates/student_account/hinted_login.underscore
 #, python-format

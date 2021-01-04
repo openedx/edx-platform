@@ -171,6 +171,6 @@ class TestApplicability(ModuleStoreTestCase):
         with patch('openedx.features.discounts.applicability.stable_bucketing_hash_group', return_value=0):
             with patch(
                 'openedx.features.discounts.applicability.datetime',
-                Mock(now=Mock(return_value=datetime(2020, 8, 1, 0, 1, tzinfo=pytz.UTC)), wraps=datetime),
+                Mock(now=Mock(return_value=datetime(datetime.now().year, 8, 1, 0, 1, tzinfo=pytz.UTC)), wraps=datetime),
             ):
                 assert not _is_in_holdback(self.user)

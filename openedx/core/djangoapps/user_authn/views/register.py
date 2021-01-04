@@ -57,6 +57,10 @@ from openedx.core.djangoapps.user_authn.views.registration_form import (
     RegistrationFormFactory
 )
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
+from openedx.features.edly.utils import (
+    create_learner_link_with_permission_groups,
+    create_user_link_with_edly_sub_organization,
+)
 from student.helpers import (
     authenticate_new_user,
     create_or_set_user_attribute_created_on_site,
@@ -208,6 +212,9 @@ def create_account_with_params(request, params):
         new_user = authenticate_new_user(request, user.username, form.cleaned_data['password'])
         django_login(request, new_user)
         request.session.set_expiry(0)
+
+    create_user_link_with_edly_sub_organization(request, user)
+    user = create_learner_link_with_permission_groups(user)
 
     # Check if system is configured to skip activation email for the current user.
     skip_email = _skip_activation_email(

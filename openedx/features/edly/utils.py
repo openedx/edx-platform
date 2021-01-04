@@ -73,7 +73,11 @@ def encode_edly_user_info_cookie(cookie_data):
     Returns:
         string
     """
-    return jwt.encode(cookie_data, settings.EDLY_COOKIE_SECRET_KEY, algorithm=settings.EDLY_JWT_ALGORITHM)
+    return jwt.encode(
+        cookie_data,
+        settings.EDLY_COOKIE_SECRET_KEY,
+        algorithm=settings.EDLY_JWT_ALGORITHM
+    ).decode('utf-8')
 
 
 def decode_edly_user_info_cookie(encoded_cookie_data):
@@ -367,6 +371,7 @@ def get_current_site_invalid_certificate_context(default_html_certificate_config
     context['company_privacy_url'] = get_privacy_url()
     context['company_tos_url'] = get_tos_and_honor_code_url()
     return context
+
 def clean_django_settings_override(django_settings_override):
     """
     Enforce only allowed django settings to be overridden.

@@ -1,5 +1,8 @@
+"""
+Utils for subscriptions.
+"""
+from urllib.parse import urljoin
 import waffle
-from urlparse import urljoin
 from django.conf import settings
 
 from courseware.access_utils import ACCESS_DENIED, ACCESS_GRANTED
@@ -7,8 +10,6 @@ from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.features.subscriptions.models import UserSubscription
 
 from student.models import User
-from enrollment import api
-from enrollment.data import get_course_enrollment
 from student.models import CourseEnrollment
 
 

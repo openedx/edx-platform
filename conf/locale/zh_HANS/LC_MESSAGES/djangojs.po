@@ -225,13 +225,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2020-02-16 20:42+0000\n"
-"PO-Revision-Date: 2019-09-29 20:43+0000\n"
-=======
 "POT-Creation-Date: 2020-05-03 20:42+0000\n"
 "PO-Revision-Date: 2020-04-27 09:13+0000\n"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
 "Language: zh_CN\n"
@@ -288,10 +283,7 @@ msgstr "删除"
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/signatory-actions.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
-<<<<<<< HEAD
-=======
 #: common/static/common/templates/discussion/templates.underscore
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
@@ -315,10 +307,7 @@ msgstr "上传中"
 #: lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
 #: common/static/common/templates/image-modal.underscore
-<<<<<<< HEAD
-=======
 #: common/static/common/templates/discussion/templates.underscore
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Close"
 msgstr "关闭"
@@ -347,10 +336,7 @@ msgstr "选择文件"
 #: cms/static/js/views/course_info_update.js cms/static/js/views/tabs.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/js/Markdown.Editor.js
-<<<<<<< HEAD
-=======
 #: common/static/common/templates/discussion/templates.underscore
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/templates/learner_dashboard/verification_popover.underscore
 msgid "OK"
 msgstr "是的"
@@ -1370,10 +1356,7 @@ msgstr "新建窗口"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
-<<<<<<< HEAD
-=======
 #: common/static/common/templates/discussion/templates.underscore
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Next"
 msgstr "下一个"
 
@@ -2537,15 +2520,9 @@ msgid "Not specific to a course"
 msgstr "不针对特定课程"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-<<<<<<< HEAD
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr "标题"
-=======
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "Topic"
 msgstr "主题"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
@@ -2616,14 +2593,8 @@ msgid "The more you tell us, the more quickly and helpfully we can respond!"
 msgstr "您提供的信息越详细，我们越能快速并有效地帮助到您！"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-<<<<<<< HEAD
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr "提交"
-=======
 msgid "Create Support Ticket"
 msgstr ""
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
@@ -2641,11 +2612,7 @@ msgid ""
 msgstr "选择一门课程或选择“不针对特定课程”选项。"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-<<<<<<< HEAD
-msgid "Select a subject for your support request."
-=======
 msgid "Select a topic for your support request."
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -2653,8 +2620,6 @@ msgid "Enter some details for your support request."
 msgstr "输入您所需要的支持的细节。"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-<<<<<<< HEAD
-=======
 msgid ""
 "Due to the recent increase in interest in online education and edX, we are "
 "currently experiencing an unusually high volume of support requests. We "
@@ -2667,7 +2632,6 @@ msgid " as many questions may have already been answered."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid "Contact Us"
 msgstr "联系我们"
@@ -2690,14 +2654,9 @@ msgstr "前往{platform}主页"
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid ""
-<<<<<<< HEAD
-"Thank you for submitting a request! We will contact you within 24 hours."
-msgstr "感谢您提交的申请！我们会在24小时内联系您。"
-=======
 "Thank you for submitting a request! We appreciate your patience while we "
 "work to review your request."
 msgstr ""
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
 msgid "Cancel upload"
@@ -2893,13 +2852,8 @@ msgid "Confirm"
 msgstr "确认"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
-<<<<<<< HEAD
-msgid "You already belong to another team."
-msgstr "您已经属于另一个团队。"
-=======
 msgid "You already belong to another team in this team set."
 msgstr ""
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "This team is full."
@@ -2910,13 +2864,8 @@ msgid "Cannot join instructor managed team"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
-<<<<<<< HEAD
-msgid "{memberCount} / {maxMemberCount} Member"
-msgid_plural "{memberCount} / {maxMemberCount} Members"
-=======
 msgid " Member"
 msgid_plural " Members"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr[0] ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
@@ -2932,13 +2881,8 @@ msgid "Topics"
 msgstr "主题"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-<<<<<<< HEAD
-msgid "My Team"
-msgstr "我的团队"
-=======
 msgid "My Teams"
 msgstr ""
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
@@ -3043,13 +2987,6 @@ msgstr "无法找到\"{team}\"团队。"
 msgid "{team_count} Team"
 msgid_plural "{team_count} Teams"
 msgstr[0] ""
-<<<<<<< HEAD
-
-#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "Topic"
-msgstr "主题"
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the {topic_name} Topic"
@@ -3385,10 +3322,7 @@ msgid "There has been an error processing your survey."
 msgstr "在处理您的调查时出现了一个错误。"
 
 #: lms/static/js/courseware/credit_progress.js
-<<<<<<< HEAD
-=======
 #: common/static/common/templates/discussion/templates.underscore
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
 msgid "More"
@@ -5273,8 +5207,6 @@ msgstr "展开全部"
 msgid "Collapse All"
 msgstr "折叠全部"
 
-<<<<<<< HEAD
-=======
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "Show More"
 msgstr "显示更多"
@@ -5283,7 +5215,6 @@ msgstr "显示更多"
 msgid "Show Less"
 msgstr "查看收起"
 
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
@@ -6836,10 +6767,7 @@ msgstr "日期"
 
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
-<<<<<<< HEAD
-=======
 #: common/static/common/templates/discussion/templates.underscore
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Previous"
 msgstr "上一步"
 
@@ -6887,8 +6815,6 @@ msgstr "清空搜索结果"
 msgid "Search"
 msgstr "搜索"
 
-<<<<<<< HEAD
-=======
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Add a Response"
 msgstr ""
@@ -7192,7 +7118,6 @@ msgstr ""
 msgid "Open"
 msgstr ""
 
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Discussion Home"
 msgstr "讨论区"
@@ -7677,17 +7602,6 @@ msgid ""
 msgstr "在点击 “结束我的考试” 之前，您必须点击 \"提交\" 按钮以获得学分。"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
-<<<<<<< HEAD
-msgid "Show More"
-msgstr "显示更多"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show Less"
-msgstr "查看收起"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Exam timer and end exam button"
 msgstr "考试计时器和结束考试按钮"
 
@@ -8586,13 +8500,8 @@ msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-<<<<<<< HEAD
-"You need a computer or cell phone that has a webcam. When you receive a "
-"browser prompt, make sure that you allow access to the camera."
-=======
 "You need a device that has a webcam. If you receive a browser prompt for "
 "access to your camera, please make sure to click 'Allow'."
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8628,13 +8537,8 @@ msgstr "您的整张脸都在框内。"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-<<<<<<< HEAD
-"To use the current photo, select the Take Photo button {icon}. To take "
-"another photo, select the Retake Photo button {icon}."
-=======
 "To take the photo of your face, click on the camera button {icon}. If you "
 "need to try again, click 'Retake Photo'."
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8715,54 +8619,6 @@ msgid ""
 "If you require assistance with taking either photo for submission, contact "
 "%(platformName)s support for additional suggestions."
 msgstr ""
-<<<<<<< HEAD
-"我们会采用最高级别的安全技术来加密您的照片并发送到我们的授权服务用于审核目的；一旦完成了认证过程，%(platformName)s不会继续保存这些照片和信息。"
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid ""
-"What if I can't see the camera image, or if I can't see my photo do "
-"determine which side is visible?"
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid ""
-"You may be able to complete the image capture procedure without assistance, "
-"but it may take a couple of submission attempts to get the camera "
-"positioning right.  Optimal camera positioning varies with each computer, "
-"but generally the best position for a headshot is approximately 12-18 inches"
-" (30-45 centimeters) from the camera, with your head centered relative to "
-"the computer screen. "
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid ""
-"If the photos you submit are rejected, try moving the computer or camera "
-"orientation to change the lighting angle.  The most common reason for "
-"rejection is inability to read the text on the ID card."
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid ""
-"What if I have difficulty holding my head in position relative to the "
-"camera?"
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-#, python-format
-msgid ""
-"If you require assistance with taking either photo for submission, contact "
-"%(platformName)s support for additional suggestions."
-msgstr ""
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8777,15 +8633,8 @@ msgid "Take a Photo of Your ID"
 msgstr "拍摄您的身份证件"
 
 #: lms/templates/verify_student/id_photo_step.underscore
-<<<<<<< HEAD
-msgid ""
-"Use your webcam to take a photo of your ID. We will match this photo with "
-"the photo of your face and the name on your account."
-msgstr "请用摄像头拍摄一张您身份证件的照片，我们将查看该照片是否与您的面部照片及您在账号中填写的姓名匹配。"
-=======
 msgid "Use your webcam to take a photo of your ID."
 msgstr ""
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
@@ -8817,8 +8666,6 @@ msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
-<<<<<<< HEAD
-=======
 "As part of the verification process, you take a photo of both your face and "
 "a photo ID. Our authorization service confirms your identity by comparing "
 "the photo you take with the photo on your ID."
@@ -8826,7 +8673,6 @@ msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 "You may be able to complete the image capture procedure without assistance, "
 "but it may take a couple of submission attempts to get the camera "
 "positioning right.  Optimal camera positioning varies with each computer, "
@@ -9121,13 +8967,6 @@ msgstr "照片要求："
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Does the photo of you show your whole face?"
 msgstr "这张照片中有您的整张脸吗？"
-<<<<<<< HEAD
-
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Does the photo of you match your ID photo?"
-msgstr "这张照片和您身份证件上的照片相匹配吗？"
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Is your name on your ID readable?"

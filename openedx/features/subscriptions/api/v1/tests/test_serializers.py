@@ -10,7 +10,7 @@ class UserSubscriptionSerializerTests(TestCase):
     Tests for "UserSubscriptionSerializer" serializer.
     """
 
-    def test_user_subscription_seriaizer(self):
+    def test_user_subscription_serializer(self):
         """
         Verify a validator checking non-existent courses.
         """
@@ -22,7 +22,7 @@ class UserSubscriptionSerializerTests(TestCase):
                 'max_allowed_courses': user_subscription.max_allowed_courses,
                 'subscription_id': user_subscription.subscription_id,
                 'subscription_type': user_subscription.subscription_type,
-                'user': user_subscription.user.id,
+                'user': user_subscription.user.username,
                 'course_enrollments': [],
             }
         )

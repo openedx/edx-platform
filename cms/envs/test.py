@@ -282,6 +282,9 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
     DIRECTORY_PREFIX='video-transcripts/',
 )
 
+MIDDLEWARE.remove('openedx.features.edly.middleware.EdlyOrganizationAccessMiddleware')  # noqa: F405
+MIDDLEWARE.remove('openedx.features.edly.middleware.SettingsOverrideMiddleware')    # noqa: F405
+MIDDLEWARE.remove('edly_panel_app.middleware.EdlyUserActivityMiddleware')   # noqa: F405
 ####################### Plugin Settings ##########################
 
 # pylint: disable=wrong-import-position

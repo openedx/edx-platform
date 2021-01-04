@@ -30,10 +30,6 @@ from openedx.core.djangoapps.user_api.serializers import (
     UserSerializer
 )
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
-from openedx.features.edly.utils import (
-    create_user_link_with_edly_sub_organization,
-    create_learner_link_with_permission_groups,
-)
 from student.helpers import AccountValidationError
 from util.json_request import JsonResponse
 

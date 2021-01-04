@@ -1,11 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-<<<<<<< HEAD
-# edX translation file.
-# Copyright (C) 2020 EdX
-=======
 # edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/).
 # Copyright (C) 2019 EdX
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -60,13 +55,8 @@
 # wd3bbas <mohed.alabbas@gmail.com>, 2014
 # Zakaria <zakaria.braksa@gmail.com>, 2015
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
-<<<<<<< HEAD
-# edX translation file.
-# Copyright (C) 2020 EdX
-=======
 # edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/).
 # Copyright (C) 2019 EdX
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -102,13 +92,8 @@
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # soliman osman <solimanosman@windowslive.com>, 2014-2015
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
-<<<<<<< HEAD
-# edX translation file
-# Copyright (C) 2020 edX
-=======
 # edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)
 # Copyright (C) 2019 edX
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -142,13 +127,8 @@
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # سيف المنايا <m2fahad9@gmail.com>, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
-<<<<<<< HEAD
-# edX translation file
-# Copyright (C) 2020 edX
-=======
 # edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)
 # Copyright (C) 2019 edX
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -183,13 +163,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2020-07-06 12:05+0000\n"
-"PO-Revision-Date: 2020-06-14 20:45+0000\n"
-=======
 "POT-Creation-Date: 2019-02-17 20:42+0000\n"
 "PO-Revision-Date: 2019-02-10 20:45+0000\n"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "Language: ar\n"
@@ -5924,18 +5899,6 @@ msgid "You receive messages from {platform_name} and course teams at this addres
 msgstr "تتلقى رسائل من {platform_name} وفرق الدورة على هذا العنوان."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-<<<<<<< HEAD
-#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
-#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
-msgid "Secondary Email Address"
-msgstr "عنوان البريد الإلكتروني الثانوي"
-
-#: lms/static/js/student_account/views/account_settings_factory.js
-#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
-#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
-msgid "You may access your account when single-sign on is not available."
-msgstr "يمكنك الوصول إلى حسابك عند عدم توفر تسجيل الدخول الأحادي."
-=======
 msgid "Recovery Email Address"
 msgstr ""
 
@@ -5944,7 +5907,6 @@ msgid ""
 "You may access your account with this address if single-sign on or access to"
 " your primary email is not available."
 msgstr ""
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
@@ -6080,13 +6042,6 @@ msgid "Preferred Language"
 msgstr "اللغة المفضّلة"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-<<<<<<< HEAD
-#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
-#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
-msgid ""
-"We've sent a confirmation message to {new_secondary_email_address}. Click "
-"the link in the message to update your secondary email address."
-=======
 msgid ""
 "We've sent a confirmation message to {new_secondary_email_address}. Click "
 "the link in the message to update your secondary email address."
@@ -6094,7 +6049,6 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Social Media Links"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 "لقد أرسلنا رسالة تأكيد إلى {new_secondary_email_address}. انقر"
 "الرابط في الرسالة لتحديث عنوان بريدك الإلكتروني الثانوي."
@@ -6521,8 +6475,6 @@ msgstr "العدد المرسَل"
 msgid "Overall Score"
 msgstr "النتيجة الكلية"
 
-<<<<<<< HEAD
-=======
 #: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
 msgid "Bookmark this page"
 msgstr ""
@@ -6547,7 +6499,6 @@ msgstr "تكبير جميع الأقسام"
 msgid "Collapse All"
 msgstr "طي جميع الأقسام"
 
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
@@ -8406,15 +8357,11 @@ msgid "Mark Exam As Completed"
 msgstr "أشّر الامتحان بعلامة ’استُكمل‘"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
-<<<<<<< HEAD
-msgid "timed"
-=======
 msgid "a timed exam"
 msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "The timer on the right shows the time remaining in the exam."
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
@@ -9151,25 +9098,9 @@ msgstr "تغيير عنوان بريدي الإلكتروني"
 msgid "Reset Password"
 msgstr "تغيير كلمة المرور"
 
-<<<<<<< HEAD
-#: lms/templates/student_account/account_recovery.underscore
-msgid "Account Recovery"
-msgstr ""
-
-#: lms/templates/student_account/account_recovery.underscore
-msgid ""
-"Please enter your secondary email address below and we will send you "
-"instructions for recovering your account and setting a new password."
-msgstr ""
-
-#: lms/templates/student_account/account_recovery.underscore
-msgid "Recover my account"
-msgstr "أنشئ حساباً جديداً اﻵن."
-=======
 #: lms/templates/student_account/account_settings.underscore
 msgid "Switch Language Back"
 msgstr ""
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
@@ -9182,13 +9113,8 @@ msgid "An error occurred. Please reload the page."
 msgstr "نأسف لحدوث خطأ. يُرجى إعادة فتح الصفحة."
 
 #: lms/templates/student_account/form_field.underscore
-<<<<<<< HEAD
-msgid "Forgot password?"
-msgstr "تغيير كلمة المرور"
-=======
 msgid "Need help logging in?"
 msgstr ""
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 
 #: lms/templates/student_account/hinted_login.underscore
 #, python-format

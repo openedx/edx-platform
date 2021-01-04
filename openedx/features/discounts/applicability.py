@@ -143,7 +143,7 @@ def _is_in_holdback(user):
     """
     Return whether the specified user is in the first-purchase-discount holdback group.
     """
-    if datetime(2020, 8, 1, tzinfo=pytz.UTC) <= datetime.now(tz=pytz.UTC):
+    if datetime(datetime.now().year, 8, 1, tzinfo=pytz.UTC) <= datetime.now(tz=pytz.UTC):
         return False
 
     # Holdback is 50/50

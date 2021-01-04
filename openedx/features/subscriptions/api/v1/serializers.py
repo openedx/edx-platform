@@ -2,9 +2,9 @@ from rest_framework import serializers
 
 from django.contrib.auth.models import User
 
+from lms.djangoapps.support.serializers import CourseEnrollmentSerializer
 from openedx.core.djangoapps.theming.helpers import get_current_site
 from openedx.features.subscriptions.models import UserSubscription
-from enrollment.serializers import CourseEnrollmentSerializer
 
 
 class UserSubscriptionSerializer(serializers.ModelSerializer):
@@ -28,4 +28,12 @@ class UserSubscriptionSerializer(serializers.ModelSerializer):
         except User.DoesNotExist:
             raise serializers.ValidationError('User with username {} does not exist'.format(username))
 
+        return data
+
+    def to_representation(self, instance):
+        """
+        Serialize username instead of user id for compatibility with ecommerce.
+        """
+        data = super(UserSubscriptionSerializer, self).to_representation(instance)
+        data['user'] = instance.user.username
         return data

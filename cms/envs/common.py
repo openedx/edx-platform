@@ -742,6 +742,7 @@ MIDDLEWARE = [
 # Edly Configuration
 ADMIN_CONFIGURATION_USERS_GROUP = 'Admin Configuration Users'
 EDLY_PANEL_USERS_GROUP = 'Edly Panel Users'
+EDLY_INSIGHTS_GROUP = 'Edly Insights Admin'
 EDLY_PANEL_ADMIN_USERS_GROUP = 'Edly Panel Admin Users'
 EDLY_PANEL_RESTRICTED_USERS_GROUP = 'Edly Panel Restricted Users'
 EDLY_WP_ADMIN_USERS_GROUP = 'WordPress Edly Admin Users'
@@ -751,6 +752,7 @@ EDLY_WP_SUBSCRIBER_USERS_GROUP = 'WordPress Subscriber Users'
 EDLY_USER_ROLES = {
     'panel_restricted': EDLY_PANEL_RESTRICTED_USERS_GROUP,
     'panel_user': EDLY_PANEL_USERS_GROUP,
+    'insights_admin': EDLY_INSIGHTS_GROUP,
     'panel_admin': EDLY_PANEL_ADMIN_USERS_GROUP,
     'subscriber': EDLY_WP_SUBSCRIBER_USERS_GROUP,
     'edly_admin': EDLY_WP_ADMIN_USERS_GROUP

@@ -23,8 +23,8 @@ class UserSubscriptionFactory(DjangoModelFactory):
     subscription_id = FuzzyInteger(1, 10)
     max_allowed_courses = FuzzyInteger(1, 10)
     expiration_date = FuzzyDate(
-        start_date=date.today() - timedelta(days=365),
-        end_date=date.today() - timedelta(days=1)
+        start_date=date.today() - timedelta(days=1),
+        end_date=date.today() + timedelta(days=365)
     )
     subscription_type = UserSubscription.LIMITED_ACCESS
     site = SubFactory(SiteFactory)

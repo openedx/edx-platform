@@ -27,27 +27,19 @@
 # Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2020.
-<<<<<<< HEAD
-=======
 #
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2020.
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2020-07-06 12:06+0000\n"
-"PO-Revision-Date: 2020-07-06 12:06:17.476078\n"
-=======
 "POT-Creation-Date: 2020-06-02 20:41+0000\n"
 "PO-Revision-Date: 2020-06-02 20:41:03.431676\n"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -79,26 +71,7 @@ msgid "Entrance Exam"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/helpers.py
-<<<<<<< HEAD
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: cms/templates/course_outline.html lms/templates/seq_module.html
-#: lms/templates/ccx/schedule.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: themes/st-lutherx/lms/templates/seq_module.html
-#: themes/st-normanx/lms/templates/seq_module.html
-msgid "Section"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/templates/ccx/schedule.html
-msgid "Subsection"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/helpers.py
-=======
 #: common/lib/xmodule/xmodule/unit_block.py
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/djangoapps/instructor/views/tools.py lms/templates/ccx/schedule.html
 #: lms/templates/seq_module.html
 msgid "Unit"
@@ -232,13 +205,7 @@ msgid "You're enrolled as an honor code student"
 msgstr ""
 
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
-<<<<<<< HEAD
-#: openedx/core/djangoapps/user_api/api.py
-#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/footer.html
-#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/footer.html
-=======
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -832,49 +799,6 @@ msgid ""
 msgstr ""
 
 #: common/djangoapps/student/views/management.py
-<<<<<<< HEAD
-msgid ""
-"Your previous request is in progress, please try again in a few moments."
-msgstr ""
-
-#: common/djangoapps/student/views/management.py
-msgid "Some error occured during password change. Please try again"
-msgstr ""
-
-#: common/djangoapps/student/views/management.py
-msgid "No email address provided."
-msgstr ""
-
-#: common/djangoapps/student/views/management.py
-msgid "Password reset unsuccessful"
-msgstr ""
-
-#: common/djangoapps/student/views/management.py
-msgid "Error in resetting your password."
-msgstr ""
-
-#: common/djangoapps/student/views/management.py
-msgid "Error in resetting your password. Please try again."
-msgstr ""
-
-#: common/djangoapps/student/views/management.py
-msgid "Password creation unsuccessful"
-msgstr ""
-
-#: common/djangoapps/student/views/management.py
-msgid "Error in creating your password. Please try again."
-msgstr ""
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid ""
-"{html_start}Password Creation Complete{html_end}Your password has been "
-"created. {bold_start}{email}{bold_end} is now your primary login email."
-msgstr ""
-
-#: common/djangoapps/student/views/management.py
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Valid e-mail address required."
 msgstr ""
 
@@ -2248,11 +2172,6 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
 #: cms/templates/index.html cms/templates/videos_index_pagination.html
-<<<<<<< HEAD
-#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
-#: lms/templates/register-shib.html
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/manage_user_standing.html
@@ -4476,28 +4395,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/x_module.py
 #, python-brace-format
-<<<<<<< HEAD
-msgid ""
-"{display_name} is only accessible to enrolled learners. Sign in or register,"
-" and enroll in this course to view it."
-msgstr ""
-
-#: common/templates/student/edx_ace/accountrecovery/email/body.html
-msgid "Create Password"
-msgstr ""
-
-#: common/templates/student/edx_ace/accountrecovery/email/body.html
-#: common/templates/student/edx_ace/accountrecovery/email/body.txt
-#, python-format
-msgid ""
-"You're receiving this e-mail because you requested to create a password for "
-"your user account at %(platform_name)s."
-msgstr ""
-
-#: common/templates/student/edx_ace/accountrecovery/email/body.html
-#: common/templates/student/edx_ace/accountrecovery/email/body.txt
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid ""
 "{display_name} is only accessible to enrolled learners. Sign in or register,"
 " and enroll in this course to view it."
@@ -4670,18 +4567,10 @@ msgstr ""
 msgid "Request to change %(platform_name)s account e-mail"
 msgstr ""
 
-<<<<<<< HEAD
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-#: themes/st-lutherx/lms/templates/student/edx_ace/passwordreset/email/body.html
-#: themes/st-normanx/lms/templates/student/edx_ace/passwordreset/email/body.html
-#: lms/templates/forgot_password_modal.html
-msgid "Password Reset"
-=======
 #: common/templates/student/edx_ace/emailchangeconfirmation/email/body.html
 #: common/templates/student/edx_ace/emailchangeconfirmation/email/subject.txt
 #, python-format
 msgid "Email Change Confirmation for %(platform_name)s"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: common/templates/student/edx_ace/emailchangeconfirmation/email/body.html
@@ -4694,29 +4583,14 @@ msgid ""
 "at:"
 msgstr ""
 
-<<<<<<< HEAD
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
-#: themes/st-lutherx/lms/templates/student/edx_ace/passwordreset/email/body.html
-#: themes/st-normanx/lms/templates/student/edx_ace/passwordreset/email/body.html
-#, python-format
-=======
 #: common/templates/student/edx_ace/emailchangeconfirmation/email/body.html
 #: common/templates/student/edx_ace/emailchangeconfirmation/email/body.txt
 #: themes/stanford-style/lms/templates/emails/confirm_email_change.txt
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid ""
 "We keep a log of old e-mails, so if this request was unintentional, we can "
 "investigate."
 msgstr ""
 
-<<<<<<< HEAD
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
-#: themes/st-lutherx/lms/templates/student/edx_ace/passwordreset/email/body.html
-#: themes/st-normanx/lms/templates/student/edx_ace/passwordreset/email/body.html
-msgid "If you did not request this change, you can ignore this email."
-=======
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
 msgid "Create Recovery Email"
 msgstr ""
@@ -4725,7 +4599,6 @@ msgstr ""
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.txt
 #, python-format
 msgid "You've registered this recovery email address for %(platform_name)s."
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
@@ -4735,18 +4608,11 @@ msgid ""
 "request this change, you can disregard this email."
 msgstr ""
 
-<<<<<<< HEAD
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-#: themes/st-lutherx/lms/templates/student/edx_ace/passwordreset/email/body.html
-#: themes/st-normanx/lms/templates/student/edx_ace/passwordreset/email/body.html
-msgid "Change my Password"
-=======
 #. Translators: This label appears above a field on the registration form
 #. meant to confirm the user's email address.
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Confirm Email"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: common/templates/student/edx_ace/recoveryemailcreate/email/subject.txt
@@ -4882,11 +4748,6 @@ msgstr ""
 #: lms/djangoapps/branding/api.py lms/templates/footer.html
 #: lms/templates/static_templates/about.html
 #: themes/red-theme/lms/templates/footer.html
-<<<<<<< HEAD
-#: themes/st-lutherx/lms/templates/footer.html
-#: themes/st-normanx/lms/templates/footer.html
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "About"
@@ -4897,15 +4758,6 @@ msgstr ""
 msgid "{platform_name} for Business"
 msgstr ""
 
-<<<<<<< HEAD
-#: lms/djangoapps/branding/api.py themes/red-theme/lms/templates/footer.html
-#: themes/st-lutherx/lms/templates/footer.html
-#: themes/st-normanx/lms/templates/footer.html
-msgid "News"
-msgstr ""
-
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/contact.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/st-lutherx/lms/templates/footer.html
@@ -4960,14 +4812,8 @@ msgstr ""
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
-<<<<<<< HEAD
-#: lms/djangoapps/branding/api.py openedx/core/djangoapps/user_api/api.py
-#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/footer.html
-#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/footer.html
-=======
 #: lms/djangoapps/branding/api.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/st-lutherx/cms/templates/widgets/footer.html
@@ -7780,89 +7626,6 @@ msgstr ""
 msgid "Donation for {platform_name}"
 msgstr ""
 
-<<<<<<< HEAD
-#: lms/djangoapps/shoppingcart/pdf.py
-#, python-brace-format
-msgid "Page {page_number} of {page_count}"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/templates/shoppingcart/receipt.html
-msgid "Invoice"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Order"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#, python-brace-format
-msgid "{id_label} # {item_id}"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-#, python-brace-format
-msgid "Date: {date}"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/djangoapps/shoppingcart/reports.py
-#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
-#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
-#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
-#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
-#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
-#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
-msgid "Quantity"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid ""
-"List Price\n"
-"per item"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid ""
-"Discount\n"
-"per item"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Amount"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
-#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
-#: lms/templates/courseware/gradebook.html
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "Total"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Payment Received"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Balance"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Billing Address"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Disclaimer"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "TERMS AND CONDITIONS"
-msgstr ""
-
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #. Translators: this text appears when an unfamiliar error code occurs during
 #. payment,
 #. for which we don't know a user-friendly message to display in advance.
@@ -9075,11 +8838,6 @@ msgstr ""
 msgid "You have signed out."
 msgstr ""
 
-<<<<<<< HEAD
-#: lms/templates/logout.html themes/st-lutherx/lms/templates/logout.html
-#: themes/st-normanx/lms/templates/logout.html
-#, python-format
-=======
 #: lms/templates/logout.html
 #, python-brace-format
 msgid ""
@@ -9100,7 +8858,6 @@ msgstr ""
 
 #: lms/templates/logout.html
 #, python-brace-format
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid ""
 "If you are not redirected within 5 seconds, {start_anchor}click here to go "
 "to the home page{end_anchor}."
@@ -9319,31 +9076,6 @@ msgstr ""
 msgid "Preview"
 msgstr ""
 
-<<<<<<< HEAD
-#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
-#. Translators: this is a control to allow users to exit out of this modal
-#. interface (a menu or piece of UI that takes the full focus of the screen)
-#: lms/templates/wiki/edit.html lms/templates/wiki/history.html
-#: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
-#: lms/templates/forgot_password_modal.html lms/templates/help_modal.html
-#: lms/templates/signup_modal.html lms/templates/ccx/schedule.html
-#: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-#: lms/templates/modal/_modal-settings-language.html
-#: themes/edx.org/lms/templates/dashboard.html
-#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
-#: themes/st-lutherx/lms/templates/dashboard.html
-#: themes/st-normanx/lms/templates/dashboard.html
-msgid "Close"
-msgstr ""
-
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/templates/wiki/edit.html
 msgid "Wiki Preview"
 msgstr ""
@@ -9721,18 +9453,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-<<<<<<< HEAD
-#: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/st-normanx/cms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
-#: cms/templates/login.html cms/templates/widgets/header.html
-#: themes/red-theme/cms/templates/login.html
-#: themes/st-lutherx/cms/templates/widgets/header.html
-#: themes/st-normanx/cms/templates/widgets/header.html
-=======
 #: cms/templates/widgets/header.html
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Sign In"
 msgstr ""
 
@@ -11121,20 +10842,8 @@ msgstr ""
 msgid "Password reset unsuccessful"
 msgstr ""
 
-<<<<<<< HEAD
-#: openedx/core/djangoapps/user_authn/views/login.py
-#: lms/templates/register-form.html
-#: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
-#: themes/st-lutherx/lms/templates/header/navbar-not-authenticated.html
-#: themes/st-normanx/lms/templates/header/navbar-not-authenticated.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Register"
-=======
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "Error in resetting your password."
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
@@ -11152,17 +10861,8 @@ msgstr ""
 msgid "Some error occured during password change. Please try again"
 msgstr ""
 
-<<<<<<< HEAD
-#: openedx/core/djangoapps/user_authn/views/login.py
-msgid "You are not allowed to login on this site."
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/login_form.py
-msgid "Create Account"
-=======
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "No email address provided."
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/register.py
@@ -11623,17 +11323,8 @@ msgid "{sign_in_link} or {register_link} and then enroll in this course."
 msgstr ""
 
 #: openedx/features/course_experience/views/course_home_messages.py
-<<<<<<< HEAD
-#: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
-#: themes/st-lutherx/lms/templates/header/navbar-not-authenticated.html
-#: themes/st-normanx/lms/templates/header/navbar-not-authenticated.html
-msgid "Sign in"
-=======
 #, python-brace-format
 msgid "Welcome to {course_display_name}"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: openedx/features/course_experience/views/course_home_messages.py
@@ -13098,12 +12789,6 @@ msgstr ""
 #: cms/templates/settings.html cms/templates/settings_advanced.html
 #: cms/templates/settings_graders.html cms/templates/widgets/header.html
 #: lms/templates/wiki/includes/article_menu.html
-<<<<<<< HEAD
-#: themes/st-lutherx/cms/templates/widgets/header.html
-#: themes/st-normanx/cms/templates/widgets/header.html
-#: wiki/templates/wiki/settings.html
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: wiki/templates/wiki/includes/article_menu.html
 #: wiki/templates/wiki/settings.html
 msgid "Settings"
@@ -13170,25 +12855,9 @@ msgstr ""
 msgid "Course Outline"
 msgstr ""
 
-<<<<<<< HEAD
-#. Translators: Pages refer to the tabs that appear in the top navigation of
-#. each course.
-#: cms/templates/edit-tabs.html cms/templates/export.html
-#: cms/templates/widgets/header.html
-#: themes/st-lutherx/cms/templates/widgets/header.html
-#: themes/st-normanx/cms/templates/widgets/header.html
-msgid "Pages"
-msgstr ""
-
-#: cms/templates/export_git.html cms/templates/widgets/header.html
-#: themes/st-lutherx/cms/templates/widgets/header.html
-#: themes/st-normanx/cms/templates/widgets/header.html
-msgid "Export to Git"
-=======
 #: cms/templates/course_outline.html
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Warning"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: cms/templates/html_error.html lms/templates/module-error.html
@@ -13210,37 +12879,6 @@ msgstr ""
 msgid "Course Run:"
 msgstr ""
 
-<<<<<<< HEAD
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Sign In to {studio_name}"
-msgstr ""
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr ""
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Required Information to Sign In to {studio_name}"
-msgstr ""
-
-#: cms/templates/login.html cms/templates/register.html
-#: lms/templates/help_modal.html lms/templates/login.html
-#: lms/templates/provider_login.html lms/templates/register-form.html
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: themes/red-theme/cms/templates/login.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "E-mail"
-msgstr ""
-
-#. Translators: This is the placeholder text for a field that requests an
-#. email
-#. address.
-#: cms/templates/login.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html cms/templates/register.html
-#: lms/templates/login.html lms/templates/register-form.html
-#: lms/templates/register-shib.html themes/red-theme/cms/templates/login.html
-=======
 #: cms/templates/index.html lms/templates/courseware/courses.html
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/header/navbar-not-authenticated.html
@@ -13254,54 +12892,11 @@ msgid "Courses"
 msgstr ""
 
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr ""
 
-<<<<<<< HEAD
-#: cms/templates/login.html lms/templates/login.html
-#: themes/red-theme/cms/templates/login.html
-msgid "Forgot password?"
-msgstr ""
-
-#: cms/templates/manage_users_lib.html cms/templates/widgets/header.html
-#: themes/st-lutherx/cms/templates/widgets/header.html
-#: themes/st-normanx/cms/templates/widgets/header.html
-msgid "User Access"
-msgstr ""
-
-#: cms/templates/register.html cms/templates/widgets/header.html
-#: themes/st-lutherx/cms/templates/widgets/header.html
-#: themes/st-normanx/cms/templates/widgets/header.html
-msgid "Sign Up"
-msgstr ""
-
-#. Translators: This is the placeholder text for a field that requests the
-#. user's full name.
-#: cms/templates/register.html lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "example: Jane Doe"
-msgstr ""
-
-#. Translators: This is the placeholder text for a field that asks the user to
-#. pick a username
-#: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "example: JaneDoe"
-msgstr ""
-
-#: cms/templates/settings.html cms/templates/widgets/header.html
-#: themes/st-lutherx/cms/templates/widgets/header.html
-#: themes/st-normanx/cms/templates/widgets/header.html
-msgid "Schedule & Details"
-msgstr ""
-
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Course End Date"
@@ -13329,21 +12924,6 @@ msgstr ""
 msgid "View"
 msgstr ""
 
-<<<<<<< HEAD
-#: cms/templates/videos_index.html cms/templates/widgets/header.html
-#: themes/st-lutherx/cms/templates/widgets/header.html
-#: themes/st-normanx/cms/templates/widgets/header.html
-msgid "Video Uploads"
-msgstr ""
-
-#: cms/templates/emails/course_creator_granted.txt
-#: themes/st-lutherx/cms/templates/emails/course_creator_granted.txt
-#: themes/st-normanx/cms/templates/emails/course_creator_granted.txt
-msgid ""
-"Your request for course creation rights to {studio_name} have been granted. To create your first course, visit\n"
-"\n"
-"{url}"
-=======
 #: cms/templates/maintenance/_announcement_edit.html
 #: lms/templates/problem.html lms/templates/word_cloud.html
 msgid "Save"
@@ -13357,7 +12937,6 @@ msgstr ""
 #: cms/templates/maintenance/_announcement_index.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "next"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: cms/templates/maintenance/_force_publish_course.html
@@ -13453,17 +13032,8 @@ msgstr ""
 msgid "Choose Language"
 msgstr ""
 
-<<<<<<< HEAD
-#: cms/templates/widgets/header.html lms/templates/user_dropdown.html
-#: lms/templates/header/user_dropdown.html
-#: themes/st-lutherx/cms/templates/widgets/header.html
-#: themes/st-lutherx/lms/templates/header/user_dropdown.html
-#: themes/st-normanx/cms/templates/widgets/header.html
-#: themes/st-normanx/lms/templates/header/user_dropdown.html
-=======
 #: cms/templates/widgets/header.html lms/templates/header/user_dropdown.html
 #: lms/templates/user_dropdown.html
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Account"
 msgstr ""
 
@@ -13560,15 +13130,8 @@ msgstr ""
 msgid "Usermenu dropdown"
 msgstr ""
 
-<<<<<<< HEAD
-#: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
-#: lms/templates/header/user_dropdown.html
-#: themes/st-lutherx/lms/templates/header/user_dropdown.html
-#: themes/st-normanx/lms/templates/header/user_dropdown.html
-=======
 #: cms/templates/widgets/user_dropdown.html
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Sign Out"
 msgstr ""
 
@@ -13747,10 +13310,6 @@ msgid "Dashboard"
 msgstr ""
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-<<<<<<< HEAD
-#: themes/st-lutherx/lms/templates/dashboard.html
-#: themes/st-normanx/lms/templates/dashboard.html
-=======
 msgid "results successfully populated,"
 msgstr ""
 
@@ -13759,7 +13318,6 @@ msgid "Click to load all enrolled courses"
 msgstr ""
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "You are not enrolled in any courses yet."
 msgstr ""
 
@@ -13799,25 +13357,12 @@ msgstr ""
 msgid "Clear search"
 msgstr ""
 
-<<<<<<< HEAD
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-#: themes/st-lutherx/lms/templates/dashboard.html
-#: themes/st-normanx/lms/templates/dashboard.html
-msgid "Account Status Info"
-msgstr ""
-
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-#: themes/st-lutherx/lms/templates/dashboard.html
-#: themes/st-normanx/lms/templates/dashboard.html
-msgid "Order History"
-=======
 #: lms/templates/dashboard.html
 msgid "Skip to list of announcements"
 msgstr ""
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Account Status Info"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
@@ -14069,11 +13614,7 @@ msgstr ""
 msgid "Search for a course"
 msgstr ""
 
-<<<<<<< HEAD
-#: lms/templates/index_overlay.html lms/templates/register-sidebar.html
-=======
 #: lms/templates/index_overlay.html
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Welcome to {platform_name}"
 msgstr ""
 
@@ -14117,101 +13658,6 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-<<<<<<< HEAD
-#: lms/templates/login-sidebar.html
-msgid "Helpful Information"
-msgstr ""
-
-#: lms/templates/login-sidebar.html
-msgid "Login via OpenID"
-msgstr ""
-
-#: lms/templates/login-sidebar.html
-msgid ""
-"You can now start learning with {platform_name} by logging in with your <a "
-"rel=\"external\" href=\"http://openid.net/\">OpenID account</a>."
-msgstr ""
-
-#: lms/templates/login-sidebar.html
-msgid "Not Enrolled?"
-msgstr ""
-
-#: lms/templates/login-sidebar.html
-msgid "Sign up for {platform_name} today!"
-msgstr ""
-
-#: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Need Help?"
-msgstr ""
-
-#: lms/templates/login-sidebar.html
-msgid "Looking for help signing in or with your {platform_name} account?"
-msgstr ""
-
-#: lms/templates/login-sidebar.html
-msgid "View our help section for answers to commonly asked questions."
-msgstr ""
-
-#: lms/templates/login.html
-msgid "Log into your {platform_name} Account"
-msgstr ""
-
-#: lms/templates/login.html
-msgid "Log into My {platform_name} Account"
-msgstr ""
-
-#: lms/templates/login.html
-msgid "Access My Courses"
-msgstr ""
-
-#: lms/templates/login.html lms/templates/register-shib.html
-#: lms/templates/register.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Processing your account information"
-msgstr ""
-
-#: lms/templates/login.html wiki/templates/wiki/accounts/login.html
-msgid "Please log in"
-msgstr ""
-
-#: lms/templates/login.html
-msgid "to access your account and courses"
-msgstr ""
-
-#: lms/templates/login.html
-msgid "We're Sorry, {platform_name} accounts are unavailable currently"
-msgstr ""
-
-#: lms/templates/login.html
-msgid "We couldn't log you in."
-msgstr ""
-
-#: lms/templates/login.html
-msgid "Your email or password is incorrect"
-msgstr ""
-
-#: lms/templates/login.html
-msgid "An error occurred when signing you in to {platform_name}."
-msgstr ""
-
-#: lms/templates/login.html
-msgid ""
-"Please provide the following information to log into your {platform_name} "
-"account. Required fields are noted by {strong_start}bold text and an "
-"asterisk (*){strong_end}."
-msgstr ""
-
-#: lms/templates/login.html
-msgid "Account Preferences"
-msgstr ""
-
-#: lms/templates/login.html
-msgid "Sign in with {provider_name}"
-msgstr ""
-
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #. Translators:  "External resource" means that this learning module is hosted
 #. on a platform external to the edX LMS
 #: lms/templates/lti.html
@@ -14257,210 +13703,6 @@ msgstr ""
 
 #: lms/templates/manage_user_standing.html
 msgid "Profile:"
-<<<<<<< HEAD
-msgstr ""
-
-#: lms/templates/manage_user_standing.html
-msgid "Image:"
-msgstr ""
-
-#: lms/templates/manage_user_standing.html
-msgid "Name:"
-msgstr ""
-
-#: lms/templates/manage_user_standing.html
-msgid "Choose an action:"
-msgstr ""
-
-#: lms/templates/manage_user_standing.html
-msgid "View Profile"
-msgstr ""
-
-#: lms/templates/manage_user_standing.html
-msgid "Disable Account"
-msgstr ""
-
-#: lms/templates/manage_user_standing.html
-msgid "Reenable Account"
-msgstr ""
-
-#: lms/templates/manage_user_standing.html
-msgid "Remove Profile Image"
-msgstr ""
-
-#: lms/templates/manage_user_standing.html
-msgid "Students whose accounts have been disabled"
-msgstr ""
-
-#: lms/templates/manage_user_standing.html
-msgid "(reload your page to refresh)"
-msgstr ""
-
-#: lms/templates/manage_user_standing.html
-msgid "working"
-msgstr ""
-
-#: lms/templates/module-error.html
-#: lms/templates/courseware/courseware-error.html
-msgid "There has been an error on the {platform_name} servers"
-msgstr ""
-
-#: lms/templates/module-error.html
-#: lms/templates/courseware/courseware-error.html
-#: lms/templates/courseware/error-message.html
-msgid ""
-"We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible. Please email us at {tech_support_email} to "
-"report any problems or downtime."
-msgstr ""
-
-#: lms/templates/module-error.html
-msgid "Raw data:"
-msgstr ""
-
-#: lms/templates/notes.html
-msgid "You do not have any notes."
-msgstr ""
-
-#: lms/templates/preview_menu.html
-msgid "Course View"
-msgstr ""
-
-#: lms/templates/preview_menu.html
-msgid "View this course as:"
-msgstr ""
-
-#: lms/templates/preview_menu.html
-msgid "Learner"
-msgstr ""
-
-#: lms/templates/preview_menu.html
-msgid "Specific learner"
-msgstr ""
-
-#: lms/templates/preview_menu.html
-msgid "Learner in {content_group}"
-msgstr ""
-
-#: lms/templates/preview_menu.html
-msgid "Username or email:"
-msgstr ""
-
-#: lms/templates/preview_menu.html
-msgid "Set preview mode"
-msgstr ""
-
-#: lms/templates/preview_menu.html
-msgid "You are now viewing the course as {i_start}{user_name}{i_end}."
-msgstr ""
-
-#: lms/templates/problem.html
-msgid "You have used {num_used} of {num_total} attempt"
-msgid_plural "You have used {num_used} of {num_total} attempts"
-msgstr[0] ""
-msgstr[1] ""
-
-#: lms/templates/problem.html
-msgid ""
-"Some problems have options such as save, reset, hints, or show answer. These"
-" options follow the Submit button."
-msgstr ""
-
-#: lms/templates/problem.html
-msgid "Hint"
-msgstr ""
-
-#: lms/templates/problem.html lms/templates/word_cloud.html
-msgid "Save"
-msgstr ""
-
-#: lms/templates/problem.html
-msgid "Save your answer"
-msgstr ""
-
-#: lms/templates/problem.html
-msgid "Reset your answer"
-msgstr ""
-
-#: lms/templates/problem.html
-msgid "Answers are displayed within the problem"
-msgstr ""
-
-#: lms/templates/problem_notifications.html
-msgid "Next Hint"
-msgstr ""
-
-#: lms/templates/problem_notifications.html
-#: lms/templates/shoppingcart/shopping_cart_flow.html
-msgid "Review"
-msgstr ""
-
-#: lms/templates/provider_login.html
-msgid "Log In"
-msgstr ""
-
-#: lms/templates/provider_login.html
-msgid ""
-"Your username, email, and full name will be sent to {destination}, where the"
-" collection and use of this information will be governed by their terms of "
-"service and privacy policy."
-msgstr ""
-
-#: lms/templates/provider_login.html
-#, python-format
-msgid "Return To %s"
-msgstr ""
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid ""
-"We're sorry, but this version of your browser is not supported. Try again "
-"using a different browser or a newer version of your browser."
-msgstr ""
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "The following errors occurred while processing your registration:"
-msgstr ""
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Sign up with {provider_name}"
-msgstr ""
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Create your own {platform_name} account below"
-msgstr ""
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid ""
-"Required fields are noted by <strong class=\"indicator\">bold text and an "
-"asterisk (*)</strong>."
-msgstr ""
-
-#. Translators: selected_provider is the name of an external, third-party user
-#. authentication service (like Google or LinkedIn).
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "You've successfully signed in with {selected_provider}."
-msgstr ""
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid ""
-"We just need a little more information before you start learning with "
-"{platform_name}."
-msgstr ""
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Please complete the following fields to register for an account. "
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: lms/templates/manage_user_standing.html
@@ -14536,20 +13778,8 @@ msgstr ""
 msgid "Specific learner"
 msgstr ""
 
-<<<<<<< HEAD
-#: lms/templates/register-shib.html
-msgid ""
-"Required fields are noted by {strong_start}bold text and an asterisk "
-"(*){strong_end}."
-msgstr ""
-
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Enter a public username:"
-=======
 #: lms/templates/preview_menu.html
 msgid "Learner in {content_group}"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: lms/templates/preview_menu.html
@@ -14568,9 +13798,6 @@ msgstr ""
 msgid "View this unit in the new experience"
 msgstr ""
 
-<<<<<<< HEAD
-#: lms/templates/register-sidebar.html
-=======
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
 msgid_plural "You have used {num_used} of {num_total} attempts"
@@ -14578,7 +13805,6 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: lms/templates/problem.html
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid ""
 "Some problems have options such as save, reset, hints, or show answer. These"
 " options follow the Submit button."
@@ -14667,23 +13893,13 @@ msgstr ""
 
 #. Translators: A button for showing the Previous Unit
 #: lms/templates/seq_module.html
-<<<<<<< HEAD
-#: themes/st-lutherx/lms/templates/seq_module.html
-#: themes/st-normanx/lms/templates/seq_module.html
-=======
 msgctxt "unit"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Previous"
 msgstr ""
 
 #. Translators: A button for showing the Next Unit
 #: lms/templates/seq_module.html
-<<<<<<< HEAD
-#: themes/st-lutherx/lms/templates/seq_module.html
-#: themes/st-normanx/lms/templates/seq_module.html
-=======
 msgctxt "unit"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Next"
 msgstr ""
 
@@ -14715,16 +13931,12 @@ msgid "e.g. Your Name (for certificates)"
 msgstr ""
 
 #: lms/templates/signup_modal.html
-<<<<<<< HEAD
-msgid "{italic_start}Welcome{italic_end} {name}"
-=======
 msgid "{start_li}Welcome{end_li} {name}"
 msgstr ""
 
 #: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Enter a public username:"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: lms/templates/signup_modal.html
@@ -15044,26 +14256,16 @@ msgid ""
 " not mean to do this, {undo_link_start}you can re-subscribe{link_end}."
 msgstr ""
 
-<<<<<<< HEAD
-=======
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Dashboard for:"
 msgstr ""
 
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/templates/user_dropdown.html
 msgid "More options"
 msgstr ""
 
-<<<<<<< HEAD
-#: lms/templates/user_dropdown.html lms/templates/header/header.html
-#: lms/templates/header/user_dropdown.html
-#: themes/st-lutherx/lms/templates/header/user_dropdown.html
-#: themes/st-normanx/lms/templates/header/user_dropdown.html
-=======
 #: lms/templates/header/header.html lms/templates/header/user_dropdown.html
 #: lms/templates/user_dropdown.html
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "More Options"
 msgstr ""
 
@@ -16482,13 +15684,7 @@ msgstr ""
 #: lms/templates/courseware/course_about.html
 #: lms/templates/dashboard/_dashboard_course_resume.html
 #: lms/templates/shoppingcart/registration_code_receipt.html
-<<<<<<< HEAD
-#: openedx/features/journals/templates/journals/bundle_about.html
-#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
-#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
-=======
 #: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "View Course"
 msgstr ""
 
@@ -16505,15 +15701,7 @@ msgid "Enrollment is Closed"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
-<<<<<<< HEAD
-msgid "Add {course_name} to Cart {start_span}({price} USD){end_span}"
-msgstr ""
-
-#: lms/templates/courseware/course_about.html
-msgid "Enroll in {course_name}"
-=======
 msgid "Enroll Now"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
@@ -16736,12 +15924,7 @@ msgstr ""
 #: lms/templates/courseware/info.html
 #: lms/templates/dashboard/_dashboard_course_resume.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-<<<<<<< HEAD
-#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
-#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
-=======
 #: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Resume Course"
 msgstr ""
 
@@ -17474,13 +16657,8 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
 "Thank you for your payment. To receive course credit, you must now request "
-<<<<<<< HEAD
-"credit at the {link_to_provider_site} website. Select {break_start}Request "
-"Credit{break_end} to get started."
-=======
 "credit at the {link_to_provider_site} website. Select {start_bold}Request "
 "Credit{end_bold} to get started."
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
@@ -17503,11 +16681,7 @@ msgstr ""
 #. provider.
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-<<<<<<< HEAD
-"{break_start}Congratulations!{break_end} {provider_name} has approved your "
-=======
 "{start_bold}Congratulations!{end_bold} {provider_name} has approved your "
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 "request for course credit. To see your course credit, visit the "
 "{link_to_provider_site} website."
 msgstr ""
@@ -17875,42 +17049,6 @@ msgstr ""
 msgid "Show notes"
 msgstr ""
 
-<<<<<<< HEAD
-#: lms/templates/emails/activation_email.txt
-#: themes/st-lutherx/lms/templates/emails/activation_email.txt
-#: themes/st-normanx/lms/templates/emails/activation_email.txt
-msgid ""
-"You're almost there! Use the link to activate your account to access "
-"engaging, high-quality {platform_name} courses. Note that you will not be "
-"able to log back into your account until you have activated it."
-msgstr ""
-
-#: lms/templates/emails/activation_email.txt
-#: themes/st-lutherx/lms/templates/emails/activation_email.txt
-#: themes/st-normanx/lms/templates/emails/activation_email.txt
-msgid "Enjoy learning with {platform_name}."
-msgstr ""
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"If you need help, please use our web form at {support_url} or email "
-"{support_email}."
-msgstr ""
-
-#: lms/templates/emails/activation_email.txt
-#: themes/st-lutherx/lms/templates/emails/activation_email.txt
-#: themes/st-normanx/lms/templates/emails/activation_email.txt
-msgid ""
-"This email message was automatically sent by {lms_url} because someone "
-"attempted to create an account on {platform_name} using this email address."
-msgstr ""
-
-#: lms/templates/emails/activation_email_subject.txt
-msgid "Action Required: Activate your {platform_name} account"
-msgstr ""
-
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Thank you for your purchase of "
 msgstr ""
@@ -18426,12 +17564,7 @@ msgstr ""
 #: lms/templates/header/brand.html
 #: lms/templates/header/navbar-logo-header.html
 #: lms/templates/navigation/bootstrap/navbar-logo-header.html
-<<<<<<< HEAD
-#: themes/st-lutherx/lms/templates/header/navbar-logo-header.html
-#: themes/st-normanx/lms/templates/header/navbar-logo-header.html
-=======
 #: lms/templates/navigation/navbar-logo-header.html
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "{platform_name} Home Page"
 msgstr ""
 
@@ -18449,15 +17582,6 @@ msgstr ""
 
 #: lms/templates/header/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
-<<<<<<< HEAD
-#: themes/st-lutherx/lms/templates/header/user_dropdown.html
-#: themes/st-normanx/lms/templates/header/user_dropdown.html
-msgid "Profile"
-msgstr ""
-
-#: lms/templates/header/navbar-authenticated.html
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid "Discover New"
 msgstr ""
 
@@ -21339,11 +20463,7 @@ msgid "Connect"
 msgstr ""
 
 #: themes/edx.org/lms/templates/footer.html
-<<<<<<< HEAD
-msgid "edX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
-=======
 msgid "© {year} edX Inc. All rights reserved."
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
@@ -21541,16 +20661,9 @@ msgstr ""
 msgid "Please share with us your reasons for registering with {platform_name}"
 msgstr ""
 
-<<<<<<< HEAD
-#: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
-msgid ""
-"All rights reserved except where noted. edX, Open edX and the edX and Open "
-"edX logos are registered trademarks of edX Inc."
-=======
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Account Acknowledgements"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -21569,158 +20682,18 @@ msgstr ""
 msgid "Welcome {username}!  Please set your preferences below"
 msgstr ""
 
-<<<<<<< HEAD
-#: themes/red-theme/lms/templates/footer.html
-msgid ""
-"{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor "
-"Code{honor_link_end}"
-msgstr ""
-
-#: themes/st-lutherx/cms/templates/widgets/footer.html
-#: themes/st-lutherx/lms/templates/footer.html
-#: themes/st-normanx/cms/templates/widgets/footer.html
-#: themes/st-normanx/lms/templates/footer.html
-msgid "Edly"
-msgstr ""
-
-#: themes/st-lutherx/cms/templates/widgets/footer.html
-#: themes/st-lutherx/lms/templates/footer.html
-#: themes/st-normanx/cms/templates/widgets/footer.html
-#: themes/st-normanx/lms/templates/footer.html
-msgid "All rights reserved."
-msgstr ""
-
-#: themes/st-lutherx/lms/templates/dashboard.html
-#: themes/st-normanx/lms/templates/dashboard.html
-msgid ""
-"Please wait for the confirmation email as your request is being processed. "
-"Course: {course_name} will be upgraded soon."
-msgstr ""
-
-#: themes/st-lutherx/lms/templates/dashboard.html
-#: themes/st-normanx/lms/templates/dashboard.html
-msgid "Past Courses"
-msgstr ""
-
-#: themes/st-lutherx/lms/templates/edly_progress_widget.html
-#: themes/st-normanx/lms/templates/edly_progress_widget.html
-msgid "TOTAL COURSE PROGRESS"
-msgstr ""
-
-#: themes/st-lutherx/lms/templates/edly_progress_widget.html
-#: themes/st-normanx/lms/templates/edly_progress_widget.html
-msgid "Problems"
-msgstr ""
-
-#: themes/st-lutherx/lms/templates/edly_progress_widget.html
-#: themes/st-normanx/lms/templates/edly_progress_widget.html
-msgid "Videos"
-msgstr ""
-
-#: themes/st-lutherx/lms/templates/edly_progress_widget.html
-#: themes/st-normanx/lms/templates/edly_progress_widget.html
-msgid "Readings"
-msgstr ""
-
-#: themes/st-lutherx/lms/templates/edly_progress_widget.html
-#: themes/st-normanx/lms/templates/edly_progress_widget.html
-msgid "Others"
-msgstr ""
-
-#: themes/st-lutherx/lms/templates/footer.html
-#: themes/st-normanx/lms/templates/footer.html
-msgid "COMPANY"
-msgstr ""
-
-#: themes/st-lutherx/lms/templates/footer.html
-#: themes/st-normanx/lms/templates/footer.html
-msgid "FAQs"
-msgstr ""
-
-#: themes/st-lutherx/lms/templates/footer.html
-#: themes/st-normanx/lms/templates/footer.html
-msgid "GET INVOLVED"
-msgstr ""
-
-#: themes/st-lutherx/lms/templates/footer.html
-#: themes/st-normanx/lms/templates/footer.html
-msgid "CONNECT"
-msgstr ""
-
-#. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
-#. Please do not translate any of these trademarks and company names.
-#: themes/st-lutherx/lms/templates/footer.html
-#: themes/st-normanx/lms/templates/footer.html
-=======
 #: themes/stanford-style/lms/templates/register-shib.html
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgid ""
 "Required fields are noted by {strong_indicator}bold text and an asterisk "
 "(*).{strong_close}"
 msgstr ""
 
-<<<<<<< HEAD
-#: themes/st-lutherx/lms/templates/footer.html
-#: themes/st-normanx/lms/templates/footer.html
-msgid ""
-"{tos_link_start}Terms of Service{tos_link_end} {honor_link_start}Honor "
-"Code{honor_link_end}"
-msgstr ""
-
-#: themes/st-lutherx/lms/templates/emails/activation_email.txt
-#: themes/st-normanx/lms/templates/emails/activation_email.txt
-msgid "If you need help, please use our email {support_email}."
-msgstr ""
-
-#: themes/st-lutherx/lms/templates/header/navbar-authenticated.html
-#: themes/st-lutherx/lms/templates/header/navbar-not-authenticated.html
-#: themes/st-normanx/lms/templates/header/navbar-authenticated.html
-#: themes/st-normanx/lms/templates/header/navbar-not-authenticated.html
-msgid "About Us"
-msgstr ""
-
-#: themes/st-lutherx/lms/templates/static_templates/404.html
-#: themes/st-normanx/lms/templates/static_templates/404.html
-msgid "Page not found!"
-msgstr ""
-
-#: themes/st-lutherx/lms/templates/static_templates/404.html
-#: themes/st-normanx/lms/templates/static_templates/404.html
-msgid ""
-"The page you are looking for may have been moved or renamed. {line_break}If "
-"you continue to have issues, please visit our  {link_start}FAQ{link_end} "
-"page or contact {support_link_start}Support{link_end}."
-msgstr ""
-
-#: themes/st-lutherx/lms/templates/static_templates/server-error.html
-#: themes/st-normanx/lms/templates/static_templates/server-error.html
-msgid "Internal Server Error!"
-msgstr ""
-
-#: themes/st-lutherx/lms/templates/static_templates/server-error.html
-#: themes/st-normanx/lms/templates/static_templates/server-error.html
-msgid ""
-"There seems to be a small problem with our servers. We apologize for the "
-"inconvenience.{line_break}Please refresh this page after a few seconds."
-msgstr ""
-
-#: themes/st-normanx/lms/templates/footer.html
-msgid ""
-"St. NormanX is an initiative of St. NormanX University, Inc., a tax-exempt "
-"501(c)(3) nonprofit organization based in McKinney, Texas."
-msgstr ""
-
-#: themes/stanford-style/lms/templates/footer.html
-#: themes/stanford-style/lms/templates/static_templates/tos.html
-msgid "Copyright"
-=======
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Update My Account"
 msgstr ""
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Registration Help"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
@@ -21863,55 +20836,8 @@ msgstr ""
 msgid "Studio Accessibility Policy"
 msgstr ""
 
-<<<<<<< HEAD
-#: cms/templates/activation_active.html cms/templates/activation_complete.html
-#: cms/templates/activation_invalid.html
-msgid "{studio_name} Account Activation"
-msgstr ""
-
-#: cms/templates/activation_active.html
-msgid "Your account is already active"
-msgstr ""
-
-#: cms/templates/activation_active.html
-msgid ""
-"This account, set up using {email}, has already been activated. Please sign "
-"in to start working within {studio_name}."
-msgstr ""
-
-#: cms/templates/activation_active.html cms/templates/activation_complete.html
-msgid "Sign into {studio_name}"
-msgstr ""
-
-#: cms/templates/activation_complete.html
-msgid "Your account activation is complete!"
-msgstr ""
-
-#: cms/templates/activation_complete.html
-msgid ""
-"Thank you for activating your account. You may now sign in and start using "
-"{studio_name} to author courses."
-msgstr ""
-
-#: cms/templates/activation_invalid.html
-msgid "Your account activation is invalid"
-msgstr ""
-
-#: cms/templates/activation_invalid.html
-msgid ""
-"We're sorry. Something went wrong with your activation. Check to make sure "
-"the URL you went to was correct, as e-mail programs will sometimes split it "
-"into two lines."
-msgstr ""
-
-#: cms/templates/activation_invalid.html
-msgid ""
-"If you still have issues, contact {platform_name} Support. In the meantime, "
-"you can also return to {link_start}the {studio_name} homepage.{link_end}"
-=======
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
 msgid "Files & Uploads"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: cms/templates/certificates.html
@@ -21977,8 +20903,6 @@ msgstr ""
 msgid "Learn more about certificates"
 msgstr ""
 
-<<<<<<< HEAD
-=======
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/settings_advanced.html
 msgid "Details & Schedule"
@@ -21997,7 +20921,6 @@ msgstr ""
 msgid "Course Team"
 msgstr ""
 
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/settings_advanced.html
 msgid "Details & Schedule"
@@ -23810,91 +22733,6 @@ msgid ""
 " library."
 msgstr ""
 
-<<<<<<< HEAD
-#: cms/templates/register.html
-msgid "Sign Up for {studio_name}"
-msgstr ""
-
-#: cms/templates/register.html
-msgid "Already have a {studio_name} Account? Sign in"
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"Ready to start creating online courses? Sign up below and start creating "
-"your first {platform_name} course today."
-msgstr ""
-
-#: cms/templates/register.html
-msgid "Required Information to Sign Up for {studio_name}"
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"This will be used in public discussions with your courses and in our edX101 "
-"support forums"
-msgstr ""
-
-#: cms/templates/register.html
-msgid "Your Location"
-msgstr ""
-
-#: cms/templates/register.html
-msgid "Preferred Language"
-msgstr ""
-
-#: cms/templates/register.html
-msgid "I agree to the {a_start} Terms of Service {a_end}"
-msgstr ""
-
-#: cms/templates/register.html
-msgid "Create My Account &amp; Start Authoring Courses"
-msgstr ""
-
-#: cms/templates/register.html
-msgid "Common {studio_name} Questions"
-msgstr ""
-
-#: cms/templates/register.html
-msgid "Who is {studio_name} for?"
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"{studio_name} is for anyone that wants to create online courses that "
-"leverage the global {platform_name} platform. Our users are often faculty "
-"members, teaching assistants and course staff, and members of instructional "
-"technology groups."
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"How technically savvy do I need to be to create courses in {studio_name}?"
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"{studio_name} is designed to be easy to use by almost anyone familiar with "
-"common web-based authoring environments (Wordpress, Moodle, etc.). No "
-"programming knowledge is required, but for some of the more advanced "
-"features, a technical background would be helpful. As always, we are here to"
-" help, so don't hesitate to dive right in."
-msgstr ""
-
-#: cms/templates/register.html
-msgid "I've never authored a course online before. Is there help?"
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"Absolutely. We have created an online course, edX101, that describes some "
-"best practices: from filming video, creating exercises, to the basics of "
-"running an online course. Additionally, we're always here to help, just drop"
-" us a note."
-msgstr ""
-
-=======
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 #: cms/templates/settings.html
 msgid "Schedule & Details Settings"
 msgstr ""
@@ -24767,12 +23605,6 @@ msgstr ""
 msgid "Return to the {link_start}home page{link_end}."
 msgstr ""
 
-<<<<<<< HEAD
-#: cms/templates/registration/reg_complete.html
-msgid ""
-"We've sent an email message to {email} with instructions for activating your"
-" account."
-=======
 #: cms/templates/widgets/footer.html
 msgid "Policies"
 msgstr ""
@@ -24827,7 +23659,6 @@ msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Sign Up"
->>>>>>> d9a072af26ddb87295aa450bea384bc643ad0e50
 msgstr ""
 
 #: cms/templates/widgets/metadata-edit.html

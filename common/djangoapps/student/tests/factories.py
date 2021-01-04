@@ -99,6 +99,18 @@ class UserFactory(DjangoModelFactory):
             return None
 
     @factory.post_generation
+    def edly_profile(obj, create, extracted, **kwargs):  # pylint: disable=unused-argument, missing-function-docstring
+        if create:
+            from openedx.features.edly.tests.factories import EdlyUserProfileFactory
+
+            obj.save()
+            return EdlyUserProfileFactory.create(user=obj, **kwargs)
+        elif kwargs:
+            raise Exception('Cannot build a user profile without saving the user')
+        else:
+            return None
+
+    @factory.post_generation
     def groups(self, create, extracted, **kwargs):
         if extracted is None:
             return

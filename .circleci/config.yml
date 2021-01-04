@@ -5,14 +5,14 @@ jobs:
     working_directory: ~/circleci-edx-platform
     docker:
       # CircleCI Python images available at: https://hub.docker.com/r/circleci/python/
-      - image: circleci/python:2.7.13
+      - image: circleci/python:3.5.4
         environment:
           BASH_ENV: ~/.bashrc
     steps: # steps that comprise the `build` job
       - checkout # check out source code to working directory
       - run: sudo chown -R circleci:circleci /usr/local/bin
       - run: sudo chown -R circleci:circleci /usr/local/share
-      - run: sudo chown -R circleci:circleci /usr/local/lib/python2.7/site-packages
+      - run: sudo chown -R circleci:circleci "$(which python3)"
       - restore_cache:
           key: edx-test-deps-{{ checksum "requirements/edx/testing.txt" }}
       - run:
@@ -23,9 +23,11 @@ jobs:
       - run:
           name: "Install python requirements"
           command: |
+            sudo pip install --upgrade pip==20.0.2
+            sudo pip install virtualenv
             virtualenv venv
             . venv/bin/activate
-            pip install --only-binary="pa11ycrawler" -r requirements/edx/testing.txt
+            pip install --only-binary="pa11ycrawler" --use-deprecated=legacy-resolver -r requirements/edx/testing.txt
       - save_cache:
           key: edx-test-deps-{{ checksum "requirements/edx/testing.txt" }}
           paths:
@@ -42,8 +44,8 @@ jobs:
           name: "Run Quality"
           command: |
             . venv/bin/activate
-            diff-quality --compare-branch=origin/develop-multisite --violations=pylint --fail-under=100 --html-report test-results/pylint-report.html
-            diff-quality --compare-branch=origin/develop-multisite --violations=flake8 --fail-under=100 --html-report test-results/pep8-report.html
+            diff-quality --compare-branch=origin/develop-juniper --violations=pylint --fail-under=100 --html-report test-results/pylint-report.html
+            diff-quality --compare-branch=origin/develop-juniper --violations=flake8 --fail-under=100 --html-report test-results/pep8-report.html
       - store_test_results:
           path: test-results
       - store_artifacts:

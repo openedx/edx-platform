@@ -48,7 +48,7 @@ class UserSiteSerializerTests(TestCase):
         self.site_configuration = SiteConfigurationFactory(
             site=self.edly_sub_org_of_user.lms_site,
             enabled=True,
-            values=self.test_site_configuration,
+            site_values=self.test_site_configuration,
         )
 
     def validate_url(self, url):
@@ -91,7 +91,7 @@ class UserSiteSerializerTests(TestCase):
         expected_api_host_url = self.get_expected_url()
         assert expected_api_host_url == app_config.get('API_HOST_URL')
 
-        self.site_configuration.values['MOBILE_ENABLED'] = False
+        self.site_configuration.site_values['MOBILE_ENABLED'] = False
         self.site_configuration.save()
         serializer = self.serializer({}, context=self.context)
 
@@ -122,7 +122,7 @@ class UserSiteSerializerTests(TestCase):
 
         assert serializer.data['mobile_enabled']
 
-        self.site_configuration.values['MOBILE_ENABLED'] = False
+        self.site_configuration.site_values['MOBILE_ENABLED'] = False
         self.site_configuration.save()
         serializer = self.serializer({}, context=self.context)
 

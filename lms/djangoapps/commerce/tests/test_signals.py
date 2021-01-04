@@ -320,7 +320,7 @@ class TestRefundSignal(TestCase):
                 },
                 'subject': subject,
                 'comment': {'body': body},
-                'tags': ['LMS'] + tags
+                'tags': tags + ['LMS']
             }
         }
         self.assertDictEqual(json.loads(last_request.body.decode('utf8')), expected)

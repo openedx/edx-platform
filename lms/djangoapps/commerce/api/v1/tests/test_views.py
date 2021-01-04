@@ -175,7 +175,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         self.assertIsNone(VerificationDeadline.deadline_for_course(self.course.id))
 
         # Generate the expected data
-        verification_deadline = datetime(year=2020, month=12, day=31, tzinfo=pytz.utc)
+        verification_deadline = datetime(year=datetime.now().year, month=12, day=31, tzinfo=pytz.utc)
         expiration_datetime = datetime.now(pytz.utc)
         response, expected = self._get_update_response_and_expected_data(expiration_datetime, verification_deadline)
 

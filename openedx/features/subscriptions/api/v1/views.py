@@ -5,11 +5,11 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework_oauth.authentication import OAuth2Authentication
 
 from django.http import Http404
 
 from lms.djangoapps.commerce.api.v1.permissions import ApiKeyOrModelPermission
+from openedx.core.lib.api.authentication import OAuth2Authentication
 from openedx.core.lib.api.mixins import PutAsCreateMixin
 from openedx.features.subscriptions.models import UserSubscription
 from openedx.features.subscriptions.api.v1.serializers import UserSubscriptionSerializer

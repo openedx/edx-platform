@@ -4,6 +4,7 @@ Unit tests for integration of the django-user-tasks app and its REST API.
 
 
 import logging
+from unittest import skip
 from uuid import uuid4
 
 import mock
@@ -140,6 +141,7 @@ class TestUserTasks(APITestCase):
         assert _data(response)['results'] == serializer.data
 
 
+@skip(('Tests not relevant as task emails are no longer sent'))
 @override_settings(BROKER_URL='memory://localhost/')
 class TestUserTaskStopped(APITestCase):
     """
@@ -160,7 +162,7 @@ class TestUserTaskStopped(APITestCase):
         self.site = SiteFactory()
         SiteConfigurationFactory(
             site=self.site,
-            values={
+            site_values={
                 'DISABLE_CMS_TASK_EMAILS': 'false'
             }
         )

@@ -1962,7 +1962,7 @@ class SegmentIOForumThreadViewedEventTestCase(SegmentIOTrackingTestCaseBase):
             data=self.create_segmentio_event_json(**kwargs),
             content_type='application/json',
         )
-        User.objects.create(pk=SEGMENTIO_TEST_USER_ID, username=str(mock.sentinel.username))
+        User.objects.create(username=str(mock.sentinel.username))
         middleware.process_request(request)
         try:
             response = segmentio.segmentio_event(request)
