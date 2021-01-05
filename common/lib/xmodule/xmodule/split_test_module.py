@@ -11,18 +11,29 @@ from operator import itemgetter
 from uuid import uuid4
 
 import six
+from django.utils.functional import cached_property
 from lxml import etree
 from six import text_type
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock
 from xblock.fields import Integer, ReferenceValueDict, Scope, String
+from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.modulestore.inheritance import UserPartitionList
 from xmodule.progress import Progress
-from xmodule.seq_module import SequenceDescriptor
-from xmodule.studio_editable import StudioEditableDescriptor, StudioEditableModule
+from xmodule.seq_module import ProctoringFields, SequenceDescriptor, SequenceMixin
+from xmodule.studio_editable import StudioEditableBlock
+from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
-from xmodule.x_module import STUDENT_VIEW, XModule, module_attr
+from xmodule.xml_module import XmlMixin
+from xmodule.x_module import (
+    ResourceTemplates,
+    shim_xmodule_js,
+    STUDENT_VIEW,
+    XModuleDescriptorToXBlockMixin,
+    XModuleMixin,
+    XModuleToXBlockMixin,
+)
 
 log = logging.getLogger('edx.' + __name__)
 
@@ -110,10 +121,22 @@ def get_split_user_partitions(user_partitions):
     return [user_partition for user_partition in user_partitions if user_partition.scheme.name == "random"]
 
 
+@XBlock.needs("i18n")
 @XBlock.needs('user_tags')  # pylint: disable=abstract-method
 @XBlock.needs('partitions')
 @XBlock.needs('user')
-class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
+class SplitTestBlock(
+    SplitTestFields,
+    SequenceMixin,
+    ProctoringFields,
+    MakoTemplateBlockBase,
+    XmlMixin,
+    XModuleDescriptorToXBlockMixin,
+    XModuleToXBlockMixin,
+    ResourceTemplates,
+    XModuleMixin,
+    StudioEditableBlock,
+):
     """
     Show the user the appropriate child.  Uses the ExperimentState
     API to figure out which child to show.
@@ -127,19 +150,35 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         grading interaction is a tangle between super and subclasses of descriptors and
         modules.
     """
+    resources_dir = 'assets/split_test'
 
-    def __init__(self, *args, **kwargs):
+    filename_extension = "xml"
 
-        super(SplitTestModule, self).__init__(*args, **kwargs)
+    has_author_view = True
 
-        self.child_descriptor = None
+    show_in_read_only_mode = True
+
+    mako_template = "widgets/metadata-only-edit.html"
+
+    @cached_property
+    def child_descriptor(self):
+        """
+        Return the child block for the partition or None.
+        """
         child_descriptors = self.get_child_descriptors()
         if len(child_descriptors) >= 1:
-            self.child_descriptor = child_descriptors[0]
+            return child_descriptors[0]
+        return None
+
+    @cached_property
+    def child(self):
+        """
+        Return the user bound child block for the partition or None.
+        """
         if self.child_descriptor is not None:
-            self.child = self.system.get_module(self.child_descriptor)
+            return self.system.get_module(self.child_descriptor)
         else:
-            self.child = None
+            return None
 
     def get_child_descriptor_by_location(self, location):
         """
@@ -147,11 +186,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         Returns the descriptor.
         If none match, return None
         """
-        # NOTE: calling self.get_children() creates a circular reference--
-        # it calls get_child_descriptors() internally, but that doesn't work until
-        # we've picked a choice.  Use self.descriptor.get_children() instead.
-
-        for child in self.descriptor.get_children():
+        for child in self.get_children():
             if child.location == location:
                 return child
 
@@ -211,13 +246,6 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         user = user_service._django_user  # pylint: disable=protected-access
         return partitions_service.get_user_group_id_for_partition(user, self.user_partition_id)
 
-    @property
-    def is_configured(self):
-        """
-        Returns true if the split_test instance is associated with a UserPartition.
-        """
-        return self.descriptor.is_configured
-
     def _staff_view(self, context):
         """
         Render the staff view for a split test module.
@@ -275,7 +303,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         inactive_groups_preview = None
 
         if is_root:
-            [active_children, inactive_children] = self.descriptor.active_and_inactive_children()
+            [active_children, inactive_children] = self.active_and_inactive_children()
             active_groups_preview = self.studio_render_children(
                 fragment, active_children, context
             )
@@ -289,7 +317,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
             'is_configured': self.is_configured,
             'active_groups_preview': active_groups_preview,
             'inactive_groups_preview': inactive_groups_preview,
-            'group_configuration_url': self.descriptor.group_configuration_url,
+            'group_configuration_url': self.group_configuration_url,
         }))
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/split_test_author_view.js'))
         fragment.initialize_js('SplitTestAuthorView')
@@ -304,7 +332,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         html = ""
         for active_child_descriptor in children:
             active_child = self.system.get_module(active_child_descriptor)
-            rendered_child = active_child.render(StudioEditableModule.get_preview_view_name(active_child), context)
+            rendered_child = active_child.render(StudioEditableBlock.get_preview_view_name(active_child), context)
             if active_child.category == 'vertical':
                 group_name, group_id = self.get_data_for_vertical(active_child)
                 if group_name:
@@ -316,6 +344,19 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
             html = html + rendered_child.content
 
         return html
+
+    def studio_view(self, context):
+        """
+        Return the studio view.
+        """
+        fragment = Fragment(
+            self.system.render_template(self.mako_template, self.get_context())
+        )
+        # Use the SequenceDescriptor js for the metadata edit view.
+        # Both the webpack bundle to include and the js class are named "SequenceDescriptor".
+        add_webpack_to_fragment(fragment, SequenceDescriptor.js_module_name)
+        shim_xmodule_js(fragment, SequenceDescriptor.js_module_name)
+        return fragment
 
     def student_view(self, context):
         """
@@ -371,7 +412,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         """
         Return name and id of a group corresponding to `vertical`.
         """
-        user_partition = self.descriptor.get_selected_partition()
+        user_partition = self.get_selected_partition()
         if user_partition:
             for group in user_partition.groups:
                 group_id = six.text_type(group.id)
@@ -383,35 +424,6 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
     @property
     def tooltip_title(self):
         return getattr(self.child, 'tooltip_title', '')
-
-    def validate(self):
-        """
-        Message for either error or warning validation message/s.
-
-        Returns message and type. Priority given to error type message.
-        """
-        return self.descriptor.validate()
-
-
-@XBlock.needs('user_tags')
-@XBlock.needs('partitions')
-@XBlock.needs('user')
-# pylint: disable=missing-class-docstring
-class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDescriptor):
-    # the editing interface can be the same as for sequences -- just a container
-    module_class = SplitTestModule
-
-    resources_dir = 'assets/split_test'
-
-    filename_extension = "xml"
-
-    mako_template = "widgets/metadata-only-edit.html"
-
-    show_in_read_only_mode = True
-
-    child_descriptor = module_attr('child_descriptor')
-    log_child_render = module_attr('log_child_render')
-    get_content_titles = module_attr('get_content_titles')
 
     def definition_to_xml(self, resource_fs):
         xml_object = etree.Element('split_test')
@@ -452,7 +464,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         }, children)
 
     def get_context(self):
-        _context = super(SplitTestDescriptor, self).get_context()
+        _context = super().get_context()
         _context.update({
             'selected_partition': self.get_selected_partition()
         })
@@ -491,7 +503,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         # Update the list of partitions based on the currently available user_partitions.
         user_partition_values.build_partition_values(self.user_partitions, self.get_selected_partition())
 
-        editable_fields = super(SplitTestDescriptor, self).editable_metadata_fields
+        editable_fields = super().editable_metadata_fields
 
         # Explicitly add user_partition_id, which does not automatically get picked up because it is Scope.content.
         # Note that this means it will be saved by the Studio editor as "metadata", but the field will
@@ -504,11 +516,12 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
 
     @property
     def non_editable_metadata_fields(self):
-        non_editable_fields = super(SplitTestDescriptor, self).non_editable_metadata_fields
+        non_editable_fields = super().non_editable_metadata_fields
         non_editable_fields.extend([
-            SplitTestDescriptor.due,
-            SplitTestDescriptor.user_partitions,
-            SplitTestDescriptor.group_id_to_child,
+            SplitTestBlock.is_entrance_exam,
+            SplitTestBlock.due,
+            SplitTestBlock.user_partitions,
+            SplitTestBlock.group_id_to_child,
         ])
         return non_editable_fields
 
@@ -570,7 +583,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         Validates the state of this split_test instance. This is the override of the general XBlock method,
         and it will also ask its superclass to validate.
         """
-        validation = super(SplitTestDescriptor, self).validate()
+        validation = super().validate()
         split_test_validation = self.validate_split_test()
 
         if split_test_validation:
@@ -722,5 +735,3 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         )
         self.children.append(dest_usage_key)  # pylint: disable=no-member
         self.group_id_to_child[six.text_type(group.id)] = dest_usage_key
-
-    tooltip_title = module_attr('tooltip_title')
