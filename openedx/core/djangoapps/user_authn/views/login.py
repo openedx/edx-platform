@@ -175,7 +175,13 @@ def _log_and_raise_inactive_user_auth_error(unauthenticated_user):
     profile = UserProfile.objects.get(user=unauthenticated_user)
     compose_and_send_activation_email(unauthenticated_user, profile)
 
-    raise AuthFailedError(error_code='inactive-user')
+    raise AuthFailedError(
+        error_code='inactive-user',
+        context={
+            'platformName': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+            'supportLink': configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK)
+        }
+    )
 
 
 def _authenticate_first_party(request, unauthenticated_user, third_party_auth_requested):

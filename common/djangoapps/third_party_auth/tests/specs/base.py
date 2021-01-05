@@ -9,6 +9,7 @@ from contextlib import contextmanager
 
 import mock
 from django import test
+from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth import models as auth_models
 from django.contrib.messages.storage import fallback
@@ -24,6 +25,7 @@ from lms.djangoapps.commerce.tests import TEST_API_URL
 from openedx.core.djangoapps.user_authn.views.login import login_user
 from openedx.core.djangoapps.user_authn.views.login_form import login_and_registration_form
 from openedx.core.djangoapps.user_authn.views.register import RegistrationView
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context
 from common.djangoapps.student import models as student_models
@@ -125,8 +127,14 @@ class HelperMixin(object):
         """Asserts failure on /login for inactive account looks right."""
         self.assertEqual(400, response.status_code)
         payload = json.loads(response.content.decode('utf-8'))
+        context = {
+            'platformName': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+            'supportLink': configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK)
+        }
+
         self.assertFalse(payload.get('success'))
         self.assertIn('inactive-user', payload.get('error_code'))
+        self.assertEqual(context, payload.get('context'))
 
     def assert_json_failure_response_is_missing_social_auth(self, response):
         """Asserts failure on /login for missing social auth looks right."""
