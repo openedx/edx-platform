@@ -6,6 +6,7 @@ Tests for permissions defined in courseware.rules
 import ddt
 import six
 from django.test import TestCase
+from django.test.utils import override_settings
 from opaque_keys.edx.locator import CourseLocator
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -50,3 +51,26 @@ class PermissionTests(TestCase):
         has_perm = self.user.has_perm('edx_proctoring.can_take_proctored_exam',
                                       {'course_id': six.text_type(self.course_id)})
         assert has_perm == should_have_perm
+
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'mock_proctoring_allow_honor_mode': {
+                'allow_honor_mode': True,
+            },
+        }
+    )
+    def test_proctoring_perm_with_honor_mode_permission(self):
+        """
+        Test that the user has the edx_proctoring.can_take_proctored_exam permission in honor enrollment mode.
+
+        If proctoring backend configuration allows exam in honor mode {`allow_honor_mode`: True} the user is
+        granter proctored exam permission.
+        """
+        CourseEnrollment.enroll(self.user, self.course_id, mode='honor')
+        self.assertTrue(self.user.has_perm(
+            'edx_proctoring.can_take_proctored_exam', {
+                'course_id': six.text_type(self.course_id),
+                'backend': 'mock_proctoring_allow_honor_mode',
+                'is_proctored': True
+            }
+        ))
