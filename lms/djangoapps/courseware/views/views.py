@@ -1612,6 +1612,43 @@ def _track_successful_certificate_generation(user_id, course_id):
     })
 
 
+def enclosing_sequence_for_gating_checks(block):
+    """
+    Return the first ancestor of this block that is a SequenceDescriptor.
+
+    Returns None if there is no such ancestor. Returns None if you call it on a
+    SequenceDescriptor directly.
+
+    We explicitly test against the three known tag types that map to sequences
+    (even though two of them have been long since deprecated and are never
+    used). We _don't_ test against SequentialDescriptor directly because:
+
+    1. A direct comparison on the type fails because we magically mix it into a
+       SequenceDescriptorWithMixins object.
+    2. An isinstance check doesn't give us the right behavior because Courses
+       and Sections both subclass SequenceDescriptor. >_<
+
+    Also important to note that some content isn't contained in Sequences at
+    all. LabXchange uses learning pathways, but even content inside courses like
+    `static_tab`, `book`, and `about` live outside the sequence hierarchy.
+    """
+    seq_tags = ['sequential', 'problemset', 'videosequence']
+
+    # If it's being called on a Sequence itself, then don't bother crawling the
+    # ancestor tree, because all the sequence metadata we need for gating checks
+    # will happen automatically when rendering the render_xblock view anyway,
+    # and we don't want weird, weird edge cases where you have nested Sequences
+    # (which would probably "work" in terms of OLX import).
+    if block.location.block_type in seq_tags:
+        return None
+
+    ancestor = block
+    while ancestor and ancestor.location.block_type not in seq_tags:
+        ancestor = ancestor.get_parent()  # Note: CourseDescriptor's parent is None
+
+    return ancestor
+
+
 @require_http_methods(["GET", "POST"])
 @ensure_valid_usage_key
 @xframe_options_exempt
@@ -1665,6 +1702,39 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
                 }
 
         missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request.user)
+
+        # Some content gating happens only at the Sequence level (e.g. "has this
+        # timed exam started?").
+        ancestor_seq = enclosing_sequence_for_gating_checks(block)
+        if ancestor_seq:
+            seq_usage_key = ancestor_seq.location
+            # We have a Descriptor, but I had trouble getting a SequenceModule
+            # from it (even using ._xmodule to force the conversion) because the
+            # runtime wasn't properly initialized. This view uses multiple
+            # runtimes (including Blockstore), so I'm pulling it from scratch
+            # based on the usage_key. We'll have to watch the performance impact
+            # of this. :(
+            seq_module_descriptor, _ = get_module_by_usage_id(
+                request, str(course_key), str(seq_usage_key), disable_staff_debug_info=True, course=course
+            )
+
+            # I'm not at all clear why get_module_by_usage_id returns the
+            # descriptor or why I need to manually force it to load the module
+            # like this manually instead of the proxying working, but trial and
+            # error has led me here. Hopefully all this weirdness goes away when
+            # SequenceModule gets converted to an XBlock in:
+            #     https://github.com/edx/edx-platform/pull/25965
+            seq_module = seq_module_descriptor._xmodule  # pylint: disable=protected-access
+
+            # If the SequenceModule feels that gating is necessary, redirect
+            # there so we can have some kind of error message at any rate.
+            if seq_module.descendants_are_gated():
+                return redirect(
+                    reverse(
+                        'render_xblock',
+                        kwargs={'usage_key_string': str(seq_module.location)}
+                    )
+                )
 
         context = {
             'fragment': block.render(requested_view, context=student_view_context),
