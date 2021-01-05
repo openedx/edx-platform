@@ -10,18 +10,19 @@ class AuthFailedError(Exception):
     message.
     """
     def __init__(
-        self, value=None, redirect=None, redirect_url=None, error_code=None
+        self, value=None, redirect=None, redirect_url=None, error_code=None, context={},
     ):
         super(AuthFailedError, self).__init__()
         self.value = Text(value)
         self.redirect = redirect
         self.redirect_url = redirect_url
         self.error_code = error_code
+        self.context = context
 
     def get_response(self):
         """ Returns a dict representation of the error. """
         resp = {'success': False}
-        for attr in ('value', 'redirect', 'redirect_url', 'error_code'):
+        for attr in ('value', 'redirect', 'redirect_url', 'error_code', 'context'):
             if self.__getattribute__(attr):
                 resp[attr] = self.__getattribute__(attr)
 
