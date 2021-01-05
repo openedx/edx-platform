@@ -15,6 +15,9 @@ class Schedule(TimeStampedModel):
     """
 
     enrollment = models.OneToOneField('student.CourseEnrollment', null=False, on_delete=models.CASCADE)
+    # The active field on the schedule is deprecated, please do not rely on it.
+    # You can use the is_active field on the CourseEnrollment model instead (i.e. schedule.enrollment.is_active).
+    # Removing this field from the database is a TODO for https://openedx.atlassian.net/browse/AA-574.
     active = models.BooleanField(
         default=True,
         help_text=_('Indicates if this schedule is actively used')

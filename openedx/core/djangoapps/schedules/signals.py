@@ -61,24 +61,6 @@ def create_schedule(sender, **kwargs):  # pylint: disable=unused-argument
         ))
 
 
-@receiver(ENROLL_STATUS_CHANGE)
-def update_schedule(sender, event, user, course_id, **kwargs):  # pylint: disable=unused-argument
-    """
-    When a CourseEnrollment's status is updated, update the Schedule's active status if configured.
-    """
-    try:
-        schedule = Schedule.objects.get(enrollment__user=user, enrollment__course=course_id)
-    except Schedule.DoesNotExist:
-        # Exit since it could just be an indication of Schedules are not enabled.
-        return
-
-    if event == 'enroll':
-        schedule.active = True
-    elif event == 'unenroll':
-        schedule.active = False
-    schedule.save()
-
-
 @receiver(COURSE_START_DATE_CHANGED)
 def update_schedules_on_course_start_changed(sender, updated_course_overview, previous_start_date, **kwargs):   # pylint: disable=unused-argument
     """
