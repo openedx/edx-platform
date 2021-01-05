@@ -275,7 +275,7 @@ social-auth-core==3.3.3   # via -r requirements/edx/testing.txt, social-auth-app
 sorl-thumbnail==12.7.0    # via -r requirements/edx/testing.txt, django-wiki
 sortedcontainers==2.3.0   # via -r requirements/edx/testing.txt
 soupsieve==2.1            # via -r requirements/edx/testing.txt, beautifulsoup4
-sphinx==3.4.2             # via edx-sphinx-theme, sphinxcontrib-httpdomain
+sphinx==3.3.0             # via -c requirements/edx/../constraints.txt, edx-sphinx-theme, sphinxcontrib-httpdomain
 sphinxcontrib-applehelp==1.0.2  # via sphinx
 sphinxcontrib-devhelp==1.0.2  # via sphinx
 sphinxcontrib-htmlhelp==1.0.3  # via sphinx
