@@ -57,6 +57,7 @@ from openedx.core.djangoapps.user_authn.views.registration_form import (
     RegistrationFormFactory,
     get_registration_extension_form
 )
+from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_auth_enabled
 from common.djangoapps.student.helpers import (
     AccountValidationError,
     authenticate_new_user,
@@ -485,6 +486,12 @@ class RegistrationView(APIView):
                 address already exists
             HttpResponse: 403 operation not allowed
         """
+        if is_require_third_party_auth_enabled() and not pipeline.running(request):
+            # if request is not running a third-party auth pipeline
+            return HttpResponseForbidden(
+                "Third party authentication is required to register. Username and password were received instead."
+            )
+
         data = request.POST.copy()
         self._handle_terms_of_service(data)
 

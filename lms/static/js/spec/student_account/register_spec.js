@@ -372,6 +372,20 @@
                     expect($('.button-oa2-facebook')).toBeVisible();
                 });
 
+                it('does not display the registration form', function() {
+                    var thirdPartyAuthView = new RegisterView({
+                        fields: FORM_DESCRIPTION.fields,
+                        model: model,
+                        thirdPartyAuth: THIRD_PARTY_AUTH,
+                        platformName: PLATFORM_NAME,
+                        is_require_third_party_auth_enabled: true
+                    });
+
+                    expect(thirdPartyAuthView).not.toContain(view.$submitButton);
+                    expect(thirdPartyAuthView).not.toContain($('form-field'));
+                });
+
+
                 it('validates registration form fields on form submission', function() {
                     createRegisterView(this);
 

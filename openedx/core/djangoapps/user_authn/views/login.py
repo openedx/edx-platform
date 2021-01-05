@@ -14,7 +14,7 @@ from django.contrib.auth import login as django_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import admin
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -36,6 +36,7 @@ from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from openedx.core.djangoapps.user_authn.utils import should_redirect_to_logistration_mircrofrontend
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangoapps.user_authn.views.password_reset import send_password_reset_email_for_user
+from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_auth_enabled
 from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.view_utils import require_post_params
@@ -451,6 +452,10 @@ def login_user(request):
 
     set_custom_attribute('login_user_course_id', request.POST.get('course_id'))
 
+    if is_require_third_party_auth_enabled() and not third_party_auth_requested:
+        return HttpResponseForbidden(
+            "Third party authentication is required to login. Username and password were received instead."
+        )
     try:
         if third_party_auth_requested and not first_party_auth_requested:
             # The user has already authenticated via third-party auth and has not
