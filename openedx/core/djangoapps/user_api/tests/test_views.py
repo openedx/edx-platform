@@ -698,7 +698,7 @@ class CountryTimeZoneListViewTest(UserApiTestCase):
         self.assertEqual(time_zone_info['description'], get_display_time_zone(time_zone_name))
 
     # The time zones count may need to change each time we upgrade pytz
-    @ddt.data((ALL_TIME_ZONES_URI, 440),
+    @ddt.data((ALL_TIME_ZONES_URI, 339),
               (COUNTRY_TIME_ZONES_URI, 28))
     @ddt.unpack
     def test_get_basic(self, country_uri, expected_count):
