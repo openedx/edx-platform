@@ -279,6 +279,7 @@ class CourseGradingView(BaseCourseView):
 
         with self.get_course(request, course_key) as course:
             results = {
+                'grade_cutoffs': course.grade_cutoffs,
                 'assignment_types': self._get_assignment_types(course),
                 'subsections': self._get_subsections(course, graded_only),
                 'grades_frozen': are_grades_frozen(course_key),
