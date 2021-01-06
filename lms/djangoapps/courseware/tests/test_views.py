@@ -2523,7 +2523,8 @@ class TestIndexView(ModuleStoreTestCase):
                                        invitation_only, is_masters_only, expected_should_show_enroll_button):
         with patch('lms.djangoapps.courseware.views.views.course_open_for_self_enrollment') \
                 as patch_course_open_for_self_enrollment, \
-                patch('course_modes.models.CourseMode.is_masters_only') as patch_is_masters_only:
+                patch('common.djangoapps.course_modes.models.CourseMode.is_masters_only') \
+                as patch_is_masters_only:
             course = CourseFactory()
 
             patch_course_open_for_self_enrollment.return_value = course_open_for_self_enrollment
