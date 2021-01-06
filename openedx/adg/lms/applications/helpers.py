@@ -103,3 +103,20 @@ def send_application_submission_confirmation_email(recipient_email):
         'course_catalog_url': course_catalog_url
     }
     send_mandrill_email(MandrillClient.APPLICATION_SUBMISSION_CONFIRMATION, recipient_email, context)
+
+
+def validate_file_size(data_file, max_size):
+    """
+    Validate maximum allowed file upload size, return error if file size exceeds, else return None.
+
+    Arguments:
+         data_file(object): file that needs to be validated for size
+         max_size(int): Maximum size allowed for file
+
+    Returns:
+        str: Error message if validation fails
+    """
+    size = getattr(data_file, 'size', None)
+    if size and max_size < size:
+        return _('File size must not exceed {size} MB').format(size=max_size / 1024 / 1024)
+    return None

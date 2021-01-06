@@ -5,45 +5,25 @@ from datetime import date
 
 from dateutil.relativedelta import relativedelta
 from django import forms
-from django.core.validators import FileExtensionValidator, RegexValidator
 from django.utils.translation import ugettext_lazy as _
 
-from openedx.adg.lms.applications.constants import MAXIMUM_AGE_LIMIT, MINIMUM_AGE_LIMIT
+from openedx.adg.lms.applications.constants import MAXIMUM_AGE_LIMIT, MINIMUM_AGE_LIMIT, RESUME_FILE_MAX_SIZE
 from openedx.adg.lms.applications.models import UserApplication
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
 from student.models import UserProfile
 
+from .helpers import validate_file_size
 
-class ContactInformationForm(forms.Form):
+
+class ExtendedUserProfileForm(forms.Form):
     """
-    Application Contact Information Form
+    Extended Profile Form for Contact Information Page
     """
-
-    MALE = 'male'
-    FEMALE = 'female'
-    OTHER = 'other'
-
-    GENDER_CHOICES = (
-        (MALE, _('Male')),
-        (FEMALE, _('Female')),
-        (OTHER, _('Prefer not to answer')),
-    )
-    gender = forms.ChoiceField(choices=GENDER_CHOICES, )
-
-    phone_regex = RegexValidator(regex=r'^\+?1?\d*$', message=_('Phone number can only contain numbers.'))
-    phone_number = forms.CharField(validators=[phone_regex], max_length=50, )
 
     birth_day = forms.IntegerField()
     birth_month = forms.IntegerField()
     birth_year = forms.IntegerField()
-
-    organization = forms.CharField(max_length=255, required=False, )
-    linkedin_url = forms.URLField(max_length=255, required=False, )
-    resume = forms.FileField(
-        required=False,
-        validators=[FileExtensionValidator(['pdf', 'doc', 'jpg', 'png'])],
-        help_text=_('Accepted extensions: .pdf, .doc, .jpg, .png'),
-    )
+    saudi_national = forms.BooleanField(required=False)
 
     def save(self, request=None):
         """
@@ -51,31 +31,13 @@ class ContactInformationForm(forms.Form):
         """
         data = self.cleaned_data
         user = request.user
-        UserProfile.objects.update_or_create(
-            user=user,
-            defaults={
-                'gender': data.get('gender'),
-                'phone_number': data.get('phone_number')
-            }
-        )
-        UserApplication.objects.update_or_create(
-            user=user,
-            defaults={
-                'organization': data.get('organization'),
-                'linkedin_url': data.get('linkedin_url'),
-                'resume': data.get('resume')
-            }
-        )
-
-        day = data.get('birth_day')
-        month = data.get('birth_month')
-        year = data.get('birth_year')
-        birth_date = date(int(year), int(month), int(day))
+        saudi_national = request.POST.get('saudi_national') == 'Yes'
 
         ExtendedUserProfile.objects.update_or_create(
             user=user,
             defaults={
-                'birth_date': birth_date,
+                'birth_date': data.get('birth_date'),
+                'saudi_national': saudi_national,
             }
         )
 
@@ -91,7 +53,7 @@ class ContactInformationForm(forms.Form):
         if day and month and year:
             try:
                 birth_date = date(int(year), int(month), int(day))
-            except Exception as e:
+            except ValueError as e:  # pylint: disable=unused-variable
                 raise forms.ValidationError(
                     {'birth_day': [_('Please enter a valid date')]}
                 )
@@ -106,3 +68,43 @@ class ContactInformationForm(forms.Form):
                 raise forms.ValidationError(
                     {'birth_day': [_('Sorry, the age limit for the program is 21-60'), ]}
                 )
+            cleaned_data['birth_date'] = birth_date
+        return cleaned_data
+
+
+class UserApplicationForm(forms.ModelForm):
+    """
+    User Application Form for Contact Information Page
+    """
+
+    class Meta:
+        model = UserApplication
+        fields = ['organization', 'linkedin_url', 'resume']
+
+    def clean_resume(self):
+        """
+        Validate resume size is less than maximum allowed size
+        """
+        resume = self.cleaned_data.get('resume')
+        if resume:
+            error = validate_file_size(resume, RESUME_FILE_MAX_SIZE)
+            if error:
+                raise forms.ValidationError(error)
+        return resume
+
+
+class UserProfileForm(forms.ModelForm):
+    """
+    User Profile Form for Contact Information Page
+    """
+
+    class Meta:
+        model = UserProfile
+        fields = ['city', 'gender', 'name', 'phone_number']
+
+    def __init__(self, *args, **kwargs):
+        super(UserProfileForm, self).__init__(*args, **kwargs)
+        self.fields['gender'].required = True
+        self.fields['phone_number'].required = True
+        self.fields['city'].disabled = True
+        self.fields['name'].disabled = True
