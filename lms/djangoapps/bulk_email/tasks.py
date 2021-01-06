@@ -41,6 +41,7 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 from markupsafe import escape
 from six import text_type
 
+from lms.djangoapps.branding.api import get_logo_url_for_email
 from lms.djangoapps.bulk_email.models import CourseEmail, Optout
 from lms.djangoapps.bulk_email.api import get_unsubscribed_link
 from lms.djangoapps.courseware.courses import get_course
@@ -123,6 +124,7 @@ def _get_course_email_context(course):
         'course_end_date': course_end_date,
         'account_settings_url': '{}{}'.format(lms_root_url, reverse('account_settings')),
         'email_settings_url': '{}{}'.format(lms_root_url, reverse('dashboard')),
+        'logo_url': get_logo_url_for_email(),
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         'year': timezone.now().year,
     }
@@ -294,7 +296,6 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
     send_exception = None
     new_subtask_status = None
     try:
-        course_title = global_email_context['course_title']
         start_time = time.time()
         new_subtask_status, send_exception = _send_course_email(
             entry_id,
