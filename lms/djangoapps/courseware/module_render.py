@@ -3,7 +3,6 @@ Module rendering
 """
 
 
-import hashlib
 import json
 import logging
 import textwrap
@@ -917,6 +916,7 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
             and (access.user_message or access.user_fragment)
         )
         if access or caller_will_handle_access_error:
+            descriptor.has_access_error = bool(caller_will_handle_access_error)
             return descriptor
         return None
     return descriptor
@@ -1074,7 +1074,8 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
         return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
 
-def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_info=False, course=None):
+def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_info=False, course=None,
+                           will_recheck_access=False):
     """
     Gets a module instance based on its `usage_id` in a course, for a given request/user
 
@@ -1126,7 +1127,8 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
         field_data_cache,
         usage_key.course_key,
         disable_staff_debug_info=disable_staff_debug_info,
-        course=course
+        course=course,
+        will_recheck_access=will_recheck_access,
     )
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
