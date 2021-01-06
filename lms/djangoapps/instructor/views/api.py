@@ -185,7 +185,6 @@ def require_post_params(*args, **kwargs):
     required_params = []
     required_params += [(arg, None) for arg in args]
     required_params += [(key, kwargs[key]) for key in kwargs]
-
     # required_params = e.g. [('action', 'enroll or unenroll'), ['emails', None]]
 
     def decorator(func):
@@ -208,9 +207,7 @@ def require_post_params(*args, **kwargs):
                 return JsonResponse(error_response_data, status=400)
             else:
                 return func(*args, **kwargs)
-
         return wrapped
-
     return decorator
 
 
@@ -223,7 +220,6 @@ def require_course_permission(permission):
     Assumes that request is in args[0].
     Assumes that course_id is in kwargs['course_id'].
     """
-
     def decorator(func):
         def wrapped(*args, **kwargs):
             request = args[0]
@@ -233,9 +229,7 @@ def require_course_permission(permission):
                 return func(*args, **kwargs)
             else:
                 return HttpResponseForbidden()
-
         return wrapped
-
     return decorator
 
 
@@ -247,7 +241,6 @@ def require_sales_admin(func):
 
     If the user does not have privileges for this operation, this will return HttpResponseForbidden (403).
     """
-
     def wrapped(request, course_id):
 
         try:
@@ -262,7 +255,6 @@ def require_sales_admin(func):
             return func(request, course_id)
         else:
             return HttpResponseForbidden()
-
     return wrapped
 
 
@@ -274,7 +266,6 @@ def require_finance_admin(func):
 
     If the user does not have privileges for this operation, this will return HttpResponseForbidden (403).
     """
-
     def wrapped(request, course_id):
 
         try:
@@ -289,7 +280,6 @@ def require_finance_admin(func):
             return func(request, course_id)
         else:
             return HttpResponseForbidden()
-
     return wrapped
 
 
