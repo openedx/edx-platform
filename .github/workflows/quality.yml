@@ -40,20 +40,21 @@ jobs:
         with:
           path: /opt/hostedtoolcache/Python/
           key: |
-            ${{ hashFiles('requirements/edx/testing.txt') }}-${{ hashFiles('requirements/adg/base.txt') }}-${{
-            hashFiles('adg/actions/scripts/github-ci-dependencies.sh') }}
+            ${{ hashFiles('requirements/edx/testing.txt') }}-${{ hashFiles('requirements/adg/base.txt') }}
         if: env.GIT_DIFF
 
-      - name: Install OS packages
+      - name: Install requirements
         run: |
-          SCRIPT_PATH=adg/actions/scripts/github-ci-dependencies.sh
-          chmod +x ${SCRIPT_PATH} && sudo ${SCRIPT_PATH}
-        if: env.GIT_DIFF && steps.cache-python-requirements.outputs.cache-hit != 'true'
+          sudo apt-get install libxmlsec1-dev pkg-config
+          sudo apt-get update
 
-      - name: Install edx-platform requirements
-        run: |
-          pip install -r requirements/edx/testing.txt
-          pip install -r requirements/adg/base.txt
+          python3 -m pip install pip==20.0.2
+          python3 -m pip install setuptools==50.3.0
+          python3 -m pip install wheel==0.35.1
+
+          pip install --disable-pip-version-check --exists-action w -r requirements/edx/testing.txt
+          pip install --disable-pip-version-check --exists-action w -r requirements/adg/base.txt
+
         if: env.GIT_DIFF && steps.cache-python-requirements.outputs.cache-hit != 'true'
 
       - name: Creating pylint report
