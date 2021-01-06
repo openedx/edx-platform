@@ -132,7 +132,8 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
             'status': self.photo_verification.status,
             'expiration_datetime': '{}Z'.format(kwargs.get('expected_expires').isoformat()),
             'message': '',
-            'updated_at': '{}Z'.format(self.CREATED_AT.isoformat())
+            'updated_at': '{}Z'.format(self.CREATED_AT.isoformat()),
+            'receipt_id': self.photo_verification.receipt_id,
         }]
 
     def test_multiple_verification_types(self):
@@ -157,6 +158,7 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
                 'expiration_datetime': '{}Z'.format(expected_expires.isoformat()),
                 'message': self.photo_verification.error_msg,
                 'updated_at': '{}Z'.format(self.CREATED_AT.isoformat()),
+                'receipt_id': self.photo_verification.receipt_id
             },
             {
                 'type': 'SSO',
@@ -164,6 +166,7 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
                 'expiration_datetime': '{}Z'.format(expected_expires.isoformat()),
                 'message': '',
                 'updated_at': '{}Z'.format(self.CREATED_AT.isoformat()),
+                'receipt_id': None,
             },
             {
                 'type': 'Manual',
@@ -171,6 +174,7 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
                 'expiration_datetime': '{}Z'.format(expected_expires.isoformat()),
                 'message': self.manual_verification.reason,
                 'updated_at': '{}Z'.format(self.CREATED_AT.isoformat()),
+                'receipt_id': None,
             },
         ]
         self.assertEqual(json.loads(response.content.decode('utf-8')), expected)
@@ -194,6 +198,7 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
                 'expiration_datetime': '{}Z'.format(expected_expires.isoformat()),
                 'message': self.photo_verification.error_msg,
                 'updated_at': '{}Z'.format(self.CREATED_AT.isoformat()),
+                'receipt_id': self.photo_verification.receipt_id,
             },
             {
                 'type': 'Software Secure',
@@ -201,6 +206,7 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
                 'expiration_datetime': '{}Z'.format(expected_expires.isoformat()),
                 'message': second_ss_photo_verification.error_msg,
                 'updated_at': '{}Z'.format(self.CREATED_AT.isoformat()),
+                'receipt_id': second_ss_photo_verification.receipt_id,
             },
             {
                 'type': 'SSO',
@@ -208,6 +214,7 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
                 'expiration_datetime': '{}Z'.format(expected_expires.isoformat()),
                 'message': '',
                 'updated_at': '{}Z'.format(self.CREATED_AT.isoformat()),
+                'receipt_id': None,
             },
         ]
         self.assertEqual(json.loads(response.content.decode('utf-8')), expected)

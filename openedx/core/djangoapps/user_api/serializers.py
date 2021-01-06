@@ -107,6 +107,7 @@ class IDVerificationDetailsSerializer(serializers.Serializer):
     expiration_datetime = serializers.DateTimeField()
     message = serializers.SerializerMethodField()
     updated_at = serializers.DateTimeField()
+    receipt_id = serializers.SerializerMethodField()
 
     def get_type(self, obj):
         if isinstance(obj, SoftwareSecurePhotoVerification):
@@ -123,3 +124,9 @@ class IDVerificationDetailsSerializer(serializers.Serializer):
             return obj.reason
         else:
             return ''
+
+    def get_receipt_id(self, obj):
+        if isinstance(obj, SoftwareSecurePhotoVerification):
+            return obj.receipt_id
+        else:
+            return None
