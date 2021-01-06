@@ -102,12 +102,12 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
         offset, target_day, enrollment = self.prepare_course_data(mock_get_current_site)
 
         with patch.object(tasks, 'ace') as mock_ace:
-            self.task().apply(kwargs=dict(
+            self.task.run(
                 site_id=self.site_config.site.id,
                 target_day_str=serialize(target_day),
                 day_offset=offset,
                 bin_num=self._calculate_bin_for_user(enrollment.user),
-            ))
+            )
 
             self.assertTrue(mock_ace.send.called)
 

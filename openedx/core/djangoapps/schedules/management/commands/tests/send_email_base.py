@@ -223,9 +223,9 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
                         is_first_match = False
 
                 with self.assertNumQueries(expected_queries, table_blacklist=WAFFLE_TABLES):
-                    self.task().apply(kwargs=dict(
+                    self.task.run(
                         site_id=self.site_config.site.id, target_day_str=target_day_str, day_offset=offset, bin_num=b,
-                    ))
+                    )
 
                 num_schedules = mock_attribute.call_args[0][1]
                 if b in bins_in_use:
@@ -247,12 +247,12 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
 
         with patch.object(self.task, 'async_send_task') as mock_schedule_send:
             for bin_num in range(self.task().num_bins):
-                self.task().apply(kwargs=dict(
+                self.task.run(
                     site_id=self.site_config.site.id,
                     target_day_str=serialize(target_day),
                     day_offset=offset,
                     bin_num=bin_num,
-                ))
+                )
 
         # There is no database constraint that enforces that enrollment.course_id points
         # to a valid CourseOverview object. However, in that case, schedules isn't going
@@ -335,9 +335,9 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
         )
 
         with patch.object(self.task, 'async_send_task') as mock_schedule_send:
-            self.task().apply(kwargs=dict(
+            self.task.run(
                 site_id=this_config.site.id, target_day_str=serialize(target_day), day_offset=offset, bin_num=0
-            ))
+            )
 
         self.assertEqual(mock_schedule_send.apply_async.call_count, expected_message_count)
         self.assertFalse(mock_ace.send.called)
@@ -355,9 +355,9 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
         )
 
         with patch.object(self.task, 'async_send_task') as mock_schedule_send:
-            self.task().apply(kwargs=dict(
+            self.task.run(
                 site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset, bin_num=0,
-            ))
+            )
 
         if has_course_ended:
             self.assertFalse(mock_schedule_send.apply_async.called)
@@ -381,10 +381,10 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
         expected_query_count = NUM_QUERIES_FIRST_MATCH + additional_course_queries
         with self.assertNumQueries(expected_query_count, table_blacklist=WAFFLE_TABLES):
             with patch.object(self.task, 'async_send_task') as mock_schedule_send:
-                self.task().apply(kwargs=dict(
+                self.task.run(
                     site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
                     bin_num=self._calculate_bin_for_user(user),
-                ))
+                )
 
         expected_call_count = 1 if self.consolidates_emails_for_learner else num_courses
         self.assertEqual(mock_schedule_send.apply_async.call_count, expected_call_count)
@@ -434,10 +434,10 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
                     num_expected_queries += 1
 
                 with self.assertNumQueries(num_expected_queries, table_blacklist=WAFFLE_TABLES):
-                    self.task().apply(kwargs=dict(
+                    self.task.run(
                         site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
                         bin_num=self._calculate_bin_for_user(user),
-                    ))
+                    )
             num_expected_messages = 1 if self.consolidates_emails_for_learner else message_count
             self.assertEqual(len(sent_messages), num_expected_messages)
 
@@ -469,10 +469,10 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
         schedule = self._schedule_factory(**kwargs)
 
         with patch.object(tasks, 'ace') as mock_ace:
-            self.task().apply(kwargs=dict(
+            self.task.run(
                 site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
                 bin_num=self._calculate_bin_for_user(schedule.enrollment.user),
-            ))
+            )
 
             self.assertEqual(mock_ace.send.called, test_config.email_sent)
 

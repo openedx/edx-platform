@@ -34,10 +34,11 @@ def get_all_partitions_for_course(course, active_only=False):
         Returns:
             A List of UserPartitions associated with the course.
     """
-    all_partitions = course.user_partitions + _get_dynamic_partitions(course)
-    if active_only:
-        all_partitions = [partition for partition in all_partitions if partition.active]
-    return all_partitions
+    if course:
+        all_partitions = course.user_partitions + _get_dynamic_partitions(course)
+        if active_only:
+            all_partitions = [partition for partition in all_partitions if partition.active]
+        return all_partitions
 
 
 def get_user_partition_groups(course_key, user_partitions, user, partition_dict_key='name'):
