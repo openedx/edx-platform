@@ -9,7 +9,7 @@
 # linking to it here is good.
 
 # celery 5.0 has dropped python3.5 support.
-celery<5.0
+celery==5.0.4
 
 # cryptography 3.3 has dropped python3.5 support.
 cryptography<3.3
