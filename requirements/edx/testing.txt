@@ -106,7 +106,7 @@ edx-django-release-util==0.4.4  # via -r requirements/edx/base.txt
 edx-django-sites-extensions==2.5.1  # via -r requirements/edx/base.txt
 edx-django-utils==3.13.0  # via -r requirements/edx/base.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-toggles, edx-when, ora2, super-csv
 edx-drf-extensions==6.2.0  # via -r requirements/edx/base.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.16.7    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
+edx-enterprise==3.16.8    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
 edx-event-routing-backends==2.0.0  # via -r requirements/edx/base.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, ora2
 edx-lint==1.6             # via -r requirements/edx/testing.in
@@ -139,7 +139,7 @@ fs==2.0.18                # via -r requirements/edx/base.txt, django-pyfs, fs-s3
 future==0.18.2            # via -r requirements/edx/base.txt, django-ses, edx-celeryutils, edx-enterprise, pycontracts, pyjwkest
 geoip2==3.0.0             # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
 gitdb==4.0.5              # via gitpython
-gitpython==3.1.11         # via transifex-client
+gitpython==3.1.12         # via transifex-client
 glob2==0.7                # via -r requirements/edx/base.txt
 gunicorn==20.0.4          # via -r requirements/edx/base.txt
 help-tokens==1.1.2        # via -r requirements/edx/base.txt
