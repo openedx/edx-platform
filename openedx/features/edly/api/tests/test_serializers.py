@@ -3,15 +3,25 @@ Tests for Edly API serializers.
 """
 import json
 
+from mock import patch
+from django.conf import settings
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 from django.test import TestCase, RequestFactory
+from django.test.utils import override_settings
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.features.edly.api.serializers import UserSiteSerializer
 from openedx.features.edly.tests.factories import EdlySubOrganizationFactory
 
 
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True})
+@override_settings(MKTG_URLS={
+    'ROOT': 'http://fake-marketing-root-url',
+    'TOS': 'http://fake-url/tos',
+    'HONOR': 'http://fake-url/honor',
+    'PRIVACY': 'http://fake-url/privacy-policy',
+})
 class UserSiteSerializerTests(TestCase):
 
     def setUp(self):
@@ -44,6 +54,7 @@ class UserSiteSerializerTests(TestCase):
             },
             'SITE_NAME': self.edly_sub_org_of_user.lms_site.domain,
             'course_org_filter': self.edly_sub_org_of_user.edx_organization.short_name,
+            'contact_email':'fake@example.com',
         }
         self.site_configuration = SiteConfigurationFactory(
             site=self.edly_sub_org_of_user.lms_site,
@@ -113,6 +124,10 @@ class UserSiteSerializerTests(TestCase):
 
         expected_site_url = self.get_expected_url()
         assert expected_site_url == serializer.data['site_data'].get('site_url')
+        assert self.test_site_configuration['contact_email'] == serializer.data['site_data'].get('contact_email')
+        assert settings.MKTG_URLS['TOS'] == serializer.data['site_data'].get('tos')
+        assert settings.MKTG_URLS['HONOR'] == serializer.data['site_data'].get('honor')
+        assert settings.MKTG_URLS['PRIVACY'] == serializer.data['site_data'].get('privacy')
 
     def test_mobile_enabled(self):
         """
