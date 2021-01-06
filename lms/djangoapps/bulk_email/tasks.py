@@ -4,7 +4,6 @@ This module contains celery task functions for handling the sending of bulk emai
 to a course.
 """
 
-
 import json
 import logging
 import random
@@ -58,7 +57,6 @@ from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.string_utils import _has_non_ascii_characters
 
 log = logging.getLogger('edx.celery.task')
-
 
 # Errors that an individual email is failing to be sent, and should just
 # be treated as a fail.

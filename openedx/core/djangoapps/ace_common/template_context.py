@@ -2,7 +2,6 @@
 Context dictionary for templates that use the ace_common base template.
 """
 
-
 from django.conf import settings
 from django.urls import NoReverseMatch, reverse
 
