@@ -157,7 +157,7 @@ var edx = edx || {};
                         // remove the first element after the registration_code_status_form
                         // so it doesn't duplicate the registration_code_lookup_actions in the UI.
                         $registration_code_status_form.next().remove();
-                        $(registration_code_lookup_actions).insertAfter($registration_code_status_form);
+                        edx.HtmlUtils.append($registration_code_status_form, $(registration_code_lookup_actions));
                     }
                 },
                 error: function(jqXHR, textStatus, errorThrown) {

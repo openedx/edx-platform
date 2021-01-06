@@ -37,7 +37,12 @@ def is_track_ok_for_exam(user, exam):
     """
     course_id = CourseKey.from_string(exam['course_id'])
     mode, is_active = CourseEnrollment.enrollment_mode_for_user(user, course_id)
-    return is_active and mode in (CourseMode.VERIFIED, CourseMode.MASTERS, CourseMode.PROFESSIONAL, CourseMode.EXECUTIVE_EDUCATION)
+    appropriate_modes = [
+        CourseMode.VERIFIED, CourseMode.MASTERS, CourseMode.PROFESSIONAL, CourseMode.EXECUTIVE_EDUCATION
+    ]
+    if exam.get('is_proctored') and settings.PROCTORING_BACKENDS.get(exam['backend'], {}).get('allow_honor_mode'):
+        appropriate_modes.append(CourseMode.HONOR)
+    return is_active and mode in appropriate_modes
 
 
 # The edx_proctoring.api uses this permission to gate access to the

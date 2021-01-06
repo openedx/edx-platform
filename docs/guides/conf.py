@@ -255,6 +255,17 @@ for app in os.listdir(six.text_type(root / 'common' / 'djangoapps')):
         modules[path] = path
 
 
+# These Django apps under lms don't import correctly with the "lms.djangapps" prefix
+# Others don't import correctly without it...INSTALLED_APPS entries are inconsistent
+lms_djangoapps = ['badges', 'branding', 'bulk_email', 'courseware',
+                  'coursewarehistoryextended', 'email_marketing', 'experiments', 'lti_provider',
+                  'mobile_api', 'notes', 'rss_proxy', 'shoppingcart', 'survey']
+for app in lms_djangoapps:
+    path = os.path.join('lms', 'djangoapps', app)
+    if app not in ['notes']:
+        modules[path] = path
+
+
 def update_settings_module(service='lms'):
     """
     Set the "DJANGO_SETTINGS_MODULE" environment variable appropriately
@@ -283,6 +294,7 @@ def on_init(app):  # pylint: disable=unused-argument
     exclude_dirs = ['envs', 'migrations', 'test', 'tests']
     exclude_dirs.extend(cms_djangoapps)
     exclude_dirs.extend(lms_djangoapps)
+
     exclude_files = ['admin.py', 'test.py', 'testing.py', 'tests.py', 'testutils.py', 'wsgi.py']
     for module in modules:
         module_path = six.text_type(root / module)
@@ -315,5 +327,5 @@ def on_init(app):  # pylint: disable=unused-argument
 
 def setup(app):
     """Sphinx extension: run sphinx-apidoc."""
-    event = b'builder-inited' if six.PY2 else 'builder-inited'
+    event = 'builder-inited'
     app.connect(event, on_init)

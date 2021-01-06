@@ -970,21 +970,26 @@ div.problem .action {
   }
 
   .problem-action-button-wrapper {
-    @include border-right(1px solid $light-gray1);
+    @include border-right(1px solid $gray-300);
+    @include padding(0, 13px); // to create a 26px gap, which is an a11y recommendation
 
     display: inline-block;
 
     &:last-child {
       border: none;
+      padding-right: 0;
     }
   }
 
   .problem-action-btn {
-    @include margin-right($baseline / 5);
-
+    border: none;
     max-width: 110px;
-    text-decoration: underline;
-    text-transform: none;
+
+    &:hover,
+    &:focus,
+    &:active {
+      color: $primary !important;
+    }
 
     .icon {
       margin-bottom: $baseline / 10;
@@ -994,12 +999,13 @@ div.problem .action {
     @media print {
       display: none;
     }
-
   }
 
   .submit-attempt-container {
     padding-bottom: $baseline;
     flex-grow: 1;
+    display: flex;
+    align-items: center;
 
     @media (max-width: $bp-screen-lg) {
       max-width: 100%;
@@ -1013,19 +1019,14 @@ div.problem .action {
       white-space: nowrap;
     }
 
-    .submit-cta {
-        display: inline-block;
-    }
     .submit-cta-description {
-        color: $blue;
+        color: $primary;
         font-size: small;
         padding-right: $baseline / 2;
     }
     .submit-cta-link-button {
-        border: none;
+        color: $primary;
         padding-right: $baseline / 4;
-        text-decoration: underline;
-        text-transform: none;
     }
   }
 

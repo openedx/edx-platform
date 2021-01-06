@@ -1,7 +1,7 @@
 """
 Tests for the Split Testing Module
 """
-
+import json
 
 import ddt
 import lxml
@@ -9,24 +9,27 @@ import six
 from fs.memoryfs import MemoryFS
 from mock import Mock, patch
 
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.utils import MixedSplitTestCase
 from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, Group, UserPartition
 from xmodule.partitions.tests.test_partitions import MockPartitionService, MockUserPartitionScheme, PartitionTestCase
 from xmodule.split_test_module import (
-    SplitTestDescriptor,
+    SplitTestBlock,
     SplitTestFields,
     get_split_user_partitions,
     user_partition_values,
 )
 from xmodule.tests import get_test_system
+from xmodule.tests.test_course_module import DummySystem as TestImportSystem
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests.xml import factories as xml
 from xmodule.validation import StudioValidationMessage
 from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
 
 
-class SplitTestModuleFactory(xml.XmlImportFactory):
+class SplitTestBlockFactory(xml.XmlImportFactory):
     """
-    Factory for generating SplitTestModules for testing purposes
+    Factory for generating SplitTestBlocks for testing purposes
     """
     tag = 'split_test'
 
@@ -63,17 +66,17 @@ class SplitTestUtilitiesTest(PartitionTestCase):
         )
 
 
-class SplitTestModuleTest(XModuleXmlImportTest, PartitionTestCase):
+class SplitTestBlockTest(XModuleXmlImportTest, PartitionTestCase):
     """
     Base class for all split_module tests.
     """
     def setUp(self):
-        super(SplitTestModuleTest, self).setUp()
+        super().setUp()
         self.course_id = 'test_org/test_course_number/test_run'
         # construct module
         course = xml.CourseFactory.build()
         sequence = xml.SequenceFactory.build(parent=course)
-        split_test = SplitTestModuleFactory(
+        split_test = SplitTestBlockFactory(
             parent=sequence,
             attribs={
                 'user_partition_id': '0',
@@ -129,13 +132,13 @@ class SplitTestModuleTest(XModuleXmlImportTest, PartitionTestCase):
 
 
 @ddt.ddt
-class SplitTestModuleLMSTest(SplitTestModuleTest):
+class SplitTestBlockLMSTest(SplitTestBlockTest):
     """
     Test the split test module
     """
 
     def setUp(self):
-        super(SplitTestModuleLMSTest, self).setUp()
+        super().setUp()
 
         content_gating_flag_patcher = patch(
             'openedx.features.content_type_gating.partitions.ContentTypeGatingConfig.current',
@@ -191,18 +194,18 @@ class SplitTestModuleLMSTest(SplitTestModuleTest):
         self.assertIsNotNone(xml_obj.get('group_id_to_child'))
 
         # Read the xml back in.
-        fields, children = SplitTestDescriptor.definition_from_xml(xml_obj, self.module_system)
+        fields, children = SplitTestBlock.definition_from_xml(xml_obj, self.module_system)
         self.assertEqual(fields.get('user_partition_id'), '0')
         self.assertIsNotNone(fields.get('group_id_to_child'))
         self.assertEqual(len(children), 2)
 
 
-class SplitTestModuleStudioTest(SplitTestModuleTest):
+class SplitTestBlockStudioTest(SplitTestBlockTest):
     """
     Unit tests for how split test interacts with Studio.
     """
 
-    @patch('xmodule.split_test_module.SplitTestDescriptor.group_configuration_url', return_value='http://example.com')
+    @patch('xmodule.split_test_module.SplitTestBlock.group_configuration_url', return_value='http://example.com')
     def test_render_author_view(self, group_configuration_url):
         """
         Test the rendering of the Studio author view.
@@ -260,29 +263,28 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
         Test the setting information passed back from editable_metadata_fields.
         """
         editable_metadata_fields = self.split_test_module.editable_metadata_fields
-        self.assertIn(SplitTestDescriptor.display_name.name, editable_metadata_fields)
-        self.assertNotIn(SplitTestDescriptor.due.name, editable_metadata_fields)
-        self.assertNotIn(SplitTestDescriptor.user_partitions.name, editable_metadata_fields)
+        self.assertIn(SplitTestBlock.display_name.name, editable_metadata_fields)
+        self.assertNotIn(SplitTestBlock.due.name, editable_metadata_fields)
+        self.assertNotIn(SplitTestBlock.user_partitions.name, editable_metadata_fields)
 
         # user_partition_id will always appear in editable_metadata_settings, regardless
         # of the selected value.
-        self.assertIn(SplitTestDescriptor.user_partition_id.name, editable_metadata_fields)
+        self.assertIn(SplitTestBlock.user_partition_id.name, editable_metadata_fields)
 
     def test_non_editable_settings(self):
         """
         Test the settings that are marked as "non-editable".
         """
         non_editable_metadata_fields = self.split_test_module.non_editable_metadata_fields
-        self.assertIn(SplitTestDescriptor.due, non_editable_metadata_fields)
-        self.assertIn(SplitTestDescriptor.user_partitions, non_editable_metadata_fields)
-        self.assertNotIn(SplitTestDescriptor.display_name, non_editable_metadata_fields)
+        self.assertIn(SplitTestBlock.due, non_editable_metadata_fields)
+        self.assertIn(SplitTestBlock.user_partitions, non_editable_metadata_fields)
+        self.assertNotIn(SplitTestBlock.display_name, non_editable_metadata_fields)
 
-    def test_available_partitions(self):
+    @patch('xmodule.split_test_module.user_partition_values.values')
+    def test_available_partitions(self, _):
         """
         Tests that the available partitions are populated correctly when editable_metadata_fields are called
         """
-        self.assertEqual([], user_partition_values.values)
-
         # user_partitions is empty, only the "Not Selected" item will appear.
         self.split_test_module.user_partition_id = SplitTestFields.no_partition_selected['value']
         self.split_test_module.editable_metadata_fields  # pylint: disable=pointless-statement
@@ -524,3 +526,87 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
             u"This content experiment has issues that affect content visibility.",
             StudioValidationMessage.ERROR
         )
+
+
+class SplitTestBlockExportImportTest(MixedSplitTestCase):
+    """
+    Export import test for split test xblock.
+    """
+    maxDiff = None
+
+    def setUp(self):
+        super().setUp()
+
+        self.course = CourseFactory.create(modulestore=self.store)
+        self.chapter = self.make_block("chapter", self.course)
+        self.sequential = self.make_block("sequential", self.chapter)
+        self.vertical = self.make_block("vertical", self.sequential)
+        self.split_test_block = self.make_block(
+            "split_test",
+            self.vertical,
+            display_name="A Split Test",
+            user_partition_id=2,
+        )
+        self.child_blocks = [
+            self.make_block("html", self.split_test_block, display_name="Hello HTML {}".format(i))
+            for i in range(1, 3)
+        ]
+        self.split_test_block.group_id_to_child = {
+            '0': self.child_blocks[0].location,
+            '1': self.child_blocks[1].location,
+        }
+        self.store.update_item(self.split_test_block, self.user_id)
+
+    def test_xml_export_import_cycle(self):
+        """
+        Test the export-import cycle.
+        """
+        split_test_block = self.store.get_item(self.split_test_block.location)
+
+        expected_olx = (
+            '<split_test group_id_to_child="{group_id_to_child}" user_partition_id="2" display_name="A Split Test">\n'
+            '  <html url_name="{child_blocks[0].location.block_id}"/>\n'
+            '  <html url_name="{child_blocks[1].location.block_id}"/>\n'
+            '</split_test>\n'
+        ).format(
+            child_blocks=self.child_blocks,
+            group_id_to_child=json.dumps(
+                {
+                    "0": str(self.child_blocks[0].location),
+                    "1": str(self.child_blocks[1].location),
+                }
+            ).replace('"', '&quot;')
+        )
+        export_fs = MemoryFS()
+        # Set the virtual FS to export the olx to.
+        split_test_block.runtime._descriptor_system.export_fs = export_fs  # pylint: disable=protected-access
+
+        # Export the olx.
+        node = lxml.etree.Element("unknown_root")
+        split_test_block.add_xml_to_node(node)
+
+        # Read it back
+        with export_fs.open('{dir}/{file_name}.xml'.format(
+            dir=split_test_block.scope_ids.usage_id.block_type,
+            file_name=split_test_block.scope_ids.usage_id.block_id
+        )) as f:
+            exported_olx = f.read()
+
+        # And compare.
+        self.assertEqual(exported_olx, expected_olx)
+
+        runtime = TestImportSystem(load_error_modules=True, course_id=split_test_block.location.course_key)
+        runtime.resources_fs = export_fs
+
+        # Now import it.
+        olx_element = lxml.etree.fromstring(exported_olx)
+        id_generator = Mock()
+        imported_split_test_block = SplitTestBlock.parse_xml(olx_element, runtime, None, id_generator)
+
+        # Check the new XBlock has the same properties as the old one.
+        self.assertEqual(imported_split_test_block.display_name, split_test_block.display_name)
+        self.assertEqual(len(imported_split_test_block.children), len(split_test_block.children))
+        self.assertEqual(imported_split_test_block.children, split_test_block.children)
+        self.assertEqual(imported_split_test_block.user_partition_id, split_test_block.user_partition_id)
+        self.assertEqual(imported_split_test_block.group_id_to_child['0'], str(split_test_block.group_id_to_child['0']))
+        self.assertEqual(imported_split_test_block.group_id_to_child['1'], str(split_test_block.group_id_to_child['1']))
