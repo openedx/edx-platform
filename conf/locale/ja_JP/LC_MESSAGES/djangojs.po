@@ -39,6 +39,7 @@
 # Toshiboumi Ohta <ohta@securesky-tech.com>, 2018
 # かわぐちひろふみ <h.kawaguchi@nttks.co.jp>, 2018
 # Kyoto University <edxkyotoux@gmail.com>, 2018
+# Omar Al-Ithawi <i@omardo.com>, 2021
 #
 msgid ""
 msgstr ""
@@ -46,7 +47,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2018-08-07 20:01+0000\n"
 "PO-Revision-Date: 2018-08-07 20:02+0000\n"
-"Last-Translator: Kyoto University <edxkyotoux@gmail.com>, 2018\n"
+"Last-Translator: Omar Al-Ithawi <i@omardo.com>, 2021\n"
 "Language-Team: Japanese (Japan) (https://www.transifex.com/open-edx/teams/6205/ja_JP/)\n"
 "Language: ja_JP\n"
 "MIME-Version: 1.0\n"
@@ -7530,7 +7531,7 @@ msgstr "%(author)sが%(time_ago)s前に投稿した質問"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 msgid "Closed"
-msgstr "終了"
+msgstr "締切済"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
