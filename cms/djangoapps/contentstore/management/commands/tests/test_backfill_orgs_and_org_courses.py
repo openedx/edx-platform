@@ -140,8 +140,20 @@ class BackfillOrgsAndOrgCoursesTest(SharedModuleStoreTestCase):
         },
     )
     @ddt.unpack
-    @patch.object(organizations_api, 'bulk_add_organizations')
-    @patch.object(organizations_api, 'bulk_add_organization_courses')
+    @patch.object(
+        # Mock out `bulk_add_organizations` to do nothing and return empty
+        # lists, indicating no organizations created or reactivated.
+        organizations_api,
+        'bulk_add_organizations',
+        return_value=([], []),
+    )
+    @patch.object(
+        # Mock out `bulk_add_organization_courses` to do nothing and return empty
+        # lists, indicating no linkages created or reactivated.
+        organizations_api,
+        'bulk_add_organization_courses',
+        return_value=([], []),
+    )
     def test_arguments_and_input(
             self,
             mock_add_orgs,
