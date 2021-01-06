@@ -5,6 +5,8 @@ A backfill command to migrate Open edX instances to the new world of
 For full context, see:
 https://github.com/edx/edx-organizations/blob/master/docs/decisions/0001-phase-in-db-backed-organizations-to-all.rst
 """
+from typing import Dict, List, Set, Tuple
+
 from django.core.management import BaseCommand, CommandError
 from organizations import api as organizations_api
 
@@ -148,7 +150,11 @@ class Command(BaseCommand):
         )
 
 
-def confirm_changes(options, orgs, org_courseid_pairs):
+def confirm_changes(
+        options: Dict[str, str],
+        orgs: List[dict],
+        org_courseid_pairs: List[Tuple[dict, str]],
+) -> bool:
     """
     Should we apply the changes to the database?
 
@@ -157,12 +163,15 @@ def confirm_changes(options, orgs, org_courseid_pairs):
     Otherwise, it does a dry run and then prompts the user.
 
     Arguments:
-        options (dict[str]): command-line arguments.
-        orgs (list[dict]): list of org data dictionaries to bulk-add.
-        org_courseid_pairs (list[tuple[dict, str]]):
+        options: command-line arguments.
+        orgs: org data dictionaries to bulk-add.
+              should each have a "short_name" and "name" key.
+        org_courseid_pairs
             list of (org data dictionary, course key string) links to bulk-add.
+            each org data dictionary should have a "short_name" key.
 
-    Returns: bool
+    Returns:
+        Whether user wants changes to be applied.
     """
     if options.get('apply') and options.get('dry'):
         raise CommandError("Only one of 'apply' and 'dry' may be specified")
@@ -182,7 +191,12 @@ def confirm_changes(options, orgs, org_courseid_pairs):
     return answer.lower().startswith('y')
 
 
-def bulk_add_data(orgs, org_courseid_pairs, dry_run, activate):
+def bulk_add_data(
+        orgs: List[dict],
+        org_courseid_pairs: List[Tuple[dict, str]],
+        dry_run: bool,
+        activate: bool,
+):
     """
     Bulk-add the organizations and organization-course linkages.
 
@@ -192,10 +206,11 @@ def bulk_add_data(orgs, org_courseid_pairs, dry_run, activate):
     existing record.
 
     Arguments:
-        options (dict[str]): command-line arguments.
-        orgs (list[dict]): list of org data dictionaries to bulk-add.
-        org_courseid_pairs (list[tuple[dict, str]]):
+        orgs: org data dictionaries to bulk-add.
+              should each have a "short_name" and "name" key.
+        org_courseid_pairs
             list of (org data dictionary, course key string) links to bulk-add.
+            each org data dictionary should have a "short_name" key.
         dry_run: Whether or not this run should be "dry" (ie, don't apply changes).
         activate: Whether newly-added organizations and organization-course linkages
             should be activated, and whether existing-but-inactive
@@ -231,7 +246,7 @@ def bulk_add_data(orgs, org_courseid_pairs, dry_run, activate):
     print("------------------------------------------------------")
 
 
-def find_orgslug_courseid_pairs():
+def find_orgslug_courseid_pairs() -> Set[Tuple[str, str]]:
     """
     Returns the unique pairs of (organization short name, course run key string)
     from the CourseOverviews table, which should contain all course runs in the
@@ -251,7 +266,7 @@ def find_orgslug_courseid_pairs():
     }
 
 
-def find_orgslug_libraryid_pairs():
+def find_orgslug_libraryid_pairs() -> Set[Tuple[str, str]]:
     """
     Returns the unique pairs of (organization short name, content library key string)
     from the modulestore.
