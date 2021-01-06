@@ -369,7 +369,7 @@
     "Click to remove all chosen %s at once.": "\u30af\u30ea\u30c3\u30af\u3059\u308b\u3068\u3059\u3079\u3066\u306e %s \u3092\u9078\u629e\u304b\u3089\u524a\u9664\u3057\u307e\u3059\u3002", 
     "Close": "\u9589\u3058\u308b", 
     "Close Calculator": "\u8a08\u7b97\u6a5f\u3092\u9589\u3058\u308b", 
-    "Closed": "\u7d42\u4e86", 
+    "Closed": "\u7de0\u5207\u6e08", 
     "Code": "\u30b3\u30fc\u30c9", 
     "Code Sample (Ctrl+K)": "\u30b3\u30fc\u30c9\u30b5\u30f3\u30d7\u30eb (Ctrl+K)", 
     "Code block": "\u30b3\u30fc\u30c9\u30d6\u30ed\u30c3\u30af", 
