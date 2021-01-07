@@ -216,7 +216,7 @@ class ConditionalBlock(
                 if not hasattr(module, attr_name):
                     # We don't throw an exception here because it is possible for
                     # the descriptor of a required module to have a property but
-                    # for the resulting module to be a (flavor of) ErrorModule.
+                    # for the resulting module to be a (flavor of) ErrorBlock.
                     # So just log and return false.
                     if module is not None:
                         # We do not want to log when module is None, and it is when requester

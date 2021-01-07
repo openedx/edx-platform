@@ -29,7 +29,7 @@ from xblock.field_data import DictFieldData
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, ScopeIds
 
 from xmodule.assetstore import AssetMetadata
-from xmodule.error_module import ErrorDescriptor
+from xmodule.error_module import ErrorBlock
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
@@ -146,7 +146,7 @@ def get_test_system(
         node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
         anonymous_student_id='student',
         course_id=course_id,
-        error_descriptor_class=ErrorDescriptor,
+        error_descriptor_class=ErrorBlock,
         get_user_role=Mock(name='get_test_system.get_user_role', is_staff=False),
         user_location=Mock(name='get_test_system.user_location'),
         descriptor_runtime=descriptor_system,

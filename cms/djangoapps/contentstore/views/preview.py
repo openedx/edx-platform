@@ -32,7 +32,7 @@ from openedx.core.lib.xblock_utils import (
 )
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
-from xmodule.error_module import ErrorDescriptor
+from xmodule.error_module import ErrorBlock
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.partitions.partitions_service import PartitionService
@@ -209,7 +209,7 @@ def _preview_module_system(request, descriptor, field_data):
         # Set up functions to modify the fragment produced by student_view
         wrappers=wrappers,
         wrappers_asides=wrappers_asides,
-        error_descriptor_class=ErrorDescriptor,
+        error_descriptor_class=ErrorBlock,
         get_user_role=lambda: get_user_role(request.user, course_id),
         # Get the raw DescriptorSystem, not the CombinedSystem
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access

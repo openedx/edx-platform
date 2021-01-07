@@ -12,7 +12,7 @@ from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KeyValueStore, KvsFieldData
 
-from xmodule.error_module import ErrorDescriptor
+from xmodule.error_module import ErrorBlock
 from xmodule.errortracker import exc_info_to_str
 from xmodule.library_tools import LibraryToolsService
 from xmodule.mako_module import MakoDescriptorSystem
@@ -258,7 +258,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
             )
         except Exception:  # pylint: disable=broad-except
             log.warning("Failed to load descriptor", exc_info=True)
-            return ErrorDescriptor.from_json(
+            return ErrorBlock.from_json(
                 block_data,
                 self,
                 course_entry_override.course_key.make_usage_key(

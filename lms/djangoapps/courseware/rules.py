@@ -21,7 +21,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
 from common.djangoapps.student.roles import CourseRole, OrgRole
 from xmodule.course_module import CourseDescriptor
-from xmodule.error_module import ErrorDescriptor
+from xmodule.error_module import ErrorBlock
 from xmodule.x_module import XModule
 
 
@@ -113,7 +113,7 @@ class HasStaffAccessToContent(Rule):
         # (start with more specific types, then get more general)
         if isinstance(instance, (CourseDescriptor, CourseOverview)):
             course_key = instance.id
-        elif isinstance(instance, (ErrorDescriptor, XModule, XBlock)):
+        elif isinstance(instance, (ErrorBlock, XModule, XBlock)):
             course_key = instance.scope_ids.usage_id.course_key
         elif isinstance(instance, CourseKey):
             course_key = instance
@@ -171,7 +171,7 @@ class HasRolesRule(Rule):
             course_key = instance
         elif isinstance(instance, (CourseDescriptor, CourseOverview)):
             course_key = instance.id
-        elif isinstance(instance, (ErrorDescriptor, XModule, XBlock)):
+        elif isinstance(instance, (ErrorBlock, XModule, XBlock)):
             course_key = instance.scope_ids.usage_id.course_key
         else:
             course_key = CourseKey.from_string(str(instance))

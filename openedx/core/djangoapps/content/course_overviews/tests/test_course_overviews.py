@@ -36,7 +36,7 @@ from xmodule.course_module import (
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
     CATALOG_VISIBILITY_NONE
 )
-from xmodule.error_module import ErrorDescriptor
+from xmodule.error_module import ErrorBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -356,13 +356,13 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
 
     def test_get_errored_course(self):
         """
-        Test that getting an ErrorDescriptor back from the module store causes
+        Test that getting an ErrorBlock back from the module store causes
         load_from_module_store to raise an IOError.
         """
-        mock_get_course = mock.Mock(return_value=ErrorDescriptor)
+        mock_get_course = mock.Mock(return_value=ErrorBlock)
         with mock.patch('xmodule.modulestore.mixed.MixedModuleStore.get_course', mock_get_course):
             # This mock makes it so when the module store tries to load course data,
-            # an exception is thrown, which causes get_course to return an ErrorDescriptor,
+            # an exception is thrown, which causes get_course to return an ErrorBlock,
             # which causes get_from_id to raise an IOError.
             with self.assertRaises(IOError):
                 CourseOverview.load_from_module_store(self.store.make_course_key('Non', 'Existent', 'Course'))

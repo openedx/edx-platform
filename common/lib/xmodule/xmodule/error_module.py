@@ -11,18 +11,25 @@ import sys
 
 import six
 from lxml import etree
+from web_fragments.fragment import Fragment
 from xblock.field_data import DictFieldData
 from xblock.fields import Scope, ScopeIds, String
 
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore import EdxJSONEncoder
-from xmodule.x_module import XModule, XModuleDescriptor
+from xmodule.x_module import (
+    HTMLSnippet,
+    ResourceTemplates,
+    XModuleMixin,
+    XModuleDescriptorToXBlockMixin,
+    XModuleToXBlockMixin,
+)
 
 log = logging.getLogger(__name__)
 
 # NOTE: This is not the most beautiful design in the world, but there's no good
 # way to tell if the module is being used in a staff context or not.  Errors that get discovered
-# at course load time are turned into ErrorDescriptor objects, and automatically hidden from students.
+# at course load time are turned into ErrorBlock objects, and automatically hidden from students.
 # Unfortunately, we can also have errors when loading modules mid-request, and then we need to decide
 # what to show, and the logic for that belongs in the LMS (e.g. in get_module), so the error handler
 # decides whether to create a staff or not-staff module.
@@ -30,62 +37,49 @@ log = logging.getLogger(__name__)
 
 class ErrorFields(object):
     """
-    XBlock fields used by the ErrorModules
+    XBlock fields used by the ErrorBlocks
     """
     contents = String(scope=Scope.content)
     error_msg = String(scope=Scope.content)
     display_name = String(scope=Scope.settings)
 
 
-class ErrorModule(ErrorFields, XModule):
+class ErrorBlock(
+    ErrorFields,
+    XModuleDescriptorToXBlockMixin,
+    XModuleToXBlockMixin,
+    HTMLSnippet,
+    ResourceTemplates,
+    XModuleMixin,
+):  # pylint: disable=abstract-method
     """
     Module that gets shown to staff when there has been an error while
     loading or rendering other modules
     """
 
-    def get_html(self):
-        '''Show an error to staff.
-        TODO (vshnayder): proper style, divs, etc.
-        '''
-        # staff get to see all the details
-        return self.system.render_template('module-error.html', {
+    resources_dir = None
+
+    def student_view(self, _context):
+        """
+        Return a fragment that contains the html for the student view.
+        """
+        fragment = Fragment(self.system.render_template('module-error.html', {
             'staff_access': True,
             'data': self.contents,
             'error': self.error_msg,
-        })
+        }))
+        return fragment
 
-
-class NonStaffErrorModule(ErrorFields, XModule):
-    """
-    Module that gets shown to students when there has been an error while
-    loading or rendering other modules
-    """
-    def get_html(self):
-        '''Show an error to a student.
-        TODO (vshnayder): proper style, divs, etc.
-        '''
-        # staff get to see all the details
-        return self.system.render_template('module-error.html', {
-            'staff_access': False,
-            'data': "",
-            'error': "",
-        })
-
-
-class ErrorDescriptor(ErrorFields, XModuleDescriptor):
-    """
-    Module that provides a raw editing view of broken xml.
-    """
-    module_class = ErrorModule
-    resources_dir = None
-
-    def get_html(self):
-        return u''
+    def studio_view(self, _context):
+        """
+        Show empty edit view since this is not editable.
+        """
+        return Fragment('')
 
     @classmethod
     def _construct(cls, system, contents, error_msg, location, for_parent=None):
         """
-        Build a new ErrorDescriptor. using ``system``.
+        Build a new ErrorBlock using ``system``.
 
         Arguments:
             system (:class:`DescriptorSystem`): The :class:`DescriptorSystem` used
@@ -106,7 +100,7 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
                 # Pick a unique url_name -- the sha1 hash of the contents.
                 # NOTE: We could try to pull out the url_name of the errored descriptor,
                 # but url_names aren't guaranteed to be unique between descriptor types,
-                # and ErrorDescriptor can wrap any type.  When the wrapped module is fixed,
+                # and ErrorBlock can wrap any type.  When the wrapped module is fixed,
                 # it will be written out with the original url_name.
                 name=hashlib.sha1(contents.encode('utf8')).hexdigest()
             )
@@ -207,8 +201,18 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
             return etree.tostring(root, encoding='unicode')
 
 
-class NonStaffErrorDescriptor(ErrorDescriptor):
+class NonStaffErrorBlock(ErrorBlock):  # pylint: disable=abstract-method
     """
-    Module that provides non-staff error messages.
+    Block that gets shown to students when there has been an error while
+    loading or rendering other blocks.
     """
-    module_class = NonStaffErrorModule
+    def student_view(self, _context):
+        """
+        Return a fragment that contains the html for the student view.
+        """
+        fragment = Fragment(self.system.render_template('module-error.html', {
+            'staff_access': False,
+            'data': '',
+            'error': '',
+        }))
+        return fragment

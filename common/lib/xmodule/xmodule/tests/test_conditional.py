@@ -14,7 +14,7 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from xmodule.conditional_module import ConditionalBlock
-from xmodule.error_module import NonStaffErrorDescriptor
+from xmodule.error_module import NonStaffErrorBlock
 from xmodule.modulestore.xml import CourseLocationManager, ImportSystem, XMLModuleStore
 from xmodule.tests import DATA_DIR, get_test_descriptor_system, get_test_system
 from xmodule.tests.xml import XModuleXmlImportTest
@@ -63,7 +63,7 @@ class ConditionalFactory(object):
         return a dict of modules: the conditional with a single source and a single child.
         Keys are 'cond_module', 'source_module', and 'child_module'.
 
-        if the source_is_error_module flag is set, create a real ErrorModule for the source.
+        if the source_is_error_module flag is set, create a real ErrorBlock for the source.
         """
         descriptor_system = get_test_descriptor_system()
 
@@ -72,7 +72,7 @@ class ConditionalFactory(object):
                                             "problem", "SampleProblem", deprecated=True)
         if source_is_error_module:
             # Make an error descriptor and module
-            source_descriptor = NonStaffErrorDescriptor.from_xml(
+            source_descriptor = NonStaffErrorBlock.from_xml(
                 'some random xml data',
                 system,
                 id_generator=CourseLocationManager(source_location.course_key),
@@ -192,7 +192,7 @@ class ConditionalBlockBasicTest(unittest.TestCase):
 
     def test_error_as_source(self):
         '''
-        Check that handle_ajax works properly if the source is really an ErrorModule,
+        Check that handle_ajax works properly if the source is really an ErrorBlock,
         and that the condition is not satisfied.
         '''
         modules = ConditionalFactory.create(self.test_system, source_is_error_module=True)

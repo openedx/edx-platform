@@ -122,7 +122,7 @@ class ImportTestCase(BaseCourseTestCase):
     date = Date()
 
     def test_fallback(self):
-        '''Check that malformed xml loads as an ErrorDescriptor.'''
+        '''Check that malformed xml loads as an ErrorBlock.'''
 
         # Use an exotic character to also flush out Unicode issues.
         bad_xml = u'''<sequential display_name="oops\N{SNOWMAN}"><video url="hi"></sequential>'''
@@ -130,7 +130,7 @@ class ImportTestCase(BaseCourseTestCase):
 
         descriptor = system.process_xml(bad_xml)
 
-        self.assertEqual(descriptor.__class__.__name__, 'ErrorDescriptorWithMixins')
+        self.assertEqual(descriptor.__class__.__name__, 'ErrorBlockWithMixins')
 
     def test_unique_url_names(self):
         '''Check that each error gets its very own url_name'''
@@ -164,7 +164,7 @@ class ImportTestCase(BaseCourseTestCase):
         descriptor.add_xml_to_node(node)
         re_import_descriptor = system.process_xml(etree.tostring(node))
 
-        self.assertEqual(re_import_descriptor.__class__.__name__, 'ErrorDescriptorWithMixins')
+        self.assertEqual(re_import_descriptor.__class__.__name__, 'ErrorBlockWithMixins')
 
         self.assertEqual(descriptor.contents, re_import_descriptor.contents)
         self.assertEqual(descriptor.error_msg, re_import_descriptor.error_msg)
@@ -627,7 +627,7 @@ class ImportTestCase(BaseCourseTestCase):
         )
 
     def test_error_on_import(self):
-        '''Check that when load_error_module is false, an exception is raised, rather than returning an ErrorModule'''
+        '''Check that when load_error_module is false, an exception is raised, rather than returning an ErrorBlock'''
 
         bad_xml = '''<sequential display_name="oops"><video url="hi"></sequential>'''
         system = self.get_system(False)
