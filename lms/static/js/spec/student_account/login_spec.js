@@ -193,6 +193,21 @@
                     expect($('.button-oa2-facebook')).toBeVisible();
                 });
 
+                it('does not display the login form', function() {
+                    var thirdPartyAuthView = new LoginView({
+                        fields: FORM_DESCRIPTION.fields,
+                        model: model,
+                        resetModel: resetModel,
+                        thirdPartyAuth: THIRD_PARTY_AUTH,
+                        platformName: PLATFORM_NAME,
+                        enterpriseSlugLoginURL: ENTERPRISE_SLUG_LOGIN_URL,
+                        is_require_third_party_auth_enabled: true
+                    });
+
+                    expect(thirdPartyAuthView).not.toContain(view.$submitButton);
+                    expect(thirdPartyAuthView).not.toContain($('form-field'));
+                });
+
                 it('displays a link to the signin help', function() {
                     createLoginView(this);
 
