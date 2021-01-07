@@ -106,6 +106,18 @@ urlpatterns = [
         views.PhotoUrlsView.as_view(),
         name="verification_photo_urls"
     ),
+
+    url(
+        r'^decrypt-idv-images/face/{receipt_id}$'.format(receipt_id=IDV_RECEIPT_ID_PATTERN),
+        views.DecryptFaceImageView.as_view(),
+        name="verification_decrypt_face_image"
+    ),
+
+    url(
+        r'^decrypt-idv-images/photo-id/{receipt_id}$'.format(receipt_id=IDV_RECEIPT_ID_PATTERN),
+        views.DecryptPhotoIDImageView.as_view(),
+        name="verification_decrypt_photo_id_image"
+    ),
 ]
 
 # Fake response page for incourse reverification ( software secure )
