@@ -143,6 +143,15 @@ class UserApplication(TimeStampedModel):
     def __str__(self):
         return 'UserApplication {id}, for user {email}'.format(id=self.id, email=self.user.email)
 
+    def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
+        if self.pk:
+            current = UserApplication.objects.get(pk=self.pk)
+            if current.resume != self.resume:
+                current.resume.delete(save=False)
+            if current.cover_letter_file != self.cover_letter_file:
+                current.cover_letter_file.delete(save=False)
+        super(UserApplication, self).save(*args, **kwargs)
+
 
 class UserStartAndEndDates(TimeStampedModel):
     """
