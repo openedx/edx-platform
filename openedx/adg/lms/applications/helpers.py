@@ -12,7 +12,7 @@ from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.adg.lms.student.helpers import send_mandrill_email
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
-from .constants import LOGO_IMAGE_MAX_SIZE, MAXIMUM_YEAR, MINIMUM_YEAR
+from .constants import LOGO_IMAGE_MAX_SIZE, MAXIMUM_YEAR_OPTION, MINIMUM_YEAR_OPTION
 
 
 def validate_logo_size(file_):
@@ -112,7 +112,7 @@ def min_year_value_validator(value):
     Args:
         value (Int): Value to save as year
     """
-    return MinValueValidator(MINIMUM_YEAR)(value)
+    return MinValueValidator(MINIMUM_YEAR_OPTION)(value)
 
 
 def max_year_value_validator(value):
@@ -122,4 +122,4 @@ def max_year_value_validator(value):
     Args:
         value (Int): Value to save as year
     """
-    return MaxValueValidator(MAXIMUM_YEAR)(value)
+    return MaxValueValidator(MAXIMUM_YEAR_OPTION)(value)

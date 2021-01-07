@@ -6,7 +6,7 @@ from unittest.mock import Mock, patch
 import pytest
 from django.core.exceptions import ValidationError
 
-from openedx.adg.lms.applications.constants import LOGO_IMAGE_MAX_SIZE, MAXIMUM_YEAR, MINIMUM_YEAR
+from openedx.adg.lms.applications.constants import LOGO_IMAGE_MAX_SIZE, MAXIMUM_YEAR_OPTION, MINIMUM_YEAR_OPTION
 from openedx.adg.lms.applications.helpers import (
     max_year_value_validator,
     min_year_value_validator,
@@ -50,14 +50,14 @@ def test_min_year_value_validator_invalid():
     Check if invalid value for min year value validator raises error
     """
     with pytest.raises(ValidationError):
-        min_year_value_validator(MINIMUM_YEAR - 1)
+        min_year_value_validator(MINIMUM_YEAR_OPTION - 1)
 
 
 def test_min_year_value_validator_valid():
     """
     Check if invalid value for min year value validator raises error
     """
-    assert min_year_value_validator(MINIMUM_YEAR) is None
+    assert min_year_value_validator(MINIMUM_YEAR_OPTION) is None
 
 
 def test_max_year_value_validator_invalid():
@@ -65,11 +65,11 @@ def test_max_year_value_validator_invalid():
     Check if invalid value for max year value validator raises error
     """
     with pytest.raises(ValidationError):
-        max_year_value_validator(MAXIMUM_YEAR + 1)
+        max_year_value_validator(MAXIMUM_YEAR_OPTION + 1)
 
 
 def test_max_year_value_validator_valid():
     """
     Check if invalid value for max year value validator raises error
     """
-    assert max_year_value_validator(MAXIMUM_YEAR) is None
+    assert max_year_value_validator(MAXIMUM_YEAR_OPTION) is None
