@@ -12,6 +12,7 @@ from datetime import datetime
 from tempfile import NamedTemporaryFile, mkdtemp
 
 from ccx_keys.locator import CCXLocator
+from celery.task import shared_task
 from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -42,7 +43,6 @@ from cms.djangoapps.contentstore.utils import initialize_permissions, reverse_us
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from common.djangoapps.course_action_state.models import CourseRerunState
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
-from openedx.core.lib.celery import APP
 from openedx.core.lib.extract_tar import safetar_extractall
 from common.djangoapps.student.auth import has_course_author_access
 from xmodule.contentstore.django import contentstore
@@ -83,7 +83,7 @@ def clone_instance(instance, field_values):
     return instance
 
 
-@APP.task
+@shared_task
 @set_code_owner_attribute
 def rerun_course(source_course_key_string, destination_course_key_string, user_id, fields=None):
     """
@@ -170,7 +170,7 @@ def _parse_time(time_isoformat):
     ).replace(tzinfo=UTC)
 
 
-@APP.task
+@shared_task
 @set_code_owner_attribute
 def update_search_index(course_id, triggered_time_isoformat):
     """ Updates course search index. """
@@ -195,7 +195,7 @@ def update_search_index(course_id, triggered_time_isoformat):
         LOGGER.debug(u'Search indexing successful for complete course %s', course_id)
 
 
-@APP.task
+@shared_task
 @set_code_owner_attribute
 def update_library_index(library_id, triggered_time_isoformat):
     """ Updates course search index. """
@@ -241,7 +241,7 @@ class CourseExportTask(UserTask):  # pylint: disable=abstract-method
         return u'Export of {}'.format(key)
 
 
-@APP.task(base=CourseExportTask, bind=True)
+@shared_task(base=CourseExportTask, bind=True)
 # Note: The decorator @set_code_owner_attribute could not be used because
 #   the implementation of this task breaks with any additional decorators.
 def export_olx(self, user_id, course_key_string, language):
@@ -376,7 +376,7 @@ class CourseImportTask(UserTask):  # pylint: disable=abstract-method
         return u'Import of {} from {}'.format(key, filename)
 
 
-@APP.task(base=CourseImportTask, bind=True)
+@shared_task(base=CourseImportTask, bind=True)
 # Note: The decorator @set_code_owner_attribute could not be used because
 #   the implementation of this task breaks with any additional decorators.
 def import_olx(self, user_id, course_key_string, archive_path, archive_name, language):

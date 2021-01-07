@@ -10,7 +10,7 @@ import logging
 import dateutil.parser
 import pytz
 import requests
-from celery.task import task
+from celery import shared_task
 from django.utils.timezone import now
 from edx_django_utils.monitoring import set_code_owner_attribute
 from lxml import etree
@@ -31,7 +31,7 @@ class MetadataParseError(Exception):
     pass
 
 
-@task(name='third_party_auth.fetch_saml_metadata')
+@shared_task(name='third_party_auth.fetch_saml_metadata')
 @set_code_owner_attribute
 def fetch_saml_metadata():
     """

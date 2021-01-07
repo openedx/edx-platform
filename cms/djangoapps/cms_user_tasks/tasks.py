@@ -5,6 +5,7 @@ Celery tasks used by cms_user_tasks
 
 from boto.exception import NoAuthHandlerFound
 from celery.exceptions import MaxRetriesExceededError
+from celery.task import shared_task
 from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.core import mail
@@ -12,14 +13,13 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.lib.celery import APP
 
 LOGGER = get_task_logger(__name__)
 TASK_COMPLETE_EMAIL_MAX_RETRIES = 3
 TASK_COMPLETE_EMAIL_TIMEOUT = 60
 
 
-@APP.task(bind=True)
+@shared_task(bind=True)
 @set_code_owner_attribute
 def send_task_complete_email(self, task_name, task_state_text, dest_addr, detail_url):
     """

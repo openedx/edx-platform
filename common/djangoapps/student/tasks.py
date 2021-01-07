@@ -6,7 +6,7 @@ This file contains celery tasks for sending email
 import logging
 
 from celery.exceptions import MaxRetriesExceededError
-from celery.task import task
+from celery import shared_task
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
@@ -20,7 +20,7 @@ from openedx.core.lib.celery.task_utils import emulate_http_request
 log = logging.getLogger('edx.celery.task')
 
 
-@task(bind=True, name='student.send_activation_email')
+@shared_task(bind=True, name='student.send_activation_email')
 @set_code_owner_attribute
 def send_activation_email(self, msg_string, from_address=None):
     """
