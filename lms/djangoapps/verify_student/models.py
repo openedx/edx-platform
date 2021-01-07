@@ -803,7 +803,8 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
             img_bytes = decode_and_decrypt(byte_img_data, aes_key)
             return img_bytes
-        except:  # pylint: disable=bare-except
+        except Exception as e:  # pylint: disable=broad-except
+            log.exception(u'Failed to decrypt face image due to an exception: %s', e)
             return None
 
     @status_before_must_be("must_retry", "submitted", "approved", "denied")
@@ -819,14 +820,15 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
         try:
             # decode rsa encrypted aes key from base64
-            rsa_encrypted_aes_key = base64.urlsafe_b64decode(self.photo_id_key)
+            rsa_encrypted_aes_key = base64.urlsafe_b64decode(self.photo_id_key.encode('utf-8'))
 
             # decrypt aes key using rsa private key
             rsa_private_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["RSA_PRIVATE_KEY"]
             decrypted_aes_key = rsa_decrypt(rsa_encrypted_aes_key, rsa_private_key_str)
             img_bytes = decode_and_decrypt(byte_img_data, decrypted_aes_key)
             return img_bytes
-        except:  # pylint: disable=bare-except
+        except Exception as e:  # pylint: disable=broad-except
+            log.exception(u'Failed to decrypt photo id image due to an exception: %s', e)
             return None
 
     @status_before_must_be("must_retry", "ready", "submitted")
