@@ -7,8 +7,10 @@ import mock
 import pytest
 from django.test import Client, RequestFactory
 from django.urls import reverse
+from rest_framework.status import HTTP_400_BAD_REQUEST
 
-from openedx.adg.lms.applications.views import ApplicationHubView, ApplicationSuccessView
+from openedx.adg.lms.applications.views import ApplicationHubView, ApplicationSuccessView, ContactInformationView
+from openedx.adg.lms.registration_extension.tests.factories import ExtendedUserProfileFactory
 from student.tests.factories import UserFactory
 
 from .constants import PASSWORD, USERNAME
@@ -26,6 +28,7 @@ def user_fixture():
     """
     user = UserFactory(username=USERNAME, password=PASSWORD)
     ApplicationHubFactory(user=user)
+    ExtendedUserProfileFactory(user=user)
     return user
 
 
@@ -282,3 +285,66 @@ def test_get_no_user_application_exists_for_application_success_view(get_request
 
     response = ApplicationSuccessView.as_view()(get_request_for_application_success_view)
     assert response.status_code == 400
+
+
+# ------- Contact Information View tests below -------
+
+
+@pytest.fixture(name='get_request_for_contact_information_view')
+def get_request_for_contact_information_view_fixture(request_factory, user):
+    """
+    Create a get request for the contact_information url.
+    """
+    request = request_factory.get(reverse('application_contact'))
+    request.user = user
+    return request
+
+
+@pytest.fixture(name='post_request_for_contact_information_view')
+def post_request_for_contact_information_view_fixture(request_factory, user):
+    """
+    Create a get request for the contact_information url.
+    """
+    request = request_factory.post(reverse('application_contact'))
+    request.user = user
+    return request
+
+
+@pytest.mark.django_db
+def test_get_redirects_without_login_for_contact_information_view():
+    """
+    Test the case where an unauthenticated user is redirected to login page or not.
+    """
+    response = Client().get(reverse('application_contact'))
+    assert '/register?next=/application/contact' in response.url
+
+
+@pytest.mark.django_db
+def test_post_user_redirects_without_login_for_contact_information_view():
+    """
+    Test the case where an unauthenticated user is redirected to login page or not.
+    """
+    response = Client().post(reverse('application_contact'))
+    assert '/register?next=/application/contact' in response.url
+
+
+@pytest.mark.django_db
+def test_get_already_submitted_application_to_contact_information_view(get_request_for_contact_information_view):
+    """
+    Test the case where a user with already submitted application hits the url again.
+    """
+    request = get_request_for_contact_information_view
+    request.user.application_hub.set_is_written_application_completed()
+    response = ContactInformationView.as_view()(request)
+    assert response.get('Location') == reverse('application_hub')
+
+
+@pytest.mark.django_db
+def test_post_already_submitted_application_to_contact_information_view(post_request_for_contact_information_view):
+    """
+    Test the case where a user with already submitted application hits the url again.
+    """
+    request = post_request_for_contact_information_view
+    request.user.application_hub.set_is_written_application_completed()
+    response = ContactInformationView.as_view()(request)
+    assert response.status_code == HTTP_400_BAD_REQUEST

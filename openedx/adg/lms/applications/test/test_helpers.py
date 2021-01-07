@@ -5,11 +5,12 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from openedx.adg.lms.applications.constants import LOGO_IMAGE_MAX_SIZE
+from openedx.adg.lms.applications.constants import LOGO_IMAGE_MAX_SIZE, RESUME_FILE_MAX_SIZE
 from openedx.adg.lms.applications.helpers import (
     check_validations_for_current_record,
     check_validations_for_past_record,
     send_application_submission_confirmation_email,
+    validate_file_size,
     validate_logo_size
 )
 
@@ -22,7 +23,7 @@ DATE_STARTED_YEAR = 2018
 ERROR_MESSAGE = '{key}, some error message'
 
 
-def test_validate_file_size_with_valid_size():
+def test_validate_logo_size_with_valid_size():
     """
     Verify that file size up to LOGO_IMAGE_MAX_SIZE is allowed
     """
@@ -31,7 +32,7 @@ def test_validate_file_size_with_valid_size():
     validate_logo_size(mocked_file)
 
 
-def test_validate_file_size_with_invalid_size():
+def test_validate_logo_size_with_invalid_size():
     """
     Verify that size greater than LOGO_IMAGE_MAX_SIZE is not allowed
     """
@@ -128,3 +129,17 @@ def test_check_validations_for_past_record(date_attrs_with_expected_results):
     """
     actual_result = check_validations_for_past_record(date_attrs_with_expected_results['attrs'], ERROR_MESSAGE)
     assert actual_result == date_attrs_with_expected_results['expected_result']
+
+
+@pytest.mark.parametrize('size , expected', [
+    (RESUME_FILE_MAX_SIZE, None),
+    (RESUME_FILE_MAX_SIZE + 1, 'File size must not exceed 4.0 MB')
+])
+def test_validate_file_size_with_valid_size(size, expected):
+    """
+    Verify that file size up to max_size i.e. RESUME_FILE_MAX_SIZE is allowed
+    """
+    mocked_file = Mock()
+    mocked_file.size = size
+    error = validate_file_size(mocked_file, RESUME_FILE_MAX_SIZE)
+    assert error == expected

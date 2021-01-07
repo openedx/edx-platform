@@ -18,3 +18,4 @@ class ExtendedUserProfileFactory(factory.DjangoModelFactory):
 
     user = factory.SubFactory(UserFactory)
     company = factory.SubFactory(BusinessLineFactory)
+    saudi_national = False
