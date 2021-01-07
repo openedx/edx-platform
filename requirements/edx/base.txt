@@ -99,20 +99,20 @@ edx-django-sites-extensions==2.5.1  # via -r requirements/edx/base.in
 edx-django-utils==3.13.0  # via -r requirements/edx/base.in, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-toggles, edx-when, ora2, super-csv
 edx-drf-extensions==6.2.0  # via -r requirements/edx/base.in, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
 edx-enterprise==3.16.8    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
-edx-event-routing-backends==2.0.0  # via -r requirements/edx/base.in
+edx-event-routing-backends==3.0.0  # via -r requirements/edx/base.in
 edx-i18n-tools==0.5.3     # via ora2
 edx-milestones==0.3.0     # via -r requirements/edx/base.in
 edx-opaque-keys[django]==2.1.1  # via -r requirements/edx/paver.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, lti-consumer-xblock, xmodule
 edx-organizations==6.6.0  # via -r requirements/edx/base.in
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/base.in
-edx-proctoring==2.5.5     # via -r requirements/edx/base.in, edx-proctoring-proctortrack
+edx-proctoring==2.5.6     # via -r requirements/edx/base.in, edx-proctoring-proctortrack
 edx-rbac==1.3.3           # via edx-enterprise
 edx-rest-api-client==5.2.2  # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring
 edx-search==2.0.1         # via -r requirements/edx/base.in
 edx-sga==0.13.1           # via -r requirements/edx/base.in
 edx-submissions==3.2.3    # via -r requirements/edx/base.in, ora2
 edx-tincan-py35==0.0.9    # via edx-enterprise
-edx-toggles==1.2.2        # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, edx-completion, edxval, ora2
+edx-toggles==1.2.2        # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, edx-completion, edx-event-routing-backends, edxval, ora2
 edx-user-state-client==1.2.0  # via -r requirements/edx/base.in
 edx-when==1.3.0           # via -r requirements/edx/base.in, edx-proctoring
 edxval==1.4.5             # via -r requirements/edx/base.in
