@@ -26,7 +26,6 @@ from six.moves.urllib.parse import urljoin
 from lms.djangoapps.branding.models import BrandingApiConfig
 from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from .toggles import app_logs_enabled
 
 log = logging.getLogger("edx.footer")
 EMPTY_URL = '#'
@@ -460,16 +459,6 @@ def _footer_logo_img(is_secure):
         settings.FOOTER_ORGANIZATION_IMAGE
     )
 
-    if app_logs_enabled():
-        log.info(
-            ("[Branding][footer_logo_img]: site_config:%s, footer_org_img:%s,"
-             "brand_url:%s, default:%s"),
-            footer_url_from_site_config,
-            settings.FOOTER_ORGANIZATION_IMAGE,
-            brand_footer_logo_url,
-            default_local_path
-        )
-
     # `logo_name` is looked up from the configuration,
     # which falls back on the Django settings, which loads it from
     # `lms.yml`, which is created and managed by Ansible. Because of
@@ -594,16 +583,6 @@ def get_logo_url(is_secure=True):
     logo_url_from_site_config = configuration_helpers.get_value('logo_image_url')
     university = configuration_helpers.get_value('university')
 
-    if app_logs_enabled():
-        log.info(
-            ("[Branding][get_logo_url]: site_config:%s, university:%s, "
-             "brand_url:%s, default:%s"),
-            logo_url_from_site_config,
-            university,
-            brand_logo_url,
-            default_local_path
-        )
-
     if logo_url_from_site_config:
         return _absolute_url_staticfile(is_secure=is_secure, name=logo_url_from_site_config)
 
@@ -628,15 +607,6 @@ def get_favicon_url():
     brand_favicon_url = settings.FAVICON_URL
     default_local_path = getattr(settings, 'FAVICON_PATH', 'images/favicon.ico')
     favicon_url_from_site_config = configuration_helpers.get_value('favicon_path')
-
-    if app_logs_enabled():
-        log.info(
-            ("[Branding][get_favicon_url]: site_config:%s, brand_url:%s "
-             "default:%s"),
-            favicon_url_from_site_config,
-            brand_favicon_url,
-            default_local_path,
-        )
 
     if favicon_url_from_site_config:
         return staticfiles_storage.url(favicon_url_from_site_config)
