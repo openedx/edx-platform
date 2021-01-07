@@ -11,7 +11,7 @@ from .serializers import EducationSerializer, WorkExperienceSerializer
 
 
 @view_auth_classes(is_authenticated=True)
-class ApplicationRequirementsViewSetBaseClass(viewsets.ModelViewSet):
+class ApplicationRequirementsViewSet(viewsets.ModelViewSet):
     """
     Base class for user application's requirements(Education and Work Experience) apis
     """
@@ -24,10 +24,10 @@ class ApplicationRequirementsViewSetBaseClass(viewsets.ModelViewSet):
         Filter queryset to allows users to filter only their own objects.
         """
         queryset = queryset.filter(user_application__user=self.request.user)
-        return super(ApplicationRequirementsViewSetBaseClass, self).filter_queryset(queryset)
+        return super(ApplicationRequirementsViewSet, self).filter_queryset(queryset)
 
 
-class EducationViewSet(ApplicationRequirementsViewSetBaseClass):
+class EducationViewSet(ApplicationRequirementsViewSet):
     """
     ViewSet for education apis
 
@@ -73,7 +73,7 @@ class EducationViewSet(ApplicationRequirementsViewSetBaseClass):
     serializer_class = EducationSerializer
 
 
-class WorkExperienceViewSet(ApplicationRequirementsViewSetBaseClass):
+class WorkExperienceViewSet(ApplicationRequirementsViewSet):
     """
     ViewSet for work experience apis
 

@@ -55,7 +55,7 @@ class EducationSerializer(serializers.ModelSerializer):
             dicts: Returns updated education attributes and errors if any in dictionary
         """
         errors = {}
-        if attrs.get('degree') == 'HD':
+        if attrs.get('degree') == Education.HIGH_SCHOOL_DIPLOMA:
             attrs['area_of_study'] = ''
         elif not attrs.get('area_of_study'):
             errors['area_of_study'] = _('Area of study is required for all degrees above High School Diploma')
