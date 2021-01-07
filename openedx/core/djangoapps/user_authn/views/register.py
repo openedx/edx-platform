@@ -21,6 +21,7 @@ from django.utils.translation import get_language
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
+from edx_django_utils.monitoring import set_custom_attribute
 from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
 from pytz import UTC
 from ratelimit.decorators import ratelimit
@@ -182,6 +183,8 @@ def create_account_with_params(request, params):
             ]}
         )
 
+    if is_third_party_auth_enabled:
+        set_custom_attribute('register_user_tpa', pipeline.running(request))
     extended_profile_fields = configuration_helpers.get_value('extended_profile_fields', [])
     # Can't have terms of service for certain SHIB users, like at Stanford
     registration_fields = getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
