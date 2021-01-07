@@ -9,10 +9,10 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
 
-from openedx.adg.lms.utils.date_utils import month_choices, year_choices
+from openedx.adg.lms.utils.date_utils import month_choices
 
 from .constants import ALLOWED_LOGO_EXTENSIONS
-from .helpers import validate_logo_size
+from .helpers import max_year_value_validator, min_year_value_validator, validate_logo_size
 
 
 class ApplicationHub(TimeStampedModel):
@@ -149,19 +149,22 @@ class UserStartAndEndDates(TimeStampedModel):
     An abstract model for start and end dates.
     """
     month_choices = month_choices(default_title='Month')
-    year_choices = year_choices(default_title='Year')
 
     user_application = models.ForeignKey(
         'UserApplication', related_name='%(app_label)s_%(class)ss', related_query_name='%(app_label)s_%(class)s',
         on_delete=models.CASCADE,
     )
     date_started_month = models.IntegerField(verbose_name=_('Start Month'), choices=month_choices, )
-    date_started_year = models.IntegerField(verbose_name=_('Start Year'), choices=year_choices, )
     date_completed_month = models.IntegerField(
         verbose_name=_('Completed Month'), choices=month_choices, blank=True, null=True,
     )
+    date_started_year = models.IntegerField(
+        verbose_name=_('Start Year'),
+        validators=(min_year_value_validator, max_year_value_validator)
+    )
     date_completed_year = models.IntegerField(
-        verbose_name=_('Completed Year'), choices=year_choices, blank=True, null=True,
+        verbose_name=_('Completed Year'), blank=True, null=True,
+        validators=(min_year_value_validator, max_year_value_validator)
     )
 
     class Meta(object):

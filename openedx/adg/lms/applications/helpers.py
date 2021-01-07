@@ -4,7 +4,7 @@ Helper methods for applications
 from datetime import datetime
 
 from django.conf import settings
-from django.core.validators import ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator, ValidationError
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
@@ -12,7 +12,7 @@ from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.adg.lms.student.helpers import send_mandrill_email
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
-from .constants import LOGO_IMAGE_MAX_SIZE
+from .constants import LOGO_IMAGE_MAX_SIZE, MAXIMUM_YEAR, MINIMUM_YEAR
 
 
 def validate_logo_size(file_):
@@ -103,3 +103,23 @@ def send_application_submission_confirmation_email(recipient_email):
         'course_catalog_url': course_catalog_url
     }
     send_mandrill_email(MandrillClient.APPLICATION_SUBMISSION_CONFIRMATION, recipient_email, context)
+
+
+def min_year_value_validator(value):
+    """
+    Minimum value validator for year fields in UserStartAndEndDates model.
+
+    Args:
+        value (Int): Value to save as year
+    """
+    return MinValueValidator(MINIMUM_YEAR)(value)
+
+
+def max_year_value_validator(value):
+    """
+    Maximum value validator for year fields in UserStartAndEndDates model.
+
+    Args:
+        value (Int): Value to save as year
+    """
+    return MaxValueValidator(MAXIMUM_YEAR)(value)
