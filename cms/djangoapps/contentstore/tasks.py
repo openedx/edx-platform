@@ -12,7 +12,7 @@ from datetime import datetime
 from tempfile import NamedTemporaryFile, mkdtemp
 
 from ccx_keys.locator import CCXLocator
-from celery.task import shared_task
+from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.contrib.auth import get_user_model
