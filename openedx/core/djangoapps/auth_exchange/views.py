@@ -6,6 +6,7 @@ The following are currently implemented:
     2. LoginWithAccessTokenView:
        1st party (open-edx) OAuth 2.0 access token -> session cookie
 """
+import logging
 
 import django.contrib.auth as auth
 import social_django.utils as social_utils
@@ -25,6 +26,8 @@ from openedx.core.djangoapps.auth_exchange.forms import AccessTokenExchangeForm
 from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+
+log = logging.getLogger(__name__)
 
 
 class AccessTokenExchangeBase(APIView):
@@ -49,13 +52,25 @@ class AccessTokenExchangeBase(APIView):
         """
         form = AccessTokenExchangeForm(request=request, oauth2_adapter=self.oauth2_adapter, data=request.POST)
         if not form.is_valid():
-            return self.error_response(form.errors)
+            error_response = self.error_response(form.errors)  # pylint: disable=no-member
+            log.info('message=login_filed, status="%d", user="%d" ,agent="%s"',
+                     error_response.status_code,
+                     request.user,
+                     request.META.get('HTTP_USER_AGENT', ''),
+                     )
+            return error_response
 
         user = form.cleaned_data["user"]
         scope = form.cleaned_data["scope"]
         client = form.cleaned_data["client"]
-
-        return self.exchange_access_token(request, user, scope, client)
+        response = self.exchange_access_token(request, user, scope, client)
+        if response.status_code == 403:
+            log.info('message=login_filed, status=%d, user="%d" ,agent="%s"',
+                     response.status_code,
+                     request.user.username,
+                     request.META.get('HTTP_USER_AGENT', ''),
+                     )
+        return response
 
     def exchange_access_token(self, request, user, scope, client):
         """
