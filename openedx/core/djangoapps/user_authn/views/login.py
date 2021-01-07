@@ -467,6 +467,8 @@ def login_user(request):
             except AuthFailedError as e:
                 set_custom_attribute('login_user_tpa_success', False)
                 set_custom_attribute('login_user_tpa_failure_msg', e.value)
+                if e.error_code:
+                    set_custom_attribute('login_error_code', e.error_code)
 
                 # user successfully authenticated with a third party provider, but has no linked Open edX account
                 response_content = e.get_response()
@@ -512,7 +514,12 @@ def login_user(request):
     except AuthFailedError as error:
         response_content = error.get_response()
         log.exception(response_content)
-        if response_content.get('error_code') == 'inactive-user':
+
+        error_code = response_content.get('error_code')
+        if error_code:
+            set_custom_attribute('login_error_code', error_code)
+
+        if error_code == 'inactive-user':
             response_content['email'] = user.email
 
         response = JsonResponse(response_content, status=400)
