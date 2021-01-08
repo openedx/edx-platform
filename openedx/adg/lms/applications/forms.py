@@ -126,4 +126,4 @@ class UserApplicationAdminForm(forms.ModelForm):
     def clean(self):
         super(UserApplicationAdminForm, self).clean()
         if 'status' not in self.request.POST:
-            raise forms.ValidationError('Please make a decision before submitting.')
+            raise forms.ValidationError(_('Please make a decision before submitting.'))

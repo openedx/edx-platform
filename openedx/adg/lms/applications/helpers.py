@@ -16,7 +16,7 @@ from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.adg.lms.student.helpers import send_mandrill_email
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
-from .constants import LOGO_IMAGE_MAX_SIZE, MAXIMUM_YEAR_OPTION, MINIMUM_YEAR_OPTION
+from .constants import COVER_LETTER_ONLY, LOGO_IMAGE_MAX_SIZE, MAXIMUM_YEAR_OPTION, MINIMUM_YEAR_OPTION, SCORES
 from django.utils.html import format_html
 
 
@@ -151,16 +151,34 @@ def can_display_file(file):
     filename = str(file)
     if not filename.endswith('doc'):
         return True
-
-
-def display_file(file):
+def is_displayable_on_browser(file):
     """
-    Return html to display image or embedded view for pdf
+    Check if the input file can be displayed as an embedded view on a browser
+
+    Arguments:
+        file (FieldFile): file to be checked
+
+    Returns:
+        bool: False if file type is 'doc', True otherwise
+    """
+    filename = str(file).lower()
+    if filename.endswith('.doc'):
+        return False
+
+    return True
+
+
+def get_embedded_view_html(file):
+    """
+    Return html to display file in browser
 
     Arguments:
         file (File): file that needs to be rendered
+
+    Returns:
+        SafeText: HTML to display image or embedded view for pdf
     """
-    _name, ext = os.path.splitext(str(file))
+    _, ext = os.path.splitext(str(file))
     if ext in ['.jpg', '.png']:
         html = '<img src="{path_to_image}"/>'.format(path_to_image=file.url)
     else:  # for pdf
@@ -169,7 +187,7 @@ def display_file(file):
     return format_html(html)
 
 
-def display_start_and_end_date(entry, is_current):
+def get_duration(entry, is_current):
     """
     Extract, format and return start and end date of Education/WorkExperience
 
@@ -181,7 +199,54 @@ def display_start_and_end_date(entry, is_current):
         str: start and end date
     """
     start_date = '{month} {year}'.format(month=entry.get_date_started_month_display(), year=entry.date_started_year)
-    completed_date = 'Present' if is_current else '{month} {year}'.format(
+    completed_date = _('Present') if is_current else '{month} {year}'.format(
         month=entry.get_date_completed_month_display(), year=entry.date_completed_year
     )
-    return '{started} to {completed}'.format(started=start_date, completed=completed_date)
+    return '{started} {to} {completed}'.format(started=start_date, to=_('to'), completed=completed_date)
+
+
+def _get_application_review_info(application):
+    """
+    Get application review information if the application has been reviewed, i.e. application status is not 'open'
+
+    Arguments:
+        application (UserApplication): User application
+
+    Returns:
+        reviewed_by (str): Name of reviewer
+        review_date (str): Date of review submission
+    """
+    reviewed_by = None
+    review_date = None
+    if application.status != application.OPEN:
+        reviewed_by = application.reviewed_by.get_full_name()
+        review_date = application.modified.strftime('%B %d, %Y')
+
+    return reviewed_by, review_date
+
+
+def get_extra_context_for_application_review_page(application):
+    """
+    Prepare and return extra context for application review page
+
+    Arguments:
+        application (UserApplication): Application under review
+
+    Returns:
+        dict: extra context
+    """
+    name_of_applicant = application.user.get_full_name()
+
+    reviewed_by, review_date = _get_application_review_info(application)
+
+    extra_context = {
+        'title': name_of_applicant,
+        'adg_view': True,
+        'application': application,
+        'reviewer': reviewed_by,
+        'review_date': review_date,
+        'COVER_LETTER_ONLY': COVER_LETTER_ONLY,
+        'SCORES': SCORES,
+    }
+
+    return extra_context

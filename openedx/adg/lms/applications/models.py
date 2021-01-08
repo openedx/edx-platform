@@ -123,7 +123,7 @@ class UserApplication(TimeStampedModel):
         validators=[FileExtensionValidator(['pdf', 'doc', 'jpg', 'png'])],
         help_text=_('Accepted extensions: .pdf, .doc, .jpg, .png'),
     )
-    cover_letter_text = models.TextField(blank=True, verbose_name=_('Cover Letter'), )
+    cover_letter = models.TextField(blank=True, verbose_name=_('Cover Letter'), )
 
     OPEN = 'open'
     ACCEPTED = 'accepted'
@@ -151,29 +151,38 @@ class UserApplication(TimeStampedModel):
         return '{}'.format(self.user.get_full_name())
 
     @property
-    def is_cover_letter_provided(self):
-        return self.cover_letter_text or self.cover_letter_file
+    def cover_letter_provided(self):
+        return self.cover_letter or self.cover_letter_file
+
+    @property
+    def cover_letter_and_resume(self):
+        return self.cover_letter_provided and self.resume
+
+    @property
+    def cover_letter_or_resume(self):
+        return self.cover_letter_provided or self.resume
+
+    @property
+    def file_attached(self):
+        return self.resume or self.cover_letter_file
 
     @property
     def prereq_course_scores(self):
         """
-        Fetch and return applicant scores in the pre-requisite courses of the franchise program
+        Fetch and return applicant scores in the pre-requisite courses of the franchise program.
 
         Returns:
-            list: List of prereq course name and score pairs
+            list: Prereq course name and score pairs
         """
-        prereq_course_overviews = list(
-            CourseOverview.objects.filter(
-                id__in=CourseMeta.objects.filter(is_prereq=True).values_list('course', flat=True)
-            )
-        )
+        prereq_course_overviews = CourseOverview.objects.filter(id__in=CourseMeta.prereq_course_ids.all())
+
+        CourseScore = namedtuple('CourseScore', 'course_name course_percentage')
         scores_in_prereq_courses = []
+
         for course_overview in prereq_course_overviews:
             course_name = course_overview.display_name
             course_grade = CourseGradeFactory().read(self.user, course_key=course_overview.id)
             course_percentage = course_grade.percent*100
-
-            CourseScore = namedtuple('CourseScore', 'course_name course_percentage')
 
             course_score = CourseScore(course_name, course_percentage)
             scores_in_prereq_courses.append(course_score)

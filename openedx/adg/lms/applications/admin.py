@@ -3,15 +3,39 @@ Registering models for applications app.
 """
 from django.contrib import admin
 from django.contrib.admin import AdminSite
-from django.contrib.auth.models import User
 from django.utils.html import format_html
+from django.utils.translation import ugettext_lazy as _
 
-from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
-from student.models import UserProfile
+from openedx.adg.lms.constants import SAUDI_NATIONAL_PROMPT
 
-from .constants import COVER_LETTER_ONLY, RESUME_AND_COVER_LETTER, RESUME_ONLY
+from .constants import (
+    APPLYING_TO,
+    COVER_LETTER_FILE,
+    COVER_LETTER_FILE_DISPLAY,
+    COVER_LETTER_ONLY,
+    COVER_LETTER_TEXT,
+    DATE_OF_BIRTH,
+    EMAIL,
+    GENDER,
+    IS_SAUDI_NATIONAL,
+    LINKED_IN_PROFILE,
+    LOCATION,
+    ORGANIZATION,
+    PHONE_NUMBER,
+    PREREQUISITES,
+    RESUME,
+    RESUME_AND_COVER_LETTER,
+    RESUME_DISPLAY,
+    RESUME_ONLY,
+    SCORES
+)
 from .forms import UserApplicationAdminForm
-from .helpers import can_display_file, display_file, display_start_and_end_date
+from .helpers import (
+    get_duration,
+    get_embedded_view_html,
+    get_extra_context_for_application_review_page,
+    is_displayable_on_browser
+)
 from .models import ApplicationHub, BusinessLine, Education, UserApplication, WorkExperience
 
 
@@ -84,7 +108,7 @@ class BusinessLineAdmin(admin.ModelAdmin):
 
 
 class ADGAdmin(AdminSite):
-    site_header = 'Al-Dabbagh'
+    site_header = _('Al-Dabbagh')
     site_title = site_header
     site_url = None
 
@@ -102,15 +126,12 @@ class EducationInline(admin.StackedInline):
     readonly_fields = ('name_of_school', 'degree', 'area_of_study', 'dates')
 
     def dates(self, obj):
-        return display_start_and_end_date(obj, obj.is_in_progress)
+        return get_duration(obj, obj.is_in_progress)
 
     def has_delete_permission(self, request, obj=None):
         return False
 
     def has_add_permission(self, request, obj=None):
-        return False
-
-    def has_change_permission(self, request, obj=None):
         return False
 
 
@@ -127,7 +148,7 @@ class WorkExperienceInline(admin.StackedInline):
         return obj.job_responsibilities
 
     def dates(self, obj):
-        return display_start_and_end_date(obj, obj.is_current_position)
+        return get_duration(obj, obj.is_current_position)
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -135,14 +156,17 @@ class WorkExperienceInline(admin.StackedInline):
     def has_add_permission(self, request, obj=None):
         return False
 
-    def has_change_permission(self, request, obj=None):
-        return False
-
 
 class UserApplicationADGAdmin(admin.ModelAdmin):
     """
     Django admin class for UserApplication
     """
+    form = UserApplicationAdminForm
+
+    inlines = [
+        EducationInline, WorkExperienceInline
+    ]
+
     list_display = ('applicant_name', 'date_received', 'status')
     list_filter = ('status', )
     list_per_page = 10
@@ -151,103 +175,128 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         return obj.user.get_full_name()
 
     def date_received(self, obj):
-        return obj.created.strftime('%m/%d/%Y')
-    date_received.short_description = 'Date Received (MM/DD/YYYY)'
+        return obj.user.application_hub.submission_date.strftime('%m/%d/%Y')
+    date_received.short_description = _('Date Received (MM/DD/YYYY)')
 
     def changelist_view(self, request, extra_context=None):
+        """
+        Override change list view of application listing page for ADG admin
+        """
         if 'status__exact' not in request.GET:
-            extra_context = {'title': 'APPLICATIONS'}
-        elif request.GET['status__exact'] == 'open':
-            extra_context = {'title': 'OPEN APPLICATIONS'}
-        elif request.GET['status__exact'] == 'accepted':
-            extra_context = {'title': 'ACCEPTED APPLICATIONS'}
-        elif request.GET['status__exact'] == 'waitlist':
-            extra_context = {'title': 'WAITLISTED APPLICATIONS'}
+            extra_context = {'title': _('APPLICATIONS')}
+        elif request.GET['status__exact'] == UserApplication.OPEN:
+            extra_context = {'title': _('OPEN APPLICATIONS')}
+        elif request.GET['status__exact'] == UserApplication.ACCEPTED:
+            extra_context = {'title': _('ACCEPTED APPLICATIONS')}
+        elif request.GET['status__exact'] == UserApplication.WAITLIST:
+            extra_context = {'title': _('WAITLISTED APPLICATIONS')}
 
         return super(UserApplicationADGAdmin, self).changelist_view(request, extra_context=extra_context)
 
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
-        application = UserApplication.objects.get(id=object_id)
-        if request.method == 'POST':
-            if 'status' in request.POST:
-                new_status = request.POST.get('status')
-                application.status = new_status
-                if 'internal_note' in request.POST:
-                    note = request.POST.get('internal_note')
-                    application.internal_admin_note = note
-                application.reviewed_by = request.user
-                application.save()
+        """
+        Override change form view of application review page for ADG admin
 
-        user_id = UserApplication.objects.get(id=object_id).user.id
-        name_of_applicant = User.objects.get(id=user_id).get_full_name()
+        Arguments:
+            request(WSGIRequest): Http Request
+            object_id (str): ID of application under review
+            form_url (str): URL of the application review form
+            extra_context (NoneType): Extra context to be passed to the application review form template
 
-        reviewed_by = None
-        review_date = None
-        if application.status != 'open':
-            reviewed_by = application.reviewed_by.get_full_name()
-            review_date = application.modified.strftime('%B %d, %Y')
+        Returns:
+            TemplateResponse: Template response to render application review form
+        """
+        if request.method == 'POST' and 'status' in request.POST:
+            self._save_application_review_info(object_id, request)
 
-        extra_context = {
-            'title': name_of_applicant,
-            'adg_view': True,
-            'status': application.status,
-            'reviewer': reviewed_by,
-            'review_date': review_date,
-            'note_for_applicant': application.internal_admin_note
-        }
+        application = self._get_user_application(object_id)
+        extra_context = get_extra_context_for_application_review_page(application)
+
         return super(UserApplicationADGAdmin, self).changeform_view(
             request, object_id, form_url, extra_context=extra_context
         )
+
+    def _save_application_review_info(self, application_id, request):
+        """
+        Save application review information, i.e. new status of application (waitlist/accepted) and optional internal
+        note
+
+        Arguments:
+            application_id (str): ID of application under review
+            request (WSGIRequest): Post request containing application review information
+        """
+        application = self._get_user_application(application_id)
+
+        new_status = request.POST.get('status')
+        application.status = new_status
+
+        if 'internal_note' in request.POST:
+            note = request.POST.get('internal_note')
+            application.internal_admin_note = note
+
+        application.reviewed_by = request.user
+
+        application.save()
+
+    def _get_user_application(self, application_id):
+        return UserApplication.objects.get(id=application_id)
 
     def email(self, obj):
         return format_html('<a href="mailto:{email_address}">{email_address}</a>', email_address=obj.user.email)
 
     def location(self, obj):
-        user_profile = UserProfile.objects.get(user=obj.user)
+        user_profile = obj.user.profile
         return '{city}, {country}'.format(city=user_profile.city, country=user_profile.country)
 
-    def linkedIn_profile(self, obj):
+    def linked_in_profile(self, obj):
         return format_html('<a href={url}>{url}</a>', url=obj.linkedin_url)
+    linked_in_profile.short_description = _('LinkedIn Profile')
 
     def is_saudi_national(self, obj):
-        extended_user_profile = ExtendedUserProfile.objects.get(user=obj.user)
-        if extended_user_profile.is_saudi_national:
-            return 'Yes'
-        return 'No'
-    is_saudi_national.short_description = 'Are you a Saudi National?'
+        extended_user_profile = obj.user.extended_profile
+        return extended_user_profile.is_saudi_national
+    is_saudi_national.short_description = SAUDI_NATIONAL_PROMPT
 
     def gender(self, obj):
         """
         Return gender of applicant
         """
-        user_profile = UserProfile.objects.get(user=obj.user)
+        user_profile = obj.user.profile
         if user_profile.gender == 'm':
-            return 'Man'
+            return _('Man')
         elif user_profile.gender == 'f':
-            return 'Woman'
+            return _('Woman')
         else:
-            return 'Prefer not to answer'
+            return _('Prefer not to answer')
 
     def phone_number(self, obj):
-        return UserProfile.objects.get(user=obj.user).phone_number
+        return obj.user.profile.phone_number
 
     def date_of_birth(self, obj):
-        return ExtendedUserProfile.objects.get(user=obj.user).birth_date.strftime('%d %B %Y')
+        extended_user_profile = obj.user.extended_profile
+        return extended_user_profile.birth_date.strftime('%d %B %Y')
 
     def applying_to(self, obj):
         return obj.business_line
 
     def resume_display(self, obj):
-        return display_file(obj.resume)
-    resume_display.short_description = 'Resume'
+        return get_embedded_view_html(obj.resume)
+    resume_display.short_description = _('Resume')
 
-    def cover_letter_display(self, obj):
-        return display_file(obj.cover_letter_file)
-    cover_letter_display.short_description = 'Cover Letter'
+    def cover_letter_file_display(self, obj):
+        return get_embedded_view_html(obj.cover_letter_file)
+    cover_letter_file_display.short_description = _('Cover Letter')
 
     def prerequisites(self, obj):
         """
-        Return the html for course names of all prereq courses and applicant's respective scores in those courses
+        Get scores of the applicant in prerequisite courses of the franchise program.
+
+        Arguments:
+            obj (UserApplication): Application under review
+
+        Returns:
+            SafeText: HTML containing course name of all prereq courses and applicant's respective scores in those
+            courses
         """
         html_for_score = '<p>{course_name}: <b>{course_percentage}%</b></p>'
         final_html = ''
@@ -261,81 +310,138 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         return format_html(final_html)
 
     def get_fieldsets(self, request, obj=None):
-        basic_info_fields = ['email', 'location']
+        """
+        Override `get_fieldsets` method of BaseModelAdmin to group application under different sections and dynamically
+        set fields to be rendered.
+
+        Arguments:
+            request (WSGIRequest): HTTP request accessing application review page
+            obj (UserApplication): Application under review
+
+        Returns:
+            tuple: Tuple of fieldsets
+        """
+        basic_info_fields = [EMAIL, LOCATION]
         if obj.linkedin_url:
-            basic_info_fields.append('linkedIn_profile')
+            basic_info_fields.append(LINKED_IN_PROFILE)
 
         fieldsets = [
             (None, {
                 'fields': tuple(basic_info_fields)
             }),
-            ('APPLICANT INFORMATION', {
+            (_('APPLICANT INFORMATION'), {
                 'fields': (
-                        'is_saudi_national', 'gender', 'phone_number', 'date_of_birth', 'organization', 'applying_to'
+                        IS_SAUDI_NATIONAL, GENDER, PHONE_NUMBER, DATE_OF_BIRTH, ORGANIZATION, APPLYING_TO
                 ),
             }),
         ]
 
-        file_fields = []
-        fieldset_for_files = None
+        if obj.cover_letter_or_resume:
+            fieldset_for_resume_cover_letter = self._get_fieldset_for_resume_cover_letter(obj)
+            fieldsets.append(fieldset_for_resume_cover_letter)
 
-        if obj.is_cover_letter_provided and obj.resume:
-            fieldset_for_files = RESUME_AND_COVER_LETTER
-            file_fields.append('resume')
-            if obj.cover_letter_file:
-                file_fields.append('cover_letter_file')
-        elif obj.resume:
-            fieldset_for_files = RESUME_ONLY
-            file_fields.append('resume')
-        elif obj.is_cover_letter_provided:
-            fieldset_for_files = COVER_LETTER_ONLY
-            if obj.cover_letter_file:
-                file_fields.append('cover_letter_file')
-
-        if fieldset_for_files:
-            if obj.resume:
-                if can_display_file(obj.resume):
-                    file_fields.append('resume_display')
-
-            if obj.cover_letter_file:
-                if can_display_file(obj.cover_letter_file):
-                    file_fields.append('cover_letter_display')
-            elif obj.cover_letter_text:
-                file_fields.append('cover_letter_text')
-
-            fieldsets.append((fieldset_for_files, {'fields': tuple(file_fields)}))
-
-        fieldset_for_scores = ('SCORES', {'fields': ('prerequisites', )})
-
+        fieldset_for_scores = (SCORES, {'fields': (PREREQUISITES, )})
         fieldsets.append(fieldset_for_scores)
 
         return tuple(fieldsets)
 
-    form = UserApplicationAdminForm
+    def _get_fieldset_for_resume_cover_letter(self, application):
+        """
+        Prepare and return fieldset for resume and cover letter provided with application.
+
+        Arguments:
+            application (UserApplication): Application under review
+
+        Returns:
+            tuple: Fieldset containing both fieldset title and a child tuple for fields.
+
+                Title for fieldset varies based on the provided data. If the applicant has provided:
+
+                    both cover letter and resume, title returned is 'RESUME & COVER LETTER',
+                    resume only, title returned is 'RESUME'
+                    cover letter only, either as an attachment or in text, title returned is 'COVER LETTER'
+
+                Fields returned as part of the fieldset also vary depending on the data that the applicant has provided
+        """
+        resume_cover_letter_file_fields = []
+
+        if application.cover_letter_and_resume:
+            fieldset_title = RESUME_AND_COVER_LETTER
+            resume_cover_letter_file_fields.append(RESUME)
+            if application.cover_letter_file:
+                resume_cover_letter_file_fields.append(COVER_LETTER_FILE)
+        elif application.resume:
+            fieldset_title = RESUME_ONLY
+            resume_cover_letter_file_fields.append(RESUME)
+        else:
+            fieldset_title = COVER_LETTER_ONLY
+            if application.cover_letter_file:
+                resume_cover_letter_file_fields.append(COVER_LETTER_FILE)
+
+        resume_cover_letter_display_fields = self._get_resume_cover_letter_display_fields(application)
+
+        resume_cover_letter_fields = resume_cover_letter_file_fields + resume_cover_letter_display_fields
+        fieldset = fieldset_title, {'fields': tuple(resume_cover_letter_fields)}
+
+        return fieldset
+
+    def _get_resume_cover_letter_display_fields(self, application):
+        """
+        Get display fields, if applicable, for resume and/or cover letter
+
+        Arguments:
+            application (UserApplication): Application under review
+
+        Returns:
+            list: Display fields
+        """
+        resume_cover_letter_display_fields = []
+
+        if application.resume:
+            if is_displayable_on_browser(application.resume):
+                resume_cover_letter_display_fields.append(RESUME_DISPLAY)
+
+        if application.cover_letter_file:
+            if is_displayable_on_browser(application.cover_letter_file):
+                resume_cover_letter_display_fields.append(COVER_LETTER_FILE_DISPLAY)
+        elif application.cover_letter:
+            resume_cover_letter_display_fields.append(COVER_LETTER_TEXT)
+
+        return resume_cover_letter_display_fields
 
     readonly_fields = (
-        'email',
-        'location',
-        'linkedIn_profile',
-        'is_saudi_national',
-        'gender',
-        'phone_number',
-        'date_of_birth',
-        'organization',
-        'applying_to',
-        'resume',
-        'cover_letter_file',
-        'cover_letter_display',
-        'resume_display',
-        'cover_letter_text',
-        'prerequisites'
+        EMAIL,
+        LOCATION,
+        LINKED_IN_PROFILE,
+        IS_SAUDI_NATIONAL,
+        GENDER,
+        PHONE_NUMBER,
+        DATE_OF_BIRTH,
+        ORGANIZATION,
+        APPLYING_TO,
+        RESUME,
+        COVER_LETTER_FILE,
+        COVER_LETTER_FILE_DISPLAY,
+        RESUME_DISPLAY,
+        COVER_LETTER_TEXT,
+        PREREQUISITES
     )
 
-    inlines = [
-        EducationInline, WorkExperienceInline
-    ]
-
     def get_formsets_with_inlines(self, request, obj=None):
+        """
+        Override method `get_formsets_with_inlines` of ModelAdmin.
+
+        Override is needed to ensure that if the applicant has attached a resume, the education and work experience
+        inlines should not be rendered. If resume is not attached with application, EducationInline should be rendered
+        while WorkExperienceInline should be optionally rendered depending on whether the user has entered any.
+
+        Arguments:
+            request (WSGIRequest): HTTP request accessing application review page
+            obj (UserApplication): Application under review
+
+        Returns:
+            Formsets with inlines
+        """
         if obj.resume:
             return
         for inline in self.get_inline_instances(request, obj):
@@ -345,6 +451,20 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
             yield inline.get_formset(request, obj), inline
 
     def get_form(self, request, obj=None, change=False, **kwargs):
+        """
+        Override method `get_form` of ModelAdmin.
+
+        Override is needed to attach request object with the admin form. The request object is needed in the `clean`
+        method that is overriden in `UserApplicationAdminForm`
+
+        Arguments:
+            request (WSGIRequest): HTTP request accessing application review page
+            obj (UserApplication): Application under review
+            change (bool): Type of form
+
+        Returns:
+            AdminFormWithRequest: Application review form for admin with request object added as a keyword argument
+        """
         admin_form = super(UserApplicationADGAdmin, self).get_form(request, obj, **kwargs)
 
         class AdminFormWithRequest(admin_form):
