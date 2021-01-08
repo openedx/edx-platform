@@ -500,9 +500,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         self.assertEqual(len(submitted), len(self.course_strings))
 
         # simulate one of the courses being published
-        with override_waffle_switch(
-            block_structure_config.waffle_switch(block_structure_config.STORAGE_BACKING_FOR_CACHE), True
-        ):
+        with override_waffle_switch(block_structure_config.STORAGE_BACKING_FOR_CACHE, True):
             update_block_structure_on_course_publish(None, self.course.id)
 
         # make sure only the published course was dumped
