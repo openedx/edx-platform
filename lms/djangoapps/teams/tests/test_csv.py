@@ -453,7 +453,7 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         CourseEnrollmentFactory.create(user=user, course_id=self.course.id, mode=mode)
 
         # When I add them to a team that does not exist
-        self.assertEquals(CourseTeam.objects.all().count(), 0)
+        self.assertEqual(CourseTeam.objects.all().count(), 0)
         csv_data = self._csv_reader_from_array([
             ['user', 'mode', 'teamset_1'],
             [user.username, mode, 'new_exciting_team'],
@@ -475,7 +475,7 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         masters_learner = self._create_and_enroll_test_user('masters_learner', mode='masters')
 
         # When I attempt to add them to the same team
-        self.assertEquals(CourseTeam.objects.all().count(), 0)
+        self.assertEqual(CourseTeam.objects.all().count(), 0)
         csv_data = self._csv_reader_from_array([
             ['user', 'mode', 'teamset_1'],
             [verified_learner.username, 'verified', 'new_exciting_team'],
