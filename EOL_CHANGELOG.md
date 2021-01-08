@@ -12,3 +12,6 @@
 - Create *CourseEmail* with *reply_to* attribute from POST data (lms/djangoapps/instructor/views/api.py)
 - Get *reply_to* value from the instructor view and send it by POST method (lms/static/js/instructor_dashboard/send_email.js)
 - New tests (lms/djangoapps/bulk_email/tests/test_models_eol.py & lms/djangoapps/instructor/tests/test_api_eol.py)
+
+### 08/01/2021 Add lis_person_name_full to LTI parameters
+- Add lis_person_name_full to the LTI body conditional with ask_to_send_username (common/lib/xmodule/xmodule/lti_module.py)
