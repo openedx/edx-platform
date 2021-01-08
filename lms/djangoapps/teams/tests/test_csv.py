@@ -468,6 +468,93 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         self.assertTrue(CourseTeamMembership.is_user_on_team(user, new_team))
         self.assert_learner_added_emitted(new_team.team_id, user.id)
 
+    # Team protection status tests
+    def test_create_new_mixed_enrollment_team_fails(self):
+        # Given users of different tracks
+        verified_learner = self._create_and_enroll_test_user('verified_learner', mode='verified')
+        masters_learner = self._create_and_enroll_test_user('masters_learner', mode='masters')
+
+        # When I attempt to add them to the same team
+        self.assertEquals(CourseTeam.objects.all().count(), 0)
+        csv_data = self._csv_reader_from_array([
+            ['user', 'mode', 'teamset_1'],
+            [verified_learner.username, 'verified', 'new_exciting_team'],
+            [masters_learner.username, 'masters', 'new_exciting_team']
+        ])
+        result = self.import_manager.set_team_memberships(csv_data)
+
+        # The import fails with "mixed users" error and no team was created
+        self.assertFalse(result)
+        self.assert_no_events_were_emitted()
+        self.assertEqual(
+            self.import_manager.validation_errors[0],
+            'Team new_exciting_team cannot have Master’s track users mixed with users in other tracks.'
+        )
+        self.assertEqual(CourseTeam.objects.all().count(), 0)
+
+    def test_add_incompatible_mode_to_existing_unprotected_team_fails(self):
+        # Given an existing unprotected team
+        unprotected_team = CourseTeamFactory(course_id=self.course.id, name='unprotected_team', topic_id='teamset_1')
+        verified_learner = self._create_and_enroll_test_user('verified_learner', mode='verified')
+        unprotected_team.add_user(verified_learner)
+
+        # When I attempt to add a student of an incompatible enrollment mode
+        masters_learner = self._create_and_enroll_test_user('masters_learner', mode='masters')
+        csv_data = self._csv_reader_from_array([
+            ['user', 'mode', 'teamset_1'],
+            [masters_learner.username, 'masters', 'unprotected_team']
+        ])
+        result = self.import_manager.set_team_memberships(csv_data)
+
+        # The import fails with "mixed users" error and learner not added to team
+        self.assertFalse(result)
+        self.assert_no_events_were_emitted()
+        self.assertEqual(
+            self.import_manager.validation_errors[0],
+            'Team unprotected_team cannot have Master’s track users mixed with users in other tracks.'
+        )
+        self.assertFalse(CourseTeamMembership.is_user_on_team(masters_learner, unprotected_team))
+
+    def test_add_incompatible_mode_to_existing_protected_team_fails(self):
+        # Given an existing protected team
+        protected_team = CourseTeamFactory(
+            course_id=self.course.id,
+            name='protected_team',
+            topic_id='teamset_1',
+            organization_protected=True,
+        )
+        masters_learner = self._create_and_enroll_test_user('masters_learner', mode='masters')
+        protected_team.add_user(masters_learner)
+
+        # When I attempt to add a student of an incompatible enrollment mode
+        verified_learner = self._create_and_enroll_test_user('verified_learner', mode='verified')
+        csv_data = self._csv_reader_from_array([
+            ['user', 'mode', 'teamset_1'],
+            [verified_learner.username, 'verified', 'protected_team']
+        ])
+        result = self.import_manager.set_team_memberships(csv_data)
+
+        # The import fails with "mixed users" error and learner not added to team
+        self.assertFalse(result)
+        self.assert_no_events_were_emitted()
+        self.assertEqual(
+            self.import_manager.validation_errors[0],
+            'Team protected_team cannot have Master’s track users mixed with users in other tracks.'
+        )
+        self.assertFalse(CourseTeamMembership.is_user_on_team(verified_learner, protected_team))
+
+    def _create_and_enroll_test_user(self, username, course_id=None, mode="audit"):
+        """
+        Create user and add to test course with mode, default is test course in audit mode.
+        Returns user.
+        """
+        user = UserFactory.create(username=username)
+        if not course_id:
+            course_id = self.course.id
+        CourseEnrollmentFactory.create(user=user, course_id=course_id, mode=mode)
+
+        return user
+
     def _csv_reader_from_array(self, rows):
         """
         Given a 2D array, treat each element as a cell of a CSV file and construct a reader
