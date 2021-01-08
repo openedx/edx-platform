@@ -20,7 +20,10 @@
             };
             var overlay = '<div id="lean_overlay"></div>';
             if ($('#lean_overlay').length === 0) {
-                $('body').append($(overlay));
+                edx.HtmlUtils.append(
+                    $('body'),
+                    $(overlay)
+                );
             }
 
             options = $.extend(defaults, options);  // eslint-disable-line no-param-reassign
