@@ -1,6 +1,8 @@
 """Unit tests for the Paver server tasks."""
 
 
+import json
+
 import ddt
 from paver.easy import call_task
 
@@ -45,10 +47,12 @@ EXPECTED_INDEX_COURSE_COMMAND = (
 )
 EXPECTED_PRINT_SETTINGS_COMMAND = [
     "python manage.py lms --settings={settings} print_setting STATIC_ROOT WEBPACK_CONFIG_PATH 2>{log_file}",
-    "python manage.py cms --settings={settings} print_setting STATIC_ROOT 2>{log_file}"
+    "python manage.py cms --settings={settings} print_setting STATIC_ROOT 2>{log_file}",
+    "python manage.py cms --settings={settings} print_setting JS_ENV_EXTRA_CONFIG 2>{log_file} --json",
 ]
 EXPECTED_WEBPACK_COMMAND = (
     "NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} "
+    "JS_ENV_EXTRA_CONFIG={js_env_extra_config} "
     "$(npm bin)/webpack --config={webpack_config_path}"
 )
 
@@ -251,6 +255,7 @@ class TestPaverServerTasks(PaverTestCase):
                 node_env="production",
                 static_root_lms=None,
                 static_root_cms=None,
+                js_env_extra_config=json.dumps("{}"),
                 webpack_config_path=None
             ))
             expected_messages.extend(self.expected_sass_commands(system=system, asset_settings=expected_asset_settings))
@@ -297,6 +302,7 @@ class TestPaverServerTasks(PaverTestCase):
                 node_env="production",
                 static_root_lms=None,
                 static_root_cms=None,
+                js_env_extra_config=json.dumps("{}"),
                 webpack_config_path=None
             ))
             expected_messages.extend(self.expected_sass_commands(asset_settings=expected_asset_settings))

@@ -1018,6 +1018,11 @@ COURSE_IMPORT_EXPORT_STORAGE = 'django.core.files.storage.FileSystemStorage'
 ##### EMBARGO #####
 EMBARGO_SITE_REDIRECT_URL = None
 
+##### custom vendor plugin variables #####
+# JavaScript code can access this data using `process.env.JS_ENV_EXTRA_CONFIG`
+# One of the current use cases for this is enabling custom TinyMCE plugins
+JS_ENV_EXTRA_CONFIG = {}
+
 ############################### PIPELINE #######################################
 
 PIPELINE = {
