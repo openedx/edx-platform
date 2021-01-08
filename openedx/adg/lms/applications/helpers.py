@@ -123,3 +123,20 @@ def max_year_value_validator(value):
         value (Int): Value to save as year
     """
     return MaxValueValidator(MAXIMUM_YEAR_OPTION)(value)
+
+
+def validate_file_size(data_file, max_size):
+    """
+    Validate maximum allowed file upload size, return error if file size exceeds, else return None.
+
+    Arguments:
+         data_file(object): file that needs to be validated for size
+         max_size(int): Maximum size allowed for file
+
+    Returns:
+        str: Error message if validation fails
+    """
+    size = getattr(data_file, 'size', None)
+    if size and max_size < size:
+        return _('File size must not exceed {size} MB').format(size=max_size / 1024 / 1024)
+    return None
