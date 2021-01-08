@@ -620,6 +620,9 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
 
         if self.ask_to_send_username and self.user_username:
             body["lis_person_sourcedid"] = self.user_username
+            # EOL: Also set lis_person_name_full as the username, as perusall requires it
+            body["lis_person_name_full"] = self.user_username
+            # /EOL
         if self.ask_to_send_email and self.user_email:
             body["lis_person_contact_email_primary"] = self.user_email
 
