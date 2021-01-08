@@ -140,3 +140,6 @@ Sphinx==3.3.0
 
 # incremental upgrade approach
 djangorestframework==3.10.3
+
+# latest edx-bulk-grades==0.8.5 is giving migration error.
+edx-bulk-grades<0.8.5
