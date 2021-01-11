@@ -39,7 +39,7 @@ class TestAccess(CacheIsolationTestCase):
 
     def assertDateInMessage(self, date, message):
         # First, check that the formatted version is in there
-        self.assertIn(strftime_localized(date, '%b %-d, %Y'), message)
+        self.assertIn(strftime_localized(date, 'SHORT_DATE'), message)
 
         # But also that the machine-readable version is in there
         self.assertIn('data-datetime="%s"' % date.isoformat(), message)

@@ -6,8 +6,12 @@ Convenience methods for working with datetime objects
 import re
 from datetime import datetime, timedelta
 
-from django.utils.translation import pgettext, ugettext
+import crum
+from django.utils.translation import get_language, pgettext, ugettext
 from pytz import UnknownTimeZoneError, timezone, utc
+
+from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
+from openedx.core.djangolib.markup import HTML
 
 
 def get_default_time_display(dtime):
@@ -210,6 +214,40 @@ def strftime_localized(dtime, format):      # pylint: disable=redefined-builtin
 
     formatted_date = re.sub(r"%-.|%.|%", process_percent_code, format)
     return formatted_date
+
+
+def strftime_localized_html(dtime, fmt):
+    """
+    Returns an html string that can be further localized in browser by JS code
+
+    For example, a user's default timezone preference is "whatever the browser default is" which must be queried via
+    Javascript. So we write out a UTC formatted date here, but tag it with enough information that dateutil_factory.js
+    can then later update the DOM to use the proper formatting.
+
+    Arguments:
+        dtime (datetime): Datetime to format
+        fmt (str): One of the special enum values that strftime_localized accepts. Only SHORT_DATE supported now.
+    """
+    locale_prefs = user_timezone_locale_prefs(crum.get_current_request())
+    user_timezone = locale_prefs['user_timezone']
+    language = get_language()
+
+    # Here we map the enums for strftime_localized into the enums used by date-utils.js when localizing on JS side.
+    format_mapping = {
+        'SHORT_DATE': 'shortDate',
+    }
+    assert fmt in format_mapping.keys(), 'format "%s" not yet supported in strftime_localized_html' % fmt
+
+    date_html = '<span class="localized-datetime" data-format="{format}" data-timezone="{user_timezone}" \
+                       data-datetime="{formatted_date}" data-language="{language}">{formatted_date_localized}</span>'
+
+    return HTML(date_html).format(
+        language=language,
+        user_timezone=user_timezone,
+        format=format_mapping[fmt],
+        formatted_date=dtime.isoformat(),
+        formatted_date_localized=strftime_localized(dtime, fmt),
+    )
 
 
 # In order to extract the strings below, we have to mark them with pgettext.

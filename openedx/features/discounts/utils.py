@@ -12,6 +12,7 @@ from edx_django_utils.cache import RequestCache
 from web_fragments.fragment import Fragment
 
 from common.djangoapps.course_modes.models import format_course_price, get_course_prices
+from common.djangoapps.util.date_utils import strftime_localized_html
 from lms.djangoapps.experiments.models import ExperimentData
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -184,7 +185,7 @@ def generate_offer_html(user, course):
             '<div class="first-purchase-offer-banner" role="note">'
             '<span class="first-purchase-offer-banner-bold"><b>'
         ),
-        discount_expiration_date=data['expiration_date'].strftime('%B %d'),
+        discount_expiration_date=strftime_localized_html(data['expiration_date'], 'SHORT_DATE'),
         percentage=data['percentage'],
         span_close=HTML('</b></span>'),
         div_close=HTML('</div>'),
