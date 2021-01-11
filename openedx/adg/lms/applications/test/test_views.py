@@ -5,16 +5,22 @@ from datetime import date
 
 import mock
 import pytest
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, RequestFactory
 from django.urls import reverse
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.adg.lms.applications.views import ApplicationHubView, ApplicationSuccessView, ContactInformationView
+from openedx.adg.lms.applications.views import (
+    ApplicationHubView,
+    ApplicationSuccessView,
+    ContactInformationView,
+    CoverLetterView
+)
 from openedx.adg.lms.registration_extension.tests.factories import ExtendedUserProfileFactory
 
-from .constants import PASSWORD, USERNAME
-from .factories import ApplicationHubFactory
+from .constants import COVER_LETTER_REDIRECT_URL, PASSWORD, USERNAME
+from .factories import ApplicationHubFactory, BusinessLineFactory, UserApplicationFactory
 
 
 @pytest.mark.django_db
@@ -114,7 +120,8 @@ def test_get_initial_application_state_for_application_hub_view(mock_render, app
 @pytest.mark.django_db
 @mock.patch('openedx.adg.lms.applications.views.render')
 def test_get_written_application_completed_state_for_application_hub_view(
-        mock_render, application_hub_view_get_request):
+    mock_render, application_hub_view_get_request
+):
     """
     Test the case where the user has completed the written application but not the pre_req courses.
     """
@@ -192,7 +199,8 @@ def test_post_logged_in_user_without_required_objectives_completed_for_applicati
 @pytest.mark.django_db
 @mock.patch('openedx.adg.lms.applications.views.send_application_submission_confirmation_email')
 def test_post_logged_in_user_with_required_objectives_completed_to_application_hub_view(
-        mock_send_mail, user, logged_in_client):
+    mock_send_mail, user, logged_in_client
+):
     """
     Test the case where an authenticated user, with all the required objectives completed, hits the url.
     """
@@ -348,3 +356,180 @@ def test_post_already_submitted_application_to_contact_information_view(post_req
     request.user.application_hub.set_is_written_application_completed()
     response = ContactInformationView.as_view()(request)
     assert response.status_code == HTTP_400_BAD_REQUEST
+
+
+# ------- Application Cover Letter View tests below -------
+
+
+@pytest.fixture(name='cover_letter_view_get_request')
+def cover_letter_view_get_request_fixture(request_factory, user):
+    """
+    Return a HttpRequest object for cover letter get request
+    Args:
+        request_factory (RequestFactory): factory to make requests
+        user (User): The user that is logged in
+    Returns:
+        HttpRequest object
+    """
+    request = request_factory.get(reverse('application_cover_letter'))
+    request.user = user
+    return request
+
+
+@pytest.fixture(name='cover_letter_view_post_request')
+def cover_letter_view_post_request_fixture(request_factory, user):
+    """
+    Return a HttpRequest object for cover letter post request
+    Args:
+        request_factory (RequestFactory): factory to make requests
+        user (User): The user that is logged in
+    Returns:
+        HttpRequest object
+    """
+    request = request_factory.post(reverse('application_cover_letter'))
+    request.user = user
+    return request
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('is_get_request', [True, False], ids=['get_request', 'post_request'])
+def test_redirection_of_a_user_without_login_for_cover_letter_view(is_get_request):
+    """
+    Test if an unauthenticated user is redirected to login page on sending a get or post request.
+    """
+    if is_get_request:
+        response = Client().get(reverse('application_cover_letter'))
+    else:
+        response = Client().post(reverse('application_cover_letter'))
+
+    assert COVER_LETTER_REDIRECT_URL in response.url
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('is_get_request', [True, False], ids=['get_request', 'post_request'])
+def test_response_for_user_with_complete_written_application_cover_letter_view(
+    is_get_request, cover_letter_view_get_request, cover_letter_view_post_request
+):
+    """
+    Test that if a user who has already completed written application sends a get request, they are redirected to the
+    Application Hub page and if a user sends a post request, http 400 is returned.
+    """
+    request = cover_letter_view_get_request if is_get_request else cover_letter_view_post_request
+
+    request.user.application_hub.set_is_written_application_completed()
+
+    response = CoverLetterView.as_view()(request)
+
+    if is_get_request:
+        assert response.get('Location') == reverse('application_hub')
+        assert response.status_code == 302
+    else:
+        assert response.status_code == 400
+
+
+@pytest.mark.django_db
+@mock.patch('openedx.adg.lms.applications.views.render')
+@mock.patch('openedx.adg.lms.applications.views.get_token')
+@mock.patch('openedx.adg.lms.applications.views.BusinessLine.objects.all')
+@pytest.mark.parametrize('is_user_application_saved', [True, False], ids=['user_application', 'no_user_application'])
+def test_get_with_or_without_user_application_cover_letter_view(
+    mock_business_lines, mock_get_token, mock_render, cover_letter_view_get_request, is_user_application_saved
+):
+    """
+    Test that if a user has not yet saved the user application then the class view sends None and if a user has a saved
+    instance of user application then the view sends that instance in user application in context upon get request.
+    """
+    mock_get_token.return_value = 'csrf_token'
+    mock_business_lines.return_value = 'business_lines'
+
+    if is_user_application_saved:
+        user_application = UserApplicationFactory(user=cover_letter_view_get_request.user)
+    else:
+        user_application = None
+
+    CoverLetterView.as_view()(cover_letter_view_get_request)
+
+    expected_context = {
+        'business_lines': 'business_lines',
+        'user_application': user_application,
+        'csrf_token': 'csrf_token',
+        'filename': None
+    }
+
+    mock_render.assert_called_once_with(
+        cover_letter_view_get_request, 'adg/lms/applications/cover_letter.html', expected_context
+    )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'button, template', [('back', 'application_experience'), ('submit', 'application_hub')], ids=['back', 'submit']
+)
+def test_post_back_or_submit_written_application_cover_letter_view(button, template, cover_letter_view_post_request):
+    # pylint: disable=protected-access
+    """
+    Test that the user is redirected to experience on clicking back and to application hub on submitting.
+    """
+    _mutable = cover_letter_view_post_request.POST._mutable
+    cover_letter_view_post_request.POST._mutable = True
+    cover_letter_view_post_request.POST['next'] = button
+    cover_letter_view_post_request.POST._mutable = _mutable
+
+    response = CoverLetterView.as_view()(cover_letter_view_post_request)
+
+    assert response.get('Location') == reverse(template)
+    assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_post_with_business_line_cover_letter_view(cover_letter_view_post_request):
+    # pylint: disable=protected-access
+    """
+    Test the case when the user has selected business line
+    """
+    business_line = BusinessLineFactory()
+
+    _mutable = cover_letter_view_post_request.POST._mutable
+    cover_letter_view_post_request.POST._mutable = True
+    cover_letter_view_post_request.POST['business_line'] = business_line.id
+    cover_letter_view_post_request.POST['next'] = 'back'
+    cover_letter_view_post_request.POST._mutable = _mutable
+
+    response = CoverLetterView.as_view()(cover_letter_view_post_request)
+
+    assert response.get('Location') == reverse('application_experience')
+    assert response.status_code == 302
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'cover_letter, attribute',
+    [
+        (None, 'text-coverletter'),
+        ('cover letter', 'text-coverletter'),
+        (SimpleUploadedFile('cover_letter.png', b'<svg><rect width="50" height="100"/></svg>'), 'add-coverletter')
+    ],
+    ids=['no_cover_letter', 'typed_cover_letter', 'cover_letter_file'])
+def test_post_with_no_cover_letter_typed_cover_letter_and_file_cover_letter_view(
+    cover_letter, attribute, cover_letter_view_post_request
+):
+    # pylint: disable=protected-access
+    """
+    Test that whether the user has neither typed a cover letter nor uploaded a file or typed a cover letter or uploaded
+    a file, in each case the information is updated in the database
+    """
+    _mutable = cover_letter_view_post_request.POST._mutable
+    cover_letter_view_post_request.POST._mutable = True
+
+    if attribute == 'text-coverletter':
+        cover_letter_view_post_request.POST[attribute] = cover_letter
+    else:
+        cover_letter_view_post_request.FILES[attribute] = cover_letter
+
+    cover_letter_view_post_request.POST['next'] = 'back'
+    cover_letter_view_post_request.POST._mutable = _mutable
+
+    response = CoverLetterView.as_view()(cover_letter_view_post_request)
+
+    assert response.get('Location') == reverse('application_experience')
+    assert response.status_code == 302
