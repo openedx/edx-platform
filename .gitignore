@@ -146,3 +146,5 @@ dist
 
 # Locally generated PII reports
 pii_report
+.mypy_cache
+sandbox

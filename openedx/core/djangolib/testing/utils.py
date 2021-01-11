@@ -43,7 +43,7 @@ class CacheIsolationMixin(object):
     """
 
     CACHES = None
-    ENABLED_CACHES = None
+    ENABLED_CACHES: Optional[List[str]] = None
 
     __settings_overrides = []
     __old_settings = []

@@ -5,6 +5,7 @@ Utility Mixins for unit tests
 
 import json
 import sys
+from typing import List
 
 import six
 from django.conf import settings
@@ -33,7 +34,7 @@ class UrlResetMixin(object):
     that affect the contents of urls.py
     """
 
-    URLCONF_MODULES = None
+    URLCONF_MODULES: List[str]
 
     def reset_urls(self, urlconf_modules=None):
         """Reset `urls.py` for a set of Django apps."""

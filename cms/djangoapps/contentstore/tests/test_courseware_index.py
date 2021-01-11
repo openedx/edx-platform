@@ -8,6 +8,7 @@ import time
 from datetime import datetime
 from unittest import skip
 from uuid import uuid4
+from typing import Optional
 
 import ddt
 import pytest
@@ -136,7 +137,7 @@ class MixedWithOptionsTestCase(MixedSplitTestCase):
         'xblock_mixins': modulestore_options['xblock_mixins'],
     }
 
-    INDEX_NAME = None
+    INDEX_NAME: Optional[str] = None
 
     def setup_course_base(self, store):
         """ base version of setup_course_base is a no-op """

@@ -6,12 +6,14 @@ Bok choy acceptance and a11y tests for problem types in the LMS
 import random
 import textwrap
 from abc import ABCMeta, abstractmethod
+from typing import Dict
 
 import ddt
 import six
 from bok_choy.promise import BrokenPromise
 
 from capa.tests.response_xml_factory import (
+    ResponseXMLFactory,
     AnnotationResponseXMLFactory,
     ChoiceResponseXMLFactory,
     ChoiceTextResponseXMLFactory,
@@ -79,11 +81,11 @@ class ProblemTypeTestBase(six.with_metaclass(ProblemTypeTestBaseMeta, ProblemsTe
     may need to be overridden for some problem types.
     """
 
-    problem_name = None
-    problem_type = None
-    problem_points = 1
-    factory = None
-    factory_kwargs = {}
+    problem_name: str
+    problem_type: str
+    problem_points: int = 1
+    factory: ResponseXMLFactory
+    factory_kwargs: Dict[str, Any] = {}
     status_indicators = {
         'correct': ['span.correct'],
         'incorrect': ['span.incorrect'],
@@ -238,7 +240,7 @@ class AnnotationProblemTypeBase(ProblemTypeTestBase):
 
         self.problem_page.q(css='div.problem textarea.comment').fill(answer)
         self.problem_page.q(
-            css='div.problem span.tag'.format(choice=choice)
+            css='div.problem span.tag'
         ).nth(choice).click()
 
 
@@ -893,7 +895,7 @@ class ChoiceTextProblemTypeTestBase(ProblemTypeTestBase):
     Base class for "Choice + Text" Problem Types.
     (e.g. RadioText, CheckboxText)
     """
-    choice_type = None
+    choice_type: str
     partially_correct = False
     can_update_save_notification = False
 

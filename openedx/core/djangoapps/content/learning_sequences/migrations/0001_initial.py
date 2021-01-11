@@ -8,13 +8,14 @@ import django.db.models.deletion
 import django.utils.timezone
 import model_utils.fields
 import opaque_keys.edx.django.models
+from typing import List, Any
 
 
 class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
+    dependencies: List[Any] = [
     ]
 
     operations = [

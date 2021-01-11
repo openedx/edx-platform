@@ -3,11 +3,12 @@
 
 from django.db import migrations, models
 from opaque_keys.edx.django.models import CourseKeyField
+from typing import List, Any
 
 
 class Migration(migrations.Migration):
 
-    dependencies = [
+    dependencies: List[Any] = [
     ]
 
     operations = [

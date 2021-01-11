@@ -3,6 +3,7 @@ Common base classes for all new XBlock runtimes.
 """
 
 import logging
+from typing import Callable, Union
 
 import crum
 from completion import waffle as completion_waffle
@@ -18,6 +19,7 @@ from xblock.exceptions import NoSuchServiceError
 from xblock.field_data import SplitFieldData
 from xblock.fields import Scope
 from xblock.runtime import KvsFieldData, MemoryIdManager, Runtime
+from opaque_keys.edx.keys import UsageKey
 
 from common.djangoapps.track import contexts as track_contexts
 from common.djangoapps.track import views as track_views
@@ -374,9 +376,9 @@ class XBlockRuntimeSystem(object):
 
     def __init__(
         self,
-        handler_url,  # type: (Callable[[UsageKey, str, Union[int, ANONYMOUS_USER]], str]
-        student_data_mode,  # type: Union[STUDENT_DATA_EPHEMERAL, STUDENT_DATA_PERSISTED]
-        runtime_class,  # type: XBlockRuntime
+        handler_url: Callable[[UsageKey, str, Union[int, str]], str],
+        student_data_mode: str,
+        runtime_class: XBlockRuntime,
     ):
         """
         args:

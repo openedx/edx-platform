@@ -1,7 +1,7 @@
 """
 Discussion API serializers
 """
-
+from typing import Set
 
 from django.contrib.auth.models import User as DjangoUser
 from django.core.exceptions import ValidationError
@@ -100,7 +100,7 @@ class _ContentSerializer(serializers.Serializer):
     vote_count = serializers.SerializerMethodField()
     editable_fields = serializers.SerializerMethodField()
 
-    non_updatable_fields = set()
+    non_updatable_fields: Set[str] = set()
 
     def __init__(self, *args, **kwargs):
         super(_ContentSerializer, self).__init__(*args, **kwargs)

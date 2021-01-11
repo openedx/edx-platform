@@ -4,12 +4,13 @@ Data models used for Blockstore API Client
 
 from datetime import datetime
 from uuid import UUID
+from typing import Union, Text
 
 import attr
 import six
 
 
-def _convert_to_uuid(value):
+def _convert_to_uuid(value: Union[UUID, Text]) -> UUID:
     if not isinstance(value, UUID):
         return UUID(value)
     return value

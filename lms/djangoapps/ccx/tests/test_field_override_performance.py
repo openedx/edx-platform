@@ -6,6 +6,7 @@ Performance tests for field overrides.
 
 import itertools
 from datetime import datetime
+from typing import Optional, Dict, Tuple
 
 import ddt
 import mock
@@ -60,7 +61,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
     multi_db = True
 
     # TEST_DATA must be overridden by subclasses
-    TEST_DATA = None
+    TEST_DATA: Optional[Dict[Tuple[str, int, bool, bool], Tuple[int, int]]] = None
 
     def setUp(self):
         """

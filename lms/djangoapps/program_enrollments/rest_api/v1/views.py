@@ -2,6 +2,7 @@
 """
 ProgramEnrollment Views
 """
+from typing import Iterable, Dict, Type
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.core.management import call_command
@@ -87,8 +88,8 @@ class EnrollmentWriteMixin(object):
     }
 
     # Set in subclasses
-    serializer_class_by_write_method = "set-me-to-a-dict-with-http-method-keys"
-    ok_write_statuses = "set-me-to-a-set"
+    serializer_class_by_write_method: Dict[str, Type] = {}
+    ok_write_statuses: Iterable[str] = ()
 
     def handle_write_request(self):
         """

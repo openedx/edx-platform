@@ -1,4 +1,5 @@
 import logging
+from typing import Set
 
 from crum import get_current_request
 
@@ -17,7 +18,7 @@ class PersonalizedLearnerScheduleCallToAction:
     CAPA_SUBMIT_DISABLED = 'capa_submit_disabled'
     VERTICAL_BANNER = 'vertical_banner'
 
-    past_due_class_warnings = set()
+    past_due_class_warnings: Set[str] = set()
 
     def get_ctas(self, xblock, category):
         """

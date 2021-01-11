@@ -32,6 +32,7 @@ Longer TODO:
 import importlib.util
 import sys
 import os
+from typing import Dict, Any
 
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from path import Path as path
@@ -1589,12 +1590,12 @@ WIKI_LINK_DEFAULT_LEVEL = 2
 ZENDESK_URL = ''
 ZENDESK_USER = ''
 ZENDESK_API_KEY = ''
-ZENDESK_CUSTOM_FIELDS = {}
+ZENDESK_CUSTOM_FIELDS: Dict[Any, Any] = {}
 ZENDESK_OAUTH_ACCESS_TOKEN = ''
 # A mapping of string names to Zendesk Group IDs
 # To get the IDs of your groups you can go to
 # {zendesk_url}/api/v2/groups.json
-ZENDESK_GROUP_ID_MAPPING = {}
+ZENDESK_GROUP_ID_MAPPING: Dict[str, int] = {}
 
 ##### EMBARGO #####
 EMBARGO_SITE_REDIRECT_URL = None
@@ -3436,7 +3437,7 @@ PDF_RECEIPT_COBRAND_LOGO_PATH = PROJECT_ROOT + '/static/images/logo.png'
 PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM = 12
 
 # Use None for the default search engine
-SEARCH_ENGINE = None
+SEARCH_ENGINE: Optional[str] = None
 # Use LMS specific search initializer
 SEARCH_INITIALIZER = "lms.lib.courseware_search.lms_search_initializer.LmsSearchInitializer"
 # Use the LMS specific result processor
@@ -4040,7 +4041,7 @@ ACCOUNT_MICROFRONTEND_URL = None
 LOGISTRATION_MICROFRONTEND_URL = None
 LOGISTRATION_MICROFRONTEND_DOMAIN = None
 PROGRAM_CONSOLE_MICROFRONTEND_URL = None
-LEARNING_MICROFRONTEND_URL = None
+LEARNING_MICROFRONTEND_URL: Optional[str] = None
 
 ############### Settings for the ace_common plugin #################
 ACE_ENABLED_CHANNELS = ['django_email']

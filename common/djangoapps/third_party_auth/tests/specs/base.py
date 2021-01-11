@@ -6,6 +6,7 @@ Base integration test for provider implementations.
 import json
 import unittest
 from contextlib import contextmanager
+from typing import Optional, Dict, Any
 
 import mock
 from django import test
@@ -1020,11 +1021,11 @@ class Oauth2IntegrationTest(IntegrationTest):
 
     # Dict of string -> object. Information about the token granted to the
     # user. Override with test values in subclass; None to force a throw.
-    TOKEN_RESPONSE_DATA = None
+    TOKEN_RESPONSE_DATA: Optional[Dict[str, Any]] = None
 
     # Dict of string -> object. Information about the user themself. Override
     # with test values in subclass; None to force a throw.
-    USER_RESPONSE_DATA = None
+    USER_RESPONSE_DATA: Optional[Dict[str, Any]] = None
 
     def get_response_data(self):
         """Gets dict (string -> object) of merged data about the user."""

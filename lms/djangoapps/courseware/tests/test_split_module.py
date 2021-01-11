@@ -24,9 +24,9 @@ class SplitTestBase(SharedModuleStoreTestCase):
     """
     __test__ = False
     COURSE_NUMBER = 'split-test-base'
-    ICON_CLASSES = None
-    TOOLTIPS = None
-    VISIBLE_CONTENT = None
+    ICON_CLASSES: List[str]
+    TOOLTIPS: List[List[str]]
+    VISIBLE_CONTENT: List[List[str]]
 
     @classmethod
     def setUpClass(cls):

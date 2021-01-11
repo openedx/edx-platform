@@ -43,6 +43,7 @@ When refering to XBlocks, we use the entry-point name. For example,
 import importlib.util
 import os
 import sys
+from typing import Dict, Any
 
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from datetime import timedelta
@@ -851,7 +852,7 @@ MODULESTORE = {
 
 # Modulestore-level field override providers. These field override providers don't
 # require student context.
-MODULESTORE_FIELD_OVERRIDE_PROVIDERS = ()
+MODULESTORE_FIELD_OVERRIDE_PROVIDERS: Sequence[str] = ()
 
 DATABASES = {
     # edxapp's edxapp-migrate scripts and the edxapp_migrate play
@@ -1801,7 +1802,7 @@ FILES_AND_UPLOAD_TYPE_FILTERS = {
 }
 
 # Default to no Search Engine
-SEARCH_ENGINE = None
+SEARCH_ENGINE: Optional[str] = None
 ELASTIC_FIELD_MAPPINGS = {
     "start_date": {
         "type": "date"
@@ -1988,7 +1989,7 @@ OPENAPI_CACHE_TIMEOUT = 0
 ################# Mobile URLS ##########################
 
 # These are URLs to the app store for mobile.
-MOBILE_STORE_URLS = {}
+MOBILE_STORE_URLS: Dict[str, str] = {}
 
 ############################# Persistent Grades ####################################
 
@@ -2040,12 +2041,12 @@ VIDEO_IMAGE_ASPECT_RATIO_ERROR_MARGIN = 0.1
 ZENDESK_URL = ''
 ZENDESK_USER = ''
 ZENDESK_API_KEY = ''
-ZENDESK_CUSTOM_FIELDS = {}
+ZENDESK_CUSTOM_FIELDS: Dict[Any, Any] = {}
 ZENDESK_OAUTH_ACCESS_TOKEN = ''
 # A mapping of string names to Zendesk Group IDs
 # To get the IDs of your groups you can go to
 # {zendesk_url}/api/v2/groups.json
-ZENDESK_GROUP_ID_MAPPING = {}
+ZENDESK_GROUP_ID_MAPPING: Dict[str, int] = {}
 
 ############## Settings for Completion API #########################
 

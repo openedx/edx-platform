@@ -2,11 +2,12 @@
 
 
 from django.db import migrations, models
+from typing import List, Any
 
 
 class Migration(migrations.Migration):
 
-    dependencies = [
+    dependencies: List[Any] = [
     ]
 
     operations = [

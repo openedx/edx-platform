@@ -3,6 +3,7 @@
 
 from datetime import datetime, timedelta
 from enum import Enum
+from typing import List
 
 import ddt
 import pytz
@@ -57,7 +58,7 @@ class AuthAndScopesTestMixin(object):
             data returned in a successful response when accessing the URL for
             self.student.
     """
-    default_scopes = None
+    default_scopes: List[str]
     user_password = 'test'
 
     def setUp(self):

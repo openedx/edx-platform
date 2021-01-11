@@ -4,6 +4,7 @@ import logging
 import re
 from abc import ABCMeta, abstractmethod
 from datetime import timedelta
+from typing import TypedDict
 
 from django.conf import settings
 from django.urls import resolve
@@ -61,6 +62,11 @@ class SearchIndexingError(Exception):
         self.error_list = error_list
 
 
+class IndexEvent(TypedDict):
+    name: str
+    category: str
+
+
 @add_metaclass(ABCMeta)
 class SearchIndexerBase(object, metaclass=ABCMeta):
     """
@@ -70,10 +76,7 @@ class SearchIndexerBase(object, metaclass=ABCMeta):
     INDEX_NAME = None
     ENABLE_INDEXING_KEY = None
 
-    INDEX_EVENT = {
-        'name': None,
-        'category': None
-    }
+    INDEX_EVENT: IndexEvent
 
     @classmethod
     def indexing_is_enabled(cls):

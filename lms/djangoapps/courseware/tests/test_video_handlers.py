@@ -137,6 +137,7 @@ class BaseTestVideoXBlock(BaseTestXmodule):
     """Base class for VideoXBlock tests."""
 
     CATEGORY = 'video'
+    METADATA: Dict[str, Any]
 
     def initialize_block(self, data=None, **kwargs):
         """ Initialize an XBlock to run tests on. """

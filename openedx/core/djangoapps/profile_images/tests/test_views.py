@@ -40,7 +40,7 @@ class ProfileImageEndpointMixin(UserSettingsEventTestMixin):
     """
     # subclasses should override this with the name of the view under test, as
     # per the urls.py configuration.
-    _view_name = None
+    _view_name: str
 
     def setUp(self):
         super(ProfileImageEndpointMixin, self).setUp()

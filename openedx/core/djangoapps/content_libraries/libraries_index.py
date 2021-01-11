@@ -32,9 +32,9 @@ class SearchIndexerBase(ABC):
     """
     Abstract Base Class for implementing library search indexers.
     """
-    INDEX_NAME = None
-    DOCUMENT_TYPE = None
-    ENABLE_INDEXING_KEY = None
+    INDEX_NAME: str
+    DOCUMENT_TYPE: str
+    ENABLE_INDEXING_KEY: str
     SCHEMA_VERSION = 0
     SEARCH_KWARGS = {
         # Set this to True or 'wait_for' if immediate refresh is required after any update.

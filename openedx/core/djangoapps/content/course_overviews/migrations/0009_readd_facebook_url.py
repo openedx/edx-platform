@@ -2,6 +2,7 @@
 
 
 from django.db import migrations, models, connection
+from typing import List, Any
 
 def table_description():
     """Handle Mysql/Pg vs Sqlite"""
@@ -35,7 +36,7 @@ class Migration(migrations.Migration):
     # 0008 ran.  We do that by using the standard information_schema to find out
     # what columns exist. _meta is unavailable as the column has already been
     # removed from the model
-    operations = []
+    operations: List[Any] = []
     fields = table_description()
 
     # during a migration from scratch, fields will be empty, but we do not want to add

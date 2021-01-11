@@ -7,6 +7,8 @@ Tests for UserPartitionTransformer.
 import string
 from collections import namedtuple
 from datetime import datetime
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional
 
 import ddt
 import six
@@ -347,11 +349,12 @@ class MergedGroupAccessTestData(UserPartitionTestMixin, CourseStructureTestCase)
             },
         ]
 
-    AccessTestData = namedtuple(
-        'AccessTestData',
-        ['partition_groups', 'xblock_access', 'merged_parents_list', 'expected_access'],
-    )
-    AccessTestData.__new__.__defaults__ = ({}, None, [], False)
+    @dataclass(frozen=True)
+    class AccessTestData:
+        partition_groups: Dict = field(default_factory=dict)
+        xblock_access: Optional[Dict] = None
+        merged_parents_list: List = field(default_factory=list)
+        expected_access: bool = False
 
     @ddt.data(
         # universal access throughout
