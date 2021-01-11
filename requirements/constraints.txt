@@ -144,6 +144,3 @@ djangorestframework==3.11.0
 
 # latest edx-bulk-grades==0.8.5 is giving migration error.
 edx-bulk-grades<0.8.5
-
-# social-auth-core==4.0.2 is giving error in saml auth tests
-social-auth-core<4.0.2
