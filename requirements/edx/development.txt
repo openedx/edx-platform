@@ -271,7 +271,7 @@ slumber==0.7.1            # via -r requirements/edx/testing.txt, edx-bulk-grades
 smmap==3.0.4              # via -r requirements/edx/testing.txt, gitdb
 snowballstemmer==2.0.0    # via sphinx
 social-auth-app-django==4.0.0  # via -r requirements/edx/testing.txt
-social-auth-core==4.0.2   # via -r requirements/edx/testing.txt, social-auth-app-django
+social-auth-core==3.3.3   # via -r requirements/edx/testing.txt, social-auth-app-django
 sorl-thumbnail==12.7.0    # via -r requirements/edx/testing.txt, django-wiki
 sortedcontainers==2.3.0   # via -r requirements/edx/testing.txt
 soupsieve==2.1            # via -r requirements/edx/testing.txt, beautifulsoup4
