@@ -12,6 +12,7 @@ import dateutil.parser
 import requests
 import six
 from django.conf import settings
+from django.core.validators import validate_email
 from lazy import lazy
 from lxml import etree
 from path import Path as path
@@ -48,6 +49,8 @@ DEFAULT_COURSE_VISIBILITY_IN_CATALOG = getattr(
 )
 
 DEFAULT_MOBILE_AVAILABLE = getattr(settings, 'DEFAULT_MOBILE_AVAILABLE', False)
+# Note: updating assets does not have settings defined, so using `getattr`.
+EXAM_SETTINGS_HTML_VIEW_ENABLED = getattr(settings, 'FEATURES', {}).get('ENABLE_EXAM_SETTINGS_HTML_VIEW', False)
 
 COURSE_VISIBILITY_PRIVATE = 'private'
 COURSE_VISIBILITY_PUBLIC_OUTLINE = 'public_outline'
@@ -81,6 +84,18 @@ class StringOrDate(Date):
             return value
         else:
             return result
+
+
+class EmailString(String):
+    """
+    Parse String with email validation
+    """
+    def from_json(self, value):
+        if value:
+            validate_email(value)
+            return value
+        else:
+            return None
 
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
@@ -828,25 +843,10 @@ class CourseFields(object):
         display_name=_("Teams Configuration"),
         # Translators: please don't translate "id".
         help=_(
-            'Specify the maximum team size and topics for teams inside the provided set of curly braces. '
-            'Make sure that you enclose all of the sets of topic values within a set of square brackets, '
-            'with a comma after the closing curly brace for each topic, and another comma after the '
-            'closing square brackets. '
-            'For example, to specify that teams should have a maximum of 5 participants and provide a list of '
-            '2 topics, enter the configuration in this format: {example_format}. '
-            'If no max_size is provided, it will default to {default_max}'
-            'In "id" values, the only supported special characters are underscore, hyphen, and period.'
-            # Note that we also support space (" "), which may have been an accident, but it's in
-            # our DB now. Let's not advertise the fact, though.
-        ),
-        help_format_args=dict(
-            # Put the sample JSON into a format variable so that translators
-            # don't muck with it.
-            example_format=(
-                '{"topics": [{"name": "Topic1Name", "description": "Topic1Description", "id": "Topic1ID"}, '
-                '{"name": "Topic2Name", "description": "Topic2Description", "id": "Topic2ID"}], "max_team_size": 5}'
-            ),
-            default_max=str(DEFAULT_COURSE_RUN_MAX_TEAM_SIZE),
+            'Configure team sets, limit team sizes, and set visibility settings using JSON. See '
+            '<a target="&#95;blank" href="https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/'
+            'course_features/teams/teams_setup.html#enable-and-configure-teams">teams '
+            'configuration documentation</a> for help and examples.'
         ),
         scope=Scope.settings,
     )
@@ -858,7 +858,8 @@ class CourseFields(object):
             "Note that enabling proctored exams will also enable timed exams."
         ),
         default=False,
-        scope=Scope.settings
+        scope=Scope.settings,
+        deprecated=EXAM_SETTINGS_HTML_VIEW_ENABLED
     )
 
     proctoring_provider = ProctoringProvider(
@@ -874,6 +875,19 @@ class CourseFields(object):
             ),
         ),
         scope=Scope.settings,
+        deprecated=EXAM_SETTINGS_HTML_VIEW_ENABLED
+    )
+
+    proctoring_escalation_email = EmailString(
+        display_name=_("Proctortrack Exam Escalation Contact"),
+        help=_(
+            "Required if 'proctortrack' is selected as your proctoring provider. "
+            "Enter an email address to be contacted by the support team whenever there are escalations "
+            "(e.g. appeals, delayed reviews, etc.)."
+        ),
+        default=None,
+        scope=Scope.settings,
+        deprecated=EXAM_SETTINGS_HTML_VIEW_ENABLED
     )
 
     allow_proctoring_opt_out = Boolean(
@@ -883,8 +897,9 @@ class CourseFields(object):
             "without proctoring. If this value is false, all learners must take the exam with proctoring. "
             "This setting only applies if proctored exams are enabled for the course."
         ),
-        default=True,
-        scope=Scope.settings
+        default=False,
+        scope=Scope.settings,
+        deprecated=EXAM_SETTINGS_HTML_VIEW_ENABLED
     )
 
     create_zendesk_tickets = Boolean(
@@ -893,7 +908,8 @@ class CourseFields(object):
             "Enter true or false. If this value is true, a Zendesk ticket will be created for suspicious attempts."
         ),
         default=True,
-        scope=Scope.settings
+        scope=Scope.settings,
+        deprecated=EXAM_SETTINGS_HTML_VIEW_ENABLED
     )
 
     enable_timed_exams = Boolean(
@@ -903,7 +919,8 @@ class CourseFields(object):
             "Regardless of this setting, timed exams are enabled if Enable Proctored Exams is set to true."
         ),
         default=False,
-        scope=Scope.settings
+        scope=Scope.settings,
+        deprecated=EXAM_SETTINGS_HTML_VIEW_ENABLED
     )
 
     minimum_grade_credit = Float(
@@ -925,17 +942,6 @@ class CourseFields(object):
         ),
         default=False,
         scope=Scope.settings
-    )
-
-    bypass_home = Boolean(
-        display_name=_("Bypass Course Home"),
-        help=_(
-            "Bypass the course home tab when students arrive from the dashboard, "
-            "sending them directly to course content."
-        ),
-        default=False,
-        scope=Scope.settings,
-        deprecated=True
     )
 
     enable_subsection_gating = Boolean(

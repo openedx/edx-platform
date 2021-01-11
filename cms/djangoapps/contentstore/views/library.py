@@ -19,24 +19,25 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator
 from six import text_type
 
-from contentstore.utils import add_instructor, reverse_library_url
-from contentstore.views.item import create_xblock_info
-from course_creators.views import get_course_creator_status
-from edxmako.shortcuts import render_to_response
-from student.auth import (
+from cms.djangoapps.course_creators.views import get_course_creator_status
+from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.student.auth import (
     STUDIO_EDIT_ROLES,
     STUDIO_VIEW_USERS,
     get_user_permissions,
     has_studio_read_access,
     has_studio_write_access
 )
-from student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
-from util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
+from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import DuplicateCourseError
 
+from ..config.waffle import REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND
+from ..utils import add_instructor, reverse_library_url
 from .component import CONTAINER_TEMPLATES, get_component_templates
+from .item import create_xblock_info
 from .user import user_with_role
 
 __all__ = ['library_handler', 'manage_library_users']
@@ -44,6 +45,21 @@ __all__ = ['library_handler', 'manage_library_users']
 log = logging.getLogger(__name__)
 
 LIBRARIES_ENABLED = settings.FEATURES.get('ENABLE_CONTENT_LIBRARIES', False)
+ENABLE_LIBRARY_AUTHORING_MICROFRONTEND = settings.FEATURES.get('ENABLE_LIBRARY_AUTHORING_MICROFRONTEND', False)
+LIBRARY_AUTHORING_MICROFRONTEND_URL = settings.LIBRARY_AUTHORING_MICROFRONTEND_URL
+
+
+def should_redirect_to_library_authoring_mfe():
+    """
+    Boolean helper method, returns whether or not to redirect to the Library
+    Authoring MFE based on settings and flags.
+    """
+
+    return (
+        ENABLE_LIBRARY_AUTHORING_MICROFRONTEND and
+        LIBRARY_AUTHORING_MICROFRONTEND_URL and
+        REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND.is_enabled()
+    )
 
 
 def get_library_creator_status(user):
@@ -127,15 +143,33 @@ def _display_library(library_key_string, request):
 
 def _list_libraries(request):
     """
-    List all accessible libraries
+    List all accessible libraries, after applying filters in the request
+    Query params:
+        org - The organization used to filter libraries
+        text_search - The string used to filter libraries by searching in title, id or org
     """
+    org = request.GET.get('org', '')
+    text_search = request.GET.get('text_search', '').lower()
+
+    if org:
+        libraries = modulestore().get_libraries(org=org)
+    else:
+        libraries = modulestore().get_libraries()
+
     lib_info = [
         {
             "display_name": lib.display_name,
             "library_key": text_type(lib.location.library_key),
         }
-        for lib in modulestore().get_libraries()
-        if has_studio_read_access(request.user, lib.location.library_key)
+        for lib in libraries
+        if (
+            (
+                text_search in lib.display_name.lower() or
+                text_search in lib.location.library_key.org.lower() or
+                text_search in lib.location.library_key.library.lower()
+            ) and
+            has_studio_read_access(request.user, lib.location.library_key)
+        )
     ]
     return JsonResponse(lib_info)
 

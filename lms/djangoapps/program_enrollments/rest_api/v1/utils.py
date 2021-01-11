@@ -12,7 +12,7 @@ from pytz import UTC
 from rest_framework import status
 from rest_framework.pagination import CursorPagination
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.bulk_email.api import get_emails_enabled
 from lms.djangoapps.certificates.api import get_certificates_for_user_by_course_keys
 from lms.djangoapps.course_api.api import get_course_run_url, get_due_dates
@@ -20,8 +20,8 @@ from lms.djangoapps.program_enrollments.api import fetch_program_enrollments
 from lms.djangoapps.program_enrollments.constants import ProgramEnrollmentStatuses
 from openedx.core.djangoapps.catalog.utils import course_run_keys_for_program, get_programs, is_course_run_in_program
 from openedx.core.lib.api.view_utils import verify_course_exists
-from student.helpers import get_resume_urls_for_enrollments
-from student.models import CourseEnrollment
+from common.djangoapps.student.helpers import get_resume_urls_for_enrollments
+from common.djangoapps.student.models import CourseEnrollment
 
 from .constants import CourseRunProgressStatuses
 
@@ -217,7 +217,7 @@ def get_enrollments_for_courses_in_program(user, program):
     return CourseEnrollment.objects.filter(
         user=user,
         course_id__in=course_keys,
-        mode__in=[CourseMode.VERIFIED, CourseMode.MASTERS],
+        mode__in=[CourseMode.VERIFIED, CourseMode.MASTERS, CourseMode.EXECUTIVE_EDUCATION],
         is_active=True,
     )
 

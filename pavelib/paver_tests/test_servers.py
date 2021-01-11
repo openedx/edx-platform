@@ -8,49 +8,48 @@ from ..utils.envs import Env
 from .utils import PaverTestCase
 
 EXPECTED_SASS_COMMAND = (
-    u"libsass {sass_directory}"
+    "libsass {sass_directory}"
 )
 EXPECTED_COMMON_SASS_DIRECTORIES = [
-    u"common/static/sass",
+    "common/static/sass",
 ]
 EXPECTED_LMS_SASS_DIRECTORIES = [
-    u"lms/static/sass",
-    u"lms/static/certificates/sass",
+    "lms/static/sass",
+    "lms/static/certificates/sass",
 ]
 EXPECTED_CMS_SASS_DIRECTORIES = [
-    u"cms/static/sass",
+    "cms/static/sass",
 ]
 EXPECTED_LMS_SASS_COMMAND = [
-    u"python manage.py lms --settings={asset_settings} compile_sass lms ",
+    "python manage.py lms --settings={asset_settings} compile_sass lms ",
 ]
 EXPECTED_CMS_SASS_COMMAND = [
-    u"python manage.py cms --settings={asset_settings} compile_sass cms ",
+    "python manage.py cms --settings={asset_settings} compile_sass cms ",
 ]
 EXPECTED_COLLECT_STATIC_COMMAND = (
-    u'python manage.py {system} --settings={asset_settings} collectstatic '
-    u'--ignore "fixtures" --ignore "karma_*.js" --ignore "spec" '
-    u'--ignore "spec_helpers" --ignore "spec-helpers" --ignore "xmodule_js" '
-    u'--ignore "geoip" --ignore "sass" '
-    u'--noinput {log_string}'
+    'python manage.py {system} --settings={asset_settings} collectstatic '
+    '--ignore "fixtures" --ignore "karma_*.js" --ignore "spec" '
+    '--ignore "spec_helpers" --ignore "spec-helpers" --ignore "xmodule_js" '
+    '--ignore "geoip" --ignore "sass" '
+    '--noinput {log_string}'
 )
 EXPECTED_CELERY_COMMAND = (
-    u"DJANGO_SETTINGS_MODULE=lms.envs.{settings} celery worker "
-    u"--app=lms.celery:APP --beat --loglevel=INFO --pythonpath=."
+    "DJANGO_SETTINGS_MODULE=lms.envs.{settings} celery worker "
+    "--app=lms.celery:APP --beat --loglevel=INFO --pythonpath=."
 )
 EXPECTED_RUN_SERVER_COMMAND = (
-    u"python manage.py {system} --settings={settings} runserver --traceback --pythonpath=. 0.0.0.0:{port}"
+    "python manage.py {system} --settings={settings} runserver --traceback --pythonpath=. 0.0.0.0:{port}"
 )
 EXPECTED_INDEX_COURSE_COMMAND = (
-    u"python manage.py {system} --settings={settings} reindex_course --setup"
+    "python manage.py {system} --settings={settings} reindex_course --setup"
 )
 EXPECTED_PRINT_SETTINGS_COMMAND = [
-    u"python manage.py lms --settings={settings} print_setting STATIC_ROOT 2>{log_file}",
-    u"python manage.py cms --settings={settings} print_setting STATIC_ROOT 2>{log_file}",
-    u"python manage.py lms --settings={settings} print_setting WEBPACK_CONFIG_PATH 2>{log_file}"
+    "python manage.py lms --settings={settings} print_setting STATIC_ROOT WEBPACK_CONFIG_PATH 2>{log_file}",
+    "python manage.py cms --settings={settings} print_setting STATIC_ROOT 2>{log_file}"
 ]
 EXPECTED_WEBPACK_COMMAND = (
-    u"NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} "
-    u"$(npm bin)/webpack --config={webpack_config_path}"
+    "NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} "
+    "$(npm bin)/webpack --config={webpack_config_path}"
 )
 
 
@@ -169,7 +168,7 @@ class TestPaverServerTasks(PaverTestCase):
         settings = options.get("settings", Env.DEVSTACK_SETTINGS)
         call_task("pavelib.servers.update_db", options=options)
         # pylint: disable=line-too-long
-        db_command = u"NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{server} --traceback --pythonpath=. "
+        db_command = "NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{server} --traceback --pythonpath=. "
         self.assertEqual(
             self.task_messages,
             [
@@ -194,8 +193,8 @@ class TestPaverServerTasks(PaverTestCase):
         self.assertEqual(
             self.task_messages,
             [
-                u"echo 'import {system}.envs.{settings}' "
-                u"| python manage.py {system} --settings={settings} shell --plain --pythonpath=.".format(
+                "echo 'import {system}.envs.{settings}' "
+                "| python manage.py {system} --settings={settings} shell --plain --pythonpath=.".format(
                     system=system, settings=settings
                 ),
             ]
@@ -242,8 +241,8 @@ class TestPaverServerTasks(PaverTestCase):
             expected_asset_settings = "test_static_optimized"
         expected_collect_static = not is_fast and expected_settings != Env.DEVSTACK_SETTINGS
         if not is_fast:
-            expected_messages.append(u"xmodule_assets common/static/xmodule")
-            expected_messages.append(u"install npm_assets")
+            expected_messages.append("xmodule_assets common/static/xmodule")
+            expected_messages.append("install npm_assets")
             expected_messages.extend(
                 [c.format(settings=expected_asset_settings,
                           log_file=Env.PRINT_SETTINGS_LOG_FILE) for c in EXPECTED_PRINT_SETTINGS_COMMAND]
@@ -288,8 +287,8 @@ class TestPaverServerTasks(PaverTestCase):
         expected_collect_static = not is_fast and expected_settings != Env.DEVSTACK_SETTINGS
         expected_messages = []
         if not is_fast:
-            expected_messages.append(u"xmodule_assets common/static/xmodule")
-            expected_messages.append(u"install npm_assets")
+            expected_messages.append("xmodule_assets common/static/xmodule")
+            expected_messages.append("install npm_assets")
             expected_messages.extend(
                 [c.format(settings=expected_asset_settings,
                           log_file=Env.PRINT_SETTINGS_LOG_FILE) for c in EXPECTED_PRINT_SETTINGS_COMMAND]
@@ -325,7 +324,7 @@ class TestPaverServerTasks(PaverTestCase):
         expected_messages.append(EXPECTED_CELERY_COMMAND.format(settings="devstack_with_worker"))
         self.assertEqual(self.task_messages, expected_messages)
 
-    def expected_sass_commands(self, system=None, asset_settings=u"test_static_optimized"):
+    def expected_sass_commands(self, system=None, asset_settings="test_static_optimized"):
         """
         Returns the expected SASS commands for the specified system.
         """

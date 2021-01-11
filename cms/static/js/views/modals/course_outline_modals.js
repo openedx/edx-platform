@@ -307,11 +307,26 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         render: function() {
+            var xblockInfo = this.model;
+            var isTimeLimited = xblockInfo.get('is_time_limited');
+            var isProctoredExam = xblockInfo.get('is_proctored_exam');
+            var isPracticeExam = xblockInfo.get('is_practice_exam');
+            var isOnboardingExam = xblockInfo.get('is_onboarding_exam');
             var html = this.template($.extend({}, {
-                xblockInfo: this.model,
+                xblockInfo: xblockInfo,
                 xblockType: this.options.xblockType,
-                enable_proctored_exam: this.options.enable_proctored_exams,
-                enable_timed_exam: this.options.enable_timed_exams
+                enableProctoredExams: this.options.enable_proctored_exams,
+                enableTimedExams: this.options.enable_timed_exams,
+                isSpecialExam: isTimeLimited,
+                isProctoredExam: isProctoredExam,
+                isPracticeExam: isPracticeExam,
+                isOnboardingExam: isOnboardingExam,
+                isTimedExam: isTimeLimited && !(
+                    isProctoredExam || isPracticeExam || isOnboardingExam
+                ),
+                specialExamLockedIn: (
+                    xblockInfo.get('released_to_students') && xblockInfo.get('was_ever_special_exam')
+                )
             }, this.getContext()));
 
             HtmlUtils.setHtml(this.$el, HtmlUtils.HTML(html));

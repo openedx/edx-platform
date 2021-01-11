@@ -4,9 +4,11 @@
 
 import datetime
 import json
+import sys
 
 import ddt
 import mock
+import pytest
 import six
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
@@ -17,8 +19,8 @@ from pytz import UTC
 from six import text_type
 
 import lms.djangoapps.discussion.django_comment_client.utils as utils
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
@@ -45,8 +47,8 @@ from openedx.core.djangoapps.django_comment_common.utils import (
     set_course_discussion_settings
 )
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
-from student.roles import CourseStaffRole
-from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
@@ -949,6 +951,74 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             }
         )
 
+    @pytest.mark.skipif(
+        sys.version_info < (3, 7),
+        reason="Python 3.7 sorted dict insertion is considered"
+    )
+    def test_sort_intermediates(self):
+        self.create_discussion("Chapter B", "Discussion 2")
+        self.create_discussion("Chapter C", "Discussion")
+        self.create_discussion("Chapter A", "Discussion 1")
+        self.create_discussion("Chapter B", "Discussion 1")
+        self.create_discussion("Chapter A", "Discussion 2")
+
+        self.assert_category_map_equals(
+            {
+                "children": [("Chapter A", TYPE_SUBCATEGORY), ("Chapter B", TYPE_SUBCATEGORY),
+                             ("Chapter C", TYPE_SUBCATEGORY)],
+                "entries": {},
+                "subcategories": {
+                    "Chapter A": {
+                        "children": [("Discussion 1", TYPE_ENTRY), ("Discussion 2", TYPE_ENTRY)],
+                        "entries": {
+                            "Discussion 1": {
+                                "id": "discussion3",
+                                "sort_key": None,
+                                "is_divided": False,
+                            },
+                            "Discussion 2": {
+                                "id": "discussion5",
+                                "sort_key": None,
+                                "is_divided": False,
+                            }
+                        },
+                        "subcategories": {},
+                    },
+                    "Chapter B": {
+                        "children": [("Discussion 2", TYPE_ENTRY), ("Discussion 1", TYPE_ENTRY)],
+                        "entries": {
+                            "Discussion 2": {
+                                "id": "discussion1",
+                                "sort_key": None,
+                                "is_divided": False,
+                            },
+                            "Discussion 1": {
+                                "id": "discussion4",
+                                "sort_key": None,
+                                "is_divided": False,
+                            }
+                        },
+                        "subcategories": {},
+                    },
+                    "Chapter C": {
+                        "entries": {
+                            "Discussion": {
+                                "id": "discussion2",
+                                "sort_key": None,
+                                "is_divided": False,
+                            }
+                        },
+                        "children": [("Discussion", TYPE_ENTRY)],
+                        "subcategories": {},
+                    }
+                },
+            }
+        )
+
+    @pytest.mark.skipif(
+        sys.version_info >= (3, 7),
+        reason="Python 3.7 sorted dict insertion is not considered"
+    )
     def test_sort_intermediates(self):
         self.create_discussion("Chapter B", "Discussion 2")
         self.create_discussion("Chapter C", "Discussion")
@@ -1246,7 +1316,7 @@ class DiscussionTabTestCase(ModuleStoreTestCase):
             self.assertTrue(self.discussion_tab_present(self.enrolled_user))
             self.assertFalse(self.discussion_tab_present(self.unenrolled_user))
 
-    @mock.patch('ccx.overrides.get_current_ccx')
+    @mock.patch('lms.djangoapps.ccx.overrides.get_current_ccx')
     def test_tab_settings(self, mock_get_ccx):
         mock_get_ccx.return_value = True
         with self.settings(FEATURES={'ENABLE_DISCUSSION_SERVICE': False}):

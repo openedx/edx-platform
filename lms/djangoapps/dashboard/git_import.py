@@ -18,7 +18,7 @@ from django.utils.translation import ugettext_lazy as _
 from opaque_keys.edx.locator import CourseLocator
 from six import StringIO
 
-from dashboard.models import CourseImportLog
+from lms.djangoapps.dashboard.models import CourseImportLog
 from xmodule.util.sandboxing import DEFAULT_PYTHON_LIB_FILENAME
 
 log = logging.getLogger(__name__)
@@ -335,7 +335,7 @@ def add_repo(repo, rdir_in, branch=None):
             mdb = mongoengine.connect(mongo_db['db'], host=mongouri)
         else:
             mdb = mongoengine.connect(mongo_db['db'], host=mongo_db['host'], port=mongo_db['port'])
-    except mongoengine.connection.ConnectionError:
+    except mongoengine.connection.ConnectionFailure:
         log.exception('Unable to connect to mongodb to save log, please '
                       'check MONGODB_LOG settings')
     cil = CourseImportLog(

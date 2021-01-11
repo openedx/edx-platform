@@ -10,9 +10,8 @@ from django.db import transaction
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-from shoppingcart.models import CertificateItem
-from student.models import CourseEnrollment
-from track.management.tracked_command import TrackedCommand
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.track.management.tracked_command import TrackedCommand
 
 
 class TransferStudentError(Exception):
@@ -43,9 +42,6 @@ class Command(TrackedCommand):
                             dest='dest_course_list',
                             required=True,
                             help='the new course(s) to enroll the student into')
-        parser.add_argument('-c', '--transfer-certificates',
-                            action='store_true',
-                            help='try to transfer certificate items to the new course')
 
     @transaction.atomic
     def handle(self, *args, **options):
@@ -53,9 +49,6 @@ class Command(TrackedCommand):
         dest_keys = []
         for course_key in options['dest_course_list']:
             dest_keys.append(CourseKey.from_string(course_key))
-
-        if options['transfer_certificates'] and len(dest_keys) > 1:
-            raise TransferStudentError('Cannot transfer certificate items from one course to many.')
 
         source_students = User.objects.filter(
             courseenrollment__course_id=source_key
@@ -89,38 +82,3 @@ class Command(TrackedCommand):
                         # form the old course.
                         if not old_is_active:
                             new_enrollment.update_enrollment(is_active=False, skip_refund=True)
-
-                        if options['transfer_certificates']:
-                            self._transfer_certificate_item(source_key, enrollment, user, dest_keys, new_enrollment)
-
-    @staticmethod
-    def _transfer_certificate_item(source_key, enrollment, user, dest_keys, new_enrollment):
-        """
-        Transfer the certificate item from one course to another.
-
-        Do not use this generally, since certificate items are directly associated with a particular purchase.
-        This should only be used when a single course to a new location. This cannot be used when transferring
-        from one course to many.
-
-        Args:
-            source_key (str): The course key string representation for the original course.
-            enrollment (CourseEnrollment): The original enrollment to move the certificate item from.
-            user (User): The user to transfer the item for.
-            dest_keys (list): A list of course key strings to transfer the item to.
-            new_enrollment (CourseEnrollment): The new enrollment to associate the certificate item with.
-
-        Returns:
-            None
-
-        """
-        try:
-            certificate_item = CertificateItem.objects.get(
-                course_id=source_key,
-                course_enrollment=enrollment
-            )
-        except CertificateItem.DoesNotExist:
-            print('No certificate for {}'.format(user))
-            return
-
-        certificate_item.course_id = dest_keys[0]
-        certificate_item.course_enrollment = new_enrollment

@@ -2,31 +2,25 @@
 Tests for masquerading functionality on course_experience
 """
 
-
-import json
-
-import six
-from django.urls import reverse
-
-from lms.djangoapps.commerce.models import CommerceConfiguration
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from edx_toggles.toggles.testutils import override_waffle_flag
+from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG, SHOW_UPGRADE_MSG_ON_COURSE_HOME
-from student.roles import CourseStaffRole
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 from xmodule.partitions.partitions_service import PartitionService
 
 from .helpers import add_course_mode
-from .test_course_home import TEST_UPDATE_MESSAGE, course_home_url
+from .test_course_home import course_home_url
 from .test_course_sock import TEST_VERIFICATION_SOCK_LOCATOR
 
 TEST_PASSWORD = 'test'
 UPGRADE_MESSAGE_CONTAINER = 'section-upgrade'
 
 
-class MasqueradeTestBase(SharedModuleStoreTestCase):
+class MasqueradeTestBase(SharedModuleStoreTestCase, MasqueradeMixin):
     """
     Base test class for masquerading functionality on course_experience
     """
@@ -66,29 +60,6 @@ class MasqueradeTestBase(SharedModuleStoreTestCase):
                 return group.id
         return None
 
-    def update_masquerade(self, role, course, username=None, group_id=None):
-        """
-        Toggle masquerade state.
-        """
-        masquerade_url = reverse(
-            'masquerade_update',
-            kwargs={
-                'course_key_string': six.text_type(course.id),
-            }
-        )
-        response = self.client.post(
-            masquerade_url,
-            json.dumps({
-                "role": role,
-                "group_id": group_id,
-                "user_name": username,
-                "user_partition_id": ENROLLMENT_TRACK_PARTITION_ID
-            }),
-            "application/json"
-        )
-        self.assertEqual(response.status_code, 200)
-        return response
-
 
 class TestVerifiedUpgradesWithMasquerade(MasqueradeTestBase):
     """
@@ -99,7 +70,7 @@ class TestVerifiedUpgradesWithMasquerade(MasqueradeTestBase):
     @override_waffle_flag(SHOW_UPGRADE_MSG_ON_COURSE_HOME, active=True)
     def test_masquerade_as_student(self):
         # Elevate the staff user to be student
-        self.update_masquerade(role='student', course=self.verified_course)
+        self.update_masquerade(course=self.verified_course, user_partition_id=ENROLLMENT_TRACK_PARTITION_ID)
         response = self.client.get(course_home_url(self.verified_course))
         self.assertContains(response, TEST_VERIFICATION_SOCK_LOCATOR, html=False)
         self.assertContains(response, UPGRADE_MESSAGE_CONTAINER, html=False)
@@ -110,7 +81,8 @@ class TestVerifiedUpgradesWithMasquerade(MasqueradeTestBase):
             self.verified_course.id,
             'Verified Certificate'
         )
-        self.update_masquerade(role='student', course=self.verified_course, group_id=user_group_id)
+        self.update_masquerade(course=self.verified_course, group_id=user_group_id,
+                               user_partition_id=ENROLLMENT_TRACK_PARTITION_ID)
         response = self.client.get(course_home_url(self.verified_course))
         self.assertNotContains(response, TEST_VERIFICATION_SOCK_LOCATOR, html=False)
         self.assertNotContains(response, UPGRADE_MESSAGE_CONTAINER, html=False)
@@ -121,7 +93,8 @@ class TestVerifiedUpgradesWithMasquerade(MasqueradeTestBase):
             self.masters_course.id,
             'Masters'
         )
-        self.update_masquerade(role='student', course=self.masters_course, group_id=user_group_id)
+        self.update_masquerade(course=self.masters_course, group_id=user_group_id,
+                               user_partition_id=ENROLLMENT_TRACK_PARTITION_ID)
         response = self.client.get(course_home_url(self.masters_course))
         self.assertNotContains(response, TEST_VERIFICATION_SOCK_LOCATOR, html=False)
         self.assertNotContains(response, UPGRADE_MESSAGE_CONTAINER, html=False)

@@ -2,28 +2,14 @@
 Content Type Gating Configuration Models
 """
 
-# -*- coding: utf-8 -*-
-
-
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
-from course_modes.models import CourseMode
-from lms.djangoapps.courseware.masquerade import (
-    get_course_masquerade,
-    get_masquerading_user_group,
-    is_masquerading_as_specific_student
-)
 from openedx.core.djangoapps.config_model_utils.models import StackedConfigurationModel
-from openedx.core.djangoapps.config_model_utils.utils import is_in_holdback
-from openedx.features.content_type_gating.helpers import FULL_ACCESS, LIMITED_ACCESS, correct_modes_for_fbe
-from student.models import CourseEnrollment
-from student.role_helpers import has_staff_roles
-from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
+from openedx.features.content_type_gating.helpers import correct_modes_for_fbe, enrollment_date_for_fbe
 
 
 @python_2_unicode_compatible
@@ -57,36 +43,7 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
     )
 
     @classmethod
-    def has_full_access_role_in_masquerade(cls, user, course_key, course_masquerade, student_masquerade,
-                                           user_partition):
-        """
-        The roles of the masquerade user are used to determine whether the content gate displays.
-        The gate will not appear if the masquerade user has any of the following roles:
-        Staff, Instructor, Beta Tester, Forum Community TA, Forum Group Moderator, Forum Moderator, Forum Administrator
-        """
-        if student_masquerade:
-            # If a request is masquerading as a specific user, the user variable will represent the correct user.
-            if user and user.id and has_staff_roles(user, course_key):
-                return True
-        elif user_partition:
-            # If the current user is masquerading as a generic student in a specific group,
-            # then return the value based on that group.
-            masquerade_group = get_masquerading_user_group(course_key, user, user_partition)
-            if masquerade_group is None:
-                audit_mode_id = settings.COURSE_ENROLLMENT_MODES.get(CourseMode.AUDIT, {}).get('id')
-                # We are checking the user partition id here because currently content
-                # cannot have both the enrollment track partition and content gating partition
-                # configured simultaneously. We may change this in the future and allow
-                # configuring both partitions on content and selecting both partitions in masquerade.
-                if course_masquerade.user_partition_id == ENROLLMENT_TRACK_PARTITION_ID:
-                    return course_masquerade.group_id != audit_mode_id
-            elif masquerade_group is FULL_ACCESS:
-                return True
-            elif masquerade_group is LIMITED_ACCESS:
-                return False
-
-    @classmethod
-    def enabled_for_enrollment(cls, user=None, course_key=None, user_partition=None):
+    def enabled_for_enrollment(cls, user=None, course_key=None):
         """
         Return whether Content Type Gating is enabled for this enrollment.
 
@@ -96,45 +53,12 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
         ``enabled_as_of`` before the enrollment was created.
 
         Arguments:
-            enrollment: The enrollment being queried.
             user: The user being queried.
             course_key: The CourseKey of the course being queried.
         """
-        if user is None or course_key is None:
-            raise ValueError('Both user and course_key must be specified if no enrollment is provided')
-
-        enrollment = CourseEnrollment.get_enrollment(user, course_key, ['fbeenrollmentexclusion'])
-
-        if user is None and enrollment is not None:
-            user = enrollment.user
-
-        course_masquerade = get_course_masquerade(user, course_key)
-        no_masquerade = course_masquerade is None
-        student_masquerade = is_masquerading_as_specific_student(user, course_key)
-        user_variable_represents_correct_user = (no_masquerade or student_masquerade)
-
-        if course_masquerade:
-            if cls.has_full_access_role_in_masquerade(user, course_key, course_masquerade, student_masquerade,
-                                                      user_partition):
-                return False
-        # When a request is not in a masquerade state the user variable represents the correct user.
-        elif user and user.id and has_staff_roles(user, course_key):
+        target_datetime = enrollment_date_for_fbe(user, course_key=course_key)
+        if not target_datetime:
             return False
-
-        # check if user is in holdback
-        if user_variable_represents_correct_user and is_in_holdback(user, enrollment):
-            return False
-
-        if not correct_modes_for_fbe(course_key, enrollment, user):
-            return False
-
-        # enrollment might be None if the user isn't enrolled. In that case,
-        # return enablement as if the user enrolled today
-        # Also, ignore enrollment creation date if the user is masquerading.
-        if enrollment is None or course_masquerade:
-            target_datetime = timezone.now()
-        else:
-            target_datetime = enrollment.created
         current_config = cls.current(course_key=course_key)
         return current_config.enabled_as_of_datetime(target_datetime=target_datetime)
 

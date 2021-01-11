@@ -9,7 +9,6 @@ import tempfile
 import textwrap
 import unittest
 
-import six
 from ddt import data, ddt, file_data, unpack
 from mock import MagicMock, mock_open, patch
 from path import Path as path
@@ -18,10 +17,7 @@ from paver.easy import BuildFailure
 import pavelib.quality
 from pavelib.paver_tests.utils import PaverTestCase, fail_on_eslint
 
-if six.PY2:
-    OPEN_BUILTIN = '__builtin__.open'
-else:
-    OPEN_BUILTIN = 'builtins.open'
+OPEN_BUILTIN = 'builtins.open'
 
 
 @ddt
@@ -30,7 +26,7 @@ class TestPaverQualityViolations(unittest.TestCase):
     For testing the paver violations-counting tasks
     """
     def setUp(self):
-        super(TestPaverQualityViolations, self).setUp()
+        super().setUp()
         self.f = tempfile.NamedTemporaryFile(delete=False)
         self.f.close()
         self.addCleanup(os.remove, self.f.name)
@@ -84,7 +80,7 @@ class TestPaverQualityOptions(unittest.TestCase):
     )
     @unpack
     def test_pylint_parser_other_string(self, options, expected_values):
-        class PaverOptions(object):
+        class PaverOptions:
             """
             Simple options class to mimick paver's Namespace object.
             """
@@ -98,11 +94,11 @@ class TestPaverQualityOptions(unittest.TestCase):
 class TestPaverReportViolationsCounts(unittest.TestCase):
     """
     For testing utility functions for getting counts from reports for
-    run_eslint, run_complexity, run_xsslint, and run_xsscommitlint.
+    run_eslint, run_xsslint, and run_xsscommitlint.
     """
 
     def setUp(self):
-        super(TestPaverReportViolationsCounts, self).setUp()
+        super().setUp()
 
         # Temporary file infrastructure
         self.f = tempfile.NamedTemporaryFile(delete=False)
@@ -131,22 +127,6 @@ class TestPaverReportViolationsCounts(unittest.TestCase):
             f.write("foo/bar/js/fizzbuzz.js: line 45, col 59, Missing semicolon.")
         actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "eslint")  # pylint: disable=protected-access
         self.assertEqual(actual_count, None)
-
-    def test_complexity_value(self):
-        with open(self.f.name, 'w') as f:
-            f.write("Average complexity: A (1.93953443446)")
-        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "python_complexity")  # pylint: disable=protected-access
-        self.assertEqual(actual_count, 1.93953443446)
-
-    def test_truncated_complexity_report(self):
-        with open(self.f.name, 'w') as f:
-            f.write("M 110:4 FooBar.default - A")
-        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "python_complexity")  # pylint: disable=protected-access
-        self.assertEqual(actual_count, None)
-
-    def test_no_complexity_report(self):
-        with self.assertRaises(BuildFailure):
-            pavelib.quality._get_count_from_last_line("non-existent-file", "python_complexity")  # pylint: disable=protected-access
 
     def test_generic_value(self):
         """
@@ -258,7 +238,7 @@ class TestPrepareReportDir(unittest.TestCase):
     """
 
     def setUp(self):
-        super(TestPrepareReportDir, self).setUp()
+        super().setUp()
         self.test_dir = tempfile.mkdtemp()
         self.test_file = tempfile.NamedTemporaryFile(delete=False, dir=self.test_dir)
         self.addCleanup(os.removedirs, self.test_dir)
@@ -280,7 +260,7 @@ class TestPaverRunQuality(PaverTestCase):
     """
 
     def setUp(self):
-        super(TestPaverRunQuality, self).setUp()
+        super().setUp()
 
         # mock the @needs decorator to skip it
         patcher = patch('pavelib.quality.sh')
@@ -365,7 +345,7 @@ class TestPaverRunDiffQuality(PaverTestCase):
     cases weren't tested properly.
     """
     def setUp(self):
-        super(TestPaverRunDiffQuality, self).setUp()
+        super().setUp()
 
         # mock the @needs decorator to skip it
         patcher = patch('pavelib.quality.sh')

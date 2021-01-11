@@ -9,16 +9,16 @@ from datetime import datetime, timedelta
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.template import RequestContext
-from entitlements.models import CourseEntitlement
-from third_party_auth import pipeline
-from util.date_utils import strftime_localized
+from common.djangoapps.entitlements.models import CourseEntitlement
+from common.djangoapps.third_party_auth import pipeline
+from common.djangoapps.util.date_utils import strftime_localized
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import HTML, Text
 
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 %>
 
 <%
@@ -97,6 +97,13 @@ from student.models import CourseEnrollment
         var banner = new MessageBannerView({urgency: 'low', type: 'warning', isRecoveryEmailMsg: true});
         $('#content').prepend(banner.$el);
         banner.showMessage(${recovery_email_activation_message | n, dump_js_escaped_json})
+      </%static:require_module>
+  % endif
+  % if enterprise_learner_portal_enabled_message:
+      <%static:require_module module_name="js/views/message_banner" class_name="MessageBannerView">
+        var banner = new MessageBannerView({urgency: 'low', type: 'warning', isLearnerPortalEnabled: true});
+        $('#content').prepend(banner.$el);
+        banner.showMessage(${enterprise_learner_portal_enabled_message | n, dump_js_escaped_json})
       </%static:require_module>
   % endif
 </%block>
@@ -196,11 +203,11 @@ from student.models import CourseEnrollment
                 show_courseware_link = show_courseware_links_for.get(session_id, False)
                 cert_status = cert_statuses.get(session_id)
                 can_refund_entitlement = entitlement and entitlement.is_entitlement_refundable()
-                can_unenroll = (not cert_status) or cert_status.get('can_unenroll') if not unfulfilled_entitlement else False
+                partner_managed_enrollment = enrollment.mode == 'masters'
+                can_unenroll = False if partner_managed_enrollment else (not cert_status) or cert_status.get('can_unenroll') if not unfulfilled_entitlement else False
                 credit_status = credit_statuses.get(session_id)
                 course_mode_info = all_course_modes.get(session_id)
                 is_paid_course = True if entitlement else (session_id in enrolled_courses_either_paid)
-                is_course_blocked = (session_id in block_courses)
                 course_verification_status = verification_status_by_course.get(session_id, {})
                 course_requirements = courses_requirements_not_met.get(session_id)
                 related_programs = inverted_programs.get(six.text_type(entitlement.course_uuid if is_unfulfilled_entitlement else session_id))
@@ -208,7 +215,7 @@ from student.models import CourseEnrollment
                 course_overview = enrollment.course_overview
                 resume_button_url = resume_button_urls[dashboard_index]
               %>
-              <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=course_overview, course_card_index=dashboard_index, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_fulfilled_entitlement=is_fulfilled_entitlement, entitlement=entitlement, entitlement_session=entitlement_session, entitlement_available_sessions=entitlement_available_sessions, entitlement_expiration_date=entitlement_expiration_date, entitlement_expired_at=entitlement_expired_at, show_courseware_link=show_courseware_link, cert_status=cert_status, can_refund_entitlement=can_refund_entitlement, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, is_course_blocked=is_course_blocked, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name, resume_button_url=resume_button_url' />
+              <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=course_overview, course_card_index=dashboard_index, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_fulfilled_entitlement=is_fulfilled_entitlement, entitlement=entitlement, entitlement_session=entitlement_session, entitlement_available_sessions=entitlement_available_sessions, entitlement_expiration_date=entitlement_expiration_date, entitlement_expired_at=entitlement_expired_at, show_courseware_link=show_courseware_link, cert_status=cert_status, can_refund_entitlement=can_refund_entitlement, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name, resume_button_url=resume_button_url, partner_managed_enrollment=partner_managed_enrollment' />
             % endfor
             % if show_load_all_courses_link:
                 <br/>

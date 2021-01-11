@@ -1,0 +1,4 @@
+{% load i18n %}
+{% autoescape off %}
+{% blocktrans trimmed %}Your {{ platform_name }} ID verification was approved!{% endblocktrans %}
+{% endautoescape %}

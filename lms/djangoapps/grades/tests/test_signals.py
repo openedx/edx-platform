@@ -12,7 +12,7 @@ from django.test import TestCase
 from mock import MagicMock, patch
 from submissions.models import score_reset, score_set
 
-from util.date_utils import to_timestamp
+from common.djangoapps.util.date_utils import to_timestamp
 
 from ..constants import ScoreDatabaseTableEnum
 from ..signals.handlers import (

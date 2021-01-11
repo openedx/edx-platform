@@ -8,6 +8,7 @@ import datetime
 import ddt
 import pytz
 import six
+from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
 from django.template import defaultfilters
 from django.test import RequestFactory, override_settings
@@ -18,27 +19,27 @@ from mock import patch
 from six.moves import range
 from six.moves.urllib.parse import parse_qs
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.access_response import MilestoneAccessError, StartDateError, VisibilityError
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
-from mobile_api.testutils import (
+from lms.djangoapps.mobile_api.testutils import (
     MobileAPITestCase,
     MobileAuthTestMixin,
     MobileAuthUserTestMixin,
     MobileCourseAccessTestMixin
 )
-from mobile_api.utils import API_V1, API_V05
+from lms.djangoapps.mobile_api.utils import API_V1, API_V05
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.lib.courses import course_image_url
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
-from student.models import CourseEnrollment
-from student.tests.factories import CourseEnrollmentFactory
-from util.milestones_helpers import set_prerequisite_courses
-from util.testing import UrlResetMixin
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
+from common.djangoapps.util.milestones_helpers import set_prerequisite_courses
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -280,15 +281,18 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
                 user=self.user,
                 course_id=course.id
             )
+            enrollment.created = self.THREE_YEARS_AGO + datetime.timedelta(days=1)
+            enrollment.save()
+
             ScheduleFactory(
-                start_date=self.THREE_YEARS_AGO + datetime.timedelta(days=1),
                 enrollment=enrollment
             )
         else:
             course = CourseFactory.create(start=self.LAST_WEEK, mobile_available=True)
             self.enroll(course.id)
 
-        add_course_mode(course, upgrade_deadline_expired=False)
+        add_course_mode(course, mode_slug=CourseMode.AUDIT)
+        add_course_mode(course)
 
     def _get_enrollment_data(self, api_version, expired):
         self.login()
@@ -318,7 +322,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         Test that expired courses are only returned in v1 of API
         when waffle flag enabled, and un-expired courses always returned
         '''
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime.datetime(2018, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime.datetime(2015, 1, 1))
         courses = self._get_enrollment_data(api_version, expired)
         self._assert_enrollment_results(api_version, courses, num_courses_returned, True)
 
@@ -446,14 +450,14 @@ class CourseStatusAPITestCase(MobileAPITestCase):
 
 
 class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
-                          MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
+                          MobileCourseAccessTestMixin, MilestonesTestCaseMixin, CompletionWaffleTestMixin):
     """
-    Tests for GET of /api/mobile/v0.5/users/<user_name>/course_status_info/{course_id}
+    Tests for GET of /api/mobile/v<version_number>/users/<user_name>/course_status_info/{course_id}
     """
-    def test_success(self):
+    def test_success_v0(self):
         self.login_and_enroll()
 
-        response = self.api_response()
+        response = self.api_response(api_version=API_V05)
         self.assertEqual(
             response.data["last_visited_module_id"],
             six.text_type(self.sub_section.location)
@@ -461,6 +465,16 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         self.assertEqual(
             response.data["last_visited_module_path"],
             [six.text_type(module.location) for module in [self.sub_section, self.section, self.course]]
+        )
+
+    def test_success_v1(self):
+        self.override_waffle_switch(True)
+        self.login_and_enroll()
+        submit_completions_for_testing(self.user, [self.unit.location])
+        response = self.api_response(api_version=API_V1)
+        self.assertEqual(
+            response.data["last_visited_block_id"],
+            six.text_type(self.unit.location)
         )
 
 

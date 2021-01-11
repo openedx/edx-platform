@@ -16,10 +16,10 @@ from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from xblock.core import XBlock
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.models import CourseAccessRole, CourseEnrollment
-from student.roles import CourseRole, OrgRole
+from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
+from common.djangoapps.student.roles import CourseRole, OrgRole
 from xmodule.course_module import CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
 from xmodule.x_module import XModule
@@ -37,7 +37,7 @@ def is_track_ok_for_exam(user, exam):
     """
     course_id = CourseKey.from_string(exam['course_id'])
     mode, is_active = CourseEnrollment.enrollment_mode_for_user(user, course_id)
-    return is_active and mode in (CourseMode.VERIFIED, CourseMode.MASTERS, CourseMode.PROFESSIONAL)
+    return is_active and mode in (CourseMode.VERIFIED, CourseMode.MASTERS, CourseMode.PROFESSIONAL, CourseMode.EXECUTIVE_EDUCATION)
 
 
 # The edx_proctoring.api uses this permission to gate access to the

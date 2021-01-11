@@ -33,6 +33,7 @@
                     this.$el,
                     HtmlUtils.template(manageTemplate)({})
                 );
+                this.delegateEvents(this.events);
                 return this;
             },
 

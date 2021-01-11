@@ -8,19 +8,18 @@ from itertools import product
 import ddt
 import six
 from django.test.client import RequestFactory
+from edx_toggles.toggles.testutils import override_waffle_switch
 from mock import patch
 
-from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
-from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, waffle
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import SampleCourseFactory, check_mongo_calls
 from xmodule.modulestore.tests.sample_courses import BlockInfo
+from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
+from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, waffle_switch
 
 from ..api import get_blocks
-from ..toggles import ENABLE_VIDEO_URL_REWRITE
 
 
 class TestGetBlocks(SharedModuleStoreTestCase):
@@ -159,10 +158,7 @@ class TestGetBlocksMobileHack(SharedModuleStoreTestCase):
         assert_containment(str(empty_container_key), blocks['blocks'])
 
     @patch('xmodule.video_module.VideoBlock.student_view_data')
-    @ddt.data(
-        True, False
-    )
-    def test_video_urls_rewrite(self, waffle_flag_value, video_data_patch):
+    def test_video_urls_rewrite(self, video_data_patch):
         """
         Verify the video blocks returned have their URL re-written for
         encoded videos.
@@ -179,17 +175,13 @@ class TestGetBlocksMobileHack(SharedModuleStoreTestCase):
                 }
             }
         }
-        with override_waffle_flag(ENABLE_VIDEO_URL_REWRITE, waffle_flag_value):
-            blocks = get_blocks(
-                self.request, self.course.location, requested_fields=['student_view_data'], student_view_data=['video']
-            )
+        blocks = get_blocks(
+            self.request, self.course.location, requested_fields=['student_view_data'], student_view_data=['video']
+        )
         video_block_key = str(self.course.id.make_usage_key('video', 'sample_video'))
         video_block_data = blocks['blocks'][video_block_key]
         for video_data in six.itervalues(video_block_data['student_view_data']['encoded_videos']):
-            if waffle_flag_value:
-                self.assertNotIn('cloudfront', video_data['url'])
-            else:
-                self.assertIn('cloudfront', video_data['url'])
+            self.assertNotIn('cloudfront', video_data['url'])
 
 
 @ddt.ddt
@@ -238,12 +230,12 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
     )
     @ddt.unpack
     def test_query_counts_cached(self, store_type, with_storage_backing):
-        with waffle().override(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
+        with override_waffle_switch(waffle_switch(STORAGE_BACKING_FOR_CACHE), active=with_storage_backing):
             course = self._create_course(store_type)
             self._get_blocks(
                 course,
                 expected_mongo_queries=0,
-                expected_sql_queries=13 if with_storage_backing else 12,
+                expected_sql_queries=11 if with_storage_backing else 10,
             )
 
     @ddt.data(
@@ -255,14 +247,14 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
     @ddt.unpack
     def test_query_counts_uncached(self, store_type_tuple, with_storage_backing):
         store_type, expected_mongo_queries = store_type_tuple
-        with waffle().override(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
+        with override_waffle_switch(waffle_switch(STORAGE_BACKING_FOR_CACHE), active=with_storage_backing):
             course = self._create_course(store_type)
             clear_course_from_cache(course.id)
 
             if with_storage_backing:
-                num_sql_queries = 23
+                num_sql_queries = 21
             else:
-                num_sql_queries = 13
+                num_sql_queries = 11
 
             self._get_blocks(
                 course,

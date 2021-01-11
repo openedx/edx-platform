@@ -19,8 +19,8 @@ from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -34,9 +34,9 @@ from lms.djangoapps.certificates.tests.factories import CertificateInvalidationF
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
-from util.testing import EventTestMixin
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -206,13 +206,13 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
         )
 
     @ddt.data(
-        (False, timedelta(days=2), False),
-        (False, -timedelta(days=2), True),
-        (True, timedelta(days=2), True)
+        (False, timedelta(days=2), False, True),
+        (False, -timedelta(days=2), True, None),
+        (True, timedelta(days=2), True, None)
     )
     @ddt.unpack
     @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
-    def test_cert_api_return(self, self_paced, cert_avail_delta, cert_downloadable_status):
+    def test_cert_api_return(self, self_paced, cert_avail_delta, cert_downloadable_status, earned_but_not_available):
         """
         Test 'downloadable status'
         """
@@ -226,10 +226,9 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
         with mock_passing_grade():
             certs_api.generate_user_certificates(self.student, self.course.id)
 
-        self.assertEqual(
-            certs_api.certificate_downloadable_status(self.student, self.course.id)['is_downloadable'],
-            cert_downloadable_status
-        )
+        downloadable_status = certs_api.certificate_downloadable_status(self.student, self.course.id)
+        self.assertEqual(downloadable_status['is_downloadable'], cert_downloadable_status)
+        self.assertEqual(downloadable_status.get('earned_but_not_available'), earned_but_not_available)
 
 
 @ddt.ddt

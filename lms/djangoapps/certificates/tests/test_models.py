@@ -26,7 +26,7 @@ from lms.djangoapps.certificates.models import (
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from student.tests.factories import AdminFactory, UserFactory
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -358,7 +358,7 @@ class CertificateInvalidationTest(SharedModuleStoreTestCase):
             CertificateInvalidation.has_certificate_invalidation(self.user, self.course_id)
         )
 
-    @patch('openedx.core.djangoapps.programs.tasks.v1.tasks.revoke_program_certificates.delay')
+    @patch('openedx.core.djangoapps.programs.tasks.revoke_program_certificates.delay')
     @patch(
         'openedx.core.djangoapps.credentials.models.CredentialsApiConfig.is_learner_issuance_enabled',
         return_value=True,

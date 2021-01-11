@@ -12,7 +12,7 @@ from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from openedx.core.lib.command_utils import get_mutually_exclusive_required_option, parse_course_keys
 from xmodule.modulestore.django import modulestore
 
-from ... import tasks
+from lms.djangoapps.grades import tasks
 
 log = logging.getLogger(__name__)
 

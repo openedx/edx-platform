@@ -15,13 +15,14 @@ $static-path: '../..';
 @import 'layouts';
 @import 'components';
 @import 'course/layout/courseware_preview';
-@import 'course/layout/dates_banner';
+@import 'course/layout/banner_cta';
 @import 'shared/modal';
 @import 'shared/help-tab';
 @import './elements/banners';
 @import './elements/progress-circle';
 @import './elements/program-card';
 @import 'elements/icons';
+@import './elements/pagination';
 
 // Features
 @import 'features/bookmarks';
@@ -31,7 +32,6 @@ $static-path: '../..';
 @import 'features/course-upgrade-message';
 @import 'features/course-duration-limits';
 @import 'features/first-purchase-banner';
-@import 'features/next-up-banner';
 
 // Individual Pages
 @import "views/program-marketing-page";

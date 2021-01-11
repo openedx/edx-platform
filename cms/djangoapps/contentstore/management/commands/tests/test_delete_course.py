@@ -6,8 +6,8 @@ Delete course tests.
 import mock
 from django.core.management import CommandError, call_command
 
-from student.roles import CourseInstructorRole
-from student.tests.factories import UserFactory
+from common.djangoapps.student.roles import CourseInstructorRole
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
@@ -20,7 +20,7 @@ class DeleteCourseTests(ModuleStoreTestCase):
     Test for course deleting functionality of the 'delete_course' command
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
-    YESNO_PATCH_LOCATION = 'contentstore.management.commands.delete_course.query_yes_no'
+    YESNO_PATCH_LOCATION = 'cms.djangoapps.contentstore.management.commands.delete_course.query_yes_no'
 
     def test_invalid_course_key(self):
         course_run_key = 'foo/TestX/TS01/2015_Q7'

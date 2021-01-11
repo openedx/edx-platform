@@ -20,7 +20,6 @@ of the query for traversing StudentModule objects.
 
 """
 
-
 import logging
 from functools import partial
 
@@ -28,12 +27,10 @@ from celery import task
 from django.conf import settings
 from django.utils.translation import ugettext_noop
 
-from bulk_email.tasks import perform_delegate_email_batches
+from lms.djangoapps.bulk_email.tasks import perform_delegate_email_batches
 from lms.djangoapps.instructor_task.tasks_base import BaseInstructorTask
 from lms.djangoapps.instructor_task.tasks_helper.certs import generate_students_certificates
 from lms.djangoapps.instructor_task.tasks_helper.enrollments import (
-    upload_enrollment_report,
-    upload_exec_summary_report,
     upload_may_enroll_csv,
     upload_students_csv
 )
@@ -42,6 +39,7 @@ from lms.djangoapps.instructor_task.tasks_helper.misc import (
     cohort_students_and_upload,
     upload_course_survey_report,
     upload_ora2_data,
+    upload_ora2_submission_files,
     upload_proctored_exam_results_report
 )
 from lms.djangoapps.instructor_task.tasks_helper.module_state import (
@@ -161,7 +159,11 @@ def send_bulk_course_email(entry_id, _xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)
+@task(
+    name='lms.djangoapps.instructor_task.tasks.calculate_problem_responses_csv.v2',
+    base=BaseInstructorTask,
+    routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY,
+)
 def calculate_problem_responses_csv(entry_id, xmodule_instance_args):
     """
     Compute student answers to a given problem and upload the CSV to
@@ -215,30 +217,6 @@ def calculate_students_features_csv(entry_id, xmodule_instance_args):
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
     action_name = ugettext_noop('generated')
     task_fn = partial(upload_students_csv, xmodule_instance_args)
-    return run_main_task(entry_id, task_fn, action_name)
-
-
-@task(base=BaseInstructorTask)
-def enrollment_report_features_csv(entry_id, xmodule_instance_args):
-    """
-    Compute student profile information for a course and upload the
-    CSV to an S3 bucket for download.
-    """
-    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
-    action_name = ugettext_noop('generating_enrollment_report')
-    task_fn = partial(upload_enrollment_report, xmodule_instance_args)
-    return run_main_task(entry_id, task_fn, action_name)
-
-
-@task(base=BaseInstructorTask)
-def exec_summary_report_csv(entry_id, xmodule_instance_args):
-    """
-    Compute executive summary report for a course and upload the
-    Html generated report to an S3 bucket for download.
-    """
-    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
-    action_name = 'generating_exec_summary_report'
-    task_fn = partial(upload_exec_summary_report, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
 
 
@@ -313,4 +291,15 @@ def export_ora2_data(entry_id, xmodule_instance_args):
     """
     action_name = ugettext_noop('generated')
     task_fn = partial(upload_ora2_data, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
+
+
+@task(base=BaseInstructorTask)
+def export_ora2_submission_files(entry_id, xmodule_instance_args):
+    """
+    Download all submission files, generate csv downloads list,
+    put all this into zip archive and push it to S3.
+    """
+    action_name = ugettext_noop('compressed')
+    task_fn = partial(upload_ora2_submission_files, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)

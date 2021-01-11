@@ -27,9 +27,10 @@ import dateutil
 import yaml
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from django.core.exceptions import ImproperlyConfigured
+from edx_django_utils.plugins import add_plugins
 from path import Path as path
 
-from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
+from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 from openedx.core.lib.derived import derive_settings
 from openedx.core.lib.logsettings import get_logger_config
 from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
@@ -92,10 +93,10 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
 
     vars().update(__config_copy__)
 
-# A file path to a YAML file from which to load all the code revisions currently deployed
-REVISION_CONFIG_FILE = get_env_setting('REVISION_CFG')
-
 try:
+    # A file path to a YAML file from which to load all the code revisions currently deployed
+    REVISION_CONFIG_FILE = get_env_setting('REVISION_CFG')
+
     with codecs.open(REVISION_CONFIG_FILE, encoding='utf-8') as f:
         REVISION_CONFIG = yaml.safe_load(f)
 except Exception:  # pylint: disable=broad-except
@@ -107,11 +108,6 @@ EDX_PLATFORM_REVISION = REVISION_CONFIG.get('EDX_PLATFORM_REVISION', EDX_PLATFOR
 # SERVICE_VARIANT specifies name of the variant used, which decides what JSON
 # configuration files are read during startup.
 SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
-
-# CONFIG_ROOT specifies the directory where the JSON configuration
-# files are expected to be found. If not specified, use the project
-# directory.
-CONFIG_ROOT = path(os.environ.get('CONFIG_ROOT', ENV_ROOT))
 
 # CONFIG_PREFIX specifies the prefix of the JSON configuration files,
 # based on the service variant. If no variant is use, don't use a
@@ -125,7 +121,7 @@ BROKER_POOL_LIMIT = 0
 BROKER_CONNECTION_TIMEOUT = 1
 
 # For the Result Store, use the django cache named 'celery'
-CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
+CELERY_RESULT_BACKEND = 'django-cache'
 
 # When the broker is behind an ELB, use a heartbeat to refresh the
 # connection and to detect if it has been dropped.
@@ -171,6 +167,10 @@ if STATIC_URL_BASE:
     STATIC_URL = STATIC_URL_BASE
     if not STATIC_URL.endswith("/"):
         STATIC_URL += "/"
+
+# Allow overriding build profile used by RequireJS with one
+# contained on a custom theme
+REQUIRE_BUILD_PROFILE = ENV_TOKENS.get('REQUIRE_BUILD_PROFILE', REQUIRE_BUILD_PROFILE)
 
 # The following variables use (or) instead of the default value inside (get). This is to enforce using the Lazy Text
 # values when the varibale is an empty string. Therefore, setting these variable as empty text in related
@@ -306,9 +306,8 @@ MKTG_URL_OVERRIDES.update(ENV_TOKENS.get('MKTG_URL_OVERRIDES', MKTG_URL_OVERRIDE
 # Intentional defaults.
 ID_VERIFICATION_SUPPORT_LINK = ENV_TOKENS.get('ID_VERIFICATION_SUPPORT_LINK', SUPPORT_SITE_LINK)
 PASSWORD_RESET_SUPPORT_LINK = ENV_TOKENS.get('PASSWORD_RESET_SUPPORT_LINK', SUPPORT_SITE_LINK)
-ACTIVATION_EMAIL_SUPPORT_LINK = ENV_TOKENS.get(
-    'ACTIVATION_EMAIL_SUPPORT_LINK', SUPPORT_SITE_LINK
-)
+ACTIVATION_EMAIL_SUPPORT_LINK = ENV_TOKENS.get('ACTIVATION_EMAIL_SUPPORT_LINK', SUPPORT_SITE_LINK)
+LOGIN_ISSUE_SUPPORT_LINK = ENV_TOKENS.get('LOGIN_ISSUE_SUPPORT_LINK', SUPPORT_SITE_LINK)
 
 # Timezone overrides
 TIME_ZONE = ENV_TOKENS.get('CELERY_TIMEZONE', CELERY_TIMEZONE)
@@ -538,6 +537,11 @@ BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
                                             CELERY_BROKER_VHOST)
 BROKER_USE_SSL = ENV_TOKENS.get('CELERY_BROKER_USE_SSL', False)
 
+BROKER_TRANSPORT_OPTIONS = {
+    'fanout_patterns': True,
+    'fanout_prefix': True,
+}
+
 # Block Structures
 
 # upload limits
@@ -558,6 +562,9 @@ TRACKING_SEGMENTIO_DISALLOWED_SUBSTRING_NAMES = ENV_TOKENS.get(
     TRACKING_SEGMENTIO_DISALLOWED_SUBSTRING_NAMES
 )
 TRACKING_SEGMENTIO_SOURCE_MAP = ENV_TOKENS.get("TRACKING_SEGMENTIO_SOURCE_MAP", TRACKING_SEGMENTIO_SOURCE_MAP)
+
+# Heartbeat
+HEARTBEAT_CELERY_ROUTING_KEY = ENV_TOKENS.get('HEARTBEAT_CELERY_ROUTING_KEY', HEARTBEAT_CELERY_ROUTING_KEY)
 
 # Student identity verification settings
 VERIFY_STUDENT = AUTH_TOKENS.get("VERIFY_STUDENT", VERIFY_STUDENT)
@@ -591,6 +598,15 @@ MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = ENV_TOKENS.get(
     "MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS", MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS
 )
 
+##### LOGISTRATION RATE LIMIT SETTINGS #####
+LOGISTRATION_RATELIMIT_RATE = ENV_TOKENS.get('LOGISTRATION_RATELIMIT_RATE', LOGISTRATION_RATELIMIT_RATE)
+LOGISTRATION_API_RATELIMIT = ENV_TOKENS.get('LOGISTRATION_API_RATELIMIT', LOGISTRATION_API_RATELIMIT)
+
+##### REGISTRATION RATE LIMIT SETTINGS #####
+REGISTRATION_VALIDATION_RATELIMIT = ENV_TOKENS.get(
+    'REGISTRATION_VALIDATION_RATELIMIT', REGISTRATION_VALIDATION_RATELIMIT
+)
+
 #### PASSWORD POLICY SETTINGS #####
 AUTH_PASSWORD_VALIDATORS = ENV_TOKENS.get("AUTH_PASSWORD_VALIDATORS", AUTH_PASSWORD_VALIDATORS)
 
@@ -608,9 +624,10 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
         'social_core.backends.linkedin.LinkedinOAuth2',
         'social_core.backends.facebook.FacebookOAuth2',
         'social_core.backends.azuread.AzureADOAuth2',
-        'third_party_auth.identityserver3.IdentityServer3',
-        'third_party_auth.saml.SAMLAuthBackend',
-        'third_party_auth.lti.LTIAuthBackend',
+        'common.djangoapps.third_party_auth.appleid.AppleIdAuth',  # vendored 'social_core.backends.apple.AppleIdAuth'
+        'common.djangoapps.third_party_auth.identityserver3.IdentityServer3',
+        'common.djangoapps.third_party_auth.saml.SAMLAuthBackend',
+        'common.djangoapps.third_party_auth.lti.LTIAuthBackend',
     ])
 
     AUTHENTICATION_BACKENDS = list(tmp_backends) + list(AUTHENTICATION_BACKENDS)
@@ -636,7 +653,7 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
 
     if ENV_TOKENS.get('THIRD_PARTY_AUTH_SAML_FETCH_PERIOD_HOURS', 24) is not None:
         CELERYBEAT_SCHEDULE['refresh-saml-metadata'] = {
-            'task': 'third_party_auth.fetch_saml_metadata',
+            'task': 'common.djangoapps.third_party_auth.fetch_saml_metadata',
             'schedule': datetime.timedelta(hours=ENV_TOKENS.get('THIRD_PARTY_AUTH_SAML_FETCH_PERIOD_HOURS', 24)),
         }
 
@@ -725,6 +742,11 @@ if FEATURES.get('INDIVIDUAL_DUE_DATES'):
         'courseware.student_field_overrides.IndividualStudentOverrideProvider',
     )
 
+##### Show Answer Override for Self-Paced Courses #####
+FIELD_OVERRIDE_PROVIDERS += (
+    'openedx.features.personalized_learner_schedules.show_answer.show_answer_field_override.ShowAnswerFieldOverride',
+)
+
 ##### Self-Paced Course Due Dates #####
 XBLOCK_FIELD_DATA_WRAPPERS += (
     'lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap',
@@ -747,8 +769,8 @@ CREDIT_PROVIDER_SECRET_KEYS = AUTH_TOKENS.get("CREDIT_PROVIDER_SECRET_KEYS", {})
 
 ##################### LTI Provider #####################
 if FEATURES.get('ENABLE_LTI_PROVIDER'):
-    INSTALLED_APPS.append('lti_provider.apps.LtiProviderConfig')
-    AUTHENTICATION_BACKENDS.append('lti_provider.users.LtiBackend')
+    INSTALLED_APPS.append('lms.djangoapps.lti_provider.apps.LtiProviderConfig')
+    AUTHENTICATION_BACKENDS.append('lms.djangoapps.lti_provider.users.LtiBackend')
 
 LTI_USER_EMAIL_DOMAIN = ENV_TOKENS.get('LTI_USER_EMAIL_DOMAIN', 'lti.example.com')
 
@@ -829,6 +851,10 @@ ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = ENV_TOKENS.get(
     'ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER',
     ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER
 )
+INTEGRATED_CHANNELS_API_CHUNK_TRANSMISSION_LIMIT = ENV_TOKENS.get(
+    'INTEGRATED_CHANNELS_API_CHUNK_TRANSMISSION_LIMIT',
+    INTEGRATED_CHANNELS_API_CHUNK_TRANSMISSION_LIMIT
+)
 
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
 # The LMS communicates with the Enterprise service via the EdxRestApiClient class
@@ -857,9 +883,6 @@ ENTERPRISE_CATALOG_INTERNAL_ROOT_URL = ENV_TOKENS.get(
     'ENTERPRISE_CATALOG_INTERNAL_ROOT_URL',
     ENTERPRISE_CATALOG_INTERNAL_ROOT_URL
 )
-
-# List of enterprise customer uuids to exclude from transition to use of enterprise-catalog
-ENTERPRISE_CUSTOMERS_EXCLUDED_FROM_CATALOG = ENV_TOKENS.get('ENTERPRISE_CUSTOMERS_EXCLUDED_FROM_CATALOG', ())
 
 ############## ENTERPRISE SERVICE LMS CONFIGURATION ##################################
 # The LMS has some features embedded that are related to the Enterprise service, but
@@ -917,23 +940,21 @@ PARENTAL_CONSENT_AGE_LIMIT = ENV_TOKENS.get(
 # Allow extra middleware classes to be added to the app through configuration.
 MIDDLEWARE.extend(ENV_TOKENS.get('EXTRA_MIDDLEWARE_CLASSES', []))
 
-############### Settings for django-fernet-fields ##################
-VEDA_FERNET_KEYS = AUTH_TOKENS.get('VEDA_FERNET_KEYS', [])
-FERNET_KEYS = AUTH_TOKENS.get('FERNET_KEYS', FERNET_KEYS)
-FERNET_KEYS += VEDA_FERNET_KEYS
-
 ################# Settings for the maintenance banner #################
 MAINTENANCE_BANNER_TEXT = ENV_TOKENS.get('MAINTENANCE_BANNER_TEXT', None)
 
 ########################## limiting dashboard courses ######################
 DASHBOARD_COURSE_LIMIT = ENV_TOKENS.get('DASHBOARD_COURSE_LIMIT', None)
 
+######################## Setting for content libraries ########################
+MAX_BLOCKS_PER_CONTENT_LIBRARY = ENV_TOKENS.get('MAX_BLOCKS_PER_CONTENT_LIBRARY', MAX_BLOCKS_PER_CONTENT_LIBRARY)
+
 ############################### Plugin Settings ###############################
 
 # This is at the bottom because it is going to load more settings after base settings are loaded
 
 # Load production.py in plugins
-plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_constants.SettingsType.PRODUCTION)
+add_plugins(__name__, ProjectType.LMS, SettingsType.PRODUCTION)
 
 ############## ADG Specific Settings  #########################
 
@@ -944,3 +965,12 @@ MAILCHIMP_LIST_ID = AUTH_TOKENS.get('MAILCHIMP_LIST_ID', None)
 ########################## Derive Any Derived Settings  #######################
 
 derive_settings(__name__)
+
+############## Settings for Completion API #########################
+
+# Once a user has watched this percentage of a video, mark it as complete:
+# (0.0 = 0%, 1.0 = 100%)
+COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get('COMPLETION_VIDEO_COMPLETE_PERCENTAGE',
+                                                      COMPLETION_VIDEO_COMPLETE_PERCENTAGE)
+COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get('COMPLETION_BY_VIEWING_DELAY_MS',
+                                                      COMPLETION_BY_VIEWING_DELAY_MS)

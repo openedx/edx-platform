@@ -81,7 +81,7 @@ class BundleCache(object):
         """
         assert isinstance(key_parts, (list, tuple))
         full_key = _get_versioned_cache_key(self.bundle_uuid, self.draft_name, key_parts)
-        return cache.set(full_key, value)
+        return cache.set(full_key, value, timeout=None)
 
     def clear(self):
         """
@@ -101,6 +101,14 @@ class BundleCache(object):
         cache.delete(cache_key)
 
 
+def _construct_versioned_cache_key(bundle_uuid, version_num, key_parts, draft_name=None):
+    cache_key = str(bundle_uuid)
+    if draft_name:
+        cache_key += ":" + draft_name
+    cache_key += ":" + str(version_num) + ":" + ":".join(key_parts)
+    return cache_key
+
+
 def _get_versioned_cache_key(bundle_uuid, draft_name, key_parts):
     """
     Generate a cache key string that can be used to store data about the current
@@ -112,7 +120,7 @@ def _get_versioned_cache_key(bundle_uuid, draft_name, key_parts):
     """
     assert isinstance(bundle_uuid, UUID)
     version_num = get_bundle_version_number(bundle_uuid, draft_name)
-    return str(bundle_uuid) + ":" + str(version_num) + ":" + ":".join(key_parts)
+    return _construct_versioned_cache_key(bundle_uuid, version_num, key_parts, draft_name)
 
 
 def get_bundle_version_number(bundle_uuid, draft_name=None):
@@ -135,6 +143,11 @@ def get_bundle_version_number(bundle_uuid, draft_name=None):
             # Convert the 'updated_at' datetime info an integer value with microsecond accuracy.
             updated_at_timestamp = (draft_metadata.updated_at - datetime(1970, 1, 1, tzinfo=UTC)).total_seconds()
             version = int(updated_at_timestamp * 1e6)
+            # Cache the draft files using the version.  This saves an API call when the draft is first retrieved.
+            draft_files = list(draft_metadata.files.values())
+            draft_files_cache_key = _construct_versioned_cache_key(
+                bundle_uuid, version, ('bundle_draft_files', ), draft_name)
+            cache.set(draft_files_cache_key, draft_files)
     # If we're not using a draft or the draft does not exist [anymore], fall
     # back to the bundle version, if any versions have been published:
     if version == 0 and bundle_metadata.latest_version:

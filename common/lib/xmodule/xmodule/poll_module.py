@@ -7,7 +7,7 @@ If student have answered - Question with statistics for each answers.
 """
 
 
-import cgi
+import html
 import json
 import logging
 from collections import OrderedDict
@@ -17,7 +17,7 @@ from pkg_resources import resource_string
 
 import six
 from lxml import etree
-from openedx.core.djangolib.markup import Text
+from openedx.core.djangolib.markup import Text, HTML
 from xblock.fields import Boolean, Dict, List, Scope, String
 from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.stringify import stringify_children
@@ -152,12 +152,12 @@ class PollModule(PollFields, XModule):
             # Set default count for answer = 0.
             if answer['id'] not in temp_poll_answers:
                 temp_poll_answers[answer['id']] = 0
-            answers_to_json[answer['id']] = cgi.escape(answer['text'])
+            answers_to_json[answer['id']] = html.escape(answer['text'], quote=False)
         self.poll_answers = temp_poll_answers
 
         return json.dumps({
             'answers': answers_to_json,
-            'question': cgi.escape(self.question),
+            'question': html.escape(self.question, quote=False),
             # to show answered poll after reload:
             'poll_answer': self.poll_answer,
             'poll_answers': self.poll_answers if self.voted else {},
@@ -215,17 +215,22 @@ class PollDescriptor(PollFields, MakoModuleDescriptor, XmlDescriptor):
 
     def definition_to_xml(self, resource_fs):
         """Return an xml element representing to this definition."""
-        poll_str = u'<{tag_name}>{text}</{tag_name}>'.format(
+        poll_str = HTML('<{tag_name}>{text}</{tag_name}>').format(
             tag_name=self._tag_name, text=self.question)
         xml_object = etree.fromstring(poll_str)
         xml_object.set('display_name', self.display_name)
 
         def add_child(xml_obj, answer):
             # Escape answer text before adding to xml tree.
-            answer_text = six.text_type(Text(answer['text']))
-            child_str = u'<{tag_name} id="{id}">{text}</{tag_name}>'.format(
-                tag_name=self._child_tag_name, id=answer['id'],
-                text=answer_text)
+            answer_text = str(answer['text'])
+            child_str = Text('{tag_begin}{text}{tag_end}').format(
+                tag_begin=HTML('<{tag_name} id="{id}">').format(
+                    tag_name=self._child_tag_name,
+                    id=answer['id']
+                ),
+                text=answer_text,
+                tag_end=HTML('</{tag_name}>').format(tag_name=self._child_tag_name)
+            )
             child_node = etree.fromstring(child_str)
             xml_object.append(child_node)
 

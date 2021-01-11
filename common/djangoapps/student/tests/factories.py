@@ -14,11 +14,12 @@ from pytz import UTC
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from student.models import (
+from common.djangoapps.student.models import (
     AccountRecovery,
     CourseAccessRole,
     CourseEnrollment,
     CourseEnrollmentAllowed,
+    CourseEnrollmentCelebration,
     PendingEmailChange,
     Registration,
     User,
@@ -163,6 +164,13 @@ class CourseEnrollmentFactory(DjangoModelFactory):
             kwargs['course'] = course_overview
 
         return manager.create(*args, **kwargs)
+
+
+class CourseEnrollmentCelebrationFactory(DjangoModelFactory):
+    class Meta:
+        model = CourseEnrollmentCelebration
+
+    enrollment = factory.SubFactory(CourseEnrollmentFactory)
 
 
 class CourseAccessRoleFactory(DjangoModelFactory):

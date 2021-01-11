@@ -14,18 +14,17 @@ from django.http import QueryDict
 from django.urls import reverse
 from django.utils.http import urlquote_plus
 from django.utils.timezone import now
+from edx_toggles.toggles.testutils import override_waffle_flag
 from pytz import UTC
 from waffle.models import Flag
 from waffle.testutils import override_flag
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
-from lms.djangoapps.courseware.tests.helpers import get_expiration_banner_text
-from experiments.models import ExperimentData
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.experiments.models import ExperimentData
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.api import add_course_goal, remove_course_goal
-from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
     GlobalStaffFactory,
@@ -34,9 +33,9 @@ from lms.djangoapps.courseware.tests.factories import (
     OrgStaffFactory,
     StaffFactory
 )
+from lms.djangoapps.courseware.tests.helpers import get_expiration_banner_text
+from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
-from openedx.features.discounts.applicability import get_discount_expiration_date
-from openedx.features.discounts.utils import format_strikeout_price, REV1008_EXPERIMENT_ID
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.django_comment_common.models import (
@@ -46,19 +45,20 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_MODERATOR
 )
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
-from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
-    RELATIVE_DATES_FLAG,
+    DISABLE_UNIFIED_COURSE_TAB_FLAG,
     SHOW_REVIEWS_TOOL_FLAG,
-    SHOW_UPGRADE_MSG_ON_COURSE_HOME,
-    UNIFIED_COURSE_TAB_FLAG
+    SHOW_UPGRADE_MSG_ON_COURSE_HOME
 )
-from student.models import CourseEnrollment, FBEEnrollmentExclusion
-from student.tests.factories import UserFactory
-from util.date_utils import strftime_localized
+from openedx.features.discounts.applicability import get_discount_expiration_date
+from openedx.features.discounts.utils import REV1008_EXPERIMENT_ID, format_strikeout_price
+from common.djangoapps.student.models import CourseEnrollment, FBEEnrollmentExclusion
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.util.date_utils import strftime_localized
 from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -186,7 +186,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
         response = self.client.get(url)
         self.assertContains(response, TEST_WELCOME_MESSAGE, status_code=200)
 
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
+    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_welcome_message_when_not_unified(self):
         # Create a welcome message
         create_course_update(self.course, self.user, TEST_WELCOME_MESSAGE)
@@ -213,13 +213,13 @@ class TestCourseHomePage(CourseHomePageTestCase):
         """
         Verify that the view's query count doesn't regress.
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=UTC))
         # Pre-fetch the view to populate any caches
         course_home_url(self.course)
 
         # Fetch the view and verify the query counts
         # TODO: decrease query count as part of REVO-28
-        with self.assertNumQueries(77, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(73, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
@@ -252,7 +252,8 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         super(TestCourseHomePageAccess, self).setUp()
 
         # Make this a verified course so that an upgrade message might be shown
-        add_course_mode(self.course, upgrade_deadline_expired=False)
+        add_course_mode(self.course, mode_slug=CourseMode.AUDIT)
+        add_course_mode(self.course)
 
         # Add a welcome message
         create_course_update(self.course, self.staff_user, TEST_WELCOME_MESSAGE)
@@ -343,7 +344,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
                     self.assertContains(private_response,
                                         'You must be enrolled in the course to see course content.')
 
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
+    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
     @override_waffle_flag(SHOW_REVIEWS_TOOL_FLAG, active=True)
     @ddt.data(
         [CourseUserType.ANONYMOUS, 'To see course content'],
@@ -439,9 +440,9 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         discount_expiration_date = get_discount_expiration_date(user, self.course).strftime(u'%B %d')
         upgrade_link = verified_upgrade_deadline_link(user=user, course=self.course)
         bannerText = u'''<div class="first-purchase-offer-banner" role="note">
-             <span class="first-purchase-offer-banner-bold">
-             Upgrade by {discount_expiration_date} and save {percentage}% [{strikeout_price}]</span>
-             <br>Use code <b>EDXWELCOME</b> at checkout! <a href="{upgrade_link}">Upgrade Now</a>
+             <span class="first-purchase-offer-banner-bold"><b>
+             Upgrade by {discount_expiration_date} and save {percentage}% [{strikeout_price}]</b></span>
+             <br>Use code <b>EDXWELCOME</b> at checkout! <a id="welcome" href="{upgrade_link}">Upgrade Now</a>
              </div>'''.format(
             discount_expiration_date=discount_expiration_date,
             percentage=percentage,
@@ -577,7 +578,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         Ensure that a user accessing an expired course sees a redirect to
         the student dashboard, not a 404.
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2010, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2010, 1, 1, tzinfo=UTC))
         course = CourseFactory.create(start=THREE_YEARS_AGO)
         url = course_home_url(course)
 
@@ -588,7 +589,9 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         audit_user = UserFactory(password=self.TEST_PASSWORD)
         self.client.login(username=audit_user.username, password=self.TEST_PASSWORD)
         audit_enrollment = CourseEnrollment.enroll(audit_user, course.id, mode=CourseMode.AUDIT)
-        ScheduleFactory(start_date=THREE_YEARS_AGO + timedelta(days=1), enrollment=audit_enrollment)
+        audit_enrollment.created = THREE_YEARS_AGO + timedelta(days=1)
+        audit_enrollment.save()
+        ScheduleFactory(enrollment=audit_enrollment)
 
         response = self.client.get(url)
 
@@ -611,7 +614,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         Ensure that a user accessing a course with an expired upgrade deadline
         will still see the course expiration banner without the upgrade related text.
         """
-        past = datetime(2010, 1, 1)
+        past = datetime(2010, 1, 1, tzinfo=UTC)
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=past)
         course = CourseFactory.create(start=now() - timedelta(days=10))
         CourseModeFactory.create(course_id=course.id, mode_slug=CourseMode.AUDIT)
@@ -631,7 +634,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         Verify that enrolled users are NOT shown the course expiration banner and can
         access the course home page if course audit only
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2010, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2010, 1, 1, tzinfo=UTC))
         audit_only_course = CourseFactory.create()
         self.create_user_for_course(audit_only_course, CourseUserType.ENROLLED)
         response = self.client.get(course_home_url(audit_only_course))
@@ -645,7 +648,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         Ensure that a user accessing an expired course that is in the holdback
         does not get redirected to the student dashboard, not a 404.
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2010, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2010, 1, 1, tzinfo=UTC))
 
         course = CourseFactory.create(start=THREE_YEARS_AGO)
         url = course_home_url(course)
@@ -668,7 +671,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         self.assertEqual(response.status_code, 200)
 
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
-    @mock.patch("util.date_utils.strftime_localized")
+    @mock.patch("common.djangoapps.util.date_utils.strftime_localized")
     def test_non_live_course_other_language(self, mock_strftime_localized):
         """
         Ensure that a user accessing a non-live course sees a redirect to
@@ -707,6 +710,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         # Verify that unenrolled users visiting a course with a Master's track
         # that is not the only track are shown an enroll call to action message
         add_course_mode(self.course, CourseMode.MASTERS, 'Master\'s Mode', upgrade_deadline_expired=False)
+        remove_course_mode(self.course, CourseMode.AUDIT)
 
         self.create_user_for_course(self.course, CourseUserType.UNENROLLED)
         url = course_home_url(self.course)
@@ -771,7 +775,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         config = CourseDurationLimitConfig(
             course=CourseOverview.get_from_id(self.course.id),
             enabled=True,
-            enabled_as_of=datetime(2018, 1, 1)
+            enabled_as_of=datetime(2018, 1, 1, tzinfo=UTC)
         )
         config.save()
 
@@ -804,7 +808,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         config = CourseDurationLimitConfig(
             course=CourseOverview.get_from_id(self.course.id),
             enabled=True,
-            enabled_as_of=datetime(2018, 1, 1)
+            enabled_as_of=datetime(2018, 1, 1, tzinfo=UTC)
         )
         config.save()
         url = course_home_url(self.course)
@@ -813,7 +817,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         bannerText = get_expiration_banner_text(self.staff_user, self.course)
         self.assertNotContains(response, bannerText, html=True)
 
-    @mock.patch("util.date_utils.strftime_localized")
+    @mock.patch("common.djangoapps.util.date_utils.strftime_localized")
     @mock.patch("openedx.features.course_duration_limits.access.get_date_string")
     def test_course_expiration_banner_with_unicode(self, mock_strftime_localized, mock_get_date_string):
         """
@@ -829,7 +833,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         config = CourseDurationLimitConfig(
             course=CourseOverview.get_from_id(self.course.id),
             enabled=True,
-            enabled_as_of=datetime(2018, 1, 1)
+            enabled_as_of=datetime(2018, 1, 1, tzinfo=UTC)
         )
         config.save()
         url = course_home_url(self.course)
@@ -977,7 +981,7 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         response = self.client.get(self.url)
         self.assertContains(response, 'section-upgrade')
         url = EcommerceService().get_checkout_page_url(self.verified_mode.sku)
-        self.assertContains(response, '<a class="btn-brand btn-upgrade"')
+        self.assertContains(response, '<a id="green_upgrade" class="btn-brand btn-upgrade"')
         self.assertContains(response, url)
         self.assertContains(
             response,
@@ -1016,9 +1020,10 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         mock.Mock(return_value=(HTML("<span>DISCOUNT_PRICE</span>"), True))
     )
     def test_upgrade_message_discount(self):
+        # pylint: disable=no-member
         CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
 
-        with SHOW_UPGRADE_MSG_ON_COURSE_HOME.override(True):
+        with override_waffle_flag(SHOW_UPGRADE_MSG_ON_COURSE_HOME, True):
             response = self.client.get(self.url)
 
         self.assertContains(response, "<span>DISCOUNT_PRICE</span>")

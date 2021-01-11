@@ -19,7 +19,7 @@ class TestGenerateCourses(ModuleStoreTestCase):
     Unit tests for creating a course in split store via command line
     """
 
-    @mock.patch('contentstore.management.commands.generate_courses.logger')
+    @mock.patch('cms.djangoapps.contentstore.management.commands.generate_courses.logger')
     def test_generate_course_in_stores(self, mock_logger):
         """
         Test that a course is created successfully
@@ -56,7 +56,7 @@ class TestGenerateCourses(ModuleStoreTestCase):
             arg = json.dumps(settings)
             call_command("generate_courses", arg)
 
-    @mock.patch('contentstore.management.commands.generate_courses.logger')
+    @mock.patch('cms.djangoapps.contentstore.management.commands.generate_courses.logger')
     @ddt.data("organization", "number", "run", "fields")
     def test_missing_course_settings(self, setting, mock_logger):
         """
@@ -74,7 +74,7 @@ class TestGenerateCourses(ModuleStoreTestCase):
         call_command("generate_courses", arg)
         mock_logger.warning.assert_any_call("Course json is missing " + setting)
 
-    @mock.patch('contentstore.management.commands.generate_courses.logger')
+    @mock.patch('cms.djangoapps.contentstore.management.commands.generate_courses.logger')
     def test_invalid_user(self, mock_logger):
         """
         Test that providing an invalid user in the course JSON will result in the appropriate error message
@@ -90,7 +90,7 @@ class TestGenerateCourses(ModuleStoreTestCase):
         call_command("generate_courses", arg)
         mock_logger.warning.assert_any_call("invalid_user user does not exist")
 
-    @mock.patch('contentstore.management.commands.generate_courses.logger')
+    @mock.patch('cms.djangoapps.contentstore.management.commands.generate_courses.logger')
     def test_missing_display_name(self, mock_logger):
         """
         Test that missing required display_name in JSON object will result in the appropriate error message
@@ -106,7 +106,7 @@ class TestGenerateCourses(ModuleStoreTestCase):
         call_command("generate_courses", arg)
         mock_logger.warning.assert_any_call("Fields json is missing display_name")
 
-    @mock.patch('contentstore.management.commands.generate_courses.logger')
+    @mock.patch('cms.djangoapps.contentstore.management.commands.generate_courses.logger')
     def test_invalid_course_field(self, mock_logger):
         """
         Test that an invalid course field will result in the appropriate message
@@ -122,7 +122,7 @@ class TestGenerateCourses(ModuleStoreTestCase):
         call_command("generate_courses", arg)
         mock_logger.info.assert_any_call((u'invalid_field') + "is not a valid CourseField")
 
-    @mock.patch('contentstore.management.commands.generate_courses.logger')
+    @mock.patch('cms.djangoapps.contentstore.management.commands.generate_courses.logger')
     def test_invalid_date_setting(self, mock_logger):
         """
         Test that an invalid date json will result in the appropriate message
@@ -138,7 +138,7 @@ class TestGenerateCourses(ModuleStoreTestCase):
         call_command("generate_courses", arg)
         mock_logger.info.assert_any_call("The date string could not be parsed for announcement")
 
-    @mock.patch('contentstore.management.commands.generate_courses.logger')
+    @mock.patch('cms.djangoapps.contentstore.management.commands.generate_courses.logger')
     def test_invalid_course_tab_list_setting(self, mock_logger):
         """
         Test that an invalid course tab list json will result in the appropriate message
@@ -154,7 +154,7 @@ class TestGenerateCourses(ModuleStoreTestCase):
         call_command("generate_courses", arg)
         mock_logger.info.assert_any_call("The course tab list string could not be parsed for tabs")
 
-    @mock.patch('contentstore.management.commands.generate_courses.logger')
+    @mock.patch('cms.djangoapps.contentstore.management.commands.generate_courses.logger')
     @ddt.data("mobile_available", "enable_proctored_exams")
     def test_missing_course_fields(self, field, mock_logger):
         """

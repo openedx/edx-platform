@@ -40,11 +40,12 @@ class CourseFieldsTestCase(unittest.TestCase):
 
 class DummySystem(ImportSystem):
     @patch('xmodule.modulestore.xml.OSFS', lambda dir: MemoryFS())
-    def __init__(self, load_error_modules):
+    def __init__(self, load_error_modules, course_id=None):
 
         xmlstore = XMLModuleStore("data_dir", source_dirs=[],
                                   load_error_modules=load_error_modules)
-        course_id = CourseKey.from_string('/'.join([ORG, COURSE, 'test_run']))
+        if course_id is None:
+            course_id = CourseKey.from_string('/'.join([ORG, COURSE, 'test_run']))
         course_dir = "test_dir"
         error_tracker = Mock()
 
@@ -375,17 +376,6 @@ class SelfPacedTestCase(unittest.TestCase):
         self.assertFalse(self.course.self_paced)
 
 
-class BypassHomeTestCase(unittest.TestCase):
-    """Tests for setting which allows course home to be bypassed."""
-
-    def setUp(self):
-        super(BypassHomeTestCase, self).setUp()
-        self.course = get_dummy_course('2012-12-02T12:00')
-
-    def test_default(self):
-        self.assertFalse(self.course.bypass_home)
-
-
 class CourseDescriptorTestCase(unittest.TestCase):
     """
     Tests for a select few functions from CourseDescriptor.
@@ -469,14 +459,14 @@ class ProctoringProviderTestCase(unittest.TestCase):
         throws a ValueError with the correct error message.
         """
         provider = 'invalid-provider'
-        proctoring_provider_whitelist = [u'mock', u'mock_proctoring_without_rules']
+        allowed_proctoring_providers = [u'mock', u'mock_proctoring_without_rules']
 
         with self.assertRaises(ValueError) as context_manager:
             self.proctoring_provider.from_json(provider)
         self.assertEqual(
             context_manager.exception.args[0],
             ['The selected proctoring provider, {}, is not a valid provider. Please select from one of {}.'
-                .format(provider, proctoring_provider_whitelist)]
+                .format(provider, allowed_proctoring_providers)]
         )
 
     def test_from_json_adds_platform_default_for_missing_provider(self):

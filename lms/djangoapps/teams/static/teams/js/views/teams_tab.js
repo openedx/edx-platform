@@ -238,10 +238,7 @@
                                 collection: view.teamsCollection,
                                 breadcrumbs: view.createBreadcrumbs(topic),
                                 title: gettext('Team Search'),
-                                description: StringUtils.interpolate(
-                                    gettext('Showing results for "{searchString}"'),
-                                    {searchString: view.teamsCollection.getSearchString()}
-                                ),
+                                description: view.searchDescription(),
                                 showSortControls: false
                             });
                             view.render();
@@ -377,6 +374,16 @@
                     return deferred.promise();
                 },
 
+                /**
+                 * Return a translated search description string from the teams collection
+                 */
+                searchDescription: function() {
+                    return StringUtils.interpolate(
+                        gettext('Showing results for "{searchString}"'),
+                        {searchString: this.teamsCollection.getSearchString()}
+                    );
+                },
+
                 createTeamsListView: function(options) {
                     var topic = options.topic,
                         collection = options.collection,
@@ -385,14 +392,14 @@
                             context: this.context,
                             model: topic,
                             collection: collection,
-                            myTeamsCollection: this.myTeamsCollection,
                             showSortControls: options.showSortControls
                         }),
-                        searchFieldView = new SearchFieldView({
-                            type: 'teams',
-                            label: gettext('Search teams'),
-                            collection: collection
-                        }),
+                        searchFieldView = this.shouldShowSearch(topic) ?
+                            new SearchFieldView({
+                                type: 'teams',
+                                label: gettext('Search teams'),
+                                collection: collection
+                            }) : null,
                         viewWithHeader = this.createViewWithHeader({
                             subject: topic,
                             mainView: teamsView,
@@ -408,18 +415,24 @@
                     //    topic teams page.
                     // 3. Otherwise, do nothing and remain on the current page.
                     // Note: Backbone makes this a no-op if redirecting to the current page.
-                    this.listenTo(collection, 'sync', function() {
-                        // Clear the stale flag here as by definition the collection is up-to-date,
-                        // and the flag itself isn't guaranteed to be cleared yet. This is to ensure
-                        // that the collection doesn't unnecessarily get refreshed again.
-                        collection.isStale = false;
+                    this.listenTo(
+                        collection,
+                        'sync',
+                        _.bind(function() {
+                            // Clear the stale flag here as by definition the collection is up-to-date,
+                            // and the flag itself isn't guaranteed to be cleared yet. This is to ensure
+                            // that the collection doesn't unnecessarily get refreshed again.
+                            collection.isStale = false;
 
-                        if (collection.getSearchString()) {
-                            Backbone.history.navigate(searchUrl, {trigger: true});
-                        } else if (Backbone.history.getFragment() === searchUrl) {
-                            Backbone.history.navigate('topics/' + topic.get('id'), {trigger: true});
-                        }
-                    });
+                            if (collection.getSearchString()) {
+                                Backbone.history.navigate(searchUrl, {trigger: true});
+                                // xss-lint: disable=javascript-jquery-html
+                                this.$el.find('.page-description').html(this.searchDescription());
+                            } else if (Backbone.history.getFragment() === searchUrl) {
+                                Backbone.history.navigate('topics/' + topic.get('id'), {trigger: true});
+                            }
+                        }, this)
+                    );
                     return viewWithHeader;
                 },
 
@@ -503,6 +516,13 @@
 
                 shouldSeeBrowseTab: function() {
                     return this.context.hasOpenTopic || this.context.hasPublicManagedTopic;
+                },
+
+                shouldShowSearch: function(topic) {
+                    if (topic && topic.get('type') === 'private_managed') {
+                        return this.context.userInfo.privileged || this.context.userInfo.staff;
+                    }
+                    return true;
                 },
 
                 getTeamsTabViewDescription: function() {

@@ -22,8 +22,8 @@ from lms.djangoapps.discussion.notification_prefs.views import (
     set_subscription
 )
 from openedx.core.djangoapps.user_api.models import UserPreference
-from student.tests.factories import UserFactory
-from util.testing import UrlResetMixin
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.util.testing import UrlResetMixin
 
 
 @override_settings(SECRET_KEY="test secret key")

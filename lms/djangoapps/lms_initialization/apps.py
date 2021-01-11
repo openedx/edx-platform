@@ -15,7 +15,7 @@ class LMSInitializationConfig(AppConfig):
     """
     Application Configuration for lms_initialization.
     """
-    name = 'lms_initialization'
+    name = 'lms.djangoapps.lms_initialization'
     verbose_name = 'LMS Initialization'
 
     def ready(self):

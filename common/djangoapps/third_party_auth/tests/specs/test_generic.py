@@ -4,12 +4,12 @@ Use the 'Dummy' auth provider for generic integration tests of third_party_auth.
 
 
 import unittest
-from third_party_auth.tests import testutil
-
+from common.djangoapps.third_party_auth.tests import testutil
+from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
 from .base import IntegrationTestMixin
 
 
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
+@skip_unless_thirdpartyauth()
 class GenericIntegrationTest(IntegrationTestMixin, testutil.TestCase):
     """
     Basic integration tests of third_party_auth using Dummy provider

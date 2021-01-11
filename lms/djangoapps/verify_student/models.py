@@ -113,6 +113,17 @@ class IDVerificationAttempt(StatusModel):
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
 
+    def expiration_default():
+        return now() + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+
+    # Datetime that the verification will expire.
+    expiration_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        db_index=True,
+        default=expiration_default
+    )
+
     class Meta(object):
         app_label = "verify_student"
         abstract = True
@@ -120,7 +131,9 @@ class IDVerificationAttempt(StatusModel):
 
     @property
     def expiration_datetime(self):
-        """Datetime that the verification will expire. """
+        """Account for old DB entries which have `expiration_date` set to NULL."""
+        if self.expiration_date:
+            return self.expiration_date
         days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
         return self.created_at + timedelta(days=days_good_for)
 
@@ -140,7 +153,7 @@ class IDVerificationAttempt(StatusModel):
 
         """
         return (
-            self.created_at < deadline and
+            self.created_at <= deadline and
             self.expiration_datetime > now()
         )
 
@@ -190,9 +203,9 @@ class SSOVerification(IDVerificationAttempt):
     .. no_pii:
     """
 
-    OAUTH2 = u'third_party_auth.models.OAuth2ProviderConfig'
-    SAML = u'third_party_auth.models.SAMLProviderConfig'
-    LTI = u'third_party_auth.models.LTIProviderConfig'
+    OAUTH2 = u'common.djangoapps.third_party_auth.models.OAuth2ProviderConfig'
+    SAML = u'common.djangoapps.third_party_auth.models.SAMLProviderConfig'
+    LTI = u'common.djangoapps.third_party_auth.models.LTIProviderConfig'
     IDENTITY_PROVIDER_TYPE_CHOICES = (
         (OAUTH2, u'OAuth2 Provider'),
         (SAML, u'SAML Provider'),
@@ -353,11 +366,11 @@ class PhotoVerification(IDVerificationAttempt):
         return self.error_msg
 
     @status_before_must_be("created")
-    def upload_face_image(self, img):
+    def upload_face_image(self, img_data):
         raise NotImplementedError
 
     @status_before_must_be("created")
-    def upload_photo_id_image(self, img):
+    def upload_photo_id_image(self, img_data):
         raise NotImplementedError
 
     @status_before_must_be("created")
@@ -390,7 +403,7 @@ class PhotoVerification(IDVerificationAttempt):
         # At any point prior to this, they can change their names via their
         # student dashboard. But at this point, we lock the value into the
         # attempt.
-        self.name = self.user.profile.name
+        self.name = self.user.profile.name  # pylint: disable=no-member
         self.status = self.STATUS.ready
         self.save()
 
@@ -435,6 +448,9 @@ class PhotoVerification(IDVerificationAttempt):
         self.reviewing_user = user_id
         self.reviewing_service = service
         self.status = self.STATUS.approved
+        self.expiration_date = now() + timedelta(
+            days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+        )
         self.save()
         # Emit signal to find and generate eligible certificates
         LEARNER_NOW_VERIFIED.send_robust(
@@ -624,29 +640,12 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
     IMAGE_LINK_DURATION = 5 * 60 * 60 * 24  # 5 days in seconds
     copy_id_photo_from = models.ForeignKey("self", null=True, blank=True, on_delete=models.CASCADE)
 
-    # Fields for functionality of sending email when verification expires
-    # expiry_date: The date when the SoftwareSecurePhotoVerification will expire
-    # expiry_email_date: This field is used to maintain a check for learners to which email
-    # to notify for expired verification is already sent.
+    # DEPRECATED: the `expiry_date` field has been replaced by `expiration_date`
     expiry_date = models.DateTimeField(null=True, blank=True, db_index=True)
+
+    # This field is used to maintain a check for learners to which email
+    # to notify for expired verification is already sent.
     expiry_email_date = models.DateTimeField(null=True, blank=True, db_index=True)
-
-    @status_before_must_be("must_retry", "submitted", "approved", "denied")
-    def approve(self, user_id=None, service=""):
-        """
-        Approve the verification attempt for user
-
-        Valid attempt statuses when calling this method:
-            `submitted`, `approved`, `denied`
-
-        After method completes:
-            status is set to `approved`
-            expiry_date is set to one year from now
-        """
-        self.expiry_date = now() + timedelta(
-            days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
-        )
-        super(SoftwareSecurePhotoVerification, self).approve(user_id, service)
 
     @classmethod
     def get_initial_verification(cls, user, earliest_allowed_date=None):
@@ -969,9 +968,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         Returns:
             SoftwareSecurePhotoVerification (object) or None
         """
-        recent_verification = SoftwareSecurePhotoVerification.objects.filter(status='approved',
-                                                                             user_id=user.id,
-                                                                             expiry_date__isnull=False)
+        recent_verification = SoftwareSecurePhotoVerification.objects.filter(status='approved', user_id=user.id)
 
         return recent_verification.latest('updated_at') if recent_verification.exists() else None
 
@@ -991,7 +988,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
         verification = SoftwareSecurePhotoVerification.get_recent_verification(user)
 
-        if verification and verification.expiry_date < recently_expired_date and not verification.expiry_email_date:
+        if verification and verification.expiration_datetime < recently_expired_date and not verification.expiry_email_date:
             expiry_email_date = today - timedelta(days=email_config['RESEND_DAYS'])
             SoftwareSecurePhotoVerification.objects.filter(pk=verification.pk).update(
                 expiry_email_date=expiry_email_date)

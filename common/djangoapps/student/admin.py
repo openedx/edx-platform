@@ -22,15 +22,19 @@ from django.utils.translation import ugettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.waffle_utils import WaffleSwitch
+from edx_toggles.toggles import WaffleSwitch
 from openedx.core.lib.courses import clean_course_id
-from student import STUDENT_WAFFLE_NAMESPACE
-from student.models import (
+from common.djangoapps.student import STUDENT_WAFFLE_NAMESPACE
+from common.djangoapps.student.models import (
     AccountRecovery,
+    AccountRecoveryConfiguration,
     AllowedAuthUser,
+    BulkChangeEnrollmentConfiguration,
+    BulkUnenrollConfiguration,
     CourseAccessRole,
     CourseEnrollment,
     CourseEnrollmentAllowed,
+    CourseEnrollmentCelebration,
     DashboardConfiguration,
     LinkedInAddToProfileConfiguration,
     LoginFailures,
@@ -39,11 +43,9 @@ from student.models import (
     RegistrationCookieConfiguration,
     UserAttribute,
     UserProfile,
-    UserTestGroup,
-    BulkUnenrollConfiguration,
-    AccountRecoveryConfiguration
+    UserTestGroup
 )
-from student.roles import REGISTERED_ACCESS_ROLES
+from common.djangoapps.student.roles import REGISTERED_ACCESS_ROLES
 from xmodule.modulestore.django import modulestore
 
 User = get_user_model()  # pylint:disable=invalid-name
@@ -51,7 +53,7 @@ User = get_user_model()  # pylint:disable=invalid-name
 # This switch exists because the CourseEnrollment admin views make DB queries that impact performance.
 # In a large enough deployment of Open edX, this is enough to cause a site outage.
 # See https://openedx.atlassian.net/browse/OPS-2943
-COURSE_ENROLLMENT_ADMIN_SWITCH = WaffleSwitch(STUDENT_WAFFLE_NAMESPACE, 'courseenrollment_admin')
+COURSE_ENROLLMENT_ADMIN_SWITCH = WaffleSwitch(STUDENT_WAFFLE_NAMESPACE, 'courseenrollment_admin', __name__)
 
 
 class _Check(object):
@@ -78,6 +80,44 @@ class _Check(object):
                 return func(*args, **kwargs)
             return decorator
         return inner
+
+
+class DisableEnrollmentAdminMixin:
+    """ Disables admin access to an admin page that scales with enrollments, as performance is poor at that size. """
+    @_Check.is_enabled(COURSE_ENROLLMENT_ADMIN_SWITCH.is_enabled)
+    def has_view_permission(self, request, obj=None):
+        """
+        Returns True if CourseEnrollment objects can be viewed via the admin view.
+        """
+        return super().has_view_permission(request, obj)
+
+    @_Check.is_enabled(COURSE_ENROLLMENT_ADMIN_SWITCH.is_enabled)
+    def has_add_permission(self, request):
+        """
+        Returns True if CourseEnrollment objects can be added via the admin view.
+        """
+        return super().has_add_permission(request)
+
+    @_Check.is_enabled(COURSE_ENROLLMENT_ADMIN_SWITCH.is_enabled)
+    def has_change_permission(self, request, obj=None):
+        """
+        Returns True if CourseEnrollment objects can be modified via the admin view.
+        """
+        return super().has_change_permission(request, obj)
+
+    @_Check.is_enabled(COURSE_ENROLLMENT_ADMIN_SWITCH.is_enabled)
+    def has_delete_permission(self, request, obj=None):
+        """
+        Returns True if CourseEnrollment objects can be deleted via the admin view.
+        """
+        return super().has_delete_permission(request, obj)
+
+    @_Check.is_enabled(COURSE_ENROLLMENT_ADMIN_SWITCH.is_enabled)
+    def has_module_permission(self, request):
+        """
+        Returns True if links to the CourseEnrollment admin view can be displayed.
+        """
+        return super().has_module_permission(request)
 
 
 class CourseAccessRoleForm(forms.ModelForm):
@@ -184,11 +224,9 @@ class LinkedInAddToProfileConfigurationAdmin(admin.ModelAdmin):
     class Meta(object):
         model = LinkedInAddToProfileConfiguration
 
-    # Exclude deprecated fields
-    exclude = ('dashboard_tracking_code',)
-
 
 class CourseEnrollmentForm(forms.ModelForm):
+    """ Form for Course Enrollments in the Django Admin Panel. """
     def __init__(self, *args, **kwargs):
         # If args is a QueryDict, then the ModelForm addition request came in as a POST with a course ID string.
         # Change the course ID string to a CourseLocator object by copying the QueryDict to make it mutable.
@@ -238,7 +276,7 @@ class CourseEnrollmentForm(forms.ModelForm):
 
 
 @admin.register(CourseEnrollment)
-class CourseEnrollmentAdmin(admin.ModelAdmin):
+class CourseEnrollmentAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
     """ Admin interface for the CourseEnrollment model. """
     list_display = ('id', 'course_id', 'mode', 'user', 'is_active',)
     list_filter = ('mode', 'is_active',)
@@ -263,41 +301,6 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
 
     def queryset(self, request):
         return super(CourseEnrollmentAdmin, self).queryset(request).select_related('user')
-
-    @_Check.is_enabled(COURSE_ENROLLMENT_ADMIN_SWITCH.is_enabled)
-    def has_view_permission(self, request, obj=None):
-        """
-        Returns True if CourseEnrollment objects can be viewed via the admin view.
-        """
-        return super(CourseEnrollmentAdmin, self).has_view_permission(request, obj)
-
-    @_Check.is_enabled(COURSE_ENROLLMENT_ADMIN_SWITCH.is_enabled)
-    def has_add_permission(self, request):
-        """
-        Returns True if CourseEnrollment objects can be added via the admin view.
-        """
-        return super(CourseEnrollmentAdmin, self).has_add_permission(request)
-
-    @_Check.is_enabled(COURSE_ENROLLMENT_ADMIN_SWITCH.is_enabled)
-    def has_change_permission(self, request, obj=None):
-        """
-        Returns True if CourseEnrollment objects can be modified via the admin view.
-        """
-        return super(CourseEnrollmentAdmin, self).has_change_permission(request, obj)
-
-    @_Check.is_enabled(COURSE_ENROLLMENT_ADMIN_SWITCH.is_enabled)
-    def has_delete_permission(self, request, obj=None):
-        """
-        Returns True if CourseEnrollment objects can be deleted via the admin view.
-        """
-        return super(CourseEnrollmentAdmin, self).has_delete_permission(request, obj)
-
-    @_Check.is_enabled(COURSE_ENROLLMENT_ADMIN_SWITCH.is_enabled)
-    def has_module_permission(self, request):
-        """
-        Returns True if links to the CourseEnrollment admin view can be displayed.
-        """
-        return super(CourseEnrollmentAdmin, self).has_module_permission(request)
 
 
 class UserProfileInline(admin.StackedInline):
@@ -511,6 +514,25 @@ class AllowedAuthUserAdmin(admin.ModelAdmin):
         model = AllowedAuthUser
 
 
+@admin.register(CourseEnrollmentCelebration)
+class CourseEnrollmentCelebrationAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
+    """Admin interface for the CourseEnrollmentCelebration model. """
+    raw_id_fields = ('enrollment',)
+    list_display = ('id', 'course', 'user', 'celebrate_first_section')
+    search_fields = ('enrollment__course__id', 'enrollment__user__username')
+
+    class Meta(object):
+        model = CourseEnrollmentCelebration
+
+    def course(self, obj):
+        return obj.enrollment.course.id
+    course.short_description = 'Course'
+
+    def user(self, obj):
+        return obj.enrollment.user.username
+    user.short_description = 'User'
+
+
 admin.site.register(UserTestGroup)
 admin.site.register(Registration)
 admin.site.register(PendingNameChange)
@@ -518,6 +540,7 @@ admin.site.register(AccountRecoveryConfiguration, ConfigurationModelAdmin)
 admin.site.register(DashboardConfiguration, ConfigurationModelAdmin)
 admin.site.register(RegistrationCookieConfiguration, ConfigurationModelAdmin)
 admin.site.register(BulkUnenrollConfiguration, ConfigurationModelAdmin)
+admin.site.register(BulkChangeEnrollmentConfiguration, ConfigurationModelAdmin)
 
 
 # We must first un-register the User model since it may also be registered by the auth app.

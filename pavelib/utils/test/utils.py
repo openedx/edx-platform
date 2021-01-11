@@ -7,7 +7,6 @@ import os
 import re
 import subprocess
 
-import six
 from paver.easy import cmdopts, sh, task
 
 from pavelib.utils.envs import Env
@@ -64,7 +63,7 @@ def clean_dir(directory):
     """
     # We delete the files but preserve the directory structure
     # so that coverage.py has a place to put the reports.
-    sh(u'find {dir} -type f -delete'.format(dir=directory))
+    sh('find {dir} -type f -delete'.format(dir=directory))
 
 
 @task
@@ -93,7 +92,7 @@ def clean_mongo():
     """
     Clean mongo test databases
     """
-    sh(u"mongo {host}:{port} {repo_root}/scripts/delete-mongo-test-dbs.js".format(
+    sh("mongo {host}:{port} {repo_root}/scripts/delete-mongo-test-dbs.js".format(
         host=Env.MONGO_HOST,
         port=MONGO_PORT_NUM,
         repo_root=Env.REPO_ROOT,
@@ -120,10 +119,10 @@ def check_firefox_version():
         driver.close()
         if firefox_ver < MINIMUM_FIREFOX_VERSION:
             raise Exception(
-                u'Required firefox version not found.\n'
-                u'Expected: {expected_version}; Actual: {actual_version}.\n\n'
-                u'Make sure that the edx.devstack.firefox container is up-to-date and running\n'
-                u'\t{expected_version}'.format(
+                'Required firefox version not found.\n'
+                'Expected: {expected_version}; Actual: {actual_version}.\n\n'
+                'Make sure that the edx.devstack.firefox container is up-to-date and running\n'
+                '\t{expected_version}'.format(
                     actual_version=firefox_ver,
                     expected_version=MINIMUM_FIREFOX_VERSION
                 )
@@ -133,7 +132,7 @@ def check_firefox_version():
     # Firefox will be run as a local process
     expected_firefox_ver = "Mozilla Firefox " + str(MINIMUM_FIREFOX_VERSION)
     firefox_ver_string = subprocess.check_output("firefox --version", shell=True).strip()
-    if isinstance(firefox_ver_string, six.binary_type):
+    if isinstance(firefox_ver_string, bytes):
         firefox_ver_string = firefox_ver_string.decode('utf-8')
     firefox_version_regex = re.compile(r"Mozilla Firefox (\d+.\d+)")
     try:
@@ -143,8 +142,8 @@ def check_firefox_version():
 
     if firefox_ver < MINIMUM_FIREFOX_VERSION:
         raise Exception(
-            u'Required firefox version not found.\n'
-            u'Expected: {expected_version}; Actual: {actual_version}.'.format(
+            'Required firefox version not found.\n'
+            'Expected: {expected_version}; Actual: {actual_version}.'.format(
                 actual_version=firefox_ver,
                 expected_version=expected_firefox_ver
             )
@@ -166,7 +165,7 @@ def fetch_coverage_test_selection_data(options):
     except OSError:
         pass  # Directory already exists
 
-    sh(u'git diff $(git merge-base {} HEAD) > {}/{}'.format(
+    sh('git diff $(git merge-base {} HEAD) > {}/{}'.format(
         getattr(options, 'compare_branch', 'origin/master'),
         COVERAGE_CACHE_BASEPATH,
         WHO_TESTS_WHAT_DIFF

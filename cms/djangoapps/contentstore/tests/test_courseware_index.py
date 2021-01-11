@@ -18,18 +18,20 @@ from mock import patch
 from pytz import UTC
 from search.search_engine_base import SearchEngine
 from six.moves import range
+from xblock.core import XBlock
 
-from contentstore.courseware_index import (
+from cms.djangoapps.contentstore.courseware_index import (
     CourseAboutSearchIndexer,
     CoursewareSearchIndexer,
     LibrarySearchIndexer,
     SearchIndexingError
 )
-from contentstore.signals.handlers import listen_for_course_publish, listen_for_library_update
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url, reverse_usage_url
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from cms.djangoapps.contentstore.signals.handlers import listen_for_course_publish, listen_for_library_update
+from cms.djangoapps.contentstore.tasks import update_search_index
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from xmodule.library_tools import normalize_key_for_search
 from xmodule.modulestore import ModuleStoreEnum
@@ -348,32 +350,6 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         response = self.search()
         self.assertEqual(response["total"], 3)
 
-    def _test_not_indexable(self, store):
-        """ test not indexable items """
-        # Publish the vertical to start with
-        self.publish_item(store, self.vertical.location)
-        self.reindex_course(store)
-        response = self.search()
-        self.assertEqual(response["total"], 4)
-
-        # Add a non-indexable item
-        ItemFactory.create(
-            parent_location=self.vertical.location,
-            category="openassessment",
-            display_name="Some other content",
-            publish_item=False,
-            modulestore=store,
-        )
-        self.reindex_course(store)
-        response = self.search()
-        self.assertEqual(response["total"], 4)
-
-        # even after publishing, we should not find the non-indexable item
-        self.publish_item(store, self.vertical.location)
-        self.reindex_course(store)
-        response = self.search()
-        self.assertEqual(response["total"], 4)
-
     def _test_start_date_propagation(self, store):
         """ make sure that the start date is applied at the right level """
         early_date = self.course.start
@@ -559,10 +535,6 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
     @ddt.data(*WORKS_WITH_STORES)
     def test_deleting_item(self, store_type):
         self._perform_test_using_store(store_type, self._test_deleting_item)
-
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_not_indexable(self, store_type):
-        self._perform_test_using_store(store_type, self._test_not_indexable)
 
     @ddt.data(*WORKS_WITH_STORES)
     def test_start_date_propagation(self, store_type):
@@ -783,6 +755,20 @@ class TestTaskExecution(SharedModuleStoreTestCase):
         response = searcher.search(field_dictionary={"library": library_search_key})
         self.assertEqual(response["total"], 2)
 
+    def test_ignore_ccx(self):
+        """Test that we ignore CCX courses (it's too slow now)."""
+        # We're relying on our CCX short circuit to just stop execution as soon
+        # as it encounters a CCX key. If that isn't working properly, it will
+        # fall through to the normal indexing and raise an exception because
+        # there is no data or backing course behind the course key.
+        with patch('cms.djangoapps.contentstore.courseware_index.CoursewareSearchIndexer.index') as mock_index:
+            self.assertIsNone(
+                update_search_index(
+                    "ccx-v1:OpenEdX+FAKECOURSE+FAKERUN+ccx@1", "2020-09-28T16:41:57.150796"
+                )
+            )
+            self.assertFalse(mock_index.called)
+
 
 @ddt.ddt
 class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
@@ -897,24 +883,6 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
         response = self.search()
         self.assertEqual(response["total"], 1)
 
-    def _test_not_indexable(self, store):
-        """ test not indexable items """
-        self.reindex_library(store)
-        response = self.search()
-        self.assertEqual(response["total"], 2)
-
-        # Add a non-indexable item
-        ItemFactory.create(
-            parent_location=self.library.location,
-            category="openassessment",
-            display_name="Assessment",
-            publish_item=False,
-            modulestore=store,
-        )
-        self.reindex_library(store)
-        response = self.search()
-        self.assertEqual(response["total"], 2)
-
     @patch('django.conf.settings.SEARCH_ENGINE', None)
     def _test_search_disabled(self, store):
         """ if search setting has it as off, confirm that nothing is indexed """
@@ -942,10 +910,6 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
     @ddt.data(*WORKS_WITH_STORES)
     def test_deleting_item(self, store_type):
         self._perform_test_using_store(store_type, self._test_deleting_item)
-
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_not_indexable(self, store_type):
-        self._perform_test_using_store(store_type, self._test_not_indexable)
 
     @ddt.data(*WORKS_WITH_STORES)
     def test_search_disabled(self, store_type):

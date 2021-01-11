@@ -16,7 +16,7 @@ from eventtracking import tracker
 from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey
 
-from branding import api as branding_api
+from lms.djangoapps.branding import api as branding_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateGenerationCourseSetting,
@@ -30,8 +30,9 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.certificates.queue import XQueueCertInterface
 from lms.djangoapps.instructor.access import list_with_level
+from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from util.organizations_helpers import get_course_organization_id
+from common.djangoapps.util.organizations_helpers import get_course_organization_id
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.certificate")
@@ -154,7 +155,7 @@ def get_certificates_for_user_by_course_keys(user, course_keys):
     }
 
 
-def get_recently_modified_certificates(course_keys=None, start_date=None, end_date=None):
+def get_recently_modified_certificates(course_keys=None, start_date=None, end_date=None, username=None):
     """
     Returns a QuerySet of GeneratedCertificate objects filtered by the input
     parameters and ordered by modified_date.
@@ -169,6 +170,9 @@ def get_recently_modified_certificates(course_keys=None, start_date=None, end_da
 
     if end_date:
         cert_filter_args['modified_date__lte'] = end_date
+
+    if username:
+        cert_filter_args['user__username'] = username
 
     return GeneratedCertificate.objects.filter(**cert_filter_args).order_by('modified_date')
 
@@ -308,8 +312,16 @@ def certificate_downloadable_status(student, course_key):
         'download_url': None,
         'uuid': None,
     }
-    may_view_certificate = CourseOverview.get_from_id(course_key).may_certify()
 
+    course_overview = CourseOverview.get_from_id(course_key)
+    if (
+        not certificates_viewable_for_course(course_overview) and
+        (current_status['status'] in CertificateStatuses.PASSED_STATUSES) and
+        course_overview.certificate_available_date
+    ):
+        response_data['earned_but_not_available'] = True
+
+    may_view_certificate = course_overview.may_certify()
     if current_status['status'] == CertificateStatuses.downloadable and may_view_certificate:
         response_data['is_downloadable'] = True
         response_data['download_url'] = current_status['download_url'] or get_certificate_url(

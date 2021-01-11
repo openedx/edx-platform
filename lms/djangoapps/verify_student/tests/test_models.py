@@ -21,8 +21,8 @@ from lms.djangoapps.verify_student.models import (
     SSOVerification,
     VerificationException
 )
-from student.tests.factories import UserFactory
-from verify_student.tests import TestVerificationBase
+from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.verify_student.tests import TestVerificationBase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 FAKE_SETTINGS = {
@@ -342,7 +342,7 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
             # Make an approved verification
             attempt = SoftwareSecurePhotoVerification(user=user)
             attempt.status = PhotoVerification.STATUS.approved
-            attempt.expiry_date = datetime.now()
+            attempt.expiration_date = datetime.now()
             attempt.save()
 
         # Test method 'get_recent_verification' returns the most recent
@@ -350,25 +350,6 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
         recent_verification = SoftwareSecurePhotoVerification.get_recent_verification(user=user)
         self.assertIsNotNone(recent_verification)
         self.assertEqual(recent_verification.id, attempt.id)
-
-    def test_get_recent_verification_expiry_null(self):
-        """Test that method 'get_recent_verification' of model
-        'SoftwareSecurePhotoVerification' will return None when expiry_date
-        is NULL for 'approved' verifications based on updated_at value.
-        """
-        user = UserFactory.create()
-        attempt = None
-
-        for _ in range(2):
-            # Make an approved verification
-            attempt = SoftwareSecurePhotoVerification(user=user)
-            attempt.status = PhotoVerification.STATUS.approved
-            attempt.save()
-
-        # Test method 'get_recent_verification' returns None
-        # as attempts don't have an expiry_date
-        recent_verification = SoftwareSecurePhotoVerification.get_recent_verification(user=user)
-        self.assertIsNone(recent_verification)
 
     def test_no_approved_verification(self):
         """Test that method 'get_recent_verification' of model
@@ -389,7 +370,7 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
         email_config = getattr(settings, 'VERIFICATION_EXPIRY_EMAIL', {'DAYS_RANGE': 1, 'RESEND_DAYS': 15})
         user = UserFactory.create()
         verification = SoftwareSecurePhotoVerification(user=user)
-        verification.expiry_date = now() - timedelta(days=FAKE_SETTINGS['DAYS_GOOD_FOR'])
+        verification.expiration_date = now() - timedelta(days=FAKE_SETTINGS['DAYS_GOOD_FOR'])
         verification.status = PhotoVerification.STATUS.approved
         verification.save()
 
@@ -399,6 +380,21 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
         result = SoftwareSecurePhotoVerification.get_recent_verification(user=user)
 
         self.assertIsNotNone(result.expiry_email_date)
+
+    def test_expiration_date_null(self):
+        """
+        Test if the `expiration_date` field is null, `expiration_datetime` returns a
+        default expiration date based on the time the entry was created.
+        """
+        user = UserFactory.create()
+        verification = SoftwareSecurePhotoVerification(user=user)
+        verification.expiration_date = None
+        verification.save()
+
+        self.assertEqual(
+            verification.expiration_datetime,
+            verification.created_at + timedelta(days=FAKE_SETTINGS["DAYS_GOOD_FOR"])
+        )
 
 
 class SSOVerificationTest(TestVerificationBase):

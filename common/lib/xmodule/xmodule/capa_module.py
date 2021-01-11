@@ -7,6 +7,7 @@ import re
 import sys
 
 import six
+from bleach.sanitizer import Cleaner
 from lxml import etree
 from pkg_resources import resource_string
 from web_fragments.fragment import Fragment
@@ -17,7 +18,6 @@ from xmodule.contentstore.django import contentstore
 from xmodule.editing_module import EditingMixin
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.raw_module import RawMixin
-from xmodule.util.misc import escape_html_characters
 from xmodule.util.sandboxing import get_python_lib_zip
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import (
@@ -37,6 +37,7 @@ log = logging.getLogger("edx.courseware")
 
 @XBlock.wants('user')
 @XBlock.needs('i18n')
+@XBlock.wants('call_to_action')
 class ProblemBlock(
         CapaMixin, RawMixin, XmlMixin, EditingMixin,
         XModuleDescriptorToXBlockMixin, XModuleToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin):
@@ -301,6 +302,10 @@ class ProblemBlock(
         Return dictionary prepared with module content and type for indexing.
         """
         xblock_body = super(ProblemBlock, self).index_dictionary()
+
+        # Make optioninput's options index friendly by replacing the actual tag with the values
+        capa_content = re.sub(r'<optioninput options="\(([^"]+)\)".*?>\s*|\S*<\/optioninput>', r'\1', self.data)
+
         # Removing solutions and hints, as well as script and style
         capa_content = re.sub(
             re.compile(
@@ -313,9 +318,14 @@ class ProblemBlock(
                 re.DOTALL |
                 re.VERBOSE),
             "",
-            self.data
+            capa_content
         )
-        capa_content = escape_html_characters(capa_content)
+        capa_content = re.sub(
+            r"(\s|&nbsp;|//)+",
+            " ",
+            Cleaner(tags=[], strip=True).clean(capa_content)
+        )
+
         capa_body = {
             "capa_content": capa_content,
             "display_name": self.display_name,

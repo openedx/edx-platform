@@ -9,10 +9,11 @@ from mock import patch
 
 from lms.djangoapps.courseware.courses import _Assignment
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.features.calendar_sync import get_calendar_event_id
-from openedx.features.calendar_sync.ics import generate_ics_for_user_course
-from student.tests.factories import UserFactory
+from openedx.features.calendar_sync.ics import generate_ics_files_for_user_course
+from openedx.features.calendar_sync.tests.factories import UserCalendarSyncConfigFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class TestIcsGeneration(TestCase):
@@ -30,13 +31,30 @@ class TestIcsGeneration(TestCase):
         self.request = RequestFactory().request()
         self.request.site = SiteFactory()
         self.request.user = self.user
+        self.site_config = SiteConfigurationFactory.create(
+            site_values={'course_org_filter': self.course.org}
+        )
+        self.user_calendar_sync_config = UserCalendarSyncConfigFactory.create(
+            user=self.user,
+            course_key=self.course.id,
+        )
 
     def make_assigment(
         self, block_key=None, title=None, url=None, date=None, contains_gated_content=False, complete=False,
-        past_due=False
+        past_due=False, assignment_type=None, extra_info=None
     ):
         """ Bundles given info into a namedtupled like get_course_assignments returns """
-        return _Assignment(block_key, title, url, date, contains_gated_content, complete, past_due)
+        return _Assignment(
+            block_key,
+            title,
+            url,
+            date,
+            contains_gated_content,
+            complete,
+            past_due,
+            assignment_type,
+            extra_info
+        )
 
     def expected_ics(self, *assignments):
         """ Returns hardcoded expected ics strings for given assignments """
@@ -50,6 +68,7 @@ DTSTART;VALUE=DATE-TIME:{timedue}
 DURATION:P0D
 DTSTAMP;VALUE=DATE-TIME:20131003T082455Z
 UID:{uid}
+SEQUENCE:{sequence}
 DESCRIPTION:{summary} is due for {course}.
 ORGANIZER;CN=édX:mailto:registration@example.com
 TRANSP:TRANSPARENT
@@ -61,7 +80,8 @@ END:VCALENDAR
                 summary=assignment.title,
                 course=self.course.display_name_with_default,
                 timedue=assignment.date.strftime('%Y%m%dT%H%M%SZ'),
-                uid=get_calendar_event_id(self.user, str(assignment.block_key), 'due', self.request.site.domain),
+                uid=get_calendar_event_id(self.user, str(assignment.block_key), 'due', self.site_config.site.domain),
+                sequence=self.user_calendar_sync_config.ics_sequence
             )
             for assignment in assignments
         )
@@ -70,11 +90,13 @@ END:VCALENDAR
         """ Uses generate_ics_for_user_course to create ics files for the given assignments """
         with patch('openedx.features.calendar_sync.ics.get_course_assignments') as mock_get_assignments:
             mock_get_assignments.return_value = assignments
-            return generate_ics_for_user_course(self.course, self.user, self.request)
+            return generate_ics_files_for_user_course(self.course, self.user, self.user_calendar_sync_config)
 
     def assert_ics(self, *assignments):
         """ Asserts that the generated and expected ics for the given assignments are equal """
-        generated = [ics.decode('utf8').replace('\r\n', '\n') for ics in self.generate_ics(*assignments)]
+        generated = [
+            file.decode('utf8').replace('\r\n', '\n') for file in sorted(self.generate_ics(*assignments).values())
+        ]
         self.assertEqual(len(generated), len(assignments))
         self.assertListEqual(generated, list(self.expected_ics(*assignments)))
 

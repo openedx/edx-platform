@@ -15,7 +15,7 @@ from django.test.utils import override_settings
 from django.utils.six import StringIO
 from six.moves import range
 
-from util.db import enable_named_outer_atomic, generate_int_id, outer_atomic
+from common.djangoapps.util.db import enable_named_outer_atomic, generate_int_id, outer_atomic
 
 
 def do_nothing():
@@ -198,6 +198,9 @@ class MigrationTests(TestCase):
     """
 
     @override_settings(MIGRATION_MODULES={})
+    @unittest.skip(
+        "Temporary skip for https://openedx.atlassian.net/browse/DEPR-43 where shoppingcart models are to be removed"
+    )
     def test_migrations_are_in_sync(self):
         """
         Tests that the migration files are in sync with the models.

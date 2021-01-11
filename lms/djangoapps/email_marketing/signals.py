@@ -14,18 +14,22 @@ from django.dispatch import receiver
 from sailthru.sailthru_error import SailthruClientError
 from six import text_type
 
-import third_party_auth
-from course_modes.models import CourseMode
-from email_marketing.models import EmailMarketingConfiguration
-from lms.djangoapps.email_marketing.tasks import get_email_cookies_via_sailthru, update_user, update_user_email
+from common.djangoapps import third_party_auth
+from common.djangoapps.course_modes.models import CourseMode
+from edx_toggles.toggles import WaffleSwitchNamespace
+from lms.djangoapps.email_marketing.tasks import (
+    get_email_cookies_via_sailthru,
+    update_course_enrollment,
+    update_user,
+    update_user_email
+)
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_authn.cookies import CREATE_LOGON_COOKIE
 from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER
-from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
-from student.signals import SAILTHRU_AUDIT_PURCHASE
-from util.model_utils import USER_FIELD_CHANGED
+from common.djangoapps.student.signals import SAILTHRU_AUDIT_PURCHASE
+from common.djangoapps.util.model_utils import USER_FIELD_CHANGED
 
-from .tasks import update_course_enrollment
+from .models import EmailMarketingConfiguration
 
 log = logging.getLogger(__name__)
 

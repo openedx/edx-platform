@@ -19,6 +19,9 @@ from six.moves.urllib.parse import parse_qs
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.features.enterprise_support.api import (
+    _CACHE_MISS,
+    ENTERPRISE_CUSTOMER_KEY_NAME,
+    add_enterprise_customer_to_session,
     ConsentApiClient,
     ConsentApiServiceClient,
     EnterpriseApiClient,
@@ -26,17 +29,23 @@ from openedx.features.enterprise_support.api import (
     consent_needed_for_course,
     data_sharing_consent_required,
     enterprise_customer_for_request,
+    enterprise_customer_from_api,
+    enterprise_customer_uuid_for_request,
     enterprise_enabled,
     get_consent_required_courses,
     get_dashboard_consent_notification,
     get_enterprise_consent_url,
+    get_enterprise_learner_portal_enabled_message,
     insert_enterprise_pipeline_elements
 )
 from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
-from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerUserFactory
+from openedx.features.enterprise_support.tests.factories import (
+    EnterpriseCustomerIdentityProviderFactory,
+    EnterpriseCustomerUserFactory,
+)
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from openedx.features.enterprise_support.utils import clear_data_consent_share_cache
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class MockEnrollment(mock.MagicMock):
@@ -150,6 +159,16 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         """
         self._assert_api_client_with_user(EnterpriseApiClient, mock_jwt_builder)
 
+    @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_uuid_for_request')
+    @mock.patch('openedx.features.enterprise_support.api.EnterpriseApiClient')
+    def test_enterprise_customer_from_api_cache_miss(self, mock_client_class, mock_uuid_from_request):
+        mock_uuid_from_request.return_value = _CACHE_MISS
+        mock_request = mock.Mock()
+
+        actual_result = enterprise_customer_from_api(mock_request)
+        self.assertIsNone(actual_result)
+        self.assertFalse(mock_client_class.called)
+
     @httpretty.activate
     @mock.patch('openedx.features.enterprise_support.api.create_jwt_for_user')
     def test_enterprise_consent_api_client_with_service_user(self, mock_jwt_builder):
@@ -169,11 +188,19 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         self._assert_api_client_with_user(ConsentApiClient, mock_jwt_builder)
 
     @httpretty.activate
-    def test_consent_needed_for_course(self):
+    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db')
+    def test_consent_needed_for_course(self, mock_get_enterprise_learner_data):
         user = UserFactory(username='janedoe')
-        request = mock.MagicMock(session={}, user=user, site=SiteFactory(domain="example.com"))
+        request = mock.MagicMock(
+            user=user,
+            site=SiteFactory(domain="example.com"),
+            session={},
+            COOKIES={},
+            GET={},
+        )
         ec_uuid = 'cf246b88-d5f6-4908-a522-fc307e0b0c59'
         course_id = 'fake-course'
+        mock_get_enterprise_learner_data.return_value = self.get_mock_enterprise_learner_results()
         self.mock_enterprise_learner_api()
 
         # test not required consent for example non enterprise customer
@@ -210,16 +237,16 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         )
         data_sharing_consent.save()
         consent_required = get_consent_required_courses(user, [course_id])
-        self.assertTrue(course_id in consent_required)
+        self.assertIn(course_id, consent_required)
 
         # now grant consent and call our method again
         data_sharing_consent.granted = True
         data_sharing_consent.save()
         consent_required = get_consent_required_courses(user, [course_id])
-        self.assertFalse(course_id in consent_required)
+        self.assertNotIn(course_id, consent_required)
 
     @httpretty.activate
-    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data')
+    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db')
     @mock.patch('openedx.features.enterprise_support.api.EnterpriseCustomer')
     @mock.patch('openedx.features.enterprise_support.api.get_partial_pipeline')
     @mock.patch('openedx.features.enterprise_support.api.Registry')
@@ -264,28 +291,55 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         # the third-party auth pipeline has no `provider_id`.
         mock_registry.get_from_pipeline.return_value.provider_id = None
         self.mock_get_enterprise_customer('real-ent-uuid', {'real': 'enterprisecustomer'}, 200)
-        enterprise_customer = enterprise_customer_for_request(
-            mock.MagicMock(GET={'enterprise_customer': 'real-ent-uuid'}, user=self.user)
+        mock_request = mock.MagicMock(
+            GET={'enterprise_customer': 'real-ent-uuid'},
+            COOKIES={},
+            session={},
+            user=self.user
         )
+        enterprise_customer = enterprise_customer_for_request(mock_request)
         self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
 
         # Verify that the method `enterprise_customer_for_request` returns
         # expected enterprise customer against the requesting user even if
         # the third-party auth pipeline has no `provider_id` but there is
         # enterprise customer UUID in the cookie.
-        enterprise_customer = enterprise_customer_for_request(
-            mock.MagicMock(GET={}, COOKIES={settings.ENTERPRISE_CUSTOMER_COOKIE_NAME: 'real-ent-uuid'}, user=self.user)
+        mock_request = mock.MagicMock(
+            GET={},
+            COOKIES={settings.ENTERPRISE_CUSTOMER_COOKIE_NAME: 'real-ent-uuid'},
+            session={},
+            user=self.user
         )
+        enterprise_customer = enterprise_customer_for_request(mock_request)
+        self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
+
+        # Verify that the method `enterprise_customer_for_request` returns
+        # expected enterprise customer against the requesting user if
+        # data is cached only in the request session
+        mock_registry.get_from_pipeline.return_value.provider_id = None
+        self.mock_get_enterprise_customer('real-ent-uuid', {'real': 'enterprisecustomer'}, 200)
+        mock_request = mock.MagicMock(
+            GET={},
+            COOKIES={},
+            session={'enterprise_customer': {'real': 'enterprisecustomer'}},
+            user=self.user
+        )
+        enterprise_customer = enterprise_customer_for_request(mock_request)
         self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
 
         # Verify that we can still get enterprise customer from enterprise
         # learner API even if we are unable to get it from preferred sources,
         # e.g. url query parameters, third-party auth pipeline, enterprise
-        # cookie.
+        # cookie, or session.
         mock_get_enterprise_learner_data.return_value = [{'enterprise_customer': {'uuid': 'real-ent-uuid'}}]
-        enterprise_customer = enterprise_customer_for_request(
-            mock.MagicMock(GET={}, COOKIES={}, user=self.user, site=1)
+        mock_request = mock.MagicMock(
+            GET={},
+            COOKIES={},
+            session={},
+            user=self.user,
+            site=1
         )
+        enterprise_customer = enterprise_customer_for_request(mock_request)
         self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
 
     def test_enterprise_customer_for_request_with_session(self):
@@ -310,13 +364,13 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
                 'openedx.features.enterprise_support.api.enterprise_customer_from_api',
                 return_value=enterprise_data
         ) as mock_enterprise_customer_from_api, mock.patch(
-                'openedx.features.enterprise_support.api.enterprise_customer_from_cache',
+                'openedx.features.enterprise_support.api.enterprise_customer_from_session',
                 return_value=enterprise_data
-        ) as mock_enterprise_customer_from_cache:
+        ) as mock_enterprise_customer_from_session:
             enterprise_customer = enterprise_customer_for_request(dummy_request)
             self.assertEqual(enterprise_customer, enterprise_data)
             self.assertEqual(mock_enterprise_customer_from_api.called, False)
-            self.assertEqual(mock_enterprise_customer_from_cache.called, True)
+            self.assertEqual(mock_enterprise_customer_from_session.called, True)
 
         # Verify enterprise customer data fetched from session for subsequent calls
         # with unauthenticated user in SAML case
@@ -326,13 +380,13 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             'openedx.features.enterprise_support.api.enterprise_customer_from_api',
             return_value=enterprise_data
         ) as mock_enterprise_customer_from_api, mock.patch(
-            'openedx.features.enterprise_support.api.enterprise_customer_from_cache',
+            'openedx.features.enterprise_support.api.enterprise_customer_from_session',
             return_value=enterprise_data
-        ) as mock_enterprise_customer_from_cache:
+        ) as mock_enterprise_customer_from_session:
             enterprise_customer = enterprise_customer_for_request(dummy_request)
             self.assertEqual(enterprise_customer, enterprise_data)
             self.assertEqual(mock_enterprise_customer_from_api.called, False)
-            self.assertEqual(mock_enterprise_customer_from_cache.called, True)
+            self.assertEqual(mock_enterprise_customer_from_session.called, True)
 
     def check_data_sharing_consent(self, consent_required=False, consent_url=None):
         """
@@ -560,3 +614,229 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
                                     'enterprise.tpa_pipeline.handle_enterprise_logistration',
                                     'social_core.pipeline.social_auth.load_extra_data',
                                     'def'])
+
+    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db')
+    def test_enterprise_learner_portal_message_cache_miss_no_customer(self, mock_learner_data_from_db):
+        """
+        When no customer data exists in the request session _and_
+        no customer is associated with the requesting user, then ``get_enterprise_learner_portal_enabled_message()``
+        should return None.
+        """
+        mock_request = mock.Mock(session={})
+        mock_learner_data_from_db.return_value = None
+
+        actual_result = get_enterprise_learner_portal_enabled_message(mock_request)
+        self.assertIsNone(actual_result)
+        mock_learner_data_from_db.assert_called_once_with(mock_request.user)
+
+    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db')
+    @override_settings(ENTERPRISE_LEARNER_PORTAL_BASE_URL='http://localhost')
+    def test_enterprise_learner_portal_message_cache_miss_customer_exists(self, mock_learner_data_from_db):
+        """
+        When no customer data exists in the request session but a
+        customer is associated with the requesting user, then ``get_enterprise_learner_portal_enabled_message()``
+        should return an appropriate message for that customer.
+        """
+        mock_request = mock.Mock(session={})
+        mock_enterprise_customer = {
+            'uuid': 'some-uuid',
+            'name': 'Best Corp',
+            'enable_learner_portal': True,
+            'slug': 'best-corp',
+        }
+        mock_learner_data_from_db.return_value = [
+            {
+                'enterprise_customer': mock_enterprise_customer,
+            },
+        ]
+
+        actual_result = get_enterprise_learner_portal_enabled_message(mock_request)
+        self.assertIn('custom dashboard for learning', actual_result)
+        self.assertIn('Best Corp', actual_result)
+        mock_learner_data_from_db.assert_called_once_with(mock_request.user)
+        # assert we cached the enterprise customer data in the request session after fetching it
+        assert mock_request.session.get(ENTERPRISE_CUSTOMER_KEY_NAME) == mock_enterprise_customer
+
+    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db')
+    def test_enterprise_learner_portal_message_cache_hit_no_customer(self, mock_learner_data_from_db):
+        """
+        When customer data exists in the request session but it's null/empty,
+        then ``get_enterprise_learner_portal_enabled_message()`` should return None.
+        """
+        mock_request = mock.Mock(session={
+            ENTERPRISE_CUSTOMER_KEY_NAME: None,
+        })
+
+        actual_result = get_enterprise_learner_portal_enabled_message(mock_request)
+        self.assertIsNone(actual_result)
+        self.assertFalse(mock_learner_data_from_db.called)
+
+    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db')
+    @override_settings(ENTERPRISE_LEARNER_PORTAL_BASE_URL='http://localhost')
+    def test_enterprise_learner_portal_message_cache_hit_customer_exists(self, mock_learner_data_from_db):
+        """
+        When customer data exists in the request session and it's a non-empty customer,
+        then ``get_enterprise_learner_portal_enabled_message()`` should return
+        an appropriate message for that customer.
+        """
+        mock_enterprise_customer = {
+            'uuid': 'some-uuid',
+            'name': 'Best Corp',
+            'enable_learner_portal': True,
+            'slug': 'best-corp',
+        }
+        mock_request = mock.Mock(session={
+            ENTERPRISE_CUSTOMER_KEY_NAME: mock_enterprise_customer,
+        })
+
+        actual_result = get_enterprise_learner_portal_enabled_message(mock_request)
+        self.assertIn('custom dashboard for learning', actual_result)
+        self.assertIn('Best Corp', actual_result)
+        self.assertFalse(mock_learner_data_from_db.called)
+
+    @mock.patch('openedx.features.enterprise_support.api.get_partial_pipeline', return_value=None)
+    def test_customer_uuid_for_request_sso_provider_id_customer_exists(self, mock_partial_pipeline):
+        mock_idp = EnterpriseCustomerIdentityProviderFactory.create()
+        mock_customer = mock_idp.enterprise_customer
+        mock_request = mock.Mock(
+            GET={'tpa_hint': mock_idp.provider_id},
+            COOKIES={},
+            session={},
+        )
+
+        actual_uuid = enterprise_customer_uuid_for_request(mock_request)
+
+        expected_uuid = mock_customer.uuid
+        self.assertEqual(expected_uuid, actual_uuid)
+        mock_partial_pipeline.assert_called_once_with(mock_request)
+        self.assertNotIn(ENTERPRISE_CUSTOMER_KEY_NAME, mock_request.session)
+
+    @mock.patch('openedx.features.enterprise_support.api.get_partial_pipeline', return_value=None)
+    def test_customer_uuid_for_request_sso_provider_id_customer_non_existent(self, mock_partial_pipeline):
+        mock_request = mock.Mock(
+            GET={'tpa_hint': 'my-third-party-auth'},
+            COOKIES={},
+            session={},
+        )
+
+        actual_uuid = enterprise_customer_uuid_for_request(mock_request)
+
+        self.assertIsNone(actual_uuid)
+        mock_partial_pipeline.assert_called_once_with(mock_request)
+        self.assertNotIn(ENTERPRISE_CUSTOMER_KEY_NAME, mock_request.session)
+
+    @mock.patch('openedx.features.enterprise_support.api.get_partial_pipeline', return_value=None)
+    def test_enterprise_uuid_for_request_from_query_params(self, mock_partial_pipeline):
+        expected_uuid = 'my-uuid'
+        mock_request = mock.Mock(
+            GET={ENTERPRISE_CUSTOMER_KEY_NAME: expected_uuid},
+            COOKIES={},
+            session={},
+        )
+
+        actual_uuid = enterprise_customer_uuid_for_request(mock_request)
+
+        self.assertEqual(expected_uuid, actual_uuid)
+        mock_partial_pipeline.assert_called_once_with(mock_request)
+        self.assertNotIn(ENTERPRISE_CUSTOMER_KEY_NAME, mock_request.session)
+
+    @mock.patch('openedx.features.enterprise_support.api.get_partial_pipeline', return_value=None)
+    def test_enterprise_uuid_for_request_from_cookies(self, mock_partial_pipeline):
+        expected_uuid = 'my-uuid'
+        mock_request = mock.Mock(
+            GET={},
+            COOKIES={settings.ENTERPRISE_CUSTOMER_COOKIE_NAME: expected_uuid},
+            session={},
+        )
+
+        actual_uuid = enterprise_customer_uuid_for_request(mock_request)
+
+        self.assertEqual(expected_uuid, actual_uuid)
+        mock_partial_pipeline.assert_called_once_with(mock_request)
+        self.assertNotIn(ENTERPRISE_CUSTOMER_KEY_NAME, mock_request.session)
+
+    @mock.patch('openedx.features.enterprise_support.api.get_partial_pipeline', return_value=None)
+    def test_enterprise_uuid_for_request_from_session(self, mock_partial_pipeline):
+        expected_uuid = 'my-uuid'
+        mock_request = mock.Mock(
+            GET={},
+            COOKIES={},
+            session={ENTERPRISE_CUSTOMER_KEY_NAME: {'uuid': expected_uuid}},
+        )
+
+        actual_uuid = enterprise_customer_uuid_for_request(mock_request)
+
+        self.assertEqual(expected_uuid, actual_uuid)
+        mock_partial_pipeline.assert_called_once_with(mock_request)
+        self.assertEqual({'uuid': expected_uuid}, mock_request.session.get(ENTERPRISE_CUSTOMER_KEY_NAME))
+
+    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db')
+    @mock.patch('openedx.features.enterprise_support.api.get_partial_pipeline', return_value=None)
+    def test_enterprise_uuid_for_request_cache_miss_but_exists_in_db(self, mock_partial_pipeline, mock_data_from_db):
+        mock_request = mock.Mock(
+            GET={},
+            COOKIES={},
+            session={},
+        )
+        mock_data_from_db.return_value = [
+            {'enterprise_customer': {'uuid': 'my-uuid'}},
+        ]
+
+        actual_uuid = enterprise_customer_uuid_for_request(mock_request)
+
+        expected_uuid = 'my-uuid'
+        self.assertEqual(expected_uuid, actual_uuid)
+        mock_partial_pipeline.assert_called_once_with(mock_request)
+        mock_data_from_db.assert_called_once_with(mock_request.user)
+        self.assertEqual({'uuid': 'my-uuid'}, mock_request.session[ENTERPRISE_CUSTOMER_KEY_NAME])
+
+    @ddt.data(True, False)
+    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db', return_value=None)
+    @mock.patch('openedx.features.enterprise_support.api.get_partial_pipeline', return_value=None)
+    def test_enterprise_uuid_for_request_cache_miss_non_existent(
+        self,
+        is_user_authenticated,
+        mock_partial_pipeline,
+        mock_data_from_db
+    ):
+        mock_request = mock.Mock(
+            GET={},
+            COOKIES={},
+            session={},
+        )
+        mock_request.user.is_authenticated = is_user_authenticated
+
+        actual_uuid = enterprise_customer_uuid_for_request(mock_request)
+
+        self.assertIsNone(actual_uuid)
+        mock_partial_pipeline.assert_called_once_with(mock_request)
+
+        if is_user_authenticated:
+            mock_data_from_db.assert_called_once_with(mock_request.user)
+            self.assertIsNone(mock_request.session[ENTERPRISE_CUSTOMER_KEY_NAME])
+        else:
+            self.assertFalse(mock_data_from_db.called)
+            self.assertNotIn(ENTERPRISE_CUSTOMER_KEY_NAME, mock_request.session)
+
+    def test_enterprise_customer_from_session(self):
+        mock_request = mock.Mock(
+            GET={},
+            COOKIES={},
+            session={},
+        )
+        mock_request.user.is_authenticated = True
+
+        enterprise_customer = {
+            'name': 'abc',
+            'uuid': 'cf246b88-d5f6-4908-a522-fc307e0b0c59'
+        }
+
+        # set enterprise customer info with authenticate user
+        add_enterprise_customer_to_session(mock_request, enterprise_customer)
+        self.assertEqual(mock_request.session[ENTERPRISE_CUSTOMER_KEY_NAME], enterprise_customer)
+
+        # Now try to set info with un-authenticated user
+        mock_request.user.is_authenticated = False
+        add_enterprise_customer_to_session(mock_request, None)
+        # verify that existing session value should not be updated for un-authenticate user
+        self.assertEqual(mock_request.session[ENTERPRISE_CUSTOMER_KEY_NAME], enterprise_customer)

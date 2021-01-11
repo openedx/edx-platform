@@ -22,6 +22,7 @@ from .methods import (
     update_collection,
     delete_collection,
     # Bundles:
+    get_bundles,
     get_bundle,
     create_bundle,
     update_bundle,
@@ -38,6 +39,7 @@ from .methods import (
     get_bundle_files_dict,
     get_bundle_file_metadata,
     get_bundle_file_data,
+    get_bundle_version,
     get_bundle_version_files,
     # Links:
     get_bundle_links,

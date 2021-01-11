@@ -13,11 +13,11 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.timezone import now
 from mock import patch
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from testfixtures import LogCapture
 
 from common.test.utils import MockS3BotoMixin
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 from lms.djangoapps.verify_student.tests.test_models import FAKE_SETTINGS, mock_software_secure_post
 
 LOGGER_NAME = 'lms.djangoapps.verify_student.management.commands.send_verification_expiry_email'
@@ -45,7 +45,18 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
         attempt.submit()
         return attempt
 
-    def test_expiry_date_range(self):
+    def create_expired_software_secure_photo_verification(self):
+        """
+        Helper method that creates an expired ssp verification
+        """
+        user = UserFactory.create()
+        verification = self.create_and_submit(user)
+        verification.status = 'approved'
+        verification.expiration_date = now() - timedelta(days=self.days)
+        verification.save()
+        return verification
+
+    def test_expiration_date_range(self):
         """
         Test that the verifications are filtered on the given range. Email is not sent for any verification with
         expiry date out of range
@@ -53,13 +64,13 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
         user = UserFactory.create()
         verification_in_range = self.create_and_submit(user)
         verification_in_range.status = 'approved'
-        verification_in_range.expiry_date = now() - timedelta(days=self.days)
+        verification_in_range.expiration_date = now() - timedelta(days=self.days)
         verification_in_range.save()
 
         user = UserFactory.create()
         verification = self.create_and_submit(user)
         verification.status = 'approved'
-        verification.expiry_date = now() - timedelta(days=self.days + 1)
+        verification.expiration_date = now() - timedelta(days=self.days + 1)
         verification.save()
 
         call_command('send_verification_expiry_email')
@@ -80,22 +91,22 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
         today = now().replace(hour=0, minute=0, second=0, microsecond=0)
         verification_in_range = self.create_and_submit(user)
         verification_in_range.status = 'approved'
-        verification_in_range.expiry_date = today - timedelta(days=self.days + 1)
+        verification_in_range.expiration_date = today - timedelta(days=self.days + 1)
         verification_in_range.expiry_email_date = today - timedelta(days=self.resend_days)
         verification_in_range.save()
 
         call_command('send_verification_expiry_email')
 
-        # Check that email is sent even if the verification is not in expiry_date range but matches the criteria
-        # to resend email
+        # Check that email is sent even if the verification is not in expiration_date range but matches
+        # the criteria to resend email
         self.assertEqual(len(mail.outbox), 1)
 
     def test_most_recent_verification(self):
         """
         Test that the SoftwareSecurePhotoVerification object is not filtered if it is outdated. A verification is
-        outdated if it's expiry_date and expiry_email_date is set NULL
+        outdated if its expiry_email_date is set NULL
         """
-        # For outdated verification the expiry_date and expiry_email_date is set NULL verify_student/views.py:1164
+        # For outdated verification the expiry_email_date is set NULL verify_student/views.py:1164
         user = UserFactory.create()
         outdated_verification = self.create_and_submit(user)
         outdated_verification.status = 'approved'
@@ -114,7 +125,7 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
         user = UserFactory.create()
         verification = self.create_and_submit(user)
         verification.status = 'approved'
-        verification.expiry_date = now() - timedelta(days=self.days)
+        verification.expiration_date = now() - timedelta(days=self.days)
         verification.save()
 
         call_command('send_verification_expiry_email')
@@ -124,6 +135,30 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
         self.assertEqual(attempt.expiry_email_date.date(), expected_date.date())
         self.assertEqual(len(mail.outbox), 1)
 
+    def test_verification_expiry_email_not_sent_valid_ssov(self):
+        """
+        Test that user has an expired software secure verification but a valid sso verification
+        so an email is not sent to the user
+        """
+        expired_ssp_verification = self.create_expired_software_secure_photo_verification()
+
+        SSOVerification.objects.create(user=expired_ssp_verification.user, status='approved')
+
+        call_command('send_verification_expiry_email')
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_verification_expiry_email_not_sent_valid_manual_verification(self):
+        """
+        Test that user has an expired software secure verification but a valid manual verification
+        so an email is not sent to the user
+        """
+        expired_ssp_verification = self.create_expired_software_secure_photo_verification()
+
+        ManualVerification.objects.create(user=expired_ssp_verification.user, status='approved')
+
+        call_command('send_verification_expiry_email')
+        self.assertEqual(len(mail.outbox), 0)
+
     def test_email_already_sent(self):
         """
         Test that if email is already sent as indicated by expiry_email_date then don't send again if it has been less
@@ -132,7 +167,7 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
         user = UserFactory.create()
         verification = self.create_and_submit(user)
         verification.status = 'approved'
-        verification.expiry_date = now() - timedelta(days=self.days)
+        verification.expiration_date = now() - timedelta(days=self.days)
         verification.expiry_email_date = now()
         verification.save()
 
@@ -160,7 +195,7 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
         user = UserFactory.create()
         verification = self.create_and_submit(user)
         verification.status = 'approved'
-        verification.expiry_date = now() - timedelta(days=self.days)
+        verification.expiration_date = now() - timedelta(days=self.days)
         verification.save()
 
         start_date = now() - timedelta(days=self.days)  # using default days
@@ -191,7 +226,7 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
         today = now().replace(hour=0, minute=0, second=0, microsecond=0)
         verification = self.create_and_submit(user)
         verification.status = 'approved'
-        verification.expiry_date = now() - timedelta(days=self.resend_days * (self.default_no_of_emails - 1))
+        verification.expiration_date = now() - timedelta(days=self.resend_days * (self.default_no_of_emails - 1))
         verification.expiry_email_date = today - timedelta(days=self.resend_days)
         verification.save()
 
@@ -212,7 +247,7 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
         verification = self.create_and_submit(user)
         verification.status = 'approved'
 
-        verification.expiry_date = now() - timedelta(days=1)
+        verification.expiration_date = now() - timedelta(days=1)
         verification.save()
         call_command('send_verification_expiry_email')
 
@@ -221,7 +256,7 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
         for i in range(1, self.default_no_of_emails + 1):
             if SoftwareSecurePhotoVerification.objects.get(pk=verification.id).expiry_email_date:
                 today = now().replace(hour=0, minute=0, second=0, microsecond=0)
-                verification.expiry_date = today - timedelta(days=self.resend_days * i + 1)
+                verification.expiration_date = today - timedelta(days=self.resend_days * i + 1)
                 verification.expiry_email_date = today - timedelta(days=self.resend_days)
                 verification.save()
                 call_command('send_verification_expiry_email')
@@ -248,7 +283,7 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
             user = UserFactory.create()
             verification = self.create_and_submit(user)
             verification.status = 'approved'
-            verification.expiry_date = now() - timedelta(days=self.days)
+            verification.expiration_date = now() - timedelta(days=self.days)
             verification.save()
             verifications.append(verification)
 

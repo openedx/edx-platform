@@ -14,7 +14,6 @@ sessions. Assumes structure:
 # pylint: disable=wildcard-import, unused-wildcard-import
 
 
-from .common import *
 import os
 from uuid import uuid4
 
@@ -22,15 +21,19 @@ from django.utils.translation import ugettext_lazy
 from path import Path as path
 
 from openedx.core.lib.derived import derive_settings
-from util.db import NoOpMigrationModules
+
+from xmodule.modulestore.modulestore_settings import update_module_store_settings
+
+from .common import *
 
 # import settings from LMS for consistent behavior with CMS
-from lms.envs.test import (
+from lms.envs.test import (  # pylint: disable=wrong-import-order
     COMPREHENSIVE_THEME_DIRS,
     DEFAULT_FILE_STORAGE,
     ECOMMERCE_API_URL,
     ENABLE_COMPREHENSIVE_THEMING,
     JWT_AUTH,
+    LOGIN_ISSUE_SUPPORT_LINK,
     MEDIA_ROOT,
     MEDIA_URL,
     PLATFORM_DESCRIPTION,
@@ -135,6 +138,8 @@ LMS_BASE = "localhost:8000"
 LMS_ROOT_URL = "http://{}".format(LMS_BASE)
 FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost"
 
+COURSE_AUTHORING_MICROFRONTEND_URL = "http://course-authoring-mfe"
+
 CACHES = {
     # This is the cache used for most things. Askbot will not work without a
     # functioning cache -- it relies on caching to load its settings in places.
@@ -142,7 +147,7 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'edx_loc_mem_cache',
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
     },
 
     # The general cache is what you get if you use our util.cache. It's used for
@@ -154,14 +159,14 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
         'KEY_PREFIX': 'general',
         'VERSION': 4,
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
     },
 
     'mongo_metadata_inheritance': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': os.path.join(tempfile.gettempdir(), 'mongo_metadata_inheritance'),
         'TIMEOUT': 300,
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
     },
     'loc_cache': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -181,9 +186,13 @@ BLOCKSTORE_API_AUTH_TOKEN = os.environ.get('EDXAPP_BLOCKSTORE_API_AUTH_TOKEN', '
 ################################# CELERY ######################################
 
 CELERY_ALWAYS_EAGER = True
-CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
+CELERY_RESULT_BACKEND = 'django-cache'
 
 CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
+
+# test_status_cancel in cms/cms_user_tasks/test.py is failing without this
+# @override_setting for BROKER_URL is not working in testcase, so updating here
+BROKER_URL = 'memory://localhost/'
 
 ########################### Server Ports ###################################
 
@@ -243,9 +252,20 @@ VIDEO_CDN_URL = {
 # Courseware Search Index
 FEATURES['ENABLE_COURSEWARE_INDEX'] = True
 FEATURES['ENABLE_LIBRARY_INDEX'] = True
+FEATURES['ENABLE_CONTENT_LIBRARY_INDEX'] = False
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 
 FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
+
+####################### ELASTICSEARCH TESTS #######################
+# Enable this when testing elasticsearch-based code which couldn't be tested using the mock engine
+ENABLE_ELASTICSEARCH_FOR_TESTS = os.environ.get(
+    'EDXAPP_ENABLE_ELASTICSEARCH_FOR_TESTS', 'no').lower() in ('true', 'yes', '1')
+
+TEST_ELASTICSEARCH_USE_SSL = os.environ.get(
+    'EDXAPP_TEST_ELASTICSEARCH_USE_SSL', 'no').lower() in ('true', 'yes', '1')
+TEST_ELASTICSEARCH_HOST = os.environ.get('EDXAPP_TEST_ELASTICSEARCH_HOST', 'edx.devstack.elasticsearch')
+TEST_ELASTICSEARCH_PORT = int(os.environ.get('EDXAPP_TEST_ELASTICSEARCH_PORT', '9200'))
 
 ########################## AUTHOR PERMISSION #######################
 FEATURES['ENABLE_CREATOR_GROUP'] = False
@@ -284,9 +304,11 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
 
 ####################### Plugin Settings ##########################
 
-# pylint: disable=wrong-import-position
-from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
-plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_constants.SettingsType.TEST)
+# pylint: disable=wrong-import-position, wrong-import-order
+from edx_django_utils.plugins import add_plugins
+# pylint: disable=wrong-import-position, wrong-import-order
+from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
+add_plugins(__name__, ProjectType.CMS, SettingsType.TEST)
 
 ########################## Derive Any Derived Settings  #######################
 
@@ -298,6 +320,12 @@ SYSTEM_WIDE_ROLE_CLASSES = os.environ.get("SYSTEM_WIDE_ROLE_CLASSES", [])
 DEFAULT_MOBILE_AVAILABLE = True
 
 PROCTORING_SETTINGS = {}
+
+##### LOGISTRATION RATE LIMIT SETTINGS #####
+LOGISTRATION_RATELIMIT_RATE = '5/5m'
+LOGISTRATION_API_RATELIMIT = '5/m'
+
+REGISTRATION_VALIDATION_RATELIMIT = '5/minute'
 
 ############### ADG #####################
 

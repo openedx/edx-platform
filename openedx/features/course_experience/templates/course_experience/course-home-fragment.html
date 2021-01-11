@@ -14,7 +14,7 @@ from django.urls import reverse
 from lms.djangoapps.discussion.django_comment_client.permissions import has_permission
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import Text, HTML
-from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REVIEWS_TOOL_FLAG
+from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG, SHOW_REVIEWS_TOOL_FLAG
 from openedx.features.course_experience.course_tools import HttpMethod
 %>
 
@@ -63,9 +63,6 @@ from openedx.features.course_experience.course_tools import HttpMethod
     </header>
     <div class="page-content">
         <div class="page-content-main">
-            % if next_up_banner_fragment:
-                ${HTML(next_up_banner_fragment.body_html())}
-            % endif
             % if offer_banner_fragment:
                 ${HTML(offer_banner_fragment.content)}
             % endif
@@ -76,7 +73,7 @@ from openedx.features.course_experience.course_tools import HttpMethod
                 ${HTML(course_home_message_fragment.body_html())}
             % endif
 
-            % if update_message_fragment and UNIFIED_COURSE_TAB_FLAG.is_enabled(course.id):
+            % if update_message_fragment and not DISABLE_UNIFIED_COURSE_TAB_FLAG.is_enabled(course.id):
                 <div class="section section-update-message">
                     ${HTML(update_message_fragment.body_html())}
                 </div>
@@ -144,7 +141,7 @@ from openedx.features.course_experience.course_tools import HttpMethod
                         <img src="https://courses.edx.org/static/images/edx-verified-mini-cert.png" alt="">
                         <div class="upgrade-container">
                             <p>
-                                <a class="btn-brand btn-upgrade"
+                                <a id="green_upgrade" class="btn-brand btn-upgrade"
                                    href="${upgrade_url}"
                                    data-creative="sidebarupsell"
                                    data-position="sidebar-message"
@@ -189,3 +186,65 @@ from openedx.features.course_experience.course_tools import HttpMethod
 <%static:webpack entry="Enrollment">
     new CourseEnrollment('.enroll-btn', '${course_key | n, js_escaped_string}');
 </%static:webpack>
+
+<%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
+
+  var personalizedLearnerSchedulesLink = $(".personalized_learner_schedules_button");
+  var fbeLink = $("#FBE_banner");
+  var welcomeLink = $("#welcome");
+  var sockLink = $("#sock");
+  var upgradeDateLink = $("#course_home_dates");
+  var GreenUpgradeLink = $("#green_upgrade");
+  var courseToolsUpgradeLink = $(document.querySelectorAll("[data-analytics-id='edx.tool.verified_upgrade']"));
+  var GreenUpgradeLink = $("#green_upgrade");
+  var certificateUpsellLink = $("#certificate_upsell");
+
+    TrackECommerceEvents.trackUpsellClick(personalizedLearnerSchedulesLink, 'course_home_upgrade_shift_dates', {
+      pageName: "course_home",
+      linkType: "button",
+      linkCategory: "personalized_learner_schedules"
+    });
+
+    TrackECommerceEvents.trackUpsellClick(fbeLink, 'course_home_audit_access_expires', {
+      pageName: "course_home",
+      linkType: "link",
+      linkCategory: "FBE_banner"
+    });
+
+    TrackECommerceEvents.trackUpsellClick(welcomeLink, 'course_home_welcome', {
+      pageName: "course_home",
+      linkType: "link",
+      linkCategory: "welcome"
+    });
+
+    TrackECommerceEvents.trackUpsellClick(sockLink, 'course_home_sock', {
+      pageName: "course_home",
+      linkType: "button",
+      linkCategory: "green_upgrade"
+    });
+
+    TrackECommerceEvents.trackUpsellClick(upgradeDateLink, 'course_home_dates', {
+      pageName: "course_home",
+      linkType: "link",
+      linkCategory: "(none)"
+    });
+
+    TrackECommerceEvents.trackUpsellClick(GreenUpgradeLink, 'course_home_green', {
+      pageName: "course_home",
+      linkType: "button",
+      linkCategory: "green_upgrade"
+    });
+
+    TrackECommerceEvents.trackUpsellClick(courseToolsUpgradeLink, 'course_home_course_tools', {
+      pageName: "course_home",
+      linkType: "link",
+      linkCategory: "(none)"
+    });
+
+    TrackECommerceEvents.trackUpsellClick(certificateUpsellLink, 'course_home_certificate', {
+        pageName: "course_home",
+        linkType: "link",
+        linkCategory: "(none)"
+      });
+
+</%static:require_module_async> 

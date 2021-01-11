@@ -19,12 +19,13 @@ from six import text_type
 
 from openedx.core.djangoapps.django_comment_common.models import assign_default_role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
-from student import auth
-from student.models import CourseEnrollment
-from student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student import auth
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -155,6 +156,21 @@ def get_lms_link_for_certificate_web_view(course_key, mode):
         course_id=six.text_type(course_key),
         mode=mode
     )
+
+
+def get_proctored_exam_settings_url(course_module):
+    """
+    Gets course authoring microfrontend URL for links to proctored exam settings page
+    """
+    course_authoring_microfrontend_url = ''
+
+    if settings.FEATURES.get('ENABLE_EXAM_SETTINGS_HTML_VIEW'):
+        course_authoring_microfrontend_url = configuration_helpers.get_value_for_org(
+            course_module.location.org,
+            'COURSE_AUTHORING_MICROFRONTEND_URL',
+            settings.COURSE_AUTHORING_MICROFRONTEND_URL
+        )
+    return course_authoring_microfrontend_url
 
 
 # pylint: disable=invalid-name

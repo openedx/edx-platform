@@ -31,7 +31,6 @@ from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField
 from six import text_type
 from six.moves import range
 
-import coursewarehistoryextended
 from openedx.core.djangolib.markup import HTML
 
 log = logging.getLogger("edx.courseware")
@@ -217,7 +216,8 @@ class BaseStudentModuleHistory(models.Model):
         history_entries = []
 
         if settings.FEATURES.get('ENABLE_CSMH_EXTENDED'):
-            history_entries += coursewarehistoryextended.models.StudentModuleHistoryExtended.objects.filter(
+            from lms.djangoapps.coursewarehistoryextended.models import StudentModuleHistoryExtended
+            history_entries += StudentModuleHistoryExtended.objects.filter(
                 # Django will sometimes try to join to courseware_studentmodule
                 # so just do an in query
                 student_module__in=[module.id for module in student_modules]

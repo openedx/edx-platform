@@ -12,7 +12,7 @@ from opaque_keys.edx.keys import CourseKey
 from six.moves import range
 
 from openedx.core.djangoapps.ccxcon import api as ccxconapi
-from student.tests.factories import AdminFactory
+from common.djangoapps.student.tests.factories import AdminFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

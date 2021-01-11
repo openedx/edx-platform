@@ -20,5 +20,4 @@ Studio.
     lms/djangoapps/mobile_api/modules
     lms/djangoapps/notes/modules
     lms/djangoapps/rss_proxy/modules
-    lms/djangoapps/shoppingcart/modules
     lms/djangoapps/survey/modules

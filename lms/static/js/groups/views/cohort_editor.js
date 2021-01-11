@@ -1,9 +1,9 @@
 /* globals _, NotificationModel, NotificationView, interpolate_text */
 (function(define) {
     'use strict';
-    define(['backbone', 'underscore', 'jquery', 'gettext', 'js/groups/views/cohort_form', 'string_utils',
-        'js/models/notification', 'js/views/notification'],
-        function(Backbone, _, $, gettext, CohortFormView) {
+    define(['backbone', 'underscore', 'jquery', 'gettext', 'js/groups/views/cohort_form',
+        'edx-ui-toolkit/js/utils/html-utils', 'string_utils', 'js/models/notification', 'js/views/notification'],
+        function(Backbone, _, $, gettext, CohortFormView, HtmlUtils) {
             var CohortEditorView = Backbone.View.extend({
 
                 events: {
@@ -14,8 +14,8 @@
                 },
 
                 initialize: function(options) {
-                    this.template = _.template($('#cohort-editor-tpl').text());
-                    this.groupHeaderTemplate = _.template($('#cohort-group-header-tpl').text());
+                    this.template = HtmlUtils.template($('#cohort-editor-tpl').text());
+                    this.groupHeaderTemplate = HtmlUtils.template($('#cohort-group-header-tpl').text());
                     this.cohorts = options.cohorts;
                     this.contentGroups = options.contentGroups;
                     this.context = options.context;
@@ -29,7 +29,7 @@
                 preassignedNotifications: null,
 
                 render: function() {
-                    this.$el.html(this.template({
+                    HtmlUtils.setHtml(this.$el, this.template({
                         cohort: this.model
                     }));
                     this.renderGroupHeader();
@@ -44,7 +44,7 @@
                 },
 
                 renderGroupHeader: function() {
-                    this.$('.cohort-management-group-header').html(this.groupHeaderTemplate({
+                    HtmlUtils.setHtml(this.$('.cohort-management-group-header'), this.groupHeaderTemplate({
                         cohort: this.model
                     }));
                 },

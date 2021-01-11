@@ -19,7 +19,7 @@ from six import text_type
 from six.moves import range
 from xblock.field_data import DictFieldData
 
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from lms.djangoapps.courseware.masquerade import MasqueradeView
@@ -28,9 +28,9 @@ from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.features.course_duration_limits.access import EXPIRATION_DATE_FORMAT_STR
-from student.models import CourseEnrollment, Registration
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.date_utils import strftime_localized
+from common.djangoapps.student.models import CourseEnrollment, Registration
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -329,6 +329,52 @@ class CourseAccessTestMixin(TestCase):
         self.assertFalse(has_access(user, action, CourseOverview.get_from_id(course.id)))
 
 
+class MasqueradeMixin:
+    """
+    Adds masquerade utilities for your TestCase.
+
+    Your test case class must have self.client. And can optionally have self.course if you don't want
+    to pass in the course parameter below.
+    """
+
+    def update_masquerade(self, course=None, role='student', group_id=None, username=None, user_partition_id=None):
+        """
+        Installs a masquerade for the specified user and course, to enable
+        the user to masquerade as belonging to the specific partition/group
+        combination.
+
+        Arguments:
+            course (object): a course or None for self.course
+            user_partition_id (int): the integer partition id, referring to partitions already
+               configured in the course.
+            group_id (int); the integer group id, within the specified partition.
+            username (str): user to masquerade as
+            role (str): role to masquerade as
+
+        Returns: the response object for the AJAX call to update the user's masquerade.
+        """
+        course = course or self.course
+        masquerade_url = reverse(
+            'masquerade_update',
+            kwargs={
+                'course_key_string': str(course.id),
+            }
+        )
+        response = self.client.post(
+            masquerade_url,
+            json.dumps({
+                'role': role,
+                'group_id': group_id,
+                'user_name': username,
+                'user_partition_id': user_partition_id,
+            }),
+            'application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()['success'], response.json().get('error'))
+        return response
+
+
 def masquerade_as_group_member(user, course, partition_id, group_id):
     """
     Installs a masquerade for the specified user and course, to enable
@@ -394,7 +440,7 @@ def get_expiration_banner_text(user, course, language='en'):
         bannerText = u'<strong>Audit Access Expires {expiration_date}</strong><br>\
                      You lose all access to this course, including your progress, on {expiration_date}.\
                      <br>Upgrade by {upgrade_deadline} to get unlimited access to the course as long as it exists\
-                     on the site. <a href="{upgrade_link}">Upgrade now<span class="sr-only"> to retain access past\
+                     on the site. <a id="FBE_banner" href="{upgrade_link}">Upgrade now<span class="sr-only"> to retain access past\
                      {expiration_date}</span></a>'.format(
             expiration_date=formatted_expiration_date,
             upgrade_link=upgrade_link,

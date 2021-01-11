@@ -1,6 +1,7 @@
 (function(define) {
     'use strict';
     define([
+        'jquery',
         'underscore',
         'backbone',
         'gettext',
@@ -9,7 +10,34 @@
         'common/js/components/views/paging_header',
         'text!teams/templates/team-actions.underscore',
         'teams/js/views/team_utils'
-    ], function(_, Backbone, gettext, HtmlUtils, TeamsView, PagingHeader, teamActionsTemplate, TeamUtils) {
+    ], function($, _, Backbone, gettext, HtmlUtils, TeamsView, PagingHeader, teamActionsTemplate, TeamUtils) {
+        // Translators: this string is shown at the bottom of the teams page
+        // to find a team to join or else to create a new one. There are three
+        // links that need to be included in the message:
+        // 1. Browse teams in other topics
+        // 2. search teams
+        // 3. create a new team
+        // Be careful to start each link with the appropriate start indicator
+        // (e.g. {browse_span_start} for #1) and finish it with {span_end}.
+        var actionMessage = interpolate_text(  // eslint-disable-line no-undef
+            _.escape(gettext(
+                '{browse_span_start}Browse teams in other ' +
+                'topics{span_end} or {search_span_start}search teams{span_end} ' +
+                'in this topic. If you still can\'t find a team to join, ' +
+                '{create_span_start}create a new team in this topic{span_end}.'
+            )),
+            {
+                browse_span_start: '<a class="browse-teams" href="">',
+                search_span_start: '<a class="search-teams" href="">',
+                create_span_start: '<a class="create-team" href="">',
+                span_end: '</a>'
+            }
+        );
+
+        var canUserCreateTeamErrorMessage = gettext(
+            'An error occurred while looking up team membership. Try refreshing the page.'
+        );
+
         var TopicTeamsView = TeamsView.extend({
             events: {
                 'click a.browse-teams': 'browseTeams',
@@ -21,55 +49,51 @@
                 this.options = _.extend({}, options);
                 this.showSortControls = options.showSortControls;
                 this.context = options.context;
-                this.myTeamsCollection = options.myTeamsCollection;
                 TeamsView.prototype.initialize.call(this, options);
             },
 
-            canUserCreateTeam: function() {
-                    // Note: non-staff and non-privileged users are automatically added to any team
-                    // that they create. This means that if multiple team membership is
-                    // disabled that they cannot create a new team when they already
-                    // belong to one.
-                return this.context.userInfo.staff
-                    || this.context.userInfo.privileged
-                    || (!TeamUtils.isInstructorManagedTopic(this.model.attributes.type)
-                        && this.myTeamsCollection.length === 0);
+            checkIfUserCanCreateTeam: function() {
+                var deferred = $.Deferred();
+                if (this.context.userInfo.staff || this.context.userInfo.privileged) {
+                    deferred.resolve(true);
+                } else if (TeamUtils.isInstructorManagedTopic(this.model.attributes.type)) {
+                    deferred.resolve(false);
+                } else {
+                    $.ajax({
+                        type: 'GET',
+                        url: this.context.teamMembershipsUrl,
+                        data: {
+                            username: this.context.userInfo.username,
+                            course_id: this.context.courseID,
+                            teamset_id: this.model.get('id')
+                        }
+                    }).done(function(data) {
+                        deferred.resolve(data.count === 0);
+                    }).fail(function(data) {
+                        TeamUtils.parseAndShowMessage(data, canUserCreateTeamErrorMessage);
+                        deferred.resolve(false);
+                    });
+                }
+                return deferred.promise();
+            },
+
+
+            showActions: function() {
+                HtmlUtils.append(
+                    this.$el,
+                    HtmlUtils.template(teamActionsTemplate)({message: actionMessage})
+                );
             },
 
             render: function() {
-                var self = this;
-                this.collection.refresh().done(function() {
-                    var message;
-                    TeamsView.prototype.render.call(self);
-                    if (self.canUserCreateTeam()) {
-                        message = interpolate_text(  // eslint-disable-line no-undef
-                                // Translators: this string is shown at the bottom of the teams page
-                                // to find a team to join or else to create a new one. There are three
-                                // links that need to be included in the message:
-                                // 1. Browse teams in other topics
-                                // 2. search teams
-                                // 3. create a new team
-                                // Be careful to start each link with the appropriate start indicator
-                                // (e.g. {browse_span_start} for #1) and finish it with {span_end}.
-                                _.escape(gettext(
-                                    '{browse_span_start}Browse teams in other ' +
-                                    'topics{span_end} or {search_span_start}search teams{span_end} ' +
-                                    'in this topic. If you still can\'t find a team to join, ' +
-                                    '{create_span_start}create a new team in this topic{span_end}.'
-                                )),
-                            {
-                                browse_span_start: '<a class="browse-teams" href="">',
-                                search_span_start: '<a class="search-teams" href="">',
-                                create_span_start: '<a class="create-team" href="">',
-                                span_end: '</a>'
-                            }
-                            );
-                        HtmlUtils.append(
-                            self.$el,
-                            HtmlUtils.template(teamActionsTemplate)({message: message})
-                        );
-                    }
-                });
+                this.collection.refresh().done(_.bind(function() {
+                    TeamsView.prototype.render.call(this);
+                    this.checkIfUserCanCreateTeam().done(_.bind(function(canUserCreateTeam) {
+                        if (canUserCreateTeam) {
+                            this.showActions();
+                        }
+                    }, this));
+                }, this));
                 return this;
             },
 

@@ -28,8 +28,8 @@ from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
 from xblock.scorable import ScorableXBlockMixin
 
-import static_replace
-from edxmako.shortcuts import render_to_string
+from common.djangoapps import static_replace
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from xmodule.seq_module import SequenceModule
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.vertical_block import VerticalBlock
@@ -323,23 +323,7 @@ def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context)
         return frag
     # TODO: make this more general, eg use an XModule attribute instead
     if isinstance(block, VerticalBlock) and (not context or not context.get('child_of_vertical', False)):
-        # check that the course is a mongo backed Studio course before doing work
-        is_studio_course = block.course_edit_method == "Studio"
-
-        if is_studio_course:
-            # build edit link to unit in CMS. Can't use reverse here as lms doesn't load cms's urls.py
-            edit_link = "//" + settings.CMS_BASE + '/container/' + text_type(block.location)
-
-            # return edit link in rendered HTML for display
-            return wrap_fragment(
-                frag,
-                render_to_string(
-                    "edit_unit_link.html",
-                    {'frag_content': frag.content, 'edit_link': edit_link}
-                )
-            )
-        else:
-            return frag
+        return frag
 
     if isinstance(block, SequenceModule) or getattr(block, 'HIDDEN', False):
         return frag

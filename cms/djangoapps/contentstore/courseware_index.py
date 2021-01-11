@@ -1,6 +1,5 @@
 """ Code to allow module store to interface with courseware index """
 
-
 import logging
 import re
 from abc import ABCMeta, abstractmethod
@@ -14,8 +13,8 @@ from eventtracking import tracker
 from search.search_engine_base import SearchEngine
 from six import add_metaclass, string_types, text_type
 
-from contentstore.course_group_config import GroupConfiguration
-from course_modes.models import CourseMode
+from cms.djangoapps.contentstore.course_group_config import GroupConfiguration
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.lib.courses import course_image_url
 from xmodule.annotator_mixin import html_to_text
 from xmodule.library_tools import normalize_key_for_search
@@ -59,11 +58,10 @@ class SearchIndexingError(Exception):
 
 
 @add_metaclass(ABCMeta)
-class SearchIndexerBase(object):
+class SearchIndexerBase(object, metaclass=ABCMeta):
     """
     Base class to perform indexing for courseware or library search from different modulestores
     """
-    __metaclass__ = ABCMeta
 
     INDEX_NAME = None
     DOCUMENT_TYPE = None
@@ -180,8 +178,7 @@ class SearchIndexerBase(object):
             Returns:
             item_content_groups - content groups assigned to indexed item
             """
-            is_indexable = hasattr(item, "index_dictionary")
-            item_index_dictionary = item.index_dictionary() if is_indexable else None
+            item_index_dictionary = item.index_dictionary()
             # if it's not indexable and it does not have children, then ignore
             if not item_index_dictionary and not item.has_children:
                 return

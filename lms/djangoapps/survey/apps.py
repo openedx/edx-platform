@@ -10,7 +10,7 @@ class SurveyConfig(AppConfig):
     """
     Application Configuration for survey.
     """
-    name = 'survey'
+    name = 'lms.djangoapps.survey'
     verbose_name = 'Student Surveys'
 
     def ready(self):

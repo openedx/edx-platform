@@ -15,16 +15,16 @@ from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
 from six.moves import zip
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.enrollments.api import validate_course_mode
 from openedx.core.djangoapps.enrollments.errors import CourseModeNotFoundError
 from openedx.core.lib.html_to_text import html_to_text
 from openedx.core.lib.mail_utils import wrap_message
-from student.roles import CourseInstructorRole, CourseStaffRole
-from util.keyword_substitution import substitute_keywords_with_data
-from util.query import use_read_replica_if_available
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.util.keyword_substitution import substitute_keywords_with_data
+from common.djangoapps.util.query import use_read_replica_if_available
 
 log = logging.getLogger(__name__)
 
@@ -468,18 +468,6 @@ class CourseAuthorization(models.Model):
         return u"Course '{}': Instructor Email {}Enabled".format(text_type(self.course_id), not_en)
 
 
-# .. toggle_name: require_course_email_auth
-# .. toggle_implementation: ConfigurationModel
-# .. toggle_default: True (enabled)
-# .. toggle_description: If the flag is enabled, course-specific authorization is required, and the course_id is either
-# not provided or not authorixed, the feature is not available.
-# .. toggle_category: bulk email
-# .. toggle_use_cases:  open_edx
-# .. toggle_creation_date: 2016-05-05
-# .. toggle_expiration_date: None
-# .. toggle_warnings: None
-# .. toggle_tickets: None
-# .. toggle_status: supported
 @python_2_unicode_compatible
 class BulkEmailFlag(ConfigurationModel):
     """
@@ -490,6 +478,18 @@ class BulkEmailFlag(ConfigurationModel):
     2. Course-specific authorization not required, or course authorized to use bulk email.
 
     .. no_pii:
+
+    .. toggle_name: require_course_email_auth
+    .. toggle_implementation: ConfigurationModel
+    .. toggle_default: True (enabled)
+    .. toggle_description: If the flag is enabled, course-specific authorization is
+      required, and the course_id is either not provided or not authorized, the feature
+      is not available.
+    .. toggle_use_cases:  open_edx
+    .. toggle_creation_date: 2016-05-05
+    .. toggle_target_removal_date: None
+    .. toggle_warnings: None
+    .. toggle_tickets: None
     """
     # boolean field 'enabled' inherited from parent ConfigurationModel
     require_course_email_auth = models.BooleanField(default=True)

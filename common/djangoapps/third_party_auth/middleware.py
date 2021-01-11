@@ -10,7 +10,7 @@ from django.utils.translation import ugettext as _
 from requests import HTTPError
 from social_django.middleware import SocialAuthExceptionMiddleware
 
-from student.helpers import get_next_url_for_login_page
+from common.djangoapps.student.helpers import get_next_url_for_login_page
 
 from . import pipeline
 

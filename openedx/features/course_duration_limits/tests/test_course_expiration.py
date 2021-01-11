@@ -2,8 +2,6 @@
 Contains tests to verify correctness of course expiration functionality
 """
 
-
-import json
 from datetime import timedelta
 
 import ddt
@@ -13,8 +11,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.timezone import now
 
-from course_modes.models import CourseMode
-from experiments.models import ExperimentData
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
     GlobalStaffFactory,
@@ -23,6 +20,7 @@ from lms.djangoapps.courseware.tests.factories import (
     OrgStaffFactory,
     StaffFactory
 )
+from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_date_signals.utils import MAX_DURATION, MIN_DURATION
@@ -37,16 +35,17 @@ from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITIO
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
-from student.models import CourseEnrollment, FBEEnrollmentExclusion
-from student.roles import CourseInstructorRole
-from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.models import CourseEnrollment, FBEEnrollmentExclusion
+from common.djangoapps.student.roles import CourseInstructorRole
+from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 
 
+# pylint: disable=no-member
 @ddt.ddt
-class CourseExpirationTestCase(ModuleStoreTestCase):
+class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
     """Tests to verify the get_user_course_expiration_date function is working correctly"""
     def setUp(self):
         super(CourseExpirationTestCase, self).setUp()
@@ -57,7 +56,8 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         self.THREE_YEARS_AGO = now() - timedelta(days=(365 * 3))
 
         # Make this a verified course so we can test expiration date
-        add_course_mode(self.course, upgrade_deadline_expired=False)
+        add_course_mode(self.course, mode_slug=CourseMode.AUDIT)
+        add_course_mode(self.course)
 
     def tearDown(self):
         CourseEnrollment.unenroll(self.user, self.course.id)
@@ -97,6 +97,11 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
             self.course.self_paced = True
         mock_get_course_run_details.return_value = {'weeks_to_complete': weeks_to_complete}
         enrollment = CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
+        CourseDurationLimitConfig.objects.create(
+            enabled=True,
+            course=CourseOverview.get_from_id(self.course.id),
+            enabled_as_of=self.course.start,
+        )
         result = get_user_course_expiration_date(
             self.user,
             CourseOverview.get_from_id(self.course.id),
@@ -115,12 +120,18 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         start_date = now() - timedelta(weeks=10)
         past_course = CourseFactory(start=start_date)
         enrollment = CourseEnrollment.enroll(self.user, past_course.id, CourseMode.AUDIT)
+        CourseDurationLimitConfig.objects.create(
+            enabled=True,
+            course=CourseOverview.get_from_id(past_course.id),
+            enabled_as_of=past_course.start,
+        )
         result = get_user_course_expiration_date(
             self.user,
             CourseOverview.get_from_id(past_course.id),
         )
         self.assertEqual(result, None)
 
+        add_course_mode(past_course, mode_slug=CourseMode.AUDIT)
         add_course_mode(past_course, upgrade_deadline_expired=False)
         result = get_user_course_expiration_date(
             self.user,
@@ -133,12 +144,18 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         start_date = now() + timedelta(weeks=10)
         future_course = CourseFactory(start=start_date)
         enrollment = CourseEnrollment.enroll(self.user, future_course.id, CourseMode.AUDIT)
+        CourseDurationLimitConfig.objects.create(
+            enabled=True,
+            course=CourseOverview.get_from_id(future_course.id),
+            enabled_as_of=past_course.start,
+        )
         result = get_user_course_expiration_date(
             self.user,
             CourseOverview.get_from_id(future_course.id),
         )
         self.assertEqual(result, None)
 
+        add_course_mode(future_course, mode_slug=CourseMode.AUDIT)
         add_course_mode(future_course, upgrade_deadline_expired=False)
         result = get_user_course_expiration_date(
             self.user,
@@ -158,6 +175,12 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         start_date = now() - timedelta(weeks=10)
         course = CourseFactory(start=start_date)
         enrollment = CourseEnrollment.enroll(self.user, course.id, CourseMode.AUDIT)
+        CourseDurationLimitConfig.objects.create(
+            enabled=True,
+            course=CourseOverview.get_from_id(course.id),
+            enabled_as_of=course.start,
+        )
+        add_course_mode(course, mode_slug=CourseMode.AUDIT)
         add_course_mode(course, upgrade_deadline_expired=True)
         result = get_user_course_expiration_date(
             self.user,
@@ -222,29 +245,6 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
             self.assertContains(response, banner_text)
         else:
             self.assertNotContains(response, banner_text)
-
-    def update_masquerade(self, role='student', group_id=None, username=None, user_partition_id=None):
-        """
-        Toggle masquerade state.
-        """
-        masquerade_url = reverse(
-            'masquerade_update',
-            kwargs={
-                'course_key_string': six.text_type(self.course.id),
-            }
-        )
-        response = self.client.post(
-            masquerade_url,
-            json.dumps({
-                'role': role,
-                'group_id': group_id,
-                'user_name': username,
-                'user_partition_id': user_partition_id,
-            }),
-            'application/json'
-        )
-        self.assertEqual(response.status_code, 200)
-        return response
 
     @mock.patch("openedx.core.djangoapps.course_date_signals.utils.get_course_run_details")
     def test_masquerade_in_holdback(self, mock_get_course_run_details):

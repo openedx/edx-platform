@@ -2,7 +2,6 @@
 Objects and utilities used to construct registration forms.
 """
 
-
 import copy
 from importlib import import_module
 import re
@@ -19,19 +18,20 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django_countries import countries
 
-import third_party_auth
-from edxmako.shortcuts import marketing_link
+from common.djangoapps import third_party_auth
+from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.helpers import FormDescription
+from openedx.core.djangoapps.user_authn.utils import is_registration_api_v1 as is_api_v1
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
-from student.models import (
+from common.djangoapps.student.models import (
     CourseEnrollmentAllowed,
     UserProfile,
     email_exists_or_retired,
 )
-from util.password_policy_validators import (
+from common.djangoapps.util.password_policy_validators import (
     password_validators_instruction_texts,
     password_validators_restrictions,
     validate_password,
@@ -42,6 +42,7 @@ class TrueCheckbox(widgets.CheckboxInput):
     """
     A checkbox widget that only accepts "true" (case-insensitive) as true.
     """
+
     def value_from_datadict(self, data, files, name):
         value = data.get(name, '')
         return value.lower() == 'true'
@@ -164,12 +165,12 @@ class AccountCreationForm(forms.Form):
     )
 
     def __init__(
-            self,
-            data=None,
-            extra_fields=None,
-            extended_profile_fields=None,
-            do_third_party_auth=True,
-            tos_required=True
+        self,
+        data=None,
+        extra_fields=None,
+        extended_profile_fields=None,
+        do_third_party_auth=True,
+        tos_required=True
     ):
         super(AccountCreationForm, self).__init__(data)
 
@@ -373,7 +374,7 @@ class RegistrationFormFactory(object):
         Returns:
             HttpResponse
         """
-        form_desc = FormDescription("post", reverse("user_api_registration"))
+        form_desc = FormDescription("post", self._get_registration_submit_url(request))
         self._apply_third_party_auth_overrides(request, form_desc)
 
         # Custom form fields can be added via the form set in settings.REGISTRATION_EXTENSION_FORM
@@ -429,8 +430,16 @@ class RegistrationFormFactory(object):
                         form_desc,
                         required=self._is_field_required(field_name)
                     )
-
+        # remove confirm_email form v1 registration form
+        if is_api_v1(request):
+            for index, field in enumerate(form_desc.fields):
+                if field['name'] == 'confirm_email':
+                    del form_desc.fields[index]
+                    break
         return form_desc
+
+    def _get_registration_submit_url(self, request):
+        return reverse("user_api_registration") if is_api_v1(request) else reverse("user_api_registration_v2")
 
     def _add_email_field(self, form_desc, required=True):
         """Add an email field to a form description.
@@ -474,6 +483,7 @@ class RegistrationFormFactory(object):
 
         form_desc.add_field(
             "confirm_email",
+            field_type="email",
             label=email_label,
             required=required,
             error_messages={
@@ -952,7 +962,6 @@ class RegistrationFormFactory(object):
         field_type = 'checkbox'
 
         if not separate_honor_and_tos:
-
             field_type = 'plaintext'
 
             pp_link = marketing_link("PRIVACY")
@@ -1069,16 +1078,28 @@ class RegistrationFormFactory(object):
                                 field_name, default=field_overrides[field_name]
                             )
 
-                            if (field_name not in ['terms_of_service', 'honor_code']
-                                    and field_overrides[field_name]
-                                    and hide_registration_fields_except_tos):
-
+                            if (
+                                field_name not in ['terms_of_service', 'honor_code'] and
+                                field_overrides[field_name] and
+                                hide_registration_fields_except_tos
+                            ):
                                 form_desc.override_field_properties(
                                     field_name,
                                     field_type="hidden",
                                     label="",
                                     instructions="",
                                 )
+
+                    # Hide the confirm_email field
+                    form_desc.override_field_properties(
+                        "confirm_email",
+                        default="",
+                        field_type="hidden",
+                        required=False,
+                        label="",
+                        instructions="",
+                        restrictions={}
+                    )
 
                     # Hide the password field
                     form_desc.override_field_properties(

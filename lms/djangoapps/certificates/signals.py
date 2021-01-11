@@ -9,7 +9,7 @@ import six
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import (
     CertificateGenerationCourseSetting,
     CertificateStatuses,
@@ -27,7 +27,7 @@ from openedx.core.djangoapps.signals.signals import (
     COURSE_GRADE_NOW_PASSED,
     LEARNER_NOW_VERIFIED
 )
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 
 log = logging.getLogger(__name__)
 CERTIFICATE_DELAY_SECONDS = 2
@@ -155,6 +155,7 @@ def fire_ungenerated_certificate_task(user, course_key, expected_verification_st
         CourseMode.PROFESSIONAL,
         CourseMode.NO_ID_PROFESSIONAL_MODE,
         CourseMode.MASTERS,
+        CourseMode.EXECUTIVE_EDUCATION,
     ]
     enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
     cert = GeneratedCertificate.certificate_for_student(user, course_key)

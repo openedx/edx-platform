@@ -15,10 +15,11 @@ from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
+from edx_when.api import set_dates_for_course
 from edx_when.field_data import DateLookupFieldData
 from openedx.core.djangoapps.course_date_signals import handlers
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -137,17 +138,19 @@ class TestGetUnitsWithDueDate(ModuleStoreTestCase):
         """
         Fixtures.
         """
-        super(TestGetUnitsWithDueDate, self).setUp()
+        super().setUp()
+
+        course = CourseFactory.create()
+        week1 = ItemFactory.create(parent=course)
+        week2 = ItemFactory.create(parent=course)
+        child = ItemFactory.create(parent=week1)
 
         due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
-        course = CourseFactory.create()
-        week1 = ItemFactory.create(due=due, parent=course)
-        week2 = ItemFactory.create(due=due, parent=course)
-
-        ItemFactory.create(
-            parent=week1,
-            due=due
-        )
+        set_dates_for_course(course.id, [
+            (week1.location, {'due': due}),
+            (week2.location, {'due': due}),
+            (child.location, {'due': due}),
+        ])
 
         self.course = course
         self.week1 = week1
@@ -242,13 +245,21 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
             block.fields['due']._del_cached_value(block)  # pylint: disable=protected-access
 
     def test_set_due_date_extension(self):
-        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=UTC)
-        tools.set_due_date_extension(self.course, self.week1, self.user, extended)
-        tools.set_due_date_extension(self.course, self.assignment, self.user, extended)
+        # First, extend the leaf assignment date
+        extended_hw = datetime.datetime(2013, 10, 25, 0, 0, tzinfo=UTC)
+        tools.set_due_date_extension(self.course, self.assignment, self.user, extended_hw)
         self._clear_field_data_cache()
-        self.assertEqual(self.week1.due, extended)
-        self.assertEqual(self.homework.due, extended)
-        self.assertEqual(self.assignment.due, extended)
+        self.assertEqual(self.week1.due, self.due)
+        self.assertEqual(self.homework.due, self.due)
+        self.assertEqual(self.assignment.due, extended_hw)
+
+        # Now, extend the whole section that the assignment was in. Both it and all under it should change
+        extended_week = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=UTC)
+        tools.set_due_date_extension(self.course, self.week1, self.user, extended_week)
+        self._clear_field_data_cache()
+        self.assertEqual(self.week1.due, extended_week)
+        self.assertEqual(self.homework.due, extended_week)
+        self.assertEqual(self.assignment.due, extended_week)
 
     def test_set_due_date_extension_invalid_date(self):
         extended = datetime.datetime(2009, 1, 1, 0, 0, tzinfo=UTC)

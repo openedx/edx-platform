@@ -12,13 +12,12 @@ from django.db.models import F, Q
 from django.urls import reverse
 from edx_ace.recipient import Recipient
 from edx_ace.recipient_resolver import RecipientResolver
-from edx_django_utils.monitoring import function_trace, set_custom_metric
-from edx_when.api import get_schedules_with_due_date
-from opaque_keys.edx.keys import CourseKey
+from edx_django_utils.monitoring import function_trace, set_custom_attribute
 
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link, can_show_verified_upgrade
 from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
+from openedx.core.djangoapps.course_date_signals.utils import get_expected_duration
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH
 from openedx.core.djangoapps.schedules.content_highlights import get_week_highlights, get_next_section_highlights
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
@@ -151,16 +150,16 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
         if "read_replica" in settings.DATABASES:
             schedules = schedules.using("read_replica")
 
-        LOG.info(u'Query = %r', schedules.query.sql_with_params())
+        LOG.info('Query = %r', schedules.query.sql_with_params())
 
         with function_trace('schedule_query_set_evaluation'):
             # This will run the query and cache all of the results in memory.
             num_schedules = len(schedules)
 
-        LOG.info(u'Number of schedules = %d', num_schedules)
+        LOG.info('Number of schedules = %d', num_schedules)
 
         # This should give us a sense of the volume of data being processed by each task.
-        set_custom_metric('num_schedules', num_schedules)
+        set_custom_attribute('num_schedules', num_schedules)
 
         return schedules
 
@@ -389,7 +388,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
                 week_highlights = get_week_highlights(user, enrollment.course_id, week_num)
             except CourseUpdateDoesNotExist:
                 LOG.warning(
-                    u'Weekly highlights for user {} in week {} of course {} does not exist or is disabled'.format(
+                    'Weekly highlights for user {} in week {} of course {} does not exist or is disabled'.format(
                         user, week_num, enrollment.course_id
                     )
                 )
@@ -437,7 +436,7 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
         schedules = self.get_schedules()
         for (user, language, context, is_self_paced) in schedules:
             msg_type = CourseUpdate() if is_self_paced else InstructorLedCourseUpdate()
-            msg_type.personalize(
+            msg = msg_type.personalize(
                 Recipient(
                     user.username,
                     self.override_recipient_email or user.email,
@@ -446,44 +445,52 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
                 context,
             )
             LOG.info(
-                u'Sending email to user: {} for course-key: {}'.format(
+                'Sending email to user: {} for course-key: {}'.format(
                     user.username,
                     self.course_id
                 )
             )
-            # TODO: Uncomment below when going live
-            # with function_trace('enqueue_send_task'):
-            #     self.async_send_task.apply_async((self.site.id, str(msg)), retry=False)
+            with function_trace('enqueue_send_task'):
+                self.async_send_task.apply_async((self.site.id, str(msg)), retry=False)
 
     def get_schedules(self):
-        course_key = CourseKey.from_string(self.course_id)
+        """
+        Grabs possible schedules that could receive a Course Next Section Update and if a
+        next section highlight is applicable for the user, yields information needed to
+        send the next section highlight email.
+        """
         target_date = self.target_datetime.date()
-        schedules = get_schedules_with_due_date(course_key, target_date).filter(
+        course_duration = get_expected_duration(self.course_id)
+        schedules = Schedule.objects.select_related('enrollment').filter(
             self.experience_filter,
             active=True,
+            enrollment__course_id=self.course_id,
             enrollment__user__is_active=True,
+            start_date__gte=target_date - course_duration,
+            start_date__lt=target_date,
         )
 
         template_context = get_base_template_context(self.site)
         for schedule in schedules:
-            enrollment = schedule.enrollment
             course = schedule.enrollment.course
-            user = enrollment.user
-            start_date = schedule.start_date
-            LOG.info(u'Received a schedule for user {} in course {} for date {}'.format(
-                user.username,
-                self.course_id,
-                target_date,
+            # We don't want to show any updates if the course has ended so we short circuit here.
+            if course.end and course.end.date() <= target_date:
+                return
+
+            user = schedule.enrollment.user
+            start_date = max(filter(None, (schedule.start_date, course.start)))
+            LOG.info('Received a schedule for user {} in course {} for date {}'.format(
+                user.username, self.course_id, target_date,
             ))
 
             try:
                 week_highlights, week_num = get_next_section_highlights(user, course.id, start_date, target_date)
-            except CourseUpdateDoesNotExist:
-                LOG.warning(
-                    u'Weekly highlights for user {} of course {} does not exist or is disabled'.format(
-                        user, course.id
-                    )
-                )
+                # (None, None) is returned when there is no section with a due date of the target_date
+                if week_highlights is None:
+                    continue
+            except CourseUpdateDoesNotExist as e:
+                log_message = self.log_prefix + ': ' + str(e)
+                LOG.warning(log_message)
                 # continue to the next schedule, don't yield an email for this one
                 continue
             unsubscribe_url = None
@@ -491,21 +498,21 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
                     'bulk_email_optout' in settings.ACE_ENABLED_POLICIES):
                 unsubscribe_url = reverse('bulk_email_opt_out', kwargs={
                     'token': UsernameCipher.encrypt(user.username),
-                    'course_id': str(enrollment.course_id),
+                    'course_id': str(course.id),
                 })
 
             template_context.update({
                 'course_name': course.display_name,
-                'course_url': _get_trackable_course_home_url(enrollment.course_id),
+                'course_url': _get_trackable_course_home_url(course.id),
                 'week_num': week_num,
                 'week_highlights': week_highlights,
                 # This is used by the bulk email optout policy
-                'course_ids': [str(enrollment.course_id)],
+                'course_ids': [str(course.id)],
                 'unsubscribe_url': unsubscribe_url,
             })
             template_context.update(_get_upsell_information_for_schedule(user, schedule))
 
-            yield (user, enrollment.course.closest_released_language, template_context, course.self_paced)
+            yield (user, course.closest_released_language, template_context, course.self_paced)
 
 
 def _get_trackable_course_home_url(course_id):

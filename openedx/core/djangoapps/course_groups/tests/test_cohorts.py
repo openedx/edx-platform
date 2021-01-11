@@ -15,8 +15,8 @@ from opaque_keys.edx.locator import CourseLocator
 from six import text_type
 from six.moves import range
 
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory

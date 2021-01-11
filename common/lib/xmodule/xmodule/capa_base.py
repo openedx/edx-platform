@@ -64,6 +64,9 @@ class SHOWANSWER(object):
     PAST_DUE = "past_due"
     NEVER = "never"
     AFTER_SOME_NUMBER_OF_ATTEMPTS = "after_attempts"
+    AFTER_ALL_ATTEMPTS = "after_all_attempts"
+    AFTER_ALL_ATTEMPTS_OR_CORRECT = "after_all_attempts_or_correct"
+    ATTEMPTED_NO_PAST_DUE = "attempted_no_past_due"
 
 
 class RANDOMIZATION(object):
@@ -167,13 +170,16 @@ class CapaFields(object):
         values=[
             {"display_name": _("Always"), "value": SHOWANSWER.ALWAYS},
             {"display_name": _("Answered"), "value": SHOWANSWER.ANSWERED},
-            {"display_name": _("Attempted"), "value": SHOWANSWER.ATTEMPTED},
+            {"display_name": _("Attempted or Past Due"), "value": SHOWANSWER.ATTEMPTED},
             {"display_name": _("Closed"), "value": SHOWANSWER.CLOSED},
             {"display_name": _("Finished"), "value": SHOWANSWER.FINISHED},
             {"display_name": _("Correct or Past Due"), "value": SHOWANSWER.CORRECT_OR_PAST_DUE},
             {"display_name": _("Past Due"), "value": SHOWANSWER.PAST_DUE},
             {"display_name": _("Never"), "value": SHOWANSWER.NEVER},
             {"display_name": _("After Some Number of Attempts"), "value": SHOWANSWER.AFTER_SOME_NUMBER_OF_ATTEMPTS},
+            {"display_name": _("After All Attempts"), "value": SHOWANSWER.AFTER_ALL_ATTEMPTS},
+            {"display_name": _("After All Attempts or Correct"), "value": SHOWANSWER.AFTER_ALL_ATTEMPTS_OR_CORRECT},
+            {"display_name": _("Attempted"), "value": SHOWANSWER.ATTEMPTED_NO_PAST_DUE},
         ]
     )
     attempts_before_showanswer_button = Integer(
@@ -731,6 +737,11 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         submit_button = self.submit_button_name()
         submit_button_submitting = self.submit_button_submitting_name()
         should_enable_submit_button = self.should_enable_submit_button()
+        submit_disabled_ctas = None
+        if not should_enable_submit_button:
+            cta_service = self.runtime.service(self, "call_to_action")
+            if cta_service:
+                submit_disabled_ctas = cta_service.get_ctas(self, 'capa_submit_disabled')
 
         content = {
             'name': self.display_name_with_default,
@@ -769,6 +780,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             'answer_notification_message': answer_notification_message,
             'has_saved_answers': self.has_saved_answers,
             'save_message': save_message,
+            'submit_disabled_cta': submit_disabled_ctas[0] if submit_disabled_ctas else None,
         }
 
         html = self.runtime.render_template('problem.html', context)
@@ -877,6 +889,10 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         hint_index = int(data['hint_index'])
         return self.get_demand_hint(hint_index)
 
+    def used_all_attempts(self):
+        """ All attempts have been used """
+        return self.max_attempts is not None and self.attempts >= self.max_attempts
+
     def is_past_due(self):
         """
         Is it now past this problem's due date, including grace period?
@@ -888,7 +904,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         """
         Is the student still allowed to submit answers?
         """
-        if self.max_attempts is not None and self.attempts >= self.max_attempts:
+        if self.used_all_attempts():
             return True
         if self.is_past_due():
             return True
@@ -936,7 +952,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             # unless the problem explicitly prevents it
             return True
         elif self.showanswer == SHOWANSWER.ATTEMPTED:
-            return self.attempts > 0 or self.is_past_due()
+            return self.is_attempted() or self.is_past_due()
         elif self.showanswer == SHOWANSWER.ANSWERED:
             # NOTE: this is slightly different from 'attempted' -- resetting the problems
             # makes lcp.done False, but leaves attempts unchanged.
@@ -957,7 +973,12 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             return self.attempts >= required_attempts
         elif self.showanswer == SHOWANSWER.ALWAYS:
             return True
-
+        elif self.showanswer == SHOWANSWER.AFTER_ALL_ATTEMPTS:
+            return self.used_all_attempts()
+        elif self.showanswer == SHOWANSWER.AFTER_ALL_ATTEMPTS_OR_CORRECT:
+            return self.used_all_attempts() or self.is_correct()
+        elif self.showanswer == SHOWANSWER.ATTEMPTED_NO_PAST_DUE:
+            return self.is_attempted()
         return False
 
     def correctness_available(self):
@@ -1214,12 +1235,15 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
         # Too late. Cannot submit
         if self.closed():
-            problem_location = text_type(self.location)
-            if 'HarvardX+MCB80.1x+3T2019' in problem_location:
-                log.info(
-                    'Problem %s closed, close date: %s, attempts: %s/%s, is_past_due: %s',
-                    problem_location, self.close_date, self.attempts, self.max_attempts, self.is_past_due()
-                )
+            log.error(
+                'ProblemClosedError: Problem %s, close date: %s, due:%s, is_past_due: %s, attempts: %s/%s,',
+                text_type(self.location),
+                self.close_date,
+                self.due,
+                self.is_past_due(),
+                self.attempts,
+                self.max_attempts,
+            )
             event_info['failure'] = 'closed'
             self.track_function_unmask('problem_check_fail', event_info)
             raise NotFoundError(_("Problem is closed."))

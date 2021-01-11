@@ -17,6 +17,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.timezone import now
+from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
 from opaque_keys import InvalidKeyError
@@ -24,8 +25,8 @@ from opaque_keys.edx.keys import CourseKey
 from pyquery import PyQuery as pq
 from six.moves import range
 
-from course_modes.models import CourseMode
-from entitlements.tests.factories import CourseEntitlementFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -33,15 +34,14 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
-from student.helpers import DISABLE_UNENROLL_CERT_STATES
-from student.models import CourseEnrollment, UserProfile
-from student.signals import REFUND_ORDER
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.milestones_helpers import get_course_milestones, remove_prerequisite_course, set_prerequisite_courses
-from util.testing import UrlResetMixin
+from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES
+from common.djangoapps.student.models import CourseEnrollment, UserProfile
+from common.djangoapps.student.signals import REFUND_ORDER
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.milestones_helpers import get_course_milestones, remove_prerequisite_course, set_prerequisite_courses
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -93,7 +93,7 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
         """ Assert that the unenroll action is shown or not based on the cert status."""
         self.cert_status = cert_status
 
-        with patch('student.views.dashboard.cert_info', side_effect=self.mock_cert):
+        with patch('common.djangoapps.student.views.dashboard.cert_info', side_effect=self.mock_cert):
             response = self.client.get(reverse('dashboard'))
 
             self.assertEqual(pq(response.content)(self.UNENROLL_ELEMENT_ID).length, unenroll_action_count)
@@ -111,7 +111,7 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
         """ Assert that the unenroll method is called or not based on the cert status"""
         self.cert_status = cert_status
 
-        with patch('student.views.management.cert_info', side_effect=self.mock_cert):
+        with patch('common.djangoapps.student.views.management.cert_info', side_effect=self.mock_cert):
             with patch('lms.djangoapps.commerce.signals.handle_refund_order') as mock_refund_handler:
                 REFUND_ORDER.connect(mock_refund_handler)
                 response = self.client.post(
@@ -138,13 +138,13 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
 
     def test_course_run_refund_status_successful(self):
         """ Assert that view:course_run_refund_status returns correct Json for successful refund call."""
-        with patch('student.models.CourseEnrollment.refundable', return_value=True):
+        with patch('common.djangoapps.student.models.CourseEnrollment.refundable', return_value=True):
             response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
 
         self.assertEqual(json.loads(response.content.decode('utf-8')), {'course_refundable_status': True})
         self.assertEqual(response.status_code, 200)
 
-        with patch('student.models.CourseEnrollment.refundable', return_value=False):
+        with patch('common.djangoapps.student.models.CourseEnrollment.refundable', return_value=False):
             response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
 
         self.assertEqual(json.loads(response.content.decode('utf-8')), {'course_refundable_status': False})
@@ -303,8 +303,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         self.assertNotContains(response, '<div class="prerequisites">')
 
     @patch('openedx.core.djangoapps.programs.utils.get_programs')
-    @patch('student.views.dashboard.get_visible_sessions_for_entitlement')
-    @patch('student.views.dashboard.get_pseudo_session_for_entitlement')
+    @patch('common.djangoapps.student.views.dashboard.get_visible_sessions_for_entitlement')
+    @patch('common.djangoapps.student.views.dashboard.get_pseudo_session_for_entitlement')
     @patch.object(CourseOverview, 'get_from_id')
     def test_unfulfilled_entitlement(self, mock_course_overview, mock_pseudo_session,
                                      mock_course_runs, mock_get_programs):
@@ -363,7 +363,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         self.assertContains(response, 'You must select a session to access the course.')
         self.assertNotContains(response, 'To access the course, select a session.')
 
-    @patch('student.views.dashboard.get_visible_sessions_for_entitlement')
+    @patch('common.djangoapps.student.views.dashboard.get_visible_sessions_for_entitlement')
     @patch.object(CourseOverview, 'get_from_id')
     def test_unfulfilled_expired_entitlement(self, mock_course_overview, mock_course_runs):
         """
@@ -389,7 +389,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         response = self.client.get(self.path)
         self.assertNotContains(response, '<li class="course-item">')
 
-    @patch('entitlements.api.v1.views.get_course_runs_for_course')
+    @patch('common.djangoapps.entitlements.rest_api.v1.views.get_course_runs_for_course')
     @patch.object(CourseOverview, 'get_from_id')
     def test_sessions_for_entitlement_course_runs(self, mock_course_overview, mock_course_runs):
         """
@@ -456,7 +456,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         # self.assertNotIn(noAvailableSessions, response.content)
 
     @patch('openedx.core.djangoapps.programs.utils.get_programs')
-    @patch('student.views.dashboard.get_visible_sessions_for_entitlement')
+    @patch('common.djangoapps.student.views.dashboard.get_visible_sessions_for_entitlement')
     @patch.object(CourseOverview, 'get_from_id')
     def test_fulfilled_entitlement(self, mock_course_overview, mock_course_runs, mock_get_programs):
         """
@@ -492,7 +492,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         self.assertContains(response, 'Related Programs:')
 
     @patch('openedx.core.djangoapps.programs.utils.get_programs')
-    @patch('student.views.dashboard.get_visible_sessions_for_entitlement')
+    @patch('common.djangoapps.student.views.dashboard.get_visible_sessions_for_entitlement')
     @patch.object(CourseOverview, 'get_from_id')
     def test_fulfilled_expired_entitlement(self, mock_course_overview, mock_course_runs, mock_get_programs):
         """
@@ -527,7 +527,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         self.assertContains(response, 'Related Programs:')
 
     @patch('openedx.core.djangoapps.catalog.utils.get_course_runs_for_course')
-    @patch('student.views.dashboard.is_bulk_email_feature_enabled')
+    @patch('common.djangoapps.student.views.dashboard.is_bulk_email_feature_enabled')
     def test_email_settings_fulfilled_entitlement(self, mock_email_feature, mock_get_course_runs):
         """
         Assert that the Email Settings action is shown when the user has a fulfilled entitlement.
@@ -548,7 +548,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         self.assertEqual(pq(response.content)(self.EMAIL_SETTINGS_ELEMENT_ID).length, 1)
 
     @patch.object(CourseOverview, 'get_from_id')
-    @patch('student.views.dashboard.is_bulk_email_feature_enabled')
+    @patch('common.djangoapps.student.views.dashboard.is_bulk_email_feature_enabled')
     def test_email_settings_unfulfilled_entitlement(self, mock_email_feature, mock_course_overview):
         """
         Assert that the Email Settings action is not shown when the entitlement is not fulfilled.
@@ -774,18 +774,21 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         Links will be removed from the course title, course image and button (View Course/Resume Course).
         The course card should have an access expired message.
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=self.THREE_YEARS_AGO - timedelta(days=30))
         self.override_waffle_switch(True)
 
         course = CourseFactory.create(start=self.THREE_YEARS_AGO)
-        add_course_mode(course, upgrade_deadline_expired=False)
+        add_course_mode(course, mode_slug=CourseMode.AUDIT)
+        add_course_mode(course)
         enrollment = CourseEnrollmentFactory.create(
             user=self.user,
             course_id=course.id
         )
+        enrollment.created = self.THREE_YEARS_AGO + timedelta(days=1)
+        enrollment.save()
 
         # pylint: disable=unused-variable
-        schedule = ScheduleFactory(start_date=self.THREE_YEARS_AGO + timedelta(days=1), enrollment=enrollment)
+        schedule = ScheduleFactory(enrollment=enrollment)
 
         response = self.client.get(reverse('dashboard'))
         dashboard_html = self._remove_whitespace_from_response(response)

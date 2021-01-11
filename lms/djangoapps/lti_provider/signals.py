@@ -8,11 +8,11 @@ from django.conf import settings
 from django.dispatch import receiver
 from opaque_keys.edx.keys import LearningContextKey
 
-import lti_provider.outcomes as outcomes
+import lms.djangoapps.lti_provider.outcomes as outcomes
 from lms.djangoapps.grades.api import signals as grades_signals
-from lti_provider.views import parse_course_and_usage_keys
+from lms.djangoapps.lti_provider.views import parse_course_and_usage_keys
 from xmodule.modulestore.django import modulestore
-from .tasks import send_composite_outcome, send_leaf_outcome
+from lms.djangoapps.lti_provider.tasks import send_composite_outcome, send_leaf_outcome
 
 log = logging.getLogger(__name__)
 

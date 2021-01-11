@@ -32,8 +32,8 @@ from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
 from six.moves import range
 
-from bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail, Optout
-from bulk_email.tasks import _get_course_email_context
+from ..models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail, Optout
+from lms.djangoapps.bulk_email.tasks import _get_course_email_context
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.subtasks import SubtaskStatus, update_subtask_status
 from lms.djangoapps.instructor_task.tasks import send_bulk_course_email
@@ -75,7 +75,7 @@ def my_update_subtask_status(entry_id, current_task_id, new_subtask_status):
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
 
 
-@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
     """Tests instructor task that send bulk email."""
 
@@ -134,7 +134,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
             update_subtask_status(entry_id, bogus_task_id, new_subtask_status)
 
         with self.assertRaises(ValueError):
-            with patch('bulk_email.tasks.update_subtask_status', dummy_update_subtask_status):
+            with patch('lms.djangoapps.bulk_email.tasks.update_subtask_status', dummy_update_subtask_status):
                 send_bulk_course_email(task_entry.id, {})
 
     def _create_students(self, num_students):
@@ -194,7 +194,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         num_emails = settings.BULK_EMAIL_EMAILS_PER_TASK
         # We also send email to the instructor:
         self._create_students(num_emails - 1)
-        with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
+        with patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True) as get_conn:
             get_conn.return_value.send_messages.side_effect = cycle([None])
             self._test_run_with_task(send_bulk_course_email, 'emailed', num_emails, num_emails)
 
@@ -203,12 +203,12 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         num_emails = settings.BULK_EMAIL_EMAILS_PER_TASK
         # We also send email to the instructor:
         self._create_students(num_emails - 1)
-        with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
+        with patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True) as get_conn:
             get_conn.return_value.send_messages.side_effect = cycle([None])
             task_entry = self._test_run_with_task(send_bulk_course_email, 'emailed', num_emails, num_emails)
 
         # submit the same task a second time, and confirm that it is not run again.
-        with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
+        with patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True) as get_conn:
             get_conn.return_value.send_messages.side_effect = cycle([Exception("This should not happen!")])
             parent_status = self._run_task_with_mock_celery(send_bulk_course_email, task_entry.id, task_entry.task_id)
         self.assertEqual(parent_status.get('total'), num_emails)
@@ -224,7 +224,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         student = students[0]
         student.is_active = False
         student.save()
-        with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
+        with patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True) as get_conn:
             get_conn.return_value.send_messages.side_effect = cycle([None])
             self._test_run_with_task(send_bulk_course_email, 'emailed', num_emails - 1, num_emails - 1)
 
@@ -239,7 +239,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         for index in range(0, num_emails, 4):
             Optout.objects.create(user=students[index], course_id=self.course.id)
         # mark some students as opting out
-        with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
+        with patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True) as get_conn:
             get_conn.return_value.send_messages.side_effect = cycle([None])
             self._test_run_with_task(
                 send_bulk_course_email, 'emailed', num_emails, expected_succeeds, skipped=expected_skipped
@@ -253,7 +253,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         self._create_students(num_emails - 1)
         expected_fails = int((num_emails + 3) / 4.0)
         expected_succeeds = num_emails - expected_fails
-        with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
+        with patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True) as get_conn:
             # have every fourth email fail due to some address failure:
             get_conn.return_value.send_messages.side_effect = cycle([exception, None, None, None])
             self._test_run_with_task(
@@ -298,7 +298,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         expected_succeeds = num_emails - emails_with_non_ascii_chars + num_of_course_instructors
         expected_fails = emails_with_non_ascii_chars
 
-        with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
+        with patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True) as get_conn:
             get_conn.return_value.send_messages.side_effect = cycle([None])
             self._test_run_with_task(
                 task_class=send_bulk_course_email,
@@ -317,7 +317,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         self._create_students(num_emails - 1)
         expected_fails = 0
         expected_succeeds = num_emails
-        with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
+        with patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True) as get_conn:
             # Have every other mail attempt fail due to disconnection.
             get_conn.return_value.send_messages.side_effect = cycle([exception, None])
             self._test_run_with_task(
@@ -338,10 +338,10 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         self._create_students(num_emails - 1)
         expected_fails = num_emails
         expected_succeeds = 0
-        with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
+        with patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True) as get_conn:
             # always fail to connect, triggering repeated retries until limit is hit:
             get_conn.return_value.send_messages.side_effect = cycle([exception])
-            with patch('bulk_email.tasks.update_subtask_status', my_update_subtask_status):
+            with patch('lms.djangoapps.bulk_email.tasks.update_subtask_status', my_update_subtask_status):
                 self._test_run_with_task(
                     send_bulk_course_email,
                     'emailed',
@@ -392,7 +392,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         # exceeded").  The maximum recursion depth is 90, so
         # num_emails * expected_retries < 90.
         expected_retries = 10
-        with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
+        with patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True) as get_conn:
             # Cycle through N throttling errors followed by a success.
             get_conn.return_value.send_messages.side_effect = cycle(
                 chain(repeat(exception, expected_retries), [None])
@@ -423,7 +423,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         self._create_students(num_emails - 1)
         expected_fails = num_emails
         expected_succeeds = 0
-        with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
+        with patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True) as get_conn:
             # always fail to connect, triggering repeated retries until limit is hit:
             get_conn.return_value.send_messages.side_effect = cycle([exception])
             self._test_run_with_task(
@@ -458,7 +458,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         # We also send email to the instructor:
         self._create_students(num_emails - 1)
 
-        with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
+        with patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True) as get_conn:
             get_conn.return_value.send_messages.side_effect = cycle([None])
             self._test_run_with_task(send_bulk_course_email, 'emailed', num_emails, num_emails)
 

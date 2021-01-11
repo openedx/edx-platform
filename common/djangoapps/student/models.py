@@ -13,14 +13,14 @@ file and check it in at the same time as your model changes. To do that,
 
 
 import hashlib
-import inspect
 import json
 import logging
 import uuid
-from collections import OrderedDict, defaultdict, namedtuple
+from collections import defaultdict, namedtuple
 from datetime import datetime, timedelta
 from functools import total_ordering
 from importlib import import_module
+from urllib.parse import urlencode
 
 import six
 from config_models.models import ConfigurationModel
@@ -52,12 +52,11 @@ from pytz import UTC
 from simple_history.models import HistoricalRecords
 from six import text_type
 from six.moves import range
-from six.moves.urllib.parse import urlencode
 from slumber.exceptions import HttpClientError, HttpServerError
 from user_util import user_util
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
-from course_modes.models import CourseMode, get_cosmetic_verified_display_price
+from common.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
@@ -71,14 +70,15 @@ from openedx.core.djangoapps.enrollments.api import (
     get_enrollment_attributes,
     set_enrollment_attributes
 )
+from openedx.core.djangoapps.signals.signals import USER_ACCOUNT_ACTIVATED
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
-from student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
-from track import contexts, segment
-from util.milestones_helpers import is_entrance_exams_enabled
-from util.model_utils import emit_field_changed_events, get_changed_fields_dict
-from util.query import use_read_replica_if_available
+from openedx.core.toggles import ENTRANCE_EXAMS
+from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
+from common.djangoapps.track import contexts, segment
+from common.djangoapps.util.model_utils import emit_field_changed_events, get_changed_fields_dict
+from common.djangoapps.util.query import use_read_replica_if_available
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
@@ -740,7 +740,7 @@ def user_post_save_callback(sender, **kwargs):
     """
     When a user is modified and either its `is_active` state or email address
     is changed, and the user is, in fact, active, then check to see if there
-    are any courses that it needs to be automatically enrolled in.
+    are any courses that it needs to be automatically enrolled in and enroll them if needed.
 
     Additionally, emit analytics events after saving the User.
     """
@@ -753,6 +753,17 @@ def user_post_save_callback(sender, **kwargs):
             ceas = CourseEnrollmentAllowed.for_user(user).filter(auto_enroll=True)
 
             for cea in ceas:
+                # skip enrolling already enrolled users
+                if CourseEnrollment.is_enrolled(user, cea.course_id):
+                    # Link the CEA to the user if the CEA isn't already linked to the user
+                    # (e.g. the user was invited to a course but hadn't activated the account yet)
+                    # This is to prevent students from changing e-mails and
+                    # enrolling many accounts through the same e-mail.
+                    if not cea.user:
+                        cea.user = user
+                        cea.save()
+                    continue
+
                 enrollment = CourseEnrollment.enroll(user, cea.course_id)
 
                 manual_enrollment_audit = ManualEnrollmentAudit.get_manual_enrollment_by_email(user.email)
@@ -840,6 +851,7 @@ class Registration(models.Model):
     def activate(self):
         self.user.is_active = True
         self.user.save(update_fields=['is_active'])
+        USER_ACCOUNT_ACTIVATED.send_robust(self.__class__, user=self.user)
         log.info(u'User %s (%s) account is successfully activated.', self.user.username, self.user.email)
 
 
@@ -971,6 +983,16 @@ class LoginFailures(models.Model):
         record.save()
 
     @classmethod
+    def check_user_reset_password_threshold(cls, user):
+        """
+        Checks if the user is above threshold for reset password message.
+        """
+        record, _ = LoginFailures.objects.get_or_create(user=user)
+        max_failures_allowed = settings.MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED
+
+        return record.failure_count >= max_failures_allowed / 2, record.failure_count
+
+    @classmethod
     def clear_lockout_counter(cls, user):
         """
         Removes the lockout counters (normally called after a successful login)
@@ -1019,19 +1041,20 @@ class CourseEnrollmentManager(models.Manager):
     Custom manager for CourseEnrollment with Table-level filter methods.
     """
 
-    def num_enrolled_in(self, course_id):
+    def is_small_course(self, course_id):
         """
-        Returns the count of active enrollments in a course.
+        Returns false if the number of enrollments are one greater than 'max_enrollments' else true
 
         'course_id' is the course_id to return enrollments
         """
+        max_enrollments = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
 
         enrollment_number = super(CourseEnrollmentManager, self).get_queryset().filter(
             course_id=course_id,
             is_active=1
-        ).count()
+        )[:max_enrollments + 1].count()
 
-        return enrollment_number
+        return enrollment_number <= max_enrollments
 
     def num_enrolled_in_exclude_admins(self, course_id):
         """
@@ -1045,7 +1068,7 @@ class CourseEnrollmentManager(models.Manager):
 
         """
         # To avoid circular imports.
-        from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
+        from common.djangoapps.student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
         course_locator = course_id
 
         if getattr(course_id, 'ccx', None):
@@ -1407,7 +1430,7 @@ class CourseEnrollment(models.Model):
                 )
 
     @classmethod
-    def enroll(cls, user, course_key, mode=None, check_access=False):
+    def enroll(cls, user, course_key, mode=None, check_access=False, can_upgrade=False):
         """
         Enroll a user in a course. This saves immediately.
 
@@ -1430,6 +1453,11 @@ class CourseEnrollment(models.Model):
                 The default is set to False to avoid breaking legacy code or
                 code with non-standard flows (ex. beta tester invitations), but
                 for any standard enrollment flow you probably want this to be True.
+
+        `can_upgrade`: if course is upgradeable, alow learners to enroll even
+                if enrollment is closed. This is a special case for entitlements
+                while selecting a session. The default is set to False to avoid
+                breaking the orignal course enroll code.
 
         Exceptions that can be raised: NonExistentCourseError,
         EnrollmentClosedError, CourseFullError, AlreadyEnrolledError.  All these
@@ -1454,7 +1482,7 @@ class CourseEnrollment(models.Model):
                 raise NonExistentCourseError
 
         if check_access:
-            if cls.is_enrollment_closed(user, course):
+            if cls.is_enrollment_closed(user, course) and not can_upgrade:
                 log.warning(
                     u"User %s failed to enroll in course %s because enrollment is closed",
                     user.username,
@@ -2510,73 +2538,68 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
     """
     LinkedIn Add to Profile Configuration
 
-    This configuration enables the "Add to Profile" LinkedIn
-    button on the student dashboard.  The button appears when
-    users have a certificate available; when clicked,
-    users are sent to the LinkedIn site with a pre-filled
-    form allowing them to add the certificate to their
-    LinkedIn profile.
+    This configuration enables the 'Add to Profile' LinkedIn button. The button
+    appears when users have a certificate available; when clicked, users are sent
+    to the LinkedIn site with a pre-filled form allowing them to add the
+    certificate to their LinkedIn profile.
+
+    See https://addtoprofile.linkedin.com/ for documentation on parameters
 
     .. no_pii:
     """
 
     MODE_TO_CERT_NAME = {
-        "honor": _(u"{platform_name} Honor Code Certificate for {course_name}"),
-        "verified": _(u"{platform_name} Verified Certificate for {course_name}"),
-        "professional": _(u"{platform_name} Professional Certificate for {course_name}"),
-        "no-id-professional": _(
-            u"{platform_name} Professional Certificate for {course_name}"
-        ),
+        'honor': _('{platform_name} Honor Code Certificate for {course_name}'),
+        'verified': _('{platform_name} Verified Certificate for {course_name}'),
+        'professional': _('{platform_name} Professional Certificate for {course_name}'),
+        'no-id-professional': _('{platform_name} Professional Certificate for {course_name}'),
     }
 
     company_identifier = models.TextField(
-        help_text=_(
-            u"The company identifier for the LinkedIn Add-to-Profile button "
-            u"e.g 0_0dPSPyS070e0HsE9HNz_13_d11_"
-        )
-    )
-
-    # Deprecated
-    dashboard_tracking_code = models.TextField(default=u"", blank=True)
-
-    trk_partner_name = models.CharField(
-        max_length=10,
-        default="",
         blank=True,
         help_text=_(
-            u"Short identifier for the LinkedIn partner used in the tracking code.  "
-            u"(Example: 'edx')  "
-            u"If no value is provided, tracking codes will not be sent to LinkedIn."
-        )
+            'Your organization ID (if your organization has an existing page on LinkedIn) e.g 1337. '
+            'If not provided, will default to sending Platform Name (e.g. edX) instead.'
+        ),
     )
 
-    def add_to_profile_url(self, course_key, course_name, cert_mode, cert_url, source="o", target="dashboard"):
-        """Construct the URL for the "add to profile" button.
+    def is_enabled(self, *key_fields):
+        """
+        Checks both the model itself and share_settings to see if LinkedIn Add to Profile is enabled
+        """
+        enabled = super().is_enabled(*key_fields)
+        share_settings = configuration_helpers.get_value('SOCIAL_SHARING_SETTINGS', settings.SOCIAL_SHARING_SETTINGS)
+        return share_settings.get('CERTIFICATE_LINKEDIN', enabled)
+
+    def add_to_profile_url(self, course_name, cert_mode, cert_url, certificate=None):
+        """
+        Construct the URL for the "add to profile" button. This will autofill the form based on
+        the params provided.
 
         Arguments:
-            course_key (CourseKey): The identifier for the course.
-            course_name (unicode): The display name of the course.
+            course_name (str): The display name of the course.
             cert_mode (str): The course mode of the user's certificate (e.g. "verified", "honor", "professional")
-            cert_url (str): The download URL for the certificate.
+            cert_url (str): The URL for the certificate.
 
         Keyword Arguments:
-            source (str): Either "o" (for onsite/UI), "e" (for emails), or "m" (for mobile)
-            target (str): An identifier for the occurrance of the button.
-
+            certificate (GeneratedCertificate): a GeneratedCertificate object for the user and course.
+                If provided, this function will also autofill the certId and issue date for the cert.
         """
-        company_identifier = configuration_helpers.get_value('LINKEDIN_COMPANY_ID', self.company_identifier)
-        params = OrderedDict([
-            ('_ed', company_identifier),
-            ('pfCertificationName', self._cert_name(course_name, cert_mode).encode('utf-8')),
-            ('pfCertificationUrl', cert_url),
-            ('source', source)
-        ])
+        params = {
+            'name': self._cert_name(course_name, cert_mode),
+            'certUrl': cert_url,
+        }
 
-        tracking_code = self._tracking_code(course_key, cert_mode, target)
-        if tracking_code is not None:
-            params['trk'] = tracking_code
+        params.update(self._organization_information())
 
-        return u'http://www.linkedin.com/profile/add?{params}'.format(
+        if certificate:
+            params.update({
+                'certId': certificate.verify_uuid,
+                'issueYear': certificate.created_date.year,
+                'issueMonth': certificate.created_date.month,
+            })
+
+        return 'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&{params}'.format(
             params=urlencode(params)
         )
 
@@ -2591,10 +2614,7 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         Returns:
             str: The formatted string to display for the name field on the LinkedIn Add to Profile dialog.
         """
-        default_cert_name = self.MODE_TO_CERT_NAME.get(
-            cert_mode,
-            _(u"{platform_name} Certificate for {course_name}")
-        )
+        default_cert_name = self.MODE_TO_CERT_NAME.get(cert_mode, _('{platform_name} Certificate for {course_name}'))
         # Look for an override of the certificate name in the SOCIAL_SHARING_SETTINGS setting
         share_settings = configuration_helpers.get_value('SOCIAL_SHARING_SETTINGS', settings.SOCIAL_SHARING_SETTINGS)
         cert_name = share_settings.get('CERTIFICATE_LINKEDIN_MODE_TO_CERT_NAME', {}).get(cert_mode, default_cert_name)
@@ -2604,41 +2624,19 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
             course_name=course_name
         )
 
-    def _tracking_code(self, course_key, cert_mode, target):
-        """Create a tracking code for the button.
-
-        Tracking codes are used by LinkedIn to collect
-        analytics about certifications users are adding
-        to their profiles.
-
-        The tracking code format is:
-            &trk=[partner name]-[certificate type]-[date]-[target field]
-
-        In our case, we're sending:
-            &trk=edx-{COURSE ID}_{COURSE MODE}-{TARGET}
-
-        If no partner code is configured, then this will
-        return None, indicating that tracking codes are disabled.
-
-        Arguments:
-
-            course_key (CourseKey): The identifier for the course.
-            cert_mode (str): The enrollment mode for the course.
-            target (str): Identifier for where the button is located.
+    def _organization_information(self):
+        """
+        Returns organization information for use in the URL parameters for add to profile.
 
         Returns:
-            unicode or None
-
+            dict: Either the organization ID on LinkedIn or the organization's name
+                Will be used to prefill the organization on the add to profile action.
         """
-        return (
-            u"{partner}-{course_key}_{cert_mode}-{target}".format(
-                partner=self.trk_partner_name,
-                course_key=text_type(course_key),
-                cert_mode=cert_mode,
-                target=target
-            )
-            if self.trk_partner_name else None
-        )
+        org_id = configuration_helpers.get_value('LINKEDIN_COMPANY_ID', self.company_identifier)
+        # Prefer organization ID per documentation at https://addtoprofile.linkedin.com/
+        if org_id:
+            return {'organizationId': org_id}
+        return {'organizationName': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)}
 
 
 @python_2_unicode_compatible
@@ -2672,7 +2670,7 @@ class EntranceExamConfiguration(models.Model):
         Return True if given user can skip entrance exam for given course otherwise False.
         """
         can_skip = False
-        if is_entrance_exams_enabled():
+        if ENTRANCE_EXAMS.is_enabled():
             try:
                 record = EntranceExamConfiguration.objects.get(user=user, course_id=course_key)
                 can_skip = record.skip_entrance_exam
@@ -2894,6 +2892,18 @@ class BulkUnenrollConfiguration(ConfigurationModel):
     )
 
 
+class BulkChangeEnrollmentConfiguration(ConfigurationModel):
+    """
+    config model for the bulk_change_enrollment_csv command
+    """
+    csv_file = models.FileField(
+        validators=[FileExtensionValidator(allowed_extensions=[u'csv'])],
+        help_text=_(u"It expect that the data will be provided in a csv file format with \
+                    first row being the header and columns will be as follows: \
+                    course_id, username, mode")
+    )
+
+
 @python_2_unicode_compatible
 class UserAttribute(TimeStampedModel):
     """
@@ -3036,5 +3046,57 @@ class AccountRecoveryConfiguration(ConfigurationModel):
         validators=[FileExtensionValidator(allowed_extensions=[u'csv'])],
         help_text=_(u"It expect that the data will be provided in a csv file format with \
                     first row being the header and columns will be as follows: \
-                    username, email, new_email")
+                    username, current_email, desired_email")
     )
+
+
+class CourseEnrollmentCelebration(TimeStampedModel):
+    """
+    Keeps track of how we've celebrated a user's course progress.
+
+    An example of a celebration is a dialog that pops up after you complete your first section
+    in a course saying "good job!". Just some positive feedback like that. (This specific example is
+    controlled by the celebrated_first_section field below.)
+
+    In general, if a row does not exist for an enrollment, we don't want to show any celebrations.
+    We don't want to suddenly inject celebrations in the middle of a course, because they
+    might not make contextual sense and it's an inconsistent experience. The helper methods below
+    (starting with "should_") can help by looking up values with appropriate fallbacks.
+
+    See the create_course_enrollment_celebration signal handler for how these get created.
+
+    .. no_pii:
+    """
+    enrollment = models.OneToOneField(CourseEnrollment, models.CASCADE, related_name='celebration')
+    celebrate_first_section = models.BooleanField(default=False)
+
+    def __str__(self):
+        return (
+            "[CourseEnrollmentCelebration] course: {}; user: {}; first_section: {}"
+        ).format(self.enrollment.course.id, self.enrollment.user.username, self.celebrate_first_section)
+
+    @staticmethod
+    def should_celebrate_first_section(enrollment):
+        """ Returns the celebration value for first_section with appropriate fallback if it doesn't exist """
+        if not enrollment:
+            return False
+        try:
+            return enrollment.celebration.celebrate_first_section
+        except CourseEnrollmentCelebration.DoesNotExist:
+            return False
+
+
+class UserPasswordToggleHistory(TimeStampedModel):
+    """
+    Keeps track of user password disable/enable history
+    """
+    user = models.ForeignKey(User, related_name='password_toggle_history', on_delete=models.CASCADE)
+    comment = models.CharField(max_length=255, help_text=_("Add a reason"), blank=True, null=True)
+    disabled = models.BooleanField(default=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ['-created']
+
+    def __str__(self):
+        return self.comment

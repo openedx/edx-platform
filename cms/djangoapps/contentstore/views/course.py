@@ -23,6 +23,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
+from edx_toggles.toggles import WaffleSwitchNamespace
 from milestones import api as milestones_api
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -30,41 +31,19 @@ from opaque_keys.edx.locator import BlockUsageLocator
 from six import text_type
 from six.moves import filter
 
-from contentstore.course_group_config import (
-    COHORT_SCHEME,
-    ENROLLMENT_SCHEME,
-    RANDOM_SCHEME,
-    GroupConfiguration,
-    GroupConfigurationsValidationError
-)
-from contentstore.course_info_model import delete_course_update, get_course_updates, update_course_updates
-from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
-from contentstore.tasks import rerun_course as rerun_course_task
-from contentstore.utils import (
-    add_instructor,
-    get_lms_link_for_item,
-    initialize_permissions,
-    remove_all_instructors,
-    reverse_course_url,
-    reverse_library_url,
-    reverse_url,
-    reverse_usage_url
-)
-from contentstore.views.entrance_exam import create_entrance_exam, delete_entrance_exam, update_entrance_exam
-from course_action_state.managers import CourseActionStateItemNotFoundError
-from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
-from course_creators.views import add_user_with_status_unrequested, get_course_creator_status
-from course_modes.models import CourseMode
-from edxmako.shortcuts import render_to_response
-from models.settings.course_grading import CourseGradingModel
-from models.settings.course_metadata import CourseMetadata
-from models.settings.encoder import CourseSettingsEncoder
+from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
+from cms.djangoapps.models.settings.course_grading import CourseGradingModel
+from cms.djangoapps.models.settings.course_metadata import CourseMetadata
+from cms.djangoapps.models.settings.encoder import CourseSettingsEncoder
+from common.djangoapps.course_action_state.managers import CourseActionStateItemNotFoundError
+from common.djangoapps.course_action_state.models import CourseRerunState, CourseRerunUIStateManager
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.core.lib.courses import course_image_url
@@ -72,22 +51,26 @@ from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
-from student import auth
-from student.auth import has_course_author_access, has_studio_read_access, has_studio_write_access
-from student.roles import CourseCreatorRole, CourseInstructorRole, CourseStaffRole, GlobalStaff, UserBasedRole
-from util.course import get_link_for_about_page
-from util.date_utils import get_default_time_display
-from util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
-from util.milestones_helpers import (
-    is_entrance_exams_enabled,
+from common.djangoapps.student import auth
+from common.djangoapps.student.auth import has_course_author_access, has_studio_read_access, has_studio_write_access
+from common.djangoapps.student.roles import (
+    CourseCreatorRole, CourseInstructorRole, CourseStaffRole, GlobalStaff, UserBasedRole
+)
+from common.djangoapps.util.course import get_link_for_about_page
+from common.djangoapps.util.date_utils import get_default_time_display
+from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
+from common.djangoapps.util.milestones_helpers import (
     is_prerequisite_courses_enabled,
     is_valid_course_key,
     remove_prerequisite_course,
     set_prerequisite_courses
 )
-from util.organizations_helpers import add_organization_course, get_organization_by_short_name, organizations_enabled
-from util.string_utils import _has_non_ascii_characters
-from xblock_django.api import deprecated_xblocks
+from openedx.core import toggles as core_toggles
+from common.djangoapps.util.organizations_helpers import (
+    add_organization_course, get_organization_by_short_name, organizations_enabled
+)
+from common.djangoapps.util.string_utils import _has_non_ascii_characters
+from common.djangoapps.xblock_django.api import deprecated_xblocks
 from xmodule.contentstore.content import StaticContent
 from xmodule.course_module import DEFAULT_START_DATE, CourseFields
 from xmodule.error_module import ErrorDescriptor
@@ -97,9 +80,36 @@ from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundErr
 from xmodule.partitions.partitions import UserPartition
 from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
 
+from ..course_group_config import (
+    COHORT_SCHEME,
+    ENROLLMENT_SCHEME,
+    RANDOM_SCHEME,
+    GroupConfiguration,
+    GroupConfigurationsValidationError
+)
+from ..course_info_model import delete_course_update, get_course_updates, update_course_updates
+from ..courseware_index import CoursewareSearchIndexer, SearchIndexingError
+from ..tasks import rerun_course as rerun_course_task
+from ..utils import (
+    add_instructor,
+    get_lms_link_for_item,
+    get_proctored_exam_settings_url,
+    initialize_permissions,
+    remove_all_instructors,
+    reverse_course_url,
+    reverse_library_url,
+    reverse_url,
+    reverse_usage_url
+)
 from .component import ADVANCED_COMPONENT_TYPES
+from .entrance_exam import create_entrance_exam, delete_entrance_exam, update_entrance_exam
 from .item import create_xblock_info
-from .library import LIBRARIES_ENABLED, get_library_creator_status
+from .library import (
+    LIBRARIES_ENABLED,
+    LIBRARY_AUTHORING_MICROFRONTEND_URL,
+    get_library_creator_status,
+    should_redirect_to_library_authoring_mfe
+)
 
 log = logging.getLogger(__name__)
 
@@ -553,8 +563,10 @@ def course_listing(request):
         u'archived_courses': archived_courses,
         u'in_process_course_actions': in_process_course_actions,
         u'libraries_enabled': LIBRARIES_ENABLED,
+        u'redirect_to_library_authoring_mfe': should_redirect_to_library_authoring_mfe(),
+        u'library_authoring_mfe_url': LIBRARY_AUTHORING_MICROFRONTEND_URL,
         u'libraries': [format_library_for_view(lib) for lib in libraries],
-        u'show_new_library_button': get_library_creator_status(user),
+        u'show_new_library_button': get_library_creator_status(user) and not should_redirect_to_library_authoring_mfe(),
         u'user': user,
         u'request_course_creator_url': reverse('request_course_creator'),
         u'course_creator_status': _get_course_creator_status(user),
@@ -653,6 +665,12 @@ def course_index(request, course_key):
             settings.FEATURES.get('FRONTEND_APP_PUBLISHER_URL', False)
         )
 
+        course_authoring_microfrontend_url = get_proctored_exam_settings_url(course_module)
+
+        # gather any errors in the currently stored proctoring settings.
+        advanced_dict = CourseMetadata.fetch(course_module)
+        proctoring_errors = CourseMetadata.validate_proctoring_settings(course_module, advanced_dict, request.user)
+
         return render_to_response('course_outline.html', {
             'language_code': request.LANGUAGE_CODE,
             'context_course': course_module,
@@ -673,6 +691,9 @@ def course_index(request, course_key):
                 },
             ) if current_action else None,
             'frontend_app_publisher_url': frontend_app_publisher_url,
+            'course_authoring_microfrontend_url': course_authoring_microfrontend_url,
+            'advance_settings_url': reverse_course_url('advanced_settings_handler', course_module.id),
+            'proctoring_errors': proctoring_errors,
         })
 
 
@@ -1082,6 +1103,8 @@ def settings_handler(request, course_key_string):
             upgrade_deadline = (verified_mode and verified_mode.expiration_datetime and
                                 verified_mode.expiration_datetime.isoformat())
 
+            course_authoring_microfrontend_url = get_proctored_exam_settings_url(course_module)
+
             settings_context = {
                 'context_course': course_module,
                 'course_locator': course_key,
@@ -1102,9 +1125,10 @@ def settings_handler(request, course_key_string):
                 'show_min_grade_warning': False,
                 'enrollment_end_editable': enrollment_end_editable,
                 'is_prerequisite_courses_enabled': is_prerequisite_courses_enabled(),
-                'is_entrance_exams_enabled': is_entrance_exams_enabled(),
+                'is_entrance_exams_enabled': core_toggles.ENTRANCE_EXAMS.is_enabled(),
                 'enable_extended_course_details': enable_extended_course_details,
                 'upgrade_deadline': upgrade_deadline,
+                'course_authoring_microfrontend_url': course_authoring_microfrontend_url,
             }
             if is_prerequisite_courses_enabled():
                 courses, in_process_course_actions = get_courses_accessible_to_user(request)
@@ -1163,7 +1187,7 @@ def settings_handler(request, course_key_string):
                 # feature-specific settings and handle them accordingly
                 # We have to be careful that we're only executing the following logic if we actually
                 # need to create or delete an entrance exam from the specified course
-                if is_entrance_exams_enabled():
+                if core_toggles.ENTRANCE_EXAMS.is_enabled():
                     course_entrance_exam_present = course_module.entrance_exam_enabled
                     entrance_exam_enabled = request.json.get('entrance_exam_enabled', '') == 'true'
                     ee_min_score_pct = request.json.get('entrance_exam_minimum_score_pct', None)
@@ -1219,12 +1243,15 @@ def grading_handler(request, course_key_string, grader_index=None):
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
             course_details = CourseGradingModel.fetch(course_key)
 
+            course_authoring_microfrontend_url = get_proctored_exam_settings_url(course_module)
+
             return render_to_response('settings_graders.html', {
                 'context_course': course_module,
                 'course_locator': course_key,
                 'course_details': course_details,
                 'grading_url': reverse_course_url('grading_handler', course_key),
                 'is_credit_course': is_credit_course(course_key),
+                'course_authoring_microfrontend_url': course_authoring_microfrontend_url,
             })
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
@@ -1322,12 +1349,18 @@ def advanced_settings_handler(request, course_key_string):
                 settings.FEATURES.get('ENABLE_PUBLISHER', False)
             )
 
+            course_authoring_microfrontend_url = get_proctored_exam_settings_url(course_module)
+
+            # gather any errors in the currently stored proctoring settings.
+            proctoring_errors = CourseMetadata.validate_proctoring_settings(course_module, advanced_dict, request.user)
+
             return render_to_response('settings_advanced.html', {
                 'context_course': course_module,
                 'advanced_dict': advanced_dict,
                 'advanced_settings_url': reverse_course_url('advanced_settings_handler', course_key),
                 'publisher_enabled': publisher_enabled,
-
+                'course_authoring_microfrontend_url': course_authoring_microfrontend_url,
+                'proctoring_errors': proctoring_errors,
             })
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
@@ -1671,6 +1704,8 @@ def group_configurations_list_handler(request, course_key_string):
             if not has_content_groups:
                 displayable_partitions.append(GroupConfiguration.get_or_create_content_group(store, course))
 
+            course_authoring_microfrontend_url = get_proctored_exam_settings_url(course)
+
             return render_to_response('group_configurations.html', {
                 'context_course': course,
                 'group_configuration_url': group_configuration_url,
@@ -1678,7 +1713,8 @@ def group_configurations_list_handler(request, course_key_string):
                 'experiment_group_configurations': experiment_group_configurations,
                 'should_show_experiment_groups': should_show_experiment_groups,
                 'all_group_configurations': displayable_partitions,
-                'should_show_enrollment_track': should_show_enrollment_track
+                'should_show_enrollment_track': should_show_enrollment_track,
+                'course_authoring_microfrontend_url': course_authoring_microfrontend_url,
             })
         elif "application/json" in request.META.get('HTTP_ACCEPT'):
             if request.method == 'POST':

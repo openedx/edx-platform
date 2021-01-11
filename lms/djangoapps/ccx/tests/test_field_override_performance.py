@@ -16,6 +16,7 @@ from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.cache import caches
+from django.db import connections
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from edx_django_utils.cache import RequestCache
@@ -30,8 +31,8 @@ from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MONGO_MODULESTORE,
     TEST_DATA_SPLIT_MODULESTORE,
@@ -57,7 +58,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
     """
     __test__ = False
     # Tell Django to clean out all databases, not just default
-    multi_db = True
+    databases = {alias for alias in connections}
 
     # TEST_DATA must be overridden by subclasses
     TEST_DATA = None
@@ -76,7 +77,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
         messages = FallbackStorage(self.request)
         self.request._messages = messages  # pylint: disable=protected-access
 
-        patcher = mock.patch('edxmako.request_context.get_current_request', return_value=self.request)
+        patcher = mock.patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=self.request)
         patcher.start()
         self.addCleanup(patcher.stop)
         self.course = None
@@ -213,7 +214,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
 
         providers = {
             'no_overrides': (),
-            'ccx': ('ccx.overrides.CustomCoursesForEdxOverrideProvider',)
+            'ccx': ('lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',)
         }
         if overrides == 'no_overrides' and view_as_ccx:
             pytest.skip("Can't view a ccx course if field overrides are disabled.")
@@ -244,7 +245,7 @@ class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     # TODO: decrease query count as part of REVO-28
-    QUERY_COUNT = 33
+    QUERY_COUNT = 31
     TEST_DATA = {
         # (providers, course_width, enable_ccx, view_as_ccx): (
         #     # of sql queries to default,
@@ -273,7 +274,7 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     # TODO: decrease query count as part of REVO-28
-    QUERY_COUNT = 33
+    QUERY_COUNT = 31
 
     TEST_DATA = {
         ('no_overrides', 1, True, False): (QUERY_COUNT, 3),

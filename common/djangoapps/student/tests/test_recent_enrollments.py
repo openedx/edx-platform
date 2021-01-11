@@ -15,13 +15,12 @@ from pytz import UTC
 from six.moves import range, zip
 
 from common.test.utils import XssTestMixin
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
-from shoppingcart.models import DonationConfiguration
-from student.models import CourseEnrollment, DashboardConfiguration
-from student.tests.factories import UserFactory
-from student.views import get_course_enrollments
-from student.views.dashboard import _get_recently_enrolled_courses
+from common.djangoapps.student.models import CourseEnrollment, DashboardConfiguration
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.views import get_course_enrollments
+from common.djangoapps.student.views.dashboard import _get_recently_enrolled_courses
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -204,88 +203,3 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
 
         # Check if response is escaped
         self.assert_no_xss(response, xss_content)
-
-    @ddt.data(
-        # Register as honor in any course modes with no payment option
-        ([('audit', 0), ('honor', 0)], 'honor', True),
-        ([('honor', 0)], 'honor', True),
-        # Register as honor in any course modes which has payment option
-        ([('honor', 10)], 'honor', False),  # This is a paid course
-        ([('audit', 0), ('honor', 0), ('professional', 20)], 'honor', True),
-        ([('audit', 0), ('honor', 0), ('verified', 20)], 'honor', True),
-        ([('audit', 0), ('honor', 0), ('verified', 20), ('professional', 20)], 'honor', True),
-        # Register as audit in any course modes with no payment option
-        ([('audit', 0), ('honor', 0)], 'audit', True),
-        ([('audit', 0)], 'audit', True),
-        ([], 'audit', True),
-        # Register as audit in any course modes which has no payment option
-        ([('audit', 0), ('honor', 0), ('verified', 10)], 'audit', True),
-        # Register as verified in any course modes which has payment option
-        ([('professional', 20)], 'professional', False),
-        ([('verified', 20)], 'verified', False),
-        ([('professional', 20), ('verified', 20)], 'verified', False),
-        ([('audit', 0), ('honor', 0), ('verified', 20)], 'verified', False)
-    )
-    @ddt.unpack
-    def test_donate_button(self, course_modes, enrollment_mode, show_donate):
-        # Enable the enrollment success message
-        self._configure_message_timeout(10000)
-
-        # Enable donations
-        DonationConfiguration(enabled=True).save()
-
-        # Create the course mode(s)
-        for mode, min_price in course_modes:
-            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id, min_price=min_price)
-
-        self.enrollment.mode = enrollment_mode
-        self.enrollment.save()
-
-        # Check that the donate button is or is not displayed
-        self.client.login(username=self.student.username, password=self.PASSWORD)
-        response = self.client.get(reverse("dashboard"))
-
-        if show_donate:
-            self.assertContains(response, "donate-container")
-        else:
-            self.assertNotContains(response, "donate-container")
-
-    def test_donate_button_honor_with_price(self):
-        # Enable the enrollment success message and donations
-        self._configure_message_timeout(10000)
-        DonationConfiguration(enabled=True).save()
-
-        # Create a white-label course mode
-        # (honor mode with a price set)
-        CourseModeFactory.create(mode_slug="honor", course_id=self.course.id, min_price=100)
-
-        # Check that the donate button is NOT displayed
-        self.client.login(username=self.student.username, password=self.PASSWORD)
-        response = self.client.get(reverse("dashboard"))
-        self.assertNotContains(response, "donate-container")
-
-    @ddt.data(
-        (True, False,),
-        (True, True,),
-        (False, False,),
-        (False, True,),
-    )
-    @ddt.unpack
-    def test_donate_button_with_enabled_site_configuration(self, enable_donation_config, enable_donation_site_config):
-        # Enable the enrollment success message and donations
-        self._configure_message_timeout(10000)
-
-        # DonationConfiguration has low precedence if 'ENABLE_DONATIONS' is enable in SiteConfiguration
-        DonationConfiguration(enabled=enable_donation_config).save()
-
-        CourseModeFactory.create(mode_slug="audit", course_id=self.course.id, min_price=0)
-        self.enrollment.mode = "audit"
-        self.enrollment.save()
-        self.client.login(username=self.student.username, password=self.PASSWORD)
-
-        with with_site_configuration_context(configuration={'ENABLE_DONATIONS': enable_donation_site_config}):
-            response = self.client.get(reverse("dashboard"))
-            if enable_donation_site_config:
-                self.assertContains(response, "donate-container")
-            else:
-                self.assertNotContains(response, "donate-container")

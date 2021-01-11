@@ -23,8 +23,8 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from six.moves.urllib.parse import urljoin
 
-from branding.models import BrandingApiConfig
-from edxmako.shortcuts import marketing_link
+from lms.djangoapps.branding.models import BrandingApiConfig
+from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger("edx.footer")
@@ -90,7 +90,7 @@ def get_footer(is_secure=True, language=settings.LANGUAGE_CODE):
             # ...
         ],
         "openedx_link": {
-            "url": "http://open.edx.org",
+            "url": "https://open.edx.org",
             "title": "Powered by Open edX",
             "image": "http://example.com/openedx.png"
         }
@@ -454,7 +454,7 @@ def _footer_logo_img(is_secure):
     logo_name = configuration_helpers.get_value('FOOTER_ORGANIZATION_IMAGE', settings.FOOTER_ORGANIZATION_IMAGE)
     # `logo_name` is looked up from the configuration,
     # which falls back on the Django settings, which loads it from
-    # `lms.env.json`, which is created and managed by Ansible. Because of
+    # `lms.yml`, which is created and managed by Ansible. Because of
     # this runaround, we lose a lot of the flexibility that Django's
     # staticfiles system provides, and we end up having to hardcode the path
     # to the footer logo rather than use the comprehensive theming system.

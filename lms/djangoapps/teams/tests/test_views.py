@@ -24,17 +24,17 @@ from search.search_engine_base import SearchEngine
 from six.moves import range
 
 from common.test.utils import skip_signal
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.tests.factories import StaffFactory
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.lib.teams_config import TeamsConfig
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
-from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
-from util.testing import EventTestMixin
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from ..models import CourseTeamMembership
 from ..search_indexes import CourseTeam, CourseTeamIndexer, course_team_post_save_callback
@@ -242,10 +242,58 @@ class TestDashboard(SharedModuleStoreTestCase):
 
         expected_has_open = "hasOpenTopic: " + "true" if has_open else "false"
         expected_has_public = "hasPublicManagedTopic: " + "true" if has_public else "false"
-        expected_has_managed = "hasManagedTopic: " + "true" if has_public or has_private else "false"
 
         self.assertContains(response, expected_has_open)
         self.assertContains(response, expected_has_public)
+
+    @ddt.unpack
+    @ddt.data(
+        (True, False, False),
+        (False, True, False),
+        (False, False, True),
+        (True, True, True),
+        (False, True, True),
+    )
+    def test_has_managed_topic(self, has_open, has_private, has_public):
+        topics = []
+        if has_open:
+            topics.append({
+                "name": "test topic 1",
+                "id": 1,
+                "description": "Desc1",
+                "type": "open"
+            })
+        if has_private:
+            topics.append({
+                "name": "test topic 2",
+                "id": 2,
+                "description": "Desc2",
+                "type": "private_managed"
+            })
+        if has_public:
+            topics.append({
+                "name": "test topic 3",
+                "id": 3,
+                "description": "Desc3",
+                "type": "public_managed"
+            })
+
+        # Given a staff user browsing the teams tab
+        course = CourseFactory.create(
+            teams_configuration=TeamsConfig({"topics": topics})
+        )
+        teams_url = reverse('teams_dashboard', args=[course.id])
+
+        staff_user = UserFactory(is_staff=True, password=self.test_password)
+        staff_client = APIClient()
+        staff_client.login(username=staff_user.username, password=self.test_password)
+
+        # When I browse to the team tab
+        response = staff_client.get(teams_url)
+
+        # Then "hasManagedTopic" (which is used to show the "Manage" tab)
+        # is shown if there are managed team-sets
+        expected_has_managed = "hasManagedTopic: " + "true" if has_public or has_private else "false"
         self.assertContains(response, expected_has_managed)
 
 
@@ -276,6 +324,14 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                     'id': 'private_topic_2_id',
                     'name': 'private_topic_2_name',
                     'description': u'Description for topic private topic 2.',
+                    'type': u'private_managed'
+                }
+            )
+            base_topics.append(
+                {
+                    'id': 'private_topic_no_teams',
+                    'name': 'private_topic_no_teams_name',
+                    'description': u'Description for topic private_topic_no_teams.',
                     'type': u'private_managed'
                 }
             )
@@ -627,6 +683,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
 
     def post_create_team(self, expected_status=200, data=None, **kwargs):
         """Posts data to the team creation endpoint. Verifies expected_status."""
+        #return self.make_call(reverse('teams_list'), expected_status, 'post', data, topic_id='topic_0', **kwargs)
         return self.make_call(reverse('teams_list'), expected_status, 'post', data, **kwargs)
 
     def get_team_detail(self, team_id, expected_status=200, data=None, **kwargs):
@@ -645,6 +702,14 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             'patch',
             json.dumps(data) if data else None,
             'application/merge-patch+json',
+            **kwargs
+        )
+
+    def get_team_assignments(self, team_id, expected_status=200, **kwargs):
+        """ Get the open response assessments assigned to a team """
+        return self.make_call(
+            reverse('teams_assignments_list', args=[team_id]),
+            expected_status,
             **kwargs
         )
 
@@ -1570,6 +1635,100 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
             self.assertEqual(team['name'], 'foo')
 
 
+@patch.dict(settings.FEATURES, {'ENABLE_ORA_TEAM_SUBMISSIONS': True})
+@ddt.ddt
+class TestTeamAssignmentsView(TeamAPITestCase):
+    """ Tests for the TeamAssignmentsView """
+
+    @classmethod
+    def setUpClass(cls):
+        """ Create an openassessment block for testing """
+        super().setUpClass()
+
+        course = cls.test_course_1
+        teamset_id = cls.solar_team.topic_id
+        other_teamset_id = cls.wind_team.topic_id
+
+        section = ItemFactory.create(
+            parent=course,
+            category='chapter',
+            display_name='Test Section'
+        )
+        subsection = ItemFactory.create(
+            parent=section,
+            category="sequential"
+        )
+        unit_1 = ItemFactory.create(
+            parent=subsection,
+            category="vertical"
+        )
+        open_assessment = ItemFactory.create(
+            parent=unit_1,
+            category="openassessment",
+            teams_enabled=True,
+            selected_teamset_id=teamset_id
+        )
+        unit_2 = ItemFactory.create(
+            parent=subsection,
+            category="vertical"
+        )
+        off_team_open_assessment = ItemFactory.create(  # pylint: disable=unused-variable
+            parent=unit_2,
+            category="openassessment",
+            teams_enabled=True,
+            selected_teamset_id=other_teamset_id
+        )
+
+        cls.team_assignments = [open_assessment]
+
+    @ddt.unpack
+    @ddt.data(
+        (None, 401),
+        ('student_inactive', 401),
+        ('student_unenrolled', 403),
+        ('student_on_team_2_private_set_1', 404),
+        ('student_enrolled', 200),
+        ('staff', 200),
+        ('course_staff', 200),
+        ('community_ta', 200),
+    )
+    def test_get_assignments(self, user, expected_status):
+        # Given a course with team-enabled open responses
+        team_id = self.solar_team.team_id
+
+        # When I get the assignments for a team
+        assignments = self.get_team_assignments(team_id, expected_status, user=user)
+
+        if expected_status == 200:
+            # I successful, I get back the assignments for a team
+            self.assertEqual(len(assignments), len(self.team_assignments))
+
+            # ... with the right data structure
+            for assignment in assignments:
+                self.assertIn('display_name', assignment.keys())
+                self.assertIn('location', assignment.keys())
+
+    def test_get_assignments_bad_team(self):
+        # Given a bad team is supplied
+        user = 'student_enrolled'
+        team_id = 'bogus-team'
+
+        # When I run the query, I get back a 404 error
+        expected_status = 404
+        self.get_team_assignments(team_id, expected_status, user=user)
+
+    @patch.dict(settings.FEATURES, {'ENABLE_ORA_TEAM_SUBMISSIONS': False})
+    def test_get_assignments_feature_not_enabled(self):
+        # Given the team submissions feature is not enabled
+        user = 'student_enrolled'
+        team_id = self.solar_team.team_id
+
+        # When I try to get assignments
+        # Then I get back a 503 error
+        expected_status = 503
+        self.get_team_assignments(team_id, expected_status, user=user)
+
+
 @ddt.ddt
 class TestListTopicsAPI(TeamAPITestCase):
     """Test cases for the topic listing endpoint."""
@@ -1579,8 +1738,8 @@ class TestListTopicsAPI(TeamAPITestCase):
         ('student_inactive', 401, None),
         ('student_unenrolled', 403, None),
         ('student_enrolled', 200, 4),
-        ('staff', 200, 6),
-        ('course_staff', 200, 6),
+        ('staff', 200, 7),
+        ('course_staff', 200, 7),
         ('community_ta', 200, 4),
     )
     @ddt.unpack
@@ -1623,7 +1782,7 @@ class TestListTopicsAPI(TeamAPITestCase):
         data = {'course_id': str(self.test_course_1.id)}
         if field:
             data['order_by'] = field
-        topics = self.get_topics_list(status, data)
+        topics = self.get_topics_list(status, data, user='student_enrolled')
         if status == 200:
             self.assertEqual(names, [topic['name'] for topic in topics['results']])
             self.assertEqual(topics['sort_order'], expected_ordering)
@@ -1656,28 +1815,37 @@ class TestListTopicsAPI(TeamAPITestCase):
             )
 
         # Wind power has the most teams, followed by Solar
-        topics = self.get_topics_list(data={
-            'course_id': str(self.test_course_1.id),
-            'page_size': 2,
-            'page': 1,
-            'order_by': 'team_count'
-        })
+        topics = self.get_topics_list(
+            data={
+                'course_id': str(self.test_course_1.id),
+                'page_size': 2,
+                'page': 1,
+                'order_by': 'team_count'
+            },
+            user='student_enrolled'
+        )
         self.assertEqual(["Wind Power", u'Sólar power'], [topic['name'] for topic in topics['results']])
 
         # Coal and Nuclear are tied, so they are alphabetically sorted.
-        topics = self.get_topics_list(data={
-            'course_id': str(self.test_course_1.id),
-            'page_size': 2,
-            'page': 2,
-            'order_by': 'team_count'
-        })
+        topics = self.get_topics_list(
+            data={
+                'course_id': str(self.test_course_1.id),
+                'page_size': 2,
+                'page': 2,
+                'order_by': 'team_count'
+            },
+            user='student_enrolled'
+        )
         self.assertEqual(["Coal Power", "Nuclear Power"], [topic['name'] for topic in topics['results']])
 
     def test_pagination(self):
-        response = self.get_topics_list(data={
-            'course_id': str(self.test_course_1.id),
-            'page_size': 2,
-        })
+        response = self.get_topics_list(
+            data={
+                'course_id': str(self.test_course_1.id),
+                'page_size': 2,
+            },
+            user='student_enrolled'
+        )
 
         self.assertEqual(2, len(response['results']))
         self.assertIn('next', response)
@@ -1691,7 +1859,10 @@ class TestListTopicsAPI(TeamAPITestCase):
 
     def test_team_count(self):
         """Test that team_count is included for each topic"""
-        response = self.get_topics_list(data={'course_id': str(self.test_course_1.id)})
+        response = self.get_topics_list(
+            data={'course_id': str(self.test_course_1.id)},
+            user='student_enrolled'
+        )
         for topic in response['results']:
             self.assertIn('team_count', topic)
             if topic['id'] in ('topic_0', 'topic_1', 'topic_2'):
@@ -1705,13 +1876,13 @@ class TestListTopicsAPI(TeamAPITestCase):
         ('student_on_team_1_private_set_1', 1),
         ('student_on_team_2_private_set_1', 1),
         ('student_masters', 0),
-        ('staff', 2)
+        ('staff', 3)
     )
     def test_teamset_type(self, requesting_user, expected_private_teamsets):
         """
         As different users, request course_1's list of topics, and see what private_managed teamsets are returned
 
-        Staff should be able to see both teamsets, and anyone enrolled in a private teamset should see that and
+        Staff should be able to see all teamsets, and anyone enrolled in a private teamset should see that and
         only that teamset
         """
         topics = self.get_topics_list(
@@ -1725,13 +1896,13 @@ class TestListTopicsAPI(TeamAPITestCase):
 
     @ddt.unpack
     @ddt.data(
-        ('student_on_team_1_private_set_1', 2),
-        ('student_on_team_2_private_set_1', 2),
+        ('student_on_team_1_private_set_1', 1),
+        ('student_on_team_2_private_set_1', 1),
         ('staff', 2)
     )
     def test_private_teamset_team_count(self, requesting_user, expected_team_count):
         """
-        TODO: the two students should probably not see that there's another team that they don't see
+        Students should only see teams they are members of in private team-sets
         """
         topics = self.get_topics_list(
             data={'course_id': str(self.test_course_1.id)},
@@ -1785,8 +1956,8 @@ class TestDetailTopicAPI(TeamAPITestCase):
     @ddt.unpack
     @ddt.data(
         ('student_enrolled', 404, None),
-        ('student_on_team_1_private_set_1', 200, 2),
-        ('student_on_team_2_private_set_1', 200, 2),
+        ('student_on_team_1_private_set_1', 200, 1),
+        ('student_on_team_2_private_set_1', 200, 1),
         ('student_masters', 404, None),
         ('staff', 200, 2)
     )
@@ -2064,7 +2235,7 @@ class TestListMembershipAPI(TeamAPITestCase):
         ('student_masters', 404, None),
         ('staff', 200, {'student_on_team_1_private_set_1', 'student_on_team_2_private_set_1'})
     )
-    def test_access_filter_teamset(self, user, expected_response, expected_users):
+    def test_access_filter_teamset__private_teamset(self, user, expected_response, expected_users):
         memberships = self.get_membership_list(
             expected_response,
             {
@@ -2076,6 +2247,64 @@ class TestListMembershipAPI(TeamAPITestCase):
         if expected_response == 200:
             returned_users = {membership['user']['username'] for membership in memberships['results']}
             self.assertEqual(returned_users, expected_users)
+
+    @ddt.unpack
+    @ddt.data(
+        ('student_enrolled', 404),
+        ('student_on_team_1_private_set_1', 404),
+        ('student_on_team_2_private_set_1', 404),
+        ('student_masters', 404),
+        ('staff', 200)
+    )
+    def test_access_filter_teamset__private_teamset__no_teams(self, user, expected_response):
+        """
+        private_topic_no_teams has no teams in it, but staff should still get a 200 when
+        requesting teamset memberships
+        """
+        self.get_membership_list(
+            expected_response,
+            {
+                'teamset_id': 'private_topic_no_teams',
+                'course_id': str(self.test_course_1.id),
+            },
+            user=user
+        )
+
+    @ddt.unpack
+    @ddt.data(
+        ('student_unenrolled', 404, {}),
+        ('student_enrolled_not_on_team', 200, {'student_enrolled'}),
+        ('student_enrolled', 200, {'student_enrolled'}),
+        ('student_masters', 200, {'student_masters'}),
+        ('staff', 200, {'student_enrolled', 'student_masters'})
+    )
+    def test_access_filter_teamset__open_teamset(self, user, expected_response, expected_usernames):
+        # topic_3 has no teams
+        self.assertFalse(CourseTeam.objects.filter(topic_id='topic_3').exists())
+        memberships = self.get_membership_list(
+            expected_response,
+            {
+                'teamset_id': 'topic_3',
+                'course_id': str(self.test_course_1.id),
+            },
+            user=user
+        )
+        if expected_response == 200:
+            self.assertEqual(memberships['count'], 0)
+
+        # topic_0 has teams
+        self.assertTrue(CourseTeam.objects.filter(topic_id='topic_0').exists())
+        memberships = self.get_membership_list(
+            expected_response,
+            {
+                'teamset_id': 'topic_0',
+                'course_id': str(self.test_course_1.id),
+            },
+            user=user
+        )
+        if expected_response == 200:
+            returned_users = {membership['user']['username'] for membership in memberships['results']}
+            self.assertEqual(returned_users, expected_usernames)
 
 
 @ddt.ddt
@@ -2722,6 +2951,30 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             data={'csv': csv_file}, user='staff'
         )
 
+    def test_upload_invalid_multiple_student_enrollment_mismatch(self):
+        audit_username = 'audit_user'
+        masters_username_a = 'masters_a'
+        masters_username_b = 'masters_b'
+        self.create_and_enroll_student(username=audit_username, mode=CourseMode.AUDIT)
+        self.create_and_enroll_student(username=masters_username_a, mode=CourseMode.MASTERS)
+        self.create_and_enroll_student(username=masters_username_b, mode=CourseMode.MASTERS)
+
+        csv_content = 'user,mode,topic_1' + '\n'
+        csv_content += '{},audit,team wind power'.format(audit_username) + '\n'
+        csv_content += '{},masters,team wind power'.format(masters_username_a) + '\n'
+        csv_content += '{},masters,team wind power'.format(masters_username_b) + '\n'
+        csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
+        self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
+        response = self.make_call(reverse(
+            'team_membership_bulk_management',
+            args=[self.good_course_id]),
+            400, method='post',
+            data={'csv': csv_file}, user='staff'
+        )
+        response_text = json.loads(response.content.decode('utf-8'))
+        expected_error = 'Team team wind power cannot have Master’s track users mixed with users in other tracks.'
+        self.assertEqual(response_text['errors'][0], expected_error)
+
     def test_upload_learners_exceed_max_team_size(self):
         csv_content = 'user,mode,topic_0,topic_1' + '\n'
         team1 = 'team wind power'
@@ -2740,7 +2993,10 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             data={'csv': csv_file}, user='staff'
         )
         response_text = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(response_text['errors'][0], 'Team {} is full.'.format(team1))
+        self.assertEqual(
+            response_text['errors'][0],
+            'New membership for team {} would exceed max size of {}.'.format(team1, 3)
+        )
 
     def test_deletion_via_upload_csv(self):
         # create a team membership that will be used further down
@@ -2891,3 +3147,28 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             [user.username for user in team.users.all()],
             [user_name]
         )
+
+    def test_upload_assign_masters_learner_to_non_protected_team(self):
+        """
+        Scenario: Attempt to add a learner enrolled in masters track to an existing, non-org protected team.
+        Outcome: Must fail
+        """
+        masters_a = 'masters_a'
+        team = self.wind_team
+        self.create_and_enroll_student(username=masters_a, mode=CourseMode.MASTERS)
+        csv_content = 'user,mode,{}'.format(team.topic_id) + '\n'
+        csv_content += 'masters_a, masters,{}'.format(team.name)
+        csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
+        self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
+
+        response = self.make_call(
+            reverse('team_membership_bulk_management', args=[self.good_course_id]),
+            400, method='post',
+            data={'csv': csv_file},
+            user='staff'
+        )
+        response_text = json.loads(response.content.decode('utf-8'))
+        expected_message = 'Team {} cannot have Master’s track users mixed with users in other tracks.'.format(
+            team.name
+        )
+        self.assertEqual(response_text['errors'][0], expected_message)

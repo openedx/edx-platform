@@ -2,120 +2,101 @@
 """Tests for LinkedIn Add to Profile configuration. """
 
 
+from urllib.parse import quote
 import ddt
+
 from django.conf import settings
 from django.test import TestCase
-from opaque_keys.edx.locator import CourseLocator
-from six.moves.urllib.parse import quote, urlencode
 
+from lms.djangoapps.certificates.tests.factories import LinkedInAddToProfileConfigurationFactory
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
-from student.models import LinkedInAddToProfileConfiguration
 
 
 @ddt.ddt
 class LinkedInAddToProfileUrlTests(TestCase):
     """Tests for URL generation of LinkedInAddToProfileConfig. """
 
-    COURSE_KEY = CourseLocator(org="edx", course="DemoX", run="Demo_Course")
-    COURSE_NAME = u"Test Course ☃"
-    CERT_URL = u"http://s3.edx/cert"
+    COURSE_NAME = 'Test Course ☃'
+    CERT_URL = 'http://s3.edx/cert'
     SITE_CONFIGURATION = {
         'SOCIAL_SHARING_SETTINGS': {
             'CERTIFICATE_LINKEDIN_MODE_TO_CERT_NAME': {
-                'honor': u'{platform_name} Honor Code Credential for {course_name}',
-                'verified': u'{platform_name} Verified Credential for {course_name}',
-                'professional': u'{platform_name} Professional Credential for {course_name}',
-                'no-id-professional': u'{platform_name} Professional Credential for {course_name}',
+                'honor': '{platform_name} Honor Code Credential for {course_name}',
+                'verified': '{platform_name} Verified Credential for {course_name}',
+                'professional': '{platform_name} Professional Credential for {course_name}',
+                'no-id-professional': '{platform_name} Professional Credential for {course_name}',
             }
         }
     }
 
     @ddt.data(
-        ('honor', u'Honor+Code+Certificate+for+Test+Course+%E2%98%83'),
-        ('verified', u'Verified+Certificate+for+Test+Course+%E2%98%83'),
-        ('professional', u'Professional+Certificate+for+Test+Course+%E2%98%83'),
-        ('default_mode', u'Certificate+for+Test+Course+%E2%98%83')
+        ('honor', 'Honor+Code+Certificate+for+Test+Course+%E2%98%83'),
+        ('verified', 'Verified+Certificate+for+Test+Course+%E2%98%83'),
+        ('professional', 'Professional+Certificate+for+Test+Course+%E2%98%83'),
+        ('default_mode', 'Certificate+for+Test+Course+%E2%98%83')
     )
     @ddt.unpack
     def test_linked_in_url(self, cert_mode, expected_cert_name):
-        config = LinkedInAddToProfileConfiguration(
-            company_identifier='0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9',
-            enabled=True
-        )
+        config = LinkedInAddToProfileConfigurationFactory()
 
-        expected_url = (
-            'http://www.linkedin.com/profile/add'
-            '?_ed=0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9&'
-            'pfCertificationName={platform_name}+{expected_cert_name}&'
-            'pfCertificationUrl=http%3A%2F%2Fs3.edx%2Fcert&'
-            'source=o'
-        ).format(
-            expected_cert_name=expected_cert_name,
-            platform_name=quote(settings.PLATFORM_NAME.encode('utf-8'))
-        )
+        # We can switch to this once edx-platform reaches Python 3.8
+        # expected_url = (
+        #     'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&'
+        #     'name={platform}+{cert_name}&certUrl={cert_url}&'
+        #     'organizationId={company_identifier}'
+        # ).format(
+        #     platform=quote(settings.PLATFORM_NAME.encode('utf-8')),
+        #     cert_name=expected_cert_name,
+        #     cert_url=quote(self.CERT_URL, safe=''),
+        #     company_identifier=config.company_identifier,
+        # )
 
-        actual_url = config.add_to_profile_url(
-            self.COURSE_KEY,
-            self.COURSE_NAME,
-            cert_mode,
-            self.CERT_URL
-        )
+        actual_url = config.add_to_profile_url(self.COURSE_NAME, cert_mode, self.CERT_URL)
 
-        self.assertEqual(actual_url, expected_url)
+        # We can switch to this instead of the assertIn once edx-platform reaches Python 3.8
+        # There was a problem with dict ordering in the add_to_profile_url function that will go away then.
+        # self.assertEqual(actual_url, expected_url)
+
+        self.assertIn('https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME', actual_url)
+        self.assertIn('&name={platform}+{cert_name}'.format(
+            platform=quote(settings.PLATFORM_NAME.encode('utf-8')), cert_name=expected_cert_name
+        ), actual_url)
+        self.assertIn('&certUrl={cert_url}'.format(cert_url=quote(self.CERT_URL, safe='')), actual_url)
+        self.assertIn('&organizationId={org_id}'.format(org_id=config.company_identifier), actual_url)
 
     @ddt.data(
-        ('honor', u'Honor+Code+Credential+for+Test+Course+%E2%98%83'),
-        ('verified', u'Verified+Credential+for+Test+Course+%E2%98%83'),
-        ('professional', u'Professional+Credential+for+Test+Course+%E2%98%83'),
-        ('no-id-professional', u'Professional+Credential+for+Test+Course+%E2%98%83'),
-        ('default_mode', u'Certificate+for+Test+Course+%E2%98%83')
+        ('honor', 'Honor+Code+Credential+for+Test+Course+%E2%98%83'),
+        ('verified', 'Verified+Credential+for+Test+Course+%E2%98%83'),
+        ('professional', 'Professional+Credential+for+Test+Course+%E2%98%83'),
+        ('no-id-professional', 'Professional+Credential+for+Test+Course+%E2%98%83'),
+        ('default_mode', 'Certificate+for+Test+Course+%E2%98%83')
     )
     @ddt.unpack
     def test_linked_in_url_with_cert_name_override(self, cert_mode, expected_cert_name):
-        config = LinkedInAddToProfileConfiguration(
-            company_identifier='0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9',
-            enabled=True
-        )
+        config = LinkedInAddToProfileConfigurationFactory()
 
-        expected_url = (
-            'http://www.linkedin.com/profile/add'
-            '?_ed=0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9&'
-            'pfCertificationName={platform_name}+{expected_cert_name}&'
-            'pfCertificationUrl=http%3A%2F%2Fs3.edx%2Fcert&'
-            'source=o'
-        ).format(
-            expected_cert_name=expected_cert_name,
-            platform_name=quote(settings.PLATFORM_NAME.encode('utf-8'))
-        )
+        # We can switch to this once edx-platform reaches Python 3.8
+        # expected_url = (
+        #     'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&'
+        #     'name={platform}+{cert_name}&certUrl={cert_url}&'
+        #     'organizationId={company_identifier}'
+        # ).format(
+        #     platform=quote(settings.PLATFORM_NAME.encode('utf-8')),
+        #     cert_name=expected_cert_name,
+        #     cert_url=quote(self.CERT_URL, safe=''),
+        #     company_identifier=config.company_identifier,
+        # )
 
         with with_site_configuration_context(configuration=self.SITE_CONFIGURATION):
-            actual_url = config.add_to_profile_url(
-                self.COURSE_KEY,
-                self.COURSE_NAME,
-                cert_mode,
-                self.CERT_URL
-            )
+            actual_url = config.add_to_profile_url(self.COURSE_NAME, cert_mode, self.CERT_URL)
 
-            self.assertEqual(actual_url, expected_url)
+            # We can switch to this instead of the assertIn once edx-platform reaches Python 3.8
+            # There was a problem with dict ordering in the add_to_profile_url function that will go away then.
+            # self.assertEqual(actual_url, expected_url)
 
-    def test_linked_in_url_tracking_code(self):
-        config = LinkedInAddToProfileConfiguration(
-            company_identifier="abcd123",
-            trk_partner_name="edx",
-            enabled=True
-        )
-
-        expected_param = urlencode({
-            'trk': u'edx-{course_key}_honor-dashboard'.format(
-                course_key=self.COURSE_KEY
-            )
-        })
-
-        actual_url = config.add_to_profile_url(
-            self.COURSE_KEY,
-            self.COURSE_NAME,
-            'honor',
-            self.CERT_URL
-        )
-
-        self.assertIn(expected_param, actual_url)
+            self.assertIn('https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME', actual_url)
+            self.assertIn('&name={platform}+{cert_name}'.format(
+                platform=quote(settings.PLATFORM_NAME.encode('utf-8')), cert_name=expected_cert_name
+            ), actual_url)
+            self.assertIn('&certUrl={cert_url}'.format(cert_url=quote(self.CERT_URL, safe='')), actual_url)
+            self.assertIn('&organizationId={org_id}'.format(org_id=config.company_identifier), actual_url)

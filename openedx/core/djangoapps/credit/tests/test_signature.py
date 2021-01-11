@@ -42,3 +42,37 @@ class SignatureTest(TestCase):
         key = signature.get_shared_secret_key("asu")
         sig = signature.signature({'name': u'Ed Xavíer'}, key)
         self.assertEqual(sig, "76b6c9a657000829253d7c23977b35b34ad750c5681b524d7fdfb25cd5273cec")
+
+    @override_settings(CREDIT_PROVIDER_SECRET_KEYS={
+        "asu": 'abcd1234',
+    })
+    def test_get_shared_secret_key_string(self):
+        """
+        get_shared_secret_key should return ascii encoded string if provider
+        secret is stored as a single key.
+        """
+        key = signature.get_shared_secret_key("asu")
+        self.assertEqual(key, 'abcd1234')
+
+    @override_settings(CREDIT_PROVIDER_SECRET_KEYS={
+        "asu": ['abcd1234', 'zyxw9876']
+    })
+    def test_get_shared_secret_key_string_multiple_keys(self):
+        """
+        get_shared_secret_key should return ascii encoded strings if provider
+        secret is stored as a list for multiple key support.
+        """
+        key = signature.get_shared_secret_key("asu")
+        self.assertEqual(key, ['abcd1234', 'zyxw9876'])
+
+    @override_settings(CREDIT_PROVIDER_SECRET_KEYS={
+        "asu": [u'\u4567', u'zyxw9876']
+    })
+    def test_get_shared_secret_key_string_multiple_keys_with_none(self):
+        """
+        get_shared_secret_key should return ascii encoded string if provider
+        secret is stored as a list for multiple key support, replacing None
+        for unencodable strings.
+        """
+        key = signature.get_shared_secret_key("asu")
+        self.assertEqual(key, [None, 'zyxw9876'])

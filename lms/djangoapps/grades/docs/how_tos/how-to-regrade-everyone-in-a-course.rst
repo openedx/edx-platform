@@ -8,27 +8,18 @@ grades for every learner in a course.
 Steps to trigger course-wide re-grade
 =====================================
 
-1. Go to the Studio grading settings for the course,
-   for example https://studio.stage.edx.org/settings/grading/edX/DemoX/Demo_Course .
+1. Go to LMS Django Admin and add an entry in ComputeGradesSetting, in the Grades section. 
+   ``/admin/grades/computegradessetting/``
+   (this requires the persistent_grades_admin role in app-permissions)
 
-2. Make a trivial edit to one of the assignment type names.  For example,
-   for an assignment type named "Homework", add a space to get "Homework ",
-   and then delete the space.
+2. Put the course key of the course you wish to recompute into the ``course ids`` field.
+   You can enter multiple whitespace-separated keys. Save the model.
 
-3. Studio should now alert you that you've made changes;
-   click the "Save Changes" button at the bottom of your screen.
+3. Go to tools-edx-jenkins and navigate to Grading/(prod,stage)-edx-compute_grades
+   You must be a member of the jenkins-tools-grading-jobs github group to run the job, or you can ask a member to run the job for you.
 
-4. Changing the grading policy of the course (even though you made no change of consequence)
-   will cause an asynchronous task called ``compute_all_grades_for_course`` to be enqueued.
-   This task re-computes grades for every graded subsection in the course, for every learner
-   in the course.  This will also cause course grades to be re-computed for
-   every learner in the course.  Note that, for the purpose of "throttling",
-   **there's a 1 hour delay between the enqueueing of this task and the actual
-   re-computation of grades.**
-
-5. Exit Studio.
-
-6. Ask an engineer to help you with the "Monitoring" section below.
+4. The job will grab the most recent ComputeGradesSetting model and enqueue a task to recompute course grades for
+   the course(s) you specified in step 2.
 
 What to do if grades are frozen
 ===============================

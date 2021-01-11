@@ -2,10 +2,10 @@
 User Authentication Configuration
 """
 
-
 from django.apps import AppConfig
+from edx_django_utils.plugins import PluginURLs
 
-from openedx.core.djangoapps.plugins.constants import PluginURLs, ProjectType
+from openedx.core.djangoapps.plugins.constants import ProjectType
 
 
 class UserAuthnConfig(AppConfig):

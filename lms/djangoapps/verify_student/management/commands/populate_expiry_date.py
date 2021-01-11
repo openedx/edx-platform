@@ -1,5 +1,6 @@
 """
-Django admin command to populate expiry_date for approved verifications in SoftwareSecurePhotoVerification
+(DEPRECATED) Django admin command to populate expiry_date for
+approved verifications in SoftwareSecurePhotoVerification
 """
 
 
@@ -12,7 +13,7 @@ from django.core.management.base import BaseCommand
 from django.db.models import F
 
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from util.query import use_read_replica_if_available
+from common.djangoapps.util.query import use_read_replica_if_available
 
 logger = logging.getLogger(__name__)
 
@@ -20,14 +21,11 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     """
     This command sets the expiry_date for users for which the verification is approved
-
     The task is performed in batches with maximum number of rows to process given in argument `batch_size`
     and a sleep time between each batch given by `sleep_time`
-
     Default values:
         `batch_size` = 1000 rows
         `sleep_time` = 10 seconds
-
     Example usage:
         $ ./manage.py lms populate_expiry_date --batch_size=1000 --sleep_time=5
     OR
@@ -55,7 +53,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """
         Handler for the command
-
         It filters approved Software Secure Photo Verification and then for each distinct user it finds the most
         recent approved verification and set its expiry_date
         """

@@ -57,13 +57,16 @@ class ZendeskPassthroughView(APIView):
         """
         try:
             proxy_status = create_zendesk_ticket(
-                requester_name=request.data['requester']['name'],
-                requester_email=request.data['requester']['email'],
+                requester_name=request.user.username,
+                requester_email=request.user.email,
                 subject=request.data['subject'],
                 body=request.data['comment']['body'],
                 custom_fields=request.data['custom_fields'],
                 tags=request.data['tags']
             )
+        except AttributeError as attribute:
+            logger.error('Zendesk Proxy Bad Request AttributeError: %s', attribute)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         except KeyError as key:
             logger.error('Zendesk Proxy Bad Request KeyError: %s', key)
             return Response(status=status.HTTP_400_BAD_REQUEST)

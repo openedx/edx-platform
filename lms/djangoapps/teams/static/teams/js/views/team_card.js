@@ -138,11 +138,17 @@
                 this.model.on('change:membership', function() {
                     this.detailViews[0].memberships = this.model.get('membership');
                 }, this);
+
+                this.teamsetName = null;
+                this.getTopic(this.model.get('topic_id')).done(_.bind(function(teamset) {
+                    this.teamsetName = teamset.get('name');
+                }, this));
             },
 
             configuration: 'list_card',
             cardClass: 'team-card',
             title: function() { return this.model.get('name'); },
+            pennant: function() { return this.showTeamset ? this.teamsetName : undefined; },
             description: function() { return this.model.get('description'); },
             details: function() { return this.detailViews; },
             actionClass: 'action-view',

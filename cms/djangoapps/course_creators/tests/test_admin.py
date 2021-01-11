@@ -11,10 +11,10 @@ from django.http import HttpRequest
 from django.test import TestCase
 from six.moves import range
 
-from course_creators.admin import CourseCreatorAdmin
-from course_creators.models import CourseCreator
-from student import auth
-from student.roles import CourseCreatorRole
+from cms.djangoapps.course_creators.admin import CourseCreatorAdmin
+from cms.djangoapps.course_creators.models import CourseCreator
+from common.djangoapps.student import auth
+from common.djangoapps.student.roles import CourseCreatorRole
 
 
 def mock_render_to_string(template_name, context):
@@ -48,7 +48,10 @@ class CourseCreatorAdminTest(TestCase):
             "STUDIO_REQUEST_EMAIL": self.studio_request_email
         }
 
-    @mock.patch('course_creators.admin.render_to_string', mock.Mock(side_effect=mock_render_to_string, autospec=True))
+    @mock.patch(
+        'cms.djangoapps.course_creators.admin.render_to_string',
+        mock.Mock(side_effect=mock_render_to_string, autospec=True)
+    )
     @mock.patch('django.contrib.auth.models.User.email_user')
     def test_change_status(self, email_user):
         """
@@ -92,7 +95,10 @@ class CourseCreatorAdminTest(TestCase):
 
             change_state_and_verify_email(CourseCreator.DENIED, False)
 
-    @mock.patch('course_creators.admin.render_to_string', mock.Mock(side_effect=mock_render_to_string, autospec=True))
+    @mock.patch(
+        'cms.djangoapps.course_creators.admin.render_to_string',
+        mock.Mock(side_effect=mock_render_to_string, autospec=True)
+    )
     def test_mail_admin_on_pending(self):
         """
         Tests that the admin account is notified when a user is in the 'pending' state.

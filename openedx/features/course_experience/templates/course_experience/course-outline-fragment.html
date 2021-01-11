@@ -26,11 +26,7 @@ is_course_staff = bool(user and course and has_access(user, 'staff', course, cou
 dates_banner_displayed = False
 %>
 <main role="main" class="course-outline" id="main" tabindex="-1">
-    <div class="dates-banner-wrapper">
-        % if enrollment_mode and relative_dates_flag_is_enabled and self_paced and not is_course_staff:
-            <%include file="/dates_banner.html" />
-        % endif
-    </div>
+    <%include file="/dates_banner.html" />
     % if course_sections is not None:
         <button class="btn btn-primary"
                 id="expand-collapse-outline-all-button"
@@ -69,15 +65,7 @@ dates_banner_displayed = False
                 scored = 'scored' if subsection.get('scored', False) else ''
                 graded = 'graded' if subsection.get('graded') else ''
                 num_graded_problems = subsection.get('num_graded_problems', 0)
-                due_date = subsection.get('due')
-                overdue = due_date is not None and due_date < timezone.now() and not subsection.get('complete', True)
                 %>
-                % if graded and overdue and not dates_banner_displayed:
-                    <% dates_banner_displayed = True %>
-                    <script type="text/javascript">
-                        $('.dates-banner-wrapper').css('display', 'block');
-                    </script>
-                % endif
                         <li class="subsection accordion ${ 'current' if subsection.get('resume_block') else '' } ${graded} ${scored}">
                             <a
                             % if enable_links:
