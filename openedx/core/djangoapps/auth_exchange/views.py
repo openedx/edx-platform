@@ -53,11 +53,12 @@ class AccessTokenExchangeBase(APIView):
         form = AccessTokenExchangeForm(request=request, oauth2_adapter=self.oauth2_adapter, data=request.POST)
         if not form.is_valid():
             error_response = self.error_response(form.errors)  # pylint: disable=no-member
-            log.info('message=login_filed, status="%d", user="%d" ,agent="%s"',
-                     error_response.status_code,
-                     request.user,
-                     request.META.get('HTTP_USER_AGENT', ''),
-                     )
+            if error_response.status_code == 403:
+                log.info('message=login_filed_1, status="%d", user="%d" ,agent="%s"',
+                         error_response.status_code,
+                         request.user,
+                         request.META.get('HTTP_USER_AGENT', ''),
+                         )
             return error_response
 
         user = form.cleaned_data["user"]
@@ -65,7 +66,7 @@ class AccessTokenExchangeBase(APIView):
         client = form.cleaned_data["client"]
         response = self.exchange_access_token(request, user, scope, client)
         if response.status_code == 403:
-            log.info('message=login_filed, status=%d, user="%d" ,agent="%s"',
+            log.info('message=login_filed_2, status=%d, user="%d" ,agent="%s"',
                      response.status_code,
                      request.user.username,
                      request.META.get('HTTP_USER_AGENT', ''),
