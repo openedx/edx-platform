@@ -185,7 +185,7 @@ class UserApplication(TimeStampedModel):
         for course_overview in prereq_course_overviews:
             course_name = course_overview.display_name
             course_grade = CourseGradeFactory().read(self.user, course_key=course_overview.id)
-            course_percentage = course_grade.percent*100
+            course_percentage = course_grade.percent * 100
 
             course_score = CourseScore(course_name, course_percentage)
             scores_in_prereq_courses.append(course_score)

@@ -354,7 +354,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
             }),
             (_('APPLICANT INFORMATION'), {
                 'fields': (
-                        IS_SAUDI_NATIONAL, GENDER, PHONE_NUMBER, DATE_OF_BIRTH, ORGANIZATION, APPLYING_TO
+                    IS_SAUDI_NATIONAL, GENDER, PHONE_NUMBER, DATE_OF_BIRTH, ORGANIZATION, APPLYING_TO
                 ),
             }),
         ]
