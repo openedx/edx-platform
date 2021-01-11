@@ -1966,7 +1966,7 @@ class CourseEnrollment(models.Model):
             return None
 
         try:
-            if not self.schedule or not self.schedule.active:  # pylint: disable=no-member
+            if not self.schedule or not self.schedule.enrollment.is_active:  # pylint: disable=no-member
                 return None
 
             log.debug(

@@ -122,29 +122,18 @@ class CourseIdFilter(admin.SimpleListFilter):
 
 @admin.register(models.Schedule)
 class ScheduleAdmin(admin.ModelAdmin):
-    list_display = ('username', 'course_id', 'active', 'start_date', 'upgrade_deadline', 'experience_display')
+    list_display = ('username', 'course_id', 'start_date', 'upgrade_deadline', 'experience_display')
     list_display_links = ('start_date', 'upgrade_deadline', 'experience_display')
     list_filter = (
         CourseIdFilter,
         'experience__experience_type',
-        'active',
         KnownErrorCases
     )
     raw_id_fields = ('enrollment',)
     readonly_fields = ('modified',)
     search_fields = ('enrollment__user__username',)
     inlines = (ScheduleExperienceAdminInline,)
-    actions = ['deactivate_schedules', 'activate_schedules'] + experience_actions
-
-    def deactivate_schedules(self, request, queryset):
-        rows_updated = queryset.update(active=False)
-        self.message_user(request, u"{} schedule(s) were deactivated".format(rows_updated))
-    deactivate_schedules.short_description = "Deactivate selected schedules"
-
-    def activate_schedules(self, request, queryset):
-        rows_updated = queryset.update(active=True)
-        self.message_user(request, u"{} schedule(s) were activated".format(rows_updated))
-    activate_schedules.short_description = "Activate selected schedules"
+    actions = experience_actions
 
     def experience_display(self, obj):
         return obj.experience.get_experience_type_display()
