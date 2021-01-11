@@ -1,7 +1,7 @@
 """
 Helper methods for Mailchimp pipeline
 """
-from student.models import CourseEnrollment, UserProfile
+from common.djangoapps.student.models import CourseEnrollment, UserProfile
 
 
 def get_enrollment_course_names_and_short_ids_by_user(user):

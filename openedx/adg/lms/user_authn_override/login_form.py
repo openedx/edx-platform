@@ -6,10 +6,10 @@ from django import forms
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
+from common.djangoapps.util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.helpers import FormDescription
 from openedx.core.djangoapps.user_authn.views.login_form import _apply_third_party_auth_overrides
-from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 
 
 def get_login_session_form_override(request):

@@ -8,10 +8,10 @@ from unittest import mock
 from django.test import TestCase
 from django.test.client import RequestFactory
 
+from common.djangoapps.util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 from openedx.adg.lms.user_authn_override.login_form import get_login_session_form_override
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH, EMAIL_MIN_LENGTH
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 
 
 @skip_unless_lms

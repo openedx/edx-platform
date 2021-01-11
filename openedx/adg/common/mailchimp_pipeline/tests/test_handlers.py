@@ -4,6 +4,8 @@ All tests for mailchimp pipeline handlers
 import pytest
 from django.test.utils import override_settings
 
+from common.djangoapps.student.models import EnrollStatusChange
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.adg.common.mailchimp_pipeline.helpers import (
     get_extendeduserprofile_merge_fields,
     get_user_merge_fields,
@@ -14,8 +16,6 @@ from openedx.adg.lms.applications.test.factories import UserApplicationFactory
 from openedx.adg.lms.registration_extension.tests.factories import ExtendedUserProfileFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.models import EnrollStatusChange
-from student.tests.factories import UserFactory
 
 
 # pylint: disable=redefined-outer-name

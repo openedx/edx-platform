@@ -7,10 +7,10 @@ from dateutil.relativedelta import relativedelta
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
+from common.djangoapps.student.models import UserProfile
 from openedx.adg.lms.applications.constants import MAXIMUM_AGE_LIMIT, MINIMUM_AGE_LIMIT, RESUME_FILE_MAX_SIZE
 from openedx.adg.lms.applications.models import UserApplication
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
-from student.models import UserProfile
 
 from .helpers import validate_file_size
 

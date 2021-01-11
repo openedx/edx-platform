@@ -6,13 +6,13 @@ import pytest
 from django.conf import settings
 from django.test.client import RequestFactory
 from mock import patch
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
+from common.djangoapps.student.tests.factories import UserFactory, UserProfileFactory
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.adg.lms.student import helpers as student_helpers
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from student.tests.factories import UserFactory, UserProfileFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @pytest.fixture

@@ -4,7 +4,7 @@ Forms for custom registration form app.
 from django.forms import ModelChoiceField, ModelForm
 from django.utils.translation import ugettext as _
 
-from edxmako.shortcuts import marketing_link
+from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.adg.lms.applications.models import BusinessLine
 from openedx.adg.lms.registration_extension.constants import CITIES
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile

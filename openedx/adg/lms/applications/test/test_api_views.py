@@ -7,7 +7,7 @@ import pytest
 from django.urls import reverse
 from rest_framework import status
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 from ..models import Education, WorkExperience
 from ..serializers import EducationSerializer, WorkExperienceSerializer

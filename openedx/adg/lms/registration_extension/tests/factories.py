@@ -3,9 +3,9 @@ Factories for registration-extension app
 """
 import factory
 
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.adg.lms.applications.test.factories import BusinessLineFactory
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
-from student.tests.factories import UserFactory
 
 
 class ExtendedUserProfileFactory(factory.DjangoModelFactory):

@@ -3,8 +3,8 @@ All tests for mailchimp pipeline tasks
 """
 import pytest
 
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.adg.common.mailchimp_pipeline import tasks as mailchimp_tasks
-from student.tests.factories import UserFactory
 
 
 @pytest.mark.django_db

@@ -3,8 +3,8 @@ All model factories for applications
 """
 import factory
 
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.adg.lms.applications.models import ApplicationHub, BusinessLine, Education, UserApplication, WorkExperience
-from student.tests.factories import UserFactory
 
 
 class BusinessLineFactory(factory.DjangoModelFactory):

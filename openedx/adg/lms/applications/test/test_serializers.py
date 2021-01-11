@@ -3,7 +3,7 @@ All tests for applications APIs serializers
 """
 import pytest
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 from ..models import Education
 from ..serializers import EducationSerializer, WorkExperienceSerializer

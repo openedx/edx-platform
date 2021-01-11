@@ -9,9 +9,9 @@ from django.test import Client, RequestFactory
 from django.urls import reverse
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.adg.lms.applications.views import ApplicationHubView, ApplicationSuccessView, ContactInformationView
 from openedx.adg.lms.registration_extension.tests.factories import ExtendedUserProfileFactory
-from student.tests.factories import UserFactory
 
 from .constants import PASSWORD, USERNAME
 from .factories import ApplicationHubFactory

@@ -6,6 +6,8 @@ from datetime import datetime
 import pytest
 from django.contrib.auth.models import User
 
+from common.djangoapps.student.models import UserProfile
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.adg.common.course_meta.tests.factories import CourseMetaFactory
 from openedx.adg.common.mailchimp_pipeline.helpers import (
     get_enrollment_course_names_and_short_ids_by_user,
@@ -20,8 +22,6 @@ from openedx.adg.lms.applications.test.factories import UserApplicationFactory
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
 from openedx.adg.lms.registration_extension.tests.factories import ExtendedUserProfileFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.models import UserProfile
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 
 @pytest.fixture

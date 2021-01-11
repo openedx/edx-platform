@@ -6,8 +6,8 @@ from datetime import datetime
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
-from branding.api import _build_support_form_url
-from edxmako.shortcuts import marketing_link
+from common.djangoapps.edxmako.shortcuts import marketing_link
+from lms.djangoapps.branding.api import _build_support_form_url
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 

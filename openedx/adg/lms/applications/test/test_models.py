@@ -5,7 +5,7 @@ from datetime import date
 
 import pytest
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 from .constants import USERNAME
 from .factories import ApplicationHubFactory

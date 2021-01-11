@@ -6,13 +6,13 @@ import logging
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 
+from common.djangoapps.student.models import EnrollStatusChange, UserProfile
+from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE
 from openedx.adg.common.course_meta.models import CourseMeta
 from openedx.adg.lms.applications.models import UserApplication
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
 from openedx.adg.lms.utils.decorators import suspendingreceiver
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.models import EnrollStatusChange, UserProfile
-from student.signals import ENROLL_STATUS_CHANGE
 
 from .helpers import (
     get_enrollment_course_names_and_short_ids_by_user,

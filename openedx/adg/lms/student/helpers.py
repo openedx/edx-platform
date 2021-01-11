@@ -7,12 +7,12 @@ from django.contrib.auth.tokens import default_token_generator
 from django.urls import reverse
 from django.utils.http import int_to_base36
 
+from common.djangoapps.student.models import UserProfile
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.adg.common.lib.mandrill_client.email_data import EmailData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import Text
-from student.models import UserProfile
 
 
 def compose_and_send_adg_activation_email(user, activation_key):
