@@ -9,6 +9,8 @@ from functools import wraps
 
 from lxml import etree
 
+from openedx.core.djangolib.markup import Text
+
 from .x_module import XModuleDescriptor
 
 log = logging.getLogger(__name__)
@@ -74,8 +76,8 @@ class SemanticSectionDescriptor(XModuleDescriptor):
         the child element
         """
         xml_object = etree.fromstring(xml_data)
-        system.error_tracker("WARNING: the <{0}> tag is deprecated.  Please do not use in new content."
-                             .format(xml_object.tag))
+        system.error_tracker(Text("WARNING: the <{tag}> tag is deprecated.  Please do not use in new content.")
+                             .format(tag=xml_object.tag))
 
         if len(xml_object) == 1:
             for (key, val) in xml_object.items():
@@ -98,8 +100,8 @@ class TranslateCustomTagDescriptor(XModuleDescriptor):
         """
 
         xml_object = etree.fromstring(xml_data)
-        system.error_tracker('WARNING: the <{tag}> tag is deprecated.  '
-                             'Instead, use <customtag impl="{tag}" attr1="..." attr2="..."/>. '
+        system.error_tracker(Text('WARNING: the <{tag}> tag is deprecated.  '
+                             'Instead, use <customtag impl="{tag}" attr1="..." attr2="..."/>. ')
                              .format(tag=xml_object.tag))
 
         tag = xml_object.tag
