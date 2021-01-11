@@ -343,6 +343,7 @@ class XQueueCertInterface(object):
 
         # Strip HTML from grade range label
         grade_contents = forced_grade or course_grade.letter_grade
+        passing = False
         try:
             grade_contents = lxml.html.fromstring(grade_contents).text_content()
             passing = True
@@ -361,16 +362,14 @@ class XQueueCertInterface(object):
                 six.text_type(exc)
             )
 
-            # Log if the student is whitelisted
-            if is_whitelisted:
-                LOGGER.info(
-                    u"Student %s is whitelisted in '%s'",
-                    student.id,
-                    six.text_type(course_id)
-                )
-                passing = True
-            else:
-                passing = False
+        # Check if the student is whitelisted
+        if is_whitelisted:
+            LOGGER.info(
+                u"Student %s is whitelisted in '%s'",
+                student.id,
+                six.text_type(course_id)
+            )
+            passing = True
 
         # If this user's enrollment is not eligible to receive a
         # certificate, mark it as such for reporting and
