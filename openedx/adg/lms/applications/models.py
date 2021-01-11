@@ -10,9 +10,9 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
 
-from openedx.adg.lms.utils.date_utils import month_choices
 from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.adg.common.course_meta.models import CourseMeta
+from openedx.adg.lms.utils.date_utils import month_choices
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 from .constants import ALLOWED_LOGO_EXTENSIONS

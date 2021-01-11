@@ -2,14 +2,12 @@
 Helper methods for applications
 """
 import os
-
 from datetime import datetime
 
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator, ValidationError
-
-from django.core.validators import ValidationError
 from django.urls import reverse
+from django.utils.html import format_html
 from django.utils.translation import ugettext as _
 
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
@@ -17,7 +15,6 @@ from openedx.adg.lms.student.helpers import send_mandrill_email
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 from .constants import COVER_LETTER_ONLY, LOGO_IMAGE_MAX_SIZE, MAXIMUM_YEAR_OPTION, MINIMUM_YEAR_OPTION, SCORES
-from django.utils.html import format_html
 
 
 def validate_logo_size(file_):
@@ -147,10 +144,6 @@ def validate_file_size(data_file, max_size):
     return None
 
 
-def can_display_file(file):
-    filename = str(file)
-    if not filename.endswith('doc'):
-        return True
 def is_displayable_on_browser(file):
     """
     Check if the input file can be displayed as an embedded view on a browser

@@ -2,6 +2,7 @@
 Constants related to applications.
 """
 from datetime import datetime
+
 from django.utils.translation import ugettext_lazy as _
 
 MINIMUM_YEAR_OPTION = 1900
