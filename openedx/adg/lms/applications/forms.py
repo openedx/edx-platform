@@ -112,8 +112,12 @@ class UserProfileForm(forms.ModelForm):
 
 class UserApplicationAdminForm(forms.ModelForm):
     """
-    Form for UserApplication ADG admin view
+    Extend form for UserApplication ADG admin view.
+
+    Extension is required to add a validation check ensuring that the application review form cannot be submitted by an
+    admin unless a decision is made regarding the status of the application.
     """
+
     class Meta:
         model = UserApplication
         fields = '__all__'

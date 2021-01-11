@@ -44,6 +44,7 @@ class ApplicationHubAdmin(admin.ModelAdmin):
     """
     Django admin class for ApplicationHub
     """
+
     fields = (
         'user', 'is_prerequisite_courses_passed', 'is_written_application_completed', 'is_application_submitted',
         'submission_date'
@@ -60,6 +61,7 @@ class UserApplicationAdmin(admin.ModelAdmin):
     """
     Django admin class for UserApplication
     """
+
     list_display = ('id', 'user_email', 'business_line',)
     list_filter = ('business_line',)
     raw_id_fields = ('user',)
@@ -73,6 +75,7 @@ class EducationAdmin(admin.ModelAdmin):
     """
     Django admin class for Education
     """
+
     fields = (
         'name_of_school', 'degree', 'area_of_study', 'date_started_month', 'date_started_year', 'date_completed_month',
         'date_completed_year', 'is_in_progress', 'user_application',
@@ -87,6 +90,7 @@ class WorkExperienceAdmin(admin.ModelAdmin):
     """
     Django admin class for WorkExperience
     """
+
     fields = (
         'name_of_organization', 'job_position_title', 'date_started_month', 'date_started_year', 'date_completed_month',
         'date_completed_year', 'is_current_position', 'job_responsibilities', 'user_application'
@@ -101,6 +105,7 @@ class BusinessLineAdmin(admin.ModelAdmin):
     """
     Django admin class for BusinessLine
     """
+
     fields = ('title', 'logo', 'description',)
     list_display = ('id', 'title', 'logo', 'description',)
     list_filter = ('title',)
@@ -108,6 +113,10 @@ class BusinessLineAdmin(admin.ModelAdmin):
 
 
 class ADGAdmin(AdminSite):
+    """
+    Subclass AdminSite to create a new admin site for ADG admins where they can review applications.
+    """
+
     site_header = _('Al-Dabbagh')
     site_title = site_header
     site_url = None
@@ -116,17 +125,12 @@ class ADGAdmin(AdminSite):
 adg_admin_site = ADGAdmin(name='adg_admin')
 
 
-class EducationInline(admin.StackedInline):
+class ApplicationReviewInline(admin.StackedInline):
     """
-    InlineModelAdmin for Education model
+    Abstract inline for inlines to be rendered in application review page.
+
+    Restrict inline deletion and addition rights from ADG admin.
     """
-    model = Education
-
-    fields = ('name_of_school', 'degree', 'area_of_study', 'dates')
-    readonly_fields = ('name_of_school', 'degree', 'area_of_study', 'dates')
-
-    def dates(self, obj):
-        return get_duration(obj, obj.is_in_progress)
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -135,14 +139,29 @@ class EducationInline(admin.StackedInline):
         return False
 
 
-class WorkExperienceInline(admin.StackedInline):
+class EducationInline(ApplicationReviewInline):
+    """
+    InlineModelAdmin for Education model
+    """
+
+    model = Education
+
+    fields = ('name_of_school', 'degree', 'area_of_study', 'dates')
+    readonly_fields = fields
+
+    def dates(self, obj):
+        return get_duration(obj, obj.is_in_progress)
+
+
+class WorkExperienceInline(ApplicationReviewInline):
     """
     InlineModelAdmin for WorkExperience model
     """
+
     model = WorkExperience
 
     fields = ('name_of_organization', 'job_position_title', 'dates', 'responsibilities')
-    readonly_fields = ('name_of_organization', 'job_position_title', 'dates', 'responsibilities')
+    readonly_fields = fields
 
     def responsibilities(self, obj):
         return obj.job_responsibilities
@@ -150,17 +169,12 @@ class WorkExperienceInline(admin.StackedInline):
     def dates(self, obj):
         return get_duration(obj, obj.is_current_position)
 
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-    def has_add_permission(self, request, obj=None):
-        return False
-
 
 class UserApplicationADGAdmin(admin.ModelAdmin):
     """
     Django admin class for UserApplication
     """
+
     form = UserApplicationAdminForm
 
     inlines = [
@@ -172,7 +186,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
     list_per_page = 10
 
     def applicant_name(self, obj):
-        return obj.user.get_full_name()
+        return obj.user.profile.name
 
     def date_received(self, obj):
         return obj.user.application_hub.submission_date.strftime('%m/%d/%Y')
@@ -180,22 +194,29 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
 
     def changelist_view(self, request, extra_context=None):
         """
-        Override change list view of application listing page for ADG admin
+        Extend change list view of application listing page for ADG admin.
+
+        Extension is done to customize heading of the application listing page, depending on the application status
+        filter that the admin has selected.
         """
-        if 'status__exact' not in request.GET:
-            extra_context = {'title': _('APPLICATIONS')}
-        elif request.GET['status__exact'] == UserApplication.OPEN:
-            extra_context = {'title': _('OPEN APPLICATIONS')}
-        elif request.GET['status__exact'] == UserApplication.ACCEPTED:
-            extra_context = {'title': _('ACCEPTED APPLICATIONS')}
-        elif request.GET['status__exact'] == UserApplication.WAITLIST:
-            extra_context = {'title': _('WAITLISTED APPLICATIONS')}
+        application_status_map = {
+            UserApplication.OPEN: _('OPEN APPLICATIONS'),
+            UserApplication.ACCEPTED: _('ACCEPTED APPLICATIONS'),
+            UserApplication.WAITLIST: _('WAITLISTED APPLICATIONS')
+        }
+
+        extra_context = {'title': _('APPLICATIONS')}
+        if 'status__exact' in request.GET:
+            extra_context['title'] = application_status_map[request.GET['status__exact']]
 
         return super(UserApplicationADGAdmin, self).changelist_view(request, extra_context=extra_context)
 
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
         """
-        Override change form view of application review page for ADG admin
+        Extend change form view of application review page for ADG admin.
+
+        Extension is required to handle conditionally storing review information and to provide extra context to the
+        review form.
 
         Arguments:
             request(WSGIRequest): Http Request
@@ -218,8 +239,9 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
 
     def _save_application_review_info(self, application_id, request):
         """
-        Save application review information, i.e. new status of application (waitlist/accepted) and optional internal
-        note
+        Save application review information.
+
+        Save new status of application (waitlist/accepted) and optional internal note.
 
         Arguments:
             application_id (str): ID of application under review
@@ -311,8 +333,9 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
 
     def get_fieldsets(self, request, obj=None):
         """
-        Override `get_fieldsets` method of BaseModelAdmin to group application under different sections and dynamically
-        set fields to be rendered.
+        Override `get_fieldsets` method of BaseModelAdmin.
+
+        Override is needed group application under different sections and dynamically set fields to be rendered.
 
         Arguments:
             request (WSGIRequest): HTTP request accessing application review page
@@ -452,10 +475,10 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
 
     def get_form(self, request, obj=None, change=False, **kwargs):
         """
-        Override method `get_form` of ModelAdmin.
+        Extend method `get_form` of ModelAdmin.
 
-        Override is needed to attach request object with the admin form. The request object is needed in the `clean`
-        method that is overriden in `UserApplicationAdminForm`
+        Extension is needed to attach request object with the admin form. The request object is needed in the `clean`
+        method that is extended in `UserApplicationAdminForm`
 
         Arguments:
             request (WSGIRequest): HTTP request accessing application review page

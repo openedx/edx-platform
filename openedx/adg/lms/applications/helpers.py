@@ -162,10 +162,8 @@ def is_displayable_on_browser(file):
         bool: False if file type is 'doc', True otherwise
     """
     filename = str(file).lower()
-    if filename.endswith('.doc'):
-        return False
 
-    return True
+    return not filename.endswith('.doc')
 
 
 def get_embedded_view_html(file):
@@ -219,7 +217,7 @@ def _get_application_review_info(application):
     reviewed_by = None
     review_date = None
     if application.status != application.OPEN:
-        reviewed_by = application.reviewed_by.get_full_name()
+        reviewed_by = application.reviewed_by.profile.name
         review_date = application.modified.strftime('%B %d, %Y')
 
     return reviewed_by, review_date
@@ -235,7 +233,7 @@ def get_extra_context_for_application_review_page(application):
     Returns:
         dict: extra context
     """
-    name_of_applicant = application.user.get_full_name()
+    name_of_applicant = application.user.profile.name
 
     reviewed_by, review_date = _get_application_review_info(application)
 

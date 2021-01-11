@@ -23,6 +23,7 @@ class ApplicationHub(TimeStampedModel):
     """
     Model for status of all required parts of user application submission.
     """
+
     TOTAL_APPLICATION_OBJECTIVES = 2
 
     user = models.OneToOneField(
@@ -88,6 +89,7 @@ class BusinessLine(TimeStampedModel):
     """
     Model to save the business lines
     """
+
     title = models.CharField(verbose_name=_('Title'), max_length=150, unique=True, )
     logo = models.ImageField(
         upload_to='business-lines/logos/', verbose_name=_('Logo'),
@@ -107,6 +109,7 @@ class UserApplication(TimeStampedModel):
     """
     Model for status of all required parts of user application submission.
     """
+
     user = models.OneToOneField(User, related_name='application', on_delete=models.CASCADE, verbose_name=_('User'), )
     business_line = models.ForeignKey(BusinessLine, verbose_name=_('Business Line'),
                                       on_delete=models.CASCADE, null=True)
@@ -148,7 +151,7 @@ class UserApplication(TimeStampedModel):
         ordering = ['created']
 
     def __str__(self):
-        return '{}'.format(self.user.get_full_name())
+        return '{}'.format(self.user.profile.name)  # pylint: disable=E1101
 
     @property
     def cover_letter_provided(self):
@@ -203,6 +206,7 @@ class UserStartAndEndDates(TimeStampedModel):
     """
     An abstract model for start and end dates.
     """
+
     month_choices = month_choices(default_title='Month')
 
     user_application = models.ForeignKey(
@@ -230,6 +234,7 @@ class Education(UserStartAndEndDates):
     """
     Model for user education qualification for application submission.
     """
+
     HIGH_SCHOOL_DIPLOMA = 'HD'
     ASSOCIATE_DEGREE = 'AD'
     BACHELOR_DEGREE = 'BD'
@@ -260,6 +265,7 @@ class WorkExperience(UserStartAndEndDates):
     """
     Model for user work experience for application submission.
     """
+
     name_of_organization = models.CharField(verbose_name=_('Organization'), max_length=255, )
     job_position_title = models.CharField(verbose_name=_('Job Position / Title'), max_length=255, )
     is_current_position = models.BooleanField(verbose_name=_('Current Position'), default=False, )
