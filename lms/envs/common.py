@@ -1117,6 +1117,7 @@ TRACKING_BACKENDS = {
 TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat', r'^/segmentio/event', r'^/performance']
 
 EVENT_TRACKING_ENABLED = True
+CALIPER_EVENTS_ENABLED = True
 EVENT_TRACKING_BACKENDS = {
     "caliper": {
         "ENGINE": "eventtracking.backends.async_routing.AsyncRoutingBackend",
