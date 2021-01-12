@@ -177,6 +177,24 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
 
     form = UserApplicationAdminForm
 
+    readonly_fields = (
+        EMAIL,
+        LOCATION,
+        LINKED_IN_PROFILE,
+        IS_SAUDI_NATIONAL,
+        GENDER,
+        PHONE_NUMBER,
+        DATE_OF_BIRTH,
+        ORGANIZATION,
+        APPLYING_TO,
+        RESUME,
+        COVER_LETTER_FILE,
+        COVER_LETTER_FILE_DISPLAY,
+        RESUME_DISPLAY,
+        COVER_LETTER_TEXT,
+        PREREQUISITES
+    )
+
     inlines = [
         EducationInline, WorkExperienceInline
     ]
@@ -432,24 +450,6 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
 
         return resume_cover_letter_display_fields
 
-    readonly_fields = (
-        EMAIL,
-        LOCATION,
-        LINKED_IN_PROFILE,
-        IS_SAUDI_NATIONAL,
-        GENDER,
-        PHONE_NUMBER,
-        DATE_OF_BIRTH,
-        ORGANIZATION,
-        APPLYING_TO,
-        RESUME,
-        COVER_LETTER_FILE,
-        COVER_LETTER_FILE_DISPLAY,
-        RESUME_DISPLAY,
-        COVER_LETTER_TEXT,
-        PREREQUISITES
-    )
-
     def get_formsets_with_inlines(self, request, obj=None):
         """
         Override method `get_formsets_with_inlines` of ModelAdmin.
@@ -467,10 +467,11 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         """
         if obj.resume:
             return
+
         for inline in self.get_inline_instances(request, obj):
-            if isinstance(inline, WorkExperienceInline)\
-                    and not WorkExperience.objects.filter(user_application=obj).exists():
+            if isinstance(inline, WorkExperienceInline) and obj.has_no_work_experience:
                 continue
+
             yield inline.get_formset(request, obj), inline
 
     def get_form(self, request, obj=None, change=False, **kwargs):
