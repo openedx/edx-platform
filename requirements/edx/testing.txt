@@ -131,7 +131,7 @@ enmerkar==0.7.1           # via -r requirements/edx/base.txt, enmerkar-underscor
 event-tracking==1.0.3     # via -r requirements/edx/base.txt, edx-event-routing-backends, edx-proctoring, edx-search
 execnet==1.7.1            # via pytest-xdist
 factory-boy==2.8.1        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
-faker==5.4.0              # via factory-boy
+faker==5.5.0              # via factory-boy
 filelock==3.0.12          # via tox, virtualenv
 freezegun==0.3.12         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
 fs-s3fs==0.1.8            # via -r requirements/edx/base.txt, django-pyfs
@@ -259,7 +259,7 @@ six==1.15.0               # via -r requirements/edx/base.txt, analytics-python, 
 slumber==0.7.1            # via -r requirements/edx/base.txt, edx-bulk-grades, edx-enterprise, edx-rest-api-client
 smmap==3.0.4              # via gitdb
 social-auth-app-django==4.0.0  # via -r requirements/edx/base.txt
-social-auth-core==3.3.3   # via -r requirements/edx/base.txt, social-auth-app-django
+social-auth-core==3.4.0   # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, social-auth-app-django
 sorl-thumbnail==12.7.0    # via -r requirements/edx/base.txt, django-wiki
 sortedcontainers==2.3.0   # via -r requirements/edx/base.txt
 soupsieve==2.1            # via -r requirements/edx/base.txt, beautifulsoup4
