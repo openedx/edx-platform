@@ -18,6 +18,7 @@ from rest_framework.utils.encoders import JSONEncoder
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.adg.lms.applications.constants import MAXIMUM_YEAR_OPTION
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -175,8 +176,9 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         self.assertIsNone(VerificationDeadline.deadline_for_course(self.course.id))
 
         # Generate the expected data
-        verification_deadline = datetime(year=2020, month=12, day=31, tzinfo=pytz.utc)
-        expiration_datetime = datetime.now(pytz.utc)
+        now = datetime.now(pytz.utc)
+        verification_deadline = now + timedelta(days=1)
+        expiration_datetime = now
         response, expected = self._get_update_response_and_expected_data(expiration_datetime, verification_deadline)
 
         # Sanity check: The API should return HTTP status 200 for updates

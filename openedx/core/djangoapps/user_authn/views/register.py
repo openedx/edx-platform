@@ -36,7 +36,6 @@ from common.djangoapps import third_party_auth
 # TODO Have the discussions code subscribe to the REGISTER_USER signal instead.
 from common.djangoapps.student.helpers import get_next_url_for_login_page
 from lms.djangoapps.discussion.notification_prefs.views import enable_notifications
-from openedx.adg.lms.registration_extension.forms import RegistrationFormFactory
 from openedx.adg.lms.student.helpers import compose_and_send_adg_activation_email
 from openedx.adg.lms.utils.env_utils import is_testing_environment
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
@@ -78,6 +77,11 @@ from common.djangoapps.third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
 from common.djangoapps.track import segment
 from common.djangoapps.util.db import outer_atomic
 from common.djangoapps.util.json_request import JsonResponse
+
+if is_testing_environment():
+    from openedx.core.djangoapps.user_authn.views.registration_form import RegistrationFormFactory
+else:
+    from openedx.adg.lms.registration_extension.forms import RegistrationFormFactory
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")

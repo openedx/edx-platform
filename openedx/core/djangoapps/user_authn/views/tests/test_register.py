@@ -50,7 +50,6 @@ from openedx.core.djangoapps.user_api.tests.test_constants import SORTED_COUNTRI
 from openedx.core.djangoapps.user_api.tests.test_helpers import TestCaseForm
 from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
 from openedx.core.djangoapps.user_authn.views.register import REGISTRATION_FAILURE_LOGGING_FLAG
-from openedx.core.djangoapps.user_authn.views.registration_form import RegistrationFormFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.api import test_utils
 from common.djangoapps.student.helpers import authenticate_new_user
@@ -392,10 +391,6 @@ class RegistrationViewTestV1(ThirdPartyAuthTestMixin, UserAPITestCase):
     def setUp(self):  # pylint: disable=arguments-differ
         super(RegistrationViewTestV1, self).setUp()
         self.url = reverse("user_api_registration")
-        patcher = mock.patch(
-            'openedx.core.djangoapps.user_authn.views.register.RegistrationFormFactory', new=RegistrationFormFactory)
-        self.mock_class = patcher.start()
-        self.addCleanup(patcher.stop)
 
     @ddt.data("get", "post")
     def test_auth_disabled(self, method):
