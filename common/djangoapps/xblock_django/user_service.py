@@ -73,13 +73,14 @@ class DjangoXBlockUserService(UserService):
         A function that returns an XBlockUser from the current Django request.user
         """
         xblock_user = XBlockUser(is_current_user=True)
-
         if django_user is not None and django_user.is_authenticated:
             # This full_name is dependent on edx-platform's profile implementation
+            full_name = None
             if hasattr(django_user, 'profile'):
                 full_name = django_user.profile.name
-            else:
-                full_name = None
+            # need this check because profile is only created through registration flow
+            full_name = full_name if full_name is not None and full_name != '' else "{} {}".format(
+                django_user.first_name, django_user.last_name)
             xblock_user.full_name = full_name
             xblock_user.emails = [django_user.email]
             xblock_user.opt_attrs[ATTR_KEY_IS_AUTHENTICATED] = True

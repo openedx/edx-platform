@@ -44,6 +44,7 @@ _ = lambda text: text
 
 @edxnotes
 @XBlock.needs("i18n")
+@XBlock.needs('user')
 class HtmlBlock(
     XmlMixin, EditingMixin,
     XModuleDescriptorToXBlockMixin, XModuleToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin,
@@ -90,7 +91,10 @@ class HtmlBlock(
         """
         Return a fragment that contains the html for the student view
         """
-        fragment = Fragment(self.get_html())
+        html_data = self.get_html()
+        if "%%USERNAME%%" in html_data:
+            html_data = self.data.replace("%%USERNAME%%", self.user_full_name)
+        fragment = Fragment(html_data)
         add_webpack_to_fragment(fragment, 'HtmlBlockPreview')
         shim_xmodule_js(fragment, 'HTMLModule')
         return fragment
@@ -101,6 +105,14 @@ class HtmlBlock(
         Returns a fragment that contains the html for the preview view
         """
         return self.student_view(context)
+
+    @property
+    def user_full_name(self):
+        """
+        returns user full name
+        """
+        current_user = self.runtime.service(self, 'user').get_current_user()
+        return current_user.full_name
 
     def student_view_data(self, context=None):  # pylint: disable=unused-argument
         """
