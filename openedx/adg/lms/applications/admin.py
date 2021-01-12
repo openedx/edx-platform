@@ -353,7 +353,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         """
         Override `get_fieldsets` method of BaseModelAdmin.
 
-        Override is needed group application under different sections and dynamically set fields to be rendered.
+        Override is needed to group application under different sections and dynamically set fields to be rendered.
 
         Arguments:
             request (WSGIRequest): HTTP request accessing application review page
@@ -362,29 +362,56 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         Returns:
             tuple: Tuple of fieldsets
         """
-        basic_info_fields = [EMAIL, LOCATION]
-        if obj.linkedin_url:
-            basic_info_fields.append(LINKED_IN_PROFILE)
+        fieldsets = []
 
-        fieldsets = [
-            (None, {
-                'fields': tuple(basic_info_fields)
-            }),
-            (_('APPLICANT INFORMATION'), {
-                'fields': (
-                    IS_SAUDI_NATIONAL, GENDER, PHONE_NUMBER, DATE_OF_BIRTH, ORGANIZATION, APPLYING_TO
-                ),
-            }),
-        ]
+        preliminary_info_fieldset = self._get_preliminary_info_fieldset(obj)
+        fieldsets.append(preliminary_info_fieldset)
+
+        applicant_info_fieldset = self._get_applicant_info_fieldset()
+        fieldsets.append(applicant_info_fieldset)
 
         if obj.cover_letter_or_resume:
             fieldset_for_resume_cover_letter = self._get_fieldset_for_resume_cover_letter(obj)
             fieldsets.append(fieldset_for_resume_cover_letter)
 
-        fieldset_for_scores = (SCORES, {'fields': (PREREQUISITES, )})
+        fieldset_for_scores = self._get_fieldset_for_scores()
         fieldsets.append(fieldset_for_scores)
 
         return tuple(fieldsets)
+
+    def _get_preliminary_info_fieldset(self, application):
+        """
+        Get fieldset for preliminary applicant information.
+
+        Arguments:
+            application (UserApplication): Application under review
+
+        Returns:
+            tuple: Fieldset containing email, location and optionally linkedIn profile
+        """
+        fieldset_title = ''
+
+        preliminary_info_fields = [EMAIL, LOCATION]
+        if application.linkedin_url:
+            preliminary_info_fields.append(LINKED_IN_PROFILE)
+
+        fieldset = (fieldset_title, {'fields': tuple(preliminary_info_fields)})
+
+        return fieldset
+
+    def _get_applicant_info_fieldset(self):
+        """
+        Get fieldset for applicant information.
+
+        Returns:
+            tuple: Fieldset containing applicant's nationality info, gender, contact number, date of birth, organization
+                    and the business line they are applying to.
+        """
+        fieldset_title = _('APPLICANT INFORMATION')
+        applicant_info_fields = (IS_SAUDI_NATIONAL, GENDER, PHONE_NUMBER, DATE_OF_BIRTH, ORGANIZATION, APPLYING_TO)
+        fieldset = (fieldset_title, {'fields': applicant_info_fields})
+
+        return fieldset
 
     def _get_fieldset_for_resume_cover_letter(self, application):
         """
@@ -422,7 +449,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         resume_cover_letter_display_fields = self._get_resume_cover_letter_display_fields(application)
 
         resume_cover_letter_fields = resume_cover_letter_file_fields + resume_cover_letter_display_fields
-        fieldset = fieldset_title, {'fields': tuple(resume_cover_letter_fields)}
+        fieldset = (fieldset_title, {'fields': tuple(resume_cover_letter_fields)})
 
         return fieldset
 
@@ -449,6 +476,15 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
             resume_cover_letter_display_fields.append(COVER_LETTER_TEXT)
 
         return resume_cover_letter_display_fields
+
+    def _get_fieldset_for_scores(self):
+        """
+        Get fieldset for scores of applicant in prerequisite courses.
+
+        Returns:
+            tuple: Fieldset
+        """
+        return SCORES, {'fields': (PREREQUISITES, )}
 
     def get_formsets_with_inlines(self, request, obj=None):
         """
