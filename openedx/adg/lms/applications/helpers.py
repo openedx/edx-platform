@@ -1,7 +1,6 @@
 """
 Helper methods for applications
 """
-import os
 from datetime import datetime
 
 from django.conf import settings
@@ -167,13 +166,9 @@ def get_embedded_view_html(file):
         file (File): file that needs to be rendered
 
     Returns:
-        SafeText: HTML to display image or embedded view for pdf
+        SafeText: HTML to display embedded view of image or pdf file
     """
-    _, ext = os.path.splitext(str(file))
-    if ext in ['.jpg', '.png']:
-        html = '<img src="{path_to_image}"/>'.format(path_to_image=file.url)
-    else:  # for pdf
-        html = '<iframe src="{path_to_file}" style="width:600px; height:500px;"></iframe>'.format(path_to_file=file.url)
+    html = '<iframe src="{path_to_file}" style="width:889px; height:393px;"></iframe>'.format(path_to_file=file.url)
 
     return format_html(html)
 
