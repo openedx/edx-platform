@@ -330,13 +330,36 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
     )
     def test_staff_can_see_writable_gradebook(self):
         """
-        Test that, when the writable gradebook featue is enabled, a staff member can see it.
+        Test that, when the writable gradebook feature is enabled and
+        deployed in another domain, a staff member can see it.
         """
         waffle_flag = waffle_flags()[WRITABLE_GRADEBOOK]
         with override_waffle_flag(waffle_flag, active=True):
             response = self.client.get(self.url)
 
         expected_gradebook_url = 'http://gradebook.local.edx.org/{}'.format(self.course.id)
+        self.assertContains(response, expected_gradebook_url)
+        self.assertContains(response, 'View Gradebook')
+
+    GRADEBOOK_LEARNER_COUNT_MESSAGE = (
+        'Note: This feature is available only to courses with a small number ' +
+        'of enrolled learners.'
+    )
+
+    @patch(
+        'lms.djangoapps.instructor.views.instructor_dashboard.settings.WRITABLE_GRADEBOOK_URL',
+        settings.LMS_ROOT_URL + '/gradebook'
+    )
+    def test_staff_can_see_writable_gradebook_as_subdirectory(self):
+        """
+        Test that, when the writable gradebook feature is enabled and
+        deployed in a subdirectory, a staff member can see it.
+        """
+        waffle_flag = waffle_flags()[WRITABLE_GRADEBOOK]
+        with override_waffle_flag(waffle_flag, active=True):
+            response = self.client.get(self.url)
+
+        expected_gradebook_url = '{}/{}'.format(settings.WRITABLE_GRADEBOOK_URL, self.course.id)
         self.assertContains(response, expected_gradebook_url)
         self.assertContains(response, 'View Gradebook')
 
