@@ -2,6 +2,7 @@
 Utilities for django models.
 """
 
+from typing import Dict, Any, Tuple
 
 import six
 from django.conf import settings
@@ -13,6 +14,7 @@ from eventtracking import tracker
 USER_SETTINGS_CHANGED_EVENT_NAME = u'edx.user.settings.changed'
 # Used to signal a field value change
 USER_FIELD_CHANGED = Signal(providing_args=["user", "table", "setting", "old_value", "new_value"])
+USER_FIELDS_CHANGED = Signal(providing_args=["user", "table", "changed_values"])
 
 
 def get_changed_fields_dict(instance, model_class):
@@ -88,11 +90,14 @@ def emit_field_changed_events(instance, user, db_table, excluded_fields=None, hi
     excluded_fields = excluded_fields or []
     hidden_fields = hidden_fields or []
     changed_fields = getattr(instance, '_changed_fields', {})
+    clean_changed_fields = {}
     for field_name in changed_fields:
         if field_name not in excluded_fields:
             old_value = clean_field(field_name, changed_fields[field_name])
             new_value = clean_field(field_name, getattr(instance, field_name))
+            clean_changed_fields[field_name] = (old_value, new_value)
             emit_setting_changed_event(user, db_table, field_name, old_value, new_value)
+    emit_settings_changed_event(user, db_table, clean_changed_fields)
     # Remove the now inaccurate _changed_fields attribute.
     if hasattr(instance, '_changed_fields'):
         del instance._changed_fields
@@ -154,6 +159,21 @@ def emit_setting_changed_event(user, db_table, setting_name, old_value, new_valu
     # Announce field change
     USER_FIELD_CHANGED.send(sender=None, user=user, table=db_table, setting=setting_name,
                             old_value=old_value, new_value=new_value)
+
+
+def emit_settings_changed_event(user, db_table, changed_fields: Dict[str, Tuple[Any, Any]]):
+    """Emits an event for a change in a setting.
+
+    Args:
+        user (User): the user that this setting is associated with.
+        db_table (str): the name of the table that we're modifying.
+        changed_fields: all changed settings, with both their old and new values
+
+    Returns:
+        None
+    """
+    # Announce field change
+    USER_FIELDS_CHANGED.send(sender=None, user=user, table=db_table, changed_fields=changed_fields)
 
 
 def _get_truncated_setting_value(value, max_length=None):

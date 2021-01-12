@@ -29,7 +29,11 @@ from common.djangoapps.student.models import (
     get_retired_email_by_email,
     get_retired_username_by_username
 )
-from common.djangoapps.util.model_utils import emit_setting_changed_event, get_changed_fields_dict
+from common.djangoapps.util.model_utils import (
+    emit_setting_changed_event,
+    get_changed_fields_dict,
+    emit_settings_changed_event,
+)
 
 
 class RetirementStateError(Exception):
@@ -122,6 +126,11 @@ def post_save_callback(sender, **kwargs):
         user_preference.user, sender._meta.db_table, user_preference.key,
         user_preference._old_value, user_preference.value  # pylint: disable=protected-access
     )
+    emit_settings_changed_event(
+        user_preference.user,
+        sender._meta.db_table,
+        {user_preference.key: (user_preference._old_value, user_preference.value)}  # pylint: disable=protected-access
+    )
     user_preference._old_value = None  # pylint: disable=protected-access
 
 
@@ -133,6 +142,11 @@ def post_delete_callback(sender, **kwargs):
     user_preference = kwargs["instance"]
     emit_setting_changed_event(
         user_preference.user, sender._meta.db_table, user_preference.key, user_preference.value, None
+    )
+    emit_settings_changed_event(
+        user_preference.user,
+        sender._meta.db_table,
+        {user_preference.key: (user_preference.value, None)}
     )
 
 

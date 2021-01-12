@@ -23,7 +23,7 @@ from common.djangoapps.student.models import (
     email_exists_or_retired,
     username_exists_or_retired
 )
-from common.djangoapps.util.model_utils import emit_setting_changed_event
+from common.djangoapps.util.model_utils import emit_setting_changed_event, emit_settings_changed_event
 from common.djangoapps.util.password_policy_validators import validate_password
 
 from openedx.core.djangoapps.user_api import accounts, errors, helpers
@@ -276,6 +276,11 @@ def _notify_language_proficiencies_update_if_needed(data, user, user_profile, ol
             setting_name="language_proficiencies",
             old_value=old_language_proficiencies,
             new_value=new_language_proficiencies,
+        )
+        emit_settings_changed_event(
+            user=user,
+            db_table=user_profile.language_proficiencies.model._meta.db_table,
+            changed_fields={"language_proficiencies": (old_language_proficiencies, new_language_proficiencies)},
         )
 
 
