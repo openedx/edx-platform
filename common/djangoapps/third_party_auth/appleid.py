@@ -2,6 +2,10 @@
 # of social-core:
 # https://github.com/python-social-auth/social-core/blob/3.4.0/social_core/backends/apple.py
 #
+# Additional changes:
+#
+# - Patch for JWT algorithms specification: eed3007c4ccdbe959b1a3ac83102fe869d261948
+#
 # v3.4.0 is unreleased at this time (2020-07-28) and contains several necessary
 # bugfixes over 3.3.3 for AppleID, but also causes the
 # TestShibIntegrationTest.test_full_pipeline_succeeds_for_unlinking_testshib_account
@@ -171,7 +175,7 @@ class AppleIdAuth(BaseOAuth2):
                 id_token,
                 key=public_key,
                 audience=self.get_audience(),
-                algorithm='RS256',
+                algorithms=['RS256'],
             )
         except PyJWTError:
             raise AuthFailed(self, 'Token validation failed')
