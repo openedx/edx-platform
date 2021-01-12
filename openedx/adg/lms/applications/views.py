@@ -307,7 +307,7 @@ class CoverLetterView(RedirectToLoginOrRelevantPageMixin, View):
         file_name = None
 
         try:
-            registration_business_line = ExtendedUserProfile.objects.get(user=request.user).company
+            registration_business_line = request.user.extended_profile.company
         except ExtendedUserProfile.DoesNotExist:
             registration_business_line = None
 
