@@ -98,7 +98,7 @@ drf-yasg==1.20.0          # via -r requirements/edx/base.txt, edx-api-doc-tools
 edx-ace==0.1.17           # via -r requirements/edx/base.txt
 edx-analytics-data-api-client==0.16.1  # via -r requirements/edx/base.txt
 edx-api-doc-tools==1.4.0  # via -r requirements/edx/base.txt
-edx-bulk-grades==0.8.2    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, staff-graded-xblock
+git+https://github.com/edx/edx-bulk-grades.git@6fd12d20f158810d256b466f7caa8810871dff8a#egg=bulk_grades
 edx-ccx-keys==1.1.0       # via -r requirements/edx/base.txt
 edx-celeryutils==0.5.6    # via -r requirements/edx/base.txt, super-csv
 edx-completion==4.0.1     # via -r requirements/edx/base.txt
