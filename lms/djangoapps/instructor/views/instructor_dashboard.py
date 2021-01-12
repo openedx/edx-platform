@@ -571,7 +571,7 @@ def _section_student_admin(course, access):
         'spoc_gradebook_url': reverse('spoc_gradebook', kwargs={'course_id': six.text_type(course_key)}),
     }
     if is_writable_gradebook_enabled(course_key) and settings.WRITABLE_GRADEBOOK_URL:
-        section_data['writable_gradebook_url'] = urljoin(settings.WRITABLE_GRADEBOOK_URL, '/' + text_type(course_key))
+        section_data['writable_gradebook_url'] = '{}/{}'.format(settings.WRITABLE_GRADEBOOK_URL, text_type(course_key))
     return section_data
 
 
