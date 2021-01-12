@@ -307,6 +307,11 @@ class CoverLetterView(RedirectToLoginOrRelevantPageMixin, View):
         file_name = None
 
         try:
+            registration_business_line = ExtendedUserProfile.objects.get(user=request.user).company
+        except ExtendedUserProfile.DoesNotExist:
+            registration_business_line = None
+
+        try:
             user_application = request.user.application
             if user_application.cover_letter_file:
                 file_name = Path(user_application.cover_letter_file.name).name
@@ -316,6 +321,7 @@ class CoverLetterView(RedirectToLoginOrRelevantPageMixin, View):
         context = {
             'business_lines': business_lines,
             'user_application': user_application,
+            'registration_business_line': registration_business_line,
             'csrf_token': get_token(request),
             'filename': file_name
         }

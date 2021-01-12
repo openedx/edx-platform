@@ -452,6 +452,7 @@ def test_get_with_or_without_user_application_cover_letter_view(
     expected_context = {
         'business_lines': 'business_lines',
         'user_application': user_application,
+        'registration_business_line': cover_letter_view_get_request.user.extended_profile.company,
         'csrf_token': 'csrf_token',
         'filename': None
     }
