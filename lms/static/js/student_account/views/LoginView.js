@@ -176,8 +176,9 @@
             },
 
             thirdPartyAuth: function(event) {
+                alert("SSO login is disabled at the moment")
+                return
                 var providerUrl = $(event.currentTarget).data('provider-url') || '';
-
                 if (providerUrl) {
                     window.location.href = providerUrl;
                 }
