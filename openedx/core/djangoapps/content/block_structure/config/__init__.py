@@ -2,37 +2,32 @@
 This module contains various configuration settings via
 waffle switches for the Block Structure framework.
 """
+from edx_django_utils.cache import RequestCache
+from edx_toggles.toggles.__future__ import WaffleSwitch
 
-
-from edx_toggles.toggles import LegacyWaffleSwitch, LegacyWaffleSwitchNamespace
 from openedx.core.lib.cache_utils import request_cached
 
 from .models import BlockStructureConfiguration
 
-# Namespace
-WAFFLE_NAMESPACE = u'block_structure'
-
 # Switches
-INVALIDATE_CACHE_ON_PUBLISH = u'invalidate_cache_on_publish'
-STORAGE_BACKING_FOR_CACHE = u'storage_backing_for_cache'
-RAISE_ERROR_WHEN_NOT_FOUND = u'raise_error_when_not_found'
+INVALIDATE_CACHE_ON_PUBLISH = WaffleSwitch(
+    "block_structure.invalidate_cache_on_publish", __name__
+)
+STORAGE_BACKING_FOR_CACHE = WaffleSwitch(
+    "block_structure.storage_backing_for_cache", __name__
+)
+RAISE_ERROR_WHEN_NOT_FOUND = WaffleSwitch(
+    "block_structure.raise_error_when_not_found", __name__
+)
 
 
-def waffle():
+def enable_storage_backing_for_cache_in_request():
     """
-    Returns the namespaced and cached Waffle class for BlockStructures.
+    Manually override the value of the STORAGE_BACKING_FOR_CACHE switch in the context of the request.
+    This function should not be replicated, as it accesses a protected member, and it shouldn't.
     """
-    return LegacyWaffleSwitchNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'BlockStructure: ')
-
-
-def waffle_switch(name):
-    """
-    Return the waffle switch associated to this namespace.
-
-    WARNING: do not replicate this pattern. Instead of declaring waffle switch names as strings, you should create
-    LegacyWaffleSwitch objects as top-level constants.
-    """
-    return LegacyWaffleSwitch(waffle(), name, module_name=__name__)
+    # pylint: disable=protected-access
+    STORAGE_BACKING_FOR_CACHE._cached_switches[STORAGE_BACKING_FOR_CACHE.name] = True
 
 
 @request_cached()

@@ -102,10 +102,9 @@ class BlockStructureManager(object):
             BlockStructureTransformers.verify_versions(block_structure)
 
         except (BlockStructureNotFound, TransformerDataIncompatible):
-            if config.waffle().is_enabled(config.RAISE_ERROR_WHEN_NOT_FOUND):
+            if config.RAISE_ERROR_WHEN_NOT_FOUND.is_enabled():
                 raise
-            else:
-                block_structure = self._update_collected()
+            block_structure = self._update_collected()
 
         return block_structure
 
