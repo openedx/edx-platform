@@ -131,22 +131,6 @@ def truncate_fields(old_value, new_value):
     return {'old': serialized_old_value, 'new': serialized_new_value, 'truncated': truncated_values}
 
 
-def emit_setting_changed_event(user, db_table, setting_name, old_value, new_value):
-    """Emits an event for a change in a setting.
-
-    Args:
-        user (User): the user that this setting is associated with.
-        db_table (str): the name of the table that we're modifying.
-        setting_name (str): the name of the setting being changed.
-        old_value (object): the value before the change.
-        new_value (object): the new value being saved.
-
-    Returns:
-        None
-    """
-    emit_settings_changed_event(user, db_table, {setting_name: (old_value, new_value)})
-
-
 def emit_settings_changed_event(user, db_table, changed_fields: Dict[str, Tuple[Any, Any]]):
     """Emits an event for a change in a setting.
 
