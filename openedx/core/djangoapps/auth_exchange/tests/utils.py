@@ -28,7 +28,7 @@ class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
             "client_id": self.client_id,
         }
 
-    def _assert_error(self, _data, _expected_error, _expected_error_description):
+    def _assert_error(self, _data, _expected_error, _expected_error_description, error_code):
         """
         Given request data, execute a test and check that the expected error
         was returned (along with any other appropriate assertions).
