@@ -21,7 +21,7 @@ jinja2==2.11.2            # via code-annotations, sphinx
 markupsafe==1.1.1         # via jinja2
 packaging==20.8           # via sphinx
 pbr==5.5.1                # via stevedore
-pygments==2.7.3           # via sphinx
+pygments==2.7.4           # via sphinx
 pyparsing==2.4.7          # via packaging
 python-slugify==4.0.1     # via code-annotations
 pytz==2020.5              # via babel, django
