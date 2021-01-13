@@ -138,10 +138,6 @@ cryptography==3.2.1
 # greater versions breaking the code
 Sphinx==3.3.0
 
-# incremental upgrade approach
-djangorestframework==3.12.0
-
-
 # latest edx-bulk-grades==0.8.5 is giving migration error.
 edx-bulk-grades<0.8.5
 
