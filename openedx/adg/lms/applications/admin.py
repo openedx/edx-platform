@@ -208,9 +208,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         Override `get_queryset` method of BaseModelAdmin to show ADG admin only those applications which have been
         submitted successfully.
         """
-        qs = UserApplication.submitted_applications.all()
-
-        return qs
+        return UserApplication.submitted_applications.all()
 
     def applicant_name(self, obj):
         return obj.user.profile.name
