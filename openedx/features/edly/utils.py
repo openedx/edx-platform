@@ -1,4 +1,5 @@
 import logging
+from urlparse import urljoin
 
 import jwt
 import waffle
@@ -7,6 +8,7 @@ from django.contrib.auth.models import Group
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Q
 from django.forms.models import model_to_dict
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from lms.djangoapps.branding.api import get_logo_url, get_privacy_url, get_tos_and_honor_code_url
@@ -367,6 +369,8 @@ def get_current_site_invalid_certificate_context(default_html_certificate_config
     context['company_privacy_url'] = get_privacy_url()
     context['company_tos_url'] = get_tos_and_honor_code_url()
     return context
+
+
 def clean_django_settings_override(django_settings_override):
     """
     Enforce only allowed django settings to be overridden.
@@ -400,3 +404,14 @@ def clean_django_settings_override(django_settings_override):
 
     if validation_errors:
         raise ValidationError(validation_errors)
+
+
+def get_marketing_link(marketing_urls, name):
+    """
+    Returns the correct URL for a link to the marketing site
+    """
+    if name in marketing_urls:
+        return urljoin(marketing_urls.get('ROOT'), marketing_urls.get(name))
+    else:
+        LOGGER.warning("Cannot find corresponding link for name: %s", name)
+        return ''

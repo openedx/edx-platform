@@ -3,6 +3,7 @@ Tests for Edly Utils Functions.
 """
 import jwt
 import mock
+from urlparse import urljoin
 from mock import MagicMock
 
 import crum
@@ -12,6 +13,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.urls import reverse
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings as cookie_settings
@@ -31,6 +33,7 @@ from openedx.features.edly.utils import (
     encode_edly_user_info_cookie,
     get_edly_sub_org_from_cookie,
     get_edx_org_from_cookie,
+    get_marketing_link,
     set_global_course_creator_status,
     update_course_creator_status,
     user_has_edly_organization_access,
@@ -429,6 +432,7 @@ class UtilsTests(ModuleStoreTestCase):
         privacy_path = marketing_urls.get('PRIVACY')
         expected_company_privacy_url = '{}{}'.format(marketing_root_url, privacy_path)
         assert expected_company_privacy_url == current_site_context_data['company_privacy_url']
+
     def test_clean_django_settings_override_for_disallowed_settings(self):
         """
         Test disallowed settings raise correct validation error.
@@ -467,3 +471,31 @@ class UtilsTests(ModuleStoreTestCase):
                 }
             )
             site_configuration.clean()
+
+    def test_get_marketing_link_with_value(self):
+        """
+        Test marketing link value with name in marketing urls
+        """
+        marketing_urls = {
+            'ROOT': 'http://{}'.format(self.request.site.domain),
+            'PRIVACY': '/fake-privacy-path',
+            'TOS': '/fake-tos-path',
+        }
+        expected_privacy_marketing_link = urljoin(marketing_urls.get('ROOT'), marketing_urls.get('PRIVACY'))
+        privacy_marketing_link = get_marketing_link(marketing_urls, 'PRIVACY')
+        assert expected_privacy_marketing_link == privacy_marketing_link
+
+        expected_tos_marketing_link = urljoin(marketing_urls.get('ROOT'), marketing_urls.get('TOS'))
+        tos_marketing_link = get_marketing_link(marketing_urls, 'TOS')
+        assert expected_tos_marketing_link == tos_marketing_link
+
+    def test_get_marketing_link_without_value(self):
+        """
+        Test marketing link value without name in marketing urls
+        """
+        marketing_urls = {
+            'ROOT': 'http://{}'.format(self.request.site.domain),
+        }
+        expected_marketing_link = ''
+        marketing_link = get_marketing_link(marketing_urls, 'HONOR')
+        assert expected_marketing_link == marketing_link
