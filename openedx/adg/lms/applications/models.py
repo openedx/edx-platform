@@ -19,15 +19,6 @@ from .constants import ALLOWED_LOGO_EXTENSIONS
 from .helpers import max_year_value_validator, min_year_value_validator, validate_logo_size
 
 
-class SubmittedApplicationUserManager(models.Manager):
-    """
-    Manager which returns all users who have submitted their complete application.
-    """
-
-    def get_queryset(self):
-        return super().get_queryset().filter(is_application_submitted=True).values_list('user', flat=True)
-
-
 class ApplicationHub(TimeStampedModel):
     """
     Model for status of all required parts of user application submission.
@@ -44,9 +35,6 @@ class ApplicationHub(TimeStampedModel):
     )
     is_application_submitted = models.BooleanField(default=False, verbose_name=_('Application Submitted'), )
     submission_date = models.DateField(null=True, blank=True, verbose_name=_('Submission Date'), )
-
-    objects = models.Manager()
-    users_with_submitted_applications = SubmittedApplicationUserManager()
 
     class Meta:
         app_label = 'applications'
@@ -124,9 +112,7 @@ class SubmittedApplicationsManager(models.Manager):
     """
 
     def get_queryset(self):
-        users_with_submitted_applications = ApplicationHub.users_with_submitted_applications.all()
-
-        return super().get_queryset().filter(user__in=users_with_submitted_applications)
+        return super().get_queryset().filter(user__application_hub__is_application_submitted=True)
 
 
 class UserApplication(TimeStampedModel):
