@@ -19,6 +19,15 @@ from .constants import ALLOWED_LOGO_EXTENSIONS
 from .helpers import max_year_value_validator, min_year_value_validator, validate_logo_size
 
 
+class SubmittedApplicationUserManager(models.Manager):
+    """
+    Manager which returns all users who have submitted their complete application.
+    """
+
+    def get_queryset(self):
+        return super().get_queryset().filter(is_application_submitted=True).values_list('user', flat=True)
+
+
 class ApplicationHub(TimeStampedModel):
     """
     Model for status of all required parts of user application submission.
@@ -30,10 +39,14 @@ class ApplicationHub(TimeStampedModel):
         User, related_name='application_hub', on_delete=models.CASCADE, verbose_name=_('User'),
     )
     is_prerequisite_courses_passed = models.BooleanField(default=False, verbose_name=_('Prerequisite Courses Passed'), )
-    is_written_application_completed = models.BooleanField(default=False,
-                                                           verbose_name=_('Written Application Submitted'), )
+    is_written_application_completed = models.BooleanField(
+        default=False, verbose_name=_('Written Application Submitted'),
+    )
     is_application_submitted = models.BooleanField(default=False, verbose_name=_('Application Submitted'), )
     submission_date = models.DateField(null=True, blank=True, verbose_name=_('Submission Date'), )
+
+    objects = models.Manager()
+    users_with_submitted_applications = SubmittedApplicationUserManager()
 
     class Meta:
         app_label = 'applications'
@@ -105,6 +118,17 @@ class BusinessLine(TimeStampedModel):
         return '{}'.format(self.title)
 
 
+class SubmittedApplicationsManager(models.Manager):
+    """
+    Manager which returns all user applications which have been submitted successfully.
+    """
+
+    def get_queryset(self):
+        users_with_submitted_applications = ApplicationHub.users_with_submitted_applications.all()
+
+        return super().get_queryset().filter(user__in=users_with_submitted_applications)
+
+
 class UserApplication(TimeStampedModel):
     """
     Model for status of all required parts of user application submission.
@@ -144,6 +168,9 @@ class UserApplication(TimeStampedModel):
         User, null=True, blank=True, on_delete=models.CASCADE, verbose_name=_('Reviewed By')
     )
     internal_admin_note = models.TextField(null=True, blank=True, verbose_name=_('Admin Note'))
+
+    objects = models.Manager()
+    submitted_applications = SubmittedApplicationsManager()
 
     class Meta:
         app_label = 'applications'
