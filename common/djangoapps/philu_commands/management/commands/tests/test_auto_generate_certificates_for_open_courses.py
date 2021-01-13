@@ -1,18 +1,20 @@
 from __future__ import unicode_literals
+
 from datetime import datetime, timedelta
 
-from mock import patch, Mock
 import pytz
 from django.core.management import call_command
-
 from django.db.models import signals
 from factory.django import mute_signals
+from mock import Mock, patch
+
+from lms.djangoapps.onboarding.tests.factories import UserFactory
+from philu_commands.management.commands.auto_generate_certificates_for_open_courses import (
+    is_course_valid_for_certificate_auto_generation
+)
+from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from lms.djangoapps.onboarding.tests.factories import UserFactory
-from student.tests.factories import CourseEnrollmentFactory
-from philu_commands.management.commands.auto_generate_certificates_for_open_courses import \
-    is_course_valid_for_certificate_auto_generation
 
 
 class TestAutoGenerateCertificateForOpenCourse(ModuleStoreTestCase):
