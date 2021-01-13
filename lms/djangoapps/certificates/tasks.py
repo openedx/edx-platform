@@ -1,5 +1,5 @@
 """
-Module for generating certificate for a user
+Tasks that generate a course certificate for a user
 """
 
 
@@ -12,6 +12,7 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.certificates.api import generate_user_certificates
+from lms.djangoapps.certificates.generation import generate_allowlist_certificate
 from lms.djangoapps.verify_student.services import IDVerificationService
 
 logger = getLogger(__name__)
@@ -32,11 +33,19 @@ def generate_certificate(self, **kwargs):
             that the actual verification status is as expected before
             generating a certificate, in the off chance that the database
             has not yet updated with the user's new verification status.
+        - allowlist_certificate: A flag indicating whether to generate an allowlist certificate (which is V2 of
+            whitelisted certificates)
     """
     original_kwargs = kwargs.copy()
     student = User.objects.get(id=kwargs.pop('student'))
     course_key = CourseKey.from_string(kwargs.pop('course_key'))
     expected_verification_status = kwargs.pop('expected_verification_status', None)
+    allowlist_certificate = kwargs.pop('allowlist_certificate', False)
+
+    if allowlist_certificate:
+        generate_allowlist_certificate(user=student, course_key=course_key)
+        return
+
     if expected_verification_status:
         actual_verification_status = IDVerificationService.user_status(student)
         actual_verification_status = actual_verification_status['status']

@@ -78,7 +78,7 @@ from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED, COURSE_
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from common.djangoapps.util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
 
-LOGGER = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class CertificateStatuses(object):
@@ -372,6 +372,11 @@ class GeneratedCertificate(models.Model):
             4 - grade = ''
             5 - status = 'unavailable'
         """
+        log.info('Marking certificate as unavailable for {user} : {course}'.format(
+            user=self.user.id,
+            course=self.course_id
+        ))
+
         self.verify_uuid = ''
         self.download_uuid = ''
         self.download_url = ''
@@ -390,6 +395,11 @@ class GeneratedCertificate(models.Model):
         """
         Invalidates a Generated Certificate by marking it as not passing
         """
+        log.info('Marking certificate as notpassing for {user} : {course}'.format(
+            user=self.user.id,
+            course=self.course_id
+        ))
+
         self.verify_uuid = ''
         self.download_uuid = ''
         self.download_url = ''
