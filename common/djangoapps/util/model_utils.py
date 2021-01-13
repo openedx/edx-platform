@@ -96,7 +96,6 @@ def emit_field_changed_events(instance, user, db_table, excluded_fields=None, hi
             old_value = clean_field(field_name, changed_fields[field_name])
             new_value = clean_field(field_name, getattr(instance, field_name))
             clean_changed_fields[field_name] = (old_value, new_value)
-            emit_setting_changed_event(user, db_table, field_name, old_value, new_value)
     emit_settings_changed_event(user, db_table, clean_changed_fields)
     # Remove the now inaccurate _changed_fields attribute.
     if hasattr(instance, '_changed_fields'):
@@ -145,20 +144,7 @@ def emit_setting_changed_event(user, db_table, setting_name, old_value, new_valu
     Returns:
         None
     """
-    truncated_fields = truncate_fields(old_value, new_value)
-
-    truncated_fields['setting'] = setting_name
-    truncated_fields['user_id'] = user.id
-    truncated_fields['table'] = db_table
-
-    tracker.emit(
-        USER_SETTINGS_CHANGED_EVENT_NAME,
-        truncated_fields
-    )
-
-    # Announce field change
-    USER_FIELD_CHANGED.send(sender=None, user=user, table=db_table, setting=setting_name,
-                            old_value=old_value, new_value=new_value)
+    emit_settings_changed_event(user, db_table, {setting_name: (old_value, new_value)})
 
 
 def emit_settings_changed_event(user, db_table, changed_fields: Dict[str, Tuple[Any, Any]]):
@@ -172,6 +158,22 @@ def emit_settings_changed_event(user, db_table, changed_fields: Dict[str, Tuple[
     Returns:
         None
     """
+    for (setting_name, (old_value, new_value)) in changed_fields.items():
+        truncated_fields = truncate_fields(old_value, new_value)
+
+        truncated_fields['setting'] = setting_name
+        truncated_fields['user_id'] = user.id
+        truncated_fields['table'] = db_table
+
+        tracker.emit(
+            USER_SETTINGS_CHANGED_EVENT_NAME,
+            truncated_fields
+        )
+
+        # Announce field change
+        USER_FIELD_CHANGED.send(sender=None, user=user, table=db_table, setting=setting_name,
+                                old_value=old_value, new_value=new_value)
+
     # Announce field change
     USER_FIELDS_CHANGED.send(sender=None, user=user, table=db_table, changed_fields=changed_fields)
 
