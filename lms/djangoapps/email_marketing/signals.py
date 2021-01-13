@@ -42,12 +42,15 @@ CHANGED_FIELDNAMES = ['username', 'is_active', 'name', 'gender', 'education',
                       'age', 'level_of_education', 'year_of_birth',
                       'country', LANGUAGE_KEY]
 
+# TODO: Remove in AA-607
 WAFFLE_NAMESPACE = 'sailthru'
 WAFFLE_SWITCHES = LegacyWaffleSwitchNamespace(name=WAFFLE_NAMESPACE)
 
+# TODO: Remove in AA-607
 SAILTHRU_AUDIT_PURCHASE_ENABLED = 'audit_purchase_enabled'
 
 
+# TODO: Remove in AA-607
 @receiver(SAILTHRU_AUDIT_PURCHASE)
 def update_sailthru(sender, user, mode, course_id, **kwargs):  # pylint: disable=unused-argument
     """
@@ -64,6 +67,7 @@ def update_sailthru(sender, user, mode, course_id, **kwargs):  # pylint: disable
         update_course_enrollment.delay(email, course_id, mode, site=_get_current_site())
 
 
+# TODO: Remove in AA-607
 @receiver(CREATE_LOGON_COOKIE)
 def add_email_marketing_cookies(sender, response=None, user=None,
                                 **kwargs):  # pylint: disable=unused-argument
@@ -131,6 +135,7 @@ def add_email_marketing_cookies(sender, response=None, user=None,
     return response
 
 
+# TODO: Remove in AA-607
 @receiver(REGISTER_USER)
 def email_marketing_register_user(sender, user, registration,
                                   **kwargs):  # pylint: disable=unused-argument
@@ -156,6 +161,7 @@ def email_marketing_register_user(sender, user, registration,
                       site=_get_current_site(), new_user=True)
 
 
+# TODO: Remove in AA-607
 @receiver(USER_FIELD_CHANGED)
 def email_marketing_user_field_changed(sender, user=None, table=None, setting=None,
                                        old_value=None, new_value=None,
