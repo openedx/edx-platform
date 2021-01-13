@@ -484,7 +484,9 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         Returns:
             tuple: Fieldset
         """
-        return SCORES, {'fields': (PREREQUISITES, )}
+        fieldset = (SCORES, {'fields': (PREREQUISITES, )})
+
+        return fieldset
 
     def get_formsets_with_inlines(self, request, obj=None):
         """
