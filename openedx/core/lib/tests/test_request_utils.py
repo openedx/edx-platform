@@ -2,12 +2,20 @@
 
 
 import unittest
+from unittest.mock import Mock, patch, call
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.test.client import RequestFactory
 
-from openedx.core.lib.request_utils import get_request_or_stub, course_id_from_url, safe_get_host
+from edx_toggles.toggles.testutils import override_waffle_flag
+from openedx.core.lib.request_utils import (
+    get_request_or_stub,
+    course_id_from_url,
+    safe_get_host,
+    CookieMonitoringMiddleware,
+    CAPTURE_COOKIE_SIZES,
+)
 
 
 class RequestUtilTestCase(unittest.TestCase):
@@ -83,3 +91,71 @@ class RequestUtilTestCase(unittest.TestCase):
         self.assertEqual(course_id.org, org)
         self.assertEqual(course_id.course, course)
         self.assertEqual(course_id.run, run)
+
+    @patch("openedx.core.lib.request_utils.CAPTURE_COOKIE_SIZES")
+    @patch("openedx.core.lib.request_utils.set_custom_attribute")
+    def test_cookie_monitoring(self, mock_set_custom_attribute, mock_capture_cookie_sizes):
+
+        mock_capture_cookie_sizes.is_enabled.return_value = True
+        middleware = CookieMonitoringMiddleware()
+
+        mock_request = Mock()
+        mock_request.COOKIES = {
+            "a": "." * 100,
+            "_b": "." * 13,
+            "_c_": "." * 13,
+            "a.b": "." * 10,
+            "a.c": "." * 10,
+            "b.": "." * 13,
+            "b_a": "." * 15,
+            "b_c": "." * 15,
+        }
+
+        middleware.process_request(mock_request)
+
+        mock_set_custom_attribute.assert_has_calls([
+            call('cookies.a.size', 100),
+            call('cookies._b.size', 13),
+            call('cookies._c_.size', 13),
+            call('cookies.a.b.size', 10),
+            call('cookies.a.c.size', 10),
+            call('cookies.b..size', 13),
+            call('cookies.b_a.size', 15),
+            call('cookies.b_c.size', 15),
+            call('cookies.a.group.size', 20),
+            call('cookies.b.group.size', 43),
+            call('cookies.max.name', 'a'),
+            call('cookies.max.size', 100),
+            # Test that single cookie is also treated as a group for max calculations.
+            call('cookies.max.group.name', 'a'),
+            call('cookies.max.group.size', 100),
+            call('cookies_total_size', 189)
+        ])
+
+    @patch("openedx.core.lib.request_utils.CAPTURE_COOKIE_SIZES")
+    @patch("openedx.core.lib.request_utils.set_custom_attribute")
+    def test_cookie_monitoring_max_group(self, mock_set_custom_attribute, mock_capture_cookie_sizes):
+
+        mock_capture_cookie_sizes.is_enabled.return_value = True
+        middleware = CookieMonitoringMiddleware()
+
+        mock_request = Mock()
+        mock_request.COOKIES = {
+            "a": "." * 10,
+            "b_a": "." * 15,
+            "b_c": "." * 20,
+        }
+
+        middleware.process_request(mock_request)
+
+        mock_set_custom_attribute.assert_has_calls([
+            call('cookies.a.size', 10),
+            call('cookies.b_a.size', 15),
+            call('cookies.b_c.size', 20),
+            call('cookies.b.group.size', 35),
+            call('cookies.max.name', 'b_c'),
+            call('cookies.max.size', 20),
+            call('cookies.max.group.name', 'b'),
+            call('cookies.max.group.size', 35),
+            call('cookies_total_size', 45)
+        ])

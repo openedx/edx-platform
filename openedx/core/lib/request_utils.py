@@ -102,18 +102,70 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
 
         Don't log contents of cookies because that might cause a security issue.
         We just want to see if any cookies are growing out of control.
+
+        A useful NRQL Query:
+            SELECT count(*), max(`cookies.max.group.size`) from Transaction FACET
+            `cookies.max.group.name`
+
+            SELECT * FROM Transaction WHERE cookies_total_size > 6000
+
+        Attributes that are added by this middleware:
+
+        cookies.<cookie_name>.size: The size of a cookie by the given name.
+        cookies.<group_prefix>.group.size: The size of a group of cookies. For example
+            the sum of the size of all braze cookies would be the value of the
+            `cookies.ab.group.size` attribute.
+        cookies.max.name: The name of the largest cookie sent by the user.
+        cookies.max.size: The size of the largest cookie sent by the user.
+        cookies.max.group.name: The name of the largest group of cookies. A single cookie
+            counts as a group of one for this calculation.
+        cookies.max.group.size: The sum total size of all the cookies in the largest group.
+        cookies_total_size: The sum total size of all cookies in this request.
+
         """
         if not CAPTURE_COOKIE_SIZES.is_enabled():
             return
 
-        cookie_names_to_size = {
-            name: len(value)
-            for name, value in request.COOKIES.items()
-        }
+        cookie_names_to_size = {}
+        cookie_groups_to_size = {}
+
+        for name, value in request.COOKIES.items():
+            # Get cookie size for all cookies.
+            cookie_size = len(value)
+            cookie_names_to_size[name] = cookie_size
+
+            # Group cookies by their prefix seperated by a period or underscore
+            grouping_name = re.split('[._]', name, 1)[0]
+            if grouping_name and grouping_name != name:
+                # Add or update the size for this group.
+                cookie_groups_to_size[grouping_name] = cookie_groups_to_size.get(grouping_name, 0) + cookie_size
+
+        max_cookie_name = max(cookie_names_to_size, key=lambda name: cookie_names_to_size[name])
+        max_cookie_size = cookie_names_to_size[max_cookie_name]
+
+        max_group_cookie_name = max(cookie_groups_to_size, key=lambda name: cookie_groups_to_size[name])
+        max_group_cookie_size = cookie_groups_to_size[max_group_cookie_name]
+
+        # If a single cookies is bigger than any group of cookies, we want max_group... to reflect that.
+        # Treating an individual cookie as a group of 1 for calculating the max.
+        if max_group_cookie_size < max_cookie_size:
+            max_group_cookie_name = max_cookie_name
+            max_group_cookie_size = max_cookie_size
+
         for name, size in cookie_names_to_size.items():
             attribute_name = 'cookies.{}.size'.format(name)
             set_custom_attribute(attribute_name, size)
             log.debug(u'%s = %d', attribute_name, size)
+
+        for name, size in cookie_groups_to_size.items():
+            attribute_name = 'cookies.{}.group.size'.format(name)
+            set_custom_attribute(attribute_name, size)
+            log.debug(u'%s = %d', attribute_name, size)
+
+        set_custom_attribute('cookies.max.name', max_cookie_name)
+        set_custom_attribute('cookies.max.size', max_cookie_size)
+        set_custom_attribute('cookies.max.group.name', max_group_cookie_name)
+        set_custom_attribute('cookies.max.group.size', max_group_cookie_size)
 
         total_cookie_size = sum(cookie_names_to_size.values())
         set_custom_attribute('cookies_total_size', total_cookie_size)
