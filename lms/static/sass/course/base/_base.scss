@@ -72,7 +72,7 @@ table {
 a {
   &:hover,
   &:focus {
-    text-decoration: none !important;
+    text-decoration: none;
   }
 
   @media print {
