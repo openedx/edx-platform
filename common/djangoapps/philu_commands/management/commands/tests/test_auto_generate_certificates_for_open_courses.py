@@ -1,3 +1,6 @@
+"""
+Tests for auto generate certificate for open courses
+"""
 from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
@@ -39,7 +42,8 @@ class TestAutoGenerateCertificateForOpenCourse(ModuleStoreTestCase):
            'is_course_valid_for_certificate_auto_generation', return_value=True)
     @patch('philu_commands.management.commands.auto_generate_certificates_for_open_courses.modulestore')
     @patch(
-        'philu_commands.management.commands.auto_generate_certificates_for_open_courses.CourseEnrollment.objects.filter')
+        'philu_commands.management.commands.auto_generate_certificates_for_open_courses.CourseEnrollment.objects.filter'
+    )
     @patch('philu_commands.management.commands.auto_generate_certificates_for_open_courses._get_cert_data')
     @patch('philu_commands.management.commands.auto_generate_certificates_for_open_courses.generate_user_certificates',
            return_value="generating")
@@ -65,6 +69,9 @@ class TestAutoGenerateCertificateForOpenCourse(ModuleStoreTestCase):
         mock__get_cert_data.return_value = Mock(**{"cert_status": "requesting"})
 
         def assert_certificates_generated(info):
+            """
+            assert certification generation
+            """
             certificate_success_message = 'Generating certificate for user with ' \
                                           'username: {} and user_id: {} with ' \
                                           'generation status: {}'.format(self.user.username, self.user.id,
@@ -123,5 +130,4 @@ class TestAutoGenerateCertificateForOpenCourse(ModuleStoreTestCase):
         self.course_1.has_ended = Mock(return_value=False)
         self.course_1.may_certify = Mock(return_value=True)
         mock_has_active_certificate.return_value = True
-        print(is_course_valid_for_certificate_auto_generation(self.course_1))
-        assert is_course_valid_for_certificate_auto_generation(self.course_1) == True
+        assert is_course_valid_for_certificate_auto_generation(self.course_1) is True
