@@ -163,11 +163,11 @@ class WorkExperienceInline(ApplicationReviewInline):
     fields = ('name_of_organization', 'job_position_title', 'dates', 'responsibilities')
     readonly_fields = fields
 
-    def responsibilities(self, obj):
-        return obj.job_responsibilities
-
     def dates(self, obj):
         return get_duration(obj, obj.is_current_position)
+
+    def responsibilities(self, obj):
+        return obj.job_responsibilities
 
 
 class UserApplicationADGAdmin(admin.ModelAdmin):

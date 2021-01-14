@@ -14,6 +14,7 @@ from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.adg.common.course_meta.models import CourseMeta
 from openedx.adg.lms.utils.date_utils import month_choices
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.lib.grade_utils import round_away_from_zero
 
 from .constants import ALLOWED_LOGO_EXTENSIONS
 from .helpers import max_year_value_validator, min_year_value_validator, validate_logo_size
@@ -198,7 +199,7 @@ class UserApplication(TimeStampedModel):
         for course_overview in prereq_course_overviews:
             course_name = course_overview.display_name
             course_grade = CourseGradeFactory().read(self.user, course_key=course_overview.id)
-            course_percentage = course_grade.percent * 100
+            course_percentage = int(round_away_from_zero(course_grade.percent * 100))
 
             course_score = CourseScore(course_name, course_percentage)
             scores_in_prereq_courses.append(course_score)
