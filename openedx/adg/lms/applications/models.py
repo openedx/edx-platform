@@ -2,7 +2,7 @@
 All models for applications app
 """
 from collections import namedtuple
-from datetime import date
+from datetime import date, datetime
 
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
@@ -300,3 +300,68 @@ class WorkExperience(UserStartAndEndDates):
 
     def __str__(self):
         return ''
+
+
+class OpenPreRequisiteCourseManager(models.Manager):
+    """
+    Manager which returns all open pre requisite entries
+    """
+
+    def get_queryset(self):
+        today = datetime.now()
+        return super().get_queryset().filter(
+            course__start_date__lte=today,
+            course__end_date__gte=today
+        ).prefetch_related('course').values_list('course', flat=True)
+
+
+class PrerequisiteCourseGroup(models.Model):
+    """
+    Model for course groups, for multilingual prereq courses
+    """
+
+    name = models.CharField(verbose_name=_('Course group name'), max_length=255, )
+
+    class Meta:
+        app_label = 'applications'
+
+    def prereq_course_count(self):
+        return self.prereq_courses.count()
+
+    def open_prereq_courses_count(self):
+        return self.prereq_courses(manager='open_prereq_course_manager').count()  # pylint: disable=no-member
+
+    def course_keys(self):
+        return self.prereq_courses(manager='open_prereq_course_manager').all()  # pylint: disable=no-member
+
+    @classmethod
+    def non_empty_prereq_course_groups(cls):
+        return cls.objects.filter(prereq_courses__isnull=False).distinct()
+
+    def __str__(self):
+        return self.name
+
+
+class PrerequisiteCourse(models.Model):
+    """
+    Model for multilingual prereq courses
+    """
+
+    objects = models.Manager()
+    open_prereq_course_manager = OpenPreRequisiteCourseManager()
+    course = models.OneToOneField(
+        CourseOverview,
+        verbose_name=_('Multilingual version of a course'),
+        related_name='prereq_courses',
+        on_delete=models.CASCADE,
+    )
+    prereq_course_group = models.ForeignKey(
+        PrerequisiteCourseGroup, related_name='prereq_courses', on_delete=models.CASCADE
+    )
+
+    class Meta:
+        unique_together = (('course', 'prereq_course_group',),)
+        app_label = 'applications'
+
+    def __str__(self):
+        return 'id={id} name={name}'.format(id=self.course.id, name=self.course.display_name)
