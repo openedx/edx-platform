@@ -178,7 +178,7 @@ lxml==4.5.0               # via -c requirements/edx/../constraints.txt, -r requi
 m2r==0.2.1                # via sphinxcontrib-openapi
 mailsnake==1.6.4          # via -r requirements/edx/testing.txt
 mako==1.1.3               # via -r requirements/edx/testing.txt, acid-xblock, lti-consumer-xblock, xblock-google-drive, xblock-utils
-markdown==2.6.11          # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, django-wiki, staff-graded-xblock, xblock-poll
+markdown==3.3.3           # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, django-wiki, staff-graded-xblock, xblock-poll
 markey==0.8               # via -r requirements/edx/testing.txt, enmerkar-underscore
 markupsafe==1.1.1         # via -r requirements/edx/testing.txt, chem, jinja2, mako, xblock
 maxminddb==1.5.4          # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, geoip2

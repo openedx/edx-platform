@@ -148,7 +148,7 @@ lti-consumer-xblock==2.4.0  # via -r requirements/edx/base.in
 lxml==4.5.0               # via -c requirements/edx/../constraints.txt, -r requirements/edx/../edx-sandbox/shared.txt, capa, edxval, lti-consumer-xblock, ora2, safe-lxml, xblock, xmlsec
 mailsnake==1.6.4          # via -r requirements/edx/base.in
 mako==1.1.3               # via -r requirements/edx/base.in, acid-xblock, lti-consumer-xblock, xblock-google-drive, xblock-utils
-markdown==2.6.11          # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, django-wiki, staff-graded-xblock, xblock-poll
+markdown==3.3.3           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, django-wiki, staff-graded-xblock, xblock-poll
 markey==0.8               # via enmerkar-underscore
 markupsafe==1.1.1         # via -r requirements/edx/paver.txt, chem, jinja2, mako, xblock
 maxminddb==1.5.4          # via -c requirements/edx/../constraints.txt, geoip2
