@@ -352,7 +352,7 @@ $seq-nav-height: 40px;
 
           @extend %ui-depth2;
 
-          margin-top: 12px;
+          margin-bottom: 15px;
           background: $seq-nav-tooltip-color;
           color: $white;
           font-family: $font-family-sans-serif;
@@ -360,7 +360,7 @@ $seq-nav-height: 40px;
           right: 0;  // Should not be RTLed, tooltips do not move in RTL
           padding: 6px;
           position: absolute;
-          top: 48px;
+          bottom: 100%;
           text-shadow: 0 -1px 0 $black;
           white-space: pre;
           pointer-events: none;
@@ -383,7 +383,7 @@ $seq-nav-height: 40px;
             height: 10px;
             right: 18px;  // Not RTLed, positions tooltips relative to seq nav item
             position: absolute;
-            top: -5px;
+            bottom: -5px;
             width: 10px;
           }
         }
