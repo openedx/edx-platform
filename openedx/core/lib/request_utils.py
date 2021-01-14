@@ -111,10 +111,10 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
 
         Attributes that are added by this middleware:
 
-        cookies.<cookie_name>.size: The size of a cookie by the given name.
-        cookies.<group_prefix>.group.size: The size of a group of cookies. For example
-            the sum of the size of all braze cookies would be the value of the
-            `cookies.ab.group.size` attribute.
+        cookies.<N>.name: The name of the Nth largest cookie
+        cookies.<N>.size: The size of the Nth largest cookie
+        cookies..group.<N>.name: The name of the Nth largest cookie.
+        cookies.group.<N>.size: The size of the Nth largest cookie group.
         cookies.max.name: The name of the largest cookie sent by the user.
         cookies.max.size: The size of the largest cookie sent by the user.
         cookies.max.group.name: The name of the largest group of cookies. A single cookie
@@ -122,9 +122,22 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
         cookies.max.group.size: The sum total size of all the cookies in the largest group.
         cookies_total_size: The sum total size of all cookies in this request.
 
+        Related Settings:
+
+        - `request_utils.capture_cookie_sizes` is the waffle flag that control whether this
+            middleware logs anything or not.
+
+        - TOP_N_COOKIES_CAPTURED(Default: 5) controls how many cookies to log.
+        - TOP_N_COOKIE_GROUPS_CAPTURED(Default: 5): controls how many cookie groups to capture.
+
+
         """
         if not CAPTURE_COOKIE_SIZES.is_enabled():
             return
+
+        # Capture the N largest cookies
+        top_n_cookies_captured = getattr(settings, "TOP_N_COOKIES_CAPTURED", 5)
+        top_n_cookie_groups_captured = getattr(settings, "TOP_N_COOKIE_GROUPS_CAPTURED", 5)
 
         cookie_names_to_size = {}
         cookie_groups_to_size = {}
@@ -152,12 +165,36 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
             max_group_cookie_name = max_cookie_name
             max_group_cookie_size = max_cookie_size
 
-        # Only log the groups because adding an arbitrary number of individual cookies pushes too many
-        # metrics into NR and results in other metrics getting dropped potentially.
-        for name, size in cookie_groups_to_size.items():
-            attribute_name = 'cookies.{}.group.size'.format(name)
-            set_custom_attribute(attribute_name, size)
-            log.debug(u'%s = %d', attribute_name, size)
+        # Log only the top N biggest cookies.
+        top_n_cookies = sorted(
+            cookie_names_to_size,
+            key=lambda x: cookie_names_to_size[x],
+            reverse=True,
+        )[:top_n_cookies_captured]
+        for index, name in enumerate(top_n_cookies, start=1):
+            size = cookie_names_to_size[name]
+            name_attribute = 'cookies.{}.name'.format(index)
+            size_attribute = 'cookies.{}.size'.format(index)
+
+            set_custom_attribute(name_attribute, name)
+            set_custom_attribute(size_attribute, size)
+            log.debug(u'%s = %d', name, size)
+
+        # Log only the top N biggest groups.
+        top_n_cookie_groups = sorted(
+            cookie_groups_to_size,
+            key=lambda x: cookie_groups_to_size[x],
+            reverse=True,
+        )[:top_n_cookie_groups_captured]
+
+        for index, name in enumerate(top_n_cookie_groups, start=1):
+            size = cookie_groups_to_size[name]
+            name_attribute = 'cookies.group.{}.name'.format(index)
+            size_attribute = 'cookies.group.{}.size'.format(index)
+
+            set_custom_attribute(name_attribute, name)
+            set_custom_attribute(size_attribute, size)
+            log.debug(u'%s = %d', name, size)
 
         set_custom_attribute('cookies.max.name', max_cookie_name)
         set_custom_attribute('cookies.max.size', max_cookie_size)

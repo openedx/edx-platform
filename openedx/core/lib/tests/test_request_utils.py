@@ -8,13 +8,11 @@ from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.test.client import RequestFactory
 
-from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.lib.request_utils import (
     get_request_or_stub,
     course_id_from_url,
     safe_get_host,
     CookieMonitoringMiddleware,
-    CAPTURE_COOKIE_SIZES,
 )
 
 
@@ -114,14 +112,25 @@ class RequestUtilTestCase(unittest.TestCase):
         middleware.process_request(mock_request)
 
         mock_set_custom_attribute.assert_has_calls([
-            call('cookies.a.group.size', 20),
-            call('cookies.b.group.size', 43),
+            call('cookies.1.name', 'a'),
+            call('cookies.1.size', 100),
+            call('cookies.2.name', 'b_a'),
+            call('cookies.2.size', 15),
+            call('cookies.3.name', 'b_c'),
+            call('cookies.3.size', 15),
+            call('cookies.4.name', '_b'),
+            call('cookies.4.size', 13),
+            call('cookies.5.name', '_c_'),
+            call('cookies.5.size', 13),
+            call('cookies.group.1.name', 'b'),
+            call('cookies.group.1.size', 43),
+            call('cookies.group.2.name', 'a'),
+            call('cookies.group.2.size', 20),
             call('cookies.max.name', 'a'),
             call('cookies.max.size', 100),
-            # Test that single cookie is also treated as a group for max calculations.
             call('cookies.max.group.name', 'a'),
             call('cookies.max.group.size', 100),
-            call('cookies_total_size', 189)
+            call('cookies_total_size', 189),
         ])
 
     @patch("openedx.core.lib.request_utils.CAPTURE_COOKIE_SIZES")
@@ -141,7 +150,14 @@ class RequestUtilTestCase(unittest.TestCase):
         middleware.process_request(mock_request)
 
         mock_set_custom_attribute.assert_has_calls([
-            call('cookies.b.group.size', 35),
+            call('cookies.1.name', 'b_c'),
+            call('cookies.1.size', 20),
+            call('cookies.2.name', 'b_a'),
+            call('cookies.2.size', 15),
+            call('cookies.3.name', 'a'),
+            call('cookies.3.size', 10),
+            call('cookies.group.1.name', 'b'),
+            call('cookies.group.1.size', 35),
             call('cookies.max.name', 'b_c'),
             call('cookies.max.size', 20),
             call('cookies.max.group.name', 'b'),
