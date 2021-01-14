@@ -69,9 +69,6 @@ kiwisolver<1.2.0
 # Tests passed, but hit a problem in stage
 lxml<4.5.1
 
-# Convert text markup to HTML; used in capa problems, forums, and course wikis; pin Markdown version as tests failed for its upgrade to the latest release
-Markdown==2.6.11
-
 # Matplotlib 3.1 requires Python 3.6
 matplotlib<3.1
 
