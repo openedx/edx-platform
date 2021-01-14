@@ -69,9 +69,6 @@ kiwisolver<1.2.0
 # Tests passed, but hit a problem in stage
 lxml<4.5.1
 
-# Convert text markup to HTML; used in capa problems, forums, and course wikis; pin Markdown version as tests failed for its upgrade to the latest release
-Markdown==2.6.11
-
 # Matplotlib 3.1 requires Python 3.6
 matplotlib<3.1
 
@@ -140,3 +137,6 @@ edx-bulk-grades<0.8.5
 
 # social-auth-core==3.4.0 is giving error in saml auth tests
 social-auth-core==3.3.3
+
+# python3-saml==1.10.0 version started breaking a11y tests
+python3-saml<1.10.0
