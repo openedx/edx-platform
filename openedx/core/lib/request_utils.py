@@ -102,18 +102,104 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
 
         Don't log contents of cookies because that might cause a security issue.
         We just want to see if any cookies are growing out of control.
+
+        A useful NRQL Query:
+            SELECT count(*), max(`cookies.max.group.size`) from Transaction FACET
+            `cookies.max.group.name`
+
+            SELECT * FROM Transaction WHERE cookies_total_size > 6000
+
+        Attributes that are added by this middleware:
+
+        cookies.<N>.name: The name of the Nth largest cookie
+        cookies.<N>.size: The size of the Nth largest cookie
+        cookies..group.<N>.name: The name of the Nth largest cookie.
+        cookies.group.<N>.size: The size of the Nth largest cookie group.
+        cookies.max.name: The name of the largest cookie sent by the user.
+        cookies.max.size: The size of the largest cookie sent by the user.
+        cookies.max.group.name: The name of the largest group of cookies. A single cookie
+            counts as a group of one for this calculation.
+        cookies.max.group.size: The sum total size of all the cookies in the largest group.
+        cookies_total_size: The sum total size of all cookies in this request.
+
+        Related Settings:
+
+        - `request_utils.capture_cookie_sizes` is the waffle flag that control whether this
+            middleware logs anything or not.
+
+        - TOP_N_COOKIES_CAPTURED(Default: 5) controls how many cookies to log.
+        - TOP_N_COOKIE_GROUPS_CAPTURED(Default: 5): controls how many cookie groups to capture.
+
+
         """
         if not CAPTURE_COOKIE_SIZES.is_enabled():
             return
 
-        cookie_names_to_size = {
-            name: len(value)
-            for name, value in request.COOKIES.items()
-        }
-        for name, size in cookie_names_to_size.items():
-            attribute_name = 'cookies.{}.size'.format(name)
-            set_custom_attribute(attribute_name, size)
-            log.debug(u'%s = %d', attribute_name, size)
+        # Capture the N largest cookies
+        top_n_cookies_captured = getattr(settings, "TOP_N_COOKIES_CAPTURED", 5)
+        top_n_cookie_groups_captured = getattr(settings, "TOP_N_COOKIE_GROUPS_CAPTURED", 5)
+
+        cookie_names_to_size = {}
+        cookie_groups_to_size = {}
+
+        for name, value in request.COOKIES.items():
+            # Get cookie size for all cookies.
+            cookie_size = len(value)
+            cookie_names_to_size[name] = cookie_size
+
+            # Group cookies by their prefix seperated by a period or underscore
+            grouping_name = re.split('[._]', name, 1)[0]
+            if grouping_name and grouping_name != name:
+                # Add or update the size for this group.
+                cookie_groups_to_size[grouping_name] = cookie_groups_to_size.get(grouping_name, 0) + cookie_size
+
+        max_cookie_name = max(cookie_names_to_size, key=lambda name: cookie_names_to_size[name])
+        max_cookie_size = cookie_names_to_size[max_cookie_name]
+
+        max_group_cookie_name = max(cookie_groups_to_size, key=lambda name: cookie_groups_to_size[name])
+        max_group_cookie_size = cookie_groups_to_size[max_group_cookie_name]
+
+        # If a single cookies is bigger than any group of cookies, we want max_group... to reflect that.
+        # Treating an individual cookie as a group of 1 for calculating the max.
+        if max_group_cookie_size < max_cookie_size:
+            max_group_cookie_name = max_cookie_name
+            max_group_cookie_size = max_cookie_size
+
+        # Log only the top N biggest cookies.
+        top_n_cookies = sorted(
+            cookie_names_to_size,
+            key=lambda x: cookie_names_to_size[x],
+            reverse=True,
+        )[:top_n_cookies_captured]
+        for index, name in enumerate(top_n_cookies, start=1):
+            size = cookie_names_to_size[name]
+            name_attribute = 'cookies.{}.name'.format(index)
+            size_attribute = 'cookies.{}.size'.format(index)
+
+            set_custom_attribute(name_attribute, name)
+            set_custom_attribute(size_attribute, size)
+            log.debug(u'%s = %d', name, size)
+
+        # Log only the top N biggest groups.
+        top_n_cookie_groups = sorted(
+            cookie_groups_to_size,
+            key=lambda x: cookie_groups_to_size[x],
+            reverse=True,
+        )[:top_n_cookie_groups_captured]
+
+        for index, name in enumerate(top_n_cookie_groups, start=1):
+            size = cookie_groups_to_size[name]
+            name_attribute = 'cookies.group.{}.name'.format(index)
+            size_attribute = 'cookies.group.{}.size'.format(index)
+
+            set_custom_attribute(name_attribute, name)
+            set_custom_attribute(size_attribute, size)
+            log.debug(u'%s = %d', name, size)
+
+        set_custom_attribute('cookies.max.name', max_cookie_name)
+        set_custom_attribute('cookies.max.size', max_cookie_size)
+        set_custom_attribute('cookies.max.group.name', max_group_cookie_name)
+        set_custom_attribute('cookies.max.group.size', max_group_cookie_size)
 
         total_cookie_size = sum(cookie_names_to_size.values())
         set_custom_attribute('cookies_total_size', total_cookie_size)
