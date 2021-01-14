@@ -114,14 +114,6 @@ class RequestUtilTestCase(unittest.TestCase):
         middleware.process_request(mock_request)
 
         mock_set_custom_attribute.assert_has_calls([
-            call('cookies.a.size', 100),
-            call('cookies._b.size', 13),
-            call('cookies._c_.size', 13),
-            call('cookies.a.b.size', 10),
-            call('cookies.a.c.size', 10),
-            call('cookies.b..size', 13),
-            call('cookies.b_a.size', 15),
-            call('cookies.b_c.size', 15),
             call('cookies.a.group.size', 20),
             call('cookies.b.group.size', 43),
             call('cookies.max.name', 'a'),
@@ -149,9 +141,6 @@ class RequestUtilTestCase(unittest.TestCase):
         middleware.process_request(mock_request)
 
         mock_set_custom_attribute.assert_has_calls([
-            call('cookies.a.size', 10),
-            call('cookies.b_a.size', 15),
-            call('cookies.b_c.size', 20),
             call('cookies.b.group.size', 35),
             call('cookies.max.name', 'b_c'),
             call('cookies.max.size', 20),

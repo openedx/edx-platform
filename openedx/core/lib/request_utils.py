@@ -152,11 +152,8 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
             max_group_cookie_name = max_cookie_name
             max_group_cookie_size = max_cookie_size
 
-        for name, size in cookie_names_to_size.items():
-            attribute_name = 'cookies.{}.size'.format(name)
-            set_custom_attribute(attribute_name, size)
-            log.debug(u'%s = %d', attribute_name, size)
-
+        # Only log the groups because adding an arbitrary number of individual cookies pushes too many
+        # metrics into NR and results in other metrics getting dropped potentially.
         for name, size in cookie_groups_to_size.items():
             attribute_name = 'cookies.{}.group.size'.format(name)
             set_custom_attribute(attribute_name, size)
