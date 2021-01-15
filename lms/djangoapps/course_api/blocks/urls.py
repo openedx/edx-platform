@@ -38,7 +38,6 @@ urlpatterns = [
         name="blocks_in_course"
     ),
 
-    # This endpoint is an alternative to the above, but requires course_id as a parameter.
     url(
         r'^v3/blocks/',
         BlocksWithCompletionView.as_view(),
