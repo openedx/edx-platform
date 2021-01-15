@@ -292,7 +292,7 @@ class BlocksInCourseView(BlocksView):
             request - Django request object
         """
 
-        # convert the requested course_key to the course's root block's usage_key
+        # convert the requested course_key to the course's root block's usage_.key
         course_key_string = request.query_params.get('course_id', None)
         if not course_key_string:
             raise ValidationError('course_id is required.')
@@ -303,3 +303,93 @@ class BlocksInCourseView(BlocksView):
         except InvalidKeyError:
             raise ValidationError(u"'{}' is not a valid course key.".format(six.text_type(course_key_string)))
         return super(BlocksInCourseView, self).list(request, course_usage_key, hide_access_denials=hide_access_denials)
+
+
+@view_auth_classes(is_authenticated=False)
+class BlocksWithCompletionView(BlocksInCourseView):
+    """
+    **Use Case**
+
+        Returns the blocks in the course according to the requesting user's
+        access level.
+
+    **Example requests**:
+
+        GET /api/courses/v1/blocks/?course_id=<course_id>
+        GET /api/courses/v1/blocks/?course_id=<course_id>
+            &username=anjali
+            &depth=all
+            &requested_fields=graded,format,student_view_multi_device,lti_url
+            &block_counts=video
+            &student_view_data=video
+            &block_types_filter=problem,html
+
+    **Parameters**:
+
+        This view redirects to /api/courses/v2/blocks/<root_usage_key>/ for the
+        root usage key of the course specified by course_id.  The view accepts
+        all parameters accepted by :class:`BlocksInCourseView`
+
+    **Response Values**
+
+        Responses are identical to those returned by :class:`BlocksInCourseView` when
+        passed the root_usage_key of the requested course but there is one exception explained below.
+
+        It adds completion from root of the course to every child block and make it boolean i.e
+        completion will be either 1 or 0
+
+    """
+
+    def list(self, request, hide_access_denials=False):  # pylint: disable=arguments-differ
+        """
+        Retrieves the usage_key for the requested course, and then returns the
+        same information that would be returned by BlocksView.list, called with
+        that usage key
+
+        Arguments:
+            request - Django request object
+        """
+
+        response = super(BlocksWithCompletionView, self).list(request, hide_access_denials=hide_access_denials)
+
+        course_blocks = {}
+        if request.query_params.get('return_type') == 'list':
+            for course_block in response.data:
+                course_blocks[course_block['id']] = course_block
+
+                if course_block.get('type') == 'course':
+                    root = course_block['id']
+        else:
+            root = response.data['root']
+            course_blocks = response.data['blocks']
+
+        recurse_mark_complete(root, course_blocks)
+
+        return response
+
+
+def recurse_mark_complete(block_id, blocks):
+    """
+    Helper function to walk course tree dict,
+    marking completion as 1 or 0
+
+    If all blocks are complete, mark parent block complete
+
+    :param blocks: dict of all blocks
+    :param block_id: root or child block id
+
+    :return:
+        block: course_outline_root_block block object or child block
+    """
+    block = blocks.get(block_id, {})
+    if block.get('completion') == 1:
+        return
+
+    children_blocks = block.get('children', block.get('descendents'))
+    if children_blocks:
+        for idx in range(len(children_blocks)):
+            recurse_mark_complete(children_blocks[idx], blocks)
+
+        completable_blocks = [blocks[child_block_id] for child_block_id in children_blocks
+                              if blocks[child_block_id].get('type') != 'discussion']
+        block['completion'] = int(all(child.get('completion') == 1 for child in completable_blocks))

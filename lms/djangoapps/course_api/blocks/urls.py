@@ -6,7 +6,7 @@ Course Block API URLs
 from django.conf import settings
 from django.conf.urls import url
 
-from .views import BlocksInCourseView, BlocksView
+from .views import BlocksInCourseView, BlocksView, BlocksWithCompletionView
 
 urlpatterns = [
     # This endpoint requires the usage_key for the starting block.
@@ -36,5 +36,12 @@ urlpatterns = [
         r'^v2/blocks/',
         BlocksInCourseView.as_view(),
         name="blocks_in_course"
+    ),
+
+    # This endpoint is an alternative to the above, but requires course_id as a parameter.
+    url(
+        r'^v3/blocks/',
+        BlocksWithCompletionView.as_view(),
+        name="blocks_with_completion_in_course"
     ),
 ]

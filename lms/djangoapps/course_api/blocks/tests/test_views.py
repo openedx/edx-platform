@@ -14,6 +14,7 @@ from opaque_keys.edx.locator import CourseLocator
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
@@ -419,3 +420,60 @@ class TestBlocksInCourseView(TestBlocksView):  # pylint: disable=test-inherits-t
         self.client.logout()
         self.query_params['username'] = ''
         self.verify_response(403, params={'course_id': str(CourseLocator('non', 'existent', 'course'))})
+
+
+class TestBlocksWithCompletionView(TestBlocksInCourseView, CompletionWaffleTestMixin):
+    """
+    Test class for BlocksInCourseView
+    """
+
+    def setUp(self):
+        super(TestBlocksWithCompletionView, self).setUp()
+        self.override_waffle_switch(True)
+        self.url = reverse('blocks_with_completion_in_course')
+        self.query_params['course_id'] = str(self.course_key)
+        self.non_orphaned_raw_block_usage_keys = set(
+            item.location
+            for item in self.store.get_items(self.course_key)
+            # remove all orphaned items in the course, except for the root 'course' block
+            if self.store.get_parent_location(item.location) or item.category == 'course'
+        )
+
+    def test_completion_one_unit(self):
+        for item in self.store.get_items(self.course_key):
+            if item.category == 'html':
+                block_usage_key = item.location
+                break
+
+        submit_completions_for_testing(self.user, [block_usage_key])
+        response = self.verify_response(params={
+            'depth': 'all',
+            'requested_fields': ['completion', 'children'],
+        })
+
+        completion = response.data['blocks'][str(block_usage_key)].get('completion')
+        self.assert_true_iff(completion, 1)
+
+    def test_completion_all_course(self):
+        for block in self.non_orphaned_raw_block_usage_keys:
+            submit_completions_for_testing(self.user, [block])
+
+        response = self.verify_response(params={
+            'depth': 'all',
+            'requested_fields': ['completion', 'children'],
+        })
+        for block_id in self.non_orphaned_block_usage_keys:
+            self.assert_true_iff(response.data['blocks'][block_id].get('completion'), 1)
+
+    def test_completion_all_course_with_list_return_type(self):
+        for block in self.non_orphaned_raw_block_usage_keys:
+            submit_completions_for_testing(self.user, [block])
+
+        response = self.verify_response(params={
+            'depth': 'all',
+            'return_type': 'list',
+            'requested_fields': ['completion', 'children'],
+        })
+        for block in response.data:
+            if block['block_id'] in self.non_orphaned_block_usage_keys:
+                self.assert_true_iff(block.get('completion'), 1)
