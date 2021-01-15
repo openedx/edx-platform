@@ -3510,6 +3510,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
         "state",
         "goals",
         "is_active",
+        "last_login",
         "mailing_address",
         "requires_parental_consent",
         "secondary_email",

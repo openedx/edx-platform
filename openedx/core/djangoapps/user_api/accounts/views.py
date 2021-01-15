@@ -169,6 +169,7 @@ class AccountViewSet(ViewSet):
             * country: An ISO 3166 country code or null.
             * date_joined: The date the account was created, in the string
               format provided by datetime. For example, "2014-08-26T17:52:11Z".
+            * last_login: The latest date the user logged in, in the string datetime format.
             * email: Email address for the user. New email addresses must be confirmed
               via a confirmation email, so GET does not reflect the change until
               the address has been confirmed.
