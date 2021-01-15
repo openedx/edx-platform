@@ -940,6 +940,15 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
                 )
                 response.context_data['err_msg'] = _('Error in resetting your password. Please try again.')
                 return response
+        elif response.status_code == 302:
+            MandrillClient().send_mail(
+                MandrillClient.PASSWORD_RESET_COMPLETE,
+                user.email,
+                {
+                    'first_name': user.first_name,
+                    'signin_link': settings.LMS_ROOT_URL + '/login'
+                }
+            )
 
         # get the updated user
         updated_user = User.objects.get(id=uid_int)

@@ -16,6 +16,7 @@ class MandrillClient(object):
     """
     ACUMEN_DATA_TEMPLATE = 'acumen-data'
     PASSWORD_RESET_TEMPLATE = 'template-60'
+    PASSWORD_RESET_COMPLETE = 'reset-password-complete'
     USER_ACCOUNT_ACTIVATION_TEMPLATE = 'template-61'
     ORG_ADMIN_ACTIVATION_TEMPLATE = 'org-admin-identified'
     ORG_ADMIN_CHANGE_TEMPLATE = 'org-admin-change'
