@@ -789,7 +789,7 @@ class DiscussionBoardFragmentView(EdxFragmentView):
         works in conjunction with the Django pipeline to ensure that in development mode
         the files are loaded individually, but in production just the single bundle is loaded.
         """
-        return list(set(self.get_js_dependencies('discussion_vendor')))
+        return list(dict.fromkeys(self.get_js_dependencies('discussion_vendor')))
 
     def js_dependencies(self):
         """
