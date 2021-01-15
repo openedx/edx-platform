@@ -54,24 +54,18 @@ class AccessTokenExchangeBase(APIView):
         if not form.is_valid():
             error_response = self.error_response(form.errors)  # pylint: disable=no-member
             if error_response.status_code == 403:
-                log.info('message=login_filed_1, status="%d", user="%d" ,agent="%s"',
+                log.info('message=login_filed_1, status="%d", user="%s" ,agent="%s", error_response"%s"',
                          error_response.status_code,
                          request.user,
                          request.META.get('HTTP_USER_AGENT', ''),
+                         error_response.data
                          )
             return error_response
 
         user = form.cleaned_data["user"]
         scope = form.cleaned_data["scope"]
         client = form.cleaned_data["client"]
-        response = self.exchange_access_token(request, user, scope, client)
-        if response.status_code == 403:
-            log.info('message=login_filed_2, status=%d, user="%d" ,agent="%s"',
-                     response.status_code,
-                     request.user.username,
-                     request.META.get('HTTP_USER_AGENT', ''),
-                     )
-        return response
+        return self.exchange_access_token(request, user, scope, client)
 
     def exchange_access_token(self, request, user, scope, client):
         """
