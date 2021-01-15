@@ -131,7 +131,7 @@ class RequestUtilTestCase(unittest.TestCase):
             call('cookies.max.group.name', 'a'),
             call('cookies.max.group.size', 100),
             call('cookies_total_size', 189),
-        ])
+        ], any_order=True)
 
     @patch("openedx.core.lib.request_utils.CAPTURE_COOKIE_SIZES")
     @patch("openedx.core.lib.request_utils.set_custom_attribute")
@@ -163,4 +163,43 @@ class RequestUtilTestCase(unittest.TestCase):
             call('cookies.max.group.name', 'b'),
             call('cookies.max.group.size', 35),
             call('cookies_total_size', 45)
-        ])
+        ], any_order=True)
+
+    @patch("openedx.core.lib.request_utils.CAPTURE_COOKIE_SIZES")
+    @patch("openedx.core.lib.request_utils.set_custom_attribute")
+    def test_cookie_monitoring_no_cookies(self, mock_set_custom_attribute, mock_capture_cookie_sizes):
+
+        mock_capture_cookie_sizes.is_enabled.return_value = True
+        middleware = CookieMonitoringMiddleware()
+
+        mock_request = Mock()
+        mock_request.COOKIES = {}
+
+        middleware.process_request(mock_request)
+
+        mock_set_custom_attribute.assert_has_calls([call('cookies_total_size', 0)], any_order=True)
+
+    @patch("openedx.core.lib.request_utils.CAPTURE_COOKIE_SIZES")
+    @patch("openedx.core.lib.request_utils.set_custom_attribute")
+    def test_cookie_monitoring_no_groups(self, mock_set_custom_attribute, mock_capture_cookie_sizes):
+
+        mock_capture_cookie_sizes.is_enabled.return_value = True
+        middleware = CookieMonitoringMiddleware()
+
+        mock_request = Mock()
+        mock_request.COOKIES = {
+            "a": "." * 10,
+            "b": "." * 15,
+        }
+
+        middleware.process_request(mock_request)
+
+        mock_set_custom_attribute.assert_has_calls([
+            call('cookies.max.name', 'b'),
+            call('cookies.max.size', 15),
+            call('cookies.1.name', 'b'),
+            call('cookies.1.size', 15),
+            call('cookies.2.name', 'a'),
+            call('cookies.2.size', 10),
+            call('cookies_total_size', 25),
+        ], any_order=True)
