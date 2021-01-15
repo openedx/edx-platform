@@ -44,19 +44,23 @@ if course is not None:
                     <%
                     tab_is_active = tab.tab_id in (active_page, default_tab)
                     %>
-                    <li class="nav-item ${'active' if tab_is_active else ''}">
-                        <a href="${tab.link_func(course, reverse)}" class="nav-link">
-                            ${_(tab.name)}
-                            % if tab_is_active:
-                                <span class="sr-only">, ${_('current location')}</span>
-                            %endif
-                            % if tab_image:
-                                ## Translators: 'needs attention' is an alternative string for the
-                                ## notification image that indicates the tab "needs attention".
-                                <img src="${tab_image}" alt="${_('needs attention')}" />
-                            %endif
-                        </a>
-                    </li>
+                        % if masquerade is not None and masquerade.role == 'student' and tab.name == 'Instructor':
+                            <% continue %>
+                        % else:
+                            <li class="nav-item ${'active' if tab_is_active else ''}">
+                                <a href="${tab.link_func(course, reverse)}" class="nav-link">
+                                    ${_(tab.name)}
+                                    % if tab_is_active:
+                                        <span class="sr-only">, ${_('current location')}</span>
+                                    %endif
+                                    % if tab_image:
+                                        ## Translators: 'needs attention' is an alternative string for the
+                                        ## notification image that indicates the tab "needs attention".
+                                        <img src="${tab_image}" alt="${_('needs attention')}" />
+                                    %endif
+                                </a>
+                            </li>
+                        %endif
                 % endfor
             </ul>
         </nav>
