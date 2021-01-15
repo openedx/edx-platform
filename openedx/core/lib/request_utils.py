@@ -153,54 +153,61 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
                 # Add or update the size for this group.
                 cookie_groups_to_size[grouping_name] = cookie_groups_to_size.get(grouping_name, 0) + cookie_size
 
-        max_cookie_name = max(cookie_names_to_size, key=lambda name: cookie_names_to_size[name])
-        max_cookie_size = cookie_names_to_size[max_cookie_name]
+        if cookie_names_to_size:
+            self.set_custom_attributes_for_top_n(
+                cookie_names_to_size,
+                top_n_cookies_captured,
+                attribute_prefix='cookies',
+            )
 
-        max_group_cookie_name = max(cookie_groups_to_size, key=lambda name: cookie_groups_to_size[name])
-        max_group_cookie_size = cookie_groups_to_size[max_group_cookie_name]
+            max_cookie_name = max(cookie_names_to_size, key=lambda name: cookie_names_to_size[name])
+            max_cookie_size = cookie_names_to_size[max_cookie_name]
 
-        # If a single cookies is bigger than any group of cookies, we want max_group... to reflect that.
-        # Treating an individual cookie as a group of 1 for calculating the max.
-        if max_group_cookie_size < max_cookie_size:
-            max_group_cookie_name = max_cookie_name
-            max_group_cookie_size = max_cookie_size
+            set_custom_attribute('cookies.max.name', max_cookie_name)
+            set_custom_attribute('cookies.max.size', max_cookie_size)
 
-        # Log only the top N biggest cookies.
-        top_n_cookies = sorted(
-            cookie_names_to_size,
-            key=lambda x: cookie_names_to_size[x],
-            reverse=True,
-        )[:top_n_cookies_captured]
-        for index, name in enumerate(top_n_cookies, start=1):
-            size = cookie_names_to_size[name]
-            name_attribute = 'cookies.{}.name'.format(index)
-            size_attribute = 'cookies.{}.size'.format(index)
+        if cookie_groups_to_size:
+            self.set_custom_attributes_for_top_n(
+                cookie_groups_to_size,
+                top_n_cookie_groups_captured,
+                attribute_prefix='cookies.group',
+            )
 
-            set_custom_attribute(name_attribute, name)
-            set_custom_attribute(size_attribute, size)
-            log.debug(u'%s = %d', name, size)
+            max_group_cookie_name = max(cookie_groups_to_size, key=lambda name: cookie_groups_to_size[name])
+            max_group_cookie_size = cookie_groups_to_size[max_group_cookie_name]
 
-        # Log only the top N biggest groups.
-        top_n_cookie_groups = sorted(
-            cookie_groups_to_size,
-            key=lambda x: cookie_groups_to_size[x],
-            reverse=True,
-        )[:top_n_cookie_groups_captured]
+            # If a single cookies is bigger than any group of cookies, we want max_group... to reflect that.
+            # Treating an individual cookie as a group of 1 for calculating the max.
+            if max_group_cookie_size < max_cookie_size:
+                max_group_cookie_name = max_cookie_name
+                max_group_cookie_size = max_cookie_size
 
-        for index, name in enumerate(top_n_cookie_groups, start=1):
-            size = cookie_groups_to_size[name]
-            name_attribute = 'cookies.group.{}.name'.format(index)
-            size_attribute = 'cookies.group.{}.size'.format(index)
-
-            set_custom_attribute(name_attribute, name)
-            set_custom_attribute(size_attribute, size)
-            log.debug(u'%s = %d', name, size)
-
-        set_custom_attribute('cookies.max.name', max_cookie_name)
-        set_custom_attribute('cookies.max.size', max_cookie_size)
-        set_custom_attribute('cookies.max.group.name', max_group_cookie_name)
-        set_custom_attribute('cookies.max.group.size', max_group_cookie_size)
+            set_custom_attribute('cookies.max.group.name', max_group_cookie_name)
+            set_custom_attribute('cookies.max.group.size', max_group_cookie_size)
 
         total_cookie_size = sum(cookie_names_to_size.values())
         set_custom_attribute('cookies_total_size', total_cookie_size)
         log.debug(u'cookies_total_size = %d', total_cookie_size)
+
+    def set_custom_attributes_for_top_n(self, names_to_size, top_n_captured, attribute_prefix):
+        """
+        Sets custom metric for the top N biggest cookies or cookie groups.
+
+        Arguments:
+            names_to_size: Dict of sizes keyed by cookie name or cookie group name
+            top_n_captured: Number of largest sizes to monitor.
+            attribute_prefix: Prefix (cookies|cookies.group) to use in the custom attribute name.
+        """
+        top_n_cookies = sorted(
+            names_to_size,
+            key=lambda x: names_to_size[x],
+            reverse=True,
+        )[:top_n_captured]
+        for index, name in enumerate(top_n_cookies, start=1):
+            size = names_to_size[name]
+            name_attribute = '{}.{}.name'.format(attribute_prefix, index)
+            size_attribute = '{}.{}.size'.format(attribute_prefix, index)
+
+            set_custom_attribute(name_attribute, name)
+            set_custom_attribute(size_attribute, size)
+            log.debug('%s = %d', name, size)
