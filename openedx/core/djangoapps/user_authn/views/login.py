@@ -581,7 +581,7 @@ class LoginSessionView(APIView):
 
         Example Usage:
 
-            POST /user_api/v1/login_session
+            POST /api/user/v1/login_session
             with POST params `email`, `password`.
 
             200 {'success': true}

@@ -30,7 +30,7 @@ urlpatterns = [
     url(
         r'^user_api/v1/preferences/email_opt_in/$',
         user_api_views.UpdateEmailOptInPreference.as_view(),
-        name="preferences_email_opt_in"
+        name="preferences_email_opt_in_legacy"
     ),
     url(
         r'^user_api/v1/preferences/time_zones/$',
