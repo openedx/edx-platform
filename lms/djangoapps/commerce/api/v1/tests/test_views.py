@@ -18,7 +18,6 @@ from rest_framework.utils.encoders import JSONEncoder
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.adg.lms.applications.constants import MAXIMUM_YEAR_OPTION
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
