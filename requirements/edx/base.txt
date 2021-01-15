@@ -105,14 +105,14 @@ edx-milestones==0.3.0     # via -r requirements/edx/base.in
 edx-opaque-keys[django]==2.1.1  # via -r requirements/edx/paver.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, lti-consumer-xblock, xmodule
 edx-organizations==6.7.1  # via -r requirements/edx/base.in
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/base.in
-edx-proctoring==2.5.8     # via -r requirements/edx/base.in, edx-proctoring-proctortrack
+edx-proctoring==2.5.9     # via -r requirements/edx/base.in, edx-proctoring-proctortrack
 edx-rbac==1.3.4           # via edx-enterprise
 edx-rest-api-client==5.3.0  # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring
 edx-search==2.0.1         # via -r requirements/edx/base.in
 edx-sga==0.13.1           # via -r requirements/edx/base.in
 edx-submissions==3.2.4    # via -r requirements/edx/base.in, ora2
 edx-tincan-py35==0.0.9    # via edx-enterprise
-edx-toggles==2.0.0        # via -r requirements/edx/base.in, edx-completion, edx-event-routing-backends, edxval, ora2
+edx-toggles==2.1.0        # via -r requirements/edx/base.in, edx-completion, edx-event-routing-backends, edxval, ora2
 edx-user-state-client==1.2.0  # via -r requirements/edx/base.in
 edx-when==1.3.0           # via -r requirements/edx/base.in, edx-proctoring
 edxval==1.4.5             # via -r requirements/edx/base.in
@@ -145,9 +145,9 @@ lazy==1.4                 # via -r requirements/edx/paver.txt, acid-xblock, lti-
 libsass==0.10.0           # via -r requirements/edx/paver.txt, ora2
 loremipsum==1.0.5         # via ora2
 lti-consumer-xblock==2.4.0  # via -r requirements/edx/base.in
-lxml==4.5.0               # via -c requirements/edx/../constraints.txt, -r requirements/edx/../edx-sandbox/shared.txt, capa, edxval, lti-consumer-xblock, ora2, safe-lxml, xblock, xmlsec
+lxml==4.5.0               # via -c requirements/edx/../constraints.txt, -r requirements/edx/../edx-sandbox/shared.txt, capa, edxval, lti-consumer-xblock, ora2, python3-saml, safe-lxml, xblock, xmlsec
 mailsnake==1.6.4          # via -r requirements/edx/base.in
-mako==1.1.3               # via -r requirements/edx/base.in, acid-xblock, lti-consumer-xblock, xblock-google-drive, xblock-utils
+mako==1.1.4               # via -r requirements/edx/base.in, acid-xblock, lti-consumer-xblock, xblock-google-drive, xblock-utils
 markdown==2.6.11          # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, django-wiki, staff-graded-xblock, xblock-poll
 markey==0.8               # via enmerkar-underscore
 markupsafe==1.1.1         # via -r requirements/edx/paver.txt, chem, jinja2, mako, xblock
@@ -191,7 +191,7 @@ python-memcached==1.59    # via -r requirements/edx/paver.txt
 python-slugify==4.0.1     # via code-annotations
 python-swiftclient==3.11.0  # via ora2
 python3-openid==3.2.0 ; python_version >= "3"  # via -r requirements/edx/base.in, social-auth-core
-python3-saml==1.9.0       # via -r requirements/edx/base.in
+python3-saml==1.10.0      # via -r requirements/edx/base.in
 pytz==2020.5              # via -r requirements/edx/base.in, babel, capa, celery, django, django-ses, edx-completion, edx-enterprise, edx-event-routing-backends, edx-proctoring, edx-submissions, edx-tincan-py35, event-tracking, fs, icalendar, ora2, tincan, xblock
 pyuca==1.2                # via -r requirements/edx/base.in
 pyyaml==5.3.1             # via -r requirements/edx/base.in, code-annotations, edx-django-release-util, edx-i18n-tools, xblock
@@ -224,7 +224,7 @@ stevedore==1.32.0         # via -c requirements/edx/../constraints.txt, -r requi
 super-csv==2.0.0          # via -r requirements/edx/base.in, edx-bulk-grades
 sympy==1.6.2              # via -c requirements/edx/../constraints.txt, symmath
 tableauserverclient==0.14.1  # via edx-enterprise
-testfixtures==6.17.0      # via edx-enterprise
+testfixtures==6.17.1      # via edx-enterprise
 text-unidecode==1.3       # via python-slugify
 tincan==1.0.0             # via edx-event-routing-backends
 tqdm==4.56.0              # via -r requirements/edx/../edx-sandbox/shared.txt, nltk
