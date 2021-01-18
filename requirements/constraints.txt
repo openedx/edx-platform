@@ -8,14 +8,15 @@
 # pin when possible.  Writing an issue against the offending project and
 # linking to it here is good.
 
+
+# This file contains all common constraints for edx-repos
+-c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
+
 # celery 5.0 has dropped python3.5 support.
 celery<5.0
 
 # cryptography 3.3 has dropped python3.5 support.
 cryptography<3.3
-
-# Stay on the latest LTS release of Django
-Django<2.3
 
 # The CORS_ORIGIN_WHITELIST changes in a backwards incompatible way in 3.0.0, needs matching configuration repo changes
 django-cors-headers<3.0.0
