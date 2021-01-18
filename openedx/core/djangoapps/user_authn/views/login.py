@@ -33,7 +33,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_authn.views.login_form import get_login_session_form
 from openedx.core.djangoapps.user_authn.cookies import get_response_with_refreshed_jwt_cookies, set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
-from openedx.core.djangoapps.user_authn.utils import should_redirect_to_logistration_mircrofrontend
+from openedx.core.djangoapps.user_authn.utils import should_redirect_to_authn_microfrontend
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangoapps.user_authn.views.password_reset import send_password_reset_email_for_user
 from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_auth_enabled
@@ -125,7 +125,7 @@ def _generate_locked_out_error_message():
     """
 
     locked_out_period_in_sec = settings.MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS
-    if not should_redirect_to_logistration_mircrofrontend:   # pylint: disable=no-else-raise
+    if not should_redirect_to_authn_microfrontend:   # pylint: disable=no-else-raise
         raise AuthFailedError(Text(_('To protect your account, it’s been temporarily '
                                      'locked. Try again in {locked_out_period} minutes.'
                                      '{li_start}To be on the safe side, you can reset your '
@@ -238,7 +238,7 @@ def _handle_failed_authentication(user, authenticated_user):
             if not LoginFailures.is_user_locked_out(user):
                 max_failures_allowed = settings.MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED
                 remaining_attempts = max_failures_allowed - failure_count
-                if not should_redirect_to_logistration_mircrofrontend:  # pylint: disable=no-else-raise
+                if not should_redirect_to_authn_microfrontend:  # pylint: disable=no-else-raise
                     raise AuthFailedError(Text(_('Email or password is incorrect.'
                                                  '{li_start}You have {remaining_attempts} more sign-in '
                                                  'attempts before your account is temporarily locked.{li_end}'
@@ -363,7 +363,7 @@ def _check_user_auth_flow(site, user):
 
         # If user belongs to allowed domain and not whitelisted then user must login through allowed domain SSO
         if user_domain == allowed_domain and not AllowedAuthUser.objects.filter(site=site, email=user.email).exists():
-            if not should_redirect_to_logistration_mircrofrontend():
+            if not should_redirect_to_authn_microfrontend():
                 msg = _create_message(site, None, allowed_domain)
             else:
                 root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
@@ -501,7 +501,7 @@ def login_user(request):
             running_pipeline = pipeline.get(request)
             redirect_url = pipeline.get_complete_url(backend_name=running_pipeline['backend'])
 
-        elif should_redirect_to_logistration_mircrofrontend():
+        elif should_redirect_to_authn_microfrontend():
             redirect_url = get_next_url_for_login_page(request, include_host=True)
 
         response = JsonResponse({

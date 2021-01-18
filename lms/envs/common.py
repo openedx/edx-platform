@@ -643,7 +643,7 @@ FEATURES = {
     #   rollout.
     'ENABLE_COURSEWARE_MICROFRONTEND': False,
 
-    # .. toggle_name: FEATURES['ENABLE_LOGISTRATION_MICROFRONTEND']
+    # .. toggle_name: FEATURES['ENABLE_AUTHN_MICROFRONTEND']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Supports staged rollout of a new micro-frontend-based implementation of the logistration.
@@ -651,9 +651,9 @@ FEATURES = {
     # .. toggle_creation_date: 2020-09-08
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/24908'
-    # .. toggle_warnings: Also set settings.LOGISTRATION_MICROFRONTEND_URL for rollout. This temporary feature
+    # .. toggle_warnings: Also set settings.AUTHN_MICROFRONTEND_URL for rollout. This temporary feature
     # toggle does not have a target removal date.
-    'ENABLE_LOGISTRATION_MICROFRONTEND': False,
+    'ENABLE_AUTHN_MICROFRONTEND': False,
 
     ### ORA Feature Flags ###
     # .. toggle_name: FEATURES['ENABLE_ORA_ALL_FILE_URLS']
@@ -4090,8 +4090,8 @@ WRITABLE_GRADEBOOK_URL = None
 PROFILE_MICROFRONTEND_URL = None
 ORDER_HISTORY_MICROFRONTEND_URL = None
 ACCOUNT_MICROFRONTEND_URL = None
-LOGISTRATION_MICROFRONTEND_URL = None
-LOGISTRATION_MICROFRONTEND_DOMAIN = None
+AUTHN_MICROFRONTEND_URL = None
+AUTHN_MICROFRONTEND_DOMAIN = None
 PROGRAM_CONSOLE_MICROFRONTEND_URL = None
 LEARNING_MICROFRONTEND_URL = None
 
