@@ -403,9 +403,31 @@
             return this.$('#sequence-list .nav-item[data-element=' + position + ']');
         };
 
+       function get_formatting_char(s){
+          var rtlChars        = '\u0591-\u07FF\u200F\u202B\u202E\uFB1D-\uFDFD\uFE70-\uFEFC',
+          rtlDirCheck     = new RegExp('^[^'+rtlChars+']*?['+rtlChars+']');
+
+          if (rtlDirCheck.test(s)) {
+              return "\u202B"
+          }
+          return "\u202A"
+        };
+
+        function update_unit_title(element, is_active) {
+          var element_title = element.getAttribute("data-page-title")
+          var updated_title = get_formatting_char(element_title) + element.getAttribute("data-element") +". "
+          if (is_active) {
+            updated_title += element_title
+          }
+          element.querySelector("#unit-title").innerHTML = updated_title
+        }
+
         Sequence.prototype.mark_visited = function(position) {
             // Don't overwrite class attribute to avoid changing Progress class
             var element = this.link_for(position);
+            if (element[0]) {
+              update_unit_title(element[0], false)
+            }
             element.attr({tabindex: '-1', 'aria-selected': 'false', 'aria-expanded': 'false'})
                 .removeClass('inactive')
                 .removeClass('active')
@@ -432,6 +454,9 @@
         Sequence.prototype.mark_active = function(position) {
             // Don't overwrite class attribute to avoid changing Progress class
             var element = this.link_for(position);
+            if (element[0]) {
+              update_unit_title(element[0], true);
+            }
             element.attr({tabindex: '0', 'aria-selected': 'true', 'aria-expanded': 'true'})
                 .removeClass('inactive')
                 .removeClass('visited')
