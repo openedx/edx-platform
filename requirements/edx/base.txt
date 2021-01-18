@@ -115,7 +115,7 @@ edx-tincan-py35==0.0.9    # via edx-enterprise
 edx-toggles==2.1.0        # via -r requirements/edx/base.in, edx-completion, edx-event-routing-backends, edxval, ora2
 edx-user-state-client==1.3.0  # via -r requirements/edx/base.in
 edx-when==1.3.2           # via -r requirements/edx/base.in, edx-proctoring
-edxval==1.4.5             # via -r requirements/edx/base.in
+edxval==1.4.6             # via -r requirements/edx/base.in
 elasticsearch==7.10.1     # via edx-search
 enmerkar-underscore==1.0.1  # via -r requirements/edx/base.in
 enmerkar==0.7.1           # via enmerkar-underscore
