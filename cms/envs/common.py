@@ -2317,6 +2317,7 @@ VERIFY_STUDENT = {
 ORGANIZATIONS_AUTOCREATE = True
 
 ################# Settings for brand logos. #################
+LOGO_IMAGE_EXTRA_TEXT = ''
 LOGO_URL = None
 LOGO_URL_PNG = None
 LOGO_TRADEMARK_URL = None
