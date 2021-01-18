@@ -139,8 +139,8 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         self.assertTrue(has_instructor_tab(org_researcher, self.course))
 
     @ddt.data(
-        ('staff', False),
-        ('instructor', False),
+        ('staff', True),  # Tahoe: Enable staff data download so non user.is_staff customers can access data (RED-1505)
+        ('instructor', True),  # Tahoe: Enable instructor data download (same as above RED-1505)
         ('data_researcher', True),
         ('global_staff', True),
     )
