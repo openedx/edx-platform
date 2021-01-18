@@ -340,7 +340,7 @@ class BlocksWithCompletionView(BlocksInCourseView):
 
     """
 
-    def list(self, request, hide_access_denials=False):  # pylint: disable=arguments-differ
+    def list(self, request, hide_access_denials=False):
         """
         Retrieves the usage_key for the requested course, and then returns the
         same information that would be returned by BlocksView.list, called with
@@ -385,11 +385,11 @@ def recurse_mark_complete(block_id, blocks):
     if block.get('completion') == 1:
         return
 
-    children_blocks = block.get('children', block.get('descendents'))
-    if children_blocks:
-        for idx in range(len(children_blocks)):
-            recurse_mark_complete(children_blocks[idx], blocks)
+    child_blocks = block.get('children', block.get('descendents'))
+    if child_blocks:
+        for child_block in child_blocks:
+            recurse_mark_complete(child_block, blocks)
 
-        completable_blocks = [blocks[child_block_id] for child_block_id in children_blocks
+        completable_blocks = [blocks[child_block_id] for child_block_id in child_blocks
                               if blocks[child_block_id].get('type') != 'discussion']
         block['completion'] = int(all(child.get('completion') == 1 for child in completable_blocks))

@@ -11,10 +11,10 @@ from urllib.parse import urlencode, urlunparse
 from django.conf import settings
 from django.urls import reverse
 from opaque_keys.edx.locator import CourseLocator
+from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
-from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
