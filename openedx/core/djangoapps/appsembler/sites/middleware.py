@@ -61,7 +61,10 @@ class RedirectMiddleware(object):
         cache_key = '{prefix}-{site}'.format(prefix=settings.REDIRECT_CACHE_KEY_PREFIX, site=site.domain)
         redirects = cache.get(cache_key)
         if redirects is None:
-            redirects = {redirect.old_path: redirect.new_path for redirect in Redirect.objects.filter(site=site)}
+            redirects = {
+                django_redirect.old_path: django_redirect.new_path
+                for django_redirect in Redirect.objects.filter(site=site)
+            }
             cache.set(cache_key, redirects, settings.REDIRECT_CACHE_TIMEOUT)
         redirect_to = redirects.get(request.path)
         if redirect_to:
