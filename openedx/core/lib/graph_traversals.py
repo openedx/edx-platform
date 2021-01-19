@@ -333,3 +333,23 @@ def _traverse_generic(
             # Keep track of whether or not the node was yielded so we
             # know whether or not to yield its children.
             yield_results[current_node] = should_yield_node
+
+
+def leaf_filter(block):
+    """
+    Filter for traversals to find leaf blocks
+    """
+    return (
+        block.location.block_type not in ('chapter', 'sequential', 'vertical') and
+        len(block.get_children()) == 0
+    )
+
+
+def get_children(parent):
+    """
+    Function for traversals to get the children of a block
+    """
+    if parent.has_children:
+        return parent.get_children()
+    else:
+        return []
