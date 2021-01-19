@@ -906,7 +906,7 @@ class CourseModesArchive(models.Model):
     mode_display_name = models.CharField(max_length=255)
 
     # minimum price in USD that we would like to charge for this mode of the course
-    min_price = models.IntegerField(default=0)
+    min_price = models.DecimalField(default=Decimal('0.00'), max_digits=30, decimal_places=2)
 
     # the suggested prices for this mode
     suggested_prices = models.CharField(max_length=255, blank=True, default=u'',
