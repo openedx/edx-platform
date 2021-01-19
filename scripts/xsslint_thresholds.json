@@ -9,12 +9,12 @@
         "django-trans-escape-variable-mismatch": 0,
         "django-trans-invalid-escape-filter": 0,
         "django-trans-missing-escape": 1,
-        "javascript-concat-html": 34,
+        "javascript-concat-html": 32,
         "javascript-escape": 1,
         "javascript-jquery-append": 8,
-        "javascript-jquery-html": 23,
-        "javascript-jquery-insert-into-target": 9,
-        "javascript-jquery-insertion": 10,
+        "javascript-jquery-html": 22,
+        "javascript-jquery-insert-into-target": 8,
+        "javascript-jquery-insertion": 9,
         "javascript-jquery-prepend": 2,
         "mako-html-entities": 0,
         "mako-invalid-html-filter": 2,
@@ -34,7 +34,7 @@
         "python-parse-error": 0,
         "python-requires-html-or-text": 0,
         "python-wrap-html": 12,
-        "underscore-not-escaped": 170
+        "underscore-not-escaped": 145
     },
-    "total": 368
+    "total": 338
 }
