@@ -6,6 +6,9 @@ import logging
 from django.dispatch import receiver
 from edx_when.api import FIELDS_TO_EXTRACT, set_dates_for_course
 from six import text_type
+
+from common.lib.xmodule.xmodule.util.misc import is_xblock_an_assignment
+from openedx.core.lib.graph_traversals import traverse_pre_order
 from xblock.fields import Scope
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, modulestore
@@ -37,6 +40,25 @@ def _field_values(fields, xblock):
                 raise TypeError(exception_message)
     return result
 
+def _has_assignment_blocks(item):
+    def leaf_filter(block):
+        return (
+            block.location.block_type not in ('chapter', 'sequential', 'vertical') and
+            len(block.get_children()) == 0
+        )
+
+    def get_children(parent):
+        # This function is used to get the children of a block in the traversal below
+        if parent.has_children:
+            return parent.get_children()
+        else:
+            return []
+
+    return any(
+        is_xblock_an_assignment(block)
+        for block in traverse_pre_order(item, get_children, leaf_filter)
+    )
+
 
 def _gather_graded_items(root, due):
     items = [root]
@@ -45,6 +67,11 @@ def _gather_graded_items(root, due):
     while items:
         next_item = items.pop()
         if next_item.graded:
+            # Sequentials can be marked as graded, but only contain ungraded problems
+            # To handle this case, we can look at the problem blocks within a sequential
+            # and check that they are a graded assignment
+            # (if they have graded/has_score attributes and nonzero weight)
+            due = due if _has_assignment_blocks(next_item) else None
             # TODO: Once studio can manually set relative dates, we would need to manually check for them here
             collected_items.append((next_item.location, {'due': due}))
             # TODO: This is pretty gross, and should maybe be configurable in the future,
