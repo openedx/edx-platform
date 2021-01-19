@@ -39,13 +39,13 @@ class CourseModesViewTestBase(AuthAndScopesTestMixin):
             course_id=cls.course_key,
             mode_slug='audit',
             mode_display_name='Audit',
-            min_price=0,
+            min_price='0.00',
         )
         cls.verified_mode = CourseModeFactory.create(
             course_id=cls.course_key,
             mode_slug='verified',
             mode_display_name='Verified',
-            min_price=25,
+            min_price='25.00',
         )
         # use these to make sure we don't fetch data for other courses
         cls.other_course_key = CourseKey.from_string('course-v1:edX+DemoX+Other_Course')
@@ -54,7 +54,7 @@ class CourseModesViewTestBase(AuthAndScopesTestMixin):
             course_id=cls.other_course_key,
             mode_slug='other-audit',
             mode_display_name='Other Audit',
-            min_price=0,
+            min_price='0.00',
         )
 
     @classmethod
@@ -133,7 +133,7 @@ class TestCourseModesListViews(CourseModesViewTestBase, ModuleStoreTestCase, API
                 'course_id': text_type(self.course_key),
                 'mode_slug': 'audit',
                 'mode_display_name': 'Audit',
-                'min_price': 0,
+                'min_price': '0.00',
                 'currency': 'usd',
                 'expiration_datetime': None,
                 'expiration_datetime_is_explicit': False,
@@ -145,7 +145,7 @@ class TestCourseModesListViews(CourseModesViewTestBase, ModuleStoreTestCase, API
                 'course_id': text_type(self.course_key),
                 'mode_slug': 'verified',
                 'mode_display_name': 'Verified',
-                'min_price': 25,
+                'min_price': '25.00',
                 'currency': 'usd',
                 'expiration_datetime': None,
                 'expiration_datetime_is_explicit': False,
@@ -168,7 +168,7 @@ class TestCourseModesListViews(CourseModesViewTestBase, ModuleStoreTestCase, API
                 'course_id': text_type(self.other_course_key),
                 'mode_slug': 'other-audit',
                 'mode_display_name': 'Other Audit',
-                'min_price': 0,
+                'min_price': '0.00',
                 'currency': 'usd',
                 'expiration_datetime': None,
                 'expiration_datetime_is_explicit': False,
@@ -285,7 +285,7 @@ class TestCourseModesDetailViews(CourseModesViewTestBase, APITestCase):
             'course_id': text_type(self.course_key),
             'mode_slug': 'audit',
             'mode_display_name': 'Audit',
-            'min_price': 0,
+            'min_price': '0.00',
             'currency': 'usd',
             'expiration_datetime': None,
             'expiration_datetime_is_explicit': False,
@@ -324,7 +324,7 @@ class TestCourseModesDetailViews(CourseModesViewTestBase, APITestCase):
             course_id=self.course_key,
             mode_slug='prof-ed',
             mode_display_name='Professional Education',
-            min_price=100,
+            min_price='100.00',
             currency='jpy',
         )
         self.client.login(username=self.global_staff.username, password=self.user_password)
@@ -393,7 +393,7 @@ class TestCourseModesDetailViews(CourseModesViewTestBase, APITestCase):
             course_id=self.course_key,
             mode_slug='bachelors',
             mode_display_name='Bachelors',
-            min_price=1000,
+            min_price='1000.00',
         )
         self.client.login(username=self.global_staff.username, password=self.user_password)
         url = self.get_url(mode_slug='bachelors')

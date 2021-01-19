@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 import ddt
 import mock
 import six
+from decimal import Decimal
 from django.conf import settings
 from django.http import QueryDict
 from django.urls import reverse
@@ -903,7 +904,7 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         self.verified_mode = CourseMode.objects.create(
             course_id=self.course.id,
             mode_slug=CourseMode.VERIFIED,
-            min_price=100,
+            min_price=Decimal('100.00'),
             expiration_datetime=end,
             sku='test'
         )

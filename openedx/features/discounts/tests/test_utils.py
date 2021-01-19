@@ -68,14 +68,14 @@ class TestOfferData(TestCase):
         self.user = UserFactory()
         self.overview = CourseOverviewFactory()
         CourseModeFactory(course_id=self.overview.id, mode_slug=CourseMode.AUDIT)
-        CourseModeFactory(course_id=self.overview.id, mode_slug=CourseMode.VERIFIED, min_price=149)
+        CourseModeFactory(course_id=self.overview.id, mode_slug=CourseMode.VERIFIED, min_price=149.00)
         CourseEnrollment.enroll(self.user, self.overview.id, CourseMode.AUDIT)
 
     def test_happy_path(self):
         self.assertEqual(utils.generate_offer_data(self.user, self.overview), {
             'code': 'EDXWELCOME',
             'expiration_date': get_discount_expiration_date(self.user, self.overview),
-            'original_price': '$149',
+            'original_price': '$149.00',
             'discounted_price': '$126.65',
             'percentage': 15,
             'upgrade_url': '/dashboard',

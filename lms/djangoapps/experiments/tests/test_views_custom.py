@@ -91,7 +91,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
         CourseModeFactory.create(
             mode_slug=CourseMode.VERIFIED,
             course_id=course.id,
-            min_price=10,
+            min_price=10.00,
             sku=six.text_type(uuid4().hex)
         )
 
@@ -102,7 +102,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
         self.assertTrue(bool(result['basket_url']))
         expected = {
             'show_upsell': True,
-            'price': u'$10',
+            'price': u'$10.00',
             'basket_url': result['basket_url'],
             # Example basket_url: u'/verify_student/upgrade/org.0/course_0/test/'
         }
