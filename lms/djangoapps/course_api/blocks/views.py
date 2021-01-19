@@ -350,7 +350,7 @@ class BlocksWithCompletionView(BlocksInCourseView):
             request - Django request object
         """
 
-        response = super(BlocksWithCompletionView, self).list(request, hide_access_denials=hide_access_denials)
+        response = super().list(request, hide_access_denials=hide_access_denials)
 
         course_blocks = {}
         if request.query_params.get('return_type') == 'list':

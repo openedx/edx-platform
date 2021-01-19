@@ -422,13 +422,14 @@ class TestBlocksInCourseView(TestBlocksView):  # pylint: disable=test-inherits-t
         self.verify_response(403, params={'course_id': str(CourseLocator('non', 'existent', 'course'))})
 
 
-class TestBlocksWithCompletionView(TestBlocksInCourseView, CompletionWaffleTestMixin):
+class TestBlocksWithCompletionView(TestBlocksInCourseView,  # pylint: disable=test-inherits-tests
+                                   CompletionWaffleTestMixin):
     """
     Test class for BlocksInCourseView
     """
 
     def setUp(self):
-        super(TestBlocksWithCompletionView, self).setUp()
+        super().setUp()
         self.override_waffle_switch(True)
         self.url = reverse('blocks_with_completion_in_course')
         self.query_params['course_id'] = str(self.course_key)
