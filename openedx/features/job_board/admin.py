@@ -7,7 +7,7 @@ from .models import Job
 
 
 class JobModelAdmin(admin.ModelAdmin):
-    list_display = ('title', 'company', 'type', 'compensation', 'hours', 'city', 'country')
+    list_display = ('title', 'company', 'type', 'compensation', 'hours', 'city', 'country', 'user')
 
 
 admin.site.register(Job, JobModelAdmin)
