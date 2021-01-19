@@ -240,3 +240,6 @@ CORS_ALLOW_HEADERS = corsheaders_default_headers + (
 ################### Special Exams (Proctoring) and Prereqs ###################
 FEATURES['ENABLE_SPECIAL_EXAMS'] = True
 FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
+
+# Don't tolerate deprecated edx-platform import usage in devstack.
+ERROR_ON_DEPRECATED_EDX_PLATFORM_IMPORTS = True

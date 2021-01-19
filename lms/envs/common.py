@@ -4179,3 +4179,17 @@ LOGO_URL_PNG = None
 LOGO_TRADEMARK_URL = None
 FAVICON_URL = None
 DEFAULT_EMAIL_LOGO_URL = 'https://edx-cdn.org/v3/default/logo.png'
+
+# .. toggle_name: ERROR_ON_DEPRECATED_EDX_PLATFORM_IMPORTS
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_use_cases: rollout
+# .. toggle_creation_date: 2021-01-20
+# .. toggle_target_removal_date: 2021-01-27
+# .. toggle_tickets: https://github.com/edx/edx-platform/pull/25932
+# .. toggle_description: Whether to raise an exception where,
+#  normally, a DeprecatedEdxPlatformImportWarning would be raised.
+#  This will allow us to test dropping support for the deprecated
+#  import paths without yet removing all of the import_shims
+#  machinery.
+ERROR_ON_DEPRECATED_EDX_PLATFORM_IMPORTS = False
