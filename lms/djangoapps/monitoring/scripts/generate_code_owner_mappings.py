@@ -49,6 +49,7 @@ THIRD_PARTY_APPS = {
     'simple_history': 'https://github.com/treyhunner/django-simple-history',
     'social_django': 'https://github.com/python-social-auth/social-app-django',
     'corsheaders': 'https://github.com/adamchainz/django-cors-headers',
+    'edx_sga': 'https://github.com/mitodl/edx-sga',
 }
 
 
