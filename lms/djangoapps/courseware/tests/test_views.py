@@ -2878,7 +2878,7 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
         """
         Overridable method to get the response from the endpoint that is being tested.
         """
-        url = reverse('render_xblock', kwargs={'usage_key_string': six.text_type(usage_key)})
+        url = reverse('render_xblock', kwargs={'usage_key_string': str(usage_key)})
         if url_encoded_params:
             url += '?' + url_encoded_params
         return self.client.get(url)
@@ -2933,6 +2933,53 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'data-enable-completion-on-view-service="false"')
         self.assertNotContains(response, 'data-mark-completed-on-view-after-delay')
+
+    def test_rendering_descendant_of_gated_sequence(self):
+        """
+        Test that we redirect instead of rendering what should be gated content,
+        for things that are gated at the sequence level.
+        """
+        with self.store.default_store(ModuleStoreEnum.Type.split):
+            # pylint:disable=attribute-defined-outside-init
+            self.course = CourseFactory.create(**self.course_options())
+            self.chapter = ItemFactory.create(parent=self.course, category='chapter')
+            self.sequence = ItemFactory.create(
+                parent=self.chapter,
+                category='sequential',
+                display_name='Sequence',
+                is_time_limited=True,
+            )
+            self.vertical_block = ItemFactory.create(
+                parent=self.sequence,
+                category='vertical',
+                display_name="Vertical",
+            )
+            self.html_block = ItemFactory.create(
+                parent=self.vertical_block,
+                category='html',
+                data="<p>Test HTML Content<p>"
+            )
+            self.problem_block = ItemFactory.create(
+                parent=self.vertical_block,
+                category='problem',
+                display_name='Problem'
+            )
+        CourseOverview.load_from_module_store(self.course.id)
+        self.setup_user(admin=False, enroll=True, login=True)
+
+        # Problem and Vertical response should both redirect to the Sequential
+        # (where useful messaging would be).
+        seq_url = reverse('render_xblock', kwargs={'usage_key_string': str(self.sequence.location)})
+        for block in [self.problem_block, self.vertical_block]:
+            response = self.get_response(usage_key=block.location)
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response.get('Location'), seq_url)
+
+        # The Sequence itself 200s (or we risk infinite redirect loops).
+        self.assertEqual(
+            self.get_response(usage_key=self.sequence.location).status_code,
+            200
+        )
 
 
 class TestRenderXBlockSelfPaced(TestRenderXBlock):

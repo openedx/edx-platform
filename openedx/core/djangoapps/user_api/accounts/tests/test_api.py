@@ -522,9 +522,11 @@ class AccountSettingsOnCreationTest(CreateAccountMixin, TestCase):
         request.user = user
         account_settings = get_account_settings(request)[0]
 
-        # Expect a date joined field but remove it to simplify the following comparison
+        # Expect a date joined and last login field but remove it to simplify the following comparison
         self.assertIsNotNone(account_settings['date_joined'])
+        self.assertIsNotNone(account_settings['last_login'])
         del account_settings['date_joined']
+        del account_settings['last_login']
 
         # Expect all the values to be defaulted
         self.assertEqual(account_settings, {

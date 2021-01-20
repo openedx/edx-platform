@@ -267,7 +267,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         Verify that all account fields are returned (even those that are not shareable).
         """
         data = response.data
-        self.assertEqual(25, len(data))
+        self.assertEqual(26, len(data))
 
         # public fields (3)
         expected_account_privacy = (
@@ -282,6 +282,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         self.assertEqual(TEST_BIO_VALUE, data["bio"])
         self.assertEqual("US", data["country"])
         self.assertIsNotNone(data["date_joined"])
+        self.assertIsNotNone(data["last_login"])
         self.assertEqual([{"code": TEST_LANGUAGE_PROFICIENCY_CODE}], data["language_proficiencies"])
         self.assertEqual("m", data["level_of_education"])
         self.assertIsNotNone(data["social_links"])
@@ -497,7 +498,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             with self.assertNumQueries(queries):
                 response = self.send_get(self.client)
             data = response.data
-            self.assertEqual(25, len(data))
+            self.assertEqual(26, len(data))
             self.assertEqual(self.user.username, data["username"])
             self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
             for empty_field in ("year_of_birth", "level_of_education", "mailing_address", "bio"):
@@ -508,6 +509,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             self.assertEqual("Learn a lot", data["goals"])
             self.assertEqual(self.user.email, data["email"])
             self.assertIsNotNone(data["date_joined"])
+            self.assertIsNotNone(data["last_login"])
             self.assertEqual(self.user.is_active, data["is_active"])
             self._verify_profile_image_data(data, False)
             self.assertTrue(data["requires_parental_consent"])
@@ -916,7 +918,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         response = self.send_get(client)
         if has_full_access:
             data = response.data
-            self.assertEqual(25, len(data))
+            self.assertEqual(26, len(data))
             self.assertEqual(self.user.username, data["username"])
             self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
             self.assertEqual(self.user.email, data["email"])
@@ -927,6 +929,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             self.assertEqual("Learn a lot", data["goals"])
             self.assertTrue(data["is_active"])
             self.assertIsNotNone(data["date_joined"])
+            self.assertIsNotNone(data["last_login"])
             self._verify_profile_image_data(data, False)
             self.assertTrue(data["requires_parental_consent"])
             self.assertEqual(PRIVATE_VISIBILITY, data["account_privacy"])

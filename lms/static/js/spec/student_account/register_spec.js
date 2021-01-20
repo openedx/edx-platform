@@ -78,7 +78,7 @@
                     },
                     FORM_DESCRIPTION = {
                         method: 'post',
-                        submit_url: '/user_api/v1/account/registration/',
+                        submit_url: '/api/user/v1/account/registration/',
                         validation_url: '/api/user/v1/validation/registration',
                         fields: [
                             {

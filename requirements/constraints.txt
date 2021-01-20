@@ -8,14 +8,15 @@
 # pin when possible.  Writing an issue against the offending project and
 # linking to it here is good.
 
+
+# This file contains all common constraints for edx-repos
+-c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
+
 # celery 5.0 has dropped python3.5 support.
 celery<5.0
 
 # cryptography 3.3 has dropped python3.5 support.
 cryptography<3.3
-
-# Stay on the latest LTS release of Django
-Django<2.3
 
 # The CORS_ORIGIN_WHITELIST changes in a backwards incompatible way in 3.0.0, needs matching configuration repo changes
 django-cors-headers<3.0.0
@@ -36,10 +37,7 @@ django-storages<1.9
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.17.5
-
-# We expect v2.0.0 to introduce large breaking changes in the feature toggle API
-edx-toggles<2.0.0
+edx-enterprise==3.17.10
 
 # Upgrading to 2.12.0 breaks several test classes due to API changes, need to update our code accordingly
 factory-boy==2.8.1
@@ -71,9 +69,6 @@ kiwisolver<1.2.0
 # 4.5.1 introduced a bug when used together with xmlsec: https://bugs.launchpad.net/lxml/+bug/1880251
 # Tests passed, but hit a problem in stage
 lxml<4.5.1
-
-# Convert text markup to HTML; used in capa problems, forums, and course wikis; pin Markdown version as tests failed for its upgrade to the latest release
-Markdown==2.6.11
 
 # Matplotlib 3.1 requires Python 3.6
 matplotlib<3.1
@@ -138,12 +133,11 @@ cryptography==3.2.1
 # greater versions breaking the code
 Sphinx==3.3.0
 
-# incremental upgrade approach
-djangorestframework==3.11.0
-
-
 # latest edx-bulk-grades==0.8.5 is giving migration error.
 edx-bulk-grades<0.8.5
 
 # social-auth-core==4.3.0 requires PyJWT > 2.0.0
 social-auth-core<4.0.3
+
+# python3-saml==1.10.0 version started breaking a11y tests
+python3-saml<1.10.0

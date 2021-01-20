@@ -123,7 +123,6 @@ class UserReadOnlySerializer(serializers.Serializer):
             account_recovery = None
 
         accomplishments_shared = badges_enabled()
-
         data = {
             "username": user.username,
             "url": self.context.get('request').build_absolute_uri(
@@ -135,6 +134,7 @@ class UserReadOnlySerializer(serializers.Serializer):
             # DRF JSONEncoder will not include it in the serialized value.
             # https://docs.djangoproject.com/en/1.8/ref/databases/#fractional-seconds-support-for-time-and-datetime-fields
             "date_joined": user.date_joined.replace(microsecond=0),
+            "last_login": user.last_login,
             "is_active": user.is_active,
             "bio": None,
             "country": None,

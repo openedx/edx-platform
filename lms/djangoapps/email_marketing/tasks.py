@@ -21,6 +21,7 @@ log = logging.getLogger(__name__)
 SAILTHRU_LIST_CACHE_KEY = "email.marketing.cache"
 
 
+# TODO: Remove in AA-607
 @shared_task(bind=True)
 @set_code_owner_attribute
 def get_email_cookies_via_sailthru(self, user_email, post_parms):
@@ -62,6 +63,7 @@ def get_email_cookies_via_sailthru(self, user_email, post_parms):
     return None
 
 
+# TODO: Remove in AA-607
 @shared_task(bind=True, default_retry_delay=3600, max_retries=24)
 @set_code_owner_attribute
 def update_user(self, sailthru_vars, email, site=None, new_user=False, activation=False):
@@ -145,6 +147,7 @@ def is_default_site(site):
     return not site or site.get('id') == settings.SITE_ID
 
 
+# TODO: Remove in AA-607
 @shared_task(bind=True, default_retry_delay=3600, max_retries=24)
 @set_code_owner_attribute
 def update_user_email(self, new_email, old_email):
@@ -200,6 +203,7 @@ def _create_email_user_param(sailthru_vars, sailthru_client, email, new_user, em
     return sailthru_user
 
 
+# TODO: Remove in AA-607
 def _get_or_create_user_list_for_site(sailthru_client, site=None, default_list_name=None):
     """
     Get the user list name from cache if exists else create one and return the name,
@@ -218,6 +222,7 @@ def _get_or_create_user_list_for_site(sailthru_client, site=None, default_list_n
     return list_name if sailthru_list else default_list_name
 
 
+# TODO: Remove in AA-607
 def _get_or_create_user_list(sailthru_client, list_name):
     """
     Get list from sailthru and return if list_name exists else create a new one
@@ -247,6 +252,7 @@ def _get_or_create_user_list(sailthru_client, list_name):
     return sailthru_list
 
 
+# TODO: Remove in AA-607
 def _get_list_from_email_marketing_provider(sailthru_client):
     """
     Get sailthru list
@@ -293,6 +299,7 @@ def _create_user_list(sailthru_client, list_name):
     return True
 
 
+# TODO: Remove in AA-607
 def _retryable_sailthru_error(error):
     """ Return True if error should be retried.
 
@@ -306,6 +313,7 @@ def _retryable_sailthru_error(error):
     return code == 9 or code == 43
 
 
+# TODO: Remove in AA-607
 @shared_task(bind=True)
 @set_code_owner_attribute
 def update_course_enrollment(self, email, course_key, mode, site=None):
@@ -360,6 +368,7 @@ def build_course_url(course_key):
                                                          course_key=six.text_type(course_key))
 
 
+# TODO: Remove in AA-607
 def update_unenrolled_list(sailthru_client, email, course_url, unenroll):
     """Maintain a list of courses the user has unenrolled from in the Sailthru user record
     Arguments:
@@ -414,12 +423,14 @@ def update_unenrolled_list(sailthru_client, email, course_url, unenroll):
         return False
 
 
+# TODO: Remove in AA-607
 def schedule_retry(self, config):
     """Schedule a retry"""
     raise self.retry(countdown=config.sailthru_retry_interval,
                      max_retries=config.sailthru_max_retries)
 
 
+# TODO: Remove in AA-607
 def _get_course_content(course_id, course_url, sailthru_client, config):
     """Get course information using the Sailthru content api or from cache.
         If there is an error, just return with an empty response.
@@ -451,6 +462,7 @@ def _get_course_content(course_id, course_url, sailthru_client, config):
     return response
 
 
+# TODO: Remove in AA-607
 def _build_purchase_item(course_id, course_url, cost_in_cents, mode, course_data):
     """Build and return Sailthru purchase item object"""
 
@@ -478,6 +490,7 @@ def _build_purchase_item(course_id, course_url, cost_in_cents, mode, course_data
     return item
 
 
+# TODO: Remove in AA-607
 def _record_purchase(sailthru_client, email, item, options):
     """
     Record a purchase in Sailthru
