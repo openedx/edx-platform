@@ -285,7 +285,7 @@ sphinxcontrib-openapi[markdown]==0.6.0  # via -r requirements/edx/development.in
 sphinxcontrib-qthelp==1.0.3  # via sphinx
 sphinxcontrib-serializinghtml==1.1.4  # via sphinx
 sqlparse==0.4.1           # via -r requirements/edx/testing.txt, django, django-debug-toolbar
-staff-graded-xblock==1.4  # via -r requirements/edx/testing.txt
+staff-graded-xblock==1.5  # via -r requirements/edx/testing.txt
 stevedore==1.32.0         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, code-annotations, edx-ace, edx-django-utils, edx-enterprise, edx-opaque-keys
 super-csv==2.0.0          # via -r requirements/edx/testing.txt, edx-bulk-grades
 sympy==1.6.2              # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, symmath

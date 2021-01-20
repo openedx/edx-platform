@@ -264,7 +264,7 @@ sorl-thumbnail==12.7.0    # via -r requirements/edx/base.txt, django-wiki
 sortedcontainers==2.3.0   # via -r requirements/edx/base.txt
 soupsieve==2.1            # via -r requirements/edx/base.txt, beautifulsoup4
 sqlparse==0.4.1           # via -r requirements/edx/base.txt, django
-staff-graded-xblock==1.4  # via -r requirements/edx/base.txt
+staff-graded-xblock==1.5  # via -r requirements/edx/base.txt
 stevedore==1.32.0         # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, code-annotations, edx-ace, edx-django-utils, edx-enterprise, edx-opaque-keys
 super-csv==2.0.0          # via -r requirements/edx/base.txt, edx-bulk-grades
 sympy==1.6.2              # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, symmath
