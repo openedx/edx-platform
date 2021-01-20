@@ -21,7 +21,7 @@ class CourseModeSerializer(serializers.Serializer):
     course_id = serializers.CharField()
     mode_slug = serializers.CharField()
     mode_display_name = serializers.CharField()
-    min_price = serializers.IntegerField(required=False)
+    min_price = serializers.DecimalField(required=False, max_digits=30, decimal_places=2)
     currency = serializers.CharField()
     expiration_datetime = serializers.DateTimeField(required=False)
     expiration_datetime_is_explicit = serializers.BooleanField(required=False)

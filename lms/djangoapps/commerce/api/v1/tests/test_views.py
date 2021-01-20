@@ -4,6 +4,7 @@
 import itertools
 import json
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 import ddt
 import pytz
@@ -40,7 +41,7 @@ class CourseApiViewTestMixin(object):
         self.course_mode = CourseMode.objects.create(
             course_id=self.course.id,
             mode_slug=u'verified',
-            min_price=100,
+            min_price=u'100.00',
             currency=u'USD',
             sku=u'ABC123',
             bulk_sku=u'BULK-ABC123'
@@ -156,7 +157,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         """ Returns expected data and response for course update. """
         expected_course_mode = CourseMode(
             mode_slug=u'verified',
-            min_price=200,
+            min_price=u'200.00',
             currency=u'USD',
             sku=u'ABC123',
             bulk_sku=u'BULK-ABC123',
@@ -227,7 +228,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
 
         verified_mode = CourseMode(
             mode_slug=u'verified',
-            min_price=200,
+            min_price=u'200.00',
             currency=u'USD',
             sku=u'ABC123',
             bulk_sku=u'BULK-ABC123',
@@ -252,7 +253,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
 
         verified_mode = CourseMode(
             mode_slug=u'verified',
-            min_price=200,
+            min_price=u'200.00',
             currency=u'USD',
             sku=u'ABC123',
             bulk_sku=u'BULK-ABC123',
@@ -297,7 +298,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         existing_masters_mode = CourseMode.objects.create(
             course_id=self.course.id,
             mode_slug=u'masters',
-            min_price=10000,
+            min_price=u'10000.00',
             currency=u'USD',
             sku=u'DEF456',
             bulk_sku=u'BULK-DEF456'
@@ -305,7 +306,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         new_mode = CourseMode(
             course_id=self.course.id,
             mode_slug=u'credit',
-            min_price=500,
+            min_price=u'500.00',
             currency=u'USD',
             sku=u'ABC123',
             bulk_sku=u'BULK-ABC123'
@@ -340,7 +341,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         mode = self._serialize_course_mode(
             CourseMode(
                 mode_slug=mode_slug,
-                min_price=500,
+                min_price=u'500.00',
                 currency=u'USD',
                 sku=u'ABC123',
                 bulk_sku=u'BULK-ABC123',
@@ -361,14 +362,14 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         expected_modes = [
             CourseMode(
                 mode_slug=u'verified',
-                min_price=150,
+                min_price=u'150.00',
                 currency=u'USD',
                 sku=u'ABC123',
                 bulk_sku=u'BULK-ABC123'
             ),
             CourseMode(
                 mode_slug=u'honor',
-                min_price=0,
+                min_price=u'0.00',
                 currency=u'USD',
                 sku=u'DEADBEEF',
                 bulk_sku=u'BULK-DEADBEEF'
@@ -412,7 +413,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         expected_modes = [
             CourseMode(
                 mode_slug=CourseMode.DEFAULT_MODE_SLUG,
-                min_price=150, currency=u'USD',
+                min_price=u'150.00', currency=u'USD',
                 sku=u'ABC123',
                 bulk_sku=u'BULK-ABC123'
             )

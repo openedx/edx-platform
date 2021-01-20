@@ -342,13 +342,13 @@ def create_mode(request, course_id):
     Attempts to use the following querystring parameters from the request:
         `mode_slug` (str): The mode to add, either 'honor', 'verified', or 'professional'
         `mode_display_name` (str): Describes the new course mode
-        `min_price` (int): The minimum price a user must pay to enroll in the new course mode
+        `min_price` (Decimal): The minimum price a user must pay to enroll in the new course mode
         `suggested_prices` (str): Comma-separated prices to suggest to the user.
         `currency` (str): The currency in which to list prices.
         `sku` (str): The product SKU value.
 
     By default, this endpoint will create an 'honor' mode for the given course with display name
-    'Honor Code', a minimum price of 0, no suggested prices, and using USD as the currency.
+    'Honor Code', a minimum price of 0.00, no suggested prices, and using USD as the currency.
 
     Args:
         request (`Request`): The Django Request object.
@@ -360,7 +360,7 @@ def create_mode(request, course_id):
     PARAMETERS = {
         'mode_slug': u'honor',
         'mode_display_name': u'Honor Code Certificate',
-        'min_price': 0,
+        'min_price': 0.00,
         'suggested_prices': u'',
         'currency': u'usd',
         'sku': None,

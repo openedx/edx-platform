@@ -52,7 +52,7 @@ def get_enrollments(username, include_inactive=False):
                         {
                             "slug": "honor",
                             "name": "Honor Code Certificate",
-                            "min_price": 0,
+                            "min_price": 0.00,
                             "suggested_prices": "",
                             "currency": "usd",
                             "expiration_datetime": null,
@@ -80,7 +80,7 @@ def get_enrollments(username, include_inactive=False):
                         {
                             "slug": "honor",
                             "name": "Honor Code Certificate",
-                            "min_price": 0,
+                            "min_price": 0.00,
                             "suggested_prices": "",
                             "currency": "usd",
                             "expiration_datetime": null,
@@ -128,7 +128,7 @@ def get_enrollment(username, course_id):
                     {
                         "slug": "honor",
                         "name": "Honor Code Certificate",
-                        "min_price": 0,
+                        "min_price": 0.00,
                         "suggested_prices": "",
                         "currency": "usd",
                         "expiration_datetime": null,
@@ -180,7 +180,7 @@ def add_enrollment(username, course_id, mode=None, is_active=True, enrollment_at
                     {
                         "slug": "audit",
                         "name": "Audit",
-                        "min_price": 0,
+                        "min_price": 0.00,
                         "suggested_prices": "",
                         "currency": "usd",
                         "expiration_datetime": null,
@@ -242,7 +242,7 @@ def update_enrollment(
                     {
                         "slug": "honor",
                         "name": "Honor Code Certificate",
-                        "min_price": 0,
+                        "min_price": 0.00,
                         "suggested_prices": "",
                         "currency": "usd",
                         "expiration_datetime": null,
@@ -306,7 +306,7 @@ def get_course_enrollment_details(course_id, include_expired=False):
                 {
                     "slug": "honor",
                     "name": "Honor Code Certificate",
-                    "min_price": 0,
+                    "min_price": 0.00,
                     "suggested_prices": "",
                     "currency": "usd",
                     "expiration_datetime": null,
