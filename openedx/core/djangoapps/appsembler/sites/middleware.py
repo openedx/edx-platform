@@ -1,12 +1,15 @@
+import beeline
+import logging
+
 from django.conf import settings
 from django.core.cache import cache, caches
 from django.contrib.redirects.models import Redirect
 from django.shortcuts import redirect
 
 from openedx.core.djangoapps.appsembler.sites.models import AlternativeDomain
+from openedx.core.djangoapps.appsembler.sites.utils import get_current_organization
 
-import beeline
-import logging
+
 log = logging.getLogger(__name__)
 
 
@@ -69,3 +72,17 @@ class RedirectMiddleware(object):
         redirect_to = redirects.get(request.path)
         if redirect_to:
             return redirect(redirect_to, permanent=True)
+
+
+class LmsCurrentOrganizationMiddleware(object):
+    """
+    Get the current middleware for the LMS.
+
+    This middleware replaces the default `organizations.OrganizationMiddleware` to
+    use a better get_current_organization() helper.
+    """
+    def process_request(self, request):
+        # Note: This does _not_ support multiple organizations per user.
+        organization = get_current_organization(failure_return_none=True)
+        beeline.add_trace_field('session_current_organization', organization)
+        request.session['organization'] = organization

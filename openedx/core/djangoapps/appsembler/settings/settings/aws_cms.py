@@ -33,6 +33,7 @@ def plugin_settings(settings):
         settings.RAVEN_CONFIG['tags']['app'] = 'cms'
 
     settings.MIDDLEWARE_CLASSES += (
+        # TODO: OrganizationMiddleware should be added before Tiers middleware in `aws_common.plugin_settings()`
         'organizations.middleware.OrganizationMiddleware',
     )
 

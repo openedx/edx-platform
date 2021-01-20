@@ -43,6 +43,11 @@ def plugin_settings(settings):
 
     This file, however, won't run in test environments.
     """
+    settings.MIDDLEWARE_CLASSES += (
+        # LmsCurrentOrganizationMiddleware needs to go before `TiersMiddleware` in aws_common.plugin_settings()
+        'openedx.core.djangoapps.appsembler.sites.middleware.LmsCurrentOrganizationMiddleware',
+    )
+
     aws_common.plugin_settings(settings)
 
     settings.LMS_BASE = settings.ENV_TOKENS.get('LMS_BASE')
