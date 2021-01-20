@@ -4,7 +4,7 @@ python-intercom==0.2.13
 raven==6.10.0
 requests==2.9.1
 django-anymail==5.0
-django-tiers==0.2.1
+django-tiers==0.2.3
 dj-database-url==0.4.2
 psycopg2-binary==2.8.3
 django-compat==1.0.14
