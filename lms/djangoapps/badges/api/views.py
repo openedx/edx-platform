@@ -119,7 +119,7 @@ class UserBadgeAssertions(generics.ListAPIView):
             try:
                 course_id = CourseKey.from_string(provided_course_id)
             except InvalidKeyError:
-                raise InvalidCourseKeyError
+                raise InvalidCourseKeyError  # lint-amnesty, pylint: disable=raise-missing-from
         elif 'slug' not in self.request.query_params:
             # Need to get all badges for the user.
             course_id = None
