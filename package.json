@@ -77,7 +77,7 @@
     "babel-jest": "23.0.1",
     "edx-custom-a11y-rules": "1.0.6",
     "enzyme": "3.3.0",
-    "enzyme-adapter-react-16": "1.1.1",
+    "enzyme-adapter-react-16": "1.15.6",
     "eslint-config-edx": "3.0.1",
     "eslint-config-edx-es5": "2.0.0",
     "eslint-import-resolver-webpack": "0.8.4",
