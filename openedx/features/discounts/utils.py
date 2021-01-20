@@ -10,6 +10,7 @@ from django.utils.translation import get_language
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import RequestCache
 from web_fragments.fragment import Fragment
+from decimal import Decimal
 
 from common.djangoapps.course_modes.models import format_course_price, get_course_prices
 from common.djangoapps.util.date_utils import strftime_localized_html
@@ -61,14 +62,20 @@ def _get_discount_prices(user, course, assume_discount=False):
     discounted and percentage will be returned as None if no discount is applicable.
     """
     base_price = get_course_prices(course, verified_only=True)[0]
+    if isinstance(base_price, float):
+        base_price = Decimal('{:0.2f}'.format(base_price))
+
     can_discount = assume_discount or can_receive_discount(user, course)
 
     if can_discount:
         percentage = discount_percentage(course)
 
-        discounted_price = base_price * ((100.0 - percentage) / 100)
+        if isinstance(base_price, Decimal):
+            discounted_price = base_price * Decimal((100.0 - percentage) / 100)
+        else:
+            discounted_price = base_price * ((100.0 - percentage) / 100)
         if discounted_price:  # leave 0 prices alone, as format_course_price below will adjust to 'Free'
-            if discounted_price == int(discounted_price):
+            if discounted_price == int(discounted_price) and not isinstance(discounted_price, Decimal):
                 discounted_price = '{:0.0f}'.format(discounted_price)
             else:
                 discounted_price = '{:0.2f}'.format(discounted_price)

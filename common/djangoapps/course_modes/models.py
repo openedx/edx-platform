@@ -843,7 +843,7 @@ def get_course_prices(course, verified_only=False):
     registration_price is the minimum price for the course across all course modes.
     cosmetic_display_prices is the course price as a string preceded by correct currency, or 'Free'.
     """
-    # Find the
+    # Find the minimum price (registration_price) whether verified mode or not
     if verified_only:
         registration_price = CourseMode.min_course_price_for_verified_for_currency(
             course.id,

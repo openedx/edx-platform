@@ -1,6 +1,7 @@
 """
 Tests of the openedx.features.discounts.utils module.
 """
+from decimal import Decimal
 from mock import patch, Mock
 
 import ddt
@@ -36,7 +37,7 @@ class TestStrikeoutPrice(TestCase):
         assert six.text_type(content) == u"<span class='price'>$100</span>"
         assert not has_discount
 
-    @ddt.data((15, 100, "$100", "$85",), (50, 50, "$50", "$25"), (10, 99, "$99", "$89.10"))
+    @ddt.data((15, 100, "$100", "$85",), (50, 50, "$50", "$25"), (10, 99, "$99", "$89.10"), (15, 100.00, "$100.00", "$85.00",), (50, 50.00, "$50.00", "$25.00"), (10, 99.00, "$99.00", "$89.10"), (15, Decimal('100.00'), "$100.00", "$85.00",), (50, Decimal('50.00'), "$50.00", "$25.00"), (10, Decimal('99.00'), "$99.00", "$89.10"))
     @ddt.unpack
     def test_eligible_eligible(self, discount_percentage, base_price, formatted_base_price, final_price):
         with patch.multiple(
@@ -68,7 +69,7 @@ class TestOfferData(TestCase):
         self.user = UserFactory()
         self.overview = CourseOverviewFactory()
         CourseModeFactory(course_id=self.overview.id, mode_slug=CourseMode.AUDIT)
-        CourseModeFactory(course_id=self.overview.id, mode_slug=CourseMode.VERIFIED, min_price=149.00)
+        CourseModeFactory(course_id=self.overview.id, mode_slug=CourseMode.VERIFIED, min_price=Decimal('149.00'))
         CourseEnrollment.enroll(self.user, self.overview.id, CourseMode.AUDIT)
 
     def test_happy_path(self):
