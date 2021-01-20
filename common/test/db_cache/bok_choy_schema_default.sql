@@ -2930,7 +2930,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=818 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=819 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -4701,7 +4701,13 @@ CREATE TABLE `lti_consumer_lticonfiguration` (
   `lti_1p3_internal_private_key_id` varchar(255) NOT NULL,
   `lti_1p3_internal_public_jwk` longtext NOT NULL,
   `lti_1p3_client_id` varchar(255) NOT NULL,
+  `config_id` char(32) NOT NULL,
+  `lti_1p1_client_key` varchar(255) NOT NULL,
+  `lti_1p1_client_secret` varchar(255) NOT NULL,
+  `lti_1p1_launch_url` varchar(255) NOT NULL,
+  `lti_config` longtext NOT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `config_id` (`config_id`),
   KEY `lti_consumer_lticonfiguration_location_e7e37735` (`location`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
