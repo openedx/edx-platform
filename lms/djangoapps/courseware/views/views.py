@@ -134,6 +134,7 @@ from xmodule.x_module import STUDENT_VIEW
 from ..context_processor import user_timezone_locale_prefs
 from ..entrance_exams import user_can_skip_entrance_exam
 from ..module_render import get_module, get_module_by_usage_id, get_module_for_descriptor
+from ..tabs import _get_dynamic_tabs
 
 log = logging.getLogger("edx.courseware")
 
@@ -602,7 +603,8 @@ class CourseTabView(EdxFragmentView):
             course = get_course_with_access(request.user, 'load', course_key)
             try:
                 # Render the page
-                tab = CourseTabList.get_tab_by_type(course.tabs, tab_type)
+                course_tabs = course.tabs + _get_dynamic_tabs(course, request.user)
+                tab = CourseTabList.get_tab_by_type(course_tabs, tab_type)
                 page_context = self.create_page_context(request, course=course, tab=tab, **kwargs)
 
                 # Show warnings if the user has limited access
