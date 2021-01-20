@@ -253,6 +253,7 @@
             },
 
             clearFormErrors: function() {
+                document.querySelector("#login-password-validation-error-msg").innerHTML = "Incorrect Password"
                 var query = '.' + this.formErrorsJsHook;
                 this.clearFormFeedbackItems(query);
             },
