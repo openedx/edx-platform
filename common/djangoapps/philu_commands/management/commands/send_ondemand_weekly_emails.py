@@ -1,19 +1,20 @@
+"""
+Command to send ondemand weekly emails.
+"""
 from datetime import datetime, timedelta
 from logging import getLogger
 
 from django.core.management.base import BaseCommand
-
 from submissions.models import Submission
 
-from philu_commands.helpers import generate_course_structure
 from common.lib.mandrill_client.client import MandrillClient
-from student.models import CourseEnrollment
-
-from xmodule.modulestore.django import modulestore
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.features.philu_courseware.helpers import get_nth_chapter_link
-from openedx.features.ondemand_email_preferences.helpers import get_my_account_link
 from lms.djangoapps.onboarding.helpers import get_email_pref_on_demand_course, get_user_anonymous_id
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.features.ondemand_email_preferences.helpers import get_my_account_link
+from openedx.features.philu_courseware.helpers import get_nth_chapter_link
+from philu_commands.helpers import generate_course_structure
+from student.models import CourseEnrollment
+from xmodule.modulestore.django import modulestore
 
 log = getLogger(__name__)
 
@@ -25,9 +26,13 @@ ON_DEMAND_MODULE_TEXT_FOMATTER = "<li> {module_name} </li>"
 
 
 class Command(BaseCommand):
+    """
+    Command class for send ondemand weekly emails
+    """
     help = """
-        Send weekly emails to those users who have completed the scheduled graded module. This email will not be sent 
-        for those module which don't have at-least one graded sub-section.
+        Send weekly emails to those users who have completed graded module in last 24 hours. This email will not be
+        sent for those modules which don't have at-least one graded sub-section. If user has completed last module and
+        skipped some graded modules then skip module email will be send.
     """
 
     def handle(self, *args, **options):
@@ -104,19 +109,20 @@ class Command(BaseCommand):
                             if len(ora_list) > 0:
                                 log.info("&&&&&&&&&&&&&&& %s &&&&&&&&&&&&&&&", verticals.display_name)
                                 for ora_block in ora_list:
-                                    try:
-                                        response_submissions = Submission.objects.get(
-                                            student_item__student_id=anonymous_user.anonymous_user_id,
-                                            student_item__item_id=ora_block)
+                                    response_submissions = Submission.objects.filter(
+                                        student_item__student_id=anonymous_user.anonymous_user_id,
+                                        student_item__item_id=ora_block
+                                    ).first()
+                                    if response_submissions:
                                         if index_chapter == last_chapter_index:
                                             last_module_ora_submission_date = response_submissions.created_at.date()
                                         # Response submitted date must be within last
                                         # 24 hours and we are checking that below
                                         if today - timedelta(hours=HOURS_TO_WAIT_FOR_EMAIL) <= \
-                                            response_submissions.created_at.date() <= today:
+                                                response_submissions.created_at.date() <= today:
                                             atleast_one_ora_submitted = True
                                             log.info('Response Created at: %s', response_submissions.created_at.date())
-                                    except Submission.DoesNotExist:
+                                    else:
                                         log.error("ORA response not submitted")
                                         chapters_skipped.update({index_chapter: sequentials.display_name})
                                         break
@@ -125,7 +131,7 @@ class Command(BaseCommand):
                                     # is less than total number of modules, number of graded sub-section is
                                     # greater than 0 and atleast one ora sub mitted in last 24 hours.
                                     if index_chapter != last_chapter_index and \
-                                        graded_subsection > 0 and atleast_one_ora_submitted:
+                                            graded_subsection > 0 and atleast_one_ora_submitted:
                                         send_weekly_email(user, course, str(chapter), course_blocks, index_chapter + 1)
 
                                     # We need to send skip email if user has completed last
@@ -196,6 +202,9 @@ def send_module_skip_email(user, course, chapters_skipped):
 
 
 def get_module_list(chapter_names):
+    """
+    Get modules list in a custom string format
+    """
     chapters_text = ''
     for chapter in chapter_names:
         module_text = ON_DEMAND_MODULE_TEXT_FOMATTER.format(
@@ -206,6 +215,9 @@ def get_module_list(chapter_names):
 
 
 def get_ora_list(verticals):
+    """
+    Get all ORAs in a list from given vertical
+    """
     oras = []
     for vertical in verticals.children:
         vertical_blocks = modulestore().get_item(vertical)
