@@ -189,6 +189,14 @@
                 this.clearPasswordResetSuccess();
             },
 
+            showServerError: function(msg) {
+              const passwordField = document.querySelector("#login-password")
+              const passwordLabel = document.querySelector("label[for=login-password")
+              passwordField.classList.add('error');
+              passwordLabel.classList.add('error');
+              document.querySelector("#login-password-validation-error-msg").innerHTML = msg
+            },
+
             saveError: function(error) {
                 var errorCode;
                 var msg;
@@ -222,6 +230,7 @@
                     }
                 } else {
                     this.renderErrors(this.defaultFormErrorsTitle, this.errors);
+                    this.showServerError(msg)
                 }
                 this.toggleDisableButton(false);
             },
