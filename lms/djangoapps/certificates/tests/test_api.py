@@ -236,7 +236,7 @@ class CertificateIsInvalid(WebCertificateTestMixin, ModuleStoreTestCase):
     """Tests for the `is_certificate_invalid` helper function. """
 
     def setUp(self):
-        super(CertificateIsInvalid, self).setUp()
+        super().setUp()
 
         self.student = UserFactory()
         self.course = CourseFactory.create(
