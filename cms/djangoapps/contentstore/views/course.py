@@ -32,6 +32,7 @@ from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from six import text_type
 from six.moves import filter
+from edx_django_utils.monitoring import function_trace
 
 from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
@@ -109,7 +110,7 @@ from .library import (
     get_library_creator_status,
     should_redirect_to_library_authoring_mfe
 )
-from edx_django_utils.monitoring import function_trace
+
 
 log = logging.getLogger(__name__)
 
