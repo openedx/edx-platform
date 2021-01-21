@@ -11,9 +11,8 @@ from django.contrib.auth.models import User
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
 
+from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.verify_student.services import IDVerificationService
-
-from .api import generate_user_certificates
 
 logger = getLogger(__name__)
 

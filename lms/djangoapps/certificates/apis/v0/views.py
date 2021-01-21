@@ -17,13 +17,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from lms.djangoapps.certificates.api import get_certificate_for_user, get_certificates_for_user
+from lms.djangoapps.certificates.apis.v0.permissions import IsOwnerOrPublicCertificates
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.user_api.accounts.api import visible_fields
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
-
-from .permissions import IsOwnerOrPublicCertificates
 
 log = logging.getLogger(__name__)
 User = get_user_model()

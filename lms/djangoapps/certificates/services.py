@@ -8,9 +8,8 @@ import logging
 from django.core.exceptions import ObjectDoesNotExist
 from opaque_keys.edx.keys import CourseKey
 
+from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.utils import _get_key
-
-from .models import GeneratedCertificate
 
 log = logging.getLogger(__name__)
 
