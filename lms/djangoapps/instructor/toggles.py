@@ -19,8 +19,8 @@ WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE)
 # .. toggle_target_removal_date: None
 # .. toggle_warnings: ??
 # .. toggle_tickets: PROD-1309
-DATA_DOWNLOAD_V2 = CourseWaffleFlag(
-    waffle_namespace=LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix='instructor_dashboard: '),
+DATA_DOWNLOAD_V2 = LegacyWaffleFlag(
+    waffle_namespace=WAFFLE_FLAG_NAMESPACE,
     flag_name='enable_data_download_v2',
     module_name=__name__,
 )
