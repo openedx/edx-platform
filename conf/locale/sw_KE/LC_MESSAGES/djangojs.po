@@ -96,8 +96,7 @@ msgstr ""
 #: cms/static/js/views/asset.js cms/static/js/views/container.js
 #: cms/static/js/views/course_info_handout.js
 #: cms/static/js/views/course_info_update.js
-#: cms/static/js/views/edit_textbook.js
-#: cms/static/js/views/list_item_editor.js
+#: cms/static/js/views/edit_textbook.js cms/static/js/views/list_item_editor.js
 #: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/tabs.js
 #: cms/static/js/views/utils/xblock_utils.js
 #: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
@@ -196,8 +195,7 @@ msgstr "Sawa"
 msgid "None"
 msgstr "Hakuna"
 
-#: cms/static/js/views/course_video_settings.js
-#: cms/static/js/views/metadata.js
+#: cms/static/js/views/course_video_settings.js cms/static/js/views/metadata.js
 #: cms/static/js/views/previous_video_upload.js
 #: cms/static/js/views/video_transcripts.js
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
@@ -445,7 +443,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid ""
-"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
+"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;"
+"{heading6}=h6"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -1648,7 +1647,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
 msgid ""
-"Click OK to have your username and e-mail address sent to a 3rd party application.\n"
+"Click OK to have your username and e-mail address sent to a 3rd party "
+"application.\n"
 "\n"
 "Click Cancel to return to this page without sending your information."
 msgstr ""
@@ -1685,7 +1685,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid ""
-"If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n"
+"If you use the Advanced Editor, this problem will be converted to XML and "
+"you will not be able to return to the Simple Editor Interface.\n"
 "\n"
 "Proceed to the Advanced Editor and convert this problem to XML?"
 msgstr ""
@@ -1899,8 +1900,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid ""
-"Press the UP arrow key to enter the language menu then use UP and DOWN arrow"
-" keys to navigate language options. Press ENTER to change to the selected "
+"Press the UP arrow key to enter the language menu then use UP and DOWN arrow "
+"keys to navigate language options. Press ENTER to change to the selected "
 "language."
 msgstr ""
 
@@ -2016,8 +2017,7 @@ msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
-"You could not be unsubscribed from this post. Refresh the page and try "
-"again."
+"You could not be unsubscribed from this post. Refresh the page and try again."
 msgstr ""
 "Hukuweza kutolewa kwenye chapisho hili. Onesha upya ukurasa na jaribu tena."
 
@@ -2042,8 +2042,8 @@ msgid ""
 "This response could not be marked as endorsed. Refresh the page and try "
 "again."
 msgstr ""
-"Taarifa hii haikuweza kuoredheshwa kwamba imeidhinishwa. Onesha upya ukurasa"
-" na jaribu tena."
+"Taarifa hii haikuweza kuoredheshwa kwamba imeidhinishwa. Onesha upya ukurasa "
+"na jaribu tena."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "This response could not be unendorsed. Refresh the page and try again."
@@ -2052,8 +2052,7 @@ msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "This vote could not be processed. Refresh the page and try again."
-msgstr ""
-"Kura hii haikuweza kushughulikiwa. Onesha upya ukurasa na jaribu tena."
+msgstr "Kura hii haikuweza kushughulikiwa. Onesha upya ukurasa na jaribu tena."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "This post could not be pinned. Refresh the page and try again."
@@ -2081,8 +2080,7 @@ msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "This post could not be closed. Refresh the page and try again."
-msgstr ""
-"Chapisho hili halikuweza kufungwa. Onesha upya ukurasa na jaribu tena."
+msgstr "Chapisho hili halikuweza kufungwa. Onesha upya ukurasa na jaribu tena."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "This post could not be reopened. Refresh the page and try again."
@@ -2125,8 +2123,7 @@ msgstr "Inapakia orodha ya machapisho"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid ""
-"No results found for {original_query}. Showing results for "
-"{suggested_query}."
+"No results found for {original_query}. Showing results for {suggested_query}."
 msgstr ""
 "Hakuna matokeo ya {original_query}. Inaonesha matokeo ya {suggested_query}."
 
@@ -2372,8 +2369,7 @@ msgstr "Tafadhali bainisha sababu."
 #: lms/djangoapps/support/static/support/js/views/enrollment_modal.js
 msgid "Something went wrong changing this enrollment. Please try again."
 msgstr ""
-"Kumetokea hitilafu wakati wa kubadilisha uandikishaji. Tafadhali jaribu "
-"tena."
+"Kumetokea hitilafu wakati wa kubadilisha uandikishaji. Tafadhali jaribu tena."
 
 #: lms/djangoapps/support/static/support/jsx/errors_list.jsx
 msgid "Please fix the following errors:"
@@ -2385,8 +2381,8 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/file_upload.jsx
 msgid ""
-"Files that you upload must be PDFs or image files in .gif, .jpg, .jpeg, or "
-".png format."
+"Files that you upload must be PDFs or image files in .gif, .jpg, .jpeg, or ."
+"png format."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/file_upload.jsx
@@ -2535,8 +2531,7 @@ msgstr ""
 msgid ""
 "Due to the recent increase in interest in online education and edX, we are "
 "currently experiencing an unusually high volume of support requests. We "
-"appreciate your patience as we work to review each request. Please check the"
-" "
+"appreciate your patience as we work to review each request. Please check the "
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -2814,8 +2809,8 @@ msgstr "Ombi lako halikuweza kukamilishwa. Pakia upya ukurasa na jaribu tena."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
-"Your request could not be completed due to a server problem. Reload the page"
-" and try again. If the issue persists, click the Help tab to report the "
+"Your request could not be completed due to a server problem. Reload the page "
+"and try again. If the issue persists, click the Help tab to report the "
 "problem."
 msgstr ""
 "Ombi lako halikuweza kukamilishwa sababu ya tatizo la sava. Pakia tena "
@@ -2835,8 +2830,8 @@ msgid ""
 "Create a new team if you can't find an existing team to join, or if you "
 "would like to learn with friends you know."
 msgstr ""
-"Tengeneza timu mpya kama huwezikupata timu iliyopo ili kujiunga, kama huwezi"
-" kupata timu iliyopo ili kujiunga, au kama ulitaka kujifunza na marafiki "
+"Tengeneza timu mpya kama huwezikupata timu iliyopo ili kujiunga, kama huwezi "
+"kupata timu iliyopo ili kujiunga, au kama ulitaka kujifunza na marafiki "
 "unaowajua."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
@@ -2928,9 +2923,8 @@ msgid ""
 "topic{span_end}."
 msgstr ""
 "{browse_span_start}Vinjari timu kwenye mada nyingine{span_end} au "
-"{search_span_start}tafuta timu{span_end}kwenye mada hii. Ikiwa bado hujapata"
-" timu ya kujiunga,{create_span_start}unda timu mpya kwenye mada "
-"hii{span_end}."
+"{search_span_start}tafuta timu{span_end}kwenye mada hii. Ikiwa bado hujapata "
+"timu ya kujiunga,{create_span_start}unda timu mpya kwenye mada hii{span_end}."
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
 msgid ""
@@ -3147,7 +3141,8 @@ msgstr "Tafadhali ingiza tarehe na muda halali wa kuanza."
 
 #: lms/static/js/ccx/schedule.js
 msgid "Due date cannot be before start date."
-msgstr "\"Tarehe inayotarajiwa\" kumaliza haiwezi kuwa kabla ya tarehe ya kuanza."
+msgstr ""
+"\"Tarehe inayotarajiwa\" kumaliza haiwezi kuwa kabla ya tarehe ya kuanza."
 
 #: lms/static/js/ccx/schedule.js
 msgid "Enter Due Date and Time"
@@ -3163,8 +3158,8 @@ msgid ""
 "in username/email and then press \"Add to Exception List\" button."
 msgstr ""
 "Kiwanja cha mwanafunzi usernsme/email kinahitajika na hakiwezi kachwa "
-"kitupu. Tunakunasihi ujaze usernsme/email na kisha bonyeza kifungo cha \"Add"
-" to Exception List\"."
+"kitupu. Tunakunasihi ujaze usernsme/email na kisha bonyeza kifungo cha \"Add "
+"to Exception List\"."
 
 #: lms/static/js/certificates/models/certificate_invalidation.js
 msgid ""
@@ -3249,13 +3244,13 @@ msgid ""
 "The certificate for this learner has been re-validated and the system is re-"
 "running the grade for this learner."
 msgstr ""
-"\"Cheti\" cha mwanafunzi huyu kimehalalishwa tena na mfumo unatoa alama tena"
-" kwa ajili ya mwanafunzi."
+"\"Cheti\" cha mwanafunzi huyu kimehalalishwa tena na mfumo unatoa alama tena "
+"kwa ajili ya mwanafunzi."
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid ""
-"Could not find Certificate Invalidation in the list. Please refresh the page"
-" and try again"
+"Could not find Certificate Invalidation in the list. Please refresh the page "
+"and try again"
 msgstr ""
 "Haikuweza kupata Ubatilishaji wa Cheti \"kwenye\" orodha. Tafadhali "
 "changamsha ukurasa na jaribu tena. "
@@ -3338,8 +3333,8 @@ msgstr ""
 
 #: lms/static/js/dashboard/legacy.js
 msgid ""
-"Are you sure you want to unenroll from the verified {certNameLong}  track of"
-" {courseName}  ({courseNumber})?"
+"Are you sure you want to unenroll from the verified {certNameLong}  track of "
+"{courseName}  ({courseNumber})?"
 msgstr ""
 
 #: lms/static/js/dashboard/legacy.js
@@ -3526,8 +3521,8 @@ msgstr ""
 #: lms/static/js/edxnotes/views/notes_visibility_factory.js
 #: lms/static/js/edxnotes/views/search_box.js
 msgid ""
-"An error has occurred. Make sure that you are connected to the Internet, and"
-" then try refreshing the page."
+"An error has occurred. Make sure that you are connected to the Internet, and "
+"then try refreshing the page."
 msgstr ""
 
 #: lms/static/js/edxnotes/views/notes_visibility_factory.js
@@ -3647,8 +3642,8 @@ msgstr ""
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid ""
-"{numPreassigned} learner was pre-assigned for this cohort. This learner will"
-" automatically be added to the cohort when they enroll in the course."
+"{numPreassigned} learner was pre-assigned for this cohort. This learner will "
+"automatically be added to the cohort when they enroll in the course."
 msgid_plural ""
 "{numPreassigned} learners were pre-assigned for this cohort. These learners "
 "will automatically be added to the cohort when they enroll in the course."
@@ -3704,8 +3699,8 @@ msgstr "'Ongeza' Kundi"
 
 #: lms/static/js/groups/views/cohorts.js
 msgid ""
-"The {cohortGroupName} cohort has been created. You can manually add students"
-" to this cohort below."
+"The {cohortGroupName} cohort has been created. You can manually add students "
+"to this cohort below."
 msgstr ""
 
 #: lms/static/js/groups/views/cohorts.js
@@ -3739,23 +3734,23 @@ msgstr ""
 
 #: lms/static/js/groups/views/verified_track_settings_notification.js
 msgid ""
-"This course uses automatic cohorting for verified track learners. You cannot"
-" disable cohorts, and you cannot rename the manual cohort named "
+"This course uses automatic cohorting for verified track learners. You cannot "
+"disable cohorts, and you cannot rename the manual cohort named "
 "'{verifiedCohortName}'. To change the configuration for verified track "
 "cohorts, contact your edX partner manager."
 msgstr ""
 
 #: lms/static/js/groups/views/verified_track_settings_notification.js
 msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" the required cohort does not exist. You must create a manually-assigned "
+"This course has automatic cohorting enabled for verified track learners, but "
+"the required cohort does not exist. You must create a manually-assigned "
 "cohort named '{verifiedCohortName}' for the feature to work."
 msgstr ""
 
 #: lms/static/js/groups/views/verified_track_settings_notification.js
 msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" cohorts are disabled. You must enable cohorts for the feature to work."
+"This course has automatic cohorting enabled for verified track learners, but "
+"cohorts are disabled. You must enable cohorts for the feature to work."
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/certificates.js
@@ -3842,11 +3837,11 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid ""
-"There was a problem creating the report. Select \"Create Executive Summary\""
-" to try again."
+"There was a problem creating the report. Select \"Create Executive Summary\" "
+"to try again."
 msgstr ""
-"Kulikuwa na tatizo katika kuandaa taarifa. Chagua \"Create Executive "
-"Summary\" kujaribu tena. "
+"Kulikuwa na tatizo katika kuandaa taarifa. Chagua \"Create Executive Summary"
+"\" kujaribu tena. "
 
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid "Enter the enrollment code."
@@ -3947,8 +3942,7 @@ msgstr "Akaunti zote zilifanikiwa kuundwa."
 
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "Error adding/removing users as beta testers."
-msgstr ""
-"Hitilafu kwenye kuongeza/kuondoa watumiaji kama watumiaji wa 'mwanzo'."
+msgstr "Hitilafu kwenye kuongeza/kuondoa watumiaji kama watumiaji wa 'mwanzo'."
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -4100,14 +4094,14 @@ msgid ""
 "large number of learners, email messages to learners might take up to an "
 "hour to be sent."
 msgstr ""
-"Barua pepe yako imefanikiwa kuwekwa kwenye orodha ya kutumwa. Kwa kozi zenye"
-" idadi kubwa ya wanafunzi, zoezi la utumaji barua pepe kwa wanafunzi "
-"linaweza kuchukua hadi saa moja."
+"Barua pepe yako imefanikiwa kuwekwa kwenye orodha ya kutumwa. Kwa kozi zenye "
+"idadi kubwa ya wanafunzi, zoezi la utumaji barua pepe kwa wanafunzi linaweza "
+"kuchukua hadi saa moja."
 
 #: lms/static/js/instructor_dashboard/send_email.js
 msgid ""
-"You are sending an email message with the subject {subject} to the following"
-" recipients."
+"You are sending an email message with the subject {subject} to the following "
+"recipients."
 msgstr ""
 "Unatuma barua pepe yenye kichwa cha habari {subject} kwenda kwa hawa "
 "wafuatao."
@@ -4155,8 +4149,8 @@ msgid ""
 "Error getting student progress url for '<%- student_id %>'. Make sure that "
 "the student identifier is spelled correctly."
 msgstr ""
-"Kosa limetokea katika kuipata url ya maendeleo ya mwanafunzi '<%- student_id"
-" %>'. Hakikisha kitambulishi cha mwanafunzi kimeandikwa kwa usahihi."
+"Kosa limetokea katika kuipata url ya maendeleo ya mwanafunzi '<%- student_id "
+"%>'. Hakikisha kitambulishi cha mwanafunzi kimeandikwa kwa usahihi."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Please enter a problem location."
@@ -4172,9 +4166,9 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error resetting problem attempts for problem '<%= problem_id %>' and student"
-" '<%- student_id %>'. Make sure that the problem and student identifiers are"
-" complete and correct."
+"Error resetting problem attempts for problem '<%= problem_id %>' and student "
+"'<%- student_id %>'. Make sure that the problem and student identifiers are "
+"complete and correct."
 msgstr ""
 "Kosa limetokea kwenye majaribio ya kutatua kosa '<%= problem_id %>' and "
 "student '<%- student_id %>'. Hakikisha tatizo na vibainishi vya mwanafunzi "
@@ -4189,13 +4183,13 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error deleting student '<%- student_id %>'s state on problem '<%- problem_id"
-" %>'. Make sure that the problem and student identifiers are complete and "
+"Error deleting student '<%- student_id %>'s state on problem '<%- problem_id "
+"%>'. Make sure that the problem and student identifiers are complete and "
 "correct."
 msgstr ""
 "Kosa limetokea kwenye ufutaji mwanfunzi mwenye kitambulisho '<%- student_id "
-"%>'s aliye na tatizo '<%- problem_id %>'. Hakikisha tatizo na vibainishi vya"
-" mwanafunzi vimekamilika na viko sahihi."
+"%>'s aliye na tatizo '<%- problem_id %>'. Hakikisha tatizo na vibainishi vya "
+"mwanafunzi vimekamilika na viko sahihi."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Module state successfully deleted."
@@ -4217,8 +4211,8 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error resetting entrance exam attempts for student '{student_id}'. Make sure"
-" student identifier is correct."
+"Error resetting entrance exam attempts for student '{student_id}'. Make sure "
+"student identifier is correct."
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4227,14 +4221,13 @@ msgstr "Ingiza jina la mtumiaji au barua pepe ya mwanafunzi."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Do you want to allow this student ('{student_id}') to skip the entrance "
-"exam?"
+"Do you want to allow this student ('{student_id}') to skip the entrance exam?"
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"An error occurred. Make sure that the student's username or email address is"
-" correct and try again."
+"An error occurred. Make sure that the student's username or email address is "
+"correct and try again."
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4261,8 +4254,8 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Successfully started task to reset attempts for problem '<%- problem_id %>'."
-" Click the 'Show Task Status' button to see the status of the task."
+"Successfully started task to reset attempts for problem '<%- problem_id %>'. "
+"Click the 'Show Task Status' button to see the status of the task."
 msgstr ""
 "Imefanikiwa kuanza kushughulikia majaribio ya kutatua tatizo lenye "
 "utambulisho wa  '<%- problem_id %>'. Bofya kibonye cha 'Show Task Status' "
@@ -4274,8 +4267,8 @@ msgid ""
 "problem_id %>'. Make sure that the problem identifier is complete and "
 "correct."
 msgstr ""
-"Kosa limetokea kwenye kuanza majaribio ya kushughulikia wanafunzi wote walio"
-" kwenye tatizo la '<%- problem_id %>'. Hakikisha kitambulishi cha tatizo "
+"Kosa limetokea kwenye kuanza majaribio ya kushughulikia wanafunzi wote walio "
+"kwenye tatizo la '<%- problem_id %>'. Hakikisha kitambulishi cha tatizo "
 "kimekamilika na ni sahihi."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4284,18 +4277,18 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Started rescore problem task for problem '<%- problem_id %>' and student "
-"'<%- student_id %>'. Click the 'Show Task Status' button to see the status "
-"of the task."
+"Started rescore problem task for problem '<%- problem_id %>' and student '<"
+"%- student_id %>'. Click the 'Show Task Status' button to see the status of "
+"the task."
 msgstr ""
-"Imeanza kazi ya kushughulikia tatizo la '<%- problem_id %>' na "
-"mwanafunzi'<%- student_id %>'. Bofya kibonye cha 'Show Task Status' kuona "
-"kazi ilipofikia."
+"Imeanza kazi ya kushughulikia tatizo la '<%- problem_id %>' na mwanafunzi'<"
+"%- student_id %>'. Bofya kibonye cha 'Show Task Status' kuona kazi "
+"ilipofikia."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error starting a task to rescore problem '<%- problem_id %>' for student "
-"'<%- student_id %>'. Make sure that the the problem and student identifiers "
+"Error starting a task to rescore problem '<%- problem_id %>' for student '<"
+"%- student_id %>'. Make sure that the the problem and student identifiers "
 "are complete and correct."
 msgstr ""
 "Kosa limetokea wakti wa kuanza shughuli ya utoaji upya alama za swali '<%- "
@@ -4351,8 +4344,8 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error starting a task to rescore problem '<%- problem_id %>'. Make sure that"
-" the problem identifier is complete and correct."
+"Error starting a task to rescore problem '<%- problem_id %>'. Make sure that "
+"the problem identifier is complete and correct."
 msgstr ""
 "Kosa limetokea katika kuanza kushughulikia utoaji upya alama za swali '<%- "
 "problem_id %>'. Hakikisha kitambuzi cha swali kiko sahihi na kimekamilika."
@@ -4413,8 +4406,8 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/util.js
 msgid ""
-"An error occurred retrieving your email. Please try again later, and contact"
-" technical support if the problem persists."
+"An error occurred retrieving your email. Please try again later, and contact "
+"technical support if the problem persists."
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/util.js
@@ -4664,8 +4657,8 @@ msgstr ""
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
 "Please note: Deletion of your account and personal data is permanent and "
-"cannot be undone. {platformName} will not be able to recover your account or"
-" the data that is deleted."
+"cannot be undone. {platformName} will not be able to recover your account or "
+"the data that is deleted."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
@@ -4714,8 +4707,8 @@ msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
-"You have selected “Delete my account.” Deletion of your account and personal"
-" data is permanent and cannot be undone. {platformName} will not be able to "
+"You have selected “Delete my account.” Deletion of your account and personal "
+"data is permanent and cannot be undone. {platformName} will not be able to "
 "recover your account or the data that is deleted."
 msgstr ""
 
@@ -4743,8 +4736,8 @@ msgstr ""
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "Account deletion, including removal from email lists, may take a few weeks "
-"to fully process through our system. If you want to opt-out of emails before"
-" then, please unsubscribe from the footer of any email."
+"to fully process through our system. If you want to opt-out of emails before "
+"then, please unsubscribe from the footer of any email."
 msgstr ""
 
 #: lms/static/js/student_account/tos_modal.js
@@ -4796,10 +4789,10 @@ msgstr "Angalia Barua pepe Yako"
 msgid ""
 "{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
 "address is associated with your {platform_name} account, we will send a "
-"message with password recovery instructions to this email "
-"address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
-" message after 1 minute, verify that you entered the correct email address, "
-"or check your spam folder.{paragraphEnd}{paragraphStart}If you need further "
+"message with password recovery instructions to this email address."
+"{paragraphEnd}{paragraphStart}If you do not receive a password reset message "
+"after 1 minute, verify that you entered the correct email address, or check "
+"your spam folder.{paragraphEnd}{paragraphStart}If you need further "
 "assistance, {anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
 msgstr ""
 
@@ -4825,8 +4818,8 @@ msgstr ""
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
 "You have successfully signed into %(currentProvider)s, but your "
-"%(currentProvider)s account does not have a linked %(platformName)s account."
-" To link your accounts, sign in now using your %(platformName)s password."
+"%(currentProvider)s account does not have a linked %(platformName)s account. "
+"To link your accounts, sign in now using your %(platformName)s password."
 msgstr ""
 "Umefaulu kuingia mtandaoni %(currentProvider)s,lakini %(currentProvider)s "
 "akaunti yako haina kiunganishi %(platformName)s. Kuunganisha akaunti zako, "
@@ -4876,8 +4869,8 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
-"You may access your account with this address if single-sign on or access to"
-" your primary email is not available."
+"You may access your account with this address if single-sign on or access to "
+"your primary email is not available."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -4914,8 +4907,7 @@ msgid ""
 "The name that identifies you on {platform_name}. You cannot change your "
 "username."
 msgstr ""
-"Jina linalokutambulisha kwenye {platform_name}. Huwezi kubadilisha jina "
-"hili."
+"Jina linalokutambulisha kwenye {platform_name}. Huwezi kubadilisha jina hili."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/templates/student_account/account.underscore
@@ -4932,7 +4924,8 @@ msgid ""
 "a limited number of languages. Changing the value of this field will cause "
 "the page to refresh."
 msgstr ""
-"Lugha iliyotumika kwenye tovuti hii. Tovuti hii inapatika kwa lugha chache tu. Ukibadilisha lugha\n"
+"Lugha iliyotumika kwenye tovuti hii. Tovuti hii inapatika kwa lugha chache "
+"tu. Ukibadilisha lugha\n"
 "kwenye kitufe hiki itasababisha ukurasa huu ufunguke upya."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -5058,8 +5051,8 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
-"We've sent a message to {email}. Click the link in the message to reset your"
-" password. Didn't receive the message? Contact {anchorStart}technical "
+"We've sent a message to {email}. Click the link in the message to reset your "
+"password. Didn't receive the message? Contact {anchorStart}technical "
 "support{anchorEnd}."
 msgstr ""
 
@@ -5280,16 +5273,16 @@ msgid ""
 "Upload is in progress. To avoid errors, stay on this page until the process "
 "is complete."
 msgstr ""
-"Upakiaji unaendelea. Kuepuka hitilafu/makosa, bakia kwenye ukurasa huu mpaka"
-" shughuli hii ikamilike."
+"Upakiaji unaendelea. Kuepuka hitilafu/makosa, bakia kwenye ukurasa huu mpaka "
+"shughuli hii ikamilike."
 
 #: lms/static/js/views/image_field.js
 msgid ""
-"Removal is in progress. To avoid errors, stay on this page until the process"
-" is complete."
+"Removal is in progress. To avoid errors, stay on this page until the process "
+"is complete."
 msgstr ""
-"Uondoaji unaendelea. Kuepuka hitilafu/makosa, bakia katika ukurasa huu mpaka"
-" shughuli hii ikamilike."
+"Uondoaji unaendelea. Kuepuka hitilafu/makosa, bakia katika ukurasa huu mpaka "
+"shughuli hii ikamilike."
 
 #: lms/static/js/views/image_field.js
 msgid "bytes"
@@ -5475,8 +5468,7 @@ msgstr "Hariri hii hati?"
 msgid ""
 "This certificate has already been activated and is live. Are you sure you "
 "want to continue editing?"
-msgstr ""
-"Cheti hiki kiko tayari na hai. Una uhakika unataka kuendelea kuhariri?"
+msgstr "Cheti hiki kiko tayari na hai. Una uhakika unataka kuendelea kuhariri?"
 
 #: cms/static/js/certificates/views/certificate_details.js
 msgid "Yes, allow edits to the active Certificate"
@@ -5552,8 +5544,8 @@ msgid ""
 "Are you sure you want to delete {email} from the course team for "
 "“{container}”?"
 msgstr ""
-"Una hakika unahitaji kufuta {email} kutoka kwenye waliomo kwenye kozi kwenda"
-" “{container}”?"
+"Una hakika unahitaji kufuta {email} kutoka kwenye waliomo kwenye kozi kwenda "
+"“{container}”?"
 
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
@@ -5570,8 +5562,7 @@ msgid "Already a library team member"
 msgstr "Tayari ni mwanachama wa maktaba"
 
 #: cms/static/js/factories/manage_users_lib.js
-msgid ""
-"Are you sure you want to delete {email} from the library “{container}”?"
+msgid "Are you sure you want to delete {email} from the library “{container}”?"
 msgstr ""
 
 #: cms/static/js/factories/manage_users_lib.js
@@ -5608,8 +5599,7 @@ msgid "Choose new file"
 msgstr ""
 
 #: cms/static/js/features/import/factories/import.js
-msgid ""
-"File format not supported. Please upload a file with a {ext} extension."
+msgid "File format not supported. Please upload a file with a {ext} extension."
 msgstr ""
 
 #: cms/static/js/features/import/factories/import.js
@@ -5890,7 +5880,8 @@ msgstr ""
 msgid ""
 "Are you sure you wish to delete this item. It cannot be reversed!\n"
 "\n"
-"Also any content that links/refers to this item will no longer work (e.g. broken images and/or links)"
+"Also any content that links/refers to this item will no longer work (e.g. "
+"broken images and/or links)"
 msgstr ""
 
 #: cms/static/js/views/asset.js
@@ -6010,10 +6001,10 @@ msgid ""
 "attempting another export. Please check that all components on the page are "
 "valid and do not display any error messages."
 msgstr ""
-"Usafirishaji nje wa XML haukufaulu kwa japo sehemu moja. Inapendekezwa uende"
-" kwa ukurasa wa ukaguzi na urekebishe hitlafu kabla kujaribu usafirishaji "
-"nje mwengine. Tafadhali tizama kuwa sehemu zote katika ukurasa bado ni "
-"halali na usionyeshe jumbe za hitlafu yoyote."
+"Usafirishaji nje wa XML haukufaulu kwa japo sehemu moja. Inapendekezwa uende "
+"kwa ukurasa wa ukaguzi na urekebishe hitlafu kabla kujaribu usafirishaji nje "
+"mwengine. Tafadhali tizama kuwa sehemu zote katika ukurasa bado ni halali na "
+"usionyeshe jumbe za hitlafu yoyote."
 
 #: cms/static/js/views/export.js
 msgid "Correct failed component"
@@ -6029,9 +6020,9 @@ msgid ""
 "to identify the failed component. Inspect your library to identify any "
 "problematic components and try again."
 msgstr ""
-"Maktaba yako haikuweza kusafirishwa kwenda kwa XML. Hakuna habari za kutosha"
-" kutambua sehemu ambayo haikufaulu. Kagua maktaba yako utambue sehemu zozote"
-" zilizo na shida na ujaribu tena."
+"Maktaba yako haikuweza kusafirishwa kwenda kwa XML. Hakuna habari za kutosha "
+"kutambua sehemu ambayo haikufaulu. Kagua maktaba yako utambue sehemu zozote "
+"zilizo na shida na ujaribu tena."
 
 #: cms/static/js/views/export.js
 msgid "Take me to the main library page"
@@ -6039,8 +6030,8 @@ msgstr ""
 
 #: cms/static/js/views/export.js
 msgid ""
-"Your course could not be exported to XML. There is not enough information to"
-" identify the failed component. Inspect your course to identify any "
+"Your course could not be exported to XML. There is not enough information to "
+"identify the failed component. Inspect your course to identify any "
 "problematic components and try again."
 msgstr ""
 "Fanni yako haikuweza kusafirisha nje kwenda kwa XML. Hakuna habari za "
@@ -6164,8 +6155,8 @@ msgstr ""
 #: cms/static/js/views/license.js
 msgid ""
 "Allow others to distribute derivative works only under a license identical "
-"to the license that governs your work. This option is incompatible with \"No"
-" Derivatives\"."
+"to the license that governs your work. This option is incompatible with \"No "
+"Derivatives\"."
 msgstr ""
 
 #. Translators: "item_display_name" is the name of the item to be deleted.
@@ -6208,8 +6199,8 @@ msgstr "Tayari ni mwanachama"
 
 #: cms/static/js/views/manage_users_and_roles.js
 msgid ""
-"{email} is already on the {container} team. Recheck the email address if you"
-" want to add a new member."
+"{email} is already on the {container} team. Recheck the email address if you "
+"want to add a new member."
 msgstr ""
 
 #: cms/static/js/views/manage_users_and_roles.js
@@ -6532,8 +6523,8 @@ msgstr ""
 
 #: cms/static/js/views/show_textbook.js
 msgid ""
-"Deleting a textbook cannot be undone and once deleted any reference to it in"
-" your courseware's navigation will also be removed."
+"Deleting a textbook cannot be undone and once deleted any reference to it in "
+"your courseware's navigation will also be removed."
 msgstr ""
 
 #: cms/static/js/views/tabs.js
@@ -6701,8 +6692,8 @@ msgstr ""
 
 #: cms/static/js/views/video/translations_editor.js
 msgid ""
-"If you remove this transcript, the transcript will not be available for this"
-" component."
+"If you remove this transcript, the transcript will not be available for this "
+"component."
 msgstr ""
 
 #: cms/static/js/views/video/translations_editor.js
@@ -6735,8 +6726,8 @@ msgstr ""
 #. Translators: This is a 3 part text which tells the image requirements.
 #: cms/static/js/views/video_thumbnail.js
 msgid ""
-"{ReqTextSpanStart}Requirements{spanEnd}{lineBreak}{InstructionsSpanStart}{videoImageResoultion}{lineBreak}"
-" {videoImageSupportedFileFormats}{spanEnd}"
+"{ReqTextSpanStart}Requirements{spanEnd}{lineBreak}{InstructionsSpanStart}"
+"{videoImageResoultion}{lineBreak} {videoImageSupportedFileFormats}{spanEnd}"
 msgstr ""
 
 #. Translators: message will be like 1280x720 pixels
@@ -7577,8 +7568,8 @@ msgstr "Changia"
 
 #: lms/templates/api_admin/catalog-error.underscore
 msgid ""
-"There was an error retrieving preview results for this catalog. Please check"
-" that your query is correct and try again."
+"There was an error retrieving preview results for this catalog. Please check "
+"that your query is correct and try again."
 msgstr ""
 
 #: lms/templates/api_admin/catalog-results.underscore
@@ -8257,10 +8248,10 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid ""
-"Once you complete one of the program requirements you have a program record."
-" This record is marked complete once you meet all program requirements. A "
-"program record can be used to continue your learning journey and demonstrate"
-" your learning to others."
+"Once you complete one of the program requirements you have a program record. "
+"This record is marked complete once you meet all program requirements. A "
+"program record can be used to continue your learning journey and demonstrate "
+"your learning to others."
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
@@ -8393,8 +8384,8 @@ msgstr "Ingia mtandaoni"
 #, python-format
 msgid "Would you like to sign in using your %(providerName)s credentials?"
 msgstr ""
-"Ungependa kujiandikisha mrtandaoni  kwa kutumia %(providerName)s "
-"sifa/utambulisho wako?"
+"Ungependa kujiandikisha mrtandaoni  kwa kutumia %(providerName)s sifa/"
+"utambulisho wako?"
 
 #: lms/templates/student_account/hinted_login.underscore
 #, python-format
@@ -8574,8 +8565,8 @@ msgid ""
 "submit photos for verification again."
 msgstr ""
 "Asante kwa kuwasilisha picha zako. Tutazipitia kwa ufupi. Sasa unaweza "
-"kujiandikisha mtandaoni kwa  ajili ya  %(platformName)s kozi yoyote inayotoa"
-" vyeti vilivyohakikiwa. Uhakiki unadumu kwa mwaka mmoja. Baada ya mwaka "
+"kujiandikisha mtandaoni kwa  ajili ya  %(platformName)s kozi yoyote inayotoa "
+"vyeti vilivyohakikiwa. Uhakiki unadumu kwa mwaka mmoja. Baada ya mwaka "
 "mmoja, lazima uwasilishe picha kwa ajili ya uhakiki tena."
 
 #: lms/templates/verify_student/error.underscore
@@ -8682,9 +8673,9 @@ msgid ""
 "You may be able to complete the image capture procedure without assistance, "
 "but it may take a couple of submission attempts to get the camera "
 "positioning right.  Optimal camera positioning varies with each computer, "
-"but generally the best position for a headshot is approximately 12-18 inches"
-" (30-45 centimeters) from the camera, with your head centered relative to "
-"the computer screen. "
+"but generally the best position for a headshot is approximately 12-18 inches "
+"(30-45 centimeters) from the camera, with your head centered relative to the "
+"computer screen. "
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8699,8 +8690,7 @@ msgstr ""
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid ""
-"What if I have difficulty holding my head in position relative to the "
-"camera?"
+"What if I have difficulty holding my head in position relative to the camera?"
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8729,8 +8719,8 @@ msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
-"You need an ID with your name and photo. A driver's license, passport, or ID"
-" are all acceptable."
+"You need an ID with your name and photo. A driver's license, passport, or ID "
+"are all acceptable."
 msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8827,8 +8817,8 @@ msgstr ""
 msgid ""
 "We use the highest levels of security available to encrypt your photo and "
 "send it to our authorization service for review. Your photo and information "
-"are not saved or visible anywhere on %(platformName)s after the verification"
-" process is complete."
+"are not saved or visible anywhere on %(platformName)s after the verification "
+"process is complete."
 msgstr ""
 "Tunatumia viwango vya juu kabisa vya kiusalama vilivyopo kwa ajili ya "
 "kuificha picha yako na kuituma kwenye huduma yetu ya kuidhinisha kwa ajili "
@@ -8837,8 +8827,7 @@ msgstr ""
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: {courseName}"
-msgstr ""
-"Asante kwa kurudi kuthibitisha Kitambulisho chako kwenye: {courseName}"
+msgstr "Asante kwa kurudi kuthibitisha Kitambulisho chako kwenye: {courseName}"
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid ""
@@ -8846,9 +8835,9 @@ msgid ""
 "your inbox for an activation email. After you complete activation you can "
 "return and refresh this page."
 msgstr ""
-"Unahitaji kuwezesha akaunti yako kabla ya kujiandikisha katika kozi. Angalia"
-" sehemu ya kupokelea ujumbe kwa ajili ya kuwezesha barua pepe yako. Baada ya"
-" kukamilisha uwezeshaji unaweza kurudi na ufungue upya ukurasa. "
+"Unahitaji kuwezesha akaunti yako kabla ya kujiandikisha katika kozi. Angalia "
+"sehemu ya kupokelea ujumbe kwa ajili ya kuwezesha barua pepe yako. Baada ya "
+"kukamilisha uwezeshaji unaweza kurudi na ufungue upya ukurasa. "
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Activate Your Account"
@@ -8903,8 +8892,8 @@ msgid ""
 "account."
 msgstr ""
 "Barua pepe imetumwa kwa  {userEmail} pamoja na kiungo wavuti chako ili "
-"kuamsha akaunti yako."
-"                                                                                                             "
+"kuamsha akaunti "
+"yako.                                                                                                             "
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "Why activate?"
@@ -8931,8 +8920,7 @@ msgid "Government-Issued Photo ID"
 msgstr "Kitambulisho cha Picha Kilichoidhinishwa na Serikali"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-msgid ""
-"ID-Verification is not required for this Professional Education course."
+msgid "ID-Verification is not required for this Professional Education course."
 msgstr ""
 "Uthibitisho wa Kitambulisho chako hakihitajiki kwa ya kozi ya elimu ya "
 "kitaaluma. "
@@ -9000,8 +8988,8 @@ msgstr "Kupokea cheti, unahitajika kuthibitisha kitambulisho chako."
 msgid ""
 "To verify your identity, you need a webcam and a government-issued photo ID."
 msgstr ""
-"Kuthibitisha kitambulisho chako, unahitaji kamera ya wavuti  na Kitambulisho"
-" cha picha kilichoidhinishwa na serikali."
+"Kuthibitisha kitambulisho chako, unahitaji kamera ya wavuti  na Kitambulisho "
+"cha picha kilichoidhinishwa na serikali."
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid ""
@@ -9398,8 +9386,8 @@ msgstr "Wasahihishi wa Cheti"
 #: cms/templates/js/certificate-editor.underscore
 msgid ""
 "It is strongly recommended that you include four or fewer signatories. If "
-"you include additional signatories, preview the certificate in Print View to"
-" ensure the certificate will print correctly on one page."
+"you include additional signatories, preview the certificate in Print View to "
+"ensure the certificate will print correctly on one page."
 msgstr ""
 
 #: cms/templates/js/certificate-editor.underscore
@@ -9862,8 +9850,8 @@ msgstr "Kifupisho"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid ""
-"This short name for the assignment type (for example, HW or Midterm) appears"
-" next to assignments on a learner's Progress page."
+"This short name for the assignment type (for example, HW or Midterm) appears "
+"next to assignments on a learner's Progress page."
 msgstr ""
 
 #: cms/templates/js/course_grade_policy.underscore
@@ -9906,8 +9894,8 @@ msgstr "Hauna nakala zozote zilizo fafanuliwa"
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid ""
-"There is invalid code in your content. Please check to make sure it is valid"
-" HTML."
+"There is invalid code in your content. Please check to make sure it is valid "
+"HTML."
 msgstr ""
 
 #: cms/templates/js/course_info_update.underscore
@@ -10015,8 +10003,8 @@ msgstr "Mpangilio wa Kundi Hili Unatumika katika:"
 
 #: cms/templates/js/group-configuration-details.underscore
 msgid ""
-"This Group Configuration is not in use. Start by adding a content experiment"
-" to any Unit via the {linkStart}Course Outline{linkEnd}."
+"This Group Configuration is not in use. Start by adding a content experiment "
+"to any Unit via the {linkStart}Course Outline{linkEnd}."
 msgstr ""
 
 #: cms/templates/js/group-configuration-editor.underscore
@@ -10073,8 +10061,8 @@ msgstr "\"futa\" kundi"
 
 #: cms/templates/js/highlights-editor.underscore
 msgid ""
-"This feature is currently in testing. Course teams can enter highlights, but"
-" learners will not receive email messages."
+"This feature is currently in testing. Course teams can enter highlights, but "
+"learners will not receive email messages."
 msgstr ""
 
 #: cms/templates/js/highlights-editor.underscore
@@ -10269,8 +10257,8 @@ msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
 msgid ""
-"Draft saved on {lastSavedStart}{editedOn}{lastSavedEnd} by "
-"{editedByStart}{editedBy}{editedByEnd}"
+"Draft saved on {lastSavedStart}{editedOn}{lastSavedEnd} by {editedByStart}"
+"{editedBy}{editedByEnd}"
 msgstr ""
 "Rasimu imehifadhiwa {lastSavedStart}{editedOn}{lastSavedEnd} na "
 "{editedByStart}{editedBy}{editedByEnd}"
@@ -10280,9 +10268,8 @@ msgid ""
 "Last published {lastPublishedStart}{publishedOn}{lastPublishedEnd} by "
 "{publishedByStart}{publishedBy}{publishedByEnd}"
 msgstr ""
-"Mara ya Mwisho kuchapishwa "
-"{lastPublishedStart}{publishedOn}{lastPublishedEnd} na "
-"{publishedByStart}{publishedBy}{publishedByEnd}"
+"Mara ya Mwisho kuchapishwa {lastPublishedStart}{publishedOn}"
+"{lastPublishedEnd} na {publishedByStart}{publishedBy}{publishedByEnd}"
 
 #: cms/templates/js/publish-xblock.underscore
 #, python-format
@@ -10374,8 +10361,8 @@ msgid ""
 "incorrect, nor the score received, until after the course end date has "
 "passed."
 msgstr ""
-"Wanafunzi hawaoni ikiwa majibu yao ya tathmini yalikuwa sahihi au si sahihi,"
-" sio alama zilizopokelewa, mpaka  kupita kwa tarehe ya mwisho ya kozi."
+"Wanafunzi hawaoni ikiwa majibu yao ya tathmini yalikuwa sahihi au si sahihi, "
+"sio alama zilizopokelewa, mpaka  kupita kwa tarehe ya mwisho ya kozi."
 
 #: cms/templates/js/show-correctness-editor.underscore
 msgid ""
@@ -10397,8 +10384,8 @@ msgstr ""
 
 #: cms/templates/js/show-correctness-editor.underscore
 msgid ""
-"If the subsection does not have a due date, learners always see their scores"
-" when they submit answers to assessments."
+"If the subsection does not have a due date, learners always see their scores "
+"when they submit answers to assessments."
 msgstr ""
 "Kama kifungu kidogo hakina tarehe ya mwiisho, wanafunzi wanaona alama zao "
 "muda wote wakati wanapowasilisha majibu kwenye tathmini."
@@ -10498,10 +10485,10 @@ msgid ""
 "the unit. Only units that are explicitly hidden from learners will remain "
 "hidden after you clear this option for the %(xblockType)s."
 msgstr ""
-"Kama unaruhusu hiiI %(xblockType)s ionekane na wanafunzi, wanafunzi wataweza"
-" kuona maudhui yake baada ya tarehe ya kutolewa maudhui kupita na "
-"umechapisha sura. Sura zile ambazo zimefichwa zisionekane na wanafunzi "
-"zitabaki kuwa siri  baada ya kufuta kipengele hiki %(xblockType)s."
+"Kama unaruhusu hiiI %(xblockType)s ionekane na wanafunzi, wanafunzi wataweza "
+"kuona maudhui yake baada ya tarehe ya kutolewa maudhui kupita na umechapisha "
+"sura. Sura zile ambazo zimefichwa zisionekane na wanafunzi zitabaki kuwa "
+"siri  baada ya kufuta kipengele hiki %(xblockType)s."
 
 #: cms/templates/js/team-member.underscore
 msgid "Current Role:"
@@ -10609,8 +10596,8 @@ msgstr "Wakati Uliotengewa (SAA:DKK):"
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
 "Select a time allotment for the exam. If it is over 24 hours, type in the "
-"amount of time. You can grant individual learners extra time to complete the"
-" exam through the Instructor Dashboard."
+"amount of time. You can grant individual learners extra time to complete the "
+"exam through the Instructor Dashboard."
 msgstr ""
 "Chagua kiasi cha muda wa kufanya mtihani. Kama ni zaidi ya masaa 24, andika "
 "kwenye kiasi cha wakati. Unaweza kuwapa wanafunzi muda wa ziada ili "
@@ -10751,8 +10738,8 @@ msgstr "Hariri %(display_name)s (linahitajika)"
 
 #: cms/templates/js/maintenance/force-published-course-response.underscore
 msgid ""
-"You have done a dry run of force publishing the course. Nothing has changed."
-" Had you run it, the following course versions would have been change."
+"You have done a dry run of force publishing the course. Nothing has changed. "
+"Had you run it, the following course versions would have been change."
 msgstr ""
 "Umejaribu kulazimisha kuchapisha kozi. Hakuna kilichobadilika. Ungefanya "
 "hivyo, matoleo ya kozi yafuatayo yangebadilishwa."
@@ -10762,8 +10749,8 @@ msgid ""
 "The published branch version, {published}, was reset to the draft branch "
 "version, {draft}."
 msgstr ""
-"Toleo la chapisho tawi, {published}, imetegeshwa upya kwenye rasimu ya toleo"
-" la tawi, {draft}."
+"Toleo la chapisho tawi, {published}, imetegeshwa upya kwenye rasimu ya toleo "
+"la tawi, {draft}."
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid "Add URLs for additional versions"
@@ -10771,8 +10758,8 @@ msgstr ""
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid ""
-"To be sure all students can access the video, we recommend providing both an"
-" .mp4 and a .webm version of your video. Click below to add a URL for "
+"To be sure all students can access the video, we recommend providing both "
+"an .mp4 and a .webm version of your video. Click below to add a URL for "
 "another version. These URLs cannot be YouTube URLs. The first listed video "
 "that's compatible with the student's computer will play."
 msgstr ""
@@ -10788,8 +10775,8 @@ msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
 msgid ""
-"The timed transcript for the first video file does not appear to be the same"
-" as the timed transcript for the second video file."
+"The timed transcript for the first video file does not appear to be the same "
+"as the timed transcript for the second video file."
 msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
@@ -10847,9 +10834,9 @@ msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
 msgid ""
-"EdX doesn't have a timed transcript for this video in Studio, but we found a"
-" transcript on YouTube. You can import the YouTube transcript or upload your"
-" own .srt transcript file."
+"EdX doesn't have a timed transcript for this video in Studio, but we found a "
+"transcript on YouTube. You can import the YouTube transcript or upload your "
+"own .srt transcript file."
 msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
@@ -10868,8 +10855,8 @@ msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
 msgid ""
-"The timed transcript for this video on edX is out of date, but YouTube has a"
-" current timed transcript for this video."
+"The timed transcript for this video on edX is out of date, but YouTube has a "
+"current timed transcript for this video."
 msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
@@ -10898,8 +10885,8 @@ msgstr ""
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid ""
 "You changed a video URL, but did not change the timed transcript file. Do "
-"you want to use the current timed transcript or upload a new .srt transcript"
-" file?"
+"you want to use the current timed transcript or upload a new .srt transcript "
+"file?"
 msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
