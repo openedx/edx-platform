@@ -288,7 +288,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
             self.assertEqual(response.status_code, 403)
 
     def test_regenerate_certificate(self):
-        """Test web certificate regenration."""
+        """Test web certificate regeneration."""
         self.cert.download_url = ''
         self.cert.save()
 
@@ -306,7 +306,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
 
     @patch('lms.djangoapps.certificates.queue.XQueueCertInterface._generate_cert')
     def test_regenerate_certificate_for_honor_mode(self, mock_generate_cert):
-        """Test web certificate regenration for the users who have earned the
+        """Test web certificate regeneration for the users who have earned the
            certificate in honor mode
         """
         self.cert.mode = 'honor'

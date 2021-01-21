@@ -232,11 +232,11 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
 
 
 @ddt.ddt
-class CertificateisInvalid(WebCertificateTestMixin, ModuleStoreTestCase):
+class CertificateIsInvalid(WebCertificateTestMixin, ModuleStoreTestCase):
     """Tests for the `is_certificate_invalid` helper function. """
 
     def setUp(self):
-        super(CertificateisInvalid, self).setUp()
+        super(CertificateIsInvalid, self).setUp()
 
         self.student = UserFactory()
         self.course = CourseFactory.create(

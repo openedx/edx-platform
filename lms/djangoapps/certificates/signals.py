@@ -39,7 +39,7 @@ def _update_cert_settings_on_pacing_change(sender, updated_course_overview, **kw
     Catches the signal that course pacing has changed and enable/disable
     the self-generated certificates according to course-pacing.
     """
-    CertificateGenerationCourseSetting.set_self_generatation_enabled_for_course(
+    CertificateGenerationCourseSetting.set_self_generation_enabled_for_course(
         updated_course_overview.id,
         updated_course_overview.self_paced,
     )

@@ -223,7 +223,7 @@ def _update_context_with_basic_info(context, course_id, platform_name, configura
 
     context['company_contact_urltext'] = _(u"Contact {platform_name}").format(platform_name=platform_name)
 
-    # Translators:  This text appears near the top of the certficate and describes the guarantee provided by edX
+    # Translators:  This text appears near the top of the certificate and describes the guarantee provided by edX
     context['document_banner'] = _(u"{platform_name} acknowledges the following student accomplishment").format(
         platform_name=platform_name
     )
