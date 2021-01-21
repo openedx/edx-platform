@@ -157,7 +157,8 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         'id': 'id_value',
         'firstName': 'firstName_value',
         'idp_name': 'testshib',
-        'attributes': {u'urn:oid:0.9.2342.19200300.100.1.1': [u'myself']}
+        'attributes': {u'urn:oid:0.9.2342.19200300.100.1.1': [u'myself'], 'name_id': '1'},
+        'session_index': '1',
     }
 
     @patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
@@ -204,6 +205,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         # Instrument the pipeline to get to the dashboard with the full expected state.
         self.client.get(
             pipeline.get_login_url(self.provider.provider_id, pipeline.AUTH_ENTRY_LOGIN))
+
         actions.do_complete(request.backend, social_views._do_login,  # pylint: disable=protected-access
                             request=request)
 

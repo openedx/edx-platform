@@ -259,7 +259,7 @@ six==1.15.0               # via -r requirements/edx/base.txt, analytics-python, 
 slumber==0.7.1            # via -r requirements/edx/base.txt, edx-bulk-grades, edx-enterprise, edx-rest-api-client
 smmap==3.0.4              # via gitdb
 social-auth-app-django==4.0.0  # via -r requirements/edx/base.txt
-social-auth-core==3.3.3   # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, social-auth-app-django
+social-auth-core==4.0.2   # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, social-auth-app-django
 sorl-thumbnail==12.7.0    # via -r requirements/edx/base.txt, django-wiki
 sortedcontainers==2.3.0   # via -r requirements/edx/base.txt
 soupsieve==2.1            # via -r requirements/edx/base.txt, beautifulsoup4
