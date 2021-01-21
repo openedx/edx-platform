@@ -7536,12 +7536,12 @@ msgstr "Enviar"
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "discussion posted %(time_ago)s by %(author)s"
-msgstr "discusión publicada hace %(time_ago)s por %(author)s"
+msgstr "discusión publicada %(time_ago)s por %(author)s"
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "question posted %(time_ago)s by %(author)s"
-msgstr "pregunta publicada hace %(time_ago)s por %(author)s"
+msgstr "pregunta publicada %(time_ago)s por %(author)s"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Pinned"
