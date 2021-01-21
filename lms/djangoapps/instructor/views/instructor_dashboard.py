@@ -10,6 +10,7 @@ from functools import reduce
 
 import pytz
 import six
+import urllib
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseServerError
@@ -633,6 +634,15 @@ def _section_data_download(course, access):
             'export_ora2_submission_files', kwargs={'course_id': six.text_type(course_key)}
         ),
     }
+    ######### EOL #############
+    try:
+        from xblockcompletion import views
+        section_data['has_xblockcompletion'] = True
+        section_data['xblockcompletion_url_resumen'] = '{}?{}'.format(reverse('xblockcompletion-data:data'), urllib.parse.urlencode({'format': 'resumen', 'course': six.text_type(course_key)}))
+        section_data['xblockcompletion_url_all'] = '{}?{}'.format(reverse('xblockcompletion-data:data'), urllib.parse.urlencode({'format': 'all', 'course': six.text_type(course_key)}))
+    except ImportError:
+        section_data['has_xblockcompletion'] = False
+    ######### EOL #############
     if not access.get('data_researcher'):
         section_data['is_hidden'] = True
     return section_data
