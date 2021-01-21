@@ -44,11 +44,11 @@ OPTIMISED_IS_SMALL_COURSE = LegacyWaffleFlag(
 )
 
 
-def data_download_v2_is_enabled(course_key):
+def data_download_v2_is_enabled():
     """
     check if data download v2 is enabled.
     """
-    return DATA_DOWNLOAD_V2.is_enabled(course_key)
+    return DATA_DOWNLOAD_V2.is_enabled()
 
 
 def use_optimised_is_small_course():
