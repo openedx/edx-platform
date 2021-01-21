@@ -9,13 +9,11 @@ rather than importing Django models directly.
 import logging
 
 import six
-from django.conf import settings
 from django.db.models import Q
-from django.urls import reverse
 from eventtracking import tracker
 from opaque_keys.edx.django.models import CourseKeyField
-from opaque_keys.edx.keys import CourseKey
 from organizations.api import get_course_organization_id
+from xmodule.modulestore.django import modulestore
 
 from lms.djangoapps.branding import api as branding_api
 from lms.djangoapps.certificates.models import (
@@ -30,10 +28,12 @@ from lms.djangoapps.certificates.models import (
     certificate_status_for_student
 )
 from lms.djangoapps.certificates.queue import XQueueCertInterface
+from lms.djangoapps.certificates.utils import emit_certificate_event as _emit_certificate_event
+from lms.djangoapps.certificates.utils import get_certificate_url as _get_certificate_url
+from lms.djangoapps.certificates.utils import has_html_certificates_enabled as _has_html_certificates_enabled
 from lms.djangoapps.instructor.access import list_with_level
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.certificate")
 MODES = GeneratedCertificate.MODES
@@ -234,7 +234,7 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
         return
 
     if CertificateStatuses.is_passing_status(cert.status):
-        emit_certificate_event('created', student, course_key, course, {
+        _emit_certificate_event('created', student, course_key, course, {
             'user_id': student.id,
             'course_id': six.text_type(course_key),
             'certificate_id': cert.verify_uuid,
@@ -458,7 +458,7 @@ def example_certificates_status(course_key):
     Example Usage:
 
         >>> from lms.djangoapps.certificates import api as certs_api
-        >>> certs_api.example_certificate_status(course_key)
+        >>> certs_api.example_certificates_status(course_key)
         [
             {
                 'description': 'honor',
@@ -476,63 +476,12 @@ def example_certificates_status(course_key):
     return ExampleCertificateSet.latest_status(course_key)
 
 
-def _safe_course_key(course_key):
-    if not isinstance(course_key, CourseKey):
-        return CourseKey.from_string(course_key)
-    return course_key
-
-
-def _course_from_key(course_key):
-    return CourseOverview.get_from_id(_safe_course_key(course_key))
-
-
-def _certificate_html_url(uuid):
-    """
-    Returns uuid based certificate URL.
-    """
-    return reverse(
-        'certificates:render_cert_by_uuid', kwargs={'certificate_uuid': uuid}
-    ) if uuid else ''
-
-
-def _certificate_download_url(user_id, course_id, user_certificate=None):
-    if not user_certificate:
-        try:
-            user_certificate = GeneratedCertificate.eligible_certificates.get(
-                user=user_id,
-                course_id=_safe_course_key(course_id)
-            )
-        except GeneratedCertificate.DoesNotExist:
-            log.critical(
-                u'Unable to lookup certificate\n'
-                u'user id: %s\n'
-                u'course: %s', six.text_type(user_id), six.text_type(course_id)
-            )
-
-    if user_certificate:
-        return user_certificate.download_url
-
-    return ''
-
-
 def has_html_certificates_enabled(course):
-    if not settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
-        return False
-    return course.cert_html_view_enabled
+    return _has_html_certificates_enabled(course)
 
 
 def get_certificate_url(user_id=None, course_id=None, uuid=None, user_certificate=None):
-    url = ''
-
-    course = _course_from_key(course_id)
-    if not course:
-        return url
-
-    if has_html_certificates_enabled(course):
-        url = _certificate_html_url(uuid)
-    else:
-        url = _certificate_download_url(user_id, course_id, user_certificate=user_certificate)
-    return url
+    return _get_certificate_url(user_id, course_id, uuid, user_certificate)
 
 
 def get_active_web_certificate(course, is_preview_mode=None):
@@ -632,30 +581,6 @@ def _get_two_letter_language_code(language_code):
         return ''
     else:
         return language_code[:2]
-
-
-def emit_certificate_event(event_name, user, course_id, course=None, event_data=None):
-    """
-    Emits certificate event.
-    """
-    event_name = '.'.join(['edx', 'certificate', event_name])
-    if course is None:
-        course = modulestore().get_course(course_id, depth=0)
-    context = {
-        'org_id': course.org,
-        'course_id': six.text_type(course_id)
-    }
-
-    data = {
-        'user_id': user.id,
-        'course_id': six.text_type(course_id),
-        'certificate_url': get_certificate_url(user.id, course_id, uuid=event_data['certificate_id'])
-    }
-    event_data = event_data or {}
-    event_data.update(data)
-
-    with tracker.get_tracker().context(event_name, context):
-        tracker.emit(event_name, event_data)
 
 
 def get_asset_url_by_slug(asset_slug):
