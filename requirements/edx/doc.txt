@@ -25,7 +25,7 @@ pygments==2.7.4           # via sphinx
 pyparsing==2.4.7          # via packaging
 python-slugify==4.0.1     # via code-annotations
 pytz==2020.5              # via babel, django
-pyyaml==5.4               # via code-annotations
+pyyaml==5.4.1             # via code-annotations
 requests==2.25.1          # via sphinx
 six==1.15.0               # via edx-sphinx-theme, stevedore
 smmap==3.0.4              # via gitdb
