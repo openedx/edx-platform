@@ -128,7 +128,9 @@ def login_and_registration_form(request, initial_mode="login"):
         initial_mode (string): Either "login" or "register".
 
     """
-    initial_mode = 'login'  # since we aren't allowing new account creation
+
+    initial_mode = 'login' if not settings.FEATURES.get(
+        'ALLOW_PUBLIC_ACCOUNT_CREATION', False) else initial_mode
     # Determine the URL to redirect to following login/registration/third_party_auth
     redirect_to = get_next_url_for_login_page(request)
 
