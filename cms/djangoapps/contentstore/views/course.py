@@ -109,6 +109,7 @@ from .library import (
     get_library_creator_status,
     should_redirect_to_library_authoring_mfe
 )
+from edx_django_utils.monitoring import function_trace
 
 log = logging.getLogger(__name__)
 
@@ -487,6 +488,7 @@ def _accessible_courses_list_from_groups(request):
     return courses_list, []
 
 
+@function_trace('_accessible_libraries_iter')
 def _accessible_libraries_iter(user, org=None):
     """
     List all libraries available to the logged in user by iterating through all libraries.
@@ -505,6 +507,7 @@ def _accessible_libraries_iter(user, org=None):
 
 @login_required
 @ensure_csrf_cookie
+@function_trace('course_listing')
 def course_listing(request):
     """
     List all courses and libraries available to the logged in user
@@ -696,6 +699,7 @@ def course_index(request, course_key):
         })
 
 
+@function_trace('get_courses_accessible_to_user')
 def get_courses_accessible_to_user(request, org=None):
     """
     Try to get all courses by first reversing django groups and fallback to old method if it fails
@@ -721,6 +725,7 @@ def get_courses_accessible_to_user(request, org=None):
     return courses, in_process_course_actions
 
 
+@function_trace('_process_courses_list')
 def _process_courses_list(courses_iter, in_process_course_actions, split_archived=False):
     """
     Iterates over the list of courses to be displayed to the user, and:
