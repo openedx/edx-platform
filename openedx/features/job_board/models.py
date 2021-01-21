@@ -29,7 +29,8 @@ class Job(TimeStampedModel):
     This model contains all the fields related to a job being
     posted on the job board.
     """
-    user = models.ForeignKey(User, related_name='job_post', related_query_name='job_post', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, blank=True, null=True, related_name='job_post', related_query_name='job_post',
+                             on_delete=models.CASCADE)
     title = models.CharField(max_length=255, verbose_name=_('Job Title'))
     company = models.CharField(max_length=255, verbose_name=_('Organization Name'))
     type = models.CharField(

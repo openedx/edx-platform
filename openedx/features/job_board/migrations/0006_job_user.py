@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='job',
             name='user',
-            field=models.ForeignKey(default=None, blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='job_post', related_query_name='job_post', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='job_post', related_query_name='job_post', to=settings.AUTH_USER_MODEL),
             preserve_default=False,
         ),
     ]
