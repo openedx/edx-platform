@@ -477,4 +477,4 @@ class TestBlocksWithCompletionView(TestBlocksInCourseView,  # pylint: disable=te
         })
         for block in response.data:
             if block['block_id'] in self.non_orphaned_block_usage_keys:
-                self.assert_true_iff(block.get('completion'), 1)
+                self.assertTrue(block.get('completion'))
