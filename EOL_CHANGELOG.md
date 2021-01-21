@@ -1,5 +1,9 @@
 # Changelog EOL
 
+## 21/01/2020 Changes on Certificates
+- Get user profile name from user_certificate and not from user. (lms/djangoapps/certificates/views/webview.py)
+- Update tests (lms/djangoapps/certificates/tests/test_webview_views.py)
+
 ## 09/10/2020 Changes on edx-proctoring
 - Alert time remaining and show student progress (lms/templates/courseware/proctored-exam-status.underscore)
 
