@@ -1013,7 +1013,7 @@ class AnonymousLookupTable(ModuleStoreTestCase):
         """Test that a same anonymous id is returned when the SECRET_KEY changes."""
         CourseEnrollment.enroll(self.user, self.course.id)
         anonymous_id = anonymous_id_for_user(self.user, self.course.id)
-        with override_settings(SECRET_KEY='some_new_and_totally_secret_pepper'):
+        with override_settings(SECRET_KEY='some_new_and_totally_secret_key'):
             # Recreate user object to clear cached anonymous id.
             self.user = User.objects.get(pk=self.user.id)
             new_anonymous_id = anonymous_id_for_user(self.user, self.course.id)
@@ -1025,7 +1025,7 @@ class AnonymousLookupTable(ModuleStoreTestCase):
         """Test that a different anonymous id is returned when the SECRET_KEY changes."""
         CourseEnrollment.enroll(self.user, self.course.id)
         anonymous_id = anonymous_id_for_user(self.user, self.course.id)
-        with override_settings(SECRET_KEY='some_new_and_totally_secret_pepper'):
+        with override_settings(SECRET_KEY='some_new_and_totally_secret_key'):
             # Recreate user object to clear cached anonymous id.
             self.user = User.objects.get(pk=self.user.id)
             AnonymousUserId.objects.filter(user=self.user).filter(course_id=self.course.id).delete()
