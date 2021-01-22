@@ -180,7 +180,7 @@ def _log_and_raise_inactive_user_auth_error(unauthenticated_user):
         error_code='inactive-user',
         context={
             'platformName': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
-            'supportLink': configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK)
+            'supportLink': configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK) or ''
         }
     )
 
