@@ -182,7 +182,7 @@ def anonymous_id_for_user(user, course_id, save=True):
     hasher = hashlib.shake_256()
     # This is one of several uses of SECRET_KEY.
     #
-    # Impact of exposure: Could result in PII exposure
+    # Impact of exposure: If a person has the SECRET_KEY and a user's `id` they can correlate the users anonymous user IDs across any courses they have participated in.
     #
     # Rotation process: Can be rotated at will.
     hasher.update(settings.SECRET_KEY.encode('utf8'))
