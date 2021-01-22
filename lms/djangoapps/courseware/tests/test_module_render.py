@@ -1991,7 +1991,7 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
             self.assertEqual(
                 # This value is set by observation, so that later changes to the student
                 # id computation don't break old data
-                '5afe5d9bb03796557ee2614f5c9611fb',
+                '68ec390483159b5367c97aeafc9e03ec',
                 self._get_anonymous_id(CourseKey.from_string(course_id), descriptor_class)
             )
 
@@ -2000,7 +2000,7 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         self.assertEqual(
             # This value is set by observation, so that later changes to the student
             # id computation don't break old data
-            'e3b0b940318df9c14be59acb08e78af5',
+            '8ac31a73259b6b2cd07574667915cc3b',
             self._get_anonymous_id(CourseKey.from_string('MITx/6.00x/2012_Fall'), descriptor_class)
         )
 
