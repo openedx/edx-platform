@@ -40,3 +40,15 @@ data(``SECRET_KEY``) is leaked, then it can be used to determine and correlate
 all anonymous IDs associated with a particular user across all courses. We
 believe that this is a worth while risk to not break downstream services that
 are using anonymous IDs during the lifetime of a course.
+
+Rejected Alternatives
+=====================
+
+Make Anonymous IDs Randomly Generated
+-------------------------------------
+
+The function that generates anonymous IDs, has the option to not persist the
+newly generated ID. In this case, it would give a new anonymous key each time
+the function was called, instead of being consistent other than at key
+rotation. The downstream consequence of changing the SECRET_KEY that often are
+unclear so we opt not to do so at this time.
