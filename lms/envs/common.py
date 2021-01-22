@@ -3622,6 +3622,15 @@ CREDIT_TASK_MAX_RETRIES = 5
 # Dummy secret key for dev/test
 SECRET_KEY = 'dev key'
 
+# Pepper (server-wide salt) for creating anonymous id for (user, course_id) pair.
+#
+# Sensitivity: Medium. Exposure might result in PII problems.
+#
+# Rotation can be performed as needed.
+#
+# This is a dummy value that should be overridden.
+ANONYMOUS_ID_PEPPER = 'dev'
+
 # Secret keys shared with credit providers.
 # Used to digitally sign credit requests (us --> provider)
 # and validate responses (provider --> us).

@@ -152,10 +152,13 @@ def anonymous_id_for_user(user, course_id, save=True):
     into e.g. personalized survey links.
 
     If user is an `AnonymousUser`, returns `None`
+    else If this user/course_id pair already has an anonymous id in AnonymousUserId object, return that
+    else: create new anonymous_id, save it in AnonymousUserId, and return anonymous id
 
     Keyword arguments:
     save -- Whether the id should be saved in an AnonymousUserId object.
     """
+
     # This part is for ability to get xblock instance in xblock_noauth handlers, where user is unauthenticated.
     assert user
 
@@ -166,9 +169,18 @@ def anonymous_id_for_user(user, course_id, save=True):
     if cached_id is not None:
         return cached_id
 
-    # include the secret key as a salt, and to make the ids unique across different LMS installs.
+    # check if an annonymous id already exists for this user and course_id combination
+    anonymous_user_ids = AnonymousUserId.objects.filter(user=user).filter(course_id=course_id)
+    if anonymous_user_ids:
+        if len(anonymous_user_ids) == 1:
+            return getattr(anonymous_user_ids[0], "anonymous_user_id")
+        else:
+            # there should only be one anonymous_user_id per user/course_id pair
+            raise Exception('Expected only one anonymous_user_id for user/course_id pair, instead ther are {}'.format(len(anonymous_user_ids)))
+
+    # include the ANONYMOUS_ID_PEPPER as salt/pepper, and to make the ids unique across different LMS installs.
     hasher = hashlib.md5()
-    hasher.update(settings.SECRET_KEY.encode('utf8'))
+    hasher.update(settings.ANONYMOUS_ID_PEPPER.encode('utf8'))
     hasher.update(text_type(user.id).encode('utf8'))
     if course_id:
         hasher.update(text_type(course_id).encode('utf-8'))
@@ -1966,7 +1978,7 @@ class CourseEnrollment(models.Model):
             return None
 
         try:
-            if not self.schedule or not self.schedule.enrollment.is_active:  # pylint: disable=no-member
+            if not self.schedule or not self.schedule.active:  # pylint: disable=no-member
                 return None
 
             log.debug(
