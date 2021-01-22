@@ -1,3 +1,4 @@
+from re import search
 from six import text_type
 from django.db.models.functions import Coalesce
 from django.db.models import Sum, Case, When, IntegerField
@@ -198,3 +199,16 @@ def get_course_progress_percentage(request, course_key):
     total_completed_blocks = sum(list(filter(lambda value: value is not None, total_completed_block_types.values()))) \
         if total_completed_block_types and total_completed_block_types.values() else 0
     return format((total_completed_blocks/total_blocks)*100, '.0f') if total_blocks > 0 else total_blocks
+
+
+def check_rtl_characters_in_string(string):
+    """"
+    check if the string contains rtl character or not
+    :param string: (str) string value to check
+
+    :return: (bool) True | False i.e True if contains
+    """
+
+    urdu_characters_pattern = r'[\u0600-\u06ff]'
+    matched_groups = search(urdu_characters_pattern, string)
+    return matched_groups is not None
