@@ -419,7 +419,10 @@
           if (is_active) {
             updated_title += element_title
           }
-          element.querySelector("#unit-title").innerHTML = updated_title
+          var title_element = element.querySelector("#unit-title")
+          if (title_element) {
+            title_element.innerHTML = updated_title
+          }
         }
 
         Sequence.prototype.mark_visited = function(position) {
