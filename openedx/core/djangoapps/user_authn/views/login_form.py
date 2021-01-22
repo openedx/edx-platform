@@ -184,8 +184,9 @@ def login_and_registration_form(request, initial_mode="login"):
         except (KeyError, ValueError, IndexError) as ex:
             log.exception(u"Unknown tpa_hint provider: %s", ex)
 
+    enterprise_customer = enterprise_customer_for_request(request)
     # Redirect to logistration MFE if it is enabled
-    if should_redirect_to_logistration_mircrofrontend():
+    if should_redirect_to_logistration_mircrofrontend() and not enterprise_customer:
         query_params = request.GET.urlencode()
         url_path = '/{}{}'.format(
             initial_mode,
@@ -245,7 +246,7 @@ def login_and_registration_form(request, initial_mode="login"):
             settings.FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER']
         ),
     }
-    enterprise_customer = enterprise_customer_for_request(request)
+
     update_logistration_context_for_enterprise(request, context, enterprise_customer)
 
     response = render_to_response('student_account/login_and_register.html', context)
