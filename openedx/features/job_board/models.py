@@ -4,6 +4,7 @@ Models for Job Board
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.text import format_lazy
@@ -28,7 +29,8 @@ class Job(TimeStampedModel):
     This model contains all the fields related to a job being
     posted on the job board.
     """
-
+    user = models.ForeignKey(User, blank=True, null=True, related_name='job_post', related_query_name='job_post',
+                             on_delete=models.CASCADE)
     title = models.CharField(max_length=255, verbose_name=_('Job Title'))
     company = models.CharField(max_length=255, verbose_name=_('Organization Name'))
     type = models.CharField(

@@ -1,7 +1,10 @@
 """
 Views for Job Board app
 """
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
@@ -114,9 +117,19 @@ class JobDetailView(DetailView):
     template_name = 'features/job_board/job_detail.html'
 
 
-class JobCreateView(CreateView):
+@method_decorator(ensure_csrf_cookie, name='dispatch')
+class JobCreateView(LoginRequiredMixin, CreateView):
+    """
+    Create job view and submit job posting data
+    """
     form_class = JobCreationForm
     template_name = 'features/job_board/create_job_form.html'
+
+    def get_initial(self, *args, **kwargs):  # pylint: disable=unused-argument, arguments-differ
+        """Pre-fill form with initial data"""
+        initial = super(JobCreateView, self).get_initial(**kwargs)
+        initial['user'] = self.request.user
+        return initial
 
     def get_success_url(self):
         return reverse('job_list')
