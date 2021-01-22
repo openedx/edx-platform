@@ -6,7 +6,7 @@ CourseBlocks API views
 import six
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.http import Http404, Http400
+from django.http import Http404
 from django.utils.cache import patch_response_headers
 from django.utils.decorators import method_decorator
 from opaque_keys import InvalidKeyError
@@ -350,9 +350,9 @@ class BlocksWithCompletionView(BlocksInCourseView):
             request - Django request object
         """
         response = super().list(request, hide_access_denials=hide_access_denials)
-        if 'completion' not in request.query_params.get('requested_fields', ''):
-            return response
 
+        if 'completion' not in request.query_params.getlist('requested_fields', ''):
+            return response
         course_blocks = {}
         root = None
         if request.query_params.get('return_type') == 'list':
@@ -366,7 +366,7 @@ class BlocksWithCompletionView(BlocksInCourseView):
             course_blocks = response.data['blocks']
 
         if not root:
-            return Http400("Unable to find course block in {}".format(request.query_params.get('course_id', None)))
+            return Http404("Unable to find course block in {}".format(request.query_params.get('course_id', None)))
 
         recurse_mark_complete(root, course_blocks)
 
