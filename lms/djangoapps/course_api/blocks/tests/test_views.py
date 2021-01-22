@@ -441,7 +441,7 @@ class TestBlocksInCourseView(TestBlocksView, CompletionWaffleTestMixin):  # pyli
         })
 
         completion = response.data['blocks'][str(block_usage_key)].get('completion')
-        self.assert_true_iff(completion, 1)
+        self.assertTrue(completion)
 
     def test_completion_all_course(self):
         for block in self.non_orphaned_raw_block_usage_keys:
@@ -452,7 +452,7 @@ class TestBlocksInCourseView(TestBlocksView, CompletionWaffleTestMixin):  # pyli
             'requested_fields': ['completion', 'children'],
         })
         for block_id in self.non_orphaned_block_usage_keys:
-            self.assert_true_iff(response.data['blocks'][block_id].get('completion'), 1)
+            self.assertTrue(response.data['blocks'][block_id].get('completion'))
 
     def test_completion_all_course_with_list_return_type(self):
         for block in self.non_orphaned_raw_block_usage_keys:
