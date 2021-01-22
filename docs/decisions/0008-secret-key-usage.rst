@@ -26,12 +26,27 @@ Decisions
 
 1. Any uses of ``SECRET_KEY`` should be resilient to that key being rotated.
 
-2. Wherever the secret key is used, it should also document the impact of
+2. Wherever the ``SECRET_KEY`` is used, it should also document the impact of
    rotating the key.
+
+For example:
+    Rotation is a one-time discontinuity in tracking metrics and should be
+    accompanied by a heads-up to data researchers
+
+3. Whenever the ``SECRET_KEY`` is used, it should also document the
+   consequences of the key being exposed.
 
 For example:
 
     Exposure of secret could result in identifying the tracking data for users
-    if their actual session keys are also known; rotation is a one-time
-    discontinuity in tracking metrics and should be accompanied by a heads-up
-    to data researchers
+    if their actual session keys are also known
+
+Consequences
+============
+
+- The ``SECRET_KEY`` should only be used in cases, where rotation can be done
+  quickly.  Because the secret is shared, not changing it quickly can expose
+  multiple features to attack if any one usage is more expensive than others.
+  If you are considering using the ``SECRET_KEY`` in a situation where the act
+  of rotation will be expensive(time, coordination, preparation) you should
+  instead consider using a new unique secret specific to your usecase.
