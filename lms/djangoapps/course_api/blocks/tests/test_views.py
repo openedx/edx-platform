@@ -396,7 +396,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         self.verify_response_with_requested_fields(response)
 
 
-class TestBlocksInCourseView(TestBlocksView):  # pylint: disable=test-inherits-tests
+class TestBlocksInCourseView(TestBlocksView, CompletionWaffleTestMixin):  # pylint: disable=test-inherits-tests
     """
     Test class for BlocksInCourseView
     """
@@ -405,6 +405,13 @@ class TestBlocksInCourseView(TestBlocksView):  # pylint: disable=test-inherits-t
         super(TestBlocksInCourseView, self).setUp()
         self.url = reverse('blocks_in_course')
         self.query_params['course_id'] = str(self.course_key)
+        self.override_waffle_switch(True)
+        self.non_orphaned_raw_block_usage_keys = set(
+            item.location
+            for item in self.store.get_items(self.course_key)
+            # remove all orphaned items in the course, except for the root 'course' block
+            if self.store.get_parent_location(item.location) or item.category == 'course'
+        )
 
     def test_no_course_id(self):
         self.query_params.pop('course_id')
@@ -420,25 +427,6 @@ class TestBlocksInCourseView(TestBlocksView):  # pylint: disable=test-inherits-t
         self.client.logout()
         self.query_params['username'] = ''
         self.verify_response(403, params={'course_id': str(CourseLocator('non', 'existent', 'course'))})
-
-
-class TestBlocksWithCompletionView(TestBlocksInCourseView,  # pylint: disable=test-inherits-tests
-                                   CompletionWaffleTestMixin):
-    """
-    Test class for BlocksInCourseView
-    """
-
-    def setUp(self):
-        super().setUp()
-        self.override_waffle_switch(True)
-        self.url = reverse('blocks_with_completion_in_course')
-        self.query_params['course_id'] = str(self.course_key)
-        self.non_orphaned_raw_block_usage_keys = set(
-            item.location
-            for item in self.store.get_items(self.course_key)
-            # remove all orphaned items in the course, except for the root 'course' block
-            if self.store.get_parent_location(item.location) or item.category == 'course'
-        )
 
     def test_completion_one_unit(self):
         for item in self.store.get_items(self.course_key):

@@ -302,57 +302,12 @@ class BlocksInCourseView(BlocksView):
             course_usage_key = modulestore().make_course_usage_key(course_key)
         except InvalidKeyError:
             raise ValidationError(u"'{}' is not a valid course key.".format(six.text_type(course_key_string)))
-        return super(BlocksInCourseView, self).list(request, course_usage_key, hide_access_denials=hide_access_denials)
-
-
-@view_auth_classes(is_authenticated=False)
-class BlocksWithCompletionView(BlocksInCourseView):
-    """
-    **Use Case**
-
-        Returns the blocks in the course according to the requesting user's
-        access level.
-
-    **Example requests**:
-
-        GET /api/courses/v1/blocks/?course_id=<course_id>
-        GET /api/courses/v1/blocks/?course_id=<course_id>
-            &username=anjali
-            &depth=all
-            &requested_fields=graded,format,student_view_multi_device,lti_url
-            &block_counts=video
-            &student_view_data=video
-            &block_types_filter=problem,html
-
-    **Parameters**:
-
-        This view redirects to /api/courses/v2/blocks/<root_usage_key>/ for the
-        root usage key of the course specified by course_id.  The view accepts
-        all parameters accepted by :class:`BlocksInCourseView`
-
-    **Response Values**
-
-        Responses are identical to those returned by :class:`BlocksInCourseView` when
-        passed the root_usage_key of the requested course but there is one exception explained below.
-
-        It adds completion from root of the course to every child block and make it boolean i.e
-        completion will be either 1 or 0
-
-    """
-
-    def list(self, request, hide_access_denials=False):
-        """
-        Retrieves the usage_key for the requested course, and then returns the
-        same information that would be returned by BlocksView.list, called with
-        that usage key
-
-        Arguments:
-            request - Django request object
-        """
-        response = super().list(request, hide_access_denials=hide_access_denials)
+        response = super(BlocksInCourseView, self).list(request, course_usage_key,
+                                                        hide_access_denials=hide_access_denials)
 
         if 'completion' not in request.query_params.getlist('requested_fields', ''):
             return response
+
         course_blocks = {}
         root = None
         if request.query_params.get('return_type') == 'list':
