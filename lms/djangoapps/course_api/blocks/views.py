@@ -302,8 +302,8 @@ class BlocksInCourseView(BlocksView):
             course_usage_key = modulestore().make_course_usage_key(course_key)
         except InvalidKeyError:
             raise ValidationError(u"'{}' is not a valid course key.".format(six.text_type(course_key_string)))
-        response = super(BlocksInCourseView, self).list(request, course_usage_key,
-                                                        hide_access_denials=hide_access_denials)
+        response = super().list(request, course_usage_key,
+                                hide_access_denials=hide_access_denials)
 
         if 'completion' not in request.query_params.getlist('requested_fields', ''):
             return response
