@@ -179,7 +179,7 @@ def anonymous_id_for_user(user, course_id, save=True):
             raise Exception('Expected only one anonymous_user_id for user/course_id pair, instead ther are {}'.format(len(anonymous_user_ids)))
 
     # include the ANONYMOUS_ID_PEPPER as salt/pepper, and to make the ids unique across different LMS installs.
-    hasher = hashlib.shake_256()
+    hasher = hashlib.shake_128()
     # This is one of several uses of SECRET_KEY.
     #
     # Impact of exposure: If a person has the SECRET_KEY and a user's `id` they can correlate the users anonymous user IDs across any courses they have participated in.
