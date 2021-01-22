@@ -1009,11 +1009,11 @@ class AnonymousLookupTable(ModuleStoreTestCase):
         self.assertEqual(self.user, real_user)
         self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, course2.id, save=False))
 
-    def test_anonymous_id_pepper_changes_do_not_change_existing_anonymous_ids(self):
-        """Test that a same anonymous id is returned when the ANONYMOUS_ID_PEPPER changes."""
+    def test_anonymous_id_secret_key_changes_do_not_change_existing_anonymous_ids(self):
+        """Test that a same anonymous id is returned when the SECRET_KEY changes."""
         CourseEnrollment.enroll(self.user, self.course.id)
         anonymous_id = anonymous_id_for_user(self.user, self.course.id)
-        with override_settings(ANONYMOUS_ID_PEPPER='some_new_and_totally_secret_pepper'):
+        with override_settings(SECRET_KEY='some_new_and_totally_secret_pepper'):
             # Recreate user object to clear cached anonymous id.
             self.user = User.objects.get(pk=self.user.id)
             new_anonymous_id = anonymous_id_for_user(self.user, self.course.id)
@@ -1021,11 +1021,11 @@ class AnonymousLookupTable(ModuleStoreTestCase):
             self.assertEqual(self.user, user_by_anonymous_id(anonymous_id))
             self.assertEqual(self.user, user_by_anonymous_id(new_anonymous_id))
 
-    def test_anonymous_id_pepper_changes_result_in_diff_values_for_same_new_user(self):
-        """Test that a different anonymous id is returned when the ANONYMOUS_ID_PEPPER changes."""
+    def test_anonymous_id_secret_key_changes_result_in_diff_values_for_same_new_user(self):
+        """Test that a different anonymous id is returned when the SECRET_KEY changes."""
         CourseEnrollment.enroll(self.user, self.course.id)
         anonymous_id = anonymous_id_for_user(self.user, self.course.id)
-        with override_settings(ANONYMOUS_ID_PEPPER='some_new_and_totally_secret_pepper'):
+        with override_settings(SECRET_KEY='some_new_and_totally_secret_pepper'):
             # Recreate user object to clear cached anonymous id.
             self.user = User.objects.get(pk=self.user.id)
             AnonymousUserId.objects.filter(user=self.user).filter(course_id=self.course.id).delete()

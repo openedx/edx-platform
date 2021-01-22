@@ -179,12 +179,20 @@ def anonymous_id_for_user(user, course_id, save=True):
             raise Exception('Expected only one anonymous_user_id for user/course_id pair, instead ther are {}'.format(len(anonymous_user_ids)))
 
     # include the ANONYMOUS_ID_PEPPER as salt/pepper, and to make the ids unique across different LMS installs.
-    hasher = hashlib.md5()
-    hasher.update(settings.ANONYMOUS_ID_PEPPER.encode('utf8'))
+    hasher = hashlib.shake_256()
+    # This is one of several uses of SECRET_KEY.
+    #
+    # Impact of exposure: Could result in PII exposure
+    #
+    # Rotation process: Can be rotated at will.
+    hasher.update(settings.SECRET_KEY.encode('utf8'))
     hasher.update(text_type(user.id).encode('utf8'))
     if course_id:
         hasher.update(text_type(course_id).encode('utf-8'))
-    digest = hasher.hexdigest()
+
+    # pylint doesn't know that SHAKE's hexdigest takes an arg:
+    # https://github.com/PyCQA/pylint/issues/4039
+    digest = hasher.hexdigest(16)   # pylint: disable=too-many-function-args
 
     if not hasattr(user, '_anonymous_id'):
         user._anonymous_id = {}  # pylint: disable=protected-access
