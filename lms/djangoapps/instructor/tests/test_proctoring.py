@@ -11,8 +11,10 @@ from six import text_type
 
 from edx_proctoring.api import create_exam
 from edx_proctoring.backends.tests.test_backend import TestBackendProvider
+from edx_toggles.toggles.testutils import override_waffle_flag
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import AdminFactory
+from lms.djangoapps.courseware.toggles import EXAM_RESUME_PROCTORING_IMPROVEMENTS
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -176,6 +178,32 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         self.instructor.is_staff = True
         self.instructor.save()
         self._assert_escalation_email_available(True)
+
+    @override_waffle_flag(EXAM_RESUME_PROCTORING_IMPROVEMENTS, True)
+    def test_exam_resume_proctoring_improvements_toggle_enabled(self):
+        """
+        The value of the feature toggle EXAM_RESUME_PROCTORING_IMPROVEMENTS should be included in the response
+        via the data-enable-exam-resume-proctoring-improvements data attribute when the toggle is enabled.
+        """
+        self.setup_course(True, True)
+        self.instructor.is_staff = True
+        self.instructor.save()
+
+        response = self.client.get(self.url)
+        self.assertIn('data-enable-exam-resume-proctoring-improvements="True"', response.content.decode('utf-8'))
+
+    @override_waffle_flag(EXAM_RESUME_PROCTORING_IMPROVEMENTS, False)
+    def test_exam_resume_proctoring_improvements_toggle_disabled(self):
+        """
+        The value of the feature toggle EXAM_RESUME_PROCTORING_IMPROVEMENTS should be included in the response
+        via the data-enable-exam-resume-proctoring-improvements data attribute when the toggle is disabled.
+        """
+        self.setup_course(True, True)
+        self.instructor.is_staff = True
+        self.instructor.save()
+
+        response = self.client.get(self.url)
+        self.assertIn('data-enable-exam-resume-proctoring-improvements="False"', response.content.decode('utf-8'))
 
     def test_review_dashboard(self):
         """

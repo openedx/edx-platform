@@ -15,7 +15,7 @@ import pytz
     </div>
     <div class="wrap">
        <h3 class="hd hd-3">${_('Student Special Exam Attempts')}</h3>
-      <div class="student-proctored-exam-container" data-course-id="${ section_data['course_id'] }"></div>
+      <div class="student-proctored-exam-container" data-course-id="${ section_data['course_id'] }" data-enable-exam-resume-proctoring-improvements="${ section_data['enable_exam_resume_proctoring_improvements'] }"></div>
     </div>
     % if section_data['show_dashboard']:
     <div class="wrap">
