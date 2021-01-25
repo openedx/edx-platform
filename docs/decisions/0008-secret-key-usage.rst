@@ -9,8 +9,8 @@ Pending
 Context
 =======
 
-Django's Secret key is used by django to cryptographically sign various
-capabilities in django.  It is also used by the edx-platform in various cases
+Django's Secret key is used by Django to cryptographically sign various
+capabilities in Django.  It is also used by the edx-platform in various cases
 as a `pepper`_ when hashing data to anonymize it while keeping it consistent.
 Some of the uses of the ``SECRET_KEY`` in edx-platform were not resilient to
 the key being rotated.  As a part of ARCHBOM-1646 those code paths are being
@@ -29,14 +29,15 @@ Decisions
 2. Wherever the ``SECRET_KEY`` is used, it should also document the impact of
    rotating the key.
 
-For example:
+    For example:
+
     Rotation is a one-time discontinuity in tracking metrics and should be
     accompanied by a heads-up to data researchers
 
 3. Whenever the ``SECRET_KEY`` is used, it should also document the
    consequences of the key being exposed.
 
-For example:
+    For example:
 
     Exposure of secret could result in identifying the tracking data for users
     if their actual session keys are also known
@@ -49,4 +50,4 @@ Consequences
   multiple features to attack if any one usage is more expensive to rotate than others.
   If you are considering using the ``SECRET_KEY`` in a situation where the act
   of rotation will be expensive(time, coordination, preparation) you should
-  instead consider using a new unique secret specific to your usecase.
+  instead consider using a new unique secret specific to your use case.
