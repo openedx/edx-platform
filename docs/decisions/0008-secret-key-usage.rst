@@ -49,5 +49,5 @@ Consequences
   quickly.  Because the secret is shared, not changing it quickly can expose
   multiple features to attack if any one usage is more expensive to rotate than others.
   If you are considering using the ``SECRET_KEY`` in a situation where the act
-  of rotation will be expensive(time, coordination, preparation) you should
+  of rotation will be expensive (time, coordination, preparation) you should
   instead consider using a new unique secret specific to your use case.
