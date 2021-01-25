@@ -32,6 +32,7 @@ from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from six import text_type
 from six.moves import filter
+from edx_django_utils.monitoring import function_trace
 
 from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
@@ -109,6 +110,7 @@ from .library import (
     get_library_creator_status,
     should_redirect_to_library_authoring_mfe
 )
+
 
 log = logging.getLogger(__name__)
 
@@ -487,6 +489,7 @@ def _accessible_courses_list_from_groups(request):
     return courses_list, []
 
 
+@function_trace('_accessible_libraries_iter')
 def _accessible_libraries_iter(user, org=None):
     """
     List all libraries available to the logged in user by iterating through all libraries.
@@ -696,6 +699,7 @@ def course_index(request, course_key):
         })
 
 
+@function_trace('get_courses_accessible_to_user')
 def get_courses_accessible_to_user(request, org=None):
     """
     Try to get all courses by first reversing django groups and fallback to old method if it fails
