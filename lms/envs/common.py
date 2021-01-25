@@ -1207,6 +1207,10 @@ XBLOCK_FIELD_DATA_WRAPPERS = ()
 
 XBLOCK_FS_STORAGE_BUCKET = None
 XBLOCK_FS_STORAGE_PREFIX = None
+
+# .. setting_name: XBLOCK_SETTINGS
+# .. setting_default: {}
+# .. setting_description: Dictionary containing server-wide configuration of XBlocks on a per-type basis
 XBLOCK_SETTINGS = {}
 
 ############# ModuleStore Configuration ##########
