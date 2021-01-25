@@ -558,7 +558,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_certificate_only_for_downloadable_status(self):
         """
-        Tests taht Certificate HTML Web View returns Certificate only if certificate status is 'downloadable',
+        Tests that Certificate HTML Web View returns Certificate only if certificate status is 'downloadable',
         for other statuses it should return "Invalid Certificate".
         """
         self._add_course_certificates(count=1, signatory_count=2)

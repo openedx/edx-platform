@@ -124,7 +124,7 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
         response = self.client.post(self.url, data=payload)
         self.assertEqual(response.status_code, 400)
 
-    def test_update_example_cetificate_non_json_param(self):
+    def test_update_example_certificate_non_json_param(self):
         payload = {
             'xqueue_header': '{/invalid',
             'xqueue_body': '{/invalid'
