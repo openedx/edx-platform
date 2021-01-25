@@ -4,7 +4,7 @@ Django Secret Key Usage
 Status
 ======
 
-Accepted
+Pending
 
 Context
 =======
