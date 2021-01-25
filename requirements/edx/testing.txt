@@ -41,7 +41,7 @@ chardet==4.0.0            # via -r requirements/edx/base.txt, -r requirements/ed
 chem==1.2.0               # via -r requirements/edx/base.txt
 click-log==0.3.2          # via edx-lint
 click==7.1.2              # via -r requirements/edx/base.txt, click-log, code-annotations, edx-lint, nltk, user-util
-code-annotations==1.0.0   # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, edx-enterprise, edx-toggles
+code-annotations==1.0.2   # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, edx-enterprise, edx-lint, edx-toggles
 contextlib2==0.6.0.post1  # via -r requirements/edx/base.txt
 coreapi==2.3.3            # via -r requirements/edx/base.txt, drf-yasg
 coreschema==0.0.4         # via -r requirements/edx/base.txt, coreapi, drf-yasg
@@ -109,7 +109,7 @@ edx-drf-extensions==6.4.0  # via -r requirements/edx/base.txt, edx-completion, e
 edx-enterprise==3.17.10   # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
 edx-event-routing-backends==4.0.1  # via -r requirements/edx/base.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, ora2
-edx-lint==1.6             # via -r requirements/edx/testing.in
+edx-lint==3.0             # via -r requirements/edx/testing.in
 edx-milestones==0.3.0     # via -r requirements/edx/base.txt
 edx-opaque-keys[django]==2.1.1  # via -r requirements/edx/base.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, lti-consumer-xblock, xmodule
 edx-organizations==6.7.1  # via -r requirements/edx/base.txt
