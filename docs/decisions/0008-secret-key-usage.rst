@@ -16,7 +16,7 @@ Some of the uses of the ``SECRET_KEY`` in edx-platform were not resilient to
 the key being rotated.  As a part of ARCHBOM-1646 those code paths are being
 updated so that regular rotation of the ``SECRET_KEY`` will cause temporary
 issues but will not fully break things.  ie. Sessions might get invalidated or
-data might not be corelatable over the change boundry but the change is
+data might not be correlatable over the change boundary but the change is
 otherwise safe.
 
 .. _pepper: https://en.wikipedia.org/wiki/Pepper_(cryptography)
