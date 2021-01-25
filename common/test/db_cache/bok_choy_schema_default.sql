@@ -2930,7 +2930,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=820 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=823 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3674,6 +3674,7 @@ CREATE TABLE `enterprise_enterprisefeatureuserroleassignment` (
   `modified` datetime(6) NOT NULL,
   `role_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
+  `applies_to_all_contexts` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `enterprise_enterpris_role_id_5e8cff42_fk_enterpris` (`role_id`),
   KEY `enterprise_enterpris_user_id_2d335bd4_fk_auth_user` (`user_id`),
@@ -4006,6 +4007,7 @@ CREATE TABLE `enterprise_systemwideenterpriseuserroleassignment` (
   `modified` datetime(6) NOT NULL,
   `role_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
+  `applies_to_all_contexts` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `enterprise_systemwid_role_id_bc7092f0_fk_enterpris` (`role_id`),
   KEY `enterprise_systemwid_user_id_e890aef2_fk_auth_user` (`user_id`),
@@ -6838,6 +6840,7 @@ CREATE TABLE `system_wide_roles_systemwideroleassignment` (
   `modified` datetime(6) NOT NULL,
   `role_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
+  `applies_to_all_contexts` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `system_wide_roles_sy_role_id_b553068b_fk_system_wi` (`role_id`),
   KEY `system_wide_roles_sy_user_id_8ec7ad0d_fk_auth_user` (`user_id`),
