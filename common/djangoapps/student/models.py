@@ -168,51 +168,39 @@ def anonymous_id_for_user(user, course_id, save=True):
     cached_id = getattr(user, '_anonymous_id', {}).get(course_id)
     if cached_id is not None:
         return cached_id
-    # check if an annonymous id already exists for this user and course_id combination
-    anonymous_user_ids = AnonymousUserId.objects.filter(user=user).filter(course_id=course_id)
+    # check if an anonymous id already exists for this user and course_id combination
+    anonymous_user_ids = AnonymousUserId.objects.filter(user=user).filter(course_id=course_id).order_by('id')
     if anonymous_user_ids:
-        if len(anonymous_user_ids) == 1:
-            anonymous_user_id = anonymous_user_ids[0].anonymous_user_id
-            if not hasattr(user, '_anonymous_id'):
-                user._anonymous_id = {}  # pylint: disable=protected-access
-            user._anonymous_id[course_id] = anonymous_user_id  # pylint: disable=protected-access
+        # If there are multiple anonymous_user_ids per user, course_id pair
+        # select the row which was created most recently
+        anonymous_user_id = anonymous_user_ids[-1].anonymous_user_id
+    else:
+        # include the secret key as a salt, and to make the ids unique across different LMS installs.
+        hasher = hashlib.md5()
+        hasher.update(settings.SECRET_KEY.encode('utf8'))
+        hasher.update(text_type(user.id).encode('utf8'))
+        if course_id:
+            hasher.update(text_type(course_id).encode('utf-8'))
+        anonymous_user_id = hasher.hexdigest()
 
-            return anonymous_user_id
-        else:
-            # there should only be one anonymous_user_id per user/course_id pair
-            raise Exception(
-                'Expected only one anonymous_user_id for user/course_id pair, instead ther are {}'.format(
-                    len(anonymous_user_ids)),
-            )
+        if save is True:
+            try:
+                AnonymousUserId.objects.create(
+                    user=user,
+                    course_id=course_id,
+                    anonymous_user_id=anonymous_user_id,
+                )
+            except IntegrityError:
+                # Another thread has already created this entry, so
+                # continue
+                pass
 
-    # include the secret key as a salt, and to make the ids unique across different LMS installs.
-    hasher = hashlib.md5()
-    hasher.update(settings.SECRET_KEY.encode('utf8'))
-    hasher.update(text_type(user.id).encode('utf8'))
-    if course_id:
-        hasher.update(text_type(course_id).encode('utf-8'))
-    digest = hasher.hexdigest()
-
+    # cache the anonymous_id in the user object
     if not hasattr(user, '_anonymous_id'):
         user._anonymous_id = {}  # pylint: disable=protected-access
+    user._anonymous_id[course_id] = anonymous_user_id  # pylint: disable=protected-access
 
-    user._anonymous_id[course_id] = digest  # pylint: disable=protected-access
-
-    if save is False:
-        return digest
-
-    try:
-        AnonymousUserId.objects.create(
-            user=user,
-            course_id=course_id,
-            anonymous_user_id=digest,
-        )
-    except IntegrityError:
-        # Another thread has already created this entry, so
-        # continue
-        pass
-
-    return digest
+    return anonymous_user_id
 
 
 def user_by_anonymous_id(uid):
