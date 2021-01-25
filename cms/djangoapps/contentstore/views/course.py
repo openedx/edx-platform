@@ -508,7 +508,6 @@ def _accessible_libraries_iter(user, org=None):
 
 @login_required
 @ensure_csrf_cookie
-@function_trace('course_listing')
 def course_listing(request):
     """
     List all courses and libraries available to the logged in user
@@ -726,7 +725,6 @@ def get_courses_accessible_to_user(request, org=None):
     return courses, in_process_course_actions
 
 
-@function_trace('_process_courses_list')
 def _process_courses_list(courses_iter, in_process_course_actions, split_archived=False):
     """
     Iterates over the list of courses to be displayed to the user, and:
