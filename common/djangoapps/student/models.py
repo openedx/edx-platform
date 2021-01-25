@@ -172,21 +172,25 @@ def anonymous_id_for_user(user, course_id, save=True):
     anonymous_user_ids = AnonymousUserId.objects.filter(user=user).filter(course_id=course_id)
     if anonymous_user_ids:
         if len(anonymous_user_ids) == 1:
-            anonymous_user_id = getattr(anonymous_user_ids[0], "anonymous_user_id")
+            anonymous_user_id = anonymous_user_ids[0].anonymous_user_id
             if not hasattr(user, '_anonymous_id'):
-                user._anonymous_id = {}
-            user._anonymous_id[course_id] = anonymous_user_id
+                user._anonymous_id = {}  # pylint: disable=protected-access
+            user._anonymous_id[course_id] = anonymous_user_id  # pylint: disable=protected-access
 
             return anonymous_user_id
         else:
             # there should only be one anonymous_user_id per user/course_id pair
-            raise Exception('Expected only one anonymous_user_id for user/course_id pair, instead ther are {}'.format(len(anonymous_user_ids)))
+            raise Exception(
+                'Expected only one anonymous_user_id for user/course_id pair, instead ther are {}'.format(
+                    len(anonymous_user_ids)),
+            )
 
     # include the ANONYMOUS_ID_PEPPER as salt/pepper, and to make the ids unique across different LMS installs.
     hasher = hashlib.shake_128()
     # This is one of several uses of SECRET_KEY.
     #
-    # Impact of exposure: If a person has the SECRET_KEY and a user's `id` they can correlate the users anonymous user IDs across any courses they have participated in.
+    # Impact of exposure: If a person has the SECRET_KEY and a user's `id`
+    # they can correlate the users anonymous user IDs across any courses they have participated in.
     #
     # Rotation process: Can be rotated at will.
     hasher.update(settings.SECRET_KEY.encode('utf8'))

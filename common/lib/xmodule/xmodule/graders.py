@@ -260,7 +260,7 @@ class WeightedSubsectionsGrader(CourseGrader):
     a value > 1, the student may end up with a percent > 100%. This allows for sections that
     are extra credit.
     """
-    def __init__(self, subgraders):
+    def __init__(self, subgraders):  # pylint: disable=super-init-not-called
         self.subgraders = subgraders
 
     @property

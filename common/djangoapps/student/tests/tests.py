@@ -981,7 +981,7 @@ class AnonymousLookupTable(ModuleStoreTestCase):
         This tests to make sure stored value is used rather than a creating a new one
         """
         anonymous_id_1 = anonymous_id_for_user(self.user, None)
-        delattr(self.user, "_anonymous_id")
+        delattr(self.user._anonymous_id)  # pylint: disable=protected-access
         anonymous_id_2 = anonymous_id_for_user(self.user, None)
         self.assertEqual(anonymous_id_1, anonymous_id_2)
 

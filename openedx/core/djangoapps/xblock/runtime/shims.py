@@ -11,8 +11,9 @@ from django.core.cache import cache
 from django.template import TemplateDoesNotExist
 from django.utils.functional import cached_property
 from fs.memoryfs import MemoryFS
-from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 import six
+
+from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 
 from common.djangoapps.edxmako.shortcuts import render_to_string
 
