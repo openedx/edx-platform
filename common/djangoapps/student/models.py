@@ -46,7 +46,7 @@ from edx_django_utils.cache import RequestCache
 from edx_rest_api_client.exceptions import SlumberBaseException
 from eventtracking import tracker
 from model_utils.models import TimeStampedModel
-from opaque_keys.edx.django.models import CourseKeyField
+from opaque_keys.edx.django.models import CourseKeyField, LearningContextKeyField
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from simple_history.models import HistoricalRecords
@@ -143,7 +143,7 @@ class AnonymousUserId(models.Model):
 
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     anonymous_user_id = models.CharField(unique=True, max_length=32)
-    course_id = CourseKeyField(db_index=True, max_length=255, blank=True)
+    course_id = LearningContextKeyField(db_index=True, max_length=255, blank=True)
 
 
 def anonymous_id_for_user(user, course_id, save=True):

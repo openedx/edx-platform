@@ -9,6 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locator import CourseLocator
 
 import lms.djangoapps.instructor.enrollment as enrollment
 from lms.djangoapps.courseware.models import StudentModule
@@ -27,6 +28,9 @@ class InstructorService(object):
     for the edx_proctoring's dependency injection to cater for a requirement where edx_proctoring
     needs to call into edx-platform's functions to delete the students' existing answers, grades
     and attempt counts if there had been an earlier attempt.
+
+    This service also contains utility functions to check if a user is course staff, send notifications
+    related to proctored exam attempts, and retrieve a course team's proctoring escalation email.
     """
 
     def delete_student_attempt(self, student_identifier, course_id, content_id, requesting_user):
@@ -118,3 +122,18 @@ class InstructorService(object):
             )
             tags = ["proctoring"]
             create_zendesk_ticket(requester_name, email, subject, body, tags)
+
+    def get_proctoring_escalation_email(self, course_key):
+        """
+        Returns the proctoring escalation email for a course, or None if not given.
+
+        Example arguments:
+        * course_key (String): 'block-v1:edX+DemoX+Demo_Course'
+        """
+        # Convert course key into id
+        course_id = CourseLocator.from_string(course_key)
+        course = modulestore().get_course(course_id)
+        if course is None:
+            raise ObjectDoesNotExist('Course not found for course_key {course_key}.')
+
+        return course.proctoring_escalation_email

@@ -481,7 +481,7 @@ class BulkEmailFlag(ConfigurationModel):
 
     .. toggle_name: require_course_email_auth
     .. toggle_implementation: ConfigurationModel
-    .. toggle_default: True (enabled)
+    .. toggle_default: True
     .. toggle_description: If the flag is enabled, course-specific authorization is
       required, and the course_id is either not provided or not authorized, the feature
       is not available.

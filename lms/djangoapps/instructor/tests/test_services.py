@@ -7,6 +7,9 @@ import json
 
 import mock
 import six
+from opaque_keys import InvalidKeyError
+
+from django.core.exceptions import ObjectDoesNotExist
 
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.instructor.access import allow_access
@@ -26,7 +29,8 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super(InstructorServiceTests, cls).setUpClass()
-        cls.course = CourseFactory.create()
+        cls.email = 'escalation@test.com'
+        cls.course = CourseFactory.create(proctoring_escalation_email=cls.email)
         cls.problem_location = msk_from_problem_urlname(
             cls.course.id,
             'robot-some-problem-urlname'
@@ -185,3 +189,24 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
             )
         expected_body = body.format(**args)
         mock_create_zendesk_ticket.assert_called_with(requester_name, email, subject, expected_body, tags)
+
+    def test_get_proctoring_escalation_email(self):
+        """
+        Test that it returns the correct proctoring escalation email
+        """
+        email = self.service.get_proctoring_escalation_email(str(self.course.id))
+        self.assertEqual(email, self.email)
+
+    def test_get_proctoring_escalation_email_no_course(self):
+        """
+        Test that it raises an exception if the course is not found
+        """
+        with self.assertRaises(ObjectDoesNotExist):
+            self.service.get_proctoring_escalation_email('a/b/c')
+
+    def test_get_proctoring_escalation_email_invalid_key(self):
+        """
+        Test that it raises an exception if the course_key is invalid
+        """
+        with self.assertRaises(InvalidKeyError):
+            self.service.get_proctoring_escalation_email('invalid key')
