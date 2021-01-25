@@ -168,12 +168,16 @@ def anonymous_id_for_user(user, course_id, save=True):
     cached_id = getattr(user, '_anonymous_id', {}).get(course_id)
     if cached_id is not None:
         return cached_id
-
     # check if an annonymous id already exists for this user and course_id combination
     anonymous_user_ids = AnonymousUserId.objects.filter(user=user).filter(course_id=course_id)
     if anonymous_user_ids:
         if len(anonymous_user_ids) == 1:
-            return getattr(anonymous_user_ids[0], "anonymous_user_id")
+            anonymous_user_id = getattr(anonymous_user_ids[0], "anonymous_user_id")
+            if not hasattr(user, '_anonymous_id'):
+                user._anonymous_id = {}
+            user._anonymous_id[course_id] = anonymous_user_id
+
+            return anonymous_user_id
         else:
             # there should only be one anonymous_user_id per user/course_id pair
             raise Exception('Expected only one anonymous_user_id for user/course_id pair, instead ther are {}'.format(len(anonymous_user_ids)))
