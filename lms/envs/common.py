@@ -1200,7 +1200,9 @@ XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin, EditInfoMixin)
 # Allow any XBlock in the LMS
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
-# Paths to wrapper methods which should be applied to every XBlock's FieldData.
+# .. setting_name: XBLOCK_FIELD_DATA_WRAPPERS
+# .. setting_default: ()
+# .. setting_description: Paths to wrapper methods which should be applied to every XBlock's FieldData.
 XBLOCK_FIELD_DATA_WRAPPERS = ()
 
 XBLOCK_FS_STORAGE_BUCKET = None
