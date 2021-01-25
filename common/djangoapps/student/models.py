@@ -58,28 +58,32 @@ from user_util import user_util
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
+from common.djangoapps.student.emails import send_proctoring_requirements_email
+from common.djangoapps.student.email_helpers import generate_proctoring_requirements_email_context
+from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
+from common.djangoapps.track import contexts, segment
+from common.djangoapps.util.model_utils import emit_field_changed_events, get_changed_fields_dict
+from common.djangoapps.util.query import use_read_replica_if_available
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
     DynamicUpgradeDeadlineConfiguration,
-    OrgDynamicUpgradeDeadlineConfiguration
+    OrgDynamicUpgradeDeadlineConfiguration,
 )
+from lms.djangoapps.courseware.toggles import COURSEWARE_PROCTORING_IMPROVEMENTS
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.enrollments.api import (
     _default_course_mode,
     get_enrollment_attributes,
-    set_enrollment_attributes
+    is_enrollment_valid_for_proctoring,
+    set_enrollment_attributes,
 )
 from openedx.core.djangoapps.signals.signals import USER_ACCOUNT_ACTIVATED
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
 from openedx.core.toggles import ENTRANCE_EXAMS
-from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
-from common.djangoapps.track import contexts, segment
-from common.djangoapps.util.model_utils import emit_field_changed_events, get_changed_fields_dict
-from common.djangoapps.util.query import use_read_replica_if_available
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
@@ -1455,6 +1459,12 @@ class CourseEnrollment(models.Model):
                 self.send_signal(EnrollStatusChange.unenroll)
 
         if mode_changed:
+            if COURSEWARE_PROCTORING_IMPROVEMENTS.is_enabled(self.course_id):
+                # If mode changed to one that requires proctoring, send proctoring requirements email
+                if is_enrollment_valid_for_proctoring(self.user.username, self.course_id):
+                    email_context = generate_proctoring_requirements_email_context(self.user, self.course_id)
+                    send_proctoring_requirements_email(context=email_context)
+
             # Only emit mode change events when the user's enrollment
             # mode has changed from its previous setting
             self.emit_event(EVENT_NAME_ENROLLMENT_MODE_CHANGED)
@@ -2586,7 +2596,7 @@ def log_successful_logout(sender, request, user, **kwargs):
 
 @receiver(user_logged_in)
 @receiver(user_logged_out)
-def enforce_single_login(sender, request, user, signal, **kwargs):
+def enforce_single_login(sender, request, user, signal, **kwargs):  # pylint: disable=unused-argument
     """
     Sets the current session id in the user profile,
     to prevent concurrent logins.

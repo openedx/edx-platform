@@ -1110,7 +1110,7 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestProctoringRendering, cls).setUpClass()
-        cls.course_key = ToyCourseFactory.create().id
+        cls.course_key = ToyCourseFactory.create(enable_proctored_exams=True).id
 
     def setUp(self):
         """

@@ -577,7 +577,11 @@ LEARNING_MICROFRONTEND_URL = "http://learning-mfe"
 
 DASHBOARD_COURSE_LIMIT = 250
 
-PROCTORING_SETTINGS = {}
+PROCTORING_SETTINGS = {
+    'LINK_URLS': {
+        'faq': 'https://support.example.com/proctoring-faq.html'
+    }
+}
 
 ############### Settings for Django Rate limit #####################
 

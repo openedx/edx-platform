@@ -52,7 +52,8 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.utils import should_redirect_to_logistration_mircrofrontend
 from openedx.core.djangolib.markup import HTML, Text
-from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info, generate_activation_email_context
+from common.djangoapps.student.email_helpers import generate_activation_email_context
+from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info
 from common.djangoapps.student.message_types import AccountActivation, EmailChange, EmailChangeConfirmation, RecoveryEmailCreate
 from common.djangoapps.student.models import (
     AccountRecovery,
