@@ -12,14 +12,24 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from six.moves.urllib.parse import urlparse
 
-from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
+from edx_toggles.toggles import WaffleFlag
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 # accommodates course api urls, excluding any course api routes that do not fall under v*/courses, such as v1/blocks.
 COURSE_REGEX = re.compile(r'^(.*?/courses/)(?!v[0-9]+/[^/]+){}'.format(settings.COURSE_ID_PATTERN))
 
-WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='request_utils')
-CAPTURE_COOKIE_SIZES = LegacyWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'capture_cookie_sizes', __name__)
+# .. toggle_name: request_utils.capture_cookie_sizes
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Enables capturing of cookie sizes for monitoring purposes. This can be useful for tracking
+#       down large cookies and avoiding hitting limits on the total size of cookies. See the CookieMonitoringMiddleware
+#       docstring for details on the monitoring custom attributes that will be set.
+# .. toggle_warnings: Enabling this flag will add a number of custom attributes, and could adversely affect other
+#       monitoring. Only enable temporarily, or lower TOP_N_COOKIES_CAPTURED and TOP_N_COOKIE_GROUPS_CAPTURED django
+#       settings to capture less data.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2019-02-22
+CAPTURE_COOKIE_SIZES = WaffleFlag('request_utils.capture_cookie_sizes', __name__)
 log = logging.getLogger(__name__)
 
 
@@ -122,21 +132,27 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
         cookies.max.group.size: The sum total size of all the cookies in the largest group.
         cookies_total_size: The sum total size of all cookies in this request.
 
-        Related Settings:
+        Related Settings (see annotations for details):
 
-        - `request_utils.capture_cookie_sizes` is the waffle flag that control whether this
-            middleware logs anything or not.
-
-        - TOP_N_COOKIES_CAPTURED(Default: 5) controls how many cookies to log.
-        - TOP_N_COOKIE_GROUPS_CAPTURED(Default: 5): controls how many cookie groups to capture.
-
+        - `request_utils.capture_cookie_sizes`
+        - TOP_N_COOKIES_CAPTURED
+        - TOP_N_COOKIE_GROUPS_CAPTURED
 
         """
         if not CAPTURE_COOKIE_SIZES.is_enabled():
             return
 
-        # Capture the N largest cookies
+        # ..setting_name: TOP_N_COOKIES_CAPTURED
+        # .. setting_default: 5
+        # .. setting_description: The number of the largest cookies to capture when monitoring. Capture fewer cookies
+        #       if you need to save on monitoring resources.
+        # .. setting_warning: Depends on the `request_utils.capture_cookie_sizes` toggle being enabled.
         top_n_cookies_captured = getattr(settings, "TOP_N_COOKIES_CAPTURED", 5)
+        # ..setting_name: TOP_N_COOKIE_GROUPS_CAPTURED
+        # .. setting_default: 5
+        # .. setting_description: The number of the largest cookie groups to capture when monitoring. Capture
+        #       fewer cookies if you need to save on monitoring resources.
+        # .. setting_warning: Depends on the `request_utils.capture_cookie_sizes` toggle being enabled.
         top_n_cookie_groups_captured = getattr(settings, "TOP_N_COOKIE_GROUPS_CAPTURED", 5)
 
         cookie_names_to_size = {}
