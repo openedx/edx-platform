@@ -188,8 +188,9 @@ class TrackMiddleware(MiddlewareMixin):
         """
         if not session_key:
             return ''
-        # Prevent confirmation attacks by using SECRET_KEY as a pepper
-        # (server-wide salt). Tracking ID and session key will only be linkable
+        # Prevent confirmation attacks by using SECRET_KEY as a pepper (see
+        # ADR: docs/decisions/0008-secret-key-usage.rst).
+        # Tracking ID and session key will only be linkable
         # by someone in possession of the pepper.
         #
         # This assumes that session_key is high-entropy and unpredictable (which

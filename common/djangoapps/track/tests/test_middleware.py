@@ -183,6 +183,7 @@ class TrackMiddlewareTestCase(TestCase):
     @override_settings(SECRET_KEY='85920908f28904ed733fe576320db18cabd7b6cd')
     def test_session_key_substitution(self):
         session_key = '665924b49a93e22b46ee9365abf28c2a'
+        # Output value pinned to alert on unintended changes to generator
         expected_session_key = 'b4103566fc80d20da1970cbb4380bccd'
         substitute_session_key = self.track_middleware.substitute_session_key(session_key)
         self.assertEqual(substitute_session_key, expected_session_key)
