@@ -981,7 +981,7 @@ class AnonymousLookupTable(ModuleStoreTestCase):
         This tests to make sure stored value is used rather than a creating a new one
         """
         anonymous_id_1 = anonymous_id_for_user(self.user, None)
-        delattr(self.user,"_anonymous_id")
+        delattr(self.user, "_anonymous_id")
         anonymous_id_2 = anonymous_id_for_user(self.user, None)
         self.assertEqual(anonymous_id_1, anonymous_id_2)
 
@@ -1032,6 +1032,7 @@ class AnonymousLookupTable(ModuleStoreTestCase):
             new_anonymous_id = anonymous_id_for_user(self.user, self.course.id)
             self.assertNotEqual(anonymous_id, new_anonymous_id)
             self.assertEqual(self.user, user_by_anonymous_id(new_anonymous_id))
+
 
 @skip_unless_lms
 @patch('openedx.core.djangoapps.programs.utils.get_programs')
