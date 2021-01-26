@@ -322,19 +322,19 @@ def _update_context_with_user_info(context, user, user_certificate):
     """
     Updates context dictionary with user related info.
     """
-    # user_fullname = user.profile.name
+    user_fullname = user_certificate.name if user_certificate.name else user.profile.name # EOL
     context['username'] = user.username
     context['course_mode'] = user_certificate.mode
     context['accomplishment_user_id'] = user.id
-    context['accomplishment_copy_name'] = user_certificate.name # EOL
+    context['accomplishment_copy_name'] = user_fullname
     context['accomplishment_copy_username'] = user.username
 
     context['accomplishment_more_title'] = _(u"More Information About {user_name}'s Certificate:").format(
-        user_name=user_certificate.name
+        user_name=user_fullname
     )
     # Translators: This line is displayed to a user who has completed a course and achieved a certification
     context['accomplishment_banner_opening'] = _(u"{fullname}, you earned a certificate!").format(
-        fullname=user_certificate.name
+        fullname=user_fullname
     )
 
     # Translators: This line congratulates the user and instructs them to share their accomplishment on social networks
@@ -344,7 +344,7 @@ def _update_context_with_user_info(context, user, user_certificate):
 
     # Translators: This line leads the reader to understand more about the certificate that a student has been awarded
     context['accomplishment_copy_more_about'] = _(u"More about {fullname}'s accomplishment").format(
-        fullname=user_certificate.name
+        fullname=user_fullname
     )
 
 
