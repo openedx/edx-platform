@@ -4,6 +4,7 @@ All models for applications app
 from datetime import date
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -76,6 +77,13 @@ class ApplicationHub(TimeStampedModel):
         self.submission_date = date.today()
         self.save()
 
+    @property
+    def is_written_application_started(self):
+        try:
+            return bool(self.user.application)
+        except ObjectDoesNotExist:
+            return False
+
     def __str__(self):
         return 'User {user_id}, application status id={id}'.format(user_id=self.user.id, id=self.id)
 
@@ -120,6 +128,8 @@ class UserApplication(TimeStampedModel):
         help_text=_('Accepted extensions: .pdf, .doc, .jpg, .png'),
     )
     cover_letter = models.TextField(blank=True, verbose_name=_('Cover Letter'), )
+    is_work_experience_not_applicable = models.BooleanField(verbose_name=_('Work Experience Not Applicable'),
+                                                            default=False)
 
     OPEN = 'open'
     ACCEPTED = 'accepted'
