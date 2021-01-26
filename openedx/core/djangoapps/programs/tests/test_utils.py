@@ -57,7 +57,6 @@ from xmodule.modulestore.tests.django_utils import (
 )
 from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
 
-CERTIFICATES_API_MODULE = 'lms.djangoapps.certificates.api'
 ECOMMERCE_URL_ROOT = 'https://ecommerce.example.com'
 UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 LOGGER_NAME = 'openedx.core.djangoapps.programs.utils'
@@ -932,7 +931,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
 
     @ddt.data(True, False)
     @mock.patch(UTILS_MODULE + '.certificate_api.certificate_downloadable_status')
-    @mock.patch(CERTIFICATES_API_MODULE + '.has_html_certificates_enabled')
+    @mock.patch('lms.djangoapps.certificates.utils.has_html_certificates_enabled')
     def test_certificate_url_retrieval(self, is_uuid_available, mock_html_certs_enabled, mock_get_cert_data):
         """
         Verify that the student's run mode certificate is included,

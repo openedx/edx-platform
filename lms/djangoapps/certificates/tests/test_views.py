@@ -15,13 +15,13 @@ from django.urls import reverse
 from opaque_keys.edx.locator import CourseLocator
 from six.moves import range
 
-from lms.djangoapps.certificates.api import get_certificate_url
 from lms.djangoapps.certificates.models import (
     CertificateHtmlViewConfiguration,
     ExampleCertificate,
     ExampleCertificateSet,
     GeneratedCertificate
 )
+from lms.djangoapps.certificates.utils import get_certificate_url
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from common.djangoapps.student.tests.factories import UserFactory
