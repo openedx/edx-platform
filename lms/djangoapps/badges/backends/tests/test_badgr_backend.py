@@ -5,12 +5,12 @@ Tests for BadgrBackend
 
 from datetime import datetime
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 import six
 from django.db.models.fields.files import ImageFieldFile
 from django.test.utils import override_settings
-from lazy.lazy import lazy
-from mock import Mock, call, patch
+from lazy.lazy import lazy  # lint-amnesty, pylint: disable=import-error, no-name-in-module
+from mock import Mock, call, patch  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.badges.backends.badgr import BadgrBackend
 from lms.djangoapps.badges.models import BadgeAssertion
@@ -18,8 +18,8 @@ from lms.djangoapps.badges.tests.factories import BadgeClassFactory
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.track.tests import EventTrackingTestCase
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 BADGR_SETTINGS = {
     'BADGR_API_TOKEN': '12345',
@@ -43,7 +43,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         """
         Create a course and user to test with.
         """
-        super(BadgrBackendTestCase, self).setUp()
+        super(BadgrBackendTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # Need key to be deterministic to test slugs.
         self.course = CourseFactory.create(
             org='edX', course='course_test', run='test_run', display_name='Badged',
@@ -72,14 +72,14 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         """
         Make sure the handler generates the correct URLs for different API tasks.
         """
-        self.assertEqual(self.handler._base_url, 'https://example.com/v1/issuer/issuers/test-issuer')
-        self.assertEqual(self.handler._badge_create_url, 'https://example.com/v1/issuer/issuers/test-issuer/badges')
+        self.assertEqual(self.handler._base_url, 'https://example.com/v1/issuer/issuers/test-issuer')  # lint-amnesty, pylint: disable=no-member
+        self.assertEqual(self.handler._badge_create_url, 'https://example.com/v1/issuer/issuers/test-issuer/badges')  # lint-amnesty, pylint: disable=no-member
         self.assertEqual(
-            self.handler._badge_url('test_slug_here'),
+            self.handler._badge_url('test_slug_here'),  # lint-amnesty, pylint: disable=no-member
             'https://example.com/v1/issuer/issuers/test-issuer/badges/test_slug_here'
         )
         self.assertEqual(
-            self.handler._assertion_url('another_test_slug'),
+            self.handler._assertion_url('another_test_slug'),  # lint-amnesty, pylint: disable=no-member
             'https://example.com/v1/issuer/issuers/test-issuer/badges/another_test_slug/assertions'
         )
 
@@ -93,7 +93,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         """
         Check to make sure the handler generates appropriate HTTP headers.
         """
-        self.check_headers(self.handler._get_headers())
+        self.check_headers(self.handler._get_headers())  # lint-amnesty, pylint: disable=no-member
 
     @patch('requests.post')
     def test_create_badge(self, post):
@@ -123,7 +123,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         """
         BadgrBackend.badges.append(EXAMPLE_SLUG)
         self.handler._create_badge = Mock()
-        self.handler._ensure_badge_created(self.badge_class)
+        self.handler._ensure_badge_created(self.badge_class)  # lint-amnesty, pylint: disable=no-member
         self.assertFalse(self.handler._create_badge.called)
 
     @ddt.unpack
@@ -133,7 +133,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         ('no_course_badge_class', 'test_componenttest_slug')
     )
     def test_slugs(self, badge_class_type, slug):
-        self.assertEqual(self.handler._slugify(getattr(self, badge_class_type)), slug)
+        self.assertEqual(self.handler._slugify(getattr(self, badge_class_type)), slug)  # lint-amnesty, pylint: disable=no-member
 
     @patch('requests.get')
     def test_ensure_badge_created_checks(self, get):
@@ -142,7 +142,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         get.return_value = response
         self.assertNotIn('test_componenttest_slug', BadgrBackend.badges)
         self.handler._create_badge = Mock()
-        self.handler._ensure_badge_created(self.badge_class)
+        self.handler._ensure_badge_created(self.badge_class)  # lint-amnesty, pylint: disable=no-member
         self.assertTrue(get.called)
         args, kwargs = get.call_args
         self.assertEqual(
@@ -161,7 +161,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         get.return_value = response
         self.assertNotIn(EXAMPLE_SLUG, BadgrBackend.badges)
         self.handler._create_badge = Mock()
-        self.handler._ensure_badge_created(self.badge_class)
+        self.handler._ensure_badge_created(self.badge_class)  # lint-amnesty, pylint: disable=no-member
         self.assertTrue(self.handler._create_badge.called)
         self.assertEqual(self.handler._create_badge.call_args, call(self.badge_class))
         self.assertIn(EXAMPLE_SLUG, BadgrBackend.badges)
@@ -178,7 +178,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         response.json.return_value = result
         post.return_value = response
         self.recreate_tracker()
-        self.handler._create_assertion(self.badge_class, self.user, 'https://example.com/irrefutable_proof')
+        self.handler._create_assertion(self.badge_class, self.user, 'https://example.com/irrefutable_proof')  # lint-amnesty, pylint: disable=no-member
         args, kwargs = post.call_args
         self.assertEqual(
             args[0],

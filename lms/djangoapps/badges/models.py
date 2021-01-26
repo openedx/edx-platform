@@ -6,23 +6,23 @@ Database models for the badges app
 from importlib import import_module
 
 import six
-from config_models.models import ConfigurationModel
+from config_models.models import ConfigurationModel  # lint-amnesty, pylint: disable=import-error
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from django.utils.encoding import python_2_unicode_compatible  # lint-amnesty, pylint: disable=no-name-in-module
 from django.utils.translation import ugettext_lazy as _
-from jsonfield import JSONField
-from lazy import lazy
-from model_utils.models import TimeStampedModel
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.django.models import CourseKeyField
-from opaque_keys.edx.keys import CourseKey
+from jsonfield import JSONField  # lint-amnesty, pylint: disable=import-error
+from lazy import lazy  # lint-amnesty, pylint: disable=no-name-in-module
+from model_utils.models import TimeStampedModel  # lint-amnesty, pylint: disable=import-error
+from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.django.models import CourseKeyField  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.badges.utils import deserialize_count_specs
 from openedx.core.djangolib.markup import HTML, Text
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 def validate_badge_image(image):
@@ -66,7 +66,7 @@ class BadgeClass(models.Model):
     mode = models.CharField(max_length=100, default=u'', blank=True)
     image = models.ImageField(upload_to=u'badge_classes', validators=[validate_badge_image])
 
-    def __str__(self):
+    def __str__(self):  # lint-amnesty, pylint: disable=invalid-str-returned
         return HTML(u"<Badge '{slug}' for '{issuing_component}'>").format(
             slug=HTML(self.slug), issuing_component=HTML(self.issuing_component)
         )
@@ -129,15 +129,15 @@ class BadgeClass(models.Model):
         """
         Contacts the backend to have a badge assertion created for this badge class for this user.
         """
-        return self.backend.award(self, user, evidence_url=evidence_url)
+        return self.backend.award(self, user, evidence_url=evidence_url)  # lint-amnesty, pylint: disable=no-member
 
-    def save(self, **kwargs):
+    def save(self, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Slugs must always be lowercase.
         """
         self.slug = self.slug and self.slug.lower()
         self.issuing_component = self.issuing_component and self.issuing_component.lower()
-        super(BadgeClass, self).save(**kwargs)
+        super(BadgeClass, self).save(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     class Meta(object):
         app_label = "badges"
@@ -159,7 +159,7 @@ class BadgeAssertion(TimeStampedModel):
     image_url = models.URLField()
     assertion_url = models.URLField()
 
-    def __str__(self):
+    def __str__(self):  # lint-amnesty, pylint: disable=invalid-str-returned
         return HTML(u"<{username} Badge Assertion for {slug} for {issuing_component}").format(
             username=HTML(self.user.username),
             slug=HTML(self.badge_class.slug),
@@ -211,7 +211,7 @@ class CourseCompleteImageConfiguration(models.Model):
         default=False,
     )
 
-    def __str__(self):
+    def __str__(self):  # lint-amnesty, pylint: disable=invalid-str-returned
         return HTML(u"<CourseCompleteImageConfiguration for '{mode}'{default}>").format(
             mode=HTML(self.mode),
             default=HTML(u" (default)") if self.default else HTML(u'')
@@ -273,7 +273,7 @@ class CourseEventBadgesConfiguration(ConfigurationModel):
         )
     )
 
-    def __str__(self):
+    def __str__(self):  # lint-amnesty, pylint: disable=invalid-str-returned
         return HTML(u"<CourseEventBadgesConfiguration ({})>").format(
             Text(u"Enabled") if self.enabled else Text(u"Disabled")
         )

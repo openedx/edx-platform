@@ -7,13 +7,13 @@ import hashlib
 import logging
 import mimetypes
 
-import requests
+import requests  # lint-amnesty, pylint: disable=import-error
 import six
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from eventtracking import tracker
-from lazy import lazy
-from requests.packages.urllib3.exceptions import HTTPError
+from eventtracking import tracker  # lint-amnesty, pylint: disable=import-error
+from lazy import lazy  # lint-amnesty, pylint: disable=no-name-in-module
+from requests.packages.urllib3.exceptions import HTTPError  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.badges.backends.base import BadgeBackend
 from lms.djangoapps.badges.models import BadgeAssertion
@@ -29,7 +29,7 @@ class BadgrBackend(BadgeBackend):
     badges = []
 
     def __init__(self):
-        super(BadgrBackend, self).__init__()
+        super(BadgrBackend, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         if not settings.BADGR_API_TOKEN:
             raise ImproperlyConfigured("BADGR_API_TOKEN not set.")
 
