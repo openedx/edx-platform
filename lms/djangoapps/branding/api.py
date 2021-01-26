@@ -13,7 +13,6 @@ the marketing site and blog).
 
 """
 
-
 import logging
 
 import six
@@ -643,3 +642,11 @@ def get_home_url():
     Return Dashboard page url
     """
     return reverse('dashboard')
+
+
+def get_logo_url_for_email():
+    """
+    Returns the url for the branded logo image for embedding in email templates.
+    """
+    default_logo_url = getattr(settings, 'DEFAULT_EMAIL_LOGO_URL', None)
+    return getattr(settings, 'LOGO_URL_PNG', None) or default_logo_url
