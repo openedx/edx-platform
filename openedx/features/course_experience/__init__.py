@@ -75,7 +75,18 @@ COURSE_ENABLE_UNENROLLED_ACCESS_FLAG = CourseWaffleFlag(
 # Waffle flag to enable relative dates for course content
 RELATIVE_DATES_FLAG = ExperimentWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'relative_dates', __name__, experiment_id=17)
 
-# Waffle flag to enable user calendar syncing
+# .. toggle_name: course_experience.calendar_sync
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This course flag enables a course tool (which is a tool that is added on a course home page)
+#   that sends course assignment calendars to course students, whenever they click on the "Subscribe to calendar
+#   updates" button. The email contains an ics attachment that students can then use to sync with their own calendar
+#   apps.
+# .. toggle_warnings: For this toggle to have an effect, the RELATIVE_DATES_FLAG toggle must be enabled, too.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2021-01-26
+# .. toggle_target_removal_date: 2021-04-26
+# .. toggle_tickets: https://openedx.atlassian.net/browse/AA-36
 CALENDAR_SYNC_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'calendar_sync', __name__)
 
 
