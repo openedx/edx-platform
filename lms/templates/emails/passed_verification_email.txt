@@ -1,7 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 
-${_("Hi {full_name}").format(full_name=full_name)}
+${_("Hola {full_name},").format(full_name=full_name)}
 
 ${_("Congratulations! Your ID verification process was successful.")}
 ${_("Your verification is effective for one year. It will expire on {expiration_datetime}").format(expiration_date=expiration_datetime)}
