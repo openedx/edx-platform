@@ -14,6 +14,7 @@ from six import text_type
 from six.moves import range
 from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
+from common.djangoapps.third_party_auth.config.waffle import ENABLE_MULTIPLE_SSO_ACCOUNTS_ASSOCIATION_TO_SAML_USER
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings, get_current_site
 from openedx.core.djangoapps.user_api.config.waffle import (
@@ -200,3 +201,13 @@ def is_multiple_user_enterprises_feature_enabled():
         Boolean value representing switch status
     """
     return user_api_waffle().is_enabled(ENABLE_MULTIPLE_USER_ENTERPRISES_FEATURE)
+
+
+def is_multiple_sso_accounts_association_to_saml_user_enabled():
+    """
+    Checks to see if the django-waffle switch for enabling the multiple sso accounts association to saml user is active
+
+    Returns:
+        Boolean value representing switch status
+    """
+    return ENABLE_MULTIPLE_SSO_ACCOUNTS_ASSOCIATION_TO_SAML_USER.is_enabled()
