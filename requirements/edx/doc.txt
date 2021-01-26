@@ -9,7 +9,7 @@ babel==2.9.0              # via sphinx
 certifi==2020.12.5        # via requests
 chardet==4.0.0            # via requests
 click==7.1.2              # via code-annotations
-code-annotations==1.0.0   # via -r requirements/edx/doc.in
+code-annotations==1.0.2   # via -r requirements/edx/doc.in
 django==2.2.17            # via -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt, code-annotations
 docutils==0.16            # via sphinx
 edx-sphinx-theme==1.6.1   # via -r requirements/edx/doc.in
@@ -28,7 +28,7 @@ pytz==2020.5              # via babel, django
 pyyaml==5.4.1             # via code-annotations
 requests==2.25.1          # via sphinx
 six==1.15.0               # via edx-sphinx-theme, stevedore
-smmap==3.0.4              # via gitdb
+smmap==3.0.5              # via gitdb
 snowballstemmer==2.1.0    # via sphinx
 sphinx==3.3.0             # via -c requirements/edx/../constraints.txt, -r requirements/edx/doc.in, edx-sphinx-theme
 sphinxcontrib-applehelp==1.0.2  # via sphinx
