@@ -172,7 +172,7 @@ def anonymous_id_for_user(user, course_id, save=True):
     # .. toggle_target_removal_date: 2021-01-29
     # .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1645
     if getattr(settings, "ANONYMOUS_USER_ID_REVERT_TO_STABLE_HASH"):
-        return deprecated(anonymous_id_for_user(user, course_id, save))
+        return deprecated_anonymous_id_for_user(user, course_id, save)
 
     # This part is for ability to get xblock instance in xblock_noauth handlers, where user is unauthenticated.
     assert user
