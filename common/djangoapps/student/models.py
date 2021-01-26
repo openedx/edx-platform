@@ -148,15 +148,17 @@ class AnonymousUserId(models.Model):
 
 def anonymous_id_for_user(user, course_id, save=True):
     """
-    Return a unique id for a (user, course) pair, suitable for inserting
+    Inputs:
+        user: User model
+        course_id: string or None
+        save:  Whether the id should be saved in an AnonymousUserId object, defaults to True
+
+    Return a unique id for a (user, course_id) pair, suitable for inserting
     into e.g. personalized survey links.
 
     If user is an `AnonymousUser`, returns `None`
     else If this user/course_id pair already has an anonymous id in AnonymousUserId object, return that
     else: create new anonymous_id, save it in AnonymousUserId, and return anonymous id
-
-    Keyword arguments:
-    save -- Whether the id should be saved in an AnonymousUserId object.
     """
 
     # This part is for ability to get xblock instance in xblock_noauth handlers, where user is unauthenticated.
@@ -169,11 +171,11 @@ def anonymous_id_for_user(user, course_id, save=True):
     if cached_id is not None:
         return cached_id
     # check if an anonymous id already exists for this user and course_id combination
-    anonymous_user_ids = AnonymousUserId.objects.filter(user=user).filter(course_id=course_id).order_by('id')
+    anonymous_user_ids = AnonymousUserId.objects.filter(user=user).filter(course_id=course_id).order_by('-id')
     if anonymous_user_ids:
         # If there are multiple anonymous_user_ids per user, course_id pair
         # select the row which was created most recently
-        anonymous_user_id = anonymous_user_ids[-1].anonymous_user_id
+        anonymous_user_id = anonymous_user_ids[0].anonymous_user_id
     else:
         # include the secret key as a salt, and to make the ids unique across different LMS installs.
         hasher = hashlib.md5()
