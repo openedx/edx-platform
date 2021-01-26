@@ -1009,10 +1009,6 @@ class AnonymousLookupTable(ModuleStoreTestCase):
         self.assertEqual(self.user, real_user)
         self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, course2.id, save=False))
 
-
-    def test_query_nums(self):
-
-
     def test_anonymous_id_secret_key_changes_do_not_change_existing_anonymous_ids(self):
         """Test that a same anonymous id is returned when the SECRET_KEY changes."""
         CourseEnrollment.enroll(self.user, self.course.id)
