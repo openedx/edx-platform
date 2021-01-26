@@ -217,6 +217,7 @@ def anonymous_id_for_user(user, course_id, save=True):
 
     return anonymous_user_id
 
+
 def deprecated_anonymous_id_for_user(user, course_id, save=True):
     """
     Return a unique id for a (user, course) pair, suitable for inserting
@@ -263,6 +264,7 @@ def deprecated_anonymous_id_for_user(user, course_id, save=True):
         pass
 
     return digest
+
 
 def user_by_anonymous_id(uid):
     """
