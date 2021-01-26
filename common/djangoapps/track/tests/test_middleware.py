@@ -188,6 +188,11 @@ class TrackMiddlewareTestCase(TestCase):
         substitute_session_key = self.track_middleware.substitute_session_key(session_key)
         self.assertEqual(substitute_session_key, expected_session_key)
 
+        # Confirm that we get *different* outputs for different inputs
+        expected_session_key_2 = "6f0c784c1087c6bc4624b7eac982fedf"
+        substitute_session_key_2 = self.track_middleware.substitute_session_key(session_key + "different")
+        self.assertEqual(expected_session_key_2, substitute_session_key_2)
+
     def test_request_headers(self):
         ip_address = '10.0.0.0'
         user_agent = 'UnitTest/1.0'
