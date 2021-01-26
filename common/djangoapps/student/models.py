@@ -43,6 +43,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django_countries.fields import CountryField
 from edx_django_utils.cache import RequestCache
+from edx_django_utils import monitoring
 from edx_rest_api_client.exceptions import SlumberBaseException
 from eventtracking import tracker
 from model_utils.models import TimeStampedModel
@@ -180,8 +181,15 @@ def anonymous_id_for_user(user, course_id, save=True):
     if user.is_anonymous:
         return None
 
+    # ARCHBOM-1674: Get a sense of what fraction of anonymous_user_id calls are
+    # cached, stored in the DB, or retrieved from the DB. This will help inform
+    # us on decisions about whether we can move to always save IDs,
+    # pregenerate them, use random instead of deterministic IDs, etc.
+    monitoring.increment('temp_anonymous_user_id.requested')
+
     cached_id = getattr(user, '_anonymous_id', {}).get(course_id)
     if cached_id is not None:
+        monitoring.increment('temp_anonymous_user_id.returned_from_cache')
         return cached_id
     # check if an anonymous id already exists for this user and course_id combination
     anonymous_user_ids = AnonymousUserId.objects.filter(user=user).filter(course_id=course_id).order_by('-id')
@@ -199,6 +207,7 @@ def anonymous_id_for_user(user, course_id, save=True):
         anonymous_user_id = hasher.hexdigest()
 
         if save is True:
+            monitoring.increment('temp_anonymous_user_id.computed_stored')
             try:
                 AnonymousUserId.objects.create(
                     user=user,
@@ -208,7 +217,9 @@ def anonymous_id_for_user(user, course_id, save=True):
             except IntegrityError:
                 # Another thread has already created this entry, so
                 # continue
-                pass
+                monitoring.increment('temp_anonymous_user_id.computed_already_present')
+        else:
+            monitoring.increment('temp_anonymous_user_id.computed_unsaved')
 
     # cache the anonymous_id in the user object
     if not hasattr(user, '_anonymous_id'):
