@@ -165,8 +165,8 @@ def anonymous_id_for_user(user, course_id, save=True):
     # .. toggle_implementation: SettingToggle
     # .. toggle_default: False
     # .. toggle_description: Used to make sure we can quickly revert back to old behaviour in case our refractoring
-    #   of anonymous_id_for_user function does not work as intended.
-    #   Reason, our refractoring adds a database lookup on every call. We are worried this will cause preformance issues.
+    #   of anonymous_id_for_user function does not work as intended.  Our concern is that our refractoring adds a
+    #   database lookup on every call and we are worried this will cause preformance issues.
     # .. toggle_use_cases: temporary
     # .. toggle_creation_date: 2021-01-26
     # .. toggle_target_removal_date: 2021-01-29
