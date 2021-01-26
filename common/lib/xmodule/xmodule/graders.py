@@ -333,7 +333,7 @@ class AssignmentFormatGrader(CourseGrader):
     min_count = 2 would produce the labels "Assignment 3", "Assignment 4"
 
     """
-    def __init__(
+    def __init__(  # pylint: disable=super-init-not-called
             self,
             type,  # pylint: disable=redefined-builtin
             min_count,
