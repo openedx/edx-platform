@@ -4146,8 +4146,10 @@ MAILCHIMP_NEW_USER_LIST_ID = ""
 ########################## BLOCKSTORE #####################################
 BLOCKSTORE_PUBLIC_URL_ROOT = 'http://localhost:18250'
 BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
-# Which of django's caches to use for storing anonymous user state for XBlocks
-# in the blockstore-based XBlock runtime
+
+# .. setting_name: XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE
+# .. setting_default: default
+# .. setting_description: The django cache key of the cache to use for storing anonymous user state for XBlocks.
 XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
 
 # Blockstore data could contain S3 links, so this should be lower than Blockstore's AWS_QUERYSTRING_EXPIRE
