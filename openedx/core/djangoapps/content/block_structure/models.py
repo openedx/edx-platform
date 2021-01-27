@@ -38,11 +38,19 @@ def _directory_name(data_usage_key):
     Returns the directory name for the given
     data_usage_key.
     """
+    # .. setting_name: BLOCK_STRUCTURES_SETTINGS['DIRECTORY_PREFIX']
+    # .. setting_default: ''
+    # .. setting_description: Specifies the path in storage where block structures would be saved,
+    #   for storage-backed block structure cache.
+    # .. setting_warnings: Depends on `BLOCK_STRUCTURES_SETTINGS['STORAGE_CLASS']` and on
+    #   `block_structure.storage_backing_for_cache`.
+    directory_prefix = settings.BLOCK_STRUCTURES_SETTINGS.get('DIRECTORY_PREFIX', '')
+
     # replace any '/' in the usage key so they aren't interpreted
     # as folder separators.
     encoded_usage_key = six.text_type(data_usage_key).replace('/', '_')
     return '{}{}'.format(
-        settings.BLOCK_STRUCTURES_SETTINGS.get('DIRECTORY_PREFIX', ''),
+        directory_prefix,
         encoded_usage_key,
     )
 
@@ -63,10 +71,21 @@ def _bs_model_storage():
     """
     Get django Storage object for BlockStructureModel.
     """
-    return get_storage(
-        settings.BLOCK_STRUCTURES_SETTINGS.get('STORAGE_CLASS'),
-        **settings.BLOCK_STRUCTURES_SETTINGS.get('STORAGE_KWARGS', {})
-    )
+    # .. setting_name: BLOCK_STRUCTURES_SETTINGS['STORAGE_CLASS']
+    # .. setting_default: None
+    # .. setting_description: Specifies the storage used for storage-backed block structure cache.
+    # .. setting_warnings: Depends on `block_structure.storage_backing_for_cache`.
+    storage_class = settings.BLOCK_STRUCTURES_SETTINGS.get('STORAGE_CLASS')
+
+    # .. setting_name: BLOCK_STRUCTURES_SETTINGS['STORAGE_KWARGS']
+    # .. setting_default: {}
+    # .. setting_description: Specifies the keyword arguments needed to setup the storage, which
+    #   would be used for storage-backed block structure cache.
+    # .. setting_warnings: Depends on `BLOCK_STRUCTURES_SETTINGS['STORAGE_CLASS']` and on
+    #   `block_structure.storage_backing_for_cache`.
+    storage_kwargs = settings.BLOCK_STRUCTURES_SETTINGS.get('STORAGE_KWARGS', {})
+
+    return get_storage(storage_class, **storage_kwargs)
 
 
 class CustomizableFileField(models.FileField):
