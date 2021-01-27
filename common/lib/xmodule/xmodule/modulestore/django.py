@@ -138,7 +138,7 @@ class SignalHandler(object):
     To listen for a signal, do the following::
 
         from django.dispatch import receiver
-        from celery.task import task
+        from celery import shared_task
         from edx_django_utils.monitoring import set_code_owner_attribute
         from xmodule.modulestore.django import modulestore, SignalHandler
 
