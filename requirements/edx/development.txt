@@ -29,7 +29,7 @@ attrs==20.3.0             # via -r requirements/edx/testing.txt, edx-ace, jsonsc
 babel==2.9.0              # via -r requirements/edx/testing.txt, enmerkar, enmerkar-underscore, sphinx
 beautifulsoup4==4.9.3     # via -r requirements/edx/testing.txt, pynliner
 billiard==3.6.3.0         # via -r requirements/edx/testing.txt, celery
-bleach==3.2.2             # via -r requirements/edx/testing.txt, django-wiki, edx-enterprise, lti-consumer-xblock, ora2, xblock-poll
+bleach==3.2.3             # via -r requirements/edx/testing.txt, django-wiki, edx-enterprise, lti-consumer-xblock, ora2, xblock-poll
 bok-choy==1.1.1           # via -r requirements/edx/testing.txt
 boto3==1.4.8              # via -r requirements/edx/testing.txt, django-ses, fs-s3fs, ora2
 boto==2.39.0              # via -r requirements/edx/testing.txt, edxval
@@ -46,7 +46,7 @@ code-annotations==1.0.2   # via -r requirements/edx/testing.txt, edx-enterprise,
 contextlib2==0.6.0.post1  # via -r requirements/edx/testing.txt
 coreapi==2.3.3            # via -r requirements/edx/testing.txt, drf-yasg
 coreschema==0.0.4         # via -r requirements/edx/testing.txt, coreapi, drf-yasg
-coverage==5.3.1           # via -r requirements/edx/testing.txt, pytest-cov
+coverage==5.4             # via -r requirements/edx/testing.txt, pytest-cov
 git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0  # via -r requirements/edx/testing.txt
 crowdsourcehinter-xblock==0.6  # via -r requirements/edx/testing.txt
 cryptography==3.2.1       # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, django-fernet-fields, edx-enterprise, pyjwt, social-auth-core
@@ -74,7 +74,7 @@ django-method-override==1.0.4  # via -r requirements/edx/testing.txt
 django-model-utils==4.1.1  # via -r requirements/edx/testing.txt, django-user-tasks, edx-bulk-grades, edx-celeryutils, edx-completion, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-rbac, edx-submissions, edx-when, edxval, ora2, super-csv
 django-mptt==0.11.0       # via -r requirements/edx/testing.txt, django-wiki
 django-multi-email-field==0.6.2  # via -r requirements/edx/testing.txt, edx-enterprise
-django-mysql==3.11.0      # via -r requirements/edx/testing.txt
+django-mysql==3.11.1      # via -r requirements/edx/testing.txt
 django-oauth-toolkit==1.3.2  # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 django-object-actions==3.0.1  # via -r requirements/edx/testing.txt, edx-enterprise
 django-pipeline==1.7.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
@@ -112,12 +112,12 @@ edx-drf-extensions==6.4.0  # via -r requirements/edx/testing.txt, edx-completion
 edx-enterprise==3.17.11   # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 edx-event-routing-backends==4.0.1  # via -r requirements/edx/testing.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/testing.txt, ora2
-edx-lint==3.0             # via -r requirements/edx/testing.txt
+edx-lint==3.0.2           # via -r requirements/edx/testing.txt
 edx-milestones==0.3.0     # via -r requirements/edx/testing.txt
 edx-opaque-keys[django]==2.1.1  # via -r requirements/edx/testing.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, lti-consumer-xblock, xmodule
 edx-organizations==6.8.0  # via -r requirements/edx/testing.txt
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/testing.txt
-edx-proctoring==2.6.2    # via -r requirements/edx/testing.txt, edx-proctoring-proctortrack
+edx-proctoring==2.6.2     # via -r requirements/edx/testing.txt, edx-proctoring-proctortrack
 edx-rbac==1.4.1           # via -r requirements/edx/testing.txt, edx-enterprise
 edx-rest-api-client==5.3.0  # via -r requirements/edx/testing.txt, edx-enterprise, edx-proctoring
 edx-search==3.0.0         # via -r requirements/edx/testing.txt
@@ -135,7 +135,7 @@ enmerkar==0.7.1           # via -r requirements/edx/testing.txt, enmerkar-unders
 event-tracking==1.0.4     # via -r requirements/edx/testing.txt, edx-event-routing-backends, edx-proctoring, edx-search
 execnet==1.7.1            # via -r requirements/edx/testing.txt, pytest-xdist
 factory-boy==2.8.1        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
-faker==5.7.0              # via -r requirements/edx/testing.txt, factory-boy
+faker==5.8.0              # via -r requirements/edx/testing.txt, factory-boy
 filelock==3.0.12          # via -r requirements/edx/testing.txt, tox, virtualenv
 freezegun==0.3.12         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 fs-s3fs==0.1.8            # via -r requirements/edx/testing.txt, django-pyfs
@@ -219,7 +219,7 @@ pygments==2.7.4           # via -r requirements/edx/testing.txt, diff-cover, sph
 pyjwkest==1.4.2           # via -r requirements/edx/testing.txt, edx-drf-extensions, lti-consumer-xblock
 pyjwt[crypto]==1.7.1      # via -r requirements/edx/testing.txt, drf-jwt, edx-rest-api-client, social-auth-core
 pylint-celery==0.3        # via -r requirements/edx/testing.txt, edx-lint
-pylint-django==2.3.0      # via -r requirements/edx/testing.txt, edx-lint
+pylint-django==2.4.2      # via -r requirements/edx/testing.txt, edx-lint
 pylint-plugin-utils==0.6  # via -r requirements/edx/testing.txt, pylint-celery, pylint-django
 pylint==2.6.0             # via -r requirements/edx/testing.txt, edx-lint, pylint-celery, pylint-django, pylint-plugin-utils
 pymongo==3.10.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, edx-opaque-keys, event-tracking, mongodbproxy, mongoengine
@@ -302,7 +302,7 @@ ua-parser==0.10.0         # via -r requirements/edx/testing.txt, django-cookies-
 unicodecsv==0.14.1        # via -r requirements/edx/testing.txt, edx-enterprise
 unidiff==0.6.0            # via -r requirements/edx/testing.txt, coverage-pytest-plugin
 uritemplate==3.0.1        # via -r requirements/edx/testing.txt, coreapi, drf-yasg
-urllib3==1.26.2           # via -r requirements/edx/testing.txt, elasticsearch, geoip2, requests, selenium, transifex-client
+urllib3==1.26.3           # via -r requirements/edx/testing.txt, elasticsearch, geoip2, requests, selenium, transifex-client
 user-util==1.0.0          # via -r requirements/edx/testing.txt
 vine==1.3.0               # via -r requirements/edx/testing.txt, amqp, celery
 virtualenv==20.4.0        # via -r requirements/edx/testing.txt, tox
