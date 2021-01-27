@@ -2,20 +2,20 @@
 """Tests of Branding API """
 
 
-import mock
+import mock  # lint-amnesty, pylint: disable=import-error
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 
 from ..api import _footer_business_links, get_footer, get_home_url, get_logo_url
-from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration  # lint-amnesty, pylint: disable=wrong-import-order
 
-test_config_disabled_contact_us = {   # pylint: disable=invalid-name
+test_config_disabled_contact_us = {
     "CONTACT_US_ENABLE": False,
 }
 
-test_config_custom_url_contact_us = {   # pylint: disable=invalid-name
+test_config_custom_url_contact_us = {
     "CONTACT_US_ENABLE": True,
     "CONTACT_US_CUSTOM_LINK": "https://open.edx.org/",
 }

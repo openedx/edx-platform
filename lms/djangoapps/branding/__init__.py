@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 EdX Branding package.
 
 Provides a way to retrieve "branded" parts of the site.
@@ -9,7 +9,7 @@ such as the site visible courses, university name and logo.
 
 
 from django.conf import settings
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 

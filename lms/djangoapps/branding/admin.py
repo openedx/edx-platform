@@ -1,7 +1,7 @@
 """Django admin pages for branding configuration. """
 
 
-from config_models.admin import ConfigurationModelAdmin
+from config_models.admin import ConfigurationModelAdmin  # lint-amnesty, pylint: disable=import-error
 from django.contrib import admin
 
 from .models import BrandingApiConfig, BrandingInfoConfig
