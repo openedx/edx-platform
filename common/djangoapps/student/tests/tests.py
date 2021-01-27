@@ -39,6 +39,7 @@ from common.djangoapps.student.models import (
     CourseEnrollment,
     LinkedInAddToProfileConfiguration,
     UserAttribute,
+    AnonymousUserId,
     anonymous_id_for_user,
     unique_id_for_user,
     user_by_anonymous_id
@@ -969,9 +970,25 @@ class AnonymousLookupTable(ModuleStoreTestCase):
             mode_slug='honor',
             mode_display_name='Honor Code',
         )
+        self.user2 = UserFactory.create()
         patcher = patch('common.djangoapps.student.models.tracker')
         patcher.start()
         self.addCleanup(patcher.stop)
+
+    def test_same_user_over_multiple_sessions(self):
+        """
+        Anonymous ids are stored in AnonymousUserId model.
+        This tests to make sure stored value is used rather than a creating a new one
+        """
+        anonymous_id_1 = anonymous_id_for_user(self.user, None)
+        delattr(self.user, "_anonymous_id")  # pylint: disable=literal-used-as-attribute
+        anonymous_id_2 = anonymous_id_for_user(self.user, None)
+        self.assertEqual(anonymous_id_1, anonymous_id_2)
+
+    def test_diff_anonymous_id_for_diff_users(self):
+        anonymous_id_1 = anonymous_id_for_user(self.user, None)
+        anonymous_id_2 = anonymous_id_for_user(self.user2, None)
+        self.assertNotEqual(anonymous_id_1, anonymous_id_2)
 
     def test_for_unregistered_user(self):  # same path as for logged out user
         self.assertEqual(None, anonymous_id_for_user(AnonymousUser(), self.course.id))
@@ -992,16 +1009,28 @@ class AnonymousLookupTable(ModuleStoreTestCase):
         self.assertEqual(self.user, real_user)
         self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, course2.id, save=False))
 
-    def test_secret_key_changes(self):
-        """Test that a new anonymous id is returned when the secret key changes."""
+    def test_anonymous_id_secret_key_changes_do_not_change_existing_anonymous_ids(self):
+        """Test that a same anonymous id is returned when the SECRET_KEY changes."""
         CourseEnrollment.enroll(self.user, self.course.id)
         anonymous_id = anonymous_id_for_user(self.user, self.course.id)
         with override_settings(SECRET_KEY='some_new_and_totally_secret_key'):
             # Recreate user object to clear cached anonymous id.
             self.user = User.objects.get(pk=self.user.id)
             new_anonymous_id = anonymous_id_for_user(self.user, self.course.id)
-            self.assertNotEqual(anonymous_id, new_anonymous_id)
+            self.assertEqual(anonymous_id, new_anonymous_id)
             self.assertEqual(self.user, user_by_anonymous_id(anonymous_id))
+            self.assertEqual(self.user, user_by_anonymous_id(new_anonymous_id))
+
+    def test_anonymous_id_secret_key_changes_result_in_diff_values_for_same_new_user(self):
+        """Test that a different anonymous id is returned when the SECRET_KEY changes."""
+        CourseEnrollment.enroll(self.user, self.course.id)
+        anonymous_id = anonymous_id_for_user(self.user, self.course.id)
+        with override_settings(SECRET_KEY='some_new_and_totally_secret_key'):
+            # Recreate user object to clear cached anonymous id.
+            self.user = User.objects.get(pk=self.user.id)
+            AnonymousUserId.objects.filter(user=self.user).filter(course_id=self.course.id).delete()
+            new_anonymous_id = anonymous_id_for_user(self.user, self.course.id)
+            self.assertNotEqual(anonymous_id, new_anonymous_id)
             self.assertEqual(self.user, user_by_anonymous_id(new_anonymous_id))
 
 

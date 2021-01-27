@@ -149,11 +149,91 @@ class AnonymousUserId(models.Model):
 
 def anonymous_id_for_user(user, course_id, save=True):
     """
-    Return a unique id for a (user, course) pair, suitable for inserting
+    Inputs:
+        user: User model
+        course_id: string or None
+        save:  Whether the id should be saved in an AnonymousUserId object, defaults to True
+
+    Return a unique id for a (user, course_id) pair, suitable for inserting
     into e.g. personalized survey links.
 
     If user is an `AnonymousUser`, returns `None`
+    else If this user/course_id pair already has an anonymous id in AnonymousUserId object, return that
+    else: create new anonymous_id, save it in AnonymousUserId, and return anonymous id
+    """
 
+    # .. toggle_name: ANONYMOUS_USER_ID_REVERT_TO_STABLE_HASH
+    # .. toggle_implementation: SettingToggle
+    # .. toggle_default: False
+    # .. toggle_description: Used to make sure we can quickly revert back to old behaviour in case our refractoring
+    #   of anonymous_id_for_user function does not work as intended.  Our concern is that our refractoring adds a
+    #   database lookup on every call and we are worried this will cause preformance issues.
+    # .. toggle_use_cases: temporary
+    # .. toggle_creation_date: 2021-01-26
+    # .. toggle_target_removal_date: 2021-01-29
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1645
+    if getattr(settings, "ANONYMOUS_USER_ID_REVERT_TO_STABLE_HASH", False):
+        return deprecated_anonymous_id_for_user(user, course_id, save)
+
+    # This part is for ability to get xblock instance in xblock_noauth handlers, where user is unauthenticated.
+    assert user
+
+    if user.is_anonymous:
+        return None
+
+    # ARCHBOM-1674: Get a sense of what fraction of anonymous_user_id calls are
+    # cached, stored in the DB, or retrieved from the DB. This will help inform
+    # us on decisions about whether we can move to always save IDs,
+    # pregenerate them, use random instead of deterministic IDs, etc.
+    monitoring.increment('temp_anonymous_user_id.requested')
+
+    cached_id = getattr(user, '_anonymous_id', {}).get(course_id)
+    if cached_id is not None:
+        monitoring.increment('temp_anonymous_user_id.returned_from_cache')
+        return cached_id
+    # check if an anonymous id already exists for this user and course_id combination
+    anonymous_user_ids = AnonymousUserId.objects.filter(user=user).filter(course_id=course_id).order_by('-id')
+    if anonymous_user_ids:
+        # If there are multiple anonymous_user_ids per user, course_id pair
+        # select the row which was created most recently
+        anonymous_user_id = anonymous_user_ids[0].anonymous_user_id
+    else:
+        # include the secret key as a salt, and to make the ids unique across different LMS installs.
+        hasher = hashlib.md5()
+        hasher.update(settings.SECRET_KEY.encode('utf8'))
+        hasher.update(text_type(user.id).encode('utf8'))
+        if course_id:
+            hasher.update(text_type(course_id).encode('utf-8'))
+        anonymous_user_id = hasher.hexdigest()
+
+        if save is True:
+            monitoring.increment('temp_anonymous_user_id.computed_stored')
+            try:
+                AnonymousUserId.objects.create(
+                    user=user,
+                    course_id=course_id,
+                    anonymous_user_id=anonymous_user_id,
+                )
+            except IntegrityError:
+                # Another thread has already created this entry, so
+                # continue
+                monitoring.increment('temp_anonymous_user_id.computed_already_present')
+        else:
+            monitoring.increment('temp_anonymous_user_id.computed_unsaved')
+
+    # cache the anonymous_id in the user object
+    if not hasattr(user, '_anonymous_id'):
+        user._anonymous_id = {}  # pylint: disable=protected-access
+    user._anonymous_id[course_id] = anonymous_user_id  # pylint: disable=protected-access
+
+    return anonymous_user_id
+
+
+def deprecated_anonymous_id_for_user(user, course_id, save=True):
+    """
+    Return a unique id for a (user, course) pair, suitable for inserting
+    into e.g. personalized survey links.
+    If user is an `AnonymousUser`, returns `None`
     Keyword arguments:
     save -- Whether the id should be saved in an AnonymousUserId object.
     """
