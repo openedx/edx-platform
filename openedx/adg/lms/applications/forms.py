@@ -8,7 +8,12 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from common.djangoapps.student.models import UserProfile
-from openedx.adg.lms.applications.constants import MAXIMUM_AGE_LIMIT, MINIMUM_AGE_LIMIT, RESUME_FILE_MAX_SIZE
+from openedx.adg.lms.applications.constants import (
+    APPLICATION_REVIEW_ERROR_MSG,
+    MAXIMUM_AGE_LIMIT,
+    MINIMUM_AGE_LIMIT,
+    RESUME_FILE_MAX_SIZE
+)
 from openedx.adg.lms.applications.models import UserApplication
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
 
@@ -130,4 +135,4 @@ class UserApplicationAdminForm(forms.ModelForm):
     def clean(self):
         super(UserApplicationAdminForm, self).clean()
         if 'status' not in self.request.POST:
-            raise forms.ValidationError(_('Please make a decision before submitting.'))
+            raise forms.ValidationError(APPLICATION_REVIEW_ERROR_MSG)
