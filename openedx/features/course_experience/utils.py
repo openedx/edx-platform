@@ -254,6 +254,18 @@ def get_resume_block(block):
     return block
 
 
+def get_start_block(block):
+    """
+    Gets the deepest block to use as the starting block.
+    """
+    if not block.get('children'):
+        return block
+
+    first_child = block['children'][0]
+
+    return get_start_block(first_child)
+
+
 def dates_banner_should_display(course_key, user):
     """
     Return whether or not the reset banner should display,

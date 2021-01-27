@@ -44,7 +44,7 @@ from .. import (
     LATEST_UPDATE_FLAG,
     SHOW_UPGRADE_MSG_ON_COURSE_HOME,
 )
-from ..utils import get_course_outline_block_tree, get_resume_block
+from ..utils import get_course_outline_block_tree, get_resume_block, get_start_block
 from .course_dates import CourseDatesFragmentView
 from .course_home_messages import CourseHomeMessageFragmentView
 from .course_outline import CourseOutlineFragmentView
@@ -88,9 +88,9 @@ class CourseHomeFragmentView(EdxFragmentView):
         Returns information relevant to resume course functionality.
 
         Returns a tuple: (has_visited_course, resume_course_url)
-            has_visited_course: True if the user has ever visted the course, False otherwise.
-            resume_course_url: The URL of the 'resume course' block if the user has visited the course,
-                otherwise the URL of the course root.
+            has_visited_course: True if the user has ever completed a block, False otherwise.
+            resume_course_url: The URL of the 'resume course' block if the user has completed a block,
+                otherwise the URL of the first block to start the course.
 
         """
         course_outline_root_block = get_course_outline_block_tree(request, course_id, request.user)
@@ -99,7 +99,8 @@ class CourseHomeFragmentView(EdxFragmentView):
         if resume_block:
             resume_course_url = resume_block['lms_web_url']
         else:
-            resume_course_url = course_outline_root_block['lms_web_url'] if course_outline_root_block else None
+            start_block = get_start_block(course_outline_root_block) if course_outline_root_block else None
+            resume_course_url = start_block['lms_web_url'] if start_block else None
 
         return has_visited_course, resume_course_url
 
