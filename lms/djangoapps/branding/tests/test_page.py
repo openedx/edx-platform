@@ -12,8 +12,8 @@ from django.http import HttpResponseRedirect
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
-from milestones.tests.utils import MilestonesTestCaseMixin
-from mock import Mock, patch
+from milestones.tests.utils import MilestonesTestCaseMixin  # lint-amnesty, pylint: disable=import-error
+from mock import Mock, patch  # lint-amnesty, pylint: disable=import-error
 from pytz import UTC
 
 from lms.djangoapps.branding.views import index
@@ -21,8 +21,8 @@ from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from common.djangoapps.util.milestones_helpers import set_prerequisite_courses
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 FEATURES_WITH_STARTDATE = settings.FEATURES.copy()
 FEATURES_WITH_STARTDATE['DISABLE_START_DATES'] = False
@@ -44,7 +44,7 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
     Tests that anonymous users can access the '/' page,  Need courses with start date
     """
     def setUp(self):
-        super(AnonymousIndexPageTest, self).setUp()
+        super(AnonymousIndexPageTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.factory = RequestFactory()
         self.course = CourseFactory.create(
             days_early_for_beta=5,
@@ -161,7 +161,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(IndexPageCourseCardsSortingTests, self).setUp()
+        super(IndexPageCourseCardsSortingTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.starting_later = CourseFactory.create(
             org='MITx',
             number='1000',
@@ -242,7 +242,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
     def test_course_cards_sorted_by_default_sorting(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
-        ((template, context), _) = RENDER_MOCK.call_args  # pylint: disable=unpacking-non-sequence
+        ((template, context), _) = RENDER_MOCK.call_args
         self.assertEqual(template, 'index.html')
 
         # by default the courses will be sorted by their creation dates, earliest first.
@@ -253,7 +253,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         # check the /courses view
         response = self.client.get(reverse('courses'))
         self.assertEqual(response.status_code, 200)
-        ((template, context), _) = RENDER_MOCK.call_args  # pylint: disable=unpacking-non-sequence
+        ((template, context), _) = RENDER_MOCK.call_args
         self.assertEqual(template, 'courseware/courses.html')
 
         # by default the courses will be sorted by their creation dates, earliest first.
@@ -268,7 +268,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
     def test_course_cards_sorted_by_start_date_disabled(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
-        ((template, context), _) = RENDER_MOCK.call_args  # pylint: disable=unpacking-non-sequence
+        ((template, context), _) = RENDER_MOCK.call_args
         self.assertEqual(template, 'index.html')
 
         # now the courses will be sorted by their announcement dates.
@@ -279,7 +279,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         # check the /courses view as well
         response = self.client.get(reverse('courses'))
         self.assertEqual(response.status_code, 200)
-        ((template, context), _) = RENDER_MOCK.call_args  # pylint: disable=unpacking-non-sequence
+        ((template, context), _) = RENDER_MOCK.call_args
         self.assertEqual(template, 'courseware/courses.html')
 
         # now the courses will be sorted by their announcement dates.

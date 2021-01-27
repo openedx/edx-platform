@@ -9,7 +9,7 @@ Includes:
 
 import json
 
-from config_models.models import ConfigurationModel
+from config_models.models import ConfigurationModel  # lint-amnesty, pylint: disable=import-error
 from django.core.exceptions import ValidationError
 from django.db.models import TextField
 
@@ -43,7 +43,7 @@ class BrandingInfoConfig(ConfigurationModel):
         try:
             json.loads(self.configuration)
         except ValueError:
-            raise ValidationError('Must be valid JSON string.')
+            raise ValidationError('Must be valid JSON string.')  # lint-amnesty, pylint: disable=raise-missing-from
 
     @classmethod
     def get_config(cls):
