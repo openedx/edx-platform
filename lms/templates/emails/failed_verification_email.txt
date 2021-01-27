@@ -1,8 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
-
-
-${_("¡Lo lamentamos! Las fotos que enviaste para verificar tu identidad no fueron aceptadas, detalle(s) a continuación:")}
-
+<p>${_("¡Lo lamentamos! Las fotos que enviaste para verificar tu identidad no fueron aceptadas, detalles a continuación:")}</p>
 
 %for reason in reasons:
     %if reason.get('userPhotoReasons'):
@@ -31,8 +28,6 @@ ${_("¡Lo lamentamos! Las fotos que enviaste para verificar tu identidad no fuer
     %endif
 %endfor
 
-${_("Resubmit Verification: {reverify_url}").format(reverify_url=reverify_url)}
-
-
-${_("Thank you,")}
-${_("The {platform_name} team").format(platform_name=platform_name)}
+<p>${_("Volver a verificar: {reverify_url}").format(reverify_url=reverify_url)}</p>
+<p>${_("Thank you,")}</p>
+<p>${_("The {platform_name} team").format(platform_name=platform_name)}</p>
