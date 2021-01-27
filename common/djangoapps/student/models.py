@@ -197,6 +197,7 @@ def anonymous_id_for_user(user, course_id, save=True):
         # If there are multiple anonymous_user_ids per user, course_id pair
         # select the row which was created most recently
         anonymous_user_id = anonymous_user_ids[0].anonymous_user_id
+        monitoring.increment('temp_anonymous_user_id.returned_from_stored')
     else:
         # include the secret key as a salt, and to make the ids unique across different LMS installs.
         hasher = hashlib.md5()
