@@ -38,7 +38,7 @@ class DeprecatedEdxPlatformImportWarning(DeprecationWarning):
         ).format(self=self)
 
 
-class DeprecatedEdxPlatformImportError(Exception):
+class DeprecatedEdxPlatformImportError(ImportError):
     """
     Error: An edx-platform module is being imported from an unsupported location.
 
