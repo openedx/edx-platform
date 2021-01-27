@@ -5,7 +5,7 @@ Celery tasks used by cms_user_tasks
 
 from boto.exception import NoAuthHandlerFound
 from celery.exceptions import MaxRetriesExceededError
-from celery.task import task
+from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.core import mail
@@ -19,7 +19,7 @@ TASK_COMPLETE_EMAIL_MAX_RETRIES = 3
 TASK_COMPLETE_EMAIL_TIMEOUT = 60
 
 
-@task(bind=True)
+@shared_task(bind=True)
 @set_code_owner_attribute
 def send_task_complete_email(self, task_name, task_state_text, dest_addr, detail_url):
     """
