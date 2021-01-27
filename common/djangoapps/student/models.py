@@ -200,12 +200,18 @@ def anonymous_id_for_user(user, course_id, save=True):
         monitoring.increment('temp_anon_uid_v2.fetched_existing')
     else:
         # include the secret key as a salt, and to make the ids unique across different LMS installs.
-        hasher = hashlib.md5()
+        hasher = hashlib.shake_128()
+        # This is one of several uses of SECRET_KEY.
+        #
+        # Impact of exposure: If a person has the SECRET_KEY and a user's `id`
+        # they can correlate the users anonymous user IDs across any courses they have participated in.
+        #
+        # Rotation process: Can be rotated at will.
         hasher.update(settings.SECRET_KEY.encode('utf8'))
         hasher.update(text_type(user.id).encode('utf8'))
         if course_id:
             hasher.update(text_type(course_id).encode('utf-8'))
-        anonymous_user_id = hasher.hexdigest()
+        anonymous_user_id = hasher.hexdigest(16)
 
         if save is True:
             try:
