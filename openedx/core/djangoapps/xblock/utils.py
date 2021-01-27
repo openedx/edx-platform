@@ -46,11 +46,68 @@ def get_secure_token_for_xblock_handler(user_id, block_key_str, time_idx=0):
     token each user gets for a given XBlock doesn't change, which makes
     debugging and reasoning about the system simpler.)
     """
+    # Impact of exposer of the SECRET_KEY or XBLOCK_HANDLER_TOKEN_KEYS:
+    # An actor with the key could produce valid secure tokens for any given user_id and xblock and
+    # could submit answers to questions on behalf of other users. This would violate the integrity
+    # of the answer data on our platform.
+    # Estimated CVSS Base Score: 7.5
+    # Score URL: https://www.first.org/cvss/calculator/3.1#CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+    # Environment score not given because the importance of the environment may change over time.
+
+    # Fall back to SECRET_KEY if XBLOCK_HANDLER_PEPPERS is not set or is an empty list.
+    # If this key is actually exposed to malicious actors, we should do a rapid rotation that
+    # breaks people because in this case a malicious actor can generate valid tokens to submit
+    # answers as any user.
+    # Transitioning from SECRET_KEY to XBLOCK_HANDLER_TOKEN_KEYS:
+    #
+    # 1. Add the current secret key and a new xblock handler specific secret key to the
+    # XBLOCK_HANDLER_TOKEN_KEYS list in your settings file or yml. The order of the keys
+    # matters and so the new xblock specific key should be at index 0.
+    #   eg. XBLOCK_HANDLER_TOKEN_KEYS = ["<new xblock specific hashing key>", "<value of django secret key>"]
+    # 2. Wait 4 days after the code has been deployed to production.
+    # 3. Remove the django secret key from the XBLOCK_HANDLER_TOKEN_KEYS list.
+    #   eg. XBLOCK_HANDLER_TOKEN_KEYS = ["<new xblock specific hashing key>"]
+
+    # Rotation Process(Assumes you've already transitioned from SECRET_KEY to XBLOCK_HANDLER_TOKEN_KEYS):
+    # If the likelihood that the old key has been exposed to malicious actors is high, you should do a rapid rotation
+    # that breaks people because in this case a malicious actor can generate valid tokens to submit answers
+    # impersonating any user.  If the likelyhood of a malicious actor is high, skip step 2 from this process(Start
+    # using only the new key right away.)
+    # 1. Add the newly generated hashing key at index 0 of the XBLOCK_HANDLER_TOKEN_KEYS list in your settings.
+    #   eg. XBLOCK_HANDLER_TOKEN_KEYS = ["<new xblock specific hashing key>", "<old xblock specific hashing key>"]
+    # 2. Wait 4 days after the code has been deployed to production.
+    # 3. Remove the old key from the list.
+    #   eg. XBLOCK_HANDLER_TOKEN_KEYS = ["<new xblock specific hashing key>"]
+
+    if getattr(settings, "XBLOCK_HANDLER_TOKEN_KEYS", None):
+        hashing_key = settings.XBLOCK_HANDLER_TOKEN_KEYS[0]
+    else:
+        hashing_key = settings.SECRET_KEY
+
+    return _get_secure_token_for_xblock_handler(user_id, block_key_str, time_idx, hashing_key)
+
+def _get_secure_token_for_xblock_handler(user_id, block_key_str, time_idx: int, hashing_key: str):
+    """
+    Internal funciton to extract repeating hashing steps which we
+    call mulitple times with different time_idx and hashing peppers.
+    """
+    # This was supposed to be an interval boundry number that matches
+    # the current 2 day chunk(midnight UTC of every other day).
+    # Instead it's a number that will always be consistent but
+    # otherwise does not have a semantic meaning.
+    # Right now the math is missing a multiplication by TOKEN_PERIOD after
+    # the math.floor wich means the unit is days which is then added to
+    # 0 or -TOKEN_PERIOD seconds.
+    # Right now this is only valid for 0-2 days instead of the intended
+    # 2-4 days beacuse of the units issue above. Correcting the math should
+    # be possible but we are not going to do it in the middle of the other
+    # change we're making. We've made https://openedx.atlassian.net/browse/ARCHBOM-1677
+    # to come back and deal with it.
     TOKEN_PERIOD = 24 * 60 * 60 * 2  # These URLs are valid for 2-4 days
     time_token = math.floor(time.time() / TOKEN_PERIOD)
     time_token += TOKEN_PERIOD * time_idx
-    check_string = text_type(time_token) + ':' + text_type(user_id) + ':' + block_key_str
-    secure_key = hmac.new(settings.SECRET_KEY.encode('utf-8'), check_string.encode('utf-8'), hashlib.sha256).hexdigest()
+    check_string = str(time_token) + ':' + str(user_id) + ':' + block_key_str
+    secure_key = hmac.new(hashing_key.encode('utf-8'), check_string.encode('utf-8'), hashlib.sha256).hexdigest()
     return secure_key[:20]
 
 
@@ -61,9 +118,27 @@ def validate_secure_token_for_xblock_handler(user_id, block_key_str, token):
 
     See get_secure_token_for_xblock_handler
     """
-    token = token.encode('utf-8')  # This line isn't needed after python 3, nor the .encode('utf-8') below
-    token_expected = get_secure_token_for_xblock_handler(user_id, block_key_str).encode('utf-8')
-    prev_token_expected = get_secure_token_for_xblock_handler(user_id, block_key_str, -1).encode('utf-8')
+    if getattr(settings, "XBLOCK_HANDLER_TOKEN_KEYS", None):
+        hashing_keys = settings.XBLOCK_HANDLER_TOKEN_KEYS
+    else:
+        hashing_keys = [settings.SECRET_KEY]
+
+    final_result = False
+    for key in hashing_keys:
+        final_result |= _validate_secure_token_for_xblock_handler(user_id, block_key_str, token, key)
+
+    # We check all peppers so that the computation takes a constant amount of
+    # time to produce its answer (security best practice).
+    return final_result
+
+
+def _validate_secure_token_for_xblock_handler(user_id, block_key_str, token: str, hashing_key):
+    """
+    Internal function to validate the incoming token with tokens generated with the given
+    hashing pepper.
+    """
+    token_expected = _get_secure_token_for_xblock_handler(user_id, block_key_str, 0, hashing_key)
+    prev_token_expected = _get_secure_token_for_xblock_handler(user_id, block_key_str, -1, hashing_key)
     result1 = hmac.compare_digest(token, token_expected)
     result2 = hmac.compare_digest(token, prev_token_expected)
     # All computations happen above this line so this function always takes a
