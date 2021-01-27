@@ -3447,6 +3447,16 @@ COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_exists'
 COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
 
 DEFAULT_COURSE_VISIBILITY_IN_CATALOG = "both"
+
+# .. toggle_name: DEFAULT_MOBILE_AVAILABLE
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: This specifies if the courses are available for mobile by default. To make any individual
+#   course available for mobile one can set the value of Mobile Course Available to true in Advanced Settings from the
+#   studio when this is False.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-01-26
+# .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1985
 DEFAULT_MOBILE_AVAILABLE = False
 
 # Enrollment API Cache Timeout
