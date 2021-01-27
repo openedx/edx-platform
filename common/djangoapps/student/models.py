@@ -209,16 +209,12 @@ def anonymous_id_for_user(user, course_id, save=True):
 
         if save is True:
             try:
-                (_, created) = AnonymousUserId.objects.create(
+                AnonymousUserId.objects.create(
                     user=user,
                     course_id=course_id,
                     anonymous_user_id=anonymous_user_id,
                 )
-                if created:
-                    monitoring.increment('temp_anon_uid_v2.stored')
-                else:
-                    # race condition w.r.t. earlier fetch
-                    monitoring.increment('temp_anon_uid_v2.computed_existing')
+                monitoring.increment('temp_anon_uid_v2.stored')
             except IntegrityError:
                 # Another thread has already created this entry, so
                 # continue
