@@ -704,6 +704,17 @@ FEATURES = {
     # .. toggle_tickets: https://openedx.atlassian.net/browse/ENT-3818
     # .. toggle_warnings: None.
     'ENABLE_COURSE_ASSESSMENT_GRADE_CHANGE_SIGNAL': False,
+
+    # .. toggle_name: FEATURES['ALLOW_ADMIN_ENTERPRISE_COURSE_ENROLLMENT_DELETION']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: If true, allows for the deletion of EnterpriseCourseEnrollment records via Django Admin.
+    # .. toggle_use_cases: enterprise
+    # .. toggle_creation_date: 2021-01-27
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/ENT-4022
+    # .. toggle_warnings: None.
+    'ALLOW_ADMIN_ENTERPRISE_COURSE_ENROLLMENT_DELETION': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
