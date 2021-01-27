@@ -2930,7 +2930,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=814 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=823 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3503,6 +3503,7 @@ CREATE TABLE `enterprise_enterprisecustomer` (
   `enable_integrated_customer_learner_portal_search` tinyint(1) NOT NULL,
   `default_language` varchar(25) DEFAULT NULL,
   `enable_portal_lms_configurations_screen` tinyint(1) NOT NULL,
+  `sender_alias` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`uuid`),
   UNIQUE KEY `enterprise_enterprisecustomer_slug_80411f46_uniq` (`slug`),
   KEY `enterprise_enterprisecustomer_site_id_947ed084_fk_django_site_id` (`site_id`),
@@ -3673,6 +3674,7 @@ CREATE TABLE `enterprise_enterprisefeatureuserroleassignment` (
   `modified` datetime(6) NOT NULL,
   `role_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
+  `applies_to_all_contexts` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `enterprise_enterpris_role_id_5e8cff42_fk_enterpris` (`role_id`),
   KEY `enterprise_enterpris_user_id_2d335bd4_fk_auth_user` (`user_id`),
@@ -3785,6 +3787,7 @@ CREATE TABLE `enterprise_historicalenterprisecustomer` (
   `enable_integrated_customer_learner_portal_search` tinyint(1) NOT NULL,
   `default_language` varchar(25) DEFAULT NULL,
   `enable_portal_lms_configurations_screen` tinyint(1) NOT NULL,
+  `sender_alias` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`history_id`),
   KEY `enterprise_historica_history_user_id_bbd9b0d6_fk_auth_user` (`history_user_id`),
   KEY `enterprise_historicalenterprisecustomer_uuid_75c3528e` (`uuid`),
@@ -3908,7 +3911,6 @@ CREATE TABLE `enterprise_historicalpendingenterprisecustomeruser` (
   PRIMARY KEY (`history_id`),
   KEY `enterprise_historica_history_user_id_c491461b_fk_auth_user` (`history_user_id`),
   KEY `enterprise_historicalpendingenterprisecustomeruser_id_3cf88198` (`id`),
-  KEY `enterprise_historicalpendin_user_email_88c478b4` (`user_email`),
   KEY `enterprise_historicalpendin_enterprise_customer_id_6c02ed95` (`enterprise_customer_id`),
   CONSTRAINT `enterprise_historica_history_user_id_c491461b_fk_auth_user` FOREIGN KEY (`history_user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -3959,7 +3961,10 @@ CREATE TABLE `enterprise_pendingenterprisecustomeradminuser` (
   `user_email` varchar(254) NOT NULL,
   `enterprise_customer_id` char(32) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `enterprise_pendingenterp_enterprise_customer_id_u_3b1fae93_uniq` (`enterprise_customer_id`,`user_email`),
+  UNIQUE KEY `unique pending admin user and EnterpriseCustomer` (`user_email`,`enterprise_customer_id`),
+  KEY `enterprise_pendingenterpris_enterprise_customer_id_aae02661` (`enterprise_customer_id`),
+  KEY `enterprise__user_em_fead22_idx` (`user_email`,`enterprise_customer_id`),
+  KEY `enterprise__user_em_6e1f5b_idx` (`user_email`),
   CONSTRAINT `enterprise_pendingen_enterprise_customer__aae02661_fk_enterpris` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -3973,8 +3978,10 @@ CREATE TABLE `enterprise_pendingenterprisecustomeruser` (
   `user_email` varchar(254) NOT NULL,
   `enterprise_customer_id` char(32) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `enterprise_pendingenterp_user_email_5440d1d3_uniq` (`user_email`),
+  UNIQUE KEY `unique user and EnterpriseCustomer` (`user_email`,`enterprise_customer_id`),
   KEY `enterprise_pendingen_enterprise_customer__a858ce2d_fk_enterpris` (`enterprise_customer_id`),
+  KEY `enterprise__user_em_f98d36_idx` (`user_email`,`enterprise_customer_id`),
+  KEY `enterprise__user_em_488930_idx` (`user_email`),
   CONSTRAINT `enterprise_pendingen_enterprise_customer__a858ce2d_fk_enterpris` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -4000,6 +4007,7 @@ CREATE TABLE `enterprise_systemwideenterpriseuserroleassignment` (
   `modified` datetime(6) NOT NULL,
   `role_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
+  `applies_to_all_contexts` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `enterprise_systemwid_role_id_bc7092f0_fk_enterpris` (`role_id`),
   KEY `enterprise_systemwid_user_id_e890aef2_fk_auth_user` (`user_id`),
@@ -4695,7 +4703,13 @@ CREATE TABLE `lti_consumer_lticonfiguration` (
   `lti_1p3_internal_private_key_id` varchar(255) NOT NULL,
   `lti_1p3_internal_public_jwk` longtext NOT NULL,
   `lti_1p3_client_id` varchar(255) NOT NULL,
+  `config_id` char(32) NOT NULL,
+  `lti_1p1_client_key` varchar(255) NOT NULL,
+  `lti_1p1_client_secret` varchar(255) NOT NULL,
+  `lti_1p1_launch_url` varchar(255) NOT NULL,
+  `lti_config` longtext NOT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `config_id` (`config_id`),
   KEY `lti_consumer_lticonfiguration_location_e7e37735` (`location`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -5512,6 +5526,7 @@ CREATE TABLE `proctoring_proctoredexamsoftwaresecurereview` (
   `exam_id` int(11) DEFAULT NULL,
   `reviewed_by_id` int(11) DEFAULT NULL,
   `student_id` int(11) DEFAULT NULL,
+  `is_attempt_active` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `proctoring_proctoredexam_attempt_code_706d3717_uniq` (`attempt_code`),
   KEY `proctoring_proctored_exam_id_ea6095a3_fk_proctorin` (`exam_id`),
@@ -5536,6 +5551,7 @@ CREATE TABLE `proctoring_proctoredexamsoftwaresecurereviewhistory` (
   `exam_id` int(11) DEFAULT NULL,
   `reviewed_by_id` int(11) DEFAULT NULL,
   `student_id` int(11) DEFAULT NULL,
+  `is_attempt_active` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `proctoring_proctored_exam_id_380d8588_fk_proctorin` (`exam_id`),
   KEY `proctoring_proctored_reviewed_by_id_bb993b3a_fk_auth_user` (`reviewed_by_id`),
@@ -5605,6 +5621,7 @@ CREATE TABLE `proctoring_proctoredexamstudentattempt` (
   `proctored_exam_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `is_status_acknowledged` tinyint(1) NOT NULL,
+  `time_remaining_seconds` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `proctoring_proctored_proctored_exam_id_0732c688_fk_proctorin` (`proctored_exam_id`),
   KEY `proctoring_proctoredexamstudentattempt_attempt_code_b10ad854` (`attempt_code`),
@@ -6823,6 +6840,7 @@ CREATE TABLE `system_wide_roles_systemwideroleassignment` (
   `modified` datetime(6) NOT NULL,
   `role_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
+  `applies_to_all_contexts` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `system_wide_roles_sy_role_id_b553068b_fk_system_wi` (`role_id`),
   KEY `system_wide_roles_sy_user_id_8ec7ad0d_fk_auth_user` (`user_id`),

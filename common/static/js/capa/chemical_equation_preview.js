@@ -3,9 +3,16 @@
         function create_handler(saved_div) {
             return (function(response) {
                 if (response.error) {
-                    saved_div.html("<span class='error'>" + response.error + '</span>');
+                    edx.HtmlUtils.setHtml(
+                        saved_div,
+                        edx.HtmlUtils.joinHtml(
+                            edx.HtmlUtils.HTML("<span class='error'>"),
+                            response.error,
+                            edx.HtmlUtils.HTML('</span>')
+                        )
+                    );
                 } else {
-                    saved_div.html(response.preview);
+                    saved_div.html(edx.HtmlUtils.HTML(response.preview).toString());
                 }
             });
         }

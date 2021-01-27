@@ -15,6 +15,10 @@ from common.djangoapps.student.models import Registration
 from common.djangoapps.student.tests.factories import UserFactory
 
 
+FEATURES_WITH_LOGIN_MFE_ENABLED = settings.FEATURES.copy()
+FEATURES_WITH_LOGIN_MFE_ENABLED['ENABLE_LOGISTRATION_MICROFRONTEND'] = True
+
+
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestActivateAccount(TestCase):
     """Tests for account creation"""
@@ -146,3 +150,27 @@ class TestActivateAccount(TestCase):
         response = self.client.get(reverse('activate', args=[uuid4().hex]), follow=True)
         self.assertRedirects(response, login_page_url)
         self.assertContains(response, 'Your account could not be activated')
+
+    @override_settings(FEATURES=FEATURES_WITH_LOGIN_MFE_ENABLED)
+    def test_unauthenticated_user_redirects_to_mfe(self):
+        """
+        Verify that if Authn MFE is enabled then authenticated user redirects to
+        login page with correct query param.
+        """
+        login_page_url = "{authn_mfe}/login?account_activation_status=".format(
+            authn_mfe=settings.LOGISTRATION_MICROFRONTEND_URL
+        )
+
+        self._assert_user_active_state(expected_active_state=False)
+
+        # Access activation link, the user is redirected to login page with success query param
+        response = self.client.get(reverse('activate', args=[self.registration.activation_key]))
+        self.assertEqual(response.url, login_page_url + 'success')
+
+        # Access activation link again, the user is redirected to login page with info query param
+        response = self.client.get(reverse('activate', args=[self.registration.activation_key]))
+        self.assertEqual(response.url, login_page_url + 'info')
+
+        # Open account activation page with an invalid activation link, the query param should contain error
+        response = self.client.get(reverse('activate', args=[uuid4().hex]))
+        self.assertEqual(response.url, login_page_url + 'error')

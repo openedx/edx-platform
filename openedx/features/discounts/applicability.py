@@ -64,7 +64,7 @@ def get_discount_expiration_date(user, course):
 
     time_limit_start = None
     try:
-        saw_banner = ExperimentData.objects.get(user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(course))
+        saw_banner = ExperimentData.objects.get(user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(course.id))
         time_limit_start = parse_datetime(saw_banner.value)
     except ExperimentData.DoesNotExist:
         return None

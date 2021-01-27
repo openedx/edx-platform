@@ -24,6 +24,7 @@ from opaque_keys.edx.locator import LibraryLocator
 from path import Path as path
 from six.moves import zip
 from storages.backends.s3boto import S3BotoStorage
+from storages.backends.s3boto3 import S3Boto3Storage
 from user_tasks.models import UserTaskStatus
 
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
@@ -805,10 +806,12 @@ class ExportTestCase(CourseTestCase):
         result = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(result['ExportOutput'], '/path/to/testfile.tar.gz')
 
+    @ddt.data(S3BotoStorage, S3Boto3Storage)
     @patch('cms.djangoapps.contentstore.views.import_export._latest_task_status')
     @patch('user_tasks.models.UserTaskArtifact.objects.get')
     def test_export_status_handler_s3(
         self,
+        s3_storage,
         mock_get_user_task_artifact,
         mock_latest_task_status,
     ):
@@ -818,7 +821,7 @@ class ExportTestCase(CourseTestCase):
         """
         mock_latest_task_status.return_value = Mock(state=UserTaskStatus.SUCCEEDED)
         mock_get_user_task_artifact.return_value = self._mock_artifact(
-            spec=S3BotoStorage,
+            spec=s3_storage,
             file_url='/s3/file/path/testfile.tar.gz',
         )
         resp = self.client.get(self.status_url)

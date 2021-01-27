@@ -4,7 +4,6 @@ This module contains celery task functions for handling the sending of bulk emai
 to a course.
 """
 
-
 import json
 import logging
 import random
@@ -27,7 +26,7 @@ from boto.ses.exceptions import (
     SESLocalAddressCharacterError,
     SESMaxSendingRateExceededError
 )
-from celery import current_task, task
+from celery import current_task, shared_task
 from celery.exceptions import RetryTaskError
 from celery.states import FAILURE, RETRY, SUCCESS
 from django.conf import settings
@@ -41,6 +40,7 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 from markupsafe import escape
 from six import text_type
 
+from lms.djangoapps.branding.api import get_logo_url_for_email
 from lms.djangoapps.bulk_email.models import CourseEmail, Optout
 from lms.djangoapps.bulk_email.api import get_unsubscribed_link
 from lms.djangoapps.courseware.courses import get_course
@@ -57,7 +57,6 @@ from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.string_utils import _has_non_ascii_characters
 
 log = logging.getLogger('edx.celery.task')
-
 
 # Errors that an individual email is failing to be sent, and should just
 # be treated as a fail.
@@ -123,6 +122,7 @@ def _get_course_email_context(course):
         'course_end_date': course_end_date,
         'account_settings_url': '{}{}'.format(lms_root_url, reverse('account_settings')),
         'email_settings_url': '{}{}'.format(lms_root_url, reverse('dashboard')),
+        'logo_url': get_logo_url_for_email(),
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         'year': timezone.now().year,
     }
@@ -237,7 +237,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     return progress
 
 
-@task(default_retry_delay=settings.BULK_EMAIL_DEFAULT_RETRY_DELAY, max_retries=settings.BULK_EMAIL_MAX_RETRIES)
+@shared_task(default_retry_delay=settings.BULK_EMAIL_DEFAULT_RETRY_DELAY, max_retries=settings.BULK_EMAIL_MAX_RETRIES)
 @set_code_owner_attribute
 def send_course_email(entry_id, email_id, to_list, global_email_context, subtask_status_dict):
     """
@@ -294,7 +294,6 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
     send_exception = None
     new_subtask_status = None
     try:
-        course_title = global_email_context['course_title']
         start_time = time.time()
         new_subtask_status, send_exception = _send_course_email(
             entry_id,

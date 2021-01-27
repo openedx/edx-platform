@@ -7,8 +7,8 @@ Module for the Storage of BlockStructure objects.
 from logging import getLogger
 
 import six
-
 from django.utils.encoding import python_2_unicode_compatible
+
 from openedx.core.lib.cache_utils import zpickle, zunpickle
 
 from . import config
@@ -28,6 +28,7 @@ class StubModel(object):
     By using this stub, we eliminate the need for extra
     conditional statements in the code.
     """
+
     def __init__(self, root_block_usage_key):
         self.data_usage_key = root_block_usage_key
 
@@ -45,6 +46,7 @@ class BlockStructureStore(object):
     """
     Storage for BlockStructure objects.
     """
+
     def __init__(self, cache):
         """
         Arguments:
@@ -121,7 +123,7 @@ class BlockStructureStore(object):
         Returns whether the data in storage for the given key is
         already up-to-date with the version in the given modulestore.
         """
-        if _is_storage_backing_enabled():
+        if config.STORAGE_BACKING_FOR_CACHE.is_enabled():
             try:
                 bs_model = self._get_model(root_block_usage_key)
                 root_block = modulestore.get_item(root_block_usage_key)
@@ -135,7 +137,7 @@ class BlockStructureStore(object):
         """
         Returns the model associated with the given key.
         """
-        if _is_storage_backing_enabled():
+        if config.STORAGE_BACKING_FOR_CACHE.is_enabled():
             return BlockStructureModel.get(root_block_usage_key)
         else:
             return StubModel(root_block_usage_key)
@@ -145,7 +147,7 @@ class BlockStructureStore(object):
         Updates or creates the model for the given block_structure
         and serialized_data.
         """
-        if _is_storage_backing_enabled():
+        if config.STORAGE_BACKING_FOR_CACHE.is_enabled():
             root_block = block_structure[block_structure.root_block_usage_key]
             bs_model, _ = BlockStructureModel.update_or_create(
                 serialized_data,
@@ -187,7 +189,7 @@ class BlockStructureStore(object):
         Raises:
              BlockStructureNotFound if not found.
         """
-        if not _is_storage_backing_enabled():
+        if not config.STORAGE_BACKING_FOR_CACHE.is_enabled():
             raise BlockStructureNotFound(bs_model.data_usage_key)
 
         return bs_model.get_serialized_data()
@@ -229,14 +231,12 @@ class BlockStructureStore(object):
         Returns the cache key to use for the given
         BlockStructureModel or StubModel.
         """
-        if _is_storage_backing_enabled():
+        if config.STORAGE_BACKING_FOR_CACHE.is_enabled():
             return six.text_type(bs_model)
-
-        else:
-            return "v{version}.root.key.{root_usage_key}".format(
-                version=six.text_type(BlockStructureBlockData.VERSION),
-                root_usage_key=six.text_type(bs_model.data_usage_key),
-            )
+        return "v{version}.root.key.{root_usage_key}".format(
+            version=six.text_type(BlockStructureBlockData.VERSION),
+            root_usage_key=six.text_type(bs_model.data_usage_key),
+        )
 
     @staticmethod
     def _version_data_of_block(root_block):
@@ -260,10 +260,3 @@ class BlockStructureStore(object):
             field_name: getattr(bs_model, field_name, None)
             for field_name in BlockStructureModel.VERSION_FIELDS
         }
-
-
-def _is_storage_backing_enabled():
-    """
-    Returns whether storage backing for Block Structures is enabled.
-    """
-    return config.waffle().is_enabled(config.STORAGE_BACKING_FOR_CACHE)

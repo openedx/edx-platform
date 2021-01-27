@@ -21,6 +21,7 @@ from waffle.testutils import override_flag
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.util.date_utils import strftime_localized_html
 from lms.djangoapps.experiments.models import ExperimentData
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
@@ -37,7 +38,6 @@ from lms.djangoapps.courseware.tests.helpers import get_expiration_banner_text
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
@@ -208,7 +208,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
 
         # Fetch the view and verify the query counts
         # TODO: decrease query count as part of REVO-28
-        with self.assertNumQueries(75, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(78, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
@@ -414,19 +414,19 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         user = self.create_user_for_course(self.course, CourseUserType.ENROLLED)
         now_time = datetime.now(tz=UTC).strftime(u"%Y-%m-%d %H:%M:%S%z")
         ExperimentData.objects.create(
-            user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(self.course), value=now_time
+            user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(self.course.id), value=now_time
         )
         self.client.login(username=user.username, password=self.TEST_PASSWORD)
         url = course_home_url(self.course)
         response = self.client.get(url)
-        discount_expiration_date = get_discount_expiration_date(user, self.course).strftime(u'%B %d')
+        expiration_date = strftime_localized_html(get_discount_expiration_date(user, self.course), 'SHORT_DATE')
         upgrade_link = verified_upgrade_deadline_link(user=user, course=self.course)
         bannerText = u'''<div class="first-purchase-offer-banner" role="note">
              <span class="first-purchase-offer-banner-bold"><b>
              Upgrade by {discount_expiration_date} and save {percentage}% [{strikeout_price}]</b></span>
              <br>Use code <b>EDXWELCOME</b> at checkout! <a id="welcome" href="{upgrade_link}">Upgrade Now</a>
              </div>'''.format(
-            discount_expiration_date=discount_expiration_date,
+            discount_expiration_date=expiration_date,
             percentage=percentage,
             strikeout_price=HTML(format_strikeout_price(user, self.course)[0]),
             upgrade_link=upgrade_link
@@ -577,7 +577,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
         response = self.client.get(url)
 
-        expiration_date = strftime_localized(course.start + timedelta(weeks=4) + timedelta(days=1), u'%b %-d, %Y')
+        expiration_date = strftime_localized(course.start + timedelta(weeks=4) + timedelta(days=1), 'SHORT_DATE')
         expected_params = QueryDict(mutable=True)
         course_name = CourseOverview.get_from_id(course.id).display_name_with_default
         expected_params['access_response_error'] = u'Access to {run} expired on {expiration_date}'.format(
@@ -798,46 +798,6 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         response = self.client.get(url)
         bannerText = get_expiration_banner_text(self.staff_user, self.course)
         self.assertNotContains(response, bannerText, html=True)
-
-    @mock.patch("common.djangoapps.util.date_utils.strftime_localized")
-    @mock.patch("openedx.features.course_duration_limits.access.get_date_string")
-    def test_course_expiration_banner_with_unicode(self, mock_strftime_localized, mock_get_date_string):
-        """
-        Ensure that switching to other languages that have unicode in their
-        date representations will not cause the course home page to 404.
-        """
-        fake_unicode_start_time = u"üñîçø∂é_ßtå®t_tîµé"
-        mock_strftime_localized.return_value = fake_unicode_start_time
-        date_string = u'<span class="localized-datetime" data-format="shortDate" \
-        data-datetime="{formatted_date}" data-language="{language}">{formatted_date_localized}</span>'
-        mock_get_date_string.return_value = date_string
-
-        config = CourseDurationLimitConfig(
-            course=CourseOverview.get_from_id(self.course.id),
-            enabled=True,
-            enabled_as_of=datetime(2018, 1, 1, tzinfo=UTC)
-        )
-        config.save()
-        url = course_home_url(self.course)
-        user = self.create_user_for_course(self.course, CourseUserType.UNENROLLED)
-        CourseEnrollment.enroll(user, self.course.id)
-
-        language = 'eo'
-        DarkLangConfig(
-            released_languages=language,
-            changed_by=user,
-            enabled=True
-        ).save()
-
-        response = self.client.get(url, HTTP_ACCEPT_LANGUAGE=language)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['Content-Language'], language)
-
-        # Check that if the string is incorrectly not marked as unicode we still get the error
-        with mock.patch("openedx.features.course_duration_limits.access.get_date_string",
-                        return_value=date_string.encode('utf-8')):
-            response = self.client.get(url, HTTP_ACCEPT_LANGUAGE=language)
-            self.assertEqual(response.status_code, 500)
 
     @override_waffle_flag(COURSE_PRE_START_ACCESS_FLAG, active=True)
     @override_waffle_flag(ENABLE_COURSE_GOALS, active=True)

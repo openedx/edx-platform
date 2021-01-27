@@ -27,10 +27,9 @@ from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.url_utils import quote_slashes
-from openedx.features.course_duration_limits.access import EXPIRATION_DATE_FORMAT_STR
 from common.djangoapps.student.models import CourseEnrollment, Registration
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.util.date_utils import strftime_localized
+from common.djangoapps.util.date_utils import strftime_localized_html
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -423,19 +422,9 @@ def get_expiration_banner_text(user, course, language='en'):
     if upgrade_deadline is None or now() < upgrade_deadline:
         upgrade_deadline = enrollment.course_upgrade_deadline
 
-    date_string = u'<span class="localized-datetime" data-format="shortDate" data-timezone="None" \
-        data-datetime="{formatted_date}" data-language="{language}">{formatted_date_localized}</span>'
-    formatted_expiration_date = date_string.format(
-        language=language,
-        formatted_date=expiration_date.isoformat(),
-        formatted_date_localized=strftime_localized(expiration_date, EXPIRATION_DATE_FORMAT_STR)
-    )
+    formatted_expiration_date = strftime_localized_html(expiration_date, 'SHORT_DATE')
     if upgrade_deadline:
-        formatted_upgrade_deadline = date_string.format(
-            language=language,
-            formatted_date=upgrade_deadline.isoformat(),
-            formatted_date_localized=strftime_localized(upgrade_deadline, EXPIRATION_DATE_FORMAT_STR)
-        )
+        formatted_upgrade_deadline = strftime_localized_html(upgrade_deadline, 'SHORT_DATE')
 
         bannerText = u'<strong>Audit Access Expires {expiration_date}</strong><br>\
                      You lose all access to this course, including your progress, on {expiration_date}.\

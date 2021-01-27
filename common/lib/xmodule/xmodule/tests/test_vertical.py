@@ -196,6 +196,22 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
             self.assertIn("'completed': None", html)
             self.assertIn("'past_due': False", html)
 
+    @ddt.data(True, False)
+    def test_render_access_denied_blocks(self, has_access_error):
+        """ Tests access denied blocks are not rendered when hide_access_error_blocks is True """
+        self.module_system._services['bookmarks'] = Mock()
+        self.module_system._services['user'] = StubUserService()
+        self.vertical.due = datetime.now(pytz.UTC) + timedelta(days=-1)
+        self.problem_block.has_access_error = has_access_error
+
+        context = {'username': self.username, 'hide_access_error_blocks': True}
+        html = self.module_system.render(self.vertical, STUDENT_VIEW, context).content
+
+        if has_access_error:
+            self.assertNotIn(self.test_problem, html)
+        else:
+            self.assertIn(self.test_problem, html)
+
     @ddt.unpack
     @ddt.data(
         (True, 0.9, True),

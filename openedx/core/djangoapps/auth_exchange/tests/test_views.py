@@ -42,13 +42,16 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
         super(AccessTokenExchangeViewTest, self).tearDown()
         Partial.objects.all().delete()
 
-    def _assert_error(self, data, expected_error, expected_error_description):
+    def _assert_error(self, data, expected_error, expected_error_description, error_code=None):
         response = self.csrf_client.post(self.url, data)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, error_code if error_code else 400)
         self.assertEqual(response["Content-Type"], "application/json")
+        expected_data = {u"error": expected_error, u"error_description": expected_error_description}
+        if error_code:
+            expected_data['error_code'] = error_code
         self.assertEqual(
             json.loads(response.content.decode('utf-8')),
-            {u"error": expected_error, u"error_description": expected_error_description}
+            expected_data
         )
 
     def _assert_success(self, data, expected_scopes):
@@ -126,6 +129,15 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
         (currently underlying code used dop adapter, which is no longer supported by auth_exchange)
         """
         pass
+
+    def test_disabled_user(self):
+        """
+        Test if response status code is correct in case of disabled user.
+        """
+        self.user.set_unusable_password()
+        self.user.save()
+        self._setup_provider_response(success=True)
+        self._assert_error(self.data, "account_disabled", "user account is disabled", 403)
 
 
 @unittest.skipUnless(TPA_FEATURE_ENABLED, TPA_FEATURES_KEY + " not enabled")

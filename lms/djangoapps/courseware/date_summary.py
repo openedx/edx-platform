@@ -193,7 +193,6 @@ class DateSummary(object):
 
         Note: this returns a span that will be localized on the client.
         """
-        locale = to_locale(get_language())
         user_timezone = user_timezone_locale_prefs(crum.get_current_request())['user_timezone']
         return HTML(
             u'<span class="date localized-datetime" data-format="{date_format}" data-datetime="{date_time}"'
@@ -203,7 +202,7 @@ class DateSummary(object):
             date_format=date_format,
             date_time=self.date,
             user_timezone=user_timezone,
-            user_language=locale,
+            user_language=get_language(),
         )
 
     @property
@@ -430,7 +429,7 @@ class CourseAssignmentDate(DateSummary):
         """ Used to set the title_html and title properties for the assignment date block """
         if link:
             self.assignment_title_html = HTML(
-                '<a href="{assignment_link}" class="btn btn-outline-primary">{assignment_title}</a>'
+                '<a href="{assignment_link}">{assignment_title}</a>'
             ).format(assignment_link=link, assignment_title=title)
         self.assignment_title = title
 

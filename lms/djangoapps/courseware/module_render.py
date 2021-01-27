@@ -3,7 +3,6 @@ Module rendering
 """
 
 
-import hashlib
 import json
 import logging
 import textwrap
@@ -95,7 +94,7 @@ from common.djangoapps.util import milestones_helpers
 from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
-from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
+from xmodule.error_module import ErrorBlock, NonStaffErrorBlock
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.lti_module import LTIModule
 from xmodule.modulestore.django import modulestore
@@ -323,7 +322,7 @@ def get_module(user, request, usage_key, field_data_cache,
                                 to the user.
 
     Returns: xmodule instance, or None if the user does not have access to the
-    module.  If there's an error, will try to return an instance of ErrorModule
+    module.  If there's an error, will try to return an instance of ErrorBlock
     if possible.  If not possible, return None.
     """
     try:
@@ -846,11 +845,11 @@ def get_module_system_for_user(
     system.set(u'user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
     system.set(u'days_early_for_beta', descriptor.days_early_for_beta)
 
-    # make an ErrorDescriptor -- assuming that the descriptor's system is ok
+    # make an ErrorBlock -- assuming that the descriptor's system is ok
     if has_access(user, u'staff', descriptor.location, course_id):
-        system.error_descriptor_class = ErrorDescriptor
+        system.error_descriptor_class = ErrorBlock
     else:
-        system.error_descriptor_class = NonStaffErrorDescriptor
+        system.error_descriptor_class = NonStaffErrorBlock
 
     return system, field_data
 
@@ -917,6 +916,7 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
             and (access.user_message or access.user_fragment)
         )
         if access or caller_will_handle_access_error:
+            descriptor.has_access_error = bool(caller_will_handle_access_error)
             return descriptor
         return None
     return descriptor
@@ -1074,7 +1074,8 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
         return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
 
-def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_info=False, course=None):
+def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_info=False, course=None,
+                           will_recheck_access=False):
     """
     Gets a module instance based on its `usage_id` in a course, for a given request/user
 
@@ -1126,7 +1127,8 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
         field_data_cache,
         usage_key.course_key,
         disable_staff_debug_info=disable_staff_debug_info,
-        course=course
+        course=course,
+        will_recheck_access=will_recheck_access,
     )
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever

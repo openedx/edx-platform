@@ -28,6 +28,7 @@ from openedx.core.djangoapps.user_authn.utils import should_redirect_to_logistra
 from openedx.core.djangoapps.user_authn.views.password_reset import get_password_reset_form
 from openedx.core.djangoapps.user_authn.views.registration_form import RegistrationFormFactory
 from openedx.core.djangoapps.user_authn.views.utils import third_party_auth_context
+from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_auth_enabled
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from openedx.features.enterprise_support.utils import (
     get_enterprise_slug_login_url,
@@ -183,8 +184,9 @@ def login_and_registration_form(request, initial_mode="login"):
         except (KeyError, ValueError, IndexError) as ex:
             log.exception(u"Unknown tpa_hint provider: %s", ex)
 
+    enterprise_customer = enterprise_customer_for_request(request)
     # Redirect to logistration MFE if it is enabled
-    if should_redirect_to_logistration_mircrofrontend():
+    if should_redirect_to_logistration_mircrofrontend() and not enterprise_customer:
         query_params = request.GET.urlencode()
         url_path = '/{}{}'.format(
             initial_mode,
@@ -231,7 +233,8 @@ def login_and_registration_form(request, initial_mode="login"):
                 'ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION', True)),
             'is_account_recovery_feature_enabled': is_secondary_email_feature_enabled(),
             'is_multiple_user_enterprises_feature_enabled': is_multiple_user_enterprises_feature_enabled(),
-            'enterprise_slug_login_url': get_enterprise_slug_login_url()
+            'enterprise_slug_login_url': get_enterprise_slug_login_url(),
+            'is_require_third_party_auth_enabled': is_require_third_party_auth_enabled(),
         },
         'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in header
         'responsive': True,
@@ -243,7 +246,7 @@ def login_and_registration_form(request, initial_mode="login"):
             settings.FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER']
         ),
     }
-    enterprise_customer = enterprise_customer_for_request(request)
+
     update_logistration_context_for_enterprise(request, context, enterprise_customer)
 
     response = render_to_response('student_account/login_and_register.html', context)

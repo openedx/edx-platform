@@ -236,12 +236,13 @@ class Env:
             SERVICE_VARIANT = 'lms'
 
     @classmethod
-    def get_django_settings(cls, django_settings, system, settings=None):
+    def get_django_settings(cls, django_settings, system, settings=None, print_setting_args=None):
         """
         Interrogate Django environment for specific settings values
         :param django_settings: list of django settings values to get
         :param system: the django app to use when asking for the setting (lms | cms)
         :param settings: the settings file to use when asking for the value
+        :param print_setting_args: the additional arguments to send to print_settings
         :return: unicode value of the django setting
         """
         if not settings:
@@ -251,15 +252,17 @@ class Env:
             os.makedirs(log_dir)
         settings_length = len(django_settings)
         django_settings = ' '.join(django_settings)  # parse_known_args makes a list again
+        print_setting_args = ' '.join(print_setting_args or [])
         try:
             value = sh(
                 django_cmd(
                     system,
                     settings,
-                    "print_setting {django_settings} 2>{log_file}".format(
+                    "print_setting {django_settings} 2>{log_file} {print_setting_args}".format(
                         django_settings=django_settings,
+                        print_setting_args=print_setting_args,
                         log_file=cls.PRINT_SETTINGS_LOG_FILE
-                    )
+                    ).strip()
                 ),
                 capture=True
             )
@@ -270,6 +273,22 @@ class Env:
             with open(cls.PRINT_SETTINGS_LOG_FILE, 'r') as f:
                 print(f.read())
             sys.exit(1)
+
+    @classmethod
+    def get_django_json_settings(cls, django_settings, system, settings=None):
+        """
+        Interrogate Django environment for specific settings value
+        :param django_settings: list of django settings values to get
+        :param system: the django app to use when asking for the setting (lms | cms)
+        :param settings: the settings file to use when asking for the value
+        :return: json string value of the django setting
+        """
+        return cls.get_django_settings(
+            django_settings,
+            system,
+            settings=settings,
+            print_setting_args=["--json"],
+        )
 
     @classmethod
     def covered_modules(cls):

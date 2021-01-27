@@ -8,7 +8,7 @@
     "@edx/frontend-component-cookie-policy-banner": "1.0.0",
     "@edx/paragon": "2.6.4",
     "@edx/studio-frontend": "^1.16.22",
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "babel-core": "6.26.0",
     "babel-loader": "6.4.1",
     "babel-plugin-transform-class-properties": "6.24.1",

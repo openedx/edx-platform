@@ -6,7 +6,6 @@ JSON views which the instructor dashboard requests.
 Many of these GETs may become PUTs in the future.
 """
 
-
 import csv
 import json
 import logging
@@ -315,8 +314,8 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
     """
 
     if not configuration_helpers.get_value(
-            'ALLOW_AUTOMATED_SIGNUPS',
-            settings.FEATURES.get('ALLOW_AUTOMATED_SIGNUPS', False),
+        'ALLOW_AUTOMATED_SIGNUPS',
+        settings.FEATURES.get('ALLOW_AUTOMATED_SIGNUPS', False),
     ):
         return HttpResponseForbidden()
 
@@ -2959,8 +2958,8 @@ def invalidate_certificate(request, generated_certificate, certificate_invalidat
     :return: dict object containing updated certificate invalidation data.
     """
     if CertificateInvalidation.get_certificate_invalidations(
-            generated_certificate.course_id,
-            generated_certificate.user,
+        generated_certificate.course_id,
+        generated_certificate.user,
     ):
         raise ValueError(
             _(u"Certificate of {user} has already been invalidated. Please check your spelling and retry.").format(

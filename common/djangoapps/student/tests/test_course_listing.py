@@ -18,7 +18,7 @@ from common.djangoapps.student.roles import GlobalStaff
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.student.views import get_course_enrollments
 from common.djangoapps.util.milestones_helpers import get_pre_requisite_courses_not_completed, set_prerequisite_courses
-from xmodule.error_module import ErrorDescriptor
+from xmodule.error_module import ErrorBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -104,7 +104,7 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
 
     def test_errored_course_regular_access(self):
         """
-        Test the course list for regular staff when get_course returns an ErrorDescriptor
+        Test the course list for regular staff when get_course returns an ErrorBlock
         """
         # pylint: disable=protected-access
         mongo_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
@@ -112,7 +112,7 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         self._create_course_with_access_groups(course_key, default_store=ModuleStoreEnum.Type.mongo)
 
         with mock.patch('xmodule.modulestore.mongo.base.MongoKeyValueStore', mock.Mock(side_effect=Exception)):
-            self.assertIsInstance(modulestore().get_course(course_key), ErrorDescriptor)
+            self.assertIsInstance(modulestore().get_course(course_key), ErrorBlock)
 
             # Invalidate (e.g., delete) the corresponding CourseOverview, forcing get_course to be called.
             CourseOverview.objects.filter(id=course_key).delete()

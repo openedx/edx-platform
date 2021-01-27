@@ -52,6 +52,7 @@ SUPPORTED_FIELDS = [
     SupportedFieldType('due'),
     SupportedFieldType('contains_gated_content'),
     SupportedFieldType('has_score'),
+    SupportedFieldType('has_scheduled_content'),
     SupportedFieldType('weight'),
     SupportedFieldType('show_correctness'),
     # 'student_view_data'

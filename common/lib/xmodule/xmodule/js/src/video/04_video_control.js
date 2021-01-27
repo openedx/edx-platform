@@ -154,7 +154,7 @@
                 var endTime = (this.config.endTime !== null) ? this.config.endTime : params.duration;
                 // in case endTime is accidentally specified as being greater than the video
                 endTime = Math.min(endTime, params.duration);
-                this.videoControl.vidTimeEl.html(Time.format(params.time) + ' / ' + Time.format(endTime));
+                this.videoControl.vidTimeEl.text(Time.format(params.time) + ' / ' + Time.format(endTime));
             }
         }
     );

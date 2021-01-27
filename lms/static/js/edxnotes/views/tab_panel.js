@@ -1,13 +1,14 @@
 (function(define, undefined) {
     'use strict';
     define(['gettext', 'underscore', 'backbone', 'js/edxnotes/views/note_item',
-        'common/js/components/views/paging_header', 'common/js/components/views/paging_footer'],
-function(gettext, _, Backbone, NoteItemView, PagingHeaderView, PagingFooterView) {
+        'common/js/components/views/paging_header', 'common/js/components/views/paging_footer',
+        'edx-ui-toolkit/js/utils/html-utils'],
+function(gettext, _, Backbone, NoteItemView, PagingHeaderView, PagingFooterView, HtmlUtils) {
     var TabPanelView = Backbone.View.extend({
         tagName: 'section',
         className: 'tab-panel',
         title: '',
-        titleTemplate: _.template('<h2 class="sr"><%- text %></h2>'),
+        titleTemplate: HtmlUtils.template('<h2 class="sr"><%- text %></h2>'),
         attributes: {
             tabindex: -1
         },
@@ -25,7 +26,10 @@ function(gettext, _, Backbone, NoteItemView, PagingHeaderView, PagingFooterView)
         },
 
         render: function() {
-            this.$el.html(this.getTitle());
+            HtmlUtils.setHtml(
+                this.$el,
+                this.getTitle()
+            );
             this.renderView(this.pagingHeaderView);
             this.renderContent();
             this.renderView(this.pagingFooterView);

@@ -1304,11 +1304,11 @@ class XModuleDescriptor(XModuleDescriptorToXBlockMixin, HTMLSnippet, ResourceTem
                 self.xmodule_runtime.xmodule_instance.save()
             except Exception:  # pylint: disable=broad-except
                 # xmodule_instance is set by the XModule.__init__. If we had an error after that,
-                # we need to clean it out so that we can set up the ErrorModule instead
+                # we need to clean it out so that we can set up the ErrorBlock instead
                 self.xmodule_runtime.xmodule_instance = None
 
                 if isinstance(self, self.xmodule_runtime.error_descriptor_class):
-                    log.exception('Error creating an ErrorModule from an ErrorDescriptor')
+                    log.exception('Error creating an ErrorBlock from an ErrorBlock')
                     raise
 
                 log.exception('Error creating xmodule')
@@ -1317,7 +1317,7 @@ class XModuleDescriptor(XModuleDescriptorToXBlockMixin, HTMLSnippet, ResourceTem
                     error_msg=exc_info_to_str(sys.exc_info())
                 )
                 descriptor.xmodule_runtime = self.xmodule_runtime
-                self.xmodule_runtime.xmodule_instance = descriptor._xmodule  # pylint: disable=protected-access
+                self.xmodule_runtime.xmodule_instance = descriptor
         return self.xmodule_runtime.xmodule_instance
 
     course_id = module_attr('course_id')

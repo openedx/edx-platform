@@ -233,7 +233,7 @@ def transcript_upload_handler(request):
                 content=transcript_file.read().decode('utf-8'),
                 input_format=Transcript.SRT,
                 output_format=Transcript.SJSON
-            )
+            ).encode()
             create_or_update_video_transcript(
                 video_id=edx_video_id,
                 language_code=language_code,

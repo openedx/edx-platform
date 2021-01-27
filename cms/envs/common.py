@@ -1018,6 +1018,11 @@ COURSE_IMPORT_EXPORT_STORAGE = 'django.core.files.storage.FileSystemStorage'
 ##### EMBARGO #####
 EMBARGO_SITE_REDIRECT_URL = None
 
+##### custom vendor plugin variables #####
+# JavaScript code can access this data using `process.env.JS_ENV_EXTRA_CONFIG`
+# One of the current use cases for this is enabling custom TinyMCE plugins
+JS_ENV_EXTRA_CONFIG = {}
+
 ############################### PIPELINE #######################################
 
 PIPELINE = {
@@ -2082,10 +2087,6 @@ ANALYTICS_DASHBOARD_NAME = 'Your Platform Name Here Insights'
 COMMENTS_SERVICE_URL = 'http://localhost:18080'
 COMMENTS_SERVICE_KEY = 'password'
 
-CAS_SERVER_URL = ""
-CAS_EXTRA_LOGIN_PARAMS = ""
-CAS_ATTRIBUTE_CALLBACK = ""
-
 FINANCIAL_REPORTS = {
     'STORAGE_TYPE': 'localfs',
     'BUCKET': None,
@@ -2316,8 +2317,23 @@ VERIFY_STUDENT = {
 ORGANIZATIONS_AUTOCREATE = True
 
 ################# Settings for brand logos. #################
+LOGO_IMAGE_EXTRA_TEXT = ''
 LOGO_URL = None
 LOGO_URL_PNG = None
 LOGO_TRADEMARK_URL = None
 FAVICON_URL = None
 DEFAULT_EMAIL_LOGO_URL = 'https://edx-cdn.org/v3/default/logo.png'
+
+# .. toggle_name: ERROR_ON_DEPRECATED_EDX_PLATFORM_IMPORTS
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2021-01-20
+# .. toggle_target_removal_date: 2021-01-27
+# .. toggle_tickets: https://github.com/edx/edx-platform/pull/25932
+# .. toggle_description: Whether to raise an exception where,
+#   normally, a DeprecatedEdxPlatformImportWarning would be raised.
+#   This will allow us to test dropping support for the deprecated
+#   import paths without yet removing all of the import_shims
+#   machinery.
+ERROR_ON_DEPRECATED_EDX_PLATFORM_IMPORTS = False

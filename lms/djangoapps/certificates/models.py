@@ -291,7 +291,7 @@ class GeneratedCertificate(models.Model):
     error_reason = models.CharField(max_length=512, blank=True, default='')
 
     # This is necessary because CMS does not install the certificates app, but it
-    # imports this models code. Simple History will attempt to connect to the installed
+    # imports this model's code. Simple History will attempt to connect to the installed
     # model in the certificates app, which will fail.
     if 'certificates' in apps.app_configs:
         history = HistoricalRecords()
@@ -319,7 +319,7 @@ class GeneratedCertificate(models.Model):
         Return a set of CourseKeys for which the user has certificates.
 
         Sometimes we just want to check if a user has already been issued a
-        certificate for a given course (e.g. to test refund elibigility).
+        certificate for a given course (e.g. to test refund eligibility).
         Instead of checking if `certificate_for_student` returns `None` on each
         course_id individually, we instead just return a set of all CourseKeys
         for which this student has certificates all at once.
@@ -874,7 +874,7 @@ class ExampleCertificate(TimeStampedModel):
 
         This will usually be called either:
         1) When an error occurs adding the certificate to the queue.
-        2) When we receieve a response from the queue (either error or success).
+        2) When we receive a response from the queue (either error or success).
 
         If an error occurs, we store the error message;
         if certificate generation is successful, we store the URL
@@ -1014,7 +1014,7 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
             return latest.self_generation_enabled
 
     @classmethod
-    def set_self_generatation_enabled_for_course(cls, course_key, is_enabled):
+    def set_self_generation_enabled_for_course(cls, course_key, is_enabled):
         """Enable or disable self-generated certificates for a course.
 
         Arguments:

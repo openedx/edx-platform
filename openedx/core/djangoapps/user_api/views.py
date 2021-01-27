@@ -148,9 +148,9 @@ class CountryTimeZoneListView(generics.ListAPIView):
 
     **Example Requests**
 
-        GET /user_api/v1/preferences/time_zones/
+        GET /api/user/v1/preferences/time_zones/
 
-        GET /user_api/v1/preferences/time_zones/?country_code=FR
+        GET /api/user/v1/preferences/time_zones/?country_code=FR
 
     **Example GET Response**
 

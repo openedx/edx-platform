@@ -65,7 +65,7 @@ from common.djangoapps.util.milestones_helpers import (
     is_prerequisite_courses_enabled
 )
 from xmodule.course_module import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CourseDescriptor
-from xmodule.error_module import ErrorDescriptor
+from xmodule.error_module import ErrorBlock
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
 from xmodule.x_module import XModule
 
@@ -149,7 +149,7 @@ def has_access(user, action, obj, course_key=None):
     if isinstance(obj, CourseOverview):
         return _has_access_course(user, action, obj)
 
-    if isinstance(obj, ErrorDescriptor):
+    if isinstance(obj, ErrorBlock):
         return _has_access_error_desc(user, action, obj, course_key)
 
     if isinstance(obj, XModule):

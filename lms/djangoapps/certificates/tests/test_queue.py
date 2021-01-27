@@ -294,11 +294,11 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
 
     def test_regen_cert_with_pdf_certificate(self):
         """
-        Test that regenerating PDF certifcate log warning message and certificate
+        Test that regenerating a PDF certificate logs a warning message and the certificate
         status remains unchanged.
         """
         download_url = 'http://www.example.com/certificate.pdf'
-        # Create an existing verifed enrollment and certificate
+        # Create an existing verified enrollment and certificate
         CourseEnrollmentFactory(
             user=self.user_2,
             course_id=self.course.id,
@@ -314,15 +314,15 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
             download_url=download_url
         )
 
-        self._assert_pdf_cert_generation_dicontinued_logs(download_url)
+        self._assert_pdf_cert_generation_discontinued_logs(download_url)
 
     def test_add_cert_with_existing_pdf_certificate(self):
         """
-        Test that add certifcate for existing PDF certificate log warning
-        message and certificate status remains unchanged.
+        Test that adding a certificate for existing PDF certificates logs a  warning
+        message and the certificate status remains unchanged.
         """
         download_url = 'http://www.example.com/certificate.pdf'
-        # Create an existing verifed enrollment and certificate
+        # Create an existing verified enrollment and certificate
         CourseEnrollmentFactory(
             user=self.user_2,
             course_id=self.course.id,
@@ -338,9 +338,9 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
             download_url=download_url
         )
 
-        self._assert_pdf_cert_generation_dicontinued_logs(download_url, add_cert=True)
+        self._assert_pdf_cert_generation_discontinued_logs(download_url, add_cert=True)
 
-    def _assert_pdf_cert_generation_dicontinued_logs(self, download_url, add_cert=False):
+    def _assert_pdf_cert_generation_discontinued_logs(self, download_url, add_cert=False):
         """Assert PDF certificate generation discontinued logs."""
         with LogCapture(LOGGER.name) as log:
             if add_cert:

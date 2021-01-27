@@ -27,12 +27,10 @@ from lms.djangoapps.badges.utils import badges_enabled
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.edxmako.template import Template
 from lms.djangoapps.certificates.api import (
-    emit_certificate_event,
     get_active_web_certificate,
     get_certificate_footer_context,
     get_certificate_header_context,
-    get_certificate_template,
-    get_certificate_url
+    get_certificate_template
 )
 from lms.djangoapps.certificates.models import (
     CertificateGenerationCourseSetting,
@@ -42,6 +40,7 @@ from lms.djangoapps.certificates.models import (
     GeneratedCertificate
 )
 from lms.djangoapps.certificates.permissions import PREVIEW_CERTIFICATES
+from lms.djangoapps.certificates.utils import emit_certificate_event, get_certificate_url
 from lms.djangoapps.courseware.courses import get_course_by_id
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course, display_date_for_certificate
@@ -223,7 +222,7 @@ def _update_context_with_basic_info(context, course_id, platform_name, configura
 
     context['company_contact_urltext'] = _(u"Contact {platform_name}").format(platform_name=platform_name)
 
-    # Translators:  This text appears near the top of the certficate and describes the guarantee provided by edX
+    # Translators:  This text appears near the top of the certificate and describes the guarantee provided by edX
     context['document_banner'] = _(u"{platform_name} acknowledges the following student accomplishment").format(
         platform_name=platform_name
     )
@@ -430,7 +429,7 @@ def _update_organization_context(context, course):
     partner_short_name = course.display_organization if course.display_organization else course.org
     organizations = organizations_api.get_course_organizations(course_key=course.id)
     if organizations:
-        #TODO Need to add support for multiple organizations, Currently we are interested in the first one.
+        # TODO Need to add support for multiple organizations, Currently we are interested in the first one.
         organization = organizations[0]
         partner_long_name = organization.get('name', partner_long_name)
         partner_short_name = organization.get('short_name', partner_short_name)

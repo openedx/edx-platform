@@ -44,6 +44,23 @@ class StartDateTransformer(FilteringTransformerMixin, BlockStructureTransformer)
         return "start_date"
 
     @classmethod
+    def _check_has_scheduled_content(cls, block_structure, scheduled_content_condition):
+        '''
+        Returns a block structure where the root course block has been
+        updated to include a has_scheduled_content field (True if the course
+        has any blocks with release dates in the future, False otherwise).
+        '''
+        has_scheduled_content = False
+        for block_key in block_structure.topological_traversal():
+            if scheduled_content_condition(block_key):
+                has_scheduled_content = True
+                break
+
+        block_structure.override_xblock_field(
+            block_structure.root_block_usage_key, 'has_scheduled_content', has_scheduled_content
+        )
+
+    @classmethod
     def _get_merged_start_date(cls, block_structure, block_key):
         """
         Returns the merged value for the start date for the block with
@@ -85,4 +102,8 @@ class StartDateTransformer(FilteringTransformerMixin, BlockStructureTransformer)
             usage_info.course_key,
             now=now,
         )
+
+        if usage_info.include_has_scheduled_content:
+            self._check_has_scheduled_content(block_structure, removal_condition)
+
         return [block_structure.create_removal_filter(removal_condition)]

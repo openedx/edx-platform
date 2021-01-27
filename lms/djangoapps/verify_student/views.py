@@ -12,7 +12,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db import transaction
-from django.http import Http404, HttpResponse, HttpResponseBadRequest
+from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -24,7 +24,6 @@ from django.views.decorators.http import require_POST
 from django.views.generic.base import View
 from edx_rest_api_client.exceptions import SlumberBaseException
 from ipware.ip import get_ip
-from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -1225,7 +1224,7 @@ class PhotoUrlsView(APIView):
     def get(self, request, receipt_id):
         """
         Endpoint for retrieving photo urls for IDV
-        GET /verify_student/photo_urls/{receipt_id}
+        GET /verify_student/photo-urls/{receipt_id}
 
         Returns:
             200 OK
@@ -1246,4 +1245,68 @@ class PhotoUrlsView(APIView):
             return Response(body)
 
         log.warning(u"Could not find verification with receipt ID %s.", receipt_id)
+        raise Http404
+
+
+class DecryptFaceImageView(APIView):
+    """
+    Endpoint to retrieve decrypted IDV face image data. Can only be used on stage.
+    """
+
+    @method_decorator(require_global_staff)
+    def get(self, request, receipt_id):
+        """
+        Endpoint used for decrypting images on stage based on a given receipt ID
+        GET /verify_student/decrypt-idv-images/face/{receipt_id}
+
+        Returns:
+            200 OK
+            {
+                img
+            }
+        """
+        # if this endpoint is not being accessed on stage, raise a 403. Only stage will have an RSA_PRIVATE_KEY
+        if not settings.VERIFY_STUDENT["SOFTWARE_SECURE"].get("RSA_PRIVATE_KEY", None):
+            log.warning(u"Cannot access image decryption outside of staging environment")
+            return HttpResponseForbidden()
+
+        verification = SoftwareSecurePhotoVerification.get_verification_from_receipt(receipt_id)
+        if verification:
+            user_photo = verification.download_face_image()
+            if user_photo:
+                return HttpResponse(user_photo, content_type="image/png")
+
+        log.warning(u"Could not decrypt face image for receipt ID %s.", receipt_id)
+        raise Http404
+
+
+class DecryptPhotoIDImageView(APIView):
+    """
+        Endpoint to retrieve decrypted IDV photo ID image data. Can only be used on stage.
+    """
+
+    @method_decorator(require_global_staff)
+    def get(self, request, receipt_id):
+        """
+        Endpoint used for decrypting images on stage based on a given receipt ID
+        GET /verify_student/decrypt-idv-images/photo-id/{receipt_id}
+
+        Returns:
+            200 OK
+            {
+                img
+            }
+        """
+        # if this endpoint is not being accessed on stage, raise a 403. Only stage will have an RSA_PRIVATE_KEY
+        if not settings.VERIFY_STUDENT["SOFTWARE_SECURE"].get("RSA_PRIVATE_KEY", None):
+            log.warning(u"Cannot access image decryption outside of staging environment")
+            return HttpResponseForbidden()
+
+        verification = SoftwareSecurePhotoVerification.get_verification_from_receipt(receipt_id)
+        if verification:
+            id_photo = verification.download_photo_id_image()
+            if id_photo:
+                return HttpResponse(id_photo, content_type="image/png")
+
+        log.warning(u"Could not decrypt photo ID image for receipt ID %s.", receipt_id)
         raise Http404

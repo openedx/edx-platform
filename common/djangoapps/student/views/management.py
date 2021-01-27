@@ -50,6 +50,7 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
+from openedx.core.djangoapps.user_authn.utils import should_redirect_to_logistration_mircrofrontend
 from openedx.core.djangolib.markup import HTML, Text
 from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info, generate_activation_email_context
 from common.djangoapps.student.message_types import AccountActivation, EmailChange, EmailChangeConfirmation, RecoveryEmailCreate
@@ -492,9 +493,11 @@ def activate_account(request, key):
     # TODO: Use custom attribute to determine if there are any `activate_account` calls for cms in Production.
     # If not, the templates wouldn't be needed for cms, but we still need a way to activate for cms tests.
     monitoring_utils.set_custom_attribute('student_activate_account', 'lms')
+    activation_message_type = None
     try:
         registration = Registration.objects.get(activation_key=key)
     except (Registration.DoesNotExist, Registration.MultipleObjectsReturned):
+        activation_message_type = 'error'
         messages.error(
             request,
             HTML(_(
@@ -511,6 +514,7 @@ def activate_account(request, key):
         )
     else:
         if registration.user.is_active:
+            activation_message_type = 'info'
             messages.info(
                 request,
                 HTML(_('{html_start}This account has already been activated.{html_end}')).format(
@@ -533,6 +537,7 @@ def activate_account(request, key):
                 )
 
             # Add message for later use.
+            activation_message_type = 'success'
             messages.success(
                 request,
                 HTML(message).format(
@@ -541,6 +546,10 @@ def activate_account(request, key):
                 ),
                 extra_tags='account-activation aa-icon',
             )
+
+    if should_redirect_to_logistration_mircrofrontend() and not request.user.is_authenticated:
+        url_path = '/login?account_activation_status={}'.format(activation_message_type)
+        return redirect(settings.LOGISTRATION_MICROFRONTEND_URL + url_path)
 
     return redirect('dashboard')
 

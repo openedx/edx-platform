@@ -93,6 +93,28 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         super(RegistrationViewValidationErrorTest, self).setUp()
         self.url = reverse("user_api_registration")
 
+    @mock.patch.dict(settings.FEATURES, {
+        "ENABLE_THIRD_PARTY_AUTH": True,
+    })
+    @mock.patch(
+        'openedx.core.djangoapps.user_authn.views.register.is_require_third_party_auth_enabled',
+        mock.Mock(return_value=True)
+    )
+    def test_register_public_account_with_only_third_party_auth_failure(self):
+        # fails to register for public user if only third party auth is allowed
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(
+            response.content,
+            b"Third party authentication is required to register. Username and password were received instead."
+        )
+
     def test_register_retired_email_validation_error(self):
         # Register the first user
         response = self.client.post(self.url, {

@@ -13,7 +13,7 @@ from six import text_type
 
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
-from xmodule.error_module import ErrorDescriptor
+from xmodule.error_module import ErrorBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
@@ -119,7 +119,7 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
 
         if check_content:
             self.assertNotContains(response, "this module is temporarily unavailable")
-            self.assertNotIsInstance(descriptor, ErrorDescriptor)
+            self.assertNotIsInstance(descriptor, ErrorBlock)
 
 
 class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):

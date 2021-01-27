@@ -175,8 +175,9 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         self.assertIsNone(VerificationDeadline.deadline_for_course(self.course.id))
 
         # Generate the expected data
-        verification_deadline = datetime(year=2030, month=12, day=31, tzinfo=pytz.utc)
-        expiration_datetime = datetime.now(pytz.utc)
+        now = datetime.now(pytz.utc)
+        verification_deadline = now + timedelta(days=1)
+        expiration_datetime = now
         response, expected = self._get_update_response_and_expected_data(expiration_datetime, verification_deadline)
 
         # Sanity check: The API should return HTTP status 200 for updates

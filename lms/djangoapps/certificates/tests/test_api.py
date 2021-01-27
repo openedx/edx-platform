@@ -232,11 +232,11 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
 
 
 @ddt.ddt
-class CertificateisInvalid(WebCertificateTestMixin, ModuleStoreTestCase):
+class CertificateIsInvalid(WebCertificateTestMixin, ModuleStoreTestCase):
     """Tests for the `is_certificate_invalid` helper function. """
 
     def setUp(self):
-        super(CertificateisInvalid, self).setUp()
+        super().setUp()
 
         self.student = UserFactory()
         self.course = CourseFactory.create(
@@ -535,7 +535,7 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(GenerateUserCertificatesTest, self).setUp('lms.djangoapps.certificates.api.tracker')
+        super().setUp('lms.djangoapps.certificates.utils.tracker')
 
         self.student = UserFactory.create(
             email='joe_user@edx.org',

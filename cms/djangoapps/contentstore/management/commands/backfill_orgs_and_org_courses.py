@@ -5,6 +5,8 @@ A backfill command to migrate Open edX instances to the new world of
 For full context, see:
 https://github.com/edx/edx-organizations/blob/master/docs/decisions/0001-phase-in-db-backed-organizations-to-all.rst
 """
+from typing import Dict, List, Set, Tuple
+
 from django.core.management import BaseCommand, CommandError
 from organizations import api as organizations_api
 
@@ -39,6 +41,56 @@ class Command(BaseCommand):
         >     logo=None,
         >     active=True,
         > )
+
+    Example run of command:
+
+        root@studio:/edx/app/edxapp/edx-platform# ./manage.py cms backfill_orgs_and_org_courses
+        << ... lots of logging output ... >>
+        ------------------------------------------------------
+        Dry-run of bulk-adding organizations...
+        Will create 5 organizations:
+            KyleX
+            KyleX2
+            KyleX3
+            KyleX4
+            KyleX5
+        Will reactivate 2 organizations:
+            BD04
+            BD05
+        ------------------------------------------------------
+        Dry-run of bulk-adding organization-course linkages...
+        Will create 5 organization-course linkages:
+            kylex,course-v1:KyleX+OrgTest+1
+            kylex2,course-v1:KyleX2+OrgTest+1
+            kylex3,course-v1:KyleX3+OrgTest+1
+            kylex4,course-v1:KyleX4+OrgTest+1
+            kylex5,course-v1:KyleX5+OrgTest+1
+        Will reactivate 0 organization-course linkages:
+        ------------------------------------------------------
+        Commit changes shown above to the database [y/n]? x
+        Commit changes shown above to the database [y/n]? yes
+        ------------------------------------------------------
+        Bulk-adding organizations...
+        Created 5 organizations:
+            KyleX
+            KyleX2
+            KyleX3
+            KyleX4
+            KyleX5
+        Reactivated 2 organizations:
+            BD04
+            BD05
+        ------------------------------------------------------
+        Bulk-adding organization-course linkages...
+        Created 5 organization-course linkages:
+            kylex,course-v1:KyleX+OrgTest+1
+            kylex2,course-v1:KyleX2+OrgTest+1
+            kylex3,course-v1:KyleX3+OrgTest+1
+            kylex4,course-v1:KyleX4+OrgTest+1
+            kylex5,course-v1:KyleX5+OrgTest+1
+        Reactivated 0 organization-course linkages:
+        ------------------------------------------------------
+        root@studio:/edx/app/edxapp/edx-platform#
     """
 
     # Make help  message the first line of docstring.
@@ -56,6 +108,11 @@ class Command(BaseCommand):
             '--dry',
             action='store_true',
             help="Show backfill, but do not apply changes to database."
+        )
+        parser.add_argument(
+            '--inactive',
+            action='store_true',
+            help="Backfill data as inactive and do not re-activate any existing data."
         )
 
     def handle(self, *args, **options):
@@ -85,13 +142,19 @@ class Command(BaseCommand):
         if not confirm_changes(options, orgs, org_courseid_pairs):
             print("No changes applied.")
             return
-        print("Applying changes...")
-        organizations_api.bulk_add_organizations(orgs, dry_run=False)
-        organizations_api.bulk_add_organization_courses(org_courseid_pairs, dry_run=False)
-        print("Changes applied successfully.")
+        bulk_add_data(
+            orgs,
+            org_courseid_pairs,
+            dry_run=False,
+            activate=(not options.get('inactive')),
+        )
 
 
-def confirm_changes(options, orgs, org_courseid_pairs):
+def confirm_changes(
+        options: Dict[str, str],
+        orgs: List[dict],
+        org_courseid_pairs: List[Tuple[dict, str]],
+) -> bool:
     """
     Should we apply the changes to the database?
 
@@ -100,19 +163,26 @@ def confirm_changes(options, orgs, org_courseid_pairs):
     Otherwise, it does a dry run and then prompts the user.
 
     Arguments:
-        options (dict[str]): command-line arguments.
-        orgs (list[dict]): list of org data dictionaries to bulk-add.
-        org_courseid_pairs (list[tuple[dict, str]]):
+        options: command-line arguments.
+        orgs: org data dictionaries to bulk-add.
+              should each have a "short_name" and "name" key.
+        org_courseid_pairs
             list of (org data dictionary, course key string) links to bulk-add.
+            each org data dictionary should have a "short_name" key.
 
-    Returns: bool
+    Returns:
+        Whether user wants changes to be applied.
     """
     if options.get('apply') and options.get('dry'):
         raise CommandError("Only one of 'apply' and 'dry' may be specified")
     if options.get('apply'):
         return True
-    organizations_api.bulk_add_organizations(orgs, dry_run=True)
-    organizations_api.bulk_add_organization_courses(org_courseid_pairs, dry_run=True)
+    bulk_add_data(
+        orgs,
+        org_courseid_pairs,
+        dry_run=True,
+        activate=(not options.get('inactive')),
+    )
     if options.get('dry'):
         return False
     answer = ""
@@ -121,7 +191,62 @@ def confirm_changes(options, orgs, org_courseid_pairs):
     return answer.lower().startswith('y')
 
 
-def find_orgslug_courseid_pairs():
+def bulk_add_data(
+        orgs: List[dict],
+        org_courseid_pairs: List[Tuple[dict, str]],
+        dry_run: bool,
+        activate: bool,
+):
+    """
+    Bulk-add the organizations and organization-course linkages.
+
+    Print out list of organizations and organization-course linkages,
+    one per line. We distinguish between records that are added by
+    being created vs. those that are being added by just reactivating an
+    existing record.
+
+    Arguments:
+        orgs: org data dictionaries to bulk-add.
+              should each have a "short_name" and "name" key.
+        org_courseid_pairs
+            list of (org data dictionary, course key string) links to bulk-add.
+            each org data dictionary should have a "short_name" key.
+        dry_run: Whether or not this run should be "dry" (ie, don't apply changes).
+        activate: Whether newly-added organizations and organization-course linkages
+            should be activated, and whether existing-but-inactive
+            organizations/linkages should be reactivated.
+    """
+    adding_phrase = "Dry-run of bulk-adding" if dry_run else "Bulk-adding"
+    created_phrase = "Will create" if dry_run else "Created"
+    reactivated_phrase = "Will reactivate" if dry_run else "Reactivated"
+
+    print("------------------------------------------------------")
+    print(f"{adding_phrase} organizations...")
+    orgs_created, orgs_reactivated = organizations_api.bulk_add_organizations(
+        orgs, dry_run=dry_run, activate=activate
+    )
+    print(f"{created_phrase} {len(orgs_created)} organizations:")
+    for org_short_name in sorted(orgs_created):
+        print(f"    {org_short_name}")
+    print(f"{reactivated_phrase} {len(orgs_reactivated)} organizations:")
+    for org_short_name in sorted(orgs_reactivated):
+        print(f"    {org_short_name}")
+
+    print("------------------------------------------------------")
+    print(f"{adding_phrase} organization-course linkages...")
+    linkages_created, linkages_reactivated = organizations_api.bulk_add_organization_courses(
+        org_courseid_pairs, dry_run=dry_run, activate=activate
+    )
+    print(f"{created_phrase} {len(linkages_created)} organization-course linkages:")
+    for org_short_name, course_id in sorted(linkages_created):
+        print(f"    {org_short_name},{course_id}")
+    print(f"{reactivated_phrase} {len(linkages_reactivated)} organization-course linkages:")
+    for org_short_name, course_id in sorted(linkages_reactivated):
+        print(f"    {org_short_name},{course_id}")
+    print("------------------------------------------------------")
+
+
+def find_orgslug_courseid_pairs() -> Set[Tuple[str, str]]:
     """
     Returns the unique pairs of (organization short name, course run key string)
     from the CourseOverviews table, which should contain all course runs in the
@@ -141,7 +266,7 @@ def find_orgslug_courseid_pairs():
     }
 
 
-def find_orgslug_libraryid_pairs():
+def find_orgslug_libraryid_pairs() -> Set[Tuple[str, str]]:
     """
     Returns the unique pairs of (organization short name, content library key string)
     from the modulestore.

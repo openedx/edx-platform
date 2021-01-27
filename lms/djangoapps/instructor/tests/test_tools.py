@@ -333,13 +333,20 @@ class TestDataDumps(ModuleStoreTestCase):
             self.week1.display_name)
         assert (
             report['header'] == ["Username", "Full Name", "Extended Due Date"])
-        assert (report['data'] == [
-            {"Username": self.user1.username,
-             "Full Name": self.user1.profile.name,
-             "Extended Due Date": "2013-12-25 00:00"},
-            {"Username": self.user2.username,
-             "Full Name": self.user2.profile.name,
-             "Extended Due Date": "2013-12-25 00:00"}])
+        self.assertCountEqual(
+            report['data'],
+            [
+                {
+                    "Username": self.user1.username,
+                    "Full Name": self.user1.profile.name,
+                    "Extended Due Date": "2013-12-25 00:00"
+                }, {
+                    "Username": self.user2.username,
+                    "Full Name": self.user2.profile.name,
+                    "Extended Due Date": "2013-12-25 00:00"
+                }
+            ]
+        )
 
     def test_dump_student_extensions(self):
         extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=UTC)

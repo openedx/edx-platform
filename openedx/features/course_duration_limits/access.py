@@ -4,27 +4,22 @@ Contains code related to computing content gating course duration limits
 and course access based on these limits.
 """
 
-import crum
 from django.utils import timezone
-from django.utils.translation import get_language
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import RequestCache
 from web_fragments.fragment import Fragment
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.util.date_utils import strftime_localized
+from common.djangoapps.util.date_utils import strftime_localized, strftime_localized_html
 from lms.djangoapps.courseware.access_response import AccessError
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
-from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_specific_student
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_date_signals.utils import get_expected_duration
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-
-EXPIRATION_DATE_FORMAT_STR = '%b %-d, %Y'
 
 
 class AuditExpiredError(AccessError):
@@ -34,7 +29,7 @@ class AuditExpiredError(AccessError):
     def __init__(self, user, course, expiration_date):
         error_code = 'audit_expired'
         developer_message = 'User {} had access to {} until {}'.format(user, course, expiration_date)
-        expiration_date = strftime_localized(expiration_date, EXPIRATION_DATE_FORMAT_STR)
+        expiration_date = strftime_localized(expiration_date, 'SHORT_DATE')
         user_message = _('Access expired on {expiration_date}').format(expiration_date=expiration_date)
         try:
             course_name = course.display_name_with_default
@@ -113,12 +108,6 @@ def check_course_expired(user, course):
     return ACCESS_GRANTED
 
 
-def get_date_string():
-    # Creating this method to allow unit testing an issue where this string was missing the unicode prefix
-    return '<span class="localized-datetime" data-format="shortDate" data-timezone="{user_timezone}" \
-        data-datetime="{formatted_date}" data-language="{language}">{formatted_date_localized}</span>'
-
-
 def get_access_expiration_data(user, course):
     """
     Create a dictionary of information about the access expiration for this user & course.
@@ -165,14 +154,11 @@ def generate_course_expired_message(user, course):
     upgrade_deadline = expiration_data['upgrade_deadline']
     upgrade_url = expiration_data['upgrade_url']
 
-    user_timezone_locale = user_timezone_locale_prefs(crum.get_current_request())
-    user_timezone = user_timezone_locale['user_timezone']
-
     if masquerading_expired_course:
         upgrade_message = _('This learner does not have access to this course. '
                             'Their access expired on {expiration_date}.')
         return HTML(upgrade_message).format(
-            expiration_date=strftime_localized(expiration_date, EXPIRATION_DATE_FORMAT_STR)
+            expiration_date=strftime_localized_html(expiration_date, 'SHORT_DATE')
         )
     else:
         expiration_message = _('{strong_open}Audit Access Expires {expiration_date}{strong_close}'
@@ -188,21 +174,9 @@ def generate_course_expired_message(user, course):
         else:
             using_upgrade_messaging = False
 
-        language = get_language()
-        date_string = get_date_string()
-        formatted_expiration_date = date_string.format(
-            language=language,
-            user_timezone=user_timezone,
-            formatted_date=expiration_date.isoformat(),
-            formatted_date_localized=strftime_localized(expiration_date, EXPIRATION_DATE_FORMAT_STR)
-        )
+        formatted_expiration_date = strftime_localized_html(expiration_date, 'SHORT_DATE')
         if using_upgrade_messaging:
-            formatted_upgrade_deadline = date_string.format(
-                language=language,
-                user_timezone=user_timezone,
-                formatted_date=upgrade_deadline.isoformat(),
-                formatted_date_localized=strftime_localized(upgrade_deadline, EXPIRATION_DATE_FORMAT_STR)
-            )
+            formatted_upgrade_deadline = strftime_localized_html(upgrade_deadline, 'SHORT_DATE')
 
             return HTML(full_message).format(
                 a_open=HTML('<a id="FBE_banner" href="{upgrade_link}">').format(upgrade_link=upgrade_url),

@@ -8,11 +8,13 @@ import unittest
 from datetime import datetime, timedelta, tzinfo
 
 import ddt
-import six
+from markupsafe import Markup
 from mock import patch
 from pytz import utc
 
-from common.djangoapps.util.date_utils import almost_same_datetime, get_default_time_display, get_time_display, strftime_localized
+from common.djangoapps.util.date_utils import (
+    almost_same_datetime, get_default_time_display, get_time_display, strftime_localized, strftime_localized_html
+)
 
 
 def test_get_default_time_display():
@@ -134,9 +136,7 @@ class StrftimeLocalizedTest(unittest.TestCase):
         (fmt, expected) = fmt_expected
         dtime = datetime(2013, 2, 14, 16, 41, 17)
         self.assertEqual(expected, strftime_localized(dtime, fmt))
-        # strftime doesn't like Unicode, so do the work in UTF8.
-        self.assertEqual(expected.encode('utf-8') if six.PY2 else expected,
-                         dtime.strftime(fmt.encode('utf-8') if six.PY2 else fmt))
+        self.assertEqual(expected, dtime.strftime(fmt))
 
     @ddt.data(
         ("SHORT_DATE", "Feb 14, 2013"),
@@ -211,3 +211,28 @@ class StrftimeLocalizedTest(unittest.TestCase):
         dtime = datetime(2013, 2, 14, 16, 41, 17)
         with self.assertRaises(ValueError):
             strftime_localized(dtime, fmt)
+
+
+@ddt.ddt
+class StrftimeLocalizedHtmlTest(unittest.TestCase):
+    """
+    Tests for strftime_localized_html.
+    """
+    @ddt.data(
+        None,
+        'Africa/Casablanca',
+    )
+    def test_happy_path(self, timezone):
+        dtime = datetime(2013, 2, 14, 16, 41, 17)
+        with patch('common.djangoapps.util.date_utils.user_timezone_locale_prefs',
+                   return_value={'user_timezone': timezone}):
+            html = strftime_localized_html(dtime, 'SHORT_DATE')
+        self.assertIsInstance(html, Markup)
+        self.assertRegex(html,
+                         '<span class="localized-datetime" data-format="shortDate" data-timezone="%s" ' % timezone +
+                         '\\s*data-datetime="2013-02-14T16:41:17" data-language="en">Feb 14, 2013</span>')
+
+    def test_invalid_format_string(self):
+        dtime = datetime(2013, 2, 14, 16, 41, 17)
+        with self.assertRaisesRegex(AssertionError, 'format "NOPE" not yet supported in strftime_localized_html'):
+            strftime_localized_html(dtime, 'NOPE')

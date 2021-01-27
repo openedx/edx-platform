@@ -7,7 +7,7 @@ pertaining to new discussion forum comments.
 import logging
 
 import six
-from celery import task
+from celery import shared_task
 from celery_utils.logged_task import LoggedTask
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -38,7 +38,7 @@ log = logging.getLogger(__name__)
 DEFAULT_LANGUAGE = 'en'
 
 
-@task(base=LoggedTask)
+@shared_task(base=LoggedTask)
 @set_code_owner_attribute
 def update_discussions_map(context):
     """
@@ -61,7 +61,7 @@ class ResponseNotification(BaseMessageType):
     pass
 
 
-@task(base=LoggedTask)
+@shared_task(base=LoggedTask)
 @set_code_owner_attribute
 def send_ace_message(context):
     context['course_id'] = CourseKey.from_string(context['course_id'])

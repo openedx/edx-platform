@@ -1200,7 +1200,9 @@ XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin, EditInfoMixin)
 # Allow any XBlock in the LMS
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
-# Paths to wrapper methods which should be applied to every XBlock's FieldData.
+# .. setting_name: XBLOCK_FIELD_DATA_WRAPPERS
+# .. setting_default: ()
+# .. setting_description: Paths to wrapper methods which should be applied to every XBlock's FieldData.
 XBLOCK_FIELD_DATA_WRAPPERS = ()
 
 XBLOCK_FS_STORAGE_BUCKET = None
@@ -1421,10 +1423,6 @@ STATICFILES_DIRS = [
 
 FAVICON_PATH = 'images/favicon.ico'
 DEFAULT_COURSE_ABOUT_IMAGE_URL = 'images/pencils.jpg'
-
-CAS_SERVER_URL = ""
-CAS_EXTRA_LOGIN_PARAMS = ""
-CAS_ATTRIBUTE_CALLBACK = ""
 
 # User-uploaded content
 MEDIA_ROOT = '/edx/var/edxapp/media/'
@@ -2578,7 +2576,7 @@ INSTALLED_APPS = [
     'common.djangoapps.course_modes.apps.CourseModesConfig',
 
     # Enrollment API
-    'openedx.core.djangoapps.enrollments',
+    'openedx.core.djangoapps.enrollments.apps.EnrollmentsConfig',
 
     # Entitlement API
     'common.djangoapps.entitlements.apps.EntitlementsConfig',
@@ -3514,6 +3512,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
         "state",
         "goals",
         "is_active",
+        "last_login",
         "mailing_address",
         "requires_parental_consent",
         "secondary_email",
@@ -4147,8 +4146,10 @@ MAILCHIMP_NEW_USER_LIST_ID = ""
 ########################## BLOCKSTORE #####################################
 BLOCKSTORE_PUBLIC_URL_ROOT = 'http://localhost:18250'
 BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
-# Which of django's caches to use for storing anonymous user state for XBlocks
-# in the blockstore-based XBlock runtime
+
+# .. setting_name: XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE
+# .. setting_default: default
+# .. setting_description: The django cache key of the cache to use for storing anonymous user state for XBlocks.
 XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
 
 # Blockstore data could contain S3 links, so this should be lower than Blockstore's AWS_QUERYSTRING_EXPIRE
@@ -4177,8 +4178,23 @@ MAX_BLOCKS_PER_CONTENT_LIBRARY = 1000
 COUNTRIES_FIRST = []
 
 ################# Settings for brand logos. #################
+LOGO_IMAGE_EXTRA_TEXT = ''
 LOGO_URL = None
 LOGO_URL_PNG = None
 LOGO_TRADEMARK_URL = None
 FAVICON_URL = None
 DEFAULT_EMAIL_LOGO_URL = 'https://edx-cdn.org/v3/default/logo.png'
+
+# .. toggle_name: ERROR_ON_DEPRECATED_EDX_PLATFORM_IMPORTS
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_use_cases: rollout
+# .. toggle_creation_date: 2021-01-20
+# .. toggle_target_removal_date: 2021-01-27
+# .. toggle_tickets: https://github.com/edx/edx-platform/pull/25932
+# .. toggle_description: Whether to raise an exception where,
+#  normally, a DeprecatedEdxPlatformImportWarning would be raised.
+#  This will allow us to test dropping support for the deprecated
+#  import paths without yet removing all of the import_shims
+#  machinery.
+ERROR_ON_DEPRECATED_EDX_PLATFORM_IMPORTS = False

@@ -117,31 +117,60 @@ class BackfillOrgsAndOrgCoursesTest(SharedModuleStoreTestCase):
             "command_line_args": [],
             "user_inputs": ["n"],
             "should_apply_changes": False,
+            "should_data_be_activated": True,
         },
         {
             "command_line_args": [],
             "user_inputs": ["x", "N"],
             "should_apply_changes": False,
+            "should_data_be_activated": True,
         },
         {
             "command_line_args": [],
             "user_inputs": ["", "", "YeS"],
             "should_apply_changes": True,
+            "should_data_be_activated": True,
+        },
+        {
+            "command_line_args": ["--inactive"],
+            "user_inputs": ["y"],
+            "should_apply_changes": True,
+            "should_data_be_activated": False,
         },
         {
             "command_line_args": ["--dry"],
             "user_inputs": [],
             "should_apply_changes": False,
+            "should_data_be_activated": True,
+        },
+        {
+            "command_line_args": ["--dry", "--inactive"],
+            "user_inputs": [],
+            "should_apply_changes": False,
+            "should_data_be_activated": False,
         },
         {
             "command_line_args": ["--apply"],
             "user_inputs": [],
             "should_apply_changes": True,
+            "should_data_be_activated": True,
         },
     )
     @ddt.unpack
-    @patch.object(organizations_api, 'bulk_add_organizations')
-    @patch.object(organizations_api, 'bulk_add_organization_courses')
+    @patch.object(
+        # Mock out `bulk_add_organizations` to do nothing and return empty
+        # lists, indicating no organizations created or reactivated.
+        organizations_api,
+        'bulk_add_organizations',
+        return_value=([], []),
+    )
+    @patch.object(
+        # Mock out `bulk_add_organization_courses` to do nothing and return empty
+        # lists, indicating no linkages created or reactivated.
+        organizations_api,
+        'bulk_add_organization_courses',
+        return_value=([], []),
+    )
     def test_arguments_and_input(
             self,
             mock_add_orgs,
@@ -149,6 +178,7 @@ class BackfillOrgsAndOrgCoursesTest(SharedModuleStoreTestCase):
             command_line_args,
             user_inputs,
             should_apply_changes,
+            should_data_be_activated,
     ):
         """
         Test that the command-line arguments and user input processing works as
@@ -172,31 +202,38 @@ class BackfillOrgsAndOrgCoursesTest(SharedModuleStoreTestCase):
             # then we expect one DRY bulk-add run *and* one REAL bulk-add run.
             assert mock_add_orgs.call_count == 2
             assert mock_add_org_courses.call_count == 2
-            assert mock_add_orgs.call_args_list[0].kwargs == {"dry_run": True}
-            assert mock_add_org_courses.call_args_list[0].kwargs == {"dry_run": True}
-            assert mock_add_orgs.call_args_list[1].kwargs == {"dry_run": False}
-            assert mock_add_org_courses.call_args_list[1].kwargs == {"dry_run": False}
+            assert mock_add_orgs.call_args_list[0].kwargs["dry_run"] is True
+            assert mock_add_org_courses.call_args_list[0].kwargs["dry_run"] is True
+            assert mock_add_orgs.call_args_list[1].kwargs["dry_run"] is False
+            assert mock_add_org_courses.call_args_list[1].kwargs["dry_run"] is False
         elif should_apply_changes:
             # If DID apply changes but the user WASN'T prompted,
             # then we expect just one REAL bulk-add run.
             assert mock_add_orgs.call_count == 1
             assert mock_add_org_courses.call_count == 1
-            assert mock_add_orgs.call_args.kwargs == {"dry_run": False}
-            assert mock_add_org_courses.call_args.kwargs == {"dry_run": False}
+            assert mock_add_orgs.call_args.kwargs["dry_run"] is False
+            assert mock_add_org_courses.call_args.kwargs["dry_run"] is False
         elif user_inputs:
             # If we DIDN'T apply changes but the user WAS prompted
             # then we expect just one DRY bulk-add run.
             assert mock_add_orgs.call_count == 1
             assert mock_add_org_courses.call_count == 1
-            assert mock_add_orgs.call_args.kwargs == {"dry_run": True}
-            assert mock_add_org_courses.call_args.kwargs == {"dry_run": True}
+            assert mock_add_orgs.call_args.kwargs["dry_run"] is True
+            assert mock_add_org_courses.call_args.kwargs["dry_run"] is True
         else:
             # Similarly, if we DIDN'T apply changes and the user WASN'T prompted
             # then we expect just one DRY bulk-add run.
             assert mock_add_orgs.call_count == 1
             assert mock_add_org_courses.call_count == 1
-            assert mock_add_orgs.call_args.kwargs == {"dry_run": True}
-            assert mock_add_org_courses.call_args.kwargs == {"dry_run": True}
+            assert mock_add_orgs.call_args.kwargs["dry_run"] is True
+            assert mock_add_org_courses.call_args.kwargs["dry_run"] is True
+
+        # Assert that the value of of the "active" kwarg is correct for all
+        # calls both bulk-add functions, whether or not they were dry runs.
+        for call in mock_add_orgs:
+            assert call.kwargs["activate"] == should_data_be_activated
+        for call in mock_add_org_courses:
+            assert call.kwargs["activate"] == should_data_be_activated
 
     def test_conflicting_arguments(self):
         """

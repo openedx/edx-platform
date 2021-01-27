@@ -146,7 +146,6 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
             self.experience_filter,
             enrollment__user__in=users,
             enrollment__is_active=True,
-            active=True,
             **schedule_day_equals_target_day_filter
         ).order_by(order_by)
 
@@ -481,7 +480,6 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
         course_duration = get_expected_duration(self.course_id)
         schedules = Schedule.objects.select_related('enrollment').filter(
             self.experience_filter,
-            active=True,
             enrollment__is_active=True,
             enrollment__course_id=self.course_id,
             enrollment__user__is_active=True,

@@ -622,6 +622,8 @@ TIME_ZONE_DISPLAYED_FOR_DEADLINES = ENV_TOKENS.get("TIME_ZONE_DISPLAYED_FOR_DEAD
                                                    TIME_ZONE_DISPLAYED_FOR_DEADLINES)
 
 ##### Third-party auth options ################################################
+ENABLE_REQUIRE_THIRD_PARTY_AUTH = ENV_TOKENS.get('ENABLE_REQUIRE_THIRD_PARTY_AUTH', False)
+
 if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     tmp_backends = ENV_TOKENS.get('THIRD_PARTY_AUTH_BACKENDS', [
         'social_core.backends.google.GoogleOAuth2',
@@ -1039,3 +1041,5 @@ EXPLICIT_QUEUES = {
     'openedx.core.djangoapps.coursegraph.dump_course_to_neo4j': {
         'queue': COURSEGRAPH_JOB_QUEUE},
 }
+
+LOGO_IMAGE_EXTRA_TEXT = ENV_TOKENS.get('LOGO_IMAGE_EXTRA_TEXT', '')

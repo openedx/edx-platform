@@ -19,7 +19,7 @@ from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, reverse
 from edx_toggles.toggles.testutils import override_waffle_switch
-from mock import patch
+from mock import Mock, patch
 from common.djangoapps.student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
 
 from openedx.core.djangoapps.password_policy.compliance import (
@@ -81,6 +81,25 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
 
     FEATURES_WITH_LOGIN_MFE_ENABLED = settings.FEATURES.copy()
     FEATURES_WITH_LOGIN_MFE_ENABLED['ENABLE_LOGISTRATION_MICROFRONTEND'] = True
+
+    @patch.dict(settings.FEATURES, {
+        "ENABLE_THIRD_PARTY_AUTH": True
+    })
+    @patch(
+        'openedx.core.djangoapps.user_authn.views.login.is_require_third_party_auth_enabled',
+        Mock(return_value=True)
+    )
+    @skip_unless_lms
+    def test_public_login_failure_with_only_third_part_auth_enabled(self):
+        response, _ = self._login_response(
+            self.user_email,
+            self.password,
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(
+            response.content,
+            b"Third party authentication is required to login. Username and password were received instead."
+        )
 
     @ddt.data(
         # Default redirect is dashboard.

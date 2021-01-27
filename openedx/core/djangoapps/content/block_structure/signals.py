@@ -29,7 +29,7 @@ def update_block_structure_on_course_publish(sender, course_key, **kwargs):  # p
     if isinstance(course_key, LibraryLocator):
         return
 
-    if config.waffle().is_enabled(config.INVALIDATE_CACHE_ON_PUBLISH):
+    if config.INVALIDATE_CACHE_ON_PUBLISH.is_enabled():
         try:
             clear_course_from_cache(course_key)
         except BlockStructureNotFound:

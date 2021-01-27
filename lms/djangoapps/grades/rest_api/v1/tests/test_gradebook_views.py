@@ -68,6 +68,9 @@ class CourseGradingViewTest(SharedModuleStoreTestCase, APITestCase):
         """
         Sets up the structure of the test course.
         """
+        course.grade_cutoffs = {
+            "Pass": 0.5,
+        }
         cls.section = ItemFactory.create(
             parent_location=course.location,
             category="chapter",
@@ -135,6 +138,9 @@ class CourseGradingViewTest(SharedModuleStoreTestCase, APITestCase):
 
     def _get_expected_data(self):
         return {
+            "grade_cutoffs": {
+                "Pass": 0.5,
+            },
             'assignment_types': {
                 'Final Exam': {
                     'drop_count': 0,

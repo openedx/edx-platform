@@ -42,7 +42,7 @@ class TestApplicability(ModuleStoreTestCase):
         CourseModeFactory.create(course_id=self.course.id, mode_slug='verified')
         now_time = datetime.now(tz=pytz.UTC).strftime(u"%Y-%m-%d %H:%M:%S%z")
         ExperimentData.objects.create(
-            user=self.user, experiment_id=REV1008_EXPERIMENT_ID, key=str(self.course), value=now_time
+            user=self.user, experiment_id=REV1008_EXPERIMENT_ID, key=str(self.course.id), value=now_time
         )
 
         holdback_patcher = patch(

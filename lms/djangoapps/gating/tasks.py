@@ -6,7 +6,7 @@ This file contains celery tasks related to course content gating.
 import logging
 
 import six
-from celery import task
+from celery import shared_task
 from django.contrib.auth.models import User
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -18,7 +18,7 @@ from xmodule.modulestore.django import modulestore
 log = logging.getLogger(__name__)
 
 
-@task
+@shared_task
 @set_code_owner_attribute
 def task_evaluate_subsection_completion_milestones(course_id, block_id, user_id):
     """

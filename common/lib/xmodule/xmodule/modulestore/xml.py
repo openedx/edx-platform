@@ -27,7 +27,7 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xblock.runtime import DictKeyValueStore
 
-from xmodule.error_module import ErrorDescriptor
+from xmodule.error_module import ErrorBlock
 from xmodule.errortracker import exc_info_to_str, make_error_tracker
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT, ModuleStoreEnum, ModuleStoreReadBase
@@ -194,7 +194,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
                 self.error_tracker(msg)
                 err_msg = msg + "\n" + exc_info_to_str(sys.exc_info())
-                descriptor = ErrorDescriptor.from_xml(
+                descriptor = ErrorBlock.from_xml(
                     xml,
                     self,
                     id_manager,
@@ -390,7 +390,7 @@ class XMLModuleStore(ModuleStoreReadBase):
 
         if course_descriptor is None:
             pass
-        elif isinstance(course_descriptor, ErrorDescriptor):
+        elif isinstance(course_descriptor, ErrorBlock):
             # Didn't load course.  Instead, save the errors elsewhere.
             self.errored_courses[course_dir] = errorlog
         else:
@@ -529,7 +529,7 @@ class XMLModuleStore(ModuleStoreReadBase):
             )
             course_descriptor = system.process_xml(etree.tostring(course_data, encoding='unicode'))
             # If we fail to load the course, then skip the rest of the loading steps
-            if isinstance(course_descriptor, ErrorDescriptor):
+            if isinstance(course_descriptor, ErrorBlock):
                 return course_descriptor
 
             self.content_importers(system, course_descriptor, course_dir, url_name)
@@ -783,7 +783,7 @@ class XMLModuleStore(ModuleStoreReadBase):
     def get_courses(self, **kwargs):
         """
         Returns a list of course descriptors.  If there were errors on loading,
-        some of these may be ErrorDescriptors instead.
+        some of these may be ErrorBlock instead.
         """
         return list(self.courses.values())
 

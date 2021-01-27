@@ -6,9 +6,10 @@ This module contains signals needed for email integration
 import datetime
 import logging
 from random import randint
+from typing import Dict, Any, Optional, Tuple
 
 import crum
-from celery.exceptions import TimeoutError
+from celery.exceptions import TimeoutError as CeleryTimeoutError
 from django.conf import settings
 from django.dispatch import receiver
 from sailthru.sailthru_error import SailthruClientError
@@ -28,7 +29,9 @@ from openedx.core.djangoapps.user_authn.cookies import CREATE_LOGON_COOKIE
 from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER
 from common.djangoapps.student.helpers import does_user_profile_exist
 from common.djangoapps.student.signals import SAILTHRU_AUDIT_PURCHASE
-from common.djangoapps.util.model_utils import USER_FIELD_CHANGED
+from common.djangoapps.student.models import UserProfile
+from common.djangoapps.track import segment
+from common.djangoapps.util.model_utils import USER_FIELD_CHANGED, USER_FIELDS_CHANGED
 
 from .models import EmailMarketingConfiguration
 
@@ -39,12 +42,15 @@ CHANGED_FIELDNAMES = ['username', 'is_active', 'name', 'gender', 'education',
                       'age', 'level_of_education', 'year_of_birth',
                       'country', LANGUAGE_KEY]
 
+# TODO: Remove in AA-607
 WAFFLE_NAMESPACE = 'sailthru'
 WAFFLE_SWITCHES = LegacyWaffleSwitchNamespace(name=WAFFLE_NAMESPACE)
 
+# TODO: Remove in AA-607
 SAILTHRU_AUDIT_PURCHASE_ENABLED = 'audit_purchase_enabled'
 
 
+# TODO: Remove in AA-607
 @receiver(SAILTHRU_AUDIT_PURCHASE)
 def update_sailthru(sender, user, mode, course_id, **kwargs):  # pylint: disable=unused-argument
     """
@@ -61,6 +67,7 @@ def update_sailthru(sender, user, mode, course_id, **kwargs):  # pylint: disable
         update_course_enrollment.delay(email, course_id, mode, site=_get_current_site())
 
 
+# TODO: Remove in AA-607
 @receiver(CREATE_LOGON_COOKIE)
 def add_email_marketing_cookies(sender, response=None, user=None,
                                 **kwargs):  # pylint: disable=unused-argument
@@ -101,7 +108,7 @@ def add_email_marketing_cookies(sender, response=None, user=None,
         cookie = sailthru_response.result
         _log_sailthru_api_call_time(time_before_call)
 
-    except TimeoutError as exc:
+    except CeleryTimeoutError as exc:
         log.error(u"Timeout error while attempting to obtain cookie from Sailthru: %s", text_type(exc))
         return response
     except SailthruClientError as exc:
@@ -128,6 +135,7 @@ def add_email_marketing_cookies(sender, response=None, user=None,
     return response
 
 
+# TODO: Remove in AA-607
 @receiver(REGISTER_USER)
 def email_marketing_register_user(sender, user, registration,
                                   **kwargs):  # pylint: disable=unused-argument
@@ -153,6 +161,7 @@ def email_marketing_register_user(sender, user, registration,
                       site=_get_current_site(), new_user=True)
 
 
+# TODO: Remove in AA-607
 @receiver(USER_FIELD_CHANGED)
 def email_marketing_user_field_changed(sender, user=None, table=None, setting=None,
                                        old_value=None, new_value=None,
@@ -219,6 +228,45 @@ def email_marketing_user_field_changed(sender, user=None, table=None, setting=No
         if not email_config.enabled:
             return
         update_user_email.delay(user.email, old_value)
+
+
+@receiver(USER_FIELDS_CHANGED)
+def email_marketing_user_fields_changed(
+        sender,  # pylint: disable=unused-argument
+        user=None,
+        table=None,
+        changed_fields: Optional[Dict[str, Tuple[Any, Any]]] = None,
+        **kwargs
+):
+    """
+    Update a collection of user profile fields
+
+    Args:
+        sender: Not used
+        user: The user object for the user being changed
+        table: The name of the table being updated
+        changed_fields: A mapping from changed field name to old and new values.
+        kwargs: Not used
+    """
+
+    fields = {field: new_value for (field, (old_value, new_value)) in changed_fields.items()}
+    # This mirrors the logic in openedx/core/djangoapps/user_authn/views/register.py:_track_user_registration
+    if table == 'auth_userprofile':
+        if 'gender' in fields and fields['gender']:
+            fields['gender'] = dict(UserProfile.GENDER_CHOICES)[fields['gender']]
+        if 'country' in fields:
+            fields['country'] = str(fields['country'])
+        if 'level_of_education' in fields and fields['level_of_education']:
+            fields['level_of_education'] = dict(UserProfile.LEVEL_OF_EDUCATION_CHOICES)[fields['level_of_education']]
+        if 'year_of_birth' in fields:
+            fields['yearOfBirth'] = fields.pop('year_of_birth')
+        if 'mailing_address' in fields:
+            fields['address'] = fields.pop('mailing_address')
+
+    segment.identify(
+        user.id,
+        fields
+    )
 
 
 def _create_sailthru_user_vars(user, profile, registration=None):

@@ -82,6 +82,7 @@
                     this.isAccountRecoveryFeatureEnabled = options.is_account_recovery_feature_enabled || false;
                     this.isMultipleUserEnterprisesFeatureEnabled =
                         options.is_multiple_user_enterprises_feature_enabled || false;
+                    this.is_require_third_party_auth_enabled = options.is_require_third_party_auth_enabled || false;
 
                 // The login view listens for 'sync' events from the reset model
                     this.resetModel = new PasswordResetModel({}, {
@@ -162,7 +163,8 @@
                             hideAuthWarnings: this.hideAuthWarnings,
                             pipelineUserDetails: this.pipelineUserDetails,
                             enterpriseName: this.enterpriseName,
-                            enterpriseSlugLoginURL: this.enterpriseSlugLoginURL
+                            enterpriseSlugLoginURL: this.enterpriseSlugLoginURL,
+                            is_require_third_party_auth_enabled: this.is_require_third_party_auth_enabled
                         });
 
                     // Listen for 'password-help' event to toggle sub-views
@@ -203,7 +205,8 @@
                             model: model,
                             thirdPartyAuth: this.thirdPartyAuth,
                             platformName: this.platformName,
-                            hideAuthWarnings: this.hideAuthWarnings
+                            hideAuthWarnings: this.hideAuthWarnings,
+                            is_require_third_party_auth_enabled: this.is_require_third_party_auth_enabled
                         });
 
                     // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
