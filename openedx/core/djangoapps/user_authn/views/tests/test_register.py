@@ -430,6 +430,7 @@ class RegistrationViewTestV1(ThirdPartyAuthTestMixin, UserAPITestCase):
         self.assertHttpMethodNotAllowed(response)
 
     def test_patch_not_allowed(self):
+
         response = self.client.patch(self.url)
         self.assertHttpMethodNotAllowed(response)
 

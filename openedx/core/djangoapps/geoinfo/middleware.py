@@ -16,7 +16,8 @@ import geoip2.database
 
 from django.conf import settings
 from django.utils.deprecation import MiddlewareMixin
-from ipware.ip import get_real_ip
+from ipware import get_client_ip
+
 
 log = logging.getLogger(__name__)
 
@@ -31,7 +32,7 @@ class CountryMiddleware(MiddlewareMixin):
 
         Store country code in session.
         """
-        new_ip_address = get_real_ip(request)
+        new_ip_address, __ = get_client_ip(request, request_header_order=['X_FORWARDED_FOR', 'HTTP_X_FORWARDED_FOR'])
         old_ip_address = request.session.get('ip_address', None)
 
         if not new_ip_address and old_ip_address:

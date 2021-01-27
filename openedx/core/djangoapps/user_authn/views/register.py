@@ -151,6 +151,7 @@ def create_account_with_params(request, params):
     """
     # Copy params so we can modify it; we can't just do dict(params) because if
     # params is request.POST, that results in a dict containing lists of values
+
     params = dict(list(params.items()))
 
     # allow to define custom set of required/optional/hidden fields via configuration
