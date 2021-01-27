@@ -173,7 +173,7 @@ class TrackMiddlewareTestCase(TestCase):
         SessionMiddleware().process_request(request)
         request.session.save()
         session_key = request.session.session_key
-        expected_session_key = self.track_middleware.encrypt_session_key(session_key)
+        expected_session_key = self.track_middleware.substitute_session_key(session_key)
         self.assertEqual(len(session_key), len(expected_session_key))
         context = self.get_context_for_request(request)
         self.assert_dict_subset(context, {
@@ -181,11 +181,17 @@ class TrackMiddlewareTestCase(TestCase):
         })
 
     @override_settings(SECRET_KEY='85920908f28904ed733fe576320db18cabd7b6cd')
-    def test_session_key_encryption(self):
+    def test_session_key_substitution(self):
         session_key = '665924b49a93e22b46ee9365abf28c2a'
-        expected_session_key = '3b81f559d14130180065d635a4f35dd2'
-        encrypted_session_key = self.track_middleware.encrypt_session_key(session_key)
-        self.assertEqual(encrypted_session_key, expected_session_key)
+        # Output value pinned to alert on unintended changes to generator
+        expected_session_key = 'b4103566fc80d20da1970cbb4380bccd'
+        substitute_session_key = self.track_middleware.substitute_session_key(session_key)
+        self.assertEqual(substitute_session_key, expected_session_key)
+
+        # Confirm that we get *different* outputs for different inputs
+        expected_session_key_2 = "6f0c784c1087c6bc4624b7eac982fedf"
+        substitute_session_key_2 = self.track_middleware.substitute_session_key(session_key + "different")
+        self.assertEqual(expected_session_key_2, substitute_session_key_2)
 
     def test_request_headers(self):
         ip_address = '10.0.0.0'
