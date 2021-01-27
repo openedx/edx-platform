@@ -167,6 +167,9 @@ class PartitionService(object):
         If the user has not yet been assigned, a group will be chosen for them based upon
         the partition's scheme.
         """
+        if not user_partition:
+            return None
+
         return user_partition.scheme.get_group_for_user(
             self._course_id, user, user_partition, assign=assign,
         )

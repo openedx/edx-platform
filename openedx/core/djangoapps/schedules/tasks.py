@@ -125,10 +125,11 @@ class BinnedScheduleMessageBaseTask(ScheduleMessageBaseTask):
                 check_completion,
             )
             cls.log_info(u'Launching task with args = %r', task_args)
-            cls.task_instance.apply_async(
-                task_args,
-                retry=False,
-            )
+            if cls.task_instance:
+                cls.task_instance.apply_async(
+                    task_args,
+                    retry=False,
+                )
 
     def run(
         self, site_id, target_day_str, day_offset, bin_num, override_recipient_email=None, check_completion=False,

@@ -106,13 +106,10 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
         super().setUp()
         self.course = CourseFactory.create(highlights_enabled_for_messaging=True)
         with self.store.bulk_operations(self.course.id):
-            self.block_key = [
-                ItemFactory.create(
-                    parent=self.course,
-                    category='chapter',
-                    highlights=[u'good stuff']
-                ).location
-            ]
+            self.block_key = ItemFactory.create(
+                parent=self.course,
+                category='chapter',
+                highlights=['good stuff']).location
 
     def create_resolver(self):
         """
@@ -187,7 +184,7 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
     @override_switch('completion.enable_completion_tracking', True)
     def test_schedule_with_check_completion_and_block_completed(self):
         resolver = self.create_resolver()
-        submit_completions_for_testing(self.user, self.block_key)
+        submit_completions_for_testing(self.user, [self.block_key])
         schedules = list(resolver.schedules_for_bin())
         self.assertEqual(len(schedules), 1)
 

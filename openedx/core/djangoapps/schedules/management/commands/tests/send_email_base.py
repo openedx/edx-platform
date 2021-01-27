@@ -177,7 +177,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
                     test_day,
                     offset,
                     None,
-                    None
+                    False
                 )
 
     @patch.object(tasks, 'ace')

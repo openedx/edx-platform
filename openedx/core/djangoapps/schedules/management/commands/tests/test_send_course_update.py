@@ -120,10 +120,10 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
         """
         offset, target_day, enrollment = self.prepare_course_data(mock_get_current_site, is_self_paced=False)
 
-        self.task().apply(kwargs=dict(
+        self.task.run(
             site_id=self.site_config.site.id,
             target_day_str=serialize(target_day),
             day_offset=offset,
             bin_num=self._calculate_bin_for_user(enrollment.user),
-        ))
+        )
         self.assertEqual(u'{} Weekly Update'.format(enrollment.course.display_name), mail.outbox[0].subject)

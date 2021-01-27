@@ -290,9 +290,9 @@ def get_partition_from_id(partitions, user_partition_id):
     Returns:
         A UserPartition, or None if not found.
     """
-    if partitions:
-        for partition in partitions:
-            if partition.id == user_partition_id:
-                return partition
+    if not partitions:
+        return None
 
-    return None
+    for partition in partitions:
+        if partition.id == user_partition_id:
+            return partition

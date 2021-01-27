@@ -8,7 +8,7 @@ import attr
 from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from completion.models import BlockCompletion
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.db.models import F, Q
 from django.urls import reverse
@@ -36,6 +36,8 @@ DEFAULT_NUM_BINS = 24
 RECURRING_NUDGE_NUM_BINS = DEFAULT_NUM_BINS
 UPGRADE_REMINDER_NUM_BINS = DEFAULT_NUM_BINS
 COURSE_UPDATE_NUM_BINS = DEFAULT_NUM_BINS
+
+User = get_user_model()
 
 
 @attr.s
@@ -389,11 +391,8 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
             enrollment = schedule.enrollment
             course = schedule.enrollment.course
             user = enrollment.user
-            course_key = schedule.enrollment.course_id
-            if check_completion:
-                last_block_completed = BlockCompletion.get_latest_block_completed(user, course_key)
-                if not last_block_completed:
-                    continue
+            if check_completion and not BlockCompletion.get_latest_block_completed(user, enrollment.course_id):
+                continue
 
             # (Weekly) Course Updates are only for Instructor-paced courses.
             # See CourseNextSectionUpdate for Self-paced updates.

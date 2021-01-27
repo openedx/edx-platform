@@ -17,11 +17,14 @@ from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfi
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 
 
-@ddt.ddt  # pylint: disable=missing-docstring
+@ddt.ddt
 @skip_unless_lms
 @skipUnless('openedx.core.djangoapps.schedules' in settings.INSTALLED_APPS,
             "Can't test schedules if the app isn't installed")
 class TestSendEmailBaseCommand(CacheIsolationTestCase, CompletionWaffleTestMixin):
+    """
+    Test send email base command
+    """
 
     def setUp(self):  # pylint: disable=super-method-not-called
         self.command = SendEmailBaseCommand()
