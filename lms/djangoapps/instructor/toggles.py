@@ -19,8 +19,8 @@ WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE)
 # .. toggle_target_removal_date: None
 # .. toggle_warnings: ??
 # .. toggle_tickets: PROD-1309
-DATA_DOWNLOAD_V2 = CourseWaffleFlag(
-    waffle_namespace=LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix='instructor_dashboard: '),
+DATA_DOWNLOAD_V2 = LegacyWaffleFlag(
+    waffle_namespace=WAFFLE_FLAG_NAMESPACE,
     flag_name='enable_data_download_v2',
     module_name=__name__,
 )
@@ -44,11 +44,11 @@ OPTIMISED_IS_SMALL_COURSE = LegacyWaffleFlag(
 )
 
 
-def data_download_v2_is_enabled(course_key):
+def data_download_v2_is_enabled():
     """
     check if data download v2 is enabled.
     """
-    return DATA_DOWNLOAD_V2.is_enabled(course_key)
+    return DATA_DOWNLOAD_V2.is_enabled()
 
 
 def use_optimised_is_small_course():
