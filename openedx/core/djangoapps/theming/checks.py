@@ -8,6 +8,7 @@ import os
 import six
 from django.conf import settings
 from django.core.checks import Error, Tags, register
+from edx_toggles.toggles import SettingToggle
 
 
 @register(Tags.compatibility)
@@ -24,7 +25,7 @@ def check_comprehensive_theme_settings(app_configs, **kwargs):  # lint-amnesty, 
     Returns:
         List of any Errors.
     """
-    if not getattr(settings, "ENABLE_COMPREHENSIVE_THEMING"):  # lint-amnesty, pylint: disable=literal-used-as-attribute
+    if not SettingToggle("ENABLE_COMPREHENSIVE_THEMING", default=False).is_enabled():
         # Only perform checks when comprehensive theming is enabled.
         return []
 

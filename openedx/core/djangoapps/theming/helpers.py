@@ -13,6 +13,7 @@ from logging import getLogger
 import crum
 from django.conf import settings
 
+from edx_toggles.toggles import SettingToggle
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers_dirs import (
     Theme,
@@ -315,10 +316,12 @@ def is_comprehensive_theming_enabled():
     Returns:
          (bool): True if comprehensive theming is enabled else False
     """
-    if settings.ENABLE_COMPREHENSIVE_THEMING and current_request_has_associated_site_theme():
+    ENABLE_COMPREHENSIVE_THEMING = SettingToggle("ENABLE_COMPREHENSIVE_THEMING", default=False)
+
+    if ENABLE_COMPREHENSIVE_THEMING.is_enabled() and current_request_has_associated_site_theme():
         return True
 
-    return settings.ENABLE_COMPREHENSIVE_THEMING
+    return ENABLE_COMPREHENSIVE_THEMING.is_enabled()
 
 
 def get_config_value_from_site_or_settings(name, site=None, site_config_name=None):

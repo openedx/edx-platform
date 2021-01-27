@@ -1881,16 +1881,28 @@ CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
 
 CREDIT_PROVIDER_SECRET_KEYS = {}
 
-# dir containing all themes
+# .. setting_name: COMPREHENSIVE_THEME_DIRS
+# .. setting_default: []
+# .. setting_description: See LMS annotation.
 COMPREHENSIVE_THEME_DIRS = []
 
-# Theme directory locale paths
+# .. setting_name: COMPREHENSIVE_THEME_LOCALE_PATHS
+# .. setting_default: []
+# .. setting_description: See LMS annotation.
+#   "COMPREHENSIVE_THEME_LOCALE_PATHS" : ["/edx/src/edx-themes/conf/locale"].
 COMPREHENSIVE_THEME_LOCALE_PATHS = []
 
-# Theme to use when no site or site theme is defined,
-# set to None if you want to use openedx theme
+# .. setting_name: DEFAULT_SITE_THEME
+# .. setting_default: None
+# .. setting_description: See LMS annotation.
 DEFAULT_SITE_THEME = None
 
+# .. toggle_name: ENABLE_COMPREHENSIVE_THEMING
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: See LMS annotation.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2016-06-30
 ENABLE_COMPREHENSIVE_THEMING = False
 
 ############################ Global Database Configuration #####################
