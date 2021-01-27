@@ -185,11 +185,11 @@ def anonymous_id_for_user(user, course_id, save=True):
     # cached, stored in the DB, or retrieved from the DB. This will help inform
     # us on decisions about whether we can move to always save IDs,
     # pregenerate them, use random instead of deterministic IDs, etc.
-    monitoring.increment('temp_anonymous_user_id.requested')
+    monitoring.increment('temp_anon_uid_v2.requested')
 
     cached_id = getattr(user, '_anonymous_id', {}).get(course_id)
     if cached_id is not None:
-        monitoring.increment('temp_anonymous_user_id.returned_from_cache')
+        monitoring.increment('temp_anon_uid_v2.returned_from_cache')
         return cached_id
     # check if an anonymous id already exists for this user and course_id combination
     anonymous_user_ids = AnonymousUserId.objects.filter(user=user).filter(course_id=course_id).order_by('-id')
@@ -197,6 +197,7 @@ def anonymous_id_for_user(user, course_id, save=True):
         # If there are multiple anonymous_user_ids per user, course_id pair
         # select the row which was created most recently
         anonymous_user_id = anonymous_user_ids[0].anonymous_user_id
+        monitoring.increment('temp_anon_uid_v2.fetched_existing')
     else:
         # include the secret key as a salt, and to make the ids unique across different LMS installs.
         hasher = hashlib.md5()
@@ -207,19 +208,19 @@ def anonymous_id_for_user(user, course_id, save=True):
         anonymous_user_id = hasher.hexdigest()
 
         if save is True:
-            monitoring.increment('temp_anonymous_user_id.computed_stored')
             try:
                 AnonymousUserId.objects.create(
                     user=user,
                     course_id=course_id,
                     anonymous_user_id=anonymous_user_id,
                 )
+                monitoring.increment('temp_anon_uid_v2.stored')
             except IntegrityError:
                 # Another thread has already created this entry, so
                 # continue
-                monitoring.increment('temp_anonymous_user_id.computed_already_present')
+                monitoring.increment('temp_anon_uid_v2.store_db_error')
         else:
-            monitoring.increment('temp_anonymous_user_id.computed_unsaved')
+            monitoring.increment('temp_anon_uid_v2.computed_unsaved')
 
     # cache the anonymous_id in the user object
     if not hasattr(user, '_anonymous_id'):
@@ -247,11 +248,11 @@ def deprecated_anonymous_id_for_user(user, course_id, save=True):
     # cached, stored in the DB, or retrieved from the DB. This will help inform
     # us on decisions about whether we can move to always save IDs,
     # pregenerate them, use random instead of deterministic IDs, etc.
-    monitoring.increment('temp_anonymous_user_id.requested')
+    monitoring.increment('temp_anon_uid_v1.requested')
 
     cached_id = getattr(user, '_anonymous_id', {}).get(course_id)
     if cached_id is not None:
-        monitoring.increment('temp_anonymous_user_id.returned_from_cache')
+        monitoring.increment('temp_anon_uid_v1.returned_from_cache')
         return cached_id
 
     # include the secret key as a salt, and to make the ids unique across different LMS installs.
@@ -268,20 +269,23 @@ def deprecated_anonymous_id_for_user(user, course_id, save=True):
     user._anonymous_id[course_id] = digest  # pylint: disable=protected-access
 
     if save is False:
-        monitoring.increment('temp_anonymous_user_id.computed_unsaved')
+        monitoring.increment('temp_anon_uid_v1.computed_unsaved')
         return digest
 
     try:
-        AnonymousUserId.objects.get_or_create(
+        _, created = AnonymousUserId.objects.get_or_create(
             user=user,
             course_id=course_id,
             anonymous_user_id=digest,
         )
-        monitoring.increment('temp_anonymous_user_id.computed_stored')
+        if created:
+            monitoring.increment('temp_anon_uid_v1.stored')
+        else:
+            monitoring.increment('temp_anon_uid_v1.computed_existing')
     except IntegrityError:
         # Another thread has already created this entry, so
         # continue
-        monitoring.increment('temp_anonymous_user_id.computed_already_present')
+        monitoring.increment('temp_anon_uid_v1.store_db_error')
 
     return digest
 
