@@ -22,20 +22,20 @@ from markupsafe import escape
 from mock import Mock, patch
 
 from ..models import BulkEmailFlag, Optout
-from lms.djangoapps.bulk_email.tasks import _get_course_email_context, _get_source_address
-from common.djangoapps.course_modes.models import CourseMode
+from lms.djangoapps.bulk_email.tasks import _get_course_email_context, _get_source_address  # lint-amnesty, pylint: disable=wrong-import-order
+from common.djangoapps.course_modes.models import CourseMode  # lint-amnesty, pylint: disable=wrong-import-order
 
-from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory
-from lms.djangoapps.instructor_task.subtasks import update_subtask_status
-from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
-from openedx.core.djangoapps.course_groups.models import CourseCohort
-from openedx.core.djangoapps.enrollments.api import update_enrollment
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.roles import CourseStaffRole
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from lms.djangoapps.instructor_task.subtasks import update_subtask_status  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.djangoapps.course_groups.models import CourseCohort  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.djangoapps.enrollments.api import update_enrollment  # lint-amnesty, pylint: disable=wrong-import-order
+from common.djangoapps.student.models import CourseEnrollment  # lint-amnesty, pylint: disable=wrong-import-order
+from common.djangoapps.student.roles import CourseStaffRole  # lint-amnesty, pylint: disable=wrong-import-order
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 STAFF_COUNT = 3
 STUDENT_COUNT = 10
@@ -113,7 +113,7 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         )
 
     def setUp(self):
-        super(EmailSendFromDashboardTestCase, self).setUp()
+        super(EmailSendFromDashboardTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
         self.create_staff_and_instructor()
         self.create_students()
@@ -134,7 +134,7 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         }
 
     def tearDown(self):
-        super(EmailSendFromDashboardTestCase, self).tearDown()
+        super(EmailSendFromDashboardTestCase, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         BulkEmailFlag.objects.all().delete()
 
 
@@ -229,7 +229,7 @@ class LocalizedFromAddressCourseLangTestCase(SendEmailWithMockedUgettextMixin, E
         self.assertRegex(message.from_email, 'AR .* Course Staff')
 
 
-@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))  # lint-amnesty, pylint: disable=line-too-long
 class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase):
     """
     Tests email sending with mocked html_to_text.
@@ -249,7 +249,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         # We should get back a HttpResponseForbidden (status code 403)
         self.assertContains(response, "Email is not enabled for this course.", status_code=403)
 
-    @patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+    @patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))  # lint-amnesty, pylint: disable=line-too-long
     def test_send_to_self(self):
         """
         Make sure email send to myself goes to myself.

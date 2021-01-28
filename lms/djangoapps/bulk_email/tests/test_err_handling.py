@@ -38,11 +38,11 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 class EmailTestException(Exception):
     """Mock exception for email testing."""
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 @ddt.ddt
-@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))  # lint-amnesty, pylint: disable=line-too-long
 class TestEmailErrors(ModuleStoreTestCase):
     """
     Test that errors from sending email are handled properly.
@@ -51,7 +51,7 @@ class TestEmailErrors(ModuleStoreTestCase):
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     def setUp(self):
-        super(TestEmailErrors, self).setUp()
+        super(TestEmailErrors, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
         self.course = CourseFactory.create(display_name=course_title)
         self.instructor = AdminFactory.create()

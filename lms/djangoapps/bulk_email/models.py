@@ -7,11 +7,11 @@ import logging
 
 import markupsafe
 import six
-from config_models.models import ConfigurationModel
-from django.contrib.auth.models import User
+from config_models.models import ConfigurationModel  # lint-amnesty, pylint: disable=import-error
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
-from opaque_keys.edx.django.models import CourseKeyField
+from opaque_keys.edx.django.models import CourseKeyField  # lint-amnesty, pylint: disable=import-error
 from six import text_type
 from six.moves import zip
 
@@ -89,7 +89,7 @@ class Target(models.Model):
         Returns a short display name
         """
         if self.target_type == SEND_TO_COHORT:
-            return self.cohorttarget.short_display()
+            return self.cohorttarget.short_display()  # lint-amnesty, pylint: disable=no-member
         elif self.target_type == SEND_TO_TRACK:
             return self.coursemodetarget.short_display()
         else:
@@ -100,7 +100,7 @@ class Target(models.Model):
         Returns a long display name
         """
         if self.target_type == SEND_TO_COHORT:
-            return self.cohorttarget.long_display()
+            return self.cohorttarget.long_display()  # lint-amnesty, pylint: disable=no-member
         elif self.target_type == SEND_TO_TRACK:
             return self.coursemodetarget.long_display()
         else:
@@ -133,7 +133,7 @@ class Target(models.Model):
                 enrollment_qset.exclude(id__in=staff_instructor_qset)
             )
         elif self.target_type == SEND_TO_COHORT:
-            return self.cohorttarget.cohort.users.filter(id__in=enrollment_qset)
+            return self.cohorttarget.cohort.users.filter(id__in=enrollment_qset)  # lint-amnesty, pylint: disable=no-member
         elif self.target_type == SEND_TO_TRACK:
             return use_read_replica_if_available(
                 User.objects.filter(
@@ -159,7 +159,7 @@ class CohortTarget(Target):
 
     def __init__(self, *args, **kwargs):
         kwargs['target_type'] = SEND_TO_COHORT
-        super(CohortTarget, self).__init__(*args, **kwargs)
+        super(CohortTarget, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def __str__(self):
         return self.short_display()
@@ -182,7 +182,7 @@ class CohortTarget(Target):
         try:
             cohort = get_cohort_by_name(name=cohort_name, course_key=course_id)
         except CourseUserGroup.DoesNotExist:
-            raise ValueError(
+            raise ValueError(  # lint-amnesty, pylint: disable=raise-missing-from
                 u"Cohort {cohort} does not exist in course {course_id}".format(
                     cohort=cohort_name,
                     course_id=course_id
@@ -205,7 +205,7 @@ class CourseModeTarget(Target):
 
     def __init__(self, *args, **kwargs):
         kwargs['target_type'] = SEND_TO_TRACK
-        super(CourseModeTarget, self).__init__(*args, **kwargs)
+        super(CourseModeTarget, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def __str__(self):
         return self.short_display()
@@ -231,7 +231,7 @@ class CourseModeTarget(Target):
         try:
             validate_course_mode(six.text_type(course_id), mode_slug, include_expired=True)
         except CourseModeNotFoundError:
-            raise ValueError(
+            raise ValueError(  # lint-amnesty, pylint: disable=raise-missing-from
                 u"Track {track} does not exist in course {course_id}".format(
                     track=mode_slug,
                     course_id=course_id
@@ -275,7 +275,7 @@ class CourseEmail(Email):
             # split target, to handle cohort:cohort_name and track:mode_slug
             target_split = target.split(':', 1)
             # Ensure our desired target exists
-            if target_split[0] not in EMAIL_TARGETS:
+            if target_split[0] not in EMAIL_TARGETS:  # lint-amnesty, pylint: disable=no-else-raise
                 fmt = u'Course email being sent to unrecognized target: "{target}" for "{course}", subject "{subject}"'
                 msg = fmt.format(target=target, course=course_id, subject=subject).encode('utf8')
                 raise ValueError(msg)

@@ -18,14 +18,14 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))  # lint-amnesty, pylint: disable=line-too-long
 class TestOptoutCourseEmailsBySignal(ModuleStoreTestCase):
     """
     Tests that the force_optout_all signal receiver opts the user out of course emails
     """
 
     def setUp(self):
-        super(TestOptoutCourseEmailsBySignal, self).setUp()
+        super(TestOptoutCourseEmailsBySignal, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(run='testcourse1', display_name="Test Course Title")
         self.instructor = AdminFactory.create()
         self.student = UserFactory.create()

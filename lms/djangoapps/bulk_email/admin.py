@@ -7,7 +7,7 @@ from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin
 
 from lms.djangoapps.bulk_email.forms import CourseAuthorizationAdminForm, CourseEmailTemplateForm
-from lms.djangoapps.bulk_email.models import BulkEmailFlag, CourseAuthorization, CourseEmail, CourseEmailTemplate, Optout
+from lms.djangoapps.bulk_email.models import BulkEmailFlag, CourseAuthorization, CourseEmail, CourseEmailTemplate, Optout  # lint-amnesty, pylint: disable=line-too-long
 
 
 class CourseEmailAdmin(admin.ModelAdmin):
