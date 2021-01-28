@@ -21,7 +21,7 @@ REFERENCE_PARAMS = {
     "validation_secret_key": "baseline_key",
     "generation_xblock_handler_token_keys": None,
     "validation_xblock_handler_token_keys": None,
-    "reference_time": datetime.datetime(2021, 1, 28, 13, 26, 38, 787309),
+    "reference_time": datetime.datetime(2021, 1, 28, 13, 26, 38, 787309, tzinfo=datetime.timezone.utc),
     "validation_time_delta_s": 0,
 }
 
@@ -34,13 +34,29 @@ REFERENCE_PARAMS = {
         ({"validation_time_delta_s": 3600}, True),
         # Ensure token still valid in 1 day, this should be true but isn't due
         # to the bug that will be fixed in ARCHBOM-1677
-        ({"validation_time_delta_s": 86400}, False),
+        ({"validation_time_delta_s": 86400}, True),
         # Ensure token is invalid after 5 days
         ({"validation_time_delta_s": 86400 * 5}, False),
         # Ensure token is not valid 5 days before generation
         # In the case where the validating server is really skewed
         # from the generating server.
         ({"validation_time_delta_s": 86400 * -5}, False),
+        # Setting reference_time to 20 seconds after start of a 2 day time period(UTC)
+        # Demonstrating maximum possible validity period is just below 4 days
+        # This passes because validation time is just below the cutoff point
+        ({"reference_time": datetime.datetime(2021, 1, 27, 0, 0, 20, tzinfo=datetime.timezone.utc), "validation_time_delta_s":86400*4-21}, True),
+        # Setting reference_time to 20 seconds after start of a 2 day time period(UTC)
+        # Demonstrating maximum possible validity period is just below 4 days
+        # This does not pass because validation time is just above the cutoff point
+        ({"reference_time": datetime.datetime(2021, 1, 27, 0, 0, 20, tzinfo=datetime.timezone.utc), "validation_time_delta_s":86400*4-19}, False),
+        # Setting reference_time to 20 seconds before end of a 2 day time period(UTC)
+        # Demonstrating minimum possible validity period is just above 2 days
+        # This passes because validation time is just below the cutoff point
+        ({"reference_time": datetime.datetime(2021, 1, 28, 23, 59, 40, tzinfo=datetime.timezone.utc), "validation_time_delta_s":86400*2+19}, True),
+         # Setting reference_time to 20 seconds before end of a 2 day time period(UTC)
+        # Demonstrating minimum possible validity period is just above 2 days
+        # This fails because validation time is just above the cutoff point
+        ({"reference_time": datetime.datetime(2021, 1, 28, 23, 59, 40, tzinfo=datetime.timezone.utc), "validation_time_delta_s":86400*2+21}, False),
         # Different user tries to use your token.
         ({"validation_user_id": 54321}, False),
         # Access a different block.
